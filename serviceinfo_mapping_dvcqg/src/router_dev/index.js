@@ -3,10 +3,15 @@ import Router from 'vue-router'
 import NotFound from '@/components/NotFound'
 import LandingDvc from '@/components/screens/Landing'
 import LandingDM from '@/components/screens/LandingDM'
+import LandingMappingTTHC from '@/components/screens/LandingMappingTTHC'
+import LandingDongBoTTHC from '@/components/screens/LandingDongBoTTHC'
 import DetailForward from '@/components/blacklist/DetailForward'
 const routes = [
   { path: '/dong-bo-danh-muc1/:index', name: 'LandingDvc', component: LandingDvc, props: true },
   { path: '/dong-bo-danh-muc2/:index', name: 'LandingDM', component: LandingDM, props: true },
+  { path: '/mapping-tthc', name: 'LandingMappingTTHC', component: LandingMappingTTHC, props: true },
+  { path: '/mapping-tthc', name: 'LandingMappingTTHC', component: LandingMappingTTHC, props: true },
+  { path: '/dongbo-tthc', name: 'LandingDongBoTTHC', component: LandingDongBoTTHC, props: true },
   {
     path: '/danh-sach-ho-so/:index',
     name: 'Landing',

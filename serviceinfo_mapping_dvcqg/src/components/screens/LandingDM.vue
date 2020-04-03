@@ -118,6 +118,9 @@
                     </v-tooltip>
                     <span class="text-bold" :style="itemAgency.mapped ? 'margin-left: 50px' : 'margin-left: 24px'">{{itemAgency.itemCodeDVCQG}}</span> - <span>{{itemAgency.itemNameDVCQG}}</span>
                   </div>
+                  <div class="mb-2" style="position: relative;">
+                    <v-btn small outline color="primary" @click="openDialogMapping(props.item)">Tìm kiếm</v-btn>
+                  </div>
                 </div>
               </td>
             </tr>
@@ -144,7 +147,7 @@
         </div>
       </div>
       <v-layout wrap align-center class="white py-2">
-        <v-flex class="xs12 sm6 px-2">
+        <v-flex class="xs12 sm3 px-2">
           <v-autocomplete
             class="select-border"
             :items="listLoaiHoiDap"
@@ -153,6 +156,20 @@
             item-value="value"
             :hide-selected="true"
             @change="changeLoaiHoiDap"
+            box
+            :readonly="loading"
+            clearable
+          ></v-autocomplete>
+        </v-flex>
+        <v-flex class="xs12 sm3 px-2">
+          <v-autocomplete
+            class="select-border"
+            label="Trạng thái"
+            :items="listTrangThai"
+            v-model="trangThaiSelected"
+            item-text="text"
+            item-value="value"
+            :hide-selected="true"
             box
             :readonly="loading"
             clearable
@@ -168,7 +185,7 @@
       <div v-else class="service__info__table">
         <v-data-table
           :headers="headersCauHoi"
-          :items="listCauHoi"
+          :items="listCauHoiView"
           class="table-landing table-bordered"
           :rows-per-page-items="rowsPerPageItems"
           :pagination.sync="pagination"
@@ -191,22 +208,22 @@
                   <span class="text-bold">{{props.item.NOIDUNG}}</span>
                 </div>
               </td>
-              <td class="text-xs-left">
+              <td class="text-xs-left" style="width: 84px;">
                 <content-placeholders v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
-                    <v-icon  color="green darken-2">done</v-icon>
+                    <span v-if="props.item.SYNC"> Đã đồng bộ</span>
                 </div>
               </td>
 
-              <td class="text-xs-left" style="width:133px;">
+              <td class="text-xs-left" style="width:153px;">
                 <content-placeholders v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
                   <v-layout wrap align-center>
-                    <v-flex xs8><v-btn small color="primary" @click="syncSharingqa(props.item)">Đồng bộ</v-btn></v-flex>
+                    <v-flex xs8><v-btn small color="primary" @click="syncSharingqa(props.item)">{{ props.item.SYNC ? 'Đồng bộ lại' : 'Đồng bộ'}}</v-btn></v-flex>
                     <v-flex xs4><v-icon style="font-size:23px;cursor: pointer;" color="primary" @click="viewDetailCauHoi(props.item)">visibility</v-icon></v-flex>
                   </v-layout>
                 
@@ -228,7 +245,7 @@
         </div> -->
       </div>
     </div>
-    <!-- Chi tiết câu hỏi -->
+    <!-- Dialog Chi tiết câu hỏi -->
     <v-dialog v-model="dialogChiTietCauHoi" persistent max-width="600px">
         <v-card>
           <v-card-title>
@@ -238,7 +255,7 @@
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field label="Mã lĩnh vực" readonly v-model="chiTietCauHoi.MALINHVUC"></v-text-field>
+                  <v-text-field label="Mã" readonly v-model="chiTietCauHoi.MALINHVUC"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
                   <v-text-field label="Mã đơn vị" readonly v-model="chiTietCauHoi.MADONVI"></v-text-field>
@@ -270,7 +287,61 @@
             <v-btn color="blue darken-1" flat @click="dialogChiTietCauHoi = false">Đóng</v-btn>
           </v-card-actions>
         </v-card>
-      </v-dialog>
+    </v-dialog>
+    <!-- Popup danh sách mapping thêm -->
+    <v-dialog v-model="dialogMapping" persistent max-width="600px">
+        <v-card style="background: #fff;">
+          <v-card-title>
+            <span class="headline">Chọn để mapping</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container grid-list-md>
+              <v-layout>
+                <v-flex xs12>
+                  <v-text-field
+                    label="Tìm kiếm theo tên"
+                    v-model="nameDVCQGModel"
+                  ></v-text-field>
+                </v-flex>
+              </v-layout>
+              <div v-if="listMappingView.length>0" style="height: 437px;">
+                <content-placeholders v-if="loadingMapping">
+                      <content-placeholders-text :lines="5" />
+                </content-placeholders>
+                <v-layout v-else align-center style="border-bottom: 0.5px dashed" wrap v-for="(item, index) in listMappingView" :key="index">
+                  <v-flex xs9 class="pa-0">
+                    <span style="font-weight: bold">{{item.itemNameDVCQG}}</span>
+                  </v-flex>
+                  <v-flex xs3 class="text-right pa-0">
+                    <v-btn small color="primary" @click="mappingAgencyDVCQG(item)">Chọn</v-btn>
+                  </v-flex>
+                </v-layout>
+              </div>
+              <div v-else style="height: 437px;">
+                <v-layout>
+                  <v-flex xs12><span>Không tìm thấy dữ liệu</span></v-flex>
+                </v-layout>
+              </div>
+              <v-layout>
+                <v-flex xs12>
+                  <div class="text-xs-right layout wrap " style="position: relative;">
+                    <div class="flex pagging-table "> 
+                      <tiny-pagination :total="listMapping.length" :page="pageMapping" custom-class="custom-tiny-class" 
+                        @tiny:change-page="paggingDataMapping" ></tiny-pagination> 
+                    </div>
+                  </div>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-card-text>
+          <v-spacer></v-spacer>
+          <v-layout>
+            <v-flex xs12 class="text-right">
+            <v-btn color="blue darken-1" flat @click="dialogMapping = false">Đóng</v-btn>
+            </v-flex>
+          </v-layout>
+        </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -288,6 +359,10 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    nameDVCQGModel: '',
+    listMapping: [],
+    listMappingView: [],
+    dialogMapping: false,
     dialogChiTietCauHoi: false,
     loadingSyncSharingqa: false,
     dialog_createDossier: false,
@@ -297,10 +372,13 @@ export default {
     userName: '',
     passWord: '',
     loadingSync: false,
+    loadingMapping: false,
     serviceInfoList: [],
     listCauHoi: [],
+    listCauHoiView: [],
     totalThuTuc: 0,
     thutucPage: 1,
+    pageMapping: 1,
     govAgencyList: [],
     govAgencySelected: '',
     govAgencyThucHienSelected: {},
@@ -329,6 +407,8 @@ export default {
         sortable: false
       }
     ],
+    listTrangThai: [{text: 'Đã đồng bộ', value: 1},{text: 'Chưa đồng bộ', value: 2}],
+    trangThaiSelected: '',
     listCoQuan: [],
     headersCauHoi: [
       {
@@ -344,7 +424,7 @@ export default {
       {
         text: 'Trạng thái',
         align: 'center',
-        sortable: false
+        sortable: false,
       },
       {
         text: 'Thao tác',
@@ -352,7 +432,7 @@ export default {
         sortable: false
       }
     ],
-    listLoaiHoiDap: [{text: 'Bộ cơ quan', value: 'LayDanhSachHoiDapBoCoQuan'},{text: 'Dịch vụ công quốc gia', value: 'LayDanhSachHoiDapGuiTuDVCQG'}],
+    listLoaiHoiDap: [{text: 'Danh sách câu hỏi được biên soạn bởi Bộ, cơ quan', value: 'LayDanhSachHoiDapBoCoQuan'},{text: 'Danh sách câu hỏi được gửi từ cổng DVC QG', value: 'LayDanhSachHoiDapGuiTuDVCQG'}],
     loaiHoiDapySelected: '',
     isLogin: false,
     verificationApplicantCreateDossier: false,
@@ -365,7 +445,8 @@ export default {
     pagination: {
         rowsPerPage: 20
     },
-    chiTietCauHoi: {}
+    chiTietCauHoi: {},
+    coQuanSelect: {}
   }),
   computed: {
 
@@ -376,28 +457,21 @@ export default {
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
-      vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') && currentQuery.keyword ? currentQuery.keyword : ''
-      vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      vm.loaiHoiDapySelected =  currentQuery.hasOwnProperty('service') ? currentQuery.service : ''
-      vm.$store.dispatch('getGovAgency').then(function (result) {
-        vm.govAgencyList = result
-        // vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyList[0]['administrationCode']
-        let filterDomain = {
-          agencyCode: ''
+      let newQuery = current.query
+      vm.loaiHoiDapySelected =  currentQuery.hasOwnProperty('service') ? currentQuery.service : 'LayDanhSachHoiDapBoCoQuan'
+      let queryString = '?'
+      newQuery['service'] = currentQuery.hasOwnProperty('service') ? currentQuery.service : 'LayDanhSachHoiDapBoCoQuan'
+      for (let key in newQuery) {
+        if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+          queryString += key + '=' + newQuery[key] + '&'
         }
-        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.domainListCurrent = result
-          if (!currentQuery.hasOwnProperty('agency') && !vm.govAgencySelected) {
-            vm.domainList = result
-          }
-        })
-      }).catch(function(){
-      })
-      if (vm.index.toString() === '0') {
-        vm.doLoadingAgency()
-      } else {
-        vm.doLoadingCauHoi()
       }
+      vm.$router.push({
+        path: current.path + queryString,
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
     })
   },
   watch: {
@@ -405,35 +479,34 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
-      if ((currentQuery.hasOwnProperty('agency') && currentQuery['agency'])) {
-        let filterDomain = {
-          agencyCode: currentQuery['agency'] ? currentQuery['agency'] : ''
-        }
-        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.domainListCurrent = result
-        })
-      } else {
-        console.log('125555123', vm.domainList)
-        if (!vm.domainList || vm.domainList.length === 0) {
-          let filterDomain = {
-            agencyCode: ''
-          }
-          vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-            vm.domainList = result
-            vm.domainListCurrent = vm.domainList
-          })
-        } else {
-          vm.domainListCurrent = vm.domainList
-        }
-      }
-      vm.govAgencySelected = vm.domainSelected = vm.serviceNameKey = ''
-      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : ''
-      vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       if (vm.index.toString() === '0') {
         vm.doLoadingAgency()
       } else {
         vm.doLoadingCauHoi()
+      }
+    },
+    nameDVCQGModel (val) {
+      let vm = this
+      vm.pageMapping = 1
+      vm.loadingMapping = true
+      if(val){
+        vm.listMappingView = vm.listMapping.filter(e => e.itemNameDVCQG.search(val) >= 0 ).slice(0, 10)
+        vm.loadingMapping = false
+      } else{
+        vm.listMappingView = vm.listMapping.slice(0, 10)
+        vm.loadingMapping = false
+      }
+    },
+    trangThaiSelected (val) {
+      let vm = this
+      if(val){
+        if(val === 1) {
+          vm.listCauHoiView = vm.listCauHoi.filter(e => e.SYNC === true )
+        } else{
+          vm.listCauHoiView = vm.listCauHoi.filter(e => e.SYNC === false )
+        }
+      } else{
+        vm.listCauHoiView = vm.listCauHoi
       }
     }
   },
@@ -498,6 +571,7 @@ export default {
         newQuery['page'] = 1
         newQuery['domain'] = vm.domainSelected
         newQuery['keyword'] = ''
+        vm.trangThaiSelected = ''
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -557,6 +631,7 @@ export default {
       let vm = this
       let currentQuery = vm.$router.history.current.query
       vm.listCauHoi = []
+      vm.listCauHoiView = []
       vm.loading = true
       let filter = null
       filter = {
@@ -565,13 +640,25 @@ export default {
       vm.$store.dispatch('getSharingqa', filter).then(function (result) {
         vm.loading = false
         if (result.result) {
-          vm.listCauHoi = result.result  
+          vm.listCauHoi = result.result
+          
+          if(vm.trangThaiSelected){
+            if(vm.trangThaiSelected === 1) {
+              vm.listCauHoiView = vm.listCauHoi.filter(e=>e.SYNC ===true)
+            } else {
+              vm.listCauHoiView = vm.listCauHoi.filter(e=>e.SYNC ===false)
+            }
+          }else{
+            vm.listCauHoiView = vm.listCauHoi
+          }
         } else {
           vm.listCauHoi = []
+           vm.listCauHoiView = vm.listCauHoi
         }
       }).catch(reject => {
         vm.loading = false
         vm.listCauHoi = []
+        vm.listCauHoiView = vm.listCauHoi
       })
     },
     mappingAgency (item, indexDvc, itemDvcqg, indexDvcqg) {
@@ -596,6 +683,7 @@ export default {
         vm.$store.dispatch('mappingServiceAgency', filter).then(function (result) {
           if(result){
             toastr.success('Mapping cơ quan thành công')
+            vm.doLoadingAgency()
           } else {
              toastr.error('Mapping cơ quan thất bại')
           }
@@ -609,9 +697,10 @@ export default {
           dictItemMappingId: itemRemoveBefore.dictItemMappingId ? itemRemoveBefore.dictItemMappingId : ''
         }
         console.log('itemRemoveBefore', itemRemoveBefore, filter2)
-        vm.$store.dispatch('removeMappingServiceAgency', filter2).then(function (result) {
+        vm.$store.dispatch('removeMaappingServiceAgency', filter2).then(function (result) {
           vm.$store.dispatch('mappingServiceAgency', filter).then(function (result) {
             if (result) {
+              vm.doLoadingAgency()
               toastr.success('Mapping cơ quan thành công')
             } else {
               toastr.error('Mapping cơ quan thất bại')
@@ -643,9 +732,15 @@ export default {
       vm.loadingSyncSharingqa = true
       item = item ? item : {}
       vm.$store.dispatch('syncSharingqa', item).then(function (result) {
-        toastr.success('Đồng bộ thành công')
-        vm.loadingSyncSharingqa = false
-        vm.doLoadingCauHoi()
+        if(result.data.length){
+          toastr.success('Đồng bộ thành công')
+          vm.loadingSyncSharingqa = false
+          vm.doLoadingCauHoi()
+        } else{
+          vm.loadingSyncSharingqa = false
+          toastr.error('Đồng bộ thất bại')
+        }
+
       }).catch(function() {
         vm.loadingSyncSharingqa = false
         toastr.error('Đồng bộ thất bại')
@@ -658,7 +753,7 @@ export default {
       }
       vm.$store.dispatch('removeMappingServiceAgency', filter).then(function (result) {
         toastr.success('Hủy đồng bộ thành công')
-        vm.doActionMappingAgency()
+        vm.doLoadingAgency()
         vm.loadingSync = false
       }).catch(function() {
         toastr.error('Hủy đồng bộ thất bại')
@@ -718,6 +813,12 @@ export default {
         path: current.path + queryString
       })
     },
+    paggingDataMapping (config) {
+      let vm = this
+      let start = config.page * 10 - 10
+      let end = config.page * 10
+      vm.listMappingView = vm.listMapping.slice(start, end)
+    },
     getColor (level) {
       if (level === 2) {
         return 'green'
@@ -731,6 +832,45 @@ export default {
       let vm = this
       vm.chiTietCauHoi = item
       vm.dialogChiTietCauHoi = true
+    },
+    openDialogMapping (item) {
+      let vm = this
+      vm.coQuanSelect = item
+      vm.dialogMapping = true
+      let filter = {
+         service: 'LayDanhMucCoQuan'
+      }
+      vm.loadingMapping = true
+      vm.$store.dispatch('getServiceAgencyDVCQG', filter).then(function (result) {
+        vm.pageMapping = 1
+        vm.listMapping = result.data
+        vm.listMappingView = vm.listMapping.slice(0, 10)
+        vm.loadingMapping = false
+      }).catch(function() {
+        vm.listMapping = []
+        vm.listMappingView = []
+        vm.loadingMapping = false
+      })
+    },
+    mappingAgencyDVCQG (item) {
+      let vm = this
+      let filter = {
+        itemCode: vm.coQuanSelect.itemCode,
+        itemCodeDVCQG: item.itemCodeDVCQG
+      }
+      vm.$store.dispatch('mappingServiceAgency', filter).then(function (result) {
+        if(result){
+          vm.dialogMapping =  false
+          toastr.success('Mapping thành công')
+          vm.doLoadingAgency()
+        } else {
+            toastr.error('Mapping thất bại')
+        }
+        vm.loadingSync = false
+      }).catch(function() {
+        toastr.error('Mapping thất bại')
+        vm.loadingSync = false
+      })
     }
   }
 }

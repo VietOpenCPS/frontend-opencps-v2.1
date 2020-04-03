@@ -157,11 +157,49 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getServiceDomainDVCQG ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/rest/v2/dictcollections/SERVICE_DOMAIN/dictitems/dvcqg',
+            method: 'get',
+            params: filter,
+            headers: {groupId: state.initData.groupId},
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     getServiceAgency ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let config = {
             url: 'o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems/mappingsuggest',
+            method: 'get',
+            params: filter,
+            headers: {groupId: state.initData.groupId},
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getServiceAgencyDVCQG ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems/dvcqg',
             method: 'get',
             params: filter,
             headers: {groupId: state.initData.groupId},
@@ -230,6 +268,30 @@ export const store = new Vuex.Store({
           let dataPost = new URLSearchParams()
           dataPost.append('serviceCode', filter.serviceCode)
           dataPost.append('serviceCodeDVCQG', filter.serviceCodeDVCQG)
+          axios.post('/o/rest/v2/nps/mappingserviceinfo', dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    mappingTTHC({commit, state}, filter){
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('serviceCode', filter.serviceCode)
+          dataPost.append('serviceCodeDVCQG', filter.serviceCodeDVCQG)
+          dataPost.append('serviceNameDVCQG', filter.serviceNameDVCQG)
           axios.post('/o/rest/v2/nps/mappingserviceinfo', dataPost, param).then(function (result) {
             if (result.data) {
               resolve(result.data)
@@ -322,6 +384,26 @@ export const store = new Vuex.Store({
             }
           }
           axios.delete('/o/rest/v2/nps/removemappingserviceinfo/' + filter.serviceInfoId, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    removeMappingTTHC ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.delete('/o/rest/v2/nps/removemappingserviceinfo/' + filter.mappingClassPK, param).then(function (result) {
             if (result.data) {
               resolve(result.data)
             } else {
@@ -457,6 +539,27 @@ export const store = new Vuex.Store({
         })
       })
     },
+    syncServiceinfoAll ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          axios.post('/o/rest/v2/nps/syncserviceinfo', dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
     syncServiceinfoCongDvc ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -510,7 +613,84 @@ export const store = new Vuex.Store({
         })
       }) 
     },
-    syncDomain ({commit, state}, filter) {
+    getTTHCDonVi ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/rest/v2/serviceinfos',
+            method: 'get',
+            params: filter,
+            headers: {groupId: state.initData.groupId},
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+          // resolve({
+          //   total: 10,
+          //   data: [
+          //     {
+          //       serviceCode: 'B-BGT-284959-TT',
+          //       serviceName: "Cấp lại Giấy phép lái tàu",
+          //       serviceCodeDVCQG: "1.003897",
+          //       serviceNameDVCQG: "Cấp lại Giấy phép lái tàu"
+          //     },
+          //     {
+          //       serviceCode: 'B-BGT-284959-TT',
+          //       erviceName: "Cấp lại Giấy phép lái tàu",
+          //       serviceCodeDVCQG: "",
+          //       serviceNameDVCQG: ""
+          //     },
+          //     {
+          //       serviceCode: 'B-BGT-284959-TT',
+          //       erviceName: "Cấp lại Giấy phép lái tàu",
+          //     },
+          //   ]
+          // })
+        })
+      })
+    },
+    getTTHCDVCQG ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/rest/v2/nps/serviceinfodvcqg',
+            method: 'get',
+            params: filter,
+            headers: {groupId: state.initData.groupId},
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getChiTietTTDVCQG ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/rest/v2/nps/serviceinfodvcqg/' + filter.serviceCodeDVCQG,
+            method: 'get',
+            headers: {groupId: state.initData.groupId},
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    addTTHC ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -518,57 +698,21 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          if(filter) {
-            axios.post('/o/rest/v2/nps/syncsharingqa',filter,param).then(function (response) {
-              let serializable = response.data
-              resolve(serializable)
-            }).catch(function (error) {
-              console.log(error)
-              reject(error)
-            })
-          } else {
-            axios.post('/o/rest/v2/nps/syncsharingqa',filter,param).then(function (response) {
-              let serializable = response.data
-              resolve(serializable)
-            }).catch(function (error) {
-              console.log(error)
-              reject(error)
-            })           
-          }
-
-        })
-      }) 
-    },
-    syncAgency ({commit, state}, filter) {
-      return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId
+          let dataPost = new URLSearchParams()
+          dataPost.append('serviceCodes', "")
+          dataPost.append('type', "create")
+          axios.post('/o/rest/v2/nps/syncserviceinfo', dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
             }
-          }
-          if(filter) {
-            axios.post('/o/rest/v2/nps/syncsharingqa',filter,param).then(function (response) {
-              let serializable = response.data
-              resolve(serializable)
-            }).catch(function (error) {
-              console.log(error)
-              reject(error)
-            })
-          } else {
-            axios.post('/o/rest/v2/nps/syncsharingqa',filter,param).then(function (response) {
-              let serializable = response.data
-              resolve(serializable)
-            }).catch(function (error) {
-              console.log(error)
-              reject(error)
-            })           
-          }
-
+          }).catch(xhr => {
+            reject(xhr)
+          })
         })
-      }) 
-    },
-  
+      })
+    }
   },
   mutations: {
     setLoading (state, payload) {

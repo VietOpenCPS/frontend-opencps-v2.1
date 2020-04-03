@@ -259,6 +259,9 @@
                     </v-tooltip>
                     <span class="text-bold" :style="itemDomain.mapped ? 'margin-left: 50px' : 'margin-left: 24px'">{{itemDomain.itemCodeDVCQG}}</span> - <span>{{itemDomain.itemNameDVCQG}}</span>
                   </div>
+                  <div class="mb-2" style="position: relative;">
+                    <v-btn small outline color="primary" @click="openDialogMapping(props.item)">Tìm kiếm</v-btn>
+                  </div>
                 </div>
               </td>
             </tr>
@@ -277,6 +280,61 @@
         </div> -->
       </div>
     </div>
+    <!-- Popup danh sách mapping thêm -->
+    <v-dialog v-model="dialogMapping" persistent max-width="600px">
+        <v-card style="background: #fff;">
+          <v-card-title>
+            <span class="headline">Chọn để mapping</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container grid-list-md>
+              <v-layout>
+                <v-flex xs12>
+                  <v-text-field
+                    label="Tìm kiếm theo tên"
+                    v-model="nameDVCQGModel"
+                  ></v-text-field>
+                </v-flex>
+              </v-layout>
+            
+              <div v-if="listMappingView.length>0"  style="height: 437px;">
+                <content-placeholders v-if="loadingMapping">
+                      <content-placeholders-text :lines="5" />
+                </content-placeholders>
+                <v-layout v-else align-center style="border-bottom: 0.5px dashed" wrap v-for="(item, index) in listMappingView" :key="index">
+                  <v-flex xs9 class="pa-0">
+                    <span style="font-weight: bold">{{item.itemNameDVCQG}}</span>
+                  </v-flex>
+                  <v-flex xs3  class="text-right pa-0">
+                    <v-btn small color="primary" @click="mappingDomainDVCQG(item)">Chọn</v-btn>
+                  </v-flex>
+                </v-layout>
+              </div>
+              <div v-else style="height: 437px;">
+                <v-layout>
+                  <v-flex xs12><span>Không tìm thấy dữ liệu</span></v-flex>
+                </v-layout>
+              </div>
+              <v-layout>
+                <v-flex xs12>
+                  <div class="text-xs-right layout wrap" style="position: relative;">
+                    <div class="flex pagging-table"> 
+                      <tiny-pagination :total="listMapping.length" :page="pageMapping" custom-class="custom-tiny-class" 
+                        @tiny:change-page="paggingDataMapping" ></tiny-pagination> 
+                    </div>
+                  </div>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-card-text>
+          <v-spacer></v-spacer>
+          <v-layout>
+            <v-flex xs12 class="text-right">
+            <v-btn color="blue darken-1" flat @click="dialogMapping = false">Đóng</v-btn>
+            </v-flex>
+          </v-layout>
+        </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -294,6 +352,10 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    nameDVCQGModel: '',
+    listMapping: [],
+    listMappingView: [],
+    dialogMapping: false,
     dialog_createDossier: false,
     dialogVerifycation: false,
     dialogLogin: false,
@@ -301,10 +363,12 @@ export default {
     userName: '',
     passWord: '',
     loadingSync: false,
+    loadingMapping: false,
     serviceInfoList: [],
     listLinhVuc: [],
     totalThuTuc: 0,
     thutucPage: 1,
+    pageMapping: 1,
     govAgencyList: [],
     govAgencySelected: '',
     govAgencyThucHienSelected: {},
@@ -361,6 +425,7 @@ export default {
     pagination: {
         rowsPerPage: 20
     },
+    linhVucSelect: {}
   }),
   computed: {
 
@@ -433,6 +498,15 @@ export default {
         vm.doLoadingThuTuc()
       } else {
         vm.doLoadingServiceDomain()
+      }
+    },
+    nameDVCQGModel (val) {
+      let vm = this
+      vm.pageMapping = 1
+      if(val){
+        vm.listMappingView = vm.listMapping.filter(e => e.itemNameDVCQG.search(val) >= 0 ).slice(0, 10)
+      } else{
+        vm.listMappingView = vm.listMapping.slice(0, 10)
       }
     }
   },
@@ -663,7 +737,9 @@ export default {
         console.log('222222222222222')
         vm.$store.dispatch('mappingServiceDomain', filter).then(function (result) {
           if(result){
+
             toastr.success('Mapping lĩnh vực thành công')
+            vm.doLoadingServiceDomain()
           } else {
              toastr.error('Mapping lĩnh vực thất bại')
           }
@@ -680,6 +756,7 @@ export default {
         vm.$store.dispatch('removeMappingServiceDomain', filter2).then(function (result) {
           vm.$store.dispatch('mappingServiceDomain', filter).then(function (result) {
             if (result) {
+              vm.doLoadingServiceDomain()
               toastr.success('Mapping lĩnh vực thành công')
             } else {
               toastr.error('Mapping lĩnh vực thất bại')
@@ -792,6 +869,12 @@ export default {
         path: current.path + queryString
       })
     },
+    paggingDataMapping (config) {
+      let vm = this
+      let start = config.page * 10 - 10
+      let end = config.page * 10
+      vm.listMappingView = vm.listMapping.slice(start, end)
+    },
     getColor (level) {
       if (level === 2) {
         return 'green'
@@ -800,6 +883,47 @@ export default {
       } else if (level === 4) {
         return 'red'
       }
+    },
+    openDialogMapping (item) {
+      let vm = this
+
+      vm.linhVucSelect = item
+      vm.dialogMapping = true
+      vm.loadingMapping = true
+      let filter = {
+         service: 'LayDanhMucLinhVuc'
+      }
+      
+      vm.$store.dispatch('getServiceDomainDVCQG', filter).then(function (result) {
+        vm.pageMapping = 1
+        vm.listMapping = result.data
+        vm.listMappingView = vm.listMapping.slice(0, 10)
+        vm.loadingMapping = false
+      }).catch(function() {
+        vm.listMapping = []
+        vm.listMappingView = []
+        vm.loadingMapping = false
+      })
+    },
+    mappingDomainDVCQG (item) {
+      let vm = this
+      let filter = {
+        itemCode: vm.linhVucSelect.itemCode,
+        itemCodeDVCQG: item.itemCodeDVCQG
+      }
+      vm.$store.dispatch('mappingServiceDomain', filter).then(function (result) {
+        if(result){
+          vm.dialogMapping =  false
+          toastr.success('Mapping lĩnh vực thành công')
+          vm.doLoadingServiceDomain()
+        } else {
+            toastr.error('Mapping lĩnh vực thất bại')
+        }
+        vm.loadingSync = false
+      }).catch(function() {
+        toastr.error('Mapping lĩnh vực thất bại')
+        vm.loadingSync = false
+      })
     }
   }
 }
