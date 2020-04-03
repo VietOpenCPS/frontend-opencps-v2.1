@@ -170,7 +170,7 @@
         vm.thongTinChungHoSo['editable'] = vm.editable
         if (vm.editable) {
           vm.dueDateInput = vm.thongTinChungHoSo.dueDate ? vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate))) : null
-          vm.maxDate = vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate)))
+          vm.maxDate = vm.thongTinChungHoSo.dueDate ? vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate))) : null
         }
         vm.minDate = vm.getCurentDateTime('date')
       },

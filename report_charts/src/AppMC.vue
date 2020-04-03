@@ -11,7 +11,7 @@
           <span>Thống kê chung</span>
         </v-tooltip>
         <v-tooltip left>
-          <v-btn slot="activator" flat icon color="green" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('bao-cao')">
+          <v-btn slot="activator" flat icon color="green" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('bao-cao-admin')">
             <v-icon size="20">book</v-icon>
           </v-btn>
           <span>Báo cáo tình hình giải quyết</span>

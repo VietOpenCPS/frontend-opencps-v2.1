@@ -720,7 +720,9 @@ export const store = new Vuex.Store({
               groupId: filter.groupId,
               Accept: 'application/json'
             },
-            params: {}
+            params: {
+              serviceCode: filter.serviceCode ? filter.serviceCode : ''
+            }
           }
           for (let key in filter['data']) {
             let currentVal = filter['data'][key]
@@ -759,7 +761,7 @@ export const store = new Vuex.Store({
             },
             params: {
               jobposCode: filter['jobposCode'],
-              employeeName: filter['employeeName']
+              keyword: filter['keyword']
             }
           }
           axios.get('/o/rest/v2/employees', param).then(result => {
@@ -864,7 +866,9 @@ export const store = new Vuex.Store({
               groupId: filter.groupId,
               Accept: 'application/json'
             },
-            params: {}
+            params: {
+              administration: filter.administration ? filter.administration : ''
+            }
           }
           axios.get(filter.api, param).then(function (response) {
             let serializable = response.data
