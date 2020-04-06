@@ -44,9 +44,14 @@
               <v-autocomplete
                 class="select-border"
                 label="Cấp"
+                :items="administrationList"
+                v-model="administrationFilter"
                 :hide-selected="true"
+                item-text="groupName"
+                item-value="groupCode"
                 clearable
                 box
+                @change="changeFilteradministration"
               ></v-autocomplete>
             </v-flex>
             <v-flex xs12 sm4 class="px-2">
@@ -55,8 +60,8 @@
                 :items="govAgencyList"
                 v-model="govAgencyFilter"
                 label="Chọn cơ quan"
-                item-text="govAgencyName"
-                item-value="govAgencyCode"
+                item-text="itemName"
+                item-value="itemCode"
                 :hide-selected="true"
                 clearable
                 @change="changeFilterAgency"
@@ -66,7 +71,7 @@
             <v-flex xs12 sm4 class="px-2">
               <v-autocomplete
                 class="select-border"
-                :items="domainListTemp"
+                :items="domainList"
                 v-model="domainFilter"
                 label="Chọn lĩnh vực"
                 item-text="domainName"
@@ -101,21 +106,21 @@
           <v-layout row wrap>
             <v-flex xs12 sm9 class="pt-1">
               <span style="font-weight: bold">{{(agencyPage*numberPerPage - numberPerPage)+ index3 + 1}}.</span> &nbsp;
-              <span>{{itemServiceConfig.serviceInfoName}}</span>
+              <span>{{itemServiceConfig.serviceName}}</span>
             </v-flex>
             <v-flex xs12 sm1 class="text-xs-center pt-1">
-              <span>Mức {{itemServiceConfig.level}}</span>
+              <span>Mức {{itemServiceConfig.maxLevel}}</span>
             </v-flex>
             <v-flex xs12 sm2 class="text-xs-center">
               <v-menu left offset-x>
                 <v-btn flat class="mx-0 my-0" slot="activator" small 
-                  @click="pullServiceOptions(itemServiceConfig, govAgencyRender[0]['govAgencyCode'])"
+                  @click="pullServiceOptions(itemServiceConfig)"
                 >
                   Chọn
                 </v-btn>
                 <v-list v-if="serviceOptions.length > 1">
                   <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
-                    @click="selectServiceOption(itemOption, govAgencyRender[0]['govAgencyCode'], itemServiceConfig)">
+                    @click="selectServiceOption(itemOption, itemServiceConfig)">
                     <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
                   </v-list-tile>
                 </v-list>
@@ -140,13 +145,13 @@
                     <v-flex xs12 sm2 class="text-xs-center">
                       <v-menu left offset-x>
                         <v-btn flat class="mx-0 my-0" slot="activator" small 
-                          @click="pullServiceOptions(itemServiceConfig, domainListRender[0]['govAgencyCode'])"
+                          @click="pullServiceOptions(itemServiceConfig)"
                         >
                           Chọn
                         </v-btn>
                         <v-list v-if="serviceOptions.length > 1">
                           <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
-                            @click="selectServiceOption(itemOption, domainListRender[0]['govAgencyCode'], itemServiceConfig)">
+                            @click="selectServiceOption(itemOption, itemServiceConfig)">
                             <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
                           </v-list-tile>
                         </v-list>
@@ -173,7 +178,7 @@
               <v-flex xs12 sm2 class="text-xs-center">
                 <v-menu left offset-x>
                   <v-btn flat class="mx-0 my-0" slot="activator" small 
-                    @click="pullServiceOptions(itemServiceConfig, itemServiceConfig.govAgencyCode)"
+                    @click="pullServiceOptions(itemServiceConfig)"
                   >
                     Chọn
                   </v-btn>
@@ -270,19 +275,19 @@
       'tiny-pagination': TinyPagination
     },
     data: () => ({
+      showFilter: false,
       dialog_captcha: false,
       validCaptcha: false,
       govAgencyList: [],
       govAgencyFilter: '',
       domainList: [],
-      domainListTemp: [],
       domainListRender: [],
-      panelDomainList: [true],
       domainFilter: '',
+      administrationList: [],
+      administrationFilter: '',
       panelAgency: [],
       panelDomain: [],
       govAgencies: [],
-      govAgencyFilterList: [],
       govAgencyRender: [],
       serviceOptions: [],
       serviceConfigSelect: '',
@@ -328,79 +333,25 @@
       // 
       let current = vm.$router.history.current
       let newQuery = current.query
-      vm.$store.dispatch('loadServiceConfigsGov', {}).then(result => {
-        vm.govAgencies = result
-        vm.govAgencyFilterList = vm.govAgencies
-        vm.govAgencyList = []
-        vm.domainList = []
-        vm.serviceConfigList = []
-        for (let index in vm.govAgencies) {
-          let item = {
-            govAgencyCode: vm.govAgencies[index]['govAgencyCode'],
-            govAgencyName: vm.govAgencies[index]['govAgencyName']
-          }
-          vm.govAgencyList.push(item)
-          let itemDomain = vm.govAgencies[index]['domains']
-          for (let index2 in itemDomain) {
-            let item2 = {
-              govAgencyCode: vm.govAgencies[index]['govAgencyCode'],
-              govAgencyName: vm.govAgencies[index]['govAgencyName'],
-              domainCode: itemDomain[index2]['domainCode'],
-              domainName: itemDomain[index2]['domainName'],
-              serviceConfigs: itemDomain[index2]['serviceConfigs']
-            }
-            vm.domainList.push(item2)
-            let itemServiceConfig = vm.govAgencies[index]['domains'][index2]['serviceConfigs']
-            for (let index3 in itemServiceConfig) {
-              let item3 = {
-                level: itemServiceConfig[index3]['level'],
-                serviceConfigId: itemServiceConfig[index3]['serviceConfigId'],
-                serviceInfoId: itemServiceConfig[index3]['serviceInfoId'],
-                serviceInfoName: itemServiceConfig[index3]['serviceInfoName'],
-                govAgencyCode: vm.govAgencies[index]['govAgencyCode']
-              }
-              vm.serviceConfigList.push(item3)
-            }
-          }
+      if (newQuery['domain']) {
+        vm.domainFilter = newQuery['domain']
+      }
+      if (newQuery['agency']) {
+        vm.govAgencyFilter = newQuery['agency']
+      }
+      if (String(vm.serviceCode) === '0') {
+        vm.filterAndSort()
+      }
+      // 
+      if (String(vm.serviceCode) !== '0') {
+        let params = {
+          service: vm.serviceCode
         }
-        vm.serviceConfigListRender = vm.serviceConfigList
-        vm.domainListRender = vm.domainList
-        vm.domainListTemp = vm.domainList
-        console.log('vm.domainList',vm.domainList)
-        console.log('vm.domainListTemp',vm.domainListTemp)
-        // 
-        if (newQuery['domain']) {
-          vm.domainFilter = newQuery['domain']
-        }
-        if (newQuery['agency']) {
-          vm.govAgencyFilter = newQuery['agency']
-        }
-        
-        if (String(vm.serviceCode) === '0') {
-          vm.filterAndSort()
-        }
-        // 
-        if (String(vm.serviceCode) !== '0') {
-          console.log('111111111111111111', vm.govAgencies)
-          for (let key in vm.govAgencies) {
-            let govAgencyCode = vm.govAgencies[key].govAgencyCode
-            for (let keyDomain in vm.govAgencies[key].domains) {
-              for (let keyConfig in vm.govAgencies[key].domains[keyDomain].serviceConfigs) {
-                let serviceConfig = vm.govAgencies[key].domains[keyDomain].serviceConfigs[keyConfig]
-                let serviceConfigId = serviceConfig.serviceConfigId
-                if (String(vm.serviceCode) === String(serviceConfigId)) {
-                  vm.govAgencyCodeSelect = govAgencyCode
-                  vm.serviceInfoIdSelect = serviceConfig.serviceInfoId
-                  console.log('333333333', govAgencyCode)
-                  console.log('444444444', serviceConfig)
-                  vm.pullServiceOptions(serviceConfig, govAgencyCode)
-                  break
-                }
-              }
-            }
-          }
-        }
-      }).catch(function(){})
+        vm.$store.dispatch('getServiceConfigs', params).then( res => {
+          vm.pullServiceOptions(res.data[0])
+        })
+      }
+      vm.getServiceAdminisTration()
     },
     updated () {
     },
@@ -419,12 +370,26 @@
         } else {
           vm.filterService()
         }
-      }
+      },
+
     },
     methods: {
+      changeFilteradministration () {
+        let vm = this
+        vm.govAgencyFilter = ''
+        vm.serviceNameKey = ''
+        vm.domainFilter = ''
+        vm.activeFilterKey = false
+        vm.serviceLastest = false
+        console.log('vm.administrationFilter',vm.administrationFilter)
+        if(vm.administrationFilter){
+          vm.getAgencys(vm.administrationFilter)
+        }
+      },
       changeFilterAgency () {
         let vm = this
         vm.serviceNameKey = ''
+        vm.domainFilter = ''
         vm.activeFilterKey = false
         vm.serviceLastest = false
         vm.filterService()
@@ -434,7 +399,6 @@
         vm.serviceNameKey = ''
         vm.activeFilterKey = false
         vm.serviceLastest = false
-        vm.panelDomainList = [true]
         vm.filterService()
       },
       filterServiceName () {
@@ -480,6 +444,7 @@
           let current = vm.$router.history.current
           let newQuery = current.query
           let queryString = '?'
+          newQuery['administration'] = vm.administrationFilter
           newQuery['agency'] = vm.govAgencyFilter
           newQuery['domain'] = vm.domainFilter
           if (vm.serviceLastest) {
@@ -506,76 +471,31 @@
       },
       filterAndSort () {
         let vm = this
-        vm.govAgencyRender = []
-        vm.govAgencyRender = []
-        vm.domainListRender = []
         let current = vm.$router.history.current
         let newQuery = current.query
-        if (!newQuery.hasOwnProperty('agency') && !newQuery.hasOwnProperty('domain') && !newQuery.hasOwnProperty('keyword') && !newQuery['lastest']) {
-          vm.serviceTotal = vm.serviceConfigList.length
-          if (newQuery.hasOwnProperty('page') && newQuery['page']) {
-            vm.agencyPage = newQuery['page']
-            let start = vm.agencyPage * vm.numberPerPage - vm.numberPerPage
-            let end = vm.agencyPage * vm.numberPerPage
-            vm.serviceConfigListRender = vm.serviceConfigList.slice(start, end)
-          } else {
-            vm.agencyPage = 1
-            let start = vm.agencyPage * vm.numberPerPage - vm.numberPerPage
-            let end = vm.agencyPage * vm.numberPerPage
-            vm.serviceConfigListRender = vm.serviceConfigList.slice(start, end)
-          }
-        }
-        if (newQuery.hasOwnProperty('agency') && newQuery.agency) {
-          let array = []
-          vm.govAgencyRender = vm.govAgencies.filter(function (item) {
-            return String(item['govAgencyCode']) === newQuery.agency
-          })
-          vm.govAgencyRender[0]['domains'].forEach(element => {
-            console.log('eeee',element.serviceConfigs)
-             
-             Array.prototype.push.apply(array,element.serviceConfigs)
-             console.log(array.length)
-          });
-          console.log(array.length)
-          vm.serviceTotal = array.length
-          vm.domainListTemp = vm.domainList.filter(e => e.govAgencyCode === newQuery.agency)
-          if (newQuery.hasOwnProperty('page') && newQuery['page']) {
-            vm.agencyPage = newQuery['page']
-            let start = vm.agencyPage * vm.numberPerPage - vm.numberPerPage
-            let end = vm.agencyPage * vm.numberPerPage
-            vm.serviceConfigListRender = array.slice(start, end)
-          } else {
-            vm.agencyPage = 1
-            let start = vm.agencyPage * vm.numberPerPage - vm.numberPerPage
-            let end = vm.agencyPage * vm.numberPerPage
-            vm.serviceConfigListRender = array.slice(start, end)
-          }
+        if(!newQuery.hasOwnProperty('lastest')) {
+          vm.agencyPage = newQuery.hasOwnProperty('page') && newQuery['page'] ? newQuery['page'] : 1
+          console.log(' vm.agencyPage',  vm.agencyPage)
 
-        } else {
-          vm.domainListTemp = vm.domainList
-        }
-        if (newQuery.hasOwnProperty('domain') && newQuery.domain) {
-          vm.domainListRender = vm.domainList.filter(function (item) {
-            return String(item['domainCode']) === newQuery.domain
-          })
-          vm.serviceTotal = vm.domainListRender[0]['serviceConfigs'].length
-          if (newQuery.hasOwnProperty('page') && newQuery['page']) {
-            vm.agencyPage = newQuery['page']
-            let start = vm.agencyPage * vm.numberPerPage - vm.numberPerPage
-            let end = vm.agencyPage * vm.numberPerPage
-            vm.serviceConfigListRender = vm.domainListRender[0]['serviceConfigs'].slice(start, end)
-          } else {
-            vm.agencyPage = 1
-            let start = vm.agencyPage * vm.numberPerPage - vm.numberPerPage
-            let end = vm.agencyPage * vm.numberPerPage
-            vm.serviceConfigListRender = vm.domainListRender[0]['serviceConfigs'].slice(start, end)
+          let params = {
+            start:  vm.agencyPage * vm.numberPerPage - vm.numberPerPage,
+            end: vm.agencyPage * vm.numberPerPage,
+            level: '2,3',
+            agency: newQuery.hasOwnProperty('agency') && newQuery.agency ? newQuery.agency : '',
+            domain: newQuery.hasOwnProperty('domain') && newQuery.domain ? newQuery.domain : '',
+            keyword: newQuery.hasOwnProperty('keyword') && newQuery.keyword ? vm.convertString(newQuery.keyword) : '',
           }
-        }
-        if (newQuery.hasOwnProperty('keyword') && newQuery.keyword) {
-          let keySearch = vm.convertString(newQuery.keyword)
-          vm.serviceConfigListRender = vm.serviceConfigList.filter(function (item) {
-            return vm.convertString(String(item['serviceInfoName'])).indexOf(keySearch) >= 0
+          vm.$store.dispatch('getServiceConfigs', params).then(res => {
+            vm.serviceTotal = res.total
+            vm.serviceConfigListRender = res.data
+          }).catch(() => {
+            vm.serviceConfigListRender = []
           })
+          if (newQuery.hasOwnProperty('agency') && newQuery.agency) {
+            vm.domainListTemp = vm.domainList.filter(e => e.govAgencyCode === newQuery.agency)
+          } else {
+            vm.domainListTemp = vm.domainList
+          }
         }
         if (newQuery.hasOwnProperty('lastest') && newQuery.lastest && String(newQuery.lastest) !== 'false') {
           vm.$store.dispatch('getServiceRecently').then(function (result) {
@@ -631,15 +551,14 @@
             }
           }
         }
-        console.log('govAgencyRender:',vm.govAgencyRender)
-        console.log('domainListRender:',vm.domainListRender)
-        console.log('serviceConfigList', vm.serviceConfigList)
-        console.log('serviceConfigListRender', vm.serviceConfigListRender)
+        if(newQuery.hasOwnProperty('agency') && newQuery.agency) {
+          vm.getDomains(newQuery.agency)
+        }
       },
-      pullServiceOptions (item, govAgencyCode) {
+      pullServiceOptions (item) {
         var vm = this
         console.log('service config', item)
-        console.log('service config govAgencyCode', govAgencyCode)
+        console.log('service config govAgencyCode', item.govAgencyCode)
         if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
           vm.hasVerify = true
           setTimeout(function () {
@@ -647,7 +566,7 @@
           }, 300)
         } else {
           vm.serviceConfigSelect = item
-          vm.govAgencyCodeSelect = govAgencyCode
+          vm.govAgencyCodeSelect = item.govAgencyCode
           vm.serviceInfoIdSelect = item.serviceInfoId
           vm.$store.dispatch('getServiceOpionByProcess', item).then(result => {
             if (result) {
@@ -661,7 +580,7 @@
                   console.log('resultresultresult',result)
                   let data = {
                     serviceCode: resServiceInfo.serviceCode,
-                    govAgencyCode: govAgencyCode,
+                    govAgencyCode: item.govAgencyCode,
                     templateNo: result[0].templateNo,
                     originality: vm.getOriginality(),
                     j_captcha_response: ''
@@ -698,13 +617,13 @@
           })
         }
       },
-      selectServiceOption (item, govAgencyCode, itemServiceConfig) {
+      selectServiceOption (item, itemServiceConfig) {
         var vm = this
         console.log('selectServiceOption', item)
-        console.log('selectServiceOption', govAgencyCode)
+        console.log('selectServiceOption', item.govAgencyCode)
         console.log('selectServiceOption', itemServiceConfig)
         vm.serviceConfigSelect = itemServiceConfig
-        vm.govAgencyCodeSelect = govAgencyCode
+        vm.govAgencyCodeSelect = itemServiceConfig.govAgencyCode
         vm.serviceInfoIdSelect = itemServiceConfig.serviceInfoId
         vm.loadingMutiple = true
         vm.$store.dispatch('getServiceInfo', {
@@ -712,7 +631,7 @@
         }).then(resServiceInfo => {
           let data = {
             serviceCode: resServiceInfo.serviceCode,
-            govAgencyCode: govAgencyCode,
+            govAgencyCode: itemServiceConfig.govAgencyCode,
             templateNo: item.templateNo,
             originality: vm.getOriginality(),
             j_captcha_response: ''
@@ -731,27 +650,6 @@
             vm.$refs.captcha.makeImageCap()
             vm.dialog_captcha = true
           }
-        })
-      },
-      selectServiceOptionCRD (item, govAgencyCode) {
-        var vm = this
-        vm.$store.dispatch('getServiceInfo', {
-          serviceInfoId: vm.serviceInfoIdSelect
-        }).then(resServiceInfo => {
-          let data = {
-            serviceCode: resServiceInfo.serviceCode,
-            govAgencyCode: govAgencyCode,
-            templateNo: item.templateNo,
-            originality: vm.getOriginality()
-          }
-          vm.$store.dispatch('postDossier', data).then(function (result) {
-            vm.loadingAction = false
-            vm.indexAction = -1
-            vm.$router.push({
-              path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-              query: vm.$router.history.current.query
-            })
-          })
         })
       },
       doCreateDossier () {
@@ -818,6 +716,45 @@
         str = str.replace(/Đ/g, 'D')
         str = str.toLocaleLowerCase().replace(/\s/g, '')
         return str
+      },
+      getServiceAdminisTration () {
+        let vm = this
+        vm.$store.dispatch('getServiceAdminisTration', {}).then(
+          res => {
+            vm.administrationList = res
+            vm.administrationFilter = res[0]['groupCode']
+            vm.getAgencys(vm.administrationFilter)
+
+          }
+        ).catch(()=>{})
+      },
+      getAgencys(administrationCode) {
+        let vm = this
+        let data = {
+          administration: administrationCode ? administrationCode : ''
+        }
+        vm.$store.dispatch('getAgencys', data).then(
+          res => {
+              vm.govAgencyList = res
+              vm.govAgencyFilter = res[0]['itemCode']
+              vm.filterService()
+          }
+        ).catch(()=>{
+          vm.govAgencyList = []
+        })      
+      },
+      getDomains(agencyCode) {
+        let vm = this
+        let data = {
+          agency: agencyCode ? agencyCode : ''
+        }
+        vm.$store.dispatch('getDomains', data).then(
+          res => {
+            vm.domainList = res
+          }
+        ).catch(()=>{
+          vm.domainList = []
+        })      
       }
     }
   }
