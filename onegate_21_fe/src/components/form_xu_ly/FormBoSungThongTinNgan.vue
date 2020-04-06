@@ -74,6 +74,7 @@
                     time-format="HH:mm"
                     :min-date="getCurentDateTime()"
                     :without-header="true"
+                    locale="vi"
                   />
                 </v-layout>
               </v-flex>
@@ -177,6 +178,7 @@
                   format="YYYY-MM-DDTHH:mm"
                   time-format="HH:mm"
                   :without-header="true"
+                  locale="vi"
                 />
               </v-layout>
             </v-flex>
@@ -223,10 +225,10 @@
   </div>
 </template>
 <script>
-  // import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
+  
   export default {
     components: {
-      'vue-ctk-date-time-picker': window['vue-ctk-date-time-picker']
+      'vue-ctk-date-time-picker': window.VueCtkDateTimePicker.default
     },
     props: {
       dossier_id: {

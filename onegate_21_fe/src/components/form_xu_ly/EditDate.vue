@@ -22,6 +22,7 @@
                 formatted="DD/MM/YYYY HH:mm"
                 :label="dueDateInput ? '' : 'Chọn ngày'"
                 :min-date="minDate"
+                locale="vi"
               ></vue-ctk-date-time-picker>
             </v-layout>
           </v-card-text>
@@ -31,10 +32,10 @@
   </div>
 </template>
 <script>
-// import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
+
 export default {
   components: {
-    'vue-ctk-date-time-picker': window['vue-ctk-date-time-picker']
+    'vue-ctk-date-time-picker': window.VueCtkDateTimePicker.default
   },
   props: ['dueDateEdit'],
   data: () => ({
