@@ -74,7 +74,7 @@
                 </content-placeholders>
                 <div v-else>
                     <v-layout wrap>
-                        <v-flex xs12 @click="openDialogChiTietThuTucDonVi(props.item)">
+                        <v-flex xs12 @click="openDialogChiTietThuTucDonVi(props.item)" style="cursor: pointer;">
                             <span class="text-bold">{{props.item.serviceCode}}</span> - <span>{{props.item.serviceName}}</span>
                         </v-flex>
                     </v-layout>
@@ -91,7 +91,7 @@
                         </v-flex>
                     </v-layout>
                     <v-layout v-else align-center wrap>
-                        <v-flex xs8  @click="openDialogChiTietThuTucDVCQG(props.item)">
+                        <v-flex xs8  @click="openDialogChiTietThuTucDVCQG(props.item)" style="cursor: pointer;">
                             <span class="text-bold">{{props.item.serviceCodeDVCQG}}</span> - <span>{{props.item.serviceNameDVCQG}}</span>
                         </v-flex>
                         <v-flex xs4 class="text-right">
@@ -132,7 +132,7 @@
                 </content-placeholders>
                 <div v-else>
                     <v-layout wrap v-if="props.item.serviceCode">
-                        <v-flex xs6 @click="openDialogChiTietThuTucDonVi(props.item)"><span class="text-bold" >{{props.item.serviceCode}}</span> - <span>{{props.item.serviceName}}</span></v-flex>
+                        <v-flex xs6 @click="openDialogChiTietThuTucDonVi(props.item)" style="cursor: pointer;"><span class="text-bold" >{{props.item.serviceCode}}</span> - <span>{{props.item.serviceName}}</span></v-flex>
                         <v-flex xs6 class="text-right"> 
                             <v-btn small outline color="primary"  @click="removeMapping(props.item)">Hủy mapping</v-btn>
                         </v-flex>
@@ -153,7 +153,7 @@
                 </content-placeholders>
                 <div v-else>
                     <v-layout wrap>
-                        <v-flex xs12 @click="openDialogChiTietThuTucDVCQG(props.item)">
+                        <v-flex xs12 @click="openDialogChiTietThuTucDVCQG(props.item)" style="cursor: pointer;">
                             <span class="text-bold" >{{props.item.serviceCodeDVCQG}}</span> - <span>{{props.item.serviceNameDVCQG}}</span>
                         </v-flex>
                     </v-layout>
@@ -178,8 +178,18 @@
     <!-- Popup danh sách mapping thêm -->
     <v-dialog v-model="dialogMapping" persistent max-width="600px">
         <v-card style="background: #fff;">
-          <v-card-title>
-            <span class="headline">Chọn để mapping</span>
+          <v-card-title pa-1>
+            <v-layout wrap align-center>
+              <v-flex xs6>
+                <span class="headline">Chọn để mapping</span>
+              </v-flex>
+              <v-flex xs6 class="text-right">
+                <v-btn color="primary" fab small dark  @click="dialogMapping = false">
+                  <v-icon>exit_to_app</v-icon>
+                </v-btn>
+              </v-flex>
+            </v-layout>
+            
           </v-card-title>
           <v-card-text>
             <v-container grid-list-md>
@@ -222,19 +232,24 @@
               </v-layout>
             </v-container>
           </v-card-text>
-          <v-spacer></v-spacer>
-          <v-layout>
-            <v-flex xs12 class="text-right">
-            <v-btn color="blue darken-1" flat @click="dialogMapping = false">Đóng</v-btn>
-            </v-flex>
-          </v-layout>
         </v-card>
     </v-dialog>
     <!-- Popup danh sách chi tiết TTHC DVCQG -->
     <v-dialog v-model="dialogChiTietThuTucDVCQG" persistent max-width="900px">
       <v-card style="background: #fff;">
-        <v-card-title>
-          <span class="headline">Chi tiết thủ tục</span>
+        <v-card-title pa-1>
+          <v-layout wrap align-center>
+            <v-flex xs6>
+              <span class="headline">Chi tiết thủ tục</span>
+            </v-flex>
+            <v-flex xs6 class="text-right">
+              <v-btn  color="blue darken-1 mx-2" v-if="btnThem"  @click="addTTHC()"> Xác nhận</v-btn>
+              <v-btn color="primary" fab small dark  @click="dialogChiTietThuTucDVCQG = false">
+                <v-icon>exit_to_app</v-icon>
+              </v-btn>
+            </v-flex>
+          </v-layout>
+          
         </v-card-title>
         <v-card-text>
           <v-container grid-list-md>
@@ -327,20 +342,23 @@
               </v-tabs>
           </v-container>
         </v-card-text>
-        <v-spacer></v-spacer>
-        <v-layout>
-          <v-flex xs12 class="text-right">
-            <v-btn  color="blue darken-1 mx-2" v-if="btnThem"  @click="addTTHC()"> Xác nhận</v-btn>
-          <v-btn color="blue darken-1" flat @click="dialogChiTietThuTucDVCQG = false">Đóng</v-btn>
-          </v-flex>
-        </v-layout>
       </v-card>
     </v-dialog>
     <!-- Popup danh sách chi tiết TTHC Don Vi -->
     <v-dialog v-model="dialogChiTietThuTucDonVi" persistent max-width="900px">
       <v-card style="background: #fff;">
-        <v-card-title>
-          <span class="headline">Chi tiết thủ tục</span>
+        <v-card-title pa-1>
+          <v-layout wrap align-center>
+            <v-flex xs6>
+              <span class="headline">Chi tiết thủ tục</span>
+            </v-flex>
+            <v-flex xs6 class="text-right">
+              <v-btn color="primary" fab small dark  @click="dialogChiTietThuTucDonVi = false">
+                <v-icon>exit_to_app</v-icon>
+              </v-btn>
+            </v-flex>
+          </v-layout>
+          
         </v-card-title>
         <v-card-text>
           <v-container grid-list-md>
@@ -430,12 +448,6 @@
             </div>
           </v-container>
         </v-card-text>
-        <v-spacer></v-spacer>
-        <v-layout>
-          <v-flex xs12 class="text-right">
-          <v-btn color="blue darken-1" flat @click="dialogChiTietThuTucDonVi = false">Đóng</v-btn>
-          </v-flex>
-        </v-layout>
       </v-card>
     </v-dialog>
   </div>

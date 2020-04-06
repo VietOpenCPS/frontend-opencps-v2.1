@@ -117,8 +117,18 @@
     <!-- Popup danh sách mapping thêm -->
     <v-dialog v-model="dialogMapping" persistent max-width="600px">
         <v-card style="background: #fff;">
-          <v-card-title>
-            <span class="headline">Chọn để mapping</span>
+          <v-card-title pa-1>
+            <v-layout wrap align-center>
+              <v-flex xs6>
+                <span class="headline">Chọn để mapping</span>
+              </v-flex>
+              <v-flex xs6 class="text-right">
+                <v-btn color="primary" fab small dark  @click="dialogMapping = false">
+                  <v-icon>exit_to_app</v-icon>
+                </v-btn>
+              </v-flex>
+            </v-layout>
+            
           </v-card-title>
           <v-card-text>
             <v-container grid-list-md>
@@ -161,12 +171,6 @@
               </v-layout>
             </v-container>
           </v-card-text>
-          <v-spacer></v-spacer>
-          <v-layout>
-            <v-flex xs12 class="text-right">
-            <v-btn color="blue darken-1" flat @click="dialogMapping = false">Đóng</v-btn>
-            </v-flex>
-          </v-layout>
         </v-card>
     </v-dialog>
   </div>
