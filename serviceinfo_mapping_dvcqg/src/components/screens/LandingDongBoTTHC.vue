@@ -51,7 +51,7 @@
                         <span>{{header.text}}</span>
                     </th>
                     <th>
-                        <v-btn color="primary" @click="syncServiceInfoAll()">Đồng bộ tất cả</v-btn>
+                        <v-btn color="primary" :loading="loadingSyncAll" @click="syncServiceInfoAll()">Đồng bộ tất cả</v-btn>
                     </th>
                 </tr>
                 </thead>
@@ -130,6 +130,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    loadingSyncAll: false,
     loading: true,
     dialogMapping: false,
     loadingMapping: false,
@@ -265,12 +266,13 @@ export default {
     syncServiceinfo (item) {
         let vm = this
         let filter = {
-            serviceCode: item.serviceCode
+            serviceCodes: item.serviceCode,
+            type: "sync"
         }
-        vm.$store.dispatch('syncServiceinfo', filter).then(function (result) {
-            toastr.clear()
-            toastr.success('Đồng bộ thành công')
-           
+        vm.$store.dispatch('syncServiceinfoNew', filter).then(function (result) {
+          toastr.clear()
+          toastr.success('Đồng bộ thành công')
+          vm.doLoadingThuTuc()
             // vm.doLoadingThuTuc()
         }).catch(function() {
             toastr.error('Đồng bộ thất bại')
@@ -280,14 +282,20 @@ export default {
     },
     syncServiceInfoAll () {
         let vm = this
-        vm.$store.dispatch('syncServiceinfoAll').then(function (result) {
+        let filter = {
+            serviceCodes: "",
+            type: "sync"
+        }
+        vm.loadingSyncAll = true
+        vm.$store.dispatch('syncServiceinfoNew', filter).then(function (result) {
             toastr.clear()
             toastr.success('Đồng bộ thành công')
-           
+            vm.loadingSyncAll = false
+            vm.doLoadingThuTuc()
             // vm.doLoadingThuTuc()
         }).catch(function() {
             toastr.error('Đồng bộ thất bại')
-       
+            vm.loadingSyncAll = false
             // vm.doLoadingThuTuc()
         })
     }

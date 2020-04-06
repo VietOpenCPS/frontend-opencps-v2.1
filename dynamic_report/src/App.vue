@@ -1,6 +1,6 @@
 <template>
   <v-app id="app_dynamic_report" :class="hiddenAside ? 'px-3' : ''">
-    <v-navigation-drawer v-if="!hiddenAside" app clipped floating width="300">
+    <v-navigation-drawer app clipped floating width="300">
       <div class="drawer__filter">
         <v-list dense style="padding: 0;" class="report_list">
           <v-list-tile

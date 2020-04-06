@@ -83,6 +83,30 @@ export const store = new Vuex.Store({
             text: 'Cấu hình dữ liệu thống kê'
           },
           {
+            icon: 'filter_8',
+            link: '/table/opencps_mapping/tthc',
+            code: 'mapping',
+            text: 'Mapping TTHC'
+          },
+          {
+            icon: 'filter_9',
+            link: '/table/opencps_mapping/domain',
+            code: 'mapping',
+            text: 'Đồng bộ danh mục lĩnh vực TTHC'
+          },
+          {
+            icon: 'filter_10',
+            link: '/table/opencps_mapping/agency-sharingqa/0',
+            code: 'mapping',
+            text: 'Đồng bộ danh mục cơ quan'
+          },
+          {
+            icon: 'filter_11',
+            link: '/table/opencps_mapping/agency-sharingqa/1',
+            code: 'mapping',
+            text: 'Đồng bộ danh mục câu hỏi'
+          },
+          {
             icon: 'import_export',
             link: '/table/import/tool_import',
             code: 'import',
@@ -1284,6 +1308,501 @@ export const store = new Vuex.Store({
           }).catch(function (error) {
             reject(error)
             commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    getGovAgency ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              sort: 'siblingSearch'
+            }
+          }
+          axios.get(state.endPoint + '/serviceinfos/statistics/agencies', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
+        })
+      })
+    },
+    getDomain ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              agency: data.agencyCode,
+              sort: 'siblingSearch'
+            }
+          }
+          axios.get(state.endPoint + '/serviceinfos/statistics/domains', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
+        })
+      })
+    },
+    getServiceLists ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let paramGet = {
+            start: filter.page * 15 - 15,
+            end: filter.page * 15,
+            keyword: filter.keyword.replace(/[!@#$%^&*(),?":{}|<>]/g, ''),
+            domain: filter.domain,
+            administration: filter.agency
+          }
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: paramGet
+          }
+          axios.get(state.endPoint + '/serviceinfos/mappingsuggest', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getSharingqa ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+
+          axios.post('/o/rest/v2/nps/getsharingqa',filter,param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getServiceDomain ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: 'o/rest/v2/dictcollections/SERVICE_DOMAIN/dictitems/mappingsuggest',
+            method: 'get',
+            params: filter,
+            headers: {groupId: state.initData.groupId},
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getServiceDomainDVCQG ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/rest/v2/dictcollections/SERVICE_DOMAIN/dictitems/dvcqg',
+            method: 'get',
+            params: filter,
+            headers: {groupId: state.initData.groupId},
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getServiceAgency ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: 'o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems/mappingsuggest',
+            method: 'get',
+            params: filter,
+            headers: {groupId: state.initData.groupId},
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getServiceAgencyDVCQG ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems/dvcqg',
+            method: 'get',
+            params: filter,
+            headers: {groupId: state.initData.groupId},
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    syncServiceinfoNew ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('serviceCodes', filter.serviceCodes)
+          dataPost.append('type', filter.type)
+          axios.post('/o/rest/v2/nps/syncserviceinfo', dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    syncServiceinfoAll ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          axios.post('/o/rest/v2/nps/syncserviceinfo', dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    removeMappingServiceAgency ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: 'o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems/removemapping/' + filter.dictItemMappingId,
+            method: 'delete',
+            headers: {groupId: state.initData.groupId},
+          }
+          // let param = {
+          //   headers: {
+          //     groupId: state.initData.groupId
+          //   },
+          //   params: {
+          //     itemCodeDVCQG: filter.itemCodeDVCQG
+          //   }
+          // }
+          // let dataPost = new URLSearchParams()
+          // dataPost.append('itemCodeDVCQG', filter.itemCodeDVCQG)
+          axios.request(config).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    removeMappingServiceDomain ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: 'o/rest/v2/dictcollections/SERVICE_DOMAIN/dictitems/removemapping/' + filter.dictItemMappingId,
+            method: 'delete',
+            headers: {groupId: state.initData.groupId},
+          }
+          // let param = {
+          //   headers: {
+          //     groupId: state.initData.groupId
+          //   },
+          //   params: {
+          //     itemCodeDVCQG: filter.itemCodeDVCQG
+          //   }
+          // }
+          // let dataPost = new URLSearchParams()
+          // dataPost.append('itemCodeDVCQG', filter.itemCodeDVCQG)
+          axios.request(config).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    removeMappingTTHC ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.delete('/o/rest/v2/nps/removemappingserviceinfo/' + filter.mappingClassPK, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    mappingTTHC({commit, state}, filter){
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('serviceCode', filter.serviceCode)
+          dataPost.append('serviceCodeDVCQG', filter.serviceCodeDVCQG)
+          dataPost.append('serviceNameDVCQG', filter.serviceNameDVCQG)
+          axios.post('/o/rest/v2/nps/mappingserviceinfo', dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    mappingServiceDomain ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('itemCode', filter.itemCode)
+          dataPost.append('itemCodeDVCQG', filter.itemCodeDVCQG)
+          axios.post('o/rest/v2/dictcollections/SERVICE_DOMAIN/dictitems/mapping', dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    mappingServiceAgency ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('itemCode', filter.itemCode)
+          dataPost.append('itemCodeDVCQG', filter.itemCodeDVCQG)
+          axios.post('o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems/mapping', dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    syncSharingqa ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          if(filter) {
+            axios.post('/o/rest/v2/nps/syncsharingqa',filter,param).then(function (response) {
+              let serializable = response.data
+              resolve(serializable)
+            }).catch(function (error) {
+              console.log(error)
+              reject(error)
+            })
+          } else {
+            axios.post('/o/rest/v2/nps/syncsharingqa',filter,param).then(function (response) {
+              let serializable = response.data
+              resolve(serializable)
+            }).catch(function (error) {
+              console.log(error)
+              reject(error)
+            })           
+          }
+
+        })
+      }) 
+    },
+    getTTHCDonVi ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/rest/v2/serviceinfos',
+            method: 'get',
+            params: filter,
+            headers: {groupId: state.initData.groupId},
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+          // resolve({
+          //   total: 10,
+          //   data: [
+          //     {
+          //       serviceCode: 'B-BGT-284959-TT',
+          //       serviceName: "Cấp lại Giấy phép lái tàu",
+          //       serviceCodeDVCQG: "1.003897",
+          //       serviceNameDVCQG: "Cấp lại Giấy phép lái tàu"
+          //     },
+          //     {
+          //       serviceCode: 'B-BGT-284959-TT',
+          //       erviceName: "Cấp lại Giấy phép lái tàu",
+          //       serviceCodeDVCQG: "",
+          //       serviceNameDVCQG: ""
+          //     },
+          //     {
+          //       serviceCode: 'B-BGT-284959-TT',
+          //       erviceName: "Cấp lại Giấy phép lái tàu",
+          //     },
+          //   ]
+          // })
+        })
+      })
+    },
+    getTTHCDVCQG ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/rest/v2/nps/serviceinfodvcqg',
+            method: 'get',
+            params: filter,
+            headers: {groupId: state.initData.groupId},
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getChiTietTTDVCQG ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/rest/v2/nps/serviceinfodvcqg/' + filter.serviceCodeDVCQG,
+            method: 'get',
+            headers: {groupId: state.initData.groupId},
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    addTTHC ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('serviceCodes', "")
+          dataPost.append('type', "create")
+          axios.post('/o/rest/v2/nps/syncserviceinfo', dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
           })
         })
       })

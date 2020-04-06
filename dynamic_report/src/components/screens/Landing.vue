@@ -154,6 +154,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 import VueFriendlyIframe from 'vue-friendly-iframe'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
@@ -223,7 +224,8 @@ export default {
     buttonsShow: false,
     noHeader: true,
     exportXML: false,
-    jsonMapperJson: {}
+    jsonMapperJson: {},
+    userData: ''
   }),
   computed: {
     itemsReports () {
@@ -267,6 +269,17 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       let query = vm.$router.history.current.query
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId()
+        },
+        params: {
+        }
+      }
+      axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId(), param).then(function(response) {
+        vm.userData = response.data
+      }).catch(function(error) {
+      })
       if (query.hasOwnProperty('doreport')) {
         vm.hiddenAside = true
       } else {
@@ -575,7 +588,14 @@ export default {
       let docDString = {}
       vm.dataReportXX = ''
       docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
-      docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
+      console.log('userData', vm.userData)
+      let titleGov = vm.userData.hasOwnProperty('govAgencyName') && vm.userData.govAgencyName ? vm.userData.govAgencyName : vm.itemsReports[vm.index]['filterConfig']['govAgencyName']
+      if (!titleGov) {
+        titleGov = vm.$store.getters.siteName
+      }
+      console.log('titleGov', titleGov)
+      docDString = docDString.replace(/\[\$siteName\$\]/g, titleGov)
+
       for (let key in vm.filters) {
         let find = vm.filters[key]['key']
         let currentVal = vm.data[vm.filters[key]['key']]
@@ -869,7 +889,13 @@ export default {
       vm.docDefinition = {}
       let docDString = {}
       docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
-      docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
+      console.log('userData', vm.userData)
+      let titleGov = vm.userData.hasOwnProperty('govAgencyName') && vm.userData.govAgencyName ? vm.userData.govAgencyName : vm.itemsReports[vm.index]['filterConfig']['govAgencyName']
+      if (!titleGov) {
+        titleGov = vm.$store.getters.siteName
+      }
+      console.log('titleGov', titleGov)
+      docDString = docDString.replace(/\[\$siteName\$\]/g, titleGov)
       for (let key in vm.filters) {
         let find = vm.filters[key]['key']
         let currentVal = vm.data[vm.filters[key]['key']]

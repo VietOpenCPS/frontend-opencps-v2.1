@@ -41,7 +41,7 @@
         <v-divider class="my-0 py-0"></v-divider>
         <v-list class="py-2 employeeList" style="max-height: 500px;overflow-y: auto;">
           <v-list-tile
-            v-for="item in employeeItems"
+            v-for="item in employeeItemsFilter"
             :key="item.employeeId"
             avatar
             class="py-1 px-2"
@@ -110,6 +110,7 @@
               :headers="headers"
               :items="votingList"
               hide-actions
+              no-data-text="Không có đánh giá"
               class="table-landing table-bordered mt-4 mx-3"
               style="border-left: 1px solid #dedede;"
             >
@@ -184,6 +185,7 @@ export default {
     showPicker: true,
     totalEmployee: 0,
     employeeItems: [],
+    employeeItemsFilter: [],
     employeeSelected: '',
     votingList: '',
     headers: [
@@ -338,14 +340,14 @@ export default {
     },
     changeAgency () {
       let vm = this
+      vm.employeeName = ''
       setTimeout(function () {
         let agencyCode = vm.agencyLists.filter(function(item) {
           return (String(item['value']) === String(vm.govAgency))
         })[0]['code']
         let filter = {
           groupId: vm.govAgency,
-          jobposCode: 'DANHGIA_' + agencyCode,
-          employeeName: vm.employeeName
+          jobposCode: 'DANHGIA_' + agencyCode
         }
         vm.getEmployee(filter)
       }, 200)
@@ -353,15 +355,19 @@ export default {
     changeEmployeeName() {
       let vm = this
       setTimeout(function () {
-        let agencyCode = vm.agencyLists.filter(function(item) {
-          return (String(item['value']) === String(vm.govAgency))
-        })[0]['code']
-        let filter = {
-          groupId: vm.govAgency,
-          jobposCode: 'DANHGIA_' + agencyCode,
-          employeeName: vm.employeeName
+        if (vm.employeeName.length > 0) {
+          vm.employeeItemsFilter = vm.employeeItems.filter(function (item) {
+            return vm.stringConvert(item.fullName).indexOf(vm.stringConvert(vm.employeeName)) >= 0
+          })
+        } else {
+          vm.employeeItemsFilter = vm.employeeItems
         }
-        vm.getEmployee(filter)
+        if (vm.employeeItemsFilter.length > 0) {
+          vm.employeeSelected = vm.employeeItemsFilter[0]
+          vm.getVotingEmployee(vm.employeeSelected)
+          vm.getAvatar(vm.employeeSelected)
+        }
+        
       }, 200)       
     },
     changeEmployee (item) {
@@ -388,6 +394,7 @@ export default {
       vm.$store.dispatch('getEmployee', filter).then(result => {
         vm.totalEmployee = result[0]
         vm.employeeItems = sortEmployee(result[1])
+        vm.employeeItemsFilter = vm.employeeItems
         if (vm.employeeItems && vm.employeeItems.length > 0) {
           vm.employeeSelected = vm.employeeItems[0]
           vm.getVotingEmployee(vm.employeeItems[0])
@@ -398,6 +405,7 @@ export default {
       }).catch(xhr => {
         vm.totalEmployee = 0
         vm.employeeItems = []
+        vm.employeeItemsFilter = vm.employeeItems
       })
     },
     getVotingEmployee (item) {
@@ -601,6 +609,24 @@ export default {
         vm.resultTotal = votingPercent
         // console.log('votingPercent', votingPercent)
       }
+    },
+    stringConvert (str) {
+      str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+      str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+      str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+      str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+      str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+      str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+      str = str.replace(/đ/g, "d");
+      str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
+      str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
+      str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
+      str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
+      str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
+      str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
+      str = str.replace(/Đ/g, "D");
+      str = str.replace(/ /g, "");
+      return str.toLowerCase();
     },
     paggingData (config) {
       let vm = this

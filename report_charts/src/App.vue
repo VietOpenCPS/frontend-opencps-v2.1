@@ -1,5 +1,6 @@
 <template>
   <v-app id="app_report_charts">
+    <v-navigation-drawer app clipped floating width="0"></v-navigation-drawer>
     <v-content>
       <router-view></router-view>
     </v-content>

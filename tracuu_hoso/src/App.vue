@@ -20,14 +20,25 @@
     created () {
       let vm = this
       vm.$nextTick(function () {
-        let searchParams = window.location.search.replace('?','')
-        if (searchParams) {
-          let params = vm.parse_query_string(searchParams)
-          if (params.hasOwnProperty('id') && params.id && params.hasOwnProperty('secretKey') && params.secretKey) {
-            let url = window.location.origin + window.location.pathname + '#/?id=' + params.id + '&secretKey=' + params.secretKey
-            window.location.href = url
-          }
+        let search = window.location.search.replace('?id=', '')
+        let params = search.split("-secretKey=")
+        if (params.length === 2) {
+          let dossierNo = params[0]
+          let secretKey = params[1]
+          let url = window.location.origin + window.location.pathname + '#/?id=' + dossierNo + '&secretKey=' + secretKey
+          window.location.href = url
         }
+        // 
+        // let searchParams = window.location.search.replace('?','')
+        // if (searchParams) {
+        //   let params = vm.parse_query_string(searchParams)
+        //   if (params.hasOwnProperty('id') && params.id && params.hasOwnProperty('secretKey') && params.secretKey) {
+        //     let url = window.location.origin + window.location.pathname + '#/?id=' + params.id + '&secretKey=' + params.secretKey
+        //     window.location.href = url
+        //   }
+        // }
+        // 
+        
       })
     },
     beforeDestroy () {

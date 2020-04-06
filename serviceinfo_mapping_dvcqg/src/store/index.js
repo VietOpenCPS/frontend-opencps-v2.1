@@ -539,6 +539,29 @@ export const store = new Vuex.Store({
         })
       })
     },
+    syncServiceinfoNew ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('serviceCodes', filter.serviceCodes)
+          dataPost.append('type', filter.type)
+          axios.post('/o/rest/v2/nps/syncserviceinfo', dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
     syncServiceinfoAll ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {

@@ -14,6 +14,7 @@
                             v-model="govAgency"
                             item-text="text"
                             item-value="value"
+                            return-object
                             @change="getThuTucHanhChinh"
                         >
                         </v-autocomplete>
@@ -25,6 +26,7 @@
                             v-model="domainCode"
                             item-text="serviceName"
                             item-value="serviceCode"
+                            return-object
                         >
                         </v-autocomplete>
                     </v-flex>
@@ -52,13 +54,13 @@
                         padding: 9px 15px;
                         font-weight: 600;
                         color: white;">
-                        <span>Thủ tục cấp lại Giấy phép lái tàu</span>
+                        <span>{{domainCode['serviceName']}}</span>
                     </v-flex>
                     <v-flex xs12 sm12 class="my-3 pl-3">
                         <div style="margin-bottom: 5px;">
                             <v-layout wrap class="text-bold mb-3">
                                 <div class="flex px-3 py-1" style="height:26px;max-width:88px;background-color: #034687;transform: skew(-25deg)">
-                                    <span class="d-block white--text" style="transform: skew(25deg)">Phần 1 : </span>
+                                    <span class="d-block white--text" style="transform: skew(25deg)">Phần 1 </span>
                                 </div>
                                 <div class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687">
                                     Đánh giá tổng thể dịch vụ
@@ -88,40 +90,50 @@
                         </div>
                         <div style="margin-bottom: 5px;">
                             <v-layout wrap class="text-bold mb-3">
-                                <div class="flex px-3 py-1" style="height:26px;max-width:88px;background-color: #034687;transform: skew(-25deg)">
-                                    <span class="d-block white--text" style="transform: skew(25deg)">Phần 2 : </span>
-                                </div>
-                                <div class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687">
-                                    Đánh giá chi tiết dịch vụ
-                                </div>
+                              <div class="flex px-3 py-1" style="height:26px;max-width:88px;background-color: #034687;transform: skew(-25deg)">
+                                <span class="d-block white--text" style="transform: skew(25deg)">Phần 2 </span>
+                              </div>
+                              <div class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687">
+                                Đánh giá chi tiết dịch vụ
+                              </div>
                             </v-layout>
                             <div class="ml-4">
                                 <v-card flat class="pl-2">
-                                <v-card-text class="px-2 py-1 pr-0">
-                                    <v-flex xs12 class="mb-2">
-                                    <v-flex xs12 v-for="(item, index) in votingItemsDetal" :key="index">
-                                      <v-layout wrap>
-                                        <v-flex xs12><strong class="primary--text">{{item.votingSubject}}</strong></v-flex>
-                                        <v-flex xs12 class="mb-3">
-                                            <v-layout wrap>
-                                                <v-flex xs12 md3>
-                                                    <p class="headline primary--text">{{item.percentVeryGood}}</p>
-                                                    <p>Rất hài lòng</p>
-                                                </v-flex>
-                                                <v-flex xs12 md3>
-                                                    <p class="headline primary--text">{{item.percentGood}}</p>
-                                                    <p>Hài lòng</p>
-                                                </v-flex>
-                                                <v-flex xs12 md3>
-                                                    <p class="headline primary--text">{{item.percentBad}}</p>
-                                                    <p>Không hài lòng</p>
-                                                </v-flex>
-                                            </v-layout>
-                                        </v-flex>
-                                      </v-layout>
+                                  <v-card-text class="px-2 py-1 pr-0">
+                                    <v-flex xs12 class="mb-2" v-if="votingItemsDetal.length > 0">
+                                      <v-flex xs12 v-for="(item, index) in votingItemsDetal" :key="index">
+                                        <v-layout wrap>
+                                          <v-flex xs12><strong class="primary--text">{{item.votingSubject}}</strong></v-flex>
+                                          <v-flex xs12 class="mb-3">
+                                              <v-layout wrap>
+                                                  <v-flex xs12 md3>
+                                                      <p class="headline primary--text">{{item.veryGoodCount}}</p>
+                                                      <p>Rất hài lòng</p>
+                                                  </v-flex>
+                                                  <v-flex xs12 md3>
+                                                      <p class="headline primary--text">{{item.goodCount}}</p>
+                                                      <p>Hài lòng</p>
+                                                  </v-flex>
+                                                  <v-flex xs12 md3>
+                                                      <p class="headline primary--text">{{item.badCount}}</p>
+                                                      <p>Không hài lòng</p>
+                                                  </v-flex>
+                                              </v-layout>
+                                          </v-flex>
+                                        </v-layout>
+                                      </v-flex>
                                     </v-flex>
-
-                                </v-card-text>
+                                    <v-flex v-else>
+                                      <v-alert
+                                        :value="true"
+                                        color="info"
+                                        icon="info"
+                                        outline
+                                      >
+                                        Không có đánh giá
+                                      </v-alert>
+                                    </v-flex>
+                                  </v-card-text>
                                 </v-card>
                             </div>
                         </div>
@@ -165,8 +177,8 @@ export default {
     votingItemsDetal: [],
     filterConfig: '',
     filters: [],
-    govAgency: 0,
-    domainCode: 0,
+    govAgency: '',
+    domainCode: '',
     data: {},
     btnLoading: false,
     showPicker: true,
@@ -197,19 +209,21 @@ export default {
         if (vm.filterConfig.hasOwnProperty('groupIdsAdmin')) {
           vm.agencyLists = vm.filterConfig['groupIdsAdmin']
           if (vm.agencyLists.length > 0) {
-            let defaultVal = vm.agencyLists[0]['value']
+            let defaultVal = vm.agencyLists[0]
             for (let key in vm.agencyLists) {
               if (vm.agencyLists[key]['selected']) {
-                defaultVal = vm.agencyLists[key]['value']
+                defaultVal = vm.agencyLists[key]
                 break
               }
             }
             if (query.hasOwnProperty('groupId') && query['groupId']) {
-              vm.govAgency = Number(query['groupId'])
-              vm.getThuTucHanhChinh()
+              vm.govAgency = vm.agencyLists.filter(function (item) {
+                return String(item['value']) === String(query['groupId'])
+              })[0]
+              vm.getThuTucHanhChinh('statistic')
             } else {
               vm.govAgency = defaultVal
-              vm.getThuTucHanhChinh()
+              vm.getThuTucHanhChinh('statistic')
             }
           }
         }
@@ -224,7 +238,7 @@ export default {
             }
           }
         }
-        vm.getStatistic()
+        // vm.getStatistic()
       })
     })
   },
@@ -235,6 +249,7 @@ export default {
     })
   },
   watch: {
+
   },
   methods: {
     reloadPickerChange (key) {
@@ -247,13 +262,13 @@ export default {
     },
     getStatistic () {
       let vm = this
-      vm.data['domainCode'] = vm.domainCode
       setTimeout (function () {
         vm.loading = true
         let filter = {
-          groupId: vm.govAgency ? vm.govAgency : window.themeDisplay.getScopeGroupId(),
+          groupId: vm.govAgency['value'] ? vm.govAgency['value'] : window.themeDisplay.getScopeGroupId(),
           data: vm.data,
-          api: vm.filterConfig['api']
+          api: vm.filterConfig['api'],
+          serviceCode: vm.domainCode['serviceCode']
         }
         vm.$store.dispatch('getDataReports', filter).then(function (result) {
           if (result) {
@@ -273,11 +288,13 @@ export default {
         vm.percentBadTotal = 0
         vm.percentGoodTotal = 0
         vm.percentVeryGoodTotal = 0
-        vm.votingItemsDetal = data
-        data.forEach(e => {
-            vm.percentVeryGoodTotal += e.percentVeryGood
-            vm.percentGoodTotal += e.percentGood
-            vm.percentBadTotal += e.percentBad
+        vm.votingItemsDetal = data.filter(function (item) {
+          return item.votingSubject && item.govAgencyCode && item.domain
+        })
+        vm.votingItemsDetal.forEach(e => {
+          vm.percentVeryGoodTotal += e.veryGoodCount
+          vm.percentGoodTotal += e.goodCount
+          vm.percentBadTotal += e.badCount
         })
       } else {
         vm.percentBadTotal = 0
@@ -286,17 +303,26 @@ export default {
         vm.votingItemsDetal = []
       }
     },
-    getThuTucHanhChinh () {
+    getThuTucHanhChinh (statistic) {
       let vm = this
       setTimeout (function () {
         vm.loading = true
         let filter = {
-          groupId: vm.govAgency ? vm.govAgency : window.themeDisplay.getScopeGroupId(),
-          api: '/o/rest/v2/onegate/serviceconfigs/processes'
+          groupId: vm.govAgency['value'] ? vm.govAgency['value'] : window.themeDisplay.getScopeGroupId(),
+          api: '/o/rest/v2/serviceinfos',
+          administration: vm.govAgency['code']
         }
         vm.$store.dispatch('getThuTucHanhChinh', filter).then(function (result) {
           if (result) {
             vm.listThuTuc = result
+            if (vm.listThuTuc.length > 0) {
+              vm.domainCode = vm.listThuTuc[0]
+            } else {
+              vm.domainCode = ''
+            }
+            if (vm.domainCode) {
+              vm.getStatistic()
+            }
           } else {
             vm.listThuTuc = []
           }

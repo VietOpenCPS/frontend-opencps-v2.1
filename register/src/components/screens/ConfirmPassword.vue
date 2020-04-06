@@ -88,6 +88,9 @@ export default {
         let filter = dataForm
         vm.$store.dispatch('confirmCodeForgotPass', filter).then(function (result) {
           vm.loading = false
+          if (result === 'captcha') {
+            vm.$refs.captcha.makeImageCap()
+          }
         }).catch(function (reject) {
           vm.loading = false
           vm.$refs.captcha.makeImageCap()

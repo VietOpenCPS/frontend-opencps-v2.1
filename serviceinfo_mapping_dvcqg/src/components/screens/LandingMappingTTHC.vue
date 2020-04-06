@@ -74,7 +74,7 @@
                 </content-placeholders>
                 <div v-else>
                     <v-layout wrap>
-                        <v-flex xs12>
+                        <v-flex xs12 @click="openDialogChiTietThuTucDonVi(props.item)">
                             <span class="text-bold">{{props.item.serviceCode}}</span> - <span>{{props.item.serviceName}}</span>
                         </v-flex>
                     </v-layout>
@@ -91,7 +91,7 @@
                         </v-flex>
                     </v-layout>
                     <v-layout v-else align-center wrap>
-                        <v-flex xs8>
+                        <v-flex xs8  @click="openDialogChiTietThuTucDVCQG(props.item)">
                             <span class="text-bold">{{props.item.serviceCodeDVCQG}}</span> - <span>{{props.item.serviceNameDVCQG}}</span>
                         </v-flex>
                         <v-flex xs4 class="text-right">
@@ -132,14 +132,14 @@
                 </content-placeholders>
                 <div v-else>
                     <v-layout wrap v-if="props.item.serviceCode">
-                        <v-flex xs6><span class="text-bold">{{props.item.serviceCode}}</span> - <span>{{props.item.serviceName}}</span></v-flex>
+                        <v-flex xs6 @click="openDialogChiTietThuTucDonVi(props.item)"><span class="text-bold" >{{props.item.serviceCode}}</span> - <span>{{props.item.serviceName}}</span></v-flex>
                         <v-flex xs6 class="text-right"> 
                             <v-btn small outline color="primary"  @click="removeMapping(props.item)">Hủy mapping</v-btn>
                         </v-flex>
                     </v-layout>
                     <v-layout v-else align-center justify-center wrap>
                         <v-flex xs6 class="text-right">
-                            <v-btn small outline color="primary" @click="openDialogChiTietThuTuc(props.item)">Thêm vào đơn vị</v-btn>
+                            <v-btn small outline color="primary" @click="openDialogChiTietThuTucThem(props.item)">Thêm vào đơn vị</v-btn>
                         </v-flex>
                         <v-flex xs6 class="text-left">
                             <v-btn small outline color="primary" @click="openDialogMappingDonVi(props.item)">Mapping</v-btn>
@@ -153,8 +153,8 @@
                 </content-placeholders>
                 <div v-else>
                     <v-layout wrap>
-                        <v-flex xs12>
-                            <span class="text-bold">{{props.item.serviceCodeDVCQG}}</span> - <span>{{props.item.serviceNameDVCQG}}</span>
+                        <v-flex xs12 @click="openDialogChiTietThuTucDVCQG(props.item)">
+                            <span class="text-bold" >{{props.item.serviceCodeDVCQG}}</span> - <span>{{props.item.serviceNameDVCQG}}</span>
                         </v-flex>
                     </v-layout>
                 </div>
@@ -230,8 +230,8 @@
           </v-layout>
         </v-card>
     </v-dialog>
-    <!-- Popup danh sách chi tiết -->
-    <v-dialog v-model="dialogChiTietThuTuc" persistent max-width="900px">
+    <!-- Popup danh sách chi tiết TTHC DVCQG -->
+    <v-dialog v-model="dialogChiTietThuTucDVCQG" persistent max-width="900px">
       <v-card style="background: #fff;">
         <v-card-title>
           <span class="headline">Chi tiết thủ tục</span>
@@ -240,9 +240,9 @@
           <v-container grid-list-md>
             <v-tabs
                 v-model="active"
-        
-                
-                color="primary"
+                color="cyan"
+                dark
+                slider-color="yellow"
             >
                 <v-tab
                   v-for="n in tabDetailServiecs"
@@ -259,31 +259,31 @@
                         <v-flex xs12 style="border-bottom: 0.5px solid;">
                           <v-layout wrap>
                             <v-flex xs3 style="border-right: 0.5px solid;"><strong>Mã thủ tục</strong></v-flex>
-                            <v-flex xs9><span>{{serviceDetail[0].MATTHC}}</span></v-flex>
+                            <v-flex xs9><span>{{serviceDVCQGDetail[0].MATTHC}}</span></v-flex>
                           </v-layout>
                         </v-flex>
                         <v-flex xs12 style="border-bottom: 0.5px solid;">
                           <v-layout wrap>
                             <v-flex xs3 style="border-right: 0.5px solid;"><strong>Cơ quan thực hiện</strong></v-flex>
-                            <v-flex xs9><p v-for="(item, index) in serviceDetail[0].COQUANTHUCHIEN" :key="index">{{item.TENDONVI}}</p></v-flex>
+                            <v-flex xs9><p v-for="(item, index) in serviceDVCQGDetail[0].COQUANTHUCHIEN" :key="index">{{item.TENDONVI}}</p></v-flex>
                           </v-layout>
                         </v-flex>
                         <v-flex xs12 style="border-bottom: 0.5px solid;">
                           <v-layout wrap>
                             <v-flex xs3 style="border-right: 0.5px solid;"><strong>Lĩnh vực</strong></v-flex>
-                            <v-flex xs9><p v-for="(item, index) in serviceDetail[0].LINHVUCTHUCHIEN" :key="index">{{item.TENLINHVUC}}</p></v-flex>
+                            <v-flex xs9><p v-for="(item, index) in serviceDVCQGDetail[0].LINHVUCTHUCHIEN" :key="index">{{item.TENLINHVUC}}</p></v-flex>
                           </v-layout>
                         </v-flex>
                         <v-flex xs12 style="border-bottom: 0.5px solid;">
                           <v-layout wrap>
                             <v-flex xs3 style="border-right: 0.5px solid;"><strong>Cách thực hiện</strong></v-flex>
-                            <v-flex xs9><p v-for="(item, index) in serviceDetail[0].CACHTHUCTHUCHIEN" :key="index">- {{item.THOIGIAN[0].MOTA}}</p></v-flex>
+                            <v-flex xs9><p v-for="(item, index) in serviceDVCQGDetail[0].CACHTHUCTHUCHIEN" :key="index">- {{item.THOIGIAN[0].MOTA}}</p></v-flex>
                           </v-layout>
                         </v-flex>
                         <v-flex xs12 style="border-bottom: 0.5px solid;">
                           <v-layout wrap>
                             <v-flex xs3 style="border-right: 0.5px solid;"><strong>Đối tượng thực hiện</strong></v-flex>
-                            <v-flex xs9><p v-for="(item, index) in serviceDetail[0].DOITUONGTHUCHIEN" :key="index">- {{item.TENDOITUONG}}</p></v-flex>
+                            <v-flex xs9><p v-for="(item, index) in serviceDVCQGDetail[0].DOITUONGTHUCHIEN" :key="index">- {{item.TENDOITUONG}}</p></v-flex>
                           </v-layout>
                         </v-flex>
                       </v-layout>
@@ -294,7 +294,7 @@
                   <v-card flat>
                     <v-card-text>
                       <v-layout wrap>
-                        <v-flex xs12 v-for="(item, index) in serviceDetail[0].TRINHTUTHUCHIEN" :key="index">
+                        <v-flex xs12 v-for="(item, index) in serviceDVCQGDetail[0].TRINHTUTHUCHIEN" :key="index">
                           <p>{{item.TRUONGHOP}}</p>
                           <p>-{{item.TRINHTU[0].TENTRINHTU}}</p>
                         </v-flex>
@@ -306,7 +306,7 @@
                   <v-card flat>
                     <v-card-text>
                       <v-layout wrap>
-                        <v-flex xs12 v-for="(item, index) in serviceDetail[0].THANHPHANHOSO[0].GIAYTO" :key="index">
+                        <v-flex xs12 v-for="(item, index) in serviceDVCQGDetail[0].THANHPHANHOSO[0].GIAYTO" :key="index">
                           <p>-{{item.TENGIAYTO}}</p>
                         </v-flex>
                       </v-layout>
@@ -318,7 +318,7 @@
                     <v-card-text>
                       <v-layout wrap>
                         <v-flex>
-                          <p>{{serviceDetail.YEUCAU ? serviceDetail.YEUCAU : 'Không có'}}</p>
+                          <p>{{serviceDVCQGDetail.YEUCAU ? serviceDVCQGDetail.YEUCAU : 'Không có'}}</p>
                         </v-flex>
                       </v-layout>
                     </v-card-text>
@@ -330,8 +330,110 @@
         <v-spacer></v-spacer>
         <v-layout>
           <v-flex xs12 class="text-right">
-            <v-btn  color="blue darken-1 mx-2"  @click="addTTHC()"> Xác nhận</v-btn>
-          <v-btn color="blue darken-1" flat @click="dialogChiTietThuTuc = false">Đóng</v-btn>
+            <v-btn  color="blue darken-1 mx-2" v-if="btnThem"  @click="addTTHC()"> Xác nhận</v-btn>
+          <v-btn color="blue darken-1" flat @click="dialogChiTietThuTucDVCQG = false">Đóng</v-btn>
+          </v-flex>
+        </v-layout>
+      </v-card>
+    </v-dialog>
+    <!-- Popup danh sách chi tiết TTHC Don Vi -->
+    <v-dialog v-model="dialogChiTietThuTucDonVi" persistent max-width="900px">
+      <v-card style="background: #fff;">
+        <v-card-title>
+          <span class="headline">Chi tiết thủ tục</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container grid-list-md>
+            <div class="mt-0">
+              <v-tabs
+                v-model="active"
+                color="cyan"
+                dark
+                slider-color="yellow"
+              >
+                <v-tab key="1" ripple class="mr-2"> Thông tin chung </v-tab>
+                <v-tab key="2" ripple class="mr-2"> Trình tự thực hiện</v-tab>
+                <v-tab key="3" ripple class="mr-2"> Thành phần hồ sơ </v-tab>
+                <v-tab key="4" ripple class="mr-2"> Yêu cầu điều kiện </v-tab>
+                <v-tab-item key="1" class="wrap-scroll wrap-scroll-sevice">
+                  <v-card>
+                    <v-card-text class="px-0 py-0">
+                      <div class="table-detail-domain table-bordered">
+                        <div class="table__overflow">
+                          <table class="datatable table">
+                            <tbody>
+                              <tr>
+                                <td class="pt-2"><span class="text-bold">Mã thủ tục</span></td>
+                                <td class="pt-2"><span>{{serviceDonViDetail.serviceCode}}</span></td>
+                              </tr>
+                              <tr>
+                                <td class="pt-2"><span class="text-bold">Cơ quan quản lý</span></td>
+                                <td class="pt-2"><span>{{serviceDonViDetail.administrationName}}</span></td>
+                              </tr>
+                              <tr>
+                                <td class="pt-2"><span class="text-bold">Lĩnh vực</span></td>
+                                <td class="pt-2"><span>{{serviceDonViDetail.domainName}}</span></td>
+                              </tr>
+                              <tr>
+                                <td class="pt-2"><span class="text-bold">Cách thực hiện</span></td>
+                                <td class="pt-2"><span v-html="serviceDonViDetail.methodText"></span></td>
+                              </tr>
+                              <tr>
+                                <td class="pt-2"><span class="text-bold">Thời gian giải quyết</span></td>
+                                <td class="pt-2"><span v-html="serviceDonViDetail.durationText"></span></td>
+                              </tr>
+                              <tr>
+                                <td class="pt-2"><span class="text-bold">Đối tượng</span></td>
+                                <td class="pt-2"><span v-html="serviceDonViDetail.applicantText"></span></td>
+                              </tr>
+                              <tr>
+                                <td class="pt-2"><span class="text-bold">Kết quả giải quyết</span></td>
+                                <td class="pt-2"><span v-html="serviceDonViDetail.resultText"></span></td>
+                              </tr>
+                              <tr>
+                                <td class="pt-2"><span class="text-bold">Lệ phí</span></td>
+                                <td class="pt-2"><span v-html="serviceDonViDetail.feeText"></span></td>
+                              </tr>
+                              <tr>
+                                <td class="pt-2"><span class="text-bold">Căn cứ pháp lý</span></td>
+                                <td class="pt-2"><span v-html="serviceDonViDetail.regularText"></span></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </v-card-text>
+                  </v-card>
+                </v-tab-item>
+                <v-tab-item key="2" class="wrap-scroll wrap-scroll-sevice">
+                  <v-card>
+                    <v-card-text>
+                      <div v-html="serviceDonViDetail.processText"></div>
+                    </v-card-text>
+                  </v-card>
+                </v-tab-item>
+                <v-tab-item key="3" class="wrap-scroll wrap-scroll-sevice">
+                  <v-card>
+                    <v-card-text>
+                      <div v-html="serviceDonViDetail.dossierText"></div>
+                    </v-card-text>
+                  </v-card>
+                </v-tab-item>
+                <v-tab-item key="4" class="wrap-scroll wrap-scroll-sevice">
+                  <v-card>
+                    <v-card-text>
+                      <div v-html="serviceDonViDetail.conditionText"></div>
+                    </v-card-text>
+                  </v-card>
+                </v-tab-item>
+              </v-tabs>
+            </div>
+          </v-container>
+        </v-card-text>
+        <v-spacer></v-spacer>
+        <v-layout>
+          <v-flex xs12 class="text-right">
+          <v-btn color="blue darken-1" flat @click="dialogChiTietThuTucDonVi = false">Đóng</v-btn>
           </v-flex>
         </v-layout>
       </v-card>
@@ -353,8 +455,10 @@ export default {
   },
   data: () => ({
     loading: true,
+    btnThem : false,
     dialogMapping: false,
-    dialogChiTietThuTuc: false,
+    dialogChiTietThuTucDonVi: false,
+    dialogChiTietThuTucDVCQG: false,
     loadingMapping: false,
     tenThuTucModel: '',
     timKiemTheoSelected: '',
@@ -391,7 +495,7 @@ export default {
     thutucPage: 1,
     pageSize: 20,
     serviceSelect: {},
-    serviceDetail: [
+    serviceDVCQGDetail: [
       {
             CACHTHUCTHUCHIEN: [     ],
             TENTTHC: "",
@@ -428,6 +532,9 @@ export default {
             KETQUATHUCHIEN: []
       }
     ],
+    serviceDonViDetail : {
+
+    }
   }),
   computed: {
 
@@ -624,6 +731,7 @@ export default {
         vm.listMapping = result.data
         vm.listMappingView = vm.listMapping.slice(0, 10)
         vm.loadingMapping = false
+        vm.nameDVCQGModel = item.serviceName
       }).catch(function() {
         vm.listMapping = []
         vm.listMappingView = []
@@ -644,21 +752,68 @@ export default {
         vm.listMapping = result.data
         vm.listMappingView = vm.listMapping.slice(0, 10)
         vm.loadingMapping = false
+        vm.nameDVCQGModel = item.serviceNameDVCQG
       }).catch(function() {
         vm.listMapping = []
         vm.listMappingView = []
         vm.loadingMapping = false
       })
     },
-    openDialogChiTietThuTuc (item) {
+    openDialogChiTiet (item) {
       let vm = this
+      vm.serviceSelect = item
+      vm.btnThem = false
       vm.dialogChiTietThuTuc = true
       let filter = {
          serviceCodeDVCQG: item.serviceCodeDVCQG,
       }
       vm.loadingMapping = true
       vm.$store.dispatch('getChiTietTTDVCQG', filter).then(function (result) {
-        vm.serviceDetail = result.result
+        vm.serviceDVCQGDetail = result.result
+      }).catch(function() {
+
+      })
+    },
+    openDialogChiTietThuTucDVCQG (item) {
+      let vm = this
+      vm.serviceSelect = item
+      vm.dialogChiTietThuTucDVCQG = true
+      vm.btnThem = false
+      let filter = {
+         serviceCodeDVCQG: item.serviceCodeDVCQG,
+      }
+      vm.loadingMapping = true
+      vm.$store.dispatch('getChiTietTTDVCQG', filter).then(function (result) {
+        vm.serviceDVCQGDetail = result.result
+      }).catch(function() {
+
+      })
+    },
+    openDialogChiTietThuTucDonVi (item) {
+      let vm = this
+      vm.serviceDonViDetail = item
+      vm.dialogChiTietThuTucDonVi = true
+      vm.btnThem = false
+      let filter = {
+         serviceCodeDVCQG: item.serviceCode,
+      }
+      // vm.$store.dispatch('getChiTietTTDVCQG', filter).then(function (result) {
+      //   vm.serviceDVCQGDetail = result.result
+      // }).catch(function() {
+
+      // })
+    },
+    openDialogChiTietThuTucThem (item) {
+      let vm = this
+      vm.serviceSelect = item
+      vm.dialogChiTietThuTucDVCQG = true
+      vm.btnThem = true
+      let filter = {
+         serviceCodeDVCQG: item.serviceCodeDVCQG,
+      }
+      vm.loadingMapping = true
+      vm.$store.dispatch('getChiTietTTDVCQG', filter).then(function (result) {
+        vm.serviceDVCQGDetail = result.result
       }).catch(function() {
 
       })
@@ -717,8 +872,11 @@ export default {
     },
     addTTHC () {
       let vm = this
-      let filter = {}
-      vm.$store.dispatch('addTTHC', filter).then(function (result) {
+      let filter = {
+        serviceCodes: vm.serviceSelect.serviceCodeDVCQG,
+        type: "create"
+      }
+      vm.$store.dispatch('syncServiceinfoNew', filter).then(function (result) {
          toastr.success('Thêm thủ tục thành công')
          vm.dialogChiTietThuTuc = false
         if(vm.timKiemTheoSelected === 'DonVi'){
@@ -734,9 +892,10 @@ export default {
     syncServiceinfo (item) {
         let vm = this
         let filter = {
-            serviceCode: item.serviceCode
+          serviceCodes: item.serviceCode,
+          type: "sync"
         }
-        vm.$store.dispatch('syncServiceinfo', filter).then(function (result) {
+        vm.$store.dispatch('syncServiceinfoNew', filter).then(function (result) {
             toastr.clear()
             toastr.success('Đồng bộ thành công')
             if(vm.timKiemTheoSelected === 'DonVi'){
