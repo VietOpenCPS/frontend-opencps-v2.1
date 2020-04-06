@@ -195,7 +195,7 @@ export const store = new Vuex.Store({
           axios.get(state.endPoint + '/serviceinfos', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
-              resolve(true)
+              resolve(serializable.data)
             } else {
               resolve(false)
             }

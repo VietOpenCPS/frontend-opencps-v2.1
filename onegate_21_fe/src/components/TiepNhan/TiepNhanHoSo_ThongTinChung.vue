@@ -78,6 +78,7 @@
                 :label="dueDateInput ? '' : 'Chọn ngày'"
                 :min-date="minDate"
                 :max-date="maxDate"
+                locale="vi"
               ></vue-ctk-date-time-picker>
               <v-icon class="hover-pointer" @click="showDatePicker">event</v-icon>
             </v-subheader>
@@ -89,11 +90,10 @@
 </template>
 
 <script>
-  // 
-  // import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
+  
   export default {
     components: {
-      'vue-ctk-date-time-picker': window['vue-ctk-date-time-picker']
+      'vue-ctk-date-time-picker': window.VueCtkDateTimePicker.default
     },
     data: () => ({
       minDate: null,

@@ -649,8 +649,12 @@ export default {
           vm.$store.dispatch('checkServiceExits', filter).then(function (result) {
             if (result) {
               // case trùng serviceCode
+              console.log('result', result)
+              let serviceCodeLocal = result[0]['serviceInfoId']
               let path = vm.confirmEnding(window.location.href.split('?')[0], '/')
-              let url = path ? window.location.href.split('?')[0] + currentQuery['MaTTHCDP'] + '?' + window.location.href.split('?')[1] : window.location.href.split('?')[0] + '/' + currentQuery['MaTTHCDP'] + '?' + window.location.href.split('?')[1]
+              console.log('path', path)
+              let url = path ? window.location.href.split('?')[0] + serviceCodeLocal + '?' + window.location.href.split('?')[1] : window.location.href.split('?')[0] + '/' + serviceCodeLocal + '?' + window.location.href.split('?')[1]
+              console.log('url', url)
               window.location.href = url
             } else {
               // case khác serviceCode
