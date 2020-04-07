@@ -45,6 +45,7 @@
                 required
                 prepend-inner-icon="person_outline"
                 @keyup.enter="submitConfirmLogin"
+                autofocus
               ></v-text-field>
             </v-flex>
             <v-flex xs12 class="">

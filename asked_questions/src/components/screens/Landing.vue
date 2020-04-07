@@ -776,6 +776,9 @@ export default {
             vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
             vm.$store.commit('setActiveAddQuestion', false)
           }).catch(function (reject) {
+            if (reject === 'captcha') {
+              vm.$refs.captcha.makeImageCap()
+            }
             console.log(reject)
           })
         }

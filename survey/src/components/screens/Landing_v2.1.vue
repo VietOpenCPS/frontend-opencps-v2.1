@@ -192,6 +192,14 @@ export default {
           if (vm.$refs.captcha) {
             vm.$refs.captcha.makeRandomString()
           }
+          vm.$store.dispatch('loadVoting', {
+            className: 'survey',
+            classPk: 0
+          }).then(result => {
+            vm.votingItems = result
+            console.log(vm.votingItems)
+          }).catch(xhr => {
+          })
         }).catch(xhr => {
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           vm.btnLoading = false
