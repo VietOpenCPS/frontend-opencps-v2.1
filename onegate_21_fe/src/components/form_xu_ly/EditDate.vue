@@ -32,10 +32,10 @@
   </div>
 </template>
 <script>
-
+ let datePicker = window.VueCtkDateTimePicker ? window.VueCtkDateTimePicker.default : window['vue-ctk-date-time-picker']
 export default {
   components: {
-    'vue-ctk-date-time-picker': window.VueCtkDateTimePicker.default
+    'vue-ctk-date-time-picker': datePicker
   },
   props: ['dueDateEdit'],
   data: () => ({

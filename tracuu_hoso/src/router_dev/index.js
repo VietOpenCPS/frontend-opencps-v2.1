@@ -2,11 +2,20 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import NotFound from '@/components/NotFound'
 import Landing from '@/components/screens/Landing'
-import DetailDossier from '@/components/screens/DetailDossier'
+import DetailForward from '@/components/blacklist/DetailForward'
 
 
 const routes = [
   { path: '/', name: 'Landing', component: Landing, props: false },
+  {
+    path: '/danh-sach-ho-so/:index',
+    name: 'Landing',
+    component: () => import(/* webpackChunkName: "Landing" */ '@/components/blacklist/Landing.vue'),
+    props: true,
+    meta: {
+      requiresAuth: false
+    }
+  },
   {
     path: '/danh-sach-ho-so/:index/tiep-nhan-ho-so/:id/:formCode',
     name: 'TiepNhanHoSoDetail',
@@ -25,6 +34,7 @@ const routes = [
       requiresAuth: false
     }
   },
+  { path: '/danh-sach-ho-so/:index/ho-so/:id/:formCode', name: 'DetailForward', component: DetailForward, props: true },
   { path: '*', name: 'NotFound', component: NotFound }
 ]
 

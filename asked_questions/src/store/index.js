@@ -253,8 +253,8 @@ export const store = new Vuex.Store({
           axios.post(url, dataAdd, param).then(response => {
             if (response['status'] !== undefined && response['status'] === 203) {
               toastr.clear()
-              toastr.error('Nhập sai mã Captcha')
-              reject(xhr)
+              toastr.error('Mã captcha không chính xác')
+              reject('captcha')
             } else {
               resolve(response.data)
             }

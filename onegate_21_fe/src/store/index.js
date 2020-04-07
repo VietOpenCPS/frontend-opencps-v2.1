@@ -592,7 +592,7 @@ export const store = new Vuex.Store({
               } catch (e) {
                 let partTip = {
                   tip: string,
-                  maxSize: 10,
+                  maxSize: 30,
                   extensions: state.fileTypeAllowDefault
                 }
                 return partTip
@@ -632,7 +632,7 @@ export const store = new Vuex.Store({
               } catch (e) {
                 let partTip = {
                   tip: string,
-                  maxSize: 10,
+                  maxSize: 30,
                   extensions: state.fileTypeAllowDefault
                 }
                 return partTip
@@ -1351,7 +1351,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('dossierNo', data.dossierNo ? data.dossierNo : '')
         dataPutdossier.append('applicantIdType', applicantType)
         dataPutdossier.append('applicantIdNo', data.applicantIdNo ? data.applicantIdNo : '')
-        dataPutdossier.append('address', data.address ? data.address : '')
+        dataPutdossier.append('address', data.address ? data.address + '.' : '')
         dataPutdossier.append('cityCode', data.cityCode ? data.cityCode : '')
         dataPutdossier.append('districtCode', data.districtCode ? data.districtCode : '')
         dataPutdossier.append('wardCode', data.wardCode ? data.wardCode : '')
@@ -1361,7 +1361,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateIdNo', data.delegateIdNo ? data.delegateIdNo : '')
         dataPutdossier.append('delegateTelNo', data.delegateTelNo ? data.delegateTelNo : '')
         dataPutdossier.append('delegateEmail', data.delegateEmail ? data.delegateEmail : '')
-        dataPutdossier.append('delegateAddress', data.delegateAddress ? data.delegateAddress : '')
+        dataPutdossier.append('delegateAddress', data.delegateAddress ? data.delegateAddress + '.' : '')
         dataPutdossier.append('delegateCityCode', data.delegateCityCode ? data.delegateCityCode : '')
         dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode ? data.delegateDistrictCode : '')
         dataPutdossier.append('delegateWardCode', data.delegateWardCode ? data.delegateWardCode : '')

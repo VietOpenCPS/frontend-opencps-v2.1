@@ -1,5 +1,7 @@
 <template>
   <v-app id="app_tracuu_hoso" style="background: #fff !important">
+    <v-navigation-drawer app clipped floating width="310" v-if="false">
+    </v-navigation-drawer>
     <v-content style="width: 100%;max-width: 1300px;margin: 0 auto">
       <router-view></router-view>
     </v-content>

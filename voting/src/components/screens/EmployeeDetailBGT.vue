@@ -261,13 +261,24 @@ export default {
       }
     },
     submitResultVoting: function () {
-      var vm = this
-      var isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
-      if (isSigned) {
-        vm.doVottingResultSubmit()
-      } else {
-        vm.dialogShowApplicantIdNo = true
+      let vm = this
+      let valid = false
+      for (var key in vm.votingItems) {
+        if (String(vm.votingItems[key]['selected']) !== '0') {
+          valid = true
+        }
       }
+      if (valid) {
+        let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
+        if (isSigned) {
+          vm.doVottingResultSubmit()
+        } else {
+          vm.dialogShowApplicantIdNo = true
+        }
+      } else {
+        toastr.error('Bạn chưa chọn đánh giá nào')
+      }
+      
     },
     doVottingSubmit () {
       var vm = this
