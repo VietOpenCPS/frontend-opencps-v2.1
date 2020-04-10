@@ -167,6 +167,45 @@
                   </template>
                 </v-text-field>
               </v-flex>
+              <v-flex xs12 sm4 v-if="isBXD">
+                <div>File ảnh CMND mặt trước </div>
+                <AttachImage :dataImage="user['applicantProfile']['indentifyNoFFileUrl']"
+                  @changeImage="changeImageFront"  
+                ></AttachImage>
+                <!-- <v-text-field 
+                  @click='onPickFileCMNDFront'
+                  v-model='fileCMNDFrontName'
+                  v-if="isBXD"
+                  box
+                  prepend-icon="attach_file"
+                ></v-text-field>
+             
+                <input
+                  type="file"
+                  style="display: none"
+                  ref="refFileCMNDFront"
+                  accept="*/*"
+                  @change="onFileCMNDFrontPicked"> -->
+              </v-flex>
+              <v-flex xs12 sm4 v-if="isBXD">
+                <div>File ảnh CMND mặt sau </div>
+                <AttachImage :dataImage="user['applicantProfile']['indentifyNoBFileUrl']"
+                  @changeImage="changeImageBack"  
+                ></AttachImage>
+                <!-- <v-text-field 
+                  @click='onPickFileCMNDBack'
+                  v-model='fileCMNDBackName'
+                  prepend-icon="attach_file"
+                  v-if="isBXD"
+                  box
+                ></v-text-field>
+                <input
+                  type="file"
+                  style="display: none"
+                  ref="refFileCMNDBack"
+                  accept="*/*"
+                  @change="onFileCMNDBackPicked"> -->
+              </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('LoaiThe') >= 0">
                 <v-text-field label="Loại thẻ" v-model="user['applicantProfile']['LoaiThe']" box></v-text-field>
               </v-flex>
@@ -658,6 +697,7 @@
   import Vue from 'vue'
   import axios from 'axios'
   import AttachedFileAvatar from '../ext/AttachedFileAvatar.vue'
+  import AttachImage from '../ext/AttachImage.vue'
   import TinyPagination from './Pagination.vue'
   import toastr from 'toastr'
   Vue.use(toastr)
@@ -668,9 +708,17 @@
   export default {
     components: {
       AttachedFileAvatar,
-      'tiny-pagination': TinyPagination
+      'tiny-pagination': TinyPagination,
+      AttachImage
     },
     data: () => ({
+      isBXD: window.themeDisplay.getScopeGroupId() === '35166' ? true : false,
+      indentifyNoFFileUrl: '',
+      indentifyNoBFileUrl: '',
+      fileCMNDFrontName: '',
+      fileCMNDBackName: '',
+      fileCMNDFront: '',
+      fileCMNDBack: '',
       mapping: false,
       dataMapping: '',
       hasSSo: false,
@@ -999,6 +1047,9 @@
               vm.NoiOHienTaiwardItems = resultWards.data
             })
           }
+          let  applicantTypeTemp = vm.user['applicantProfile']
+          vm.indentifyNoBFileUrl = applicantTypeTemp.indentifyNoBFileUrl
+          vm.indentifyNoFFileUrl = applicantTypeTemp.indentifyNoFFileUrl
           // profileConfig cấu hình fragment
           try {
             if (vm.user['applicantType'] === 'citizen') {
@@ -1134,15 +1185,50 @@
         if (vm.$refs.form.validate()) {
           vm.loading = true
           console.log('user put data', vm.user)
-          vm.$store.dispatch('putUser', vm.user).then(function () {
+          if(!vm.fileCMNDFront && !vm.fileCMNDBack) {
+            toastr.error('File ảnh chưa được chọn')
             vm.loading = false
-            toastr.clear()
-            toastr.success('Yêu cầu thực hiện thành công')
-          }).catch(function () {
-            vm.loading = false
-            toastr.clear()
-            toastr.error('Yêu cầu thực hiện thất bại')
-          })
+            return
+          }
+          let filter = {
+            indentifyNoFFile: vm.fileCMNDFront,
+            indentifyNoBFile: vm.fileCMNDBack,
+            applicantId: vm.user['classPK']
+          }
+          if(vm.isBXD) {
+            vm.$store.dispatch('updateindentifies', filter).then(function (data) {
+              let applicantProfile =  JSON.parse(data['applicantProfile'])
+              vm.user['applicantProfile']['indentifyNoFFileUrl'] = applicantProfile.indentifyNoFFileUrl
+              vm.user['applicantProfile']['indentifyNoBFileUrl'] = applicantProfile.indentifyNoBFileUrl
+              vm.$store.dispatch('putUser', vm.user).then(function () {
+                vm.loading = false
+                toastr.clear()
+                toastr.success('Yêu cầu thực hiện thành công')
+                // vm.$store.dispatch('getUserInfo').then((data)=>{
+                
+                // }).catch(()=>{})
+              }).catch(function () {
+                vm.loading = false
+                toastr.clear()
+                toastr.error('Yêu cầu thực hiện thất bại')
+              })
+            }).catch(function () {
+              vm.loading = false
+              toastr.clear()
+              toastr.error('Yêu cầu thực hiện thất bại')
+            })
+          } else {
+            vm.$store.dispatch('putUser', vm.user).then(function () {
+              vm.loading = false
+              toastr.clear()
+              toastr.success('Yêu cầu thực hiện thành công')
+            }).catch(function () {
+              vm.loading = false
+              toastr.clear()
+              toastr.error('Yêu cầu thực hiện thất bại')
+            })
+          }
+
         }
       },
       showChangePass () {
@@ -1417,6 +1503,44 @@
         vm.$router.push({
           path: current.path + queryString
         })
+      },
+      onPickFileCMNDFront () {
+        this.$refs.refFileCMNDFront.click()
+      },
+      onPickFileCMNDBack () {
+        this.$refs.refFileCMNDBack.click()
+      },
+      onFileCMNDFrontPicked (event) {
+        let vm = this
+        const files = event.target.files
+        if(files.length){
+          const file = files[0]
+          console.log(files)
+          console.log(files[0])
+          vm.fileCMNDFront = file
+          vm.fileCMNDFrontName = files[0].name
+        }
+      },
+      onFileCMNDBackPicked (event) {
+        let vm = this
+        const files = event.target.files
+        if(files.length){
+          const file = files[0]
+          console.log(files)
+          console.log(files[0])
+          vm.fileCMNDBack = file
+          vm.fileCMNDBackName = files[0].name
+        }
+      },
+      changeImageFront(config) {
+        let vm = this
+        vm.fileCMNDFront = config.file
+        console.log(config)
+      },
+      changeImageBack(config) {
+        let vm = this
+        vm.fileCMNDBack = config.file
+        console.log(config)
       }
     }
   }

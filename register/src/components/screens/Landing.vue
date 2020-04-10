@@ -134,6 +134,42 @@
                 ></v-text-field>
               </v-flex>
               <v-flex xs12>
+                <div>File ảnh CMND mặt trước <span style="color:red">(*)</span></div>
+                <v-text-field 
+                  @click='onPickFileCMNDFront'
+                  v-model='fileCMNDFrontName'
+                  prepend-icon="attach_file"
+                  v-if="isBXD"
+                  :rules="[rules.required]"
+                  box
+                ></v-text-field>
+                <!-- Hidden -->
+                <input
+                  type="file"
+                  style="display: none"
+                  ref="refFileCMNDFront"
+                  accept="*/*"
+                  @change="onFileCMNDFrontPicked">
+              </v-flex>
+              <v-flex xs12>
+                <div>File ảnh CMND mặt sau <span style="color:red">(*)</span></div>
+                <v-text-field 
+                  @click='onPickFileCMNDBack'
+                  v-model='fileCMNDBackName'
+                  prepend-icon="attach_file"
+                  v-if="isBXD"
+                  :rules="[rules.required]"
+                  box
+                ></v-text-field>
+                <!-- Hidden -->
+                <input
+                  type="file"
+                  style="display: none"
+                  ref="refFileCMNDBack"
+                  accept="*/*"
+                  @change="onFileCMNDBackPicked">
+              </v-flex>
+              <v-flex xs12>
                 <captcha ref="captcha"></captcha>
               </v-flex>
               <v-flex xs12>
@@ -249,6 +285,7 @@ export default {
     date: null,
     dialogRules: false,
     dialog_applicantInfos: false,
+    isBXD: window.themeDisplay.getScopeGroupId() === '35166' ? true : false,
     applicantInfos: {
       applicantName: '',
       applicantIdNo: '',
@@ -277,6 +314,10 @@ export default {
     validBussinessInfos: true,
     messageCheckApplicant: '',
     ruleContent: '',
+    fileCMNDFrontName: '',
+    fileCMNDBackName: '',
+    fileCMNDFront: '',
+    fileCMNDBack: '',
     e1: true,
     e2: true,
     rules: {
@@ -412,7 +453,9 @@ export default {
         contactTelNo: vm.contactTelNo,
         contactEmail: vm.contactEmail,
         password: vm.passWord,
-        j_captcha_response: vm.$refs.captcha.j_captcha_response
+        j_captcha_response: vm.$refs.captcha.j_captcha_response,
+        indentifyNoFFile: vm.fileCMNDFront,
+        indentifyNoBFile: vm.fileCMNDBack
       }
       console.log('dataForm', dataForm)
       if (vm.$refs.form.validate() && vm.agreeRules) {
@@ -426,16 +469,33 @@ export default {
         if (passValid) {
           vm.loading = true
           let filter = dataForm
-          vm.$store.dispatch('postApplicant', filter).then(function (result) {
-            vm.loading = false
-            vm.$refs.captcha.makeImageCap()
-            vm.$router.push({
-              path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
+          if(vm.isBXD) {
+            vm.$store.dispatch('postApplicantBXD', filter).then(function (result) {
+              vm.loading = false
+              vm.$refs.captcha.makeImageCap()
+              // vm.$router.push({
+              //   path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
+              // })
+              vm.$router.push({
+                path: '/cho-xac-nhan'
+              })
+            }).catch(function (reject) {
+              vm.$refs.captcha.makeImageCap()
+              vm.loading = false
             })
-          }).catch(function (reject) {
-            vm.$refs.captcha.makeImageCap()
-            vm.loading = false
-          })
+          } else {
+            vm.$store.dispatch('postApplicant', filter).then(function (result) {
+              vm.loading = false
+              vm.$refs.captcha.makeImageCap()
+              vm.$router.push({
+                path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
+              })
+            }).catch(function (reject) {
+              vm.$refs.captcha.makeImageCap()
+              vm.loading = false
+            })
+          }
+
         }
       }
     },
@@ -533,6 +593,34 @@ export default {
     },
     inputDisable () {
       return
+    },
+    onPickFileCMNDFront () {
+      this.$refs.refFileCMNDFront.click()
+    },
+    onPickFileCMNDBack () {
+      this.$refs.refFileCMNDBack.click()
+    },
+    onFileCMNDFrontPicked (event) {
+      let vm = this
+      const files = event.target.files
+      if(files.length){
+        const file = files[0]
+        console.log(files)
+        console.log(files[0])
+        vm.fileCMNDFront = file
+        vm.fileCMNDFrontName = files[0].name
+      }
+    },
+    onFileCMNDBackPicked (event) {
+      let vm = this
+      const files = event.target.files
+      if(files.length){
+        const file = files[0]
+        console.log(files)
+        console.log(files[0])
+        vm.fileCMNDBack = file
+        vm.fileCMNDBackName = files[0].name
+      }
     }
   }
 }

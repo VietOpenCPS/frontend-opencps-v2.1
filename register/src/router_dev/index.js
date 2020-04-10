@@ -6,12 +6,14 @@ import LandingRegister from '@/components/screens/Landing'
 import XacThucTaiKhoan from '@/components/screens/XacThucTaiKhoan'
 import ForgotPassword from '@/components/screens/ForgotPassword'
 import ConfirmPassword from '@/components/screens/ConfirmPassword'
+import ChoXacNhan from '@/components/screens/ChoXacNhan'
 import Login from '@/components/screens/Login'
 import LoginDvcBgt from '@/components/screens/LoginDvcBgt'
 import LoginMotCua from '@/components/screens/LoginMotCua'
 const routes = [
   { path: '/', name: 'LandingRegister', component: LandingRegister, props: false },
   { path: '/xac-thuc-tai-khoan', name: 'XacThucTaiKhoan', component: XacThucTaiKhoan },
+  { path: '/cho-xac-nhan', name: 'ChoXacNhan', component: ChoXacNhan },
   { path: '/cap-lai-mat-khau', name: 'ForgotPassword', component: ForgotPassword },
   { path: '/xac-thuc-cap-lai-mat-khau', name: 'ConfirmPassword', component: ConfirmPassword },
   { path: '/login', name: 'Login', component: Login },

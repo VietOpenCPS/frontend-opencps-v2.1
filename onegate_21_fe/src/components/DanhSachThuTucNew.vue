@@ -100,7 +100,7 @@
         </v-flex>
       </v-layout>
       <v-divider class="my-0 py-0"></v-divider>
-      <v-card v-if="!domainFilter && !activeFilterKey && !serviceLastest">
+      <v-card v-if="!activeFilterKey && !serviceLastest">
         <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>
           <!-- Cap 3 -->
           <v-layout row wrap>
@@ -129,11 +129,11 @@
           </v-layout>
         </v-card-text>
       </v-card>
-      <v-card v-if="domainFilter">
+      <!-- <v-card v-if="domainFilter">
         <v-card-text class='grey lighten-3 px-0 py-0'>
               <v-card>
                 <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>
-                  <!-- Cap 3 -->
+               ư
                   <v-layout row wrap>
                     <v-flex xs12 sm9 class="pt-1">
                       <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
@@ -161,7 +161,7 @@
                 </v-card-text>
               </v-card>
         </v-card-text>
-      </v-card>
+      </v-card> -->
       <v-card v-if="activeFilterKey || serviceLastest">
         <div v-if="serviceConfigListRender.length > 0">
           <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>

@@ -84,7 +84,7 @@
             >
               <template slot="items" slot-scope="props">
                 <tr v-bind:class="{'active': props.index%2==1}">
-                  <td class="text-xs-center">
+                  <td class="text-xs-center" style="border-right: 0.5px solid #aba6a6;">
                     <content-placeholders v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
@@ -92,7 +92,7 @@
                       <span>{{ thutucPage*pageSize - pageSize + props.index + 1}}</span><br>
                     </div>
                   </td>
-                  <td class="text-xs-left">
+                  <td class="text-xs-left" style="border-right: 0.5px solid #aba6a6;">
                     <content-placeholders v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
@@ -104,14 +104,14 @@
                         </v-layout>
                     </div>
                   </td>
-                  <td class="text-xs-left" style="min-width: 400px;">
+                  <td class="text-xs-left" style="min-width: 575px;">
                     <content-placeholders v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
                     <div v-else>
                         <v-layout wrap v-if="props.item.serviceCodeDVCQG === '' ">
                             <v-flex xs12 class="text-right"> 
-                                <v-btn small outline color="primary" @click="openDialogMappingDVCQG(props.item)">Mapping</v-btn>
+                                <v-btn small outline color="#115ebe" @click="openDialogMappingDVCQG(props.item)">Mapping</v-btn>
                             </v-flex>
                         </v-layout>
                         <v-layout v-else align-center wrap>
@@ -119,8 +119,8 @@
                                 <span class="text-bold">{{props.item.serviceCodeDVCQG}}</span> - <span>{{props.item.serviceNameDVCQG}}</span>
                             </v-flex>
                             <v-flex xs4 class="text-right">
-                                <v-btn small outline color="primary" @click="removeMapping(props.item)">Huỷ mapping</v-btn>
-                                <v-btn small outline color="primary" v-if="props.item.synced === 0" @click="syncServiceinfo(props.item)">Đồng bộ</v-btn>
+                                <v-btn small outline color="#115ebe" @click="removeMapping(props.item)">Huỷ mapping</v-btn>
+                                <v-btn small outline color="#115ebe" v-if="props.item.synced === 0" @click="syncServiceinfo(props.item)">Đồng bộ</v-btn>
                             </v-flex>
                         </v-layout>
                     </div>
@@ -142,7 +142,7 @@
             >
               <template slot="items" slot-scope="props">
                 <tr v-bind:class="{'active': props.index%2==1}">
-                  <td class="text-xs-center">
+                  <td class="text-xs-center" style="border-right: 0.5px solid #aba6a6;">
                     <content-placeholders v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
@@ -150,7 +150,7 @@
                       <span>{{thutucPage*pageSize - pageSize + props.index + 1}}</span><br>
                     </div>
                   </td>
-                  <td class="text-xs-left" style="min-width: 471px;">
+                  <td class="text-xs-left" style="min-width: 575px; border-right: 0.5px solid #aba6a6;" >
                     <content-placeholders v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
@@ -158,15 +158,15 @@
                         <v-layout wrap v-if="props.item.serviceCode">
                             <v-flex xs6 @click="openDialogChiTietThuTucDonVi(props.item)" style="cursor: pointer;"><span class="text-bold" >{{props.item.serviceCode}}</span> - <span>{{props.item.serviceName}}</span></v-flex>
                             <v-flex xs6 class="text-right"> 
-                                <v-btn small outline color="primary"  @click="removeMapping(props.item)">Hủy mapping</v-btn>
+                                <v-btn small outline color="#115ebe"  @click="removeMapping(props.item)">Hủy mapping</v-btn>
                             </v-flex>
                         </v-layout>
                         <v-layout v-else align-center justify-center wrap>
                             <v-flex xs6 class="text-right">
-                                <v-btn small outline color="primary" @click="openDialogChiTietThuTucThem(props.item)">Thêm vào đơn vị</v-btn>
+                                <v-btn small outline color="#115ebe" @click="openDialogChiTietThuTucThem(props.item)">Thêm vào đơn vị</v-btn>
                             </v-flex>
                             <v-flex xs6 class="text-left">
-                                <v-btn small outline color="primary" @click="openDialogMappingDonVi(props.item)">Mapping</v-btn>
+                                <v-btn small outline color="#115ebe" @click="openDialogMappingDonVi(props.item)">Mapping</v-btn>
                             </v-flex>
                         </v-layout>
                     </div>
@@ -211,7 +211,7 @@
                 <span class="headline">Chọn để mapping</span>
               </v-flex>
               <v-flex xs6 class="text-right">
-                <v-btn color="primary" fab small dark  @click="dialogMapping = false">
+                <v-btn color="#115ebe" fab small dark  @click="dialogMapping = false">
                   <v-icon>exit_to_app</v-icon>
                 </v-btn>
               </v-flex>
@@ -238,7 +238,7 @@
                     <span style="font-weight: bold">{{timKiemTheoSelected === 'DonVi' ? item.serviceNameDVCQG : item.serviceName}}</span>
                   </v-flex>
                   <v-flex xs3  class="text-right pa-0">
-                    <v-btn small color="primary" @click="mappingTTHC(item)">Chọn</v-btn>
+                    <v-btn small style="color:#fff;" color="#115ebe" @click="mappingTTHC(item)">Chọn</v-btn>
                   </v-flex>
                 </v-layout>
               </div>
@@ -271,7 +271,7 @@
             </v-flex>
             <v-flex xs6 class="text-right">
               <v-btn  color="blue darken-1 mx-2" v-if="btnThem"  @click="addTTHC()"> Xác nhận</v-btn>
-              <v-btn color="primary" fab small dark  @click="dialogChiTietThuTucDVCQG = false">
+              <v-btn color="#115ebe" fab small dark  @click="dialogChiTietThuTucDVCQG = false">
                 <v-icon>exit_to_app</v-icon>
               </v-btn>
             </v-flex>
@@ -380,7 +380,7 @@
               <span class="headline">Chi tiết thủ tục</span>
             </v-flex>
             <v-flex xs6 class="text-right">
-              <v-btn color="primary" fab small dark  @click="dialogChiTietThuTucDonVi = false">
+              <v-btn color="#115ebe" fab small dark  @click="dialogChiTietThuTucDonVi = false">
                 <v-icon>exit_to_app</v-icon>
               </v-btn>
             </v-flex>
@@ -408,7 +408,7 @@
                           <table class="datatable table">
                             <tbody>
                               <tr>
-                                <td class="pt-2"><span class="text-bold">Mã thủ tục</span></td>
+                                <td class="pt-2" style="min-width: 148px;"><span class="text-bold">Mã thủ tục</span></td>
                                 <td class="pt-2"><span>{{serviceDonViDetail.serviceCode}}</span></td>
                               </tr>
                               <tr>
@@ -477,6 +477,44 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <v-snackbar
+      v-model="snackbarsuccess"
+      :bottom="false"
+      :left="false"
+      :multi-line="false"
+      :right="true"
+      :timeout="2000"
+      :top="true"
+      :vertical="false"
+      color="success"
+    >
+      Yêu cầu thực hiện thành công
+      <v-btn
+        icon
+        @click="snackbarsuccess = false"
+      >
+        <v-icon>clear</v-icon>
+      </v-btn>
+    </v-snackbar>
+    <v-snackbar
+      v-model="snackbarerror"
+      :bottom="false"
+      :left="false"
+      :multi-line="false"
+      :right="true"
+      :timeout="2000"
+      :top="true"
+      :vertical="false"
+      color="#EF5350"
+    >
+      Yêu cầu thực hiện thất bại
+      <v-btn
+        icon
+        @click="snackbarerror = false"
+      >
+        <v-icon>clear</v-icon>
+      </v-btn>
+    </v-snackbar>
   </div>
 </template>
 
@@ -492,6 +530,8 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    snackbarerror: false,
+    snackbarsuccess: false,
     breadCrumbsitems: [
       {
         text: 'Bảng dữ liệu',
@@ -869,15 +909,18 @@ export default {
     mappingTTHC (item) {
       let vm = this
       let serviceCode = ''
+      let serviceName = ''
       let serviceCodeDVCQG = ''
       let serviceNameDVCQG = ''
       if (vm.timKiemTheoSelected === 'DonVi') {
         serviceCode =  vm.serviceSelect.serviceCode,
+        serviceName = vm.serviceSelect.serviceCode,
         serviceCodeDVCQG = item.serviceCodeDVCQG
         serviceNameDVCQG = item.serviceNameDVCQG        
       }
       if (vm.timKiemTheoSelected === 'DVCQG') {
         serviceCode = item.serviceCode
+        serviceName = item.serviceName
         serviceCodeDVCQG = vm.serviceSelect.serviceCodeDVCQG
         serviceNameDVCQG = vm.serviceSelect.serviceNameDVCQG          
       }
@@ -888,15 +931,49 @@ export default {
       }
       vm.$store.dispatch('mappingTTHC', filter).then(function (result) {
         vm.dialogMapping = false
-        toastr.success('Mapping thủ tục thành công')
+        // toastr.success('Mapping thủ tục thành công')
+        vm.snackbarsuccess = true
         if(vm.timKiemTheoSelected === 'DonVi'){
-          vm.doLoadingThuTucDonVi()
+          // vm.doLoadingThuTucDonVi()
+          for (let i = 0; i < vm.serviceInfoListDonVi.length; i++) {
+            if (vm.serviceInfoListDonVi[i].serviceCode === serviceCode) {
+              vm.serviceInfoListDonVi[i].serviceCodeDVCQG = serviceCodeDVCQG
+              vm.serviceInfoListDonVi[i].serviceNameDVCQG = serviceNameDVCQG
+              vm.serviceInfoListDonVi[i].synced = 0
+              break
+            }
+          }
+          for (let i = 0; i < vm.serviceInfoListDonViView.length; i++) {
+            if (vm.serviceInfoListDonViView[i].serviceCode === serviceCode) {
+              vm.serviceInfoListDonViView[i].serviceCodeDVCQG = serviceCodeDVCQG
+              vm.serviceInfoListDonViView[i].serviceNameDVCQG = serviceNameDVCQG
+              vm.serviceInfoListDonViView[i].synced = 0
+              break
+            }
+          }
         }
         if (vm.timKiemTheoSelected === 'DVCQG') {
-          vm.doLoadingThuTucDVCQG()
+          // vm.doLoadingThuTucDVCQG()
+          for (let i = 0; i < vm.serviceInfoListDVCQG.length; i++) {
+            if (vm.serviceInfoListDVCQG[i].serviceCodeDVCQG === serviceCodeDVCQG) {
+              vm.serviceInfoListDVCQG[i].serviceCode = serviceCode
+              vm.serviceInfoListDVCQG[i].serviceName = serviceName
+  
+              break
+            }
+          }
+          for (let i = 0; i < vm.serviceInfoListDVCQGView.length; i++) {
+            if (vm.serviceInfoListDVCQGView[i].serviceCodeDVCQG === serviceCodeDVCQG) {
+              vm.serviceInfoListDVCQGView[i].serviceCode = serviceCode
+              vm.serviceInfoListDVCQGView[i].serviceName = serviceName
+              
+              break
+            }
+          }
         }
       }).catch(function() {
-        toastr.error('Mapping thủ tục thất bại')
+        // toastr.error('Mapping thủ tục thất bại')
+        vm.snackbarerror = true
      
       })
     },
@@ -906,15 +983,53 @@ export default {
         mappingClassPK: item.mappingClassPK
       }
       vm.$store.dispatch('removeMappingTTHC', filter).then(function (result) {
-          toastr.success('Hủy đồng bộ thành công')
-          if(vm.timKiemTheoSelected === 'DonVi'){
-            vm.doLoadingThuTucDonVi()
-          }
-          if (vm.timKiemTheoSelected === 'DVCQG') {
-            vm.doLoadingThuTucDVCQG()
+          // toastr.success('Hủy đồng bộ thành công')
+          if(result){
+            vm.snackbarsuccess = true
+            if(vm.timKiemTheoSelected === 'DonVi'){
+              // vm.doLoadingThuTucDonVi()
+                for (let i = 0; i < vm.serviceInfoListDonVi.length; i++) {
+                  if (vm.serviceInfoListDonVi[i].serviceCode === item.serviceCode) {
+                    vm.serviceInfoListDonVi[i].serviceCodeDVCQG = ""
+                    vm.serviceInfoListDonVi[i].serviceNameDVCQG = ""
+                    vm.serviceInfoListDonVi[i].synced = 0
+                    break
+                  }
+                }
+                for (let i = 0; i < vm.serviceInfoListDonViView.length; i++) {
+                  if (vm.serviceInfoListDonViView[i].serviceCode === item.serviceCode) {
+                    vm.serviceInfoListDonViView[i].serviceCodeDVCQG = ""
+                    vm.serviceInfoListDonViView[i].serviceNameDVCQG = ""
+                    vm.serviceInfoListDonViView[i].synced = 0
+                    break
+                  }
+                }
+            }
+            if (vm.timKiemTheoSelected === 'DVCQG') {
+              // vm.doLoadingThuTucDVCQG()
+                for (let i = 0; i < vm.serviceInfoListDVCQG.length; i++) {
+                  if (vm.serviceInfoListDVCQG[i].serviceCodeDVCQG === item.serviceCodeDVCQG) {
+                    vm.serviceInfoListDVCQG[i].serviceCode = ""
+                    vm.serviceInfoListDVCQG[i].serviceName = ""
+        
+                    break
+                  }
+                }
+                for (let i = 0; i < vm.serviceInfoListDVCQGView.length; i++) {
+                  if (vm.serviceInfoListDVCQGView[i].serviceCodeDVCQG === item.serviceCodeDVCQG) {
+                    vm.serviceInfoListDVCQGView[i].serviceCode = ""
+                    vm.serviceInfoListDVCQGView[i].serviceName = ""
+                    
+                    break
+                  }
+                }
+            }
+          } else {
+            vm.snackbarerror = true
           }
         }).catch(function() {
-          toastr.error('Hủy đồng bộ thất bại')
+          // toastr.error('Hủy đồng bộ thất bại')
+          vm.snackbarerror = true
 
         })
     },
@@ -925,16 +1040,21 @@ export default {
         type: "create"
       }
       vm.$store.dispatch('syncServiceinfoNew', filter).then(function (result) {
-         toastr.success('Thêm thủ tục thành công')
+        //  toastr.success('Thêm thủ tục thành công')
+        vm.snackbarsuccess = true
          vm.dialogChiTietThuTuc = false
         if(vm.timKiemTheoSelected === 'DonVi'){
-          vm.doLoadingThuTucDonVi()
+          vm.dialogChiTietThuTucDVCQG = false
+          //vm.doLoadingThuTucDonVi()
         }
         if (vm.timKiemTheoSelected === 'DVCQG') {
-          vm.doLoadingThuTucDVCQG()
+          vm.dialogChiTietThuTucDVCQG = false
+          //vm.doLoadingThuTucDVCQG()
         }
       }).catch(function() {
-        toastr.error('Thêm thủ tục thất bại')
+        vm.dialogChiTietThuTucDVCQG = false
+        // toastr.error('Thêm thủ tục thất bại')
+        vm.snackbarerror = true
       })     
     },
     syncServiceinfo (item) {
@@ -944,17 +1064,21 @@ export default {
           type: "sync"
         }
         vm.$store.dispatch('syncServiceinfoNew', filter).then(function (result) {
-            toastr.clear()
-            toastr.success('Đồng bộ thành công')
+            // toastr.clear()
+            // toastr.success('Đồng bộ thành công')
+            vm.snackbarsuccess = true
             if(vm.timKiemTheoSelected === 'DonVi'){
-              vm.doLoadingThuTucDonVi()
+              // vm.doLoadingThuTucDonVi()
+              
             }
             if (vm.timKiemTheoSelected === 'DVCQG') {
-              vm.doLoadingThuTucDVCQG()
+              // vm.doLoadingThuTucDVCQG()
+              
             }
             // vm.doLoadingThuTuc()
         }).catch(function() {
-            toastr.error('Đồng bộ thất bại')
+            // toastr.error('Đồng bộ thất bại')
+            vm.snackbarerror = true
        
             // vm.doLoadingThuTuc()
         })

@@ -86,25 +86,25 @@ export const store = new Vuex.Store({
             icon: 'filter_8',
             link: '/table/opencps_mapping/tthc',
             code: 'mapping',
-            text: 'Mapping TTHC'
+            text: 'Mapping thủ tục'
           },
           {
             icon: 'filter_9',
             link: '/table/opencps_mapping/domain',
             code: 'mapping',
-            text: 'Đồng bộ danh mục lĩnh vực TTHC'
+            text: 'Đồng bộ DM lĩnh vực'
           },
           {
-            icon: 'filter_10',
+            icon: 'filter',
             link: '/table/opencps_mapping/agency-sharingqa/0',
             code: 'mapping',
-            text: 'Đồng bộ danh mục cơ quan'
+            text: 'Đồng bộ DM cơ quan'
           },
           {
-            icon: 'filter_11',
+            icon: 'filter',
             link: '/table/opencps_mapping/agency-sharingqa/1',
             code: 'mapping',
-            text: 'Đồng bộ danh mục câu hỏi'
+            text: 'Đồng bộ DM câu hỏi'
           },
           {
             icon: 'import_export',

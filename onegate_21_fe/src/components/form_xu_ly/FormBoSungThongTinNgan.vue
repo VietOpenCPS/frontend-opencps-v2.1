@@ -225,10 +225,11 @@
   </div>
 </template>
 <script>
+  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
   
   export default {
     components: {
-      'vue-ctk-date-time-picker': window.VueCtkDateTimePicker.default
+      'vue-ctk-date-time-picker': VueCtkDateTimePicker
     },
     props: {
       dossier_id: {
