@@ -910,7 +910,8 @@ export default {
       }
       return dossierTemplates
     },
-    showAlpacaJSFORM (item) {
+    showAlpacaJSFORM (item, isPending) {
+      console.log('showAlpacaJSFORM', item)
       let vm = this
       item['dossierId'] = vm.thongTinHoSo.dossierId
       item['editForm'] = true
@@ -941,6 +942,9 @@ export default {
         } else {
           item.embed = false
           vm.$store.dispatch('loadFormData', item).then(resData => {
+            if (isPending) {
+              resData = item.formData
+            }
             window.$('div[id="formAlpaca' + item.partNo + vm.id + '"]').empty()
             let formScript, formData
             /* eslint-disable */
@@ -1181,16 +1185,23 @@ export default {
       }, 500)
       //
       let fileFind = vm.dossierFilesItems.find(itemFile => {
-        return itemFile.dossierPartNo === data.partNo && itemFile.eForm && itemFile.fileSize
+        return itemFile.dossierPartNo === data.partNo && itemFile.eForm
       })
       if (fileFind) {
-        fileFind['id'] = vm.id
-        // vm.$store.dispatch('loadAlpcaForm', fileFind)
-        // preview PDF
-        data['editForm'] = false
-        vm.$store.dispatch('viewFile', fileFind).then(result => {
-          document.getElementById('displayPDF' + fileFind.dossierPartNo + vm.id).src = result
-        })
+        console.log('fileFind', fileFind)
+        if (fileFind.fileSize) {
+          fileFind['id'] = vm.id
+          // vm.$store.dispatch('loadAlpcaForm', fileFind)
+          // preview PDF
+          data['editForm'] = false
+          vm.$store.dispatch('viewFile', fileFind).then(result => {
+            document.getElementById('displayPDF' + fileFind.dossierPartNo + vm.id).src = result
+          })
+        } else {
+          data.formData = fileFind.formData
+          vm.showAlpacaJSFORM(data, true)
+        }
+        
       } else {
         vm.dossierTemplateItems.forEach(val => {
           if (val.hasForm && data.partNo === val.partNo) {

@@ -694,6 +694,9 @@ export default {
     },
     thongTinChuHoSo () {
       return this.$store.getters.thongTinChuHoSo
+    },
+    menuConfigsToDo () {
+      return this.$store.getters.getMenuConfigsTodo
     }
   },
   created () {
@@ -934,7 +937,8 @@ export default {
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               if (vm.formCode === 'UPDATE') {
-                vm.goBack()
+                window.history.back()
+                // vm.goBack()
               } else {
                 var initData = vm.$store.getters.loadingInitData
                 let actionUser = initData.user.userName ? initData.user.userName : ''

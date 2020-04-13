@@ -278,10 +278,10 @@
           </v-layout>
           
         </v-card-title>
-        <v-card-text>
+        <v-card-text style="height: 600px;">
           <v-container grid-list-md>
             <v-tabs
-                v-model="active"
+                v-model="activeDVC"
                 color="cyan"
                 dark
                 slider-color="yellow"
@@ -295,37 +295,48 @@
 
                 </v-tab>
                 <v-tab-item>
-                  <v-card flat>
+                  <v-card flat style="height:500px; overflow-y: scroll;">
                     <v-card-text>
                       <v-layout wrap align-center>
-                        <v-flex xs12 style="border-bottom: 0.5px solid;">
+                        <v-flex xs12 >
                           <v-layout wrap>
-                            <v-flex xs3 style="border-right: 0.5px solid;"><strong>Mã thủ tục</strong></v-flex>
+                            <v-flex xs3 ><strong>Mã thủ tục</strong></v-flex>
                             <v-flex xs9><span>{{serviceDVCQGDetail[0].MATTHC}}</span></v-flex>
                           </v-layout>
                         </v-flex>
-                        <v-flex xs12 style="border-bottom: 0.5px solid;">
+                        <v-flex xs12 >
                           <v-layout wrap>
-                            <v-flex xs3 style="border-right: 0.5px solid;"><strong>Cơ quan thực hiện</strong></v-flex>
-                            <v-flex xs9><p v-for="(item, index) in serviceDVCQGDetail[0].COQUANTHUCHIEN" :key="index">{{item.TENDONVI}}</p></v-flex>
+                            <v-flex xs3 ><strong>Cơ quan quản lý</strong></v-flex>
+                            <v-flex xs9><span v-for="(item, index) in serviceDVCQGDetail[0].COQUANTHUCHIEN" :key="index">{{item.TENDONVI}}</span><br></v-flex>
                           </v-layout>
                         </v-flex>
-                        <v-flex xs12 style="border-bottom: 0.5px solid;">
+                        <v-flex xs12 >
                           <v-layout wrap>
-                            <v-flex xs3 style="border-right: 0.5px solid;"><strong>Lĩnh vực</strong></v-flex>
-                            <v-flex xs9><p v-for="(item, index) in serviceDVCQGDetail[0].LINHVUCTHUCHIEN" :key="index">{{item.TENLINHVUC}}</p></v-flex>
+                            <v-flex xs3 ><strong>Lĩnh vực</strong></v-flex>
+                            <v-flex xs9><span v-for="(item, index) in serviceDVCQGDetail[0].LINHVUCTHUCHIEN" :key="index">{{item.TENLINHVUC}}</span><br></v-flex>
                           </v-layout>
                         </v-flex>
-                        <v-flex xs12 style="border-bottom: 0.5px solid;">
+                        <v-flex xs12 >
                           <v-layout wrap>
-                            <v-flex xs3 style="border-right: 0.5px solid;"><strong>Cách thực hiện</strong></v-flex>
-                            <v-flex xs9><p v-for="(item, index) in serviceDVCQGDetail[0].CACHTHUCTHUCHIEN" :key="index">- {{item.THOIGIAN[0].MOTA}}</p></v-flex>
+                            <v-flex xs3 ><strong>Cách thực hiện</strong></v-flex>
+                            <v-flex xs9><div v-for="(item, index) in serviceDVCQGDetail[0].CACHTHUCTHUCHIEN" :key="index"><span>-Thời gian giải quyết: {{item.THOIGIAN[0].MOTA}}</span><br></div></v-flex>
                           </v-layout>
                         </v-flex>
-                        <v-flex xs12 style="border-bottom: 0.5px solid;">
+                        <v-flex xs12 >
                           <v-layout wrap>
-                            <v-flex xs3 style="border-right: 0.5px solid;"><strong>Đối tượng thực hiện</strong></v-flex>
-                            <v-flex xs9><p v-for="(item, index) in serviceDVCQGDetail[0].DOITUONGTHUCHIEN" :key="index">- {{item.TENDOITUONG}}</p></v-flex>
+                            <v-flex xs3 ><strong>Đối tượng</strong></v-flex>
+                            <v-flex xs9><span v-for="(item, index) in serviceDVCQGDetail[0].DOITUONGTHUCHIEN" :key="index">- {{item.TENDOITUONG}}</span><br></v-flex>
+                          </v-layout>
+                        </v-flex>
+                        <v-flex xs12 >
+                          <v-layout wrap>
+                            <v-flex xs3 ><strong>Kết quả giải quyết</strong></v-flex>
+                            <v-flex xs9>
+                              <div v-for="(item, index) in serviceDVCQGDetail[0].KETQUATHUCHIEN" :key="index">
+                                <span>- Mã kết quả: {{item.MAKETQUA}}</span><br>
+                                <span>-Tên văn bản: {{item.TENKETQUA}}</span><br>
+                              </div>
+                            </v-flex>
                           </v-layout>
                         </v-flex>
                       </v-layout>
@@ -333,30 +344,35 @@
                   </v-card>
                 </v-tab-item>
                 <v-tab-item>
-                  <v-card flat>
+                  <v-card flat  style="height:500px; overflow-y: scroll;">
                     <v-card-text>
                       <v-layout wrap>
                         <v-flex xs12 v-for="(item, index) in serviceDVCQGDetail[0].TRINHTUTHUCHIEN" :key="index">
-                          <p>{{item.TRUONGHOP}}</p>
-                          <p>-{{item.TRINHTU[0].TENTRINHTU}}</p>
+                          <span>{{item.TRUONGHOP}}</span><br>
+                          <div v-for="(item2, index2) in item.TRINHTU" :key="index2">
+                            <span>-{{item2.TENTRINHTU}}</span><br>
+                          </div>
                         </v-flex>
                       </v-layout>
                     </v-card-text>
                   </v-card>
                 </v-tab-item>
                 <v-tab-item>
-                  <v-card flat>
+                  <v-card flat  style="height:500px; overflow-y: scroll;">
                     <v-card-text>
                       <v-layout wrap>
-                        <v-flex xs12 v-for="(item, index) in serviceDVCQGDetail[0].THANHPHANHOSO[0].GIAYTO" :key="index">
-                          <p>-{{item.TENGIAYTO}}</p>
+                        <v-flex xs12 v-for="(item, index) in serviceDVCQGDetail[0].THANHPHANHOSO" :key="index">
+                          <span>({{index + 1}}), {{item.TRUONGHOP}}</span><br>
+                          <div v-for="(item2, index2) in item.GIAYTO" :key="index2">
+                           <span>-{{item2.TENGIAYTO}}</span> <br>
+                          </div>
                         </v-flex>
                       </v-layout>
                     </v-card-text>
                   </v-card>
                 </v-tab-item>
                 <v-tab-item>
-                  <v-card flat>
+                  <v-card flat  style="height:500px; overflow-y: scroll;">
                     <v-card-text>
                       <v-layout wrap>
                         <v-flex>
@@ -387,11 +403,11 @@
           </v-layout>
           
         </v-card-title>
-        <v-card-text>
+        <v-card-text style="height: 600px;">
           <v-container grid-list-md>
             <div class="mt-0">
               <v-tabs
-                v-model="active"
+                v-model="activeDonVi"
                 color="cyan"
                 dark
                 slider-color="yellow"
@@ -401,7 +417,7 @@
                 <v-tab key="3" ripple class="mr-2"> Thành phần hồ sơ </v-tab>
                 <v-tab key="4" ripple class="mr-2"> Yêu cầu điều kiện </v-tab>
                 <v-tab-item key="1" class="wrap-scroll wrap-scroll-sevice">
-                  <v-card>
+                  <v-card  style="height:500px; overflow-y: scroll;">
                     <v-card-text class="px-0 py-0">
                       <div class="table-detail-domain table-bordered">
                         <div class="table__overflow">
@@ -424,24 +440,12 @@
                                 <td class="pt-2"><span v-html="serviceDonViDetail.methodText"></span></td>
                               </tr>
                               <tr>
-                                <td class="pt-2"><span class="text-bold">Thời gian giải quyết</span></td>
-                                <td class="pt-2"><span v-html="serviceDonViDetail.durationText"></span></td>
-                              </tr>
-                              <tr>
                                 <td class="pt-2"><span class="text-bold">Đối tượng</span></td>
                                 <td class="pt-2"><span v-html="serviceDonViDetail.applicantText"></span></td>
                               </tr>
                               <tr>
                                 <td class="pt-2"><span class="text-bold">Kết quả giải quyết</span></td>
                                 <td class="pt-2"><span v-html="serviceDonViDetail.resultText"></span></td>
-                              </tr>
-                              <tr>
-                                <td class="pt-2"><span class="text-bold">Lệ phí</span></td>
-                                <td class="pt-2"><span v-html="serviceDonViDetail.feeText"></span></td>
-                              </tr>
-                              <tr>
-                                <td class="pt-2"><span class="text-bold">Căn cứ pháp lý</span></td>
-                                <td class="pt-2"><span v-html="serviceDonViDetail.regularText"></span></td>
                               </tr>
                             </tbody>
                           </table>
@@ -451,21 +455,21 @@
                   </v-card>
                 </v-tab-item>
                 <v-tab-item key="2" class="wrap-scroll wrap-scroll-sevice">
-                  <v-card>
+                  <v-card  style="height:500px; overflow-y: scroll;">
                     <v-card-text>
                       <div v-html="serviceDonViDetail.processText"></div>
                     </v-card-text>
                   </v-card>
                 </v-tab-item>
                 <v-tab-item key="3" class="wrap-scroll wrap-scroll-sevice">
-                  <v-card>
+                  <v-card  style="height:500px; overflow-y: scroll;">
                     <v-card-text>
                       <div v-html="serviceDonViDetail.dossierText"></div>
                     </v-card-text>
                   </v-card>
                 </v-tab-item>
                 <v-tab-item key="4" class="wrap-scroll wrap-scroll-sevice">
-                  <v-card>
+                  <v-card  style="height:500px; overflow-y: scroll;">
                     <v-card-text>
                       <div v-html="serviceDonViDetail.conditionText"></div>
                     </v-card-text>
@@ -530,6 +534,8 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    activeDVC: null,
+    activeDonVi: null,
     snackbarerror: false,
     snackbarsuccess: false,
     breadCrumbsitems: [
@@ -666,10 +672,19 @@ export default {
       vm.pageMapping = 1
       vm.loadingMapping = true
       if(val){
+        let test = val.toLowerCase()
         if(vm.timKiemTheoSelected === 'DonVi') {
-          vm.listMappingView = vm.listMapping.filter(e => e.serviceNameDVCQG.search(val) >= 0 ).slice(0, 10)
+          vm.listMappingView = vm.listMapping.filter(e => {
+            if(e.serviceNameDVCQG.toLowerCase().search(test) >= 0 || e.serviceNameDVCQG.search(test) >= 0){
+              return e
+            }
+          }).slice(0, 10)
         } else {
-          vm.listMappingView = vm.listMapping.filter(e => e.serviceName.search(val) >= 0 ).slice(0, 10)
+          vm.listMappingView = vm.listMapping.filter(e => {
+            if(e.serviceName.toLowerCase().search(test) >= 0 ||  e.serviceName.search(test) >= 0){
+              return e
+            }
+          }).slice(0, 10)
         }
         
         vm.loadingMapping = false
@@ -682,10 +697,19 @@ export default {
       let vm = this
       vm.thutucPage = 1
       if(val){
+        let test = val.toLowerCase()
         if(vm.timKiemTheoSelected === 'DonVi') {
-          vm.serviceInfoListDonViView = vm.serviceInfoListDonVi.filter(e => e.serviceName.search(val) >= 0 ).slice(0, vm.pageSize)
+          vm.serviceInfoListDonViView = vm.serviceInfoListDonVi.filter(e => {
+            if(e.serviceName.toLowerCase().search(test) >= 0 || e.serviceName.search(test) >= 0){
+              return e
+            }
+          }).slice(0, vm.pageSize)
         } else {
-          vm.serviceInfoListDVCQGView = vm.serviceInfoListDVCQG.filter(e => e.serviceNameDVCQG.search(val) >= 0 ).slice(0, vm.pageSize)
+          vm.serviceInfoListDVCQGView = vm.serviceInfoListDVCQG.filter(e =>{
+            if( e.serviceNameDVCQG.toLowerCase().search(test) >= 0 || e.serviceNameDVCQG.search(test) >= 0){
+              return e
+            }
+          }).slice(0, vm.pageSize)
         }
         
       } else{
@@ -851,13 +875,15 @@ export default {
       let vm = this
       vm.serviceSelect = item
       vm.btnThem = false
-      vm.dialogChiTietThuTuc = true
       let filter = {
          serviceCodeDVCQG: item.serviceCodeDVCQG,
       }
       vm.loadingMapping = true
       vm.$store.dispatch('getChiTietTTDVCQG', filter).then(function (result) {
         vm.serviceDVCQGDetail = result.result
+        vm.dialogChiTietThuTuc = true
+        vm.activeDVC = 0
+        vm.activeDonVi = 0
       }).catch(function() {
 
       })
@@ -865,7 +891,7 @@ export default {
     openDialogChiTietThuTucDVCQG (item) {
       let vm = this
       vm.serviceSelect = item
-      vm.dialogChiTietThuTucDVCQG = true
+
       vm.btnThem = false
       let filter = {
          serviceCodeDVCQG: item.serviceCodeDVCQG,
@@ -873,28 +899,34 @@ export default {
       vm.loadingMapping = true
       vm.$store.dispatch('getChiTietTTDVCQG', filter).then(function (result) {
         vm.serviceDVCQGDetail = result.result
+        vm.dialogChiTietThuTucDVCQG = true
+        vm.activeDVC = 0
+        vm.activeDonVi = 0
       }).catch(function() {
 
       })
     },
     openDialogChiTietThuTucDonVi (item) {
       let vm = this
-      vm.serviceDonViDetail = item
-      vm.dialogChiTietThuTucDonVi = true
+      // vm.serviceDonViDetail = item
+      
       vm.btnThem = false
       let filter = {
-         serviceCodeDVCQG: item.serviceCode,
+         serviceCode: item.serviceInfoId,
       }
-      // vm.$store.dispatch('getChiTietTTDVCQG', filter).then(function (result) {
-      //   vm.serviceDVCQGDetail = result.result
-      // }).catch(function() {
+      vm.$store.dispatch('getChiTietDonVi', filter).then(function (result) {
+        vm.serviceDonViDetail = result
+        vm.dialogChiTietThuTucDonVi = true
+        vm.activeDVC = 0
+        vm.activeDonVi = 0
+      }).catch(function() {
 
-      // })
+      })
     },
     openDialogChiTietThuTucThem (item) {
       let vm = this
       vm.serviceSelect = item
-      vm.dialogChiTietThuTucDVCQG = true
+      
       vm.btnThem = true
       let filter = {
          serviceCodeDVCQG: item.serviceCodeDVCQG,
@@ -902,6 +934,9 @@ export default {
       vm.loadingMapping = true
       vm.$store.dispatch('getChiTietTTDVCQG', filter).then(function (result) {
         vm.serviceDVCQGDetail = result.result
+        vm.activeDVC = 0
+        vm.activeDonVi = 0
+        vm.dialogChiTietThuTucDVCQG = true
       }).catch(function() {
 
       })
@@ -940,6 +975,7 @@ export default {
               vm.serviceInfoListDonVi[i].serviceCodeDVCQG = serviceCodeDVCQG
               vm.serviceInfoListDonVi[i].serviceNameDVCQG = serviceNameDVCQG
               vm.serviceInfoListDonVi[i].synced = 0
+              vm.serviceInfoListDonVi[i].mappingClassPK = result.serviceInfoMappingId
               break
             }
           }
@@ -948,6 +984,7 @@ export default {
               vm.serviceInfoListDonViView[i].serviceCodeDVCQG = serviceCodeDVCQG
               vm.serviceInfoListDonViView[i].serviceNameDVCQG = serviceNameDVCQG
               vm.serviceInfoListDonViView[i].synced = 0
+              vm.serviceInfoListDonViView[i].mappingClassPK = result.serviceInfoMappingId
               break
             }
           }
@@ -958,7 +995,7 @@ export default {
             if (vm.serviceInfoListDVCQG[i].serviceCodeDVCQG === serviceCodeDVCQG) {
               vm.serviceInfoListDVCQG[i].serviceCode = serviceCode
               vm.serviceInfoListDVCQG[i].serviceName = serviceName
-  
+              vm.serviceInfoListDVCQG[i].mappingClassPK= result.serviceInfoMappingId
               break
             }
           }
@@ -966,6 +1003,7 @@ export default {
             if (vm.serviceInfoListDVCQGView[i].serviceCodeDVCQG === serviceCodeDVCQG) {
               vm.serviceInfoListDVCQGView[i].serviceCode = serviceCode
               vm.serviceInfoListDVCQGView[i].serviceName = serviceName
+              vm.serviceInfoListDVCQGView[i].mappingClassPK= result.serviceInfoMappingId
               
               break
             }

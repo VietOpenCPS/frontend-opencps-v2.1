@@ -1784,6 +1784,24 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getChiTietDonVi ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/rest/v2/serviceinfos/' + filter.serviceCode,
+            method: 'get',
+            headers: {groupId: state.initData.groupId},
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     addTTHC ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {

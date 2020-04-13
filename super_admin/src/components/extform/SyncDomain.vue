@@ -397,7 +397,12 @@ export default {
       let vm = this
       vm.pageMapping = 1
       if(val){
-        vm.listMappingView = vm.listMapping.filter(e => e.itemNameDVCQG.search(val) >= 0 ).slice(0, 10)
+        let test = val.toLowerCase()
+        vm.listMappingView = vm.listMapping.filter(e => {
+          if(e.itemNameDVCQG.toLowerCase().search(test) >= 0 || e.itemNameDVCQG.search(test) >= 0){
+            return e
+          }
+        }).slice(0, 10)
       } else{
         vm.listMappingView = vm.listMapping.slice(0, 10)
       }
@@ -550,7 +555,6 @@ export default {
           dictItemMappingId: itemRemoveBefore.dictItemMappingId
         }
         console.log('itemRemoveBefore', itemRemoveBefore, filter2)
-        vm.$store.dispatch('removeMappingServiceDomain', filter2).then(function (result) {
           vm.$store.dispatch('mappingServiceDomain', filter).then(function (result) {
             if (result) {
               // vm.doLoadingServiceDomain()
@@ -566,9 +570,25 @@ export default {
             vm.snackbarsuccess = true
             vm.loadingSync = false
           })
-        }).catch(function() {
-          vm.loadingSync = false
-        })
+        // vm.$store.dispatch('removeMappingServiceDomain', filter2).then(function (result) {
+        //   vm.$store.dispatch('mappingServiceDomain', filter).then(function (result) {
+        //     if (result) {
+        //       // vm.doLoadingServiceDomain()
+        //       // toastr.success('Mapping lĩnh vực thành công')
+        //       vm.snackbarsuccess = true
+        //     } else {
+        //       // toastr.error('Mapping lĩnh vực thất bại')
+        //       vm.snackbarerror = true
+        //     }
+        //     vm.loadingSync = false
+        //   }).catch(function() {
+        //     // toastr.error('Mapping lĩnh vực thất bại')
+        //     vm.snackbarsuccess = true
+        //     vm.loadingSync = false
+        //   })
+        // }).catch(function() {
+        //   vm.loadingSync = false
+        // })
       }
       
     },
@@ -643,13 +663,10 @@ export default {
     },
     openDialogMapping (item) {
       let vm = this
-
       vm.linhVucSelect = item
+      vm.nameDVCQGModel = item.itemName
+      vm.pageMapping = 1
       vm.dialogMapping = true
-      
-
-        vm.nameDVCQGModel = item.itemName
-        vm.pageMapping = 1
     },
     mappingDomainDVCQG (item) {
       let vm = this

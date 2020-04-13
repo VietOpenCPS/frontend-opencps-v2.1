@@ -526,7 +526,12 @@ export default {
       vm.pageMapping = 1
       vm.loadingMapping = true
       if(val){
-        vm.listMappingView = vm.listMapping.filter(e => e.itemNameDVCQG.search(val) >= 0 ).slice(0, 10)
+        let test =  val.toLowerCase()
+        vm.listMappingView = vm.listMapping.filter(e => {
+          if(e.itemNameDVCQG.toLowerCase().search(test) >= 0 || e.itemNameDVCQG.search(test) >= 0){
+            return e
+          }
+        }).slice(0, 10)
         vm.loadingMapping = false
       } else{
         vm.listMappingView = vm.listMapping.slice(0, 10)
@@ -736,8 +741,7 @@ export default {
           dictItemMappingId: itemRemoveBefore.dictItemMappingId
         }
         console.log('itemRemoveBefore', itemRemoveBefore, filter2)
-        vm.$store.dispatch('removeMappingServiceAgency', filter2).then(function (result) {
-          vm.$store.dispatch('mappingServiceAgency', filter).then(function (result) {
+        vm.$store.dispatch('mappingServiceAgency', filter).then(function (result) {
             if (result) {
               // vm.doLoadingAgency()
               vm.snackbarsuccess = true
@@ -752,9 +756,11 @@ export default {
             // toastr.error('Mapping cơ quan thất bại')
             vm.loadingSync = false
           })
-        }).catch(function() {
-          vm.loadingSync = false
-        })
+        // vm.$store.dispatch('removeMappingServiceAgency', filter2).then(function (result) {
+
+        // }).catch(function() {
+        //   vm.loadingSync = false
+        // })
       }
     },
     doActionMappingAgency(item, index, itemAgency, indexDomain) {
@@ -863,9 +869,9 @@ export default {
     openDialogMapping (item) {
       let vm = this
       vm.coQuanSelect = item
-      vm.dialogMapping = true
       vm.pageMapping = 1
       vm.nameDVCQGModel = item.itemName
+      vm.dialogMapping = true
     },
     mappingAgencyDVCQG (item) {
       let vm = this

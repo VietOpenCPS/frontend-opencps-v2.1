@@ -133,7 +133,7 @@
                   required
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12>
+              <v-flex xs12  v-if="isBXD">
                 <div>File ảnh CMND mặt trước <span style="color:red">(*)</span></div>
                 <v-text-field 
                   @click='onPickFileCMNDFront'
@@ -151,7 +151,7 @@
                   accept="*/*"
                   @change="onFileCMNDFrontPicked">
               </v-flex>
-              <v-flex xs12>
+              <v-flex xs12  v-if="isBXD">
                 <div>File ảnh CMND mặt sau <span style="color:red">(*)</span></div>
                 <v-text-field 
                   @click='onPickFileCMNDBack'
