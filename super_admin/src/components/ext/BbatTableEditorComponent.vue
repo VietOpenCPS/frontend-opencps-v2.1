@@ -37,6 +37,10 @@
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'changeEmail'">swap_horiz</v-icon>
           {{item.label}}
         </v-btn>
+        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['active_acount']" v-on:click.native="activeAcount()">
+          <v-icon class="mr-1" size="14">lock_open</v-icon>
+          {{item.label}}
+        </v-btn>
         <content-placeholders v-if="item.type === 'selects' && !pullOk && item.hasOwnProperty('datasource_key')">
           <content-placeholders-text :lines="1" />
         </content-placeholders>
@@ -361,6 +365,25 @@
         <v-icon>clear</v-icon>
       </v-btn>
     </v-snackbar>
+    <v-snackbar
+      v-model="snackbarerror"
+      :bottom="false"
+      :left="false"
+      :multi-line="false"
+      :right="true"
+      :timeout="2000"
+      :top="true"
+      :vertical="false"
+      color="#EF5350"
+    >
+      Yêu cầu thực hiện thất bại
+      <v-btn
+        icon
+        @click="snackbarerror = false"
+      >
+        <v-icon>clear</v-icon>
+      </v-btn>
+    </v-snackbar>
   </v-form>
     <v-alert
       style="position: fixed!important;right: 0!important;top:46px;z-index:9999999999;"
@@ -459,6 +482,7 @@
         deactiveAccountFlag: 0,
         deactiveAccountFlagBoolean: false,
         snackbarsuccess: false,
+        snackbarerror: false,
         pickItem: {},
         layoutNameDynamic: '',
         mappingUserIdCurrent: '',
@@ -993,8 +1017,17 @@
         dataPost.append('mappingUserId', JSON.stringify(params.mappingUserId))
         axios.post('/o/rest/v2/users/lockin', dataPost).then((res)=>{
           console.log('lockin', res)
-          toastr.success('Mở khóa tài khoản thành công.')
+          vm.snackbarsuccess = true
         }).catch( ()=>{
+        })
+      },
+      activeAcount () {
+        let vm = this
+        axios.post('/o/rest/v2/applicants/'+vm.data.applicantId+'/active').then((res)=>{
+          console.log('activeAcount', res)
+          vm.snackbarsuccess = true
+        }).catch( ()=>{
+          vm.snackbarerror = true
         })
       },
       showChangeEmail () {
@@ -1027,18 +1060,18 @@
             }
           }
           let dataPost = new URLSearchParams()
-          dataPost.append('oldEmail', JSON.stringify(params.oldEmail))
-          dataPost.append('newEmail', JSON.stringify(params.newEmail))
+          dataPost.append('oldEmail', params.oldEmail)
+          dataPost.append('newEmail', params.newEmail)
           axios.post('/o/rest/v2/applicants/updatemail', dataPost).then((res)=>{
             vm.dialogChangeMail= false
             console.log('changeMail', res)
-            if (res.data.user && res.data.user.hasOwnProperty('emailAddress') && res.data.user.emailAddress){
-              toastr.success('Cập nhật thành công.')
+            if (res.data.user && res.data.user.hasOwnProperty('emailAddess') && res.data.user.emailAddess){
+              vm.snackbarsuccess = true
             } else {
-              toastr.error('Cập nhật thất bại')
+              vm.snackbarerror = true
             }
           }).catch( ()=>{
-            toastr.error('Cập nhật thất bại.')
+            vm.snackbarerror = true
           })
         }
       }

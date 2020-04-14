@@ -22,7 +22,7 @@
           <v-icon>edit</v-icon>
         </v-btn>
         <v-toolbar-title class="ml-0">
-          Đồng bộ danh mục cơ quan
+          Đồng bộ danh mục lĩnh vực
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn dark icon v-on:click.native="backToList">
@@ -54,7 +54,7 @@
             >
               <template slot="items" slot-scope="props">
                 <tr v-bind:class="{'active': props.index%2==1}">
-                  <td class="text-xs-center">
+                  <td class="text-xs-center" style="border-right: 0.5px solid #aba6a6;">
                     <content-placeholders v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
@@ -62,7 +62,7 @@
                       <span>{{props.index + 1}}</span><br>
                     </div>
                   </td>
-                  <td class="text-xs-left">
+                  <td class="text-xs-left" style="border-right: 0.5px solid #aba6a6;">
                     <content-placeholders v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
@@ -82,7 +82,7 @@
                             v-model="itemDomain.mapped"
                             primary
                             hide-details
-                            color="primary"
+                            color="#115ebe"
                             :disabled="loadingSync"
                             @change="doActionMappingDomain(props.item, props.index, itemDomain, index1)"
                           ></v-checkbox>
@@ -92,7 +92,7 @@
                         <span class="text-bold" :style="itemDomain.mapped ? 'margin-left: 50px' : 'margin-left: 24px'">{{itemDomain.itemCodeDVCQG}}</span> - <span>{{itemDomain.itemNameDVCQG}}</span>
                       </div>
                       <div class="mb-2" style="position: relative;">
-                        <v-btn small outline color="primary" @click="openDialogMapping(props.item)">Tìm kiếm</v-btn>
+                        <v-btn small outline color="#115ebe" @click="openDialogMapping(props.item)">Chọn</v-btn>
                       </div>
                     </div>
                   </td>
@@ -123,7 +123,7 @@
                 <span class="headline">Chọn để mapping</span>
               </v-flex>
               <v-flex xs6 class="text-right">
-                <v-btn color="primary" fab small dark  @click="dialogMapping = false">
+                <v-btn color="#115ebe" fab small dark  @click="dialogMapping = false">
                   <v-icon>exit_to_app</v-icon>
                 </v-btn>
               </v-flex>
@@ -150,7 +150,7 @@
                     <span style="font-weight: bold">{{item.itemNameDVCQG}}</span>
                   </v-flex>
                   <v-flex xs3  class="text-right pa-0">
-                    <v-btn small color="primary" @click="mappingDomainDVCQG(item)">Chọn</v-btn>
+                    <v-btn style="color:#fff;" small color="#115ebe" @click="mappingDomainDVCQG(item)">Chọn</v-btn>
                   </v-flex>
                 </v-layout>
               </div>
@@ -173,6 +173,44 @@
           </v-card-text>
         </v-card>
     </v-dialog>
+    <v-snackbar
+      v-model="snackbarsuccess"
+      :bottom="false"
+      :left="false"
+      :multi-line="false"
+      :right="true"
+      :timeout="2000"
+      :top="true"
+      :vertical="false"
+      color="success"
+    >
+      Yêu cầu thực hiện thành công
+      <v-btn
+        icon
+        @click="snackbarsuccess = false"
+      >
+        <v-icon>clear</v-icon>
+      </v-btn>
+    </v-snackbar>
+    <v-snackbar
+      v-model="snackbarerror"
+      :bottom="false"
+      :left="false"
+      :multi-line="false"
+      :right="true"
+      :timeout="2000"
+      :top="true"
+      :vertical="false"
+      color="#EF5350"
+    >
+      Yêu cầu thực hiện thất bại
+      <v-btn
+        icon
+        @click="snackbarerror = false"
+      >
+        <v-icon>clear</v-icon>
+      </v-btn>
+    </v-snackbar>
   </div>
 </template>
 
@@ -188,6 +226,8 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    snackbarerror: false,
+    snackbarsuccess: false,
     breadCrumbsitems: [
       {
         text: 'Bảng dữ liệu',
@@ -299,6 +339,21 @@ export default {
       }).catch(function(){
       })
       vm.doLoadingServiceDomain()
+      vm.loadingMapping = true
+      let filter = {
+         service: 'LayDanhMucLinhVuc'
+      }
+      vm.$store.dispatch('getServiceDomainDVCQG', filter).then(function (result) {
+        
+        vm.listMapping = result.data
+        vm.listMappingView = vm.listMapping.slice(0, 10)
+        vm.loadingMapping = false
+    
+      }).catch(function() {
+        vm.listMapping = []
+        vm.listMappingView = []
+        vm.loadingMapping = false
+      })
     })
   },
   updated () {
@@ -342,7 +397,12 @@ export default {
       let vm = this
       vm.pageMapping = 1
       if(val){
-        vm.listMappingView = vm.listMapping.filter(e => e.itemNameDVCQG.search(val) >= 0 ).slice(0, 10)
+        let test = val.toLowerCase()
+        vm.listMappingView = vm.listMapping.filter(e => {
+          if(e.itemNameDVCQG.toLowerCase().search(test) >= 0 || e.itemNameDVCQG.search(test) >= 0){
+            return e
+          }
+        }).slice(0, 10)
       } else{
         vm.listMappingView = vm.listMapping.slice(0, 10)
       }
@@ -422,37 +482,6 @@ export default {
         })
       }, 100)
     },
-    doLoadingThuTuc () {
-      let vm = this
-      vm.mappingIdArray = {}
-      vm.serviceInfoList = []
-      vm.loading = true
-      let currentQuery = vm.$router.history.current.query
-      let filter = null
-      filter = {
-        page: currentQuery.page ? currentQuery.page : 1,
-        keyword: currentQuery.keyword ? currentQuery.keyword : '',
-        agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencySelected,
-        domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      }
-      vm.$store.dispatch('getServiceLists', filter).then(function (result) {
-        vm.loading = false
-        if (result.data) {
-          vm.serviceInfoList = result.data
-          vm.thutucPage = Number(currentQuery.page) ? Number(currentQuery.page) : 1
-          vm.totalThuTuc = result.total
-        } else {
-          vm.totalThuTuc = 0
-          vm.serviceInfoList = []
-        }
-        vm.serviceItemTotal = result.total
-      }).catch(reject => {
-        vm.loading = false
-        vm.serviceInfoList = []
-        vm.totalThuTuc = 0
-        vm.thutucPage = 1
-      })
-    },
     doLoadingServiceDomain () {
       let vm = this
       let currentQuery = vm.$router.history.current.query
@@ -474,21 +503,6 @@ export default {
         vm.listLinhVuc = []
       })
     },
-    doActionMapping(item, indexDvc, itemDvcqg, indexDvcqg) {
-      console.log(item, indexDvc, itemDvcqg, indexDvcqg)
-      let vm = this
-      setTimeout(function() {
-        if (itemDvcqg['mapped']) {
-          vm.mappingDvcqgCongMotCua(item, indexDvc, itemDvcqg, indexDvcqg)
-        } else {
-          // if (!itemDvcqg['serviceInfoMappingId']) {
-          //   itemDvcqg.serviceInfoMappingId = vm.mappingIdArray[item['serviceInfoId']]
-          // }
-          vm.removeMapping(item, indexDvc, itemDvcqg, indexDvcqg)
-        }
-        vm.loadingSync = true
-      }, 300)
-    },
     doActionMappingDomain(item, index, itemDomain, indexDomain) {
       console.log(item, index, itemDomain, indexDomain)
       let vm = this
@@ -500,59 +514,6 @@ export default {
         }
         vm.loadingSync = true
       }, 300)
-    },
-    mappingDvcqgCongMotCua (item, indexDvc, itemDvcqg, indexDvcqg) {
-      let vm = this
-      let removeBeforeMapping = false
-      let itemRemoveBefore = ''
-      vm.syncing = false
-      let filter = {
-        serviceCode: item.serviceCode,
-        serviceCodeDVCQG: itemDvcqg.serviceCodeDVCQG
-      }
-      for (let i = 0; i < vm.serviceInfoList[indexDvc]['similarity'].length; i++) {
-        if (String(i) !== String(indexDvcqg) && vm.serviceInfoList[indexDvc]['similarity'][i]['mapped']) {
-          vm.serviceInfoList[indexDvc]['similarity'][i]['mapped'] = false
-          itemRemoveBefore = vm.serviceInfoList[indexDvc]['similarity'][i]
-          vm.syncing = {
-            item: item,
-            indexDvc: indexDvc,
-            itemDvcqg: itemDvcqg,
-            index: indexDvcqg
-          }
-          removeBeforeMapping = true
-          break
-        }
-      }
-      console.log('filterMapping', filter)
-      if (!removeBeforeMapping) {
-        vm.$store.dispatch('mappingDvcqg', filter).then(function (result) {
-          vm.mappingIdArray[item['itemCode']] = result.serviceInfoMappingId
-          toastr.success('Mapping thủ tục thành công')
-          vm.loadingSync = false
-        }).catch(function() {
-          toastr.error('Mapping thủ tục thất bại')
-          vm.loadingSync = false
-        })
-      } else {
-        let filter2 = {
-          serviceInfoId: itemRemoveBefore.serviceInfoMappingId ? itemRemoveBefore.serviceInfoMappingId : vm.mappingIdArray[item['serviceInfoId']]
-        }
-        console.log('itemRemoveBefore', itemRemoveBefore, filter2)
-        vm.$store.dispatch('removeMappingDvcqg', filter2).then(function (result) {
-          vm.$store.dispatch('mappingDvcqg', filter).then(function (result) {
-            vm.mappingIdArray[item['serviceInfoId']] = result.serviceInfoMappingId
-            toastr.success('Mapping thủ tục thành công')
-            vm.loadingSync = false
-          }).catch(function() {
-            toastr.error('Mapping thủ tục thất bại')
-            vm.loadingSync = false
-          })
-        }).catch(function() {
-          vm.loadingSync = false
-        })
-      }
-      
     },
     mappingDomain (item, indexDvc, itemDvcqg, indexDvcqg) {
       let vm = this
@@ -576,69 +537,60 @@ export default {
         vm.$store.dispatch('mappingServiceDomain', filter).then(function (result) {
           if(result){
 
-            toastr.success('Mapping lĩnh vực thành công')
-            vm.doLoadingServiceDomain()
+            // toastr.success('Mapping lĩnh vực thành công')
+            vm.snackbarsuccess = true
+            // vm.doLoadingServiceDomain()
           } else {
-             toastr.error('Mapping lĩnh vực thất bại')
+            //  toastr.error('Mapping lĩnh vực thất bại')
+            vm.snackbarerror = true
           }
           vm.loadingSync = false
         }).catch(function() {
-          toastr.error('Mapping lĩnh vực thất bại')
+          // toastr.error('Mapping lĩnh vực thất bại')
+          vm.snackbarerror = true
           vm.loadingSync = false
         })
       } else {
         let filter2 = {
-          dictItemMappingId: itemRemoveBefore.dictItemMappingId ? itemRemoveBefore.dictItemMappingId : ''
+          dictItemMappingId: itemRemoveBefore.dictItemMappingId
         }
         console.log('itemRemoveBefore', itemRemoveBefore, filter2)
-        vm.$store.dispatch('removeMappingServiceDomain', filter2).then(function (result) {
           vm.$store.dispatch('mappingServiceDomain', filter).then(function (result) {
             if (result) {
-              vm.doLoadingServiceDomain()
-              toastr.success('Mapping lĩnh vực thành công')
+              // vm.doLoadingServiceDomain()
+              // toastr.success('Mapping lĩnh vực thành công')
+              vm.snackbarsuccess = true
             } else {
-              toastr.error('Mapping lĩnh vực thất bại')
+              // toastr.error('Mapping lĩnh vực thất bại')
+              vm.snackbarerror = true
             }
             vm.loadingSync = false
           }).catch(function() {
-            toastr.error('Mapping lĩnh vực thất bại')
+            // toastr.error('Mapping lĩnh vực thất bại')
+            vm.snackbarsuccess = true
             vm.loadingSync = false
           })
-        }).catch(function() {
-          vm.loadingSync = false
-        })
+        // vm.$store.dispatch('removeMappingServiceDomain', filter2).then(function (result) {
+        //   vm.$store.dispatch('mappingServiceDomain', filter).then(function (result) {
+        //     if (result) {
+        //       // vm.doLoadingServiceDomain()
+        //       // toastr.success('Mapping lĩnh vực thành công')
+        //       vm.snackbarsuccess = true
+        //     } else {
+        //       // toastr.error('Mapping lĩnh vực thất bại')
+        //       vm.snackbarerror = true
+        //     }
+        //     vm.loadingSync = false
+        //   }).catch(function() {
+        //     // toastr.error('Mapping lĩnh vực thất bại')
+        //     vm.snackbarsuccess = true
+        //     vm.loadingSync = false
+        //   })
+        // }).catch(function() {
+        //   vm.loadingSync = false
+        // })
       }
       
-    },
-    removeMapping (item, indexDvc, itemDvcqg, index) {
-      let vm = this
-      let filter = {
-        serviceInfoId: vm.mappingIdArray[item['serviceInfoId']] ? vm.mappingIdArray[item['serviceInfoId']] : itemDvcqg.serviceInfoMappingId
-      }
-      vm.$store.dispatch('removeMappingDvcqg', filter).then(function (result) {
-        if (!vm.syncing) {
-          toastr.clear()
-          toastr.success('Hủy đồng bộ thành công')
-          vm.loadingSync = false
-        } else {
-          let filter1 = {
-            serviceCode: item.serviceCode,
-            serviceCodeDVCQG: itemDvcqg.serviceCodeDVCQG
-          }
-          vm.$store.dispatch('mappingDvcqg', filter1).then(function (result) {
-            vm.syncServiceinfo(vm.syncing.item, vm.syncing.indexDvc, vm.syncing.itemDvcqg, vm.syncing.index)
-          }).catch(function() {
-            toastr.error('Đồng bộ thất bại')
-            vm.doLoadingThuTuc()
-          })
-        }
-      }).catch(function() {
-        if (!vm.syncing) {
-          toastr.error('Hủy đồng bộ thất bại')
-          vm.loadingSync = false
-          vm.doLoadingThuTuc()
-        }
-      })
     },
     removeServiceDomain (item, indexDvc, itemDvcqg, index) {
       let vm = this
@@ -646,11 +598,13 @@ export default {
         dictItemMappingId: itemDvcqg.dictItemMappingId
       }
       vm.$store.dispatch('removeMappingServiceDomain', filter).then(function (result) {
-        toastr.success('Hủy đồng bộ thành công')
-        vm.doLoadingServiceDomain()
+        // toastr.success('Hủy đồng bộ thành công')
+        vm.snackbarsuccess = true
+        // vm.doLoadingServiceDomain()
         vm.loadingSync = false
       }).catch(function() {
-        toastr.error('Hủy đồng bộ thất bại')
+        // toastr.error('Hủy đồng bộ thất bại')
+        vm.snackbarerror= true
         vm.loadingSync = false
       })
     },
@@ -661,29 +615,14 @@ export default {
         serviceCode: item.serviceCode
       }
       vm.$store.dispatch('syncServiceinfo', filter).then(function (result) {
-        toastr.clear()
-        toastr.success('Đồng bộ thành công')
+        // toastr.clear()
+        // toastr.success('Đồng bộ thành công')
+        vm.snackbarsuccess = true
         vm.loadingSync = false
         // vm.doLoadingThuTuc()
       }).catch(function() {
-        toastr.error('Đồng bộ thất bại')
-        vm.loadingSync = false
-        // vm.doLoadingThuTuc()
-      })
-    },
-    syncServiceinfoDomain (item, indexDvc, itemDvcqg, index) {
-      let vm = this
-      vm.loadingSync = true
-      let filter = {
-        serviceCode: item.serviceCode
-      }
-      vm.$store.dispatch('syncServiceinfo', filter).then(function (result) {
-        toastr.clear()
-        toastr.success('Đồng bộ thành công')
-        vm.loadingSync = false
-        // vm.doLoadingThuTuc()
-      }).catch(function() {
-        toastr.error('Đồng bộ thất bại')
+        // toastr.error('Đồng bộ thất bại')
+        vm.snackbarerror = true
         vm.loadingSync = false
         // vm.doLoadingThuTuc()
       })
@@ -724,24 +663,10 @@ export default {
     },
     openDialogMapping (item) {
       let vm = this
-
       vm.linhVucSelect = item
+      vm.nameDVCQGModel = item.itemName
+      vm.pageMapping = 1
       vm.dialogMapping = true
-      vm.loadingMapping = true
-      let filter = {
-         service: 'LayDanhMucLinhVuc'
-      }
-      
-      vm.$store.dispatch('getServiceDomainDVCQG', filter).then(function (result) {
-        vm.pageMapping = 1
-        vm.listMapping = result.data
-        vm.listMappingView = vm.listMapping.slice(0, 10)
-        vm.loadingMapping = false
-      }).catch(function() {
-        vm.listMapping = []
-        vm.listMappingView = []
-        vm.loadingMapping = false
-      })
     },
     mappingDomainDVCQG (item) {
       let vm = this
@@ -752,14 +677,26 @@ export default {
       vm.$store.dispatch('mappingServiceDomain', filter).then(function (result) {
         if(result){
           vm.dialogMapping =  false
-          toastr.success('Mapping lĩnh vực thành công')
-          vm.doLoadingServiceDomain()
+          // toastr.success('Mapping lĩnh vực thành công')
+          // vm.doLoadingServiceDomain()
+          for (let i = 0; i < vm.listLinhVuc.length; i++) {
+            if(vm.listLinhVuc[i].itemCode === vm.linhVucSelect.itemCode){
+              for (let j = 0; j < vm.listLinhVuc[i]['similarity'].length; j++){
+                vm.listLinhVuc[i]['similarity'][j].mapped =  false
+              }
+              vm.listLinhVuc[i]['similarity'].push({itemCodeDVCQG: item.itemCodeDVCQG, itemNameDVCQG: item.itemNameDVCQG, mapped: true})
+              break
+            }
+          }
+          vm.snackbarsuccess = true
         } else {
-            toastr.error('Mapping lĩnh vực thất bại')
+            // toastr.error('Mapping lĩnh vực thất bại')
+            vm.snackbarerror = true
         }
         vm.loadingSync = false
       }).catch(function() {
-        toastr.error('Mapping lĩnh vực thất bại')
+        // toastr.error('Mapping lĩnh vực thất bại')
+        vm.snackbarerror = true
         vm.loadingSync = false
       })
     },

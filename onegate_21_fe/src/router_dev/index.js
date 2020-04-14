@@ -9,7 +9,8 @@ import XemChiTietHoSoDetailCanBo from '@/components/XemChiTietHoSoDetailCanBo'
 import XuLyHoSo from '@/components/XuLyHoSo'
 import HoanThienBoSungHoSoDetail from '@/components/HoanThienBoSungHoSoDetail'
 import DetailForward from '@/components/DetailForward'
-import DanhSachThuTuc from '@/components/DanhSachThuTuc'
+import DanhSachThuTuc from '@/components/DanhSachThuTucNew'
+import LinhVucThuTuc from '@/components/LinhVucThuTuc'
 import NopThanhCong from '@/components/NopThanhCong'
 import ThanhToanThanhCong from '@/components/ThanhToanThanhCong'
 import NotFound from '@/components/NotFound'
@@ -29,6 +30,7 @@ const routes = [
   { path: '/danh-sach-ho-so/:index/nop-thanh-cong/:id', name: 'NopThanhCong', component: NopThanhCong, props: true },
   { path: '/thanh-toan-thanh-cong', name: 'ThanhToanThanhCong', component: ThanhToanThanhCong, props: true },
   { path: '/import-ho-so/:id', name: 'ImportHoSo', component: ImportHoSo, props: true},
+  { path: '/linh-vuc-thu-tuc', name: 'LinhVucThuTuc', component: LinhVucThuTuc, props: true},
   { path: '*', name: 'NotFound', component: NotFound },
 
 ]
