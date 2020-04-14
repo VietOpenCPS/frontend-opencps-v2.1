@@ -134,6 +134,7 @@ export const store = new Vuex.Store({
     activePrintBienNhan: '',
     createFileSigned: '',
     advSearchShow: false,
+    visibleDoAction: true,
     filterDateFromTo: ['fromReceiveDate','toReceiveDate','fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate']
   },
   actions: {
@@ -3955,6 +3956,42 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    getDictcollections ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: 'o/rest/v2/dictcollections/REPORT_GROUP/dictgroups/' + filter.groupCode +'/dictitems',
+            method: 'get',
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.request(config).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getLevers ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/rest/v2/serviceinfos/statistics/levels',
+            method: 'get',
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.request(config).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
     // ----End---------
   },
   mutations: {
@@ -3972,6 +4009,9 @@ export const store = new Vuex.Store({
     },
     setError (state, payload) {
       state.error = payload
+    },
+    setVisibleDoAction (state, payload) {
+      state.visibleDoAction = payload
     },
     clearError (state) {
       state.error = null
@@ -4239,6 +4279,9 @@ export const store = new Vuex.Store({
     },
     loadingTable (state) {
       return state.loadingTable
+    },
+    getVisibleDoAction (state) {
+      return state.visibleDoAction
     },
     loadingGov (state) {
       return state.loadingGov

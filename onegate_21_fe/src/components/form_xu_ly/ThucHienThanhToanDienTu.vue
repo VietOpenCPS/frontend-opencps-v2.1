@@ -68,17 +68,9 @@
             </v-layout>
             <!-- epayment -->
             <p class="mb-0"><span class="red--text">* </span>&nbsp;Lựa chọn hình thức thanh toán:</p>
-            <!-- <v-btn dark small color="blue darken-1" class="ml-3 mr-2" @click.native="() => isBank = true">
-              <v-icon>account_balance</v-icon> &nbsp;
-              Thanh toán chuyển khoản
-            </v-btn>
-            <v-btn v-if="getEPaymentProfile(paymentProfile.epaymentProfile)" dark small color="amber accent-4" class="ml-2 mr-2" @click.native="toKeyPay(getEPaymentProfile(paymentProfile.epaymentProfile).keypayUrl)">
-              <v-icon>payment</v-icon> &nbsp;
-              Thanh toán qua Keypay
-            </v-btn> -->
-            <!--  -->
-            <div class="text-xs-left mt-2 mb-3 ml-2">
-              <v-chip color="indigo" text-color="white" @click.native="() => isBank = true">
+            <div class="text-xs-left mt-2 mb-3 ml-0">
+              <v-chip color="indigo" text-color="white" @click.native="showThanhToanChuyenKhoan" 
+                :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 1 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')">
                 <v-avatar style="cursor: pointer">
                   <v-icon>account_balance</v-icon>
                 </v-avatar>
@@ -86,6 +78,7 @@
               </v-chip>
               <v-chip v-if="getEPaymentProfile(paymentProfile.epaymentProfile)" color="orange" text-color="white"
                 @click.native="toKeyPay(getEPaymentProfile(paymentProfile.epaymentProfile).keypayUrl)"
+                :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 2 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
               >
                 <v-avatar style="cursor: pointer">
                   <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
@@ -93,7 +86,9 @@
                 <span class="py-2" style="cursor: pointer">Thanh toán qua Keypay</span>
               </v-chip>
 
-              <v-chip color="green" text-color="white" @click.native="showViettelPay">
+              <v-chip color="green" text-color="white" @click.native="showViettelPay" 
+                :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 3 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
+              >
                 <v-avatar style="cursor: pointer">
                   <img src="/o/opencps-store/js/cli/dvc/app/image/logo-viettelpay.svg"  style="background: #fff">
                 </v-avatar>
@@ -101,7 +96,7 @@
               </v-chip>
             </div>
             <!--  -->
-            <div v-if="isBank" class="ml-3 mt-2 px-2 py-1" style="border: 1px solid #004b9485;border-radius: 3px;">
+            <div v-if="isBank" class="ml-0 mt-2 px-2 py-1" style="border: 1px solid #004b9485;border-radius: 3px;">
               <div>
                 <input type="file" id="paymentFile1" @change="uploadPaymentFile($event)" style="display:none">
                 <span class="text-bold" style="color: #004b94!important">Tải lên file báo thanh toán chuyển khoản (Định dạng: .png, .jpg, .jpeg)</span>
@@ -189,10 +184,10 @@
           <v-toolbar-title class="white--text">THANH TOÁN DỊCH VỤ CÔNG</v-toolbar-title>
         </v-toolbar>
         <!-- <div class="py-2 pb-3 text-bold white--text" style="font-size: 18px">THANH TOÁN DỊCH VỤ CÔNG</div> -->
-        <div class="d-inline-block py-2" style="position:relative">
+        <div class="d-inline-block py-2 mt-4" style="position:relative">
           <img class="logo" src="/o/opencps-store/js/cli/dvc/app/image/logo-viettelpay.svg" width="30" style="
             position: absolute;
-            top: 63px;
+            top: 70px;
             left: 60px;
             background: #efe5e5;
             border-radius: 5px;
@@ -269,8 +264,9 @@ export default {
     dialogQrViettelPay: false,
     dialogPDF: false,
     dialogPDFLoading: true,
-    isBank: true,
-    errorNotSelect: false
+    isBank: false,
+    errorNotSelect: false,
+    methodSelect: 0
   }),
   directives: {money: VMoney},
   created () {
@@ -342,6 +338,12 @@ export default {
     }
   },
   methods: {
+    showThanhToanChuyenKhoan () {
+      let vm = this
+      vm.isBank = true
+      vm.methodSelect = 1
+      vm.$store.commit('setVisibleDoAction', true)
+    },
     uploadPaymentFile (e) {
       var vm = this
       vm.progressUploadPart = true
@@ -450,10 +452,15 @@ export default {
     toKeyPay (item) {
       let vm = this
       vm.isBank = false
+      vm.methodSelect = 2
+      vm.$store.commit('setVisibleDoAction', false)
       window.open(item, '_self')
     },
     showViettelPay () {
       let vm = this
+      vm.isBank = false
+      vm.methodSelect = 3
+      vm.$store.commit('setVisibleDoAction', false)
       vm.dialogQrViettelPay = true
     },
     goBack () {

@@ -10,7 +10,7 @@
       <p class="mt-5">Đang tạo hồ sơ ...</p>
     </div>
     <div v-else>
-      <div class="row-header no__hidden_class">
+      <div class="row-header no__hidden_class" style="padding-right:24px;">
         <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
           <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
         </div>
@@ -19,82 +19,115 @@
             <v-text-field
               v-model="serviceNameKey"
               placeholder="Tìm kiếm theo tên thủ tục"
-              solo
-              chips
-              multiple
-              deletable-chips
-              item-value="value"
-              item-text="text"
               @keyup.enter="filterServiceName"
-              content-class="adv__search__select"
-              return-object
+              
+              hide-details="true"
             ></v-text-field>
           </div>
-          <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
-            <v-btn icon class="my-0 mx-2" v-on:click.native="filterServiceName">
-              <v-icon size="16">search</v-icon>
-            </v-btn>
+          <div class="flex text-right" style="margin-left: auto;max-width: 340px;">
+              <div style="display: flex;align-items: center;justify-content: flex-end;">
+                <v-chip label color="primary" class="my-0" text-color="white" style="height:38px;border-radius: 5px;">
+                  <v-checkbox
+                    class="mt-0"
+                    v-model="serviceLastest"
+                    color="white"
+                    hide-details
+                  >
+                    <template slot="label">
+                      <div class="white--text">THỦ TỤC NỘP GẦN ĐÂY</div>
+                    </template>
+                  </v-checkbox>
+                </v-chip>
+                <v-btn small color="primary" @click="searchServiceConfig()">
+                  <v-icon>search</v-icon>
+                  Tìm kiếm
+                </v-btn>
+              </div>
           </div>
         </div> 
       </div>
-      <v-layout wrap class="white pt-3">
-        <v-flex :style="!isMobile ? 'width:calc(100% - 230px)' : ''">
-          <v-layout wrap class="">
-            <v-flex xs12 sm4 class="px-2">
-              <v-autocomplete
-                class="select-border"
-                label="Cấp cơ quan thực hiện"
-                :items="administrationList"
-                v-model="administrationFilter"
-                :hide-selected="true"
-                item-text="groupName"
-                item-value="groupCode"
-                box
-                @change="changeFilteradministration"
-              ></v-autocomplete>
+
+      <v-layout wrap>
+        <v-flex xs12  class="px-2">
+          <v-layout wrap align-center>
+            <v-flex xs8>
             </v-flex>
-            <v-flex xs12 sm4 class="px-2">
-              <v-autocomplete
-                class="select-border"
-                :items="govAgencyList"
-                v-model="govAgencyFilter"
-                label="Chọn cơ quan"
-                item-text="itemName"
-                item-value="itemCode"
-                :hide-selected="true"
-                @change="changeFilterAgency"
-                box
-              ></v-autocomplete>
-            </v-flex>
-            <v-flex xs12 sm4 class="px-2">
-              <v-autocomplete
-                class="select-border"
-                :items="domainList"
-                v-model="domainFilter"
-                label="Chọn lĩnh vực"
-                item-text="domainName"
-                item-value="domainCode"
-                :hide-selected="true"
-                clearable
-                @change="changeFilterDomain"
-                box
-              ></v-autocomplete>
+            <v-flex xs4 class="text-right">
+
             </v-flex>
           </v-layout>
         </v-flex>
-        <v-flex style="width:230px" class="pl-2" v-if="!isMobile">
-          <v-chip label color="primary" class="my-0" text-color="white" style="height:48px;border-radius: 5px;">
-            <v-checkbox
-              class="mt-0"
-              v-model="serviceLastest"
-              color="white"
-              hide-details
-            >
-              <template slot="label">
-                <div class="white--text">THỦ TỤC NỘP GẦN ĐÂY</div>
-              </template>
-            </v-checkbox>
-          </v-chip>
+        <v-flex xs12>
+          <v-layout wrap class="pa-2">
+            <v-flex xs12 class="px-2">
+              <v-layout wrap align-center>
+                <v-flex xs3><strong>Cấp cơ quan thực hiện</strong></v-flex>
+                <v-flex xs9>    
+                    <v-radio-group v-model="capCoQuanThucHien" row>
+                      <v-radio label="Sở ban ngành" value="SBN"></v-radio>
+                      <v-radio label="Thành phố, quận, huyện, thị xã" value="QUAN_HUYEN"></v-radio>
+                      <v-radio label="Xã phường thị trấn" value="XA_PHUONG"></v-radio>
+                    </v-radio-group>
+                  </v-flex>
+              </v-layout>
+            </v-flex>
+            <v-flex xs12>
+              <v-layout wrap>
+                <v-flex xs6 class="pa-2" v-if="capCoQuanThucHien === 'XA_PHUONG'">
+                  <v-autocomplete
+                    class="select-border"
+                    label="Quận, huyện, thị xã"
+                    :items="listQuanHuyen"
+                    v-model="administrationFilter"
+                    :hide-selected="true"
+                    item-text="itemName"
+                    item-value="itemCode"
+                    clearable
+                    
+                  ></v-autocomplete>
+                </v-flex>
+                <v-flex xs6 class="pa-2">
+                  <v-autocomplete
+                    class="select-border"
+                    :items="govAgencyList"
+                    v-model="govAgencyFilter"
+                    label="Chọn cơ quan"
+                    item-text="itemName"
+                    item-value="itemCode"
+                    :hide-selected="true"
+                    clearable
+                    
+                  ></v-autocomplete>
+                </v-flex>
+                <v-flex xs6 class="pa-2">
+                  <v-autocomplete
+                    class="select-border"
+                    :items="domainList"
+                    v-model="domainFilter"
+                    label="Chọn lĩnh vực"
+                    item-text="domainName"
+                    item-value="domainCode"
+                    :hide-selected="true"
+                    clearable
+                    
+                  ></v-autocomplete>
+                </v-flex>
+                <v-flex xs6 class="pa-2">
+                  <v-autocomplete
+                    class="select-border"
+                    label="Mức độ"
+                    :items="listLerver"
+                    v-model="leverFilter"
+                    :hide-selected="true"
+                    item-text="levelName"
+                    item-value="level"
+                    clearable
+                    
+                  ></v-autocomplete>
+                </v-flex>
+              </v-layout>
+            </v-flex>
+          </v-layout>
         </v-flex>
       </v-layout>
       <v-divider class="my-0 py-0"></v-divider>
@@ -126,38 +159,6 @@
           </v-layout>
         </v-card-text>
       </v-card>
-      <!-- <v-card v-if="domainFilter">
-        <v-card-text class='grey lighten-3 px-0 py-0'>
-              <v-card>
-                <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>
-                  <v-layout row wrap>
-                    <v-flex xs12 sm9 class="pt-1">
-                      <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
-                      <span>{{itemServiceConfig.serviceInfoName}}</span>
-                    </v-flex>
-                    <v-flex xs12 sm1 class="text-xs-center pt-1">
-                      <span>Mức {{itemServiceConfig.level}}</span>
-                    </v-flex>
-                    <v-flex xs12 sm2 class="text-xs-center">
-                      <v-menu left offset-x>
-                        <v-btn flat class="mx-0 my-0" slot="activator" small 
-                          @click="pullServiceOptions(itemServiceConfig)"
-                        >
-                          Chọn
-                        </v-btn>
-                        <v-list v-if="serviceOptions.length > 1">
-                          <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
-                            @click="selectServiceOption(itemOption, itemServiceConfig)">
-                            <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
-                          </v-list-tile>
-                        </v-list>
-                      </v-menu>
-                    </v-flex>
-                  </v-layout>
-                </v-card-text>
-              </v-card>
-        </v-card-text>
-      </v-card> -->
       <v-card v-if="activeFilterKey || serviceLastest">
         <div v-if="serviceConfigListRender.length > 0">
           <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>
@@ -190,7 +191,7 @@
           </v-card-text>
         </div>
         <div v-else class="my-3 mx-2">
-          <v-alert outline color="warning" icon="priority_high" :value="true">
+          <v-alert  color="warning" icon="priority_high" :value="true">
             Không có thủ tục nào
           </v-alert>
         </div>
@@ -272,6 +273,7 @@
     },
     data: () => ({
       showFilter: false,
+      capCoQuanThucHien: 'SBN',
       dialog_captcha: false,
       validCaptcha: false,
       govAgencyList: [],
@@ -281,6 +283,7 @@
       domainFilter: '',
       administrationList: [],
       administrationFilter: '',
+      leverFilter: '',
       panelAgency: [],
       panelDomain: [],
       govAgencies: [],
@@ -291,6 +294,8 @@
       serviceConfigListRender: [],
       serviceInfoIdSelect: '',
       serviceOptionsProcess: [],
+      listQuanHuyen: [],
+      listLerver: [],
       selectOption: false,
       govAgencyCodeSelect: '',
       serviceNameKey: '',
@@ -351,6 +356,10 @@
         })
       }
       vm.getServiceAdminisTration()
+      vm.getDictcollections()
+      vm.getLevers()
+      vm.getAgencys(vm.capCoQuanThucHien)
+      vm.getDomains()
     },
     updated () {
     },
@@ -370,7 +379,12 @@
           vm.filterService()
         }
       },
-
+      capCoQuanThucHien (val) {
+        let vm = this
+        if(val){
+          vm.getAgencys(val)
+        }
+      }
     },
     methods: {
       changeFilteradministration () {
@@ -449,6 +463,7 @@
           newQuery['administration'] = vm.administrationFilter
           newQuery['agency'] = vm.govAgencyFilter
           newQuery['domain'] = vm.domainFilter
+          newQuery['lever'] = vm.leverFilter
           if (vm.serviceLastest) {
             newQuery['lastest'] = vm.serviceLastest
           } else {
@@ -482,14 +497,19 @@
           let params = {
             start:  vm.agencyPage * vm.numberPerPage - vm.numberPerPage,
             end: vm.agencyPage * vm.numberPerPage,
-            level: '2,3',
+            level: newQuery.hasOwnProperty('lever') && newQuery.agency ? newQuery.lever : '',
             agency: newQuery.hasOwnProperty('agency') && newQuery.agency ? newQuery.agency : '',
             domain: newQuery.hasOwnProperty('domain') && newQuery.domain ? newQuery.domain : '',
             keyword: newQuery.hasOwnProperty('keyword') && newQuery.keyword ? vm.convertString(newQuery.keyword) : '',
           }
           vm.$store.dispatch('getServiceConfigs', params).then(res => {
             vm.serviceTotal = res.total
-            vm.serviceConfigListRender = res.data
+            if(res.data){
+              vm.serviceConfigListRender = res.data
+            }
+            else {
+              vm.serviceConfigListRender = []
+            }
           }).catch(() => {
             vm.serviceConfigListRender = []
           })
@@ -526,6 +546,38 @@
             vm.serviceConfigListRender = []
           })
         }
+
+        if (!vm.domainFilter && !vm.serviceNameKey) {
+          if (vm.govAgencyRender.length === 1) {
+            vm.panelAgency = [true]
+            if (vm.govAgencyRender[0].domains.length === 1) {
+              vm.panelDomain = []
+              vm.panelDomain[0] = [true]
+            } else {
+              for (let key in vm.govAgencyRender[0].domains) {
+                vm.panelDomain.push([])
+                vm.panelDomain[key].push(false)
+              }
+              vm.panelDomain[0] = [true]
+            }
+          } else {
+            for (let key in vm.govAgencyRender) {
+              vm.panelAgency.push(false)
+              vm.panelDomain.push([])
+              if (vm.govAgencyRender[key].domains.length === 1) {
+                vm.panelDomain[0] = [true]
+              } else {
+                for (let index in vm.govAgencyRender[key].domains[index]) {
+                  vm.panelDomain[key].push(false)
+                }
+              }
+            }
+          }
+        }
+        // if(newQuery.hasOwnProperty('agency') && newQuery.agency) {
+        //   vm.getDomains(newQuery.agency)
+        // }
+
       },
       pullServiceOptions (item) {
         var vm = this
@@ -702,6 +754,28 @@
           }
         ).catch(()=>{})
       },
+      getDictcollections () {
+        let vm = this
+        let filter = {
+          groupCode: 'QUAN_HUYEN'
+        }
+        vm.$store.dispatch('getDictcollections', filter).then(
+          res => {
+            vm.listQuanHuyen = res.data
+
+          }
+        ).catch(()=>{})
+      },
+      getLevers () {
+        let vm = this
+
+        vm.$store.dispatch('getLevers').then(
+          res => {
+            vm.listLerver = res.data
+
+          }
+        ).catch(()=>{})
+      },
       getAgencys(administrationCode) {
         let vm = this
         let current = vm.$router.history.current
@@ -712,8 +786,8 @@
         vm.$store.dispatch('getAgencys', data).then(
           res => {
               vm.govAgencyList = res
-              vm.govAgencyFilter = res[0]['itemCode']
-              vm.filterService()
+              // vm.govAgencyFilter = res[0]['itemCode']
+              // vm.filterService()
           }
         ).catch(()=>{
           vm.govAgencyList = []
@@ -731,6 +805,20 @@
         ).catch(()=>{
           vm.domainList = []
         })      
+      },
+      searchServiceConfig(){
+        let vm = this
+        if (vm.serviceNameKey && vm.serviceNameKey.length > 5) {
+          vm.govAgencyFilter = ''
+          vm.domainFilter = ''
+          vm.serviceLastest = false
+          vm.activeFilterKey = true
+          vm.filterService()
+        } else {
+          vm.serviceLastest = false
+          vm.activeFilterKey = false
+          vm.filterService()
+        }
       }
     }
   }

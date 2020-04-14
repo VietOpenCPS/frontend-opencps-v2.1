@@ -216,6 +216,27 @@ export const store = new Vuex.Store({
         })
       })
     },
+    updateindentifies ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        var dataPutUser = new FormData()
+        var url = '/o/rest/v2/applicants/updateindentifies'
+        dataPutUser.append('indentifyNoFFile', filter.indentifyNoFFile)
+        dataPutUser.append('indentifyNoBFile', filter.indentifyNoBFile)
+        dataPutUser.append('applicantId', filter.applicantId)
+        axios.post(url, dataPutUser, param).then(result1 => {
+          resolve(result1.data)
+        }).catch(xhr => {
+          reject(xhr)
+          commit('setsnackbarerror', true)
+        })
+      })
+    },
     getImageComponent ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {

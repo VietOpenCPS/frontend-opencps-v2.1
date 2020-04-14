@@ -86,25 +86,25 @@ export const store = new Vuex.Store({
             icon: 'filter_8',
             link: '/table/opencps_mapping/tthc',
             code: 'mapping',
-            text: 'Mapping TTHC'
+            text: 'Mapping thủ tục'
           },
           {
             icon: 'filter_9',
             link: '/table/opencps_mapping/domain',
             code: 'mapping',
-            text: 'Đồng bộ danh mục lĩnh vực TTHC'
+            text: 'Đồng bộ DM lĩnh vực'
           },
           {
-            icon: 'filter_10',
+            icon: 'filter',
             link: '/table/opencps_mapping/agency-sharingqa/0',
             code: 'mapping',
-            text: 'Đồng bộ danh mục cơ quan'
+            text: 'Đồng bộ DM cơ quan'
           },
           {
-            icon: 'filter_11',
+            icon: 'filter',
             link: '/table/opencps_mapping/agency-sharingqa/1',
             code: 'mapping',
-            text: 'Đồng bộ danh mục câu hỏi'
+            text: 'Đồng bộ DM câu hỏi'
           },
           {
             icon: 'import_export',
@@ -1771,6 +1771,24 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let config = {
             url: '/o/rest/v2/nps/serviceinfodvcqg/' + filter.serviceCodeDVCQG,
+            method: 'get',
+            headers: {groupId: state.initData.groupId},
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getChiTietDonVi ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/rest/v2/serviceinfos/' + filter.serviceCode,
             method: 'get',
             headers: {groupId: state.initData.groupId},
           }

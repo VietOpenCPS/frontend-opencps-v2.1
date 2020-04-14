@@ -171,6 +171,69 @@ export const store = new Vuex.Store({
         })
       })
     },
+    postApplicantBXD ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let configs = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        store.dispatch('loadInitResource').then(function (result) {
+          let configs = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+          var dataPostApplicant = new FormData()
+          dataPostApplicant.append('applicantIdType', data.applicantType)
+          dataPostApplicant.append('applicantName', data.applicantName)
+          dataPostApplicant.append('applicantIdNo', data.applicantIdNo)
+          dataPostApplicant.append('applicantIdDate', data.applicantIdNoDate)
+          dataPostApplicant.append('contactEmail', data.contactEmail)
+          dataPostApplicant.append('contactTelNo', data.contactTelNo)
+          dataPostApplicant.append('password', data.password)
+          dataPostApplicant.append('j_captcha_response', data.j_captcha_response)
+          dataPostApplicant.append('indentifyNoFFile', data.indentifyNoFFile)
+          dataPostApplicant.append('indentifyNoBFile', data.indentifyNoBFile)
+          console.log('dataPostApplicant', dataPostApplicant)
+          // test local
+          // axios.post('http://127.0.0.1:8081/api/applicants', dataPostApplicant, configs).then(function (response) {
+          axios.post('/o/rest/v2/applicants/withindentifies', dataPostApplicant, configs).then(function (response) {
+            if (response['status'] !== undefined && response['status'] === 203) {
+              toastr.clear()
+              toastr.error('Mã captcha không chính xác')
+              reject(xhr)
+            } else {
+              resolve(response.data)
+            }
+            toastr.success('Đăng ký thành công')
+            resolve(response.data)
+          }).catch(function (errorRes, response) {
+            reject(errorRes)
+            console.log('response', errorRes.response)
+            let dataError
+            if (errorRes.response.data) {
+              dataError = errorRes.response.data
+              if (dataError && dataError.description && dataError.description === 'DuplicateContactEmailException') {
+                toastr.error('Đăng ký thất bại. Email sử dụng đã tồn tại trên hệ thống. Sử dụng Email khác để đăng ký')
+              } else if (dataError && dataError.description && dataError.description === 'DuplicateApplicantIdException') {
+                toastr.error('Đăng ký thất bại. Số CMDN/Mã số thuế đã tồn tại trên hệ thống. Sử dụng số CMDN/mã số thuế khác để đăng ký')
+              } else if (dataError && dataError.description && dataError.description === 'DuplicateContactTelNoException') {
+                toastr.error('Đăng ký thất bại. Số điện thoại đã được sử dụng trên hệ thống. Sử dụng số điện thoại khác để đăng ký')
+              } else if (dataError && dataError.description && dataError.description === 'Invalid ID, could not validate unexisting or already validated captcha') {
+                toastr.error('Nhập sai Captcha')
+              } else {
+                toastr.error('Đăng ký thất bại. Vui lòng thử lại ' + dataError.description)
+              }
+            }
+          })
+        })
+      })
+    },
     postApplicant ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         let configs = {

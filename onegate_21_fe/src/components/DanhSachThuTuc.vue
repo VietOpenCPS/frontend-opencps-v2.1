@@ -1,16 +1,55 @@
 <template>
   <div>
-    <div class="text-center mt-5" v-if="String(serviceCode) !== '0' && !hasVerify && !selectOption">
-      <v-progress-circular
-        :size="100"
-        :width="1"
-        color="primary"
-        indeterminate
-      ></v-progress-circular>
-      <p class="mt-5">Đang tạo hồ sơ ...</p>
+    <div class="" v-if="String(serviceCode) !== '0' && !hasVerify">
+      <v-dialog
+        v-model="dialogLoadingCreate"
+        persistent
+        width="300"
+        v-if="!selectOption"
+      >
+        <v-card
+          color="primary"
+          dark
+        >
+          <v-card-text>
+            Đang tạo hồ sơ
+            <v-progress-linear
+              indeterminate
+              color="white"
+              class="mb-0"
+            ></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+      
+      <v-dialog v-else v-model="dialog_selectOption" scrollable persistent max-width="1000px">
+        <v-card style="width: 100%">
+          <v-toolbar flat dark color="primary">
+            <v-toolbar-title>Chọn dịch vụ</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon dark @click.native="closeSelectOption()">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-card-text class="pt-3">
+            <v-layout class="py-2" wrap v-for="(item, index) in serviceOptionsProcess" :key="index" style="border-bottom: 1px solid #dedede;">
+              <v-flex style="width: calc(100% - 110px)">
+                <span>{{item.optionName}}</span>
+              </v-flex>
+              <v-flex style="width: 100px">
+                <v-btn class="px-3 right" color="primary" @click="selectServiceOptionCRD(item, govAgencyCodeSelect)">
+                  Chọn
+                </v-btn>
+              </v-flex>
+              
+            </v-layout>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+      
     </div>
 
-    <div v-if="!selectOption">
+    <div>
       <div class="row-header no__hidden_class">
         <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
           <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
@@ -229,7 +268,7 @@
       </v-card>
     </div>
     <!-- case multiple processOption -->
-    <div v-if="selectOption">
+    <!-- <div v-if="selectOption">
       <div class="row-header">
         <div class="background-triangle-big"> <span>Chọn dịch vụ công</span> </div>
         <div class="layout row wrap header_tools row-blue">
@@ -255,7 +294,7 @@
           </v-list-tile>
         </template>
       </v-list>
-    </div>
+    </div> -->
 
     <v-dialog v-model="dialog_captcha" scrollable persistent max-width="700px">
       <v-card>
@@ -306,7 +345,6 @@
       </v-card>
     </v-dialog>
 
-    
   </div>
 </template>
 
@@ -355,7 +393,9 @@
       agencyPage: 1,
       dialogVerifycation: false,
       verificationApplicantCreateDossier: false,
-      hasVerify: false
+      hasVerify: false,
+      dialogLoadingCreate: true,
+      dialog_selectOption: true
     }),
     computed: {
       currentIndex () {
@@ -703,6 +743,11 @@
             vm.serviceOptions = []
           })
         }
+      },
+      closeSelectOption () {
+        let vm = this
+        vm.dialog_selectOption = false
+        vm.filterAndSort()
       },
       selectServiceOption (item, govAgencyCode, itemServiceConfig) {
         var vm = this

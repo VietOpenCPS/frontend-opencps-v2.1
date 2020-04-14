@@ -264,7 +264,7 @@
                 <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
                 <thong-tin-buu-chinh v-if="showPostalService" :postalService="thongTinChiTietHoSo"></thong-tin-buu-chinh>
                 <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
-                <div class="px-4 pt-0 pb-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+                <div v-if="visibleDoAction" class="px-4 pt-0 pb-2" style="width: 100%;border-bottom: 1px solid #dddddd">
                   <v-btn color="primary" class="ml-0 mr-2" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
                     :loading="loadingActionProcess"
                     :disabled="loadingActionProcess"
@@ -936,6 +936,9 @@ export default {
     loading () {
       return this.$store.getters.loading
     },
+    visibleDoAction () {
+      return this.$store.getters.getVisibleDoAction
+    },
     originality () {
       var vm = this
       return vm.getOriginality()
@@ -1100,6 +1103,9 @@ export default {
         }
         vm.btnStateVisible = false
       }
+    },
+    visibleDoAction (val) {
+      this.loadingActionProcess = false
     }
   },
   methods: {

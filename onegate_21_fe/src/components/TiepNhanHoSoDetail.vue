@@ -36,7 +36,7 @@
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 HƯỚNG DẪN &nbsp;&nbsp;&nbsp;&nbsp; 
               </div>
-              <v-layout row wrap>
+              <v-layout wrap>
                 <v-flex xs12 sm12>
                   <div class="ml-3 mr-3 pt-1" v-html="thongTinChiTietHoSo.dossierNote"></div>
                 </v-flex>
