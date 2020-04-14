@@ -359,6 +359,7 @@
             <v-layout wrap>
               <v-flex xs12 class="px-2 pb-3">
                 <v-autocomplete
+                  label="Thủ tục:"
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelected"
                   :rules="[v => !!v || 'Thủ tục hành chính bắt buộc phải chọn']"
@@ -572,7 +573,7 @@
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
-                  :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>

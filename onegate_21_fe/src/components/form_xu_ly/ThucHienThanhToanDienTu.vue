@@ -68,14 +68,39 @@
             </v-layout>
             <!-- epayment -->
             <p class="mb-0"><span class="red--text">* </span>&nbsp;Lựa chọn hình thức thanh toán:</p>
-            <v-btn dark small color="blue darken-1" class="ml-3 mr-2" @click.native="() => isBank = true">
+            <!-- <v-btn dark small color="blue darken-1" class="ml-3 mr-2" @click.native="() => isBank = true">
               <v-icon>account_balance</v-icon> &nbsp;
               Thanh toán chuyển khoản
             </v-btn>
             <v-btn v-if="getEPaymentProfile(paymentProfile.epaymentProfile)" dark small color="amber accent-4" class="ml-2 mr-2" @click.native="toKeyPay(getEPaymentProfile(paymentProfile.epaymentProfile).keypayUrl)">
               <v-icon>payment</v-icon> &nbsp;
-              Thanh toán điện tử
-            </v-btn>
+              Thanh toán qua Keypay
+            </v-btn> -->
+            <!--  -->
+            <div class="text-xs-left mt-2 mb-3 ml-2">
+              <v-chip color="indigo" text-color="white" @click.native="() => isBank = true">
+                <v-avatar style="cursor: pointer">
+                  <v-icon>account_balance</v-icon>
+                </v-avatar>
+                <span class="py-2" style="cursor: pointer">Thanh toán chuyển khoản</span>
+              </v-chip>
+              <v-chip v-if="getEPaymentProfile(paymentProfile.epaymentProfile)" color="orange" text-color="white"
+                @click.native="toKeyPay(getEPaymentProfile(paymentProfile.epaymentProfile).keypayUrl)"
+              >
+                <v-avatar style="cursor: pointer">
+                  <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
+                </v-avatar>
+                <span class="py-2" style="cursor: pointer">Thanh toán qua Keypay</span>
+              </v-chip>
+
+              <v-chip color="green" text-color="white" @click.native="showViettelPay">
+                <v-avatar style="cursor: pointer">
+                  <img src="/o/opencps-store/js/cli/dvc/app/image/logo-viettelpay.svg"  style="background: #fff">
+                </v-avatar>
+                <span class="py-2" style="cursor: pointer">Thanh toán qua ứng dụng ViettelPay</span>
+              </v-chip>
+            </div>
+            <!--  -->
             <div v-if="isBank" class="ml-3 mt-2 px-2 py-1" style="border: 1px solid #004b9485;border-radius: 3px;">
               <div>
                 <input type="file" id="paymentFile1" @change="uploadPaymentFile($event)" style="display:none">
@@ -158,6 +183,28 @@
         </iframe>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogQrViettelPay" max-width="350" transition="scale-transition" origin="center center" style="overflow: hidden;">
+      <v-card color="#24b2b4" class="text-xs-center">
+        <v-toolbar dark color="primary">
+          <v-toolbar-title class="white--text">THANH TOÁN DỊCH VỤ CÔNG</v-toolbar-title>
+        </v-toolbar>
+        <!-- <div class="py-2 pb-3 text-bold white--text" style="font-size: 18px">THANH TOÁN DỊCH VỤ CÔNG</div> -->
+        <div class="d-inline-block py-2" style="position:relative">
+          <img class="logo" src="/o/opencps-store/js/cli/dvc/app/image/logo-viettelpay.svg" width="30" style="
+            position: absolute;
+            top: 63px;
+            left: 60px;
+            background: #efe5e5;
+            border-radius: 5px;
+          ">
+          <qrcode :value="JSON.stringify(dataVietelPay)" :options="{ width: 150 }"></qrcode><br>
+          <v-chip class="my-0 ml-1" color="#24b2b4" text-color="white" style="width:135px;margin-top:-5px !important">
+            <span style="font-size:13px !important">Quét để thanh toán</span>
+          </v-chip>
+        </div>
+      </v-card>
+    </v-dialog>
+    
   </div>
 </template>
 
@@ -167,6 +214,8 @@ import Vue from 'vue'
 import $ from 'jquery'
 import toastr from 'toastr'
 import {VMoney} from 'v-money'
+import VueQrcode from '@chenfengyuan/vue-qrcode'
+Vue.component(VueQrcode.name, VueQrcode)
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -192,6 +241,15 @@ export default {
       paymentNote: '',
       paymentFile: ''
     },
+    dataVietelPay: {
+      "PRIORITY":"BankPlus",
+      "VERSION":"3.0", 
+      "TYPE":"PAY_BILL", 
+      "BILLCODE":"MSTT0513234", 
+      "ORDER_ID":"MSTT0513234", 
+      "AMOUNT":"0", 
+      "MERCHANT_CODE":"FDS"
+    },
     paymentFile: '',
     epaymentValid: true,
     money: {
@@ -208,6 +266,7 @@ export default {
     checkPaid: true,
     activeEdit: true,
     progressUploadPart: false,
+    dialogQrViettelPay: false,
     dialogPDF: false,
     dialogPDFLoading: true,
     isBank: true,
@@ -240,6 +299,12 @@ export default {
     paymentProfile (val) {
       var vm = this
       if (vm.paymentProfile) {
+        //
+        if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && vm.paymentProfile.epaymentProfile) {
+          let jsonQR = JSON.parse(vm.paymentProfile.epaymentProfile)
+          vm.dataVietelPay = jsonQR.genQRCode
+        }
+        //
         vm.feeTong = Number(vm.paymentProfile.feeAmount) + Number(vm.paymentProfile.serviceAmount)
         if ((vm.detailDossier.viaPostal === 2 || vm.detailDossier.viaPostal === '2') && vm.paymentProfile.shipAmount !== 0) {
           vm.feeTong = Number(vm.paymentProfile.feeAmount) + Number(vm.paymentProfile.serviceAmount) + Number(vm.paymentProfile.shipAmount)
@@ -386,6 +451,10 @@ export default {
       let vm = this
       vm.isBank = false
       window.open(item, '_self')
+    },
+    showViettelPay () {
+      let vm = this
+      vm.dialogQrViettelPay = true
     },
     goBack () {
       window.history.back()

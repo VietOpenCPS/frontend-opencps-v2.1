@@ -729,11 +729,13 @@ export default {
       let vm = this
       // console.log('thongTinChuHoSo', vm.thongTinChuHoSo)
       vm.briefNote = vm.thongTinChiTietHoSo.serviceName ? vm.thongTinChiTietHoSo.serviceName : ''
+      // set dossierName
       // if (vm.thongTinChiTietHoSo.serviceName && !vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
       //   vm.briefNote = vm.briefNote + ' cho ' + vm.thongTinChuHoSo['applicantName']
       // } else if (vm.thongTinChiTietHoSo.serviceName && vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
       //   vm.briefNote = vm.briefNote + ' cho ông/bà ' + vm.thongTinChuHoSo['applicantName']
       // }
+      // end
       if (vm.formCode === 'UPDATE') {
         vm.briefNote = vm.thongTinChiTietHoSo.dossierName ? vm.thongTinChiTietHoSo.dossierName : vm.thongTinChiTietHoSo.serviceName
       }
@@ -1029,7 +1031,8 @@ export default {
             vm.loadingAction = false
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             if (vm.formCode === 'UPDATE') {
-              vm.goBack()
+              // vm.goBack()
+              window.history.back()
             } else {
               var initData = vm.$store.getters.loadingInitData
               let actionUser = initData.user.userName ? initData.user.userName : ''

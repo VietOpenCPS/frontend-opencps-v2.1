@@ -122,7 +122,7 @@ export default {
     initComment: function () {
       var vm = this
       window.$('#comments-container-el').comments({
-        profilePictureURL: 'https://png.icons8.com/material/50/000000/guest-male.png',
+        profilePictureURL: '/o/opencps-store/js/cli/motcua/app/image/icons-user-comment.png',
         textareaRows: 2,
         enableAttachments: true,
         enableHashtags: true,

@@ -25,6 +25,7 @@
     "toastr": "^2.1.4",
     "v-money": "^0.8.1",
     "v-suggestions": "^1.0.6",
+    "@chenfengyuan/vue-qrcode": "^1.0.1",
     "vue": "^2.5.9",
     "vue-content-placeholders": "^0.2.1",
     "vue-ctk-date-time-picker": "^1.1.19",

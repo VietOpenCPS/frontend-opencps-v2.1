@@ -43,13 +43,12 @@
             <v-flex xs12 sm4 class="px-2">
               <v-autocomplete
                 class="select-border"
-                label="Cấp"
+                label="Cấp cơ quan thực hiện"
                 :items="administrationList"
                 v-model="administrationFilter"
                 :hide-selected="true"
                 item-text="groupName"
                 item-value="groupCode"
-                clearable
                 box
                 @change="changeFilteradministration"
               ></v-autocomplete>
@@ -63,7 +62,6 @@
                 item-text="itemName"
                 item-value="itemCode"
                 :hide-selected="true"
-                clearable
                 @change="changeFilterAgency"
                 box
               ></v-autocomplete>
@@ -100,9 +98,8 @@
         </v-flex>
       </v-layout>
       <v-divider class="my-0 py-0"></v-divider>
-      <v-card v-if="!domainFilter && !activeFilterKey && !serviceLastest">
+      <v-card v-if="!activeFilterKey && !serviceLastest">
         <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>
-          <!-- Cap 3 -->
           <v-layout row wrap>
             <v-flex xs12 sm9 class="pt-1">
               <span style="font-weight: bold">{{(agencyPage*numberPerPage - numberPerPage)+ index3 + 1}}.</span> &nbsp;
@@ -129,11 +126,10 @@
           </v-layout>
         </v-card-text>
       </v-card>
-      <v-card v-if="domainFilter">
+      <!-- <v-card v-if="domainFilter">
         <v-card-text class='grey lighten-3 px-0 py-0'>
               <v-card>
                 <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>
-                  <!-- Cap 3 -->
                   <v-layout row wrap>
                     <v-flex xs12 sm9 class="pt-1">
                       <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
@@ -161,7 +157,7 @@
                 </v-card-text>
               </v-card>
         </v-card-text>
-      </v-card>
+      </v-card> -->
       <v-card v-if="activeFilterKey || serviceLastest">
         <div v-if="serviceConfigListRender.length > 0">
           <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>
@@ -339,9 +335,12 @@
       if (newQuery['agency']) {
         vm.govAgencyFilter = newQuery['agency']
       }
-      if (String(vm.serviceCode) === '0') {
-        vm.filterAndSort()
+      if (newQuery['agency']) {
+        vm.administrationFilter = newQuery['administration']
       }
+      // if (String(vm.serviceCode) === '0') {
+      //   vm.filterAndSort()
+      // }
       // 
       if (String(vm.serviceCode) !== '0') {
         let params = {
@@ -381,10 +380,13 @@
         vm.domainFilter = ''
         vm.activeFilterKey = false
         vm.serviceLastest = false
-        console.log('vm.administrationFilter',vm.administrationFilter)
-        if(vm.administrationFilter){
-          vm.getAgencys(vm.administrationFilter)
-        }
+        setTimeout(function () {
+          console.log('vm.administrationFilter',vm.administrationFilter)
+          if (vm.administrationFilter) {
+            vm.govAgencyList = []
+            vm.getAgencys(vm.administrationFilter)
+          }
+        }, 200)
       },
       changeFilterAgency () {
         let vm = this
@@ -467,7 +469,7 @@
               renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
             }
           })
-        }, 5)
+        }, 100)
       },
       filterAndSort () {
         let vm = this
@@ -523,36 +525,6 @@
           }).catch (function () {
             vm.serviceConfigListRender = []
           })
-        }
-        if (!vm.domainFilter && !vm.serviceNameKey) {
-          if (vm.govAgencyRender.length === 1) {
-            vm.panelAgency = [true]
-            if (vm.govAgencyRender[0].domains.length === 1) {
-              vm.panelDomain = []
-              vm.panelDomain[0] = [true]
-            } else {
-              for (let key in vm.govAgencyRender[0].domains) {
-                vm.panelDomain.push([])
-                vm.panelDomain[key].push(false)
-              }
-              vm.panelDomain[0] = [true]
-            }
-          } else {
-            for (let key in vm.govAgencyRender) {
-              vm.panelAgency.push(false)
-              vm.panelDomain.push([])
-              if (vm.govAgencyRender[key].domains.length === 1) {
-                vm.panelDomain[0] = [true]
-              } else {
-                for (let index in vm.govAgencyRender[key].domains[index]) {
-                  vm.panelDomain[key].push(false)
-                }
-              }
-            }
-          }
-        }
-        if(newQuery.hasOwnProperty('agency') && newQuery.agency) {
-          vm.getDomains(newQuery.agency)
         }
       },
       pullServiceOptions (item) {
@@ -719,10 +691,12 @@
       },
       getServiceAdminisTration () {
         let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
         vm.$store.dispatch('getServiceAdminisTration', {}).then(
           res => {
             vm.administrationList = res
-            vm.administrationFilter = res[0]['groupCode']
+            vm.administrationFilter = vm.administrationFilter ? vm.administrationFilter : res[0]['groupCode']
             vm.getAgencys(vm.administrationFilter)
 
           }
@@ -730,6 +704,8 @@
       },
       getAgencys(administrationCode) {
         let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
         let data = {
           administration: administrationCode ? administrationCode : ''
         }

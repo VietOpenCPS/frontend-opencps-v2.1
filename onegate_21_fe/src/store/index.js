@@ -524,7 +524,7 @@ export const store = new Vuex.Store({
     resetThongTinChuHoSo ({ commit }) {
       let data = {
         userType: '1',
-        cityCode: 25,
+        cityCode: '',
         districtCode: '',
         wardCode: '',
         applicantIdNo: '',
@@ -539,7 +539,7 @@ export const store = new Vuex.Store({
       let data = {
         sameUser: '',
         delegateName: '',
-        delegateCityCode: 25,
+        delegateCityCode: '',
         delegateAddress: '',
         delegateDistrictCode: '',
         delegateWardCode: '',
