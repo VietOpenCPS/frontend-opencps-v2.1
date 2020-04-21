@@ -671,7 +671,7 @@
 import axios from 'axios'
 import Suggestions from 'v-suggestions'
 import toastr from 'toastr'
-import TinyPagination from '../../components/pagging/hanghai_pagination'
+import TinyPagination from '../../components/pagging/opencps_pagination'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -800,7 +800,7 @@ export default {
     functionTimeOut: null,
     dialog_applicantInfos: false,
     dialog_applicantList: false,
-    applicantConfig: false,
+    applicantConfig: true,
     titleEdit: 'Thông tin công dân, tổ chức, doanh nghiệp',
     applicantEdit: '',
     dialog_editApplicant: false,

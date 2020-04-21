@@ -93,7 +93,7 @@
 
 import toastr from 'toastr'
 import $ from 'jquery'
-import TinyPagination from '../pagging/hanghai_pagination'
+import TinyPagination from '../pagging/opencps_pagination'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'

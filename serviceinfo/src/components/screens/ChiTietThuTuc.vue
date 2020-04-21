@@ -86,7 +86,7 @@
                     </div>
                   </v-card-text>
                   <v-menu bottom right offset-y class="ml-2 my-2" style="display: inline-block;position:relative !important;"
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
                   >
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
@@ -97,6 +97,18 @@
                       </v-list-tile>
                     </v-list>
                   </v-menu>
+                  <v-btn class="mx-2 my-2" small color="primary" 
+                    v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs)"
+                  >
+                    Nộp hồ sơ
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
+                    v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
+                  >
+                    Hướng dẫn
+                  </v-btn>
                   <v-btn small color="primary" class="mx-3 my-2" 
                     v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
                     @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
@@ -117,7 +129,7 @@
                     <div v-html="serviceDetail.processText"></div>
                   </v-card-text>
                   <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
                   >
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
@@ -128,6 +140,18 @@
                       </v-list-tile>
                     </v-list>
                   </v-menu>
+                  <v-btn class="mx-2 my-2" small color="primary" 
+                    v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs)"
+                  >
+                    Nộp hồ sơ
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
+                    v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
+                  >
+                    Hướng dẫn
+                  </v-btn>
                   <v-btn small color="primary" class="mx-3 my-2" 
                     v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
                     @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
@@ -158,7 +182,7 @@
                     </div>
                   </v-card-text>
                   <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
                   >
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
@@ -169,6 +193,18 @@
                       </v-list-tile>
                     </v-list>
                   </v-menu>
+                  <v-btn class="mx-2 my-2" small color="primary" 
+                    v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs)"
+                  >
+                    Nộp hồ sơ
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
+                    v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
+                  >
+                    Hướng dẫn
+                  </v-btn>
                   <v-btn small color="primary" class="mx-3 my-2" 
                     v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
                     @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
@@ -189,7 +225,7 @@
                     <div v-html="serviceDetail.conditionText"></div>
                   </v-card-text>
                   <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
                   >
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
@@ -200,6 +236,18 @@
                       </v-list-tile>
                     </v-list>
                   </v-menu>
+                  <v-btn class="mx-2 my-2" small color="primary" 
+                    v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs)"
+                  >
+                    Nộp hồ sơ
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
+                    v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
+                  >
+                    Hướng dẫn
+                  </v-btn>
                   <v-btn small color="primary" class="mx-3 my-2" 
                     v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
                     @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
@@ -317,7 +365,7 @@
                     </div>
                   </v-card-text>
                   <v-menu bottom right offset-y class="ml-2 my-2" style="display: inline-block;position:relative !important;"
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
                   >
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
@@ -328,6 +376,18 @@
                       </v-list-tile>
                     </v-list>
                   </v-menu>
+                  <v-btn class="mx-2 my-2" small color="primary" 
+                    v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs)"
+                  >
+                    Nộp hồ sơ
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
+                    v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
+                  >
+                    Xem hướng dẫn
+                  </v-btn>
                   <v-btn small color="primary" class="mx-2 my-2" 
                     v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
                     @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
@@ -348,7 +408,7 @@
                     <div v-html="serviceDetail.processText"></div>
                   </v-card-text>
                   <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
                   >
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
@@ -359,6 +419,18 @@
                       </v-list-tile>
                     </v-list>
                   </v-menu>
+                  <v-btn class="mx-2 my-2" small color="primary" 
+                    v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs)"
+                  >
+                    Nộp hồ sơ
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
+                    v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
+                  >
+                    Xem hướng dẫn
+                  </v-btn>
                   <v-btn small color="primary" class="mx-2 my-2" 
                     v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
                     @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
@@ -389,7 +461,7 @@
                     </div>
                   </v-card-text>
                   <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
                   >
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
@@ -400,6 +472,18 @@
                       </v-list-tile>
                     </v-list>
                   </v-menu>
+                  <v-btn class="mx-2 my-2" small color="primary" 
+                    v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs)"
+                  >
+                    Nộp hồ sơ
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
+                    v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
+                  >
+                    Xem hướng dẫn
+                  </v-btn>
                   <v-btn small color="primary" class="mx-2 my-2" 
                     v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
                     @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
@@ -420,7 +504,7 @@
                     <div v-html="serviceDetail.conditionText"></div>
                   </v-card-text>
                   <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
                   >
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
@@ -431,6 +515,18 @@
                       </v-list-tile>
                     </v-list>
                   </v-menu>
+                  <v-btn class="mx-2 my-2" small color="primary" 
+                    v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs)"
+                  >
+                    Nộp hồ sơ
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
+                    v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                    @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
+                  >
+                    Xem hướng dẫn
+                  </v-btn>
                   <v-btn small color="primary" class="mx-2 my-2" 
                     v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
                     @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
@@ -575,6 +671,44 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <!--  -->
+    <!--  -->
+    <v-dialog v-model="dialog_selectAgency" scrollable persistent max-width="700px">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Chọn cơ quan tiếp nhận</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_selectAgency = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-form ref="formSelect" v-model="validFormSelectGov" lazy-validation>
+            <v-autocomplete
+              class="mt-3"
+              placeholder="Chọn cơ quan"
+              :items="govAgencyListTiepNhan"
+              v-model="govAgencyTiepNhanSelected"
+              item-text="govAgencyName"
+              item-value="govAgencyCode"
+              clearable
+              :rules="[v => !!v || 'Chọn cơ quan tiếp nhận']"
+              required
+              return-object
+            ></v-autocomplete>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="submitSelectGov">
+            <v-icon size="20">save</v-icon>&nbsp; Đồng ý
+          </v-btn>
+          <v-btn class="white--text" color="red"  @click="dialog_selectAgency = false">
+            <v-icon size="20">clear</v-icon>&nbsp; Thoát
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -588,6 +722,10 @@ export default {
   props: ['index'],
   components: {},
   data: () => ({
+    dialog_selectAgency: false,
+    validFormSelectGov: false,
+    govAgencyListTiepNhan: [],
+    govAgencyTiepNhanSelected: '',
     loading: true,
     loadingAction: false,
     loadingLogin: false,
@@ -687,6 +825,9 @@ export default {
         vm.serviceDetail = result
         if (query.hasOwnProperty('code') && query.code) {
           vm.serviceDetail.serviceCodeDVCQG = query.code
+        }
+        if (query.hasOwnProperty('MaTTHCDP') && query.MaTTHCDP) {
+          vm.serviceDetail.serviceCodeDVCQG = query.MaTTHCDP
         }
         vm.loading = false
       }).catch(function (reject) {
@@ -826,6 +967,26 @@ export default {
         }
       }
     },
+    showSelectGov (govList, guide) {
+      let vm = this
+      vm.govAgencyTiepNhanSelected = ''
+      vm.selectGuide = guide ? true : false
+      vm.govAgencyListTiepNhan = vm.serviceConfigs(govList)
+      vm.dialog_selectAgency = true
+    },
+    submitSelectGov () {
+      let vm = this
+      if (vm.$refs.formSelect.validate()) {
+        if (vm.selectGuide) {
+          vm.dialog_selectAgency = false
+          setTimeout(function () {
+            vm.viewGuide(vm.govAgencyTiepNhanSelected)
+          }, 200)
+        } else {
+          vm.createDossier(vm.govAgencyTiepNhanSelected)
+        }
+      }
+    },
     serviceConfigs (config) {
       if (Array.isArray(config)) {
         return config
@@ -841,9 +1002,16 @@ export default {
       let vm = this
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
+      let codeDvcqg = ''
+      if (query.hasOwnProperty('code') && query.code) {
+        codeDvcqg = query.code
+      }
+      if (query.hasOwnProperty('MaTTHCDP') && query.MaTTHCDP) {
+        codeDvcqg = query.MaTTHCDP
+      }
       let filter = {
         state: '',
-        redirectURL: window.location.href.split("?")[0]
+        redirectURL: codeDvcqg ? window.location.href.split("?")[0] + '?code=' +  codeDvcqg : window.location.href.split("?")[0]
       }
       setTimeout (function () {
         if (!vm.isSigned) {

@@ -3093,8 +3093,9 @@ export const store = new Vuex.Store({
               agency: data.agency ? data.agency : '',
               keyword: data.keyword ? data.keyword : '',
               domain: data.domain ? data.domain : '',
-              // level: data.level ? data.level : '3,4',
-              service: data.service ? data.service : ''
+              level: data.level ? data.level : '3,4',
+              serviceConfigId: data.service ? data.service : '',
+              service: data.serviceCode ? data.serviceCode : ''
             }
           }
           axios.get('/o/rest/v2/serviceconfigs', param).then(function (response) {
@@ -3645,21 +3646,26 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getServiceRecently ({commit, state}) {
+    getServiceRecently ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              start: filter.start ? filter.start : 0,
+              end: filter.end ? filter.end : 50,
+              top: 'recently'
             }
           }
           // test local
-          axios.get('/o/rest/v2/serviceinfos/statistic/recently?top=recently', param).then(result => {
+          axios.get('/o/rest/v2/serviceinfos/statistic/recently', param).then(result => {
             let serializable = result.data
-            if (serializable && serializable.data) {
-              resolve(serializable.data)
+            if (serializable) {
+              resolve(serializable)
             } else {
-              resolve([])
+              resolve('')
             }
           }).catch(xhr => {
             reject(xhr)
@@ -3974,7 +3980,7 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
-    getLevers ({commit, state}, filter) {
+    getLevels ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let config = {
@@ -3985,13 +3991,46 @@ export const store = new Vuex.Store({
             }
           }
           axios.request(config).then(function (response) {
-            resolve(response.data)
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data.filter(function (item) {
+                return String(item.level) !== '2'
+              })
+              for (let key in dataReturn) {
+                dataReturn[key]['levelName'] = 'Mức độ ' + dataReturn[key].level
+              }
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
           }).catch(function (error) {
             reject(error)
           })
         }).catch(function (){})
       })
     },
+    getVtPayStatus ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/pgi/vtp/search',
+            method: 'get',
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              billcode: filter.billcode,
+              order_id: filter.order_id
+            }
+          }
+          axios.request(config).then(function (response) {
+            resolve(response)
+          }).catch(function (error) {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    }
     // ----End---------
   },
   mutations: {

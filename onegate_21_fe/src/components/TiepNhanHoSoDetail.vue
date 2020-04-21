@@ -209,22 +209,11 @@
               <span slot="loader">Loading...</span>
             </v-btn>
           </v-tab>
-          <!-- <v-tab href="#tab-3" @click="boSungHoSo">
-            <v-btn flat class="px-0 py-0 mx-0 my-0">
-              Bổ sung &nbsp;
-              <v-icon>save</v-icon>
-            </v-btn>
-          </v-tab>
-          <v-tab href="#tab-4">
-            <v-btn flat class="px-0 py-0 mx-0 my-0">
-              Trả kết quả &nbsp;
-              <v-icon>send</v-icon>
-            </v-btn>
-          </v-tab> -->
-          <v-tab href="#tab-5" @click="goBack" class="px-0 py-0">
+          <v-tab href="#tab-5" class="px-0 py-0">
             <v-btn flat class=""
               :loading="loadingAction"
               :disabled="loadingAction"
+              @click="goBackHistory"
             >
               <v-icon size="18">reply</v-icon> &nbsp;
               Quay lại
@@ -1543,6 +1532,9 @@ export default {
           query: currentQuery
         })
       }
+    },
+    goBackHistory () {
+      window.history.back()
     }
   }
 }

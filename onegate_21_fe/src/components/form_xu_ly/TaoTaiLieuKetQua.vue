@@ -1050,6 +1050,7 @@
                 dataSigned = JSON.parse(received_msg.FileServer)
               } catch (error) {
               }
+              console.log('dataSigned', dataSigned)
               toastr.clear()
               toastr.success('Tài liệu đã được ký duyệt')
               if (!partNo) {
@@ -1064,7 +1065,6 @@
                     break
                   }
                 }
- 
                 vm.dossierFilesItems[indexFile].isSigned = true
                 vm.dossierFilesItems[indexFile].pdfSigned = dataSigned ? dataSigned.url : ''
                 vm.dossierFilesItems[indexFile].fileEntryId = dataSigned ? dataSigned.fileEntryId : ''
@@ -1080,6 +1080,7 @@
                   }, 200)
                 }
                 // 
+                console.log('indexFile', vm.dossierFilesItems)
               }
               let createFileSigned = {
                 dossierId: vm.detailDossier['dossierId'],
@@ -1167,6 +1168,7 @@
       },
       viewFile2 (data, index) {
         var vm = this
+        console.log('fileView', vm.dossierFilesItems[index])
         if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt') {
           var url = vm.initDataResource.dossierApi + '/' + vm.detailDossier.dossierId + '/files/' + data.referenceUid
           window.location.assign(url)

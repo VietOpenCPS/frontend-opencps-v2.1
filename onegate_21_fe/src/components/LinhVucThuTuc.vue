@@ -1,19 +1,86 @@
 <template>
 
   <div>
+    <div class="row-header no__hidden_class">
+      <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
+        <span>LĨNH VỰC THỦ TỤC HÀNH CHÍNH</span>
+      </div>
+      <div class="layout row wrap header_tools row-blue">
+      </div> 
+    </div>
     <v-layout wrap>
       <v-flex xs12 md3 v-for="(item,index) in domains" :key="index" class="px-2 my-2">
-        <div @click="redirectDVC(item)" style="width: 100%; height:215px;background: rgb(27, 117, 227); position: relative;display:flex;cursor: pointer;">
-            <v-icon v-if="item.domainCode === 'BGTVT_DB'" color="#fff" style="font-size: 163px; margin: 0 auto;">local_shipping</v-icon>
-            <v-icon v-if="item.domainCode ==='BGTVT_DS'" color="#fff" style="font-size: 163px; margin: 0 auto;">directions_transit</v-icon>
-            <v-icon  v-if="item.domainCode ==='BGTVT_HK'" color="#fff" style="font-size: 163px; margin: 0 auto;">local_airport</v-icon>
-            <v-icon v-if="item.domainCode ==='BGTVT_HH'" color="#fff" style="font-size: 163px; margin: 0 auto;">directions_boat</v-icon>
-            <v-icon v-if="item.domainCode ==='BGTVT_DTND'" color="#fff" style="font-size: 163px; margin: 0 auto;">rowing</v-icon>
-            <v-icon  v-if="item.domainCode ==='BGTVT_DK'" color="#fff" style="font-size: 163px; margin: 0 auto;">local_shipping</v-icon>
-            <v-icon  v-if="item.domainCode ==='BGTVT_LVK'" color="#fff" style="font-size: 163px; margin: 0 auto;">devices_other</v-icon>
-            <div style="width: 100%; background: #4d47479c;;height: 50px;position: absolute;bottom: 0px; display:flex; align-items: center; justify-content: center;">
-              <span style="color: #fff; font-size: 20px;">{{item.domainName}}</span>
-            </div>
+        <div v-if="item.domainCode === 'BGTVT_DB'" @click="redirectDVC(item)"
+         style="width: 100%; height:215px;position: relative;display:flex;cursor: pointer;
+          background: url(/o/kiemthuduongbo-theme/images/img-BGTVT-DB.png) center center no-repeat;background-size: cover
+         "
+        >
+          <div style="width: 100%; background: #4d47479c;;height: 50px;position: absolute;bottom: 0px; display:flex; align-items: center; justify-content: center;">
+            <span style="color: #fff; font-size: 20px;">{{item.domainName}}</span>
+          </div>
+        </div>
+        <div v-else-if="item.domainCode === 'BGTVT_DS'" @click="redirectDVC(item)"
+         style="width: 100%; height:215px;position: relative;display:flex;cursor: pointer;
+          background: url(/o/kiemthuduongbo-theme/images/img-BGTVT-DS.png) center center no-repeat;background-size: cover
+         "
+        >
+          <div style="width: 100%; background: #4d47479c;;height: 50px;position: absolute;bottom: 0px; display:flex; align-items: center; justify-content: center;">
+            <span style="color: #fff; font-size: 20px;">{{item.domainName}}</span>
+          </div>
+        </div>
+        <div v-else-if="item.domainCode === 'BGTVT_HK'" @click="redirectDVC(item)"
+         style="width: 100%; height:215px;position: relative;display:flex;cursor: pointer;
+          background: url(/o/kiemthuduongbo-theme/images/img-BGTVT-HK.png) center center no-repeat;background-size: cover
+         "
+        >
+          <div style="width: 100%; background: #4d47479c;;height: 50px;position: absolute;bottom: 0px; display:flex; align-items: center; justify-content: center;">
+            <span style="color: #fff; font-size: 20px;">{{item.domainName}}</span>
+          </div>
+        </div>
+        <div v-else-if="item.domainCode === 'BGTVT_HH'" @click="redirectDVC(item)"
+         style="width: 100%; height:215px;position: relative;display:flex;cursor: pointer;
+          background: url(/o/kiemthuduongbo-theme/images/img-BGTVT-HH.png) center center no-repeat;background-size: cover
+         "
+        >
+          <div style="width: 100%; background: #4d47479c;;height: 50px;position: absolute;bottom: 0px; display:flex; align-items: center; justify-content: center;">
+            <span style="color: #fff; font-size: 20px;">{{item.domainName}}</span>
+          </div>
+        </div>
+        <div v-else-if="item.domainCode === 'BGTVT_DTND'" @click="redirectDVC(item)"
+         style="width: 100%; height:215px;position: relative;display:flex;cursor: pointer;
+          background: url(/o/kiemthuduongbo-theme/images/img-BGTVT-CDTND.png) center center no-repeat;background-size: cover
+         "
+        >
+          <div style="width: 100%; background: #4d47479c;;height: 50px;position: absolute;bottom: 0px; display:flex; align-items: center; justify-content: center;">
+            <span style="color: #fff; font-size: 20px;">{{item.domainName}}</span>
+          </div>
+        </div>
+        <div v-else-if="item.domainCode === 'BGTVT_DK'" @click="redirectDVC(item)"
+         style="width: 100%; height:215px;position: relative;display:flex;cursor: pointer;
+          background: url(/o/kiemthuduongbo-theme/images/img-BGTVT-DK.png) center center no-repeat;background-size: cover
+         "
+        >
+          <div style="width: 100%; background: #4d47479c;;height: 50px;position: absolute;bottom: 0px; display:flex; align-items: center; justify-content: center;">
+            <span style="color: #fff; font-size: 20px;">{{item.domainName}}</span>
+          </div>
+        </div>
+        <div v-else-if="item.domainCode === 'BGTVT_LVK'" @click="redirectDVC(item)"
+         style="width: 100%; height:215px;position: relative;display:flex;cursor: pointer;
+          background: url(/o/kiemthuduongbo-theme/images/img-BGTVT-LVK.jpg) center center no-repeat;background-size: cover
+         "
+        >
+          <div style="width: 100%; background: #4d47479c;;height: 50px;position: absolute;bottom: 0px; display:flex; align-items: center; justify-content: center;">
+            <span style="color: #fff; font-size: 20px;">{{item.domainName}}</span>
+          </div>
+        </div>
+        <div v-else @click="redirectDVC(item)"
+         style="width: 100%; height:215px;position: relative;display:flex;cursor: pointer;
+          background: url(/o/kiemthuduongbo-theme/images/img-BGTVT-LVK.jpg) center center no-repeat;background-size: cover
+         "
+        >
+          <div style="width: 100%; background: #4d47479c;;height: 50px;position: absolute;bottom: 0px; display:flex; align-items: center; justify-content: center;">
+            <span style="color: #fff; font-size: 20px;">{{item.domainName}}</span>
+          </div>
         </div>
       </v-flex>
     </v-layout>

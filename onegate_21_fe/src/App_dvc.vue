@@ -420,7 +420,7 @@
           vm.dialogVerifycation = true
         } else {
           vm.$router.push('/add-dvc/0')
-          //  vm.$router.push('/linh-vuc-thu-tuc')
+          // vm.$router.push('/linh-vuc-thu-tuc')
         }
       },
       onResize () {

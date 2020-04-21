@@ -267,34 +267,6 @@
         </div>
       </v-card>
     </div>
-    <!-- case multiple processOption -->
-    <!-- <div v-if="selectOption">
-      <div class="row-header">
-        <div class="background-triangle-big"> <span>Chọn dịch vụ công</span> </div>
-        <div class="layout row wrap header_tools row-blue">
-          <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
-            <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
-              <v-icon size="16">reply</v-icon> &nbsp;
-              Quay lại
-            </v-btn>
-          </div>
-        </div> 
-      </div>
-      <v-list class="py-0">
-        <template v-for="(item, index) in serviceOptionsProcess" >
-          <v-list-tile class="px-2 py-1" :key="index" style="border-bottom: 1px solid #dede;">
-            <v-list-tile-content>
-              <v-list-tile-title v-html="item.optionName"></v-list-tile-title>
-            </v-list-tile-content>
-            <v-list-tile-action style="width: 120px;">
-              <v-btn class="px-3" color="primary" @click="selectServiceOptionCRD(item, govAgencyCodeSelect)">
-                Chọn
-              </v-btn>
-            </v-list-tile-action>
-          </v-list-tile>
-        </template>
-      </v-list>
-    </div> -->
 
     <v-dialog v-model="dialog_captcha" scrollable persistent max-width="700px">
       <v-card>
@@ -351,7 +323,7 @@
 <script>
   import Captcha from './Captcha.vue'
   import toastr from 'toastr'
-  import TinyPagination from './pagging/hanghai_pagination.vue'
+  import TinyPagination from './pagging/opencps_pagination.vue'
   toastr.options = {
     'closeButton': true,
     'timeOut': '3000'

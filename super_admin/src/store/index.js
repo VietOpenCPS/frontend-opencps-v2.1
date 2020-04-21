@@ -92,19 +92,19 @@ export const store = new Vuex.Store({
             icon: 'filter_9',
             link: '/table/opencps_mapping/domain',
             code: 'mapping',
-            text: 'Đồng bộ DM lĩnh vực'
+            text: 'Đồng bộ danh mục lĩnh vực'
           },
           {
             icon: 'filter',
             link: '/table/opencps_mapping/agency-sharingqa/0',
             code: 'mapping',
-            text: 'Đồng bộ DM cơ quan'
+            text: 'Đồng bộ danh mục cơ quan'
           },
           {
             icon: 'filter',
             link: '/table/opencps_mapping/agency-sharingqa/1',
             code: 'mapping',
-            text: 'Đồng bộ DM câu hỏi'
+            text: 'Đồng bộ danh mục câu hỏi'
           },
           {
             icon: 'import_export',

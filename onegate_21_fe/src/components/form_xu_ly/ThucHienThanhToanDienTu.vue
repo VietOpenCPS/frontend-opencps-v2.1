@@ -86,7 +86,7 @@
                 <span class="py-2" style="cursor: pointer">Thanh toán qua Keypay</span>
               </v-chip>
 
-              <v-chip color="green" text-color="white" @click.native="showViettelPay" 
+              <v-chip v-if="dataVietelPay" color="green" text-color="white" @click.native="showViettelPay" 
                 :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 3 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
               >
                 <v-avatar style="cursor: pointer">
@@ -236,15 +236,7 @@ export default {
       paymentNote: '',
       paymentFile: ''
     },
-    dataVietelPay: {
-      "PRIORITY":"BankPlus",
-      "VERSION":"3.0", 
-      "TYPE":"PAY_BILL", 
-      "BILLCODE":"MSTT0513234", 
-      "ORDER_ID":"MSTT0513234", 
-      "AMOUNT":"0", 
-      "MERCHANT_CODE":"FDS"
-    },
+    dataVietelPay: '',
     paymentFile: '',
     epaymentValid: true,
     money: {
@@ -297,8 +289,13 @@ export default {
       if (vm.paymentProfile) {
         //
         if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && vm.paymentProfile.epaymentProfile) {
-          let jsonQR = JSON.parse(vm.paymentProfile.epaymentProfile)
-          vm.dataVietelPay = jsonQR.genQRCode
+          try {
+            let jsonQR = JSON.parse(vm.paymentProfile.epaymentProfile)
+            vm.dataVietelPay = jsonQR.genQRCode
+          } catch (error) {
+            vm.dataVietelPay = ''
+          }
+          
         }
         //
         vm.feeTong = Number(vm.paymentProfile.feeAmount) + Number(vm.paymentProfile.serviceAmount)

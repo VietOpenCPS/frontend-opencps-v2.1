@@ -583,7 +583,7 @@
 import Vue from 'vue'
 
 import TemplateRendering from './pagging/template_rendering.vue'
-import TinyPagination from './pagging/hanghai_pagination.vue'
+import TinyPagination from './pagging/opencps_pagination.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import support from '../store/support.json'
