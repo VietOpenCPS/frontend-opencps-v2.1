@@ -605,10 +605,15 @@ export default {
       const files = event.target.files
       if(files.length){
         const file = files[0]
-        console.log(files)
-        console.log(files[0])
-        vm.fileCMNDFront = file
-        vm.fileCMNDFrontName = files[0].name
+        const size = (file.size / 1024 / 1024).toFixed(2)
+        if(size > 10){
+          alert("Tệp quá lớn. Vui lòng chọn tệp kích thước hơn 10MB"); 
+        } else {
+          console.log(files)
+          console.log(files[0])
+          vm.fileCMNDFront = file
+          vm.fileCMNDFrontName = files[0].name
+        }
       }
     },
     onFileCMNDBackPicked (event) {
@@ -616,10 +621,15 @@ export default {
       const files = event.target.files
       if(files.length){
         const file = files[0]
-        console.log(files)
-        console.log(files[0])
-        vm.fileCMNDBack = file
-        vm.fileCMNDBackName = files[0].name
+        const size = (file.size / 1024 / 1024).toFixed(2)
+        if(size > 10){
+          alert("Tệp quá lớn. Vui lòng chọn tệp kích thước hơn 10MB"); 
+        } else{
+          console.log(files)
+          console.log(files[0])
+          vm.fileCMNDBack = file
+          vm.fileCMNDBackName = files[0].name
+        }
       }
     }
   }
