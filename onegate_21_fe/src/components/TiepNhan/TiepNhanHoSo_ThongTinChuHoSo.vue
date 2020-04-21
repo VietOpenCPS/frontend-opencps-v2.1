@@ -671,7 +671,7 @@
 import axios from 'axios'
 import Suggestions from 'v-suggestions'
 import toastr from 'toastr'
-import TinyPagination from '../../components/pagging/hanghai_pagination'
+import TinyPagination from '../../components/pagging/opencps_pagination'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -800,7 +800,7 @@ export default {
     functionTimeOut: null,
     dialog_applicantInfos: false,
     dialog_applicantList: false,
-    applicantConfig: false,
+    applicantConfig: true,
     titleEdit: 'Thông tin công dân, tổ chức, doanh nghiệp',
     applicantEdit: '',
     dialog_editApplicant: false,
@@ -900,11 +900,7 @@ export default {
           delegateTelNo: value.contactTelNo,
           delegateIdNo: value.applicantIdNo
         }
-        // if (!vm.thongTinChuHoSo.userType) {
-        //   vm.thongTinNguoiNopHoSo.sameUser = false
-        // } else {
-        //   vm.thongTinNguoiNopHoSo.sameUser = true
-        // }
+
         if (vm.thongTinNguoiNopHoSo.sameUser) {
           if (value.cityCode && value.cityCode !== vm.thongTinNguoiNopHoSo['delegateCityCode']) {
             vm.onChangeDelegateCity(value.cityCode)
@@ -1072,37 +1068,48 @@ export default {
       })
       vm.$refs.formChuHoSo.resetValidation()
     },
-    onChangeCity (data) {
+    onChangeCity (data, editDelegate) {
       var vm = this
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
         level: 1,
         parent: data
       }
-      vm.thongTinChuHoSo.districtCode = ''
-      vm.thongTinChuHoSo.wardCode = ''
-      vm.$store.commit('setCityVal', data)
+      if (!editDelegate) {
+        vm.thongTinChuHoSo.districtCode = ''
+        vm.thongTinChuHoSo.wardCode = ''
+        vm.$store.commit('setCityVal', data)
+      }
       vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.districts = result.data
-        vm.wards = []
-        if (vm.thongTinNguoiNopHoSo.sameUser || (!vm.thongTinNguoiNopHoSo.sameUser && vm.showApplicant && !vm.showDelegate)) {
-          vm.delegateDistricts = result.data
+        if (!editDelegate) {
+          vm.districts = result.data
           vm.wards = []
+        }
+
+        if (editDelegate || vm.thongTinNguoiNopHoSo.sameUser || (!vm.thongTinNguoiNopHoSo.sameUser && vm.showApplicant && !vm.showDelegate)) {
+          vm.delegateDistricts = result.data
+          vm.delegateWards = []
         }
       })
     },
-    onChangeDistrict (data) {
+    onChangeDistrict (data, editDelegate) {
       var vm = this
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
         level: 1,
         parent: data
       }
-      vm.thongTinChuHoSo.wardCode = ''
-      vm.$store.commit('setDistrictVal', data)
+      if (!editDelegate) {
+        vm.thongTinChuHoSo.wardCode = ''
+        vm.$store.commit('setDistrictVal', data)
+      }
+      
       vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.wards = result.data
-        if (vm.thongTinNguoiNopHoSo.sameUser || (!vm.thongTinNguoiNopHoSo.sameUser && vm.showApplicant && !vm.showDelegate)) {
+        if (!editDelegate) {
+          vm.wards = result.data
+        }
+        
+        if (editDelegate || vm.thongTinNguoiNopHoSo.sameUser || (!vm.thongTinNguoiNopHoSo.sameUser && vm.showApplicant && !vm.showDelegate)) {
           vm.delegateWards = result.data
         }
       })
@@ -1311,7 +1318,7 @@ export default {
         return new Promise((resolve, reject) => {
           setTimeout(
             () => {
-              vm.onChangeCity(data)
+              vm.onChangeCity(data, 'true')
               resolve()
             }, Math.floor(Math.random() * 100) + 1
           )
@@ -1321,7 +1328,7 @@ export default {
         return new Promise((resolve, reject) => {
           setTimeout(
             () => {
-              vm.onChangeDistrict(data)
+              vm.onChangeDistrict(data, 'true')
               resolve()
             }, Math.floor(Math.random() * 100) + 1
           )

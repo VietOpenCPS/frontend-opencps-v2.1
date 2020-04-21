@@ -148,7 +148,7 @@
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
-                  <v-menu bottom right offset-y v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 1">
+                  <v-menu bottom right offset-y v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 1 && serviceConfigs(props.item.serviceConfigs).length <= 5">
                     <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel >= 3" style="min-width: 110px;">Nộp hồ sơ</v-btn>
                     <v-btn small slot="activator" color="primary" v-else style="min-width: 110px;">Hướng dẫn</v-btn>
                     <v-list v-if="props.item.serviceConfigs">
@@ -158,13 +158,25 @@
                       </v-list-tile>
                     </v-list>
                   </v-menu>
-                  <v-btn small slot="activator" color="primary" class="my-1" style="min-width: 110px;"
+                  <v-btn small color="primary" class="my-1" style="min-width: 110px;"
+                    v-if="props.item.maxLevel >= 3 && props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 5"
+                    @click="showSelectGov(props.item.serviceConfigs)"
+                  >
+                    Nộp hồ sơ
+                  </v-btn>
+                  <v-btn small color="primary" class="my-1" style="min-width: 110px;"
+                    v-if="props.item.maxLevel < 3 && props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 5"
+                    @click="showSelectGov(props.item.serviceConfigs, 'guide')"
+                  >
+                    Hướng dẫn
+                  </v-btn>
+                  <v-btn small color="primary" class="my-1" style="min-width: 110px;"
                     v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) > 2"
                     @click="createDossier(serviceConfigs(props.item.serviceConfigs)[0])"
                   >
                     Nộp hồ sơ
                   </v-btn>
-                  <v-btn small slot="activator" color="primary" class="my-1" style="min-width: 110px;"
+                  <v-btn small color="primary" class="my-1" style="min-width: 110px;"
                     v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) <= 2"
                     @click="viewGuide(serviceConfigs(props.item.serviceConfigs)[0])"
                   >
@@ -306,6 +318,18 @@
                           </v-list-tile>
                         </v-list>
                       </v-menu>
+                      <v-btn class="mx-0 my-0" small color="primary" 
+                        v-if="item.maxLevel >= 3 && item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 5"
+                        @click="showSelectGov(item.serviceConfigs)"
+                      >
+                        Nộp hồ sơ
+                      </v-btn>
+                      <v-btn small color="primary" class="my-1" style="min-width: 110px;"
+                        v-if="item.maxLevel < 3 && item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 5"
+                        @click="showSelectGov(item.serviceConfigs, 'guide')"
+                      >
+                        Hướng dẫn
+                      </v-btn>
                       <v-btn class="mx-0 my-0" small color="primary" 
                         v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length === 1 && Number(serviceConfigs(item.serviceConfigs)[0]['serviceLevel']) > 2"
                         @click="createDossier(serviceConfigs(item.serviceConfigs)[0])"
@@ -491,6 +515,43 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialog_selectAgency" scrollable persistent max-width="700px">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Chọn cơ quan tiếp nhận</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_selectAgency = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-form ref="formSelect" v-model="validFormSelectGov" lazy-validation>
+            <v-autocomplete
+              class="mt-3"
+              placeholder="Chọn cơ quan"
+              :items="govAgencyListTiepNhan"
+              v-model="govAgencyTiepNhanSelected"
+              item-text="govAgencyName"
+              item-value="govAgencyCode"
+              clearable
+              :rules="[v => !!v || 'Chọn cơ quan tiếp nhận']"
+              required
+              return-object
+            ></v-autocomplete>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="submitSelectGov">
+            <v-icon size="20">save</v-icon>&nbsp; Đồng ý
+          </v-btn>
+          <v-btn class="white--text" color="red"  @click="dialog_selectAgency = false">
+            <v-icon size="20">clear</v-icon>&nbsp; Thoát
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -508,6 +569,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    dialog_selectAgency: false,
     dialog_createDossier: false,
     dialogVerifycation: false,
     dialogLogin: false,
@@ -574,7 +636,11 @@ export default {
     doCreateDossier: false,
     captcha: false,
     j_captcha_response: '',
-    chapchablob: ''
+    chapchablob: '',
+    validFormSelectGov: false,
+    govAgencyListTiepNhan: [],
+    govAgencyTiepNhanSelected: '',
+    selectGuide: false
   }),
   computed: {
     govAgencyList () {
@@ -1172,6 +1238,26 @@ export default {
       var vm = this
       vm.serviceDetail = item
       vm.dialogGuide = true
+    },
+    showSelectGov (govList, guide) {
+      let vm = this
+      vm.govAgencyTiepNhanSelected = ''
+      vm.selectGuide = guide ? true : false
+      vm.govAgencyListTiepNhan = vm.serviceConfigs(govList)
+      vm.dialog_selectAgency = true
+    },
+    submitSelectGov () {
+      let vm = this
+      if (vm.$refs.formSelect.validate()) {
+        if (vm.selectGuide) {
+          vm.dialog_selectAgency = false
+          setTimeout(function () {
+            vm.viewGuide(vm.govAgencyTiepNhanSelected)
+          }, 200)
+        } else {
+          vm.createDossier(vm.govAgencyTiepNhanSelected)
+        }
+      }
     },
     serviceConfigs (config) {
       if (Array.isArray(config)) {

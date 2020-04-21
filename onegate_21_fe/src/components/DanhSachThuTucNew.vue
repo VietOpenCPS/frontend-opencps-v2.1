@@ -1,29 +1,59 @@
 <template>
   <div>
-    <div class="text-center mt-5" v-if="String(serviceCode) !== '0' && !selectOption && !hasVerify">
-      <v-progress-circular
-        :size="100"
-        :width="1"
-        color="primary"
-        indeterminate
-      ></v-progress-circular>
-      <p class="mt-5">Đang tạo hồ sơ ...</p>
+    <div class="" v-if="String(serviceCode) !== '0' && !hasVerify">
+      <v-dialog
+        v-model="dialogLoadingCreate"
+        persistent
+        width="300"
+        v-if="!selectOption"
+      >
+        <v-card
+          color="primary"
+          dark
+        >
+          <v-card-text>
+            Đang tạo hồ sơ
+            <v-progress-linear
+              indeterminate
+              color="white"
+              class="mb-0"
+            ></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+      
+      <v-dialog v-else v-model="dialog_selectOption" scrollable persistent max-width="1000px">
+        <v-card style="width: 100%">
+          <v-toolbar flat dark color="primary">
+            <v-toolbar-title>Chọn dịch vụ</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon dark @click.native="closeSelectOption()">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-card-text class="pt-3">
+            <v-layout class="py-2" wrap v-for="(item, index) in serviceOptionsProcess" :key="index" style="border-bottom: 1px solid #dedede;">
+              <v-flex style="width: calc(100% - 110px)">
+                <span>{{item.optionName}}</span>
+              </v-flex>
+              <v-flex style="width: 100px">
+                <v-btn class="px-3 right" color="primary" @click="selectServiceOptionCRD(item, govAgencyCodeSelect)">
+                  Chọn
+                </v-btn>
+              </v-flex>
+              
+            </v-layout>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+      
     </div>
-    <div v-else>
-      <div class="row-header no__hidden_class" style="padding-right:24px;">
+    <div>
+      <div class="row-header no__hidden_class">
         <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
           <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
         </div>
         <div class="layout row wrap header_tools row-blue" v-if="!isMobile">
-          <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-            <v-text-field
-              v-model="serviceNameKey"
-              placeholder="Tìm kiếm theo tên thủ tục"
-              @keyup.enter="filterServiceName"
-              
-              hide-details="true"
-            ></v-text-field>
-          </div>
           <div class="flex text-right" style="margin-left: auto;max-width: 340px;">
               <div style="display: flex;align-items: center;justify-content: flex-end;">
                 <v-chip label color="primary" class="my-0" text-color="white" style="height:38px;border-radius: 5px;">
@@ -38,173 +68,251 @@
                     </template>
                   </v-checkbox>
                 </v-chip>
-                <v-btn small color="primary" @click="searchServiceConfig()">
-                  <v-icon>search</v-icon>
-                  Tìm kiếm
-                </v-btn>
               </div>
           </div>
         </div> 
       </div>
-      <v-layout wrap>
-        <v-flex xs12  class="px-2">
-          <v-layout wrap align-center>
-            <v-flex xs8>
-
-            </v-flex>
-            <v-flex xs4 class="text-right">
-
-            </v-flex>
-          </v-layout>
-        </v-flex>
-        <v-flex xs12>
-          <v-layout wrap class="pa-2">
-            <v-flex xs12 class="px-2">
-              <v-layout wrap align-center>
-                <v-flex xs3><strong>Cấp cơ quan thực hiện</strong></v-flex>
-                <v-flex xs9>    
-                    <v-radio-group v-model="capCoQuanThucHien" row>
-                      <v-radio label="Sở ban ngành" value="SBN"></v-radio>
-                      <v-radio label="Thành phố, quận, huyện, thị xã" value="QUAN_HUYEN"></v-radio>
-                      <v-radio label="Xã phường thị trấn" value="XA_PHUONG"></v-radio>
-                    </v-radio-group>
-                  </v-flex>
-              </v-layout>
-            </v-flex>
-            <v-flex xs12>
+      <v-form ref="form" v-model="validFormSearch" lazy-validation>
+        <v-layout wrap>
+          <div class="adv_search px-2 my-2 mx-2" style="background: #eeeeee">
+            <div class="searchAdvanced-content pb-2">
               <v-layout wrap>
-                <v-flex xs6 class="pa-2" v-if="capCoQuanThucHien === 'XA_PHUONG'">
-                  <v-autocomplete
-                    class="select-border"
-                    label="Quận, huyện, thị xã"
-                    :items="listQuanHuyen"
-                    v-model="administrationFilter"
-                    :hide-selected="true"
-                    item-text="itemName"
-                    item-value="itemCode"
-                    clearable
-                    
-                  ></v-autocomplete>
+                <v-flex xs12 class="px-2">
+                  <v-layout wrap align-center>
+                    <v-flex class="text-bold" style="font-weight:450;width: 200px;">Cấp cơ quan tiếp nhận:</v-flex>
+                    <v-flex style="width: calc(100% - 200px);">    
+                      <v-radio-group v-model="capCoQuanThucHien" row class="mt-2">
+                        <v-radio v-for='(item, index) in administrationList' :key='index' :label="item.groupName" :value="item.groupCode"></v-radio>
+                      </v-radio-group>
+                    </v-flex>
+                  </v-layout>
                 </v-flex>
-                <v-flex xs6 class="pa-2">
-                  <v-autocomplete
-                    class="select-border"
-                    :items="govAgencyList"
-                    v-model="govAgencyFilter"
-                    label="Chọn cơ quan"
-                    item-text="itemName"
-                    item-value="itemCode"
-                    :hide-selected="true"
-                    clearable
-                    
-                  ></v-autocomplete>
+                <v-flex xs12 class="mb-2 px-2">
+                  <div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Cơ quan tiếp nhận <span style="color: red" > *</span>:</div>
+                    <v-autocomplete
+                      placeholder="Chọn cơ quan tiếp nhận"
+                      class="select-search d-inline-block"
+                      style="width: calc(100% - 200px);"
+                      :items="govAgencyList"
+                      v-model="govAgencyFilter"
+                      item-text="itemName"
+                      item-value="itemCode"
+                      hide-details
+                      solo
+                      flat
+                      height="32"
+                      min-height="32"
+                      clearable
+                      required
+                      :rules="[v => !!v || 'Chọn cơ quan tiếp nhận']"
+                    >
+                      <template slot="prepend-inner" v-if="!govAgencyFilter && validSearch">
+                        <v-icon color="red">error_outline</v-icon>
+                      </template>
+                    </v-autocomplete>
+                  </div>
                 </v-flex>
-                <v-flex xs6 class="pa-2">
-                  <v-autocomplete
-                    class="select-border"
-                    :items="domainList"
-                    v-model="domainFilter"
-                    label="Chọn lĩnh vực"
-                    item-text="domainName"
-                    item-value="domainCode"
-                    :hide-selected="true"
-                    clearable
-                    
-                  ></v-autocomplete>
+                <v-flex xs12 sm6 class="mb-2 px-2">
+                  <div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Lĩnh vực:</div>
+                    <v-autocomplete
+                      placeholder="Chọn lĩnh vực"
+                      class="select-search d-inline-block"
+                      style="width: calc(100% - 200px);"
+                      :items="domainList"
+                      v-model="domainFilter"
+                      item-text="domainName"
+                      item-value="domainCode"
+                      hide-details
+                      solo
+                      flat
+                      height="32"
+                      min-height="32"
+                      clearable
+                    ></v-autocomplete>
+                  </div>
                 </v-flex>
-                <v-flex xs6 class="pa-2">
-                  <v-autocomplete
-                    class="select-border"
-                    label="Mức độ"
-                    :items="listLerver"
-                    v-model="leverFilter"
-                    :hide-selected="true"
-                    item-text="levelName"
-                    item-value="level"
-                    clearable
-                    
-                  ></v-autocomplete>
+                <v-flex xs12 sm3 class="mb-2 px-2">
+                  <div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 100px;">Mức độ:</div>
+                    <v-autocomplete
+                      placeholder="Chọn mức độ"
+                      class="select-search d-inline-block"
+                      style="width: calc(100% - 100px);"
+                      :items="listLerver"
+                      v-model="leverFilter"
+                      item-text="levelName"
+                      item-value="level"
+                      hide-details
+                      solo
+                      flat
+                      height="32"
+                      min-height="32"
+                      clearable
+                    ></v-autocomplete>
+                  </div>
                 </v-flex>
+                <v-flex xs12 sm3 class="mb-2 px-2">
+                  <div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 100px;">Mã thủ tục:</div>
+                    <v-text-field
+                      placeholder="Nhập mã thủ tục"
+                      v-model="serviceCodeFilter"
+                      class="search-input-appbar input-search d-inline-block"
+                      style="width: calc(100% - 100px);"
+                      single-lines
+                      hide-details
+                      solo
+                      flat
+                      height="32"
+                      min-height="32"
+                      clearable
+                    ></v-text-field>
+                  </div>
+                </v-flex>
+                <v-flex xs12 class="mb-2 px-2">
+                  <div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Tên thủ tục :</div>
+                    <v-text-field
+                      placeholder="Nhập tên thủ tục"
+                      v-model="serviceNameKey"
+                      class="search-input-appbar input-search d-inline-block"
+                      style="width: calc(100% - 200px);"
+                      single-lines
+                      hide-details
+                      solo
+                      flat
+                      height="32"
+                      min-height="32"
+                      clearable
+                    ></v-text-field>
+                  </div>
+                </v-flex>
+                
               </v-layout>
-            </v-flex>
-          </v-layout>
-        </v-flex>
-      </v-layout>
-      <v-divider class="my-0 py-0"></v-divider>
-      <v-card v-if="!activeFilterKey && !serviceLastest">
-        <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>
-          <!-- Cap 3 -->
-          <v-layout row wrap>
-            <v-flex xs12 sm9 class="pt-1">
-              <span style="font-weight: bold">{{(agencyPage*numberPerPage - numberPerPage)+ index3 + 1}}.</span> &nbsp;
-              <span>{{itemServiceConfig.serviceName}}</span>
-            </v-flex>
-            <v-flex xs12 sm1 class="text-xs-center pt-1">
-              <span>Mức {{itemServiceConfig.maxLevel}}</span>
-            </v-flex>
-            <v-flex xs12 sm2 class="text-xs-center">
-              <v-menu left offset-x>
-                <v-btn flat class="mx-0 my-0" slot="activator" small 
-                  @click="pullServiceOptions(itemServiceConfig)"
-                >
-                  Chọn
+              
+              <v-flex class="xs12 mx-2">
+                <v-btn class="mx-0 mb-0" color="primary" dark @click.native="filterService">
+                  <v-icon size="18">search</v-icon> &nbsp; Tìm kiếm
                 </v-btn>
-                <v-list v-if="serviceOptions.length > 1">
-                  <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
-                    @click="selectServiceOption(itemOption, itemServiceConfig)">
-                    <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
-                  </v-list-tile>
-                </v-list>
-              </v-menu>
-            </v-flex>
-          </v-layout>
-        </v-card-text>
-      </v-card>
-      <v-card v-if="activeFilterKey || serviceLastest">
-        <div v-if="serviceConfigListRender.length > 0">
-          <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>
-            <!-- Cap 3 -->
-            <v-layout row wrap>
-              <v-flex xs12 sm9 class="pt-1">
-                <span style="font-weight: bold">{{(agencyPage*numberPerPage - numberPerPage)+ index3 + 1}}.</span> &nbsp;
-                <span>{{itemServiceConfig.serviceInfoName}}</span>&nbsp;
-                <span v-if="itemServiceConfig.govAgencyNameRender" class="primary--text">({{itemServiceConfig.govAgencyNameRender}})</span>
               </v-flex>
-              <v-flex xs12 sm1 class="text-xs-center pt-1">
-                <span>Mức {{serviceLastest ? itemServiceConfig.serviceLevel : itemServiceConfig.level}}</span>
-              </v-flex>
-              <v-flex xs12 sm2 class="text-xs-center">
-                <v-menu left offset-x>
-                  <v-btn flat class="mx-0 my-0" slot="activator" small 
-                    @click="pullServiceOptions(itemServiceConfig)"
-                  >
-                    Chọn
-                  </v-btn>
-                  <v-list v-if="serviceOptions.length > 1">
-                    <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
-                      @click="selectServiceOption(itemOption, itemServiceConfig.govAgencyCode, itemServiceConfig)">
-                      <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
-                    </v-list-tile>
-                  </v-list>
-                </v-menu>
-              </v-flex>
-            </v-layout>
-          </v-card-text>
-        </div>
-        <div v-else class="my-3 mx-2">
-          <v-alert  color="warning" icon="priority_high" :value="true">
-            Không có thủ tục nào
-          </v-alert>
-        </div>
-      </v-card>
-      <div class="my-2">
-        <div class="text-xs-right layout wrap" style="position: relative;">
-          <div class="flex pagging-table px-2"> 
-            <tiny-pagination :total="serviceTotal" :page="agencyPage" :numberPerPage="numberPerPage" nameRecord="thủ tục" custom-class="custom-tiny-class" 
-              @tiny:change-page="changePage" ></tiny-pagination> 
+            </div>
+          </div>
+
+        </v-layout>
+        <v-divider class="my-0 py-0"></v-divider>
+        <content-placeholders class="mt-3" v-if="loading">
+          <content-placeholders-text :lines="10" />
+        </content-placeholders>
+        <div v-if="!loading && loaded">
+          <v-card v-if="!activeFilterKey && !serviceLastest">
+            <div v-if="serviceConfigListRender.length > 0">
+              <v-card-text class="pl-3 py-1" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3' style="border-bottom: 1px solid #dedede;">
+                <v-layout row wrap>
+                  <v-flex xs12 sm9 class="pt-1">
+                    <span style="font-weight: bold">{{(agencyPage*numberPerPage - numberPerPage)+ index3 + 1}}.</span> &nbsp;
+                    <span>{{itemServiceConfig.serviceName}}</span>
+                  </v-flex>
+                  <v-flex xs12 sm1 class="text-xs-center">
+                    <v-btn class="mx-0 my-0 mt-0 white--text" depressed readonly small :color="getColor(itemServiceConfig.serviceLevel)"
+                      style="pointer-events: none;min-width: 90px;">Mức độ {{itemServiceConfig.serviceLevel}}</v-btn>
+                  </v-flex>
+                  <v-flex xs12 sm2 class="text-xs-center">
+                    <v-menu left offset-x>
+                      <v-btn color="primary" class="mx-0 my-0" slot="activator" small 
+                        @click="pullServiceOptions(itemServiceConfig)" style="min-width: 90px;"
+                      >
+                        Chọn
+                      </v-btn>
+                      <v-list v-if="serviceOptions.length > 1">
+                        <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
+                          @click="selectServiceOption(itemOption, itemServiceConfig)">
+                          <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
+                        </v-list-tile>
+                      </v-list>
+                    </v-menu>
+                  </v-flex>
+                </v-layout>
+              </v-card-text>
+            </div>
+            <div v-else class="my-3 mx-2">
+              <v-alert
+                :value="true"
+                color="info"
+                icon="info"
+                outline
+              >
+                  Không có thủ tục nào
+              </v-alert>
+            </div>
+          </v-card>
+          <v-card v-if="serviceLastest">
+            <div v-if="serviceInfoLastestList.length > 0">
+              <v-card-text class="pl-3 py-1" v-for='(item, index) in serviceInfoLastestList' :key='index' style="border-bottom: 1px solid #dedede;">
+                <v-layout row wrap>
+                  <v-flex xs12 sm9 class="">
+                    <span style="font-weight: bold">{{(agencyPage*numberPerPage - numberPerPage)+ index + 1}}.</span> &nbsp;
+                    <span>{{item.serviceName}}</span>
+                  </v-flex>
+                  <v-flex xs12 sm1 class="text-xs-center">
+                    <v-btn class="mx-0 my-0 mt-0 white--text" depressed readonly small :color="getColor(item.maxLevel)"
+                      style="pointer-events: none;min-width: 90px;">Mức độ {{item.maxLevel}}</v-btn>
+                  </v-flex>
+                  <v-flex xs12 sm2 class="text-xs-center">
+                    <v-menu left offset-x v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length === 1">
+                      <v-btn color="primary" class="mx-0 my-0" slot="activator" small 
+                        @click="pullServiceOptions(serviceConfigs(item.serviceConfigs)[0], item)" style="min-width: 90px;"
+                      >
+                        Chọn
+                      </v-btn>
+                      <v-list v-if="serviceOptions.length > 1">
+                        <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
+                          @click="selectServiceOption(itemOption, serviceConfigs(item.serviceConfigs)[0].govAgencyCode, serviceConfigs(item.serviceConfigs)[0])">
+                          <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
+                        </v-list-tile>
+                      </v-list>
+                    </v-menu>
+                    <v-btn small color="primary" class="mx-0 my-0" style="min-width: 90px;"
+                      v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 1"
+                      @click="showSelectGov(item.serviceConfigs, item)"
+                    >
+                      Chọn
+                    </v-btn>
+                  </v-flex>
+                </v-layout>
+              </v-card-text>
+            </div>
+            <div v-else class="my-3 mx-2">
+              <v-alert
+                :value="true"
+                color="info"
+                icon="info"
+                outline
+              >
+                  Không có thủ tục nào
+              </v-alert>
+            </div>
+          </v-card>
+          <div class="my-2" v-if="serviceConfigListRender.length > 0 && !serviceLastest">
+            <div class="text-xs-right layout wrap" style="position: relative;">
+              <div class="flex pagging-table px-2"> 
+                <tiny-pagination :total="serviceTotal" :page="agencyPage" :numberPerPage="numberPerPage" nameRecord="thủ tục" custom-class="custom-tiny-class" 
+                  @tiny:change-page="changePage" ></tiny-pagination> 
+              </div>
+            </div>
+          </div>
+          <!--  -->
+          <div class="my-2" v-if="serviceInfoLastestList.length > 0 && serviceLastest">
+            <div class="text-xs-right layout wrap" style="position: relative;">
+              <div class="flex pagging-table px-2"> 
+                <tiny-pagination :total="serviceLastestTotal" :page="serviceLastestPage" :numberPerPage="numberPerPage" nameRecord="thủ tục" custom-class="custom-tiny-class" 
+                  @tiny:change-page="changePageServiceLastest" ></tiny-pagination> 
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </v-form>
       <v-dialog v-model="dialog_captcha" scrollable persistent max-width="700px">
         <v-card>
           <v-toolbar flat dark color="primary">
@@ -253,6 +361,57 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <!--  -->
+      <v-dialog v-model="dialog_selectAgency" scrollable persistent max-width="700px">
+        <v-card>
+          <v-toolbar flat dark color="primary">
+            <v-toolbar-title>Chọn cơ quan tiếp nhận</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon dark @click.native="dialog_selectAgency = false">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-card-text>
+            <v-form ref="formSelect" v-model="validFormSelectGov" lazy-validation>
+              <v-autocomplete
+                class="mt-3"
+                placeholder="Chọn cơ quan"
+                :items="govAgencyListTiepNhan"
+                v-model="govAgencyTiepNhanSelected"
+                item-text="govAgencyName"
+                item-value="govAgencyCode"
+                clearable
+                :rules="[v => !!v || 'Chọn cơ quan tiếp nhận']"
+                required
+                return-object
+                @change="changeGovSelected"
+              ></v-autocomplete>
+              <v-autocomplete
+                v-if="serviceOptions.length > 1"
+                class="mt-3"
+                placeholder="Chọn dịch vụ"
+                :items="serviceOptions"
+                v-model="serviceOptionsSelect"
+                item-text="optionName"
+                item-value="processOptionId"
+                clearable
+                :rules="[v => !!v || 'Chọn dịch vụ']"
+                required
+                return-object
+              ></v-autocomplete>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" @click="submitSelectGov">
+              <v-icon size="20">save</v-icon>&nbsp; Đồng ý
+            </v-btn>
+            <v-btn class="white--text" color="red"  @click="dialog_selectAgency = false">
+              <v-icon size="20">clear</v-icon>&nbsp; Thoát
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
     
   </div>
@@ -261,7 +420,7 @@
 <script>
   import Captcha from './Captcha.vue'
   import toastr from 'toastr'
-  import TinyPagination from './pagging/hanghai_pagination.vue'
+  import TinyPagination from './pagging/opencps_pagination.vue'
   toastr.options = {
     'closeButton': true,
     'timeOut': '3000'
@@ -273,6 +432,14 @@
       'tiny-pagination': TinyPagination
     },
     data: () => ({
+      dialog_selectAgency: false,
+      validFormSelectGov: false,
+      govAgencyListTiepNhan: [],
+      govAgencyTiepNhanSelected: '',
+      loading: false,
+      loaded: false,
+      validFormSearch: false,
+      validSearch: false,
       showFilter: false,
       capCoQuanThucHien: 'SBN',
       dialog_captcha: false,
@@ -282,6 +449,7 @@
       domainList: [],
       domainListRender: [],
       domainFilter: '',
+      serviceCodeFilter: '',
       administrationList: [],
       administrationFilter: '',
       leverFilter: '',
@@ -290,6 +458,7 @@
       govAgencies: [],
       govAgencyRender: [],
       serviceOptions: [],
+      serviceOptionsSelect: '',
       serviceConfigSelect: '',
       serviceConfigList: [],
       serviceConfigListRender: [],
@@ -307,9 +476,14 @@
       numberPerPage: 10,
       agencyPage: 1,
       serviceTotal: 0,
+      serviceLastestTotal: 0,
+      serviceLastestPage: 1,
       dialogVerifycation: false,
       verificationApplicantCreateDossier: false,
-      hasVerify: false
+      hasVerify: false,
+      dialogLoadingCreate: true,
+      dialog_selectOption: true,
+      serviceInfoLastestList: []
     }),
     computed: {
       currentIndex () {
@@ -335,16 +509,17 @@
       // 
       let current = vm.$router.history.current
       let newQuery = current.query
-      if (newQuery['domain']) {
-        vm.domainFilter = newQuery['domain']
-      }
-      if (newQuery['agency']) {
-        vm.govAgencyFilter = newQuery['agency']
-      }
-      if (String(vm.serviceCode) === '0') {
+
+      vm.govAgencyFilter = newQuery['agency'] ? newQuery['agency'] : ''
+      vm.capCoQuanThucHien = newQuery['administration'] ? newQuery['administration'] : ''
+      vm.domainFilter = newQuery['domain'] ? newQuery['domain'] : ''
+      vm.leverFilter = newQuery['lever'] ? Number(newQuery['lever']) : ''
+      vm.serviceCodeFilter = newQuery['serviceCode'] ? newQuery['serviceCode'] : ''
+      vm.serviceLastest = String(newQuery['lastest']) === 'true' ? true : false
+      if (vm.govAgencyFilter || vm.serviceLastest) {
         vm.filterAndSort()
       }
-      // 
+
       if (String(vm.serviceCode) !== '0') {
         let params = {
           service: vm.serviceCode
@@ -354,9 +529,10 @@
         })
       }
       vm.getServiceAdminisTration()
-      vm.getDictcollections()
       vm.getLevers()
-      vm.getAgencys(vm.capCoQuanThucHien)
+      if (vm.capCoQuanThucHien) {
+        vm.getAgencys(vm.capCoQuanThucHien)
+      }
       vm.getDomains()
     },
     updated () {
@@ -364,7 +540,17 @@
     watch: {
       '$route': function (newRoute, oldRoute) {
         let vm = this
-        vm.filterAndSort()
+        let newQuery = newRoute.query
+        
+        vm.govAgencyFilter = newQuery['agency'] ? newQuery['agency'] : ''
+        vm.capCoQuanThucHien = newQuery['administration'] ? newQuery['administration'] : ''
+        vm.domainFilter = newQuery['domain'] ? newQuery['domain'] : ''
+        vm.leverFilter = newQuery['lever'] ? Number(newQuery['lever']) : ''
+        vm.serviceCodeFilter = newQuery['serviceCode'] ? newQuery['serviceCode'] : ''
+        vm.serviceLastest = String(newQuery['lastest']) === 'true' ? true : false
+        if (vm.govAgencyFilter || vm.serviceLastest) {
+          vm.filterAndSort()
+        }
       },
       serviceLastest (val) {
         let vm = this
@@ -385,50 +571,6 @@
       }
     },
     methods: {
-      changeFilteradministration () {
-        let vm = this
-        vm.govAgencyFilter = ''
-        vm.serviceNameKey = ''
-        vm.domainFilter = ''
-        vm.activeFilterKey = false
-        vm.serviceLastest = false
-        console.log('vm.administrationFilter',vm.administrationFilter)
-        if(vm.administrationFilter){
-          vm.getAgencys(vm.administrationFilter)
-        }
-      },
-      changeFilterAgency () {
-        let vm = this
-        vm.serviceNameKey = ''
-        vm.domainFilter = ''
-        vm.activeFilterKey = false
-        vm.serviceLastest = false
-        vm.filterService()
-      },
-      changeFilterDomain () {
-        let vm = this
-        vm.serviceNameKey = ''
-        vm.activeFilterKey = false
-        vm.serviceLastest = false
-        vm.filterService()
-      },
-      filterServiceName () {
-        let vm = this
-        if (vm.serviceNameKey && vm.serviceNameKey.length > 5) {
-          vm.govAgencyFilter = ''
-          vm.domainFilter = ''
-          vm.serviceLastest = false
-          vm.activeFilterKey = true
-          vm.filterService()
-        } else {
-          vm.govAgencyFilter = ''
-          vm.domainFilter = ''
-          vm.serviceNameKey = ''
-          vm.serviceLastest = false
-          vm.activeFilterKey = false
-          vm.filterService()
-        }
-      },
       changePage (config) {
         let vm = this
         let current = vm.$router.history.current
@@ -449,55 +591,88 @@
           }
         })
       },
+      changePageServiceLastest (config) {
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        vm.serviceLastestPage = config.page
+        newQuery['page'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null && newQuery[key] !== 'null') {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        queryString += 'page=' + vm.agencyPage
+        vm.$router.push({
+          path: current.path + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      },
       filterService () {
         let vm = this
-        setTimeout (function () {
-          let current = vm.$router.history.current
-          let newQuery = current.query
-          let queryString = '?'
-          newQuery['administration'] = vm.administrationFilter
-          newQuery['agency'] = vm.govAgencyFilter
-          newQuery['domain'] = vm.domainFilter
-          newQuery['lever'] = vm.leverFilter
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        if (vm.$refs.form.validate() || vm.serviceLastest) {
+          vm.validSearch = false
+          setTimeout (function () {
+            let queryString = '?'
+            newQuery['administration'] = vm.capCoQuanThucHien
+            newQuery['agency'] = vm.govAgencyFilter
+            newQuery['domain'] = vm.domainFilter
+            newQuery['serviceCode'] = vm.serviceCodeFilter
+            newQuery['lever'] = vm.leverFilter
+            newQuery['page'] = 1
+            if (vm.serviceLastest) {
+              newQuery['lastest'] = vm.serviceLastest
+            } else {
+              newQuery['lastest'] = ''
+            }
+            newQuery['keyword'] = String(vm.serviceNameKey).trim()
+
+            for (let key in newQuery) {
+              if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+                queryString += key + '=' + newQuery[key] + '&'
+              }
+            }
+            vm.$router.push({
+              path: current.path + queryString,
+              query: {
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              }
+            })
+          }, 10)
+        } else {
+          vm.validSearch = true
           if (vm.serviceLastest) {
             newQuery['lastest'] = vm.serviceLastest
           } else {
             newQuery['lastest'] = ''
           }
-          newQuery['keyword'] = String(vm.serviceNameKey).trim()
-          if (!vm.govAgencyFilter) {
-            newQuery['page'] = 1
-          }
-          for (let key in newQuery) {
-            if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
-              queryString += key + '=' + newQuery[key] + '&'
-            }
-          }
-          vm.$router.push({
-            path: current.path + queryString,
-            query: {
-              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-            }
-          })
-        }, 5)
+        }
+        
       },
       filterAndSort () {
         let vm = this
+        vm.loading = true
+        vm.loaded = true
         let current = vm.$router.history.current
         let newQuery = current.query
         if(!newQuery.hasOwnProperty('lastest')) {
-          vm.agencyPage = newQuery.hasOwnProperty('page') && newQuery['page'] ? newQuery['page'] : 1
-          console.log(' vm.agencyPage',  vm.agencyPage)
-
+          vm.agencyPage = newQuery.hasOwnProperty('page') && newQuery['page'] ? Number(newQuery['page']) : 1
           let params = {
             start:  vm.agencyPage * vm.numberPerPage - vm.numberPerPage,
             end: vm.agencyPage * vm.numberPerPage,
-            level: newQuery.hasOwnProperty('lever') && newQuery.agency ? newQuery.lever : '',
+            level: newQuery.hasOwnProperty('lever') && newQuery.lever ? newQuery.lever : '',
             agency: newQuery.hasOwnProperty('agency') && newQuery.agency ? newQuery.agency : '',
             domain: newQuery.hasOwnProperty('domain') && newQuery.domain ? newQuery.domain : '',
-            keyword: newQuery.hasOwnProperty('keyword') && newQuery.keyword ? vm.convertString(newQuery.keyword) : '',
+            keyword: newQuery.hasOwnProperty('keyword') && newQuery.keyword ? newQuery.keyword : '',
+            serviceCode: newQuery.hasOwnProperty('serviceCode') && newQuery.serviceCode ? newQuery.serviceCode : ''
           }
           vm.$store.dispatch('getServiceConfigs', params).then(res => {
+            vm.loading = false
             vm.serviceTotal = res.total
             if(res.data){
               vm.serviceConfigListRender = res.data
@@ -506,6 +681,7 @@
               vm.serviceConfigListRender = []
             }
           }).catch(() => {
+            vm.loading = false
             vm.serviceConfigListRender = []
           })
           if (newQuery.hasOwnProperty('agency') && newQuery.agency) {
@@ -515,67 +691,26 @@
           }
         }
         if (newQuery.hasOwnProperty('lastest') && newQuery.lastest && String(newQuery.lastest) !== 'false') {
-          vm.$store.dispatch('getServiceRecently').then(function (result) {
-            if (result.length > 0) {
-              let serviceConfigs = []
-              for (let index in result) {
-                if (Array.isArray(result[index]['serviceConfigs'])) {
-                  for (let key in result[index]['serviceConfigs']) {
-                    result[index]['serviceConfigs'][key].serviceInfoId = result[index]['serviceConfigs'][key]['serviceInfoId']
-                    result[index]['serviceConfigs'][key].serviceInfoName = result[index]['serviceName']
-                    result[index]['serviceConfigs'][key].govAgencyNameRender = result[index]['serviceConfigs'][key]['govAgencyName']
-                    serviceConfigs.push(result[index]['serviceConfigs'][key])
-                  }
-                } else {
-                  result[index]['serviceConfigs'].serviceInfoId = result[index]['serviceInfoId']
-                  result[index]['serviceConfigs'].serviceInfoName = result[index]['serviceName']
-                  serviceConfigs.push(result[index]['serviceConfigs'])
-                }
-              }
-              vm.serviceConfigListRender = serviceConfigs
-              console.log('serviceConfigListRender 2', vm.serviceConfigListRender)
-            } else {
-              vm.serviceConfigListRender = []
-            }
+          vm.serviceLastestPage = newQuery.hasOwnProperty('page') && newQuery['page'] ? Number(newQuery['page']) : 1
+          let params = {
+            start:  vm.serviceLastestPage * vm.numberPerPage - vm.numberPerPage,
+            end: vm.serviceLastestPage * vm.numberPerPage
+          }
+          vm.$store.dispatch('getServiceRecently', params).then(function (result) {
+            vm.loading = false
+            vm.serviceLastestTotal = result.total
+            vm.serviceInfoLastestList = result.data
           }).catch (function () {
-            vm.serviceConfigListRender = []
+            vm.loading = false
+            vm.serviceInfoLastestList = []
+            vm.serviceLastestTotal = 0
           })
         }
-        if (!vm.domainFilter && !vm.serviceNameKey) {
-          if (vm.govAgencyRender.length === 1) {
-            vm.panelAgency = [true]
-            if (vm.govAgencyRender[0].domains.length === 1) {
-              vm.panelDomain = []
-              vm.panelDomain[0] = [true]
-            } else {
-              for (let key in vm.govAgencyRender[0].domains) {
-                vm.panelDomain.push([])
-                vm.panelDomain[key].push(false)
-              }
-              vm.panelDomain[0] = [true]
-            }
-          } else {
-            for (let key in vm.govAgencyRender) {
-              vm.panelAgency.push(false)
-              vm.panelDomain.push([])
-              if (vm.govAgencyRender[key].domains.length === 1) {
-                vm.panelDomain[0] = [true]
-              } else {
-                for (let index in vm.govAgencyRender[key].domains[index]) {
-                  vm.panelDomain[key].push(false)
-                }
-              }
-            }
-          }
-        }
-        // if(newQuery.hasOwnProperty('agency') && newQuery.agency) {
-        //   vm.getDomains(newQuery.agency)
-        // }
+
       },
-      pullServiceOptions (item) {
+      pullServiceOptions (item, serviceInfo) {
         var vm = this
-        console.log('service config', item)
-        console.log('service config govAgencyCode', item.govAgencyCode)
+
         if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
           vm.hasVerify = true
           setTimeout(function () {
@@ -584,43 +719,74 @@
         } else {
           vm.serviceConfigSelect = item
           vm.govAgencyCodeSelect = item.govAgencyCode
-          vm.serviceInfoIdSelect = item.serviceInfoId
+          vm.serviceInfoIdSelect = serviceInfo ? serviceInfo.serviceInfoId : item.serviceInfoId
           vm.$store.dispatch('getServiceOpionByProcess', item).then(result => {
             if (result) {
               vm.serviceOptions = result
-              console.log((String(vm.serviceCode) !== '0') || (result.length === 1 && String(vm.serviceCode) === '0'))
-              if ((String(vm.serviceCode) !== '0') || (result.length === 1 && String(vm.serviceCode) === '0')) {
+
+              if (String(vm.serviceCode) === '0') {
                 vm.selectOption = false
-                vm.$store.dispatch('getServiceInfo', {
-                  serviceInfoId: item.serviceInfoId
-                }).then(resServiceInfo => {
-                  console.log('resultresultresult',result)
-                  let data = {
-                    serviceCode: resServiceInfo.serviceCode,
-                    govAgencyCode: item.govAgencyCode,
-                    templateNo: result[0].templateNo,
-                    originality: vm.getOriginality(),
-                    j_captcha_response: ''
-                  }
-                  console.log()
-                  if (!vm.isOffLine) {
-                    vm.$store.dispatch('postDossier', data).then(function (result) {
-                      vm.loadingAction = false
-                      vm.indexAction = -1
-                      vm.$router.push({
-                        path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                        query: vm.$router.history.current.query
+                if (result.length === 1) {
+                  vm.$store.dispatch('getServiceInfo', {
+                    serviceInfoId: vm.serviceInfoIdSelect
+                  }).then(resServiceInfo => {
+                    console.log('resultresultresult',result)
+                    let data = {
+                      serviceCode: resServiceInfo.serviceCode,
+                      govAgencyCode: item.govAgencyCode,
+                      templateNo: result[0].templateNo,
+                      originality: vm.getOriginality(),
+                      j_captcha_response: ''
+                    }
+                    if (!vm.isOffLine) {
+                      vm.$store.dispatch('postDossier', data).then(function (result) {
+                        vm.loadingAction = false
+                        vm.indexAction = -1
+                        vm.$router.push({
+                          path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+                          query: vm.$router.history.current.query
+                        })
                       })
-                    })
-                  } else {
-                    vm.dataPostDossier = data
-                    vm.$refs.captcha.makeImageCap()
-                    vm.dialog_captcha = true
-                  }
-                })
+                    } else {
+                      vm.dataPostDossier = data
+                      vm.$refs.captcha.makeImageCap()
+                      vm.dialog_captcha = true
+                    }
+                  })
+                }
               } else {
-                vm.serviceOptionsProcess = result
-                vm.selectOption = true
+                if (result.length === 1) {
+                  vm.$store.dispatch('getServiceInfo', {
+                    serviceInfoId: vm.serviceInfoIdSelect
+                  }).then(resServiceInfo => {
+                    console.log('resultresultresult',result)
+                    let data = {
+                      serviceCode: resServiceInfo.serviceCode,
+                      govAgencyCode: item.govAgencyCode,
+                      templateNo: result[0].templateNo,
+                      originality: vm.getOriginality(),
+                      j_captcha_response: ''
+                    }
+                    if (!vm.isOffLine) {
+                      vm.$store.dispatch('postDossier', data).then(function (result) {
+                        vm.loadingAction = false
+                        vm.indexAction = -1
+                        vm.$router.push({
+                          path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+                          query: vm.$router.history.current.query
+                        })
+                      })
+                    } else {
+                      vm.dataPostDossier = data
+                      vm.$refs.captcha.makeImageCap()
+                      vm.dialog_captcha = true
+                    }
+                  })
+                } else {
+                  vm.serviceOptionsProcess = result
+                  vm.selectOption = true
+                }
+                
               }
             } else {
               vm.$store.dispatch('getServiceConfigDetail', item).then(result => {
@@ -636,9 +802,6 @@
       },
       selectServiceOption (item, itemServiceConfig) {
         var vm = this
-        console.log('selectServiceOption', item)
-        console.log('selectServiceOption', item.govAgencyCode)
-        console.log('selectServiceOption', itemServiceConfig)
         vm.serviceConfigSelect = itemServiceConfig
         vm.govAgencyCodeSelect = itemServiceConfig.govAgencyCode
         vm.serviceInfoIdSelect = itemServiceConfig.serviceInfoId
@@ -666,6 +829,14 @@
             vm.dataPostDossier = data
             vm.$refs.captcha.makeImageCap()
             vm.dialog_captcha = true
+          }
+        })
+      },
+      pullServiceOptionsLastest (item) {
+        let vm = this
+        vm.$store.dispatch('getServiceOpionByProcess', item).then(result => {
+          if (result) {
+            vm.serviceOptions = result
           }
         })
       },
@@ -704,11 +875,22 @@
           })
         }
       },
+      serviceConfigs (config) {
+        if (Array.isArray(config)) {
+          return config
+        } else {
+          if (config.hasOwnProperty('serviceConfigId')) {
+            return [config]
+          } else {
+            return []
+          }
+        }
+      },
       getColor (level) {
         if (level === 2) {
           return 'green'
         } else if (level === 3) {
-          return 'orange'
+          return 'orange darken-1'
         } else if (level === 4) {
           return 'red'
         }
@@ -716,67 +898,73 @@
       goBack () {
         window.history.back()
       },
-      convertString(str) {
-        str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
-        str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
-        str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i')
-        str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
-        str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
-        str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
-        str = str.replace(/đ/g, 'd')
-        str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, 'A')
-        str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, 'E')
-        str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, 'I')
-        str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, 'O')
-        str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
-        str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
-        str = str.replace(/Đ/g, 'D')
-        str = str.toLocaleLowerCase().replace(/\s/g, '')
-        return str
-      },
       getServiceAdminisTration () {
         let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
         vm.$store.dispatch('getServiceAdminisTration', {}).then(
           res => {
             vm.administrationList = res
-            vm.administrationFilter = res[0]['groupCode']
-            vm.getAgencys(vm.administrationFilter)
-
+            vm.capCoQuanThucHien = newQuery['administration'] ? newQuery['administration'] : res[0]['groupCode']
+            vm.getAgencys(vm.capCoQuanThucHien)
           }
         ).catch(()=>{})
       },
-      getDictcollections () {
+      showSelectGov (govList, serviceInfo) {
         let vm = this
-        let filter = {
-          groupCode: 'QUAN_HUYEN'
-        }
-        vm.$store.dispatch('getDictcollections', filter).then(
-          res => {
-            vm.listQuanHuyen = res.data
-
-          }
-        ).catch(()=>{})
+        vm.serviceInfoIdSelect = serviceInfo.serviceInfoId
+        vm.govAgencyTiepNhanSelected = ''
+        vm.serviceOptionsSelect = ''
+        vm.govAgencyListTiepNhan = vm.serviceConfigs(govList)
+        vm.dialog_selectAgency = true
       },
+      changeGovSelected () {
+        let vm = this
+        setTimeout(function () {
+          vm.pullServiceOptionsLastest(vm.govAgencyTiepNhanSelected)
+        }, 100)
+      },
+      submitSelectGov () {
+        let vm = this
+        if (vm.$refs.formSelect.validate()) {
+          vm.govAgencyTiepNhanSelected.serviceInfoId = vm.serviceInfoIdSelect
+          if (vm.serviceOptions.length === 1) {
+            vm.selectServiceOption(vm.serviceOptions[0], vm.govAgencyTiepNhanSelected)
+          } else {
+            vm.selectServiceOption(vm.serviceOptionsSelect, vm.govAgencyTiepNhanSelected)
+          }
+        }
+      },
+      // getDictcollections () {
+      //   let vm = this
+      //   let filter = {
+      //     groupCode: 'QUAN_HUYEN'
+      //   }
+      //   vm.$store.dispatch('getDictcollections', filter).then(
+      //     res => {
+      //       vm.listQuanHuyen = res.data
+
+      //     }
+      //   ).catch(()=>{})
+      // },
       getLevers () {
         let vm = this
-
-        vm.$store.dispatch('getLevers').then(
+        vm.$store.dispatch('getLevels').then(
           res => {
-            vm.listLerver = res.data
-
+            vm.listLerver = res
           }
         ).catch(()=>{})
       },
       getAgencys(administrationCode) {
         let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
         let data = {
           administration: administrationCode ? administrationCode : ''
         }
         vm.$store.dispatch('getAgencys', data).then(
           res => {
-              vm.govAgencyList = res
-              // vm.govAgencyFilter = res[0]['itemCode']
-              // vm.filterService()
+            vm.govAgencyList = res
           }
         ).catch(()=>{
           vm.govAgencyList = []
@@ -795,20 +983,32 @@
           vm.domainList = []
         })      
       },
-      searchServiceConfig(){
+      closeSelectOption () {
         let vm = this
-        if (vm.serviceNameKey && vm.serviceNameKey.length > 5) {
-          vm.govAgencyFilter = ''
-          vm.domainFilter = ''
-          vm.serviceLastest = false
-          vm.activeFilterKey = true
-          vm.filterService()
-        } else {
-          vm.serviceLastest = false
-          vm.activeFilterKey = false
-          vm.filterService()
-        }
-      }
+        vm.dialog_selectOption = false
+        // vm.filterAndSort()
+      },
+      selectServiceOptionCRD (item, govAgencyCode) {
+        var vm = this
+        vm.$store.dispatch('getServiceInfo', {
+          serviceInfoId: vm.serviceInfoIdSelect
+        }).then(resServiceInfo => {
+          let data = {
+            serviceCode: resServiceInfo.serviceCode,
+            govAgencyCode: govAgencyCode,
+            templateNo: item.templateNo,
+            originality: vm.getOriginality()
+          }
+          vm.$store.dispatch('postDossier', data).then(function (result) {
+            vm.loadingAction = false
+            vm.indexAction = -1
+            vm.$router.push({
+              path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+              query: vm.$router.history.current.query
+            })
+          })
+        })
+      },
     }
   }
 </script>

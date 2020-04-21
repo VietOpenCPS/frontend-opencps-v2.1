@@ -470,7 +470,7 @@ import ThanhPhanHoSo2 from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhomNew.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
-import TinyPagination from './pagging/hanghai_pagination.vue'
+import TinyPagination from './pagging/opencps_pagination.vue'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'

@@ -71,6 +71,20 @@
                   <p class="pt-2 mb-0">{{getPaymentStatus(payments.paymentStatus)}}</p>
                 </v-flex>
                 <v-flex xs12 sm7></v-flex>
+                <v-layout wrap v-if="doneVTpay">
+                  <v-flex xs12 sm2>
+                    <v-subheader class="pl-0 text-right">Người làm thủ tục thanh toán: </v-subheader>
+                  </v-flex>
+                  <v-flex xs12 sm3>
+                    <p class="pt-2 mb-0">Đã thanh toán qua ViettelPay
+                      <a class="ml-2" href="javascript:;" @click=""
+                        style="color: #001fff;text-decoration: underline;font-style: italic;">
+                        chi tiết
+                      </a>
+                    </p>
+                  </v-flex>
+                  <v-flex xs12 sm7></v-flex>
+                </v-layout>
                 <v-layout wrap v-if="Number(payments.paymentStatus) >= 3">
                   <v-flex xs12 sm2>
                     <v-subheader class="pl-0 text-right">Hình thức thanh toán: </v-subheader>
@@ -242,7 +256,8 @@ export default {
     dialogPDFLoading: true,
     activePrintPay: false,
     transId: '',
-    goodCode: ''
+    goodCode: '',
+    doneVTpay: false
   }),
   computed: {
     paymentFileName () {
@@ -284,9 +299,21 @@ export default {
       //   vm.payments.paymentMethod = 'Keypay'
       // }
       let paymentProfile = vm.getEPaymentProfile(val.epaymentProfile)
+      // keypay
       if (paymentProfile && paymentProfile['keypayUrl']) {
         vm.transId = paymentProfile['keypayUrl'].split('&').filter(function (item) {return item.indexOf('merchant_trans_id') >= 0})[0].split('=')[1]
         vm.goodCode = paymentProfile['keypayUrl'].split('&').filter(function (item) {return item.indexOf('good_code') >= 0})[0].split('=')[1]
+      }
+      // viettelPay
+      if (paymentProfile && paymentProfile.genQRCode && String(val.paymentStatus) !== '3' && String(val.paymentStatus) !== '5') {
+        let filter = {
+          billcode: paymentProfile.genQRCode.BILLCODE,
+          order_id: paymentProfile.genQRCode.ORDER_ID
+        }
+        vm.$store.dispatch('getVtPayStatus', filter).then(result => {
+          // vm.doneVTpay = true
+        }).catch(function(){})
+
       }
     }
   },
@@ -333,8 +360,6 @@ export default {
     },
     downloadPaymentFile (item) {
       let vm = this
-      // test local
-      // let url = 'http://127.0.0.1:8081/api/dossiers/' + vm.dossierId + '/payment/confirmfile'
       let url = '/o/rest/v2/dossiers/' + vm.dossierDetail.dossierId + '/payments/' + vm.dossierDetail.referenceUid + '/confirmfile'
       window.open(url)
     },
@@ -377,6 +402,17 @@ export default {
         urlRedirect = 'http://tracuu.cmcsoft.com'
       }
       window.open(urlRedirect, '_blank')
+    },
+    checkVTpay () {
+      let vm = this
+      let paymentProfile = vm.getEPaymentProfile(vm.payments.epaymentProfile)
+      let filter = {
+        billcode: paymentProfile.genQRCode.BILLCODE,
+        order_id: paymentProfile.genQRCode.ORDER_ID
+      }
+      vm.$store.dispatch('getVtPayStatus', filter).then(result => {
+
+      }).catch(function(){})
     },
     getPaymentStatus (code) {
       if (code === 1 || code === '1') {

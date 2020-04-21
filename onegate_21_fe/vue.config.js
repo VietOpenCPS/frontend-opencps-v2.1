@@ -1,3 +1,4 @@
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 if (process.env.NODE_ENV === 'production') {
   module.exports = {
     runtimeCompiler: true,
@@ -19,6 +20,7 @@ if (process.env.NODE_ENV === 'production') {
       }
     },
     configureWebpack: {
+      // plugins: [new BundleAnalyzerPlugin()],
       output: {
         filename: '../../docs/o/opencps-frontend-cli/motcua/app/js/[name].js',
         chunkFilename: '../../docs/o/opencps-frontend-cli/motcua/app/js/[name].js'
