@@ -285,7 +285,7 @@ export default {
     date: null,
     dialogRules: false,
     dialog_applicantInfos: false,
-    isBXD: window.themeDisplay.getScopeGroupId() === '35166' ? true : false,
+    isBXD: false,
     applicantInfos: {
       applicantName: '',
       applicantIdNo: '',
@@ -383,6 +383,12 @@ export default {
         }
         if (hasOrganizationConfig === true) {
           vm.hasOrganization = true
+        }
+      } catch (error) {
+      }
+      try {
+        if (xacthuc_credit) {
+          vm.isBXD = true
         }
       } catch (error) {
       }

@@ -36,7 +36,7 @@
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 HƯỚNG DẪN &nbsp;&nbsp;&nbsp;&nbsp; 
               </div>
-              <v-layout row wrap>
+              <v-layout wrap>
                 <v-flex xs12 sm12>
                   <div class="ml-3 mr-3 pt-1" v-html="thongTinChiTietHoSo.dossierNote"></div>
                 </v-flex>
@@ -209,22 +209,11 @@
               <span slot="loader">Loading...</span>
             </v-btn>
           </v-tab>
-          <!-- <v-tab href="#tab-3" @click="boSungHoSo">
-            <v-btn flat class="px-0 py-0 mx-0 my-0">
-              Bổ sung &nbsp;
-              <v-icon>save</v-icon>
-            </v-btn>
-          </v-tab>
-          <v-tab href="#tab-4">
-            <v-btn flat class="px-0 py-0 mx-0 my-0">
-              Trả kết quả &nbsp;
-              <v-icon>send</v-icon>
-            </v-btn>
-          </v-tab> -->
-          <v-tab href="#tab-5" @click="goBack" class="px-0 py-0">
+          <v-tab href="#tab-5" class="px-0 py-0">
             <v-btn flat class=""
               :loading="loadingAction"
               :disabled="loadingAction"
+              @click="goBackHistory"
             >
               <v-icon size="18">reply</v-icon> &nbsp;
               Quay lại
@@ -729,11 +718,13 @@ export default {
       let vm = this
       // console.log('thongTinChuHoSo', vm.thongTinChuHoSo)
       vm.briefNote = vm.thongTinChiTietHoSo.serviceName ? vm.thongTinChiTietHoSo.serviceName : ''
+      // set dossierName
       // if (vm.thongTinChiTietHoSo.serviceName && !vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
       //   vm.briefNote = vm.briefNote + ' cho ' + vm.thongTinChuHoSo['applicantName']
       // } else if (vm.thongTinChiTietHoSo.serviceName && vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
       //   vm.briefNote = vm.briefNote + ' cho ông/bà ' + vm.thongTinChuHoSo['applicantName']
       // }
+      // end
       if (vm.formCode === 'UPDATE') {
         vm.briefNote = vm.thongTinChiTietHoSo.dossierName ? vm.thongTinChiTietHoSo.dossierName : vm.thongTinChiTietHoSo.serviceName
       }
@@ -1029,7 +1020,8 @@ export default {
             vm.loadingAction = false
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             if (vm.formCode === 'UPDATE') {
-              vm.goBack()
+              // vm.goBack()
+              window.history.back()
             } else {
               var initData = vm.$store.getters.loadingInitData
               let actionUser = initData.user.userName ? initData.user.userName : ''
@@ -1540,6 +1532,9 @@ export default {
           query: currentQuery
         })
       }
+    },
+    goBackHistory () {
+      window.history.back()
     }
   }
 }

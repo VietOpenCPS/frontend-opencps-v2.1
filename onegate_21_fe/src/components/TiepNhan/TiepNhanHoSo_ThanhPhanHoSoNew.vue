@@ -117,6 +117,9 @@
                     <v-btn icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView && checkInput !== 1">
                       <v-icon style="color: red">delete_outline</v-icon>
                     </v-btn>
+                    <v-btn icon ripple v-on:click.stop="downloadSingleFile(itemFileView)" class="mx-0 my-0">
+                      <v-icon size="14" color="primary">fas fa fa-download</v-icon>
+                    </v-btn>
                   </div>
                 </div>
                 <div class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;max-height: 250px;overflow:auto;border:1px dashed #f3ae75;border-radius: 5px;position:relative">
@@ -1387,6 +1390,11 @@ export default {
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
         })
       }
+    },
+    downloadSingleFile (data) {
+      let vm = this
+      let url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
+      window.location.assign(url)
     },
     viewFile (data) {
       var vm = this

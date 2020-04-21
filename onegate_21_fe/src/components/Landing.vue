@@ -6,7 +6,7 @@
         <div v-if="!isMobile" class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
           <v-text-field
             v-model="keyword"
-            placeholder="Tìm kiếm theo tên hồ sơ, tên thủ tục, chủ hồ sơ ..."
+            placeholder="Tìm kiếm theo tên hồ sơ, mã hồ sơ, tên thủ tục, chủ hồ sơ ..."
             solo
             @keyup.enter="keywordEventChange"
           ></v-text-field>
@@ -359,6 +359,7 @@
             <v-layout wrap>
               <v-flex xs12 class="px-2 pb-3">
                 <v-autocomplete
+                  label="Thủ tục:"
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelected"
                   :rules="[v => !!v || 'Thủ tục hành chính bắt buộc phải chọn']"
@@ -572,7 +573,7 @@
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
-                  :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>
@@ -827,7 +828,7 @@
 // import Vue from 'vue'
 import $ from 'jquery'
 import TemplateRendering from './pagging/template_rendering.vue'
-import TinyPagination from './pagging/hanghai_pagination.vue'
+import TinyPagination from './pagging/opencps_pagination.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import support from '../store/support.json'

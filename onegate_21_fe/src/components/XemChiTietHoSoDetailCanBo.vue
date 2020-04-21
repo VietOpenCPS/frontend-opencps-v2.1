@@ -264,7 +264,7 @@
                 <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
                 <thong-tin-buu-chinh v-if="showPostalService" :postalService="thongTinChiTietHoSo"></thong-tin-buu-chinh>
                 <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
-                <div class="px-4 pt-0 pb-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+                <div v-if="visibleDoAction" class="px-4 pt-0 pb-2" style="width: 100%;border-bottom: 1px solid #dddddd">
                   <v-btn color="primary" class="ml-0 mr-2" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
                     :loading="loadingActionProcess"
                     :disabled="loadingActionProcess"
@@ -480,25 +480,28 @@
             <v-tab-item v-if="originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done'"
             value="tabs-1b" :key="1" reverse-transition="fade-transition" transition="fade-transition">
               <div class="px-2 py-2">
-                <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" >
-                  <div class="text-bold">
-                    {{index + 1}}.&nbsp; {{ item.subject }}
+                <div v-if="votingItems && votingItems.length > 0">
+                  <div v-for="(item, index) in votingItems" :key="index" >
+                    <div class="text-bold">
+                      {{index + 1}}.&nbsp; {{ item.subject }}
+                    </div>
+                    <v-radio-group class="ml-3 mt-2" v-model="item.selected" column>
+                      <v-radio class="ml-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" :disabled="originality === 3"></v-radio>
+                    </v-radio-group>
+                    <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
+                      <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
+                        <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
+                      </v-flex>
+                    </v-layout> -->
                   </div>
-                  <v-radio-group class="ml-3 mt-2" v-model="item.selected" column>
-                    <v-radio class="ml-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" :disabled="originality === 3"></v-radio>
-                  </v-radio-group>
-                  <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
-                    <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
-                      <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
-                    </v-flex>
-                  </v-layout> -->
                 </div>
-                <div v-if="votingItems.length === 0" class="mx-3">
+                
+                <div v-if="!votingItems || (votingItems && votingItems.length === 0)" class="mx-3">
                   <v-alert outline color="warning" icon="priority_high" :value="true">
                     Không có đánh giá
                   </v-alert>
                 </div>
-                <div class="ml-3 mt-4" v-if="votingItems.length > 0 && originality === 1">
+                <div class="ml-3 mt-4" v-if="votingItems && votingItems.length > 0 && originality === 1">
                   <v-btn color="primary"
                     :loading="loadingVoting"
                     :disabled="loadingVoting"
@@ -933,6 +936,9 @@ export default {
     loading () {
       return this.$store.getters.loading
     },
+    visibleDoAction () {
+      return this.$store.getters.getVisibleDoAction
+    },
     originality () {
       var vm = this
       return vm.getOriginality()
@@ -1097,6 +1103,9 @@ export default {
         }
         vm.btnStateVisible = false
       }
+    },
+    visibleDoAction (val) {
+      this.loadingActionProcess = false
     }
   },
   methods: {
@@ -2170,6 +2179,9 @@ export default {
                     vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
                     })
                   }
+                  if (filter['payment']) {
+                    vm.loadThanhToan()
+                  }
                   vm.loadingAction = false
                   vm.dialogActionProcess = false
                   vm.loadingActionProcess = false
@@ -2262,6 +2274,9 @@ export default {
                       vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
                       })
                     }
+                    if (filter['payment']) {
+                      vm.loadThanhToan()
+                    }
                     vm.loadingAction = false
                     vm.dialogActionProcess = false
                     vm.loadingActionProcess = false
@@ -2316,6 +2331,9 @@ export default {
                 if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
                   vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
                   })
+                }
+                if (filter['payment']) {
+                  vm.loadThanhToan()
                 }
                 vm.loadingAction = false
                 vm.dialogActionProcess = false
