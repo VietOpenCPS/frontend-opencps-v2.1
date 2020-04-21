@@ -134,7 +134,7 @@
                 ></v-text-field>
               </v-flex>
               <v-flex xs12  v-if="isBXD">
-                <div>File ảnh CMND mặt trước <span style="color:red">(*)</span></div>
+                <div>{{applicantType === '1' ? 'Ảnh CMND mặt trước ' : (applicantType === '2' ? 'Ảnh giấy phép đăng ký mặt trước ' : 'Ảnh giấy phép đăng ký mặt trước ')}} <span style="color:red">(*)</span></div>
                 <v-text-field 
                   @click='onPickFileCMNDFront'
                   v-model='fileCMNDFrontName'
@@ -148,11 +148,11 @@
                   type="file"
                   style="display: none"
                   ref="refFileCMNDFront"
-                  accept="*/*"
+                  accept="image/*"
                   @change="onFileCMNDFrontPicked">
               </v-flex>
               <v-flex xs12  v-if="isBXD">
-                <div>File ảnh CMND mặt sau <span style="color:red">(*)</span></div>
+                <div>{{applicantType === '1' ? 'Ảnh CMND mặt sau ' : (applicantType === '2' ? 'Ảnh giấy phép đăng ký mặt sau ' : 'Ảnh giấy phép đăng ký mặt sau ')}}<span style="color:red">(*)</span></div>
                 <v-text-field 
                   @click='onPickFileCMNDBack'
                   v-model='fileCMNDBackName'
@@ -166,7 +166,7 @@
                   type="file"
                   style="display: none"
                   ref="refFileCMNDBack"
-                  accept="*/*"
+                  accept="image/*"
                   @change="onFileCMNDBackPicked">
               </v-flex>
               <v-flex xs12>
