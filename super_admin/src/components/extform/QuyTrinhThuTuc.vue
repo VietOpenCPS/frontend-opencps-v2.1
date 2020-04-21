@@ -894,7 +894,7 @@
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm12>
-                    <v-autocomplete
+                    <!-- <v-autocomplete
                       box
                       label="Cấu hình cơ quan"
                       :items="agencyLists"
@@ -904,18 +904,25 @@
                       multiple
                       clearable
                     >
-                    </v-autocomplete>
-                    <!-- <v-text-field
+                    </v-autocomplete> -->
+                    <v-text-field
                       label="Cấu hình cơ quan"
                       v-model="currentAction.createDossier"
                       box
-                    ></v-text-field> -->
+                    ></v-text-field>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm12>
                     <v-text-field
                       label="Cấu hình panel nhập ý kiến"
                       v-model="currentAction.configNote"
+                      box
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm12>
+                    <v-text-field
+                      label="Thao tác thực hiện sau"
+                      v-model="currentAction.postAction"
                       box
                     ></v-text-field>
                   </v-flex>
@@ -1231,7 +1238,8 @@
           configNote: '',
           createDossierNo: false,
           eSignature: false,
-          signatureType: 'digital'
+          signatureType: 'digital',
+          portAction: '',
         },
         esignatureTypeList: [
           { text: 'Sử dụng chữ ký số', value: 'digital' },
@@ -1491,7 +1499,8 @@
         }
         vm.$store.dispatch('getProcessActionsDetail', filter).then(function (result) {
           vm.currentAction = result
-          vm.currentAction['createDossier'] = result.createDossiers ? result.createDossiers.split(',') : []
+          // vm.currentAction['createDossier'] = result.createDossiers ? result.createDossiers.split(',') : []
+          vm.currentAction['createDossier'] = result.createDossiers ? result.createDossiers : ''
           vm.currentAction['createDossierFiles'] = result.createDossierFiles ? result.createDossierFiles.split(',') : []
           vm.currentAction['returnDossierFiles'] = result.returnDossierFiles ? result.returnDossierFiles.split(',') : []
         }).catch(reject => {
@@ -1868,12 +1877,18 @@
           vm.currentAction['type'] = type
           vm.currentAction['currentProcess'] = vm.id
           vm.$store.dispatch('postProcessAction', vm.currentAction).then(function (result) {
-            vm.$router.push({
-              path: currentPath + '?action=true',
-              query: {
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-              }
-            })
+            let data = {
+              processActionId: result.processActionId,
+              postAction: vm.currentAction['postAction']
+            }
+            vm.$store.dispatch('postAction', data).then( res => {
+                vm.$router.push({
+                  path: currentPath + '?action=true',
+                  query: {
+                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                  }
+                })
+            }).catch(() => {})
             console.log(result)
           }).catch(reject => {
             console.log(reject)

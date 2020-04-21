@@ -21,7 +21,7 @@
           <v-icon>edit</v-icon>
         </v-btn>
         <v-toolbar-title class="ml-0">
-          {{index.toString() === '0' ? 'Đồng bộ danh mục cơ quan' : 'Đồng bộ danh mục câu hỏi'}}
+          Đồng bộ danh mục cơ quan
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn dark icon v-on:click.native="backToList">
@@ -30,7 +30,7 @@
       </v-toolbar>
       <div class="grid-list mt-3">
         <!-- Đồng bộ danh mục cơ quan-->
-        <div class="list-thu-tuc" v-if="!isMobile && index.toString() === '0'">
+        <div class="list-thu-tuc" v-if="!isMobile">
           <content-placeholders class="mt-3" v-if="loading">
             <content-placeholders-text :lines="10" />
           </content-placeholders>
@@ -44,14 +44,6 @@
             >
               <template slot="items" slot-scope="props">
                 <tr v-bind:class="{'active': props.index%2==1}">
-                  <td class="text-xs-center" style="border-right: 0.5px solid #aba6a6;">
-                    <content-placeholders v-if="loading">
-                      <content-placeholders-text :lines="1" />
-                    </content-placeholders>
-                    <div v-else>
-                      <span>{{props.index + 1}}</span><br>
-                    </div>
-                  </td>
                   <td class="text-xs-left" style="border-right: 0.5px solid #aba6a6;">
                     <content-placeholders v-if="loading">
                       <content-placeholders-text :lines="1" />
@@ -65,25 +57,27 @@
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
                     <div v-else>
-                      <div v-for="(itemAgency, index1) in props.item.similarity" :key="index1" class="mb-2" style="position: relative;">
-                        <v-tooltip top style="display: inline-block;width: 25px;position: absolute;top: -2px;">
-                          <v-checkbox
-                            slot="activator"
-                            v-model="itemAgency.mapped"
-                            primary
-                            hide-details
-                            color="#115ebe"
-                            :disabled="loadingSync"
-                            @change="doActionMappingAgency(props.item, props.index, itemAgency, index1)"
-                          ></v-checkbox>
-                          <span v-if="itemAgency.mapped">Chọn để hủy mapping</span>
-                          <span v-else>Chọn để mapping</span>
-                        </v-tooltip>
-                        <span class="text-bold" :style="itemAgency.mapped ? 'margin-left: 50px' : 'margin-left: 24px'">{{itemAgency.itemCodeDVCQG}}</span> - <span>{{itemAgency.itemNameDVCQG}}</span>
-                      </div>
-                      <div class="mb-2" style="position: relative;">
-                        <v-btn small outline color="#115ebe" @click="openDialogMapping(props.item)">Chọn</v-btn>
-                      </div>
+                      <v-layout wrap align-center>
+                        <v-flex xs9>
+                          <div v-for="(itemAgency, index1) in props.item.similarity" :key="index1" class="mb-2" style="position: relative;" v-if="itemAgency.mapped">
+                            <v-tooltip v-if="itemAgency.mapped" top style="display: inline-block;width: 25px;position: absolute;top: -2px;">
+                              <v-checkbox
+                                slot="activator"
+                                v-model="itemAgency.mapped"
+                                primary
+                                hide-details
+                                color="#115ebe"
+                                :disabled="loadingSync"
+                                @change="doActionMappingAgency(props.item, props.index, itemAgency, index1)"
+                              ></v-checkbox>
+                              <span v-if="itemAgency.mapped">Chọn để hủy mapping</span>
+                              <span v-else>Chọn để mapping</span>
+                            </v-tooltip>
+                            <span v-if="itemAgency.mapped" class="text-bold" :style="itemAgency.mapped ? 'margin-left: 50px' : 'margin-left: 24px'">{{itemAgency.itemCodeDVCQG}}</span> - <span v-if="itemAgency.mapped">{{itemAgency.itemNameDVCQG}}</span>
+                          </div>
+                        </v-flex>
+                        <v-flex xs3 class="text-right"><v-btn small outline color="#115ebe" @click="openDialogMapping(props.item)">Chọn</v-btn></v-flex>
+                      </v-layout>
                     </div>
                   </td>
                 </tr>
@@ -102,158 +96,8 @@
             </div> -->
           </div>
         </div>
-        <!-- Đồng bộ danh mục câu hỏi -->
-        <div class="list-thu-tuc" v-if="!isMobile && index.toString() !== '0'">
-          <v-layout wrap align-center class="white py-2">
-            <v-flex class="xs12 sm3 px-2">
-              <v-autocomplete
-                class="select-border"
-                :items="listLoaiHoiDap"
-                v-model="loaiHoiDapySelected"
-                item-text="text"
-                item-value="value"
-                :hide-selected="true"
-                @change="changeLoaiHoiDap"
-                box
-                :readonly="loading"
-                clearable
-              ></v-autocomplete>
-            </v-flex>
-            <v-flex class="xs12 sm3 px-2">
-              <v-autocomplete
-                class="select-border"
-                label="Trạng thái"
-                :items="listTrangThai"
-                v-model="trangThaiSelected"
-                item-text="text"
-                item-value="value"
-                :hide-selected="true"
-                box
-                :readonly="loading"
-                clearable
-              ></v-autocomplete>
-            </v-flex>
-            <v-flex class="xs12 sm6">
-              <v-btn style="color:#fff;"  small color="#115ebe" :loading="loadingSyncSharingqa"  @click="syncSharingqa()">Đồng bộ tất cả</v-btn>
-            </v-flex>   
-          </v-layout>
-          <content-placeholders class="mt-3" v-if="loading">
-            <content-placeholders-text :lines="10" />
-          </content-placeholders>
-          <div v-else class="service__info__table">
-            <v-data-table
-              :headers="headersCauHoi"
-              :items="listCauHoiView"
-              class="table-landing table-bordered"
-              :rows-per-page-items="rowsPerPageItems"
-              :pagination.sync="pagination"
-            >
-              <template slot="items" slot-scope="props">
-                <tr v-bind:class="{'active': props.index%2==1}">
-                  <td class="text-xs-center" style="border-right: 0.5px solid #aba6a6;">
-                    <content-placeholders v-if="loading">
-                      <content-placeholders-text :lines="1" />
-                    </content-placeholders>
-                    <div v-else>
-                      <span>{{props.index + 1}}</span><br>
-                    </div>
-                  </td>
-                  <td class="text-xs-left" style="border-right: 0.5px solid #aba6a6;">
-                    <content-placeholders v-if="loading">
-                      <content-placeholders-text :lines="1" />
-                    </content-placeholders>
-                    <div v-else>
-                      <span class="text-bold">{{props.item.NOIDUNG}}</span>
-                    </div>
-                  </td>
-                  <td class="text-xs-left"  style="border-right: 0.5px solid #aba6a6; width: 112px;">
-                    <content-placeholders v-if="loading">
-                      <content-placeholders-text :lines="1" />
-                    </content-placeholders>
-                    <div v-else>
-                        <span v-if="props.item.SYNC"> Đã đồng bộ</span>
-                    </div>
-                  </td>
-
-                  <td class="text-xs-left" style="width:229px;">
-                    <content-placeholders v-if="loading">
-                      <content-placeholders-text :lines="1" />
-                    </content-placeholders>
-                    <div v-else>
-                      <v-layout wrap align-center>
-                        <v-flex xs8><v-btn small style="color:#fff;" color="#115ebe" @click="syncSharingqa(props.item)">{{ props.item.SYNC ? 'Đồng bộ lại' : 'Đồng bộ'}}</v-btn></v-flex>
-                        <v-flex xs4><v-icon style="font-size:23px;cursor: pointer;" color="#115ebe" @click="viewDetailCauHoi(props.item)">visibility</v-icon></v-flex>
-                      </v-layout>
-                    
-                    </div>
-                  </td>
-                </tr>
-              </template>
-              <template slot="no-data">
-                <div class="text-xs-center mt-2">
-                  Không có câu hỏi nào được tìm thấy
-                </div>
-              </template>
-            </v-data-table>
-            <!-- <div class="text-xs-right layout wrap mt-2" style="position: relative;">
-              <div class="flex pagging-table px-2"> 
-                <tiny-pagination :total="totalThuTuc" :page="thutucPage" custom-class="custom-tiny-class" 
-                  @tiny:change-page="paggingData" ></tiny-pagination> 
-              </div>
-            </div> -->
-          </div>
-        </div>
       </div>
     </v-card>
-    <!-- Dialog Chi tiết câu hỏi -->
-    <v-dialog v-model="dialogChiTietCauHoi" persistent max-width="600px">
-        <v-card>
-          <v-card-title pa-1>
-            <v-layout wrap align-center>
-              <v-flex xs6>
-                <span class="headline">Chi tiết câu hỏi</span>
-              </v-flex>
-              <v-flex xs6 class="text-right">
-                <v-btn color="#115ebe" fab small dark @click="dialogChiTietCauHoi = false">
-                  <v-icon>exit_to_app</v-icon>
-                </v-btn>
-              </v-flex>
-            </v-layout>
-            
-          </v-card-title>
-          <v-card-text>
-            <v-container grid-list-md>
-              <v-layout wrap>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field label="Mã" readonly v-model="chiTietCauHoi.MALINHVUC"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field label="Mã đơn vị" readonly v-model="chiTietCauHoi.MADONVI"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field label="Tên đơn vị" readonly v-model="chiTietCauHoi.TENDONVI"></v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                  <v-textarea
-                    name="input-4-1"
-                    label="Nội dung:"
-                    readonly
-                    v-model="chiTietCauHoi.NOIDUNG"
-                  ></v-textarea>
-                </v-flex>
-                <v-flex xs12>
-                  <v-textarea
-                    name="input-4-1"
-                    label="Nội dung trả lời:"
-                    readonly
-                    v-model="chiTietCauHoi.NOIDUNGTRALOI"
-                  ></v-textarea>
-                </v-flex>
-              </v-layout>
-            </v-container>
-          </v-card-text>
-        </v-card>
-    </v-dialog>
     <!-- Popup danh sách mapping thêm -->
     <v-dialog v-model="dialogMapping" persistent max-width="600px">
         <v-card style="background: #fff;">
@@ -262,9 +106,9 @@
               <v-flex xs6>
                 <span class="headline">Chọn để mapping</span>
               </v-flex>
-              <v-flex xs6 class="text-right">
+              <v-flex xs6 class="#F44336">
                 <v-btn color="#115ebe" fab small dark  @click="dialogMapping = false">
-                  <v-icon>exit_to_app</v-icon>
+                  <v-icon>cancel</v-icon>
                 </v-btn>
               </v-flex>
             </v-layout>
@@ -286,7 +130,7 @@
                 </content-placeholders>
                 <v-layout v-else align-center style="border-bottom: 0.5px dashed" wrap v-for="(item, index) in listMappingView" :key="index">
                   <v-flex xs9 class="pa-0">
-                    <span style="font-weight: bold">{{item.itemNameDVCQG}}</span>
+                    <span style="font-weight: bold">{{item.itemCodeDVCQG}}-{{item.itemNameDVCQG}}</span>
                   </v-flex>
                   <v-flex xs3 class="text-right pa-0">
                     <v-btn small style="color:#fff;" color="#115ebe" @click="mappingAgencyDVCQG(item)">Chọn</v-btn>
@@ -414,17 +258,12 @@ export default {
     loading: true,
     headersCoQuan: [
       {
-        text: 'STT',
+        text: 'Mã cơ quan',
         align: 'center',
         sortable: false
       },
       {
-        text: 'Cơ quan',
-        align: 'center',
-        sortable: false
-      },
-      {
-        text: 'Thao tác',
+        text: 'Mã DVCQG',
         align: 'center',
         sortable: false
       }
@@ -433,11 +272,6 @@ export default {
     trangThaiSelected: '',
     listCoQuan: [],
     headersCauHoi: [
-      {
-        text: 'STT',
-        align: 'center',
-        sortable: false
-      },
       {
         text: 'Câu hỏi',
         align: 'center',
@@ -515,11 +349,7 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
-      if (vm.index.toString() === '0') {
-        vm.doLoadingAgency()
-      } else {
-        vm.doLoadingCauHoi()
-      }
+      vm.doLoadingAgency()
     },
     nameDVCQGModel (val) {
       let vm = this
@@ -885,9 +715,10 @@ export default {
           // toastr.success('Mapping thành công')
           for (let i = 0; i < vm.listCoQuan.length; i++) {
             if(vm.listCoQuan[i].itemCode === vm.coQuanSelect.itemCode){
-              for (let j = 0; j < vm.listCoQuan[i]['similarity'].length; j++){
-                vm.listCoQuan[i]['similarity'][j].mapped =  false
-              }
+              // for (let j = 0; j < vm.listCoQuan[i]['similarity'].length; j++){
+              //   vm.listCoQuan[i]['similarity'][j].mapped =  false
+              // }
+              vm.listCoQuan[i]['similarity'] = []
               vm.listCoQuan[i]['similarity'].push({itemCodeDVCQG: item.itemCodeDVCQG, itemNameDVCQG: item.itemNameDVCQG, mapped: true})
               break
             }

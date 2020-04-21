@@ -8,7 +8,8 @@ import QuyTrinhThuTuc from '@/components/extform/QuyTrinhThuTuc.vue'
 import ThamSoHeThong from '@/components/extform/ThamSoHeThong.vue'
 import Voting from '@/components/extform/Voting.vue'
 import MappingTTHC from '@/components/extform/MappingTTHC.vue'
-import SyncAgencyVsSharingqa from '@/components/extform/SyncAgencyVsSharingqa.vue'
+import SyncAgency from '@/components/extform/SyncAgency.vue'
+import SyncSharingqa from '@/components/extform/SyncSharingqa.vue'
 import SyncDomain from '@/components/extform/SyncDomain.vue'
 import Report from '@/components/extform/Report.vue'
 import Import from '@/components/screens/import.vue'
@@ -88,9 +89,18 @@ const routes = [
         }
       },
       {
-        path: '/table/opencps_mapping/agency-sharingqa/:index',
-        name: 'SyncAgencyVsSharingqa',
-        component: SyncAgencyVsSharingqa,
+        path: '/table/opencps_mapping/agency',
+        name: 'SyncAgency',
+        component: SyncAgency,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_mapping/sharingqa',
+        name: 'SyncSharingqa',
+        component: SyncSharingqa,
         props: true,
         meta: {
           requiresAuth: true

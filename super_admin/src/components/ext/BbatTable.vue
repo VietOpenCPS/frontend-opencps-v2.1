@@ -118,6 +118,7 @@
     },
     data () {
       return {
+        order: 1,
         applicantType: '',
         backTableName: '',
         depen: false,
@@ -294,15 +295,29 @@
               } else {
                 vm.depen = false
               }
-              textPost = {
-                'type': 'admin',
-                'cmd': 'get',
-                'code': vm.$router.history.current.params.tableName,
-                'respone': 'tableData',
-                'filter': vm.columnsDataFilter,
-                'start': vm.page * 10 - 10,
-                'end': vm.page * 10
+              if(vm.tableName === 'opencps_applicant'){
+                textPost = {
+                  'type': 'admin',
+                  'cmd': 'get',
+                  'code': vm.$router.history.current.params.tableName,
+                  'respone': 'tableData',
+                  'filter': vm.columnsDataFilter,
+                  'sort': vm.order ? 'activationCode_desc' : 'activationCode_asc',
+                  'start': vm.page * 10 - 10,
+                  'end': vm.page * 10
+                }
+              } else {
+                textPost = {
+                  'type': 'admin',
+                  'cmd': 'get',
+                  'code': vm.$router.history.current.params.tableName,
+                  'respone': 'tableData',
+                  'filter': vm.columnsDataFilter,
+                  'start': vm.page * 10 - 10,
+                  'end': vm.page * 10
+                }               
               }
+
               dataPost = new URLSearchParams();
               dataPost.append('text', JSON.stringify(textPost))
               axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
@@ -466,8 +481,11 @@
           contextMenu:function() { 
             vm.show(window.event); 
           },
-          onsort: function (e) {
-            window.$('#table_database_' + vm.tableName).jexcel('orderBy', window.$(e).next().val())
+          onsort: function (instance, cellNum, order) {
+            let colName = columns[cellNum]['column']
+            vm.order = order
+            vm.page = 1
+            vm.setDataJexcel(colName)
           },
           closeEditor : function(cell, save) {
             let value = cell.children[0].value
@@ -478,6 +496,33 @@
           columns: columns
         })
         vm.problem = false
+      },
+      setDataJexcel (colName) {
+        let vm = this
+        let textPost = {}
+        let orderBy = vm.order ? '_desc' : '_asc' 
+        textPost = {
+          'type': 'admin',
+          'cmd': 'get',
+          'code': vm.$router.history.current.params.tableName,
+          'respone': 'tableData',
+          'filter': vm.columnsDataFilter,
+          'sort': colName + orderBy,
+          'start': vm.page * 10 - 10,
+          'end': vm.page * 10
+        }
+
+        let dataPost = new URLSearchParams();
+        dataPost.append('text', JSON.stringify(textPost))
+        axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+          let dataObj = response.data
+          vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+            if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['tableData'] !== null && vm.dataSocket['tableData'] !== undefined && (dataObj.respone === 'tableData' || dataObj.respone === 'tableConfig')) {
+              window.$('#table_database_' + vm.tableName).jexcel('setData', vm.dataSocket['tableData'], false);
+            }
+        }).catch(function (error) {
+        })
+
       },
       toEditor (id) {
         let vm = this

@@ -168,7 +168,7 @@
                 </v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="isBXD">
-                <div>File ảnh CMND mặt trước </div>
+                <div>{{ user['applicantType'] === 'citizen' ? 'Ảnh CMND mặt trước' : 'Ảnh Giấy phép đăng ký kinh doanh mặt trước'}} </div>
                 <AttachImage :dataImage="user['applicantProfile']['indentifyNoFFileUrl']"
                   @changeImage="changeImageFront"  
                 ></AttachImage>
@@ -188,7 +188,7 @@
                   @change="onFileCMNDFrontPicked"> -->
               </v-flex>
               <v-flex xs12 sm4 v-if="isBXD">
-                <div>File ảnh CMND mặt sau </div>
+                <div>{{ user['applicantType'] === 'citizen' ? 'Ảnh CMND mặt sau' : 'Ảnh Giấy phép đăng ký kinh doanh mặt sau'}} </div>
                 <AttachImage :dataImage="user['applicantProfile']['indentifyNoBFileUrl']"
                   @changeImage="changeImageBack"  
                 ></AttachImage>
@@ -712,7 +712,7 @@
       AttachImage
     },
     data: () => ({
-      isBXD: window.themeDisplay.getScopeGroupId() === '35166' ? true : false,
+      isBXD: false,
       indentifyNoFFileUrl: '',
       indentifyNoBFileUrl: '',
       fileCMNDFrontName: '',
@@ -942,6 +942,12 @@
         vm.hasSSo = ssoConect
         if (rulesConfig) {
           vm.rules = Object.assign({}, vm.rules, rulesConfig)
+        }
+      } catch (error) {
+      }
+      try {
+        if (xacthuc_credit) {
+          vm.isBXD = true
         }
       } catch (error) {
       }
