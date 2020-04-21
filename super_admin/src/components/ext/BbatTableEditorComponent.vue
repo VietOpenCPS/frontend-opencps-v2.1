@@ -41,6 +41,17 @@
           <v-icon class="mr-1" size="14">lock_open</v-icon>
           {{item.label}}
         </v-btn>
+        <div v-if="item.type === 'imageFront'" style="width: 100%;height:150px;">
+          <span>{{data['applicantIdType'] === 'citizen' ? 'Ảnh CMND mặt trước' : 'Ảnh giấy phép kinh doanh mặt trước'}}</span>
+          <img v-if="isJsonString(data['profile'])" :src="JSON.parse(data['profile']).indentifyNoFFileUrl" style="width: 100%;height:140px;">
+          <img v-else style="width: 100%;height:140px;">
+        </div>
+        <div v-if="item.type === 'imageBack'" style="width: 100%;height:150px;">
+          <span>{{data['applicantIdType'] === 'citizen' ? 'Ảnh CMND mặt sau' : 'Ảnh giấy phép kinh doanh mặt sau'}}</span>
+          <img v-if="isJsonString(data['profile'])" :src="JSON.parse(data['profile']).indentifyNoBFileUrl" style="width: 100%;height:140px;">
+          <img v-else style="width: 100%;height:140px;">
+          
+        </div>
         <content-placeholders v-if="item.type === 'selects' && !pullOk && item.hasOwnProperty('datasource_key')">
           <content-placeholders-text :lines="1" />
         </content-placeholders>
@@ -1074,6 +1085,14 @@
             vm.snackbarerror = true
           })
         }
+      },
+      isJsonString(str) {
+            try {
+                JSON.parse(str);
+            } catch (e) {
+                return false;
+            }
+            return true;
       }
     }
   }

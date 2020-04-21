@@ -96,13 +96,13 @@ export const store = new Vuex.Store({
           },
           {
             icon: 'filter',
-            link: '/table/opencps_mapping/agency-sharingqa/0',
+            link: '/table/opencps_mapping/agency',
             code: 'mapping',
             text: 'Đồng bộ DM cơ quan'
           },
           {
             icon: 'filter',
-            link: '/table/opencps_mapping/agency-sharingqa/1',
+            link: '/table/opencps_mapping/sharingqa',
             code: 'mapping',
             text: 'Đồng bộ DM câu hỏi'
           },
@@ -1124,7 +1124,9 @@ export const store = new Vuex.Store({
           dataPostAction.append('signatureType', data.eSignature && data.signatureType ? data.signatureType : '')
           dataPostAction.append('configNote', data.configNote ? data.configNote : data.configNote)
           dataPostAction.append('dossierTemplateNo', data.dossierTemplateNo ? data.dossierTemplateNo : '')
-          dataPostAction.append('createDossiers', data.createDossier ? data.createDossier.join() : '')
+          // dataPostAction.append('createDossiers', data.createDossier ? data.createDossier.join() : '')
+          dataPostAction.append('createDossiers', data.createDossier ? data.createDossier : '')
+          // dataPostAction.append('postAction', data.postAction ? data.postAction : '')
           if (data.type === 'add') {
             console.log('dataPostAction', dataPostAction)
             axios.post(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/actions', dataPostAction, options).then(function (response) {
@@ -1144,6 +1146,29 @@ export const store = new Vuex.Store({
               // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
             })
           }
+        })
+      })
+    },
+    postAction ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          var dataPostAction = new URLSearchParams()
+
+          dataPostAction.append('postAction', data.postAction ? data.postAction : '')
+          axios.put(state.endPointApi + '/serviceprocesses/processAction/' + data.processActionId + '/postAction', dataPostAction, options).then(function (response) {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            commit('setsnackbarerror', true)
+            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
         })
       })
     },

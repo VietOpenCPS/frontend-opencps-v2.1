@@ -84,14 +84,6 @@
             >
               <template slot="items" slot-scope="props">
                 <tr v-bind:class="{'active': props.index%2==1}">
-                  <td class="text-xs-center" style="border-right: 0.5px solid #aba6a6;">
-                    <content-placeholders v-if="loading">
-                      <content-placeholders-text :lines="1" />
-                    </content-placeholders>
-                    <div v-else>
-                      <span>{{ thutucPage*pageSize - pageSize + props.index + 1}}</span><br>
-                    </div>
-                  </td>
                   <td class="text-xs-left" style="border-right: 0.5px solid #aba6a6;">
                     <content-placeholders v-if="loading">
                       <content-placeholders-text :lines="1" />
@@ -114,13 +106,14 @@
                                 <v-btn small outline color="#115ebe" @click="openDialogMappingDVCQG(props.item)">Mapping</v-btn>
                             </v-flex>
                         </v-layout>
-                        <v-layout v-else align-center wrap>
-                            <v-flex xs8  @click="openDialogChiTietThuTucDVCQG(props.item)" style="cursor: pointer;">
+                        <v-layout v-else wrap align-center>
+                            <v-flex sm6  @click="openDialogChiTietThuTucDVCQG(props.item)" style="cursor: pointer;"> 
                                 <span class="text-bold">{{props.item.serviceCodeDVCQG}}</span> - <span>{{props.item.serviceNameDVCQG}}</span>
                             </v-flex>
-                            <v-flex xs4 class="text-right">
-                                <v-btn small outline color="#115ebe" @click="removeMapping(props.item)">Huỷ mapping</v-btn>
+                            <v-flex sm6 class="text-right">
                                 <v-btn small outline color="#115ebe" v-if="props.item.synced === 0" @click="syncServiceinfo(props.item)">Đồng bộ</v-btn>
+                                <v-btn small outline color="#115ebe" @click="removeMapping(props.item)">Huỷ mapping</v-btn>
+                                
                             </v-flex>
                         </v-layout>
                     </div>
@@ -142,14 +135,6 @@
             >
               <template slot="items" slot-scope="props">
                 <tr v-bind:class="{'active': props.index%2==1}">
-                  <td class="text-xs-center" style="border-right: 0.5px solid #aba6a6;">
-                    <content-placeholders v-if="loading">
-                      <content-placeholders-text :lines="1" />
-                    </content-placeholders>
-                    <div v-else>
-                      <span>{{thutucPage*pageSize - pageSize + props.index + 1}}</span><br>
-                    </div>
-                  </td>
                   <td class="text-xs-left" style="min-width: 575px; border-right: 0.5px solid #aba6a6;" >
                     <content-placeholders v-if="loading">
                       <content-placeholders-text :lines="1" />
@@ -162,10 +147,8 @@
                             </v-flex>
                         </v-layout>
                         <v-layout v-else align-center justify-center wrap>
-                            <v-flex xs6 class="text-right">
+                            <v-flex xs12 class="text-right">
                                 <v-btn small outline color="#115ebe" @click="openDialogChiTietThuTucThem(props.item)">Thêm vào đơn vị</v-btn>
-                            </v-flex>
-                            <v-flex xs6 class="text-left">
                                 <v-btn small outline color="#115ebe" @click="openDialogMappingDonVi(props.item)">Mapping</v-btn>
                             </v-flex>
                         </v-layout>
@@ -211,8 +194,8 @@
                 <span class="headline">Chọn để mapping</span>
               </v-flex>
               <v-flex xs6 class="text-right">
-                <v-btn color="#115ebe" fab small dark  @click="dialogMapping = false">
-                  <v-icon>exit_to_app</v-icon>
+                <v-btn color="#F44336" fab small dark  @click="dialogMapping = false">
+                  <v-icon>cancel</v-icon>
                 </v-btn>
               </v-flex>
             </v-layout>
@@ -235,7 +218,7 @@
                 </content-placeholders>
                 <v-layout v-else align-center style="border-bottom: 0.5px dashed" wrap v-for="(item, index) in listMappingView" :key="index">
                   <v-flex xs9 class="pa-0">
-                    <span style="font-weight: bold">{{timKiemTheoSelected === 'DonVi' ? item.serviceNameDVCQG : item.serviceName}}</span>
+                    <span style="font-weight: bold">{{timKiemTheoSelected === 'DonVi' ? item.serviceCodeDVCQG : item.serviceCode}}-{{timKiemTheoSelected === 'DonVi' ? item.serviceNameDVCQG : item.serviceName}}</span>
                   </v-flex>
                   <v-flex xs3  class="text-right pa-0">
                     <v-btn small style="color:#fff;" color="#115ebe" @click="mappingTTHC(item)">Chọn</v-btn>
@@ -271,8 +254,8 @@
             </v-flex>
             <v-flex xs6 class="text-right">
               <v-btn  color="blue darken-1 mx-2" v-if="btnThem"  @click="addTTHC()"> Xác nhận</v-btn>
-              <v-btn color="#115ebe" fab small dark  @click="dialogChiTietThuTucDVCQG = false">
-                <v-icon>exit_to_app</v-icon>
+              <v-btn color="#F44336" fab small dark  @click="dialogChiTietThuTucDVCQG = false">
+                <v-icon>cancel</v-icon>
               </v-btn>
             </v-flex>
           </v-layout>
@@ -298,6 +281,12 @@
                   <v-card flat style="height:500px; overflow-y: scroll;">
                     <v-card-text>
                       <v-layout wrap align-center>
+                        <v-flex xs12 >
+                          <v-layout wrap>
+                            <v-flex xs3 ><strong>Tên thủ tục</strong></v-flex>
+                            <v-flex xs9><span>{{serviceDVCQGDetail[0].TENTTHC}}</span></v-flex>
+                          </v-layout>
+                        </v-flex>
                         <v-flex xs12 >
                           <v-layout wrap>
                             <v-flex xs3 ><strong>Mã thủ tục</strong></v-flex>
@@ -396,8 +385,8 @@
               <span class="headline">Chi tiết thủ tục</span>
             </v-flex>
             <v-flex xs6 class="text-right">
-              <v-btn color="#115ebe" fab small dark  @click="dialogChiTietThuTucDonVi = false">
-                <v-icon>exit_to_app</v-icon>
+              <v-btn color="#F44336" fab small dark  @click="dialogChiTietThuTucDonVi = false">
+                <v-icon>cancel</v-icon>
               </v-btn>
             </v-flex>
           </v-layout>
@@ -424,9 +413,14 @@
                           <table class="datatable table">
                             <tbody>
                               <tr>
+                                <td class="pt-2" ><span class="text-bold">Tên thủ tục</span></td>
+                                <td class="pt-2"><span>{{serviceDonViDetail.serviceName}}</span></td>
+                              </tr>
+                              <tr>
                                 <td class="pt-2" style="min-width: 148px;"><span class="text-bold">Mã thủ tục</span></td>
                                 <td class="pt-2"><span>{{serviceDonViDetail.serviceCode}}</span></td>
                               </tr>
+
                               <tr>
                                 <td class="pt-2"><span class="text-bold">Cơ quan quản lý</span></td>
                                 <td class="pt-2"><span>{{serviceDonViDetail.administrationName}}</span></td>
@@ -565,11 +559,6 @@ export default {
     serviceInfoListDVCQG: [],
     serviceInfoListDVCQGView: [],
     headers: [
-      {
-        text: 'STT',
-        align: 'center',
-        sortable: false
-      },
       {
         text: 'TTHC tại đơn vị',
         align: 'center',
