@@ -1191,7 +1191,7 @@
         if (vm.$refs.form.validate()) {
           vm.loading = true
           console.log('user put data', vm.user)
-          if(!vm.fileCMNDFront && !vm.fileCMNDBack) {
+          if(vm.isBXD && !vm.fileCMNDFront && !vm.fileCMNDBack) {
             toastr.error('File ảnh chưa được chọn')
             vm.loading = false
             return

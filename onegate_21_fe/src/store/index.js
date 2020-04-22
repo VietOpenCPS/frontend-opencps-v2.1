@@ -1389,10 +1389,12 @@ export const store = new Vuex.Store({
           dataPutdossier.append('postalAddress', data.postalAddress ? data.postalAddress : '')
           dataPutdossier.append('postalCityCode', data.postalCityCode ? data.postalCityCode : '')
           dataPutdossier.append('postalTelNo', data.postalTelNo ? data.postalTelNo : '')
-          
-          dataPutdossier.append('vnpostalStatus', data.vnpostalStatus)
+
+          if (dataPutdossier.hasOwnProperty('vnpostalStatus')) {
+            dataPutdossier.append('vnpostalStatus', data.vnpostalStatus)
+          }
         }
-        if (data.viaPostal && String(data.vnpostalStatus) !== 0) {
+        if (data.viaPostal && String(data.vnpostalStatus) === '1') {
           dataPutdossier.append('vnpostalProfile', JSON.stringify(data.vnpostalProfile))
         }
         dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 0)

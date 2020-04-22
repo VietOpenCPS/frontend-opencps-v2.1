@@ -144,14 +144,14 @@
           </v-expansion-panel>
         </div>
         <!--  -->
-        <div style="position: relative;" v-if="viaPortalDetail !== 0">
+        <!-- <div style="position: relative;" v-if="viaPortalDetail !== 0 && formCode === 'NEW' && originality === 1">
           <v-expansion-panel :value="[true]" expand  class="expansion-pl">
             <v-expansion-panel-content hide-actions value="2">
               <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát hồ sơ</div>
               <dich-vu-chuyen-phat-ho-so ref="dichvuchuyenphathoso" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ho-so>
             </v-expansion-panel-content>
           </v-expansion-panel>
-        </div>
+        </div> -->
         <!--  -->
         <div style="position: relative;" v-if="viaPortalDetail !== 0">
           <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -965,7 +965,7 @@ export default {
           tempData['originality'] = vm.originality
           tempData['dossierName'] = vm.briefNote
           // console.log('data put dossier -->', tempData)
-          if (dichvuchuyenphathoso) {
+          if (dichvuchuyenphathoso && vm.formCode === 'NEW') {
             let vnpostal = {
               postalServiceName: dichvuchuyenphathoso.postalServiceCode,
               postalAddress: dichvuchuyenphathoso.postalAddress,
@@ -978,7 +978,7 @@ export default {
               postalTelNo: dichvuchuyenphathoso.postalTelNo
             }
             tempData['vnpostalStatus'] = dichvuchuyenphathoso.vnpostalStatus
-            tempData['vnpostalProfile'] = String(dichvuchuyenphathoso.vnpostalStatus) !== 0 ? vnpostal : ''
+            tempData['vnpostalProfile'] = vnpostal
           }
           setTimeout(function () {
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
