@@ -1348,7 +1348,7 @@ export const store = new Vuex.Store({
               sort: 'siblingSearch'
             }
           }
-          axios.get(state.endPoint + '/serviceinfos/statistics/agencies', param).then(function (response) {
+          axios.get(state.endPointApi + '/serviceinfos/statistics/agencies', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -1374,7 +1374,7 @@ export const store = new Vuex.Store({
               sort: 'siblingSearch'
             }
           }
-          axios.get(state.endPoint + '/serviceinfos/statistics/domains', param).then(function (response) {
+          axios.get(state.endPointApi + '/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -1404,7 +1404,7 @@ export const store = new Vuex.Store({
             },
             params: paramGet
           }
-          axios.get(state.endPoint + '/serviceinfos/mappingsuggest', param).then(function (response) {
+          axios.get(state.endPointApi + '/serviceinfos/mappingsuggest', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {

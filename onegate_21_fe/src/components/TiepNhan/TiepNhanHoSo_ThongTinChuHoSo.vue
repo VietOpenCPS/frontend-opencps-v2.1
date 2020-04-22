@@ -800,7 +800,7 @@ export default {
     functionTimeOut: null,
     dialog_applicantInfos: false,
     dialog_applicantList: false,
-    applicantConfig: true,
+    applicantConfig: false,
     titleEdit: 'Thông tin công dân, tổ chức, doanh nghiệp',
     applicantEdit: '',
     dialog_editApplicant: false,
