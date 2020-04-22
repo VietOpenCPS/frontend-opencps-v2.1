@@ -144,6 +144,15 @@
           </v-expansion-panel>
         </div>
         <!--  -->
+        <!-- <div style="position: relative;" v-if="viaPortalDetail !== 0 && formCode === 'NEW' && originality === 1">
+          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+            <v-expansion-panel-content hide-actions value="2">
+              <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát hồ sơ</div>
+              <dich-vu-chuyen-phat-ho-so ref="dichvuchuyenphathoso" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ho-so>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div> -->
+        <!--  -->
         <div style="position: relative;" v-if="viaPortalDetail !== 0">
           <v-expansion-panel :value="[true]" expand  class="expansion-pl">
             <v-expansion-panel-content hide-actions value="2">
@@ -582,6 +591,7 @@ import TaiLieuChungThuc from './TiepNhan/TaiLieuChungThuc.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
+import DichVuChuyenPhatHoSo from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatHoSo.vue'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -594,6 +604,7 @@ export default {
     'tai-lieu-chung-thuc': TaiLieuChungThuc,
     'thong-tin-chung': ThongTinChung,
     'thu-phi': LePhi,
+    'dich-vu-chuyen-phat-ho-so': DichVuChuyenPhatHoSo,
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua
   },
   data: () => ({
@@ -680,6 +691,9 @@ export default {
     },
     dichVuChuyenPhatKetQua () {
       return this.$store.getters.dichVuChuyenPhatKetQua
+    },
+    dichVuChuyenPhatHoSo () {
+      return this.$store.getters.dichVuChuyenPhatHoSo
     },
     thongTinChuHoSo () {
       return this.$store.getters.thongTinChuHoSo
@@ -852,12 +866,35 @@ export default {
             vm.$refs.thongtinchuhoso.initData(result)
             vm.viaPortalDetail = result.viaPostal
             if (result.viaPostal > 0) {
+              let vnpostalProfile = {
+                vnpostalStatus: 0,
+                postalServiceName: '',
+                postalServiceCode: '',
+                postalAddress: '',
+                postalCityCode: '',
+                postalCityName: '',
+                postalDistrictCode: '',
+                postalDistrictName: '',
+                postalWardCode: '',
+                postalWardName: '',
+                postalTelNo: ''
+              }
               let postalAddress = result.address ? (result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName) : ''
               if (vm.formCode === 'NEW' && vm.originality === 1) {
                 result['postalAddress'] = postalAddress
                 result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
+
+                vnpostalProfile['postalAddress'] = result.address
+                vnpostalProfile['postalCityCode'] = result.cityCode
+                vnpostalProfile['postalCityName'] = result.cityName
+                vnpostalProfile['postalDistrictCode'] = result.districtCode
+                vnpostalProfile['postalDistrictName'] = result.districtName
+                vnpostalProfile['postalWardCode'] = result.wardCode
+                vnpostalProfile['postalWardName'] = result.wardName
+                vnpostalProfile['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
               }
               vm.$store.commit('setDichVuChuyenPhatKetQua', result)
+              vm.$store.commit('setDichVuChuyenPhatHoSo', vnpostalProfile)
             }
             // lấy thông tin notify config
             vm.getNotifyConfig(vm.dossierId)
@@ -886,6 +923,7 @@ export default {
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso ? this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo : {}
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
       let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
+      let dichvuchuyenphathoso = this.$refs.dichvuchuyenphathoso ? this.$refs.dichvuchuyenphathoso.dichVuChuyenPhatHoSo : ''
       // console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
       let validThongtinchuhoso = vm.$refs.thongtinchuhoso.showValid()
       if (validThongtinchuhoso['validForm']) {
@@ -901,6 +939,9 @@ export default {
             return
           }
           if (dichvuchuyenphatketqua.viaPostal === 2 && !vm.$refs.dichvuchuyenphatketqua.validDichVuChuyenPhat()) {
+            return
+          }
+          if (dichvuchuyenphathoso && dichvuchuyenphathoso.vnpostalStatus === 1 && !vm.$refs.dichvuchuyenphathoso.validDichVuChuyenPhat()) {
             return
           }
           let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
@@ -924,6 +965,21 @@ export default {
           tempData['originality'] = vm.originality
           tempData['dossierName'] = vm.briefNote
           // console.log('data put dossier -->', tempData)
+          if (dichvuchuyenphathoso && vm.formCode === 'NEW') {
+            let vnpostal = {
+              postalServiceName: dichvuchuyenphathoso.postalServiceCode,
+              postalAddress: dichvuchuyenphathoso.postalAddress,
+              postalCityCode: dichvuchuyenphathoso.postalCityCode,
+              postalCityName: dichvuchuyenphathoso.postalCityName,
+              postalDistrictCode: dichvuchuyenphathoso.postalDistrictCode,
+              postalDistrictName: dichvuchuyenphathoso.postalDistrictName,
+              postalWardCode: dichvuchuyenphathoso.postalWardCode,
+              postalWardName: dichvuchuyenphathoso.postalWardName,
+              postalTelNo: dichvuchuyenphathoso.postalTelNo
+            }
+            tempData['vnpostalStatus'] = dichvuchuyenphathoso.vnpostalStatus
+            tempData['vnpostalProfile'] = vnpostal
+          }
           setTimeout(function () {
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')

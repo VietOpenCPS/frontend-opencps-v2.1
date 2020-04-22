@@ -133,13 +133,13 @@
                   required
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12  v-if="isBXD">
+              <v-flex xs12  v-if="xacthuc_credit">
                 <div>{{applicantType === '1' ? 'Ảnh CMND mặt trước ' : (applicantType === '2' ? 'Ảnh giấy phép đăng ký mặt trước ' : 'Ảnh giấy phép đăng ký mặt trước ')}} <span style="color:red">(*)</span></div>
                 <v-text-field 
                   @click='onPickFileCMNDFront'
                   v-model='fileCMNDFrontName'
                   prepend-icon="attach_file"
-                  v-if="isBXD"
+                  v-if="xacthuc_credit"
                   :rules="[rules.required]"
                   box
                 ></v-text-field>
@@ -151,13 +151,13 @@
                   accept="image/*"
                   @change="onFileCMNDFrontPicked">
               </v-flex>
-              <v-flex xs12  v-if="isBXD">
+              <v-flex xs12  v-if="xacthuc_credit">
                 <div>{{applicantType === '1' ? 'Ảnh CMND mặt sau ' : (applicantType === '2' ? 'Ảnh giấy phép đăng ký mặt sau ' : 'Ảnh giấy phép đăng ký mặt sau ')}}<span style="color:red">(*)</span></div>
                 <v-text-field 
                   @click='onPickFileCMNDBack'
                   v-model='fileCMNDBackName'
                   prepend-icon="attach_file"
-                  v-if="isBXD"
+                  v-if="xacthuc_credit"
                   :rules="[rules.required]"
                   box
                 ></v-text-field>
@@ -285,7 +285,7 @@ export default {
     date: null,
     dialogRules: false,
     dialog_applicantInfos: false,
-    isBXD: false,
+    xacthuc_credit: false,
     applicantInfos: {
       applicantName: '',
       applicantIdNo: '',
@@ -388,7 +388,7 @@ export default {
       }
       try {
         if (xacthuc_credit) {
-          vm.isBXD = true
+          vm.xacthuc_credit = true
         }
       } catch (error) {
       }
@@ -475,7 +475,7 @@ export default {
         if (passValid) {
           vm.loading = true
           let filter = dataForm
-          if(vm.isBXD) {
+          if(vm.xacthuc_credit) {
             vm.$store.dispatch('postApplicantBXD', filter).then(function (result) {
               vm.loading = false
               vm.$refs.captcha.makeImageCap()
@@ -613,10 +613,8 @@ export default {
         const file = files[0]
         const size = (file.size / 1024 / 1024).toFixed(2)
         if(size > 10){
-          alert("Tệp quá lớn. Vui lòng chọn tệp kích thước hơn 10MB"); 
+          alert("Tệp tải lên kích thước tối đa 10MB"); 
         } else {
-          console.log(files)
-          console.log(files[0])
           vm.fileCMNDFront = file
           vm.fileCMNDFrontName = files[0].name
         }
@@ -629,10 +627,8 @@ export default {
         const file = files[0]
         const size = (file.size / 1024 / 1024).toFixed(2)
         if(size > 10){
-          alert("Tệp quá lớn. Vui lòng chọn tệp kích thước hơn 10MB"); 
+          alert("Tệp tải lên kích thước tối đa 10MB"); 
         } else{
-          console.log(files)
-          console.log(files[0])
           vm.fileCMNDBack = file
           vm.fileCMNDBackName = files[0].name
         }

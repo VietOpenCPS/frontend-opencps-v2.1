@@ -185,13 +185,6 @@
         <!-- <v-radio label="Nhận trực tuyến" :value="9"></v-radio> -->
       </v-radio-group>
       <!--  -->
-      <!-- <v-checkbox
-        v-else
-        label="Đăng ký trả kết quả tại nhà"
-        v-model="dichVuChuyenPhatKetQua.viaPostal"
-        :value="2"
-        @change="changeViaPostal($event)"
-      ></v-checkbox> -->
     </div>
   </div>
 </template>

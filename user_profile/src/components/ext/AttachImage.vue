@@ -26,7 +26,7 @@ export default {
             if (!files.length)
                 return;
             if((files[0].size / 1024 / 1024).toFixed(2) > 10){
-                alert("Tệp quá lớn. Vui lòng chọn tệp kích thước hơn 10MB"); 
+                alert("Tệp tải lên kích thước tối đa 10MB"); 
             } else {
                 this.$emit('changeImage', {
                     file: files[0]
