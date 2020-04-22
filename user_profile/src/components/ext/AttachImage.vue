@@ -25,10 +25,14 @@ export default {
             var files = e.target.files || e.dataTransfer.files
             if (!files.length)
                 return;
-            this.$emit('changeImage', {
-                file: files[0]
-            })
-            this.createImage(files[0]);
+            if((files[0].size / 1024 / 1024).toFixed(2) > 10){
+                alert("Tệp tải lên kích thước tối đa 10MB"); 
+            } else {
+                this.$emit('changeImage', {
+                    file: files[0]
+                })
+                this.createImage(files[0]);
+            }
         },
         createImage(file) {
             var image = new Image();

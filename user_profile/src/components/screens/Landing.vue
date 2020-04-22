@@ -167,7 +167,7 @@
                   </template>
                 </v-text-field>
               </v-flex>
-              <v-flex xs12 sm4 v-if="isBXD">
+              <v-flex xs12 sm4 v-if="xacthuc_credit">
                 <div>{{ user['applicantType'] === 'citizen' ? 'Ảnh CMND mặt trước' : 'Ảnh Giấy phép đăng ký kinh doanh mặt trước'}} </div>
                 <AttachImage :dataImage="user['applicantProfile']['indentifyNoFFileUrl']"
                   @changeImage="changeImageFront"  
@@ -175,7 +175,7 @@
                 <!-- <v-text-field 
                   @click='onPickFileCMNDFront'
                   v-model='fileCMNDFrontName'
-                  v-if="isBXD"
+                  v-if="xacthuc_credit"
                   box
                   prepend-icon="attach_file"
                 ></v-text-field>
@@ -187,7 +187,7 @@
                   accept="*/*"
                   @change="onFileCMNDFrontPicked"> -->
               </v-flex>
-              <v-flex xs12 sm4 v-if="isBXD">
+              <v-flex xs12 sm4 v-if="xacthuc_credit">
                 <div>{{ user['applicantType'] === 'citizen' ? 'Ảnh CMND mặt sau' : 'Ảnh Giấy phép đăng ký kinh doanh mặt sau'}} </div>
                 <AttachImage :dataImage="user['applicantProfile']['indentifyNoBFileUrl']"
                   @changeImage="changeImageBack"  
@@ -196,7 +196,7 @@
                   @click='onPickFileCMNDBack'
                   v-model='fileCMNDBackName'
                   prepend-icon="attach_file"
-                  v-if="isBXD"
+                  v-if="xacthuc_credit"
                   box
                 ></v-text-field>
                 <input
@@ -712,7 +712,7 @@
       AttachImage
     },
     data: () => ({
-      isBXD: false,
+      xacthuc_credit: false,
       indentifyNoFFileUrl: '',
       indentifyNoBFileUrl: '',
       fileCMNDFrontName: '',
@@ -947,7 +947,7 @@
       }
       try {
         if (xacthuc_credit) {
-          vm.isBXD = true
+          vm.xacthuc_credit = true
         }
       } catch (error) {
       }
@@ -1191,7 +1191,7 @@
         if (vm.$refs.form.validate()) {
           vm.loading = true
           console.log('user put data', vm.user)
-          if(vm.isBXD && !vm.fileCMNDFront && !vm.fileCMNDBack) {
+          if(vm.xacthuc_credit && !vm.fileCMNDFront && !vm.fileCMNDBack) {
             toastr.error('File ảnh chưa được chọn')
             vm.loading = false
             return
@@ -1201,7 +1201,7 @@
             indentifyNoBFile: vm.fileCMNDBack,
             applicantId: vm.user['classPK']
           }
-          if(vm.isBXD) {
+          if(vm.xacthuc_credit) {
             vm.$store.dispatch('updateindentifies', filter).then(function (data) {
               let applicantProfile =  JSON.parse(data['applicantProfile'])
               vm.user['applicantProfile']['indentifyNoFFileUrl'] = applicantProfile.indentifyNoFFileUrl
@@ -1532,8 +1532,6 @@
         const files = event.target.files
         if(files.length){
           const file = files[0]
-          console.log(files)
-          console.log(files[0])
           vm.fileCMNDBack = file
           vm.fileCMNDBackName = files[0].name
         }
@@ -1541,12 +1539,10 @@
       changeImageFront(config) {
         let vm = this
         vm.fileCMNDFront = config.file
-        console.log(config)
       },
       changeImageBack(config) {
         let vm = this
         vm.fileCMNDBack = config.file
-        console.log(config)
       }
     }
   }
