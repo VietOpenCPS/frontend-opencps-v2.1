@@ -85,15 +85,59 @@
             </v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+
+        <v-list-tile :to="'/table/opencps_mapping/tthc?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1">
+          <v-list-tile-action>
+            <v-icon>cached</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>
+              Mapping thủ tục hành chính
+            </v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+
+        <v-list-tile :to="'/table/opencps_mapping/domain?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1">
+          <v-list-tile-action>
+            <v-icon>cached</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>
+              Đồng bộ danh mục lĩnh vực
+            </v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+
+        <v-list-tile :to="'/table/opencps_mapping/agency?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1">
+          <v-list-tile-action>
+            <v-icon>cached</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>
+              Đồng bộ danh mục cơ quan
+            </v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+
+        <v-list-tile :to="'/table/opencps_mapping/sharingqa?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1">
+          <v-list-tile-action>
+            <v-icon>cached</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>
+              Đồng bộ danh mục câu hỏi
+            </v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
       </v-list>
-      <!-- <div>
+      <div>
         <v-btn class="ml-1 mr-1 my-0 white--text" color="#0b72ba"
           @click="thongKeTruyCap"
         >
           <v-icon>how_to_reg</v-icon>&nbsp;
           Thống kê truy cập hệ thống
         </v-btn>
-      </div> -->
+      </div>
     </v-navigation-drawer>
     <v-toolbar
       :clipped-left="$vuetify.breakpoint.lgAndUp"

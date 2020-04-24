@@ -3091,6 +3091,36 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    getServiceInfos ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let paramGet = {
+            start: filter.start ? filter.start : 0,
+            end: filter.end ? filter.end : 10,
+            keyword: filter.keyword ? filter.keyword.replace(/[!@#$%^&*(),?":{}|<>]/g, '') : '',
+            level: filter.level ? filter.level : 0,
+            domain: filter.domain ? filter.domain : ''
+          }
+
+          if (filter.domain) {
+            paramGet.sort = "siblingSearch"
+          }
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: paramGet
+          }
+          axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     getServiceConfigs ({commit, state}, data) {
       return new Promise((resolve, reject)=>{
         store.dispatch('loadInitResource').then(function (result) {
@@ -3147,6 +3177,11 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
+            }
+          }
+          if (data.parent) {
+            param.params = {
+              parent: data.parent
             }
           }
           console.log('data', data)
