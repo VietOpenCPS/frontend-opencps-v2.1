@@ -733,11 +733,11 @@ export default {
       // console.log('thongTinChuHoSo', vm.thongTinChuHoSo)
       vm.briefNote = vm.thongTinChiTietHoSo.serviceName ? vm.thongTinChiTietHoSo.serviceName : ''
       // set dossierName
-      // if (vm.thongTinChiTietHoSo.serviceName && !vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
-      //   vm.briefNote = vm.briefNote + ' cho ' + vm.thongTinChuHoSo['applicantName']
-      // } else if (vm.thongTinChiTietHoSo.serviceName && vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
-      //   vm.briefNote = vm.briefNote + ' cho ông/bà ' + vm.thongTinChuHoSo['applicantName']
-      // }
+      if (vm.thongTinChiTietHoSo.serviceName && !vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
+        vm.briefNote = vm.briefNote + ' cho ' + vm.thongTinChuHoSo['applicantName']
+      } else if (vm.thongTinChiTietHoSo.serviceName && vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
+        vm.briefNote = vm.briefNote + ' cho ông/bà ' + vm.thongTinChuHoSo['applicantName']
+      }
       // end
       if (vm.formCode === 'UPDATE') {
         vm.briefNote = vm.thongTinChiTietHoSo.dossierName ? vm.thongTinChiTietHoSo.dossierName : vm.thongTinChiTietHoSo.serviceName
