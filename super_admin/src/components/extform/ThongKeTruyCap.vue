@@ -82,6 +82,24 @@
                 </v-card-text>
             </v-card>
         </v-flex>
+        <v-flex xs12 sm6>
+            <v-card>
+                <v-card-text>
+                  <v-data-table
+                    :headers="headers"
+                    :items="items"
+                    hide-actions
+                  >
+                    <template slot="items" slot-scope="props">
+                      <tr>
+                        <td class="text-xs-left">{{props.item.page}}</td>
+                        <td class="text-xs-right">{{props.item.count}}</td>
+                      </tr>
+                    </template>
+                  </v-data-table>
+                </v-card-text>
+            </v-card>
+        </v-flex>
     </v-layout>
   </div>
 </template>
@@ -160,6 +178,25 @@
               offsetX: -5
             }
           },
+          headers: [
+            {
+              text: 'Trang',
+              align: 'left',
+              sortable: false
+            },
+            {
+              text: 'Số lần xem trang',
+              align: 'right',
+              sortable: false
+            }
+          ],
+          items: [
+            {page: '/web/cong-dich-vu-cong/dich-vu-cong', count: 233},
+            {page: '/web/cong-dich-vu-cong/dich-vu-cong', count: 233},
+            {page: '/web/cong-dich-vu-cong/dich-vu-cong', count: 233},
+            {page: '/web/cong-dich-vu-cong/dich-vu-cong', count: 233},
+            {page: '/web/cong-dich-vu-cong/dich-vu-cong', count: 233},
+          ]
         }
     },
     created () {

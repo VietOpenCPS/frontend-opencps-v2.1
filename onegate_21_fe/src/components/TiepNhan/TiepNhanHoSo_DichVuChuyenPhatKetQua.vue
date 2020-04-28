@@ -174,7 +174,7 @@
         
       </v-card-text>
     </v-card>
-    <div class="absolute__btn" style="width: 350px; margin-top: 4px;"> <!-- style="width: 485px; margin-top: 4px;" -->
+    <div class="absolute__btn" style="width: 350px; margin-top: 4px;"> <!-- style="width: 485/350px; margin-top: 4px;" -->
       <content-placeholders class="mt-1" v-if="loading">
         <content-placeholders-text :lines="1" />
       </content-placeholders>
@@ -185,13 +185,6 @@
         <!-- <v-radio label="Nhận trực tuyến" :value="9"></v-radio> -->
       </v-radio-group>
       <!--  -->
-      <!-- <v-checkbox
-        v-else
-        label="Đăng ký trả kết quả tại nhà"
-        v-model="dichVuChuyenPhatKetQua.viaPostal"
-        :value="2"
-        @change="changeViaPostal($event)"
-      ></v-checkbox> -->
     </div>
   </div>
 </template>
