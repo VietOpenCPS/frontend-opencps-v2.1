@@ -1358,6 +1358,7 @@ export const store = new Vuex.Store({
         if (data['sameUser'] !== null && data['sameUser'] !== undefined && data['sameUser'] !== 'undefined') {
           isSameAsApplicant = data['sameUser']
         }
+        console.log('dataPutdossier_1', data)
         let dataPutdossier = new URLSearchParams()
         dataPutdossier.append('applicantName', data.applicantName ? data.applicantName : '')
         dataPutdossier.append('dossierNo', data.dossierNo ? data.dossierNo : '')
@@ -1390,7 +1391,7 @@ export const store = new Vuex.Store({
           dataPutdossier.append('postalCityCode', data.postalCityCode ? data.postalCityCode : '')
           dataPutdossier.append('postalTelNo', data.postalTelNo ? data.postalTelNo : '')
 
-          if (dataPutdossier.hasOwnProperty('vnpostalStatus')) {
+          if (data.hasOwnProperty('vnpostalStatus')) {
             dataPutdossier.append('vnpostalStatus', data.vnpostalStatus)
           }
         }

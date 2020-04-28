@@ -119,55 +119,71 @@ export default {
       let current = vm.$router.history.current
       let currentQuery = current.query
       if (vm.fileTemplateSelected) {
-        vm.loadingForm = true
-        vm.$store.dispatch('loadFormScript', vm.fileTemplateSelected).then(resFormScript => {
-          vm.loadingForm = false
-          vm.$store.commit('setFormScriptEform', resFormScript)
-          if (resFormScript) {
-            let formScript, formData
-            /* eslint-disable */
-            if (resFormScript) {
-              formScript = eval('(' + resFormScript + ')')
-            } else {
-              formScript = {}
-            }
-            formData = {}
-            /* eslint-disable */
-            formScript.data = formData
-            window.$('#formAlpacaEform').alpaca(formScript)
-            // fixed button
-            // setTimeout(function () {
-            //   let pstEl = $('#formAlpacaEform').offset().top + 100
-            //   let offsetLeft = $('#eform-btn').offset().left
-            //   $(window).scroll(function () {
-            //     if ($(window).scrollTop() > pstEl) {
-            //       $('#eform-btn').css({'position':'fixed', 'top':0, 'left': `${offsetLeft}px`})
-            //     } else {
-            //       $('#eform-btn').css({'position':'relative', 'top':0, 'left': 0})
-            //     }
-            //   })
-            // }, 300)
-          }
-        })
+        vm.loadScriptTemplate(vm.fileTemplateSelected)
       } else {
-        vm.goBack()
+        if (currentQuery.hasOwnProperty('service') && currentQuery.service && currentQuery.hasOwnProperty('template') && currentQuery.template) {
+          vm.loadingForm = true
+          let filter = {
+            index: currentQuery.service
+          }
+          vm.$store.dispatch('getServiceDetail', filter).then(function (result) {
+            vm.$store.commit('setServiceinfoSelected', result)
+            
+            let data = {
+              serviceInfoId: currentQuery.service,
+              fileTemplateNo: currentQuery.template
+            }
+            vm.loadScriptTemplate(data)
+          }).catch(function (reject) {
+            vm.loadingForm = false
+          })
+        } else {
+          vm.goBack()
+        }
+        
       }
     })
   },
   updated () {
-    var vm = this
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
+      if (vm.fileTemplateSelected) {
+        vm.loadScriptTemplate(vm.fileTemplateSelected)
+      } else {
+        if (currentQuery.hasOwnProperty('service') && currentQuery.service && currentQuery.hasOwnProperty('template') && currentQuery.template) {
+          vm.loadingForm = true
+          let filter = {
+            index: currentQuery.service
+          }
+          vm.$store.dispatch('getServiceDetail', filter).then(function (result) {
+            vm.$store.commit('setServiceinfoSelected', result)
+            
+            let data = {
+              serviceInfoId: currentQuery.service,
+              fileTemplateNo: currentQuery.template
+            }
+            vm.loadScriptTemplate(data)
+          }).catch(function (reject) {
+            vm.loadingForm = false
+          })
+        } else {
+          vm.goBack()
+        }
+      }
+    }
+  },
+  methods: {
+    loadScriptTemplate (dataInput) {
+      let vm = this
       vm.loadingForm = true
-      vm.$store.dispatch('loadFormScript', fileTemplateSelected).then(resFormScript => {
+      vm.$store.dispatch('loadFormScript', dataInput).then(resFormScript => {
         vm.loadingForm = false
         vm.$store.commit('setFormScriptEform', resFormScript)
         if (resFormScript) {
-          window.$('#formAlpacaEform').empty()
           let formScript, formData
           /* eslint-disable */
           if (resFormScript) {
@@ -192,10 +208,10 @@ export default {
           //   })
           // }, 300)
         }
+      }).catch(function () {
+        vm.loadingForm = false
       })
-    }
-  },
-  methods: {
+    },
     searchEform () {
       let vm = this
       vm.dialogSecret = true
@@ -319,12 +335,18 @@ export default {
     },
     goBack () {
       let vm = this
-      vm.$router.push({
-        path: '/',
-        query: {
-          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-        }
-      })
+      let current = vm.$router.history.current
+      let currentQuery = current.query
+      if (currentQuery.hasOwnProperty('service') && currentQuery.service && currentQuery.hasOwnProperty('template') && currentQuery.template) {
+        window.history.back()
+      } else {
+        vm.$router.push({
+          path: '/',
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      }
     }
   }
 }
