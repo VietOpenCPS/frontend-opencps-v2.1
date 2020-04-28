@@ -8,6 +8,7 @@ import QuyTrinhThuTuc from '@/components/extform/QuyTrinhThuTuc.vue'
 import ThamSoHeThong from '@/components/extform/ThamSoHeThong.vue'
 import Voting from '@/components/extform/Voting.vue'
 import MappingTTHC from '@/components/extform/MappingTTHC.vue'
+import ThongKeTruyCap from '@/components/extform/ThongKeTruyCap.vue'
 import SyncAgency from '@/components/extform/SyncAgency.vue'
 import SyncSharingqa from '@/components/extform/SyncSharingqa.vue'
 import SyncDomain from '@/components/extform/SyncDomain.vue'
@@ -110,6 +111,15 @@ const routes = [
         path: '/table/opencps_config_report/reports',
         name: 'Report',
         component: Report,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_statists/statists',
+        name: 'ThongKeTruyCap',
+        component: ThongKeTruyCap,
         props: true,
         meta: {
           requiresAuth: true

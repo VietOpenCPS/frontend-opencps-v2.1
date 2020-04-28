@@ -94,6 +94,14 @@
           Thống kê truy cập hệ thống
         </v-btn>
       </div> -->
+      <div>
+        <v-btn class="ml-1 mr-1 my-0 white--text" color="#0b72ba"
+          @click="thongKeTruyCap"
+        >
+          <v-icon>how_to_reg</v-icon>&nbsp;
+          Thống kê truy cập hệ thống
+        </v-btn>
+      </div>
     </v-navigation-drawer>
     <v-toolbar
       :clipped-left="$vuetify.breakpoint.lgAndUp"
@@ -296,7 +304,10 @@
         window.location.href = '/c/portal/logout'
       },
       thongKeTruyCap () {
-        window.location.href = 'https://analytics.google.com'
+        // window.location.href = 'https://analytics.google.com'
+        this.$router.push({
+          name: 'ThongKeTruyCap'
+        })
       }
     }
   }
