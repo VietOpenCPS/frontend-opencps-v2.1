@@ -197,8 +197,7 @@ export const store = new Vuex.Store({
           dataPostApplicant.append('contactTelNo', data.contactTelNo)
           dataPostApplicant.append('password', data.password)
           dataPostApplicant.append('j_captcha_response', data.j_captcha_response)
-          dataPostApplicant.append('indentifyNoFFile', data.indentifyNoFFile)
-          dataPostApplicant.append('indentifyNoBFile', data.indentifyNoBFile)
+          dataPostApplicant.append('indentifyNoFile', data.indentifyNoFile)
           console.log('dataPostApplicant', dataPostApplicant)
           // test local
           // axios.post('http://127.0.0.1:8081/api/applicants', dataPostApplicant, configs).then(function (response) {

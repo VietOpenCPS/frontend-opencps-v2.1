@@ -134,40 +134,31 @@
                 ></v-text-field>
               </v-flex>
               <v-flex xs12  v-if="xacthuc_credit">
-                <div>{{applicantType === '1' ? 'Ảnh CMND mặt trước ' : (applicantType === '2' ? 'Ảnh giấy phép đăng ký mặt trước ' : 'Ảnh giấy phép đăng ký mặt trước ')}} <span style="color:red">(*)</span></div>
-                <v-text-field 
-                  @click='onPickFileCMNDFront'
-                  v-model='fileCMNDFrontName'
-                  prepend-icon="attach_file"
-                  v-if="xacthuc_credit"
-                  :rules="[rules.required]"
-                  box
-                ></v-text-field>
-                <!-- Hidden -->
-                <input
-                  type="file"
-                  style="display: none"
-                  ref="refFileCMNDFront"
-                  accept="image/*"
-                  @change="onFileCMNDFrontPicked">
-              </v-flex>
-              <v-flex xs12  v-if="xacthuc_credit">
-                <div>{{applicantType === '1' ? 'Ảnh CMND mặt sau ' : (applicantType === '2' ? 'Ảnh giấy phép đăng ký mặt sau ' : 'Ảnh giấy phép đăng ký mặt sau ')}}<span style="color:red">(*)</span></div>
-                <v-text-field 
-                  @click='onPickFileCMNDBack'
-                  v-model='fileCMNDBackName'
-                  prepend-icon="attach_file"
-                  v-if="xacthuc_credit"
-                  :rules="[rules.required]"
-                  box
-                ></v-text-field>
-                <!-- Hidden -->
-                <input
-                  type="file"
-                  style="display: none"
-                  ref="refFileCMNDBack"
-                  accept="image/*"
-                  @change="onFileCMNDBackPicked">
+                <div>{{applicantType === '1' ? 'Ảnh CMND ' : (applicantType === '2' ? 'Ảnh giấy phép đăng ký ' : 'Ảnh giấy phép đăng ký  ')}} <span style="color:red">(*)</span></div>
+                <div style="display:flex; flex-wrap: wrap;">
+                  <v-text-field 
+                    @click='onPickFileCMND'
+                    v-model='fileCMNDName'
+                    v-if="xacthuc_credit"
+                    :rules="[rules.required]"
+                    placeholder="Tải lên ảnh .png, .jpg, .jqeg"
+                    box
+                  ></v-text-field>
+                  <v-btn
+                    color="primary"
+                    @click="onPickFileCMND"
+                  >
+                    Upload
+                    <v-icon right dark>cloud_upload</v-icon>
+                  </v-btn>
+                  <!-- Hidden -->
+                  <input
+                    type="file"
+                    style="display: none"
+                    ref="refFileCMND"
+                    accept="image/*"
+                    @change="onFileCMNDPicked">
+                </div>
               </v-flex>
               <v-flex xs12>
                 <captcha ref="captcha"></captcha>
@@ -314,10 +305,8 @@ export default {
     validBussinessInfos: true,
     messageCheckApplicant: '',
     ruleContent: '',
-    fileCMNDFrontName: '',
-    fileCMNDBackName: '',
-    fileCMNDFront: '',
-    fileCMNDBack: '',
+    fileCMNDName: '',
+    fileCMND: '',
     e1: true,
     e2: true,
     rules: {
@@ -460,8 +449,7 @@ export default {
         contactEmail: vm.contactEmail,
         password: vm.passWord,
         j_captcha_response: vm.$refs.captcha.j_captcha_response,
-        indentifyNoFFile: vm.fileCMNDFront,
-        indentifyNoBFile: vm.fileCMNDBack
+        indentifyNoFile: vm.fileCMND,
       }
       console.log('dataForm', dataForm)
       if (vm.$refs.form.validate() && vm.agreeRules) {
@@ -600,13 +588,10 @@ export default {
     inputDisable () {
       return
     },
-    onPickFileCMNDFront () {
-      this.$refs.refFileCMNDFront.click()
+    onPickFileCMND () {
+      this.$refs.refFileCMND.click()
     },
-    onPickFileCMNDBack () {
-      this.$refs.refFileCMNDBack.click()
-    },
-    onFileCMNDFrontPicked (event) {
+    onFileCMNDPicked (event) {
       let vm = this
       const files = event.target.files
       if(files.length){
@@ -615,22 +600,8 @@ export default {
         if(size > 10){
           alert("Tệp tải lên kích thước tối đa 10MB"); 
         } else {
-          vm.fileCMNDFront = file
-          vm.fileCMNDFrontName = files[0].name
-        }
-      }
-    },
-    onFileCMNDBackPicked (event) {
-      let vm = this
-      const files = event.target.files
-      if(files.length){
-        const file = files[0]
-        const size = (file.size / 1024 / 1024).toFixed(2)
-        if(size > 10){
-          alert("Tệp tải lên kích thước tối đa 10MB"); 
-        } else{
-          vm.fileCMNDBack = file
-          vm.fileCMNDBackName = files[0].name
+          vm.fileCMND = file
+          vm.fileCMNDName = files[0].name
         }
       }
     }

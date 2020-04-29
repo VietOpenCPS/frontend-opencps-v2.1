@@ -137,6 +137,7 @@
           <v-icon>how_to_reg</v-icon>&nbsp;
           Thống kê truy cập hệ thống
         </v-btn>
+
       </div>
     </v-navigation-drawer>
     <v-toolbar
@@ -340,7 +341,10 @@
         window.location.href = '/c/portal/logout'
       },
       thongKeTruyCap () {
-        window.location.href = 'https://analytics.google.com'
+        // window.location.href = 'https://analytics.google.com'
+        this.$router.push({
+          name: 'ThongKeTruyCap'
+        })
       }
     }
   }
