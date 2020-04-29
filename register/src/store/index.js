@@ -262,7 +262,7 @@ export const store = new Vuex.Store({
           dataPostApplicant.append('j_captcha_response', data.j_captcha_response)
           console.log('dataPostApplicant', dataPostApplicant)
           // test local
-          // axios.post('http://127.0.0.1:8081/api/applicants', dataPostApplicant, configs).then(function (response) {
+          // axios.post('/o/rest/v2/applicants/lgsp/withcaptcha', dataPostApplicant, configs).then(function (response) {
           axios.post('/o/rest/v2/applicants/withcaptcha', dataPostApplicant, configs).then(function (response) {
             if (response['status'] !== undefined && response['status'] === 203) {
               toastr.clear()
@@ -334,8 +334,8 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          // test local
-          // axios.get('http://127.0.0.1:8081/api/applicants/' + data.userId + '/activate/' + data.pinCode, param).then(function (response) {
+
+          // axios.get('/o/rest/v2/applicants/' + data.userId + '/lgsp/activate/' + data.pinCode, param).then(function (response) {
           axios.get('/o/rest/v2/applicants/' + data.userId + '/activate/' + data.pinCode, param).then(function (response) {
             resolve(response.data)
             toastr.success('Xác thực thành công')
