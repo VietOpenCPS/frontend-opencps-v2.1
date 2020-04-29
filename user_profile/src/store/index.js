@@ -226,8 +226,7 @@ export const store = new Vuex.Store({
         }
         var dataPutUser = new FormData()
         var url = '/o/rest/v2/applicants/updateindentifies'
-        dataPutUser.append('indentifyNoFFile', filter.indentifyNoFFile)
-        dataPutUser.append('indentifyNoBFile', filter.indentifyNoBFile)
+        dataPutUser.append('indentifyNoFile', filter.indentifyNoFile)
         dataPutUser.append('applicantId', filter.applicantId)
         axios.post(url, dataPutUser, param).then(result1 => {
           resolve(result1.data)

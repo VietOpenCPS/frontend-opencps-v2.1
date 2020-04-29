@@ -167,45 +167,7 @@
                   </template>
                 </v-text-field>
               </v-flex>
-              <v-flex xs12 sm4 v-if="xacthuc_credit">
-                <div>{{ user['applicantType'] === 'citizen' ? 'Ảnh CMND mặt trước' : 'Ảnh Giấy phép đăng ký kinh doanh mặt trước'}} </div>
-                <AttachImage :dataImage="user['applicantProfile']['indentifyNoFFileUrl']"
-                  @changeImage="changeImageFront"  
-                ></AttachImage>
-                <!-- <v-text-field 
-                  @click='onPickFileCMNDFront'
-                  v-model='fileCMNDFrontName'
-                  v-if="xacthuc_credit"
-                  box
-                  prepend-icon="attach_file"
-                ></v-text-field>
-             
-                <input
-                  type="file"
-                  style="display: none"
-                  ref="refFileCMNDFront"
-                  accept="*/*"
-                  @change="onFileCMNDFrontPicked"> -->
-              </v-flex>
-              <v-flex xs12 sm4 v-if="xacthuc_credit">
-                <div>{{ user['applicantType'] === 'citizen' ? 'Ảnh CMND mặt sau' : 'Ảnh Giấy phép đăng ký kinh doanh mặt sau'}} </div>
-                <AttachImage :dataImage="user['applicantProfile']['indentifyNoBFileUrl']"
-                  @changeImage="changeImageBack"  
-                ></AttachImage>
-                <!-- <v-text-field 
-                  @click='onPickFileCMNDBack'
-                  v-model='fileCMNDBackName'
-                  prepend-icon="attach_file"
-                  v-if="xacthuc_credit"
-                  box
-                ></v-text-field>
-                <input
-                  type="file"
-                  style="display: none"
-                  ref="refFileCMNDBack"
-                  accept="*/*"
-                  @change="onFileCMNDBackPicked"> -->
-              </v-flex>
+
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('LoaiThe') >= 0">
                 <v-text-field label="Loại thẻ" v-model="user['applicantProfile']['LoaiThe']" box></v-text-field>
               </v-flex>
@@ -304,6 +266,13 @@
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('NoiOHienTaiAddress') >= 0">
                 <v-autocomplete label="Xã/phường" :items="NoiOHienTaiwardItems" v-model="user['applicantProfile']['NoiOHienTaiWardCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box></v-autocomplete>
+              </v-flex>
+              <!--  -->
+              <v-flex xs12 sm4 v-if="xacthuc_credit">
+                <div>{{ user['applicantType'] === 'citizen' ? 'Ảnh CMND' : 'Ảnh Giấy phép đăng ký kinh doanh'}} </div>
+                <AttachImage :dataImage="user['applicantProfile']['indentifyNoFileUrl']"
+                  @changeImage="changeImage"  
+                ></AttachImage>
               </v-flex>
               <!--  -->
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('TonGiao') >= 0">
@@ -714,11 +683,8 @@
     data: () => ({
       xacthuc_credit: false,
       indentifyNoFFileUrl: '',
-      indentifyNoBFileUrl: '',
-      fileCMNDFrontName: '',
-      fileCMNDBackName: '',
-      fileCMNDFront: '',
-      fileCMNDBack: '',
+      indentifyNoFileUrl: '',
+      fileCMND: '',
       mapping: false,
       dataMapping: '',
       hasSSo: false,
@@ -1054,8 +1020,7 @@
             })
           }
           let  applicantTypeTemp = vm.user['applicantProfile']
-          vm.indentifyNoBFileUrl = applicantTypeTemp.indentifyNoBFileUrl
-          vm.indentifyNoFFileUrl = applicantTypeTemp.indentifyNoFFileUrl
+          vm.indentifyNoFileUrl = applicantTypeTemp.indentifyNoFileUrl
           // profileConfig cấu hình fragment
           try {
             if (vm.user['applicantType'] === 'citizen') {
@@ -1191,21 +1156,19 @@
         if (vm.$refs.form.validate()) {
           vm.loading = true
           console.log('user put data', vm.user)
-          if(vm.xacthuc_credit && !vm.fileCMNDFront && !vm.fileCMNDBack) {
-            toastr.error('File ảnh chưa được chọn')
-            vm.loading = false
-            return
-          }
+          // if(vm.xacthuc_credit && !vm.fileCMND) {
+          //   toastr.error('File ảnh chưa được chọn')
+          //   vm.loading = false
+          //   return
+          // }
           let filter = {
-            indentifyNoFFile: vm.fileCMNDFront,
-            indentifyNoBFile: vm.fileCMNDBack,
+            indentifyNoFile: vm.fileCMND,
             applicantId: vm.user['classPK']
           }
           if(vm.xacthuc_credit) {
             vm.$store.dispatch('updateindentifies', filter).then(function (data) {
               let applicantProfile =  JSON.parse(data['applicantProfile'])
-              vm.user['applicantProfile']['indentifyNoFFileUrl'] = applicantProfile.indentifyNoFFileUrl
-              vm.user['applicantProfile']['indentifyNoBFileUrl'] = applicantProfile.indentifyNoBFileUrl
+              vm.user['applicantProfile']['indentifyNoFileUrl'] = applicantProfile.indentifyNoFileUrl
               vm.$store.dispatch('putUser', vm.user).then(function () {
                 vm.loading = false
                 toastr.clear()
@@ -1510,40 +1473,10 @@
           path: current.path + queryString
         })
       },
-      onPickFileCMNDFront () {
-        this.$refs.refFileCMNDFront.click()
-      },
-      onPickFileCMNDBack () {
-        this.$refs.refFileCMNDBack.click()
-      },
-      onFileCMNDFrontPicked (event) {
+      changeImage(config) {
         let vm = this
-        const files = event.target.files
-        if(files.length){
-          const file = files[0]
-          console.log(files)
-          console.log(files[0])
-          vm.fileCMNDFront = file
-          vm.fileCMNDFrontName = files[0].name
-        }
+        vm.fileCMND = config.file
       },
-      onFileCMNDBackPicked (event) {
-        let vm = this
-        const files = event.target.files
-        if(files.length){
-          const file = files[0]
-          vm.fileCMNDBack = file
-          vm.fileCMNDBackName = files[0].name
-        }
-      },
-      changeImageFront(config) {
-        let vm = this
-        vm.fileCMNDFront = config.file
-      },
-      changeImageBack(config) {
-        let vm = this
-        vm.fileCMNDBack = config.file
-      }
     }
   }
 </script>
