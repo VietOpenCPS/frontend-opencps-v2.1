@@ -15,7 +15,7 @@
     "handlebars": "^4.0.11",
     "http-vue-loader": "^1.3.5",
     "idempotent-babel-polyfill": "^7.0.0",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "macaddress": "^0.2.9",
     "mermaid": "^8.0.0-rc.8",
     "mobile-device-detect": "^0.2.3",
