@@ -884,7 +884,7 @@ export default {
                 result['postalAddress'] = postalAddress
                 result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
 
-                result['vnpostalStatus'] = result.vnpostalStatus
+                vnpostalProfile['vnpostalStatus'] = result.vnpostalStatus
                 vnpostalProfile['postalAddress'] = result.address
                 vnpostalProfile['postalCityCode'] = result.cityCode
                 vnpostalProfile['postalCityName'] = result.cityName
