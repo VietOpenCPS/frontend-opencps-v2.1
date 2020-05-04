@@ -664,13 +664,13 @@ export default {
         let test = val.toLowerCase()
         if(vm.timKiemTheoSelected === 'DonVi') {
           vm.listMappingView = vm.listMapping.filter(e => {
-            if(e.serviceNameDVCQG.toLowerCase().search(test) >= 0 || e.serviceNameDVCQG.search(test) >= 0){
+            if(e.serviceNameDVCQG.toLowerCase().search(test) >= 0 || e.serviceNameDVCQG.search(test) >= 0 || e.serviceNameDVCQG === val){
               return e
             }
           }).slice(0, 10)
         } else {
           vm.listMappingView = vm.listMapping.filter(e => {
-            if(e.serviceName.toLowerCase().search(test) >= 0 ||  e.serviceName.search(test) >= 0){
+            if(e.serviceName.toLowerCase().search(test) >= 0 ||  e.serviceName.search(test) >= 0  || e.serviceName === val){
               return e
             }
           }).slice(0, 10)
@@ -689,13 +689,13 @@ export default {
         let test = val.toLowerCase()
         if(vm.timKiemTheoSelected === 'DonVi') {
           vm.serviceInfoListDonViView = vm.serviceInfoListDonVi.filter(e => {
-            if(e.serviceName.toLowerCase().search(test) >= 0 || e.serviceName.search(test) >= 0){
+            if(e.serviceName.toLowerCase().search(test) >= 0 || e.serviceName.search(test) >= 0 || e.serviceName === val){
               return e
             }
           }).slice(0, vm.pageSize)
         } else {
           vm.serviceInfoListDVCQGView = vm.serviceInfoListDVCQG.filter(e =>{
-            if( e.serviceNameDVCQG.toLowerCase().search(test) >= 0 || e.serviceNameDVCQG.search(test) >= 0){
+            if( e.serviceNameDVCQG.toLowerCase().search(test) >= 0 || e.serviceNameDVCQG.search(test) >= 0 || e.serviceNameDVCQG === val){
               return e
             }
           }).slice(0, vm.pageSize)
