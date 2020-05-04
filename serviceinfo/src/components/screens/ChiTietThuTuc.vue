@@ -705,6 +705,35 @@
       </v-card>
     </v-dialog>
     <!--  -->
+    <v-dialog v-model="dialogLoginDvcqg" max-width="450">
+      <v-card class="px-0">
+        <v-card-text class="px-0 py-0">
+          <v-flex v-if="!isSigned" xs12>
+            <nav class="toolbar theme--dark primary py-2" data-booted="true">
+              <div class="toolbar__content"  style="justify-content: center">
+                <div class="white--text text-bold" style="font-size: 1.25em;">ĐĂNG NHẬP HỆ THỐNG</div>
+              </div>
+            </nav>
+            <v-flex xs12 class="px-2 pb-2 pt-3" style="border: 1px solid #dddddd;">
+              <v-flex xs12 class="text-xs-left text-xs-center">
+                <v-btn class="ml-0 mr-1 my-0 white--text" color="primary"
+                  @click="checkOnlyLoginDvcqg"
+                >
+                  <v-icon>how_to_reg</v-icon>&nbsp;
+                  Đồng ý
+                </v-btn>
+
+                <v-btn @click="dialogLoginDvcqg = false" color="primary">
+                  <v-icon>reply</v-icon>&nbsp;
+                  Thoát
+                </v-btn>
+              </v-flex>
+            </v-flex>
+          </v-flex>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <!--  -->
     <v-dialog class="my-0" v-model="dialog_loginDVCQG" max-width="1200px" style="width:100%;max-height: 100%;">
       <v-card>
         <v-card-text class="px-0 py-0">
@@ -818,6 +847,7 @@ export default {
     dialogGuide: false,
     dialogVerifycation: false,
     dialog_loginDVCQG: false,
+    dialogLoginDvcqg: false,
     dialogLogin: false,
     tempDVCQG: '',
     userName: '',
@@ -835,7 +865,8 @@ export default {
     dataMapping: '',
     captcha: false,
     j_captcha_response: '',
-    chapchablob: ''
+    chapchablob: '',
+    onlyLoginDvcqg: false
   }),
   computed: {
     isMobile () {
@@ -864,6 +895,11 @@ export default {
     } catch (error) {
     }
     // 
+    try {
+      vm.onlyLoginDvcqg = hasOnlyLoginDvcqg
+    } catch (error) {
+    }
+    // 
     if ( typeof(Storage) !== 'undefined') {
       let count = sessionStorage.getItem('isbot')
       if (window.themeDisplay.isSignedIn() || !count) {
@@ -882,15 +918,12 @@ export default {
         // window.callback_dvcqg = vm.callback_dvcqg
         vm.checkVNConect()
       }
-      // Auto mapping
-      // let sync = false
-      // if ( typeof(Storage) !== 'undefined') {
-      //   sync = sessionStorage.getItem('sync')
-      // }
-      // if (window.themeDisplay.isSignedIn() && sync) {
-      //   window.callback_dvcqg = vm.callback_dvcqg
-      //   vm.checkVNConectAutoMapping()  
-      // }
+      // Auto redirect create dossier
+      if (query.hasOwnProperty('serviceCreate') && query.serviceCreate && window.themeDisplay.isSignedIn()) {
+        let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+        let url = redirectURL + '/dich-vu-cong#/add-dvc/' + query.serviceCreate
+        window.open(url, '_self')
+      }
       // 
       let searchParams = window.location.href.split("?")
       if (searchParams[1]) {
@@ -947,9 +980,12 @@ export default {
               window.open(url, '_self')
             }
           } else {
-            // alert('Vui lòng đăng nhập để nộp hồ sơ trực tuyến')
-            vm.doCreateDossier = true
-            vm.dialogLogin = true
+            if (!vm.onlyLoginDvcqg) {
+              vm.doCreateDossier = true
+              vm.dialogLogin = true
+            } else {
+              vm.dialogLoginDvcqg = true
+            }
           }
         } else {
           let filterSearch = {
@@ -1185,6 +1221,34 @@ export default {
       }).catch(function (reject) {
         vm.chapchablob = ''
       })
+    },
+    checkOnlyLoginDvcqg () {
+      let vm = this
+      let current = vm.$router.history.current
+      let query = vm.$router.history.current.query
+      let codeDvcqg = ''
+      if (query.hasOwnProperty('code') && query.code) {
+        codeDvcqg = query.code
+      }
+      if (query.hasOwnProperty('MaTTHCDP') && query.MaTTHCDP) {
+        codeDvcqg = query.MaTTHCDP
+      }
+      let filter = {
+        state: '',
+        redirectURL: codeDvcqg ? window.location.href.split("?")[0] + '?code=' +  codeDvcqg + '&serviceCreate=' + vm.serviceSelected.serviceConfigId : window.location.href.split("?")[0] + '?serviceCreate=' + vm.serviceSelected.serviceConfigId
+      }
+      setTimeout (function () {
+        if (!vm.isSigned) {
+          vm.$store.dispatch('getVNConect', filter).then(function (result) {
+            if (result) {
+              window.location.href = result
+            } else {
+              alert('Chức năng đang cập nhật')
+            }
+          }).catch(function () {
+          })
+        }
+      }, 300)
     },
     doMappingDvcqg () {
       let vm = this

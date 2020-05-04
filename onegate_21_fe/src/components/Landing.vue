@@ -1115,6 +1115,7 @@ export default {
                 }
               }
             }
+            console.log('btnDynamics_menu 1', vm.btnDynamics)
             vm.$store.commit('setLoadingDynamicBtn', false)
           }).catch(function (){})
         }, 200)
@@ -1175,7 +1176,6 @@ export default {
               break
             }
           }
-          // console.log('btnDynamics', vm.btnDynamics)
         }
         if (currentQuery.hasOwnProperty('page')) {
           vm.hosoDatasPage = parseInt(currentQuery.page)

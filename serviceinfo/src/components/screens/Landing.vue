@@ -515,14 +515,31 @@
       </v-card>
     </v-dialog>
     <!--  -->
-    <v-dialog class="my-0" v-model="dialog_loginDVCQG" max-width="1200px" style="width:100%;max-height: 100%;">
-      <v-card>
+    <v-dialog v-model="dialogLoginDvcqg" max-width="450">
+      <v-card class="px-0">
         <v-card-text class="px-0 py-0">
-          <iframe id="iframeLoginDVCQG" :src="tempDVCQG" style="
-            width: 100%;
-            height: 650px;
-            border: none;
-          "></iframe>
+          <v-flex v-if="!isSigned" xs12>
+            <nav class="toolbar theme--dark primary py-2" data-booted="true">
+              <div class="toolbar__content"  style="justify-content: center">
+                <div class="white--text text-bold" style="font-size: 1.25em;">ĐĂNG NHẬP HỆ THỐNG</div>
+              </div>
+            </nav>
+            <v-flex xs12 class="px-2 pb-2 pt-3" style="border: 1px solid #dddddd;">
+              <v-flex xs12 class="text-xs-left text-xs-center">
+                <v-btn class="ml-0 mr-1 my-0 white--text" color="primary"
+                  @click="checkOnlyLoginDvcqg"
+                >
+                  <v-icon>how_to_reg</v-icon>&nbsp;
+                  Đồng ý
+                </v-btn>
+
+                <v-btn @click="dialogLoginDvcqg = false" color="primary">
+                  <v-icon>reply</v-icon>&nbsp;
+                  Thoát
+                </v-btn>
+              </v-flex>
+            </v-flex>
+          </v-flex>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -627,6 +644,7 @@ export default {
     dialog_createDossier: false,
     dialogVerifycation: false,
     dialogLogin: false,
+    dialogLoginDvcqg: false,
     dialog_loginDVCQG: false,
     tempDVCQG: '',
     valid: false,
@@ -694,7 +712,8 @@ export default {
     validFormSelectGov: false,
     govAgencyListTiepNhan: [],
     govAgencyTiepNhanSelected: '',
-    selectGuide: false
+    selectGuide: false,
+    onlyLoginDvcqg: false
   }),
   computed: {
     govAgencyList () {
@@ -743,6 +762,11 @@ export default {
     // 
     try {
       vm.keyCodeDvcqg = keyCodeDvcqg
+    } catch (error) {
+    }
+    // 
+    try {
+      vm.onlyLoginDvcqg = hasOnlyLoginDvcqg
     } catch (error) {
     }
     // 
@@ -1150,6 +1174,28 @@ export default {
         }
       }, 300)
     },
+    checkOnlyLoginDvcqg () {
+      let vm = this
+      let current = vm.$router.history.current
+      let query = vm.$router.history.current.query
+      let codeDvcqg = vm.serviceInfoSelected.hasOwnProperty('serviceCodeDVCQG') && vm.serviceInfoSelected.serviceCodeDVCQG ? vm.serviceInfoSelected.serviceCodeDVCQG : ''
+      let filter = {
+        state: '',
+        redirectURL: codeDvcqg ? window.location.href.split("?")[0] + '/' + vm.serviceInfoSelected.serviceInfoId + '?code=' +  codeDvcqg + '&serviceCreate=' + vm.serviceSelected.serviceConfigId : window.location.href.split("?")[0] + '/' + vm.serviceInfoSelected.serviceInfoId + '?serviceCreate=' + vm.serviceSelected.serviceConfigId
+      }
+      setTimeout (function () {
+        if (!vm.isSigned) {
+          vm.$store.dispatch('getVNConect', filter).then(function (result) {
+            if (result) {
+              window.location.href = result
+            } else {
+              alert('Chức năng đang cập nhật')
+            }
+          }).catch(function () {
+          })
+        }
+      }, 300)
+    },
     doMappingDvcqg () {
       let vm = this
       let filter = {
@@ -1284,9 +1330,14 @@ export default {
               window.open(url, '_self') 
             }
           } else {
-            vm.doCreateDossier = true
-            vm.dialogLogin = true
-            // alert('Vui lòng đăng nhập để nộp hồ sơ trực tuyến')
+            if (!vm.onlyLoginDvcqg) {
+              vm.doCreateDossier = true
+              vm.dialogLogin = true
+            } else {
+              vm.serviceInfoSelected = serviceInfoItem
+              vm.dialogLoginDvcqg = true
+            }
+            
           }
         } else {
           vm.serviceInfoSelected = serviceInfoItem
