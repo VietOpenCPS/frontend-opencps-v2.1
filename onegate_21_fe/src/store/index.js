@@ -3196,6 +3196,32 @@ export const store = new Vuex.Store({
         }).catch(function (){})     
       })     
     },
+    getAgencysFromParent ({commit,state}, data) {
+      return new Promise((resolve, reject)=>{
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+            }
+          }
+          if (data.parent) {
+            param.params = {
+              parent: data.parent
+            }
+          }
+          console.log('data', data)
+          axios.get('/o/rest/v2/dictcollections/REPORT_GROUP/dictitems', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable.data)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        }).catch(function (){})     
+      })     
+    },
     getDomains ({commit,state}, data) {
       return new Promise((resolve, reject)=>{
         store.dispatch('loadInitResource').then(function (result) {
