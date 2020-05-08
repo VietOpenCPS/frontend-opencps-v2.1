@@ -1346,42 +1346,7 @@ export default {
         vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
           vm.loadingAction = false
           vm.$store.commit('setActivePrintBienNhan', result.dossierId)
-          vm.goBack()
-          // let paymentsOut = ''
-          // if (dataFormTemplate['payment']) {
-          //   try {
-          //     paymentsOut = JSON.parse(dataFormTemplate['payment'])
-          //   } catch (error) {
-          //   }
-          // }
-          // let payloadDate = ''
-          // if (dataFormTemplate['dueDate']) {
-          //   payloadDate = {
-          //     dueDate: vm.parseDateToTimestamp(dataFormTemplate['dueDate']),
-          //     receiveDate: (new Date()).getTime()
-          //   }
-          // }
-          // let dataPostAction = {
-          //   dossierId: result.dossierId,
-          //   actionCode: 1100,
-          //   actionNote: '',
-          //   actionUser: window.themeDisplay.getUserName(),
-          //   payload: payloadDate,
-          //   security: '',
-          //   assignUsers: '',
-          //   payment: paymentsOut,
-          //   createDossiers: ''
-          // }
-          // vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-          //   vm.loadingAction = false
-          //   if (!type) {
-          //     vm.goBack()
-          //   } else {
-          //   }
-          // }).catch(reject => {
-          //   vm.loadingAction = false
-          // })
-          
+          vm.goBack()         
         }).catch(reject => {
           vm.loadingAction = false
         })

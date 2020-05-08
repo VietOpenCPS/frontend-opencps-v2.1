@@ -16,7 +16,7 @@
               box
               placeholder="Mã bảo mật"
               v-model="confirmCode"
-              :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+              :rules="[v => !!v || 'Mã bảo mật là bắt buộc']"
               required
             ></v-text-field>
           </v-flex>
@@ -32,6 +32,13 @@
               <v-icon>how_to_reg</v-icon>&nbsp;
               Đồng ý
             </v-btn>
+            <v-btn color="primary"
+              @click="goBack"
+            >
+              <v-icon>reply</v-icon>&nbsp;
+              Quay lại
+            </v-btn>
+            
           </div>
         </v-form>
       </v-flex>
@@ -96,6 +103,9 @@ export default {
           vm.$refs.captcha.makeImageCap()
         })
       }
+    },
+    goBack () {
+      window.history.back()
     }
   }
 }

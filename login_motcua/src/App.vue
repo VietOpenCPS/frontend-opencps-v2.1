@@ -22,8 +22,12 @@
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
-        console.log('current', current)
-        console.log('newQuery', newQuery)
+        try {
+          if (pathNameConfig) {
+            vm.$store.commit('setPathNameConfig', pathNameConfig)
+          }
+        } catch (error) {
+        }
       })
     },
     watch: {

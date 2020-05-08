@@ -141,16 +141,18 @@
                     v-model='fileCMNDName'
                     v-if="xacthuc_credit"
                     :rules="[rules.required]"
-                    placeholder="Tải lên ảnh .png, .jpg, .jqeg"
+                    placeholder="Tải lên ảnh .png, .jpg, .jpeg"
                     box
+                    append-icon="cloud_upload"
+                    :append-icon-cb="onPickFileCMND"
                   ></v-text-field>
-                  <v-btn
+                  <!-- <v-btn
                     color="primary"
                     @click="onPickFileCMND"
                   >
-                    Upload
+                    Tải lên
                     <v-icon right dark>cloud_upload</v-icon>
-                  </v-btn>
+                  </v-btn> -->
                   <!-- Hidden -->
                   <input
                     type="file"
@@ -251,6 +253,17 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogPending" max-width="350">
+      <v-card>
+        <v-card-text class="text-xs-center" style="background-color: #00204a;position: relative;color:white">
+          <span>ĐĂNG KÝ TÀI KHOẢN THÀNH CÔNG</span><br>
+          <span>VUI LÒNG CHỜ QUẢN TRỊ VIÊN XÁC NHẬN</span>
+          <v-btn icon dark @click.native="dialogPending = false" style="position: absolute;right:0;top:0">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -274,6 +287,7 @@ export default {
   },
   data: () => ({
     date: null,
+    dialogPending: false,
     dialogRules: false,
     dialog_applicantInfos: false,
     xacthuc_credit: false,
@@ -467,12 +481,10 @@ export default {
             vm.$store.dispatch('postApplicantBXD', filter).then(function (result) {
               vm.loading = false
               vm.$refs.captcha.makeImageCap()
-              // vm.$router.push({
-              //   path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
-              // })
-              vm.$router.push({
-                path: '/cho-xac-nhan'
-              })
+              vm.$refs.form.reset()
+              vm.$refs.form.resetValidation()
+              vm.applicantType = '1'
+              vm.dialogPending = true
             }).catch(function (reject) {
               vm.$refs.captcha.makeImageCap()
               vm.loading = false

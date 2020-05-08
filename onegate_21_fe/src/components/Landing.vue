@@ -1350,14 +1350,14 @@ export default {
       vm.$store.dispatch('loadListThuTucHanhChinh').then(function (result) {
         if (!currentQuery.hasOwnProperty('domain') || (currentQuery.hasOwnProperty('domain') && String(currentQuery.domain) === '')) {
           vm.listThuTucHanhChinh = result.map(thuTuc => {
-            // thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
-            thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+            thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+            // thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
             return thuTuc
           })
         }
         vm.listThuTuc = result.map(thuTuc => {
-          // thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
-          thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+          thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+          // thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
           return thuTuc
         })
         if (currentQuery.hasOwnProperty('service_config') && String(currentQuery.service_config) !== '0') {
@@ -1417,8 +1417,8 @@ export default {
           }
           vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
             vm.listThuTucHanhChinh = result.map(thuTuc => {
-              // thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
-              thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+              thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+              // thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
               return thuTuc
             })
           }).catch(function (){})
@@ -1721,8 +1721,8 @@ export default {
           }
           vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
             vm.listThuTucHanhChinh = result.map(thuTuc => {
-              // thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
-              thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+              thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+              // thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
               return thuTuc
             })
           }).catch(function (){})

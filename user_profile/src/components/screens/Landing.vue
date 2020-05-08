@@ -492,11 +492,11 @@
                 </v-flex>
               </v-layout>
               <!-- Đổi mật khẩu -->
-              <v-layout row wrap v-if="activeChangePass">
+              <!-- <v-layout row wrap v-if="activeChangePass">
                 <v-flex xs12 class="mx-3">
                   <v-btn block color="blue darken-3" dark v-on:click.native="showChangePass">{{stateLabel}}</v-btn>
                 </v-flex>
-              </v-layout>
+              </v-layout> -->
             </v-card-text>
             <!-- Profile Apllicant -->
             <v-card-text class="py-3" v-else-if="user['className'] === 'org.opencps.usermgt.model.Applicant' || user['className'] === 'com.liferay.portal.kernel.model.User'">

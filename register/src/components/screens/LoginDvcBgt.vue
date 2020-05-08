@@ -127,7 +127,7 @@
         </v-flex>
       </v-flex>
     </v-layout>
-    <v-dialog v-model="dialogContact" persistent max-width="290">
+    <v-dialog v-model="dialogContact" persistent max-width="310">
       <v-card>
         <v-card-title class="headline">
           <span>Cập nhật email sử dụng trên hệ thống</span>

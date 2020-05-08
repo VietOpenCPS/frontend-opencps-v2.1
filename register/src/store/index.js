@@ -20,6 +20,7 @@ export const store = new Vuex.Store({
     domainList: [],
     levelList: [],
     isMobile: false,
+    pathNameConfig: '/register'
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -129,7 +130,7 @@ export const store = new Vuex.Store({
               'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
             }
           }
-          var dataPostApplicant = new URLSearchParams()
+          let dataPostApplicant = new URLSearchParams()
           if (filter.j_captcha_response) {
             dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
           }
@@ -139,9 +140,11 @@ export const store = new Vuex.Store({
             commit('setLoading', false)
             if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha' && response.data !== "lockout") {
               if (response.data === 'pending') {
-                window.location.href = window.themeDisplay.getURLHome() +
-                "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
-                  "&redirectURL=" + window.themeDisplay.getURLHome()
+                let url = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
+                let userId = response.headers.hasOwnProperty('userid') ? response.headers.userid : ''
+                window.location.href = url + state.pathNameConfig + 
+                "#/xac-thuc-tai-khoan?active_user_id=" + userId +
+                  "&redirectURL=" + url
               } else {
                 window.location.href = response.data
               }
@@ -152,7 +155,7 @@ export const store = new Vuex.Store({
                 window.location.href = urlDvc + '/dich-vu-cong'
               },200)
             } else if (response.data === 'captcha') {
-              if (response['status'] !== undefined && response['status'] === 203) {
+              if (filter.j_captcha_response && response['status'] !== undefined && response['status'] === 203) {
                 toastr.error("Mã captcha không chính xác")
               }
               resolve('captcha')
@@ -220,7 +223,7 @@ export const store = new Vuex.Store({
               if (dataError && dataError.description && dataError.description === 'DuplicateContactEmailException') {
                 toastr.error('Đăng ký thất bại. Email sử dụng đã tồn tại trên hệ thống. Sử dụng Email khác để đăng ký')
               } else if (dataError && dataError.description && dataError.description === 'DuplicateApplicantIdException') {
-                toastr.error('Đăng ký thất bại. Số CMDN/Mã số thuế đã tồn tại trên hệ thống. Sử dụng số CMDN/mã số thuế khác để đăng ký')
+                toastr.error('Đăng ký thất bại. Số CMND/Mã số thuế đã tồn tại trên hệ thống. Sử dụng số CMND/mã số thuế khác để đăng ký')
               } else if (dataError && dataError.description && dataError.description === 'DuplicateContactTelNoException') {
                 toastr.error('Đăng ký thất bại. Số điện thoại đã được sử dụng trên hệ thống. Sử dụng số điện thoại khác để đăng ký')
               } else if (dataError && dataError.description && dataError.description === 'Invalid ID, could not validate unexisting or already validated captcha') {
@@ -488,6 +491,9 @@ export const store = new Vuex.Store({
     setIsMobile (state, payload) {
       state.isMobile = payload
     },
+    setPathNameConfig (state, payload) {
+      state.pathNameConfig = payload
+    }
   },
   getters: {
     loading (state) {
@@ -507,6 +513,9 @@ export const store = new Vuex.Store({
     },
     getIsMobile (state) {
       return state.isMobile
+    },
+    getPathNameConfig (state) {
+      return state.pathNameConfig
     },
   }
 })

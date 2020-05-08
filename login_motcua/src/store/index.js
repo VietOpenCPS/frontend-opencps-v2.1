@@ -18,7 +18,8 @@ export const store = new Vuex.Store({
     index: 0,
     agencyList: [],
     domainList: [],
-    levelList: []
+    levelList: [],
+    pathNameConfig: '/register'
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -129,15 +130,17 @@ export const store = new Vuex.Store({
             }
           }
           var dataPostApplicant = new URLSearchParams()
-          // dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
+          if (filter.j_captcha_response) {
+            dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
+          }
           axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
             console.log(response.data)
-            resolve(response)
             if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha' && response.data !== 'lockout') {
               if (response.data === 'pending') {
-                let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
-                window.location.href = url +
-                "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
+                let url = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
+                let userId = response.headers.hasOwnProperty('userid') ? response.headers.userid : ''
+                window.location.href = url + state.pathNameConfig + 
+                "#/xac-thuc-tai-khoan?active_user_id=" + userId +
                   "&redirectURL=" + url
               } else {
                 window.location.href = response.data
@@ -150,10 +153,15 @@ export const store = new Vuex.Store({
               }, 200)
               
             } else if (response.data === 'captcha') {
-              toastr.error("Nhập sai mã Captcha.", { autoClose: 2000 });
+              if (filter.j_captcha_response && response['status'] !== undefined && response['status'] === 203) {
+                toastr.error("Mã captcha không chính xác")
+              }
+              resolve('captcha')
             } else if (response.data === "lockout") {
+              resolve('lockout')
               toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị tạm khóa trong 10 phút.")
             } else {
+              resolve('fail')
               toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
             }
           }).catch(function (error) {
@@ -414,6 +422,9 @@ export const store = new Vuex.Store({
     },
     setLevelList (state, payload) {
       state.levelList = payload
+    },
+    setPathNameConfig (state, payload) {
+      state.pathNameConfig = payload
     }
   },
   getters: {
@@ -431,6 +442,9 @@ export const store = new Vuex.Store({
     },
     getLevelList (state) {
       return state.levelList
-    }
+    },
+    getPathNameConfig (state) {
+      return state.pathNameConfig
+    },
   }
 })
