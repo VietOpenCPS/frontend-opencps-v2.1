@@ -1,0 +1,1363 @@
+<template>
+  <div>
+    <v-form v-model="validTNHS" ref="formTiepNhanHoSo" lazy-validation>
+      <!-- Thông tin nhóm hồ sơ -->
+      <div class="row-header">
+        <div class="background-triangle-big">
+          <span>THÔNG TIN NHÓM HỒ SƠ</span>
+        </div>
+        <div class="layout wrap header_tools row-blue">
+          <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinNhomHoSo.serviceName">
+            {{thongTinNhomHoSo.serviceName}}
+          </div>
+          <!-- <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+            <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 my-0">
+              <v-icon size="20">add</v-icon>  &nbsp;
+              <span>Tạo hồ sơ trong nhóm</span>
+            </v-btn>
+          </div> -->
+        </div> 
+      </div>
+      <div v-if="!activeAddDossierIntoGroup">
+        <v-layout wrap style="background: #fff;border-bottom: 1px solid #dedede;">
+          <v-flex xs12 sm2 class="my-2">
+            <v-subheader class="pl-0 text-header pt-2">Tên nhóm hồ sơ: </v-subheader>
+          </v-flex>
+          <v-flex xs12 sm10 class="my-2 pr-3">
+            <v-text-field class="mt-1"
+            v-model="thongTinNhomHoSo.dossierName"
+            ></v-text-field>
+          </v-flex>
+        </v-layout>
+        <thong-tin-chu-ho-so :showApplicant="true" :showDelegate="false" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
+        <div style="position: relative;border-top: 1px solid #dedede;">
+          <v-expansion-panel :value="0" class="expansion-pl">
+            <v-expansion-panel-content>
+              <div slot="header" style="display: flex; align-items: center;">
+                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                Thành phần hồ sơ theo nhóm&nbsp;&nbsp;&nbsp;&nbsp;
+              </div>
+              <thanh-phan-ho-so-1 ref="thanhphanhoso1" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so-1>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
+        <div style="position: relative;">
+          <v-expansion-panel :value="[true]" expand class="expansion-pl">
+            <v-expansion-panel-content :key="1">
+              <div slot="header" style="display: flex; align-items: center;">
+                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                Kết quả xử lý theo nhóm&nbsp;&nbsp;&nbsp;&nbsp;
+              </div>
+              <thanh-phan-ho-so-2 ref="thanhphanhoso2" :onlyView="true" :id="'nm'" :partTypes="outputTypesGroup"></thanh-phan-ho-so-2>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
+        <div style="position: relative;border-bottom: 1px solid #dedede;">
+          <v-expansion-panel :value="[true]" expand class="expansion-pl">
+            <v-expansion-panel-content :key="1">
+              <div slot="header" style="display: flex; align-items: center;">
+                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                Hồ sơ trong nhóm&nbsp;&nbsp;&nbsp;&nbsp;
+              </div>
+              <div class="mb-3" v-if="dossiersIntoGroupRender.length > 0">
+                <v-layout wrap class="my-2">
+                  <v-flex style="width: 120px">
+                    <v-subheader class="pl-0 text-header">Bước xử lý: </v-subheader>
+                  </v-flex>
+                  <v-flex class="pr-3" style="width: calc(100% - 120px)">
+                    <v-select
+                    :items="stepList"
+                    item-text="stepName"
+                    item-value="stepCode"
+                    v-model="stepSelected"
+                    @change="changeStep"
+                    return-object
+                    clearable
+                    >
+                    </v-select>
+                  </v-flex>
+                </v-layout>
+                <div class="btn_wrap_actions my-2 mr-2">
+                  <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
+                    v-on:click.native="btnActionEvent(item, indexBTN)" 
+                    :loading="loadingAction"
+                    :disabled="loadingAction"
+                  >
+                    {{item.title}}{{item.tiltle}}
+                    <span slot="loader">Loading...</span>
+                  </v-btn>
+                </div>
+                <v-data-table
+                  v-model="selected"
+                  select-all
+                  :headers="headers"
+                  :items="dossiersIntoGroupRender"
+                  :pagination.sync="pagination"
+                  hide-actions
+                  class="table-landing table-bordered"
+                  item-key="dossierId"
+                >
+                  <!--  -->
+                  <template slot="headers" slot-scope="props">
+                    <tr>
+                      <th width="32px" class="v_data_table_check_all" style="padding-left: 14px !important;">
+                        <v-checkbox
+                          :input-value="props.all"
+                          :indeterminate="props.indeterminate"
+                          primary
+                          hide-details
+                          @click.native="toggleAll"
+                        ></v-checkbox>
+                      </th>
+                      <th
+                        v-for="header in headers"
+                        :key="header.text"
+                        :class="header['class'] ? header['class'] : ''"
+                        :width="header['width'] ? header['width'] + 'px' : ''"
+                      >
+                        <v-tooltip bottom>
+                          <span slot="activator">{{ header.text }}</span>
+                          <span>{{ header.text }}</span>
+                        </v-tooltip>
+                      </th>
+                    </tr>
+                  </template>
+                  <!--  -->
+                  <template slot="items" slot-scope="props">
+                    <tr style="cursor: pointer">
+                      <td class="text-xs-center pl-3" width="32px" style="height: 40px !important">
+                        <v-checkbox
+                          v-model="props.selected"
+                          primary
+                          hide-details
+                        ></v-checkbox>
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-center" width="50px" style="height: 40px !important">
+                        <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="250px" style="height: 40px !important">
+                        {{ props.item.dossierNo }}
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" style="height: 40px !important">
+                        {{ props.item.applicantName }}
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="200px" style="height: 40px !important">
+                        {{ props.item.dossierSubStatusText ? props.item.dossierSubStatusText : props.item.dossierStatusText }}
+                      </td>
+                    </tr>
+                  </template>
+                </v-data-table>
+
+                <div v-if="dossiersIntoGroupRender.length > 10" class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
+                  <div class="flex pagging-table px-2">
+                    <tiny-pagination :total="dossiersIntoGroupRender.length" :currentLimit="10" :page="pagination.page" custom-class="custom-tiny-class" 
+                      @tiny:change-page="paggingData" ></tiny-pagination> 
+                  </div>
+                </div>
+              </div>
+              <div v-else class="pl-4 py-2">Chưa có hồ sơ nào</div>
+              <v-flex xs12 class="text-right mb-3 mr-2">
+                <input type="file" id="dossierImport" @change="uploadfileDossierImport($event)" style="display:none">
+                <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2" style="height:36px !important">
+                  <v-icon size="20">add</v-icon>  &nbsp;
+                  <span>Thêm hồ sơ vào nhóm</span>
+                </v-btn>
+                <v-btn color="primary" @click="importIntoGroup" class="mx-0 my-0 mr-1" style="height:36px !important">
+                  <v-icon size="20">cloud_upload</v-icon>  &nbsp;
+                  <span>Import hồ sơ vào nhóm</span>
+                </v-btn>
+              </v-flex>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
+        
+        <!-- <div style="position: relative;">
+          <v-expansion-panel :value="[true]" expand class="expansion-pl">
+            <v-expansion-panel-content :key="1">
+              <div slot="header" style="display: flex; align-items: center;">
+                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                Kết quả xử lý theo nhóm&nbsp;&nbsp;&nbsp;&nbsp;
+              </div>
+              <thanh-phan-ho-so-2 ref="thanhphanhoso2" :onlyView="false" :id="'nm'" :partTypes="outputTypesGroup"></thanh-phan-ho-so-2>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div> -->
+      </div>
+      <!-- Thông tin hồ sơ trong nhóm -->
+      <div v-if="activeAddDossierIntoGroup">
+        <thong-tin-chu-ho-so :showApplicant="false" :showDelegate="true" v-if="activeAddDossierIntoGroup" ref="thongtinchuhoso"></thong-tin-chu-ho-so>
+        <div style="position: relative;" v-if="activeAddDossierIntoGroup">
+          <v-expansion-panel :value="0" class="expansion-pl">
+            <v-expansion-panel-content>
+              <div slot="header" style="display: flex; align-items: center;">
+                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
+              </div>
+              <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypesIntoGroup"></thanh-phan-ho-so>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
+        <!--  -->
+        <div style="position: relative;" v-if="viaPortalDetail !== 0">
+          <v-expansion-panel :value="0"  class="expansion-pl">
+            <v-expansion-panel-content hide-actions value="2">
+              <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát kết quả</div>
+              <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
+        <!--  -->
+        <div style="position: relative;">
+          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+            <v-expansion-panel-content hide-actions value="2">
+              <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
+        <!--  -->
+      </div>
+      <!--  -->
+      <v-tabs icons-and-text centered class="mb-0 mt-4" v-if="activeAddDossierIntoGroup || activeAddGroup">
+        <!-- <v-tabs-slider color="primary"></v-tabs-slider> -->
+        <!-- Cập nhật thông tin nhóm -->
+        <v-tab href="#tab-1" @click="putGroupDossier()" v-if="activeAddGroup" class="px-0 py-0"> 
+          <v-btn flat class="" 
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">save</v-icon>  &nbsp;
+            <span>Cập nhật</span>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+        <!--  -->
+        <v-tab href="#tab-1" @click="tiepNhanHoSo()" v-if="!activeAddGroup" class="px-0 py-0"> 
+          <v-btn flat class="" 
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">save</v-icon>  &nbsp;
+            <span>Tiếp nhận hồ sơ</span>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+        <v-tab href="#tab-2" @click="tiepNhanHoSo('add')" v-if="!activeAddGroup" class="px-0 py-0"> 
+          <v-btn flat class=""
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">note_add</v-icon>  &nbsp;
+            <span>Tiếp nhận và thêm mới</span>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+        <!--  -->
+        <v-tab href="#tab-2" @click="goBack" class="px-0 py-0">
+          <v-btn flat class=""
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="18">reply</v-icon> &nbsp;
+            Quay lại
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+      </v-tabs>
+    </v-form>
+    <v-dialog v-model="dialogImportDosier" max-width="700" transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Import hồ sơ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogImportDosier = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="pt-0 pb-0 px-0">
+          <v-flex class="text-xs-center">
+            <v-progress-circular
+              :rotate="-90"
+              :size="70"
+              :width="10"
+              :value="valueProgress"
+              color="primary"
+              class="my-2"
+              >
+              <span style="font-size: 1.5em;font-weight: bold;">{{ countDossierProgress }}</span> 
+            </v-progress-circular>
+            <div class="pb-0" style="margin: 0 auto;">
+              <v-card class="py-0">
+                <span style="color: green;">Thành công: {{countDossierSuccess}} hồ sơ</span>
+                <p style="color: red;">Lỗi: {{dossierError.length}} hồ sơ</p>
+              </v-card>
+            </div>
+          </v-flex>
+          
+          <div class="px-2" v-if="dossierError.length && !loadingImportDossier" style="margin: 0 auto;">
+            <span style="font-size: 1.2em;font-weight: bold;">Danh sách hồ sơ bị lỗi:</span>
+            <v-data-table
+              :headers="headers"
+              :items="dossierError"
+              hide-actions
+              class="table-landing table-bordered mt-2"
+              item-key="dossierId"
+              style="border-left: 1px solid #dedede"
+            >
+              <template slot="items" slot-scope="props">
+                <tr style="cursor: pointer">
+                  <td class="text-xs-center" width="">
+                    <span>{{props.index + 1}}</span>
+                  </td>
+                  <td class="text-xs-left" width="">
+                    {{ props.item.applicantName }}
+                  </td>
+                  <td class="text-xs-left">
+                    {{ props.item.applicantIdNo }}
+                  </td>
+                  <td class="text-xs-left" width="">
+                    {{ props.item.address}}
+                  </td>
+                </tr>
+              </template>
+            </v-data-table>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click.native="addDossierAgain()"
+              :loading="loadingImportDossier"
+              :disabled="loadingImportDossier"
+              v-if="dossierError.length"
+              >
+              <v-icon>send</v-icon>&nbsp;
+              Thực hiện lại
+              <span slot="loader">Loading...</span>
+          </v-btn>
+          <v-btn color="red" style="color: #fff;" @click.native="dialogImportDosier = false"
+            :loading="loadingImportDossier"
+            :disabled="loadingImportDossier"
+            >
+            <v-icon>reply</v-icon>&nbsp;
+            Quay lại
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialogSelectDosier" max-width="1000" transition="fade-transition">
+      <v-card flat>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Chọn hồ sơ đính kèm tài liệu</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="cancelAddFile">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="pt-0 pb-0 px-0">
+          <div class="mb-3" v-if="dossiersIntoGroupRender.length > 0">
+            <v-layout wrap class="my-2">
+              <v-flex style="width: 120px">
+                <v-subheader class="pl-0 text-header">Bước xử lý: </v-subheader>
+              </v-flex>
+              <v-flex class="pr-3" style="width: calc(100% - 120px)">
+                <v-select
+                :items="stepList"
+                item-text="stepName"
+                item-value="stepCode"
+                v-model="stepSelected"
+                @change="changeStep"
+                return-object
+                clearable
+                >
+                </v-select>
+              </v-flex>
+            </v-layout>
+            <v-data-table
+              v-model="selectedAttach"
+              select-all
+              :headers="headers"
+              :items="dossiersIntoGroupRender"
+              :pagination.sync="pagination"
+              hide-actions
+              class="table-landing table-bordered"
+              item-key="dossierId"
+            >
+              <!--  -->
+              <template slot="headers" slot-scope="props">
+                <tr>
+                  <th width="32px" class="v_data_table_check_all" style="padding-left: 14px !important;">
+                    <v-checkbox
+                      :input-value="props.all"
+                      :indeterminate="props.indeterminate"
+                      primary
+                      hide-details
+                      @click.native="toggleAllSelectDialog"
+                    ></v-checkbox>
+                  </th>
+                  <th
+                    v-for="header in headers"
+                    :key="header.text"
+                    :class="header['class'] ? header['class'] : ''"
+                    :width="header['width'] ? header['width'] + 'px' : ''"
+                  >
+                    <v-tooltip bottom>
+                      <span slot="activator">{{ header.text }}</span>
+                      <span>{{ header.text }}</span>
+                    </v-tooltip>
+                  </th>
+                </tr>
+              </template>
+              <!--  -->
+              <template slot="items" slot-scope="props">
+                <tr style="cursor: pointer">
+                  <td class="text-xs-center pl-3" width="32px" style="height: 40px !important">
+                    <v-checkbox
+                      v-model="props.selected"
+                      primary
+                      hide-details
+                    ></v-checkbox>
+                  </td>
+                  <td @click="viewDetail(props.item, props.index)" class="text-xs-center" width="50px" style="height: 40px !important">
+                    <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
+                  </td>
+                  <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="250px" style="height: 40px !important">
+                    {{ props.item.dossierNo }}
+                  </td>
+                  <td @click="viewDetail(props.item, props.index)" class="text-xs-left" style="height: 40px !important">
+                    {{ props.item.applicantName }}
+                  </td>
+                  <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="200px" style="height: 40px !important">
+                    {{ props.item.dossierSubStatusText ? props.item.dossierSubStatusText : props.item.dossierStatusText }}
+                  </td>
+                </tr>
+              </template>
+            </v-data-table>
+
+            <div v-if="dossiersIntoGroupRender.length > 10" class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
+              <div class="flex pagging-table px-2">
+                <tiny-pagination :total="dossiersIntoGroupRender.length" :currentLimit="10" :page="pagination.page" custom-class="custom-tiny-class" 
+                  @tiny:change-page="paggingData" ></tiny-pagination> 
+              </div>
+            </div>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click.native="addFileToDossier()">
+            <v-icon>send</v-icon>&nbsp;
+            Xác nhận
+          </v-btn>
+          <v-btn color="red" style="color: #fff;" @click.native="cancelAddFile"
+            >
+            <v-icon>close</v-icon>&nbsp;
+            Bỏ qua
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+
+<script>
+
+import toastr from 'toastr'
+import $ from 'jquery'
+import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhomNew.vue'
+import ThanhPhanHoSo1 from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhomNew.vue'
+import ThanhPhanHoSo2 from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhomNew.vue'
+import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
+import LePhi from './form_xu_ly/FeeDetail.vue'
+import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
+import TinyPagination from './pagging/opencps_pagination.vue'
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '5000'
+}
+export default {
+  props: ['groupId', 'index', 'id', 'formCode'],
+  components: {
+    'thong-tin-chu-ho-so': ThongTinChuHoSo,
+    'thanh-phan-ho-so': ThanhPhanHoSo,
+    'thanh-phan-ho-so-1': ThanhPhanHoSo1,
+    'thanh-phan-ho-so-2': ThanhPhanHoSo2,
+    'thong-tin-chung': ThongTinChung,
+    'thu-phi': LePhi,
+    'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua,
+    'tiny-pagination': TinyPagination
+  },
+  data: () => ({
+    detailGroup: false,
+    dialogImportDosier: false,
+    dialogSelectDosier: false,
+    groupDossierList: [],
+    groupDossierSelected: '',
+    dossiersIntoGroup: [],
+    dossiersIntoGroupRender: [],
+    selected: [],
+    selectedAttach: [],
+    stepList: [],
+    stepSelected: '',
+    btnDynamics: [],
+    processOptionSelected: '',
+    thongTinNhomHoSo: '',
+    validTNHS: false,
+    groupDossierNameCreate: '',
+    currentDossierIntoGroup: '',
+    dossierId: '',
+    mark: true,
+    stateEditSample: false,
+    tiepNhanState: false,
+    activeAddGroup: false,
+    thongTinChiTietHoSo: {},
+    payments: {},
+    paymentProfile: {},
+    briefNote: '',
+    receiveDateEdit: '',
+    editableDate: false,
+    dueDateEdit: '',
+    viaPortalDetail: 0,
+    showThuPhi: false,
+    inputTypes: [6],
+    outputTypesGroup: [7],
+    inputTypesIntoGroup: [1, 3, 6],
+    outputTypes: [2],
+    sampleCount: 0,
+    isMobile: false,
+    loadingAction: false,
+    dialogAddGroup: false,
+    activeAddDossierIntoGroup: false,
+    headers: [
+      {
+        text: 'STT',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Mã hồ sơ',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Tên chủ hồ sơ',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Trạng thái',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      }
+    ],
+    filesGroupDossier: [],
+    countDossierProgress: 0,
+    dialogImportDosier: false,
+    listDossierImport: [],
+    progressUploadFile: false,
+    loadingImportDossier: false,
+    dossierError: [],
+    dossierSuccess: [],
+    totalDossier: 0,
+    valueProgress: 0,
+    countDossierSuccess: 0,
+    pagination: {
+      rowsPerPage: 10,
+      page: 1
+    }
+  }),
+  computed: {
+    loading () {
+      return this.$store.getters.loading
+    },
+    originality () {
+      var vm = this
+      return vm.getOriginality()
+    },
+    dichVuChuyenPhatKetQua () {
+      return this.$store.getters.dichVuChuyenPhatKetQua
+    },
+    thongTinChuHoSo () {
+      return this.$store.getters.thongTinChuHoSo
+    },
+    filesAdd () {
+      return this.$store.getters.getFilesAdd
+    },
+    activeAddFileGroup () {
+      return this.$store.getters.activeAddFileGroup
+    },
+    pathLanding () {
+      let initData = this.$store.getters.loadingInitData
+      return '/' + initData['groupId'] + '/danh-sach-ho-so/'
+    },
+  },
+  created () {
+    var vm = this
+    vm.$nextTick(function () {
+      let query = vm.$router.history.current.query
+      let id = vm.id
+      if (id) {
+        vm.getDetaiGroup(id)
+      }
+    })
+  },
+  beforeDestroy () {
+    let viewport = $('meta[name="viewport"]')
+    viewport.attr('content', 'initial-scale=1.0, width=device-width')
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.onResize, { passive: true })
+    }
+  },
+  mounted () {
+    let vm = this
+    if (vm.thongTinNhomHoSo) {
+      vm.$refs.thongtinnguoinophoso.initData(vm.thongTinNhomHoSo)
+      vm.$refs.thanhphanhoso1.initData(vm.thongTinNhomHoSo)
+      vm.$refs.thanhphanhoso2.initData(vm.thongTinNhomHoSo)
+      // 
+      vm.filesGroupDossier = vm.$refs.thanhphanhoso1.getFilesGroupDossier()
+      console.log('fileItems 1', vm.filesGroupDossier)
+    }
+  },
+  watch: {
+    isMobile (val) {
+      let viewport = $('meta[name="viewport"]')
+      if (val) {
+        viewport.attr('content', '')
+      } else {
+        viewport.attr('content', 'initial-scale=1.0, width=device-width')
+      }
+    },
+    '$route': function (newRoute, oldRoute) {
+      let vm = this
+      let currentQuery = newRoute.query
+      let id = vm.id
+      if (id) {
+        vm.getDetaiGroup(id)
+      }
+    },
+    thongTinNhomHoSo (val) {
+      let vm = this
+      if (val) {
+        vm.$refs.thongtinnguoinophoso.initData(val)
+        vm.$refs.thanhphanhoso1.initData(val)
+        vm.$refs.thanhphanhoso2.initData(val)
+        //
+        vm.$store.dispatch('loadDossierFiles', val.dossierId).then(resFiles => {
+          vm.filesGroupDossier = resFiles
+        }).catch(reject => {
+        })
+      }
+    },
+    selected (val) {
+      let vm = this
+      // vm.$store.commit('setSelectDossierGroup', val)
+    },
+    activeAddFileGroup (val) {
+      let vm = this
+      console.log('val activeAddFileGroup', val)
+      vm.stepSelected = ''
+      vm.dialogSelectDosier = val
+    }
+  },
+  methods: {
+    onResize () {
+      let vm = this
+      let isMobile = window.innerWidth < 1024
+      vm.isMobile = isMobile
+    },
+    paggingData (config) {
+      let vm = this
+      vm.pagination.page = config.page
+    },
+    getGroupDossier () {
+      let vm = this
+      let query = vm.$router.history.current.query
+      let filter = {
+        service: query.serviceCode ? query.serviceCode : '',
+        template: query.template_no ? query.template_no : '',
+        agency: query.govAgencyCode ? query.govAgencyCode : ''
+      }
+      vm.$store.dispatch('getGroupDossier', filter).then(result => {
+        vm.groupDossierList = result
+        // if (query.hasOwnProperty('groupDossierId') && query.groupDossierId) {
+        //   let id = query.groupDossierId
+        //   vm.$store.dispatch('getDetailDossier', id).then(resultDossier => {
+        //     vm.activeAddDossierIntoGroup = false
+        //     vm.activeAddGroup = true
+        //     vm.groupDossierSelected = resultDossier
+        //   })
+        // }
+      })
+    },
+    getDetaiGroup (id) {
+      let vm = this
+      vm.$store.dispatch('getDetailDossier', id).then(resultDossier => {
+        vm.thongTinNhomHoSo = resultDossier
+        vm.activeAddDossierIntoGroup = false
+        vm.activeAddGroup = true
+        vm.groupDossierSelected = resultDossier
+        let filter = {
+          groupDossierId: id
+        }
+        vm.dossiersIntoGroup = []
+        vm.dossiersIntoGroupRender = []
+        vm.$store.dispatch('getDossiersIntoGroup', filter).then(function (result) {
+          vm.dossiersIntoGroup = result
+          vm.$store.commit('setSelectDossierGroup', vm.dossiersIntoGroup)
+          if (vm.dossiersIntoGroup.length > 0) {
+            let steps = []
+            for (let index in vm.dossiersIntoGroup) {
+              if (steps.filter(function (item) {
+                return String(item['stepCode']) === String(vm.dossiersIntoGroup[index]['stepCode'])
+              }).length === 0) {
+                steps.push({
+                  stepCode: vm.dossiersIntoGroup[index]['stepCode'],
+                  stepName: vm.dossiersIntoGroup[index]['stepName']
+                })
+              }
+            }
+            vm.stepList = steps
+            // if (vm.stepList.length === 1) {
+            //   vm.stepSelected = vm.stepList[0]
+            //   vm.$store.dispatch('pullProcessSteps', vm.stepList[0]).then(function (result) {
+            //     if (result.hasOwnProperty('buttonConfig') && result.buttonConfig) {
+            //       try {
+            //         vm.btnDynamics = JSON.parse(result['buttonConfig'])['buttons']
+            //         vm.btnDynamics = vm.btnDynamics.filter(function(item) {
+            //           return item['form'] === 'ACTIONS'
+            //         })
+            //       } catch (error) {
+            //         vm.btnDynamics = []
+            //       }
+            //     } else {
+            //       vm.btnDynamics = []
+            //     }
+            //   })
+            // }
+          }
+          vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
+        })
+      })
+    },
+    changeStep () {
+      let vm = this
+      setTimeout(function () {
+        if (vm.stepSelected) {
+          vm.dossiersIntoGroupRender = vm.dossiersIntoGroup.filter(function(item) {
+            return String(item['stepCode']) === String(vm.stepSelected['stepCode'])
+          })
+          vm.$store.dispatch('pullProcessSteps', vm.stepSelected).then(function (result) {
+            if (result.hasOwnProperty('menuGroup') && result.menuGroup) {
+              vm.$store.dispatch('getDetailMenuConfig', result).then(function (result2) {
+                if (result2.hasOwnProperty('buttonConfig') && result2.buttonConfig) {
+                  try {
+                    vm.btnDynamics = JSON.parse(result2['buttonConfig'])['buttons']
+                    vm.btnDynamics = vm.btnDynamics.filter(function(item) {
+                      return item['form'] === 'ACTIONS'
+                    })
+                    vm.btnDynamics = vm.btnDynamics.filter(function(item) {
+                      return (!item.hasOwnProperty('onlySteps') ||
+                        (item.hasOwnProperty('onlySteps') && item['onlySteps'].filter(function(item2) {
+                          return String(item2) === String(vm.stepSelected['stepCode']) 
+                        }) > 0)
+                      )
+                    })
+                  } catch (error) {
+                    vm.btnDynamics = []
+                  }
+                } else {
+                  vm.btnDynamics = []
+                }
+              })
+            } else {
+              vm.btnDynamics = []
+            }
+          })
+        } else {
+          vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
+          vm.btnDynamics = []
+        }
+      }, 200)
+    },
+    btnActionEvent (item, index) {
+      let vm = this
+      if (!vm.selected) {
+        alert('Chọn hồ sơ để thực hiện')
+        return
+      }
+      // console.log('btnAction', item)
+      // console.log('dossierSelected', vm.selected)
+      vm.$store.dispatch('loadActionActive', item).then(function () {
+        vm.$store.dispatch('loadDossierSelected', vm.selected).then(function () {
+          let dossiersSelect = vm.selected.map(select => {
+            return select.dossierId
+          }).join(',')
+          let query = vm.$router.history.current.query
+          query['dossiers'] = dossiersSelect
+          query['actionActive'] = JSON.stringify(item)
+          vm.$router.push({
+            path: '/danh-sach-ho-so/0/xu-ly-ho-so',
+            query: query
+          })
+        })
+      })
+    },
+    putGroupDossier () {
+      let vm = this
+      let thongtinnguoinophoso = this.$refs.thongtinnguoinophoso ? this.$refs.thongtinnguoinophoso.thongTinNguoiNopHoSo : {}
+      let validThongtinnguoinophoso = vm.$refs.thongtinnguoinophoso.showValid()
+      if (validThongtinnguoinophoso['validForm']) {
+        let passValid = false
+        if (!validThongtinnguoinophoso['validApplicant']) {
+          let x = confirm(validThongtinnguoinophoso['message'] + ' Bạn có muốn tiếp tục?')
+          if (x) {
+            passValid = true
+          }
+        } else { passValid = true }
+        if (passValid) {
+          // if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
+          //   return
+          // }
+          // let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
+          // let listAction = []
+          // let listDossierMark = []
+          // if (dossierFiles) {
+          //   dossierFiles.forEach(function (value, index) {
+          //     if (value.eForm) {
+          //       value['dossierId'] = vm.thongTinNhomHoSo.dossierId
+          //       listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+          //     }
+          //   })
+          // }
+          let tempData = Object.assign(vm.thongTinNhomHoSo, thongtinnguoinophoso)
+          tempData['dossierId'] = vm.thongTinNhomHoSo.dossierId
+          tempData['originality'] = vm.thongTinNhomHoSo.originality
+          tempData['dossierName'] = vm.thongTinNhomHoSo.dossierName
+          console.log('data put groupDossier -->', tempData)
+          setTimeout(function () {
+            vm.$store.dispatch('putDossier', tempData).then(function (result) {
+              toastr.clear()
+              toastr.success('Cập nhật thành công')
+            }).catch(function (xhr) {
+              toastr.clear()
+              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            })
+          }, 500)
+        }
+      }
+    },
+    createDossierIntoGroup () {
+      // Tạo hồ sơ -> add vào nhóm
+      let vm = this
+      let query = vm.$router.history.current.query
+      vm.activeAddGroup = false
+      vm.activeAddDossierIntoGroup = true
+      let data = {
+        serviceCode: vm.thongTinNhomHoSo.serviceCode,
+        govAgencyCode: vm.thongTinNhomHoSo.govAgencyCode,
+        templateNo: vm.thongTinNhomHoSo.dossierTemplateNo,
+        originality: vm.originality,
+        groupDossierId: vm.thongTinNhomHoSo.dossierId,
+        dossierId: ''
+      }
+      vm.$store.dispatch('postDossier', data).then(function (result) {
+        vm.currentDossierIntoGroup = result
+        data.dossierId = result.dossierId
+        setTimeout (function () {
+          result['editable'] = false
+          if (result.dossierStatus === '') {
+            vm.$store.dispatch('pullNextactions', result).then(result2 => {
+              if (result2) {
+                var actionDetail = result2.filter(function (item) {
+                  return (item.actionCode === 1100 || item.actionCode === '1100')
+                })
+                vm.$store.dispatch('processPullBtnDetail', {
+                  dossierId: result.dossierId,
+                  actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
+                }).then(resAction => {
+                  result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
+                  result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : null
+                  result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                  vm.editableDate = resAction && resAction.receiving ? resAction.receiving.editable : false
+                  vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
+                  vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                  if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
+                    vm.showThuPhi = true
+                    vm.payments = resAction.payment
+                  }
+                })
+              } else {
+              }
+            })
+          } else {
+            if (vm.$refs.thongtinchunghoso) {
+              console.log('has thong tin chung ho so')
+              vm.$refs.thongtinchunghoso.initData(result)
+            }
+          }
+          vm.$refs.thongtinchuhoso.initData(result)
+          // copy file 
+          let count = 0
+          let files = vm.filesGroupDossier.filter(function(item) {
+            return (item['dossierPartType'] === 6 || item['dossierPartType'] === 7)
+          })
+          if (files.length > 0) {
+            // for (let key in files) {
+            //   filterCopyFile.dossierTemplateNo = files[key]['dossierTemplateNo']
+            //   filterCopyFile.dossierPartNo = files[key]['dossierPartNo']
+            //   filterCopyFile.dossierFileId = files[key]['dossierFileId']
+            //   vm.$store.dispatch('copyFile', filterCopyFile).then(function(resultFile) {
+            //     count += 1
+            //     if (count === files.length) {
+            //       vm.$refs.thanhphanhoso.initData(result)
+            //     }
+            //   }).catch(function(reject) {
+            //     count += 1
+            //     if (count === files.length) {
+            //       vm.$refs.thanhphanhoso.initData(result)
+            //     }
+            //   })
+            // }
+            let dossierFileIds = files.map(obj =>{ 
+              return obj.dossierFileId
+            }).toString()
+            let filterCopyFile = {
+              dossierIds: result.dossierId,
+              dossierFileId: dossierFileIds
+            }
+            vm.$store.dispatch('uploadFileDossierGroup', filterCopyFile).then(function (resultFile) {
+              setTimeout(function () {
+                vm.$refs.thanhphanhoso.initData(result)
+              }, 300)
+            })
+          } else {
+            vm.$refs.thanhphanhoso.initData(result)
+          }
+          // 
+          vm.viaPortalDetail = result.viaPostal
+          if (result.viaPostal > 0) {
+            let postalAddress = result.address ? (result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName) : ''
+            if (vm.formCode === 'NEW' && vm.originality === 1) {
+              result['postalAddress'] = postalAddress
+              result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
+            }
+            vm.$store.commit('setDichVuChuyenPhatKetQua', result)
+          }
+        }, 300)
+        vm.$store.dispatch('postDossierIntoGroup', data).then(function (result) {
+        })
+      }).catch(reject => {
+      })
+    },
+    uploadfileDossierImport: function (e) {
+      var vm = this
+      let thanhphanhoso = vm.$refs.thanhphanhoso1.dossierTemplateItems
+      thanhphanhoso = thanhphanhoso.filter(function (item) {
+        return (item['partType'] === 1 || item['partType'] === 6)
+      })
+      // console.log('thanhphanhoso', thanhphanhoso)
+      vm.$store.dispatch('loadDossierFiles', vm.thongTinNhomHoSo['dossierId']).then(function (result) {
+        let files = []
+        for (let index in result) {
+          if (result[index]['dossierPartType'] === 1 || result[index]['dossierPartType'] === 6) {
+            files.push(result[index]['dossierFileId'])
+          }
+        }
+        vm.dossierFiles = files ? files.toString() : ''
+        vm.progressUploadFile = true
+        let data = {}
+        vm.countDossierProgress = 0
+        vm.valueProgress = 0
+        vm.listDossierImport = []
+        vm.dossierError = []
+        vm.dossierSuccess = []
+        vm.countDossierSuccess = 0
+        data['dossierId'] = vm.thongTinNhomHoSo['dossierId']
+        data['referenceUid'] = vm.thongTinNhomHoSo['referenceUid']
+        data['selector'] = 'dossierImport'
+        data['partTip'] = {
+          tip: '',
+          maxSize: 10,
+          extensions: 'xlsx,xls'
+        }
+        let file = $('#dossierImport')[0].files[0]
+        vm.$store.dispatch('uploadDossierFileImport', data).then(function (result) {
+          vm.progressUploadFile = false
+          vm.totalDossier = result.total
+          if (result.total) {
+            let cf = confirm('Bạn có chắc chắn thực hiện hành động này?')
+            if (cf) {
+              vm.dialogImportDosier = true
+              vm.listDossierImport = result.data
+              console.log(result.data)
+              setTimeout(function () {
+                if (vm.listDossierImport.length) {
+                  vm.loadingImportDossier = true
+                  let action = []
+                  vm.listDossierImport.forEach(function (item, index) {
+                    setTimeout(function () {
+                      action.push(vm.doCreateDossier(item, index))
+                      if (action.length === vm.listDossierImport.length) {
+                        Promise.all(action).then(function (result) {
+                          vm.loadingImportDossier = false
+                          // add dossier into group
+                          console.log('dossierSuccess 1123412', vm.dossierSuccess)
+                          let dataAddGroup = {
+                            groupDossierId: vm.thongTinNhomHoSo.dossierId,
+                            dossierId: ''
+                          }
+                          let dossierIdArr = []
+                          for (let key in vm.dossierSuccess) {
+                            dossierIdArr.push(vm.dossierSuccess[key]['dossierId'])
+                          }
+                          dataAddGroup['dossierId'] = dossierIdArr.toString()
+                          console.log('dataAddGroup', dataAddGroup)
+                          vm.$store.dispatch('postDossierIntoGroup', dataAddGroup).then(function (result) {
+                            if (vm.dossierError.length === 0) {
+                              toastr.success('Import hồ sơ thành công')
+                              vm.getDetaiGroup(vm.thongTinNhomHoSo.dossierId)
+                              vm.dialogImportDosier = false
+                            }
+                          })
+                          // 
+                        }).catch(function (xhr) {
+                          vm.loadingImportDossier = false
+                        })
+                      }
+                    }, index * 1000);
+                  })
+                }
+              }, 300);
+            }
+          } else {
+            vm.listDossierImport = []
+            toastr.error('Dữ liệu bị lỗi, vui lòng kiểm tra lại!')
+          }
+        }).catch(function (xhr) {
+          vm.dialogImportDosier = false
+          vm.progressUploadFile = false
+          toastr.error('Tải file lỗi, vui lòng thử lại!')
+        })
+      }).catch(function (reject) {
+
+      })
+    },
+    importIntoGroup () {
+      let vm = this
+      document.getElementById('dossierImport').value = ''
+      document.getElementById('dossierImport').click()
+    },
+    addDossierAgain () {
+      let vm = this
+      vm.countDossierProgress = vm.dossierSuccess.length
+      vm.valueProgress = vm.countDossierProgress * 100 / vm.totalDossier
+      console.log('valueProgress++++', vm.valueProgress)
+      vm.countDossierSuccess = vm.dossierSuccess.length
+      if (vm.dossierError.length) {
+        vm.loadingImportDossier = true
+        let action = []
+        vm.dossierError.forEach(function (item, index) {
+          setTimeout(function () {
+            action.push(vm.doCreateDossier(item, index))
+            if (action.length === vm.dossierError.length) {
+              Promise.all(action).then(function (result) {
+                vm.loadingImportDossier = false
+                // add dossier into group
+                console.log('dossierSuccess 1', vm.dossierSuccess)
+                let dataAddGroup = {
+                  groupDossierId: vm.thongTinNhomHoSo.dossierId,
+                  dossierId: ''
+                }
+                let dossierIdArr = []
+                for (let key in vm.dossierSuccess) {
+                  dossierIdArr = dossierIdArr.push(vm.dossierSuccess[key]['dossierId'])
+                  dataAddGroup['dossierId'] = dossierIdArr.toString()
+                }
+                vm.$store.dispatch('postDossierIntoGroup', dataAddGroup).then(function (result) {
+                  if (vm.dossierError.length === 0) {
+                    toastr.success('Import hồ sơ thành công')
+                    vm.getDetaiGroup(vm.thongTinNhomHoSo.dossierId)
+                    vm.dialogImportDosier = false
+                  }
+                })
+                // 
+              }).catch(function (xhr) {
+                vm.loadingImportDossier = false
+              })
+            }
+          }, index * 1000);
+        })
+      }
+    },
+    doCreateDossier (item, index) {
+      return new Promise((resolve, reject) => {
+        var vm = this
+        let thanhphanhoso = this.$refs.thanhphanhoso1.dossierTemplateItems
+        let dataTotal = {}
+        let dataDossier = item
+        let dataDossiermark = ''
+        let dataDossierFile = ''
+        let dataDossierPayment = ''
+        let thongTinChungHS = vm.$refs.thongtinnguoinophoso
+        // let dichVuChuyenKetQua = vm.$refs.dichvuchuyenphatketqua
+        dataTotal['serviceCode'] = vm.thongTinNhomHoSo['serviceCode']
+        dataTotal['govAgencyCode'] = vm.thongTinNhomHoSo['govAgencyCode']
+        dataTotal['dossierTemplateNo'] = vm.thongTinNhomHoSo['dossierTemplateNo']
+        dataTotal['originality'] = vm.originality
+        if (thanhphanhoso && thanhphanhoso.length) {
+          let tmp = thanhphanhoso.map(item => {
+            return {
+              partNo: item.partNo,
+              partName: item.partName,
+              fileMark: item.fileMark
+            }
+          })
+          dataDossiermark = JSON.stringify(tmp)
+        } else {
+          dataDossiermark = ''
+        }
+        dataTotal['dossierMarks'] = dataDossiermark
+        if (thongTinChungHS && thongTinChungHS['thongTinNguoiNopHoSo']) {
+          let thongTinNguoiNop = thongTinChungHS['thongTinNguoiNopHoSo']
+          dataDossier = Object.assign(dataDossier, thongTinNguoiNop)
+        }
+        // dataDossier = Object.assign(dataDossier, vm.dichVuChuyenPhatKetQua)
+        dataTotal['dossiers'] = dataDossier ? JSON.stringify(dataDossier) : ''
+        dataTotal['dossierFiles'] = vm.dossierFiles ? vm.dossierFiles : ''
+        dataTotal['payment'] = dataDossierPayment ? JSON.stringify(dataDossierPayment) : ''
+
+        vm.$store.dispatch('importDossier', dataTotal).then(function (result) {
+          // ---------
+          vm.countDossierProgress ++
+          vm.valueProgress += (100 / vm.totalDossier)
+          vm.listDossierImport[index]['dossierId'] = result['dossierId']
+          vm.listDossierImport[index]['flagError'] = false
+          if (vm.countDossierSuccess < vm.listDossierImport.length) {
+            vm.countDossierSuccess ++
+          }
+          vm.calDossierErrorSuccess()
+          resolve(true)
+        }).catch(xhr => {
+          console.log(xhr)
+          vm.countDossierProgress ++
+          vm.valueProgress += (100 / vm.totalDossier)
+          vm.listDossierImport[index]['flagError'] = true
+          vm.calDossierErrorSuccess()
+          reject(xhr)
+        })
+      })
+    },
+    calDossierErrorSuccess () {
+      let vm = this
+      vm.dossierError = vm.listDossierImport.filter(function (item) {
+        return item['flagError']
+      })
+      vm.dossierSuccess = vm.listDossierImport.filter(function (item) {
+        return !item.hasOwnProperty('flagError') || !item['flagError']
+      })
+    },
+    tiepNhanHoSo (type) {
+      var vm = this
+      vm.$store.commit('setPrintPH', false)
+      let thongtinchuhoso = this.$refs.thongtinchuhoso.getThongTinChuHoSo()
+      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.getThongTinNguoiNopHoSo()
+      let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
+      // let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
+      let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
+      console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
+      let validThongtinchuhoso = vm.$refs.thongtinchuhoso.showValid()
+      if (validThongtinchuhoso['validForm']) {
+        let passValid = true
+        if (passValid) {
+          vm.loadingAction = true
+          if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
+            vm.loadingAction = false
+            return
+          }
+          if (dichvuchuyenphatketqua.viaPostal === 2 && !vm.$refs.dichvuchuyenphatketqua.validDichVuChuyenPhat()) {
+            vm.loadingAction = false
+            return
+          }
+          let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
+          let dossierTemplates = thanhphanhoso
+          let listAction = []
+          let listDossierMark = []
+          if (dossierFiles) {
+            dossierFiles.forEach(function (value, index) {
+              if (value.eForm) {
+                value['dossierId'] = vm.dossierId
+                listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+              }
+            })
+          }
+          // if (vm.$refs.thanhphanhoso) {
+          //   vm.$refs.thanhphanhoso.saveMark()
+          // }
+          thongtinnguoinophoso = {
+            sameUser: false,
+            delegateName: vm.thongTinNhomHoSo['delegateName'],
+            delegateCityCode: vm.thongTinNhomHoSo['delegateCityCode'],
+            delegateAddress: vm.thongTinNhomHoSo['delegateAddress'],
+            delegateDistrictCode: vm.thongTinNhomHoSo['delegateDistrictCode'],
+            delegateWardCode: vm.thongTinNhomHoSo['delegateWardCode'],
+            delegateEmail: vm.thongTinNhomHoSo['delegateEmail'],
+            delegateTelNo: vm.thongTinNhomHoSo['delegateTelNo'],
+            delegateIdNo: vm.thongTinNhomHoSo['delegateIdNo']
+          }
+          var tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
+          tempData['dossierId'] = vm.currentDossierIntoGroup.dossierId
+          tempData['sampleCount'] = vm.currentDossierIntoGroup.sampleCount
+          tempData['originality'] = vm.originality
+          vm.$store.dispatch('putDossier', tempData).then(function (result) {
+            vm.loadingAction = false
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            if (vm.formCode === 'UPDATE') {
+              vm.goBack()
+            } else {
+              var initData = vm.$store.getters.loadingInitData
+              let actionUser = initData.user.userName ? initData.user.userName : ''
+              //
+              var paymentsOut = {}
+              if (vm.showThuPhi) {
+                paymentsOut = {
+                  requestPayment: vm.payments['requestPayment'],
+                  paymentNote: vm.payments['paymentNote'],
+                  advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                  feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                  serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                  shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+                }
+              }
+              var payloadDate = {
+                'dueDate': vm.editableDate && tempData.dueDate ? tempData.dueDate : vm.dueDateEdit,
+                'receiveDate': vm.receiveDateEdit
+              }
+              let dataPostAction = {
+                dossierId: vm.currentDossierIntoGroup.dossierId,
+                actionCode: 1100,
+                actionNote: '',
+                actionUser: actionUser,
+                payload: payloadDate,
+                security: '',
+                assignUsers: '',
+                payment: paymentsOut,
+                createDossiers: ''
+              }
+              vm.loadingAction = true
+              vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+                vm.loadingAction = false
+                if (!type) {
+                  toastr.success('Thêm hồ sơ vào nhóm thành công')
+                  vm.getDetaiGroup(vm.id)
+                  vm.activeAddDossierIntoGroup = false
+                } else {
+                  // tạo hồ sơ mới
+                  vm.createDossierIntoGroup()
+                }
+              }).catch(reject => {
+                vm.loadingAction = false
+              })
+            }
+          }).catch(rejectXhr => {
+            vm.loadingAction = false
+            toastr.clear()
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          })
+        }
+      }
+    },
+    changeViapostal (viapostal) {
+      if (viapostal) {
+        this.viaPortalDetail = 2
+      } else {
+        this.viaPortalDetail = 1
+      }
+    },
+    durationText (durationUnit, durationCount) {
+      let durationText
+      if (durationUnit === 1 && durationCount > 8) {
+        let day = Math.floor(durationCount / 8) + ' ngày'
+        let hours
+        if (durationCount % 8 !== 0) {
+          hours = ((durationCount / 8) - Math.floor(durationCount / 8)) * 8 + ' giờ'
+        } else {
+          hours = ''
+        }
+        durationText = `${day} ${hours}`
+      } else if (durationUnit === 0) {
+        durationText = durationCount + ' ngày'
+      } else if (durationUnit === 1 && durationCount <= 8) {
+        durationText = durationCount + ' giờ'
+      }
+      return durationText
+    },
+    viewDetail (item, indexItem) {
+      let vm = this
+      let currentQuery = vm.$router.history.current.query
+      vm.$router.push('/danh-sach-ho-so/0/chi-tiet-ho-so/' + item['dossierId'])
+    },
+    addFileToDossier () {
+      let vm = this
+      // add file cho thành phần hồ sơ con
+      let dossierIds = vm.selectedAttach.map(obj =>{
+        return obj.dossierId
+      }).toString()
+      let dossierFileIds = vm.filesAdd.map(obj =>{
+        return obj.dossierFileId
+      }).toString()
+      let filterCopyFile = {
+        dossierIds: dossierIds,
+        dossierFileId: dossierFileIds
+      }
+      // for (let index in vm.filesAdd) {
+      //   filterCopyFile.dossierFileId = vm.filesAdd[index]['dossierFileId']
+        vm.$store.dispatch('uploadFileDossierGroup', filterCopyFile).then(function (result) {
+          toastr.success('Đính kèm tài liệu thành công')
+          vm.$store.commit('setActiveAddFileGroup', false)
+        })
+      // }
+    },
+    cancelAddFile () {
+      let vm = this
+      vm.$store.commit('setActiveAddFileGroup', false)
+    },
+    toggleAll () {
+      var vm = this
+      if (vm.selected.length) {
+        vm.selected = []
+      } else {
+        vm.selected = vm.dossiersIntoGroupRender
+      }
+    },
+    toggleAllSelectDialog () {
+      var vm = this
+      console.log('toggleAllSelectDialog', vm.dossiersIntoGroupRender, vm.selectedAttach)
+      if (vm.selectedAttach.length) {
+        vm.selectedAttach = []
+      } else {
+        vm.selectedAttach = vm.dossiersIntoGroupRender
+      }
+      console.log('toggleAllSelectDialog 2', vm.selectedAttach)
+    },
+    goBack () {
+      let vm = this
+      let currentParams = vm.$router.history.current.params
+      let currentQuery = vm.$router.history.current.query
+      if (vm.activeAddDossierIntoGroup) {
+        vm.activeAddDossierIntoGroup = false
+        vm.getDetaiGroup(vm.id)
+      } else {
+        vm.$router.push({
+          path: vm.pathLanding + currentParams.index,
+          query: currentQuery
+        })
+      }
+    }
+  }
+}
+</script>

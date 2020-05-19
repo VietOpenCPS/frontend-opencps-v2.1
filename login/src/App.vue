@@ -544,10 +544,11 @@ export default {
           ) {
             if (response.data === "pending") {
               let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
+              let userId = response.headers.hasOwnProperty('userid') ? response.headers.userid : ''
               window.location.href =
                 url +
                 "/register#/xac-thuc-tai-khoan?active_user_id=" +
-                window.themeDisplay.getUserId() +
+                userId +
                 "&redirectURL=" +
                 url;
             } else {
@@ -595,12 +596,14 @@ export default {
               response.data !== "lockout"
             ) {
               if (response.data === "pending") {
+                let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
+                let userId = response.headers.hasOwnProperty('userid') ? response.headers.userid : ''
                 window.location.href =
-                  window.themeDisplay.getURLHome() +
+                  url +
                   "/register#/xac-thuc-tai-khoan?active_user_id=" +
-                  window.themeDisplay.getUserId() +
+                  userId +
                   "&redirectURL=" +
-                  window.themeDisplay.getURLHome()
+                  url;
               } else {
                 window.location.href = response.data
               }

@@ -7,16 +7,16 @@
         </div>
       </nav>
       <v-flex xs12>
-        <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
+        <v-form ref="form" v-model="valid" lazy-validation class="px-2 pt-3" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
           <v-flex xs12>
-            <p>Vui lòng nhập mã PIN đã được gửi về email của bạn</p>
+            <p>Tài khoản chưa xác thực. Để xác thực tài khoản, vui lòng nhập mã PIN đã được gửi về email của bạn.</p>
           </v-flex>
           <v-flex xs12>
             <v-text-field
               box
               placeholder="Nhập mã pin"
               v-model="pinCode"
-              :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+              :rules="[v => !!v || 'Mã pin là bắt buộc']"
               required
             ></v-text-field>
           </v-flex>
@@ -28,6 +28,12 @@
             >
               <v-icon>how_to_reg</v-icon>&nbsp;
               Xác thực
+            </v-btn>
+            <v-btn color="primary"
+              @click="goBack"
+            >
+              <v-icon>reply</v-icon>&nbsp;
+              Quay lại
             </v-btn>
           </div>
         </v-form>
@@ -170,6 +176,9 @@ export default {
       })
       .catch(function(error) {
       })
+    },
+    goBack () {
+      window.history.back()
     }
   }
 }

@@ -165,9 +165,6 @@
       activeGetCounter () {
         return this.$store.getters.activeGetCounter
       },
-      // viewMobile () {
-      //   return isMobile
-      // },
       pathLanding () {
         return '/danh-sach-ho-so'
       },

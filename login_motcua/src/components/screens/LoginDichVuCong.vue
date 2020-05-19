@@ -57,6 +57,27 @@
               @keyup.enter="submitConfirmLogin"
             ></v-text-field>
           </v-flex>
+          <!--  -->
+          <v-flex v-if="captcha" class="py-2 text-xs-center captcha" xs12 style="
+            align-items: center;
+            background: #dedede;
+            justify-content: center;
+          ">
+            <img :src="chapchablob" alt="capcha" style="border-radius: 5px;">
+            <v-btn flat icon v-on:click.native="makeImageCap">
+              <v-icon color="white" size="26">refresh</v-icon>
+            </v-btn>
+          </v-flex>
+          <v-flex xs12 class="mt-2 text-xs-center" v-if="captcha">
+            <v-text-field
+              box
+              v-model="j_captcha_response"
+              placeholder="Nhập captcha"
+              :rules="[v => !!v || 'Mã captcha là bắt buộc']"
+              required
+            ></v-text-field>
+          </v-flex>
+          <!--  -->
           <v-flex xs12 class="text-xs-left">
             <div class="d-inline-block ml-2">
               <v-checkbox
@@ -74,6 +95,7 @@
               </p>
             </div>
           </v-flex>
+          
           <v-flex xs12 class="mt-3 text-xs-center">
             <v-btn class="my-0 white--text" color="#0b72ba"
               :loading="loading"
@@ -112,7 +134,7 @@
       </v-card>
     </v-dialog>
     <!--  -->
-    <v-dialog v-model="dialogContact" persistent max-width="290">
+    <v-dialog v-model="dialogContact" persistent max-width="310">
       <v-card>
         <v-card-title class="headline">
           <span>Cập nhật email sử dụng trên hệ thống</span>
@@ -145,6 +167,7 @@
 
 import Vue from 'vue'
 import $ from 'jquery'
+import toastr from 'toastr'
 import support from '../../store/support.json'
 export default {
   props: [],
@@ -152,6 +175,7 @@ export default {
   data: () => ({
     npmreactlogin_login: '',
     npmreactlogin_password: '',
+    captcha: false,
     j_captcha_response: '',
     chapchablob: '',
     loading: false,
@@ -198,6 +222,27 @@ export default {
           vm.dataMapping = dataObj
           if (dataObj && dataObj.hasOwnProperty('userId') && String(dataObj.userId) === '0') {
             vm.mapping = true
+            let typeAccount = ''
+            let title = ''
+            let idType = ''
+            if (dataObj.LoaiTaiKhoan === '1') {
+              typeAccount = 'Số CMND/ Căn cước '
+              idType = dataObj.SoCMND
+            } else if (dataObj.LoaiTaiKhoan === '2') {
+              typeAccount = 'Mã số thuế '
+              idType = dataObj.MaSoThue
+            }
+            if (typeAccount && (dataObj.SoCMND || dataObj.MaSoThue)) {
+              title = typeAccount + idType + ' đã tạo tài khoản trên hệ thống. Vui lòng đăng nhập để đồng bộ với tài khoản Cổng Dịch vụ công Quốc gia.'
+            }
+            if (title) {
+              toastr.options = {
+                'positionClass': 'toast-top-center',
+                'closeButton': true,
+                'timeOut': '30000'
+              }
+              toastr.info(title)
+            }
           }
           if (dataObj && dataObj.hasOwnProperty('state') && dataObj.state === 'create') {
             vm.contactEmail = dataObj['ThuDienTu'] ? dataObj['ThuDienTu'] : ''
@@ -234,10 +279,14 @@ export default {
         npmreactlogin_password: vm.npmreactlogin_password,
         j_captcha_response: vm.j_captcha_response
       }
-      if (vm.npmreactlogin_login && vm.npmreactlogin_password) {
+      if (vm.$refs.form.validate()) {
         vm.$store.dispatch('goToDangNhap', filter).then(function (result) {
           if (vm.mapping && result === 'success') {
             vm.doMappingDvcqg()
+          }
+          if (result === 'captcha') {
+            vm.captcha = true
+            vm.makeImageCap()
           }
         })
       }
