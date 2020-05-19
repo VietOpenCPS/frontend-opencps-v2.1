@@ -6,9 +6,19 @@
           <span>QUẢN LÝ THÔNG TIN CÔNG DÂN, CƠ QUAN TỔ CHỨC, DOANH NGHIỆP</span>
         </div>
       </div>
-      <v-card-text class="px-0">
-        <v-layout wrap class="mt-3">
-          <v-flex xs12 sm7 class="pr-2 input-group--text-field-box">
+      <v-card-text class="px-0 pt-0">
+        <v-layout wrap class="">
+          <v-flex xs12 class="pr-2 mt-3">
+            <div class="text-bold d-inline-block mr-3" style="color: #903938;line-height: 24px;vertical-align: top;">Loại thông tin người dùng: </div>
+            <v-radio-group class="pt-0 d-inline-block ml-3 mt-0" v-model="typeSearch" row @change="changeTypeSearch">
+              <v-radio label="Công dân" :value="'citizen'"></v-radio>
+              <v-radio label="Doanh nghiệp" :value="'business'"></v-radio>
+              <v-radio label="Cơ quan, tổ chức" :value="'organization'"></v-radio>
+              <v-radio label="Tất cả" :value="''" ></v-radio>
+            </v-radio-group>
+          </v-flex>
+
+          <v-flex xs12 sm6 class="pr-2 input-group--text-field-box mt-1">
             <v-text-field
                 label="Tìm kiếm theo tên người dùng"
                 v-model="keySearch"
@@ -17,19 +27,22 @@
                 box
                 clear-icon="clear"
                 clearable
-                @click:clear="clearKeySearch"
+                @click:clear="clearKeySearch('keyword')"
                 @click:append="searchKeyword"
               ></v-text-field>
           </v-flex>
-          <v-flex xs12 sm5 class="pl-2 pr-2">
-            <div style="position:relative">
-              <v-radio-group class="mt-3 pt-0" v-model="typeSearch" row @change="changeTypeSearch">
-                <v-radio label="Tất cả" :value="''" ></v-radio>
-                <v-radio label="Công dân" :value="'citizen'"></v-radio>
-                <v-radio label="Doanh nghiệp" :value="'business'"></v-radio>
-                <v-radio label="Cơ quan, tổ chức" :value="'organization'"></v-radio>
-              </v-radio-group>
-            </div>
+          <v-flex xs12 sm6 class="input-group--text-field-box mt-1 pl-2">
+            <v-text-field
+                label="Số CMND/ căn cước, mã tổ chức, doanh nghiệp"
+                v-model="idNoSearch"
+                @keyup.enter="searchKeyword"
+                append-icon="search"
+                box
+                clear-icon="clear"
+                clearable
+                @click:clear="clearKeySearch('idNo')"
+                @click:append="searchKeyword"
+              ></v-text-field>
           </v-flex>
         </v-layout>
         <v-data-table
@@ -92,12 +105,12 @@
                   <span>Sửa thông tin</span>
                 </v-tooltip>
                 
-                <!-- <v-tooltip top v-if="!loadingTable">
-                  <v-btn @click="bindInfoApplicant(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
-                    <v-icon>beenhere</v-icon>
+                <v-tooltip top v-if="!loadingTable" class="ml-2">
+                  <v-btn @click="documentManage(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
+                    <v-icon>fas fa fa-folder-open</v-icon>
                   </v-btn>
-                  <span>Sử dụng</span>
-                </v-tooltip> -->
+                  <span>Quản lý tài liệu</span>
+                </v-tooltip>
               </td>
             </tr>
           </template>
@@ -110,7 +123,7 @@
         <!--  -->
         <div class="my-2" v-if="totalApplicantSearch > numberPerPage">
           <div class="text-xs-right layout wrap" style="position: relative;">
-            <div class="flex pagging-table px-2"> 
+            <div class="flex pagging-table"> 
               <tiny-pagination :total="totalApplicantSearch" :page="applicantPage" :numberPerPage="numberPerPage" nameRecord="người dùng" custom-class="custom-tiny-class" 
                 @tiny:change-page="changePage" ></tiny-pagination> 
             </div>
@@ -230,6 +243,7 @@ export default {
   },
   data: () => ({
     keySearch: '',
+    idNoSearch: '',
     typeSearch: '',
     applicantListHeader: [
       {
@@ -342,7 +356,8 @@ export default {
               start: vm.applicantPage * vm.numberPerPage - vm.numberPerPage,
               end: vm.applicantPage * vm.numberPerPage,
               type: vm.typeSearch,
-              applicantName: vm.keySearch
+              applicantName: vm.keySearch,
+              idNo: vm.idNoSearch
             }
           }
           axios.get(url, param).then(response => {
@@ -403,22 +418,34 @@ export default {
       vm.dialog_editApplicant = true
       vm.$refs.form.resetValidation()
     },
+    documentManage (item) {
+      let vm = this
+      vm.$store.commit('setApplicantInfos', item)
+      vm.$router.push({
+        path: '/' + item.applicantIdNo + '/quan-ly-giay-to',
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
+    },
     searchKeyword () {
       let vm = this
       setTimeout(function () {
-        if (String(vm.keySearch).length >= 3) {
-          vm.applicantPage = 1
-          vm.getApplicantList().then(function(result) {
-            vm.totalApplicantSearch = result['total']
-            vm.applicantLists = result['data']
-          }).catch(function () {
-          })
-        }
+        vm.applicantPage = 1
+        vm.getApplicantList().then(function(result) {
+          vm.totalApplicantSearch = result['total']
+          vm.applicantLists = result['data']
+        }).catch(function () {
+        })
       }, 200)
     },
-    clearKeySearch () {
+    clearKeySearch (item) {
       let vm = this
-      vm.keySearch = ''
+      if (item === 'keyword') {
+        vm.keySearch = ''
+      } else {
+        vm.idNoSearch = ''
+      }
       setTimeout(function () {
         vm.applicantPage = 1
         vm.getApplicantList().then(function(result) {
@@ -493,6 +520,11 @@ export default {
       let vm = this
       vm.menuBirthDate = false
       vm.applicantEdit['applicantIdDate'] = vm.formatDate(vm.ngayCap)
+    },
+    formatDate(date) {
+      if (!date) return null
+      const [year, month, day] = date.split('-')
+      return `${day}/${month}/${year}`
     },
     onChangeCityEditApplicant (data) {
       let vm = this

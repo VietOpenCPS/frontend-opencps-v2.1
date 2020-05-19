@@ -31,7 +31,7 @@
                 
                 <div class="search-wrapper mt-3">
                     <div class="search">
-                        <input type="text" class="form-control" placeholder="Nhập mã số hồ sơ" id="dossierNoSearch" name="dossierNoSearch">
+                        <input type="text" class="form-control" placeholder="Nhập mã hồ sơ" id="dossierNoSearch" name="dossierNoSearch">
                         <button type="button" @click="toDetailDossier">Xử lý hồ sơ</button>
                     </div>
                 </div>
@@ -105,34 +105,49 @@
         let vm = this
         if (vm.donviSelect) {
             let url = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
-            window.location.href = url + '#/' + vm.donviSelect + '/danh-sach-ho-so'
+            window.location.href = url + '/mot-cua-dien-tu#/' + vm.donviSelect + '/danh-sach-ho-so'
         } else {
             toastr.info('Vui lòng chọn đơn vị xử lý hồ sơ')
         }
       },
       toDetailDossier () {
         let vm = this
-        if (vm.donviSelect) {
-            if (document.getElementById('dossierNoSearch').value) {
+        if (document.getElementById('dossierNoSearch').value) {
+            let dossierNo = document.getElementById('dossierNoSearch').value
+            let govCode = dossierNo.split('-')[0]
+            let govCodeSelect = ''
+            try {
+                govCodeSelect = vm.listDonVi.filter(function (item) {
+                    return item.itemNameEN === govCode
+                })[0]['itemCode']
+            } catch (error) {
+                toastr.error('Không có hồ sơ mã ' + dossierNo)
+                return
+            }
+            
+            if (govCodeSelect) {
                 let dossierId = ''
                 let config = {
                     headers: {
-                        'groupId': vm.donviSelect
+                        'groupId': govCodeSelect
                     }
                 }
-                axios.get('/o/rest/v2/dossiers?start=0&end=15&dossierNo=' + document.getElementById('dossierNoSearch').value, config).then(function (response) {
+                axios.get('/o/rest/v2/dossiers?start=0&end=1&dossierNo=' + dossierNo, config).then(function (response) {
                     if (response.data && response.data.hasOwnProperty('data') && response.data.data.length > 0) {
                         dossierId = response.data.data[0]['dossierId']
                         let url = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
-                        window.location.href = url + '#/' + vm.donviSelect + '/danh-sach-ho-so/0/chi-tiet-ho-so/' + dossierId
+                        window.location.href = url + '/mot-cua-dien-tu#/' + govCodeSelect + '/danh-sach-ho-so/0/chi-tiet-ho-so/' + dossierId
                     } else {
-                        toastr.error('Không có hồ sơ mã số ' + document.getElementById('dossierNoSearch').value)
+                        toastr.error('Không có hồ sơ mã ' + dossierNo)
                     }
                 }).catch(function (error) {
                 })
+            } else {
+                toastr.error('Không có hồ sơ mã ' + dossierNo)
             }
+            
         } else {
-            toastr.info('Vui lòng chọn đơn vị xử lý hồ sơ')
+            toastr.info('Vui lòng nhập mã hồ sơ')
         }
       }
     }

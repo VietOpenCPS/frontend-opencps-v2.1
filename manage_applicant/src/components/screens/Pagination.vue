@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!isMobile" style="text-align: left;position: absolute;line-height: 46px">Tổng số <span class="text-bold primary--text">{{total}}</span> thủ tục. </div>
+    <div v-if="!isMobile" style="text-align: left;position: absolute;line-height: 46px">Tổng số <span class="text-bold primary--text">{{total}}</span> {{nameRecord}} </div>
     <div v-if="total > 0" class="vue-tiny-pagination pagination layout" :style="!isMobile ? 'justify-content: flex-end; -webkit-justify-content: flex-end;' : ''">
       <div :class="!isMobile ? 'px-3 xs4 flex' : 'pr-3 xs4 flex'">
         <v-select
@@ -72,6 +72,10 @@ export default {
     showLimit: {
       type: Boolean,
       default: true
+    },
+    nameRecord: {
+      type: String,
+      default: 'bản ghi'
     }
   },
   data () {

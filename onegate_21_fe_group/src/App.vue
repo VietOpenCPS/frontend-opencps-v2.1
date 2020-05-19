@@ -100,6 +100,11 @@
       </div>
     </div>
     <v-content>
+      <div v-if="agencyManage" class="row-header no__hidden_class mb-3">
+        <div class="background-triangle-big"> <span>{{agencyManage}} </span> </div>
+        <div class="layout row wrap header_tools row-blue">
+        </div> 
+      </div>
       <router-view v-if="isSigned"></router-view>
       <v-alert class="mx-3" v-if="!loading && trangThaiHoSoList.length === 0 && isSigned" outline color="warning" icon="priority_high" :value="true">
         Bạn không có quyền thao tác!
@@ -144,7 +149,8 @@
       currentStep: '0',
       counterData: [],
       detailState: 0,
-      isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false
+      isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false,
+      agencyManage: ''
     }),
     beforeDestroy () {
       if (typeof window !== 'undefined') {
@@ -165,9 +171,9 @@
       activeGetCounter () {
         return this.$store.getters.activeGetCounter
       },
-      // viewMobile () {
-      //   return isMobile
-      // },
+      initDataResource () {
+        return this.$store.getters.loadingInitData
+      },
       pathLanding () {
         let initData = this.$store.getters.loadingInitData
         return '/' + initData['groupId'] + '/danh-sach-ho-so'
@@ -212,6 +218,7 @@
             vm.loadingCounter()
             vm.loading = false
           }
+          vm.getAgencies()
         })
         // 
         setInterval(function () {
@@ -389,6 +396,26 @@
             }
           }
           vm.loading = false
+        })
+      },
+      getAgencies () {
+        let vm = this
+        let url = '/o/rest/v2/dictcollections/SITE_GROUP/dictitems'
+        let config = {
+          headers: {
+            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get(url, config).then(function (response) {
+          if (response.data && response.data['data']) {
+            let listDonVi = response.data.data
+            vm.agencyManage = listDonVi.filter(function (item) {
+              return String(item.itemCode) === String(vm.initDataResource.groupId) 
+            })[0].itemName
+          }
+          
+        }).catch(function (error) {
+          
         })
       },
       doLogin () {
