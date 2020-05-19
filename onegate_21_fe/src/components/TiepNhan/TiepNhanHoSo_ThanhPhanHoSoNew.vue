@@ -1202,6 +1202,7 @@ export default {
           })
         } else {
           data.formData = fileFind.formData
+          data['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
           vm.showAlpacaJSFORM(data, true)
         }
         

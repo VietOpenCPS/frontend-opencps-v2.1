@@ -141,7 +141,7 @@
                     v-model='fileCMNDName'
                     v-if="xacthuc_credit"
                     :rules="[rules.required]"
-                    placeholder="Tải lên ảnh .png, .jpg, .jqeg"
+                    placeholder="Tải lên ảnh .png, .jpg, .jqeg, .pdf"
                     box
                   ></v-text-field>
                   <v-btn
@@ -156,7 +156,7 @@
                     type="file"
                     style="display: none"
                     ref="refFileCMND"
-                    accept="image/*"
+                    accept="image/pdf*"
                     @change="onFileCMNDPicked">
                 </div>
               </v-flex>

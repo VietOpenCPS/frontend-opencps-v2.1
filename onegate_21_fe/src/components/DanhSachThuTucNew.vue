@@ -555,7 +555,10 @@
       if (vm.capCoQuanThucHien) {
         vm.getAgencys(vm.capCoQuanThucHien)
       }
-      vm.getDomains()
+      if (vm.govAgencyFilter) {
+        vm.getDomains()
+      }
+      
     },
     updated () {
     },
@@ -600,6 +603,12 @@
           vm.getAgencys(vm.capCoQuanThucHien, val)
         } else {
           vm.getAgencys(vm.capCoQuanThucHien)
+        }
+      },
+      govAgencyFilter (val) {
+        let vm = this
+        if (val) {
+          vm.getDomains(val)
         }
       }
     },
@@ -995,13 +1004,24 @@
           administration: administrationCode ? administrationCode : '',
           parent: parentFilter ? parentFilter : ''
         }
-        vm.$store.dispatch('getAgencys', data).then(
-          res => {
-            vm.govAgencyList = res
-          }
-        ).catch(()=>{
-          vm.govAgencyList = []
-        })      
+        if (!parentFilter) {
+          vm.$store.dispatch('getAgencys', data).then(
+            res => {
+              vm.govAgencyList = res
+            }
+          ).catch(()=>{
+            vm.govAgencyList = []
+          }) 
+        } else {
+          vm.$store.dispatch('getAgencysFromParent', data).then(
+            res => {
+              vm.govAgencyList = res
+            }
+          ).catch(()=>{
+            vm.govAgencyList = []
+          }) 
+        }
+             
       },
       getDomains(agencyCode) {
         let vm = this

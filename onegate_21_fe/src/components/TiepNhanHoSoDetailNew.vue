@@ -240,6 +240,10 @@
           <input id="serviceName_hidden" type="text" :value="serviceName_hidden">
           <input id="govAgencyCode_hidden" type="text" :value="govAgencyCode_hidden">
           <input id="dossierTemplateNo_hidden" type="text" :value="dossierTemplateNo_hidden">
+          <input id="dossiers_hidden" type="text">
+          <input id="dossierFileArr_hidden" type="text">
+          <input id="dossierMarkArr_hidden" type="text">
+          <input id="payment_hidden" type="text">
           <input id="eformCode_hidden" type="text" :value="eformCode_hidden">
         </div>
         <div class="row-header">
@@ -276,7 +280,9 @@
                 Phiếu từ chối tiếp nhận
               </v-btn>
             </div>
-            <div id="formAlpacaNewTemplate" class="mb-5 pt-0"></div>
+            <div id="formAlpacaNewTemplate" class="mb-5 pt-0" v-if="serviceCode_hidden !== 'BNG-270821' && serviceCode_hidden !== 'BNG-270817'"></div>
+            <thu-tuc-cap-ho-chieu-ngoai-giao-cong-vu v-if="serviceCode_hidden === 'BNG-270821'"></thu-tuc-cap-ho-chieu-ngoai-giao-cong-vu>
+            <thu-tuc-hop-phap-hoa-lanh-su v-if="serviceCode_hidden === 'BNG-270817'"></thu-tuc-hop-phap-hoa-lanh-su>
           </v-card>
           <!--  -->
           <v-tabs icons-and-text centered class="mb-4">
@@ -592,6 +598,8 @@ import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
 import DichVuChuyenPhatHoSo from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatHoSo.vue'
+import ThuTucCapHoChieuNgoaiGiaoCongVu from './TiepNhan/ThuTucCapHoChieuNgoaiGiaoCongVu.vue'
+import ThuTucHopPhapHoaLanhSu from './TiepNhan/ThuTucHopPhapHoaLanhSu.vue'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -605,7 +613,9 @@ export default {
     'thong-tin-chung': ThongTinChung,
     'thu-phi': LePhi,
     'dich-vu-chuyen-phat-ho-so': DichVuChuyenPhatHoSo,
-    'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua
+    'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua,
+    'thu-tuc-cap-ho-chieu-ngoai-giao-cong-vu': ThuTucCapHoChieuNgoaiGiaoCongVu,
+    'thu-tuc-hop-phap-hoa-lanh-su': ThuTucHopPhapHoaLanhSu
   },
   data: () => ({
     // add new template
@@ -1328,20 +1338,24 @@ export default {
         serviceCode: $('#serviceCode_hidden').val(),
         govAgencyCode: $('#govAgencyCode_hidden').val(),
         templateNo: $('#dossierTemplateNo_hidden').val(),
-        dossiers: ''
+        dossiers:  $('#dossiers_hidden').val(),
+        dossierFileArr:  $('#dossierFileArr_hidden').val(), 
+        dossierMarkArr:  $('#dossierMarkArr_hidden').val(),
+        payment:  $('#payment_hidden').val(),
       }
-      let dataFormTemplate = window.$('#formAlpacaNewTemplate').alpaca('get').getValue()
-      let dataFilter = dataFormTemplate
-      for (let i in dataFilter) {
-        if (String(i).indexOf('_') >= 0) {
-          delete dataFilter[i]
-        }
-      }
-      dataCreate['dossiers'] = JSON.stringify(dataFilter['dossiers'])
-      dataCreate['dossierFileArr'] = JSON.stringify(dataFilter['dossierFileArr'])
-      dataCreate['dossierMarkArr'] = JSON.stringify(dataFilter['dossierMarkArr'])
-      dataCreate['payment'] = JSON.stringify(dataFilter['payment'])
-      if (String($('#validate_required').val()) === 'true' ) {
+      // let dataFormTemplate = window.$('#formAlpacaNewTemplate').alpaca('get').getValue()
+      // let dataFilter = dataFormTemplate
+      // for (let i in dataFilter) {
+      //   if (String(i).indexOf('_') >= 0) {
+      //     delete dataFilter[i]
+      //   }
+      // }
+      // dataCreate['dossiers'] = JSON.stringify(dataFilter['dossiers'])
+      // dataCreate['dossierFileArr'] = JSON.stringify(dataFilter['dossierFileArr'])
+      // dataCreate['dossierMarkArr'] = JSON.stringify(dataFilter['dossierMarkArr'])
+      // dataCreate['payment'] = JSON.stringify(dataFilter['payment'])
+      let dossiers = JSON.parse($('#dossiers_hidden').val())
+      if (dossiers.delegateName) {
         vm.loadingAction = true
         vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
           vm.loadingAction = false
