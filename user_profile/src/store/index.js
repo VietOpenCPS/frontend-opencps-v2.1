@@ -418,6 +418,80 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    getApplicantDocument ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+              start: filter.start ? filter.start : 0,
+              end: filter.end ? filter.end : 15,
+              applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : '',
+              fileTemplateNo: filter.fileTemplateNo ? filter.fileTemplateNo : '',
+              status: filter.status,
+              keyword: filter.keywordSearch ? filter.keywordSearch : '',
+              applicantDataType: filter.applicantDataType ? filter.applicantDataType : '',
+              fileNo: filter.fileNoSearch
+            }
+          }
+          axios.get('/o/rest/v2/applicantdatas', param).then(function (response) {
+            if (response['data'].hasOwnProperty('data')) {
+              if (Array.isArray(response['data']['data'])) {
+                resolve(response.data)
+              } else {
+                resolve(
+                  {
+                    data: [response['data']['data']],
+                    total: response['data']['total']
+                  }
+                )
+              }
+            } else {
+              reject(error)
+            }
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getFileItems ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+              status: filter.status ? filter.status : ''
+            }
+          }
+          axios.get('/o/rest/v2/fileitems', param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getFileAttach ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          },
+          responseType: 'blob'
+        }
+        axios.get('/o/rest/v2/applicantdatas/' + filter.applicantDataId + '/preview', param).then(response => {
+          let url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
     }
   },
   mutations: {

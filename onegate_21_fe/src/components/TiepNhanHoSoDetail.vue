@@ -144,14 +144,36 @@
           </v-expansion-panel>
         </div>
         <!--  -->
-        <!-- <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
+        <div style="position: relative;border-top:1px solid #ddd" v-if="originality !== 1 && fromViaPostalConfig">
+          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+            <v-expansion-panel-content hide-actions value="2">
+              <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
+                Nhận hồ sơ qua bưu chính
+              </div>
+              <div class="absolute__btn" style="width: 200px">
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-checkbox
+                  v-model="fromViaPostal"
+                  label="Hồ sơ nhận qua bưu chính"
+                  color="primary"
+                  hide-details
+                  class="d-inline-block mt-2"
+                ></v-checkbox>
+              </div>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
+        <!--  -->
+        <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
           <v-expansion-panel :value="[true]" expand  class="expansion-pl">
             <v-expansion-panel-content hide-actions value="2">
               <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát hồ sơ</div>
               <dich-vu-chuyen-phat-ho-so ref="dichvuchuyenphathoso" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ho-so>
             </v-expansion-panel-content>
           </v-expansion-panel>
-        </div> -->
+        </div>
         <!--  -->
         <div style="position: relative;" v-if="viaPortalDetail !== 0">
           <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -642,6 +664,8 @@ export default {
     loadingAction: false,
     loadingForm: false,
     notifyConfig: false,
+    fromViaPostal: false,
+    fromViaPostalConfig: true,
     smsNotify: true,
     emailNotify: true,
     dialog_printGuide: false,
@@ -813,7 +837,7 @@ export default {
             vm.dossierId = result.dossierId
             vm.briefNote = result.serviceName ? result.serviceName : ''
             if (vm.formCode === 'UPDATE') {
-              vm.briefNote = result.dossierName ? result.dossierName : result.serviceName
+              vm.fromViaPostal = String(result.fromViaPostal) === '1' ? true : false
             }
             result['editable'] = false
             if (result.dossierStatus === '') {
@@ -1072,6 +1096,7 @@ export default {
           tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
           tempData['dossierName'] = vm.briefNote
           tempData['originality'] = vm.originality
+          tempData['fromViaPostal'] = vm.fromViaPostal ? 1 : 0
           // console.log('data put dossier -->', tempData)
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             vm.loadingAction = false

@@ -862,7 +862,7 @@ export default {
   created () {
     let vm = this
     if (vm.formCode === "NEW") {
-      vm.thongTinNguoiNopHoSo.sameUser = true
+      // vm.thongTinNguoiNopHoSo.sameUser = true
     }
     if (vm.hasOrganization) {
       vm.labelSwitch = {

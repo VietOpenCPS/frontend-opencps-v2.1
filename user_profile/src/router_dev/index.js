@@ -3,9 +3,10 @@ import Router from 'vue-router'
 import DetailForward from '@/components/blacklist/DetailForward'
 import NotFound from '@/components/NotFound'
 import LandingUserProfile from '@/components/screens/Landing'
-
+import DocumentStorage from '@/components/screens/QuanLyGiayTo'
 const routes = [
   { path: '/', component: LandingUserProfile, props: true },
+  { path: '/kho-tai-lieu/:index', component: DocumentStorage, props: true },
   {
     path: '/danh-sach-ho-so/:index',
     name: 'Landing',
