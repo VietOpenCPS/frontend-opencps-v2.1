@@ -9,13 +9,15 @@
                         v-model="dossiers.delegateName"
                         :rules="[rules.required]"
                         required
-                        solo 
+                        solo
+                        @input="dossiers.delegateName = dossiers.delegateName.toUpperCase()"
                     ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6  class="px-2 ">
                     <label>CMND/CCCD số</label>
                     <v-text-field
                         v-model="dossiers.delegateIdNo"
+                        :rules="[rules.credit]"
                         solo
                     ></v-text-field>
                 </v-flex>
@@ -237,108 +239,127 @@
                 <v-flex xs12 sm4  class="px-2 my-2">
                     <label>Hộ chiếu cũ</label>
                     <div style="display:flex; flex-wrap: wrap; align-items: center;">
-                        <v-text-field
-                            v-model="ho_chieu_ngoai_giao_cu"
-                            label="Ngoại giao"
-                            style="width: 100px;"
-                            solo
-                        ></v-text-field>
-                        <v-text-field
-                            v-model="ho_chieu_cong_vu_cu"
-                            class="ml-2"
-                            label="Công vụ "
-                            style="width: 100px;"
-                            solo
-                        ></v-text-field>
-                        <v-text-field
-                            v-model="ho_chieu_pho_thong_cu"
-                            class="ml-2"
-                            label="Phổ thông"
-                            style="width: 100px;"
-                            solo
-                        ></v-text-field>
+                        <div>
+                            <v-text-field
+                                v-model="ho_chieu_ngoai_giao_cu"
+                                style="width: 100px;"
+                                solo
+                            ></v-text-field>
+                            <label for="">(Ngoại giao)</label>
+                        </div>
+                        <div class="ml-2">
+                            <v-text-field
+                                v-model="ho_chieu_cong_vu_cu"
+                                style="width: 100px;"
+                                solo
+                            ></v-text-field>
+                            <label for="">(Công vụ)</label>
+                        </div>
+                        <div class="ml-2">
+                            <v-text-field
+                                v-model="ho_chieu_pho_thong_cu"
+                                style="width: 100px;"
+                                solo
+                            ></v-text-field>
+                            <label for="">(Phổ thông)</label>
+                        </div>
                     </div>
                 </v-flex>
                 <v-flex xs12 sm4  class="px-2 my-2">
                     <label>Hộ chiếu cấp mới</label>
                     <div style="display:flex; flex-wrap: wrap;align-items: center;">
-                        <v-text-field
-                            v-model="ho_chieu_ngoai_giao_moi"
-                            label="Ngoại giao"
-                            style="width: 100px;"
-                            solo
-                        ></v-text-field>
-                        <v-text-field
-                            v-model="ho_chieu_cong_vu_moi"
-                            class="ml-2"
-                            label="Công vụ"
-                            style="width: 100px;"
-                            solo
-                        ></v-text-field>
+                        <div>
+                            <v-text-field
+                                v-model="ho_chieu_ngoai_giao_moi"
+                                style="width: 100px;"
+                                solo
+                            ></v-text-field>
+                            <label for="">(Ngoại giao)</label>
+                        </div>
+                        <div class="ml-2">
+                            <v-text-field
+                                v-model="ho_chieu_cong_vu_moi"
+                                style="width: 100px;"
+                                solo
+                            ></v-text-field>
+                            <label for="">(Công vụ)</label>
+                        </div>
                     </div>
                 </v-flex>
                 <v-flex xs12 sm4  class="px-2 my-2">
                     <label>Hộ chiếu</label>
                     <div style="display:flex; flex-wrap: wrap;align-items: center;">
-                        <v-text-field
-                            v-model="ho_chieu_gia_han"
-                            label="Gia hạn"
-                            style="width: 100px;"
-                            solo
-                        ></v-text-field>
-                        <v-text-field
-                            v-model="ho_chieu_hong"
-                            class="ml-2"
-                            label="Hỏng"
-                            style="width: 100px;"
-                            solo
-                        ></v-text-field>
-                        <v-text-field
-                            v-model="ho_chieu_mat"
-                            class="ml-2"
-                            label="Mất"
-                            style="width: 100px;"
-                            solo
-                        ></v-text-field>
+                        <div>
+                            <v-text-field
+                                v-model="ho_chieu_gia_han"
+                                style="width: 100px;"
+                                solo
+                            ></v-text-field>
+                            <label for="">(Gia hạn)</label>
+                        </div>
+                        <div class="ml-2">
+                            <v-text-field
+                                v-model="ho_chieu_hong"
+                                style="width: 100px;"
+                                solo
+                            ></v-text-field>  
+                            <label for="">(Hỏng)</label>                         
+                        </div>
+                        <div class="ml-2">
+                            <v-text-field
+                                v-model="ho_chieu_mat"
+                                style="width: 100px;"
+                                solo
+                            ></v-text-field>
+                            <label for="">(Mất)</label>
+                        </div>
+
                     </div>
                 </v-flex>
                 <v-flex xs12 class="px-2 my-2">
                     <label>Công hàm</label>
                     <div style="display:flex; flex-wrap: wrap;align-items: center;">
-                        <v-text-field
-                            v-model="cong_ham_so_nuoc"
-                            label="Số nước xin"
-                            style="width: 100px;"
-                            solo
-                        ></v-text-field>
-                        <v-text-field
-                            v-model="cong_ham_so_nguoi"
-                            class="ml-2"
-                            label="Số người xin CH"
-                            style="width: 100px;"
-                            solo
-                        ></v-text-field>
-                        <v-text-field
-                            v-model="cong_ham_nhap_canh"
-                            class="ml-2"
-                            label="Nhập cảnh"
-                            style="width: 100px;"
-                            solo
-                        ></v-text-field>
-                        <v-text-field
-                            v-model="cong_ham_qua_canh"
-                            label="Quá cảnh"
-                            class="ml-2"
-                            style="width: 100px;"
-                            solo
-                        ></v-text-field>
-                        <v-text-field
-                            v-model="cong_ham_schengen"
-                            label="Schengen"
-                            class="mx-2"
-                            style="width: 100px;"
-                            solo
-                        ></v-text-field>
+                        <div>
+                            <v-text-field
+                                v-model="cong_ham_so_nuoc"
+                                style="width: 100px;"
+                                solo
+                            ></v-text-field>
+                            <label for="">(Số nước xin)</label>
+                        </div>
+                        <div class="ml-2">
+                            <v-text-field
+                                v-model="cong_ham_so_nguoi"  
+                                style="width: 100px;"
+                                solo
+                            ></v-text-field>
+                            <label for="">(Số người xin CH)</label>
+                        </div>
+                        <div class="ml-2">
+                            <v-text-field
+                                v-model="cong_ham_nhap_canh"
+                                style="width: 100px;"
+                                solo
+                            ></v-text-field>
+                            <label for="">(Nhập cảnh)</label>
+                        </div>
+                        <div class="ml-2">
+                            <v-text-field
+                                v-model="cong_ham_qua_canh"
+                                style="width: 100px;"
+                                solo
+                            ></v-text-field>
+                            <label for="">(Quá cảnh)</label>
+                        </div>
+                        <div class="ml-2">
+                            <v-text-field
+                                v-model="cong_ham_schengen"
+                                class="mx-2"
+                                style="width: 100px;"
+                                solo
+                            ></v-text-field>
+                            <label for="">(Schengen)</label>
+                        </div>
                     </div>
                 </v-flex>
                 <v-flex xs12 sm4  class="px-2 my-2">
@@ -367,6 +388,7 @@
                             v-model="dossiers.dueDate"
                             persistent-hint
                             append-icon="event"
+                            hint="DD/MM/YYYY"
                             @blur="dateDueDate = parseDate(dossiers.dueDate)"
                             :rules="[rules.required]"
                             
@@ -400,10 +422,14 @@
         >
             <v-card>
                 <v-card-title
-                class="headline lighten-2"
-                primary-title
+                    class="headline lighten-2"
+                    primary-title
+                    style="display: flex;justify-content: space-between;"
                 >
                     Thông tin văn bản cử đi nước ngoài
+                    <v-btn color="#115ebe" fab small dark  @click="dialogThemVanBan = false">
+                        <v-icon>cancel</v-icon>
+                    </v-btn>
                 </v-card-title>
                 <v-card-text class="form_vuejs">
                     <v-form ref="formVanBan" lazy-validation>
@@ -431,6 +457,7 @@
                                                 v-model="vb_ngay_ky"
                                                 persistent-hint
                                                 append-icon="event"
+                                                hint="DD/MM/YYYY"
                                                 @blur="dateNgayKy = parseDate(vb_ngay_ky)"
                                                 solo
                                                 :rules="[rules.required,rules.checkDate]"
@@ -467,7 +494,7 @@
                                         ></v-text-field>
                                     </v-flex>
                                     <v-flex xs12 class="px-2 my-2">
-                                        <label for="">Người ký Văn bản/Quyết định</label>
+                                        <label for="">Người ký Văn bản/Quyết định <span class="red--text">*</span></label>
                                         <v-autocomplete
                                             :items="listVanBanNguoiKy"
                                             v-model="vb_nguoi_ky"
@@ -510,10 +537,14 @@
         >
             <v-card>
                 <v-card-title
-                class="headline lighten-2"
-                primary-title
+                    class="headline lighten-2"
+                    primary-title
+                    style="display: flex;justify-content: space-between;"
                 >
                     Thông tin thành viên
+                    <v-btn color="#115ebe" fab small dark  @click="dialogThemThanhVien = false">
+                        <v-icon>cancel</v-icon>
+                    </v-btn>
                 </v-card-title>
                 <v-card-text class="form_vuejs">
                     <v-form ref="formThanhVien" lazy-validation>
@@ -525,11 +556,13 @@
                                             <v-checkbox
                                                 v-model="ho_chieu_ngoai_giao"
                                                 label="CẤP HỘ CHIẾU NGOẠI GIAO"
+                                                required
                                                 >
                                             </v-checkbox>
                                             <v-checkbox
                                                 v-model="ho_chieu_cong_vu"
                                                 label="CẤP HỘ CHIẾU CÔNG VỤ"
+                                                required
                                                 >
                                             </v-checkbox>
                                             <v-checkbox
@@ -537,6 +570,7 @@
                                                 label="CẤP CÔNG HÀM XIN THỊ THỰC"
                                                 >
                                             </v-checkbox>
+                                            <span class="red--text">*</span>
                                         </div>
                                     </v-flex>
                                     <v-flex xs12 class="px-2 my-2">
@@ -577,32 +611,38 @@
                                             :rules="[rules.required]"
                                             required
                                             solo
+                                            @input="ho_ten= ho_ten.toUpperCase()"
                                         ></v-text-field>
                                     </v-flex>
-                                    <v-flex xs12 class="px-2 my-2">
-                                        <div style="display:flex; flex-wrap: wrap;align-items: center;">
-                                            <label for="">2. Sinh ngày</label>
-                                            <v-text-field
-                                                v-model="ngay_sinh"
-                                                :rules="[rules.required]"
-                                                required
-                                                solo
-                                            ></v-text-field>
-                                            <label for="">Tháng sinh</label>
-                                            <v-text-field
-                                                v-model="thang_sinh"
-                                                :rules="[rules.required]"
-                                                required
-                                                solo
-                                            ></v-text-field>
-                                            <label for="">Năm sinh</label>
-                                            <v-text-field
-                                                v-model="nam_sinh"
-                                                :rules="[rules.required]"
-                                                required
-                                                solo
-                                            ></v-text-field>
-                                        </div>
+                                    <v-flex xs12 sm3 class="px-2 my-2">
+                                        <label for="">2. Sinh ngày</label>
+                                        <v-text-field
+                                            type="number"
+                                            v-model="ngay_sinh"
+                                            :rules="[rules.required]"
+                                            required
+                                            solo
+                                        ></v-text-field>
+                                    </v-flex>
+                                    <v-flex xs12 sm3 class="px-2 my-2">
+                                        <label for="">Tháng sinh</label>
+                                        <v-text-field
+                                            type="number"
+                                            v-model="thang_sinh"
+                                            :rules="[rules.required]"
+                                            required
+                                            solo
+                                        ></v-text-field>
+                                    </v-flex>
+                                    <v-flex xs12 sm3 class="px-2 my-2">
+                                        <label for="">Năm sinh</label>
+                                        <v-text-field
+                                            type="number"
+                                            v-model="nam_sinh"
+                                            :rules="[rules.required]"
+                                            required
+                                            solo
+                                        ></v-text-field>
                                     </v-flex>
                                     <v-flex xs12 sm3 class="px-2 my-2">
                                         <div style="display:flex; flex-wrap: wrap;align-items: center;">
@@ -655,7 +695,7 @@
                                             <v-text-field
                                                 v-model="so_cmt"
                                                 label="Giấy CMND/Thẻ CCCD số"
-                                                :rules="[rules.required]"
+                                                :rules="[rules.required, rules.credit]"
                                                 required
                                                 solo
                                             ></v-text-field>
@@ -678,6 +718,7 @@
                                             <v-text-field
                                                 slot="activator"
                                                 v-model="ngay_cap_cmt"
+                                                hint="DD/MM/YYYY"
                                                 persistent-hint
                                                 append-icon="event"
                                                 @blur="dateNgayCapCMND = parseDate(ngay_cap_cmt)"
@@ -779,6 +820,7 @@
                                                 slot="activator"
                                                 v-model="ngay_ho_chieu_ngoai_giao"
                                                 persistent-hint
+                                                hint="DD/MM/YYYY"
                                                 append-icon="event"
                                                 @blur="dateNgayCapHCNG = parseDate(ngay_ho_chieu_ngoai_giao)"
                                                 solo
@@ -818,6 +860,7 @@
                                                 slot="activator"
                                                 v-model="ngay_ho_chieu_cong_vu"
                                                 persistent-hint
+                                                hint="DD/MM/YYYY"
                                                 append-icon="event"
                                                 @blur="dateNgayCapHCCV = parseDate(ngay_ho_chieu_cong_vu)"
                                                 solo
@@ -857,7 +900,6 @@
                                                         class="mx-2"
                                                         label="Năm sinh"
                                                         v-model="gia_dinh[0].nam_sinh"
-                                                        :rules="[rules.checkYear]"
                                                         solo
                                                     ></v-text-field>
                                                     <v-text-field
@@ -891,7 +933,6 @@
                                                         class="mx-2"
                                                         label="Năm sinh"
                                                         v-model="gia_dinh[1].nam_sinh"
-                                                        :rules="[rules.checkYear]"
                                                         solo
                                                     ></v-text-field>
                                                     <v-text-field
@@ -925,7 +966,6 @@
                                                         class="mx-2"
                                                         label="Năm sinh"
                                                         v-model="gia_dinh[2].nam_sinh"
-                                                        :rules="[rules.checkYear]"
                                                         solo
                                                     ></v-text-field>
                                                     <v-text-field
@@ -959,7 +999,7 @@
                                                         class="mx-2"
                                                         label="Năm sinh"
                                                         v-model="gia_dinh[3].nam_sinh"
-                                                        :rules="[rules.checkYear]"
+                                                        
                                                         solo
                                                     ></v-text-field>
                                                     <v-text-field
@@ -993,7 +1033,7 @@
                                                         class="mx-2"
                                                         label="Năm sinh"
                                                         v-model="gia_dinh[4].nam_sinh"
-                                                        :rules="[rules.checkYear]"
+                                                
                                                         solo
                                                     ></v-text-field>
                                                     <v-text-field
@@ -1146,7 +1186,7 @@ export default {
           }
         ],
         listThanhPhanHoSo: [],
-        listGioiTinh: [{name: 'Nam', value: 'Nam'},{name: 'Nu', value: 'Nu'}],
+        listGioiTinh: [{name: 'Nam', value: 'Nam'},{name: 'Nữ', value: 'Nữ'}],
         fileMarks: [{value: 1, name: 'Bản chụp'},{value: 2, name: 'Bản sao'},{value: 3, name: 'Bản gốc'},{value: 4, name: 'Bản dịch'}],
         checkbox: false,
         dialogThemVanBan: false,
@@ -1311,6 +1351,15 @@ export default {
                 let newDate = new Date()
                 newDate.setFullYear(year)
                  return today >= newDate || 'Năm không được lớn hơn năm hiện tại'
+            },
+            credit: (value) => {
+                if (value.length === 9) {
+                const pattern = /^(([0-9]{9,9}))$/
+                return pattern.test(value) || 'Số CMND gồm 9 hoặc 12 ký tự 0-9'
+                } else {
+                const pattern = /^(([0-9]{12,12}))$/
+                return pattern.test(value) || 'Số CMND gồm 9 hoặc 12 ký tự 0-9'
+                }
             }
         }
     }),
@@ -1729,7 +1778,7 @@ export default {
         },
         updateThanhVien(){
             let vm = this
-            if(this.$refs.formThanhVien.validate()){
+            if(this.$refs.formThanhVien.validate() && (this.ho_chieu_ngoai_giao || this.ho_chieu_cong_vu)){
                 let tg = 'ma_nhan_than,ho_chieu_ngoai_giao,ho_chieu_cong_vu,vb_co_quan_chu_quan,vb_ma_co_quan_chu_quan,cong_ham,so_ho_chieu,so_hieu_van_ban,co_quan_chu_quan,co_quan_chu_quan_text,ho_ten,gioi_tinh,ngay_sinh,thang_sinh,nam_sinh,noi_sinh_khac,noi_sinh,noi_sinh_text,ho_khau,so_cmt,ngay_cap_cmt,noi_cap_cmt,co_quan_cong_tac,dien_thoai,chuc_vu,cap_bac_ham,chuc_vu_tieng_anh,cong_chuc_loai,cong_chuc_bac,cong_chuc_ngach,can_bo_bo_nhiem,so_ho_chieu_ngoai_giao,ngay_ho_chieu_ngoai_giao,noi_cap_ho_chieu_ngoai_giao,so_ho_chieu_cong_vu,ngay_ho_chieu_cong_vu,noi_cap_ho_chieu_cong_vu,gia_dinh'
                 let mang_key = tg.split(',')
                 let tk = new Object()

@@ -32,27 +32,16 @@
                     :items="applicants"
                     :loading="isLoadingDelegateIdNo"
                     :search-input.sync="searchApplicants"
-                    @input="chooseAplicant()"
+                    @change="chooseAplicant($event)"
                     hide-no-data
                     hide-selected
-                    item-text="applicantName"
+                    item-text="applicantIdNo"
                     item-value="applicantIdNo"
                     solo
                     :rules="[rules.credit]"
                 >
-                    <template v-slot:item="data">
-                        <template>
-                            <v-list-tile-content>
-                            <v-list-tile-title v-html="data"></v-list-tile-title>
-                            <v-list-tile-sub-title v-html="data"></v-list-tile-sub-title>
-                            </v-list-tile-content>
-                        </template>
-                    </template>
+
                 </v-autocomplete>
-                <!-- <v-text-field
-                    v-model="dossiers.delegateIdNo"
-                    solo
-                ></v-text-field> -->
             </v-flex>
             <v-flex xs12 sm6  class="px-2 ">
                 <label>Điện thoại</label>
@@ -123,6 +112,10 @@
                     no-data-text="Không có giấy tờ nào"
                     style="border-left: 0.5px solid #dedede;"
                 >
+                    <template slot="headerCell" slot-scope="props">
+                        <p><strong>{{ props.header.text }}</strong></p>
+                        <p>{{ props.header.textEng }}</p>
+                    </template>
                     <template slot="items" slot-scope="props">
                     <tr>
                         <td>
@@ -272,6 +265,7 @@
                         v-model="dossiers.dueDate"
                         persistent-hint
                         append-icon="event"
+                        hint="DD/MM/YYYY"
                         @blur="dateDueDate = parseDate(dossiers.dueDate)"
                         :rules="[rules.required]"
                         
@@ -423,6 +417,7 @@
                                                 v-model="ngay_ky"
                                                 persistent-hint
                                                 append-icon="event"
+                                                hint="DD/MM/YYYY"
                                                 @blur="dateNgayKy = parseDate(ngay_ky)"
                                                 solo
                                                 :rules="[rules.required,rules.checkDate]"
@@ -596,67 +591,81 @@ export default {
             {
                 text: 'Đã KT',
                 align: 'center',
-                sortable: false
+                sortable: false,
+                textEng: ''
             },
             {
                 text: 'Tên giấy tờ',
                 align: 'center',
-                sortable: false
+                sortable: false,
+                textEng: 'Name of documents'
             },
             {
                 text: 'Loại giấy tờ',
                 align: 'center',
-                sortable: false
+                sortable: false,
+                textEng: 'Type of documents'
             },
             {
                 text: 'Tên người được cấp giấy tờ',
                 align: 'center',
-                sortable: false
+                sortable: false,
+                textEng: 'Holder of document'
             },
             {
                 text: 'Tổng số bản',
                 align: 'center',
-                sortable: false
+                sortable: false,
+                textEng: 'Total of Documents'
             },
             {
                 text: 'Số hiệu của giấy tờ',
                 align: 'center',
-                sortable: false
+                sortable: false,
+                textEng: 'Number sign of document'
             },
             {
                 text: 'Cơ quan cấp/sao chứng thực',
                 align: 'center',
-                sortable: false
+                sortable: false,
+                textEng: 'Authentication office'
             },
             {
                 text: 'Người ký',
                 align: 'center',
-                sortable: false
+                sortable: false,
+                textEng: 'Name of signer'
             },
             {
                 text: 'Chức danh',
                 align: 'center',
-                sortable: false
+                sortable: false,
+                textEng: 'Title of signer'
             },
             {
                 text: 'Ngày ký',
                 align: 'center',
-                sortable: false
+                sortable: false,
+                textEng: 'Signed date'
             },
             {
                 text: 'Sửa',
                 align: 'center',
-                sortable: false
+                sortable: false,
+                textEng: ''
+                
             },
             {
                 text: 'Sao chép',
                 align: 'center',
-                sortable: false
+                sortable: false,
+                textEng: ''
             },
             {
                 text: 'Xóa',
                 align: 'center',
-                sortable: false
+                sortable: false,
+                textEng: ''
             },
         ],
         listGiayTo: [],
@@ -1476,9 +1485,21 @@ export default {
             }
 
         },
-        chooseAplicant () {
-            console.log(this.dossiers.applicantIdNo)
-        }
+        chooseAplicant (event) {
+            let vm = this
+            console.log(event)
+            console.log(vm.dossiers.delegateIdNo)
+            console.log(typeof vm.dossiers.delegateIdNo)
+            
+            let applicant = vm.applicants.find(e=>e.applicantIdNo === event)
+            console.log(applicant)
+            vm.dossiers.delegateName = applicant.applicantName.toUpperCase()
+            vm.dossiers.delegateTelNo = applicant.contactTelNo
+            vm.dossiers.delegateEmail = applicant.contactEmail
+            vm.delegateCityCode =  applicant.cityCode
+            vm.delegateDistrictCode = applicant.districtCode
+            vm.delegateWardCode = applicant.wardCode
+        },
     }
 }
 </script>
