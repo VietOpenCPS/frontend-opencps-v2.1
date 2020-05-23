@@ -323,6 +323,7 @@
                 </v-btn>
                 <span>Xem</span>
               </v-tooltip>
+
               <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
                   <v-badge>
@@ -340,12 +341,26 @@
                 </v-btn>
                 <span>Giấy tờ đã nộp</span>
               </v-tooltip>
-              <!-- <v-tooltip top>
-                <v-btn slot="activator" class="mx-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:20px;width:20px">
-                  {{item.count}}
+
+              <!-- <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
+                  <v-badge>
+                    <v-icon size="24" color="#004b94">cloud_upload</v-icon>
+                  </v-badge>
                 </v-btn>
-                <span>Xem</span>
+                <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ từ máy</span>
+                <span v-else>Tải giấy tờ từ máy (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
+              </v-tooltip>
+              <v-tooltip class="pl-1 pt-1" top v-if="!onlyView">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click="showDocumentApplicant(item.partNo)">
+                  <v-badge>
+                    <v-icon size="20" color="orange darken-3">fas fa fa-folder-open</v-icon>
+                  </v-badge>
+                </v-btn>
+                <span>Tải giấy tờ từ kho</span>
               </v-tooltip> -->
+
+
             </v-flex>
           </v-layout>
         </div>
@@ -443,13 +458,29 @@
         <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
       </v-card>
-    </v-dialog>   
+    </v-dialog>
+
+    <v-dialog v-model="dialog_documentApplicant" scrollable persistent max-width="1300px">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Kho tài liệu công dân, tổ chức, doanh nghiệp</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_documentApplicant = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-1">
+          <kho-tai-lieu ref="khotailieu" :index="applicantId"></kho-tai-lieu>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import $ from 'jquery'
 import toastr from 'toastr'
+import KhoTaiLieu from '../TiepNhan/KhoTaiLieu'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -480,6 +511,9 @@ export default {
       type: Boolean,
       default: () => false
     }
+  },
+  components: {
+    'kho-tai-lieu': KhoTaiLieu,
   },
   data: () => ({
     dossierTemplateItems: [],
@@ -545,7 +579,8 @@ export default {
     applicantNoteDossier: '',
     doChange: {},
     dossierTemplateLienThong: [],
-    receiveMessage: ''
+    receiveMessage: '',
+    dialog_documentApplicant: false
   }),
   created () {
     let vm = this
@@ -984,7 +1019,8 @@ export default {
     saveAlpacaForm (item, index) {
       var vm = this
       var fileFind = vm.dossierFilesItems.find(itemFile => {
-        return itemFile.dossierPartNo === item.partNo && itemFile.eForm && itemFile.fileSize!==0
+        // return itemFile.dossierPartNo === item.partNo && itemFile.eForm && itemFile.fileSize!==0
+        return itemFile.dossierPartNo === item.partNo && itemFile.eForm
       })
       if (fileFind) {
         fileFind['dossierId'] = vm.thongTinHoSo.dossierId
@@ -1000,7 +1036,7 @@ export default {
             vm.dossierFilesItems = resFiles
           }).catch(reject => {
           })
-          vm.dossierTemplateItems[index]['passRequired'] = true
+          vm.dossierTemplateItemsFilter[index]['passRequired'] = true
         }).catch(reject => {
           vm.loadingApacal = false
         })
@@ -1014,9 +1050,9 @@ export default {
             vm.loadingApacal = false
             toastr.clear()
             toastr.success('Thực hiện thành công')
-            vm.dossierTemplateItems[index].daKhai = true
+            vm.dossierTemplateItemsFilter[index].daKhai = true
           }, 3000)
-          vm.dossierTemplateItems[index]['passRequired'] = true
+          vm.dossierTemplateItemsFilter[index]['passRequired'] = true
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
           }).catch(reject => {
@@ -1034,7 +1070,8 @@ export default {
       console.log('data_output new_eform_2', dataOutPut)
       if (dataOutPut.hasOwnProperty('tp') && dataOutPut.tp) {
         let fileFind = vm.dossierFilesItems.find(itemFile => {
-          return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm && itemFile.fileSize!==0
+          // return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm && itemFile.fileSize!==0
+          return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm
         })
         if (fileFind) {
           fileFind['dossierId'] = vm.thongTinHoSo.dossierId
@@ -1051,8 +1088,8 @@ export default {
               vm.dossierFilesItems = resFiles
             }).catch(reject => {
             })
-            let index = vm.dossierTemplateItems.findIndex(item => item.partNo === dataOutPut.tp);
-            vm.dossierTemplateItems[index]['passRequired'] = true
+            let index = vm.dossierTemplateItemsFilter.findIndex(item => item.partNo === dataOutPut.tp);
+            vm.dossierTemplateItemsFilter[index]['passRequired'] = true
           }).catch(reject => {
             vm.loadingApacal = false
             toastr.clear()
@@ -1064,14 +1101,14 @@ export default {
           vm.loadingApacal = true
           console.log('item post', dataOutPut)
           vm.$store.dispatch('postEformCallBack', dataOutPut).then(resPostEform => {
-            let index = vm.dossierTemplateItems.findIndex(item => item.partNo === dataOutPut.tp)
+            let index = vm.dossierTemplateItemsFilter.findIndex(item => item.partNo === dataOutPut.tp)
             setTimeout(function () {
               vm.loadingApacal = false
               toastr.clear()
               toastr.success('Thực hiện thành công')
-              vm.dossierTemplateItems[index].daKhai = true
+              vm.dossierTemplateItemsFilter[index].daKhai = true
             }, 3000)
-            vm.dossierTemplateItems[index]['passRequired'] = true
+            vm.dossierTemplateItemsFilter[index]['passRequired'] = true
             vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
             }).catch(reject => {
@@ -1091,7 +1128,7 @@ export default {
       console.log('delete')
       let x = confirm('Bạn có muốn xóa toàn bộ file trong thành phần hồ sơ này?')
       if (x) {
-        vm.dossierFilesItems.forEach(val => {
+        vm.dossierTemplateItemsFilter.forEach(val => {
           if (val.dossierPartNo === item.partNo) {
             val['dossierId'] = vm.thongTinHoSo.dossierId
             vm.$store.dispatch('deleteAttackFiles', val).then(function (result) {
@@ -1122,7 +1159,7 @@ export default {
       data['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
       if (data.partType !== 3) {
         vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
-          vm.dossierTemplateItems[index]['passRequired'] = true
+          vm.dossierTemplateItemsFilter[index]['passRequired'] = true
           vm.progressUploadPart = ''
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
@@ -1130,7 +1167,7 @@ export default {
           })
         }).catch(function (data) {
           if (data.length > 0) {
-            vm.dossierTemplateItems[index]['passRequired'] = true
+            vm.dossierTemplateItemsFilter[index]['passRequired'] = true
           }
           vm.progressUploadPart = ''
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
@@ -1158,7 +1195,7 @@ export default {
         fileFind['id'] = vm.id
         vm.$store.dispatch('loadAlpcaForm', fileFind)
       } else {
-        vm.dossierTemplateItems.forEach(val => {
+        vm.dossierTemplateItemsFilter.forEach(val => {
           if (val.hasForm && data.partNo === val.partNo) {
             val['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
             vm.showAlpacaJSFORM(val)
@@ -1206,7 +1243,7 @@ export default {
         }
         
       } else {
-        vm.dossierTemplateItems.forEach(val => {
+        vm.dossierTemplateItemsFilter.forEach(val => {
           if (val.hasForm && data.partNo === val.partNo) {
             val['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
             // if (!val['loaded']) {
@@ -1262,7 +1299,7 @@ export default {
           if (file.dossierPartNo === item.partNo && file.eForm) {
             file['dossierId'] = vm.thongTinHoSo.dossierId
             vm.$store.dispatch('deleteDossierFile', file).then(resFile => {
-              vm.dossierTemplateItems[index].daKhai = false
+              vm.dossierTemplateItemsFilter[index].daKhai = false
               vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
                 vm.dossierFilesItems = result
                 vm.recountFileTemplates()
@@ -1277,12 +1314,12 @@ export default {
                     return file.dossierPartNo === item.partNo
                   })
                   if (fileViewsTemp) {
-                    vm.dossierTemplateItems[index]['passRequired'] = true
+                    vm.dossierTemplateItemsFilter[index]['passRequired'] = true
                   } else {
-                    vm.dossierTemplateItems[index]['passRequired'] = false
+                    vm.dossierTemplateItemsFilter[index]['passRequired'] = false
                   }
                 } else {
-                  vm.dossierTemplateItems[index]['passRequired'] = false
+                  vm.dossierTemplateItemsFilter[index]['passRequired'] = false
                 }
               })
             })
@@ -1438,16 +1475,16 @@ export default {
         return file.dossierPartNo === itemFile.dossierPartNo
       })
       if (indexFile === -1) {
-        for (var i = 0; i < vm.dossierTemplateItems.length; i++) {
-          if (vm.dossierTemplateItems[i].partNo === itemFile.dossierPartNo) {
-            vm.dossierTemplateItems[i]['passRequired'] = false
+        for (var i = 0; i < vm.dossierTemplateItemsFilter.length; i++) {
+          if (vm.dossierTemplateItemsFilter[i].partNo === itemFile.dossierPartNo) {
+            vm.dossierTemplateItemsFilter[i]['passRequired'] = false
             break
           }
         }
       } else {
-        for (var i = 0; i < vm.dossierTemplateItems.length; i++) {
-          if (vm.dossierTemplateItems[i].partNo === itemFile.dossierPartNo) {
-            vm.dossierTemplateItems[i]['passRequired'] = true
+        for (var i = 0; i < vm.dossierTemplateItemsFilter.length; i++) {
+          if (vm.dossierTemplateItemsFilter[i].partNo === itemFile.dossierPartNo) {
+            vm.dossierTemplateItemsFilter[i]['passRequired'] = true
             break
           }
         }
@@ -1500,7 +1537,7 @@ export default {
         vm.progressUploadPart = file.dossierFileId
         vm.$store.dispatch('copyFile', file).then(function (result) {
           vm.progressUploadPart = ''
-          vm.dossierTemplateItems[index]['passRequired'] = true
+          vm.dossierTemplateItemsFilter[index]['passRequired'] = true
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
             vm.recountFileTemplates()
@@ -1563,8 +1600,8 @@ export default {
     saveMark () {
       let vm = this
       // console.log('save mark', vm.dossierTemplateItems)
-      if (vm.dossierTemplateItems) {
-        vm.dossierTemplateItems.forEach(function (value, index) {
+      if (vm.dossierTemplateItemsFilter) {
+        vm.dossierTemplateItemsFilter.forEach(function (value, index) {
           if (value.partType === 1 && value.fileMark && !value.recordCountDefault) {
             value['dossierId'] = vm.thongTinHoSo.dossierId
             vm.$store.dispatch('postDossierMark', value)
@@ -1645,7 +1682,7 @@ export default {
       item['stateEditFileCheck'] = !item['stateEditFileCheck']
       // console.log('item-comment-------', item)
       vm.$store.dispatch('postDossierMark', item)
-      vm.dossierTemplateItems[index].fileComment = item.fileComment
+      vm.dossierTemplateItemsFilter[index].fileComment = item.fileComment
     },
     checkStyle (item) {
       var vm = this
@@ -1799,10 +1836,10 @@ export default {
     },
     validDossierTemplate () {
       var vm = this
-      if (vm.dossierTemplateItems.length > 0) {
-        for (var i = 0; i < vm.dossierTemplateItems.length; i++) {
-          if (vm.dossierTemplateItems[i]['required'] && !vm.dossierTemplateItems[i]['passRequired'] && vm.partTypes.includes(vm.dossierTemplateItems[i].partType)) {
-            let message = 'Chú ý :' + vm.dossierTemplateItems[i].partName + ' là thành phần bắt buộc!'
+      if (vm.dossierTemplateItemsFilter.length > 0) {
+        for (var i = 0; i < vm.dossierTemplateItemsFilter.length; i++) {
+          if (vm.dossierTemplateItemsFilter[i]['required'] && !vm.dossierTemplateItemsFilter[i]['passRequired'] && vm.partTypes.includes(vm.dossierTemplateItemsFilter[i].partType)) {
+            let message = 'Chú ý :' + vm.dossierTemplateItemsFilter[i].partName + ' là thành phần bắt buộc!'
             toastr.clear()
             toastr.error(message)
             return false
@@ -1907,7 +1944,7 @@ export default {
     decreaseCounter (index) {
       let vm = this
       vm.dossierTemplateItemsFilter[index].recordCount = vm.dossierTemplateItemsFilter[index]['recordCount'] ? vm.dossierTemplateItemsFilter[index]['recordCount'] : ''
-      vm.dossierTemplateItemsFilter[index]['recordCount'] = vm.dossierTemplateItemsFilter[index]['recordCount'] ? Number(vm.dossierTemplateItemsFilter[index]['recordCount']) - 1 : vm.dossierTemplateItems[index]['recordCount']
+      vm.dossierTemplateItemsFilter[index]['recordCount'] = vm.dossierTemplateItemsFilter[index]['recordCount'] ? Number(vm.dossierTemplateItemsFilter[index]['recordCount']) - 1 : vm.dossierTemplateItemsFilter[index]['recordCount']
       function changeRecord () {
         vm.doChange[index] = setTimeout(function () {
           if (!vm.onlyView && Number(vm.dossierTemplateItemsFilter[index]['recordCount']) >= 0) {
@@ -1959,6 +1996,11 @@ export default {
       } else {
         return ''
       }
+    },
+    showDocumentApplicant () {
+      let vm = this
+      vm.$refs.khotailieu.initData()
+      vm.dialog_documentApplicant = true
     }
   }
 }

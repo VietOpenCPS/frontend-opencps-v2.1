@@ -687,7 +687,7 @@
       AttachImage
     },
     data: () => ({
-      hasDocumentStorage: true,
+      hasDocumentStorage: false,
       xacthuc_credit: false,
       indentifyNoFFileUrl: '',
       indentifyNoFileUrl: '',
@@ -921,6 +921,12 @@
       try {
         if (xacthuc_credit) {
           vm.xacthuc_credit = true
+        }
+      } catch (error) {
+      }
+      try {
+        if (documentStorageConfig) {
+          vm.hasDocumentStorage = true
         }
       } catch (error) {
       }

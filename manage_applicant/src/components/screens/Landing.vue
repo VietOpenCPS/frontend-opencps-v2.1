@@ -343,24 +343,66 @@ export default {
     },
   },
   methods: {
+    // getApplicantList () {
+    //   let vm = this
+    //   let url = '/o/rest/v2/applicants'
+    //   vm.loadingTable = true
+    //   return new Promise(resolve => {
+    //     vm.$store.dispatch('loadInitResource').then(result => {
+    //       let param = {
+    //         headers: {
+    //         },
+    //         params: {
+    //           start: vm.applicantPage * vm.numberPerPage - vm.numberPerPage,
+    //           end: vm.applicantPage * vm.numberPerPage,
+    //           type: vm.typeSearch,
+    //           applicantName: vm.keySearch,
+    //           idNo: vm.idNoSearch
+    //         }
+    //       }
+    //       axios.get(url, param).then(response => {
+    //         let items = []
+    //         if (response.data.hasOwnProperty('data')) {
+    //           items = response.data.data
+    //         } else {
+    //         }
+    //         let dataOut = {
+    //           data: items,
+    //           total: response.data['total']
+    //         }
+    //         vm.loadingTable = false
+    //         resolve(dataOut)
+    //       }).catch(function () {
+    //         vm.loadingTable = false
+    //       })
+    //     })
+    //   })
+    // },
+
     getApplicantList () {
       let vm = this
-      let url = '/o/rest/v2/applicants'
       vm.loadingTable = true
       return new Promise(resolve => {
         vm.$store.dispatch('loadInitResource').then(result => {
           let param = {
             headers: {
-            },
-            params: {
-              start: vm.applicantPage * vm.numberPerPage - vm.numberPerPage,
-              end: vm.applicantPage * vm.numberPerPage,
-              type: vm.typeSearch,
-              applicantName: vm.keySearch,
-              idNo: vm.idNoSearch
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
             }
           }
-          axios.get(url, param).then(response => {
+          let filter = {
+            start: vm.applicantPage * vm.numberPerPage - vm.numberPerPage,
+            end: vm.applicantPage * vm.numberPerPage,
+            type: vm.typeSearch,
+            applicantName: vm.keySearch,
+            idNo: vm.idNoSearch
+          }
+
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/applicants')
+          dataPost.append('data', JSON.stringify(filter))
+
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
             let items = []
             if (response.data.hasOwnProperty('data')) {
               items = response.data.data

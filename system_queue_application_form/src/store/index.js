@@ -334,6 +334,51 @@ export const store = new Vuex.Store({
         })
       })
     },
+    createBookingOnlineProxy ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+
+        let dataCreate = {
+          className: filter['className'],
+          classPK: filter['classPK'],
+          codeNumber: filter['codeNumber'],
+          serviceCode: filter['serviceCode'],
+          state: filter['state'],
+          gateNumber: '',
+          bookingName: filter['bookingName'],
+          serviceGroupCode:  filter['serviceGroupCode'],
+          online: true,
+          bookingDate: filter['bookingDate'],
+          telNo: filter['telNo'],
+          j_captcha_response: filter['j_captcha_response']
+        }
+
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'POST')
+        dataPost.append('url', '/bookings')
+        dataPost.append('data', JSON.stringify(dataCreate))
+
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
+          console.log('responseCreateBooking', response)
+          if (response['data'] && response['data']['code'] === 203) {
+            toastr.clear()
+            toastr.error('Mã captcha không chính xác')
+            reject(response)
+          } else {
+            resolve(response.data)
+          }
+        }).catch(xhr => {
+          toastr.clear()
+          toastr.error('Đăng ký xếp hàng thất bại. Vui lòng thử lại.')
+          reject(xhr)
+        })
+      })
+    },
     updateBooking ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -429,6 +474,39 @@ export const store = new Vuex.Store({
           }).catch(function (xhr) {
             reject(false)
           })
+        })
+      })
+    },
+    getCounterBookingProxy ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+
+        let dataCreate = {
+          groupIdBooking: filter.groupIdBooking ? filter.groupIdBooking : '',
+          bookingDate: filter.bookingDate ? filter.bookingDate : '',
+          online: true
+        }
+
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/bookings/counter')
+        dataPost.append('serverCode', filter.serverCode)
+        dataPost.append('data', JSON.stringify(dataCreate))
+
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
+          let serializable = response.data
+          if (serializable && serializable.booking) {
+            resolve(true)
+          } else {
+            resolve(false)
+          }
+        }).catch(xhr => {
+          reject(false)
         })
       })
     },
