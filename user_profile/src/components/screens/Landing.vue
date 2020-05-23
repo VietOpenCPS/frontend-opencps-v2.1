@@ -8,13 +8,19 @@
         <v-flex class="xs12 sm8">
           <v-card style="border-radius: 4px;-webkit-box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;">
             <v-toolbar color="blue darken-3" dark height="48">
-              <v-btn dark flat>
+              <v-btn dark flat class="mr-2">
                 <v-icon>verified_user</v-icon> &nbsp; 
                 <span v-if="state === 0">
                   Thông tin tài khoản
                 </span>
                 <span v-else>
                   Đổi mật khẩu
+                </span>
+              </v-btn>
+              <v-btn dark flat v-if="hasDocumentStorage" @click.native="showDocumentStorage">
+                <v-icon>fas fa fa-folder-open</v-icon> &nbsp; 
+                <span>
+                  Kho tài liệu
                 </span>
               </v-btn>
               <v-spacer></v-spacer>
@@ -538,7 +544,7 @@
         </v-flex>
       </v-layout>
     </v-form>
-    <div class="mt-2 mb-5" v-if="user['className'] === 'org.opencps.usermgt.model.Applicant'" style="
+    <div class="mt-2 mb-5" v-if="user['className'] === 'org.opencps.usermgt.model.Applicant' && !hasDocumentStorage" style="
       max-width: 1300px;
       margin: 0 auto;
     ">
@@ -681,6 +687,7 @@
       AttachImage
     },
     data: () => ({
+      hasDocumentStorage: false,
       xacthuc_credit: false,
       indentifyNoFFileUrl: '',
       indentifyNoFileUrl: '',
@@ -914,6 +921,12 @@
       try {
         if (xacthuc_credit) {
           vm.xacthuc_credit = true
+        }
+      } catch (error) {
+      }
+      try {
+        if (documentStorageConfig) {
+          vm.hasDocumentStorage = true
         }
       } catch (error) {
       }
@@ -1477,6 +1490,12 @@
         let vm = this
         vm.fileCMND = config.file
       },
+      showDocumentStorage () {
+        let vm = this
+        vm.$router.push({
+          path: '/kho-tai-lieu/' + vm.user['applicantIdNo']
+        })
+      }
     }
   }
 </script>

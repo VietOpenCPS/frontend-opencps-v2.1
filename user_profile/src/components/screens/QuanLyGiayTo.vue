@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div style="max-width: 1300px; margin: 0px auto;">
     <v-card>
       <div class="row-header no__hidden_class">
         <div class="background-triangle-big">
-          <span>QUẢN LÝ TÀI LIỆU CÔNG DÂN, CƠ QUAN TỔ CHỨC, DOANH NGHIỆP</span>
+          <span>QUẢN LÝ KHO TÀI LIỆU</span>
         </div>
         <div class="layout row wrap header_tools row-blue">
           <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
@@ -14,42 +14,7 @@
           </div>
         </div> 
       </div>
-      <v-card-text class="px-0 pt-0">
-        <v-card-text class="py-0 px-0">
-          <v-layout wrap class="px-0 py-3">
-            <v-flex xs12 sm5 class="pr-2">
-              <div class="xs12 sm12 pb-1 mb-1">
-                <span class="pr-2">{{nameTitle}}: </span>
-                <span class="pl-0 text-bold"> {{applicantInfos.applicantName}}</span>
-              </div>
-            </v-flex>
-            <v-flex xs12 sm7 class="mb-1">
-              <div class="xs12 sm12 pb-1">
-                <span class="pr-2">{{creditTitle}}: </span>
-                <span class="pl-0 text-bold"> {{applicantInfos.applicantIdNo}}</span>
-              </div>
-            </v-flex>
-            <v-flex xs12 sm5 class="pr-2 mb-1">
-              <div class="xs12 sm12 pb-1">
-                <span class="pr-2">Điện thoại: </span>
-                <span class="pl-0 text-bold"> {{applicantInfos.contactTelNo}} </span>
-              </div>
-            </v-flex>
-            <v-flex xs12 sm7 class="mb-1">
-              <div class="xs12 sm12 pb-1">
-                <span class="pl-0">Thư điện tử: </span>
-                <span class="pl-0 text-bold"> {{applicantInfos.contactEmail}} </span>
-              </div>
-            </v-flex>
-            <v-flex xs12 class="">
-              <div class="xs12 sm12 pb-1">
-                <span class="pr-2">Địa chỉ: </span>
-                <span class="pl-0 text-bold"> {{String(applicantInfos.address).replace(/\./g, "")}} {{applicantInfos.wardName}}<span v-if="applicantInfos.wardName">, {{applicantInfos.districtName}}, {{applicantInfos.cityName}}</span></span>
-              </div>
-            </v-flex>
-            
-          </v-layout>
-        </v-card-text>
+      <v-card-text class="px-0 pt-0 mt-3">
         <v-layout wrap class="mt-0">
           <v-flex xs12 sm6 class="pr-2">
             <v-autocomplete
@@ -176,7 +141,7 @@
                   </v-btn>
                   <span>Tải xuống</span>
                 </v-tooltip>
-                <v-tooltip top v-if="!loadingTable" class="mr-2">
+                <v-tooltip top v-if="!loadingTable && props.item.status === 1" class="mr-2">
                   <v-btn @click="showEditDocument(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon>edit</v-icon>
                   </v-btn>
@@ -214,7 +179,7 @@
         <v-card-text class="py-1">
           <v-form ref="form" v-model="valid" lazy-validation class="px-0 grid-list">
             <v-layout row wrap class="px-0 py-3">
-              <v-flex xs12 sm6 class="pr-2">
+              <v-flex xs12 class="pr-2">
                 <v-autocomplete
                   :items="fileTemplateList"
                   v-model="fileTemplateNoCreate"
@@ -228,19 +193,7 @@
                   required
                 ></v-autocomplete>
               </v-flex>
-              <v-flex xs12 sm6 class="pr-2">
-                <v-autocomplete
-                  :items="statusList"
-                  v-model="statusCreate"
-                  label="Chọn tình trạng"
-                  item-text="text"
-                  item-value="value"
-                  :hide-selected="true"
-                  box
-                  :rules="[v => v !== '' && v !== null || 'Tình trạng là bắt buộc']"
-                  required
-                ></v-autocomplete>
-              </v-flex>
+              
               <v-flex xs12 class="">
                 <v-text-field
                   label="Tên tài liệu"
@@ -402,7 +355,6 @@ export default {
     srcDownload: ''
   }),
   computed: {
-    
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
@@ -417,13 +369,7 @@ export default {
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
       let applicant = vm.$store.getters.getApplicantInfos
-      if (applicant) {
-        vm.applicantInfos = applicant
-        vm.getApplicantType(vm.applicantInfos)
-        vm.getApplicantDocument()
-      } else {
-        vm.getApplicantList()
-      }
+      vm.getApplicantDocument()
       vm.getFileItems()
     })
   },
@@ -443,34 +389,12 @@ export default {
       }).catch(function () {
       })
     },
-    getApplicantList () {
-      let vm = this
-      let url = '/o/rest/v2/applicants'
-      let param = {
-        headers: {
-        },
-        params: {
-          start: 0,
-          end: 1,
-          idNo: vm.index
-        }
-      }
-      axios.get(url, param).then(response => {
-        if (response.data.hasOwnProperty('data')) {
-          vm.applicantInfos = response.data.data[0]
-          vm.getApplicantType(vm.applicantInfos)
-          vm.getApplicantDocument()
-        } else {
-        }
-      }).catch(function () {
-      })
-    },
     getApplicantDocument () {
       let vm = this
       let filter = {
         start: vm.documentPage * vm.numberPerPage - vm.numberPerPage,
         end: vm.documentPage * vm.numberPerPage,
-        applicantIdNo: vm.applicantInfos.applicantIdNo,
+        applicantIdNo: vm.index,
         fileTemplateNo: vm.fileTemplateNo,
         status: vm.status,
         keywordSearch: vm.keySearch,
@@ -553,13 +477,6 @@ export default {
       if (vm.$refs.form.validate()) {
         if (vm.fileNameView) {
           vm.loadingAction = true
-          let filter = {
-            fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
-            status: vm.statusCreate,
-            fileNo: vm.fileNo,
-            fileName: vm.fileName,
-            applicantIdNo: vm.applicantInfos.applicantIdNo,
-          }
           let param = {
             headers: {
               groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
@@ -568,12 +485,14 @@ export default {
             }
           }
           let dataPost = new FormData()
-          dataPost.append('method', 'POST')
-          dataPost.append('url', '/applicantdatas')
-          dataPost.append('data', JSON.stringify(filter))
+          dataPost.append('status', 0)
+          dataPost.append('applicantIdNo', vm.index)
+          dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
+          dataPost.append('fileNo', vm.fileNo)
+          dataPost.append('fileName', vm.fileName)
           dataPost.append('file', vm.fileUpdate)
           
-          axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
+          axios.post('/o/rest/v2/applicantdatas', dataPost, param).then(response => {
             vm.loadingAction = false
             toastr.success('Thêm mới tài liệu thành công')
             vm.dialog_createDocument = false
@@ -603,10 +522,8 @@ export default {
         vm.loadingAction = true
         let filter = {
           fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
-          status: vm.statusCreate,
           fileNo: vm.fileNo,
-          fileName: vm.fileName,
-          applicantIdNo: vm.applicantInfos.applicantIdNo
+          fileName: vm.fileName
         }
         let param = {
           headers: {
@@ -616,14 +533,14 @@ export default {
           }
         }
         let dataPost = new FormData()
-        dataPost.append('method', 'PUT')
-        dataPost.append('url', '/applicantdatas/' + vm.documentSelect.applicantDataId)
-        dataPost.append('data', JSON.stringify(filter))
+        dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
+        dataPost.append('fileNo', vm.fileNo)
+        dataPost.append('fileName', vm.fileName)
         if (vm.updateFile) {
           dataPost.append('file', vm.fileUpdate)
         }
 
-        axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
+        axios.post('/o/rest/v2/applicantdatas/' + vm.documentSelect.applicantDataId, dataPost, param).then(response => {
           vm.loadingAction = false
           toastr.success('Cập nhật tài liệu thành công')
           vm.dialog_createDocument = false

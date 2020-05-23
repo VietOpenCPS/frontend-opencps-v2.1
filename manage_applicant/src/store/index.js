@@ -56,6 +56,35 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    // putUser ({commit, state}, filter) {
+    //   return new Promise((resolve, reject) => {
+    //     let param = {
+    //       headers: {
+    //         groupId: window.themeDisplay.getScopeGroupId()
+    //       }
+    //     }
+    //     let dataPutUser = new URLSearchParams()
+    //     let url = ''
+    //     url = '/o/rest/v2/applicants/' + filter['applicantId']
+    //     dataPutUser.append('applicantName', filter['applicantName'])
+    //     dataPutUser.append('applicantIdType', filter['applicantIdType'])
+    //     dataPutUser.append('contactTelNo', filter['contactTelNo'])
+    //     dataPutUser.append('address', filter['address'])
+    //     dataPutUser.append('contactEmail', filter['contactEmail'])
+    //     dataPutUser.append('cityCode', filter['cityCode'])
+    //     dataPutUser.append('cityName', filter['cityName'])
+    //     dataPutUser.append('districtCode', filter['districtCode'])
+    //     dataPutUser.append('districtName', filter['districtName'])
+    //     dataPutUser.append('wardCode', filter['wardCode'])
+    //     dataPutUser.append('wardName', filter['wardName'])
+    //     dataPutUser.append('applicantIdDate', filter['applicantIdDate'])
+    //     axios.put(url, dataPutUser, param).then(result1 => {
+    //       resolve(result1)
+    //     }).catch(xhr => {
+    //       reject(xhr)
+    //     })
+    //   })
+    // },
     putUser ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let param = {
@@ -63,23 +92,27 @@ export const store = new Vuex.Store({
             groupId: window.themeDisplay.getScopeGroupId()
           }
         }
-        let dataPutUser = new URLSearchParams()
-        let url = ''
-        url = '/o/rest/v2/applicants/' + filter['applicantId']
-        dataPutUser.append('applicantName', filter['applicantName'])
-        dataPutUser.append('applicantIdType', filter['applicantIdType'])
-        dataPutUser.append('contactTelNo', filter['contactTelNo'])
-        dataPutUser.append('address', filter['address'])
-        dataPutUser.append('contactEmail', filter['contactEmail'])
-        dataPutUser.append('cityCode', filter['cityCode'])
-        dataPutUser.append('cityName', filter['cityName'])
-        dataPutUser.append('districtCode', filter['districtCode'])
-        dataPutUser.append('districtName', filter['districtName'])
-        dataPutUser.append('wardCode', filter['wardCode'])
-        dataPutUser.append('wardName', filter['wardName'])
-        // dataPutUser.append('applicantIdNo', filter['applicantIdNo'])
-        dataPutUser.append('applicantIdDate', filter['applicantIdDate'])
-        axios.put(url, dataPutUser, param).then(result1 => {
+        let dataPutUser = {
+          applicantName: filter['applicantName'],
+          applicantIdType: filter['applicantIdType'],
+          contactTelNo: filter['contactTelNo'],
+          address: filter['address'],
+          contactEmail: filter['contactEmail'],
+          cityCode: filter['cityCode'],
+          cityName: filter['cityName'],
+          districtCode:  filter['districtCode'],
+          districtName: filter['districtName'],
+          wardCode: filter['wardCode'],
+          wardName: filter['wardName'],
+          applicantIdDate: filter['applicantIdDate']
+        }
+
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'PUT')
+        dataPost.append('url', '/applicants/' + filter['applicantId'])
+        dataPost.append('data', JSON.stringify(dataPutUser))
+
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(result1 => {
           resolve(result1)
         }).catch(xhr => {
           reject(xhr)
@@ -127,7 +160,20 @@ export const store = new Vuex.Store({
           dataPost.append('data', JSON.stringify(textPost))
 
           axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
-            resolve(response.data)
+            if (response['data'].hasOwnProperty('data')) {
+              if (Array.isArray(response['data']['data'])) {
+                resolve(response.data)
+              } else {
+                resolve(
+                  {
+                    data: [response['data']['data']],
+                    total: response['data']['total']
+                  }
+                )
+              }
+            } else {
+              reject(response)
+            }
           }, error => {
             reject(error)
           })
@@ -158,7 +204,29 @@ export const store = new Vuex.Store({
           })
         }).catch(function (){})
       })
-    }
+    },
+    getFileAttach ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          },
+          responseType: 'blob'
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/applicantdatas/' + filter.applicantDataId + '/preview')
+        dataPost.append('dataType', 'binary')
+        dataPost.append('data', '')
+        
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
+          let url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
   },
   mutations: {
     setLoading (state, payload) {

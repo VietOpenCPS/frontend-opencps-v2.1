@@ -493,9 +493,10 @@ export const store = new Vuex.Store({
     loadDictItems ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
+          let groupIdSet = data.collectionCode === 'VNPOST_CITY_CODE' ? 0 : state.initData.groupId
           let param = {
             headers: {
-              groupId: state.initData.groupId
+              groupId: groupIdSet
             },
             params: {
               parent: data.parent
@@ -1389,6 +1390,7 @@ export const store = new Vuex.Store({
           dataPutdossier.append('postalServiceCode', data.postalServiceCode ? data.postalServiceCode : '')
           dataPutdossier.append('postalAddress', data.postalAddress ? data.postalAddress : '')
           dataPutdossier.append('postalCityCode', data.postalCityCode ? data.postalCityCode : '')
+          dataPutdossier.append('postalDistrictCode', data.postalDistrictCode ? data.postalDistrictCode : '')
           dataPutdossier.append('postalTelNo', data.postalTelNo ? data.postalTelNo : '')
 
           if (data.hasOwnProperty('vnpostalStatus')) {
@@ -1398,6 +1400,7 @@ export const store = new Vuex.Store({
         if (data.viaPostal && String(data.vnpostalStatus) === '1') {
           dataPutdossier.append('vnpostalProfile', JSON.stringify(data.vnpostalProfile))
         }
+        dataPutdossier.append('fromViaPostal', data.hasOwnProperty('fromViaPostal') ? data.fromViaPostal : '')
         dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 0)
         console.log('dataPutdossier', dataPutdossier)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
@@ -4103,7 +4106,99 @@ export const store = new Vuex.Store({
           })
         }).catch(function (){})
       })
-    }
+    },
+    getApplicantDocument ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let params = {
+            start: filter.start ? filter.start : 0,
+            end: filter.end ? filter.end : 15,
+            applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : '',
+            fileTemplateNo: filter.fileTemplateNo ? filter.fileTemplateNo : '',
+            status: filter.status,
+            keyword: filter.keywordSearch ? filter.keywordSearch : '',
+            applicantDataType: filter.applicantDataType ? filter.applicantDataType : '',
+            fileNo: filter.fileNoSearch
+          }
+          let dataPost = new URLSearchParams()
+          let textPost = params
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/applicantdatas')
+          dataPost.append('data', JSON.stringify(textPost))
+
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+            if (response['data'].hasOwnProperty('data')) {
+              if (Array.isArray(response['data']['data'])) {
+                resolve(response.data)
+              } else {
+                resolve(
+                  {
+                    data: [response['data']['data']],
+                    total: response['data']['total']
+                  }
+                )
+              }
+            } else {
+              reject(response)
+            }
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getFileItems ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let params = {
+            status: filter.status ? filter.status : ''
+          }
+          let dataPost = new URLSearchParams()
+          let textPost = params
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/fileitems')
+          dataPost.append('data', JSON.stringify(textPost))
+
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getFileAttach ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          },
+          responseType: 'blob'
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/applicantdatas/' + filter.applicantDataId + '/preview')
+        dataPost.append('dataType', 'binary')
+        dataPost.append('data', '')
+        
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
+          let url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
     // ----End---------
   },
   mutations: {

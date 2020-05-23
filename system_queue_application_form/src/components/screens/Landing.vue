@@ -153,6 +153,7 @@
                       slot="activator"
                       v-model="applicantIdDateFormatted"
                       append-icon="event"
+                      readonly
                       @blur="dateBooking = parseDate(applicantIdDateFormatted)"
                     >
                       <template slot="label"> 
@@ -316,8 +317,7 @@ export default {
     serviceInfoListRender: [],
     formTemplateList: [],
     agencyItems: [
-      {name: 'Cục lãnh sự - 40 Trần Phú, Ba Đình, Hà Nội', value: '124302', code: 'CLS'},
-      {name: 'Sở ngoại vụ TP.Hồ Chí Minh - 6 Alexandre De Rhodes, Quận 1, TP.HCM', value: '124301', code: 'SNV'}
+      {name: 'Cục lãnh sự - 40 Trần Phú, Ba Đình, Hà Nội', value: '124302', code: 'CLS', serverNo: 'SERVER_CLS'}
     ],
     dialogSecret: false,
     loading: false,
@@ -543,9 +543,10 @@ export default {
               // 
               let filter = {
                 groupIdBooking: vm.agencyTiepNhan.value,
-                bookingDate: vm.applicantIdDateFormatted
+                bookingDate: vm.applicantIdDateFormatted,
+                serverCode: vm.agencyTiepNhan.serverNo
               }
-              vm.$store.dispatch('getCounterBooking', filter).then(function (result) {
+              vm.$store.dispatch('getCounterBookingProxy', filter).then(function (result) {
                 console.log('checkCounter', result)
                 if (result) {
                   vm.isSlot = true
@@ -571,7 +572,7 @@ export default {
     },
     createBookingOnline (filter) {
       let vm = this
-      vm.$store.dispatch('createBookingOnline', filter).then(function (result) {
+      vm.$store.dispatch('createBookingOnlineProxy', filter).then(function (result) {
         vm.$refs.captcha.makeImageCap()
         toastr.success('Đăng ký xếp hàng thành công')
         vm.applicantName = ''
@@ -653,9 +654,10 @@ export default {
       setTimeout(function () {
         let filterEform = {
           groupIdBooking: vm.agencyTiepNhan.value,
-          bookingDate: vm.applicantIdDateFormatted
+          bookingDate: vm.applicantIdDateFormatted,
+          serverCode: vm.agencyTiepNhan.serverNo
         }
-        vm.$store.dispatch('getCounterBooking', filterEform).then(function (result) {
+        vm.$store.dispatch('getCounterBookingProxy', filterEform).then(function (result) {
           if (result) {
             vm.isSlot = true
           } else {

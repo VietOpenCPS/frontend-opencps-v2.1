@@ -69,7 +69,7 @@
                 </content-placeholders>
                 <v-subheader v-else class="pl-0">Tỉnh/Thành phố: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm2>
+              <v-flex xs12 sm4>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -88,7 +88,7 @@
                 </content-placeholders>
                 <v-subheader v-else class="pl-0">Quận/Huyện: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm2>
+              <v-flex xs12 sm4>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -101,7 +101,7 @@
                   v-model="dichVuChuyenPhatHoSo.postalDistrictCode"
                 ></v-autocomplete>
               </v-flex>
-              <v-flex xs12 sm2>
+              <!-- <v-flex xs12 sm2>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -119,7 +119,7 @@
                   v-model="dichVuChuyenPhatHoSo.postalWardCode"
                   @change="onChangeResultWard"
                 ></v-autocomplete>
-              </v-flex>
+              </v-flex> -->
             </v-layout>
           </v-form>
         </v-slide-y-transition>
@@ -199,7 +199,7 @@ export default {
       vm.dichVuChuyenPhatHoSo.postalTelNo = val.contactTelNo
       */
       // var filter = {
-      //   collectionCode: 'ADMINISTRATIVE_REGION',
+      //   collectionCode: 'VNPOST_CITY_CODE',
       //   level: 0,
       //   parent: 0
       // }
@@ -214,7 +214,7 @@ export default {
   mounted () {
     let vm = this
     let filter = {
-      collectionCode: 'ADMINISTRATIVE_REGION',
+      collectionCode: 'VNPOST_CITY_CODE',
       level: 0,
       parent: 0
     }
@@ -224,7 +224,7 @@ export default {
     })
     if (data.postalCityCode) {
       let filter1 = {
-        collectionCode: 'ADMINISTRATIVE_REGION',
+        collectionCode: 'VNPOST_CITY_CODE',
         level: 1,
         parent: data.postalCityCode
       }
@@ -232,16 +232,16 @@ export default {
         vm.resultDistricts = result.data
       })
     }
-    if (data.postalDistrictCode) {
-      let filter2 = {
-        collectionCode: 'ADMINISTRATIVE_REGION',
-        level: 1,
-        parent: data.postalDistrictCode
-      }
-      vm.$store.getters.getDictItems(filter2).then(function (result) {
-        vm.resultWards = result.data
-      })
-    }
+    // if (data.postalDistrictCode) {
+    //   let filter2 = {
+    //     collectionCode: 'VNPOST_CITY_CODE',
+    //     level: 1,
+    //     parent: data.postalDistrictCode
+    //   }
+    //   vm.$store.getters.getDictItems(filter2).then(function (result) {
+    //     vm.resultWards = result.data
+    //   })
+    // }
   },
   methods: {
     initData (data) {
@@ -254,7 +254,7 @@ export default {
       vm.resultDistricts = []
       vm.resultWards = []
       let filter = {
-        collectionCode: 'ADMINISTRATIVE_REGION',
+        collectionCode: 'VNPOST_CITY_CODE',
         level: 1,
         parent: data
       }
@@ -268,16 +268,15 @@ export default {
     },
     onChangeResultDistrict (data) {
       let vm = this
-      vm.resultWards = []
-      let filter = {
-        collectionCode: 'ADMINISTRATIVE_REGION',
-        level: 2,
-        parent: data
-      }
-      console.log('onChangeResultDistrict', data)
-      vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.resultWards = result.data
-      })
+      // vm.resultWards = []
+      // let filter = {
+      //   collectionCode: 'VNPOST_CITY_CODE',
+      //   level: 2,
+      //   parent: data
+      // }
+      // vm.$store.getters.getDictItems(filter).then(function (result) {
+      //   vm.resultWards = result.data
+      // })
       vm.dichVuChuyenPhatHoSo.postalDistrictName = vm.resultDistricts.filter(function(item) {
         return item.itemCode === data
       })[0]['itemName']

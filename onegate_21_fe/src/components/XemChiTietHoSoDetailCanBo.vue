@@ -2248,7 +2248,7 @@ export default {
                 let fileEntries = []
                 let dossierFiles = []
                 for (let index in files) {
-                  if (!files[index]['isSigned']) {
+                  if (!files[index]['isSigned'] && files[index]['fileSize']) {
                     toastr.clear()
                     toastr.error(files[index]['displayName'] + ' chưa được ký duyệt')
                     valid = false
