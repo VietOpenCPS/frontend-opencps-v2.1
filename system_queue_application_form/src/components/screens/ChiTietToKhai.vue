@@ -252,6 +252,9 @@ export default {
     },
     postEform () {
       let vm = this
+      let current = vm.$router.history.current
+      let currentQuery = current.query
+      let fileTemplateNoParam = currentQuery.hasOwnProperty('template') && currentQuery.template ? currentQuery.template : ''
       let options = {
         headers: {
           groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
@@ -274,7 +277,7 @@ export default {
         let dataCreateEform = new URLSearchParams()
         dataCreateEform.append('eFormData', JSON.stringify(formData))
         dataCreateEform.append('serviceInfoId', vm.serviceinfoSelected.serviceInfoId)
-        dataCreateEform.append('fileTemplateNo', vm.fileTemplateSelected.fileTemplateNo)
+        dataCreateEform.append('fileTemplateNo', fileTemplateNoParam ? fileTemplateNoParam : vm.fileTemplateSelected.fileTemplateNo)
         dataCreateEform.append('email', '')
         axios.post('/o/rest/v2/eforms', dataCreateEform, options).then(function (response) {
           vm.$store.commit('setEformDetail', response.data)
