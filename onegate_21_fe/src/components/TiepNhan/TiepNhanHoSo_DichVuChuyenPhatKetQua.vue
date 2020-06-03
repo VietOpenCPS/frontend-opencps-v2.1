@@ -96,7 +96,7 @@
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-subheader v-else class="pl-0">Tỉnh/Thành phố: </v-subheader>
+                <v-subheader v-else class="pl-0">Tỉnh/Thành phố<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
               </v-flex>
               <v-flex xs12 sm4>
                 <content-placeholders class="mt-1" v-if="loading">
@@ -109,13 +109,15 @@
                   item-value="itemCode"
                   @change="onChangeResultCity"
                   v-model="dichVuChuyenPhatKetQua.postalCityCode"
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  required
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 sm2>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-subheader v-else class="pl-0">Quận/Huyện: </v-subheader>
+                <v-subheader v-else class="pl-0">Quận/Huyện<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
               </v-flex>
               <v-flex xs12 sm4>
                 <content-placeholders class="mt-1" v-if="loading">
@@ -128,6 +130,8 @@
                   item-value="itemCode"
                   @change="onChangeResultDistrict"
                   v-model="dichVuChuyenPhatKetQua.postalDistrictCode"
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  required
                 ></v-autocomplete>
               </v-flex>
               <!-- <v-flex xs12 sm2>

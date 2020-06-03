@@ -130,6 +130,12 @@ export const store = new Vuex.Store({
               for (let key in dataReturn) {
                 dataReturn[key]['levelName'] = 'Mức độ ' + dataReturn[key].level
               }
+              try {
+                if (sortLevelConfig !== undefined) {
+                  dataReturn.reverse()
+                }
+              } catch (error) {
+              }
               resolve(dataReturn)
             } else {
               resolve([])
@@ -158,9 +164,15 @@ export const store = new Vuex.Store({
           // } else {
           //   paramGet.sort = "siblingDomain"
           // }
-
           if (filter.domain) {
             paramGet.sort = "siblingSearch"
+          }
+          try {
+            if (sortLevelConfig) {
+              paramGet.sort = 'maxLevel'
+              paramGet.order = sortLevelConfig
+            }
+          } catch (error) {
           }
           let param = {
             headers: {

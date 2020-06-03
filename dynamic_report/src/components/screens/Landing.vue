@@ -701,6 +701,7 @@ export default {
               break
             }
           }
+          console.log('dataReport-+-+-', dataReport)
           for (let key in dataReport) {
             dataReportCurrent = dataReport[key]
             if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
@@ -733,7 +734,9 @@ export default {
           let dataToExportCSV = []
           let dataRaw = []
           for (let key in dossierRaw) {
-            dataRaw.push(dossierRaw[key])
+            if (key) {
+              dataRaw.push(dossierRaw[key])
+            }
           }
           dataRaw.reverse()
           console.log('dossierRaw 46', dataRaw)
@@ -889,13 +892,14 @@ export default {
       vm.docDefinition = {}
       let docDString = {}
       docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
-      console.log('userData', vm.userData)
+      // console.log('userData', vm.userData)
       let titleGov = vm.userData.hasOwnProperty('govAgencyName') && vm.userData.govAgencyName ? vm.userData.govAgencyName : vm.itemsReports[vm.index]['filterConfig']['govAgencyName']
       if (!titleGov) {
         titleGov = vm.$store.getters.siteName
       }
-      console.log('titleGov', titleGov)
+      // console.log('titleGov', titleGov)
       docDString = docDString.replace(/\[\$siteName\$\]/g, titleGov)
+      console.log('docDString', docDString)
       for (let key in vm.filters) {
         let find = vm.filters[key]['key']
         let currentVal = vm.data[vm.filters[key]['key']]
@@ -947,6 +951,7 @@ export default {
       let merge = vm.itemsReports[vm.index]['filterConfig']['merge']
       let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
       let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
+      
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null) {
           vm.showErrorData = false
@@ -978,7 +983,7 @@ export default {
               })
             }
           }
-          
+
           // TODO
           let resultData = result
           // console.log('resultData 1', resultData)
@@ -1136,10 +1141,14 @@ export default {
                   alignment: alignmentConfig,
                   style: 'tdStyle'
                 })
+                console.log('currentConfig-govAgency-currentConfig', dataRowTotal[indexTotal], vm.govAgency, currentConfig)
                 if (vm.govAgency === 0) {
+                  console.log('currentConfig', currentConfig)
                   if (dataRowTotal[indexTotal] !== null && dataRowTotal[indexTotal] !== undefined && dataRowTotal[indexTotal]['text'] !== '') {
                     if (currentConfig['value'] === 'ontimePercentage') {
                       dataRowTotal[indexTotal]['text'] = parseInt(dataText)
+                    } else if (currentConfig['value'] === 'note') {
+                      dataRowTotal[indexTotal]['text'] = ' '
                     } else if (isNaN(dataText)) {
                       // dataRowTotal[indexTotal]['text'] = ' '
                       dataRowTotal[indexTotal]['text'] = 0
@@ -1155,42 +1164,13 @@ export default {
               } else {
                 index = index + 1
               }
+              console.log('dataRow', dataRow)
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
               vm.dataReportXX += JSON.stringify(dataRow) + ','
               dataToExportCSV.push(dataToExportCSVItem)
             }
           }
           if (vm.agencyLists.length > 0 && vm.govAgency === 0) {
-            /*
-            let resultDataVariTotal = {}
-            for (let key in resultDataTotal) {
-              let keyVari = ''
-              for (let keysd in merge) {
-                keyVari += resultDataTotal[key][merge[keysd]] + '_'
-              }
-              if (resultDataVariTotal[keyVari] === undefined || resultDataVariTotal[keyVari] === null || resultDataVariTotal[keyVari] === '') {
-                resultDataVariTotal[keyVari] = resultDataTotal[key]
-              } else {
-                for (let kkey in resultDataVariTotal[keyVari]) {
-                  if (resultDataVariTotal[keyVari][kkey] !== '' && resultDataVariTotal[keyVari][kkey] !== undefined && resultDataVariTotal[keyVari][kkey] !== null) {
-                    if (String(parseInt(resultDataVariTotal[keyVari][kkey])) === 'NaN') {
-                      resultDataVariTotal[keyVari][kkey] = resultDataTotal[key][kkey]
-                    } else if (kkey === 'ontimePercentage') {
-                      resultDataVariTotal[keyVari][kkey] = parseInt(resultDataVariTotal[keyVari][kkey])
-                    } else {
-                      resultDataVariTotal[keyVari][kkey] = parseInt(resultDataTotal[key][kkey]) + parseInt(resultDataVariTotal[keyVari][kkey])
-                    }
-                  }
-                }
-              }
-            }
-            resultDataTotal = []
-            for (let key in resultDataVariTotal) {
-              if (key === undefined || key === 'undefined_') {
-                resultDataTotal.push(resultDataVariTotal[key])
-              }
-            }
-            */
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
               for (let keyMappingXXTT in vm.itemsReportsConfig) {
@@ -1236,7 +1216,7 @@ export default {
             }
           }
           vm.dataReportXX += JSON.stringify(dataRowTotal)
-          // console.log('vm.dataReportXX 123', vm.dataReportXX)
+          console.log('vm.dataReportXX 123', vm.dataReportXX)
           let itemTotal = []
           for (let keyTotalCSV in dataRowTotal) {
             itemTotal.push(dataRowTotal[keyTotalCSV]['text'])
@@ -1261,7 +1241,7 @@ export default {
           // console.log('docDString', docDString)
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
-          // console.log('docDefinition', vm.docDefinition)
+          console.log('docDefinition-render-pdf', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)

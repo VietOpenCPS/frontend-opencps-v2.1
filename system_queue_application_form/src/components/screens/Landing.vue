@@ -496,7 +496,8 @@ export default {
         telNo: vm.applicantTelNo,
         groupId: vm.agencyTiepNhan.value,
         bookingDate: vm.applicantIdDateFormatted,
-        j_captcha_response: vm.$refs.captcha.j_captcha_response
+        j_captcha_response: vm.$refs.captcha.j_captcha_response,
+        serverCode: ''
       }
       if (keySearch.length === 1) {
         filterBooking['codeNumber'] = vm.eformNoBooking
@@ -540,6 +541,7 @@ export default {
               filterBooking.serviceCode = result.serviceCode
               filterBooking.bookingName = bookingName
               filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
+              filterBooking.serverCode = vm.agencyTiepNhan.serverNo
               // 
               let filter = {
                 groupIdBooking: vm.agencyTiepNhan.value,
@@ -572,26 +574,47 @@ export default {
     },
     createBookingOnline (filter) {
       let vm = this
-      vm.$store.dispatch('createBookingOnlineProxy', filter).then(function (result) {
-        vm.$refs.captcha.makeImageCap()
-        toastr.success('Đăng ký xếp hàng thành công')
-        vm.applicantName = ''
-        vm.eformNoBooking = ''
-        vm.secretBooking = ''
-        vm.applicantTelNo = ''
-        vm.agencyTiepNhan = ''
-        vm.$refs.formBooking.resetValidation()
-        setTimeout(function () {
-          vm.$router.push({
-            path: '/tao-to-khai-thanh-cong/1',
-            query: {
-              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-            }
+      let filterValidate = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+        }
+      }
+      let dataValidate = new URLSearchParams()
+      dataValidate.append('value', vm.$refs.captcha.j_captcha_response)
+      axios.post('/o/rest/v2/bookings/validatecaptcha', dataValidate, filterValidate).then(function (response) {
+        console.log('validatecaptcha', response)
+        if (response['data'] && response['data']['code'] === 203) {
+          toastr.clear()
+          toastr.error('Mã captcha không chính xác')
+          vm.$refs.captcha.makeImageCap()
+        } else {
+          vm.$store.dispatch('createBookingOnlineProxy', filter).then(function (result) {
+            vm.$refs.captcha.makeImageCap()
+            toastr.success('Đăng ký xếp hàng thành công')
+            vm.applicantName = ''
+            vm.eformNoBooking = ''
+            vm.secretBooking = ''
+            vm.applicantTelNo = ''
+            vm.agencyTiepNhan = ''
+            vm.$refs.formBooking.resetValidation()
+            setTimeout(function () {
+              vm.$router.push({
+                path: '/tao-to-khai-thanh-cong/1',
+                query: {
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                }
+              })
+            }, 300)
+          }).catch (function (reject) {
+            vm.$refs.captcha.makeImageCap()
           })
-        }, 300)
-      }).catch (function (reject) {
+        }
+      }).catch(function (xhr) {
+        toastr.clear()
+        toastr.error('Mã captcha không chính xác')
         vm.$refs.captcha.makeImageCap()
       })
+      
     },
     changeAgencyBooking () {
       let vm = this
@@ -599,6 +622,9 @@ export default {
       if (vm.applicantIdDateFormatted) {
         vm.getCounterBooking()
       }
+      setTimeout(function () {
+        vm.$store.commit('setServerNo', vm.agencyTiepNhan.serverNo)
+      }, 200)
     },
     changeDateBooking () {
       let vm = this
