@@ -147,7 +147,7 @@
                 <v-text-field label="Điện thoại cố định" v-model="user['applicantProfile']['SoDienThoaiBan']" box></v-text-field>
               </v-flex>
               <v-flex xs12 sm12 v-if="user['applicantType'] === 'citizen'">
-                <v-text-field v-model="user['applicantContactEmail']" box readonly>
+                <v-text-field v-model="user['applicantContactEmail']" box >
                   <template slot="label"> 
                     <span>Thư điện tử</span> 
                     <span class="red--text darken-3"> *</span>
@@ -330,7 +330,7 @@
                 <v-text-field label="Fax" v-model="user['applicantProfile']['Fax']" box clearable></v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'business'">
-                <v-text-field v-model="user['applicantContactEmail']" box readonly>
+                <v-text-field v-model="user['applicantContactEmail']" box>
                   <template slot="label"> 
                     <span>Thư điện tử</span> 
                     <span class="red--text darken-3"> *</span>

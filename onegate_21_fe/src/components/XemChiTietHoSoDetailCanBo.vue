@@ -68,7 +68,7 @@
               indeterminate
             ></v-progress-circular>
           </div>
-          <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+          <iframe v-show="!dialogPDFLoading" id="dialogPDFPreviewXl" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
           </iframe>
         </v-card>
       </v-dialog>
@@ -370,7 +370,7 @@
               </v-card>
             </v-tab-item>
             <v-tab-item value="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
-              <v-flex xs12 style="height:42px">
+              <v-flex xs12 style="height:42px" v-if="!sequencyDossierImport">
                 <v-radio-group class="absolute__btn pt-1" style="width: 350px" v-model="typeTienTrinh" row @change="changeTypeTienTrinh($event)">
                   <v-radio label="Xem dạng bảng" :value="1" ></v-radio>
                   <v-radio label="Xem dạng biểu đồ" :value="2"></v-radio>
@@ -384,7 +384,31 @@
                   In
                 </v-btn>
               </v-flex>
-              <v-data-table v-if="typeTienTrinh === 1" :headers="headers" :items="dossierActions" class="table-landing table-bordered"
+              <v-data-table v-if="sequencyDossierImport" :headers="headersSequencyImport" :items="dossierImportActions" class="table-landing table-bordered"
+              hide-actions no-data-text="Không có dữ liệu"
+              >
+                <template slot="headerCell" slot-scope="props">
+                  <v-tooltip bottom>
+                    <span slot="activator">
+                      {{ props.header.text }}
+                    </span>
+                    <span>
+                      {{ props.header.text }}
+                    </span>
+                  </v-tooltip>
+                </template>
+                <template slot="items" slot-scope="props">
+                  <td class="text-xs-center">{{props.index + 1}}</td>
+                  <td class="text-xs-left">{{props.item.sequenceName}}</td>
+                  <td class="text-xs-left">{{props.item.actions[0]['actionUser']}}</td>
+                  <td class="text-xs-left">{{props.item.startDate|dateTimeViewSequency}}</td>
+                  <td class="text-xs-left">{{props.item.finishDate|dateTimeViewSequency}}</td>
+                  <td class="text-xs-left">{{props.item.actions[0]['note']}}</td>
+
+                </template>
+              </v-data-table>
+
+              <v-data-table v-if="!sequencyDossierImport && typeTienTrinh === 1" :headers="headers" :items="dossierActions" class="table-landing table-bordered"
               hide-actions no-data-text="Không có dữ liệu"
               >
                 <template slot="headerCell" slot-scope="props">
@@ -446,7 +470,7 @@
                   </td>
                 </template>
               </v-data-table>
-              <div v-else>
+              <div v-if="!sequencyDossierImport && typeTienTrinh !== 1">
                 <content-placeholders v-if="loadingMermaidgraph">
                   <content-placeholders-img />
                   <content-placeholders-heading />
@@ -782,6 +806,7 @@ export default {
     documents: [],
     payments: '',
     dossierActions: [],
+    dossierImportActions: [],
     reAsignUsers: [],
     showReasign: false,
     itemselect: '',
@@ -874,6 +899,38 @@ export default {
         class: 'ketqua_column'
       }
     ],
+    headersSequencyImport: [
+      {
+        text: '#',
+        align: 'center',
+        sortable: false
+      }, {
+        text: 'Công việc',
+        align: 'center',
+        sortable: false,
+        class: 'congviec_column'
+      }, {
+        text: 'Người thực hiện',
+        align: 'center',
+        sortable: false,
+        class: 'nguoithuchien_column'
+      }, {
+        text: 'Ngày bắt đầu',
+        align: 'center',
+        sortable: false,
+        class: 'ngaybatdau_column'
+      }, {
+        text: 'Ngày kết thúc',
+        align: 'center',
+        sortable: false,
+        class: 'ngayketthuc_column'
+      }, {
+        text: 'Ghi chú',
+        align: 'center',
+        sortable: false,
+        class: 'ghichu_column'
+      }
+    ],
     headerSyncs: [
       {
         text: 'Nhật kí hồ sơ',
@@ -930,7 +987,8 @@ export default {
     viewScript: false,
     loadingForm: false,
     hasPreviewSync: false,
-    isNotarization: false
+    isNotarization: false,
+    sequencyDossierImport: false
   }),
   computed: {
     loading () {
@@ -1205,7 +1263,7 @@ export default {
         if (result) {
           vm.dialogPDFLoading = false
           vm.dialogPDF = true
-          document.getElementById('dialogPDFPreview').src = result
+          document.getElementById('dialogPDFPreviewXl').src = result
         }
       })
     },
@@ -1219,31 +1277,60 @@ export default {
         if (result) {
           vm.dialogPDFLoading = false
           vm.dialogPDF = true
-          document.getElementById('dialogPDFPreview').src = result
+          document.getElementById('dialogPDFPreviewXl').src = result
         }
       })
     },
     loadDossierActions (data) {
       var vm = this
-      if (vm.thongTinChiTietHoSo.dossierId) {
-        let dataParams = {
-          dossierId: vm.thongTinChiTietHoSo.dossierId,
-          stepType: data
-        }
-        vm.$store.dispatch('loadDossierActions', dataParams).then(resultActions => {
-          if (resultActions.data && resultActions.data.length !== 0) {
-            let resultTemp = resultActions.data
-            for (var i = 0; i < resultTemp.length; i++) {
-              if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
-                if (!Array.isArray(resultTemp[i]['actions'])) {
-                  let arrActionsTemp = []
-                  arrActionsTemp.push(resultTemp[i]['actions'])
-                  resultTemp[i]['actions'] = arrActionsTemp
+      let submissionNote = ''
+      try {
+        submissionNote = vm.thongTinChiTietHoSo['submissionNote'] ? JSON.parse(vm.thongTinChiTietHoSo['submissionNote']) : ''
+      } catch (error) {
+      }
+      if (submissionNote && submissionNote.hasOwnProperty('dossierImport') && submissionNote.dossierImport) {
+        vm.sequencyDossierImport = true
+        vm.dossierImportActions = submissionNote['data']
+      } else {
+        vm.sequencyDossierImport = false
+        if (vm.thongTinChiTietHoSo.dossierId) {
+          let dataParams = {
+            dossierId: vm.thongTinChiTietHoSo.dossierId,
+            stepType: data
+          }
+          vm.$store.dispatch('loadDossierActions', dataParams).then(resultActions => {
+            if (resultActions.data && resultActions.data.length !== 0) {
+              let resultTemp = resultActions.data
+              for (var i = 0; i < resultTemp.length; i++) {
+                if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                  if (!Array.isArray(resultTemp[i]['actions'])) {
+                    let arrActionsTemp = []
+                    arrActionsTemp.push(resultTemp[i]['actions'])
+                    resultTemp[i]['actions'] = arrActionsTemp
+                  }
+                }
+              }
+              vm.dossierActions = resultTemp
+            } else {
+              if (vm.thongTinChiTietHoSo['submissionNote']) {
+                try {
+                  JSON.parse(vm.thongTinChiTietHoSo['submissionNote'])
+                  let resultTemp = JSON.parse(vm.thongTinChiTietHoSo['submissionNote']).data
+                  for (var i = 0; i < resultTemp.length; i++) {
+                    if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                      if (!Array.isArray(resultTemp[i]['actions'])) {
+                        let arrActionsTemp = []
+                        arrActionsTemp.push(resultTemp[i]['actions'])
+                        resultTemp[i]['actions'] = arrActionsTemp
+                      }
+                    }
+                  }
+                  vm.dossierActions = resultTemp
+                } catch (e) {
                 }
               }
             }
-            vm.dossierActions = resultTemp
-          } else {
+          }).catch(function () {
             if (vm.thongTinChiTietHoSo['submissionNote']) {
               try {
                 JSON.parse(vm.thongTinChiTietHoSo['submissionNote'])
@@ -1261,27 +1348,10 @@ export default {
               } catch (e) {
               }
             }
-          }
-        }).catch(function () {
-          if (vm.thongTinChiTietHoSo['submissionNote']) {
-            try {
-              JSON.parse(vm.thongTinChiTietHoSo['submissionNote'])
-              let resultTemp = JSON.parse(vm.thongTinChiTietHoSo['submissionNote']).data
-              for (var i = 0; i < resultTemp.length; i++) {
-                if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
-                  if (!Array.isArray(resultTemp[i]['actions'])) {
-                    let arrActionsTemp = []
-                    arrActionsTemp.push(resultTemp[i]['actions'])
-                    resultTemp[i]['actions'] = arrActionsTemp
-                  }
-                }
-              }
-              vm.dossierActions = resultTemp
-            } catch (e) {
-            }
-          }
-        })
+          })
+        }
       }
+      
     },
     loadMermaidgraph (data) {
       var vm = this
@@ -1339,7 +1409,7 @@ export default {
         vm.dialogPDFLoading = false
         vm.titleDialogPdf = 'Tiến trình thụ lý'
         vm.dialogPDF = true
-        document.getElementById('dialogPDFPreview').src = result
+        document.getElementById('dialogPDFPreviewXl').src = result
       }).catch(function () {
         vm.dialogPDFLoading = false
       })
@@ -1696,7 +1766,7 @@ export default {
       }
       vm.$store.dispatch('doPrint01', filter).then(function (result) {
         vm.dialogPDFLoading = false
-        document.getElementById('dialogPDFPreview').src = result
+        document.getElementById('dialogPDFPreviewXl').src = result
       })
     },
     doPreview (dossierItem, item, index) {
@@ -1710,7 +1780,7 @@ export default {
         vm.dialogPDFLoading = false
         if (result !== 'pending') {
           vm.dialogPDF = true
-          document.getElementById('dialogPDFPreview').src = result
+          document.getElementById('dialogPDFPreviewXl').src = result
         }
       }).catch(function () {
         vm.dialogPDFLoading = false
@@ -2432,7 +2502,7 @@ export default {
         vm.dialogPDF = true
         vm.$store.dispatch('doPrint02', filter).then(function (result) {
           vm.dialogPDFLoading = false
-          document.getElementById('dialogPDFPreview').src = result
+          document.getElementById('dialogPDFPreviewXl').src = result
         })
       }
     },
@@ -2447,7 +2517,7 @@ export default {
         vm.dialogPDFLoading = false
         if (result !== 'pending') {
           vm.dialogPDF = true
-          document.getElementById('dialogPDFPreview').src = result
+          document.getElementById('dialogPDFPreviewXl').src = result
         }
       }).catch(function () {
         vm.dialogPDFLoading = false
@@ -2465,7 +2535,7 @@ export default {
         vm.dialogPDF = true
         vm.$store.dispatch('doGuiding', filter).then(function (result) {
           vm.dialogPDFLoading = false
-          document.getElementById('dialogPDFPreview').src = result
+          document.getElementById('dialogPDFPreviewXl').src = result
         })
       }
     },
@@ -2670,7 +2740,7 @@ export default {
       data['dossierId'] = vm.thongTinChiTietHoSo.dossierId
       vm.$store.dispatch('viewFile', data).then(result => {
         vm.dialogPDFLoading = false
-        document.getElementById('dialogPDFPreview').src = result
+        document.getElementById('dialogPDFPreviewXl').src = result
       })
     },
     viewFileDocument (item) {
@@ -2681,7 +2751,7 @@ export default {
       item['dossierId'] = vm.thongTinChiTietHoSo.dossierId
       vm.$store.dispatch('viewDocument', item).then(result => {
         vm.dialogPDFLoading = false
-        document.getElementById('dialogPDFPreview').src = result
+        document.getElementById('dialogPDFPreviewXl').src = result
       })
     },
     loadTPHS () {
@@ -2838,7 +2908,7 @@ export default {
                 vm.dialogPDFLoading = false
                 vm.dialogPDF = true
                 setTimeout(function () {
-                  document.getElementById('dialogPDFPreview').src = result
+                  document.getElementById('dialogPDFPreviewXl').src = result
                 }, 100)
               }
             }
@@ -2859,7 +2929,7 @@ export default {
         vm.titleDialogPdf = 'Biên lai thanh toán'
         vm.dialogPDF = true
         setTimeout(function () {
-          document.getElementById('dialogPDFPreview').src = result
+          document.getElementById('dialogPDFPreviewXl').src = result
         }, 200)
       }).catch(function(){
         vm.dialogPDFLoading = false
@@ -3033,6 +3103,14 @@ export default {
     dateTimeView (arg) {
       if (arg) {
         let value = new Date(Number(arg))
+        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+      } else {
+        return ''
+      }
+    },
+    dateTimeViewSequency (arg) {
+      if (arg) {
+        let value = new Date(arg)
         return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
       } else {
         return ''

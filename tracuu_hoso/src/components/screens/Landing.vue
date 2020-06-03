@@ -67,7 +67,7 @@
                       <span>{{props.item.dossierNo}}</span>
                     </div>
                   </td>
-                  <td class="text-xs-left py-2" @click="viewDetail(props.item)" style="min-width: 150px;">
+                  <td class="text-xs-left py-2" style="min-width: 150px;">
                     <content-placeholders v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
@@ -140,7 +140,8 @@
                 height="42"
                 :rules="[v => !!v || 'Mã tra cứu là bắt buộc']"
                 required
-                @keyup.enter.native="submitPass"
+                @keyup.enter="submitPass"
+                autofocus
               ></v-text-field>
             </v-flex>
             <div class="flex primary--text mb-3">Mã tra cứu là dãy số gồm 4 ký tự được in trên giấy tiếp nhận hồ sơ và hẹn trả kết quả, mail thông báo tiếp nhận hồ sơ.</div>
@@ -351,6 +352,7 @@ export default {
       let vm = this
       let current = vm.$router.history.current
       if (vm.$refs.form.validate()) {
+        vm.$store.commit('setScretCode', vm.secretKey)
         let filter = {
           password: vm.secretKey,
           dossierId: vm.dossierSelected.dossierId

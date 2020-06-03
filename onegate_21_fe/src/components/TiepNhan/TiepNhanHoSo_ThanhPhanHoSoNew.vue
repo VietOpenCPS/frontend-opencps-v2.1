@@ -97,7 +97,7 @@
                   <v-icon slot="activator" v-on:click.stop="item.stateEditFileCheck = !item.stateEditFileCheck" style="font-size: 13px; color: #0d71bb; margin-left: 10px; cursor: pointer;">edit</v-icon>
                   <span>Chỉnh sửa lý do</span>
                 </v-tooltip>
-                <div class="mt-2" v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo">
+                <div class="mt-0" v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo">
                   <!-- <div v-if="itemFileView.eForm && onlyView && itemFileView.fileSize !== 0" :style="{width: 'calc(100% - 370px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
                     <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
                       <i style="font-size: 13px;" class="ml-1 fa fa-file-o"></i> &nbsp;
@@ -230,7 +230,7 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
-        <div class="absolute__btn group__thanh_phan mr-1">
+        <div class="absolute__btn group__thanh_phan mr-1" :style="originality !== 1 ? 'top: 10px' : ''">
           <content-placeholders class="mt-1" v-if="loading">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
@@ -352,7 +352,7 @@
                 <span v-else>Tải giấy tờ từ máy (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
               </v-tooltip>
               <v-tooltip class="pl-1 pt-1" top v-if="!onlyView">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click="showDocumentApplicant(item.partNo)">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click="showDocumentApplicant(item, index)">
                   <v-badge>
                     <v-icon size="20" color="orange darken-3">fas fa fa-folder-open</v-icon>
                   </v-badge>
@@ -470,7 +470,7 @@
           </v-btn>
         </v-toolbar>
         <v-card-text class="py-1">
-          <kho-tai-lieu ref="khotailieu" :index="applicantId"></kho-tai-lieu>
+          <kho-tai-lieu ref="khotailieu" :index="applicantId" v-on:trigger-attach="attachFileFromStorage"></kho-tai-lieu>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -580,7 +580,9 @@ export default {
     doChange: {},
     dossierTemplateLienThong: [],
     receiveMessage: '',
-    dialog_documentApplicant: false
+    dialog_documentApplicant: false,
+    dossierPartAttach: '',
+    indexPart: ''
   }),
   created () {
     let vm = this
@@ -593,7 +595,7 @@ export default {
       return this.$store.getters.loading
     },
     originality () {
-      var vm = this
+      let vm = this
       return vm.getOriginality()
     },
     initDataResource () {
@@ -1957,6 +1959,32 @@ export default {
       clearTimeout(vm.doChange[index])
       changeRecord()
     },
+    attachFileFromStorage (data) {
+      let vm = this
+      let filter = {
+        dossierId: vm.thongTinHoSo.dossierId,
+        dossierTemplateNo: vm.thongTinHoSo.dossierTemplateNo,
+        partNo: vm.dossierPartAttach.partNo,
+        filePath: data.filePath,
+        fileName: data.fileName,
+        fileType: data.fileExtension,
+        // fileName: String(data.fileName).replace(/\s/g, '')
+      }
+      console.log('data storage', filter)
+      if (vm.dossierPartAttach.partType !== 3) {
+        vm.$store.dispatch('copyFileFromStorage', filter).then(function (result) {
+          vm.dialog_documentApplicant = false
+          vm.dossierTemplateItemsFilter[vm.indexPart]['passRequired'] = true
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+            vm.dossierFilesItems = result
+            vm.recountFileTemplates()
+          })
+        }).catch(function (xhr) {
+          vm.dialog_documentApplicant = false
+          toastr.error('Đính kèm tài liệu thất bại')
+        })
+      }
+    },
     getDocumentTypeIcon (type) {
       let vm = this
       let typeDoc = 'doc,docx'
@@ -1998,8 +2026,10 @@ export default {
         return ''
       }
     },
-    showDocumentApplicant () {
+    showDocumentApplicant (part, index) {
       let vm = this
+      vm.dossierPartAttach = part
+      vm.indexPart = index
       vm.$refs.khotailieu.initData()
       vm.dialog_documentApplicant = true
     }

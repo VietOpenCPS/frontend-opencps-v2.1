@@ -43,7 +43,31 @@
               </div>
             </div>
             <v-flex xs12 sm12 class="mb-3 mt-3" v-if="showCaptcha">
-              <captcha ref="captcha"></captcha>
+              <div style="max-width: 400px;background: #dedede;margin: 0 auto;" class="pb-2">
+                <v-flex xs12 class="py-2" style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                ">
+                  <div id="captcha" class="d-inline-block text-xs-center" style="padding-top: 15px;background: #fff;border-radius: 5px;"></div>
+                  <v-btn class="right ml-3 mx-0 my-0" title="refresh" flat icon v-on:click.native="createCaptcha">
+                    <v-icon color="primary" size="32">refresh</v-icon>
+                  </v-btn>
+                </v-flex>
+                <v-text-field
+                  class="mx-3"
+                  single-lines
+                  hide-details
+                  solo
+                  flat
+                  height="36"
+                  min-height="36"
+                  clearable
+                  v-model="captchaValue"
+                  placeholder="Nhập mã captcha"
+                ></v-text-field>
+              </div>
+              
             </v-flex>
             <v-flex xs12 sm12 :class="!isMobile ? 'text-xs-left mt-2' : 'text-xs-left mt-2 px-2'">
               <v-btn class="white--text" @click="doVottingResultSubmit" color="#004C98" :loading="btnLoading" :disabled="btnLoading">
@@ -208,7 +232,6 @@
 <script>
 
 import Vue from 'vue'
-import Captcha from './Captcha.vue'
 import toastr from 'toastr'
 import ProgressBar from 'vue-simple-progress'
 Vue.use(toastr)
@@ -219,7 +242,6 @@ toastr.options = {
 export default {
   props: ['index'],
   components: {
-    'captcha': Captcha,
     ProgressBar
   },
   data: () => ({
@@ -230,7 +252,9 @@ export default {
     dialog_voting_result: false,
     resultTotal: [],
     totalAnswer: 0,
-    dialogMobile: false
+    dialogMobile: false,
+    captchaCode: '',
+    captchaValue: ''
   }),
   computed: {
     loading () {
@@ -272,13 +296,16 @@ export default {
     },
     doVottingResultSubmit: function () {
       var vm = this
-      if (vm.$refs.captcha) {
-        if (!vm.$refs.captcha.checkValidCaptcha()) {
-          toastr.error('Mã captcha không đúng. Vui lòng kiểm tra lại')
+      if (vm.showCaptcha) {
+        let valid = vm.validateCaptcha()
+        if (!valid) {
           return
         }
       } else {
         vm.showCaptcha = true
+        setTimeout (function () {
+          vm.createCaptcha()
+        }, 100)
         return
       }
       vm.btnLoading = true
@@ -295,10 +322,9 @@ export default {
       if (valid) {
         Promise.all(arrAction).then(results => {
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          vm.createCaptcha()
+          vm.captchaValue = ''
           vm.btnLoading = false
-          if (vm.$refs.captcha) {
-            vm.$refs.captcha.makeRandomString()
-          }
           vm.$store.dispatch('loadVoting', {
             className: 'survey',
             classPk: 0
@@ -406,6 +432,38 @@ export default {
     getQuarters () {
       let month = (new Date()).getMonth() + 1;
       return (Math.ceil(month / 3));
+    },
+    createCaptcha () {
+      let vm = this
+      document.getElementById('captcha').innerHTML = "";
+      let charsArray = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@!#&*"
+      let lengthOtp = 6
+      let captcha = []
+      for (var i = 0; i < lengthOtp; i++) {
+        var index = Math.floor(Math.random() * charsArray.length + 1)
+        if (captcha.indexOf(charsArray[index]) == -1)
+          captcha.push(charsArray[index])
+        else i--
+      }
+      let canv = document.createElement("canvas")
+      canv.id = "captcha"
+      canv.width = 150
+      canv.height = 50
+      let ctx = canv.getContext("2d")
+      ctx.font = "32px Georgia"
+      ctx.strokeText(captcha.join(""), 0, 30)
+      vm.captchaCode = captcha.join("")
+      document.getElementById("captcha").appendChild(canv)
+    },
+    validateCaptcha () {
+      let vm = this
+      if (vm.captchaValue == vm.captchaCode) {
+        return true
+      } else {
+        toastr.error('Mã captcha không đúng. Vui lòng thử lại.')
+        vm.createCaptcha()
+        return false
+      }
     }
   },
   filters: {

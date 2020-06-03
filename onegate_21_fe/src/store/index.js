@@ -684,6 +684,28 @@ export const store = new Vuex.Store({
         })
       })
     },
+    copyFileFromStorage ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('dossierTemplateNo', filter.dossierTemplateNo ? filter.dossierTemplateNo : '')
+        dataPost.append('dossierPartNo', filter.partNo ? filter.partNo : '')
+        dataPost.append('uri', filter.filePath ? filter.filePath : '')
+        dataPost.append('displayName', filter.fileName ? filter.fileName : '')
+        dataPost.append('fileType', filter.fileType ? filter.fileType : '')
+        
+        axios.post(state.initData.dossierApi + '/' + filter.dossierId + '/files/applicantdata', dataPost, param).then(function (response) {
+          resolve(response)
+        }).catch(function (xhr) {
+          console.log(xhr)
+          reject(xhr)
+        })
+      })
+    },
     deleteAttackFiles ({ commit, state, dispatch }, data) {
       return new Promise((resolve, reject) => {
         let param = {

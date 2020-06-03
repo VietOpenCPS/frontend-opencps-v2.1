@@ -19,7 +19,8 @@
         >
           <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
           <v-tab key="2" ripple class="mx-2"> Tiến trình thụ lý </v-tab>
-          <v-tab key="3" ripple class="mx-2" @click="loadVoting()" v-if="dossierDetail['dossierStatus'] === 'done'"> Đánh giá chất lượng dịch vụ</v-tab>
+          <v-tab key="3" ripple class="mx-2" v-if="paymentInfo"> Thanh toán trực tuyến</v-tab>
+          <v-tab key="4" ripple class="mx-2" @click="loadVoting()" v-if="dossierDetail['dossierStatus'] === 'done'"> Đánh giá chất lượng dịch vụ</v-tab>
           <v-tab-item key="1">
             <v-card style="border: 1px solid #dedede;border-top: none;">
               <v-card-text class="px-0 py-0">
@@ -176,7 +177,63 @@
               </v-card-text>
             </v-card>
           </v-tab-item>
-          <v-tab-item key="3">
+          <v-tab-item key="3" v-if="paymentInfo">
+            <v-card style="border: 1px solid #dedede;border-top: none;">
+              <v-card-text class="px-0 py-0">
+                <v-layout wrap>
+                  <v-flex xs12 sm2>
+                    <v-subheader class="pl-0 text-right">Lệ phí: </v-subheader>
+                  </v-flex>
+                  <v-flex xs12 sm2>
+                    <p class="mt-1 mb-0">{{currency(Number(paymentInfo.feeAmount))}} &nbsp;&nbsp; vnđ</p>
+                  </v-flex>
+                  <v-flex xs12 sm2>
+                    <v-subheader class="pl-0 text-right">Phí: </v-subheader>
+                  </v-flex>
+                  <v-flex xs12 sm2>
+                    <p class="mt-1 mb-0">{{currency(Number(paymentInfo.serviceAmount))}} &nbsp;&nbsp; vnđ</p>
+                  </v-flex>
+                  <v-flex xs12 sm2 v-if="paymentInfo.shipAmount !== 0">
+                    <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
+                  </v-flex>
+                  <v-flex xs12 sm2>
+                    <p class="mt-1 mb-0" v-if="paymentInfo.shipAmount !== 0">
+                      {{currency(Number(paymentInfo.shipAmount))}} &nbsp;&nbsp; vnđ
+                    </p>
+                  </v-flex>
+                </v-layout>
+              </v-card-text>
+              <v-card-text class="px-0 py-0">
+                <v-layout wrap>
+                  <v-flex xs12 sm2>
+                    <v-subheader class="pl-0 text-right"><span class="text-bold">Tổng: </span></v-subheader>
+                  </v-flex>
+                  <v-flex xs12 sm3 style="padding-top:7px">
+                    <span>{{currency(Number(paymentInfo.paymentAmount))}} &nbsp;&nbsp; vnđ</span>
+                  </v-flex>
+                </v-layout>
+                <v-layout wrap v-if="paymentInfo.paymentNote">
+                  <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
+                  <v-flex style="width:calc(100% - 80px)">
+                    <p class="px-2 my-0 py-1">
+                      {{paymentInfo.paymentNote}} &nbsp;&nbsp;
+                    </p>
+                  </v-flex>
+                </v-layout>
+              </v-card-text>
+            </v-card>
+            <div class="text-xs-left mt-2 mb-3 ml-0">
+              <v-chip v-if="getEPaymentProfile(paymentInfo.epaymentProfile)" color="orange" text-color="white"
+                @click.native="toKeyPay(getEPaymentProfile(paymentInfo.epaymentProfile).keypayUrl)"
+              >
+                <v-avatar style="cursor: pointer">
+                  <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
+                </v-avatar>
+                <span class="py-2" style="cursor: pointer">Thanh toán trực tuyến</span>
+              </v-chip>
+            </div>
+          </v-tab-item>
+          <v-tab-item key="4" v-if="dossierDetail['dossierStatus'] === 'done'">
             <v-card style="border: 1px solid #dedede;border-top: none;">
               <v-card-text class="px-2 py-2">
                 <div>
@@ -298,9 +355,13 @@
         }
       ],
       isMobile: false,
-      two_system: false
+      two_system: false,
+      paymentInfo: false
     }),
     computed: {
+      secretCode () {
+        return this.$store.getters.getScretCode
+      }
     },
     beforeDestroy () {
       if (typeof window !== 'undefined') {
@@ -326,6 +387,7 @@
         } catch (error) {
         }
         vm.dossierDetail = vm.detail
+        vm.getPaymentInfo()
         if (vm.dossierDetail.submissionNote) {
           let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
           let resultTemp = submissionNote ? submissionNote.data : ''
@@ -421,6 +483,41 @@
           }).catch(xhr => {
             vm.loadingVoting = false
           })
+        }
+      },
+      toKeyPay (item) {
+        let vm = this
+        window.open(item, '_self')
+      },
+      getPaymentInfo () {
+        let vm = this
+        let filter = {
+          referenceUid: vm.dossierDetail.referenceUid,
+          secretCode: vm.secretCode
+        }
+        vm.$store.dispatch('loadDossierPayments', filter).then(function (result) {
+          console.log(result)
+          if (result && String(result.paymentStatus) !== '3' && String(result.paymentStatus) !== '5') {
+            vm.paymentInfo = result
+          }
+        })
+      },
+      currency (value) {
+        if (value) {
+          return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : 0
+        }
+        return 0
+      },
+      getEPaymentProfile (paymentProfile) {
+        if (paymentProfile) {
+          try {
+            JSON.parse(paymentProfile)
+            return JSON.parse(paymentProfile)
+          } catch (e) {
+            return ''
+          }
+        } else {
+          return ''
         }
       },
       goBack () {

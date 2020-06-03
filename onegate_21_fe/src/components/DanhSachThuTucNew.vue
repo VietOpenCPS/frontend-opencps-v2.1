@@ -25,7 +25,7 @@
       <v-dialog v-else v-model="dialog_selectOption" scrollable persistent max-width="1000px">
         <v-card style="width: 100%">
           <v-toolbar flat dark color="primary">
-            <v-toolbar-title>Chọn dịch vụ</v-toolbar-title>
+            <v-toolbar-title>Chọn trường hợp</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn icon dark @click.native="closeSelectOption()">
               <v-icon>close</v-icon>
@@ -410,13 +410,13 @@
               <v-autocomplete
                 v-if="serviceOptions.length > 1"
                 class="mt-3"
-                placeholder="Chọn dịch vụ"
+                placeholder="Chọn trường hợp"
                 :items="serviceOptions"
                 v-model="serviceOptionsSelect"
                 item-text="optionName"
                 item-value="processOptionId"
                 clearable
-                :rules="[v => !!v || 'Chọn dịch vụ']"
+                :rules="[v => !!v || 'Chọn trường hợp']"
                 required
                 return-object
               ></v-autocomplete>
@@ -944,9 +944,19 @@
         let vm = this
         let current = vm.$router.history.current
         let newQuery = current.query
+        let sortCode = function (serviceList) {
+          function compare(a, b) {
+            if (a.dictGroupId < b.dictGroupId)
+              return -1
+            if (a.dictGroupId > b.dictGroupId)
+              return 1
+            return 0
+          }
+          return serviceList.sort(compare)
+        }
         vm.$store.dispatch('getServiceAdminisTration', {}).then(
           res => {
-            vm.administrationList = res
+            vm.administrationList = sortCode(res)
             vm.capCoQuanThucHien = newQuery['administration'] ? newQuery['administration'] : res[0]['groupCode']
             vm.getAgencys(vm.capCoQuanThucHien)
           }

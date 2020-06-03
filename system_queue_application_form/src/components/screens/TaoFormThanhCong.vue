@@ -9,7 +9,7 @@
         class="my-0 px-2 py-2"
       >
         - Tờ khai đã đăng ký xếp hàng.<br>
-        - Thời gian xếp hàng: {{timeBooking}} {{checkinDate}}.<br>
+        - Thời gian xếp hàng: {{timeBooking}} ngày {{checkinDate}}.<br>
         - Qua thời gian xếp hàng trên nếu chưa đến làm thủ tục đề nghị đăng ký xếp hàng lại.
       </v-alert>
     </div>
@@ -154,6 +154,9 @@ export default {
     },
     eformDetail () {
       return this.$store.getters.getEformDetail
+    },
+    serverCode () {
+      return this.$store.getters.getServerNo
     }
   },
   created () {
@@ -210,10 +213,13 @@ export default {
     },
     getDetailBooking () {
       let vm = this
+      let serverNoInfo = this.$store.getters.getServerNo
+      let serverNo = serverNoInfo ? serverNoInfo : 'SERVER_CLS'
       let filter = {
-        codeNumber: vm.eformDetail.eFormNo ? vm.eformDetail.eFormNo : ''
+        codeNumber: vm.eformDetail.eFormNo ? vm.eformDetail.eFormNo : '',
+        serverCode: serverNo
       }
-      vm.$store.dispatch('getDetailBooking', filter).then(function (result) {
+      vm.$store.dispatch('getDetailBookingProxy', filter).then(function (result) {
         vm.timeBooking = result.bookingInTime ? result.bookingInTime : ''
         vm.checkinDate = vm.parseDate(result.checkinDate)
       }).catch(function (reject) {

@@ -25,10 +25,9 @@
     "vue-content-placeholders": "^0.2.1",
     "vue-friendly-iframe": "^0.9.0",
     "vue-router": "^3.0.1",
-    "vuetify": "^1.4.2",
-    "vuex": "^3.0.1",
     "vue-simple-progress": "^1.1.0",
-    "vue-star-rating": "^1.6.1"
+    "vuetify": "^1.4.2",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",

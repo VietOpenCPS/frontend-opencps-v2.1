@@ -3,7 +3,7 @@
     <v-card>
       <v-card-text class="px-0 pt-0 mt-3">
         <v-layout wrap class="mt-0">
-          <v-flex xs12 sm6 class="pr-2">
+          <v-flex xs12 sm6 class="pr-2" v-if="originality === 3">
             <v-text-field
               label="Số CMND/ căn cước công dân, mã số thuế doanh nghiệp, mã tổ chức"
               v-model="applicantIdNo"
@@ -16,7 +16,7 @@
               @click:append="changeFilterSearch"
             ></v-text-field>
           </v-flex>
-          <v-flex xs12 sm6 class="">
+          <v-flex xs12 sm6 class="" v-if="originality === 3">
             <v-text-field
               label="Tìm theo mã tài liệu"
               v-model="fileNoSearch"
@@ -42,7 +42,7 @@
               box
             ></v-autocomplete>
           </v-flex>
-          <v-flex xs12 sm4 class="pr-2">
+          <v-flex xs12 sm4 class="pr-2" v-if="originality === 3">
             <v-autocomplete
               :items="statusList"
               v-model="status"
@@ -54,6 +54,19 @@
               @change="changeFilterSearch"
               box
             ></v-autocomplete>
+          </v-flex>
+          <v-flex xs12 sm4 class="" v-if="originality === 1">
+            <v-text-field
+              label="Tìm theo mã tài liệu"
+              v-model="fileNoSearch"
+              @keyup.enter="changeFilterSearch"
+              append-icon="search"
+              box
+              clear-icon="clear"
+              clearable
+              @click:clear="changeFilterSearch"
+              @click:append="changeFilterSearch"
+            ></v-text-field>
           </v-flex>
           <v-flex xs12 sm4 class="">
             <v-text-field
@@ -133,7 +146,7 @@
                   <span>Xem trước</span>
                 </v-tooltip>
                 <v-tooltip top v-if="!loadingTable" class="mr-2">
-                  <v-btn @click="attachDocument(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
+                  <v-btn @click="$emit('trigger-attach', props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon>fas fa fa-download</v-icon>
                   </v-btn>
                   <span>Sử dụng</span>
@@ -261,6 +274,10 @@ export default {
     applicantIdNo: ''
   }),
   computed: {
+    originality () {
+      let vm = this
+      return vm.getOriginality()
+    }
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
@@ -308,7 +325,7 @@ export default {
         end: vm.documentPage * vm.numberPerPage,
         applicantIdNo: vm.applicantIdNo,
         fileTemplateNo: vm.fileTemplateNo,
-        status: vm.status,
+        status: vm.originality === 1 ? 1 : vm.status,
         keywordSearch: vm.keySearch,
         fileNoSearch: vm.fileNoSearch,
         applicantDataType: ''

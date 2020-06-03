@@ -4,12 +4,6 @@
       <div class="row-header">
         <div class="background-triangle-big"> <span>THÔNG TIN THANH TOÁN</span> </div>
         <div class="layout row wrap header_tools row-blue">
-          <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
-            <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
-              Quay lại &nbsp;
-              <v-icon size="16">undo</v-icon>
-            </v-btn>
-          </div>
         </div> 
       </div>
       <div>
@@ -52,7 +46,7 @@
                       <td><span>{{dossierDetail.transId}}</span></td>
                     </tr>
                     <tr v-if="statusDeal">
-                      <td><span class="text-bold">Mã hóa đơn</span></td>
+                      <td><span class="text-bold">Mã đơn hàng</span></td>
                       <td><span>{{dossierDetail.goodCode}}</span></td>
                     </tr>
                     <tr v-if="statusDeal">
@@ -156,7 +150,11 @@ export default {
           vm.statusDeal = false
           vm.keypayStatusText = vm.keypayStatusCode['responseCode'] ? vm.keypayStatusCode['responseCode'] : ''
         }
-        vm.$store.dispatch('getDetailDossier', referenceUidQuery).then(resultDossier => {
+        let filter = {
+          password: vm.secretKey,
+          dossierId: referenceUidQuery
+        }
+        vm.$store.dispatch('getDossierDetailPass', referenceUidQuery).then(resultDossier => {
           vm.dossierDetail['serviceName'] = resultDossier.serviceName
           vm.dossierDetail['dossierNo'] = resultDossier.dossierNo
           vm.dossierDetail['govAgencyName'] = resultDossier.govAgencyName
@@ -205,12 +203,6 @@ export default {
         return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : 0
       }
       return 0
-    },
-    goBack () {
-      var vm = this
-      let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
-      let url = redirectURL + '/dich-vu-cong#/'
-      window.open(url, '_self')
     },
     getEPaymentProfile (paymentProfile) {
       if (paymentProfile) {

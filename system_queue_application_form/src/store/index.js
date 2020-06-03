@@ -26,7 +26,8 @@ export const store = new Vuex.Store({
     agencyList: [],
     domainList: [],
     levelList: [],
-    isMobile: false
+    isMobile: false,
+    serverNo: ''
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -266,6 +267,37 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDetailBookingProxy ({state, commit}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId(),
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let dataGet = {
+            codeNumber: filter['codeNumber']
+          }
+  
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('serverCode', filter.serverCode)
+          dataPost.append('url', '/bookings/eformDetail')
+          dataPost.append('data', JSON.stringify(dataGet))
+
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+            if (response.data) {
+              resolve(response.data)
+            } else {
+              resolve(response)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
     getEformData ({state, commit}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -355,13 +387,16 @@ export const store = new Vuex.Store({
           online: true,
           bookingDate: filter['bookingDate'],
           telNo: filter['telNo'],
-          j_captcha_response: filter['j_captcha_response']
+          // j_captcha_response: filter['j_captcha_response']
+          bypassCaptcha: true
         }
 
         let dataPost = new URLSearchParams()
         dataPost.append('method', 'POST')
+        dataPost.append('serverCode', filter.serverCode)
         dataPost.append('url', '/bookings')
         dataPost.append('data', JSON.stringify(dataCreate))
+        dataPost.append('bypassCaptcha', true)
 
         axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
           console.log('responseCreateBooking', response)
@@ -571,6 +606,9 @@ export const store = new Vuex.Store({
     },
     setEformDetail (state, payload) {
       state.eformDetail = payload
+    },
+    setServerNo (state, payload) {
+      state.serverNo = payload
     }
   },
   getters: {
@@ -594,6 +632,9 @@ export const store = new Vuex.Store({
     },
     getEformDetail (state, payload) {
       return state.eformDetail
+    },
+    getServerNo (state, payload) {
+      return state.serverNo
     }
   }
 })

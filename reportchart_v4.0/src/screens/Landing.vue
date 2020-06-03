@@ -255,7 +255,7 @@
               ></apexchart>
               <v-flex xs12 class="text-center text-bold my-3" v-if="isTable">
                 BÁO CÁO TỔNG HỢP TÌNH HÌNH GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH <br/>
-                <span v-if="String(month) !== '0'">Tháng {{monthSelected}}</span> Năm {{yearSelected2}}
+                <span v-if="String(monthSelected) !== '0'">Tháng {{monthSelected}}</span> Năm {{yearSelected2}}
               </v-flex>
               <table class="my-2" v-if="isTable" hide-default-footer>
                 <thead>
@@ -582,6 +582,7 @@ export default {
       }
     },
     monthList: [
+      { name: "Cả năm", value: 0 },
       { name: "Tháng 1", value: 1 },
       { name: "Tháng 2", value: 2 },
       { name: "Tháng 3", value: 3 },
