@@ -60,9 +60,10 @@
                 ></v-text-field>
             </v-flex>
             <v-flex xs12 sm3 class="px-2 ">
-                <label for="">Địa chi</label>
+                <label for="">Địa chỉ</label>
                 <v-text-field
                     v-model="dossiers.delegateAddress"
+                    placeholder="Không quá 100 ký tự"
                     solo
                     @change="changeAdress()"
                 ></v-text-field>
@@ -443,7 +444,7 @@
                                         </v-menu>
                                     </v-flex>
                                     <v-flex xs12 class="text-xs-right">
-                                        <v-btn small color="primary" @click="openKiemTraChuKyConDau()">Kiểm tra chữ ký con dấsu</v-btn>
+                                        <v-btn small color="primary" @click="openKiemTraChuKyConDau()">Kiểm tra chữ ký con dấu</v-btn>
                                         <v-btn small color="primary" @click="backGiayto()" v-if="update_giayto !== 'add' && update_giayto > 0">Chuyển giấy tờ trước</v-btn>
                                         <v-btn small color="primary" @click="nextGiayto()" v-if="update_giayto !== 'add'">Chuyển giấy tờ tiếp theo</v-btn>
                                     </v-flex>                     
@@ -535,40 +536,44 @@
                             <v-layout wrap class="pa-2" style="border: 0.5px solid #dedede">
                                 <v-flex xs12> Mẫu con dấu</v-flex>
                                 <v-flex xs12>
-                                    <div style="width: 100%; height: 190px; border: 0.5px solid #dedede;">
-                                        <div v-if="loadingImage" style="height: 140px;font-size: 16pt;color: blue;">Loading ....</div>
-                                        <div v-if="!loadingImage" style="width: 100%; height: 190px; overflow-y: scroll;">
-                                            <div v-for="(item, index) in listConDau" :key="index">
-                                                <img :src="'data:image/png;base64,' +  hexToBase64(item['CD_IMAGE_FILE'])" alt="" style="width: 100%; height: 140px;">
-                                                <v-checkbox
-                                                    v-model="chonConDau"
-                                                    primary
-                                                    :label="item['CD_NGAY_HL']"
-                                                    :value="item['CD_MA_CON_DAU']"
-                                                    @change="checkedConDau(item)"
-                                                    class="ma-0"
-                                                >
-                                                ></v-checkbox> 
+                                    <div style="width: 100%; height: 190px; border: 0.5px solid #dedede;overflow-x: scroll;">
+                                        <div style="width: 1000px;">
+                                            <div v-if="loadingImage" style="height: 140px;font-size: 16pt;color: blue;">Loading ....</div>
+                                            <div v-if="!loadingImage" style="width: 100%; height: 190px;display:flex;">
+                                                <div v-for="(item, index) in listConDau" :key="index">
+                                                    <img :src="'data:image/png;base64,' +  hexToBase64(item['CD_IMAGE_FILE'])" alt="" style="width: 200px; height: 140px;">
+                                                    <v-checkbox
+                                                        v-model="chonConDau"
+                                                        primary
+                                                        :label="item['CD_NGAY_HL']"
+                                                        :value="item['CD_MA_CON_DAU']"
+                                                        @change="checkedConDau(item)"
+                                                        class="ma-0"
+                                                    >
+                                                    ></v-checkbox> 
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </v-flex>
                                 <v-flex xs12 class="my-2"> Mẫu chữ ký</v-flex>
                                 <v-flex xs12>
-                                    <div style="width: 100%; height: 190px; border: 0.5px solid #dedede;">
-                                        <div v-if="loadingImage" style="height: 140px;font-size: 16pt;color: blue;">Loading ....</div>
-                                        <div v-if="!loadingImage" style="width: 100%; height: 190px; overflow-x: auto;">
-                                            <div v-for="(item, index) in listChuKy" :key="index">
-                                                <img :src="'data:image/png;base64,' +  hexToBase64(item['CK_IMAGE_FILE'])" alt="" style="width: 100%; height: 140px;">
-                                                <v-checkbox
-                                                    v-model="chonChuKy"
-                                                    primary
-                                                    :value="item['CK_MA_CK']"
-                                                    :label="item['CK_NGAY_HL']"
-                                                    @change="checkedChuKy(item)"
-                                                    class="ma-0"
-                                                >
-                                                ></v-checkbox> 
+                                    <div style="width: 100%; height: 190px; border: 0.5px solid #dedede;overflow-x: scroll;">
+                                        <div style="width: 1000px;">
+                                            <div v-if="loadingImage" style="height: 140px;font-size: 16pt;color: blue;">Loading ....</div>
+                                            <div v-if="!loadingImage" style="width: 100%; height: 190px;display:flex;">
+                                                <div v-for="(item, index) in listChuKy" :key="index">
+                                                    <img :src="'data:image/png;base64,' +  hexToBase64(item['CK_IMAGE_FILE'])" alt="" style="width: 200px; height: 140px;">
+                                                    <v-checkbox
+                                                        v-model="chonChuKy"
+                                                        primary
+                                                        :value="item['CK_MA_CK']"
+                                                        :label="item['CK_NGAY_HL']"
+                                                        @change="checkedChuKy(item)"
+                                                        class="ma-0"
+                                                    >
+                                                    ></v-checkbox> 
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1469,14 +1474,8 @@ export default {
             }
             vm.loadingImage = true
             axios.request(config).then(res => {
-                let tg = ''
-                // let sortDate = (a,b) => {
-                //     let date1 = new Date (a)
-                //     let date2 = new Date (b)
-                //     return date1 > date2
-                // }
-                vm.listConDau = res.data.CON_DAU
-                vm.listChuKy = res.data.CHU_KY
+                vm.listConDau = vm.sortDate(res.data.CON_DAU, 'CD_NGAY_HL')
+                vm.listChuKy = vm.sortDate (res.data.CHU_KY, 'CK_NGAY_HL')
                 vm.loadingImage = false
             }).catch(err => {})
         },
@@ -1854,6 +1853,19 @@ export default {
         },
         sortArr (arr, key) {
           return arr.sort((a, b) => a[key].localeCompare(b[key]))
+        },
+        sortDate(arr, key){
+            return arr.sort((a, b) => {
+                let date1 = new Date (a[key])
+                let date2 = new Date (b[key])
+                if(date1 > date2) {
+                    return -1
+                }
+                if(date1 < date2){
+                    return 1
+                }
+                return 0 
+            })
         },
         onSearchItemSelected (item) {
             var vm = this
