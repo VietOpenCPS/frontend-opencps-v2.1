@@ -418,6 +418,7 @@ export default {
       vm.getServiceInfo()
       vm.getGateLists()
       vm.loadBooking()
+      vm.getFieldPick()
       setTimeout(function () {
         if (vm.bookingList.length > 5) {
           let heightScroll = $('header').height() + $('.navbar-container').height()
@@ -484,8 +485,11 @@ export default {
     },
     changeGroup () {
       let vm = this
-      vm.serviceInfoSelected = ''
-      vm.filterBooking()
+      setTimeout(()=>{
+        vm.serviceInfoSelected = ''
+        vm.filterBooking()
+        vm.postFieldPick('groupCode',vm.serviceGroupSelected.groupCode)
+      },100)
     },
     changeMethod () {
       let vm = this
@@ -546,7 +550,10 @@ export default {
     },
     changeService () {
       let vm = this
-      vm.filterBooking()
+      setTimeout(()=>{
+        vm.filterBooking()
+        vm.postFieldPick('serviceCode',vm.serviceInfoSelected)
+      },100)
     },
     changeState () {
       let vm = this
@@ -1008,6 +1015,32 @@ export default {
       } else if (level === 4) {
         return 'red'
       }
+    },
+    getFieldPick(){
+      let vm = this
+      let classPK = 'BOOKING'
+      vm.$store.dispatch('getFieldPick', classPK).then(function (result) {
+        try{
+          let formData = result
+          vm.serviceInfoSelected = formData.serviceCode
+          vm.serviceGroupSelected = vm.serviceGroupList.find(e=> e.groupCode === formData.groupCode)
+        } catch (err) {
+        }
+
+      }).catch (function (reject) {
+      }) 
+    },
+    postFieldPick(key,val){
+      let vm = this
+      let filter = {
+        classPK: 'BOOKING',
+        key,
+        val
+      }
+      vm.$store.dispatch('postFieldPick', filter).then(function (result) {
+      
+      }).catch (function (reject) {
+      }) 
     }
   }
 }

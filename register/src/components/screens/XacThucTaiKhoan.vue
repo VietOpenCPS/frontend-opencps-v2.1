@@ -79,7 +79,8 @@ export default {
     pinCode: '',
     userName: '',
     passWord: '',
-    dialogVerify: false
+    dialogVerify: false,
+    xacthuc_credit: false,
   }),
   computed: {
   },
@@ -95,6 +96,12 @@ export default {
         setTimeout(function() {
           vm.submitConfirmPIN()
         }, 300)
+      }
+      try {
+        if (xacthuc_credit) {
+          vm.xacthuc_credit = true
+        }
+      } catch (error) {
       }
     })
   },
@@ -118,18 +125,34 @@ export default {
       if (vm.$refs.form.validate() && dataForm.userId) {
         vm.loading = true
         let filter = dataForm
-        vm.$store.dispatch('confirmPIN', filter).then(function (result) {
-          vm.loading = false
-          $('.login-input input[type=text]').val('')
-          $('.login-input input[type=password]').val('')
-          $('.login-input input[type=text]').val(result.email)
-          $('.login-input input[type=password]').val(result.token)
-          vm.userName = result.email
-          vm.passWord = result.token
-          vm.goToDangNhap()
-        }).catch(function (reject) {
-          vm.loading = false
-        })
+
+        if(vm.xacthuc_credit){
+          vm.$store.dispatch('confirmPINBXD', filter).then(function (result) {
+            vm.loading = false
+            $('.login-input input[type=text]').val('')
+            $('.login-input input[type=password]').val('')
+            $('.login-input input[type=text]').val(result.email)
+            $('.login-input input[type=password]').val(result.token)
+            vm.userName = result.email
+            vm.passWord = result.token
+            vm.goToDangNhap()
+          }).catch(function (reject) {
+            vm.loading = false
+          })
+        } else {
+          vm.$store.dispatch('confirmPIN', filter).then(function (result) {
+            vm.loading = false
+            $('.login-input input[type=text]').val('')
+            $('.login-input input[type=password]').val('')
+            $('.login-input input[type=text]').val(result.email)
+            $('.login-input input[type=password]').val(result.token)
+            vm.userName = result.email
+            vm.passWord = result.token
+            vm.goToDangNhap()
+          }).catch(function (reject) {
+            vm.loading = false
+          })
+        }
       }
     },
     goToDangNhap() {

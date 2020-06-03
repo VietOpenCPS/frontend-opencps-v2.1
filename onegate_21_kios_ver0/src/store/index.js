@@ -478,6 +478,31 @@ export const store = new Vuex.Store({
         })
       })
     },
+    loadVotingNew ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        commit('setLoading', true)
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          axios.get(state.endPoint + '/postal/votings/dossier/0', param).then(result => {
+          // axios.get('http://127.0.0.1:8081/api/votings/12/' + data.classPK, param).then(result => {
+            if (result.data) {
+              resolve(result.data.data)
+            } else {
+              resolve([])
+            }
+            commit('setLoading', false)
+          }).catch(xhr => {
+            reject(xhr)
+            commit('setLoading', false)
+          })
+        })
+      })
+    },   
     submitVoting ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result1) {

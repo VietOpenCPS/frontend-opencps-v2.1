@@ -141,7 +141,7 @@
                     v-model='fileCMNDName'
                     v-if="xacthuc_credit"
                     :rules="[rules.required]"
-                    placeholder="Tải lên ảnh .png, .jpg, .jpeg"
+                    placeholder="Tải lên ảnh .png, .jpg, .jqeg, .pdf"
                     box
                     append-icon="cloud_upload"
                     :append-icon-cb="onPickFileCMND"
@@ -158,7 +158,7 @@
                     type="file"
                     style="display: none"
                     ref="refFileCMND"
-                    accept="image/*"
+                    accept="image/pdf*"
                     @change="onFileCMNDPicked">
                 </div>
               </v-flex>
@@ -253,7 +253,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogPending" max-width="350">
+    <!-- <v-dialog v-model="dialogPending" max-width="350">
       <v-card>
         <v-card-text class="text-xs-center" style="background-color: #00204a;position: relative;color:white">
           <span>ĐĂNG KÝ TÀI KHOẢN THÀNH CÔNG</span><br>
@@ -263,7 +263,7 @@
           </v-btn>
         </v-card-text>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
   </div>
 </template>
 
@@ -485,6 +485,9 @@ export default {
               vm.$refs.form.resetValidation()
               vm.applicantType = '1'
               vm.dialogPending = true
+              vm.$router.push({
+                path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
+              })
             }).catch(function (reject) {
               vm.$refs.captcha.makeImageCap()
               vm.loading = false

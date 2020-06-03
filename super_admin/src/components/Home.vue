@@ -341,10 +341,10 @@
         window.location.href = '/c/portal/logout'
       },
       thongKeTruyCap () {
-        window.location.href = 'https://analytics.google.com'
-        // this.$router.push({
-        //   name: 'ThongKeTruyCap'
-        // })
+        // window.location.href = 'https://analytics.google.com'
+        this.$router.push({
+          name: 'ThongKeTruyCap'
+        })
       }
     }
   }

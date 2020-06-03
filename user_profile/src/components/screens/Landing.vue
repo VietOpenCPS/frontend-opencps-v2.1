@@ -1179,26 +1179,38 @@
             applicantId: vm.user['classPK']
           }
           if(vm.xacthuc_credit) {
-            vm.$store.dispatch('updateindentifies', filter).then(function (data) {
-              let applicantProfile =  JSON.parse(data['applicantProfile'])
-              vm.user['applicantProfile']['indentifyNoFileUrl'] = applicantProfile.indentifyNoFileUrl
-              vm.$store.dispatch('putUser', vm.user).then(function () {
-                vm.loading = false
-                toastr.clear()
-                toastr.success('Yêu cầu thực hiện thành công')
-                // vm.$store.dispatch('getUserInfo').then((data)=>{
-                
-                // }).catch(()=>{})
+            if(vm.fileCMND){
+              vm.$store.dispatch('updateindentifies', filter).then(function (data) {
+                let applicantProfile =  JSON.parse(data['applicantProfile'])
+                vm.user['applicantProfile']['indentifyNoFileUrl'] = applicantProfile.indentifyNoFileUrl
+                vm.$store.dispatch('putUser', vm.user).then(function () {
+                  vm.loading = false
+                  toastr.clear()
+                  toastr.success('Yêu cầu thực hiện thành công')
+                  // vm.$store.dispatch('getUserInfo').then((data)=>{
+                  
+                  // }).catch(()=>{})
+                }).catch(function () {
+                  vm.loading = false
+                  toastr.clear()
+                  toastr.error('Yêu cầu thực hiện thất bại')
+                })
               }).catch(function () {
                 vm.loading = false
                 toastr.clear()
                 toastr.error('Yêu cầu thực hiện thất bại')
               })
-            }).catch(function () {
-              vm.loading = false
-              toastr.clear()
-              toastr.error('Yêu cầu thực hiện thất bại')
-            })
+            } else {
+              vm.$store.dispatch('putUser', vm.user).then(function () {
+                vm.loading = false
+                toastr.clear()
+                toastr.success('Yêu cầu thực hiện thành công')
+              }).catch(function () {
+                vm.loading = false
+                toastr.clear()
+                toastr.error('Yêu cầu thực hiện thất bại')
+              })
+            }
           } else {
             vm.$store.dispatch('putUser', vm.user).then(function () {
               vm.loading = false

@@ -1,5 +1,6 @@
 if (process.env.NODE_ENV === 'production') {
   module.exports = {
+    productionSourceMap: true,
     runtimeCompiler: true,
     chainWebpack: config => {
       config.module.rule('images').use('url-loader')
