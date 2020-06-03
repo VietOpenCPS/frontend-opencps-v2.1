@@ -10,8 +10,7 @@
                 <v-tooltip left v-if="(thongTinChuHoSo.userType === '2' || (originality === 1 && thongTinChuHoSo.applicantIdType === 'business')) && bussinessExits"
                 style="position:absolute;right:5px;z-index:101"
                 >
-                  <v-btn slot="activator" class="my-0 mt-1" fab icon small dark color="primary" @click.native="getApplicantInfos()" style="width:32px!important;height:32px!important"
-                  >
+                  <v-btn slot="activator" class="my-0 mt-1" fab icon small dark color="primary" @click.native="getApplicantInfos()" style="width:32px!important;height:32px!important">
                     <v-icon dark>account_balance</v-icon>
                   </v-btn>
                   <span>Đối chiếu thông tin doanh nghiệp</span>
@@ -1159,7 +1158,7 @@ export default {
       if (vm.requiredOptions['applicantIdNo'] && !vm.thongTinChuHoSo.applicantIdNo) {
         applicantIdRequired = false
       }
-      if (vm.requiredOptions['delegateIdNo'] && !vm.thongTinNguoiNopHoSo.delegateIdNo) {
+      if (vm.originality !== 1  && !vm.showDelegate && vm.requiredOptions['delegateIdNo'] && !vm.thongTinNguoiNopHoSo.delegateIdNo) {
         applicantIdRequired = false
       }
       let result = {

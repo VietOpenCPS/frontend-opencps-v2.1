@@ -9,14 +9,14 @@
       <v-flex xs12>
         <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
           <v-flex xs12>
-            <p>Vui lòng nhập Email để được cấp lại mật khẩu</p>
+            <p>Vui lòng nhập email để được cấp lại mật khẩu</p>
           </v-flex>
           <v-flex xs12>
             <v-text-field
               box
-              placeholder="Địa chỉ Email"
+              placeholder="Địa chỉ email"
               v-model="confirmCode"
-              :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+              :rules="[v => !!v || 'Địa chỉ email là bắt buộc']"
               required
             ></v-text-field>
           </v-flex>
@@ -32,10 +32,31 @@
               <v-icon>how_to_reg</v-icon>&nbsp;
               Đồng ý
             </v-btn>
+            <v-btn color="primary"
+              @click="goBack"
+            >
+              <v-icon>reply</v-icon>&nbsp;
+              Quay lại
+            </v-btn>
           </div>
         </v-form>
       </v-flex>
     </v-layout>
+    <v-dialog v-model="dialogConfirm" persistent max-width="350">
+      <v-card>
+        <v-card-title class="headline">
+          <span >Tài khoản chưa xác thực. Vui lòng thực hiện xác thực.</span>
+        </v-card-title>
+        <v-card-text class="mx-0 my-0 px-0 py-0">
+        </v-card-text>
+        <v-card-actions class="my-2">
+          <div class="text-xs-center flex">
+            <v-btn class="px-3" color="primary" @click="confirmXacThuc">Đồng ý</v-btn>
+            <v-btn class="px-3" color="primary" @click="dialogConfirm = false">Bỏ qua</v-btn>
+          </div>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -45,6 +66,7 @@ import Vue from 'vue'
 import $ from 'jquery'
 import support from '../../store/support.json'
 import Captcha from './Captcha.vue'
+import axios from 'axios'
 export default {
   props: [],
   components: {
@@ -53,9 +75,14 @@ export default {
   data: () => ({
     loading: false,
     valid: false,
-    confirmCode: ''
+    confirmCode: '',
+    dialogConfirm: false,
+    userIdLogin: ''
   }),
   computed: {
+    pathNameConfig () {
+      return this.$store.getters.getPathNameConfig
+    }
   },
   created () {
     var vm = this
@@ -77,23 +104,61 @@ export default {
       let vm = this
       let currentQuery = vm.$router.history.current.query
       let currentParams = vm.$router.history.current.params
-      let dataForm = {
-        confirmCode: vm.confirmCode,
-        j_captcha_response: vm.$refs.captcha.j_captcha_response
-      }
       if (vm.$refs.form.validate()) {
         vm.loading = true
-        let filter = dataForm
-        vm.$store.dispatch('confirmForgotPASS', filter).then(function (result) {
-          vm.loading = false
-          vm.$router.push({
-            path: '/xac-thuc-cap-lai-mat-khau?active_user_id=' + vm.confirmCode
+        let configs = {
+          headers: {
+            'Authorization': 'BASIC ' + window.btoa(vm.confirmCode + ":0")
+          }
+        }
+        let dataPostApplicant = new URLSearchParams()
+        axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
+          if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha' && response.data !== "lockout" && response.data === 'pending') {
+            vm.loading = false
+            vm.$refs.captcha.makeImageCap()
+            vm.dialogConfirm = true
+            vm.userIdLogin = response.headers.hasOwnProperty('userid') ? response.headers.userid : ''
+          } else {
+            let filter = {
+              confirmCode: vm.confirmCode,
+              j_captcha_response: vm.$refs.captcha.j_captcha_response
+            }      
+            vm.$store.dispatch('confirmForgotPASS', filter).then(function (result) {
+              vm.loading = false
+              vm.$router.push({
+                path: '/xac-thuc-cap-lai-mat-khau?active_user_id=' + vm.confirmCode
+              })
+            }).catch(function (reject) {
+              vm.loading = false
+              vm.$refs.captcha.makeImageCap()
+            })
+          }
+        }).catch(function () {
+          let filter = {
+            confirmCode: vm.confirmCode,
+            j_captcha_response: vm.$refs.captcha.j_captcha_response
+          }      
+          vm.$store.dispatch('confirmForgotPASS', filter).then(function (result) {
+            vm.loading = false
+            vm.$router.push({
+              path: '/xac-thuc-cap-lai-mat-khau?active_user_id=' + vm.confirmCode
+            })
+          }).catch(function (reject) {
+            vm.loading = false
+            vm.$refs.captcha.makeImageCap()
           })
-        }).catch(function (reject) {
-          vm.loading = false
-          vm.$refs.captcha.makeImageCap()
         })
       }
+    },
+    confirmXacThuc () {
+      let vm = this
+      let url = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
+      window.location.href = url + vm.pathNameConfig + 
+      "#/xac-thuc-tai-khoan?active_user_id=" + vm.userIdLogin +
+        "&redirectURL=" + url
+    },
+    goBack () {
+      window.history.back()
     }
   }
 }

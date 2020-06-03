@@ -1576,15 +1576,15 @@ export default {
     changeFileMark (event, index) {
       let vm = this
       if (!vm.onlyView) {
-        let item = vm.dossierTemplateItems[index]
+        let item = vm.dossierTemplateItemsFilter[index]
         item['dossierId'] = vm.thongTinHoSo.dossierId
         item['fileMark'] = event
         item['checkInput'] = vm.checkInput
         vm.$store.dispatch('postDossierMark', item)
-        vm.dossierTemplateItems[index].fileMark = event
-        vm.dossierTemplateItems[index].hasTemplate = String(vm.dossierTemplateItems[index].fileMark) !== '0'
+        vm.dossierTemplateItemsFilter[index].fileMark = event
+        vm.dossierTemplateItemsFilter[index].hasTemplate = String(vm.dossierTemplateItemsFilter[index].fileMark) !== '0'
         if (event === 0) {
-          vm.dossierTemplateItems[index].recordCount = 0
+          vm.dossierTemplateItemsFilter[index].recordCount = 0
         }
       }
     },
@@ -1620,7 +1620,7 @@ export default {
     changeFileCheck (event, index) {
       var vm = this
       // console.log('event=====', event)
-      let item = vm.dossierTemplateItems[index]
+      let item = vm.dossierTemplateItemsFilter[index]
       item['dossierId'] = vm.thongTinHoSo.dossierId
       item['fileCheck'] = event
       item['checkInput'] = vm.checkInput
@@ -1632,7 +1632,7 @@ export default {
       }
       // console.log('item-check-------', item)
       vm.$store.dispatch('postDossierMark', item)
-      vm.dossierTemplateItems[index].fileCheck = event
+      vm.dossierTemplateItemsFilter[index].fileCheck = event
     },
     changeFileComment (item, index) {
       var vm = this
@@ -1877,11 +1877,11 @@ export default {
     changeRecordCount (index) {
       let vm = this
       if (!vm.onlyView) {
-        vm.dossierTemplateItems[index].recordCount = vm.dossierTemplateItems[index]['recordCount'] ? vm.dossierTemplateItems[index]['recordCount'] : ''
+        vm.dossierTemplateItemsFilter[index].recordCount = vm.dossierTemplateItemsFilter[index]['recordCount'] ? vm.dossierTemplateItemsFilter[index]['recordCount'] : ''
         function changeRecord () {
           vm.doChange[index] = setTimeout(function () {
-            if (!vm.onlyView && Number(vm.dossierTemplateItems[index]['recordCount']) >= 0) {
-              let item = Object.assign({}, vm.dossierTemplateItems[index], {dossierId: vm.thongTinHoSo.dossierId})  
+            if (!vm.onlyView && Number(vm.dossierTemplateItemsFilter[index]['recordCount']) >= 0) {
+              let item = Object.assign({}, vm.dossierTemplateItemsFilter[index], {dossierId: vm.thongTinHoSo.dossierId})  
               vm.$store.dispatch('postDossierMark', item)
             }
           }, 1000)
@@ -1892,12 +1892,12 @@ export default {
     },
     increaseCounter (index) {
       let vm = this
-      vm.dossierTemplateItems[index].recordCount = vm.dossierTemplateItems[index]['recordCount'] ? vm.dossierTemplateItems[index]['recordCount'] : ''
-      vm.dossierTemplateItems[index]['recordCount'] = Number(vm.dossierTemplateItems[index]['recordCount']) + 1
+      vm.dossierTemplateItemsFilter[index].recordCount = vm.dossierTemplateItemsFilter[index]['recordCount'] ? vm.dossierTemplateItemsFilter[index]['recordCount'] : ''
+      vm.dossierTemplateItemsFilter[index]['recordCount'] = Number(vm.dossierTemplateItemsFilter[index]['recordCount']) + 1
       function changeRecord () {
         vm.doChange[index] = setTimeout(function () {
-          if (!vm.onlyView && Number(vm.dossierTemplateItems[index]['recordCount']) >= 0) {
-            let item = Object.assign({}, vm.dossierTemplateItems[index], {dossierId: vm.thongTinHoSo.dossierId})  
+          if (!vm.onlyView && Number(vm.dossierTemplateItemsFilter[index]['recordCount']) >= 0) {
+            let item = Object.assign({}, vm.dossierTemplateItemsFilter[index], {dossierId: vm.thongTinHoSo.dossierId})  
             vm.$store.dispatch('postDossierMark', item)
           }
         }, 1000)
@@ -1907,12 +1907,12 @@ export default {
     },
     decreaseCounter (index) {
       let vm = this
-      vm.dossierTemplateItems[index].recordCount = vm.dossierTemplateItems[index]['recordCount'] ? vm.dossierTemplateItems[index]['recordCount'] : ''
-      vm.dossierTemplateItems[index]['recordCount'] = vm.dossierTemplateItems[index]['recordCount'] ? Number(vm.dossierTemplateItems[index]['recordCount']) - 1 : vm.dossierTemplateItems[index]['recordCount']
+      vm.dossierTemplateItemsFilter[index].recordCount = vm.dossierTemplateItemsFilter[index]['recordCount'] ? vm.dossierTemplateItemsFilter[index]['recordCount'] : ''
+      vm.dossierTemplateItemsFilter[index]['recordCount'] = vm.dossierTemplateItemsFilter[index]['recordCount'] ? Number(vm.dossierTemplateItemsFilter[index]['recordCount']) - 1 : vm.dossierTemplateItems[index]['recordCount']
       function changeRecord () {
         vm.doChange[index] = setTimeout(function () {
-          if (!vm.onlyView && Number(vm.dossierTemplateItems[index]['recordCount']) >= 0) {
-            let item = Object.assign({}, vm.dossierTemplateItems[index], {dossierId: vm.thongTinHoSo.dossierId})  
+          if (!vm.onlyView && Number(vm.dossierTemplateItemsFilter[index]['recordCount']) >= 0) {
+            let item = Object.assign({}, vm.dossierTemplateItemsFilter[index], {dossierId: vm.thongTinHoSo.dossierId})  
             vm.$store.dispatch('postDossierMark', item)
           }
         }, 1000)

@@ -33,10 +33,16 @@
       }
     },
     created () {
-      var vm = this
+      let vm = this
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
+        try {
+          if (pathNameConfig) {
+            vm.$store.commit('setPathNameConfig', pathNameConfig)
+          }
+        } catch (error) {
+        }
       })
     },
     watch: {

@@ -4,6 +4,7 @@
       v-if="formCode === 'NEW' || formCode === 'NEW_GROUP' || formCode === 'UPDATE' || formCode === 'COPY'" 
       ref="tiepnhanhosodetail"
       :formCode="formCode"
+      :id="id"
     ></tiep-nhan-ho-so-detail>
   </div>
 </template>

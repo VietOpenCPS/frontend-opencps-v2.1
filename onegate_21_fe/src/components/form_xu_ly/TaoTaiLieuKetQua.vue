@@ -1082,9 +1082,23 @@
                 // 
                 console.log('indexFile', vm.dossierFilesItems)
               }
+              // lọc file gán với createFiles
+              let createFileItems = []
+              if (vm.dossierFilesItems.length > 0) {
+                for (let i = 0; i < vm.dossierFilesItems.length; i++) {
+                  let hasCreate = vm.createFiles.filter(function (item) {
+                    return String(item.partNo) === String(vm.dossierFilesItems[i]['dossierPartNo'])
+                  })
+                  if (hasCreate && hasCreate.length > 0) {
+                    createFileItems.push(vm.dossierFilesItems[i])
+                  }
+                }
+              }
+              
+              // 
               let createFileSigned = {
                 dossierId: vm.detailDossier['dossierId'],
-                createFiles: vm.dossierFilesItems
+                createFiles: createFileItems
               }
               vm.$store.commit('setCreateFileSigned', createFileSigned)
             } else {
@@ -1299,9 +1313,23 @@
             vm.dossierFilesItems[index]['pdfSigned'] = ''
           }
         })
+        // lọc file gán với createFiles
+          let createFileItems = []
+          if (vm.dossierFilesItems.length > 0) {
+            for (let i = 0; i < vm.dossierFilesItems.length; i++) {
+              let hasCreate = vm.createFiles.filter(function (item) {
+                return String(item.partNo) === String(vm.dossierFilesItems[i]['dossierPartNo'])
+              })
+              if (hasCreate && hasCreate.length > 0) {
+                createFileItems.push(vm.dossierFilesItems[i])
+              }
+            }
+          }
+          
+        // 
         let createFileSigned = {
           dossierId: vm.detailDossier['dossierId'],
-          createFiles: vm.dossierFilesItems
+          createFiles: createFileItems
         }
         console.log('fileSignedSync', createFileSigned)
         vm.$store.commit('setCreateFileSigned', createFileSigned)

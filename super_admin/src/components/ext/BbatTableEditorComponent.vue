@@ -37,7 +37,7 @@
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'changeEmail'">swap_horiz</v-icon>
           {{item.label}}
         </v-btn>
-        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['active_acount']" v-on:click.native="activeAcount()">
+        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['active_acount'] && data['activationCode'] === 'verified'" v-on:click.native="activeAcount()">
           <v-icon class="mr-1" size="14">lock_open</v-icon>
           {{item.label}}
         </v-btn>

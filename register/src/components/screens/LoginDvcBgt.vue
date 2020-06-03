@@ -127,7 +127,7 @@
         </v-flex>
       </v-flex>
     </v-layout>
-    <v-dialog v-model="dialogContact" persistent max-width="290">
+    <v-dialog v-model="dialogContact" persistent max-width="310">
       <v-card>
         <v-card-title class="headline">
           <span>Cập nhật email sử dụng trên hệ thống</span>
@@ -160,7 +160,9 @@
 
 import Vue from 'vue'
 import $ from 'jquery'
+import toastr from 'toastr'
 import support from '../../store/support.json'
+
 export default {
   props: [],
   components: {},
@@ -226,6 +228,28 @@ export default {
           vm.dataMapping = dataObj
           if (dataObj && dataObj.hasOwnProperty('userId') && String(dataObj.userId) === '0') {
             vm.mapping = true
+            let typeAccount = ''
+            let title = ''
+            let idType = ''
+            if (dataObj.LoaiTaiKhoan === '1') {
+              typeAccount = 'Số CMND/ Căn cước '
+              idType = dataObj.SoCMND
+            } else if (dataObj.LoaiTaiKhoan === '2') {
+              typeAccount = 'Mã số thuế '
+              idType = dataObj.MaSoThue
+            }
+            if (typeAccount && (dataObj.SoCMND || dataObj.MaSoThue)) {
+              title = typeAccount + idType + ' đã tạo tài khoản trên hệ thống. Vui lòng đăng nhập để đồng bộ với tài khoản Cổng Dịch vụ công Quốc gia.'
+            }
+            if (title) {
+              toastr.options = {
+                'positionClass': 'toast-top-center',
+                'closeButton': true,
+                'timeOut': '30000'
+              }
+              toastr.info(title)
+            }
+            
           }
           if (dataObj && dataObj.hasOwnProperty('state') && dataObj.state === 'create') {
             vm.contactEmail = dataObj['ThuDienTu'] ? dataObj['ThuDienTu'] : ''
