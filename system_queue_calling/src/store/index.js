@@ -364,6 +364,48 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getFieldPick ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let url = '/o/rest/v2/fieldpick/classpk/' + filter
+          axios.get(url, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    postFieldPick ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let url = '/o/rest/v2/fieldpick/classpk/' + filter.classPK
+          let dataPost = new URLSearchParams()
+          let data = {}
+          data[filter.key] = filter.val
+          dataPost.append('formData', JSON.stringify(data))
+          axios.post(url,dataPost, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     // add new template
     loadDossierFormTemplates ({ commit, state }, data) {
       return new Promise((resolve, reject) => {

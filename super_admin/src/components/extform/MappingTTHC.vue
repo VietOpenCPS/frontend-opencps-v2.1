@@ -234,7 +234,7 @@
                 <v-flex xs12>
                   <div class="text-xs-right layout wrap" style="position: relative;">
                     <div class="flex pagging-table"> 
-                      <tiny-pagination :total="listMapping.length" :page="pageMapping" custom-class="custom-tiny-class" 
+                      <tiny-pagination :total="totalMapping" :page="pageMapping" custom-class="custom-tiny-class" 
                         @tiny:change-page="paggingDataMapping" ></tiny-pagination> 
                     </div>
                   </div>
@@ -544,6 +544,7 @@ export default {
     ],
     loading: true,
     btnThem : false,
+    totalMapping: 0,
     dialogMapping: false,
     dialogChiTietThuTucDonVi: false,
     dialogChiTietThuTucDVCQG: false,
@@ -663,22 +664,27 @@ export default {
       if(val){
         let test = val.toLowerCase()
         if(vm.timKiemTheoSelected === 'DonVi') {
-          vm.listMappingView = vm.listMapping.filter(e => {
-            if(e.serviceNameDVCQG.toLowerCase().search(test) >= 0 || e.serviceNameDVCQG.search(test) >= 0){
+          let arr = vm.listMapping.filter(e => {
+            if(e.serviceNameDVCQG.toLowerCase().search(test) >= 0 || e.serviceNameDVCQG.search(test) >= 0 || e.serviceNameDVCQG === val){
               return e
             }
-          }).slice(0, 10)
+          })
+          vm.listMappingView =arr.slice(0, 10)
+          vm.totalMapping = arr.length
         } else {
-          vm.listMappingView = vm.listMapping.filter(e => {
-            if(e.serviceName.toLowerCase().search(test) >= 0 ||  e.serviceName.search(test) >= 0){
+          let arr = vm.listMapping.filter(e => {
+            if(e.serviceName.toLowerCase().search(test) >= 0 ||  e.serviceName.search(test) >= 0  || e.serviceName === val){
               return e
             }
-          }).slice(0, 10)
+          })
+          vm.listMappingView = arr.slice(0, 10)
+          vm.totalMapping = arr.length
         }
         
         vm.loadingMapping = false
       } else{
         vm.listMappingView = vm.listMapping.slice(0, 10)
+        vm.totalMapping = vm.listMapping.length
         vm.loadingMapping = false
       }
     },
@@ -689,13 +695,13 @@ export default {
         let test = val.toLowerCase()
         if(vm.timKiemTheoSelected === 'DonVi') {
           vm.serviceInfoListDonViView = vm.serviceInfoListDonVi.filter(e => {
-            if(e.serviceName.toLowerCase().search(test) >= 0 || e.serviceName.search(test) >= 0){
+            if(e.serviceName.toLowerCase().search(test) >= 0 || e.serviceName.search(test) >= 0 || e.serviceName === val){
               return e
             }
           }).slice(0, vm.pageSize)
         } else {
           vm.serviceInfoListDVCQGView = vm.serviceInfoListDVCQG.filter(e =>{
-            if( e.serviceNameDVCQG.toLowerCase().search(test) >= 0 || e.serviceNameDVCQG.search(test) >= 0){
+            if( e.serviceNameDVCQG.toLowerCase().search(test) >= 0 || e.serviceNameDVCQG.search(test) >= 0 || e.serviceNameDVCQG === val){
               return e
             }
           }).slice(0, vm.pageSize)
@@ -804,7 +810,36 @@ export default {
       let vm = this
       let start = config.page * 10 - 10
       let end = config.page * 10
-      vm.listMappingView = vm.listMapping.slice(start, end)
+      if (vm.nameDVCQGModel) {
+        let test = vm.nameDVCQGModel.toLowerCase()
+        if(vm.timKiemTheoSelected === 'DonVi') {
+          vm.listMappingView = vm.listMapping.filter(e => {
+            if(e.serviceNameDVCQG.toLowerCase().search(test) >= 0 || e.serviceNameDVCQG.search(test) >= 0 || e.serviceNameDVCQG === vm.nameDVCQGModel){
+              return e
+            }
+          }).slice(start, end)
+          vm.totalMapping = vm.listMapping.filter(e => {
+            if(e.serviceNameDVCQG.toLowerCase().search(test) >= 0 || e.serviceNameDVCQG.search(test) >= 0 || e.serviceNameDVCQG === vm.nameDVCQGModel){
+              return e
+            }
+          }).length
+        } else {
+          vm.listMappingView = vm.listMapping.filter(e => {
+            if(e.serviceName.toLowerCase().search(test) >= 0 ||  e.serviceName.search(test) >= 0  || e.serviceName === vm.nameDVCQGModel){
+              return e
+            }
+          }).slice(start, end)
+          vm.totalMapping = vm.listMapping.filter(e => {
+            if(e.serviceName.toLowerCase().search(test) >= 0 ||  e.serviceName.search(test) >= 0  || e.serviceName === vm.nameDVCQGModel){
+              return e
+            }
+          }).length
+        }
+      } else {
+        vm.listMappingView = vm.listMapping.slice(start, end)
+        vm.totalMapping = vm.listMapping.length
+      }
+     
     },
     paggingData (config) {
       let vm = this
@@ -812,11 +847,32 @@ export default {
       let end = config.page * vm.pageSize
       vm.thutucPage = config.page
       if(vm.timKiemTheoSelected === 'DonVi') {
-        vm.serviceInfoListDonViView = vm.serviceInfoListDonVi.slice(start, end)
+        if(vm.tenThuTucModel){
+          let test = vm.tenThuTucModel.toLowerCase()
+          vm.serviceInfoListDonViView = vm.serviceInfoListDonVi.filter(e => {
+            if(e.serviceName.toLowerCase().search(test) >= 0 || e.serviceName.search(test) >= 0 || e.serviceName === vm.tenThuTucModel){
+              return e
+            }
+          }).slice(start, end)
+        }
+        else{
+          vm.serviceInfoListDonViView = vm.serviceInfoListDonVi.slice(start, end)
+        }
       }
       if(vm.timKiemTheoSelected === 'DVCQG') {
-        vm.serviceInfoListDVCQGView = vm.serviceInfoListDVCQG.slice(start, end)
-      }      
+        if(vm.tenThuTucModel){
+          let test = vm.tenThuTucModel.toLowerCase()
+          vm.serviceInfoListDVCQGView = vm.serviceInfoListDVCQG.filter(e =>{
+            if( e.serviceNameDVCQG.toLowerCase().search(test) >= 0 || e.serviceNameDVCQG.search(test) >= 0 || e.serviceNameDVCQG === vm.tenThuTucModel){
+              return e
+            }
+          }).slice(start, end)
+        } else{
+          vm.serviceInfoListDVCQGView = vm.serviceInfoListDVCQG.slice(start, end)
+        }
+        
+      }
+      
     },
     openDialogMappingDVCQG (item) {
       let vm = this
@@ -831,6 +887,7 @@ export default {
         vm.pageMapping = 1
         vm.listMapping = result.data
         vm.listMappingView = vm.listMapping.slice(0, 10)
+        vm.totalMapping = vm.listMapping.length
         vm.loadingMapping = false
         vm.nameDVCQGModel = item.serviceName
       }).catch(function() {
@@ -852,6 +909,7 @@ export default {
         vm.pageMapping = 1
         vm.listMapping = result.data
         vm.listMappingView = vm.listMapping.slice(0, 10)
+        vm.totalMapping = vm.listMapping.length
         vm.loadingMapping = false
         vm.nameDVCQGModel = item.serviceNameDVCQG
       }).catch(function() {

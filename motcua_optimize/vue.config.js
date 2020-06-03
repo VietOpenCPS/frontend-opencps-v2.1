@@ -1,6 +1,7 @@
 if (process.env.NODE_ENV === 'production') {
   const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
   module.exports = {
+    productionSourceMap: false,
     runtimeCompiler: true,
     chainWebpack: config => {
       config.module.rule('images').use('url-loader')

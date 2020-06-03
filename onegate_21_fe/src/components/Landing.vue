@@ -341,7 +341,9 @@
     </v-data-table>
     <div class="text-xs-right layout wrap" style="position: relative;">
       <div class="flex pagging-table px-2" :class="isMobile ? 'mt-2' : ''"> 
-        <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" :numberPerPage="limitRecord" :showLimit="showLimit ? showLimit : false" custom-class="custom-tiny-class" 
+        <!-- <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" :numberPerPage="limitRecord" :showLimit="showLimit ? showLimit : false" custom-class="custom-tiny-class" 
+          :limits="limits" @tiny:change-page="paggingData" ></tiny-pagination>  -->
+        <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" :numberPerPage="limitRecord" :showLimit="true" custom-class="custom-tiny-class" 
           :limits="limits" @tiny:change-page="paggingData" ></tiny-pagination> 
       </div>
     </div>
@@ -1594,6 +1596,7 @@ export default {
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
+          vm.limits = [15 , 30, 50, 100 ]
           vm.hosoTotalPage = Math.ceil(vm.hosoDatasTotal / vm.limitRecord)
           /*
           if (window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139') {
@@ -1821,10 +1824,15 @@ export default {
           vm.doCreateDossier()
         }
       } else if (String(item.form) === 'UPDATE') {
-       vm.$router.push({
-          path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
-          query: vm.$router.history.current.query
-        })
+        if(dossierItem.serviceCode === 'BNG-270817' || dossierItem.serviceCode === 'BNG-270821'){
+          vm.$router.history.current.query['template_no'] = dossierItem.dossierTemplateNo
+          vm.$router.history.current.query['serviceCode'] = dossierItem.serviceCode
+        }
+
+        vm.$router.push({
+            path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
+            query: vm.$router.history.current.query
+          })
       } else if (String(item.form) === 'ADD') {
        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/bo-sung-ho-so/' + dossierItem.dossierId,

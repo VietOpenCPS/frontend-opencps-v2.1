@@ -1849,6 +1849,78 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    statisticURl ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {}
+          if (filter.path === 'year'){
+            config = {
+              url: '/o/rest/v2/accessStatistics/url/' + filter.path,
+              method: 'get',
+              params: {
+                day: filter.day,
+                month: filter.month,
+                year: filter.year 
+              },
+              headers: {groupId: state.initData.groupId},
+            }
+          } else {
+            config = {
+              url: '/o/rest/v2/accessStatistics/url/' + filter.path,
+              method: 'get',
+              params: {
+                startDay: filter.startDay,
+                endDay: filter.endDay, 
+              },
+              headers: {groupId: state.initData.groupId},
+            }
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    statisticThietBi ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {}
+          if (filter.path === 'day'){
+            config = {
+              url: '/o/rest/v2/accessStatistics/' + filter.path,
+              method: 'get',
+              params: {
+                day: filter.day,
+                month: filter.month,
+                year: filter.year 
+              },
+              headers: {groupId: state.initData.groupId},
+            }
+          } else {
+            config = {
+              url: '/o/rest/v2/accessStatistics/' + filter.path,
+              method: 'get',
+              params: {
+                startDay: filter.startDay,
+                endDay: filter.endDay, 
+              },
+              headers: {groupId: state.initData.groupId},
+            }
+          }
+          axios.request(config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
     }
   },
   mutations: {

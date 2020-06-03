@@ -1682,9 +1682,12 @@ export default {
       }
       console.log('vm.titleDialogPdf++++++++++', vm.titleDialogPdf)
       if (String(item.form) === 'UPDATE') {
+        let query = vm.$router.history.current.query
+        query['template_no'] = vm.thongTinChiTietHoSo.dossierTemplateNo
+        query['serviceCode'] = vm.thongTinChiTietHoSo.serviceCode
         vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + vm.thongTinChiTietHoSo.dossierId + '/' + vm.itemAction.form,
-          query: vm.$router.history.current.query
+          query: query
         })
       } else if (String(item.form) === 'ADD') {
         vm.$router.push({

@@ -35,6 +35,7 @@ module.exports = {
 */
 
 module.exports = {
+    productionSourceMap: false,
     runtimeCompiler: true,
     configureWebpack: {
       output: {

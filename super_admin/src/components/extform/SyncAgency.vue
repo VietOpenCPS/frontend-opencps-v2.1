@@ -106,7 +106,7 @@
               <v-flex xs6>
                 <span class="headline">Chọn để mapping</span>
               </v-flex>
-              <v-flex xs6 class="#F44336">
+              <v-flex xs6 class="text-right">
                 <v-btn color="#115ebe" fab small dark  @click="dialogMapping = false">
                   <v-icon>cancel</v-icon>
                 </v-btn>
@@ -149,7 +149,7 @@
                 <v-flex xs12>
                   <div class="text-xs-right layout wrap " style="position: relative;">
                     <div class="flex pagging-table "> 
-                      <tiny-pagination :total="listMapping.length" :page="pageMapping" custom-class="custom-tiny-class" 
+                      <tiny-pagination :total="total" :page="pageMapping" custom-class="custom-tiny-class" 
                         @tiny:change-page="paggingDataMapping" ></tiny-pagination> 
                     </div>
                   </div>
@@ -243,6 +243,7 @@ export default {
     listCauHoi: [],
     listCauHoiView: [],
     totalThuTuc: 0,
+    total: 0,
     thutucPage: 1,
     pageMapping: 1,
     govAgencyList: [],
@@ -336,6 +337,7 @@ export default {
         vm.pageMapping = 1
         vm.listMapping = result.data
         vm.listMappingView = vm.listMapping.slice(0, 10)
+        vm.total =  vm.listMapping.length
         vm.loadingMapping = false
       }).catch(function() {
         vm.listMapping = []
@@ -356,15 +358,18 @@ export default {
       vm.pageMapping = 1
       vm.loadingMapping = true
       if(val){
-        let test =  val.toLowerCase()
-        vm.listMappingView = vm.listMapping.filter(e => {
-          if(e.itemNameDVCQG.toLowerCase().search(test) >= 0 || e.itemNameDVCQG.search(test) >= 0){
+        let test =  val.toLowerCase() 
+        let arr = vm.listMapping.filter(e => {
+          if(e.itemNameDVCQG.toLowerCase().search(test) >= 0 || e.itemNameDVCQG.search(test) >= 0 || e.itemNameDVCQG === val){
             return e
           }
-        }).slice(0, 10)
+        })
+        vm.listMappingView = arr.slice(0, 10)
+        vm.total =  arr.length
         vm.loadingMapping = false
       } else{
         vm.listMappingView = vm.listMapping.slice(0, 10)
+        vm.total = vm.listMapping.length
         vm.loadingMapping = false
       }
     },
@@ -680,7 +685,17 @@ export default {
       let vm = this
       let start = config.page * 10 - 10
       let end = config.page * 10
-      vm.listMappingView = vm.listMapping.slice(start, end)
+      if(vm.nameDVCQGModel){
+          let test =  vm.nameDVCQGMode.toLowerCase()
+          vm.listMappingView = vm.listMapping.filter(e => {
+            if(e.itemNameDVCQG.toLowerCase().search(test) >= 0 || e.itemNameDVCQG.search(test) >= 0 || e.itemNameDVCQG === vm.nameDVCQGModel){
+              return e
+            }
+          }).slice(start, end)
+      } else {
+        vm.listMappingView = vm.listMapping.slice(start, end)
+      }
+      
     },
     getColor (level) {
       if (level === 2) {

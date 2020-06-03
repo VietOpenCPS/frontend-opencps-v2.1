@@ -348,6 +348,25 @@ export const store = new Vuex.Store({
         })
       })
     },
+    confirmPINBXD ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // axios.get('/o/rest/v2/applicants/' + data.userId + '/lgsp/activate/' + data.pinCode, param).then(function (response) {
+          axios.get('/o/rest/v2/applicants/'+data.userId+'/verify/'+ data.pinCode, param).then(function (response) {
+            resolve(response.data)
+            toastr.success('Xác thực thành công')
+          }).catch(function (xhr) {
+            reject(xhr)
+            toastr.error('Mã pin không chính xác. Vui lòng kiểm tra lại')
+          })
+        })
+      })
+    },   
     confirmForgotPASS ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
