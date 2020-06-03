@@ -67,7 +67,7 @@
           <v-autocomplete
             :items="listDichVu"
             v-model="dichVuSelected"
-            label="Chọn trường hợp"
+            label="Chọn dịch vụ"
             item-text="optionName"
             item-value="processOptionId"
             return-object
@@ -376,14 +376,14 @@
                 <v-autocomplete
                   :items="listDichVu"
                   v-model="dichVuSelected"
-                  label="Trường hợp:"
-                  placeholder="Chọn trường hợp"
+                  label="Dịch vụ:"
+                  placeholder="Chọn dịch vụ"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
-                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn']"
+                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn']"
                   @change="changeDichVuConfigs"
                   required
                   box
@@ -562,18 +562,18 @@
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2 text-bold">Trường hợp <span style="color:red">*</span>:</div>
+                <div class="my-2 text-bold">Dịch vụ <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
-                  placeholder="Chọn trường hợp"
+                  placeholder="Chọn dịch vụ"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
-                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>
@@ -711,18 +711,18 @@
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2 text-bold">Trường hợp <span style="color:red">*</span>:</div>
+                <div class="my-2 text-bold">Dịch vụ <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
-                  placeholder="Chọn trường hợp"
+                  placeholder="Chọn dịch vụ"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
-                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>
@@ -1350,14 +1350,14 @@ export default {
       vm.$store.dispatch('loadListThuTucHanhChinh').then(function (result) {
         if (!currentQuery.hasOwnProperty('domain') || (currentQuery.hasOwnProperty('domain') && String(currentQuery.domain) === '')) {
           vm.listThuTucHanhChinh = result.map(thuTuc => {
-            // thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
-            thuTuc['displayName'] = thuTuc['serviceName']
+            thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+            // thuTuc['displayName'] = thuTuc['serviceName']
             return thuTuc
           })
         }
         vm.listThuTuc = result.map(thuTuc => {
-          // thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
-          thuTuc['displayName'] = thuTuc['serviceName']
+          thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+          // thuTuc['displayName'] = thuTuc['serviceName']
           return thuTuc
         })
         if (currentQuery.hasOwnProperty('service_config') && String(currentQuery.service_config) !== '0') {
@@ -1401,8 +1401,8 @@ export default {
       vm.$store.dispatch('getDomainLists').then(function (result) {
         if (result.length > 0) {
           vm.listLinhVuc = result.map(domain => {
-            // domain['displayName'] = domain['domainCode'] + ' - ' + domain['domainName']
-            domain['displayName'] = domain['domainName']
+            domain['displayName'] = domain['domainCode'] + ' - ' + domain['domainName']
+            // domain['displayName'] = domain['domainName']
             return domain
           })
         }
@@ -1418,8 +1418,8 @@ export default {
           }
           vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
             vm.listThuTucHanhChinh = result.map(thuTuc => {
-              // thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
-              thuTuc['displayName'] = thuTuc['serviceName']
+              thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+              // thuTuc['displayName'] = thuTuc['serviceName']
               return thuTuc
             })
           }).catch(function (){})
@@ -1722,8 +1722,8 @@ export default {
           }
           vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
             vm.listThuTucHanhChinh = result.map(thuTuc => {
-              // thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
-              thuTuc['displayName'] = thuTuc['serviceName']
+              thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+              // thuTuc['displayName'] = thuTuc['serviceName']
               return thuTuc
             })
           }).catch(function (){})
