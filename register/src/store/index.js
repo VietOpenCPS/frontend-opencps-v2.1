@@ -376,7 +376,6 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          // axios.get('http://127.0.0.1:8081/api/users/' + data.confirmCode + '/forgot', param).then(function (response) {
           axios.get('/o/rest/v2/users/' + data.confirmCode + '/forgot?j_captcha_response=' + data['j_captcha_response'], param).then(function (response) {
             if (response['status'] !== undefined && response['status'] === 203) {
               toastr.clear()
@@ -406,8 +405,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          // axios.get('http://127.0.0.1:8081/api/users/' + data.userCode + '/forgot/confirm/' + data.confirmCode, param).then(function (response) {
           axios.get('/o/rest/v2/users/' + data.userCode + '/forgot/confirm/' + data.confirmCode + '?j_captcha_response=' + data['j_captcha_response'], param).then(function (response) {
+          // axios.get('/o/rest/v2/users/lgsp/' + data.userCode + '/forgot/confirm/' + data.confirmCode + '?j_captcha_response=' + data['j_captcha_response'], param).then(function (response) {
             if (response['status'] !== undefined && response['status'] === 203) {
               toastr.clear()
               toastr.error('Mã captcha không chính xác. Vui lòng nhập lại.')

@@ -1269,8 +1269,11 @@ export default {
       vm.thongTinChuHoSo['contactTelNo'] = item['contactTelNo'] ? item['contactTelNo'] : ''
       vm.thongTinChuHoSo['contactEmail'] = item['contactEmail'] ? item['contactEmail'] : ''
       vm.thongTinChuHoSo.cityCode = item['cityCode'] ? item['cityCode'] : ''
-      vm.$store.commit('setApplicantId', vm.thongTinChuHoSo['applicantIdNo'])
-      vm.checkApplicantInfos()
+      setTimeout(function () {
+        vm.$store.commit('setApplicantId', vm.thongTinChuHoSo['applicantIdNo'])
+        vm.checkApplicantInfos()
+      }, 2100)
+      
       function changeCity (data) {
         return new Promise((resolve, reject) => {
           setTimeout(

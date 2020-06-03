@@ -60,7 +60,7 @@
                 </content-placeholders>
                 <v-subheader v-else class="pl-0">Địa chỉ trả kết quả<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm6>
+              <v-flex xs12 sm10>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -71,25 +71,8 @@
                   required
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12 sm2>
-                <content-placeholders class="mt-1" v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <v-subheader v-else class="pl-0">SĐT người nhận<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
-              </v-flex>
-              <v-flex xs12 sm2>
-                <content-placeholders class="mt-1" v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <v-text-field
-                  v-else
-                  v-model="dichVuChuyenPhatKetQua.postalTelNo"
-                  append-icon="phone"
-                  :rules="[rules.telNo, rules.required]"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm2>
+              
+              <!-- <v-flex xs12 sm2>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -108,26 +91,25 @@
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
                 ></v-autocomplete>
-              </v-flex>
-              <!-- <v-flex xs12 sm2>
+              </v-flex> -->
+              <v-flex xs12 sm2>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <v-subheader v-else class="pl-0">Tỉnh/Thành phố: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm2>
+              <v-flex xs12 sm4>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-select
+                <v-autocomplete
                   v-else
                   :items="citys"
                   item-text="itemName"
                   item-value="itemCode"
                   @change="onChangeResultCity"
                   v-model="dichVuChuyenPhatKetQua.postalCityCode"
-                  autocomplete
-                ></v-select>
+                ></v-autocomplete>
               </v-flex>
               <v-flex xs12 sm2>
                 <content-placeholders class="mt-1" v-if="loading">
@@ -135,21 +117,20 @@
                 </content-placeholders>
                 <v-subheader v-else class="pl-0">Quận/Huyện: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm2>
+              <v-flex xs12 sm4>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-select
+                <v-autocomplete
                   v-else
                   :items="resultDistricts"
                   item-text="itemName"
                   item-value="itemCode"
                   @change="onChangeResultDistrict"
                   v-model="dichVuChuyenPhatKetQua.postalDistrictCode"
-                  autocomplete
-                ></v-select>
+                ></v-autocomplete>
               </v-flex>
-              <v-flex xs12 sm2>
+              <!-- <v-flex xs12 sm2>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -168,6 +149,24 @@
                   autocomplete
                 ></v-select>
               </v-flex> -->
+              <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0">SĐT người nhận<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-text-field
+                  v-else
+                  v-model="dichVuChuyenPhatKetQua.postalTelNo"
+                  append-icon="phone"
+                  :rules="[rules.telNo, rules.required]"
+                  required
+                ></v-text-field>
+              </v-flex>
             </v-layout>
           </v-form>
         </v-slide-y-transition>
@@ -246,7 +245,7 @@ export default {
       vm.dichVuChuyenPhatKetQua.postalTelNo = val.contactTelNo
       */
       // var filter = {
-      //   collectionCode: 'ADMINISTRATIVE_REGION',
+      //   collectionCode: 'VNPOST_CITY_CODE',
       //   level: 0,
       //   parent: 0
       // }
@@ -261,7 +260,7 @@ export default {
   mounted () {
     var vm = this
     var filter = {
-      collectionCode: 'ADMINISTRATIVE_REGION',
+      collectionCode: 'VNPOST_CITY_CODE',
       level: 0,
       parent: 0
     }
@@ -276,13 +275,13 @@ export default {
         vm.resultDistricts = result.data
       })
     }
-    if (data.postalDistrictCode) {
-      filter.parent = data.postalDistrictCode
-      filter.level = 1
-      vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.resultWards = result.data
-      })
-    }
+    // if (data.postalDistrictCode) {
+    //   filter.parent = data.postalDistrictCode
+    //   filter.level = 1
+    //   vm.$store.getters.getDictItems(filter).then(function (result) {
+    //     vm.resultWards = result.data
+    //   })
+    // }
   },
   methods: {
     initData (data) {
@@ -304,7 +303,7 @@ export default {
       // vm.dichVuChuyenPhatKetQua = dichVuChuyenPhatKetQuaTemp
       vm.$nextTick(function () {
         // var filter = {
-        //   collectionCode: 'ADMINISTRATIVE_REGION',
+        //   collectionCode: 'VNPOST_CITY_CODE',
         //   level: 0,
         //   parent: 0
         // }
@@ -338,7 +337,7 @@ export default {
     onChangeResultCity (data) {
       var vm = this
       let filter = {
-        collectionCode: 'ADMINISTRATIVE_REGION',
+        collectionCode: 'VNPOST_CITY_CODE',
         level: 1,
         parent: data
       }
@@ -349,15 +348,18 @@ export default {
     },
     onChangeResultDistrict (data) {
       var vm = this
-      let filter = {
-        collectionCode: 'ADMINISTRATIVE_REGION',
-        level: 2,
-        parent: data
-      }
-      console.log('onChangeResultDistrict', data)
-      vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.resultWards = result.data
-      })
+      // let filter = {
+      //   collectionCode: 'VNPOST_CITY_CODE',
+      //   level: 2,
+      //   parent: data
+      // }
+      // console.log('onChangeResultDistrict', data)
+      // vm.$store.getters.getDictItems(filter).then(function (result) {
+      //   vm.resultWards = result.data
+      // })
+      vm.dichVuChuyenPhatHoSo.postalDistrictName = vm.resultDistricts.filter(function(item) {
+        return item.itemCode === data
+      })[0]['itemName']
     },
     changeViaPostal (event) {
       console.log('changeViaPostal', event)

@@ -84,6 +84,7 @@
                   <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
                 </v-avatar>
                 <span class="py-2" style="cursor: pointer">Thanh toán qua Keypay</span>
+                <!-- <span class="py-2" style="cursor: pointer">Thanh toán trực tuyến</span> -->
               </v-chip>
 
               <v-chip v-if="dataVietelPay" color="green" text-color="white" @click.native="showViettelPay" 
