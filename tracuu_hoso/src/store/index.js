@@ -19,7 +19,8 @@ export const store = new Vuex.Store({
       'role': ''
     },
     endPointApi: '/o/rest/v2',
-    dossierDetail: ''
+    dossierDetail: '',
+    secretCode: ''
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -288,7 +289,26 @@ export const store = new Vuex.Store({
           })
         })
       })
-    }
+    },
+    loadDossierPayments ({commit, state}, data) {
+      let config = {
+        headers: {
+          groupId: state.initData.groupId
+        },
+        params: {
+          secretCode: data.secretCode
+        }
+      }
+      let url = '/o/rest/v2/dossiers/' + data.referenceUid+ '/payment'
+      return new Promise((resolve, reject) => {
+        axios.get(url, config).then(function (response) {
+          resolve(response.data)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+
   },
   mutations: {
     setLoading (state, payload) {
@@ -300,6 +320,9 @@ export const store = new Vuex.Store({
     setDossierDetail (state, payload) {
       state.dossierDetail = payload
     },
+    setScretCode (state, payload) {
+      state.secretCode = payload
+    },
   },
   getters: {
     loading (state) {
@@ -307,6 +330,9 @@ export const store = new Vuex.Store({
     },
     getDetailDossier (state) {
       return state.dossierDetail
+    },
+    getScretCode (state) {
+      return state.secretCode
     }
   }
 })

@@ -12,7 +12,7 @@
                 </content-placeholders>
                 <v-subheader v-else class="pl-0">Dịch vụ đăng ký <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm4>
+              <v-flex xs12 sm10>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -30,26 +30,7 @@
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-subheader v-else class="pl-0">SĐT người nhận<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
-              </v-flex>
-              <v-flex xs12 sm4>
-                <content-placeholders class="mt-1" v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <v-text-field
-                  v-else
-                  v-model="dichVuChuyenPhatHoSo.postalTelNo"
-                  append-icon="phone"
-                  :rules="[rules.telNo, rules.required]"
-                  required
-                ></v-text-field>
-              </v-flex>
-              
-              <v-flex xs12 sm2>
-                <content-placeholders class="mt-1" v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <v-subheader v-else class="pl-0">Địa chỉ trả kết quả<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                <v-subheader v-else class="pl-0">Địa chỉ nhận hồ sơ<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
               </v-flex>
               <v-flex xs12 sm10>
                 <content-placeholders class="mt-1" v-if="loading">
@@ -119,6 +100,24 @@
                   v-model="dichVuChuyenPhatHoSo.postalWardCode"
                   @change="onChangeResultWard"
                 ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0">SĐT người nhận<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-text-field
+                  v-else
+                  v-model="dichVuChuyenPhatHoSo.postalTelNo"
+                  append-icon="phone"
+                  :rules="[rules.telNo, rules.required]"
+                  required
+                ></v-text-field>
               </v-flex>
             </v-layout>
           </v-form>

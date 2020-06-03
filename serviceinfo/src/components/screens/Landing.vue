@@ -100,7 +100,7 @@
         >
           <template slot="items" slot-scope="props">
             <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
-              <td class="text-xs-center">
+              <td class="text-xs-center" @click="viewDetail(props.item)">
                 <content-placeholders v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -108,7 +108,7 @@
                   <span>{{thutucPage * 15 - 15 + props.index + 1}}</span><br>
                 </div>
               </td>
-              <td class="text-xs-left" style="min-width: 135px;">
+              <td class="text-xs-left" style="min-width: 135px;" @click="viewDetail(props.item)">
                 <content-placeholders v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -124,7 +124,7 @@
                   <span>{{props.item.serviceName}}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="min-width: 135px">
+              <td class="text-xs-left" style="min-width: 135px" @click="viewDetail(props.item)">
                 <content-placeholders v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -134,7 +134,7 @@
                   </span>
                 </div>
               </td>
-              <td class="text-xs-center">
+              <td class="text-xs-center" @click="viewDetail(props.item)">
                 <content-placeholders v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -163,14 +163,14 @@
                   </v-menu>
                   <v-btn small color="primary" class="my-1" style="min-width: 110px;"
                     v-if="props.item.maxLevel >= 3 && props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 5"
-                    @click="showSelectGov(props.item.serviceConfigs)"
+                    @click="showSelectGov(props.item, props.item.serviceConfigs)"
                   >
                     <span v-if="!formToKhai">Nộp hồ sơ</span>
                     <span v-else>Tạo tờ khai</span>
                   </v-btn>
                   <v-btn small color="primary" class="my-1" style="min-width: 110px;"
                     v-if="props.item.maxLevel < 3 && props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 5"
-                    @click="showSelectGov(props.item.serviceConfigs, 'guide')"
+                    @click="showSelectGov(props.item, props.item.serviceConfigs, 'guide')"
                   >
                     Hướng dẫn
                   </v-btn>
@@ -294,7 +294,7 @@
       <div v-else class="service__info__table mt-2">
         <v-card class="mx-2">
           <div class="px-2 py-2 text-bold white--text" style="background: #0054a6;">
-            STT | Thủ tục hành chính
+            STT | Thủ tục hành chính (tổng số: {{totalThuTuc}} thủ tục)
           </div>
           <v-list class="py-0">
             <template v-for="(item, index) in serviceInfoList" >
@@ -313,7 +313,7 @@
                       <v-icon color="primary lighten-1">more_vert</v-icon>
                     </v-btn>
                     <v-list>
-                      <v-menu :close-on-content-click="false" bottom right offset-y v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 1" style="position:relative !important;">
+                      <v-menu :close-on-content-click="false" bottom right offset-y v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 1 && serviceConfigs(item.serviceConfigs).length <=5" style="position:relative !important;">
                         <v-btn class="mx-0 my-0" small slot="activator" color="primary" v-if="item.maxLevel >= 3">
                           <span v-if="!formToKhai">Nộp hồ sơ</span>
                           <span v-if="formToKhai">Tạo tờ khai</span> &nbsp; 
@@ -327,16 +327,17 @@
                           </v-list-tile>
                         </v-list>
                       </v-menu>
+
                       <v-btn class="mx-0 my-0" small color="primary" 
                         v-if="item.maxLevel >= 3 && item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 5"
-                        @click="showSelectGov(item.serviceConfigs)"
+                        @click="showSelectGov(item, item.serviceConfigs)"
                       >
                         <span v-if="!formToKhai">Nộp hồ sơ</span>
                         <span v-else>Tạo tờ khai</span>
                       </v-btn>
                       <v-btn small color="primary" class="my-1" style="min-width: 110px;"
                         v-if="item.maxLevel < 3 && item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 5"
-                        @click="showSelectGov(item.serviceConfigs, 'guide')"
+                        @click="showSelectGov(item, item.serviceConfigs, 'guide')"
                       >
                         Hướng dẫn
                       </v-btn>
@@ -914,7 +915,7 @@ export default {
       vm.doLoadingThuTuc()
     },
     changeAdministration () {
-      var vm = this
+      let vm = this
       setTimeout(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
@@ -962,7 +963,7 @@ export default {
       }, 100)
     },
     changeDomain () {
-      var vm = this
+      let vm = this
       setTimeout(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
@@ -985,7 +986,7 @@ export default {
       }, 100)
     },
     changeLevel () {
-      var vm = this
+      let vm = this
       setTimeout(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
@@ -1007,7 +1008,7 @@ export default {
       }, 100)
     },
     filterServiceName () {
-      var vm = this
+      let vm = this
       setTimeout(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
@@ -1028,12 +1029,11 @@ export default {
       }, 100)
     },
     doLoadingThuTuc () {
-      var vm = this
+      let vm = this
       vm.serviceInfoList = []
       vm.loading = true
       let currentQuery = vm.$router.history.current.query
-      var filter = null
-      filter = {
+      let filter = {
         page: currentQuery.page ? currentQuery.page : 1,
         administration: currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : ''),
         agency: currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : '',
@@ -1060,7 +1060,7 @@ export default {
       })
     },
     makeImageCap () {
-      var vm = this
+      let vm = this
       vm.chapchablob = ''
       vm.$store.dispatch('makeImageCapLogin').then(function (result) {
         vm.chapchablob = result
@@ -1366,12 +1366,13 @@ export default {
       window.open(url, '_self')
     },
     viewGuide (item) {
-      var vm = this
+      let vm = this
       vm.serviceDetail = item
       vm.dialogGuide = true
     },
-    showSelectGov (govList, guide) {
+    showSelectGov (serviceInfo, govList, guide) {
       let vm = this
+      vm.serviceInfoSelected = serviceInfo
       vm.govAgencyTiepNhanSelected = ''
       vm.selectGuide = guide ? true : false
       vm.govAgencyListTiepNhan = vm.serviceConfigs(govList)
@@ -1386,7 +1387,7 @@ export default {
             vm.viewGuide(vm.govAgencyTiepNhanSelected)
           }, 200)
         } else {
-          vm.createDossier(vm.govAgencyTiepNhanSelected)
+          vm.createDossier(vm.govAgencyTiepNhanSelected, vm.serviceInfoSelected)
         }
       }
     },

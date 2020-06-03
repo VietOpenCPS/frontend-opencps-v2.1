@@ -211,12 +211,30 @@
                 queryString += key + '=' + newQuery[key] + '&'
               }
             }
-            vm.$router.push({
-              path: vm.pathRouter + queryString,
-              query: {
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            let sortLevel = false
+            try {
+              if (sortLevelConfig !== undefined) {
+                sortLevel = true
               }
-            })
+            } catch (error) {
+            }
+
+            if (!sortLevel) {
+              vm.$router.push({
+                path: vm.pathRouter + queryString,
+                query: {
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                }
+              })
+            } else {
+              vm.$router.push({
+                path: '/thu-tuc-hanh-chinh?page=1',
+                query: {
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                }
+              })
+            }
+
           } else {
             vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
           }
