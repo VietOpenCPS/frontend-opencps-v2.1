@@ -799,7 +799,7 @@ export default {
     functionTimeOut: null,
     dialog_applicantInfos: false,
     dialog_applicantList: false,
-    applicantConfig: true,
+    applicantConfig: false,
     titleEdit: 'Thông tin công dân, tổ chức, doanh nghiệp',
     applicantEdit: '',
     dialog_editApplicant: false,
@@ -828,7 +828,7 @@ export default {
     wardItems: [],
     valid: false,
     loadingTable: false,
-    hasOrganization: true
+    hasOrganization: false
   }),
   computed: {
     loading () {
@@ -862,7 +862,7 @@ export default {
   created () {
     let vm = this
     if (vm.formCode === "NEW") {
-      vm.thongTinNguoiNopHoSo.sameUser = true
+      // vm.thongTinNguoiNopHoSo.sameUser = true
     }
     if (vm.hasOrganization) {
       vm.labelSwitch = {
@@ -1020,10 +1020,10 @@ export default {
         vm.$store.getters.getDictItems(filter).then(function (result) {
           vm.citys = result.data
           // set default cityCode
-          if (vm.formCode === "NEW") {
-            vm.thongTinChuHoSo['cityCode'] = 87
-            vm.thongTinChuHoSo['cityName'] = 'Tỉnh Đồng Tháp'
-          }
+          // if (vm.formCode === "NEW") {
+          //   vm.thongTinChuHoSo['cityCode'] = 87
+          //   vm.thongTinChuHoSo['cityName'] = 'Tỉnh Đồng Tháp'
+          // }
           
         })
         setTimeout(function () {

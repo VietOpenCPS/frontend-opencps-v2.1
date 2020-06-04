@@ -663,7 +663,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: true,
+    notifyConfig: false,
     fromViaPostal: false,
     fromViaPostalConfig: false,
     smsNotify: true,

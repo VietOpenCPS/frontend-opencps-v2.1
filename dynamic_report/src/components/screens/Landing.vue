@@ -1137,21 +1137,20 @@ export default {
                 }
                 dataToExportCSVItem.push(dataText)
                 dataRow.push({
-                  text: dataText === ' ' ? 0 : dataText, 
+                  text: currentConfig['value'] === 'note' ? ' ' : (dataText === ' ' ? ' 0 ' : dataText), 
                   alignment: alignmentConfig,
                   style: 'tdStyle'
                 })
-                console.log('currentConfig-govAgency-currentConfig', dataRowTotal[indexTotal], vm.govAgency, currentConfig)
+
                 if (vm.govAgency === 0) {
-                  console.log('currentConfig', currentConfig)
-                  if (dataRowTotal[indexTotal] !== null && dataRowTotal[indexTotal] !== undefined && dataRowTotal[indexTotal]['text'] !== '') {
+                  if (dataRowTotal[indexTotal] !== null && dataRowTotal[indexTotal] !== undefined) {
                     if (currentConfig['value'] === 'ontimePercentage') {
                       dataRowTotal[indexTotal]['text'] = parseInt(dataText)
                     } else if (currentConfig['value'] === 'note') {
                       dataRowTotal[indexTotal]['text'] = ' '
                     } else if (isNaN(dataText)) {
                       // dataRowTotal[indexTotal]['text'] = ' '
-                      dataRowTotal[indexTotal]['text'] = 0
+                      dataRowTotal[indexTotal]['text'] = ' 0 '
                     } else {
                       dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(dataText)
                     }
@@ -1164,7 +1163,7 @@ export default {
               } else {
                 index = index + 1
               }
-              console.log('dataRow', dataRow)
+              // console.log('dataRow', dataRow)
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
               vm.dataReportXX += JSON.stringify(dataRow) + ','
               dataToExportCSV.push(dataToExportCSVItem)
@@ -1188,6 +1187,9 @@ export default {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
                 dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? '0 '  : parseInt(dataTextXXTT) + ' '
+                if (currentConfigXXTT['value'] === 'note') {
+                  dataRowTotal[indexTotalXXTT]['text'] = ' '
+                }
                 indexTotalXXTT = indexTotalXXTT + 1
               }
               break
@@ -1211,12 +1213,15 @@ export default {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
                 dataRowTotal[indexTotalXXTT]['text'] = parseInt(dataTextXXTT) + ' '
+                if (currentConfigXXTT['value'] === 'note') {
+                  dataRowTotal[indexTotalXXTT]['text'] = ' '
+                }
                 indexTotalXXTT = indexTotalXXTT + 1
               }
             }
           }
           vm.dataReportXX += JSON.stringify(dataRowTotal)
-          console.log('vm.dataReportXX 123', vm.dataReportXX)
+          // console.log('vm.dataReportXX 123', vm.dataReportXX)
           let itemTotal = []
           for (let keyTotalCSV in dataRowTotal) {
             itemTotal.push(dataRowTotal[keyTotalCSV]['text'])
