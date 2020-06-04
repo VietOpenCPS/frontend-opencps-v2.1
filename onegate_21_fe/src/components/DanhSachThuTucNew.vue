@@ -25,7 +25,7 @@
       <v-dialog v-else v-model="dialog_selectOption" scrollable persistent max-width="1000px">
         <v-card style="width: 100%">
           <v-toolbar flat dark color="primary">
-            <v-toolbar-title>Chọn trường hợp</v-toolbar-title>
+            <v-toolbar-title>Chọn dịch vụ</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn icon dark @click.native="closeSelectOption()">
               <v-icon>close</v-icon>
@@ -410,13 +410,13 @@
               <v-autocomplete
                 v-if="serviceOptions.length > 1"
                 class="mt-3"
-                placeholder="Chọn trường hợp"
+                placeholder="Chọn dịch vụ"
                 :items="serviceOptions"
                 v-model="serviceOptionsSelect"
                 item-text="optionName"
                 item-value="processOptionId"
                 clearable
-                :rules="[v => !!v || 'Chọn trường hợp']"
+                :rules="[v => !!v || 'Chọn dịch vụ']"
                 required
                 return-object
               ></v-autocomplete>

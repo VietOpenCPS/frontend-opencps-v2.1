@@ -226,7 +226,7 @@
             indeterminate
           ></v-progress-circular>
         </div>
-        <iframe v-show="!dialogPDFLoading" id="dialogPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        <iframe v-show="!dialogPDFLoading" id="dialogPaymentPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
       </v-card>
     </v-dialog>
@@ -343,7 +343,7 @@ export default {
       }
       vm.$store.dispatch('viewPaymentFile', filter).then(result => {
         vm.dialogPDFLoading = false
-        document.getElementById('dialogPreview').src = result
+        document.getElementById('dialogPaymentPreview').src = result
       }).catch(function(){})
     },
     getEPaymentProfile (paymentProfile) {
@@ -374,7 +374,7 @@ export default {
       vm.dialogPDF = true
       vm.$store.dispatch('printPay', filter).then(function (result) {
         vm.dialogPDFLoading = false
-        document.getElementById('dialogPreview').src = result
+        document.getElementById('dialogPaymentPreview').src = result
       }).catch(function(){})
     },
     getEinvoiceNo (string) {
