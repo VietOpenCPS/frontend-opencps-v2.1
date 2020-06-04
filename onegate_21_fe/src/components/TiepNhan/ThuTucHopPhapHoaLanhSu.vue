@@ -884,6 +884,17 @@ export default {
         })
     },
     watch: {
+        listGiayTo: {
+            deep: true,
+            handler:  (val, oldVal) => {
+                let find = val.find(e => e.kiem_tra === 1)
+                if(find){
+                    $('#checkCKCD_hidden').val(true)
+                } else {
+                    $('#checkCKCD_hidden').val(false)
+                }
+            }           
+        },
         payment: {
             deep: true,
             handler:  (val, oldVal) => {
@@ -1589,7 +1600,7 @@ export default {
 
                 // Gen le phi
                 vm.genLePhi()
-                vm.dialogGiayTo =  false
+                
 
             }
         },
