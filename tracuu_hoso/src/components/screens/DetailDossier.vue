@@ -6,14 +6,14 @@
     <div v-else>
       <v-layout class="wrap">
         <v-flex :class="isMobile ? 'pb-2 pl-2' : 'pb-2'">
-          <h3 style="color:#0167d3" v-if="!isMobile"><span class="text-bold">Tên hồ sơ: </span>{{dossierDetail.dossierName ? dossierDetail.dossierName : dossierDetail.serviceName}}</h3>
-          <h3 style="color:#0167d3" v-else><span class="text-bold">Thủ tục hành chính: </span>{{dossierDetail.serviceName}}</h3>
+          <h3 style="color:#0054a6" v-if="!isMobile"><span class="text-bold">Tên hồ sơ: </span>{{dossierDetail.dossierName ? dossierDetail.dossierName : dossierDetail.serviceName}}</h3>
+          <h3 style="color:#0054a6" v-else><span class="text-bold">Thủ tục hành chính: </span>{{dossierDetail.serviceName}}</h3>
         </v-flex>
       </v-layout>
       <div class="pt-1">
         <v-tabs
           v-model="active"
-          color="#0167d3"
+          color="#0054a6"
           dark
           slider-color="yellow"
         >
@@ -241,14 +241,14 @@
                     <div class="text-bold">
                       {{index + 1}}.&nbsp; {{ item.subject }}
                     </div>
-                    <v-radio-group class="ml-3 pt-2" v-model="item.selected" row>
+                    <v-radio-group :class="!isMobile ? 'ml-3 pt-2' : 'ml-0 mb-2 mt-2 pt-0'" v-model="item.selected" row>
                       <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" ></v-radio>
                     </v-radio-group>
-                    <v-layout wrap class="ml-3" style="margin-top:-10px">
+                    <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
                       <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
                         <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
                       </v-flex>
-                    </v-layout>
+                    </v-layout> -->
                   </div>
                   <div v-if="votingItems.length === 0" class="mx-3">
                     <v-alert outline color="warning" icon="priority_high" :value="true">
@@ -275,6 +275,7 @@
 <script>
   import router from '@/router'
   import Vue from 'vue/dist/vue.min.js'
+  import toastr from 'toastr'
   export default {
     props: ['index', 'detail'],
     components: {
@@ -283,6 +284,7 @@
       loading: false,
       loadingAction: false,
       dossierDetail: {},
+      dossierDetailMotcua: '',
       listHistoryProcessing: [],
       dossierActions: [],
       tailieuNop: [],
@@ -355,7 +357,7 @@
         }
       ],
       isMobile: false,
-      two_system: false,
+      two_system: true,
       paymentInfo: false
     }),
     computed: {
@@ -388,6 +390,7 @@
         }
         vm.dossierDetail = vm.detail
         vm.getPaymentInfo()
+        vm.loadDossierDetailMotcua()
         if (vm.dossierDetail.submissionNote) {
           let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
           let resultTemp = submissionNote ? submissionNote.data : ''
@@ -442,13 +445,25 @@
           vm.listHistoryProcessing = result
         })
       },
+      loadDossierDetailMotcua () {
+        let vm = this
+        if (vm.two_system) {
+          vm.$store.dispatch('loadDetailDossierMC', vm.dossierDetail).then(function (result) {
+            console.log('loadDetailDossierMC', result)
+            vm.dossierDetailMotcua = result[0]
+          }).catch(function (reject) {
+          })
+        }
+      },
       loadVoting () {
         let vm = this
+        console.log('dossierDetailMotcua', vm.dossierDetailMotcua)
         let filter = {
           className: 'dossier',
-          classPK: vm.dossierDetail.dossierId
+          classPK: vm.two_system ? vm.dossierDetailMotcua.dossierId : vm.dossierDetail.dossierId,
+          serverCode: vm.dossierDetailMotcua['govAgencyCode']
         }
-        if (!vm.two_system) {
+        if (vm.two_system) {
           vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
             vm.votingItems = result
             console.log('votingItems', vm.votingItems)
@@ -469,7 +484,7 @@
           vm.loadingVoting = true
           for (var index in vm.votingItems) {
             vm.votingItems[index]['className'] = 'dossier'
-            vm.votingItems[index]['classPk'] = vm.dossierDetail.dossierId
+            vm.votingItems[index]['classPk'] = vm.two_system ? vm.dossierDetailMotcua.dossierId : vm.dossierDetail.dossierId
             vm.votingItems[index]['serverCode'] = 'SERVER_' + vm.dossierDetail['govAgencyCode']
             if (!vm.two_system) {
               arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
@@ -479,6 +494,7 @@
           }
           Promise.all(arrAction).then(results => {
             vm.loadingVoting = false
+            toastr.success('Gửi đánh giá thành công')
             vm.loadVoting()
           }).catch(xhr => {
             vm.loadingVoting = false
@@ -497,7 +513,7 @@
         }
         vm.$store.dispatch('loadDossierPayments', filter).then(function (result) {
           console.log(result)
-          if (result && String(result.paymentStatus) !== '3' && String(result.paymentStatus) !== '5') {
+          if (result && result.paymentStatus && String(result.paymentStatus) !== '3' && String(result.paymentStatus) !== '5') {
             vm.paymentInfo = result
           }
         })

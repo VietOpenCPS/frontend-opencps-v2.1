@@ -740,6 +740,33 @@ export default {
           }
           dataRaw.reverse()
           console.log('dossierRaw 46', dataRaw)
+          // row total
+          let dataRowTotal = []
+          let totalText = 'Tổng cộng'
+          dataRowTotal.push({
+            text: totalText, 
+            colSpan: 2,
+            bold: true,
+            alignment: 'center',
+            style: 'tdStyle'
+          })
+          for (let keyMapping in vm.itemsReportsConfig) {
+            if (vm.itemsReportsConfig[keyMapping]['value'] === 'note') {
+              dataRowTotal.push({
+                text: '', 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            }  else {
+              dataRowTotal.push({
+                text: 0, 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            }
+          }
+          
+          // end
           for (let key in dataRaw) {
             if (dataRaw[key][vm.groupByVal] !== undefined && dataRaw[key][vm.groupByVal] !== null && dataRaw[key][vm.groupByVal] !== '') {
               let csvGroup = []
@@ -785,6 +812,7 @@ export default {
               style: 'tdStyle'
             }])
             */
+           
             let dossiersArray = dataRaw[key]['dossiers']
             let indexStt = 1
             let dataRow = []
@@ -825,6 +853,16 @@ export default {
                     alignment: alignmentConfig,
                     style: 'tdStyle'
                   })
+                  // caculator count total
+                  if (vm.reportType.startsWith('REPORT_STATISTIC')) {
+                    let indexRow = dataRow.length - 1
+                    dataRowTotal[indexRow]['text'] = Number(dataRowTotal[indexRow]['text']) + Number(dataRow[indexRow]['text'])
+                    if (vm.itemsReportsConfig[keyVal]['value'] === 'note') {
+                      dataRowTotal[indexRow]['text'] = ''
+                    }
+                  }
+                  
+                  // 
                 }
               }
               dataReportTotal += JSON.stringify(dataRow) + ','
@@ -835,7 +873,12 @@ export default {
           }
           dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
           vm.dataReportXX += dataReportTotal
-          // }
+          if (vm.reportType.startsWith('REPORT_STATISTIC')) {
+            vm.dataReportXX += ',' + JSON.stringify(dataRowTotal)
+          }
+          
+          // console.log('dataReportXX11ZZ', vm.dataReportXX)
+          
           vm.csvExport = []
           vm.csvExport = dataToExportCSV
           vm.fields = []

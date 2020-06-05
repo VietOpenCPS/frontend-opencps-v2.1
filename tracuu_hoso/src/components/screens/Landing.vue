@@ -1,8 +1,8 @@
 <template>
   <div>
-    <v-layout row wrap :class="isMobile ? 'pt-3' : 'pt-2'">
+    <v-layout row wrap :class="isMobile ? 'pt-0' : 'pt-2'">
       <v-flex xs12 md3>
-        <div style="font-size: 20px;font-weight: 500;color:#0167d3" :class="isMobile ? 'px-2 text-xs-center' : 'px-2'">
+        <div style="font-size: 20px;font-weight: 500;color:#0054a6" :class="isMobile ? 'px-2 text-xs-center' : 'px-2'">
           {{!qrscan ? 'TRA CỨU HỒ SƠ' : 'THÔNG TIN HỒ SƠ'}}
         </div>
         <v-card v-if="!qrscan" flat color="#ffffff" class="px-2 py-2">

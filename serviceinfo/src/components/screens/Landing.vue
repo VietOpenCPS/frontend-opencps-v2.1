@@ -292,7 +292,7 @@
         <content-placeholders-text :lines="10" />
       </content-placeholders>
       <div v-else class="service__info__table mt-2">
-        <v-card class="mx-2">
+        <v-card class="">
           <div class="px-2 py-2 text-bold white--text" style="background: #0054a6;">
             STT | Thủ tục hành chính (tổng số: {{totalThuTuc}} thủ tục)
           </div>
