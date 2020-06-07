@@ -4,7 +4,8 @@
       <!-- Thông tin nhóm hồ sơ -->
       <div class="row-header">
         <div class="background-triangle-big">
-          <span>THÔNG TIN NHÓM HỒ SƠ</span>
+          <span v-if="formCode === 'NEW_GROUP'">THÔNG TIN NHÓM HỒ SƠ</span>
+          <span v-if="formCode === 'NEW_GROUP_CV'">THÔNG TIN CÔNG VĂN</span>
         </div>
         <div class="layout wrap header_tools row-blue">
           <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinNhomHoSo.serviceName">
@@ -19,7 +20,7 @@
         </div> 
       </div>
       <div v-if="!activeAddDossierIntoGroup">
-        <v-layout wrap style="background: #fff;border-bottom: 1px solid #dedede;">
+        <v-layout v-if="formCode === 'NEW_GROUP'" wrap style="background: #fff;border-bottom: 1px solid #dedede;">
           <v-flex xs12 sm2 class="my-2">
             <v-subheader class="pl-0 text-header pt-2">Tên nhóm hồ sơ: </v-subheader>
           </v-flex>
@@ -29,8 +30,13 @@
             ></v-text-field>
           </v-flex>
         </v-layout>
-        <thong-tin-chu-ho-so :showApplicant="true" :showDelegate="false" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
-        <div style="position: relative;border-top: 1px solid #dedede;">
+
+        <thong-tin-chu-ho-so v-if="formCode === 'NEW_GROUP'" :showApplicant="true" :showDelegate="false" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
+
+        <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV'" ref="thongtincongvan"></thong-tin-cong-van>
+
+
+        <div v-if="formCode === 'NEW_GROUP'" style="position: relative;border-top: 1px solid #dedede;">
           <v-expansion-panel :value="0" class="expansion-pl">
             <v-expansion-panel-content>
               <div slot="header" style="display: flex; align-items: center;">
@@ -41,7 +47,7 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
-        <div style="position: relative;">
+        <div v-if="formCode === 'NEW_GROUP'" style="position: relative;">
           <v-expansion-panel :value="[true]" expand class="expansion-pl">
             <v-expansion-panel-content :key="1">
               <div slot="header" style="display: flex; align-items: center;">
@@ -55,10 +61,16 @@
         <div style="position: relative;border-bottom: 1px solid #dedede;">
           <v-expansion-panel :value="[true]" expand class="expansion-pl">
             <v-expansion-panel-content :key="1">
-              <div slot="header" style="display: flex; align-items: center;">
+              <div v-if="formCode === 'NEW_GROUP'" slot="header" style="display: flex; align-items: center;">
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 Hồ sơ trong nhóm&nbsp;&nbsp;&nbsp;&nbsp;
               </div>
+
+              <div v-if="formCode === 'NEW_GROUP_CV'" slot="header" style="display: flex; align-items: center;">
+                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                Danh sách hồ sơ&nbsp;&nbsp;&nbsp;&nbsp;
+              </div>
+              
               <div class="mb-3" v-if="dossiersIntoGroupRender.length > 0">
                 <v-layout wrap class="my-2">
                   <v-flex style="width: 120px">
@@ -156,7 +168,15 @@
                 </div>
               </div>
               <div v-else class="pl-4 py-2">Chưa có hồ sơ nào</div>
-              <v-flex xs12 class="text-right mb-3 mr-2">
+
+              <v-flex xs12 class="text-right mb-3 mr-2" v-if="formCode === 'NEW_GROUP_CV'">
+                <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2" style="height:36px !important">
+                  <v-icon size="20">add</v-icon>  &nbsp;
+                  <span>Thêm mới hồ sơ</span>
+                </v-btn>
+              </v-flex>
+
+              <v-flex xs12 class="text-right mb-3 mr-2" v-if="formCode === 'NEW_GROUP'">
                 <input type="file" id="dossierImport" @change="uploadfileDossierImport($event)" style="display:none">
                 <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2" style="height:36px !important">
                   <v-icon size="20">add</v-icon>  &nbsp;
@@ -185,7 +205,31 @@
       </div>
       <!-- Thông tin hồ sơ trong nhóm -->
       <div v-if="activeAddDossierIntoGroup">
-        <thong-tin-chu-ho-so :showApplicant="false" :showDelegate="true" v-if="activeAddDossierIntoGroup" ref="thongtinchuhoso"></thong-tin-chu-ho-so>
+        <thong-tin-chu-ho-so-cong-van v-if="activeAddDossierIntoGroup && formCode === 'NEW_GROUP_CV'" ref="thongtinchuhosocongvan"></thong-tin-chu-ho-so-cong-van>
+        <thong-tin-chu-ho-so :showApplicant="false" :showDelegate="true" v-if="activeAddDossierIntoGroup && formCode === 'NEW_GROUP'" ref="thongtinchuhoso"></thong-tin-chu-ho-so>
+
+        <v-expansion-panel v-if="formCode === 'NEW_GROUP_CV'" :value="[true]" expand  class="expansion-pl">
+          <v-expansion-panel-content>
+            <div slot="header" style="display: flex; align-items: center;">
+              <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+              <span>Tên hồ sơ</span>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
+            <div>
+              <v-card>
+                <v-card-text>
+                  <v-textarea
+                    v-model="dossierNameCongVan"
+                    :rows="2"
+                    box
+                    :label="'Nhập tên hồ sơ'"
+                  ></v-textarea>
+                </v-card-text>
+              </v-card>
+            </div>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+
         <div style="position: relative;" v-if="activeAddDossierIntoGroup">
           <v-expansion-panel :value="0" class="expansion-pl">
             <v-expansion-panel-content>
@@ -463,6 +507,7 @@
 
 import toastr from 'toastr'
 import $ from 'jquery'
+import ThongTinChuHoSoCongVan from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSoCongVan.vue'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhomNew.vue'
 import ThanhPhanHoSo1 from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhomNew.vue'
@@ -471,6 +516,7 @@ import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
 import TinyPagination from './pagging/opencps_pagination.vue'
+import ThongTinCongVan from './TiepNhan/TiepNhanHoSo_ThongTinCongVan.vue'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -478,6 +524,7 @@ toastr.options = {
 export default {
   props: ['index', 'id', 'formCode'],
   components: {
+    'thong-tin-chu-ho-so-cong-van': ThongTinChuHoSoCongVan,
     'thong-tin-chu-ho-so': ThongTinChuHoSo,
     'thanh-phan-ho-so': ThanhPhanHoSo,
     'thanh-phan-ho-so-1': ThanhPhanHoSo1,
@@ -485,7 +532,8 @@ export default {
     'thong-tin-chung': ThongTinChung,
     'thu-phi': LePhi,
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua,
-    'tiny-pagination': TinyPagination
+    'tiny-pagination': TinyPagination,
+    'thong-tin-cong-van': ThongTinCongVan
   },
   data: () => ({
     detailGroup: false,
@@ -565,6 +613,7 @@ export default {
     totalDossier: 0,
     valueProgress: 0,
     countDossierSuccess: 0,
+    dossierNameCongVan: '',
     pagination: {
       rowsPerPage: 10,
       page: 1
@@ -611,12 +660,17 @@ export default {
   mounted () {
     let vm = this
     if (vm.thongTinNhomHoSo) {
-      vm.$refs.thongtinnguoinophoso.initData(vm.thongTinNhomHoSo)
-      vm.$refs.thanhphanhoso1.initData(vm.thongTinNhomHoSo)
-      vm.$refs.thanhphanhoso2.initData(vm.thongTinNhomHoSo)
-      // 
-      vm.filesGroupDossier = vm.$refs.thanhphanhoso1.getFilesGroupDossier()
-      console.log('fileItems 1', vm.filesGroupDossier)
+      if (vm.formCode === 'NEW_GROUP') {
+        vm.$refs.thongtinnguoinophoso.initData(vm.thongTinNhomHoSo)
+        vm.$refs.thanhphanhoso1.initData(vm.thongTinNhomHoSo)
+        vm.$refs.thanhphanhoso2.initData(vm.thongTinNhomHoSo)
+        // 
+        vm.filesGroupDossier = vm.$refs.thanhphanhoso1.getFilesGroupDossier()
+        console.log('fileItems 1', vm.filesGroupDossier)
+      }
+      if (vm.formCode === 'NEW_GROUP_CV') {
+        vm.$refs.thongtincongvan.initData(vm.thongTinNhomHoSo)
+      }
     }
   },
   watch: {
@@ -639,14 +693,20 @@ export default {
     thongTinNhomHoSo (val) {
       let vm = this
       if (val) {
-        vm.$refs.thongtinnguoinophoso.initData(val)
-        vm.$refs.thanhphanhoso1.initData(val)
-        vm.$refs.thanhphanhoso2.initData(val)
-        //
-        vm.$store.dispatch('loadDossierFiles', val.dossierId).then(resFiles => {
-          vm.filesGroupDossier = resFiles
-        }).catch(reject => {
-        })
+        if (vm.formCode === 'NEW_GROUP') {
+          vm.$refs.thongtinnguoinophoso.initData(val)
+          vm.$refs.thanhphanhoso1.initData(val)
+          vm.$refs.thanhphanhoso2.initData(val)
+          //
+          vm.$store.dispatch('loadDossierFiles', val.dossierId).then(resFiles => {
+            vm.filesGroupDossier = resFiles
+          }).catch(reject => {
+          })
+        }
+        if (vm.formCode === 'NEW_GROUP_CV') {
+          vm.$refs.thongtincongvan.initData(val)
+        }
+        
       }
     },
     selected (val) {
@@ -805,47 +865,63 @@ export default {
     },
     putGroupDossier () {
       let vm = this
-      let thongtinnguoinophoso = this.$refs.thongtinnguoinophoso ? this.$refs.thongtinnguoinophoso.thongTinNguoiNopHoSo : {}
-      let validThongtinnguoinophoso = vm.$refs.thongtinnguoinophoso.showValid()
-      if (validThongtinnguoinophoso['validForm']) {
-        let passValid = false
-        if (!validThongtinnguoinophoso['validApplicant']) {
-          let x = confirm(validThongtinnguoinophoso['message'] + ' Bạn có muốn tiếp tục?')
-          if (x) {
-            passValid = true
+      if (vm.formCode === 'NEW_GROUP') {
+        let thongtinnguoinophoso = this.$refs.thongtinnguoinophoso ? this.$refs.thongtinnguoinophoso.thongTinNguoiNopHoSo : {}
+        let validThongtinnguoinophoso = vm.$refs.thongtinnguoinophoso.showValid()
+        if (validThongtinnguoinophoso['validForm']) {
+          let passValid = false
+          if (!validThongtinnguoinophoso['validApplicant']) {
+            let x = confirm(validThongtinnguoinophoso['message'] + ' Bạn có muốn tiếp tục?')
+            if (x) {
+              passValid = true
+            }
+          } else { passValid = true }
+          if (passValid) {
+            // if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
+            //   return
+            // }
+            // let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
+            // let listAction = []
+            // let listDossierMark = []
+            // if (dossierFiles) {
+            //   dossierFiles.forEach(function (value, index) {
+            //     if (value.eForm) {
+            //       value['dossierId'] = vm.thongTinNhomHoSo.dossierId
+            //       listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+            //     }
+            //   })
+            // }
+            let tempData = Object.assign(vm.thongTinNhomHoSo, thongtinnguoinophoso)
+            tempData['dossierId'] = vm.thongTinNhomHoSo.dossierId
+            tempData['originality'] = vm.thongTinNhomHoSo.originality
+            tempData['dossierName'] = vm.thongTinNhomHoSo.dossierName
+            console.log('data put groupDossier -->', tempData)
+            setTimeout(function () {
+              vm.$store.dispatch('putDossier', tempData).then(function (result) {
+                toastr.clear()
+                toastr.success('Cập nhật thành công')
+              }).catch(function (xhr) {
+                toastr.clear()
+                toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+              })
+            }, 500)
           }
-        } else { passValid = true }
-        if (passValid) {
-          // if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
-          //   return
-          // }
-          // let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
-          // let listAction = []
-          // let listDossierMark = []
-          // if (dossierFiles) {
-          //   dossierFiles.forEach(function (value, index) {
-          //     if (value.eForm) {
-          //       value['dossierId'] = vm.thongTinNhomHoSo.dossierId
-          //       listAction.push(vm.$store.dispatch('putAlpacaForm', value))
-          //     }
-          //   })
-          // }
-          let tempData = Object.assign(vm.thongTinNhomHoSo, thongtinnguoinophoso)
-          tempData['dossierId'] = vm.thongTinNhomHoSo.dossierId
-          tempData['originality'] = vm.thongTinNhomHoSo.originality
-          tempData['dossierName'] = vm.thongTinNhomHoSo.dossierName
-          console.log('data put groupDossier -->', tempData)
-          setTimeout(function () {
-            vm.$store.dispatch('putDossier', tempData).then(function (result) {
-              toastr.clear()
-              toastr.success('Cập nhật thành công')
-            }).catch(function (xhr) {
-              toastr.clear()
-              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
-            })
-          }, 500)
         }
       }
+      if (vm.formCode === 'NEW_GROUP_CV') {
+        let thongtincongvan = this.$refs.thongtincongvan.getThongTinCongVan()
+        let tempData = thongtincongvan
+        vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
+          vm.loadingAction = false
+          toastr.clear()
+          toastr.success('Cập nhật thành công')
+        }).catch(rejectXhr => {
+          vm.loadingAction = false
+          toastr.clear()
+          toastr.error('Yêu cầu của bạn thực hiện thất bại')
+        })
+      }
+      
     },
     createDossierIntoGroup () {
       // Tạo hồ sơ -> add vào nhóm

@@ -8,6 +8,7 @@
             <span v-else-if="formCode === 'COPY'">SAO CHÉP HỒ SƠ</span>
             <span v-else-if="isOffLine">NỘP HỒ SƠ TRỰC TUYẾN</span>
             <span v-else-if="formCode === 'NEW_GROUP'">THÊM NHÓM HỒ SƠ</span>
+            <span v-else-if="formCode === 'NEW_GROUP_CV'">THÊM MỚI CÔNG VĂN</span>
             <span v-else>THÊM MỚI HỒ SƠ</span> 
           </div>
           <div class="layout row wrap header_tools row-blue">
@@ -22,177 +23,192 @@
             </div>
           </div> 
         </div>
-        <div :style="!isNotarization ? 'position: relative' : 'display: none'" v-if="originality !== 1 && formCode !== 'NEW_GROUP'">
-          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-            <v-expansion-panel-content>
-              <thong-tin-chung ref="thongtinchunghoso"></thong-tin-chung>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
+
+        <div v-if="formCode !== 'NEW_GROUP_CV'">
+          <div :style="!isNotarization ? 'position: relative' : 'display: none'" v-if="originality !== 1 && formCode !== 'NEW_GROUP'">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+              <v-expansion-panel-content>
+                <thong-tin-chung ref="thongtinchunghoso"></thong-tin-chung>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </div>
+          <div style="position: relative;" v-if="originality === 1">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+              <v-expansion-panel-content>
+                <div slot="header">
+                  <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                  HƯỚNG DẪN &nbsp;&nbsp;&nbsp;&nbsp; 
+                </div>
+                <v-layout wrap>
+                  <v-flex xs12 sm12>
+                    <div class="ml-3 mr-3 pt-1" v-html="thongTinChiTietHoSo.dossierNote"></div>
+                  </v-flex>
+                </v-layout>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </div>
+          <!--  -->
+          <thong-tin-chu-ho-so ref="thongtinchuhoso" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="isNotarization ? true : false"></thong-tin-chu-ho-so>
+          <!--  -->
+          <div v-if="!isNotarization">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+              <v-expansion-panel-content>
+                <div slot="header" style="display: flex; align-items: center;">
+                  <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                  <span v-if="formCode === 'NEW_GROUP'">Tên nhóm hồ sơ</span>
+                  <span v-else>Tên hồ sơ</span>
+                  <!-- <span v-else>Nội dung giải quyết</span> -->
+                  &nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+                <div>
+                  <v-card>
+                    <v-card-text>
+                      <v-textarea
+                        v-model="briefNote"
+                        :rows="2"
+                        box
+                        :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập tên hồ sơ'"
+                      ></v-textarea>
+                      <!-- <v-textarea
+                        v-model="briefNote"
+                        :rows="2"
+                        box
+                        :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập nội dung giải quyết'"
+                      ></v-textarea> -->
+                      <div v-if="templateDescription">(*) &nbsp; {{templateDescription}}</div>
+                    </v-card-text>
+                  </v-card>
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </div>
+          <!--  -->
+          <div style="position: relative;" v-if="!isNotarization">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+              <v-expansion-panel-content>
+                <div slot="header" style="display: flex; align-items: center;">
+                  <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                  <span v-if="formCode === 'NEW_GROUP'">Thành phần hồ sơ dùng chung</span>
+                  <span v-else>Thành phần hồ sơ</span>
+                  &nbsp;&nbsp;&nbsp;&nbsp;
+                  <span v-if="!stateEditSample && originality !== 1">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
+                  <v-text-field
+                  class="px-0 py-0"
+                  style="width: 90px; max-width: 90px;"
+                  v-else-if="originality !== 1"
+                  v-model="thongTinChiTietHoSo.sampleCount"
+                  type="number"
+                  @click.stop=""
+                  ></v-text-field> &nbsp;
+                  <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
+                  <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
+                </div>
+                <thanh-phan-ho-so ref="thanhphanhoso" :formCodeInput="formCode"  :onlyView="formCode === 'NEW_GROUP' ? true : false" :id="'nm'" :partTypes="formCode === 'NEW_GROUP' ? inputTypesGroup : inputTypes"></thanh-phan-ho-so>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </div>
+          <!-- thu-tuc-chung-thuc -->
+          <div style="position: relative;" v-if="isNotarization">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+              <v-expansion-panel-content>
+                <div slot="header" style="display: flex; align-items: center;">
+                  <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                  <span>Tài liệu chứng thực</span>
+                </div>
+                <tai-lieu-chung-thuc ref="tailieuchungthuc" :dossierId="thongTinChiTietHoSo.dossierId" :formCodeInput="formCode" :onlyView="false"></tai-lieu-chung-thuc>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </div>
+          <!--  -->
+          <div style="position: relative;border-top:1px solid #ddd" v-if="originality !== 1 && notifyConfig">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+              <v-expansion-panel-content hide-actions value="2">
+                <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Hình thức gửi thông báo giải quyết hồ sơ</div>
+                <div class="absolute__btn" style="width: 220px">
+                  <content-placeholders class="mt-1" v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <v-checkbox
+                    v-model="smsNotify"
+                    label="Gửi SMS"
+                    color="primary"
+                    hide-details
+                    class="d-inline-block mr-3 mt-2"
+                  ></v-checkbox>
+                  <v-checkbox
+                    v-model="emailNotify"
+                    label="Gửi email"
+                    color="primary"
+                    hide-details
+                    class="d-inline-block ml-3 mt-2"
+                  ></v-checkbox>
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </div>
+          <!--  -->
+          <div style="position: relative;border-top:1px solid #ddd" v-if="originality !== 1 && fromViaPostalConfig">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+              <v-expansion-panel-content hide-actions value="2">
+                <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
+                  Nhận hồ sơ qua bưu chính
+                </div>
+                <div class="absolute__btn" style="width: 200px">
+                  <content-placeholders class="mt-1" v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <v-checkbox
+                    v-model="fromViaPostal"
+                    label="Hồ sơ nhận qua bưu chính"
+                    color="primary"
+                    hide-details
+                    class="d-inline-block mt-2"
+                  ></v-checkbox>
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </div>
+          <!--  -->
+          <!-- <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+              <v-expansion-panel-content hide-actions value="2">
+                <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát hồ sơ</div>
+                <dich-vu-chuyen-phat-ho-so ref="dichvuchuyenphathoso" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ho-so>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </div> -->
+          <!--  -->
+          <div style="position: relative;" v-if="viaPortalDetail !== 0">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+              <v-expansion-panel-content hide-actions value="2">
+                <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát kết quả</div>
+                <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </div>
+          <!--  -->
+          <div :style="isNotarization ? 'display: none' : 'position: relative;'">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+              <v-expansion-panel-content hide-actions value="2">
+                <thu-phi v-if="showThuPhi" v-model="payments" :detailDossier="thongTinChiTietHoSo" :viaPortal="viaPortalDetail"></thu-phi>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </div>
+          <!--  -->
+        
         </div>
-        <div style="position: relative;" v-if="originality === 1">
-          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-            <v-expansion-panel-content>
-              <div slot="header">
-                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                HƯỚNG DẪN &nbsp;&nbsp;&nbsp;&nbsp; 
-              </div>
-              <v-layout wrap>
-                <v-flex xs12 sm12>
-                  <div class="ml-3 mr-3 pt-1" v-html="thongTinChiTietHoSo.dossierNote"></div>
-                </v-flex>
-              </v-layout>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
+
+        <div v-if="formCode === 'NEW_GROUP_CV'">
+          <div>
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+              <v-expansion-panel-content>
+                <thong-tin-cong-van ref="thongtincongvan"></thong-tin-cong-van>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </div>
         </div>
-        <!--  -->
-        <thong-tin-chu-ho-so ref="thongtinchuhoso" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="isNotarization ? true : false"></thong-tin-chu-ho-so>
-        <!--  -->
-        <div v-if="!isNotarization">
-          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-            <v-expansion-panel-content>
-              <div slot="header" style="display: flex; align-items: center;">
-                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                <span v-if="formCode === 'NEW_GROUP'">Tên nhóm hồ sơ</span>
-                <span v-else>Tên hồ sơ</span>
-                <!-- <span v-else>Nội dung giải quyết</span> -->
-                &nbsp;&nbsp;&nbsp;&nbsp;
-              </div>
-              <div>
-                <v-card>
-                  <v-card-text>
-                    <v-textarea
-                      v-model="briefNote"
-                      :rows="2"
-                      box
-                      :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập tên hồ sơ'"
-                    ></v-textarea>
-                    <!-- <v-textarea
-                      v-model="briefNote"
-                      :rows="2"
-                      box
-                      :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập nội dung giải quyết'"
-                    ></v-textarea> -->
-                    <div v-if="templateDescription">(*) &nbsp; {{templateDescription}}</div>
-                  </v-card-text>
-                </v-card>
-              </div>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </div>
-        <!--  -->
-        <div style="position: relative;" v-if="!isNotarization">
-          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-            <v-expansion-panel-content>
-              <div slot="header" style="display: flex; align-items: center;">
-                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                <span v-if="formCode === 'NEW_GROUP'">Thành phần hồ sơ dùng chung</span>
-                <span v-else>Thành phần hồ sơ</span>
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <span v-if="!stateEditSample && originality !== 1">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
-                <v-text-field
-                class="px-0 py-0"
-                style="width: 90px; max-width: 90px;"
-                v-else-if="originality !== 1"
-                v-model="thongTinChiTietHoSo.sampleCount"
-                type="number"
-                @click.stop=""
-                ></v-text-field> &nbsp;
-                <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
-                <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
-              </div>
-              <thanh-phan-ho-so ref="thanhphanhoso" :formCodeInput="formCode"  :onlyView="formCode === 'NEW_GROUP' ? true : false" :id="'nm'" :partTypes="formCode === 'NEW_GROUP' ? inputTypesGroup : inputTypes"></thanh-phan-ho-so>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </div>
-        <!-- thu-tuc-chung-thuc -->
-        <div style="position: relative;" v-if="isNotarization">
-          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-            <v-expansion-panel-content>
-              <div slot="header" style="display: flex; align-items: center;">
-                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                <span>Tài liệu chứng thực</span>
-              </div>
-              <tai-lieu-chung-thuc ref="tailieuchungthuc" :dossierId="thongTinChiTietHoSo.dossierId" :formCodeInput="formCode" :onlyView="false"></tai-lieu-chung-thuc>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </div>
-        <!--  -->
-        <div style="position: relative;border-top:1px solid #ddd" v-if="originality !== 1 && notifyConfig">
-          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-            <v-expansion-panel-content hide-actions value="2">
-              <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Hình thức gửi thông báo giải quyết hồ sơ</div>
-              <div class="absolute__btn" style="width: 220px">
-                <content-placeholders class="mt-1" v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <v-checkbox
-                  v-model="smsNotify"
-                  label="Gửi SMS"
-                  color="primary"
-                  hide-details
-                  class="d-inline-block mr-3 mt-2"
-                ></v-checkbox>
-                <v-checkbox
-                  v-model="emailNotify"
-                  label="Gửi email"
-                  color="primary"
-                  hide-details
-                  class="d-inline-block ml-3 mt-2"
-                ></v-checkbox>
-              </div>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </div>
-        <!--  -->
-        <div style="position: relative;border-top:1px solid #ddd" v-if="originality !== 1 && fromViaPostalConfig">
-          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-            <v-expansion-panel-content hide-actions value="2">
-              <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
-                Nhận hồ sơ qua bưu chính
-              </div>
-              <div class="absolute__btn" style="width: 200px">
-                <content-placeholders class="mt-1" v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <v-checkbox
-                  v-model="fromViaPostal"
-                  label="Hồ sơ nhận qua bưu chính"
-                  color="primary"
-                  hide-details
-                  class="d-inline-block mt-2"
-                ></v-checkbox>
-              </div>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </div>
-        <!--  -->
-        <!-- <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
-          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-            <v-expansion-panel-content hide-actions value="2">
-              <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát hồ sơ</div>
-              <dich-vu-chuyen-phat-ho-so ref="dichvuchuyenphathoso" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ho-so>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </div> -->
-        <!--  -->
-        <div style="position: relative;" v-if="viaPortalDetail !== 0">
-          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-            <v-expansion-panel-content hide-actions value="2">
-              <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát kết quả</div>
-              <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </div>
-        <!--  -->
-        <div :style="isNotarization ? 'display: none' : 'position: relative;'">
-          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-            <v-expansion-panel-content hide-actions value="2">
-              <thu-phi v-if="showThuPhi" v-model="payments" :detailDossier="thongTinChiTietHoSo" :viaPortal="viaPortalDetail"></thu-phi>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </div>
-        <!--  -->
-        <v-tabs icons-and-text centered class="mb-4">
+        
+        <v-tabs v-if="formCode !== 'NEW_GROUP_CV'" icons-and-text centered class="mb-4">
           <v-tabs-slider color="primary"></v-tabs-slider>
           <!-- <v-tab href="#tab-1" @click="luuHoSo">
             <v-btn flat class="px-0 py-0 mx-0 my-0">
@@ -241,6 +257,29 @@
             </v-btn>
           </v-tab>
           <v-tab href="#tab-5" class="px-0 py-0">
+            <v-btn flat class=""
+              :loading="loadingAction"
+              :disabled="loadingAction"
+              @click="goBackHistory"
+            >
+              <v-icon size="18">reply</v-icon> &nbsp;
+              Quay lại
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-tab>
+        </v-tabs>
+        <v-tabs v-if="formCode === 'NEW_GROUP_CV'" icons-and-text centered class="mb-4">
+          <v-tab href="#tab-1" @click="tiepNhanCongVan()" class="px-0 py-0"> 
+            <v-btn flat class="" 
+              :loading="loadingAction"
+              :disabled="loadingAction"
+            >
+              <v-icon size="20">save</v-icon>  &nbsp;
+              <span>Thêm công văn</span>
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-tab>
+          <v-tab href="#tab-2" class="px-0 py-0">
             <v-btn flat class=""
               :loading="loadingAction"
               :disabled="loadingAction"
@@ -614,6 +653,7 @@ import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
 import DichVuChuyenPhatHoSo from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatHoSo.vue'
+import ThongTinCongVan from './TiepNhan/TiepNhanHoSo_ThongTinCongVan.vue'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -627,7 +667,8 @@ export default {
     'thong-tin-chung': ThongTinChung,
     'thu-phi': LePhi,
     'dich-vu-chuyen-phat-ho-so': DichVuChuyenPhatHoSo,
-    'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua
+    'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua,
+    'thong-tin-cong-van': ThongTinCongVan
   },
   data: () => ({
     // add new template
@@ -872,6 +913,10 @@ export default {
                     if (vm.$refs.thongtinchunghoso) {
                       vm.$refs.thongtinchunghoso.initData(result)
                     }
+                    // call initData thong tin cong van
+                    if (vm.$refs.thongtincongvan) {
+                      vm.$refs.thongtincongvan.initData(result)
+                    }
                   }).catch(function(){})
                 } else {
                   // call initData thong tin chung ho so
@@ -1014,9 +1059,10 @@ export default {
               } else {
                 var initData = vm.$store.getters.loadingInitData
                 let actionUser = initData.user.userName ? initData.user.userName : ''
+                let actionCodeRequest = vm.actionDetail.actionCode
                 let dataPostAction = {
                   dossierId: vm.dossierId,
-                  actionCode: vm.actionDetail.actionCode,
+                  actionCode: actionCodeRequest,
                   actionNote: '',
                   actionUser: actionUser,
                   payload: '',
@@ -1127,9 +1173,10 @@ export default {
                 'dueDate': vm.editableDate && tempData.dueDate ? tempData.dueDate : vm.dueDateEdit,
                 'receiveDate': vm.receiveDateEdit
               }
+              let actionCodeRequest = vm.actionDetail.actionCode
               let dataPostAction = {
                 dossierId: vm.dossierId,
-                actionCode: vm.actionDetail.actionCode,
+                actionCode: actionCodeRequest,
                 actionNote: '',
                 actionUser: actionUser,
                 payload: payloadDate,
@@ -1190,6 +1237,24 @@ export default {
       } else {
         toastr.error('Vui lòng điền đầy đủ thông tin bắt buộc')
       }
+    },
+    tiepNhanCongVan (type) {
+      let vm = this
+      vm.loadingAction = true
+      let thongtincongvan = this.$refs.thongtincongvan.getThongTinCongVan()
+      let tempData = thongtincongvan
+      console.log('data put congvan -->', tempData)
+      vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
+        vm.loadingAction = false
+        vm.$router.push({
+          path: '/danh-sach-ho-so/0/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,
+          query: vm.$router.history.current.query
+        })
+      }).catch(rejectXhr => {
+        vm.loadingAction = false
+        toastr.clear()
+        toastr.error('Yêu cầu của bạn thực hiện thất bại')
+      })
     },
     boSungHoSo () {
       var vm = this
@@ -1298,44 +1363,9 @@ export default {
         vm.$store.dispatch('putDossier', tempData).then(function (result) {
           vm.loadingAction = false
           vm.$router.push({
-            path: '/danh-sach-ho-so/0/nhom-ho-so/' + result.dossierId,
+            path: '/danh-sach-ho-so/0/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,
             query: vm.$router.history.current.query
           })
-          // var initData = vm.$store.getters.loadingInitData
-          // let actionUser = initData.user.userName ? initData.user.userName : ''
-          // //
-          // var paymentsOut = {}
-          // if (vm.showThuPhi) {
-          //   paymentsOut = {
-          //     requestPayment: vm.payments['requestPayment'],
-          //     paymentNote: vm.payments['paymentNote'],
-          //     advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-          //     feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-          //     serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-          //     shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
-          //   }
-          // }
-          // let dataPostAction = {
-          //   dossierId: result.dossierId,
-          //   actionCode: 1100,
-          //   actionNote: '',
-          //   actionUser: actionUser,
-          //   payload: '',
-          //   security: '',
-          //   assignUsers: '',
-          //   payment: paymentsOut,
-          //   createDossiers: ''
-          // }
-          // vm.loadingAction = true
-          // vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-          //   vm.loadingAction = false
-          //   vm.$router.push({
-          //     path: '/danh-sach-ho-so/0/nhom-ho-so/' + result.dossierId,
-          //     query: vm.$router.history.current.query
-          //   })
-          // }).catch(reject => {
-          //   vm.loadingAction = false
-          // })
         }).catch(rejectXhr => {
           vm.loadingAction = false
           toastr.clear()
@@ -1552,7 +1582,12 @@ export default {
         })
       }
     },
-    // 
+    //
+    formatDate (date) {
+      if (!date) return null
+      const [year, month, day] = date.split('-')
+      return `${day}/${month}/${year}`
+    },
     parseDateToTimestamp (date) {
       if (!date) {
         return null

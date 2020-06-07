@@ -1813,7 +1813,7 @@ export default {
       //
       vm.itemAction = item
       vm.indexAction = index
-      if (String(item.form) === 'NEW' || String(item.form) === 'NEW_GROUP') {
+      if (String(item.form) === 'NEW' || String(item.form) === 'NEW_GROUP' || String(item.form) === 'NEW_GROUP_CV') {
         let isOpenDialog = true
         if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
           isOpenDialog = false
@@ -2373,7 +2373,7 @@ export default {
         serviceCode: vm.serviceCode,
         govAgencyCode: vm.govAgencyCode,
         templateNo: vm.templateNo,
-        originality: vm.itemAction['form'] === 'NEW_GROUP' ? 9 : vm.getOriginality()
+        originality: vm.itemAction['form'] === 'NEW_GROUP' || vm.itemAction['form'] === 'NEW_GROUP_CV' ? 9 : vm.getOriginality()
       }
       // add new template
       let filter = {
@@ -2664,7 +2664,7 @@ export default {
       if (item.permission) {
         if (item['originality'] === 9) {
           vm.$router.push({
-            path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/' + item.dossierId,
+            path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV/' + item.dossierId,
             query: vm.$router.history.current.query
           })
         } else {
