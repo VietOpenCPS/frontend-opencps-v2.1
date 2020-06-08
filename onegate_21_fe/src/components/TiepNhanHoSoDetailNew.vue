@@ -282,8 +282,10 @@
               </v-btn>
             </div>
             <div id="formAlpacaNewTemplate" class="mb-5 pt-0" v-if="serviceCode_hidden !== 'BNG-270821' && serviceCode_hidden !== 'BNG-270817'"></div>
-            <thu-tuc-cap-ho-chieu-ngoai-giao-cong-vu v-if="serviceCode_hidden === 'BNG-270821'" :formCode="formCode" :id="id"></thu-tuc-cap-ho-chieu-ngoai-giao-cong-vu>
-            <thu-tuc-hop-phap-hoa-lanh-su v-if="serviceCode_hidden === 'BNG-270817'"  :formCode="formCode" :id="id"></thu-tuc-hop-phap-hoa-lanh-su>
+            <v-form  ref="formTiepNhan" lazy-validation>
+              <thu-tuc-cap-ho-chieu-ngoai-giao-cong-vu v-if="serviceCode_hidden === 'BNG-270821'" :formCode="formCode" :id="id"></thu-tuc-cap-ho-chieu-ngoai-giao-cong-vu>
+              <thu-tuc-hop-phap-hoa-lanh-su v-if="serviceCode_hidden === 'BNG-270817'"  :formCode="formCode" :id="id" @changeCheckCKCD="changeCheckCKCD"></thu-tuc-hop-phap-hoa-lanh-su>
+            </v-form>
           </v-card>
           <!--  -->
           <v-tabs icons-and-text centered class="mb-4">
@@ -654,6 +656,7 @@ export default {
     // add new template
     isNotarization: false,
     dialogXacNhanThaoTac: false,
+    checkCKCD: false,
     templateName: '',
     formTemplate: '',
     data_form_template: '',
@@ -1388,10 +1391,11 @@ export default {
         payment:  $('#payment_hidden').val(),
       }
       let dossiers = JSON.parse($('#dossiers_hidden').val())
-      if (dossiers.delegateName) {
-        if(vm.formCode === 'NEW'){
-          if(vm.serviceCode_hidden === 'BNG-270817'){
-            if($('#checkCKCD_hidden').val() === 'true') {
+
+      if (vm.serviceCode_hidden === 'BNG-270817') {
+        if(vm.$refs.formTiepNhan.validate() && dossiers.delegateIdNo){
+          if (vm.formCode === 'NEW') {
+            if(vm.checkCKCD) {
               vm.loadingAction = true
               vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
                 vm.loadingAction = false
@@ -1402,21 +1406,10 @@ export default {
               })
             } else {
               vm.dialogXacNhanThaoTac = true
+              vm.loadingAction = false
             }
-          } 
-          if(vm.serviceCode_hidden === 'BNG-270821'){
-            vm.loadingAction = true
-            vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
-              vm.loadingAction = false
-              vm.$store.commit('setActivePrintBienNhan', result.dossierId)
-              vm.goBack() 
-            }).catch(reject => {
-              vm.loadingAction = false
-            })
-          }
-        } else {
-          if (vm.serviceCode_hidden === 'BNG-270817'){
-            if($('#checkCKCD_hidden').val() === 'true') {
+          } else {
+            if(vm.checkCKCD) {
               let dataPUTDossier = {
                 id: vm.id,
                 dossier: dossiers
@@ -1484,9 +1477,27 @@ export default {
               })
             } else {
               vm.dialogXacNhanThaoTac = true
+              vm.loadingAction = false
             }
           }
-          if (vm.serviceCode_hidden === 'BNG-270821'){
+        } else {
+          toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
+          vm.loadingAction = false
+          return 
+        }       
+      }
+      if(vm.serviceCode_hidden === 'BNG-270821'){
+        if(vm.$refs.formTiepNhan.validate()){
+           if(vm.formCode === 'NEW') {
+            vm.loadingAction = true
+            vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
+              vm.loadingAction = false
+              vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+              vm.goBack() 
+            }).catch(reject => {
+              vm.loadingAction = false
+            })
+           } else {
             let dataPUTDossier = {
               id: vm.id,
               dossier: dossiers
@@ -1552,13 +1563,189 @@ export default {
             }).catch(reject => {
               vm.loadingAction = false
             })
-          }
+           }
+        } else {
+          toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
+          vm.loadingAction = false
+          return 
         }
-      } else {
-        toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
-        vm.loadingAction = false
-        return
       }
+
+
+
+      // if (vm.$refs.formTiepNhan.validate()) {
+      //   if(vm.formCode === 'NEW'){
+      //     if(vm.serviceCode_hidden === 'BNG-270817'){
+      //       if(vm.checkCKCD) {
+      //         vm.loadingAction = true
+      //         vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
+      //           vm.loadingAction = false
+      //           vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+      //           vm.goBack() 
+      //         }).catch(reject => {
+      //           vm.loadingAction = false
+      //         })
+      //       } else {
+      //         vm.dialogXacNhanThaoTac = true
+      //         vm.loadingAction = false
+      //       }
+      //     } 
+      //     if(vm.serviceCode_hidden === 'BNG-270821'){
+      //       vm.loadingAction = true
+      //       vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
+      //         vm.loadingAction = false
+      //         vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+      //         vm.goBack() 
+      //       }).catch(reject => {
+      //         vm.loadingAction = false
+      //       })
+      //     }
+      //   } else {
+      //     if (vm.serviceCode_hidden === 'BNG-270817'){
+      //       if(vm.checkCKCD) {
+      //         let dataPUTDossier = {
+      //           id: vm.id,
+      //           dossier: dossiers
+      //         }
+
+      //         vm.loadingAction = true
+      //         vm.$store.dispatch('putDossierNew', dataPUTDossier).then(function (result) {
+      //           let metaData = JSON.parse(dossiers.metaData)
+      //           let dataMetaData = {
+      //             id: vm.id,
+      //             data: {
+      //               dossierFileCustom: metaData.dossierFileCustom,
+      //               ma_to_khai: metaData.ma_to_khai,
+      //               totalRecord: metaData.totalRecord,
+      //               dossierFilePayment: metaData.dossierFilePayment,
+      //               Doan_HCTN: metaData.Doan_HCTN
+      //             }
+
+      //           }
+      //           vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
+      //             console.log(result)
+      //             let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+      //             dossierFile.forEach(async (e)=>{
+      //               if(vm.serviceCode_hidden === 'BNG-270821'){
+      //                 if(e.partNo === 'TP01' || e.partNo === 'TP02'){
+      //                   let dataPUTDossierFile = {
+      //                     id: vm.id,
+      //                     referenceUid: e.referenceUid,
+      //                     formData: e.formData
+      //                   }
+      //                   await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+
+      //                   }).catch(reject=>{
+                          
+      //                   })
+      //                 }
+      //               }
+      //               if(vm.serviceCode_hidden === 'BNG-270817'){
+      //                 if(e.partNo === 'TP01'){
+      //                   let dataPUTDossierFile = {
+      //                     id: vm.id,
+      //                     referenceUid: e.referenceUid,
+      //                     formData: e.formData
+      //                   }
+      //                   await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+
+      //                   }).catch(reject=>{
+                          
+      //                   })
+      //                 }
+      //               }
+
+      //             })
+      //             vm.loadingAction = false
+      //             vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+      //             vm.goBack()
+      //           }).catch(err=> {
+      //             vm.loadingAction = false
+      //           })
+    
+
+
+      //         }).catch(reject => {
+      //           vm.loadingAction = false
+      //         })
+      //       } else {
+      //         vm.dialogXacNhanThaoTac = true
+      //         vm.loadingAction = false
+      //       }
+      //     }
+      //     if (vm.serviceCode_hidden === 'BNG-270821'){
+      //       let dataPUTDossier = {
+      //         id: vm.id,
+      //         dossier: dossiers
+      //       }
+
+      //       vm.loadingAction = true
+      //       vm.$store.dispatch('putDossierNew', dataPUTDossier).then(function (result) {
+      //         let metaData = JSON.parse(dossiers.metaData)
+      //         let dataMetaData = {
+      //           id: vm.id,
+      //           data: {
+      //             dossierFileCustom: metaData.dossierFileCustom,
+      //             ma_to_khai: metaData.ma_to_khai,
+      //             totalRecord: metaData.totalRecord,
+      //             dossierFilePayment: metaData.dossierFilePayment,
+      //             Doan_HCTN: metaData.Doan_HCTN
+      //           }
+
+      //         }
+      //         vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
+      //           console.log(result)
+      //           let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+      //           dossierFile.forEach(async (e)=>{
+      //             if(vm.serviceCode_hidden === 'BNG-270821'){
+      //               if(e.partNo === 'TP01' || e.partNo === 'TP02'){
+      //                 let dataPUTDossierFile = {
+      //                   id: vm.id,
+      //                   referenceUid: e.referenceUid,
+      //                   formData: e.formData
+      //                 }
+      //                 await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+
+      //                 }).catch(reject=>{
+                        
+      //                 })
+      //               }
+      //             }
+      //             if(vm.serviceCode_hidden === 'BNG-270817'){
+      //               if(e.partNo === 'TP01'){
+      //                 let dataPUTDossierFile = {
+      //                   id: vm.id,
+      //                   referenceUid: e.referenceUid,
+      //                   formData: e.formData
+      //                 }
+      //                 await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+
+      //                 }).catch(reject=>{
+                        
+      //                 })
+      //               }
+      //             }
+
+      //           })
+      //           vm.loadingAction = false
+      //           vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+      //           vm.goBack()
+      //         }).catch(err=> {
+      //           vm.loadingAction = false
+      //         })
+  
+
+
+      //       }).catch(reject => {
+      //         vm.loadingAction = false
+      //       })
+      //     }
+      //   }
+      // } else {
+      //   toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
+      //   vm.loadingAction = false
+      //   return
+      // }
     },
     xacNhan(){
       let vm = this
@@ -1863,6 +2050,10 @@ export default {
     },
     goBackHistory () {
       window.history.back()
+    },
+    changeCheckCKCD(val){
+      console.log(val)
+      this.checkCKCD = val
     }
   }
 }

@@ -8,6 +8,7 @@
                         <v-text-field
                             v-model="eFormCode"
                             solo
+                            @keyup.enter="getDataEform()"
                         ></v-text-field>
                     </div>
                     <v-btn small color="primary" @click="getDataEform()" class="ml-2">Lấy dữ liệu</v-btn>
@@ -126,6 +127,7 @@
                             <v-checkbox
                                 v-model="props.item.kiem_tra"
                                 primary
+                                @change="toggleKT(props.index, props.item)"
                             >
                             </v-checkbox> 
                         </td>
@@ -223,7 +225,7 @@
                     item-value="MA"
                     clearable
                     multiple
-                    :rules="[rules.required]"
+                    :rules="[rules.required, rules.requiredArr,]"
                     required
                     solo
                 ></v-autocomplete>
@@ -238,8 +240,7 @@
                     clearable
                     return-object
                     
-                    :rules="[rules.required]"
-                    required
+
                     solo
                 ></v-autocomplete>
             </v-flex>
@@ -318,7 +319,7 @@
                         <v-flex xs12 sm8>
                             <v-form ref="formGiayTo" lazy-validation>
                                 <v-layout wrap>
-                                    <v-flex xs12 sm6 class="px-2 my-2">
+                                    <v-flex xs12 sm4 class="px-2 my-2">
                                         <label for="">Tên giấy tờ <span class="red--text">*</span></label>
                                         <v-autocomplete
                                             :items="listTenGiayTo"
@@ -332,7 +333,7 @@
                                             :rules="[rules.required]"
                                         ></v-autocomplete>
                                     </v-flex>
-                                    <v-flex xs12 sm6 class="px-2 my-2">
+                                    <v-flex xs12 sm4 class="px-2 my-2">
                                         <label for="">Loại giấy tờ <span class="red--text">*</span></label>
                                         <v-autocomplete
                                             :items="litstLoaiGiayTo"
@@ -345,6 +346,30 @@
                                             required
                                             :rules="[rules.required]"
                                         ></v-autocomplete>
+                                    </v-flex>
+                                    <v-flex xs12 sm4 class="px-2 my-2">
+                                        <label for="">Ngày ký <span class="red--text">*</span></label>
+                                        <v-menu
+                                            ref="menu"
+                                            :close-on-content-click="false"
+                                            v-model="menu"
+                                            transition="scale-transition"
+                                            offset-y
+                                        >
+                                            <v-text-field
+                                                slot="activator"
+                                                v-model="ngay_ky"
+                                                persistent-hint
+                                                append-icon="event"
+                                                placeholder="DD/MM/YYYY"
+                                                @change="changeNgayKy()"
+                                                @input="inputNgayKy()"
+                                                solo
+                                                :rules="[rules.required,rules.checkDate]"
+                                                required
+                                            ></v-text-field>
+                                            <v-date-picker v-model="dateNgayKy" no-title @input="menu = false" locale="vi"></v-date-picker>
+                                        </v-menu>
                                     </v-flex>
                                     <v-flex xs12 sm4 class="px-2 my-2">
                                         <label for="">Loại CV <span class="red--text">*</span></label>
@@ -374,6 +399,7 @@
                                         <label for="">Tổng số bản<span class="red--text">*</span></label>
                                         <v-text-field
                                             solo
+                                            type="number"
                                             v-model="so_ban"
                                             required
                                             :rules="[rules.required]"
@@ -420,33 +446,10 @@
                                         >
                                         </v-text-field>
                                     </v-flex>
-                                    <v-flex xs12 sm4 class="px-2 my-2">
-                                        <label for="">Ngày ký <span class="red--text">*</span></label>
-                                        <v-menu
-                                            ref="menu"
-                                            :close-on-content-click="false"
-                                            v-model="menu"
-                                            transition="scale-transition"
-                                            offset-y
-                                        >
-                                            <v-text-field
-                                                slot="activator"
-                                                v-model="ngay_ky"
-                                                persistent-hint
-                                                append-icon="event"
-                                                placeholder="DD/MM/YYYY"
-                                                @change="dateNgayKy = parseDate(ngay_ky)"
-                                                solo
-                                                :rules="[rules.required,rules.checkDate]"
-                                                required
-                                            ></v-text-field>
-                                            <v-date-picker v-model="dateNgayKy" no-title @input="menu = false" locale="vi"></v-date-picker>
-                                        </v-menu>
-                                    </v-flex>
                                     <v-flex xs12 class="text-xs-right">
                                         <v-btn small color="primary" @click="openKiemTraChuKyConDau()">Kiểm tra chữ ký con dấu</v-btn>
-                                        <v-btn small color="primary" @click="backGiayto()" v-if="update_giayto !== 'add' && update_giayto > 0">Chuyển giấy tờ trước</v-btn>
-                                        <v-btn small color="primary" @click="nextGiayto()" v-if="update_giayto !== 'add'">Chuyển giấy tờ tiếp theo</v-btn>
+                                        <v-btn small color="primary" @click="backGiayto()" :disabled="update_giayto === 'add' || update_giayto === 0"><v-icon>skip_previous</v-icon></v-btn>
+                                        <v-btn small color="primary" @click="nextGiayto()" :disabled="update_giayto === 'add' || update_giayto === (listGiayTo.length - 1)"><v-icon>skip_next</v-icon></v-btn>
                                     </v-flex>                     
                                 </v-layout>
                             </v-form>
@@ -455,14 +458,14 @@
                             <v-layout wrap class="pa-2" style="border: 0.5px solid #dedede">
                                 <v-flex xs12> Mẫu con dấu</v-flex>
                                 <v-flex xs12>
-                                    <div style="width: 100%; height: 140px; border: 0.5px solid #dedede;">
-                                        <img :src="'data:image/png;base64,' +  conDau" alt="" style="width: 100%; height: 100%;">
+                                    <div style="width: 100%; height: 140px; border: 0.5px solid #dedede; display:flex; justify-content: center;overflow-x: scroll;">
+                                        <img :src="'data:image/png;base64,' +  conDau" alt="" style=" height: 100%;" @click="phongTo(conDau)">
                                     </div>
                                 </v-flex>
                                 <v-flex xs12 class="my-2"> Mẫu chữ ký</v-flex>
                                 <v-flex xs12>
-                                    <div style="width: 100%; height: 140px; border: 0.5px solid #dedede;">
-                                        <img :src="'data:image/png;base64,' +  chuKy" alt="" style="width: 100%; height: 100%;">
+                                    <div style="width: 100%; height: 140px; border: 0.5px solid #dedede; display:flex; justify-content: center;overflow-x: scroll;">
+                                        <img :src="'data:image/png;base64,' +  chuKy" alt="" style=" height: 100%;"  @click="phongTo(chuKy)">
                                     </div>
                                 </v-flex>
                             </v-layout>
@@ -494,6 +497,7 @@
                                     <v-text-field
                                         solo
                                         v-model="co_quan_cap_tg"
+                                        @keyup.enter="getDSNguoiKy()"
                                     >
                                     </v-text-field>
                                 </v-flex>
@@ -503,6 +507,7 @@
                                         <v-text-field
                                             solo
                                             v-model="nguoi_ky_tg"
+                                            @keyup.enter="getDSNguoiKy()"
                                         >
                                         </v-text-field>
                                         <v-btn small color="primary" @click="getDSNguoiKy()">Tìm kiếm</v-btn>
@@ -537,11 +542,11 @@
                                 <v-flex xs12> Mẫu con dấu</v-flex>
                                 <v-flex xs12>
                                     <div style="width: 100%; height: 190px; border: 0.5px solid #dedede;overflow-x: scroll;">
-                                        <div style="width: 1000px;">
+                                        <div >
                                             <div v-if="loadingImage" style="height: 140px;font-size: 16pt;color: blue;">Loading ....</div>
                                             <div v-if="!loadingImage" style="width: 100%; height: 190px;display:flex;">
                                                 <div v-for="(item, index) in listConDau" :key="index">
-                                                    <img :src="'data:image/png;base64,' +  hexToBase64(item['CD_IMAGE_FILE'])" alt="" style="width: 200px; height: 140px;">
+                                                    <img :src="'data:image/png;base64,' +  item.strConDau" alt="" style=" height: 140px;" @click="phongTo(item.strConDau)">
                                                     <v-checkbox
                                                         v-model="chonConDau"
                                                         primary
@@ -559,11 +564,11 @@
                                 <v-flex xs12 class="my-2"> Mẫu chữ ký</v-flex>
                                 <v-flex xs12>
                                     <div style="width: 100%; height: 190px; border: 0.5px solid #dedede;overflow-x: scroll;">
-                                        <div style="width: 1000px;">
+                                        <div >
                                             <div v-if="loadingImage" style="height: 140px;font-size: 16pt;color: blue;">Loading ....</div>
                                             <div v-if="!loadingImage" style="width: 100%; height: 190px;display:flex;">
                                                 <div v-for="(item, index) in listChuKy" :key="index">
-                                                    <img :src="'data:image/png;base64,' +  hexToBase64(item['CK_IMAGE_FILE'])" alt="" style="width: 200px; height: 140px;">
+                                                    <img :src="'data:image/png;base64,' +  item.strChuKy" alt="" style=" height: 140px;" @click="phongTo(item.strChuKy)">
                                                     <v-checkbox
                                                         v-model="chonChuKy"
                                                         primary
@@ -588,6 +593,34 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
+        <v-dialog
+            v-model="dialogPhongTO"
+            max-width="800px"
+            class="form_vuejs"
+            persistent
+        >
+            <v-card>
+                <v-card-title
+                    class="headline lighten-2"
+                    primary-title
+                    style="display: flex;justify-content: space-between;"
+                >
+                
+                    <v-btn color="#115ebe" fab small dark  @click="dialogPhongTO = false">
+                        <v-icon>cancel</v-icon>
+                    </v-btn>
+                </v-card-title>
+                <v-card-text class="form_vuejs">
+                    <v-layout wrap>
+                        <v-flex xs12>
+                            <div width="100%; height: 500px;">
+                                <img :src="'data:image/png;base64,'+ anhPhongTo" alt="" style="width: 100%;height: 500px;">
+                            </div>
+                        </v-flex>
+                    </v-layout>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 <script>
@@ -606,10 +639,13 @@ export default {
     },
     data: () => ({
         eFormCode: '',
+        updateStratus: false,
+        dialogPhongTO: false,
         dialogGiayTo: false,
         dialogTimKiemConDau: false,
         isLoadingDelegateIdNo: false,
         menu5: false,
+        anhPhongTo: '',
         loadingImage: false,
         checkCMT: false,
         messengeCMT: '',
@@ -733,6 +769,14 @@ export default {
         fileMarks: [{value: 1, name: 'Bản chụp'},{value: 2, name: 'Bản sao'},{value: 3, name: 'Bản gốc'},{value: 4, name: 'Bản dịch'}],
         rules: {
             required: (v) => !!v || 'Thông tin này là bắt buộc',
+            required2: (v) => {
+                return v ? true : 'Thông tin này là bắt buộc'
+            },
+            requiredArr: (v) => {
+                if(Array.isArray(v)){
+                    return v.length ? true : 'Thông tin này bắt buộc'
+                }
+            },
             checkDate: (date)=> {
                 if(date){
                      let today = new Date()
@@ -760,7 +804,10 @@ export default {
                 }
             },
             soHieuGiayTo: (value) => {
-                return value.length > 50 ?  'Số hiệu giấy tờ không được quá 50 ký tự' : true
+                if(value){  
+                    return value.length > 50 ?  'Số hiệu giấy tờ không được quá 50 ký tự' : true
+                }
+                else return true 
             }
         },
         dateDueDateFormated: '',
@@ -866,16 +913,22 @@ export default {
     }),
     created () {
         let vm = this
-        vm.$nextTick(()=>{
+        vm.$nextTick( ()=>{
             let currentQuery = vm.$router.history.current.query
             vm.dossierTemplateNo = currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
+            vm.eFormCode = currentQuery.hasOwnProperty('eformCode') && currentQuery.eformCode ? currentQuery.eformCode : ''
             console.log(vm.dossierTemplateNo)
             if(vm.formCode==='UPDATE'){
                 vm.getDetail()
             } else {
-                vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": []})
+                vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [],  'totalRecord': 0})
                 vm.getThanhPhan()
                 vm.genDueDate()
+                if(vm.eFormCode){
+                    setTimeout(() => {
+                        vm.getDataEform()
+                    }, 500);
+                }
             }
             vm.getDelegateCity()
             vm.getQuocGia()
@@ -884,17 +937,6 @@ export default {
         })
     },
     watch: {
-        listGiayTo: {
-            deep: true,
-            handler:  (val, oldVal) => {
-                let find = val.find(e => e.kiem_tra === 1)
-                if(find){
-                    $('#checkCKCD_hidden').val(true)
-                } else {
-                    $('#checkCKCD_hidden').val(false)
-                }
-            }           
-        },
         payment: {
             deep: true,
             handler:  (val, oldVal) => {
@@ -949,19 +991,6 @@ export default {
                     try{
                         let formData = JSON.parse(vm.dossierFileArr[i]['formData'])
                         formData['de_nghi_chung_nhan'] = val
-                        // let formData = {
-                        //     ho_ten_yeu_cau: vm.dossiers.delegateName,
-                        //     so_cmnd: vm.delegateIdNo,
-                        //     dien_thoai: vm.delegateTelNo,
-                        //     email: vm.delegateEmail,
-                        //     dia_chi: vm.delegateAddress,
-                        //     de_nghi_chung_nhan: vm.de_nghi_chung_nhan,
-                        //     list_giay_to : vm.listGiayTo,
-                        //     tong_so: vm.tongSoBan,
-                        //     su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
-                        //     ma_muc_dich: vm.muc_dich.MA,
-                        //     muc_dich: vm.muc_dich.TEN
-                        // }
                         vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
                     }catch(err){
                       let formData = {
@@ -982,24 +1011,37 @@ export default {
                     try{
                         let formData = JSON.parse(vm.dossierFileArr[i]['formData'])
                         formData['su_dung_tai_nuoc_ma'] = val
-                        // let formData = {
-                        //     ho_ten_yeu_cau: vm.dossiers.delegateName,
-                        //     so_cmnd: vm.delegateIdNo,
-                        //     dien_thoai: vm.delegateTelNo,
-                        //     email: vm.delegateEmail,
-                        //     dia_chi: vm.delegateAddress,
-                        //     de_nghi_chung_nhan: vm.de_nghi_chung_nhan,
-                        //     list_giay_to : vm.listGiayTo,
-                        //     tong_so: vm.tongSoBan,
-                        //     su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
-                        //     ma_muc_dich: vm.muc_dich.MA,
-                        //     muc_dich: vm.muc_dich.TEN
-                        // }
+                        let arr = ''
+                        for(let i =0 ; i<val.length; i++) {
+                            let find = vm.listQuocGia.find(e =>e.MA === val[i])
+                            if(find){
+                                if(arr === '') {
+                                    arr+=find.TEN
+                                } else {
+                                    arr+= ',' + find.TEN
+                                }
+                                
+                            }
+                        }
+                        formData['su_dung_tai_nuoc'] = arr 
                         vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
                         // vm.dossierFileArr[i]['eform'] = 'true'
                     }catch(err){
+                        let arr = ''
+                        for(let i =0 ; i<val.length; i++) {
+                            let find = vm.listQuocGia.find(e =>e.MA === val[i])
+                            if(find){
+                                if(arr === '') {
+                                    arr+=find.TEN
+                                } else {
+                                    arr+= ',' + find.TEN
+                                }
+                                
+                            }
+                        }
                         let formData = {
-                            su_dung_tai_nuoc_ma: val
+                            su_dung_tai_nuoc_ma: val,
+                            su_dung_tai_nuoc: arr
                         }
                         vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
                     }
@@ -1015,19 +1057,6 @@ export default {
                         let formData = JSON.parse(vm.dossierFileArr[i]['formData'])
                         formData['ma_muc_dich'] = val.MA
                         formData['muc_dich'] = val.TEN
-                        // let formData = {
-                        //     ho_ten_yeu_cau: vm.dossiers.delegateName,
-                        //     so_cmnd: vm.delegateIdNo,
-                        //     dien_thoai: vm.delegateTelNo,
-                        //     email: vm.delegateEmail,
-                        //     dia_chi: vm.delegateAddress,
-                        //     de_nghi_chung_nhan: vm.de_nghi_chung_nhan,
-                        //     list_giay_to : vm.listGiayTo,
-                        //     tong_so: vm.tongSoBan,
-                        //     su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
-                        //     ma_muc_dich: vm.muc_dich.MA,
-                        //     muc_dich: vm.muc_dich.TEN
-                        // }
                         vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
                         // vm.dossierFileArr[i]['eform'] = 'true'
                     } catch(err){
@@ -1073,22 +1102,6 @@ export default {
                 vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
                 vm.viaPostal = vm.dossiers.viaPostal ?  true : false
                
-                // vm.nuoc_di = metaData.Doan_HCTN.CacNuocDi_ma.split(',')
-
-                // vm.ho_chieu_ngoai_giao_cu = metaData.Doan_HCTN.SoHCCu_NG ? parseInt(metaData.Doan_HCTN.SoHCCu_NG) : 0
-                // vm.ho_chieu_cong_vu_cu = metaData.Doan_HCTN.SoHCCu_CV ? parseInt(metaData.Doan_HCTN.SoHCCu_CV) : 0
-                // vm.ho_chieu_pho_thong_cu = metaData.Doan_HCTN.SoHCCu_PT ? parseInt(metaData.Doan_HCTN.SoHCCu_PT) : 0
-                // vm.ho_chieu_cong_vu_moi = metaData.Doan_HCTN.SoHCCapMoi ? parseInt(metaData.Doan_HCTN.SoHCCapMoi) : 0
-                // vm.cong_ham_so_nuoc = metaData.Doan_HCTN.SoNuocXinCH ? parseInt(metaData.Doan_HCTN.SoNuocXinCH) : 0
-                // vm.ho_chieu_ngoai_giao_moi = metaData.Doan_HCTN.SoHCCapMoi_NG ? parseInt(metaData.Doan_HCTN.SoHCCapMoi_NG) : 0
-                // vm.cong_ham_schengen = metaData.Doan_HCTN.SoNguoiMienCH ? parseInt(metaData.Doan_HCTN.SoNguoiMienCH) : 0
-                // vm.cong_ham_nhap_canh = metaData.Doan_HCTN.SoCHNhapCanh ? parseInt(metaData.Doan_HCTN.SoCHNhapCanh) : 0
-                // vm.cong_ham_qua_canh = metaData.Doan_HCTN.SoCHQuaCanh ? parseInt(metaData.Doan_HCTN.SoCHQuaCanh) : 0
-                // vm.ho_chieu_gia_han = metaData.Doan_HCTN.SoHCGH ? parseInt(metaData.Doan_HCTN.SoHCGH) : 0
-                // vm.ho_chieu_hong = metaData.Doan_HCTN.SoHCHong ? parseInt(metaData.Doan_HCTN.SoHCHong) : 0
-                // vm.ho_chieu_mat = metaData.Doan_HCTN.SoHCMat ? parseInt(metaData.Doan_HCTN.SoHCMat) : 0
-                // vm.so_nguoi = metaData.Doan_HCTN.SoNguoi ? parseInt(metaData.Doan_HCTN.SoNguoi) : 0
-                // vm.genLePhi()
                 vm.getThanhPhan()
                 vm.getDossierFile()
             }).catch(err => {})       
@@ -1115,6 +1128,7 @@ export default {
                             let formData = JSON.parse(data[i]['formData'])
                             console.log(formData)
                             vm.listGiayTo = formData.list_giay_to
+                            vm.checkCKCD()
                             vm.de_nghi_chung_nhan = formData.de_nghi_chung_nhan
                             vm.su_dung_tai_nuoc_ma = formData.su_dung_tai_nuoc_ma
                             vm.muc_dich = {
@@ -1183,7 +1197,9 @@ export default {
                 }
                 let totalRecord = 0
                 for(let i =0; i<file_bien_nhan.length ; i++){
-                    totalRecord+=parseInt(file_bien_nhan[i]['recordCount'])
+                    if(file_bien_nhan[i]['partNo'] === 'TP03'){
+                        totalRecord+=parseInt(file_bien_nhan[i]['recordCount'])
+                    }
                 }
                 tg['totalRecord'] = totalRecord
                 tg['dossierFileCustom'] = file_bien_nhan
@@ -1211,38 +1227,6 @@ export default {
                 vm.listMucDichSuDung = vm.sortArr(res.data.data, 'TEN')
             }).catch(err => {})  
         },
-        // getThanhPhan(){
-        //     let vm = this
-        //     let config = {
-        //         url: '/o/rest/v2/dossiertemplates/'+ vm.dossierTemplateNo,
-        //         headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
-        //     }
-        //     axios.request(config).then(res => {
-        //         vm.dossierParts = res.data.dossierParts
-        //         let file_bien_nhan = new Array();
-        //         let j = 0
-        //         vm.dossierFileArr = []
-        //         for (let i=0; i<vm.dossierParts.length; i++){
-        //             vm.dossierMarkArr.push({
-        //                 dossierPartNo: vm.dossierParts[i]['partNo'],
-        //                 fileMark: vm.dossierParts[i]['fileMark'],
-        //                 partName: vm.dossierParts[i]['partName'],
-        //                 partType: vm.dossierParts[i]['partType'],
-        //                 fileCheck: 0,
-        //                 fileComment: '',
-        //                 recordCount: ''
-        //             })
-        //             if( (vm.dossierParts[i]['partNo'] === 'TP01' || vm.dossierParts[i]['partNo'] === 'TP03') && vm.dossierParts[i].partType === 1){
-        //                 vm.dossierFileArr[j] = {formData: '', partNo: vm.dossierParts[i]['partNo']}
-        //                 file_bien_nhan[j] = {'partNo': vm.dossierParts[i]['partNo'], 'partName': vm.dossierParts[i]['partName'], 'fileMark': vm.dossierParts[i]['fileMark'], 'recordCount': 1}
-        //                 j++;
-        //             } 
-        //         }
-        //         let tg2 = JSON.parse(vm.dossiers['metaData']);
-        //         tg2['dossierFileCustom'] = file_bien_nhan;
-        //         vm.dossiers['metaData'] = JSON.stringify(tg2);
-        //     }).catch(err => {})  
-        // },
         getThanhPhan(){
             let vm = this
             let config = {
@@ -1299,8 +1283,15 @@ export default {
                             j++;
                         } 
                     }
+                    let totalRecord = 0
+                    for(let i =0; i<file_bien_nhan.length ; i++){
+                        if(file_bien_nhan[i]['partNo'] === 'TP03'){
+                            totalRecord+=parseInt(file_bien_nhan[i]['recordCount'])
+                        }
+                    }
                     let tg2 = JSON.parse(vm.dossiers['metaData']);
                     tg2['dossierFileCustom'] = file_bien_nhan;
+                    tg2['totalRecord'] = totalRecord
                     vm.dossiers['metaData'] = JSON.stringify(tg2);
                 }
             }).catch(err => {})  
@@ -1379,19 +1370,42 @@ export default {
             }
             axios.request(config).then(res => {
                 if(Object.keys(res.data).length !== 0 && res.data.constructor === Object){
-                    vm.dossiers.delegateName = res.data.bookingName
-                    vm.dossiers.applicantName = res.data.bookingName
-                    vm.dossiers.delegateIdNo = res.data.so_cmnd
-                    vm.dossiers.delegateTelNo = res.data.dien_thoai
-                    vm.dossiers.delegateEmail = res.data.email
-                    vm.dossiers.delegateAddress = res.data.dia_chi
-                    vm.dossiers.address = res.data.dia_chi
-                    vm.su_dung_tai_nuoc_ma = res.data.su_dung_tai_nuoc_ma
-                    vm.de_nghi_chung_nhan = res.data.de_nghi_chung_nhan
-                    vm.muc_dich = vm.listMucDichSuDung.find(e=>e.TEN === res.data.muc_dich)
-                    vm.fillTableGiayTo(res.data.list_giay_to)
+                    if(res.data.bookingName) {
+                        vm.dossiers.delegateName = res.data.bookingName
+                        vm.dossiers.applicantName = res.data.bookingName
+                    }
+                    if(res.data.so_cmnd) {
+                       vm.dossiers.delegateIdNo = res.data.so_cmnd
+                    }
+                    if(res.data.dien_thoai) {
+                        vm.dossiers.delegateTelNo = res.data.dien_thoai
+                    }
+                    if(res.data.email) {
+                        vm.dossiers.delegateEmail = res.data.email
+                    }
+                    if(res.data.dia_chi) {
+                        vm.dossiers.delegateAddress = res.data.dia_chi
+                        vm.dossiers.address = res.data.dia_chi
+                    }
+                    if(res.data.su_dung_tai_nuoc_ma) {
+                        vm.su_dung_tai_nuoc_ma = res.data.su_dung_tai_nuoc_ma
+                    }
+                    if(res.data.de_nghi_chung_nhan) {
+                        vm.de_nghi_chung_nhan = res.data.de_nghi_chung_nhan
+                    }
+                    if(res.data.muc_dich) {
+                        vm.muc_dich = vm.listMucDichSuDung.find(e=>e.TEN === res.data.muc_dich)
+                    }
+                    if(res.data.list_giay_to) {
+                        vm.fillTableGiayTo(res.data.list_giay_to)
+                    }      
                 }
-            }).catch(err => {}) 
+                else {
+                    toastr.error('Mã tờ khai không hợp lệ')  
+                }
+            }).catch(err => {
+                 toastr.error('Mã tờ khai không tìm thấy') 
+            }) 
         },
         fillTableGiayTo (data) {
             let vm = this
@@ -1418,6 +1432,7 @@ export default {
             // }
 
             vm.listGiayTo = data
+            vm.checkCKCD()
             vm.tongSoBan = 0
             vm.listGiayTo.forEach(e=>{
                 vm.tongSoBan+=parseInt(e['so_ban'])
@@ -1425,6 +1440,18 @@ export default {
             // 
             for (let i=0; i<vm.dossierFileArr.length; i++){
                 if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                    let arr = ''
+                    for(let i = 0; i<vm.su_dung_tai_nuoc_ma.length; i++) {
+                        let find = vm.listQuocGia.find(e=>e.MA === vm.su_dung_tai_nuoc_ma[i])
+                        if(find){
+                            if(arr === '') {
+                                arr+=find.TEN
+                            } else {
+                                arr+= ',' + find.TEN
+                            }
+                            
+                        }
+                    }
                     let formData = {
                         ho_ten_yeu_cau: vm.dossiers.delegateName,
                         so_cmnd: vm.delegateIdNo,
@@ -1435,6 +1462,7 @@ export default {
                         list_giay_to : vm.listGiayTo,
                         tong_so: vm.tongSoBan,
                         su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
+                        su_dung_tai_nuoc: arr,
                         ma_muc_dich: vm.muc_dich.MA,
                         muc_dich: vm.muc_dich.TEN
                     }
@@ -1485,8 +1513,18 @@ export default {
             }
             vm.loadingImage = true
             axios.request(config).then(res => {
-                vm.listConDau = vm.sortDate(res.data.CON_DAU, 'CD_NGAY_HL')
-                vm.listChuKy = vm.sortDate (res.data.CHU_KY, 'CK_NGAY_HL')
+                let arrConDau = res.data.CON_DAU.map(function(el) {
+                    let o = Object.assign({}, el);
+                    o['strConDau'] = vm.hexToBase64(o.CD_IMAGE_FILE);
+                    return o;
+                })
+                let arrChuKy = res.data.CHU_KY.map(function(el) {
+                    let o = Object.assign({}, el);
+                    o['strChuKy'] = vm.hexToBase64(o.CK_IMAGE_FILE);
+                    return o;
+                })
+                vm.listConDau = vm.sortDate(arrConDau, 'CD_NGAY_HL')
+                vm.listChuKy = vm.sortDate (arrChuKy, 'CK_NGAY_HL')
                 vm.loadingImage = false
             }).catch(err => {})
         },
@@ -1497,7 +1535,7 @@ export default {
                 vm.chonConDau = [item['CD_MA_CON_DAU']]
 
                 vm.ma_con_dau_tg = item['CD_MA_CON_DAU']
-                vm.conDauSelected = vm.hexToBase64(item['CD_IMAGE_FILE'])
+                vm.conDauSelected = item.strConDau
             } else {
                 vm.conDauSelected = ''
             }
@@ -1508,7 +1546,7 @@ export default {
             if(vm.chonChuKy.includes(item['CK_MA_CK'])){
                 vm.chonChuKy = [item['CK_MA_CK']]
                 vm.ma_chu_ky_tg =  item['CK_MA_CK']
-                vm.chuKySelected = vm.hexToBase64(item['CK_IMAGE_FILE'])
+                vm.chuKySelected = item.strChuKy
             } else {
                 vm.chuKySelected = ''
             }
@@ -1554,15 +1592,23 @@ export default {
                   ngay_ky: vm.ngay_ky,
                   ma_con_dau: vm.ma_con_dau,
                   ma_chu_ky: vm.ma_chu_ky,
-                  kiem_tra: 1,
+                  kiem_tra: true,
                   anh_con_dau: vm.conDau,
                   anh_chu_ky: vm.chuKy,
                     
                 }  
                 if(vm.update_giayto === 'add') {
                     vm.listGiayTo.push(gt) 
+                    vm.checkCKCD()
+                    vm.$refs.formGiayTo.reset()
+                    vm.conDau = ''
+                    vm.chuKy = ''
+                    toastr.success('Thao tác thực hiện thành công.')
                 } else {
                     vm.$set(vm.listGiayTo, vm.update_giayto, gt)
+                    // vm.$refs.formGiayTo.reset()
+                     vm.checkCKCD()
+                     toastr.success('Thao tác thực hiện thành công.')
                 }
                 // Count Sl giay to
                 vm.tongSoBan = 0
@@ -1579,6 +1625,19 @@ export default {
                             // delete obj['anh_con_dau']
                             arr.push(obj)
                         }) 
+                        let arrNuocSD = ''
+                        for(let i = 0; i<vm.su_dung_tai_nuoc_ma.length; i++) {
+                            let find = vm.listQuocGia.find(e=>e.MA === vm.su_dung_tai_nuoc_ma[i])
+                            if(find){
+                                if(arrNuocSD === '') {
+                                    arrNuocSD+=find.TEN
+                                } else {
+                                    arrNuocSD+= ',' + find.TEN
+                                }
+                                
+                            }
+                        }
+                
                         let formData = {
                             ho_ten_yeu_cau: vm.dossiers.delegateName,
                             so_cmnd: vm.delegateIdNo,
@@ -1589,6 +1648,7 @@ export default {
                             list_giay_to : arr,
                             tong_so: vm.tongSoBan,
                             su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
+                            su_dung_tai_nuoc: arrNuocSD,
                             ma_muc_dich: vm.muc_dich.MA,
                             muc_dich: vm.muc_dich.TEN
                         }
@@ -1596,6 +1656,7 @@ export default {
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
                 }
+                
                 $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
 
                 // Gen le phi
@@ -1605,6 +1666,7 @@ export default {
             }
         },
         genLePhi () {
+
             let vm = this
             let tg2 = JSON.parse(vm.dossiers['metaData']);
             let file_bien_nhan = tg2['dossierFileCustom'];			
@@ -1627,7 +1689,13 @@ export default {
                 file_payment2[file_payment2.length] = {'partNo': 'TP03', 'partName': e['ten_giay_to'] + ' ('+e['so_hieu_giay_to']+')', 'fileMark': '-1', 'fileMarkName': e['loai_giay_to'], 'recordCount': e['so_ban'], 'trang_thai': 1, 'don_gia': 30000, 'thanh_tien': thanh_tien}
 
             })
-             console.log(file_bien_nhan2)
+            let totalRecord = 0
+            for(let i =0; i<file_bien_nhan2.length ; i++){
+                if(file_bien_nhan2[i]['partNo'] === 'TP03'){
+                    totalRecord+=parseInt(file_bien_nhan2[i]['recordCount'])
+                }
+            }
+            tg2['totalRecord'] = totalRecord
             tg2['dossierFileCustom'] =file_bien_nhan2;
             tg2['dossierFilePayment'] =file_payment2;
             vm.dossiers['metaData'] = JSON.stringify(tg2);
@@ -1682,6 +1750,7 @@ export default {
         },
         openDialogUpdateGiayTo (index, item) {
             let vm = this
+            console.log(item)
             vm.update_giayto = index
             vm.ten_giay_to = item.ten_giay_to,
             vm.ma_ten_giay_to = item.ma_ten_giay_to,
@@ -1703,18 +1772,31 @@ export default {
             vm.kiem_tra =item.kiem_tra,
             vm.conDau = item.anh_con_dau
             vm.chuKy = item.anh_chu_ky
-            vm.giay_to = {
-                TEN: item.ten_giay_to,
-                MA: item.ma_ten_giay_to,
+            if(item.ten_giay_to && item.ma_ten_giay_to){
+                vm.giay_to = {
+                    TEN: item.ten_giay_to,
+                    MA: item.ma_ten_giay_to,
+                }
+            } else {
+                vm.giay_to = ''
             }
-            vm.loai_giay_to = {
-                text: item.loai_giay_to,
-                value: item.ma_loai_giay_to
+            if(item.loai_giay_to && item.ma_loai_giay_to){
+                vm.loai_giay_to = {
+                    text: item.loai_giay_to,
+                    value: item.ma_loai_giay_to
+                }
+            } else {
+                vm.loai_giay_to = ''
             }
-            vm.loai_cong_viec = {
-                text: item.loai_cong_viec,
-                value:  item.loai_cong_viec
+            if(item.loai_cong_viec){
+                vm.loai_cong_viec = {
+                    text: item.loai_cong_viec,
+                    value:  item.loai_cong_viec
+                }
+            } else {
+                vm.loai_cong_viec = ''
             }
+
             // vm.conDau = ''
             // vm.chuKy = ''
             vm.dialogGiayTo = true
@@ -1722,35 +1804,47 @@ export default {
         openDialogCopyGiayTo (index, item) {
             let vm = this
             vm.update_giayto = 'add'
-            vm.ten_giay_to = item.ten_giay_to,
-            vm.ma_ten_giay_to = item.ma_ten_giay_to,
-            vm.ma_loai_giay_to =  item.ma_loai_giay_to,
-            vm.loai_giay_to = item.loai_giay_to,
-            vm.so_ban = item.so_ban,
-            vm.loai_cong_viec = item.loai_cong_viec,
-            vm.so_hieu_giay_to = item.so_hieu_giay_to,
-            vm.ten_nguoi_duoc_cap = item.ten_nguoi_duoc_cap,
-            vm.co_quan_cap = item.co_quan_cap,
-            vm.ma_co_quan_cap = item.ma_co_quan_cap,
-            vm.nguoi_ky = item.nguoi_ky,
+            vm.ten_giay_to = item.ten_giay_to
+            vm.ma_ten_giay_to = item.ma_ten_giay_to
+            vm.ma_loai_giay_to =  item.ma_loai_giay_to
+            vm.loai_giay_to = item.loai_giay_to
+            vm.so_ban = item.so_ban
+            vm.loai_cong_viec = item.loai_cong_viec
+            vm.so_hieu_giay_to = item.so_hieu_giay_to
+            vm.ten_nguoi_duoc_cap = item.ten_nguoi_duoc_cap
+            vm.co_quan_cap = item.co_quan_cap
+            vm.ma_co_quan_cap = item.ma_co_quan_cap
+            vm.nguoi_ky = item.nguoi_ky
             vm.ma_nguoi_ky = item.ma_nguoi_ky,
             vm.chuc_danh_ky = item.chuc_danh_ky,
-            vm.ma_chuc_vu = item.ma_chuc_vu,
-            vm.ngay_ky = item.ngay_ky,
-            vm.ma_con_dau = item.ma_con_dau,
-            vm.ma_chu_ky = item.ma_chu_ky,
-            vm.kiem_tra =item.kiem_tra,
-            vm.giay_to = {
-                TEN: item.ten_giay_to,
-                MA: item.ma_ten_giay_to,
+            vm.ma_chuc_vu = item.ma_chuc_vu
+            vm.ngay_ky = item.ngay_ky
+            vm.ma_con_dau = item.ma_con_dau
+            vm.ma_chu_ky = item.ma_chu_ky
+            vm.kiem_tra =item.kiem_tra
+            if(item.ten_giay_to && item.ma_ten_giay_to){
+                vm.giay_to = {
+                    TEN: item.ten_giay_to,
+                    MA: item.ma_ten_giay_to,
+                }
+            } else {
+                vm.giay_to = ''
             }
-            vm.loai_giay_to = {
-                text: item.loai_giay_to,
-                value: item.ma_loai_giay_to
+            if(item.loai_giay_to && item.ma_loai_giay_to){
+                vm.loai_giay_to = {
+                    text: item.loai_giay_to,
+                    value: item.ma_loai_giay_to
+                }
+            } else {
+                vm.loai_giay_to = ''
             }
-            vm.loai_cong_viec = {
-                text: item.loai_cong_viec,
-                value:  item.loai_cong_viec
+            if(item.loai_cong_viec){
+                vm.loai_cong_viec = {
+                    text: item.loai_cong_viec,
+                    value:  item.loai_cong_viec
+                }
+            } else {
+                vm.loai_cong_viec = ''
             }
             vm.dialogGiayTo = true
             vm.conDau = item.anh_con_dau
@@ -1759,6 +1853,7 @@ export default {
         deleteGiayTo(index) {
             let vm = this
             vm.listGiayTo.splice(index,1)
+            vm.checkCKCD()
             // Count Sl giay to
             vm.tongSoBan = 0
             vm.listGiayTo.forEach(e=>{
@@ -1774,6 +1869,18 @@ export default {
                         // delete obj['anh_con_dau']
                         arr.push(obj)
                     }) 
+                    let arrNuocSD = ''
+                    for(let i = 0; i<vm.su_dung_tai_nuoc_ma.length; i++) {
+                        let find = vm.listQuocGia.find(e=>e.MA === vm.su_dung_tai_nuoc_ma[i])
+                            if(find){
+                                if(arrNuocSD === '') {
+                                    arrNuocSD+=find.TEN
+                                } else {
+                                    arrNuocSD+= ',' + find.TEN
+                                }
+                                
+                            }
+                    }
                     let formData = {
                         ho_ten_yeu_cau: vm.dossiers.delegateName,
                         so_cmnd: vm.delegateIdNo,
@@ -1784,6 +1891,7 @@ export default {
                         list_giay_to : arr,
                         tong_so: vm.tongSoBan,
                         su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
+                        su_dung_tai_nuoc: arrNuocSD,
                         ma_muc_dich: vm.muc_dich.MA,
                         muc_dich: vm.muc_dich.TEN
                     }
@@ -1827,6 +1935,13 @@ export default {
                      let tp = {'partNo': item.dossierPartNo, 'partName': item.partName, 'fileMark': item.fileMark,'recordCount': item.recordCount}
                    file_bien_nhan.push(tp) 
                 }
+                let totalRecord = 0
+                for(let i =0; i<file_bien_nhan.length ; i++){
+                    if(file_bien_nhan[i]['partNo'] === 'TP03'){
+                        totalRecord+=parseInt(file_bien_nhan[i]['recordCount'])
+                    }
+                }
+                tg['totalRecord'] = totalRecord
                 tg['dossierFileCustom'] = file_bien_nhan
                 vm.dossiers['metaData'] = JSON.stringify(tg)
             } else {
@@ -1857,6 +1972,13 @@ export default {
                 //      let tp = {'partNo': item.dossierPartNo, 'partName': item.partName, 'fileMark': item.fileMark,'recordCount': item.recordCount}
                 //    file_bien_nhan.push(item) 
                 // }
+                let totalRecord = 0
+                for(let i =0; i<file_bien_nhan.length ; i++){
+                    if(file_bien_nhan[i]['partNo'] === 'TP03'){
+                        totalRecord+=parseInt(file_bien_nhan[i]['recordCount'])
+                    }
+                }
+                tg['totalRecord'] = totalRecord
                 tg['dossierFileCustom'] = file_bien_nhan
                 vm.dossiers['metaData'] = JSON.stringify(tg)
             }
@@ -1972,17 +2094,23 @@ export default {
                 vm.kiem_tra =vm.listGiayTo[vm.update_giayto].kiem_tra,
                 vm.conDau = vm.listGiayTo[vm.update_giayto].anh_con_dau
                 vm.chuKy = vm.listGiayTo[vm.update_giayto].anh_chu_ky
-                vm.giay_to = {
-                    TEN: vm.listGiayTo[vm.update_giayto].ten_giay_to,
-                    MA: vm.listGiayTo[vm.update_giayto].ma_ten_giay_to,
+                if(vm.listGiayTo[vm.update_giayto].ten_giay_to && vm.listGiayTo[vm.update_giayto].ma_ten_giay_to) {
+                    vm.giay_to = {
+                        TEN: vm.listGiayTo[vm.update_giayto].ten_giay_to,
+                        MA: vm.listGiayTo[vm.update_giayto].ma_ten_giay_to,
+                    }
                 }
-                vm.loai_giay_to = {
-                    text: vm.listGiayTo[vm.update_giayto].loai_giay_to,
-                    value: vm.listGiayTo[vm.update_giayto].ma_loai_giay_to
+                if (vm.listGiayTo[vm.update_giayto].loai_giay_to && vm.listGiayTo[vm.update_giayto].ma_loai_giay_to) {
+                    vm.loai_giay_to = {
+                        text: vm.listGiayTo[vm.update_giayto].loai_giay_to,
+                        value: vm.listGiayTo[vm.update_giayto].ma_loai_giay_to
+                    }
                 }
-                vm.loai_cong_viec = {
-                    text: vm.listGiayTo[vm.update_giayto].loai_cong_viec,
-                    value:  vm.listGiayTo[vm.update_giayto].loai_cong_viec
+                if (vm.listGiayTo[vm.update_giayto].loai_cong_viec) {
+                    vm.loai_cong_viec = {
+                        text: vm.listGiayTo[vm.update_giayto].loai_cong_viec,
+                        value:  vm.listGiayTo[vm.update_giayto].loai_cong_viec
+                    }
                 }
             }
         },
@@ -2009,17 +2137,23 @@ export default {
             vm.kiem_tra =vm.listGiayTo[vm.update_giayto].kiem_tra,
             vm.conDau = vm.listGiayTo[vm.update_giayto].anh_con_dau
             vm.chuKy = vm.listGiayTo[vm.update_giayto].anh_chu_ky
-            vm.giay_to = {
-                TEN: vm.listGiayTo[vm.update_giayto].ten_giay_to,
-                MA: vm.listGiayTo[vm.update_giayto].ma_ten_giay_to,
+            if(vm.listGiayTo[vm.update_giayto].ten_giay_to && vm.listGiayTo[vm.update_giayto].ma_ten_giay_to) {
+                vm.giay_to = {
+                    TEN: vm.listGiayTo[vm.update_giayto].ten_giay_to,
+                    MA: vm.listGiayTo[vm.update_giayto].ma_ten_giay_to,
+                }
             }
-            vm.loai_giay_to = {
-                text: vm.listGiayTo[vm.update_giayto].loai_giay_to,
-                value: vm.listGiayTo[vm.update_giayto].ma_loai_giay_to
+            if (vm.listGiayTo[vm.update_giayto].loai_giay_to && vm.listGiayTo[vm.update_giayto].ma_loai_giay_to) {
+                vm.loai_giay_to = {
+                    text: vm.listGiayTo[vm.update_giayto].loai_giay_to,
+                    value: vm.listGiayTo[vm.update_giayto].ma_loai_giay_to
+                }
             }
-            vm.loai_cong_viec = {
-                text: vm.listGiayTo[vm.update_giayto].loai_cong_viec,
-                value:  vm.listGiayTo[vm.update_giayto].loai_cong_viec
+            if (vm.listGiayTo[vm.update_giayto].loai_cong_viec) {
+                vm.loai_cong_viec = {
+                    text: vm.listGiayTo[vm.update_giayto].loai_cong_viec,
+                    value:  vm.listGiayTo[vm.update_giayto].loai_cong_viec
+                }
             }
         },
         changeAdress(){
@@ -2032,6 +2166,72 @@ export default {
             }
             
 
+        },
+        toggleKT(index, item){
+            let vm = this
+            console.log(item)
+            vm.$set(vm.listGiayTo, index, item)
+            vm.checkCKCD()
+        },
+        phongTo(str){
+            this.anhPhongTo = str
+            this.dialogPhongTO = true
+        },
+        checkCKCD(){
+            let vm = this
+            for (let i = 0; i< vm.listGiayTo.length ; i++){
+                if(!vm.listGiayTo[i]['kiem_tra']){
+                    vm.$emit('changeCheckCKCD', false)
+                    return
+                }
+            }
+             vm.$emit('changeCheckCKCD', true)
+        },
+        changeNgayKy(){
+            let vm = this
+            vm.changeDate('ngay_ky')
+            vm.dateNgayKy = vm.parseDate(vm.ngay_ky)
+        },
+        inputNgayKy(){
+            let vm = this
+            vm.inputDate('ngay_ky')
+        },
+        changeDate(key){
+            let vm = this 
+            let dateString = vm[key];
+            let regex = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/
+            let regex2 = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{2}$/
+            if (!regex.test(dateString) && !regex2.test(dateString)) {
+                vm[key] = ''
+            }
+            else{
+                let date = vm[key].split("/");
+                let day = date[0];
+                let month = date[1];
+                if (day > 31) {
+                    vm[key] = ''
+                }
+                else
+                    if (month > 12) {
+                    vm[key] = ''
+                    }else
+                    if(date[2].length == 2){
+                        vm[key] = day+'/'+month+'/20'+date[2]
+                    }
+            }
+        },
+        validateDate(str){
+            return str.replace(/[^\d\/]/g, "");
+        },
+        inputDate (key) {
+            let vm = this
+            let gt = vm.validateDate(vm[key]);
+            if (gt.match(/^\d{2}$/) !== null) {
+                vm[key] = gt + '/'
+            } else if (gt.match(/^\d{2}\/\d{2}$/) !== null) {
+                vm[key] = gt + '/'
+            }else
+                vm[key] = gt
         }
     }
 }

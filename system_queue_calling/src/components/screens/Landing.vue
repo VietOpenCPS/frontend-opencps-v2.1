@@ -293,6 +293,7 @@ export default {
   components: {
   },
   data: () => ({
+    xacthuc_BNG: false,
     loadData: false,
     apiRelease: '',
     dialogAction: false,
@@ -414,7 +415,6 @@ export default {
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
-      vm.getFieldPick()
       vm.getServerConfig()
       vm.getServiceInfo()
       vm.getGateLists()
@@ -433,6 +433,13 @@ export default {
           })
         }
       }, 500)
+      try {
+        if (xacthuc_BNG) {
+          vm.xacthuc_BNG = true
+          vm.getFieldPick()
+        }
+      } catch (error) {
+      }
     })
   },
   updated () {
@@ -467,7 +474,7 @@ export default {
       let newQuery = current.query
       vm.$store.dispatch('getServiceLists').then(function (result) {
         vm.serviceInfoList = result
-        vm.serviceInfoSelected = newQuery.hasOwnProperty('service') && newQuery.service ? newQuery.service : ''
+        // vm.serviceInfoSelected = newQuery.hasOwnProperty('service') && newQuery.service ? newQuery.service : ''
       })
     },
     getServerConfig () {
@@ -488,12 +495,19 @@ export default {
       setTimeout(()=>{
         vm.serviceInfoSelected = ''
         vm.filterBooking()
-        vm.postFieldPick('serviceGroup',vm.serviceGroupSelected)
+        if(vm.xacthuc_BNG){
+          vm.postFieldPick('serviceGroup',vm.serviceGroupSelected)
+        }
       },100)
     },
     changeMethod () {
       let vm = this
-      vm.filterBooking()
+      setTimeout(()=>{
+        vm.filterBooking()
+        if(vm.xacthuc_BNG){
+          vm.postFieldPick('method',vm.bookingMethodSelected)
+        }
+      },100)
     },
     getGateLists () {
       let vm = this
@@ -552,12 +566,19 @@ export default {
       let vm = this
       setTimeout(()=>{
         vm.filterBooking()
-        vm.postFieldPick('serviceCode',vm.serviceInfoSelected)
+        if(vm.xacthuc_BNG){
+          vm.postFieldPick('serviceCode',vm.serviceInfoSelected)
+        }
       },100)
     },
     changeState () {
       let vm = this
-      vm.filterBooking()
+      setTimeout(()=>{
+        vm.filterBooking()
+        if(vm.xacthuc_BNG){
+          vm.postFieldPick('stateCode',vm.stateSelected)
+        }
+      },100)
     },
     loadBooking () {
       let vm = this
@@ -1025,9 +1046,14 @@ export default {
              vm.serviceInfoSelected = formData.serviceCode
           }
           if(formData.serviceGroup){
-            vm.serviceGroupSelected = formData.serviceGroup
+            vm.serviceGroupSelected = JSON.parse(formData.serviceGroup)
           }
-
+          if(formData.method){
+            vm.bookingMethodSelected = formData.method === 'true' ? true : false
+          }
+          if(formData.stateCode){
+            vm.stateSelected = formData.stateCode
+          }
       }).catch (function (reject) {
       }) 
     },

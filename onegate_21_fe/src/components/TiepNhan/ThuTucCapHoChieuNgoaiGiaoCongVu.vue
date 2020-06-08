@@ -1,6 +1,5 @@
 <template>
     <div class="form_vuejs">
-        <v-form  ref="fromDossiers" lazy-validation>
             <v-layout wrap>
                 <v-flex xs12 class="px-2 my-2"><strong>Thông tin người nộp</strong></v-flex>
                 <v-flex xs12 sm6  class="px-2">
@@ -125,6 +124,7 @@
                         <v-text-field
                             v-model="eFormCode"
                             solo
+                            @keyup.enter="getDataEform()"
                         ></v-text-field>
                         <v-btn small color="primary" @click="getDataEform()" class="ml-2">Lấy dữ liệu</v-btn>
                     </div>
@@ -474,7 +474,6 @@
                     ></v-textarea>
                 </v-flex>
             </v-layout>
-        </v-form>
         <!-- Dialog thêm văn bản -->
         <v-dialog
             v-model="dialogThemVanBan"
@@ -1509,6 +1508,7 @@ export default {
             let currentQuery = vm.$router.history.current.query
             vm.dossierTemplateNo = currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
             // vm.dossierTemplateNo = $('#dossierTemplateNo_hidden').val()
+            vm.eFormCode = currentQuery.hasOwnProperty('eformCode') && currentQuery.eformCode ? currentQuery.eformCode : ''
             console.log(vm.dossierTemplateNo)
             if(vm.formCode==='UPDATE'){
                 vm.getDetail()
@@ -1516,6 +1516,11 @@ export default {
                 vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [], 'ma_to_khai': [], 'totalRecord': 0})
                 vm.getThanhPhan()
                 vm.genDueDate()
+                if(vm.eFormCode){
+                    setTimeout(() => {
+                        vm.getDataEform()
+                    }, 500);
+                }
             }
             vm.getDelegateCity()
             vm.getCoQuanChuQuan()
@@ -1793,44 +1798,6 @@ export default {
                 vm.delegateWards = vm.sortArr(res.data.data, 'itemName')
             }).catch(err => {})   
         },
-        // getThanhPhan(){
-        //     let vm = this
-        //     let config = {
-        //         url: '/o/rest/v2/dossiertemplates/'+ vm.dossierTemplateNo,
-        //         headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
-        //     }
-        //     axios.request(config).then(res => {
-        //         vm.dossierParts = res.data.dossierParts
-        //         let file_bien_nhan = new Array();
-        //         let j = 0
-        //         vm.dossierFileArr = []
-        //         for (let i=0; i<vm.dossierParts.length; i++){
-        //             vm.dossierMarkArr.push({
-        //                 dossierPartNo: vm.dossierParts[i]['partNo'],
-        //                 fileMark: vm.dossierParts[i]['fileMark'],
-        //                 partName: vm.dossierParts[i]['partName'],
-        //                 partType: vm.dossierParts[i]['partType'],
-        //                 fileCheck: 0,
-        //                 fileComment: '',
-        //                 recordCount: ''
-        //             })
-        //             if((vm.dossierParts[i]['partNo'] === 'TP01' || vm.dossierParts[i]['partNo'] === 'TP02') && vm.dossierParts[i].partType === 1){
-        //                 vm.dossierFileArr[j] = {formData: '', partNo: vm.dossierParts[i]['partNo'], eform: false}
-        //                 file_bien_nhan[j] = {'partNo': vm.dossierParts[i]['partNo'], 'partName': vm.dossierParts[i]['partName'], 'fileMark': vm.dossierParts[i]['fileMark'], 'recordCount': 1}
-        //                 j++;
-        //             }
-                    
-        //         }
-        //         let totalRecord = 0
-        //         for(let i =0; i<file_bien_nhan.length ; i++){
-        //             totalRecord+=parseInt(file_bien_nhan[i]['recordCount'])
-        //         }
-        //         let tg2 = JSON.parse(vm.dossiers['metaData']);
-        //         tg2['dossierFileCustom'] = file_bien_nhan;
-        //         tg2['totalRecord'] = totalRecord
-        //         vm.dossiers['metaData'] = JSON.stringify(tg2);
-        //     }).catch(err => {})  
-        // },
         getThanhPhan(){
             let vm = this
             let config = {
@@ -1936,7 +1903,7 @@ export default {
                     }
                 }).catch(err => {
                     vm.eFormCode = ''
-                    // toastr.error('Mã tờ khai không tìm thấy') 
+                     toastr.error('Mã tờ khai không tìm thấy') 
                 }) 
             }
         },

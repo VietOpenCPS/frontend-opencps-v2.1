@@ -848,6 +848,7 @@ export default {
     'tim-kiem-nang-cao': AdvSearch
   },
   data: () => ({
+    xacthuc_BNG: false,
     doActionGroup: false,
     isAdminSuper: false,
     actionId: '',
