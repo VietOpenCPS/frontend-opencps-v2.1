@@ -9,7 +9,7 @@ import XemChiTietHoSoDetailCanBo from '@/components/XemChiTietHoSoDetailCanBo'
 import XuLyHoSo from '@/components/XuLyHoSo'
 import HoanThienBoSungHoSoDetail from '@/components/HoanThienBoSungHoSoDetail'
 import DetailForward from '@/components/DetailForward'
-import DanhSachThuTuc from '@/components/DanhSachThuTuc'
+import DanhSachThuTuc from '@/components/DanhSachThuTucNew'
 import LinhVucThuTuc from '@/components/LinhVucThuTuc'
 import NopThanhCong from '@/components/NopThanhCong'
 import ThanhToanThanhCong from '@/components/ThanhToanThanhCong'
@@ -21,7 +21,7 @@ const routes = [
   { path: '/danh-sach-ho-so/:index', name: 'Landing', component: Landing, props: true },
   { path: '/m/danh-sach-ho-so/:index', name: 'LandingMobile', component: LandingMobile, props: true },
   { path: '/danh-sach-ho-so/:index/tiep-nhan-ho-so/:id/:formCode', name: 'TiepNhanHoSoDetail', component: TiepNhanHoSoDetail, props: true },
-  { path: '/danh-sach-ho-so/:index/nhom-ho-so/:id', name: 'TiepNhanNhomHoSo', component: TiepNhanNhomHoSo, props: true },
+  { path: '/danh-sach-ho-so/:index/nhom-ho-so/:formCode/:id', name: 'TiepNhanNhomHoSo', component: TiepNhanNhomHoSo, props: true },
   { path: '/danh-sach-ho-so/:index/chi-tiet-ho-so/:id', name: 'XemChiTietHoSoDetailCanBo', component: XemChiTietHoSoDetailCanBo, props: true },
   { path: '/danh-sach-ho-so/:index/xu-ly-ho-so', name: 'XuLyHoSo', component: XuLyHoSo, props: true },
   { path: '/danh-sach-ho-so/:index/bo-sung-ho-so/:id', name: 'HoanThienBoSungHoSoDetail', component: HoanThienBoSungHoSoDetail, props: true },

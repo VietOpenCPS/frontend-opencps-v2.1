@@ -174,13 +174,23 @@ export const store = new Vuex.Store({
             'groupId': state.initData.groupId
           }
         }
+        let paramsGet = {
+          start: 0,
+          end: 10,
+          dossierNo: data['dossierNo']
+        }
         let dataPost = new URLSearchParams()
         dataPost.append('method', 'GET')
-        dataPost.append('url', '/dossiers/' + data['referenceUid'])
-        dataPost.append('data', '')
+        dataPost.append('url', '/dossiers')
+        dataPost.append('data', JSON.stringify(paramsGet))
         dataPost.append('serverCode', 'SERVER_' + data['govAgencyCode'])
         axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
-          resolve(result.data)
+          if (result.data.hasOwnProperty('data')) {
+            resolve(result.data.data)
+          } else {
+            resolve('')
+          }
+          
         }).catch(xhr => {
           reject(xhr)
         })
@@ -210,27 +220,24 @@ export const store = new Vuex.Store({
     },
     loadVotingMC ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadDetailDossierMC', data['dossierDetail']).then(result => {
-          let config = {
-            headers: {
-              'groupId': state.initData.groupId
-            }
+        let config = {
+          headers: {
+            'groupId': state.initData.groupId
           }
-          let dataPost = new URLSearchParams()
-          dataPost.append('method', 'GET')
-          dataPost.append('url', '/postal/votings/' + data.className + '/' + result['dossierId'])
-          dataPost.append('data', '')
-          dataPost.append('serverCode', 'SERVER_' + result['govAgencyCode'])
-          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result1) {
-            if (result1.data) {
-              resolve(result1.data.data)
-            } else {
-              resolve([])
-            }
-          }).catch(xhr => {
-            reject(xhr)
-          })
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/postal/votings/' + data.className + '/' + data.classPK)
+        dataPost.append('data', '')
+        dataPost.append('serverCode', 'SERVER_' + data['serverCode'])
+        axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result1) {
+          if (result1.data) {
+            resolve(result1.data.data)
+          } else {
+            resolve([])
+          }
         }).catch(xhr => {
+          reject(xhr)
         })
       })
     },

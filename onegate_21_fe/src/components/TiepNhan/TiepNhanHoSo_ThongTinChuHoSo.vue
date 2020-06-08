@@ -692,12 +692,12 @@ export default {
       contactTelNo: true,
       contactEmail: false,
       delegateIdNo: false,
-      delegateName: true,
-      delegateAddress: true,
-      delegateCityCode: true,
-      delegateDistrictCode: true,
-      delegateWardCode: true,
-      delegateTelNo: true,
+      delegateName: false,
+      delegateAddress: false,
+      delegateCityCode: false,
+      delegateDistrictCode: false,
+      delegateWardCode: false,
+      delegateTelNo: false,
       delegateEmail: false
     },
     valid_thongtinchuhoso: false,
@@ -909,6 +909,47 @@ export default {
           }
           vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
         }
+        // set requiredOptions
+        // if (value.userType === '2') {
+        //   vm.requiredOptions = {
+        //     applicantIdNo: false,
+        //     applicantName: true,
+        //     address: true,
+        //     cityCode: true,
+        //     districtCode: true,
+        //     wardCode: true,
+        //     contactTelNo: true,
+        //     contactEmail: false,
+        //     delegateIdNo: false,
+        //     delegateName: false,
+        //     delegateAddress: false,
+        //     delegateCityCode: false,
+        //     delegateDistrictCode: false,
+        //     delegateWardCode: false,
+        //     delegateTelNo: false,
+        //     delegateEmail: false
+        //   }
+        // } else {
+        //   vm.requiredOptions = {
+        //     applicantIdNo: true,
+        //     applicantName: true,
+        //     address: true,
+        //     cityCode: true,
+        //     districtCode: true,
+        //     wardCode: true,
+        //     contactTelNo: true,
+        //     contactEmail: false,
+        //     delegateIdNo: false,
+        //     delegateName: false,
+        //     delegateAddress: false,
+        //     delegateCityCode: false,
+        //     delegateDistrictCode: false,
+        //     delegateWardCode: false,
+        //     delegateTelNo: false,
+        //     delegateEmail: false
+        //   }
+        // }
+        // end
       },
       deep: true
     },
