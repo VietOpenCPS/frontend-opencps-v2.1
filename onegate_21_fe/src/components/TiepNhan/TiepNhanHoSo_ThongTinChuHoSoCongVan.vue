@@ -9,18 +9,11 @@
               <v-card>
                 <v-card-text class="pt-3">
                   <v-layout wrap>
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0"> Họ và tên<span v-if="requiredOptions['applicantName']" style="color:red"> &nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0"> Họ và tên<span v-if="requiredOptions['applicantName']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
+                    <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
-                        v-else
                         v-model="applicantName"
                         @input="changeApplicantInfos"
                         :disabled="loadingVerify"
@@ -29,34 +22,28 @@
                       ></v-text-field>
                     </v-flex>
                     
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0">Giới tính <span v-if="requiredOptions['gender']" style="color:red">&nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0">Giới tính <span v-if="requiredOptions['gender']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4 style="position:relative">
-                      
+                    <v-flex xs12 sm4 class="mb-2" style="position:relative">
+                      <v-radio-group class="mt-0" v-model="gender" row>
+                        <v-radio label="Nam" :value="1" class="mr-4"></v-radio>
+                        <v-radio label="Nữ" :value="2" class=""></v-radio>
+                      </v-radio-group>
                     </v-flex>
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0">Ngày tháng năm sinh<span v-if="requiredOptions['birthDate']" style="color:red">&nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0">Ngày tháng năm sinh<span v-if="requiredOptions['birthDate']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4 style="position:relative">
+                    <v-flex xs12 sm4 class="mb-2" style="position:relative">
                       
                     </v-flex>
                     
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0">CMND/ hộ chiếu<span v-if="requiredOptions['applicantIdNo']" style="color:red">&nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0">CMND/ hộ chiếu<span v-if="requiredOptions['applicantIdNo']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4 style="position:relative">
+                    <v-flex xs12 sm4 class="mb-2" style="position:relative">
                       <suggestions
-                        v-model="thongTinChuHoSo.applicantIdNo"
+                        v-model="applicantIdNo"
                         :options="searchOptions"
                         :onItemSelected="onSearchItemSelected"
                         :onInputChange="onInputChange"
@@ -72,117 +59,83 @@
                       </suggestions>
                     </v-flex>
 
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0"> Quê quán<span style="color:red"> &nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0"> Quê quán<span style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm10>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
+                    <v-flex xs12 sm10 class="mb-2">
                       <v-layout wrap>
                         <v-flex xs12 sm4>
                           <v-autocomplete :items="cityItems" label="Tỉnh/thành phố" v-model="cityNativeCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeCity($event, 'NoiDangKyKhaiSinhdistrictItems', 'NoiDangKyKhaiSinhwardItems')"></v-autocomplete>
                         </v-flex>
-                        <v-flex xs12 sm4>
+                        <v-flex xs12 sm4 class="pl-3">
                           <v-autocomplete :items="districtNativeItems" label="Quận/huyện" v-model="districtNativeCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeDistrict($event, 'NoiDangKyKhaiSinhwardItems')"></v-autocomplete>
                         </v-flex>
-                        <v-flex xs12 sm4>
+                        <v-flex xs12 sm4 class="pl-3">
                           <v-autocomplete label="Xã/phường" :items="wardNativeItems" v-model="wardNativeCode" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
                         </v-flex>
                       </v-layout>
                     </v-flex>
 
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0"> Tình trạng<span style="color:red"> &nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0"> Tình trạng<span style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm10>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
+                    <v-flex xs12 sm10 class="mb-2">
                       <div>
-
+                        <v-radio-group class="mt-0" v-model="state" row>
+                          <v-radio label="Còn sống" :value="1" class="mr-4"></v-radio>
+                          <v-radio label="Đã chết" :value="2" class=""></v-radio>
+                        </v-radio-group>
                       </div>
                     </v-flex>
 
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0"> Nơi đăng ký HKTT<span style="color:red"> &nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0"> Nơi đăng ký HKTT<span style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm10>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
+                    <v-flex xs12 sm10 class="mb-2">
                       <v-text-field  v-model="address" clearable></v-text-field>
                     </v-flex>
-                    <v-flex xs12 sm2></v-flex>
-                    <v-flex xs12 sm10>
-                      <v-flex xs12 sm4>
-                        <v-autocomplete :items="cityItems" label="Tỉnh/thành phố" v-model="cityCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeCity($event, 'NoiDangKyKhaiSinhdistrictItems', 'NoiDangKyKhaiSinhwardItems')"></v-autocomplete>
-                      </v-flex>
-                      <v-flex xs12 sm4>
-                        <v-autocomplete :items="districtItems" label="Quận/huyện" v-model="districtCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeDistrict($event, 'NoiDangKyKhaiSinhwardItems')"></v-autocomplete>
-                      </v-flex>
-                      <v-flex xs12 sm4>
-                        <v-autocomplete label="Xã/phường" :items="wardItems" v-model="wardCode" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
-                      </v-flex>
+                    <v-flex xs12 sm2 class="mb-2"></v-flex>
+                    <v-flex xs12 sm10 class="mb-2">
+                      <v-layout wrap>
+                        <v-flex xs12 sm4>
+                          <v-autocomplete :items="cityItems" label="Tỉnh/thành phố" v-model="cityCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeCity($event, 'NoiDangKyKhaiSinhdistrictItems', 'NoiDangKyKhaiSinhwardItems')"></v-autocomplete>
+                        </v-flex>
+                        <v-flex xs12 sm4 class="pl-3">
+                          <v-autocomplete :items="districtItems" label="Quận/huyện" v-model="districtCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeDistrict($event, 'NoiDangKyKhaiSinhwardItems')"></v-autocomplete>
+                        </v-flex>
+                        <v-flex xs12 sm4 class="pl-3">
+                          <v-autocomplete label="Xã/phường" :items="wardItems" v-model="wardCode" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
+                        </v-flex>
+                      </v-layout>
                     </v-flex>
 
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0"> Số năm được hưởng<span v-if="requiredOptions['yearPayment']" style="color:red"> &nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0"> Số năm được hưởng<span style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
+                    <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
-                        v-else
                         v-model="yearPayment"
                         :rules="requiredOptions['yearPayment'] ? [rules.required] : ''"
                         :required="requiredOptions['yearPayment']"
                       ></v-text-field>
                     </v-flex>
 
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0"> Mức trợ cấp<span v-if="requiredOptions['subsidy']" style="color:red"> &nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0"> Mức trợ cấp<span style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
+                    <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
-                        v-else
                         v-model="subsidy"
                         :rules="requiredOptions['subsidy'] ? [rules.required] : ''"
                         :required="requiredOptions['subsidy']"
                       ></v-text-field>
                     </v-flex>
                     
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0">Số điện thoại <span v-if="requiredOptions['contactTelNo']" style="color:red">&nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0">Số điện thoại : </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
+                    <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
-                      v-else
                       v-model="contactTelNo"
                       append-icon="phone"
                       :rules="requiredOptions['contactTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
@@ -190,105 +143,62 @@
                       ></v-text-field>
                     </v-flex>
 
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0">Địa chỉ email <span v-if="requiredOptions['contactEmail']" style="color:red">&nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0">Địa chỉ email <span v-if="requiredOptions['contactEmail']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
+                    <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
-                      v-else
                       v-model="contactEmail"
                       :rules="requiredOptions['contactEmail'] ? [rules.email, rules.required] : (contactEmail ? [rules.email] : '')"
                       :required="requiredOptions['contactEmail']"
                       ></v-text-field>
                     </v-flex>
 
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0"> Bí danh<span v-if="requiredOptions['anonymName']" style="color:red"> &nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0"> Bí danh<span v-if="requiredOptions['anonymName']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
+                    <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
-                        v-else
                         v-model="anonymName"
                         :rules="requiredOptions['anonymName'] ? [rules.required] : ''"
                         :required="requiredOptions['anonymName']"
                       ></v-text-field>
                     </v-flex>
 
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0"> Là đối tượng<span v-if="requiredOptions['incidence']" style="color:red"> &nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0"> Là đối tượng<span v-if="requiredOptions['incidence']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
+                    <v-flex xs12 sm4 class="mb-2">
                       
                     </v-flex>
 
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0">Nhập ngũ, tuyển dụng <span v-if="requiredOptions['recruitment']" style="color:red"> &nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+
+                      <v-subheader class="pl-0">Nhập ngũ, tuyển dụng <span v-if="requiredOptions['recruitment']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-autocomplete v-else  :items="recruitmentItems" v-model="recruitment" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
+                    <v-flex xs12 sm4 class="mb-2">
+                      <v-autocomplete :items="recruitmentItems" v-model="recruitment" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
                     </v-flex>
 
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0">Phục viên, xuất ngũ, thôi việc <span v-if="requiredOptions['retire']" style="color:red"> &nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0">Phục viên, xuất ngũ, thôi việc <span v-if="requiredOptions['retire']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-autocomplete v-else  :items="retireItems" v-model="retire" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
+                    <v-flex xs12 sm4 class="mb-2">
+                      <v-autocomplete :items="retireItems" v-model="retire" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
                     </v-flex>
 
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0">Tái ngũ <span v-if="requiredOptions['reactivated']" style="color:red"> &nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0">Tái ngũ <span v-if="requiredOptions['reactivated']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-autocomplete v-else  :items="reactivatedItems" v-model="reactivated" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
+                    <v-flex xs12 sm4 class="mb-2">
+                      <v-autocomplete :items="reactivatedItems" v-model="reactivated" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
                     </v-flex>
 
-                    <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0">Phục viên, xuất ngũ <span v-if="requiredOptions['published']" style="color:red"> &nbsp;*</span>: </v-subheader>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <v-subheader class="pl-0">Phục viên, xuất ngũ <span v-if="requiredOptions['published']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4>
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-autocomplete v-else  :items="publishedItems" v-model="published" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
+                    <v-flex xs12 sm4 class="mb-2">
+                      <v-autocomplete :items="publishedItems" v-model="published" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
                     </v-flex>
 
                   </v-layout>
@@ -304,16 +214,9 @@
                   <v-card-text>
                     <v-layout wrap>
                       <v-flex xs12 sm2>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
-                        <v-subheader v-else class="pl-0">CMND/Hộ chiếu <span v-if="requiredOptions['delegateIdNo']" style="color:red">&nbsp;*</span>: </v-subheader>
+                        <v-subheader class="pl-0">CMND/Hộ chiếu <span v-if="requiredOptions['delegateIdNo']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2 style="position:relative">
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
-                        <!--  -->
                         <suggestions
                           v-model="delegateIdNo"
                           :options="searchOptions"
@@ -328,34 +231,20 @@
                         </suggestions>
                       </v-flex>
                       <v-flex xs12 sm2>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
-                        <v-subheader v-else class="pl-0">Họ và tên <span v-if="requiredOptions['delegateName']" style="color:red">&nbsp;*</span>: </v-subheader>
+                        <v-subheader class="pl-0">Họ và tên <span v-if="requiredOptions['delegateName']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm6>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
                         <v-text-field
-                        v-else
                         v-model="delegateName"
                         :rules="requiredOptions['delegateName'] ? [rules.required] : ''"
                         :required="requiredOptions['delegateName']"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
-                        <v-subheader v-else class="pl-0">Địa chỉ <span v-if="requiredOptions['delegateAddress']" style="color:red">&nbsp;*</span>: </v-subheader>
+                        <v-subheader class="pl-0">Địa chỉ <span v-if="requiredOptions['delegateAddress']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm10>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
                         <v-textarea
-                        v-else
                         v-model="delegateAddress"
                         rows="2"
                         :rules="requiredOptions['delegateAddress'] ? [rules.required] : ''"
@@ -363,17 +252,10 @@
                         ></v-textarea>
                       </v-flex>
                       <v-flex xs12 sm2>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
-                        <v-subheader v-else class="pl-0">Tỉnh/Thành phố <span v-if="requiredOptions['delegateCityCode']" style="color:red">&nbsp;*</span>: </v-subheader>
+                        <v-subheader class="pl-0">Tỉnh/Thành phố <span v-if="requiredOptions['delegateCityCode']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
                         <v-autocomplete
-                        v-else
                         :items="citys"
                         item-text="itemName"
                         item-value="itemCode"
@@ -384,17 +266,10 @@
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
-                        <v-subheader v-else class="pl-0">Quận/Huyện <span v-if="requiredOptions['delegateDistrictCode']" style="color:red">&nbsp;*</span>: </v-subheader>
+                        <v-subheader class="pl-0">Quận/Huyện <span v-if="requiredOptions['delegateDistrictCode']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
                         <v-autocomplete
-                        v-else
                         :items="delegateDistricts"
                         item-text="itemName"
                         item-value="itemCode"
@@ -405,17 +280,10 @@
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
-                        <v-subheader v-else class="pl-0">Xã/Phường <span v-if="requiredOptions['delegateWardCode']" style="color:red">&nbsp;*</span>: </v-subheader>
+                        <v-subheader class="pl-0">Xã/Phường <span v-if="requiredOptions['delegateWardCode']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
                         <v-autocomplete
-                        v-else
                         :items="delegateWards"
                         item-text="itemName"
                         item-value="itemCode"
@@ -425,17 +293,10 @@
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
-                        <v-subheader v-else class="pl-0">Số điện thoại <span v-if="requiredOptions['delegateTelNo']" style="color:red">&nbsp;*</span>: </v-subheader>
+                        <v-subheader class="pl-0">Số điện thoại <span v-if="requiredOptions['delegateTelNo']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
                         <v-text-field
-                        v-else
                         v-model="delegateTelNo"
                         append-icon="phone"
                         :rules="requiredOptions['delegateTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
@@ -443,19 +304,12 @@
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
-                        <v-subheader v-else class="pl-0">Địa chỉ email <span v-if="requiredOptions['delegateEmail']" style="color:red">&nbsp;*</span>: </v-subheader>
+                        <v-subheader class="pl-0">Địa chỉ email <span v-if="requiredOptions['delegateEmail']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm6>
-                        <content-placeholders class="mt-1" v-if="loading">
-                          <content-placeholders-text :lines="1" />
-                        </content-placeholders>
                         <v-text-field
-                        v-else
                         v-model="delegateEmail"
-                        :rules="requiredOptions['delegateEmail'] ? [rules.email, rules.required] : (thongTinNguoiNopHoSo.delegateEmail ? [rules.email] : '')"
+                        :rules="requiredOptions['delegateEmail'] ? [rules.email, rules.required] : (delegateEmail ? [rules.email] : '')"
                         :required="requiredOptions['delegateEmail']"
                         ></v-text-field>
                       </v-flex>
@@ -464,14 +318,10 @@
                 </v-card>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <div class="absolute__btn" style="width: 200px;margin-top: 4px;" v-if="!showApplicant">
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
+            <div class="absolute__btn" style="width: 200px;margin-top: 4px;">
               <v-checkbox class="mt-1"
-              v-else
               label="Là chủ hồ sơ"
-              v-model="thongTinNguoiNopHoSo.sameUser"
+              v-model="sameUser"
               ></v-checkbox>
             </div>
           </div>
@@ -508,7 +358,8 @@ export default {
     wardNativeCode: '',
     districtNativeCode: '',
     cityNativeCode: '',
-    state: '',
+    gender: 1,
+    state: 1,
     address: '',
     districtItems: '',
     wardItems: '',
@@ -537,7 +388,6 @@ export default {
     delegateCityCode: '',
     delegateTelNo: '',
     delegateEmail: '',
-
 
     requiredOptions: {
       applicantIdNo: true,
@@ -595,7 +445,8 @@ export default {
     },
     valid: false,
     loadingTable: false,
-    hasOrganization: false
+    hasOrganization: false,
+    sameUser: false
   }),
   computed: {
     loading () {
@@ -618,25 +469,6 @@ export default {
   },
   created () {
     let vm = this
-    if (vm.formCode === "NEW") {
-      // vm.thongTinNguoiNopHoSo.sameUser = true
-    }
-    if (vm.hasOrganization) {
-      vm.labelSwitch = {
-        '1': {
-          cmtnd: 'CMND/ Hộ chiếu',
-          nguoi_nop: 'Họ và tên'
-        },
-        '2': {
-          cmtnd: 'Mã số thuế',
-          nguoi_nop: 'Tên doanh nghiệp'
-        },
-        '3': {
-          cmtnd: 'Mã cơ quan, tổ chức',
-          nguoi_nop: 'Tên cơ quan, tổ chức'
-        }
-      }
-    }
     if (vm.requiredConfig && vm.requiredConfig['applicant']) {
       vm.requiredOptions = Object.assign(vm.requiredOptions, vm.requiredConfig['applicant'])
     }
@@ -654,58 +486,15 @@ export default {
   },
   methods: {
     initData (data) {
-      var vm = this
-      vm.$store.commit('setApplicantId', data.applicantIdNo)
-      let tempData = {
-        delegateName: data.delegateName,
-        delegateCityCode: data.delegateCityCode,
-        delegateAddress: data.delegateAddress,
-        delegateDistrictCode: data.delegateDistrictCode,
-        delegateWardCode: data.delegateWardCode,
-        delegateEmail: data.delegateEmail,
-        delegateTelNo: data.delegateTelNo,
-        delegateIdNo: data.delegateIdNo
-      }
-      let thongTinNguoiNopHoSoTemp = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
-      vm.thongTinNguoiNopHoSo = thongTinNguoiNopHoSoTemp
-      let userTypeCondition = '1'
-      if (data.applicantIdType === 'business') {
-        userTypeCondition = '2'
-      } else if (data.applicantIdType === 'organization') {
-        userTypeCondition = '3'
-      }
-      let tempDataChuHs = {
-        userType: userTypeCondition,
-        cityCode: data.cityCode,
-        districtCode: data.districtCode,
-        wardCode: data.wardCode,
-        applicantIdNo: data.applicantIdNo,
-        applicantIdType: data.applicantIdType,
-        contactEmail: data.contactEmail,
-        contactName: data.contactName,
-        contactTelNo: data.contactTelNo,
-        address: data.address,
-        applicantName: data.applicantName,
-        cityName: data.cityName,
-        districtName: data.districtName,
-        wardName: data.wardName
-      }
-      let thongTinChuHoSoTemp = Object.assign(vm.thongTinChuHoSo, tempDataChuHs)
-      vm.thongTinChuHoSo = thongTinChuHoSoTemp
-      vm.checkApplicantInfos()
+      let vm = this
       vm.$nextTick(function () {
-        var filter = {
+        let filter = {
           collectionCode: 'ADMINISTRATIVE_REGION',
           level: 0,
           parent: 0
         }
         vm.$store.getters.getDictItems(filter).then(function (result) {
           vm.citys = result.data
-          // set default cityCode
-          // if (vm.formCode === "NEW") {
-          //   vm.thongTinChuHoSo['cityCode'] = 87
-          //   vm.thongTinChuHoSo['cityName'] = 'Tỉnh Đồng Tháp'
-          // }
           
         })
         setTimeout(function () {
@@ -750,7 +539,7 @@ export default {
       vm.$refs.formChuHoSo.resetValidation()
     },
     onChangeCity (data, editDelegate) {
-      var vm = this
+      let vm = this
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
         level: 1,

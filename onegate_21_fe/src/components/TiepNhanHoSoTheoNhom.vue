@@ -972,7 +972,7 @@ export default {
               vm.$refs.thongtinchunghoso.initData(result)
             }
           }
-          vm.$refs.thongtinchuhoso.initData(result)
+          vm.$refs.thongtinchuhosocongvan.initData(result)
           // copy file 
           let count = 0
           let files = vm.filesGroupDossier.filter(function(item) {
