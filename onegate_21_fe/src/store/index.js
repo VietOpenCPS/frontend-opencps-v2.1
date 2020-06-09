@@ -862,6 +862,76 @@ export const store = new Vuex.Store({
         })
       })
     },
+    uploadSingleFileGroupCongVan ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let dataOutPut = []
+        let files = $('input[id="documentFile"]')[0].files
+        let countFiles = files.length
+        let count = 0
+        if (files) {
+          for (let index = 0; index < countFiles; index++) {
+            let file = files[index]
+            let fileName = file['name']
+            if (file['name']) {
+              fileName = file['name'].replace(/\%/g, '')
+              fileName = fileName.replace(/\//g, '')
+              fileName = fileName.replace(/\\/g, '')
+            }
+            let formData = new FormData()
+            if (data.partType === 3) {
+              if (data['displayName']) {
+                fileName = data['displayName'].replace(/\%/g, '')
+                fileName = fileName.replace(/\//g, '')
+                fileName = fileName.replace(/\\/g, '')
+              }
+              formData.append('displayName', fileName)
+            } else {
+              formData.append('displayName', fileName)
+            }
+            formData.append('fileType', file.type)
+            formData.append('fileSize', file.size)
+            formData.append('isSync', 'false')
+            formData.append('file', file, fileName)
+            formData.append('dossierPartNo', data.partNo)
+            formData.append('dossierTemplateNo', data.dossierTemplateNo)
+            formData.append('fileTemplateNo', data.fileTemplateNo)
+            formData.append('formData', '')
+            formData.append('referenceUid', '')
+            let fileUpload = {
+              partTip: data.partTip,
+              file: file
+            }
+            store.dispatch('validFileUpload', fileUpload) // check size, type tài liệu upload
+            if (file && state.validFileUpload) {
+              axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
+                headers: {
+                  'groupId': state.initData.groupId,
+                  'Content-Type': 'multipart/form-data'
+                }
+              }).then(function (response) {
+                count += 1
+                dataOutPut.push(response.data)
+                if (count === countFiles) {
+                  resolve(dataOutPut)
+                }
+              }).catch(function (xhr) {
+                toastr.clear()
+                toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+                count += 1
+                if (count === countFiles) {
+                  reject(dataOutPut)
+                }
+              })
+            } else {
+              count += 1
+              if (count === countFiles) {
+                reject(dataOutPut)
+              }
+            }
+          }
+        }
+      })
+    },
     uploadSingleOtherFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         let formData = new FormData()
@@ -1240,7 +1310,7 @@ export const store = new Vuex.Store({
         }
         let dataPostdossier = new URLSearchParams()
         dataPostdossier.append('dossierId', data.dossierId)
-        dataPostdossier.append('groupDossierId', String(data.groupDossierId))
+        // dataPostdossier.append('groupDossierId', String(data.groupDossierId))
         
         axios.put('/o/rest/v2/dossiers/' + data.groupDossierId + '/groupDossier', dataPostdossier, options).then(function (response) {
           commit('setLoading', false)
@@ -1545,6 +1615,9 @@ export const store = new Vuex.Store({
         }
         dataPutdossier.append('fromViaPostal', data.hasOwnProperty('fromViaPostal') ? data.fromViaPostal : '')
         dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 0)
+        if (data.formMeta) {
+          dataPutdossier.append('formMeta', data.formMeta ? data.formMeta : '')
+        }
         console.log('dataPutdossier', dataPutdossier)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)

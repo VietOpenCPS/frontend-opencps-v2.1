@@ -15,7 +15,6 @@
                     <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
                         v-model="applicantName"
-                        @input="changeApplicantInfos"
                         :disabled="loadingVerify"
                         :rules="requiredOptions['applicantName'] ? [rules.required] : ''"
                         :required="requiredOptions['applicantName']"
@@ -23,26 +22,50 @@
                     </v-flex>
                     
                     <v-flex xs12 sm2 class="mb-2">
-                      <v-subheader class="pl-0">Giới tính <span v-if="requiredOptions['gender']" style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader class="pl-0">Giới tính <span style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2" style="position:relative">
                       <v-radio-group class="mt-0" v-model="gender" row>
-                        <v-radio label="Nam" :value="1" class="mr-4"></v-radio>
-                        <v-radio label="Nữ" :value="2" class=""></v-radio>
+                        <v-radio label="Nam" :value="0" class="mr-4"></v-radio>
+                        <v-radio label="Nữ" :value="1" class=""></v-radio>
                       </v-radio-group>
                     </v-flex>
                     <v-flex xs12 sm2 class="mb-2">
-                      <v-subheader class="pl-0">Ngày tháng năm sinh<span v-if="requiredOptions['birthDate']" style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader class="pl-0">Ngày tháng năm sinh<span style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2" style="position:relative">
-                      
+                      <v-layout wrap>
+                        <v-flex xs12 sm4 class="pr-2">
+                          <v-autocomplete :items="days" placeholder="Ngày" v-model="birthDateDay" :hide-selected="true" ></v-autocomplete>
+                        </v-flex>
+                        <v-flex xs12 sm4 class="pr-2">
+                          <v-layout wrap>
+                            <v-flex class="pt-2" style="width: 17px;max-width: 17px;font-size: 18px;">
+                              <span>/</span>
+                            </v-flex>
+                            <v-flex style="width: calc(100% - 20px)">
+                              <v-autocomplete :items="months" placeholder="Tháng" v-model="birthDateMonth"></v-autocomplete>
+                            </v-flex>
+                          </v-layout>
+                        </v-flex>
+                        <v-flex xs12 sm4 class="">
+                          <v-layout wrap>
+                            <v-flex class="pt-2" style="width: 17px;max-width: 17px;font-size: 18px;">
+                              <span>/</span>
+                            </v-flex>
+                            <v-flex style="width: calc(100% - 20px)">
+                              <v-autocomplete placeholder="Năm" :items="years" v-model="birthDateYear"></v-autocomplete>
+                            </v-flex>
+                          </v-layout>
+                        </v-flex>
+                      </v-layout>
                     </v-flex>
                     
                     <v-flex xs12 sm2 class="mb-2">
                       <v-subheader class="pl-0">CMND/ hộ chiếu<span v-if="requiredOptions['applicantIdNo']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2" style="position:relative">
-                      <suggestions
+                      <!-- <suggestions
                         v-model="applicantIdNo"
                         :options="searchOptions"
                         :onItemSelected="onSearchItemSelected"
@@ -56,7 +79,12 @@
                             <v-list-tile-sub-title v-html="props.item.applicantIdNo"></v-list-tile-sub-title>
                           </v-list-tile-content>
                         </div>
-                      </suggestions>
+                      </suggestions> -->
+                      <v-text-field
+                      v-model="applicantIdNo"
+                      :rules="requiredOptions['applicantIdNo'] ? [rules.required] : ''"
+                      :required="requiredOptions['applicantIdNo']"
+                      ></v-text-field>
                     </v-flex>
 
                     <v-flex xs12 sm2 class="mb-2">
@@ -64,14 +92,14 @@
                     </v-flex>
                     <v-flex xs12 sm10 class="mb-2">
                       <v-layout wrap>
-                        <v-flex xs12 sm4>
-                          <v-autocomplete :items="cityItems" label="Tỉnh/thành phố" v-model="cityNativeCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeCity($event, 'NoiDangKyKhaiSinhdistrictItems', 'NoiDangKyKhaiSinhwardItems')"></v-autocomplete>
+                        <v-flex xs12 sm4 class="pr-3">
+                          <v-autocomplete :items="cityItems" placeholder="Tỉnh/thành phố" v-model="cityNativeCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeCity($event, 'districtNativeItems', 'wardNativeItems')"></v-autocomplete>
+                        </v-flex>
+                        <v-flex xs12 sm4 class="px-3">
+                          <v-autocomplete :items="districtNativeItems" placeholder="Quận/huyện" v-model="districtNativeCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeDistrict($event, 'wardNativeItems')"></v-autocomplete>
                         </v-flex>
                         <v-flex xs12 sm4 class="pl-3">
-                          <v-autocomplete :items="districtNativeItems" label="Quận/huyện" v-model="districtNativeCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeDistrict($event, 'NoiDangKyKhaiSinhwardItems')"></v-autocomplete>
-                        </v-flex>
-                        <v-flex xs12 sm4 class="pl-3">
-                          <v-autocomplete label="Xã/phường" :items="wardNativeItems" v-model="wardNativeCode" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
+                          <v-autocomplete placeholder="Xã/phường" :items="wardNativeItems" v-model="wardNativeCode" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
                         </v-flex>
                       </v-layout>
                     </v-flex>
@@ -82,8 +110,8 @@
                     <v-flex xs12 sm10 class="mb-2">
                       <div>
                         <v-radio-group class="mt-0" v-model="state" row>
-                          <v-radio label="Còn sống" :value="1" class="mr-4"></v-radio>
-                          <v-radio label="Đã chết" :value="2" class=""></v-radio>
+                          <v-radio label="Còn sống" :value="0" class="mr-4"></v-radio>
+                          <v-radio label="Đã chết" :value="1" class=""></v-radio>
                         </v-radio-group>
                       </div>
                     </v-flex>
@@ -97,14 +125,14 @@
                     <v-flex xs12 sm2 class="mb-2"></v-flex>
                     <v-flex xs12 sm10 class="mb-2">
                       <v-layout wrap>
-                        <v-flex xs12 sm4>
-                          <v-autocomplete :items="cityItems" label="Tỉnh/thành phố" v-model="cityCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeCity($event, 'NoiDangKyKhaiSinhdistrictItems', 'NoiDangKyKhaiSinhwardItems')"></v-autocomplete>
+                        <v-flex xs12 sm4 class="pr-3">
+                          <v-autocomplete :items="cityItems" placeholder="Tỉnh/thành phố" v-model="cityCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeCity($event, 'districtItems', 'wardItems')"></v-autocomplete>
+                        </v-flex>
+                        <v-flex xs12 sm4 class="px-3">
+                          <v-autocomplete :items="districtItems" placeholder="Quận/huyện" v-model="districtCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeDistrict($event, 'wardItems')"></v-autocomplete>
                         </v-flex>
                         <v-flex xs12 sm4 class="pl-3">
-                          <v-autocomplete :items="districtItems" label="Quận/huyện" v-model="districtCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeDistrict($event, 'NoiDangKyKhaiSinhwardItems')"></v-autocomplete>
-                        </v-flex>
-                        <v-flex xs12 sm4 class="pl-3">
-                          <v-autocomplete label="Xã/phường" :items="wardItems" v-model="wardCode" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
+                          <v-autocomplete placeholder="Xã/phường" :items="wardItems" v-model="wardCode" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
                         </v-flex>
                       </v-layout>
                     </v-flex>
@@ -165,11 +193,14 @@
                       ></v-text-field>
                     </v-flex>
 
-                    <v-flex xs12 sm2 class="mb-2">
+                    <v-flex xs12 sm2 class="mb-2 pt-1">
                       <v-subheader class="pl-0"> Là đối tượng<span v-if="requiredOptions['incidence']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4 class="mb-2">
-                      
+                    <v-flex xs12 sm4 class="mb-2 pt-1" style="position:relative">
+                      <v-radio-group class="mt-0" v-model="incidence" row>
+                        <v-radio label="Quân nhân" :value="0" class="mr-4"></v-radio>
+                        <v-radio label="Cơ yếu" :value="1" class=""></v-radio>
+                      </v-radio-group>
                     </v-flex>
 
                     <v-flex xs12 sm2 class="mb-2">
@@ -177,28 +208,48 @@
                       <v-subheader class="pl-0">Nhập ngũ, tuyển dụng <span v-if="requiredOptions['recruitment']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
-                      <v-autocomplete :items="recruitmentItems" v-model="recruitment" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
+                      <v-text-field
+                        v-model="recruitment"
+                        :rules="requiredOptions['recruitment'] ? [rules.required] : ''"
+                        :required="requiredOptions['recruitment']"
+                      ></v-text-field>
+                      <!-- <v-autocomplete :items="recruitmentItems" v-model="recruitment" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete> -->
                     </v-flex>
 
                     <v-flex xs12 sm2 class="mb-2">
                       <v-subheader class="pl-0">Phục viên, xuất ngũ, thôi việc <span v-if="requiredOptions['retire']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
-                      <v-autocomplete :items="retireItems" v-model="retire" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
+                      <v-text-field
+                        v-model="retire"
+                        :rules="requiredOptions['retire'] ? [rules.required] : ''"
+                        :required="requiredOptions['retire']"
+                      ></v-text-field>
+                      <!-- <v-autocomplete :items="retireItems" v-model="retire" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete> -->
                     </v-flex>
 
                     <v-flex xs12 sm2 class="mb-2">
                       <v-subheader class="pl-0">Tái ngũ <span v-if="requiredOptions['reactivated']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
-                      <v-autocomplete :items="reactivatedItems" v-model="reactivated" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
+                      <v-text-field
+                        v-model="reactivated"
+                        :rules="requiredOptions['reactivated'] ? [rules.required] : ''"
+                        :required="requiredOptions['reactivated']"
+                      ></v-text-field>
+                      <!-- <v-autocomplete :items="reactivatedItems" v-model="reactivated" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete> -->
                     </v-flex>
 
                     <v-flex xs12 sm2 class="mb-2">
                       <v-subheader class="pl-0">Phục viên, xuất ngũ <span v-if="requiredOptions['published']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
-                      <v-autocomplete :items="publishedItems" v-model="published" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
+                      <!-- <v-autocomplete :items="publishedItems" v-model="published" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete> -->
+                      <v-text-field
+                        v-model="published"
+                        :rules="requiredOptions['published'] ? [rules.required] : ''"
+                        :required="requiredOptions['published']"
+                      ></v-text-field>
                     </v-flex>
 
                   </v-layout>
@@ -217,7 +268,7 @@
                         <v-subheader class="pl-0">CMND/Hộ chiếu <span v-if="requiredOptions['delegateIdNo']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2 style="position:relative">
-                        <suggestions
+                        <!-- <suggestions
                           v-model="delegateIdNo"
                           :options="searchOptions"
                           :onItemSelected="onSearchItemSelected1"
@@ -228,7 +279,12 @@
                               <v-list-tile-sub-title v-html="props.item.applicantIdNo"></v-list-tile-sub-title>
                             </v-list-tile-content>
                           </div>
-                        </suggestions>
+                        </suggestions> -->
+                        <v-text-field
+                        v-model="delegateIdNo"
+                        :rules="requiredOptions['delegateIdNo'] ? [rules.required] : ''"
+                        :required="requiredOptions['delegateIdNo']"
+                        ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <v-subheader class="pl-0">Họ và tên <span v-if="requiredOptions['delegateName']" style="color:red">&nbsp;*</span>: </v-subheader>
@@ -256,10 +312,10 @@
                       </v-flex>
                       <v-flex xs12 sm2>
                         <v-autocomplete
-                        :items="citys"
+                        :items="cityItems"
                         item-text="itemName"
                         item-value="itemCode"
-                        @change="onChangeDelegateCity"
+                        @change="onChangeCity($event, 'delegateDistricts', 'delegateWards')"
                         v-model="delegateCityCode"
                         :rules="requiredOptions['delegateCityCode'] ? [rules.required] : ''"
                         :required="requiredOptions['delegateCityCode']"
@@ -273,7 +329,7 @@
                         :items="delegateDistricts"
                         item-text="itemName"
                         item-value="itemCode"
-                        @change="onChangeDelegateDistrict"
+                        @change="onChangeDistrict($event, 'delegateWards')"
                         v-model="delegateDistrictCode"
                         :rules="requiredOptions['delegateDistrictCode'] ? [rules.required] : ''"
                         :required="requiredOptions['delegateDistrictCode']"
@@ -349,20 +405,19 @@ export default {
   props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode'],
   data: () => ({
     applicantName: '',
-    gender: '',
     birthDate: '',
     applicantIdNo: '',
-    cityItems: '',
-    districtNativeItems: '',
-    wardNativeItems: '',
+    cityItems: [],
+    districtNativeItems: [],
+    wardNativeItems: [],
     wardNativeCode: '',
     districtNativeCode: '',
     cityNativeCode: '',
-    gender: 1,
-    state: 1,
+    gender: 0,
+    state: 0,
     address: '',
-    districtItems: '',
-    wardItems: '',
+    districtItems: [],
+    wardItems: [],
     wardCode: '',
     districtCode: '',
     cityCode: '',
@@ -371,7 +426,7 @@ export default {
     contactTelNo: '',
     contactEmail: '',
     anonymName: '',
-    incidence: '',
+    incidence: 0,
     recruitmentItems: '',
     recruitment: '',
     retireItems: '',
@@ -390,7 +445,7 @@ export default {
     delegateEmail: '',
 
     requiredOptions: {
-      applicantIdNo: true,
+      applicantIdNo: false,
       applicantName: true,
       address: true,
       cityCode: true,
@@ -398,13 +453,13 @@ export default {
       wardCode: true,
       contactTelNo: true,
       contactEmail: false,
-      delegateIdNo: false,
-      delegateName: false,
-      delegateAddress: false,
+      delegateIdNo: true,
+      delegateName: true,
+      delegateAddress: true,
       delegateCityCode: false,
       delegateDistrictCode: false,
       delegateWardCode: false,
-      delegateTelNo: false,
+      delegateTelNo: true,
       delegateEmail: false
     },
     valid_thongtinchuhoso: false,
@@ -446,7 +501,10 @@ export default {
     valid: false,
     loadingTable: false,
     hasOrganization: false,
-    sameUser: false
+    sameUser: false,
+    years: [],
+    months: [1,2,3,4,5,6,7,8,9,10,11,12],
+    days: []
   }),
   computed: {
     loading () {
@@ -482,29 +540,74 @@ export default {
     },
     search2 (val) {
       val && this.querySelections2(val)
+    },
+    sameUser (val) {
+      let vm = this
+      vm.delegateIdNo = vm.applicantIdNo
+      vm.delegateName = vm.applicantName
+      vm.delegateAddress = vm.address
+      vm.delegateTelNo = vm.contactTelNo
+      vm.delegateEmail = vm.contactEmail
+      vm.delegateCityCode = vm.cityCode
+      vm.delegateDistrictCode = vm.districtCode
+      vm.delegateWardCode = vm.wardCode
+
+      vm.onChangeDelegateCity(vm.delegateCityCode)
+      vm.onChangeDelegateDistrict(vm.delegateDistrictCode)
     }
   },
   methods: {
     initData (data) {
       let vm = this
       vm.$nextTick(function () {
+        vm.days = []
+        vm.years = []
+        let currentYear = (new Date()).getFullYear()
+        for (let i = 1; i <= 31; i++) {
+          vm.days.push(i)
+        }
+        for (let i = currentYear; i >= 1900; i--) {
+          vm.years.push(i)
+        }
+        // mapping data
+        vm.mappingData(data)
+        // 
         let filter = {
           collectionCode: 'ADMINISTRATIVE_REGION',
           level: 0,
           parent: 0
         }
         vm.$store.getters.getDictItems(filter).then(function (result) {
-          vm.citys = result.data
-          
+          vm.cityItems = result.data
         })
         setTimeout(function () {
+          // 
+          if (vm.cityNativeCode) {
+            vm.$store.getters.getDictItems({
+              collectionCode: 'ADMINISTRATIVE_REGION',
+              level: 1,
+              parent: vm.cityNativeCode
+            }).then(function (resultDistricts) {
+              vm.districtNativeItems = resultDistricts.data
+            })
+          }
+          if (vm.districtNativeCode) {
+            vm.$store.getters.getDictItems({
+              collectionCode: 'ADMINISTRATIVE_REGION',
+              level: 1,
+              parent: vm.districtNativeCode
+            }).then(function (resultWards) {
+              vm.wardNativeItems = resultWards.data
+            })
+          }
+          // 
           if (data.cityCode) {
             vm.$store.getters.getDictItems({
               collectionCode: 'ADMINISTRATIVE_REGION',
               level: 1,
               parent: data.cityCode
             }).then(function (resultDistricts) {
-              vm.districts = resultDistricts.data
+              vm.districtItems = resultDistricts.data
             })
           }
           if (data.districtCode) {
@@ -513,9 +616,10 @@ export default {
               level: 1,
               parent: data.districtCode
             }).then(function (resultWards) {
-              vm.wards = resultWards.data
+              vm.wardItems = resultWards.data
             })
           }
+          // 
           if (data.delegateCityCode) {
             vm.$store.getters.getDictItems({
               collectionCode: 'ADMINISTRATIVE_REGION',
@@ -538,54 +642,150 @@ export default {
       })
       vm.$refs.formChuHoSo.resetValidation()
     },
-    onChangeCity (data, editDelegate) {
+    getThongTinChuHoSo () {
       let vm = this
-      let filter = {
-        collectionCode: 'ADMINISTRATIVE_REGION',
-        level: 1,
-        parent: data
+      let formMeta = {
+        gender: vm.gender,
+        birthDate: vm.birthDate,
+        birthDateDay: vm.birthDateDay,
+        birthDateMonth: vm.birthDateMonth,
+        birthDateYear: vm.birthDateYear,
+        wardNativeCode: vm.wardNativeCode,
+        districtNativeCode: vm.districtNativeCode,
+        cityNativeCode: vm.cityNativeCode,
+        state: vm.state,
+        yearPayment: vm.yearPayment,
+        subsidy: vm.subsidy,
+        anonymName: vm.anonymName,
+        incidence: vm.incidence,
+        recruitment: vm.recruitment,
+        retire: vm.retire,
+        reactivated: vm.reactivated,
+        published: vm.published
       }
-      if (!editDelegate) {
-        vm.thongTinChuHoSo.districtCode = ''
-        vm.thongTinChuHoSo.wardCode = ''
-        vm.$store.commit('setCityVal', data)
+      let dataOut = {
+        applicantName: vm.applicantName,
+        gender: vm.gender,
+        birthDate: vm.birthDate,
+        applicantIdNo: vm.applicantIdNo,
+        wardNativeCode: vm.wardNativeCode,
+        districtNativeCode: vm.districtNativeCode,
+        cityNativeCode: vm.cityNativeCode,
+        state: vm.state,
+        address: vm.address,
+        wardCode: vm.wardCode,
+        districtCode: vm.districtCode,
+        cityCode: vm.cityCode,
+        yearPayment: vm.yearPayment,
+        subsidy: vm.subsidy,
+        contactTelNo: vm.contactTelNo,
+        contactEmail: vm.contactEmail,
+        anonymName: vm.anonymName,
+        incidence: vm.incidence,
+        recruitment: vm.recruitment,
+        retire: vm.retire,
+        reactivated: vm.reactivated,
+        published: vm.published,
+        delegateName: vm.delegateName,
+        delegateIdNo: vm.delegateIdNo,
+        delegateAddress: vm.delegateAddress,
+        delegateWardCode: vm.delegateWardCode,
+        delegateDistrictCode: vm.delegateDistrictCode,
+        delegateCityCode: vm.delegateCityCode,
+        delegateTelNo: vm.delegateTelNo,
+        delegateEmail: vm.delegateEmail,
+        formMeta: JSON.stringify(formMeta)
       }
-      vm.$store.getters.getDictItems(filter).then(function (result) {
-        if (!editDelegate) {
-          vm.districts = result.data
-          vm.wards = []
-        }
-
-        if (editDelegate || vm.thongTinNguoiNopHoSo.sameUser || (!vm.thongTinNguoiNopHoSo.sameUser && vm.showApplicant && !vm.showDelegate)) {
-          vm.delegateDistricts = result.data
-          vm.delegateWards = []
-        }
-      })
+      return dataOut
     },
-    onChangeDistrict (data, editDelegate) {
+    mappingData (data) {
+      let vm = this
+      let metaData = ''
+      try {
+        metaData = JSON.parse(data.metaData)
+      } catch (error) {
+      }
+      vm.applicantName = data.applicantName
+      vm.applicantIdNo = data.applicantIdNo
+      vm.address = data.address
+      vm.wardCode = data.wardCode
+      vm.districtCode = data.districtCode
+      vm.cityCode = data.cityCode
+      vm.contactTelNo = data.contactTelNo
+      vm.contactEmail = data.contactEmail
+      vm.delegateName = data.delegateName
+      vm.delegateIdNo = data.delegateIdNo
+      vm.delegateAddress = data.delegateAddress
+      vm.delegateWardCode = data.delegateWardCode
+      vm.delegateDistrictCode = data.delegateDistrictCode
+      vm.delegateCityCode = data.delegateCityCode
+      vm.delegateTelNo = data.delegateTelNo
+      vm.delegateEmail = data.delegateEmail
+      // metaData
+      if (metaData) {
+        vm.gender = metaData.hasOwnProperty('gender') ? metaData.gender : ''
+        vm.birthDate = metaData.hasOwnProperty('birthDate') ? metaData.birthDate : ''
+        vm.birthDateDay = metaData.hasOwnProperty('birthDateDay') ? metaData.birthDateDay : ''
+        vm.birthDateMonth = metaData.hasOwnProperty('birthDateMonth') ? metaData.birthDateMonth : ''
+        vm.birthDateYear = metaData.hasOwnProperty('birthDateYear') ? metaData.birthDateYear : ''
+        vm.wardNativeCode = metaData.hasOwnProperty('wardNativeCode') ? metaData.wardNativeCode : ''
+        vm.districtNativeCode = metaData.hasOwnProperty('districtNativeCode') ? metaData.districtNativeCode : ''
+        vm.cityNativeCode = metaData.hasOwnProperty('cityNativeCode') ? metaData.cityNativeCode : ''
+        vm.state = metaData.hasOwnProperty('state') ? metaData.state : ''
+        vm.yearPayment = metaData.hasOwnProperty('yearPayment') ? metaData.yearPayment : ''
+        vm.subsidy = metaData.hasOwnProperty('subsidy') ? metaData.subsidy : ''
+        vm.anonymName = metaData.hasOwnProperty('anonymName') ? metaData.anonymName : ''
+        vm.incidence = metaData.hasOwnProperty('incidence') ? metaData.incidence : ''
+        vm.recruitment = metaData.hasOwnProperty('recruitment') ? metaData.recruitment : ''
+        vm.retire = metaData.hasOwnProperty('retire') ? metaData.retire : ''
+        vm.reactivated = metaData.hasOwnProperty('reactivated') ? metaData.reactivated : ''
+        vm.published = metaData.hasOwnProperty('published') ? metaData.published : ''
+      }
+    },
+    onChangeCity (data, districts, wards) {
       var vm = this
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
         level: 1,
         parent: data
       }
-      if (!editDelegate) {
-        vm.thongTinChuHoSo.wardCode = ''
-        vm.$store.commit('setDistrictVal', data)
-      }
-      
-      vm.$store.getters.getDictItems(filter).then(function (result) {
-        if (!editDelegate) {
-          vm.wards = result.data
-        }
-        
-        if (editDelegate || vm.thongTinNguoiNopHoSo.sameUser || (!vm.thongTinNguoiNopHoSo.sameUser && vm.showApplicant && !vm.showDelegate)) {
-          vm.delegateWards = result.data
-        }
+      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
+        vm[districts] = result.data
+        vm[wards] = []
       })
     },
-    onChangeWard (data) {
-      this.$store.commit('setWardVal', data)
+    onChangeDistrict (data, wards) {
+      var vm = this
+      let filter = {
+        collectionCode: 'ADMINISTRATIVE_REGION',
+        level: 1,
+        parent: data
+      }
+      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
+        vm[wards] = result.data
+      })
+    },
+    onChangeDelegateCity (data) {
+      let vm = this
+      let filter = {
+        collectionCode: 'ADMINISTRATIVE_REGION',
+        level: 1,
+        parent: data
+      }
+      vm.$store.getters.getDictItems(filter).then(function (result) {
+        vm.delegateDistricts = result.data
+      })
+    },
+    onChangeDelegateDistrict (data) {
+      let vm = this
+      let filter = {
+        collectionCode: 'ADMINISTRATIVE_REGION',
+        level: 1,
+        parent: data
+      }
+      vm.$store.getters.getDictItems(filter).then(function (result) {
+        vm.delegateWards = result.data
+      })
     },
     querySelections (val) {
       var vm = this
@@ -607,22 +807,7 @@ export default {
       }).catch(xhr => {
       })
     },
-    onChangeDelegateCity (data) {
-      var vm = this
-      vm.thongTinNguoiNopHoSo.delegateDistrictCode = ''
-      vm.thongTinNguoiNopHoSo.delegateWardCode = ''
-      let filter = {
-        collectionCode: 'ADMINISTRATIVE_REGION',
-        level: 1,
-        parent: data
-      }
-      vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.delegateDistricts = result.data
-        if (vm.thongTinNguoiNopHoSo.sameUser) {
-          vm.districts = result.data
-        }
-      })
-    },
+
     showValid () {
       var vm = this
       let applicantIdRequired = true
@@ -638,21 +823,6 @@ export default {
         validApplicant: vm.validBussinessInfos
       }
       return result
-    },
-    onChangeDelegateDistrict (data) {
-      var vm = this
-      vm.thongTinNguoiNopHoSo.delegateWardCode = ''
-      let filter = {
-        collectionCode: 'ADMINISTRATIVE_REGION',
-        level: 1,
-        parent: data
-      }
-      vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.delegateWards = result.data
-        if (vm.thongTinNguoiNopHoSo.sameUser) {
-          vm.wards = result.data
-        }
-      })
     },
     onInputChange (query) {
       let vm = this
@@ -818,24 +988,6 @@ export default {
           }
         })
       }
-    },
-    getThongTinChuHoSo () {
-      return this.thongTinChuHoSo
-    },
-    getThongTinNguoiNopHoSo () {
-      return this.thongTinNguoiNopHoSo
-    },
-    changeApplicantInfos () {
-      let vm = this
-      if (vm.functionTimeOut) {
-        clearTimeout(vm.functionTimeOut)
-      }
-      vm.functionTimeOut = setTimeout(function () {
-        if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2') || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
-          vm.checkApplicantInfos()
-        }
-        vm.$store.commit('setApplicantId', vm.thongTinChuHoSo.applicantIdNo)
-      }, 2000)
     },
     checkApplicantInfos () {
       let vm = this
@@ -1083,12 +1235,6 @@ export default {
       vm.$store.dispatch('loadDictItems', filter).then(function (result) {
         vm.wardItems = result.data
       })
-    },
-    onChangeWardEditApplicant (data) {
-      let vm = this
-      vm.applicantEdit['wardName'] = vm.wardItems.filter(function (item) {
-        return item['itemCode'] === data
-      })[0]['itemName']
     },
     updateApplicant () {
       let vm = this

@@ -156,6 +156,17 @@
                       <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="200px" style="height: 40px !important">
                         {{ props.item.dossierSubStatusText ? props.item.dossierSubStatusText : props.item.dossierStatusText }}
                       </td>
+                      <td class="text-xs-center" width="200px" style="height: 40px !important">
+                        <v-btn flat icon color="indigo" class="mr-2 my-0" @click="viewDetail(props.item)" title="Xem chi tiết">
+                          <v-icon>fas fa fa-file-text</v-icon>
+                        </v-btn>
+                        <v-btn flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
+                          <v-icon size="22">create</v-icon>
+                        </v-btn>
+                        <v-btn flat icon color="red" class="my-0" @click="" title="Xóa">
+                          <v-icon size="22">delete</v-icon>
+                        </v-btn>
+                      </td>
                     </tr>
                   </template>
                 </v-data-table>
@@ -275,7 +286,7 @@
           </v-btn>
         </v-tab>
         <!--  -->
-        <v-tab href="#tab-1" @click="tiepNhanHoSo()" v-if="!activeAddGroup" class="px-0 py-0"> 
+        <v-tab href="#tab-1" @click="tiepNhanHoSoCongVan()" v-if="!activeAddGroup && formCode === 'NEW_GROUP_CV'" class="px-0 py-0"> 
           <v-btn flat class="" 
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -285,7 +296,18 @@
             <span slot="loader">Loading...</span>
           </v-btn>
         </v-tab>
-        <v-tab href="#tab-2" @click="tiepNhanHoSo('add')" v-if="!activeAddGroup" class="px-0 py-0"> 
+        <v-tab href="#tab-1" @click="tiepNhanHoSo()" v-if="!activeAddGroup && formCode === 'NEW_GROUP'" class="px-0 py-0"> 
+          <v-btn flat class="" 
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">save</v-icon>  &nbsp;
+            <span>Tiếp nhận hồ sơ</span>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+
+        <!-- <v-tab href="#tab-2" @click="tiepNhanHoSo('add')" v-if="!activeAddGroup" class="px-0 py-0"> 
           <v-btn flat class=""
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -294,7 +316,7 @@
             <span>Tiếp nhận và thêm mới</span>
             <span slot="loader">Loading...</span>
           </v-btn>
-        </v-tab>
+        </v-tab> -->
         <!--  -->
         <v-tab href="#tab-2" @click="goBack" class="px-0 py-0">
           <v-btn flat class=""
@@ -600,6 +622,12 @@ export default {
         align: 'center',
         sortable: false,
         class: 'text-xs-center'
+      },
+      {
+        text: 'Thao tác',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
       }
     ],
     filesGroupDossier: [],
@@ -668,9 +696,9 @@ export default {
         vm.filesGroupDossier = vm.$refs.thanhphanhoso1.getFilesGroupDossier()
         console.log('fileItems 1', vm.filesGroupDossier)
       }
-      if (vm.formCode === 'NEW_GROUP_CV') {
-        vm.$refs.thongtincongvan.initData(vm.thongTinNhomHoSo)
-      }
+      // if (vm.formCode === 'NEW_GROUP_CV') {
+      //   vm.$refs.thongtincongvan.initData(vm.thongTinNhomHoSo)
+      // }
     }
   },
   watch: {
@@ -911,6 +939,7 @@ export default {
       if (vm.formCode === 'NEW_GROUP_CV') {
         let thongtincongvan = this.$refs.thongtincongvan.getThongTinCongVan()
         let tempData = thongtincongvan
+        tempData.dueDate = vm.dateTimeView(thongtincongvan.dueDate)
         vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
           vm.loadingAction = false
           toastr.clear()
@@ -942,6 +971,10 @@ export default {
         data.dossierId = result.dossierId
         setTimeout (function () {
           result['editable'] = false
+          if (vm.formCode === 'NEW_GROUP_CV') {
+            vm.$refs.thongtinchuhosocongvan.initData(result)
+          }
+          
           if (result.dossierStatus === '') {
             vm.$store.dispatch('pullNextactions', result).then(result2 => {
               if (result2) {
@@ -972,7 +1005,6 @@ export default {
               vm.$refs.thongtinchunghoso.initData(result)
             }
           }
-          vm.$refs.thongtinchuhosocongvan.initData(result)
           // copy file 
           let count = 0
           let files = vm.filesGroupDossier.filter(function(item) {
@@ -1343,6 +1375,103 @@ export default {
         }
       }
     },
+    tiepNhanHoSoCongVan (type) {
+      var vm = this
+      let thongtinchuhosocongvan = this.$refs.thongtinchuhosocongvan.getThongTinChuHoSo()
+      let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
+      // let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
+      let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
+      // console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
+      // let validThongtinchuhoso = vm.$refs.thongtinchuhoso.showValid()
+      // if (validThongtinchuhoso['validForm']) {
+        let passValid = true
+        if (passValid) {
+          vm.loadingAction = true
+          if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
+            vm.loadingAction = false
+            return
+          }
+          if (dichvuchuyenphatketqua.viaPostal === 2 && !vm.$refs.dichvuchuyenphatketqua.validDichVuChuyenPhat()) {
+            vm.loadingAction = false
+            return
+          }
+          let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
+          let dossierTemplates = thanhphanhoso
+          let listAction = []
+          let listDossierMark = []
+          if (dossierFiles) {
+            dossierFiles.forEach(function (value, index) {
+              if (value.eForm) {
+                value['dossierId'] = vm.dossierId
+                listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+              }
+            })
+          }
+          console.log('assign=congvan', thongtinchuhosocongvan, dichvuchuyenphatketqua)
+          let tempData = Object.assign(thongtinchuhosocongvan, dichvuchuyenphatketqua)
+          tempData['dossierId'] = vm.currentDossierIntoGroup.dossierId
+          tempData['sampleCount'] = vm.currentDossierIntoGroup.sampleCount
+          tempData['originality'] = vm.originality
+          tempData['userType'] = '1'
+          console.log('putDossierCongVan', tempData)
+          vm.$store.dispatch('putDossier', tempData).then(function (result) {
+            vm.loadingAction = false
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            if (vm.formCode === 'UPDATE') {
+              vm.goBack()
+            } else {
+              let initData = vm.$store.getters.loadingInitData
+              let actionUser = initData.user.userName ? initData.user.userName : ''
+              //
+              let paymentsOut = {}
+              if (vm.showThuPhi) {
+                paymentsOut = {
+                  requestPayment: vm.payments['requestPayment'],
+                  paymentNote: vm.payments['paymentNote'],
+                  advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                  feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                  serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                  shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+                }
+              }
+              var payloadDate = {
+                'dueDate': vm.editableDate && tempData.dueDate ? tempData.dueDate : vm.dueDateEdit,
+                'receiveDate': vm.receiveDateEdit
+              }
+              let dataPostAction = {
+                dossierId: vm.currentDossierIntoGroup.dossierId,
+                actionCode: 1100,
+                actionNote: '',
+                actionUser: actionUser,
+                payload: payloadDate,
+                security: '',
+                assignUsers: '',
+                payment: paymentsOut,
+                createDossiers: ''
+              }
+              vm.loadingAction = true
+              vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+                vm.loadingAction = false
+                if (!type) {
+                  toastr.success('Thêm hồ sơ vào nhóm thành công')
+                  vm.getDetaiGroup(vm.id)
+                  vm.activeAddDossierIntoGroup = false
+                } else {
+                  // tạo hồ sơ mới
+                  vm.createDossierIntoGroup()
+                }
+              }).catch(reject => {
+                vm.loadingAction = false
+              })
+            }
+          }).catch(rejectXhr => {
+            vm.loadingAction = false
+            toastr.clear()
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          })
+        // }
+      }
+    },
     changeViapostal (viapostal) {
       if (viapostal) {
         this.viaPortalDetail = 2
@@ -1373,6 +1502,16 @@ export default {
       let currentQuery = vm.$router.history.current.query
       vm.$router.push('/danh-sach-ho-so/0/chi-tiet-ho-so/' + item['dossierId'])
     },
+    editDossierIntoGroup (item) {
+      let vm = this
+      let query = vm.$router.history.current.query
+      query['template_no'] = item.dossierTemplateNo
+      query['serviceCode'] = item.serviceCode
+      vm.$router.push({
+        path: '/danh-sach-ho-so/0/ho-so/' + item.dossierId + '/UPDATE',
+        query: query
+      })
+    },
     addFileToDossier () {
       let vm = this
       // add file cho thành phần hồ sơ con
@@ -1393,6 +1532,21 @@ export default {
           vm.$store.commit('setActiveAddFileGroup', false)
         })
       // }
+    },
+    dateTimeView (arg) {
+      if (arg) {
+        let value = new Date(arg)
+        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} | ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+      } else {
+        return ''
+      }
+    },
+    currency (value) {
+      if (value) {
+        let moneyCur = (value / 1).toFixed(0).replace('.', ',')
+        return moneyCur.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+      }
+      return ''
     },
     cancelAddFile () {
       let vm = this

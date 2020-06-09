@@ -193,6 +193,31 @@
                       :rules="thongTinCongVan.contactEmail ? [rules.email] : ''"
                       ></v-text-field>
                     </v-flex>
+
+                    <v-flex xs12 class="mt-2">
+                      <!-- <div v-if="!itemFileView.eForm" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
+                        <span v-on:click.stop="viewFile2(itemFileView)" class="ml-1" style="cursor: pointer;">
+                          <v-icon class="mr-1" v-if="itemFileView.fileSize !== 0" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
+                            :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
+                            {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
+                          </v-icon>
+                          {{itemFileView.displayName}} - 
+                          <i>{{itemFileView.modifiedDate}}</i>
+                        </span>
+                        <v-btn icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView && checkInput !== 1">
+                          <v-icon style="color: red">delete_outline</v-icon>
+                        </v-btn>
+                        <v-btn icon ripple v-on:click.stop="downloadSingleFile(itemFileView)" class="mx-0 my-0">
+                          <v-icon size="14" color="primary">fas fa fa-download</v-icon>
+                        </v-btn>
+                      </div> -->
+                      <input type="file" id="documentFile" @input="onUploadSingleFile($event)" style="display:none">
+                      <v-btn block color="primary" class="mx-0" dark @click.native="uploadFile" style="height: 42px;">
+                        <v-icon size="20">fas fa fa-upload</v-icon> &nbsp; &nbsp;
+                        Chọn tài liệu tải lên
+                      </v-btn>
+                      
+                    </v-flex>
                   </v-layout>
                 </v-card-text>
               </v-card>
@@ -218,12 +243,12 @@ export default {
     'suggestions': Suggestions,
     'tiny-pagination': TinyPagination
   },
-  props: ['formCode'],
+  props: ['formCode', 'detailDossier', 'tphs'],
   data: () => ({
     loading: false,
     valid_thongtincongvan: true,
     thongTinCongVan: '',
-    documentNo: '',
+    dossierFilesItems: '',
     menuDate: false,
     menuDueDate: false,
     documentDate: null,
@@ -298,6 +323,65 @@ export default {
       vm.thongTinCongVan.documentDate = vm.parseDateToTimestamp(vm.documentDate)
       console.log('thongtincongvanOutput', vm.thongTinCongVan)
       return vm.thongTinCongVan
+    },
+    uploadFile () {
+      let vm = this
+      document.getElementById('documentFile').value = ''
+      document.getElementById('documentFile').click()
+    },
+    onUploadSingleFile (e, data, index) {
+      let vm = this
+      let filter = vm.detailDossier
+      vm.$store.dispatch('uploadSingleFileGroupCongVan', filter).then(function (result) {
+        vm.$store.dispatch('loadDossierFiles', filter.dossierId).then(result => {
+          vm.dossierFilesItems = result
+        })
+      })
+    },
+    getDocumentTypeIcon (type) {
+      let vm = this
+      let typeDoc = 'doc,docx'
+      let typeExcel = 'xls,xlsx'
+      let typeImage = 'png,jpg,jpeg'
+      if (type) {
+        if (typeDoc.indexOf(type.toLowerCase()) >= 0) {
+          return {
+            icon: 'fas fa fa-file-word-o',
+            color: 'blue',
+            size: 14
+          }
+        } else if (typeExcel.indexOf(type.toLowerCase()) >= 0) {
+          return {
+            icon: 'fas fa fa-file-excel-o',
+            color: 'green',
+            size: 14
+          }
+        } else if (type.toLowerCase() === 'pdf') {
+          return {
+            icon: 'fa fa-file-pdf-o',
+            color: 'red',
+            size: 14
+          }
+        } else if (typeImage.indexOf(type.toLowerCase()) >= 0) {
+          return {
+            icon: 'fas fa fa-file-image-o',
+            color: 'primary',
+            size: 14
+          }
+        } else {
+          return {
+            icon: 'fas fa fa-paperclip',
+            color: '',
+            size: 14
+          }
+        }
+      } else {
+        return {
+          icon: 'attach_file',
+          color: 'primary',
+          size: 14
+        }
+      }
     },
     formatDate (date) {
       if (!date) return null

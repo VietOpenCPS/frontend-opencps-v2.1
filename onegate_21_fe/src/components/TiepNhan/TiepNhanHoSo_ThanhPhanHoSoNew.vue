@@ -230,7 +230,7 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
-        <div class="absolute__btn group__thanh_phan mr-1" :style="originality !== 1 ? 'top: 10px' : ''">
+        <div class="absolute__btn group__thanh_phan mr-1" :style="originality !== 1 ? 'top: 3px' : ''">
           <content-placeholders class="mt-1" v-if="loading">
             <content-placeholders-text :lines="1" />
           </content-placeholders>

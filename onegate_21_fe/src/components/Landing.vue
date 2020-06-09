@@ -2380,7 +2380,8 @@ export default {
         dossierTemplateNo: vm.templateNo
       }
       vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result1) {
-        if (result1['newFormScript']) {
+        let mauCongVan = result1['newFormScript'] && result1['newFormScript'].startsWith('MAU_CV_') ? result1['newFormScript'] : false 
+        if (result1['newFormScript'] && !mauCongVan) {
           vm.$router.push({
             path: '/danh-sach-ho-so/0/ho-so/0/' + vm.itemAction.form,
             query: vm.$router.history.current.query
