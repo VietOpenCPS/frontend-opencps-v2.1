@@ -154,6 +154,7 @@
                     <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
                         v-model="subsidy"
+                        v-money="money"
                         :rules="requiredOptions['subsidy'] ? [rules.required] : ''"
                         :required="requiredOptions['subsidy']"
                       ></v-text-field>
@@ -393,6 +394,7 @@ import axios from 'axios'
 import Suggestions from 'v-suggestions'
 import toastr from 'toastr'
 import TinyPagination from '../../components/pagging/opencps_pagination'
+import {VMoney} from 'v-money'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -504,7 +506,15 @@ export default {
     sameUser: false,
     years: [],
     months: [1,2,3,4,5,6,7,8,9,10,11,12],
-    days: []
+    days: [],
+    money: {
+      decimal: '',
+      thousands: '.',
+      prefix: '',
+      suffix: '',
+      precision: 0,
+      masked: false
+    },
   }),
   computed: {
     loading () {
@@ -525,6 +535,7 @@ export default {
       return this.$store.getters.dichVuChuyenPhatKetQua
     }
   },
+  directives: {money: VMoney},
   created () {
     let vm = this
     if (vm.requiredConfig && vm.requiredConfig['applicant']) {
@@ -655,7 +666,7 @@ export default {
         cityNativeCode: vm.cityNativeCode,
         state: vm.state,
         yearPayment: vm.yearPayment,
-        subsidy: vm.subsidy,
+        subsidy: Number(String(vm.subsidy).replace(/\./g, '')),
         anonymName: vm.anonymName,
         incidence: vm.incidence,
         recruitment: vm.recruitment,
@@ -733,7 +744,7 @@ export default {
         vm.cityNativeCode = metaData.hasOwnProperty('cityNativeCode') ? metaData.cityNativeCode : ''
         vm.state = metaData.hasOwnProperty('state') ? metaData.state : ''
         vm.yearPayment = metaData.hasOwnProperty('yearPayment') ? metaData.yearPayment : ''
-        vm.subsidy = metaData.hasOwnProperty('subsidy') ? metaData.subsidy : ''
+        vm.subsidy = metaData.hasOwnProperty('subsidy') ? Number(metaData.subsidy) : 0
         vm.anonymName = metaData.hasOwnProperty('anonymName') ? metaData.anonymName : ''
         vm.incidence = metaData.hasOwnProperty('incidence') ? metaData.incidence : ''
         vm.recruitment = metaData.hasOwnProperty('recruitment') ? metaData.recruitment : ''

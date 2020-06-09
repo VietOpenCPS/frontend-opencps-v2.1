@@ -65,7 +65,7 @@
                       </v-menu>
                     </v-flex>
                     <!--  -->
-                    <v-flex xs12 sm2 class="mb-2">
+                    <!-- <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
@@ -84,6 +84,25 @@
                       :rules="[rules.required]"
                       required
                       ></v-autocomplete>
+                    </v-flex> -->
+
+                    <!--  -->
+                    <v-flex xs12 sm2 class="mb-2">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-subheader v-else class="pl-0">Số lượng hồ sơ đề nghị xét<span style="color:red">&nbsp;*</span>: </v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm4 class="mb-2">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-text-field
+                      v-else
+                      v-model="thongTinCongVan.sampleCount"
+                      :rules="[rules.required]"
+                      required
+                      ></v-text-field>
                     </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
@@ -141,24 +160,7 @@
                       required
                       ></v-textarea>
                     </v-flex>
-                    <!--  -->
-                    <v-flex xs12 sm2 class="mb-2">
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0">Số lượng hồ sơ đề nghị xét<span style="color:red">&nbsp;*</span>: </v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm10 class="mb-2">
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-text-field
-                      v-else
-                      v-model="thongTinCongVan.sampleCount"
-                      :rules="[rules.required]"
-                      required
-                      ></v-text-field>
-                    </v-flex>
+                    
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
@@ -195,25 +197,26 @@
                     </v-flex>
 
                     <v-flex xs12 class="mt-2">
-                      <!-- <div v-if="!itemFileView.eForm" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
-                        <span v-on:click.stop="viewFile2(itemFileView)" class="ml-1" style="cursor: pointer;">
-                          <v-icon class="mr-1" v-if="itemFileView.fileSize !== 0" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
-                            :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
-                            {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
-                          </v-icon>
-                          {{itemFileView.displayName}} - 
-                          <i>{{itemFileView.modifiedDate}}</i>
-                        </span>
-                        <v-btn icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView && checkInput !== 1">
-                          <v-icon style="color: red">delete_outline</v-icon>
-                        </v-btn>
-                        <v-btn icon ripple v-on:click.stop="downloadSingleFile(itemFileView)" class="mx-0 my-0">
-                          <v-icon size="14" color="primary">fas fa fa-download</v-icon>
-                        </v-btn>
-                      </div> -->
+                      <div> <span style="color:red">(*) &nbsp;</span>Tài liệu đính kèm: </div>
+                      <div v-for="(itemFileView, index) in dossierFilesItems" :key="index">
+                        <div v-if="!itemFileView.eForm">
+                          <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
+                            <v-icon class="mr-1" v-if="itemFileView.fileSize !== 0" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
+                              :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
+                              {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
+                            </v-icon>
+                            {{itemFileView.displayName}} - 
+                            <i>{{itemFileView.modifiedDate}}</i>
+                          </span>
+                          <v-btn icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView && checkInput !== 1">
+                            <v-icon style="color: red">delete_outline</v-icon>
+                          </v-btn>
+                        </div>
+                      </div>
                       <input type="file" id="documentFile" @input="onUploadSingleFile($event)" style="display:none">
-                      <v-btn block color="primary" class="mx-0" dark @click.native="uploadFile" style="height: 42px;">
-                        <v-icon size="20">fas fa fa-upload</v-icon> &nbsp; &nbsp;
+                      
+                      <v-btn small color="primary" class="mx-0 mt-2" dark @click.native="uploadFile">
+                        <v-icon>fas fa fa-upload</v-icon> &nbsp; &nbsp;
                         Chọn tài liệu tải lên
                       </v-btn>
                       
@@ -226,6 +229,34 @@
         </div>
       </div>
     </v-form>
+    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>
+            <span>Tài liệu đính kèm</span>
+          </v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPDF = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <div v-if="dialogPDFLoading" style="
+            min-height: 600px;
+            text-align: center;
+            margin: auto;
+            padding: 25%;
+        ">
+          <v-progress-circular
+            :size="100"
+            :width="1"
+            color="primary"
+            indeterminate
+          ></v-progress-circular>
+        </div>
+        <iframe v-show="!dialogPDFLoading" id="dialogPDFPreviewCV" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -246,6 +277,8 @@ export default {
   props: ['formCode', 'detailDossier', 'tphs'],
   data: () => ({
     loading: false,
+    dialogPDFLoading: false,
+    dialogPDF: false,
     valid_thongtincongvan: true,
     thongTinCongVan: '',
     dossierFilesItems: '',
@@ -275,7 +308,8 @@ export default {
         const pattern = /^([0-9]{0,})$/
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       }
-    }
+    },
+    
   }),
   computed: {
     originality () {
@@ -314,6 +348,9 @@ export default {
       vm.thongTinCongVan = data
       vm.documentDate = vm.thongTinCongVan.hasOwnProperty('documentDate') ? vm.parseDate(vm.thongTinCongVan.documentDate) : ''
       vm.dueDate = vm.thongTinCongVan.hasOwnProperty('dueDate') ? vm.parseDate(vm.thongTinCongVan.dueDate) : ''
+      vm.$store.dispatch('loadDossierFiles', vm.thongTinCongVan.dossierId).then(result => {
+        vm.dossierFilesItems = result
+      })
       vm.$refs.formThongTinCongVan.resetValidation()
       console.log('thongtincongvanInput', vm.thongTinCongVan)
     },
@@ -329,14 +366,57 @@ export default {
       document.getElementById('documentFile').value = ''
       document.getElementById('documentFile').click()
     },
-    onUploadSingleFile (e, data, index) {
+    onUploadSingleFile () {
       let vm = this
-      let filter = vm.detailDossier
+      console.log('tphs', vm.tphs)
+      let filter = Object.assign(vm.detailDossier, vm.tphs[0])
       vm.$store.dispatch('uploadSingleFileGroupCongVan', filter).then(function (result) {
         vm.$store.dispatch('loadDossierFiles', filter.dossierId).then(result => {
           vm.dossierFilesItems = result
         })
       })
+    },
+    deleteSingleFile (item, index) {
+      var vm = this
+      let x = confirm('Bạn có chắc chắn xóa file đính kèm ?')
+      if (x) {
+        item['dossierId'] = vm.detailDossier.dossierId
+        vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+            vm.dossierFilesItems = result
+          })
+        }).catch(reject => {
+          
+        })
+      }
+    },
+    viewFile2 (data) {
+      var vm = this
+      if (data.fileSize === 0) {
+        return
+      }
+      if (data['eForm']) {
+        vm.pdfEform = true
+      } else {
+        vm.pdfEform = false
+      }
+      if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt' || data.fileType === 'mp3' || data.fileType === 'mp4') {
+        var url = '/o/rest/v2/dossier/' + vm.detailDossier.dossierId + '/files/' + data.referenceUid
+        window.location.assign(url)
+      } else {
+        data['dossierId'] = vm.detailDossier.dossierId
+        if (data.referenceUid) {
+          vm.dialogPDFLoading = true
+          vm.dialogPDF = true
+          vm.$store.dispatch('viewFile', data).then(result => {
+            vm.dialogPDFLoading = false
+            document.getElementById('dialogPDFPreviewCV').src = result
+          })
+        } else {
+          toastr.clear()
+          toastr.error('File dữ liệu không tồn tại')
+        }
+      }
     },
     getDocumentTypeIcon (type) {
       let vm = this

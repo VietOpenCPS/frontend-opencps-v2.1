@@ -33,7 +33,7 @@
 
         <thong-tin-chu-ho-so v-if="formCode === 'NEW_GROUP'" :showApplicant="true" :showDelegate="false" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
 
-        <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV'" ref="thongtincongvan"></thong-tin-cong-van>
+        <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV'" ref="thongtincongvan" :detailDossier="thongTinNhomHoSo" :tphs="tphsCV"></thong-tin-cong-van>
 
 
         <div v-if="formCode === 'NEW_GROUP'" style="position: relative;border-top: 1px solid #dedede;">
@@ -645,7 +645,8 @@ export default {
     pagination: {
       rowsPerPage: 10,
       page: 1
-    }
+    },
+    tphsCV: ''
   }),
   computed: {
     loading () {
@@ -733,6 +734,12 @@ export default {
         }
         if (vm.formCode === 'NEW_GROUP_CV') {
           vm.$refs.thongtincongvan.initData(val)
+          let filter = {
+            dossierTemplateNo: val.dossierTemplateNo
+          }
+          vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result) {
+            vm.tphsCV = result['dossierParts']
+          })
         }
         
       }

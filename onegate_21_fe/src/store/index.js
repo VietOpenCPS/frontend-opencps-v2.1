@@ -743,10 +743,8 @@ export const store = new Vuex.Store({
           }
         }
         axios.delete(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
-          console.log('success!')
           resolve(response)
         }).catch(function (xhr) {
-          console.log(xhr)
           reject(xhr)
         })
       })
