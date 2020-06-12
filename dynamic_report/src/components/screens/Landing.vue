@@ -628,6 +628,7 @@ export default {
       for (let key in vm.agencyLists) {
         if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
           docDString = docDString.replace(/\[\$groupIds\$\]/g, vm.agencyLists[key]['text'])
+          docDString = docDString.replace(/\[\$groupIdsHeader\$\]/g, vm.agencyLists[key]['text'].toUpperCase())
           break
         }
       }
@@ -701,7 +702,6 @@ export default {
               break
             }
           }
-          console.log('dataReport-+-+-', dataReport)
           for (let key in dataReport) {
             dataReportCurrent = dataReport[key]
             if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
@@ -740,7 +740,6 @@ export default {
           }
           dataRaw.reverse()
           console.log('dossierRaw 46', dataRaw)
-          // row total
           let dataRowTotal = []
           let totalText = 'Tổng cộng'
           dataRowTotal.push({
@@ -766,7 +765,6 @@ export default {
             }
           }
           
-          // end
           for (let key in dataRaw) {
             if (dataRaw[key][vm.groupByVal] !== undefined && dataRaw[key][vm.groupByVal] !== null && dataRaw[key][vm.groupByVal] !== '') {
               let csvGroup = []
@@ -876,7 +874,6 @@ export default {
           if (vm.reportType.startsWith('REPORT_STATISTIC')) {
             vm.dataReportXX += ',' + JSON.stringify(dataRowTotal)
           }
-          
           // console.log('dataReportXX11ZZ', vm.dataReportXX)
           
           vm.csvExport = []

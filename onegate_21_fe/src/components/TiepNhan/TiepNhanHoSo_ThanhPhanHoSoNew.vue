@@ -2,16 +2,6 @@
   <div>
     <v-card flat>
       <div class="d-inline-block" v-if="checkInput === 1" style="position: absolute;right: 10px;top: -50px">
-        <!-- <v-checkbox
-          v-model="markCheck"
-          color="indigo"
-          hide-details
-          @change="markAll"
-        >
-          <template slot="label">
-            <span style="color: #000000de">Xác nhận tất cả hồ sơ đạt yêu cầu</span>
-          </template>
-        </v-checkbox> -->
         <v-radio-group v-model="markCheck" row @change="markAll">
           <v-radio
             label="Tất cả đạt"

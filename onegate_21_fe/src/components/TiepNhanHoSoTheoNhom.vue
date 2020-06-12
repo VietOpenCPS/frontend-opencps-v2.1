@@ -5,7 +5,10 @@
       <div class="row-header">
         <div class="background-triangle-big">
           <span v-if="formCode === 'NEW_GROUP'">THÔNG TIN NHÓM HỒ SƠ</span>
-          <span v-if="formCode === 'NEW_GROUP_CV'">THÔNG TIN CÔNG VĂN</span>
+          <span v-if="formCode === 'NEW_GROUP_CV'">
+            <span v-if="!activeAddDossierIntoGroup">THÔNG TIN CÔNG VĂN</span>
+            <span v-else>THÊM MỚI HỒ SƠ</span>
+          </span>
         </div>
         <div class="layout wrap header_tools row-blue">
           <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinNhomHoSo.serviceName">
@@ -72,7 +75,7 @@
               </div>
               
               <div class="mb-3" v-if="dossiersIntoGroupRender.length > 0">
-                <v-layout wrap class="my-2">
+                <!-- <v-layout wrap class="my-2">
                   <v-flex style="width: 120px">
                     <v-subheader class="pl-0 text-header">Bước xử lý: </v-subheader>
                   </v-flex>
@@ -98,11 +101,11 @@
                     {{item.title}}{{item.tiltle}}
                     <span slot="loader">Loading...</span>
                   </v-btn>
-                </div>
+                </div> -->
                 <v-data-table
                   v-model="selected"
                   select-all
-                  :headers="headers"
+                  :headers="headersCV"
                   :items="dossiersIntoGroupRender"
                   :pagination.sync="pagination"
                   hide-actions
@@ -112,7 +115,7 @@
                   <!--  -->
                   <template slot="headers" slot-scope="props">
                     <tr>
-                      <th width="32px" class="v_data_table_check_all" style="padding-left: 14px !important;">
+                      <!-- <th width="32px" class="v_data_table_check_all" style="padding-left: 14px !important;">
                         <v-checkbox
                           :input-value="props.all"
                           :indeterminate="props.indeterminate"
@@ -120,9 +123,9 @@
                           hide-details
                           @click.native="toggleAll"
                         ></v-checkbox>
-                      </th>
+                      </th> -->
                       <th
-                        v-for="header in headers"
+                        v-for="header in headersCV"
                         :key="header.text"
                         :class="header['class'] ? header['class'] : ''"
                         :width="header['width'] ? header['width'] + 'px' : ''"
@@ -137,26 +140,46 @@
                   <!--  -->
                   <template slot="items" slot-scope="props">
                     <tr style="cursor: pointer">
-                      <td class="text-xs-center pl-3" width="32px" style="height: 40px !important">
+                      <!-- <td class="text-xs-center pl-3" width="32px" style="height: 40px !important">
                         <v-checkbox
                           v-model="props.selected"
                           primary
                           hide-details
                         ></v-checkbox>
-                      </td>
+                      </td> -->
                       <td @click="viewDetail(props.item, props.index)" class="text-xs-center" width="50px" style="height: 40px !important">
                         <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
                       </td>
-                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="250px" style="height: 40px !important">
-                        {{ props.item.dossierNo }}
-                      </td>
-                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" style="height: 40px !important">
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="150px" style="height: 40px !important">
                         {{ props.item.applicantName }}
                       </td>
-                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="200px" style="height: 40px !important">
-                        {{ props.item.dossierSubStatusText ? props.item.dossierSubStatusText : props.item.dossierStatusText }}
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="100px" style="height: 40px !important">
+                        <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateDay') && getMetaData(props.item).hasOwnProperty('birthDateMonth') && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateDay}}/</span>
+                        <span v-if="props.item && getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateMonth') && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateMonth}}/</span>
+                        <span v-if="props.item && getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateYear}} </span>
                       </td>
-                      <td class="text-xs-center" width="200px" style="height: 40px !important">
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" style="height: 40px !important">
+                        <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('wardNativeName')">{{getMetaData(props.item).wardNativeName}}, </span>
+                        <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('districtNativeName')">{{getMetaData(props.item).districtNativeName}}, </span>
+                        <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('cityNativeName')">{{getMetaData(props.item).cityNativeName}} </span>
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left"  style="height: 40px !important">
+                        <span v-if="props.item.address">{{props.item.address}}, </span>
+                        <span v-if="props.item.wardName">{{props.item.wardName}}, </span>
+                        <span v-if="props.item.districtName">{{props.item.districtName}}, </span>
+                        <span v-if="props.item.cityName">{{props.item.cityName}} </span>
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="100px" style="height: 40px !important">
+                        <span v-if="props.item.metaData && getMetaData(props.item) && getMetaData(props.item).yearPayment">{{getMetaData(props.item).yearPayment}} </span>
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="100px" style="height: 40px !important">
+                        <span v-if="props.item.metaData && getMetaData(props.item) && getMetaData(props.item).subsidy">{{currency(getMetaData(props.item).subsidy)}} </span>
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="100px" style="height: 40px !important">
+                        <span v-if="props.item.applicantNote">{{props.item.applicantNote}} </span>
+                      </td>
+                      
+                      <td class="text-xs-center" width="170px" style="height: 40px !important">
                         <v-btn flat icon color="indigo" class="mr-2 my-0" @click="viewDetail(props.item)" title="Xem chi tiết">
                           <v-icon>fas fa fa-file-text</v-icon>
                         </v-btn>
@@ -170,20 +193,33 @@
                     </tr>
                   </template>
                 </v-data-table>
-
-                <div v-if="dossiersIntoGroupRender.length > 10" class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
+                <v-layout wrap class="mt-3 ml-3">
+                  <v-flex xs12 sm6>
+                    <span>Tổng số đối tượng: </span>
+                    <span class="text-bold">{{dossiersIntoGroupRender.length}} </span>
+                  </v-flex>
+                  <v-flex xs12 sm6>
+                    <span>Tổng số tiền: </span>
+                    <span class="text-bold">{{currency(totalFee)}} đồng</span>
+                  </v-flex>
+                </v-layout>
+                <div v-if="dossiersIntoGroupRender.length > 30" class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
                   <div class="flex pagging-table px-2">
-                    <tiny-pagination :total="dossiersIntoGroupRender.length" :currentLimit="10" :page="pagination.page" custom-class="custom-tiny-class" 
+                    <tiny-pagination :total="dossiersIntoGroupRender.length" :currentLimit="30" :page="pagination.page" custom-class="custom-tiny-class" 
                       @tiny:change-page="paggingData" ></tiny-pagination> 
                   </div>
                 </div>
               </div>
-              <div v-else class="pl-4 py-2">Chưa có hồ sơ nào</div>
+              <div v-else class="pl-5 py-2">Chưa có hồ sơ nào</div>
 
               <v-flex xs12 class="text-right mb-3 mr-2" v-if="formCode === 'NEW_GROUP_CV'">
                 <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2" style="height:36px !important">
                   <v-icon size="20">add</v-icon>  &nbsp;
                   <span>Thêm mới hồ sơ</span>
+                </v-btn>
+                <v-btn color="primary" @click="showDossierToAdd" class="mx-0 my-0" style="height:36px !important">
+                  <v-icon size="20">create_new_folder</v-icon>  &nbsp;
+                  <span>Thêm hồ sơ đã có</span>
                 </v-btn>
               </v-flex>
 
@@ -248,7 +284,7 @@
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
               </div>
-              <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypesIntoGroup"></thanh-phan-ho-so>
+              <thanh-phan-ho-so ref="thanhphanhoso" :formCode="formCode" :onlyView="false" :id="'nm'" :partTypes="inputTypesIntoGroup"></thanh-phan-ho-so>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
@@ -487,8 +523,8 @@
                   <td @click="viewDetail(props.item, props.index)" class="text-xs-center" width="50px" style="height: 40px !important">
                     <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
                   </td>
-                  <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="250px" style="height: 40px !important">
-                    {{ props.item.dossierNo }}
+                  <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="150px" style="height: 40px !important">
+                    {{ props.item.applicantName }}
                   </td>
                   <td @click="viewDetail(props.item, props.index)" class="text-xs-left" style="height: 40px !important">
                     {{ props.item.applicantName }}
@@ -500,9 +536,9 @@
               </template>
             </v-data-table>
 
-            <div v-if="dossiersIntoGroupRender.length > 10" class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
+            <div v-if="dossiersIntoGroupRender.length > 30" class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
               <div class="flex pagging-table px-2">
-                <tiny-pagination :total="dossiersIntoGroupRender.length" :currentLimit="10" :page="pagination.page" custom-class="custom-tiny-class" 
+                <tiny-pagination :total="dossiersIntoGroupRender.length" :currentLimit="30" :page="pagination.page" custom-class="custom-tiny-class" 
                   @tiny:change-page="paggingData" ></tiny-pagination> 
               </div>
             </div>
@@ -518,6 +554,120 @@
             >
             <v-icon>close</v-icon>&nbsp;
             Bỏ qua
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialogAddDossier" max-width="1300" transition="fade-transition">
+      <v-card flat>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Chọn hồ sơ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogAddDossier = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="pt-0 pb-0 px-0">
+          <div class="mb-3">
+            <v-layout wrap class="my-2">
+              <v-flex class="px-2 mt-3">
+                <v-text-field
+                  label="Tìm kiếm theo mã hồ sơ"
+                  v-model="dossierNoKey"
+                  @keyup.enter="searchDossierToAdd"
+                  append-icon="search"
+                  box
+                  @click:append="searchDossierToAdd"
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+            <v-data-table
+              :headers="headersCV"
+              :items="dossiersSelectAdd"
+              hide-actions
+              class="table-landing table-bordered"
+              item-key="dossierId"
+            >
+              <!--  -->
+              <template slot="headers" slot-scope="props">
+                <tr>
+                  <th
+                    v-for="header in headersCV"
+                    :key="header.text"
+                    :class="header['class'] ? header['class'] : ''"
+                    :width="header['width'] ? header['width'] + 'px' : ''"
+                  >
+                    <v-tooltip bottom>
+                      <span slot="activator">{{ header.text }}</span>
+                      <span>{{ header.text }}</span>
+                    </v-tooltip>
+                  </th>
+                </tr>
+              </template>
+              <!--  -->
+              <template slot="items" slot-scope="props">
+                <tr style="cursor: pointer">
+                  <td class="text-xs-center" width="50px" style="height: 40px !important">
+                    <span>{{hosoDatasPage * 10 - 10 + props.index + 1}}</span>
+                  </td>
+                  <td class="text-xs-left" width="150px" style="height: 40px !important">
+                    {{ props.item.applicantName }}
+                  </td>
+                  <td class="text-xs-left" width="100px" style="height: 40px !important">
+                    <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateDay') && getMetaData(props.item).hasOwnProperty('birthDateMonth') && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateDay}}/</span>
+                    <span v-if="props.item && getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateMonth') && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateMonth}}/</span>
+                    <span v-if="props.item && getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateYear}} </span>
+                  </td>
+                  <td class="text-xs-left" style="height: 40px !important">
+                    <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('wardNativeName')">{{getMetaData(props.item).wardNativeName}}, </span>
+                    <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('districtNativeName')">{{getMetaData(props.item).districtNativeName}}, </span>
+                    <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('cityNativeName')">{{getMetaData(props.item).cityNativeName}} </span>
+                  </td>
+                  <td class="text-xs-left"  style="height: 40px !important">
+                    <span v-if="props.item.address">{{props.item.address}}, </span>
+                    <span v-if="props.item.wardName">{{props.item.wardName}}, </span>
+                    <span v-if="props.item.districtName">{{props.item.districtName}}, </span>
+                    <span v-if="props.item.cityName">{{props.item.cityName}} </span>
+                  </td>
+                  <td class="text-xs-left" width="100px" style="height: 40px !important">
+                    <span v-if="props.item.metaData && getMetaData(props.item) && getMetaData(props.item).yearPayment">{{getMetaData(props.item).yearPayment}} </span>
+                  </td>
+                  <td class="text-xs-left" width="100px" style="height: 40px !important">
+                    <span v-if="props.item.metaData && getMetaData(props.item) && getMetaData(props.item).subsidy">{{currency(getMetaData(props.item).subsidy)}} </span>
+                  </td>
+                  <td class="text-xs-left" width="100px" style="height: 40px !important">
+                    <span v-if="props.item.applicantNote">{{props.item.applicantNote}} </span>
+                  </td>
+                  
+                  <td class="text-xs-center" width="100px" style="height: 40px !important">
+                    <v-btn small color="primary" @click="addDossierToGroup(props.item)" class="mr-2 my-0">
+                      <v-icon size="20">add</v-icon>  &nbsp;
+                      <span>Thêm hồ sơ</span>
+                    </v-btn>
+                  </td>
+                </tr>
+              </template>
+            </v-data-table>
+
+            <div class="text-xs-right layout wrap" style="position: relative;">
+              <div class="flex pagging-table px-2"> 
+                <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" :numberPerPage="10" :showLimit="false" custom-class="custom-tiny-class" 
+                 @tiny:change-page="paggingDataDossierAdd" ></tiny-pagination> 
+              </div>
+            </div>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <!-- <v-btn color="primary" @click.native="addFileToDossier()">
+            <v-icon>send</v-icon>&nbsp;
+            Xác nhận
+          </v-btn> -->
+          <v-btn color="red" style="color: #fff;" @click.native="dialogAddDossier = false"
+            >
+            <v-icon class="white--text">close</v-icon>&nbsp;
+            Thoát
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -561,8 +711,13 @@ export default {
     detailGroup: false,
     dialogImportDosier: false,
     dialogSelectDosier: false,
+    dialogAddDossier: false,
+    dossiersSelectAdd: [],
     groupDossierList: [],
     groupDossierSelected: '',
+    dossierNoKey: '',
+    hosoDatasPage: 1,
+    hosoDatasTotal: 0,
     dossiersIntoGroup: [],
     dossiersIntoGroupRender: [],
     selected: [],
@@ -598,6 +753,62 @@ export default {
     loadingAction: false,
     dialogAddGroup: false,
     activeAddDossierIntoGroup: false,
+    headersCV: [
+      {
+        text: 'STT',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Họ và tên',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Năm sinh',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Quê quán',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Nơi đăng ký HKTT',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Số năm được hưởng',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Mức trợ cấp (đồng/tháng)',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Ghi chú',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Thao tác',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+    ],
     headers: [
       {
         text: 'STT',
@@ -622,17 +833,10 @@ export default {
         align: 'center',
         sortable: false,
         class: 'text-xs-center'
-      },
-      {
-        text: 'Thao tác',
-        align: 'center',
-        sortable: false,
-        class: 'text-xs-center'
       }
     ],
     filesGroupDossier: [],
     countDossierProgress: 0,
-    dialogImportDosier: false,
     listDossierImport: [],
     progressUploadFile: false,
     loadingImportDossier: false,
@@ -643,10 +847,11 @@ export default {
     countDossierSuccess: 0,
     dossierNameCongVan: '',
     pagination: {
-      rowsPerPage: 10,
+      rowsPerPage: 30,
       page: 1
     },
-    tphsCV: ''
+    tphsCV: '',
+    totalFee: 0
   }),
   computed: {
     loading () {
@@ -719,6 +924,23 @@ export default {
         vm.getDetaiGroup(id)
       }
     },
+    dossiersIntoGroupRender (arr) {
+      let vm = this
+      let totalFee = 0
+      if (arr && arr.length > 0) {
+        for (let i = 0; i < arr.length; i++) {
+          console.log(i, arr[i])
+          let metaData = vm.getMetaData(arr[i])
+          let fee = 0
+          if (metaData) {
+            fee = Number(metaData['yearPayment'])*12*Number(metaData['subsidy'])
+            totalFee += fee
+          }
+        }
+        vm.totalFee = totalFee
+      }
+      
+    },
     thongTinNhomHoSo (val) {
       let vm = this
       if (val) {
@@ -739,6 +961,10 @@ export default {
           }
           vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result) {
             vm.tphsCV = result['dossierParts']
+          })
+          vm.$store.dispatch('loadDossierFiles', val.dossierId).then(resFiles => {
+            vm.filesGroupDossier = resFiles
+          }).catch(reject => {
           })
         }
         
@@ -764,6 +990,11 @@ export default {
     paggingData (config) {
       let vm = this
       vm.pagination.page = config.page
+    },
+    paggingDataDossierAdd (config) {
+      let vm = this
+      vm.hosoDatasPage = config.page
+      vm.searchDossierToAdd()
     },
     getGroupDossier () {
       let vm = this
@@ -898,6 +1129,13 @@ export default {
         })
       })
     },
+    showDossierToAdd () {
+      let vm = this
+      vm.hosoDatasPage = 1
+      vm.dossierNoKey = ''
+      vm.searchDossierToAdd()
+      vm.dialogAddDossier = true
+    },
     putGroupDossier () {
       let vm = this
       if (vm.formCode === 'NEW_GROUP') {
@@ -1018,22 +1256,6 @@ export default {
             return (item['dossierPartType'] === 6 || item['dossierPartType'] === 7)
           })
           if (files.length > 0) {
-            // for (let key in files) {
-            //   filterCopyFile.dossierTemplateNo = files[key]['dossierTemplateNo']
-            //   filterCopyFile.dossierPartNo = files[key]['dossierPartNo']
-            //   filterCopyFile.dossierFileId = files[key]['dossierFileId']
-            //   vm.$store.dispatch('copyFile', filterCopyFile).then(function(resultFile) {
-            //     count += 1
-            //     if (count === files.length) {
-            //       vm.$refs.thanhphanhoso.initData(result)
-            //     }
-            //   }).catch(function(reject) {
-            //     count += 1
-            //     if (count === files.length) {
-            //       vm.$refs.thanhphanhoso.initData(result)
-            //     }
-            //   })
-            // }
             let dossierFileIds = files.map(obj =>{ 
               return obj.dossierFileId
             }).toString()
@@ -1392,7 +1614,7 @@ export default {
       // let validThongtinchuhoso = vm.$refs.thongtinchuhoso.showValid()
       // if (validThongtinchuhoso['validForm']) {
         let passValid = true
-        if (passValid) {
+        if (passValid && thongtinchuhosocongvan.validation) {
           vm.loadingAction = true
           if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
             vm.loadingAction = false
@@ -1476,8 +1698,11 @@ export default {
             toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
-        // }
-      }
+        } else {
+          toastr.clear()
+          toastr.error('Vui lòng điền đầy đủ thông tin bắt buộc')
+        }
+      // }
     },
     changeViapostal (viapostal) {
       if (viapostal) {
@@ -1539,6 +1764,65 @@ export default {
           vm.$store.commit('setActiveAddFileGroup', false)
         })
       // }
+    },
+    searchDossierToAdd () {
+      let vm = this
+      let filter = {
+        dossierNo: vm.dossierNoKey,
+        service: vm.thongTinNhomHoSo.serviceCode,
+        page: vm.hosoDatasPage,
+        numberPerPage: 10,
+        originality: 3,
+        sort: 'dossierNo',
+        order: true
+      }
+      vm.$store.dispatch('getHoSoAddGroup', filter).then(function (result) {
+        vm.dossiersSelectAdd = result.data
+        vm.hosoDatasTotal = result.total
+      }).catch(reject => {
+        vm.dossiersSelectAdd = []
+        vm.hosoDatasTotal = 0
+      })
+    },
+    addDossierToGroup (item) {
+      let vm = this
+      let data = {
+        groupDossierId: vm.thongTinNhomHoSo.dossierId,
+        dossierId: item.dossierId
+      }
+      vm.$store.dispatch('postDossierIntoGroup', data).then(function (result) {
+        toastr.clear()
+        toastr.success('Thêm hồ sơ thành công')
+        vm.dialogAddDossier = false
+        vm.$store.dispatch('getDossiersIntoGroup', data).then(function (result) {
+          vm.dossiersIntoGroupRender = result
+        })
+        // copy file 
+        let count = 0
+        let files = vm.filesGroupDossier.filter(function(item) {
+          return (item['dossierPartType'] === 6 || item['dossierPartType'] === 7)
+        })
+        if (files.length > 0) {
+          let dossierFileIds = files.map(obj =>{ 
+            return obj.dossierFileId
+          }).toString()
+          let filterCopyFile = {
+            dossierIds: item.dossierId,
+            dossierFileId: dossierFileIds
+          }
+          vm.$store.dispatch('uploadFileDossierGroup', filterCopyFile).then(function (resultFile) {
+          })
+        }
+        // 
+      }).catch(function () {})
+    },
+    getMetaData (val) {
+      let metaDataOut = ''
+      try {
+        metaDataOut = JSON.parse(val.metaData)
+      } catch (error) {
+      }
+      return metaDataOut
     },
     dateTimeView (arg) {
       if (arg) {

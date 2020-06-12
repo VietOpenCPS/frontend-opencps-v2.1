@@ -176,7 +176,7 @@
                       v-else
                       v-model="thongTinCongVan.contactTelNo"
                       append-icon="phone"
-                      :rules="thongTinCongVan.contactEmail ? [rules.telNo] : ''"
+                      :rules="thongTinCongVan.contactTelNo ? [rules.telNo] : ''"
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 class="mb-2">
@@ -197,7 +197,7 @@
                     </v-flex>
 
                     <v-flex xs12 class="mt-2">
-                      <div> <span style="color:red">(*) &nbsp;</span>Tài liệu đính kèm: </div>
+                      <div class="mb-2"> <span style="color:red">(*) &nbsp;</span>Tài liệu đính kèm: <i v-if="dossierFilesItems.length === 0">(Chưa có tài liệu đính kèm)</i></div>
                       <div v-for="(itemFileView, index) in dossierFilesItems" :key="index">
                         <div v-if="!itemFileView.eForm">
                           <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
@@ -213,9 +213,9 @@
                           </v-btn>
                         </div>
                       </div>
+
                       <input type="file" id="documentFile" @input="onUploadSingleFile($event)" style="display:none">
-                      
-                      <v-btn small color="primary" class="mx-0 mt-2" dark @click.native="uploadFile">
+                      <v-btn small color="primary" class="mx-0 mt-3" dark @click.native="uploadFile">
                         <v-icon>fas fa fa-upload</v-icon> &nbsp; &nbsp;
                         Chọn tài liệu tải lên
                       </v-btn>
@@ -358,6 +358,7 @@ export default {
       let vm = this
       vm.thongTinCongVan.dueDate = vm.parseDateToTimestamp(vm.dueDate)
       vm.thongTinCongVan.documentDate = vm.parseDateToTimestamp(vm.documentDate)
+      vm.thongTinCongVan.validation = vm.$refs.formThongTinCongVan.validate()
       console.log('thongtincongvanOutput', vm.thongTinCongVan)
       return vm.thongTinCongVan
     },
@@ -369,7 +370,10 @@ export default {
     onUploadSingleFile () {
       let vm = this
       console.log('tphs', vm.tphs)
-      let filter = Object.assign(vm.detailDossier, vm.tphs[0])
+      let tphsDungChung = vm.tphs.filter(function(item) {
+        return item.partType == 6
+      })[0]
+      let filter = Object.assign(vm.detailDossier, tphsDungChung)
       vm.$store.dispatch('uploadSingleFileGroupCongVan', filter).then(function (result) {
         vm.$store.dispatch('loadDossierFiles', filter.dossierId).then(result => {
           vm.dossierFilesItems = result

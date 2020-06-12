@@ -700,6 +700,7 @@ export default {
     dueDateEdit: '',
     viaPortalDetail: 0,
     showThuPhi: false,
+    // inputTypes: [1, 3],
     inputTypes: [1, 3, 6],
     inputTypesGroup: [6],
     outputTypes: [2],
@@ -1119,7 +1120,8 @@ export default {
       let thanhphanhoso = this.$refs.thanhphanhoso ? this.$refs.thanhphanhoso.dossierTemplateItems : ''
       let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
       let validThongtinchuhoso = vm.$refs.thongtinchuhoso ? vm.$refs.thongtinchuhoso.showValid() : {validForm: true, validApplicant: true}
-      if (validThongtinchuhoso['validForm']) {
+      let thongtinchuhosocongvan = vm.$refs.thongtinchuhosocongvan ? vm.$refs.thongtinchuhosocongvan.getThongTinChuHoSo() : {validation: true}
+      if (validThongtinchuhoso['validForm'] && thongtinchuhosocongvan['validation']) {
         let passValid = false
         if (!validThongtinchuhoso['validApplicant']) {
           let x = confirm(validThongtinchuhoso['message'] + ' Bạn có muốn tiếp tục?')
@@ -1155,7 +1157,6 @@ export default {
             tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
             
           } else {
-            let thongtinchuhosocongvan = this.$refs.thongtinchuhosocongvan.getThongTinChuHoSo()
             tempData = Object.assign(thongtinchuhosocongvan, dichvuchuyenphatketqua, thongtinchunghoso)
           }
           tempData['dossierId'] = vm.dossierId
@@ -1265,17 +1266,24 @@ export default {
       let tempData = thongtincongvan
       tempData.dueDate = vm.dateTimeView(thongtincongvan.dueDate)
       console.log('data put congvan -->', tempData)
-      vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
-        vm.loadingAction = false
-        vm.$router.push({
-          path: '/danh-sach-ho-so/0/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,
-          query: vm.$router.history.current.query
+      if (thongtincongvan.validation) {
+        vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
+          vm.loadingAction = false
+          vm.$router.push({
+            path: '/danh-sach-ho-so/0/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,
+            query: vm.$router.history.current.query
+          })
+        }).catch(rejectXhr => {
+          vm.loadingAction = false
+          toastr.clear()
+          toastr.error('Yêu cầu của bạn thực hiện thất bại')
         })
-      }).catch(rejectXhr => {
+      } else {
         vm.loadingAction = false
         toastr.clear()
-        toastr.error('Yêu cầu của bạn thực hiện thất bại')
-      })
+        toastr.error('Vui lòng điền đầy đủ các thông tin bắt buộc')
+      }
+      
     },
     boSungHoSo () {
       var vm = this

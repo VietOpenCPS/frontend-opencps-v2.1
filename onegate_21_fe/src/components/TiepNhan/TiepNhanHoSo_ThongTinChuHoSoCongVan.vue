@@ -54,7 +54,7 @@
                               <span>/</span>
                             </v-flex>
                             <v-flex style="width: calc(100% - 20px)">
-                              <v-autocomplete placeholder="Năm" :items="years" v-model="birthDateYear"></v-autocomplete>
+                              <v-autocomplete placeholder="Năm" :items="years" v-model="birthDateYear" :rules="[rules.required]" required></v-autocomplete>
                             </v-flex>
                           </v-layout>
                         </v-flex>
@@ -93,13 +93,19 @@
                     <v-flex xs12 sm10 class="mb-2">
                       <v-layout wrap>
                         <v-flex xs12 sm4 class="pr-3">
-                          <v-autocomplete :items="cityItems" placeholder="Tỉnh/thành phố" v-model="cityNativeCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeCity($event, 'districtNativeItems', 'wardNativeItems')"></v-autocomplete>
+                          <v-autocomplete :items="cityItems" placeholder="Tỉnh/thành phố" v-model="cityNativeCode" :rules="[rules.required]" required
+                            item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeCity($event, 'districtNativeItems', 'wardNativeItems')">
+                          </v-autocomplete>
                         </v-flex>
                         <v-flex xs12 sm4 class="px-3">
-                          <v-autocomplete :items="districtNativeItems" placeholder="Quận/huyện" v-model="districtNativeCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeDistrict($event, 'wardNativeItems')"></v-autocomplete>
+                          <v-autocomplete :items="districtNativeItems" placeholder="Quận/huyện" v-model="districtNativeCode" :rules="[rules.required]" required
+                          item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeDistrict($event, 'wardNativeItems')">
+                          </v-autocomplete>
                         </v-flex>
                         <v-flex xs12 sm4 class="pl-3">
-                          <v-autocomplete placeholder="Xã/phường" :items="wardNativeItems" v-model="wardNativeCode" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
+                          <v-autocomplete placeholder="Xã/phường" :items="wardNativeItems" v-model="wardNativeCode" :rules="[rules.required]" required
+                           item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeWard($event, 'wardNative')">
+                          </v-autocomplete>
                         </v-flex>
                       </v-layout>
                     </v-flex>
@@ -120,19 +126,22 @@
                       <v-subheader class="pl-0"> Nơi đăng ký HKTT<span style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm10 class="mb-2">
-                      <v-text-field  v-model="address" clearable></v-text-field>
+                      <v-text-field  v-model="address" clearable :rules="[rules.required]" required></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 class="mb-2"></v-flex>
                     <v-flex xs12 sm10 class="mb-2">
                       <v-layout wrap>
                         <v-flex xs12 sm4 class="pr-3">
-                          <v-autocomplete :items="cityItems" placeholder="Tỉnh/thành phố" v-model="cityCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeCity($event, 'districtItems', 'wardItems')"></v-autocomplete>
+                          <v-autocomplete :items="cityItems" placeholder="Tỉnh/thành phố" v-model="cityCode" :rules="[rules.required]" required
+                           item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeCity($event, 'districtItems', 'wardItems')"></v-autocomplete>
                         </v-flex>
                         <v-flex xs12 sm4 class="px-3">
-                          <v-autocomplete :items="districtItems" placeholder="Quận/huyện" v-model="districtCode" item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeDistrict($event, 'wardItems')"></v-autocomplete>
+                          <v-autocomplete :items="districtItems" placeholder="Quận/huyện" v-model="districtCode" :rules="[rules.required]" required
+                           item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeDistrict($event, 'wardItems')"></v-autocomplete>
                         </v-flex>
                         <v-flex xs12 sm4 class="pl-3">
-                          <v-autocomplete placeholder="Xã/phường" :items="wardItems" v-model="wardCode" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
+                          <v-autocomplete placeholder="Xã/phường" :items="wardItems" v-model="wardCode" :rules="[rules.required]" required
+                          item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
                         </v-flex>
                       </v-layout>
                     </v-flex>
@@ -143,8 +152,7 @@
                     <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
                         v-model="yearPayment"
-                        :rules="requiredOptions['yearPayment'] ? [rules.required] : ''"
-                        :required="requiredOptions['yearPayment']"
+                        :rules="[rules.required]" required
                       ></v-text-field>
                     </v-flex>
 
@@ -154,9 +162,8 @@
                     <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
                         v-model="subsidy"
-                        v-money="money"
-                        :rules="requiredOptions['subsidy'] ? [rules.required] : ''"
-                        :required="requiredOptions['subsidy']"
+                        @keyup="formatCurrent($event)"
+                        :rules="[rules.required]" required
                       ></v-text-field>
                     </v-flex>
                     
@@ -167,8 +174,7 @@
                       <v-text-field
                       v-model="contactTelNo"
                       append-icon="phone"
-                      :rules="requiredOptions['contactTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
-                      :required="requiredOptions['contactTelNo']"
+                      :rules="[rules.telNo]"
                       ></v-text-field>
                     </v-flex>
 
@@ -413,8 +419,11 @@ export default {
     districtNativeItems: [],
     wardNativeItems: [],
     wardNativeCode: '',
+    wardNativeName: '',
     districtNativeCode: '',
+    districtNativeName: '',
     cityNativeCode: '',
+    cityNativeName: '',
     gender: 0,
     state: 0,
     address: '',
@@ -424,7 +433,7 @@ export default {
     districtCode: '',
     cityCode: '',
     yearPayment: '',
-    subsidy: '',
+    subsidy: 0,
     contactTelNo: '',
     contactEmail: '',
     anonymName: '',
@@ -594,12 +603,20 @@ export default {
         setTimeout(function () {
           // 
           if (vm.cityNativeCode) {
+            vm.cityNativeName = vm.cityItems.filter(function (item) {
+              return item.itemCode == vm.cityNativeCode
+            })[0]['itemName']
             vm.$store.getters.getDictItems({
               collectionCode: 'ADMINISTRATIVE_REGION',
               level: 1,
               parent: vm.cityNativeCode
             }).then(function (resultDistricts) {
               vm.districtNativeItems = resultDistricts.data
+              if (vm.districtNativeCode) {
+                vm.districtNativeName = vm.districtNativeItems.filter(function (item) {
+                  return item.itemCode == vm.districtNativeCode
+                })[0]['itemName']
+              }
             })
           }
           if (vm.districtNativeCode) {
@@ -609,6 +626,11 @@ export default {
               parent: vm.districtNativeCode
             }).then(function (resultWards) {
               vm.wardNativeItems = resultWards.data
+              if (vm.wardNativeCode) {
+                vm.wardNativeName = vm.wardNativeItems.filter(function (item) {
+                  return item.itemCode == vm.wardNativeCode
+                })[0]['itemName']
+              }
             })
           }
           // 
@@ -662,8 +684,11 @@ export default {
         birthDateMonth: vm.birthDateMonth,
         birthDateYear: vm.birthDateYear,
         wardNativeCode: vm.wardNativeCode,
+        wardNativeName: vm.wardNativeName,
         districtNativeCode: vm.districtNativeCode,
+        districtNativeName: vm.districtNativeName,
         cityNativeCode: vm.cityNativeCode,
+        cityNativeName: vm.cityNativeName,
         state: vm.state,
         yearPayment: vm.yearPayment,
         subsidy: Number(String(vm.subsidy).replace(/\./g, '')),
@@ -680,15 +705,18 @@ export default {
         birthDate: vm.birthDate,
         applicantIdNo: vm.applicantIdNo,
         wardNativeCode: vm.wardNativeCode,
+        wardNativeName: vm.wardNativeName,
         districtNativeCode: vm.districtNativeCode,
+        districtNativeName: vm.districtNativeName,
         cityNativeCode: vm.cityNativeCode,
+        cityNativeName: vm.cityNativeName,
         state: vm.state,
         address: vm.address,
         wardCode: vm.wardCode,
         districtCode: vm.districtCode,
         cityCode: vm.cityCode,
         yearPayment: vm.yearPayment,
-        subsidy: vm.subsidy,
+        subsidy: Number(String(vm.subsidy).replace(/\./g, '')),
         contactTelNo: vm.contactTelNo,
         contactEmail: vm.contactEmail,
         anonymName: vm.anonymName,
@@ -705,7 +733,8 @@ export default {
         delegateCityCode: vm.delegateCityCode,
         delegateTelNo: vm.delegateTelNo,
         delegateEmail: vm.delegateEmail,
-        formMeta: JSON.stringify(formMeta)
+        formMeta: JSON.stringify(formMeta),
+        validation: vm.$refs.formChuHoSo.validate()
       }
       return dataOut
     },
@@ -744,7 +773,7 @@ export default {
         vm.cityNativeCode = metaData.hasOwnProperty('cityNativeCode') ? metaData.cityNativeCode : ''
         vm.state = metaData.hasOwnProperty('state') ? metaData.state : ''
         vm.yearPayment = metaData.hasOwnProperty('yearPayment') ? metaData.yearPayment : ''
-        vm.subsidy = metaData.hasOwnProperty('subsidy') ? Number(metaData.subsidy) : 0
+        vm.subsidy = metaData.hasOwnProperty('subsidy') ? vm.currency(metaData.subsidy) : ''
         vm.anonymName = metaData.hasOwnProperty('anonymName') ? metaData.anonymName : ''
         vm.incidence = metaData.hasOwnProperty('incidence') ? metaData.incidence : ''
         vm.recruitment = metaData.hasOwnProperty('recruitment') ? metaData.recruitment : ''
@@ -752,6 +781,17 @@ export default {
         vm.reactivated = metaData.hasOwnProperty('reactivated') ? metaData.reactivated : ''
         vm.published = metaData.hasOwnProperty('published') ? metaData.published : ''
       }
+    },
+    formatCurrent (event) {
+      let vm = this
+      vm.subsidy = vm.currency(String(vm.subsidy).replace(/\D/g,''))
+    },
+    currency (value) {
+      if (value) {
+        let moneyCur = (value / 1).toFixed(0).replace('.', ',')
+        return moneyCur.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+      }
+      return ''
     },
     onChangeCity (data, districts, wards) {
       var vm = this
@@ -763,6 +803,11 @@ export default {
       vm.$store.dispatch('loadDictItems', filter).then(function (result) {
         vm[districts] = result.data
         vm[wards] = []
+        if (districts === 'districtNativeItems') {
+          vm.cityNativeName = vm.cityItems.filter(function (item) {
+            return item.itemCode == data
+          })[0]['itemName']
+        }
       })
     },
     onChangeDistrict (data, wards) {
@@ -774,7 +819,20 @@ export default {
       }
       vm.$store.dispatch('loadDictItems', filter).then(function (result) {
         vm[wards] = result.data
+        if (wards === 'wardNativeItems') {
+          vm.districtNativeName = vm.districtNativeItems.filter(function (item) {
+            return item.itemCode == data
+          })[0]['itemName']
+        }
       })
+    },
+    onChangeWard (data, ward) {
+      var vm = this
+      if (ward === 'wardNative') {
+        vm.wardNativeName = vm.wardNativeItems.filter(function (item) {
+          return item.itemCode == data
+        })[0]['itemName']
+      }
     },
     onChangeDelegateCity (data) {
       let vm = this
@@ -1046,65 +1104,6 @@ export default {
         vm.applicantInfos['companyStatus'] = result['MainInformation']['ENTERPRISE_STATUS_NAME']
         vm.dialog_applicantInfos = true
       })
-    },
-    getApplicantList () {
-      let vm = this
-      let url = '/o/rest/v2/applicants'
-      vm.loadingTable = true
-      return new Promise(resolve => {
-        vm.$store.dispatch('loadInitResource').then(result => {
-          let param = {
-            headers: {
-            },
-            params: {
-              start: vm.applicantPage * vm.numberPerPage - vm.numberPerPage,
-              end: vm.applicantPage * vm.numberPerPage,
-              type: vm.typeSearch,
-              applicantName: vm.keySearch
-            }
-          }
-          axios.get(url, param).then(response => {
-            let items = []
-            if (response.data.hasOwnProperty('data')) {
-              items = response.data.data
-            } else {
-            }
-            let dataOut = {
-              data: items,
-              total: response.data['total']
-            }
-            vm.loadingTable = false
-            resolve(dataOut)
-          }).catch(function () {
-            vm.loadingTable = false
-          })
-        })
-      })
-    },
-    showDialogApplicantList (type) {
-      let vm = this
-      vm.typeApplicantBind = type
-      vm.applicantPage = 1
-      vm.getApplicantList().then(function(result) {
-        vm.totalApplicantSearch = result['total']
-        vm.applicantLists = result['data']
-        vm.dialog_applicantList = true
-      }).catch(function () {
-        toastr.error('Không lấy được danh sách công dân, tổ chức, doanh nghiệp')
-      })
-    },
-    searchKeyword () {
-      let vm = this
-      setTimeout(function () {
-        if (String(vm.keySearch).length >= 3) {
-          vm.applicantPage = 1
-          vm.getApplicantList().then(function(result) {
-            vm.totalApplicantSearch = result['total']
-            vm.applicantLists = result['data']
-          }).catch(function () {
-          })
-        }
-      }, 200)
     },
     clearKeySearch () {
       let vm = this

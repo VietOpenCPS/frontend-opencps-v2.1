@@ -394,6 +394,51 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    getHoSoAddGroup ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let paramSearch = {
+            start: filter.page * filter.numberPerPage - filter.numberPerPage,
+            end: filter.page * filter.numberPerPage,
+            service: filter.service ? filter.service : '',
+            template: filter.template ? filter.template : '',
+            status: filter.status ? filter.status : '',
+            register: filter.register ? filter.register : '',
+            keyword: filter.keyword ? filter.keyword : '',
+            domain: filter.domain ? filter.domain : '',
+            substatus: filter.substatus ? filter.substatus : '',
+            year: filter.year ? filter.year : 0,
+            month: filter.month ? filter.month : 0,
+            day: filter.day ? filter.day : 0,
+            top: filter.top ? filter.top : '',
+            dossierNo: filter.dossierNo ? filter.dossierNo : '',
+            paymentStatus: filter.paymentStatus ? filter.paymentStatus : ''
+          }
+          if (filter['originality']) {
+            paramSearch.originality = filter.originality
+          }
+          if (filter['sort']) {
+            paramSearch.sort = filter.sort
+          }
+          if (filter.order !== '') {
+            paramSearch.order = String(filter.order) === 'true' ? true : false
+          }
+          // 
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: paramSearch
+          }
+          axios.get('/o/rest/v2/dossiers/todo', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
     getGroupDossier ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {

@@ -234,27 +234,30 @@
                 <div class="xs12 sm12 pb-1">
                   <span class="pr-2">Ngày sinh: </span>
                   <span class="pl-0 text-bold"> 
-                    <span v-if="metaData.birthDateDay && metaData.birthDateMonth && metaData.birthDateYear">{{metaData.birthDateDay}} / </span>
-                    <span v-if="metaData.birthDateMonth && metaData.birthDateYear">{{metaData.birthDateMonth}} / </span>
+                    <span v-if="metaData.birthDateDay && metaData.birthDateMonth && metaData.birthDateYear">{{metaData.birthDateDay}}/ </span>
+                    <span v-if="metaData.birthDateMonth && metaData.birthDateYear">{{metaData.birthDateMonth}}/ </span>
                     <span v-if="metaData.birthDateYear">{{metaData.birthDateYear}} </span>
                   </span>
                 </div>
-                <div class="xs12 sm12 pb-1 overHidden">
+                <div class="xs12 sm12 pb-1">
                   <span class="pr-2">Quê quán: </span>
-                  <!-- <v-tooltip top>
-                    <span slot="activator" class="text-bold ">{{ String(thongTinChiTietHoSo.address).replace(/\./g, "") }} {{thongTinChiTietHoSo.wardName}}<span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span></span>
-                    <span class="pl-0"> {{String(thongTinChiTietHoSo.address).replace(/\./g, "")}} {{thongTinChiTietHoSo.wardName}}<span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span></span>
-                  </v-tooltip> -->
+                  <span class="text-bold pl-0">
+                    <span v-if="metaData.wardNativeName">{{metaData.wardNativeName}}, </span>
+                    <span v-if="metaData.districtNativeName">{{metaData.districtNativeName}}, </span>
+                    <span v-if="metaData.cityNativeName">{{metaData.cityNativeName}} </span>
+                  </span>
                 </div>
                 
               </v-flex>
-              <v-flex xs12 sm4>
-                <div class="xs12 sm12 pb-1 overHidden">
+              <v-flex xs12 sm4 class="pr-3">
+                <div class="xs12 sm12 pb-1">
                   <span class="pr-2">Nơi đăng ký HKTT: </span>
-                  <!-- <v-tooltip top>
-                    <span slot="activator" class="text-bold ">{{ String(thongTinChiTietHoSo.address).replace(/\./g, "") }} {{thongTinChiTietHoSo.wardName}}<span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span></span>
-                    <span class="pl-0"> {{String(thongTinChiTietHoSo.address).replace(/\./g, "")}} {{thongTinChiTietHoSo.wardName}}<span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span></span>
-                  </v-tooltip> -->
+                  <span class="text-bold pl-0">
+                    <span v-if="thongTinChiTietHoSo.address">{{thongTinChiTietHoSo.address}}, </span>
+                    <span v-if="thongTinChiTietHoSo.wardName">{{thongTinChiTietHoSo.wardName}}, </span>
+                    <span v-if="thongTinChiTietHoSo.districtName">{{thongTinChiTietHoSo.districtName}}, </span>
+                    <span v-if="thongTinChiTietHoSo.cityName">{{thongTinChiTietHoSo.cityName}} </span>
+                  </span>
                 </div>
                 <!--  -->
                 <div class="xs12 sm12 pb-1">
