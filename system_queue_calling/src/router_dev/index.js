@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import DetailForward from '@/components/blacklist/DetailForward'
 import NotFound from '@/components/NotFound'
-import LandingServiceInfo from '@/components/screens/Landing'
+import LandingServiceInfo from '@/components/screens/LandingNew'
 
 const routes = [
   { path: '/', name: 'LandingServiceInfo', component: LandingServiceInfo, props: true },

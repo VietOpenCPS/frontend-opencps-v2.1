@@ -329,6 +329,8 @@ export const store = new Vuex.Store({
                   } else {
                     resolve([serializable.data])
                   }
+                } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
+                  resolve(serializable)
                 } else {
                   console.log('docu', filter.document === 'STATISTIC_05')
                   if (filter.document === 'STATISTIC_05') {
@@ -350,19 +352,6 @@ export const store = new Vuex.Store({
                 }
               }
               axios.all(promises)
-              /*
-              .then(function(results) {
-                let temp = results.map(r => r.data)
-                if (temp.length > 0) {
-                  resolve({
-                    type: 1,
-                    data: temp
-                  })
-                } else {
-                  resolve(null)
-                }
-              })
-              */
               .then(axios.spread((...args) => {
                 let myObject = []
                 for (let i = 0; i < args.length; i++) {
@@ -385,11 +374,17 @@ export const store = new Vuex.Store({
                 }
               }))
             } else if (String(govAgency) !== '0' && String(govAgency) !== '' && agencyLists.length > 0) {
-              param['headers']['groupId'] = govAgency
+              if (String(govAgency) === 'all') {
+                param['headers']['groupId'] = 0
+              } else {
+                param['headers']['groupId'] = govAgency
+              }
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
                   resolve(serializable.data)
+                } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
+                  resolve(serializable)
                 } else {
                   resolve(null)
                 }
@@ -445,7 +440,7 @@ export const store = new Vuex.Store({
               }
               
               dataUpdate.append("method", "GET")
-              dataUpdate.append("url", "/statistics")
+              dataUpdate.append("url", filter['proxyApi'])
               dataUpdate.append('data', JSON.stringify(paramGetProxy))
               axios({
                 method: typeMethod,
@@ -457,6 +452,8 @@ export const store = new Vuex.Store({
                 let serializable = response.data
                 if (serializable.data) {
                   resolve(serializable.data)
+                } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
+                  resolve(serializable)
                 } else {
                   resolve(null)
                 }

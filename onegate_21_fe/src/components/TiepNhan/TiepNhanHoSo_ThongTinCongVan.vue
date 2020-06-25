@@ -60,7 +60,7 @@
                           @blur="documentDate = parseDate(dateFormated)"
                         >
                         </v-text-field>
-                        <v-date-picker :min="getMindate()" ref="picker" locale="vi"
+                        <v-date-picker ref="picker" locale="vi"
                         :first-day-of-week="1" v-model="documentDate" no-title @input="menuDate = false"></v-date-picker>
                       </v-menu>
                     </v-flex>

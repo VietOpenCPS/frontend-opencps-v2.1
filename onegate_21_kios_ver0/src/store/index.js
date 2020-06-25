@@ -529,6 +529,36 @@ export const store = new Vuex.Store({
         })
       })
     },
+    submitVotingMC ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          // api đồng bộ sang một cửa
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            className: data.className,
+            classPk: data.classPk,
+            selected: data.selected,
+            votingCode: data.votingCode ? data.votingCode : ''
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', data.serverCode)
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            resolve(result.data)
+          }).catch(xhr => {
+            toastr.clear()
+            toastr.error('Gửi đánh giá thất bại')
+            reject(xhr)
+          })
+        }).catch(function (){})
+      })
+    },
     checkPermisionVoting ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {

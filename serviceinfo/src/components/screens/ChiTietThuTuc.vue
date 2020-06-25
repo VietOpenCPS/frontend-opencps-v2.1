@@ -1102,6 +1102,7 @@ export default {
       var vm = this
       vm.serviceConfigDetail = item
       vm.dialogGuide = true
+      vm.trackingBTTT(vm.serviceDetail.serviceCode)
     },
     downloadFileTemplate (item) {
       var vm = this
@@ -1297,6 +1298,15 @@ export default {
         return 'orange'
       } else if (level === 4) {
         return 'red'
+      }
+    },
+    trackingBTTT (serviceCode) {
+      try {
+        console.log('trackDVC serviceCode', serviceCode)
+        if (_govaq) {
+          _govaq.push(['trackDVC', serviceCode, '1', ''])
+        }
+      } catch (error) { 
       }
     }
   }

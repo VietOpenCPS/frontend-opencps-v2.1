@@ -25,7 +25,7 @@
       <v-dialog v-else v-model="dialog_selectOption" scrollable persistent max-width="1000px">
         <v-card style="width: 100%">
           <v-toolbar flat dark color="primary">
-            <v-toolbar-title>Chọn dịch vụ</v-toolbar-title>
+            <v-toolbar-title>Chọn trường hợp</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn icon dark @click.native="closeSelectOption()">
               <v-icon>close</v-icon>
@@ -410,13 +410,13 @@
               <v-autocomplete
                 v-if="serviceOptions.length > 1"
                 class="mt-3"
-                placeholder="Chọn dịch vụ"
+                placeholder="Chọn trường hợp"
                 :items="serviceOptions"
                 v-model="serviceOptionsSelect"
                 item-text="optionName"
                 item-value="processOptionId"
                 clearable
-                :rules="[v => !!v || 'Chọn dịch vụ']"
+                :rules="[v => !!v || 'Chọn trường hợp']"
                 required
                 return-object
               ></v-autocomplete>
@@ -781,6 +781,7 @@
                       j_captcha_response: ''
                     }
                     if (!vm.isOffLine) {
+                      vm.trackingBTTT(resServiceInfo.serviceCode)
                       vm.$store.dispatch('postDossier', data).then(function (result) {
                         vm.loadingAction = false
                         vm.indexAction = -1
@@ -810,6 +811,7 @@
                       j_captcha_response: ''
                     }
                     if (!vm.isOffLine) {
+                      vm.trackingBTTT(resServiceInfo.serviceCode)
                       vm.$store.dispatch('postDossier', data).then(function (result) {
                         vm.loadingAction = false
                         vm.indexAction = -1
@@ -859,6 +861,7 @@
             j_captcha_response: ''
           }
           if (!vm.isOffLine) {
+            vm.trackingBTTT(resServiceInfo.serviceCode)
             vm.$store.dispatch('postDossier', data).then(function (result) {
               vm.loadingAction = false
               vm.indexAction = -1
@@ -896,6 +899,7 @@
         if (vm.serviceConfigSelect.serviceUrl) {
           window.location.href = vm.serviceConfigSelect
         } else {
+          vm.trackingBTTT(data.serviceCode)
           vm.$store.dispatch('postDossier', data).then(function (result) {
             if (result['status'] !== undefined && result['status'] === 203) {
               vm.loadingAction = false
@@ -1056,6 +1060,7 @@
         vm.$store.dispatch('getServiceInfo', {
           serviceInfoId: vm.serviceInfoIdSelect
         }).then(resServiceInfo => {
+          vm.trackingBTTT(resServiceInfo.serviceCode)
           let data = {
             serviceCode: resServiceInfo.serviceCode,
             govAgencyCode: govAgencyCode,
@@ -1072,6 +1077,15 @@
           })
         })
       },
+      trackingBTTT (serviceCode) {
+        try {
+          console.log('trackDVC serviceCode', serviceCode)
+          if (_govaq) {
+            _govaq.push(['trackDVC', serviceCode, '1', ''])
+          }
+        } catch (error) { 
+        }
+      }
     }
   }
 </script>

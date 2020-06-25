@@ -4487,6 +4487,30 @@ export const store = new Vuex.Store({
         })
       })
     },
+    toKeypayDvcqg ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('dossierId', filter.dossierId)
+        
+        axios.post('/o/pgi/kpdvcqg/createtransaction', dataPost, param).then(response => {
+          if (response.data && response.data.hasOwnProperty('error') && response.data.error == '0') {
+            resolve(response.data.payment_url)
+          } else if (response.data && response.data.hasOwnProperty('error') && response.data.error != '0') {
+            toastr.error(response.data.hasOwnProperty('msg') ? response.data.msg : 'Yêu cầu thực hiện thất bại')
+            reject(response)
+          } else {
+            reject(response)
+          }
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    }
     // ----End---------
   },
   mutations: {

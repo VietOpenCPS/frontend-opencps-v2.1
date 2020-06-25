@@ -20,6 +20,7 @@
       <v-flex xs12 class="mt-4">
         <v-flex class="text-xs-center">
           <v-text-field
+            v-if="allowScan"
             v-model="eformInformation"
             height="70px"
             class="d-inline-block centered-input"
@@ -30,6 +31,17 @@
             style="font-size: 32px;width:480px"
             @keyup.enter="submitQueue"
           ></v-text-field>
+          <div v-else>
+            <div class="v-input d-inline-block centered-input v-text-field v-text-field--single-line v-text-field--solo v-text-field--solo-flat v-text-field--enclosed theme--light" style="font-size: 32px; width: 480px;">
+              <div class="v-input__control">
+                <div class="v-input__slot" style="height: 70px;">
+                  <div class="v-text-field__slot">
+                  </div>
+                </div>
+              <div class="v-text-field__details">
+            <div class="v-messages theme--light">
+            <div class="v-messages__wrapper"></div></div></div></div></div>
+          </div>
         </v-flex>
       </v-flex>
       <v-flex v-if="isActive" xs12 class="mt-3 text-xs-center" style="color:yellow">
@@ -95,7 +107,8 @@ export default {
     currentGroup: '',
     eformInformation: '',
     codeShow: '',
-    countBooking: '', 
+    countBooking: '',
+    allowScan: true,
     isActive: false,
     checkinFail: false,
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
@@ -151,9 +164,12 @@ export default {
         vm.getBooking()
       }, 5000)
     },
-    isActive () {
+    isActive (val) {
       let vm = this
       vm.eformInformation = ''
+      if (!val) {
+        vm.allowScan = true
+      }
     }
   },
   methods: {
@@ -165,6 +181,7 @@ export default {
       vm.checkOntime()
       if (!vm.isActive) {
         if (vm.onTime) {
+          vm.allowScan = false
           vm.overTime = false
           if (String(vm.eformInformation).length > 0) {
             let keySearch = String(vm.eformInformation).split('-')
@@ -227,7 +244,7 @@ export default {
                   vm.checkinFail = true
                   setTimeout(function() {
                     vm.isActive = false
-                  }, 5000)
+                  }, 3000)
                   vm.eformInformation = ''
                 }
               }).catch (function (reject) {
@@ -235,7 +252,7 @@ export default {
                 vm.checkinFail = true
                 setTimeout(function() {
                   vm.isActive = false
-                }, 5000)
+                }, 3000)
                 vm.eformInformation = ''
               })
             } else if (keySearch[0] === 'D' && keySearch.length !== 1) {
@@ -266,7 +283,7 @@ export default {
                     vm.checkinFail = true
                     setTimeout(function() {
                       vm.isActive = false
-                    }, 5000)
+                    }, 3000)
                     vm.eformInformation = ''
                   }
                 } else {
@@ -274,7 +291,7 @@ export default {
                   vm.checkinFail = true
                   setTimeout(function() {
                     vm.isActive = false
-                  }, 5000)
+                  }, 3000)
                   vm.eformInformation = ''
                 }
               }).catch (function (reject) {
@@ -282,16 +299,24 @@ export default {
                 vm.checkinFail = true
                 setTimeout(function() {
                   vm.isActive = false
-                }, 5000)
+                }, 3000)
                 vm.eformInformation = ''
               })
-            }
+            } else {
+              vm.isActive = true
+              vm.checkinFail = true
+              vm.isScaned = false
+              setTimeout(function() {
+                vm.isActive = false
+              }, 3000)
+              vm.eformInformation = ''
+              }
           } else {
             vm.isActive = true
             vm.checkinFail = true
             setTimeout(function() {
               vm.isActive = false
-            }, 5000)
+            }, 3000)
             vm.eformInformation = ''
           }
         } else {
@@ -300,7 +325,7 @@ export default {
           vm.overTime = true
           setTimeout(function() {
             vm.isActive = false
-          }, 5000)
+          }, 3000)
           vm.eformInformation = ''
         }
       }
@@ -308,39 +333,51 @@ export default {
     createBooking (filter) {
       let vm = this
       console.log('filter create booking', filter)
-      vm.$store.dispatch('createBooking', filter).then(function (result) {
-        vm.isActive = true
-        vm.checkinFail = false
-        vm.isScaned = false
-        vm.countBooking = result['count']
-        // 
-        let timeDelay = 5000
-        if (String(result['state']) === '4') {
-          vm.checkinFail = true
-          vm.isScaned = true
-        } else {
+      let checkCodeNumber = filter.hasOwnProperty('codeNumber') && filter.codeNumber.split("-").length === 1
+      if (checkCodeNumber) {
+        vm.$store.dispatch('createBooking', filter).then(function (result) {
+          vm.isActive = true
+          vm.checkinFail = false
+          vm.isScaned = false
+          vm.countBooking = result['count']
           // 
-          if (filter.dossierRelease) {
-            result.state = 4
-            console.log('filter update', result)
-            vm.updateStateBooking(result)
+          let timeDelay = 3000
+          if (String(result['state']) === '4') {
+            vm.checkinFail = true
+            vm.isScaned = true
+          } else {
+            // 
+            if (filter.dossierRelease) {
+              result.state = 4
+              console.log('filter update', result)
+              vm.updateStateBooking(result)
+            }
+            vm.overMax = false
+            if (vm.currentGroup.hasOwnProperty('maxRecord') && vm.currentGroup['maxRecord'] 
+              && Number(result['count']) > Number(vm.currentGroup['maxRecord'])
+            ) {
+              vm.overMax = true
+              timeDelay = 5000
+            }
           }
-          vm.overMax = false
-          if (vm.currentGroup.hasOwnProperty('maxRecord') && vm.currentGroup['maxRecord'] 
-            && Number(result['count']) > Number(vm.currentGroup['maxRecord'])
-          ) {
-            vm.overMax = true
-            timeDelay = 10000
-          }
-        }
-        // 
+          // 
+          setTimeout(function() {
+            vm.isActive = false
+          }, timeDelay)
+          vm.eformInformation = ''
+        }).catch (function (reject) {
+          vm.eformInformation = ''
+        })
+      } else {
+        vm.isActive = true
+        vm.checkinFail = true
+        vm.isScaned = false
         setTimeout(function() {
           vm.isActive = false
-        }, timeDelay)
+        }, 3000)
         vm.eformInformation = ''
-      }).catch (function (reject) {
-        vm.eformInformation = ''
-      })
+      }
+      
     },
     getBooking () {
       let vm = this

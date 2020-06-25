@@ -654,6 +654,7 @@
                       j_captcha_response: ''
                     }
                     if (!vm.isOffLine) {
+                      vm.trackingBTTT(resServiceInfo.serviceCode)
                       vm.$store.dispatch('postDossier', data).then(function (result) {
                         vm.loadingAction = false
                         vm.indexAction = -1
@@ -683,6 +684,7 @@
                       j_captcha_response: ''
                     }
                     if (!vm.isOffLine) {
+                      vm.trackingBTTT(resServiceInfo.serviceCode)
                       vm.$store.dispatch('postDossier', data).then(function (result) {
                         vm.loadingAction = false
                         vm.indexAction = -1
@@ -715,23 +717,28 @@
           })
         }
       },
-      selectServiceOption (item, itemServiceConfig) {
-        var vm = this
-        vm.serviceConfigSelect = itemServiceConfig
-        vm.govAgencyCodeSelect = itemServiceConfig.govAgencyCode
-        vm.serviceInfoIdSelect = itemServiceConfig.serviceInfoId
+      selectServiceOption (item, govAgencyCodeSelect, itemServiceConfig) {
+        let vm = this
+        if (itemServiceConfig) {
+          vm.serviceConfigSelect = itemServiceConfig
+          vm.govAgencyCodeSelect = itemServiceConfig.govAgencyCode
+        } else {
+          vm.govAgencyCodeSelect = govAgencyCodeSelect.govAgencyCode
+        }
+        
         vm.loadingMutiple = true
         vm.$store.dispatch('getServiceInfo', {
-          serviceInfoId: vm.serviceConfigSelect.serviceInfoId
+          serviceInfoId: vm.serviceInfoIdSelect
         }).then(resServiceInfo => {
           let data = {
             serviceCode: resServiceInfo.serviceCode,
-            govAgencyCode: itemServiceConfig.govAgencyCode,
+            govAgencyCode: itemServiceConfig ? itemServiceConfig.govAgencyCode : govAgencyCodeSelect.govAgencyCode,
             templateNo: item.templateNo,
             originality: vm.getOriginality(),
             j_captcha_response: ''
           }
           if (!vm.isOffLine) {
+            vm.trackingBTTT(resServiceInfo.serviceCode)
             vm.$store.dispatch('postDossier', data).then(function (result) {
               vm.loadingAction = false
               vm.indexAction = -1
@@ -769,6 +776,7 @@
         if (vm.serviceConfigSelect.serviceUrl) {
           window.location.href = vm.serviceConfigSelect
         } else {
+          vm.trackingBTTT(data.serviceCode)
           vm.$store.dispatch('postDossier', data).then(function (result) {
             if (result['status'] !== undefined && result['status'] === 203) {
               vm.loadingAction = false
@@ -908,6 +916,7 @@
         vm.$store.dispatch('getServiceInfo', {
           serviceInfoId: vm.serviceInfoIdSelect
         }).then(resServiceInfo => {
+          vm.trackingBTTT(resServiceInfo.serviceCode)
           let data = {
             serviceCode: resServiceInfo.serviceCode,
             govAgencyCode: govAgencyCode,
@@ -924,6 +933,15 @@
           })
         })
       },
+      trackingBTTT (serviceCode) {
+        try {
+          console.log('trackDVC serviceCode', serviceCode)
+          if (_govaq) {
+            _govaq.push(['trackDVC', serviceCode, '1', ''])
+          }
+        } catch (error) { 
+        }
+      }
     }
   }
 </script>

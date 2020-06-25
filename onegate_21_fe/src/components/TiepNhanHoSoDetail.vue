@@ -1169,7 +1169,6 @@ export default {
             vm.loadingAction = false
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             if (vm.formCode === 'UPDATE') {
-              // vm.goBack()
               window.history.back()
             } else {
               var initData = vm.$store.getters.loadingInitData

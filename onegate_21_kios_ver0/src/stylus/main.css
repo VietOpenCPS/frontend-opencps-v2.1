@@ -1252,7 +1252,9 @@ div.table-tracuu::-webkit-scrollbar-thumb {
 .kios-input {
     height: 35px !important;
 }
-
+.kios-input:focus{
+    outline: none;
+}
 .back-btn {
     width: 40px !important;
     height: 40px !important;
@@ -1378,7 +1380,7 @@ table > thead > tr > th.column {
 .validDanhGiaCLDV {
     z-index: 10000;
     background-color: #ffffff;
-    width: calc(100% - 350px);
+    width: calc(100% - 370px);
     position: fixed;
     bottom: 272px;
 }

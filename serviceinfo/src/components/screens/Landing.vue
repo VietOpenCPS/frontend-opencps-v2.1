@@ -157,7 +157,7 @@
                     <v-list v-if="props.item.serviceConfigs">
                       <v-list-tile v-for="(item2, index) in serviceConfigs(props.item.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
                         <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2, props.item)" >{{item2.govAgencyName}}</v-list-tile-title>
-                        <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                        <v-list-tile-title v-else @click="viewGuide(item2, props.item.serviceCode)">{{item2.govAgencyName}}</v-list-tile-title>
                       </v-list-tile>
                     </v-list>
                   </v-menu>
@@ -183,7 +183,7 @@
                   </v-btn>
                   <v-btn small color="primary" class="my-1" style="min-width: 110px;"
                     v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) <= 2"
-                    @click="viewGuide(serviceConfigs(props.item.serviceConfigs)[0])"
+                    @click="viewGuide(serviceConfigs(props.item.serviceConfigs)[0], props.item.serviceCode)"
                   >
                     Hướng dẫn
                   </v-btn>
@@ -323,7 +323,7 @@
                         <v-list v-if="item.serviceConfigs">
                           <v-list-tile v-for="(item2, index) in serviceConfigs(item.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
                             <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2, item)" >{{item2.govAgencyName}}</v-list-tile-title>
-                            <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                            <v-list-tile-title v-else @click="viewGuide(item2, item.serviceCode)">{{item2.govAgencyName}}</v-list-tile-title>
                           </v-list-tile>
                         </v-list>
                       </v-menu>
@@ -350,7 +350,7 @@
                       </v-btn>
                       <v-btn class="mx-0 my-0" small color="primary" 
                         v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length === 1 && Number(serviceConfigs(item.serviceConfigs)[0]['serviceLevel']) <= 2"
-                        @click="viewGuide(serviceConfigs(item.serviceConfigs)[0])"
+                        @click="viewGuide(serviceConfigs(item.serviceConfigs)[0], item.serviceCode)"
                       >
                         Xem hướng dẫn
                       </v-btn>
@@ -1365,10 +1365,11 @@ export default {
       let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
       window.open(url, '_self')
     },
-    viewGuide (item) {
+    viewGuide (item, serviceCode) {
       let vm = this
       vm.serviceDetail = item
       vm.dialogGuide = true
+      vm.trackingBTTT(serviceCode)
     },
     showSelectGov (serviceInfo, govList, guide) {
       let vm = this
@@ -1419,6 +1420,15 @@ export default {
         return 'orange darken-1'
       } else if (level === 4) {
         return 'red'
+      }
+    },
+    trackingBTTT (serviceCode) {
+      try {
+        console.log('trackDVC serviceCode', serviceCode)
+        if (_govaq) {
+          _govaq.push(['trackDVC', serviceCode, '1', ''])
+        }
+      } catch (error) { 
       }
     }
   }

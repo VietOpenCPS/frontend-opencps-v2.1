@@ -5,8 +5,8 @@
         <a href="/web/cong-dich-vu-cong" :class="!isKios?'mobile':''">
           <img src="/o/opencps-store/js/kios_ver0/img/logo.png">
           <div>
-            <p class="text-bold">TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG TỈNH PHÚ THỌ</p>
-            <span class="text-bold">HỆ THỐNG MỘT CỬA ĐIỆN TỬ VÀ DỊCH VỤ CÔNG TRỰC TUYẾN</span>
+            <p class="text-bold"></p>
+            <span class="text-bold"></span>
           </div>
         </a>
       </header>

@@ -184,6 +184,7 @@ export default {
     fields: [],
     valid: false,
     api: '',
+    proxyApi: '',
     onlines: [],
     online: '',
     itemsReportsConfig: [],
@@ -218,6 +219,7 @@ export default {
     customize: false,
     groupBy: [],
     groupByVal: '',
+    groupByValObj: '',
     dataReportXX: '',
     buttons: [],
     buttonsVal: '',
@@ -290,6 +292,7 @@ export default {
         vm.showCSVDownload = false
         vm.agencyLists = []
         vm.api = ''
+        vm.proxyApi = ''
         vm.filters = []
         vm.customize = false
         vm.data = {}
@@ -341,6 +344,9 @@ export default {
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
             vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+            vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
             vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
@@ -398,6 +404,7 @@ export default {
       vm.customize = false
       vm.data = {}
       vm.api = ''
+      vm.proxyApi = ''
       vm.filters = []
       vm.report1Def = {}
       vm.dataReportXX = ''
@@ -446,6 +453,9 @@ export default {
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
         vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
       }
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+        vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
       }
@@ -489,6 +499,7 @@ export default {
         vm.showCSVDownload = false
         vm.agencyLists = []
         vm.api = ''
+        vm.proxyApi = ''
         vm.filters = []
         vm.customize = false
         vm.data = {}
@@ -537,6 +548,9 @@ export default {
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
             vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
           }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+            vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+          }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
             vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
           }
@@ -570,7 +584,15 @@ export default {
           vm.pdfBlob = ''
         }
       }, 200)
-    }
+    },
+    // groupByVal (val) {
+    //   let vm = this
+    //   if (val) {
+    //     vm.groupByValObj = vm.groupBy.filter(function (item) {
+    //       return item.key === val
+    //     })[0]
+    //   }
+    // }
   },
   methods: {
     doCreatePDF () {
@@ -633,6 +655,9 @@ export default {
         }
       }
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+        vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
       let widthsConfig = []
       widthsConfig.push(30)
       let headerTableReport = '['
@@ -651,8 +676,9 @@ export default {
       let colLeng = 0
       for (let key in vm.itemsReportsConfig) {
         if (vm.itemsReportsConfig[key].hasOwnProperty('selected') && vm.itemsReportsConfig[key]['selected']) {
+          let widthConfig = vm.itemsReportsConfig[key].hasOwnProperty('width') ? vm.itemsReportsConfig[key] : 'auto'
           colLeng = colLeng + 1
-          widthsConfig.push('auto')
+          widthsConfig.push(widthConfig)
           // vm.docDefinition['content'][2]['table']['widths'].push('auto')
           let str1 = ' '
           if (vm.report1Def[vm.itemsReportsConfig[key]['value']] !== undefined && vm.report1Def[vm.itemsReportsConfig[key]['value']] !== null && vm.report1Def[vm.itemsReportsConfig[key]['value']] !== '') {
@@ -680,7 +706,8 @@ export default {
       let filter = {
         document: vm.reportType,
         data: vm.data,
-        api: vm.api
+        api: vm.api,
+        proxyApi: vm.proxyApi
       }
       filter['govAgency'] = vm.govAgency
       filter['agencyLists'] = vm.agencyLists
@@ -702,6 +729,13 @@ export default {
               break
             }
           }
+          try {
+            vm.groupByValObj = vm.groupBy.filter(function (item) {
+              return item.key === vm.groupByVal
+            })[0]
+          } catch (error) {
+          }
+          
           for (let key in dataReport) {
             dataReportCurrent = dataReport[key]
             if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
@@ -711,7 +745,7 @@ export default {
               }
             } else {
               let dossierRawItem = {}
-              if (!dataReportCurrent.hasOwnProperty('dossierId')) {
+              if (!dataReportCurrent.hasOwnProperty('dossierId') && !vm.reportType.startsWith('REPORT_STATISTIC')) {
                 dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
                 dossierRawItem[textGroup] = dataReportCurrent[textGroup]
                 dossierRawItem['totalChild'] = 0
@@ -730,7 +764,7 @@ export default {
               }
             }
           }
-          console.log('dossierRaw', dossierRaw)
+          // console.log('dossierRaw', dossierRaw)
           let dataToExportCSV = []
           let dataRaw = []
           for (let key in dossierRaw) {
@@ -739,7 +773,7 @@ export default {
             }
           }
           dataRaw.reverse()
-          console.log('dossierRaw 46', dataRaw)
+          console.log('dossierRaw 47', dataRaw)
           let dataRowTotal = []
           let totalText = 'Tổng cộng'
           dataRowTotal.push({
@@ -757,59 +791,64 @@ export default {
                 style: 'tdStyle'
               })
             }  else {
-              dataRowTotal.push({
-                text: 0, 
-                alignment: 'center',
-                style: 'tdStyle'
-              })
+              if (vm.itemsReportsConfig[keyMapping].hasOwnProperty('type') && vm.itemsReportsConfig[keyMapping].type === 'currency') {
+                dataRowTotal.push({
+                  text: 0, 
+                  alignment: 'center',
+                  style: 'tdStyle',
+                  type: 'currency'
+                })
+              } else {
+                dataRowTotal.push({
+                  text: 0, 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+              }
+              
             }
           }
-          
+          let indexNotShowGroup = 1
           for (let key in dataRaw) {
-            if (dataRaw[key][vm.groupByVal] !== undefined && dataRaw[key][vm.groupByVal] !== null && dataRaw[key][vm.groupByVal] !== '') {
-              let csvGroup = []
-              csvGroup.push( dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ')
-              for (let colLengIndex in colLeng) {
-                csvGroup.push('')
-              }
-              dataToExportCSV.push(csvGroup)
-              if (vm.doExportExcel) {
-                dataReportTotal += '[ '
-                dataReportTotal += JSON.stringify({
-                  text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
-                  bold: true,
-                  style: 'tdStyle'
-                }) + ','
-                for (let csvIndexXXX = 0; csvIndexXXX < colLeng - 1; csvIndexXXX ++) {
+            if (!vm.groupByValObj.hasOwnProperty('showGroup')) {
+              if (dataRaw[key][vm.groupByVal] !== undefined && dataRaw[key][vm.groupByVal] !== null && dataRaw[key][vm.groupByVal] !== '') {
+                let csvGroup = []
+                csvGroup.push( dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ')
+                for (let colLengIndex in colLeng) {
+                  csvGroup.push('')
+                }
+                dataToExportCSV.push(csvGroup)
+                if (vm.doExportExcel) {
+                  dataReportTotal += '[ '
+                  dataReportTotal += JSON.stringify({
+                    text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
+                    bold: true,
+                    style: 'tdStyle'
+                  }) + ','
+                  for (let csvIndexXXX = 0; csvIndexXXX < colLeng - 1; csvIndexXXX ++) {
+                    dataReportTotal += JSON.stringify({
+                      text: '',
+                      bold: true,
+                      style: 'tdStyle'
+                    }) + ','
+                  }
                   dataReportTotal += JSON.stringify({
                     text: '',
                     bold: true,
                     style: 'tdStyle'
-                  }) + ','
+                  })
+                  dataReportTotal += ' ],'
+                } else {
+                  dataReportTotal += JSON.stringify([{
+                    colSpan: colLeng + 1,
+                    text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
+                    bold: true,
+                    style: 'tdStyle'
+                  }]) + ','
                 }
-                dataReportTotal += JSON.stringify({
-                  text: '',
-                  bold: true,
-                  style: 'tdStyle'
-                })
-                dataReportTotal += ' ],'
-              } else {
-                dataReportTotal += JSON.stringify([{
-                  colSpan: colLeng + 1,
-                  text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
-                  bold: true,
-                  style: 'tdStyle'
-                }]) + ','
               }
             }
-            /*
-            vm.docDefinition['content'][2]['table']['body'].push([{
-              colSpan: val.length + 1,
-              text: '- ' + domains[0]['services'][key]['serviceCode'] + ' - ' + domains[0]['services'][key]['serviceName'],
-              bold: true,
-              style: 'tdStyle'
-            }])
-            */
+            
            
             let dossiersArray = dataRaw[key]['dossiers']
             let indexStt = 1
@@ -820,7 +859,7 @@ export default {
               let dossierObj = dossiersArray[keyDossier]
               dataToExportCSVItem.push(indexStt)
               dataRow.push({
-                text: indexStt, 
+                text: !vm.groupByValObj.hasOwnProperty('showGroup') ? indexStt : indexNotShowGroup, 
                 alignment: 'center',
                 style: 'tdStyle'
               })
@@ -846,15 +885,19 @@ export default {
                     }
                   }
                   dataToExportCSVItem.push(ddStr)
+                  // convert value currency
                   dataRow.push({
-                    text: ddStr, 
+                    text: currentConfig.hasOwnProperty('type') && currentConfig.type === 'currency' ? vm.currency(ddStr) : ddStr, 
                     alignment: alignmentConfig,
                     style: 'tdStyle'
                   })
                   // caculator count total
                   if (vm.reportType.startsWith('REPORT_STATISTIC')) {
                     let indexRow = dataRow.length - 1
-                    dataRowTotal[indexRow]['text'] = Number(dataRowTotal[indexRow]['text']) + Number(dataRow[indexRow]['text'])
+                    dataRowTotal[indexRow]['text'] = Number(dataRowTotal[indexRow]['text'].toString().replace(/\./g, '')) + Number(dataRow[indexRow]['text'].toString().replace(/\./g, ''))
+                    if (dataRowTotal[indexRow]['type'] === 'currency') {
+                      dataRowTotal[indexRow]['text'] = vm.currency(dataRowTotal[indexRow]['text'])
+                    }
                     if (vm.itemsReportsConfig[keyVal]['value'] === 'note') {
                       dataRowTotal[indexRow]['text'] = ''
                     }
@@ -866,15 +909,17 @@ export default {
               dataReportTotal += JSON.stringify(dataRow) + ','
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
               indexStt = indexStt + 1
+              indexNotShowGroup = indexNotShowGroup + 1
               dataToExportCSV.push(dataToExportCSVItem)
             }
           }
           dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
           vm.dataReportXX += dataReportTotal
+          // console.log('dataRowTotal 777===', dataRowTotal)
           if (vm.reportType.startsWith('REPORT_STATISTIC')) {
             vm.dataReportXX += ',' + JSON.stringify(dataRowTotal)
           }
-          // console.log('dataReportXX11ZZ', vm.dataReportXX)
+          console.log('dataReportXX11ZZ', vm.dataReportXX)
           
           vm.csvExport = []
           vm.csvExport = dataToExportCSV
@@ -893,6 +938,7 @@ export default {
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           vm.docDefinition = JSON.parse(docDString)
+
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
@@ -928,6 +974,7 @@ export default {
       let vm = this
       vm.agencyLists = []
       vm.api = ''
+      vm.proxyApi = ''
       vm.dataReportXX = ''
       vm.docDefinition = {}
       let docDString = {}
@@ -976,11 +1023,15 @@ export default {
         }
       }
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+        vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
       vm.isShowLoading = true
       let filter = {
         document: vm.reportType,
         data: vm.data,
-        api: vm.api
+        api: vm.api,
+        proxyApi: vm.proxyApi
       }
       filter['govAgency'] = vm.govAgency
       filter['agencyLists'] = vm.agencyLists
@@ -1367,11 +1418,15 @@ export default {
       vm.jsonMapperJson = {}
       vm.jsonMapperJson = vm.itemsReports[vm.index]['userConfig']
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+        vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
       // bild data
       let filter = {
         document: vm.reportType,
         data: vm.data,
-        api: vm.api
+        api: vm.api,
+        proxyApi: vm.proxyApi
       }
       filter['govAgency'] = vm.govAgency
       filter['agencyLists'] = vm.agencyLists
@@ -1473,7 +1528,14 @@ export default {
       } catch (e) {
         return ''
       }
-    }
+    },
+    currency (value) {
+      if (value) {
+        let moneyCur = (value / 1).toFixed(0).replace('.', ',')
+        return moneyCur.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+      }
+      return ''
+    },
   }
 }
 </script>

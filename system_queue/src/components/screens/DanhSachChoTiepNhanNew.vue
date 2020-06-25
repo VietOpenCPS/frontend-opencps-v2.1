@@ -37,7 +37,7 @@
           <v-flex xs12 class="text-xs-center title py-3 pt-4" style="height:70px">
             <p class="text-bold white--text">{{item.title}} ({{Array.isArray(columnList[index]['content']) ? columnList[index]['content'].length : 0}})</p>
           </v-flex>
-          <table-cho-tiep-nhan :applicantList="item.content"></table-cho-tiep-nhan>
+          <table-cho-tiep-nhan :applicantList="columnList[index]['content']"></table-cho-tiep-nhan>
         </div>
       </v-flex>
       
@@ -86,7 +86,7 @@ export default {
       vm.getServerConfig()
       setInterval(function () {
         vm.getDanhSachCho()
-      }, 15000)
+      }, 5000)
     })
   },
   updated () {
@@ -192,45 +192,20 @@ export default {
           } else if (vm.columnList[index]['key'] === 'API') {
             let bookingDossierRealease = []
             let filter = {
-              url: vm.columnList[index]['url'] ? vm.columnList[index]['url'] : ''
+              state: 4,
+              className: 'DOSSIER',
+              service: vm.columnList[index]['config'],
+              bookingFrom: vm.getCurrentDate(),
+              bookingTo: vm.getCurrentDate(),
+              online: false
             }
-            vm.$store.dispatch('getDossier', filter).then(function (result) {
-              // -----
-              let bookingDossierArray = []
-              if (Array.isArray(result) && result.length > 0) {
-                let filter = {
-                  state: 4,
-                  className: 'DOSSIER',
-                  service: vm.columnList[index]['config'],
-                  bookingFrom: vm.getCurrentDate(),
-                  bookingTo: vm.getCurrentDate(),
-                  online: false
-                }
-                vm.$store.dispatch('getBookingDangGoi', filter).then(function (resultBooking) {
-                  if (resultBooking) {
-                    bookingDossierRealease = resultBooking
-                  } else {
-                    bookingDossierRealease = []
-                  }
-                  if (bookingDossierRealease.length > 0) {
-                    let lengthBooking = bookingDossierRealease.length
-                    for (let i = 0; i < lengthBooking; i++) {
-                      let dossierId = bookingDossierRealease[i]['classPK']
-                      let lengthDossier = result.length
-                      for (let j = 0; j < lengthDossier; j++) {
-                        if (String(dossierId) === String(result[j]['dossierId'])) {
-                          bookingDossierArray.push(bookingDossierRealease[i])
-                          break
-                        }
-                      }
-                      vm.columnList[index]['content'] = bookingDossierArray
-                    }
-                  }
-                })
+            vm.$store.dispatch('getBookingDangGoi', filter).then(function (resultBooking) {
+              if (resultBooking) {
+                bookingDossierRealease = resultBooking
+              } else {
+                bookingDossierRealease = []
               }
-              // -----
-              // vm.columnList[index]['content'] = result
-            }).catch(function (reject) {
+              vm.columnList[index]['content'] = bookingDossierRealease
             })
           }
         }

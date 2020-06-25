@@ -138,7 +138,9 @@ export const store = new Vuex.Store({
           axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
             console.log('responseLogin', response)
             commit('setLoading', false)
-            if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha' && response.data !== "lockout") {
+            if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha' && response.data !== "lockout" &&
+            response.data !== "changeSecrect" && response.data !== "verify"
+            ) {
               if (response.data === 'pending') {
                 let url = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
                 let userId = response.headers.hasOwnProperty('userid') ? response.headers.userid : ''
@@ -153,7 +155,7 @@ export const store = new Vuex.Store({
               setTimeout(function () {
                 let urlDvc = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
                 window.location.href = urlDvc + '/dich-vu-cong'
-              },200)
+              }, 200)
             } else if (response.data === 'captcha') {
               if (filter.j_captcha_response && response['status'] !== undefined && response['status'] === 203) {
                 toastr.error("Mã captcha không chính xác")
@@ -162,6 +164,16 @@ export const store = new Vuex.Store({
             } else if (response.data === "lockout") {
               resolve('lockout')
               toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị tạm khóa trong 10 phút.")
+            } else if (response.data === "changeSecrect") {
+              resolve('changeSecrect')
+            } else if (response.data === "verify") {
+              console.log('reponseLogin', response, response.headers)
+              let header = response.headers.hasOwnProperty('applicantid') ? response.headers['applicantid'] : ''
+              if ( typeof(Storage) !== 'undefined') {
+                sessionStorage.removeItem('applicantId')
+                sessionStorage.setItem('applicantId', header)
+              }
+              resolve('verify')
             } else {
               resolve('fail')
               toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
@@ -279,20 +291,25 @@ export const store = new Vuex.Store({
             reject(errorRes)
             console.log('response', errorRes.response)
             let dataError
-            if (errorRes.response.data) {
-              dataError = errorRes.response.data
-              if (dataError && dataError.description && dataError.description === 'DuplicateContactEmailException') {
-                toastr.error('Đăng ký thất bại. Email sử dụng đã tồn tại trên hệ thống. Sử dụng Email khác để đăng ký')
-              } else if (dataError && dataError.description && dataError.description === 'DuplicateApplicantIdException') {
-                toastr.error('Đăng ký thất bại. Số CMDN/Mã số thuế đã tồn tại trên hệ thống. Sử dụng số CMDN/mã số thuế khác để đăng ký')
-              } else if (dataError && dataError.description && dataError.description === 'DuplicateContactTelNoException') {
-                toastr.error('Đăng ký thất bại. Số điện thoại đã được sử dụng trên hệ thống. Sử dụng số điện thoại khác để đăng ký')
-              } else if (dataError && dataError.description && dataError.description === 'Invalid ID, could not validate unexisting or already validated captcha') {
-                toastr.error('Nhập sai Captcha')
-              } else {
-                toastr.error('Đăng ký thất bại. Vui lòng thử lại ' + dataError.description)
+            if (String(errorRes.response.status) === '409') {
+              toastr.error('Đăng ký thất bại. Tài khoản đã tồn tại trên hệ thống')
+            } else {
+              if (errorRes.response.data) {
+                dataError = errorRes.response.data
+                if (dataError && dataError.description && dataError.description === 'DuplicateContactEmailException') {
+                  toastr.error('Đăng ký thất bại. Email sử dụng đã tồn tại trên hệ thống. Sử dụng Email khác để đăng ký')
+                } else if (dataError && dataError.description && dataError.description === 'DuplicateApplicantIdException') {
+                  toastr.error('Đăng ký thất bại. Số CMDN/Mã số thuế đã tồn tại trên hệ thống. Sử dụng số CMDN/mã số thuế khác để đăng ký')
+                } else if (dataError && dataError.description && dataError.description === 'DuplicateContactTelNoException') {
+                  toastr.error('Đăng ký thất bại. Số điện thoại đã được sử dụng trên hệ thống. Sử dụng số điện thoại khác để đăng ký')
+                } else if (dataError && dataError.description && dataError.description === 'Invalid ID, could not validate unexisting or already validated captcha') {
+                  toastr.error('Nhập sai Captcha')
+                } else {
+                  toastr.error('Đăng ký thất bại. Vui lòng thử lại ' + dataError.description)
+                }
               }
             }
+            
           })
         })
       })
@@ -359,7 +376,6 @@ export const store = new Vuex.Store({
           // axios.get('/o/rest/v2/applicants/' + data.userId + '/lgsp/activate/' + data.pinCode, param).then(function (response) {
           axios.get('/o/rest/v2/applicants/'+data.userId+'/verify/'+ data.pinCode, param).then(function (response) {
             resolve(response.data)
-            toastr.success('Xác thực thành công')
           }).catch(function (xhr) {
             reject(xhr)
             toastr.error('Mã pin không chính xác. Vui lòng kiểm tra lại')
@@ -488,7 +504,31 @@ export const store = new Vuex.Store({
           reject(xhr)
         })
       })
-    }
+    },
+    changePass ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let userId = 0
+        if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+          userId = window.themeDisplay.getUserId()
+        }
+        var url = '/o/rest/v2/users/' + userId + '/changepass/application'
+        var dataPutUser = new URLSearchParams()
+        dataPutUser.append('oldPassword', filter.oldPassword)
+        dataPutUser.append('newPassword', filter.newPassword)
+        axios.post(url, dataPutUser, param).then(result1 => {
+          resolve(result1.data)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
   },
   mutations: {
     setLoading (state, payload) {

@@ -9,11 +9,13 @@ import ConfirmPassword from '@/components/screens/ConfirmPassword'
 import Login from '@/components/screens/Login'
 import LoginDvcBgt from '@/components/screens/LoginDvcBgt'
 import LoginMotCua from '@/components/screens/LoginMotCua'
+import ChangePassword from '@/components/screens/ChangePassWord'
 const routes = [
   { path: '/', name: 'LandingRegister', component: LandingRegister, props: false },
   { path: '/xac-thuc-tai-khoan', name: 'XacThucTaiKhoan', component: XacThucTaiKhoan },
   { path: '/cap-lai-mat-khau', name: 'ForgotPassword', component: ForgotPassword },
   { path: '/xac-thuc-cap-lai-mat-khau', name: 'ConfirmPassword', component: ConfirmPassword },
+  { path: '/thay-doi-mat-khau', name: 'ChangePassword', component: ChangePassword },
   { path: '/login', name: 'Login', component: Login },
   { path: '/login-dichvucong', name: 'LoginDvcBgt', component: LoginDvcBgt },
   { path: '/login-motcua', name: 'LoginMotCua', component: LoginMotCua },

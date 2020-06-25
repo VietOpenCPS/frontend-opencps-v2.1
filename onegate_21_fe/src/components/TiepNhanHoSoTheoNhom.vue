@@ -75,7 +75,7 @@
               </div>
               
               <div class="mb-3" v-if="dossiersIntoGroupRender.length > 0">
-                <!-- <v-layout wrap class="my-2">
+                <v-layout wrap class="my-2">
                   <v-flex style="width: 120px">
                     <v-subheader class="pl-0 text-header">Bước xử lý: </v-subheader>
                   </v-flex>
@@ -101,7 +101,7 @@
                     {{item.title}}{{item.tiltle}}
                     <span slot="loader">Loading...</span>
                   </v-btn>
-                </div> -->
+                </div>
                 <v-data-table
                   v-model="selected"
                   select-all
@@ -115,7 +115,7 @@
                   <!--  -->
                   <template slot="headers" slot-scope="props">
                     <tr>
-                      <!-- <th width="32px" class="v_data_table_check_all" style="padding-left: 14px !important;">
+                      <th width="32px" class="v_data_table_check_all" style="padding-left: 14px !important;">
                         <v-checkbox
                           :input-value="props.all"
                           :indeterminate="props.indeterminate"
@@ -123,7 +123,7 @@
                           hide-details
                           @click.native="toggleAll"
                         ></v-checkbox>
-                      </th> -->
+                      </th>
                       <th
                         v-for="header in headersCV"
                         :key="header.text"
@@ -140,13 +140,13 @@
                   <!--  -->
                   <template slot="items" slot-scope="props">
                     <tr style="cursor: pointer">
-                      <!-- <td class="text-xs-center pl-3" width="32px" style="height: 40px !important">
+                      <td class="text-xs-center pl-3" width="32px" style="height: 40px !important">
                         <v-checkbox
                           v-model="props.selected"
                           primary
                           hide-details
                         ></v-checkbox>
-                      </td> -->
+                      </td>
                       <td @click="viewDetail(props.item, props.index)" class="text-xs-center" width="50px" style="height: 40px !important">
                         <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
                       </td>
@@ -213,11 +213,11 @@
               <div v-else class="pl-5 py-2">Chưa có hồ sơ nào</div>
 
               <v-flex xs12 class="text-right mb-3 mr-2" v-if="formCode === 'NEW_GROUP_CV'">
-                <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2" style="height:36px !important">
+                <v-btn small color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2">
                   <v-icon size="20">add</v-icon>  &nbsp;
                   <span>Thêm mới hồ sơ</span>
                 </v-btn>
-                <v-btn color="primary" @click="showDossierToAdd" class="mx-0 my-0" style="height:36px !important">
+                <v-btn small color="primary" @click="showDossierToAdd" class="mx-0 my-0" >
                   <v-icon size="20">create_new_folder</v-icon>  &nbsp;
                   <span>Thêm hồ sơ đã có</span>
                 </v-btn>
@@ -575,16 +575,18 @@
                 <v-text-field
                   label="Tìm kiếm theo mã hồ sơ"
                   v-model="dossierNoKey"
-                  @keyup.enter="searchDossierToAdd"
+                  @keyup.enter="searchKeyWordDossierToAdd"
                   append-icon="search"
                   box
-                  @click:append="searchDossierToAdd"
+                  @click:append="searchKeyWordDossierToAdd"
                 ></v-text-field>
               </v-flex>
             </v-layout>
             <v-data-table
               :headers="headersCV"
               :items="dossiersSelectAdd"
+              :select-all="true"
+              v-model="selectedDossierAdd"
               hide-actions
               class="table-landing table-bordered"
               item-key="dossierId"
@@ -592,6 +594,16 @@
               <!--  -->
               <template slot="headers" slot-scope="props">
                 <tr>
+                  <th width="32px" class="v_data_table_check_all" style="padding-left: 14px !important;">
+                    <v-checkbox
+                      class="pl-1"
+                      :input-value="props.all"
+                      :indeterminate="props.indeterminate"
+                      primary
+                      hide-details
+                      @click.native="toggleAllSelectDossierAdd"
+                    ></v-checkbox>
+                  </th>
                   <th
                     v-for="header in headersCV"
                     :key="header.text"
@@ -608,8 +620,18 @@
               <!--  -->
               <template slot="items" slot-scope="props">
                 <tr style="cursor: pointer">
+                  <td class="text-xs-center" width="30px" style="height: 40px !important">
+                    <v-checkbox
+                      class="pl-3"
+                      v-model="props.selected"
+                      @change="changeSelectedDossierAdd"
+                      primary
+                      hide-details
+                      color="primary"
+                    ></v-checkbox>
+                  </td>
                   <td class="text-xs-center" width="50px" style="height: 40px !important">
-                    <span>{{hosoDatasPage * 10 - 10 + props.index + 1}}</span>
+                    <span>{{hosoDatasPage * numberPerPageAddDossier - numberPerPageAddDossier + props.index + 1}}</span>
                   </td>
                   <td class="text-xs-left" width="150px" style="height: 40px !important">
                     {{ props.item.applicantName }}
@@ -641,7 +663,7 @@
                   </td>
                   
                   <td class="text-xs-center" width="100px" style="height: 40px !important">
-                    <v-btn small color="primary" @click="addDossierToGroup(props.item)" class="mr-2 my-0">
+                    <v-btn small outline color="primary" @click="addDossierToGroup(props.item)" class="mr-2 my-0">
                       <v-icon size="20">add</v-icon>  &nbsp;
                       <span>Thêm hồ sơ</span>
                     </v-btn>
@@ -652,7 +674,7 @@
 
             <div class="text-xs-right layout wrap" style="position: relative;">
               <div class="flex pagging-table px-2"> 
-                <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" :numberPerPage="10" :showLimit="false" custom-class="custom-tiny-class" 
+                <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" :numberPerPage="numberPerPageAddDossier" :showLimit="false" custom-class="custom-tiny-class" 
                  @tiny:change-page="paggingDataDossierAdd" ></tiny-pagination> 
               </div>
             </div>
@@ -660,11 +682,11 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <!-- <v-btn color="primary" @click.native="addFileToDossier()">
+          <v-btn color="primary" @click.native="addMultipleDossierToGroup()">
             <v-icon>send</v-icon>&nbsp;
             Xác nhận
-          </v-btn> -->
-          <v-btn color="red" style="color: #fff;" @click.native="dialogAddDossier = false"
+          </v-btn>
+          <v-btn color="primary" @click.native="dialogAddDossier = false"
             >
             <v-icon class="white--text">close</v-icon>&nbsp;
             Thoát
@@ -713,11 +735,16 @@ export default {
     dialogSelectDosier: false,
     dialogAddDossier: false,
     dossiersSelectAdd: [],
+    selectedDossierAdd: [],
+    selectMultiplePage: [],
+    selectedDoAction: [],
     groupDossierList: [],
     groupDossierSelected: '',
     dossierNoKey: '',
     hosoDatasPage: 1,
     hosoDatasTotal: 0,
+    hosoTotalPage: 0,
+    numberPerPageAddDossier: 5,
     dossiersIntoGroup: [],
     dossiersIntoGroupRender: [],
     selected: [],
@@ -979,6 +1006,20 @@ export default {
       console.log('val activeAddFileGroup', val)
       vm.stepSelected = ''
       vm.dialogSelectDosier = val
+    },
+    selectMultiplePage: {
+      handler: function (val) {
+        let vm = this
+        if (val.length > 0) {
+          vm.selectedDoAction = []
+          for (let key in val) {
+            vm.selectedDoAction = vm.selectedDoAction.concat(val[key]['selected'])
+          }
+        } else {
+          vm.selectedDoAction = []
+        }
+      },
+      deep: true
     }
   },
   methods: {
@@ -1044,23 +1085,6 @@ export default {
               }
             }
             vm.stepList = steps
-            // if (vm.stepList.length === 1) {
-            //   vm.stepSelected = vm.stepList[0]
-            //   vm.$store.dispatch('pullProcessSteps', vm.stepList[0]).then(function (result) {
-            //     if (result.hasOwnProperty('buttonConfig') && result.buttonConfig) {
-            //       try {
-            //         vm.btnDynamics = JSON.parse(result['buttonConfig'])['buttons']
-            //         vm.btnDynamics = vm.btnDynamics.filter(function(item) {
-            //           return item['form'] === 'ACTIONS'
-            //         })
-            //       } catch (error) {
-            //         vm.btnDynamics = []
-            //       }
-            //     } else {
-            //       vm.btnDynamics = []
-            //     }
-            //   })
-            // }
           }
           vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
         })
@@ -1086,9 +1110,10 @@ export default {
                       return (!item.hasOwnProperty('onlySteps') ||
                         (item.hasOwnProperty('onlySteps') && item['onlySteps'].filter(function(item2) {
                           return String(item2) === String(vm.stepSelected['stepCode']) 
-                        }) > 0)
+                        }).length >= 0)
                       )
                     })
+                    console.log('btnDynamics dossierGroup', vm.btnDynamics)
                   } catch (error) {
                     vm.btnDynamics = []
                   }
@@ -1108,12 +1133,10 @@ export default {
     },
     btnActionEvent (item, index) {
       let vm = this
-      if (!vm.selected) {
-        alert('Chọn hồ sơ để thực hiện')
+      if (!vm.selected || vm.selected.length === 0) {
+        toastr.error('Chọn hồ sơ để thực hiện')
         return
       }
-      // console.log('btnAction', item)
-      // console.log('dossierSelected', vm.selected)
       vm.$store.dispatch('loadActionActive', item).then(function () {
         vm.$store.dispatch('loadDossierSelected', vm.selected).then(function () {
           let dossiersSelect = vm.selected.map(select => {
@@ -1133,6 +1156,7 @@ export default {
       let vm = this
       vm.hosoDatasPage = 1
       vm.dossierNoKey = ''
+      vm.selectMultiplePage = []
       vm.searchDossierToAdd()
       vm.dialogAddDossier = true
     },
@@ -1765,13 +1789,18 @@ export default {
         })
       // }
     },
+    searchKeyWordDossierToAdd () {
+      let vm = this
+      vm.selectMultiplePage = []
+      vm.searchDossierToAdd()
+    },
     searchDossierToAdd () {
       let vm = this
       let filter = {
         dossierNo: vm.dossierNoKey,
         service: vm.thongTinNhomHoSo.serviceCode,
         page: vm.hosoDatasPage,
-        numberPerPage: 10,
+        numberPerPage: vm.numberPerPageAddDossier,
         originality: 3,
         sort: 'dossierNo',
         order: true
@@ -1779,16 +1808,44 @@ export default {
       vm.$store.dispatch('getHoSoAddGroup', filter).then(function (result) {
         vm.dossiersSelectAdd = result.data
         vm.hosoDatasTotal = result.total
+
+        vm.hosoTotalPage = Math.ceil(vm.hosoDatasTotal / vm.numberPerPageAddDossier)
+        if (vm.hosoTotalPage > 0 && vm.selectMultiplePage.length === 0) {
+          for (let key = 0; key < vm.hosoTotalPage; key++) {
+            let item = {
+              selected: [],
+              page: key + 1
+            }
+            vm.selectMultiplePage.push(item)
+          }
+        }
+        vm.selectedDossierAdd = vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected']
       }).catch(reject => {
         vm.dossiersSelectAdd = []
         vm.hosoDatasTotal = 0
       })
     },
-    addDossierToGroup (item) {
+    changeSelectedDossierAdd () {
+      let vm = this
+      console.log('selectedDossierAdd', vm.selectedDossierAdd)
+      vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected'] = vm.selectedDossierAdd
+    },
+    addMultipleDossierToGroup () {
+      let vm = this
+      console.log('selectedDoAction', vm.selectedDoAction)
+      let arrDossierId = []
+      let arrLength = vm.selectedDoAction.length
+      for (let index = 0; index < arrLength; index++) {
+        let id = vm.selectedDoAction[index]['dossierId']
+        arrDossierId.push(id)
+      }
+      vm.addDossierToGroup(false, arrDossierId.toString())
+    },
+    addDossierToGroup (item, multiple) {
       let vm = this
       let data = {
         groupDossierId: vm.thongTinNhomHoSo.dossierId,
-        dossierId: item.dossierId
+        dossierId: multiple ? multiple : item.dossierId
       }
       vm.$store.dispatch('postDossierIntoGroup', data).then(function (result) {
         toastr.clear()
@@ -1807,7 +1864,7 @@ export default {
             return obj.dossierFileId
           }).toString()
           let filterCopyFile = {
-            dossierIds: item.dossierId,
+            dossierIds: multiple ? multiple : item.dossierId,
             dossierFileId: dossierFileIds
           }
           vm.$store.dispatch('uploadFileDossierGroup', filterCopyFile).then(function (resultFile) {
@@ -1850,6 +1907,17 @@ export default {
       } else {
         vm.selected = vm.dossiersIntoGroupRender
       }
+    },
+    toggleAllSelectDossierAdd () {
+      let vm = this
+      if (vm.selectedDossierAdd.length) {
+        vm.selectedDossierAdd = []
+      } else {
+        vm.selectedDossierAdd = vm.dossiersSelectAdd
+      }
+      vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected'] = vm.selectedDossierAdd
+      console.log('selectedDossierAdd all', vm.selectedDossierAdd)
+      console.log('selectMultiplePage all', vm.selectMultiplePage)
     },
     toggleAllSelectDialog () {
       var vm = this

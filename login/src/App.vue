@@ -331,9 +331,19 @@ export default {
         // kt
         vm.pullNotificationCount();
         setTimeout(() => {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
           axios
-            .get("/o/v1/opencps/users/" + window.themeDisplay.getUserId())
+            .get("/o/v1/opencps/users/" + window.themeDisplay.getUserId(), param)
             .then(function(response) {
+              if (response.headers['jwt-token']) {
+                if (typeof(Storage) !== "undefined") {
+                  localStorage.setItem("jwt_token", String(response.headers['jwt-token']));
+                }
+              }
               vm.userData = response.data;
               // vm.avatarURL = vm.userData["avatar"];
               // if (vm.avatarURL.includes("img_id=0")) {
@@ -547,11 +557,6 @@ export default {
           }
         )
         .then(function(response) {
-          if (response.headers['jwt-token']) {
-            if (typeof(Storage) !== "undefined") {
-              localStorage.setItem("jwt_token", "response.headers['jwt-token']");
-            }
-          }
           if (
             response.data !== "" &&
             response.data !== "ok" &&
@@ -600,11 +605,6 @@ export default {
           )
           .then(function(response) {
             console.log(response.data);
-            if (response.headers['jwt-token']) {
-              if (typeof(Storage) !== "undefined") {
-                localStorage.setItem("jwt_token", "response.headers['jwt-token']");
-              }
-            }
             if (
               response.data !== "" &&
               response.data !== "ok" &&
