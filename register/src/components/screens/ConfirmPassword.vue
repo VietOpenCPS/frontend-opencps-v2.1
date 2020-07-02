@@ -32,13 +32,19 @@
               <v-icon>how_to_reg</v-icon>&nbsp;
               Đồng ý
             </v-btn>
-            <v-btn color="primary"
+            <v-btn color="primary" v-if="!resend_mail"
               @click="goBack"
             >
               <v-icon>reply</v-icon>&nbsp;
               Quay lại
             </v-btn>
-            
+            <v-btn color="primary"
+              @click="resendMail"
+              v-if="resend_mail"
+            >
+              <v-icon>replay</v-icon>&nbsp;
+              Gửi lại mã bảo mật
+            </v-btn>
           </div>
         </v-form>
       </v-flex>
@@ -60,7 +66,8 @@ export default {
   data: () => ({
     loading: false,
     valid: false,
-    confirmCode: ''
+    confirmCode: '',
+    resend_mail: false,
   }),
   computed: {
   },
@@ -70,6 +77,12 @@ export default {
       var vm = this
       let current = vm.$router.history.current
       let currentQuery = current.query
+      try {
+        if (allow_resend_mail) {
+          vm.resend_mail = allow_resend_mail
+        }
+      } catch (error) {
+      }
     })
   },
   updated () {
@@ -103,6 +116,17 @@ export default {
           vm.$refs.captcha.makeImageCap()
         })
       }
+    },
+    resendMail () {
+      let vm = this
+      let filter = {
+        type: ''
+      }
+      vm.$store.dispatch('resendMail', filter).then(function (result) {
+        toastr.success('Mã bảo mật đã được gửi lại. Vui lòng kiểm tra email.')
+      }).catch(function(error) {
+        toastr.error('Gửi lại không thành công.')
+      })
     },
     goBack () {
       window.history.back()

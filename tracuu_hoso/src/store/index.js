@@ -298,24 +298,87 @@ export const store = new Vuex.Store({
       })
     },
     loadDossierPayments ({commit, state}, data) {
-      let config = {
-        headers: {
-          groupId: state.initData.groupId
-        },
-        params: {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            'groupId': state.initData.groupId
+          }
+        }
+        let paramsGet = {
           secretCode: data.secretCode
         }
-      }
-      let url = '/o/rest/v2/dossiers/' + data.referenceUid+ '/payment'
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/dossiers/' + data.referenceUid+ '/payment')
+        dataPost.append('data', JSON.stringify(paramsGet))
+        dataPost.append('serverCode', 'SERVER_' + data['serverCode'])
+        axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+          resolve(result.data)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+      
+    },
+    putPayments ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
-        axios.get(url, config).then(function (response) {
-          resolve(response.data)
-        }).catch(function (xhr) {
+        let config = {
+          headers: {
+            'groupId': state.initData.groupId
+          }
+        }
+        let paramsGet = {
+          secretCode: data.secretCode
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'PUT')
+        dataPost.append('url', '/dossiers/keypay/' + data.referenceUid + '/' + data.referenceUid)
+        dataPost.append('data', JSON.stringify(paramsGet))
+        dataPost.append('serverCode', 'SERVER_' + data['serverCode'])
+        axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+          if (result.data) {
+            resolve(result.data)
+          } else {
+            resolve([])
+          }
+        }).catch(xhr => {
           reject(xhr)
         })
       })
     },
+    processDossierRouter ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+          let paramsGet = {
+            secretCode: filter.secretCode,
+            actionCode: filter.actionCode ? filter.actionCode : '',
+            payment: filter.payment?JSON.stringify(filter.payment):'',
+            assignUsers: filter.toUsers?JSON.stringify(filter.toUsers):'',
+            actionNote: filter.userNote?JSON.stringify(filter.userNote):'',
+            payload: filter.payload?JSON.stringify(filter.payload):''
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/dossiers/' + filter.dossierId + '/actions')
+          dataPost.append('data', JSON.stringify(paramsGet))
+          dataPost.append('serverCode', 'SERVER_' + data['serverCode'])
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            let serializable = result.data
+            resolve(serializable)
+          }).catch(xhr => {
+            reject(xhr)
+          })
 
+        }).catch(function (){})
+      })
+    },
   },
   mutations: {
     setLoading (state, payload) {

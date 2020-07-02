@@ -88,7 +88,17 @@
               </v-chip>
 
               <v-chip v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('kpdvcqg')" color="orange" text-color="white"
-                @click.native="toKeyPayDvcqg"
+                @click.native="toKeyPayDvcqg('kpdvcqg')"
+                :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 2 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
+              >
+                <v-avatar style="cursor: pointer">
+                  <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
+                </v-avatar>
+                <span class="py-2" style="cursor: pointer">Thanh toán qua Cổng DVQG</span>
+              </v-chip>
+
+              <v-chip v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('ppkpdvcqg')" color="orange" text-color="white"
+                @click.native="toKeyPayDvcqg('ppkpdvcqg')"
                 :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 2 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
               >
                 <v-avatar style="cursor: pointer">
@@ -464,13 +474,14 @@ export default {
       vm.$store.commit('setVisibleDoAction', false)
       window.open(item, '_self')
     },
-    toKeyPayDvcqg () {
+    toKeyPayDvcqg (text) {
       let vm = this
       vm.isBank = false
       vm.methodSelect = 2
       vm.$store.commit('setVisibleDoAction', false)
       let filter = {
-        dossierId: vm.detailDossier.dossierId
+        dossierId: vm.detailDossier.dossierId,
+        key: text
       }
       vm.$store.dispatch('toKeypayDvcqg', filter).then(result => {
         window.open(result, '_self')

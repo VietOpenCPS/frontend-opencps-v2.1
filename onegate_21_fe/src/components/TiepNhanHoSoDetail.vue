@@ -8,7 +8,7 @@
             <span v-else-if="formCode === 'COPY'">SAO CHÉP HỒ SƠ</span>
             <span v-else-if="isOffLine">NỘP HỒ SƠ TRỰC TUYẾN</span>
             <span v-else-if="formCode === 'NEW_GROUP'">THÊM NHÓM HỒ SƠ</span>
-            <span v-else-if="formCode === 'NEW_GROUP_CV'">THÊM MỚI CÔNG VĂN</span>
+            <span v-else-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'">THÊM MỚI CÔNG VĂN</span>
             <span v-else>THÊM MỚI HỒ SƠ</span> 
           </div>
           <div class="layout row wrap header_tools row-blue">
@@ -24,7 +24,7 @@
           </div> 
         </div>
 
-        <div v-if="formCode !== 'NEW_GROUP_CV'">
+        <div v-if="formCode !== 'NEW_GROUP_CV' && formCode !== 'NEW_GROUP_CV_DI'">
           <div :style="!isNotarization ? 'position: relative' : 'display: none'" v-if="originality !== 1 && formCode !== 'NEW_GROUP'">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content>
@@ -104,7 +104,7 @@
                   <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
                   <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
                 </div>
-                <thanh-phan-ho-so ref="thanhphanhoso" :formCodeInput="formCode"  :onlyView="formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' ? true : false" :id="'nm'" :partTypes="formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' ? inputTypesGroup : inputTypes"></thanh-phan-ho-so>
+                <thanh-phan-ho-so ref="thanhphanhoso" :formCodeInput="formCode"  :onlyView="formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'? true : false" :id="'nm'" :partTypes="formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI' ? inputTypesGroup : inputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
@@ -199,17 +199,17 @@
         
         </div>
 
-        <div v-if="formCode === 'NEW_GROUP_CV'">
+        <div v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'">
           <div>
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content>
-                <thong-tin-cong-van ref="thongtincongvan" :detailDossier="thongTinChiTietHoSo" :tphs="tphsCV"></thong-tin-cong-van>
+                <thong-tin-cong-van ref="thongtincongvan" :detailDossier="thongTinChiTietHoSo" :tphs="tphsCV" :formCodeInput="formCode"></thong-tin-cong-van>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
         </div>
         
-        <v-tabs v-if="formCode !== 'NEW_GROUP_CV'" icons-and-text centered class="mb-4">
+        <v-tabs v-if="formCode !== 'NEW_GROUP_CV' && formCode !== 'NEW_GROUP_CV_DI'" icons-and-text centered class="mb-4">
           <v-tabs-slider color="primary"></v-tabs-slider>
           <!-- <v-tab href="#tab-1" @click="luuHoSo">
             <v-btn flat class="px-0 py-0 mx-0 my-0">
@@ -269,7 +269,7 @@
             </v-btn>
           </v-tab>
         </v-tabs>
-        <v-tabs v-if="formCode === 'NEW_GROUP_CV'" icons-and-text centered class="mb-4">
+        <v-tabs v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" icons-and-text centered class="mb-4">
           <v-tab href="#tab-1" @click="tiepNhanCongVan()" class="px-0 py-0"> 
             <v-btn flat class="" 
               :loading="loadingAction"
@@ -708,7 +708,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: false,
+    notifyConfig: true,
     fromViaPostal: false,
     fromViaPostalConfig: false,
     smsNotify: true,
@@ -1267,6 +1267,11 @@ export default {
       console.log('data put congvan -->', tempData)
       if (thongtincongvan.validation) {
         vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
+          let dataMetaData = {
+            id: vm.dossierId,
+            data: thongtincongvan.metaData
+          }
+          vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
           vm.loadingAction = false
           vm.$router.push({
             path: '/danh-sach-ho-so/0/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,

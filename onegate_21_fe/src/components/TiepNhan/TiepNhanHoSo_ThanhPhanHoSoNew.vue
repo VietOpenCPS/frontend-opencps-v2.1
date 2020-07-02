@@ -25,7 +25,7 @@
           <v-expansion-panel-content hide-actions>
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
-                <div class="mr-2" @click="item.hasForm ? loadAlpcaFormClick(item) : ''" style="min-width: 20px; display: flex;">
+                <div class="mr-2" @click="item.hasForm ? loadAlpcaFormClick(item, index) : ''" style="min-width: 20px; display: flex;">
                   <div v-if="originality === 3 && (formCodeInput === 'NEW' || formCodeInput === 'NEW_GROUP')" @click='$event.stopPropagation()' class="header__tphs check-template mr-2" style="width: 20px;margin-left: -15px;">
                     <v-checkbox class="my-0 py-0" v-model="item['hasTemplate']" @change="changeHasTemplate(index, item)"></v-checkbox>
                   </div>
@@ -786,7 +786,10 @@ export default {
     },
     genAllAlpacaForm (dossierFiles, dossierTemplateItems) {
       var vm = this
-      if (dossierFiles.length > 0) {
+      if (dossierFiles.length > 0 && dossierFiles.filter(file => {
+          return file.eForm && file.size
+        }).length > 0
+      ) {
         var dossierFilesEform = dossierFiles.filter(file => {
           return file.eForm
         })
@@ -963,11 +966,15 @@ export default {
           let dossierSubStatus = vm.thongTinHoSo.dossierSubStatus
           let templateNo = item.partNo
           let deliverableType = item.deliverableType ? item.deliverableType : ''
+          let token = localStorage.getItem('jwt_token')
 
-          let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
-          // console.log('urlEmbed', urlEmbed)
+          let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
           setTimeout(function () {
-            document.getElementById('formAlpaca' + item.partNo + vm.id).src = urlEmbed
+            console.log('urlEmbed123123123', urlEmbed)
+            document.getElementById('formAlpaca' + item.partNo + vm.id).src = ''
+            setTimeout(function () {
+              document.getElementById('formAlpaca' + item.partNo + vm.id).src = urlEmbed
+            }, 50)
           }, 300)
         } else {
           item.embed = false
@@ -1071,21 +1078,25 @@ export default {
           vm.loadingApacal = true
           console.log('item put', fileFind)
           vm.$store.dispatch('putAlpacaFormCallBack', fileFind).then(resData => {
+            let index = vm.dossierTemplateItemsFilter.findIndex(item => item.partNo === dataOutPut.tp);
+            vm.dossierTemplateItemsFilter[index]['passRequired'] = true
             setTimeout(function () {
               vm.loadingApacal = false
               toastr.clear()
               toastr.success('Thực hiện thành công')
+              // gen lại sau cập nhật
+              vm.dossierTemplateItemsFilter[index].daKhai = true
+              vm.showAlpacaJSFORM(vm.dossierTemplateItemsFilter[index])
             }, 3000)
             vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
             }).catch(reject => {
             })
-            let index = vm.dossierTemplateItemsFilter.findIndex(item => item.partNo === dataOutPut.tp);
-            vm.dossierTemplateItemsFilter[index]['passRequired'] = true
+            
           }).catch(reject => {
             vm.loadingApacal = false
             toastr.clear()
-            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại')
           })
         } else {
           dataOutPut['dossierId'] = vm.thongTinHoSo.dossierId
@@ -1099,13 +1110,14 @@ export default {
               toastr.clear()
               toastr.success('Thực hiện thành công')
               vm.dossierTemplateItemsFilter[index].daKhai = true
+              // gen lại sau cập nhật
+              console.log('dossierTemplateItemsFilter-1', vm.dossierTemplateItemsFilter[index])
+              vm.showAlpacaJSFORM(vm.dossierTemplateItemsFilter[index])
             }, 3000)
             vm.dossierTemplateItemsFilter[index]['passRequired'] = true
             vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
             }).catch(reject => {
-              toastr.clear()
-              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
           }).catch(reject => {
             vm.loadingApacal = false
@@ -1230,7 +1242,9 @@ export default {
             document.getElementById('displayPDF' + fileFind.dossierPartNo + vm.id).src = result
           })
         } else {
+          data['editForm'] = false
           data.formData = fileFind.formData
+          data['editForm'] = true
           data['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
           vm.showAlpacaJSFORM(data, true)
         }
@@ -1267,7 +1281,9 @@ export default {
         let templateNo = item.partNo
         let deliverableType = item.deliverableType ? item.deliverableType : ''
 
-        let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+        let token = localStorage.getItem('jwt_token')
+
+        let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
         // console.log('urlEmbed', urlEmbed)
         setTimeout(function () {
           document.getElementById('formAlpaca' + item.partNo + vm.id).src = urlEmbed

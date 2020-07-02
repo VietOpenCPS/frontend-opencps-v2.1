@@ -1,10 +1,11 @@
 <template>
   <div>
-    <div class="row-header no__hidden_class">
+    <div class="row-header no__hidden_class" v-if="trangThaiHoSoList">
       <div v-if="trangThaiHoSoList !== null" class="background-triangle-big"> <span>{{trangThaiHoSoList[index]['title']}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div v-if="!isMobile" class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
           <v-text-field
+            v-if="trangThaiHoSoList[index]['id'] !== 'CV_DI' && trangThaiHoSoList[index]['id'] !== 'CV_DEN'"
             v-model="keyword"
             placeholder="Tìm kiếm theo tên hồ sơ, mã hồ sơ, tên thủ tục, chủ hồ sơ ..."
             solo
@@ -31,10 +32,10 @@
       </div> 
     </div>
     <!-- Tìm kiếm nâng cao -->
-    <tim-kiem-nang-cao ref="advSearch" v-if="advSearchShow"></tim-kiem-nang-cao>
+    <tim-kiem-nang-cao :menuInfo="trangThaiHoSoList[index]" ref="advSearch" v-if="advSearchShow"></tim-kiem-nang-cao>
     <!--  -->
     <div class="menu_header_list py-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
-      <v-layout wrap v-if="originality !== 1">
+      <v-layout wrap v-if="originality !== 1 && trangThaiHoSoList">
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
           <v-autocomplete
             :items="listLinhVuc"
@@ -63,11 +64,12 @@
             box
           ></v-autocomplete>
         </v-flex>
-        <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+        <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box" v-if="trangThaiHoSoList">
           <v-autocomplete
+            v-if="trangThaiHoSoList[index]['id'] !== 'CV_DI' && trangThaiHoSoList[index]['id'] !== 'CV_DEN'"
             :items="listDichVu"
             v-model="dichVuSelected"
-            label="Chọn dịch vụ"
+            label="Chọn trường hợp"
             item-text="optionName"
             item-value="processOptionId"
             return-object
@@ -75,12 +77,45 @@
             @change="changeDichVuConfigs"
             box
           ></v-autocomplete>
-        </v-flex>
-        <v-flex xs12 sm3 class="pl-2 pr-2">
-          <div style="position:relative">
+          <v-menu
+            v-else
+            ref="menuDateCV"
+            v-model="menuDateCV"
+            :close-on-content-click="true"
+            transition="scale-transition"
+            offset-y
+            full-width
+          >
             <v-text-field
+              label="Chọn ngày công văn"
+              slot="activator"
+              class="search-input-appbar input-search"
+              v-model="dateCvFormatted"
+              append-icon="event"
+              @blur="dateCv = parseDate(dateCvFormatted)"
+              box
+              clearable
+            >
+            </v-text-field>
+            <v-date-picker v-model="dateCv" locale="vi" :first-day-of-week="1" no-title @input="changeDate()"></v-date-picker>
+          </v-menu>
+        </v-flex>
+
+        <v-flex xs12 sm3 class="pl-2 pr-2">
+          <div style="position:relative" v-if="trangThaiHoSoList">
+            <v-text-field
+              v-if="trangThaiHoSoList[index]['id'] !== 'CV_DI' && trangThaiHoSoList[index]['id'] !== 'CV_DEN'"
               label="Nhập mã hồ sơ"
               v-model="dossierNoKey"
+              @keyup.enter="changeDossierNoKey"
+              append-icon="search"
+              box
+              @click:append="changeDossierNoKey"
+            ></v-text-field>
+            <v-text-field
+              v-else
+              label="Nhập số công văn"
+              v-model="documentNo"
               @keyup.enter="changeDossierNoKey"
               append-icon="search"
               box
@@ -378,14 +413,14 @@
                 <v-autocomplete
                   :items="listDichVu"
                   v-model="dichVuSelected"
-                  label="Dịch vụ:"
-                  placeholder="Chọn dịch vụ"
+                  label="Trường hợp:"
+                  placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
-                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn']"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn']"
                   @change="changeDichVuConfigs"
                   required
                   box
@@ -564,18 +599,18 @@
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2 text-bold">Dịch vụ <span style="color:red">*</span>:</div>
+                <div class="my-2 text-bold">Trường hợp <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
-                  placeholder="Chọn dịch vụ"
+                  placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
-                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>
@@ -713,18 +748,18 @@
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2 text-bold">Dịch vụ <span style="color:red">*</span>:</div>
+                <div class="my-2 text-bold">Trường hợp <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
-                  placeholder="Chọn dịch vụ"
+                  placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
-                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>
@@ -930,6 +965,9 @@ export default {
     serviceCode: '',
     templateNo: '',
     dossierNoKey: '',
+    documentNo: '',
+    dateCvFormatted: '',
+    menuDateCV: false,
     dialogAction: false,
     loadingAction: false,
     dialogActionProcess: false,
@@ -983,7 +1021,7 @@ export default {
     showLimit: false,
     advSearchShow: false,
     filterKeyAdvSearch: ['status','substatus','top','agency','domain','register','fromReceiveDate','toReceiveDate',
-      'fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate'
+      'fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate','documentNo','dateCv'
     ],
     status: '',
     top: '',
@@ -1136,6 +1174,9 @@ export default {
       vm.top = currentQuery.hasOwnProperty('top') ? currentQuery.top : ''
       vm.orderSort = currentQuery.hasOwnProperty('order') ? currentQuery.order : ''
       vm.sortValue = currentQuery.hasOwnProperty('sort') ? currentQuery.sort : ''
+      vm.documentNo = currentQuery.hasOwnProperty('documentNo') ? currentQuery.documentNo : ''
+      vm.dateCv = currentQuery.hasOwnProperty('dateCv') ? vm.parseDate(currentQuery.dateCv) : ''
+      vm.dateCvFormatted = vm.formatDate(vm.dateCv)
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
         vm.$store.commit('setLoadingDynamicBtn', true)
@@ -1552,6 +1593,10 @@ export default {
             toReleaseDate: currentQuery.hasOwnProperty('toReleaseDate') ? currentQuery.toReleaseDate : '',
             fromFinishDate: currentQuery.hasOwnProperty('fromFinishDate') ? currentQuery.fromFinishDate : '',
             toFinishDate: currentQuery.hasOwnProperty('toFinishDate') ? currentQuery.toFinishDate : '',
+            dateCv: currentQuery.hasOwnProperty('dateCv') ? currentQuery.dateCv : vm.dateCvFormatted,
+            documentNo: currentQuery.hasOwnProperty('documentNo') ? currentQuery.documentNo : vm.documentNo,
+            donvigui: currentQuery.hasOwnProperty('donvigui') ? currentQuery.donvigui : '',
+            donvinhan: currentQuery.hasOwnProperty('donvinhan') ? currentQuery.donvinhan : '',
             sort: vm.sortValue
           }
         } else {
@@ -1589,6 +1634,10 @@ export default {
             toReleaseDate: currentQuery.hasOwnProperty('toReleaseDate') ? currentQuery.toReleaseDate : '',
             fromFinishDate: currentQuery.hasOwnProperty('fromFinishDate') ? currentQuery.fromFinishDate : '',
             toFinishDate: currentQuery.hasOwnProperty('toFinishDate') ? currentQuery.toFinishDate : '',
+            dateCv: currentQuery.hasOwnProperty('dateCv') ? currentQuery.dateCv : vm.dateCvFormatted,
+            documentNo: currentQuery.hasOwnProperty('documentNo') ? currentQuery.documentNo : vm.documentNo,
+            donvigui: currentQuery.hasOwnProperty('donvigui') ? currentQuery.donvigui : '',
+            donvinhan: currentQuery.hasOwnProperty('donvinhan') ? currentQuery.donvinhan : '',
             sort: vm.sortValue
           }
         }
@@ -1770,13 +1819,7 @@ export default {
       vm.selectMultiplePage = []
       // console.log('run log ...')
       setTimeout(function () {
-        if (vm.dossierNoKey) {
-          if (vm.dossierNoKey.length > 3 || vm.dossierNoKey === '') {
-            vm.doLoadingDataHoSo()
-          }
-        } else {
-          vm.doLoadingDataHoSo()
-        }
+        vm.doLoadingDataHoSo()
       }, 200)
     },
     clearDossierNoKey () {
@@ -1813,7 +1856,7 @@ export default {
       //
       vm.itemAction = item
       vm.indexAction = index
-      if (String(item.form) === 'NEW' || String(item.form) === 'NEW_GROUP' || String(item.form) === 'NEW_GROUP_CV') {
+      if (String(item.form) === 'NEW' || String(item.form) === 'NEW_GROUP' || String(item.form) === 'NEW_GROUP_CV' || String(item.form) === 'NEW_GROUP_CV_DI') {
         let isOpenDialog = true
         if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
           isOpenDialog = false
@@ -2373,7 +2416,7 @@ export default {
         serviceCode: vm.serviceCode,
         govAgencyCode: vm.govAgencyCode,
         templateNo: vm.templateNo,
-        originality: vm.itemAction['form'] === 'NEW_GROUP' || vm.itemAction['form'] === 'NEW_GROUP_CV' ? 9 : vm.getOriginality()
+        originality: vm.itemAction['form'] === 'NEW_GROUP' || vm.itemAction['form'] === 'NEW_GROUP_CV' || vm.itemAction['form'] === 'NEW_GROUP_CV_DI' ? 9 : vm.getOriginality()
       }
       // add new template
       let filter = {
@@ -2664,10 +2707,18 @@ export default {
       let currentQuery = vm.$router.history.current.query
       if (item.permission) {
         if (item['originality'] === 9) {
-          vm.$router.push({
-            path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV/' + item.dossierId,
-            query: vm.$router.history.current.query
-          })
+          if (vm.trangThaiHoSoList[vm.index]['menuGroup'] === 'CV_DI') {
+            vm.$router.push({
+              path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV_DI/' + item.dossierId,
+              query: vm.$router.history.current.query
+            })
+          } else {
+            vm.$router.push({
+              path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV/' + item.dossierId,
+              query: vm.$router.history.current.query
+            })
+          }
+          
         } else {
           vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
         }
@@ -2764,6 +2815,32 @@ export default {
         }
       }
       return count
+    },
+    changeDate() {
+      let vm = this
+      vm.menuDateCV = false
+      vm.dateCvFormatted = vm.formatDate(vm.dateCv)
+      setTimeout(function () {
+        vm.doLoadingDataHoSo()
+      }, 200)
+    },
+    formatDate(date) {
+      if (!date) return ''
+      const [year, month, day] = date.split('-')
+      return `${day}/${month}/${year}`
+    },
+    parseDate(date) {
+      if (!date) return ''
+      if (String(date).indexOf('/') > 0) {
+        const [day, month, year] = date.split('/')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      } else if (String(date).indexOf('-') > 0) {
+        const [day, month, year] = date.split('-')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      } else {
+        let date1 = new Date(Number(date))
+        return `${date1.getFullYear()}-${(date1.getMonth() + 1).toString().padStart(2, '0')}-${date1.getDate().toString().padStart(2, '0')}`
+      }
     },
     validate () {
       // validate your form , if you don't have validate prop , default validate pass .

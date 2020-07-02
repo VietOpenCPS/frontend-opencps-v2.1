@@ -80,7 +80,7 @@
           </div>
         </v-flex>
         <v-flex xs12 sm6 md4 class="mb-2 px-2">
-          <div>
+          <div v-if="menuInfo.id !== 'CV_DI' && menuInfo.id !== 'CV_DEN'">
             <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Lĩnh vực:</div>
             <v-autocomplete
               class="select-search d-inline-block"
@@ -97,9 +97,24 @@
               clearable
             ></v-autocomplete>
           </div>
+          <div v-else>
+            <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Số công văn:</div>
+            <v-text-field
+              v-model="documentNo"
+              class="search-input-appbar input-search d-inline-block"
+              style="width: calc(100% - 130px);"
+              single-lines
+              hide-details
+              solo
+              flat
+              height="32"
+              min-height="32"
+              clearable
+            ></v-text-field>
+          </div>
         </v-flex>
         <v-flex xs12 sm6 md4 class="mb-2 px-2">
-          <div>
+          <div v-if="menuInfo.id !== 'CV_DI' && menuInfo.id !== 'CV_DEN'">
             <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Mã sổ theo dõi:</div>
             <v-text-field
               v-model="register"
@@ -113,6 +128,37 @@
               min-height="32"
               clearable
             ></v-text-field>
+          </div>
+          <div v-else>
+            <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Ngày công văn:</div>
+            <div class="d-inline-block" style="width: calc(100% - 130px);">
+              <v-menu
+                ref="menuDateCV"
+                v-model="menuDateCV"
+                :close-on-content-click="true"
+                transition="scale-transition"
+                offset-y
+                full-width
+              >
+                <v-text-field
+                  slot="activator"
+                  class="search-input-appbar input-search"
+                  v-model="dateCvFormatted"
+                  persistent-hint
+                  append-icon="event"
+                  @blur="dateCv = parseDate(dateCvFormatted)"
+                  placeholder=""
+                  hide-details
+                  solo
+                  flat
+                  height="32"
+                  min-height="32"
+                  clearable
+                >
+                </v-text-field>
+                <v-date-picker v-model="dateCv" locale="vi" :first-day-of-week="1" no-title @input="changeDate('9')"></v-date-picker>
+              </v-menu>
+            </div>
           </div>
         </v-flex>
         <!-- date -->
@@ -400,7 +446,7 @@
 <script>
 import axios from 'axios'
 export default {
-  props: {},
+  props: ['menuInfo'],
   components: {},
   data: () => ({
     advSearchShow: false,
@@ -414,6 +460,9 @@ export default {
     menuDate6: false,
     menuDate7: false,
     menuDate8: false,
+    menuDateCV: false,
+    dateCvFormatted: '',
+    dateCv: '',
     fromReceiveDate: '',
     fromReceiveDateFormatted: '',
     toReceiveDate: '',
@@ -453,18 +502,23 @@ export default {
       }
     ],
     top: '',
-    register: ''
+    register: '',
+    documentNo: ''
   }),
   computed: {
   },
   created () {
     let vm = this
     vm.getSearchItems()
+    console.log('menuInfo', vm.menuInfo)
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       vm.getSearchItems()
+    },
+    menuInfo (val) {
+      console.log('menuInfo', val)
     }
   },
   methods: {
@@ -521,6 +575,7 @@ export default {
       vm.toReleaseDate = newQuery.hasOwnProperty('toReleaseDate') ? vm.parseDate(newQuery.toReleaseDate) : ''
       vm.fromFinishDate = newQuery.hasOwnProperty('fromFinishDate') ? vm.parseDate(newQuery.fromFinishDate) : ''
       vm.toFinishDate = newQuery.hasOwnProperty('toFinishDate') ? vm.parseDate(newQuery.toFinishDate) : ''
+      vm.dateCv = newQuery.hasOwnProperty('dateCv') ? vm.parseDate(newQuery.dateCv) : ''
 
       vm.fromReceiveDateFormatted = vm.formatDate(vm.fromReceiveDate)
       vm.toReceiveDateFormatted = vm.formatDate(vm.toReceiveDate)
@@ -530,6 +585,8 @@ export default {
       vm.toReleaseDateFormatted= vm.formatDate(vm.toReleaseDate)
       vm.fromFinishDateFormatted= vm.formatDate(vm.fromFinishDate)
       vm.toFinishDateFormatted= vm.formatDate(vm.toFinishDate)
+
+      vm.dateCvFormatted = vm.formatDate(vm.dateCv)
     },
     submitAdvSearch () {
       let vm = this
@@ -544,6 +601,7 @@ export default {
       newQuery['agency'] = vm.agency
       newQuery['domain'] = vm.domain
       newQuery['register'] = vm.register
+      newQuery['documentNo'] = vm.documentNo ? vm.documentNo : ''
 
       newQuery['fromReceiveDate'] = vm.formatDate(vm.fromReceiveDate)
       newQuery['toReceiveDate'] = vm.formatDate(vm.toReceiveDate)
@@ -553,6 +611,7 @@ export default {
       newQuery['toReleaseDate'] = vm.formatDate(vm.toReleaseDate)
       newQuery['fromFinishDate'] = vm.formatDate(vm.fromFinishDate)
       newQuery['toFinishDate'] = vm.formatDate(vm.toFinishDate)
+      newQuery['dateCv'] = vm.formatDate(vm.dateCv)
 
       console.log('newQuery', newQuery)
       for (let key in newQuery) {
@@ -570,7 +629,7 @@ export default {
     },
     changeDate(index) {
       let vm = this
-      vm.menuDate = vm.menuDate2 = vm.menuDate3 = vm.menuDate4 = false
+      vm.menuDate = vm.menuDate2 = vm.menuDate3 = vm.menuDate4 = vm.menuDateCV = false
       if (index === '1') {
         vm.fromReceiveDateFormatted = vm.formatDate(vm.fromReceiveDate)
       } else if (index === '2') {
@@ -587,6 +646,8 @@ export default {
         vm.fromFinishDateFormatted= vm.formatDate(vm.fromFinishDate)
       } else if (index === '8') {
         vm.toFinishDateFormatted= vm.formatDate(vm.toFinishDate)
+      } else if (index === '9') {
+        vm.dateCvFormatted = vm.formatDate(vm.dateCv)
       }
     },
     formatDate(date) {

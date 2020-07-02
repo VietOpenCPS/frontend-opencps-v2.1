@@ -137,7 +137,7 @@ export default {
   created () {
     let vm = this
     vm.$nextTick(function () {
-      var vm = this
+      let secretCodeDossier = ''
       let query = vm.$router.history.current.query
       let responseCode = query.hasOwnProperty('response_code') ? query.response_code : ''
       let dossierId = query.hasOwnProperty('dossierId') ? query.dossierId : ''
@@ -155,6 +155,7 @@ export default {
           dossierId: referenceUidQuery
         }
         vm.$store.dispatch('getDossierDetailPass', referenceUidQuery).then(resultDossier => {
+          secretCodeDossier = vm.getScr(resultDossier.referenceUid)
           vm.dossierDetail['serviceName'] = resultDossier.serviceName
           vm.dossierDetail['dossierNo'] = resultDossier.dossierNo
           vm.dossierDetail['govAgencyName'] = resultDossier.govAgencyName
@@ -164,10 +165,13 @@ export default {
           vm.dossierDetail['paymentAmount'] = query.net_cost
           let filter = {
             dossierId: resultDossier.dossierId,
-            referenceUid: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery
+            referenceUid: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery,
+            serverCode: resultDossier['govAgencyCode'],
+            secretCode: secretCodeDossier
           }
           let filterPayment = {
-            dossierId: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery
+            dossierId: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery,
+            serverCode: resultDossier['govAgencyCode']
           }
           if (vm.statusDeal === true) {
             vm.$store.dispatch('putPayments', filter).then(result => {
@@ -178,7 +182,9 @@ export default {
               if (actionCode) {
                 let fiter2 = {
                   dossierId: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery,
-                  actionCode: actionCode
+                  actionCode: actionCode,
+                  serverCode: resultDossier['govAgencyCode'],
+                  secretCode: secretCodeDossier
                 }
                 vm.$store.dispatch('processDossierRouter', fiter2).then(function (result) {
                 }).catch(function () {
@@ -215,7 +221,14 @@ export default {
       } else {
         return ''
       }
-    }
+    },
+    getScr (id) {
+      if (typeof(Storage) !== 'undefined') {
+        return sessionStorage.getItem(id) ? sessionStorage.getItem(id) : ''
+      } else {
+        return ''
+      }
+    },
   }
 }
 </script>

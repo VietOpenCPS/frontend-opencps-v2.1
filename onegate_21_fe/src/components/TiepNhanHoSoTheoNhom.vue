@@ -5,7 +5,7 @@
       <div class="row-header">
         <div class="background-triangle-big">
           <span v-if="formCode === 'NEW_GROUP'">THÔNG TIN NHÓM HỒ SƠ</span>
-          <span v-if="formCode === 'NEW_GROUP_CV'">
+          <span v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'">
             <span v-if="!activeAddDossierIntoGroup">THÔNG TIN CÔNG VĂN</span>
             <span v-else>THÊM MỚI HỒ SƠ</span>
           </span>
@@ -36,8 +36,7 @@
 
         <thong-tin-chu-ho-so v-if="formCode === 'NEW_GROUP'" :showApplicant="true" :showDelegate="false" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
 
-        <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV'" ref="thongtincongvan" :detailDossier="thongTinNhomHoSo" :tphs="tphsCV"></thong-tin-cong-van>
-
+        <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" ref="thongtincongvan" :detailDossier="thongTinNhomHoSo" :tphs="tphsCV" :formCodeInput="formCode"></thong-tin-cong-van>
 
         <div v-if="formCode === 'NEW_GROUP'" style="position: relative;border-top: 1px solid #dedede;">
           <v-expansion-panel :value="0" class="expansion-pl">
@@ -69,7 +68,7 @@
                 Hồ sơ trong nhóm&nbsp;&nbsp;&nbsp;&nbsp;
               </div>
 
-              <div v-if="formCode === 'NEW_GROUP_CV'" slot="header" style="display: flex; align-items: center;">
+              <div v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" slot="header" style="display: flex; align-items: center;">
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 Danh sách hồ sơ&nbsp;&nbsp;&nbsp;&nbsp;
               </div>
@@ -212,7 +211,7 @@
               </div>
               <div v-else class="pl-5 py-2">Chưa có hồ sơ nào</div>
 
-              <v-flex xs12 class="text-right mb-3 mr-2" v-if="formCode === 'NEW_GROUP_CV'">
+              <v-flex xs12 class="text-right mb-3 mr-2" v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'">
                 <v-btn small color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2">
                   <v-icon size="20">add</v-icon>  &nbsp;
                   <span>Thêm mới hồ sơ</span>
@@ -252,10 +251,10 @@
       </div>
       <!-- Thông tin hồ sơ trong nhóm -->
       <div v-if="activeAddDossierIntoGroup">
-        <thong-tin-chu-ho-so-cong-van v-if="activeAddDossierIntoGroup && formCode === 'NEW_GROUP_CV'" ref="thongtinchuhosocongvan"></thong-tin-chu-ho-so-cong-van>
+        <thong-tin-chu-ho-so-cong-van v-if="activeAddDossierIntoGroup && (formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI')" ref="thongtinchuhosocongvan"></thong-tin-chu-ho-so-cong-van>
         <thong-tin-chu-ho-so :showApplicant="false" :showDelegate="true" v-if="activeAddDossierIntoGroup && formCode === 'NEW_GROUP'" ref="thongtinchuhoso"></thong-tin-chu-ho-so>
 
-        <v-expansion-panel v-if="formCode === 'NEW_GROUP_CV'" :value="[true]" expand  class="expansion-pl">
+        <v-expansion-panel v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" :value="[true]" expand  class="expansion-pl">
           <v-expansion-panel-content>
             <div slot="header" style="display: flex; align-items: center;">
               <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
@@ -322,7 +321,7 @@
           </v-btn>
         </v-tab>
         <!--  -->
-        <v-tab href="#tab-1" @click="tiepNhanHoSoCongVan()" v-if="!activeAddGroup && formCode === 'NEW_GROUP_CV'" class="px-0 py-0"> 
+        <v-tab href="#tab-1" @click="tiepNhanHoSoCongVan()" v-if="!activeAddGroup && (formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI')" class="px-0 py-0"> 
           <v-btn flat class="" 
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -981,7 +980,7 @@ export default {
           }).catch(reject => {
           })
         }
-        if (vm.formCode === 'NEW_GROUP_CV') {
+        if (vm.formCode === 'NEW_GROUP_CV' || vm.formCode === 'NEW_GROUP_CV_DI') {
           vm.$refs.thongtincongvan.initData(val)
           let filter = {
             dossierTemplateNo: val.dossierTemplateNo
@@ -1205,11 +1204,19 @@ export default {
           }
         }
       }
-      if (vm.formCode === 'NEW_GROUP_CV') {
+      if (vm.formCode === 'NEW_GROUP_CV' || vm.formCode === 'NEW_GROUP_CV_DI') {
         let thongtincongvan = this.$refs.thongtincongvan.getThongTinCongVan()
         let tempData = thongtincongvan
         tempData.dueDate = vm.dateTimeView(thongtincongvan.dueDate)
         vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
+          if (vm.formCode === 'NEW_GROUP_CV_DI') {
+            let dataMetaData = {
+              id: vm.thongTinNhomHoSo.dossierId,
+              data: thongtincongvan.metaData
+            }
+            vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
+          }
+          
           vm.loadingAction = false
           toastr.clear()
           toastr.success('Cập nhật thành công')
@@ -1240,7 +1247,7 @@ export default {
         data.dossierId = result.dossierId
         setTimeout (function () {
           result['editable'] = false
-          if (vm.formCode === 'NEW_GROUP_CV') {
+          if (vm.formCode === 'NEW_GROUP_CV' || vm.formCode === 'NEW_GROUP_CV_DI') {
             vm.$refs.thongtinchuhosocongvan.initData(result)
           }
           
@@ -1666,7 +1673,7 @@ export default {
           tempData['sampleCount'] = vm.currentDossierIntoGroup.sampleCount
           tempData['originality'] = vm.originality
           tempData['userType'] = '1'
-          console.log('putDossierCongVan', tempData)
+          console.log('putDossierIntoCongVan', tempData)
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             vm.loadingAction = false
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')

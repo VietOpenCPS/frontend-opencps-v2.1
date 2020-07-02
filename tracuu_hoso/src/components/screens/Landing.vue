@@ -2,7 +2,7 @@
   <div>
     <v-layout row wrap :class="isMobile ? 'pt-0' : 'pt-2'">
       <v-flex xs12 md3>
-        <div style="font-size: 20px;font-weight: 500;color:#0054a6" :class="isMobile ? 'px-2 text-xs-center' : 'px-2'">
+        <div id="titlePortlet" style="font-size: 20px;font-weight: 500;color:#0054a6" :class="isMobile ? 'px-2 text-xs-center' : 'px-2'">
           {{!qrscan ? 'TRA CỨU HỒ SƠ' : 'THÔNG TIN HỒ SƠ'}}
         </div>
         <v-card v-if="!qrscan" flat color="#ffffff" class="px-2 py-2">
@@ -34,6 +34,10 @@
               <v-icon>reply</v-icon> &nbsp;
               Quay lại
             </v-btn>
+            <!-- <v-btn class="" outline color="#0072bc" @click="thanhToanTrucTuyen()">
+             
+              Thanh toán trực tuyến
+            </v-btn> -->
           </v-flex>
         </v-card>
       </v-flex>
@@ -365,6 +369,7 @@ export default {
             vm.dialogCheckPass = false
             vm.dossierDetail = result.data
             vm.detail = true
+            vm.setScr(vm.dossierDetail.referenceUid, vm.secretKey)
           }
         }).catch(function (reject) {
           vm.loading = false
@@ -386,11 +391,17 @@ export default {
         } else if (result.status && result.status.toString() === '200') {
           vm.dossierDetail = result.data
           vm.detail = true
+          vm.setScr(vm.dossierDetail.referenceUid, secretKey)
         }
       }).catch(function (reject) {
         vm.loading = false
         toastr.error('Lỗi hệ thống')
       })
+    },
+    setScr (id, key) {
+      if (typeof(Storage) !== 'undefined') {
+        sessionStorage.setItem(id, key);
+      }
     },
     onResize () {
       let vm = this
@@ -414,6 +425,56 @@ export default {
     },
     goBack () {
       window.history.back()
+    },
+    thanhToanTrucTuyen () {
+      let vm = this
+      let paymentProfile = {
+        "paymentMerchantCode": "UBNDHG",
+        "paymentHashAlgorithm": "SHA-256",
+        "paymentServiceCode": "720",
+        "paymentVersion": "1.0",
+        "paymentCommand": "pay",
+        "paymentCurrencyCode": "704",
+        "paymentCurrentLocale": "vn",
+        "paymentCountryCode": "+84",
+        "paymentInternalBank": "all_card",
+        "paymentMerchantSecureKey": "ubnd@keypay@haugiang",
+        "paymentResultUrl": "http://119.17.200.66:8074/o/rest/v2/dossiers/keypay",
+        "paymentKeypayDomain": "http://online.keypay.vn/process",
+            "bankAccountInfo": {
+              "default": "3511.0.1004872.00000"
+            },
+        "paymentReturnUrl":"http://119.17.200.66:8074/web/cong-dich-vu-cong-tinh-hau-giang/dich-vu-cong/#/thanh-toan-thanh-cong?paymentPortal=KEYPAY&actionCode=6200"
+      }
+      let filter = {
+        payment_domain: 'online.keypay.vn',
+        params: {
+          merchant_code: paymentProfile.paymentMerchantCode,
+          name: 'Ten Khach Hang',
+          phone: '0987654321',
+          email: 'kh@email.com.vn',
+          address: 'Đống Đa, Hà Nội',
+          merchant_trans_id: '123',
+          good_code: 'GC_232134034',
+          net_cost: '100000',
+          ship_fee: '3000',
+          Tax: '3000',
+          return_url: paymentProfile.paymentReturnUrl,
+          Version: '1.0',
+          Command: paymentProfile.paymentCommand,
+          current_locale: paymentProfile.paymentCurrentLocale,
+          currency_code: paymentProfile.paymentCurrencyCode,
+          service_code: paymentProfile.paymentServiceCode,
+          country_code: paymentProfile.paymentCountryCode,
+          xml_description: 'Nap tien mobile',
+          secure_hash: 'd13eac5a49adff8bdcd757ea8a527eab'
+        }
+      }
+      vm.$store.dispatch('createBillCode', filter).then(function (result) {
+
+      }).catch(function (reject) {
+
+      })
     }
   }
 }

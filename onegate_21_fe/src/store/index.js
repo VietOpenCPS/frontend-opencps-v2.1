@@ -350,6 +350,18 @@ export const store = new Vuex.Store({
           if (filter.order !== '') {
             paramSearch.order = String(filter.order) === 'true' ? true : false
           }
+          if (filter.donvigui) {
+            paramSearch.donvigui = filter.donvigui
+          }
+          if (filter.donvinhan) {
+            paramSearch.donvinhan = filter.donvinhan
+          }
+          if (filter.documentNo) {
+            paramSearch.documentNo = filter.documentNo
+          }
+          if (filter.dateCv) {
+            paramSearch.documentDate = filter.dateCv
+          }
           // 
           for (let index in state.filterDateFromTo) {
             if (filter.hasOwnProperty(state.filterDateFromTo[index]) && filter[state.filterDateFromTo[index]]) {
@@ -1492,9 +1504,6 @@ export const store = new Vuex.Store({
           resolve(response)
         }).catch(function (error) {
           reject(error)
-          toastr.clear()
-          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
-          commit('setLoading', false)
         })
       })
     },
@@ -1694,8 +1703,11 @@ export const store = new Vuex.Store({
         dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : '')
         dataPutdossier.append('contactTelNo', data.contactTelNo ? data.contactTelNo : '')
         dataPutdossier.append('contactEmail', data.contactEmail ? data.contactEmail : '')
-
-        
+        dataPutdossier.append('delegateIdNo', data.delegateIdNo ? data.delegateIdNo : '')
+        dataPutdossier.append('delegateName', data.delegateName ? data.delegateName : '')
+        if (data.hasOwnProperty('formCode') && data.formCode === 'NEW_GROUP_CV_DI') {
+          dataPutdossier.append('metadata', JSON.stringify({congVanDi: true}))
+        }
         console.log('dataPutdossier', dataPutdossier)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)
@@ -3775,7 +3787,12 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
             }
+          }
+          if (String(filter.actionId) === '9100') {
+            param.params.isActionCode = true
           }
           axios.get(state.initData.dossierApi + '/' + filter.dossierId + '/nextactions/' + filter.actionId +  '/payload', param).then(function (response) {
             let serializable = response.data
@@ -4494,10 +4511,11 @@ export const store = new Vuex.Store({
             groupId: window.themeDisplay.getScopeGroupId()
           }
         }
+        let url = filter.key === 'kpdvcqg' ? '/o/pgi/kpdvcqg/createtransaction' : '/o/pgi/ppdvcqg/inittransaction'
         let dataPost = new URLSearchParams()
         dataPost.append('dossierId', filter.dossierId)
         
-        axios.post('/o/pgi/kpdvcqg/createtransaction', dataPost, param).then(response => {
+        axios.post(url, dataPost, param).then(response => {
           if (response.data && response.data.hasOwnProperty('error') && response.data.error == '0') {
             resolve(response.data.payment_url)
           } else if (response.data && response.data.hasOwnProperty('error') && response.data.error != '0') {

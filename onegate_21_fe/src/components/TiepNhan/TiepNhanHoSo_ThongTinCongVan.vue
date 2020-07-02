@@ -65,28 +65,6 @@
                       </v-menu>
                     </v-flex>
                     <!--  -->
-                    <!-- <v-flex xs12 sm2 class="mb-2">
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0">Đơn vị gửi công văn<span style="color:red">&nbsp;*</span>: </v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm4 class="mb-2">
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-autocomplete
-                      v-else
-                      :items="govAgencySubmitList"
-                      item-text="govAgencyName"
-                      item-value="govAgencyCode"
-                      v-model="agencySubmit"
-                      :rules="[rules.required]"
-                      required
-                      ></v-autocomplete>
-                    </v-flex> -->
-
-                    <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
@@ -141,6 +119,32 @@
                         :first-day-of-week="1" v-model="dueDate" no-title @input="menuDueDate = false"></v-date-picker>
                       </v-menu>
                     </v-flex>
+                    <!--  -->
+                    <v-flex xs12 sm2 class="mb-2">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-subheader v-else class="pl-0">
+                        <span v-if="formCodeInput === 'NEW_GROUP_CV'">Đơn vị gửi công văn: </span>
+                        <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'">Đơn vị nhận công văn: </span> 
+                        <span style="color:red">&nbsp;*</span>: 
+                      </v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm10 class="mb-2">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-autocomplete
+                      v-else
+                      :items="govAgencySubmitList"
+                      item-text="itemName"
+                      item-value="itemCode"
+                      v-model="donvi_gui_nhan"
+                      :rules="[rules.required]"
+                      required
+                      ></v-autocomplete>
+                    </v-flex>
+
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
@@ -274,13 +278,14 @@ export default {
     'suggestions': Suggestions,
     'tiny-pagination': TinyPagination
   },
-  props: ['formCode', 'detailDossier', 'tphs'],
+  props: ['formCodeInput', 'detailDossier', 'tphs'],
   data: () => ({
     loading: false,
     dialogPDFLoading: false,
     dialogPDF: false,
     valid_thongtincongvan: true,
     thongTinCongVan: '',
+    donvi_gui_nhan: '',
     dossierFilesItems: '',
     menuDate: false,
     menuDueDate: false,
@@ -314,12 +319,15 @@ export default {
   computed: {
     originality () {
       var vm = this
-      console.log('originality', vm.getOriginality())
       return vm.getOriginality()
-    }
+    },
+    userLoginInfomation () {
+      return this.$store.getters.getUserLogin
+    },
   },
   created () {
     let vm = this
+    vm.getGovAgencyList()
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
@@ -346,6 +354,12 @@ export default {
     initData (data) {
       let vm = this
       vm.thongTinCongVan = data
+      try {
+        let metadata = JSON.parse(vm.thongTinCongVan.metadata)
+        vm.donvi_gui_nhan = vm.formCodeInput === 'NEW_GROUP_CV_DI' ? metadata.donvinhan : metadata.donvigui
+      } catch (error) {
+      }
+      
       vm.documentDate = vm.thongTinCongVan.hasOwnProperty('documentDate') ? vm.parseDate(vm.thongTinCongVan.documentDate) : ''
       vm.dueDate = vm.thongTinCongVan.hasOwnProperty('dueDate') ? vm.parseDate(vm.thongTinCongVan.dueDate) : ''
       vm.$store.dispatch('loadDossierFiles', vm.thongTinCongVan.dossierId).then(result => {
@@ -356,8 +370,28 @@ export default {
     },
     getThongTinCongVan () {
       let vm = this
+      let delegateFilter = vm.govAgencySubmitList.filter(function (item) {
+        return item.itemCode === vm.thongTinCongVan.delegateIdNo
+      })
+      let delegateName = delegateFilter.length > 0 ? delegateFilter[0]['itemName'] : ''
       vm.thongTinCongVan.dueDate = vm.parseDateToTimestamp(vm.dueDate)
       vm.thongTinCongVan.documentDate = vm.parseDateToTimestamp(vm.documentDate)
+      let metaDataDossier = ''
+      try {
+        metaDataDossier = JSON.parse(vm.thongTinCongVan.metaData)
+      } catch (error) {
+      }
+      let metaData = metaDataDossier ? metaDataDossier : {donvigui: '', donvinhan: ''}
+
+      if (vm.formCodeInput === 'NEW_GROUP_CV') {
+        vm.thongTinCongVan.delegateName = delegateName ? delegateName : ''
+        metaData.donvigui = vm.donvi_gui_nhan
+        metaData.donvinhan = vm.userLoginInfomation.hasOwnProperty('scope') && vm.userLoginInfomation.scope ? vm.userLoginInfomation.scope : vm.detailDossier.govAgencyCode
+      } else {
+        metaData.donvigui = vm.userLoginInfomation.hasOwnProperty('scope') && vm.userLoginInfomation.scope ? vm.userLoginInfomation.scope : vm.detailDossier.govAgencyCode
+        metaData.donvinhan = vm.donvi_gui_nhan
+      }
+      vm.thongTinCongVan.metaData = metaData
       vm.thongTinCongVan.validation = vm.$refs.formThongTinCongVan.validate()
       console.log('thongtincongvanOutput', vm.thongTinCongVan)
       return vm.thongTinCongVan
@@ -421,6 +455,17 @@ export default {
           toastr.error('File dữ liệu không tồn tại')
         }
       }
+    },
+    getGovAgencyList () {
+      let vm = this
+      let filter = {
+        collectionCode: 'DON_VI_CONG_VAN',
+        level: '',
+        parent: ''
+      }
+      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
+        vm.govAgencySubmitList = result.data
+      })
     },
     getDocumentTypeIcon (type) {
       let vm = this

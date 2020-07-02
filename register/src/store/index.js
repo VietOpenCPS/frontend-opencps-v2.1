@@ -529,6 +529,26 @@ export const store = new Vuex.Store({
         })
       })
     },
+    resendMail ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let url = ''
+        if (filter.type === '') {
+          url = ''
+        }
+        let dataPutUser = new URLSearchParams()
+        // dataPutUser.append('oldPassword', filter.oldPassword)
+        axios.post(url, dataPutUser, param).then(result => {
+          resolve(result)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    }
   },
   mutations: {
     setLoading (state, payload) {
