@@ -4516,9 +4516,9 @@ export const store = new Vuex.Store({
         dataPost.append('dossierId', filter.dossierId)
         
         axios.post(url, dataPost, param).then(response => {
-          if (response.data && response.data.hasOwnProperty('error') && response.data.error == '0') {
-            resolve(response.data.payment_url)
-          } else if (response.data && response.data.hasOwnProperty('error') && response.data.error != '0') {
+          if (response.data && ((response.data.hasOwnProperty('error') && response.data.error == '0') || (response.data.hasOwnProperty('MaLoi') && response.data.MaLoi == '00'))) {
+            resolve(filter.key === 'kpdvcqg' ? response.data.payment_url : response.data.UrlThanhToan)
+          } else if (response.data && ((response.data.hasOwnProperty('error') && response.data.error != '0') || (response.data.hasOwnProperty('MaLoi') && response.data.MaLoi != '00'))) {
             toastr.error(response.data.hasOwnProperty('msg') ? response.data.msg : 'Yêu cầu thực hiện thất bại')
             reject(response)
           } else {

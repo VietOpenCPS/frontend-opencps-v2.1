@@ -1209,17 +1209,22 @@ export default {
         let tempData = thongtincongvan
         tempData.dueDate = vm.dateTimeView(thongtincongvan.dueDate)
         vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
-          if (vm.formCode === 'NEW_GROUP_CV_DI') {
+          // if (vm.formCode === 'NEW_GROUP_CV_DI') {
             let dataMetaData = {
               id: vm.thongTinNhomHoSo.dossierId,
               data: thongtincongvan.metaData
             }
             vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
-          }
+          // }
           
           vm.loadingAction = false
           toastr.clear()
           toastr.success('Cập nhật thành công')
+          let currentParams = vm.$router.history.current.params
+          vm.$router.push({
+            path: '/danh-sach-ho-so/' + currentParams.index + '?' + window.location.href.split('?')[1]
+          })
+
         }).catch(rejectXhr => {
           vm.loadingAction = false
           toastr.clear()

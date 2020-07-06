@@ -80,7 +80,7 @@
           </div>
         </v-flex>
         <v-flex xs12 sm6 md4 class="mb-2 px-2">
-          <div v-if="menuInfo.id !== 'CV_DI' && menuInfo.id !== 'CV_DEN'">
+          <div v-if="menuInfo.id.indexOf('CV_DI') !== -1 && menuInfo.id.indexOf('CV_DEN') !== -1">
             <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Lĩnh vực:</div>
             <v-autocomplete
               class="select-search d-inline-block"
@@ -114,7 +114,7 @@
           </div>
         </v-flex>
         <v-flex xs12 sm6 md4 class="mb-2 px-2">
-          <div v-if="menuInfo.id !== 'CV_DI' && menuInfo.id !== 'CV_DEN'">
+          <div v-if="menuInfo.id.indexOf('CV_DI') !== -1 && menuInfo.id.indexOf('CV_DEN') !== -1">
             <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Mã sổ theo dõi:</div>
             <v-text-field
               v-model="register"

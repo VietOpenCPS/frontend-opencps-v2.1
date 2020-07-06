@@ -125,9 +125,9 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-subheader v-else class="pl-0">
-                        <span v-if="formCodeInput === 'NEW_GROUP_CV'">Đơn vị gửi công văn: </span>
-                        <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'">Đơn vị nhận công văn: </span> 
-                        <span style="color:red">&nbsp;*</span>: 
+                        <span v-if="formCodeInput === 'NEW_GROUP_CV'">Đơn vị gửi công văn </span>
+                        <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'">Đơn vị nhận công văn </span> 
+                        <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'" style="color:red">&nbsp;*</span>: 
                       </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm10 class="mb-2">
@@ -140,8 +140,8 @@
                       item-text="itemName"
                       item-value="itemCode"
                       v-model="donvi_gui_nhan"
-                      :rules="[rules.required]"
-                      required
+                      :rules="formCodeInput === 'NEW_GROUP_CV_DI' ? [rules.required] : []"
+                      :required="formCodeInput === 'NEW_GROUP_CV_DI'"
                       ></v-autocomplete>
                     </v-flex>
 
@@ -355,7 +355,7 @@ export default {
       let vm = this
       vm.thongTinCongVan = data
       try {
-        let metadata = JSON.parse(vm.thongTinCongVan.metadata)
+        let metadata = JSON.parse(vm.thongTinCongVan.metaData)
         vm.donvi_gui_nhan = vm.formCodeInput === 'NEW_GROUP_CV_DI' ? metadata.donvinhan : metadata.donvigui
       } catch (error) {
       }
@@ -371,7 +371,7 @@ export default {
     getThongTinCongVan () {
       let vm = this
       let delegateFilter = vm.govAgencySubmitList.filter(function (item) {
-        return item.itemCode === vm.thongTinCongVan.delegateIdNo
+        return item.itemCode === vm.donvi_gui_nhan
       })
       let delegateName = delegateFilter.length > 0 ? delegateFilter[0]['itemName'] : ''
       vm.thongTinCongVan.dueDate = vm.parseDateToTimestamp(vm.dueDate)
@@ -381,15 +381,17 @@ export default {
         metaDataDossier = JSON.parse(vm.thongTinCongVan.metaData)
       } catch (error) {
       }
-      let metaData = metaDataDossier ? metaDataDossier : {donvigui: '', donvinhan: ''}
+      let metaData = metaDataDossier ? metaDataDossier : {donvigui: '', donvinhan: '', tendonvigui: '', tendonvinhan: ''}
 
       if (vm.formCodeInput === 'NEW_GROUP_CV') {
-        vm.thongTinCongVan.delegateName = delegateName ? delegateName : ''
+        // vm.thongTinCongVan.delegateName = delegateName ? delegateName : ''
+        metaData.tendonvigui = delegateName
         metaData.donvigui = vm.donvi_gui_nhan
         metaData.donvinhan = vm.userLoginInfomation.hasOwnProperty('scope') && vm.userLoginInfomation.scope ? vm.userLoginInfomation.scope : vm.detailDossier.govAgencyCode
       } else {
         metaData.donvigui = vm.userLoginInfomation.hasOwnProperty('scope') && vm.userLoginInfomation.scope ? vm.userLoginInfomation.scope : vm.detailDossier.govAgencyCode
         metaData.donvinhan = vm.donvi_gui_nhan
+        metaData.tendonvinhan = delegateName
       }
       vm.thongTinCongVan.metaData = metaData
       vm.thongTinCongVan.validation = vm.$refs.formThongTinCongVan.validate()

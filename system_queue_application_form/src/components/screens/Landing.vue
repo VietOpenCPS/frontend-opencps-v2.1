@@ -428,6 +428,7 @@ export default {
     },
     selectTemplate (indexService, template, serviceInfo) {
       let vm = this
+      vm.trackingBTTT(serviceInfo.serviceCode)
       vm.$store.commit('setServiceinfoSelected', serviceInfo)
       let templateFile = Object.assign({}, template, {serviceInfoId: serviceInfo.serviceInfoId})
       vm.$store.commit('setFileTemplateSelected', templateFile)
@@ -693,6 +694,15 @@ export default {
           vm.isSlot = false
         })
       }, 300)
+    },
+    trackingBTTT (serviceCode) {
+      try {
+        console.log('trackDVC serviceCode', serviceCode)
+        if (_govaq) {
+          _govaq.push(['trackDVC', serviceCode, '1', ''])
+        }
+      } catch (error) { 
+      }
     },
     allowedDates: val => (new Date(val)).getDay() !== 0 && (new Date(val)).getDay() !== 6,
     maBienNhan (str) {

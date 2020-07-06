@@ -5,7 +5,7 @@
       <div class="layout row wrap header_tools row-blue">
         <div v-if="!isMobile" class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
           <v-text-field
-            v-if="trangThaiHoSoList[index]['id'] !== 'CV_DI' && trangThaiHoSoList[index]['id'] !== 'CV_DEN'"
+            v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== -1 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== -1"
             v-model="keyword"
             placeholder="Tìm kiếm theo tên hồ sơ, mã hồ sơ, tên thủ tục, chủ hồ sơ ..."
             solo
@@ -66,7 +66,7 @@
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box" v-if="trangThaiHoSoList">
           <v-autocomplete
-            v-if="trangThaiHoSoList[index]['id'] !== 'CV_DI' && trangThaiHoSoList[index]['id'] !== 'CV_DEN'"
+            v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== -1 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== -1"
             :items="listDichVu"
             v-model="dichVuSelected"
             label="Chọn trường hợp"
@@ -104,7 +104,7 @@
         <v-flex xs12 sm3 class="pl-2 pr-2">
           <div style="position:relative" v-if="trangThaiHoSoList">
             <v-text-field
-              v-if="trangThaiHoSoList[index]['id'] !== 'CV_DI' && trangThaiHoSoList[index]['id'] !== 'CV_DEN'"
+              v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== -1 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== -1"
               label="Nhập mã hồ sơ"
               v-model="dossierNoKey"
               @keyup.enter="changeDossierNoKey"
@@ -413,14 +413,14 @@
                 <v-autocomplete
                   :items="listDichVu"
                   v-model="dichVuSelected"
-                  label="Trường hợp:"
+                  label="Dịch vụ:"
                   placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
-                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn']"
+                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn']"
                   @change="changeDichVuConfigs"
                   required
                   box
@@ -599,7 +599,7 @@
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2 text-bold">Trường hợp <span style="color:red">*</span>:</div>
+                <div class="my-2 text-bold">Dịch vụ <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
@@ -610,7 +610,7 @@
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
-                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>
@@ -748,7 +748,7 @@
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2 text-bold">Trường hợp <span style="color:red">*</span>:</div>
+                <div class="my-2 text-bold">Dịch vụ <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
@@ -759,7 +759,7 @@
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
-                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>
@@ -2707,7 +2707,7 @@ export default {
       let currentQuery = vm.$router.history.current.query
       if (item.permission) {
         if (item['originality'] === 9) {
-          if (vm.trangThaiHoSoList[vm.index]['menuGroup'] === 'CV_DI') {
+          if (vm.trangThaiHoSoList[vm.index]['id'].indexOf('CV_DI') !== -1) {
             vm.$router.push({
               path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV_DI/' + item.dossierId,
               query: vm.$router.history.current.query

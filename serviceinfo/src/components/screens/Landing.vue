@@ -148,6 +148,7 @@
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
+
                   <v-menu bottom right offset-y v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 1 && serviceConfigs(props.item.serviceConfigs).length <= 5">
                     <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel >= 3" style="min-width: 110px;">
                       <span v-if="!formToKhai">Nộp hồ sơ</span>
@@ -161,6 +162,7 @@
                       </v-list-tile>
                     </v-list>
                   </v-menu>
+
                   <v-btn small color="primary" class="my-1" style="min-width: 110px;"
                     v-if="props.item.maxLevel >= 3 && props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 5"
                     @click="showSelectGov(props.item, props.item.serviceConfigs)"
@@ -168,12 +170,14 @@
                     <span v-if="!formToKhai">Nộp hồ sơ</span>
                     <span v-else>Tạo tờ khai</span>
                   </v-btn>
+
                   <v-btn small color="primary" class="my-1" style="min-width: 110px;"
                     v-if="props.item.maxLevel < 3 && props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 5"
                     @click="showSelectGov(props.item, props.item.serviceConfigs, 'guide')"
                   >
                     Hướng dẫn
                   </v-btn>
+
                   <v-btn small color="primary" class="my-1" style="min-width: 110px;"
                     v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) > 2"
                     @click="createDossier(serviceConfigs(props.item.serviceConfigs)[0], props.item)"
@@ -181,11 +185,21 @@
                     <span v-if="!formToKhai">Nộp hồ sơ</span>
                     <span v-else>Tạo tờ khai</span>
                   </v-btn>
+
                   <v-btn small color="primary" class="my-1" style="min-width: 110px;"
-                    v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) <= 2"
+                    v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 
+                      && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
                     @click="viewGuide(serviceConfigs(props.item.serviceConfigs)[0], props.item.serviceCode)"
                   >
                     Hướng dẫn
+                  </v-btn>
+
+                  <v-btn small color="primary" class="my-1" style="min-width: 110px;"
+                    v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 
+                      && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
+                    @click="createDossier(serviceConfigs(props.item.serviceConfigs)[0], props.item)"
+                  >
+                    Tạo tờ khai
                   </v-btn>
                 </div>
               </td>
@@ -1340,6 +1354,7 @@ export default {
             
           }
         } else {
+          vm.trackingBTTT(serviceInfoItem.serviceCode)
           vm.serviceInfoSelected = serviceInfoItem
           let filterSearch = {
             serviceInfoId: serviceInfoItem.serviceInfoId
