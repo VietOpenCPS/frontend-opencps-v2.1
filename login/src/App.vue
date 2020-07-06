@@ -500,7 +500,23 @@ export default {
           sessionStorage.setItem('userLogout', 'applicant')
         }
       }
-      window.location.href = "/c/portal/logout";
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId()
+        },
+        params: {}
+      }
+      let urlRedirect = window.location.origin 
+      let data = {
+        accessToken: '',
+        redirectURL: urlRedirect,
+        state: ''
+      }
+      axios.post('/o/rest/v2/dvcqgsso/logout', data, param).then(function (response) {
+        window.location.href = "/c/portal/logout"
+      }).catch(function (error) {
+        window.location.href = "/c/portal/logout"
+      })
     },
     goToDangKyPage() {
       if (window.themeDisplay !== null && window.themeDisplay !== undefined) {

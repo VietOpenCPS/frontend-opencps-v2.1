@@ -6,14 +6,14 @@
     <div v-else>
       <v-layout class="wrap">
         <v-flex :class="isMobile ? 'pb-2 pl-2' : 'pb-2'">
-          <h3 style="color:#0167d3" v-if="!isMobile"><span class="text-bold">Tên hồ sơ: </span>{{dossierDetail.dossierName ? dossierDetail.dossierName : dossierDetail.serviceName}}</h3>
-          <h3 style="color:#0167d3" v-else><span class="text-bold">Thủ tục hành chính: </span>{{dossierDetail.serviceName}}</h3>
+          <h3 style="color:#0054a6" v-if="!isMobile"><span class="text-bold">Tên hồ sơ: </span>{{dossierDetail.dossierName ? dossierDetail.dossierName : dossierDetail.serviceName}}</h3>
+          <h3 style="color:#0054a6" v-else><span class="text-bold">Thủ tục hành chính: </span>{{dossierDetail.serviceName}}</h3>
         </v-flex>
       </v-layout>
       <div class="pt-1">
         <v-tabs
           v-model="active"
-          color="#0167d3"
+          color="#0054a6"
           dark
           slider-color="yellow"
         >
@@ -178,23 +178,23 @@
             </v-card>
           </v-tab-item>
           <v-tab-item key="3" v-if="paymentInfo">
-            <v-card style="border: 1px solid #dedede;border-top: none;">
+            <v-card class="px-2 py-2" style="border: 1px solid #dedede;border-top: none;">
               <v-card-text class="px-0 py-0">
                 <v-layout wrap>
-                  <v-flex xs12 sm2>
-                    <v-subheader class="pl-0 text-right">Lệ phí: </v-subheader>
+                  <v-flex xs12 sm2 style="height: 32px;">
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;">Lệ phí: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <p class="mt-1 mb-0">{{currency(Number(paymentInfo.feeAmount))}} &nbsp;&nbsp; vnđ</p>
                   </v-flex>
-                  <v-flex xs12 sm2>
-                    <v-subheader class="pl-0 text-right">Phí: </v-subheader>
+                  <v-flex xs12 sm2 style="height: 32px;">
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;">Phí: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <p class="mt-1 mb-0">{{currency(Number(paymentInfo.serviceAmount))}} &nbsp;&nbsp; vnđ</p>
                   </v-flex>
-                  <v-flex xs12 sm2 v-if="paymentInfo.shipAmount !== 0">
-                    <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
+                  <v-flex xs12 sm2 v-if="paymentInfo.shipAmount !== 0" style="height: 32px;">
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;">Phí chuyển phát: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <p class="mt-1 mb-0" v-if="paymentInfo.shipAmount !== 0">
@@ -205,8 +205,8 @@
               </v-card-text>
               <v-card-text class="px-0 py-0">
                 <v-layout wrap>
-                  <v-flex xs12 sm2>
-                    <v-subheader class="pl-0 text-right"><span class="text-bold">Tổng: </span></v-subheader>
+                  <v-flex xs12 sm2 style="height: 32px;">
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;"><span class="text-bold">Tổng: </span></v-subheader>
                   </v-flex>
                   <v-flex xs12 sm3 style="padding-top:7px">
                     <span>{{currency(Number(paymentInfo.paymentAmount))}} &nbsp;&nbsp; vnđ</span>
@@ -221,17 +221,18 @@
                   </v-flex>
                 </v-layout>
               </v-card-text>
+              <div class="text-xs-left mt-2 mb-3 ml-0">
+                <v-chip v-if="getEPaymentProfile(paymentInfo.epaymentProfile)" color="orange" text-color="white"
+                  @click.native="toKeyPay(getEPaymentProfile(paymentInfo.epaymentProfile).keypayUrl)"
+                >
+                  <v-avatar style="cursor: pointer">
+                    <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
+                  </v-avatar>
+                  <span class="py-2" style="cursor: pointer">Thanh toán trực tuyến</span>
+                </v-chip>
+              </div>
             </v-card>
-            <div class="text-xs-left mt-2 mb-3 ml-0">
-              <v-chip v-if="getEPaymentProfile(paymentInfo.epaymentProfile)" color="orange" text-color="white"
-                @click.native="toKeyPay(getEPaymentProfile(paymentInfo.epaymentProfile).keypayUrl)"
-              >
-                <v-avatar style="cursor: pointer">
-                  <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
-                </v-avatar>
-                <span class="py-2" style="cursor: pointer">Thanh toán trực tuyến</span>
-              </v-chip>
-            </div>
+            
           </v-tab-item>
           <v-tab-item key="4" v-if="dossierDetail['dossierStatus'] === 'done'">
             <v-card style="border: 1px solid #dedede;border-top: none;">
@@ -241,14 +242,14 @@
                     <div class="text-bold">
                       {{index + 1}}.&nbsp; {{ item.subject }}
                     </div>
-                    <v-radio-group class="ml-3 pt-2" v-model="item.selected" row>
+                    <v-radio-group :class="!isMobile ? 'ml-3 pt-2' : 'ml-0 mb-2 mt-2 pt-0'" v-model="item.selected" row>
                       <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" ></v-radio>
                     </v-radio-group>
-                    <v-layout wrap class="ml-3" style="margin-top:-10px">
+                    <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
                       <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
                         <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
                       </v-flex>
-                    </v-layout>
+                    </v-layout> -->
                   </div>
                   <div v-if="votingItems.length === 0" class="mx-3">
                     <v-alert outline color="warning" icon="priority_high" :value="true">
@@ -275,6 +276,7 @@
 <script>
   import router from '@/router'
   import Vue from 'vue/dist/vue.min.js'
+  import toastr from 'toastr'
   export default {
     props: ['index', 'detail'],
     components: {
@@ -283,6 +285,7 @@
       loading: false,
       loadingAction: false,
       dossierDetail: {},
+      dossierDetailMotcua: '',
       listHistoryProcessing: [],
       dossierActions: [],
       tailieuNop: [],
@@ -355,7 +358,7 @@
         }
       ],
       isMobile: false,
-      two_system: false,
+      two_system: true,
       paymentInfo: false
     }),
     computed: {
@@ -388,6 +391,7 @@
         }
         vm.dossierDetail = vm.detail
         vm.getPaymentInfo()
+        vm.loadDossierDetailMotcua()
         if (vm.dossierDetail.submissionNote) {
           let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
           let resultTemp = submissionNote ? submissionNote.data : ''
@@ -442,13 +446,25 @@
           vm.listHistoryProcessing = result
         })
       },
+      loadDossierDetailMotcua () {
+        let vm = this
+        if (vm.two_system) {
+          vm.$store.dispatch('loadDetailDossierMC', vm.dossierDetail).then(function (result) {
+            console.log('loadDetailDossierMC', result)
+            vm.dossierDetailMotcua = result[0]
+          }).catch(function (reject) {
+          })
+        }
+      },
       loadVoting () {
         let vm = this
+        console.log('dossierDetailMotcua', vm.dossierDetailMotcua)
         let filter = {
           className: 'dossier',
-          classPK: vm.dossierDetail.dossierId
+          classPK: vm.two_system ? vm.dossierDetailMotcua.dossierId : vm.dossierDetail.dossierId,
+          serverCode: vm.dossierDetailMotcua['govAgencyCode']
         }
-        if (!vm.two_system) {
+        if (vm.two_system) {
           vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
             vm.votingItems = result
             console.log('votingItems', vm.votingItems)
@@ -469,7 +485,7 @@
           vm.loadingVoting = true
           for (var index in vm.votingItems) {
             vm.votingItems[index]['className'] = 'dossier'
-            vm.votingItems[index]['classPk'] = vm.dossierDetail.dossierId
+            vm.votingItems[index]['classPk'] = vm.two_system ? vm.dossierDetailMotcua.dossierId : vm.dossierDetail.dossierId
             vm.votingItems[index]['serverCode'] = 'SERVER_' + vm.dossierDetail['govAgencyCode']
             if (!vm.two_system) {
               arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
@@ -479,6 +495,7 @@
           }
           Promise.all(arrAction).then(results => {
             vm.loadingVoting = false
+            toastr.success('Gửi đánh giá thành công')
             vm.loadVoting()
           }).catch(xhr => {
             vm.loadingVoting = false
@@ -491,13 +508,15 @@
       },
       getPaymentInfo () {
         let vm = this
+        let scr = vm.getScr(vm.dossierDetail.referenceUid)
         let filter = {
           referenceUid: vm.dossierDetail.referenceUid,
-          secretCode: vm.secretCode
+          secretCode: scr,
+          serverCode: vm.dossierDetail['govAgencyCode']
         }
         vm.$store.dispatch('loadDossierPayments', filter).then(function (result) {
           console.log(result)
-          if (result && String(result.paymentStatus) !== '3' && String(result.paymentStatus) !== '5') {
+          if (result && result.paymentStatus && String(result.paymentStatus) === '2') {
             vm.paymentInfo = result
           }
         })
@@ -516,6 +535,13 @@
           } catch (e) {
             return ''
           }
+        } else {
+          return ''
+        }
+      },
+      getScr (id) {
+        if (typeof(Storage) !== 'undefined') {
+          return sessionStorage.getItem(id) ? sessionStorage.getItem(id) : ''
         } else {
           return ''
         }

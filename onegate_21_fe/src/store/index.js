@@ -1240,6 +1240,8 @@ export const store = new Vuex.Store({
         }
         let dataPostdossier = new URLSearchParams()
         dataPostdossier.append('dossierId', data.dossierId)
+        dataPostdossier.append('groupDossierId', String(data.groupDossierId))
+        
         axios.put('/o/rest/v2/dossiers/' + data.groupDossierId + '/groupDossier', dataPostdossier, options).then(function (response) {
           commit('setLoading', false)
           // toastr.clear()
@@ -1372,8 +1374,36 @@ export const store = new Vuex.Store({
         // dataPostdossier.append('totalRecord',data.totalRecord)
         // dataPostdossier.append('dossierFilePayment',data.dossierFilePayment)
         // dataPostdossier.append('Doan_HCTN',data.Doan_HCTN)
-        dataPostdossier.append('data',JSON.stringify(data.data))
+        dataPostdossier.append('data',data.data)
         axios.put('/o/rest/v2/dossiers/'+data.id+'/metadata', dataPostdossier, options).then(function (response) {
+          resolve(response)
+        }).catch(function (error) {
+          reject(error)
+          toastr.clear()
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          commit('setLoading', false)
+        })
+      })
+    },
+    putPayment({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        commit('setLoading', true)
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json',
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          }
+        }
+        let dataPostdossier = new URLSearchParams()
+
+        dataPostdossier.append('requestPayment',data.payment.requestPayment)
+        dataPostdossier.append('paymentNote',data.payment.paymentNote)
+        dataPostdossier.append('advanceAmount',data.payment.advanceAmount)
+        dataPostdossier.append('feeAmount',data.payment.feeAmount)
+        dataPostdossier.append('serviceAmount',data.payment.serviceAmount)
+        dataPostdossier.append('shipAmount',data.payment.shipAmount)
+        axios.post('/o/rest/v2/dossiers/'+data.dossierId + '/payment', dataPostdossier, options).then(function (response) {
           resolve(response)
         }).catch(function (error) {
           reject(error)
@@ -1390,7 +1420,7 @@ export const store = new Vuex.Store({
             groupId: state.initData.groupId
           },
           params: {
-            groupDossierId: filter.groupDossierId ? filter.groupDossierId : ''
+            groupDossierId: filter.groupDossierId ? String(filter.groupDossierId) : ''
           }
         }
         axios.get('/o/rest/v2/dossiers', param).then(function (response) {
@@ -1552,6 +1582,35 @@ export const store = new Vuex.Store({
           commit('setThongTinChungHoSo', response.data)
           commit('setLePhi', response.data)
           commit('setDichVuChuyenPhatKetQua', response.data)
+        }).catch(rejectXhr => {
+          reject(rejectXhr)
+        })
+      })
+    },
+    putDossierCongVan ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        commit('setLoading', false)
+        let options = {
+          headers: {
+            groupId: state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': ''
+          }
+        }
+        let dataPutdossier = new URLSearchParams()
+        dataPutdossier.append('documentNo', data.documentNo ? data.documentNo : '')
+        dataPutdossier.append('documentDate', data.documentDate ? data.documentDate : '')
+        dataPutdossier.append('dueDate', data.dueDate ? data.dueDate : '')
+        dataPutdossier.append('briefNote', data.briefNote ? data.briefNote : '')
+        dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : '')
+        dataPutdossier.append('contactTelNo', data.contactTelNo ? data.contactTelNo : '')
+        dataPutdossier.append('contactEmail', data.contactEmail ? data.contactEmail : '')
+
+        
+        console.log('dataPutdossier', dataPutdossier)
+        axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
+          resolve(response.data)
         }).catch(rejectXhr => {
           reject(rejectXhr)
         })

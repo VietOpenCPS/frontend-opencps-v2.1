@@ -1,7 +1,7 @@
 <template>
   <div>
     <tiep-nhan-ho-so-detail 
-      v-if="formCode === 'NEW' || formCode === 'NEW_GROUP' || formCode === 'UPDATE' || formCode === 'COPY'" 
+      v-if="formCode === 'NEW' || formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'UPDATE' || formCode === 'COPY'" 
       ref="tiepnhanhosodetail"
       :formCode="formCode"
       :id="id"

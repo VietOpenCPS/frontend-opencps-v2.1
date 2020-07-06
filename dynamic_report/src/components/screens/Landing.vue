@@ -19,7 +19,7 @@
               >
               </vue-csv-downloader>
               -->
-              <v-btn flat class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds" :style="showGuilds ? 'color: #1565c0' : ''">
+              <v-btn flat v-if="!itemsReports[index]['filterConfig']['showTable']" class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds" :style="showGuilds ? 'color: #1565c0' : ''">
                 <v-icon>receipt</v-icon> &nbsp; Hướng dẫn PDF -> Excel
               </v-btn>
               <v-select v-if="buttonsShow"
@@ -108,8 +108,16 @@
       </v-flex>
       <v-flex xs12 sm6 v-if="hiddenAside">
         <div class="d-inline-block right">
-          <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo</v-btn>
-          <v-btn dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
+          <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> 
+            <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
+          </v-btn>
+          <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
+            <v-icon>print</v-icon> &nbsp; In báo cáo
+          </v-btn>
+          <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
+            <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
+          </v-btn>
+          <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
             <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
           </v-btn>
           <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
@@ -124,15 +132,119 @@
     <v-layout row wrap class="mx-2 my-2" v-if="!hiddenAside">
       <v-flex xs12>
         <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo</v-btn>
-        <v-btn dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
+        
+        <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
+          <v-icon>print</v-icon> &nbsp; In báo cáo
+        </v-btn>
+        <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
+          <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
+        </v-btn>
+        <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
           <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
         </v-btn>
         <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
       </v-flex>
     </v-layout>
+    <!-- table bao cao -->
     <div>
-      <vue-friendly-iframe v-if="showGuilds" :src="'/documents/' + groupId + '/0/hdsd.pdf'"></vue-friendly-iframe>
-      <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' && !showGuilds" :src="pdfBlob"></vue-friendly-iframe>
+      <div v-if="!itemsReports[index]['filterConfig']['showTable']">
+        <vue-friendly-iframe v-if="showGuilds" :src="'/documents/' + groupId + '/0/hdsd.pdf'"></vue-friendly-iframe>
+        <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' && !showGuilds" :src="pdfBlob"></vue-friendly-iframe>
+      </div>
+      <div v-if="itemsReports[index]['filterConfig']['showTable'] && isRender && !showErrorData && !isShowLoading">
+        <v-data-table
+          :headers="headers"
+          :items="dossierList"
+          :pagination.sync="pagination"
+          hide-actions
+          class="table-landing table-bordered"
+        >
+          <template slot="items" slot-scope="props">
+            <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;" @click="viewDetail(props.item)">
+              <td class="text-xs-center">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span><br>
+                </div>
+              </td>
+              <td class="text-xs-left" style="min-width: 135px;">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.dossierNo}}</span>
+                </div>
+              </td>
+              <td class="text-xs-left">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.dossierName}}</span>
+                </div>
+              </td>
+              <td class="text-xs-left" style="min-width: 135px">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>
+                    <span>{{props.item.applicantName}}</span>
+                  </span>
+                </div>
+              </td>
+              <td class="text-xs-center">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>
+                    <span>{{props.item.receiveDate}}</span>
+                  </span>
+                </div>
+              </td>
+              <td class="text-xs-center">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>
+                    <span>{{props.item.dueDate}}</span>
+                  </span>
+                </div>
+              </td>
+              <td class="text-xs-left">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>
+                    <span>{{props.item.dossierStatusText}}</span>
+                  </span>
+                </div>
+              </td>
+              <td class="text-xs-left">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>
+                    <span>{{props.item.dossierOverdue}}</span>
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
+        <div class="text-xs-right layout wrap mt-2" style="position: relative;">
+          <div class="flex pagging-table px-2"> 
+            <tiny-pagination :total="pagination.totalItems" :page="pagination.page" custom-class="custom-tiny-class" 
+              @tiny:change-page="paggingData" ></tiny-pagination> 
+          </div>
+        </div>
+      </div>
       <div class="mx-3 my-4" v-if="showErrorData">
         <v-alert :value="true" outline color="info" icon="info">
           Không có dữ liệu báo cáo.
@@ -149,6 +261,36 @@
         </v-flex>
       </v-layout>
     </div>
+    <!-- thong tin ho so -->
+    <v-dialog v-model="dialogDossierDetail" max-width="1200" transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Thông tin hồ sơ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogDossierDetail = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-0 px-0">
+          <thong-tin-ho-so :detailDossier="dossierInfo"></thong-tin-ho-so>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <!-- dialog pdf -->
+    <v-dialog v-model="dialogPDF" max-width="1200" transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Báo cáo thống kê</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPDF = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <vue-friendly-iframe :src="pdfBlob"></vue-friendly-iframe>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+
   </div>
 </v-form>
 </template>
@@ -162,6 +304,8 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs
 import DatetimePicker from './DatetimePicker.vue'
 import CsvDownload from './CsvDownload.vue'
 import { toXML } from 'jstoxml'
+import TinyPagination from './Pagination.vue'
+import ThongTinHoSo from './ThongTinHoSo.vue'
 const jsonMapper = require('json-mapper-json')
 var FileSaver = require('file-saver-fixed')
 
@@ -170,7 +314,9 @@ export default {
   components: {
     'vue-friendly-iframe': VueFriendlyIframe,
     DatetimePicker,
-    'vue-csv-downloader': CsvDownload
+    'vue-csv-downloader': CsvDownload,
+    'tiny-pagination': TinyPagination,
+    'thong-tin-ho-so': ThongTinHoSo
   },
   data: () => ({
     hiddenAside: false,
@@ -225,7 +371,61 @@ export default {
     noHeader: true,
     exportXML: false,
     jsonMapperJson: {},
-    userData: ''
+    userData: '',
+    headers: [
+      {
+        text: 'STT',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Mã hồ sơ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Tên hồ sơ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Chủ hồ sơ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Ngày tiếp nhận',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Ngày hẹn trả',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Trạng thái',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Hạn xử lý',
+        align: 'center',
+        sortable: false
+      }
+    ],
+    pagination: {
+      page: 1,
+      rowsPerPage: 15,
+      totalItems: 0
+    },
+    dossierList: [],
+    dossierInfo: '',
+    dialogDossierDetail: false,
+    dialogPDF: false,
+    dialogPDFLoading: false,
+    isRender: false,
+    dataExportExcel: '',
   }),
   computed: {
     itemsReports () {
@@ -323,7 +523,13 @@ export default {
             vm.groupByVal = defaultValGroup
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
-            vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+            // set list filter
+            if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+              vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
+            } else {
+              vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+            }
+            
             if (vm.agencyLists.length > 0) {
               let defaultVal = vm.agencyLists[0]['value']
               for (let key in vm.agencyLists) {
@@ -431,7 +637,12 @@ export default {
         vm.groupByVal = defaultValGroup
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
-        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+        // set list filter
+        if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+          vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
+        } else {
+          vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+        }
         if (vm.agencyLists.length > 0) {
           let defaultVal = vm.agencyLists[0]['value']
           for (let key in vm.agencyLists) {
@@ -522,7 +733,11 @@ export default {
             vm.groupByVal = defaultValGroup
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
-            vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+            if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+              vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
+            } else {
+              vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+            }
             if (vm.agencyLists.length > 0) {
               let defaultVal = vm.agencyLists[0]['value']
               for (let key in vm.agencyLists) {
@@ -584,6 +799,7 @@ export default {
     },
     doDynamicReport () {
       let vm = this
+      vm.isRender = false
       vm.docDefinition = {}
       let docDString = {}
       vm.dataReportXX = ''
@@ -624,7 +840,11 @@ export default {
           docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
         }
       }
-      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
+      } else {
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      }
       for (let key in vm.agencyLists) {
         if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
           docDString = docDString.replace(/\[\$groupIds\$\]/g, vm.agencyLists[key]['text'])
@@ -687,6 +907,11 @@ export default {
       vm.isShowLoading = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null && result !== undefined) {
+          // set dossierList
+          vm.dossierList = result
+          vm.pagination.totalItems = vm.dossierList.length
+          console.log('dossiers', vm.dossierList)
+          // 
           vm.showErrorData = false
           let dataReport = result
           let dossierRaw = {}
@@ -740,6 +965,33 @@ export default {
           }
           dataRaw.reverse()
           console.log('dossierRaw 46', dataRaw)
+          // row total
+          let dataRowTotal = []
+          let totalText = 'Tổng cộng'
+          dataRowTotal.push({
+            text: totalText, 
+            colSpan: 2,
+            bold: true,
+            alignment: 'center',
+            style: 'tdStyle'
+          })
+          for (let keyMapping in vm.itemsReportsConfig) {
+            if (vm.itemsReportsConfig[keyMapping]['value'] === 'note') {
+              dataRowTotal.push({
+                text: '', 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            }  else {
+              dataRowTotal.push({
+                text: 0, 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            }
+          }
+          
+          // end
           for (let key in dataRaw) {
             if (dataRaw[key][vm.groupByVal] !== undefined && dataRaw[key][vm.groupByVal] !== null && dataRaw[key][vm.groupByVal] !== '') {
               let csvGroup = []
@@ -785,6 +1037,7 @@ export default {
               style: 'tdStyle'
             }])
             */
+           
             let dossiersArray = dataRaw[key]['dossiers']
             let indexStt = 1
             let dataRow = []
@@ -825,6 +1078,16 @@ export default {
                     alignment: alignmentConfig,
                     style: 'tdStyle'
                   })
+                  // caculator count total
+                  if (vm.reportType.startsWith('REPORT_STATISTIC')) {
+                    let indexRow = dataRow.length - 1
+                    dataRowTotal[indexRow]['text'] = Number(dataRowTotal[indexRow]['text']) + Number(dataRow[indexRow]['text'])
+                    if (vm.itemsReportsConfig[keyVal]['value'] === 'note') {
+                      dataRowTotal[indexRow]['text'] = ''
+                    }
+                  }
+                  
+                  // 
                 }
               }
               dataReportTotal += JSON.stringify(dataRow) + ','
@@ -835,7 +1098,12 @@ export default {
           }
           dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
           vm.dataReportXX += dataReportTotal
-          // }
+          if (vm.reportType.startsWith('REPORT_STATISTIC')) {
+            vm.dataReportXX += ',' + JSON.stringify(dataRowTotal)
+          }
+          
+          // console.log('dataReportXX11ZZ', vm.dataReportXX)
+          
           vm.csvExport = []
           vm.csvExport = dataToExportCSV
           vm.fields = []
@@ -852,31 +1120,46 @@ export default {
           vm.showCSVDownload = true
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
+          vm.dataExportExcel = docDString
           vm.docDefinition = JSON.parse(docDString)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
-          pdfDocGenerator.getBlob((blob) => {
-            vm.pdfBlob = window.URL.createObjectURL(blob)
-            vm.isShowLoading = false
-            if (vm.doExportExcel) {
-              /** TODO: Call API
-              let currentTimestemp = new Date().getTime()
-              let fileToExcel = new File([blob], currentTimestemp + '.pdf')
-              {
-                var reader = new FileReader()
-                reader.onload = function(e) {
-                    var data = e.target.result
-                    console.log('data', data)
-                    vm.convertPDFToHTML(data)
-                };
-                reader.readAsArrayBuffer(fileToExcel)
+          // create blob
+          // check showTable
+          if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+            pdfDocGenerator.getBlob((blob) => {
+              vm.pdfBlob = window.URL.createObjectURL(blob)
+              if (vm.pdfBlob) {
+                vm.isRender = true
+              } else {
+                vm.isRender = false
               }
-              */
-              vm.$store.dispatch('getExcelReportFromServer', {
-                data: docDString,
-                fileName: 'baocaothongke' + '.xls'
-              })
-            }
-          })
+              vm.isShowLoading = false
+            })
+          } else {
+            pdfDocGenerator.getBlob((blob) => {
+              vm.pdfBlob = window.URL.createObjectURL(blob)
+              vm.isShowLoading = false
+              if (vm.doExportExcel) {
+                /** TODO: Call API
+                let currentTimestemp = new Date().getTime()
+                let fileToExcel = new File([blob], currentTimestemp + '.pdf')
+                {
+                  var reader = new FileReader()
+                  reader.onload = function(e) {
+                      var data = e.target.result
+                      console.log('data', data)
+                      vm.convertPDFToHTML(data)
+                  };
+                  reader.readAsArrayBuffer(fileToExcel)
+                }
+                */
+                vm.$store.dispatch('getExcelReportFromServer', {
+                  data: docDString,
+                  fileName: 'baocaothongke' + '.xls'
+                })
+              }
+            })
+          }
         } else {
           // vm.agencyLists = []
           vm.isShowLoading = false
@@ -886,6 +1169,7 @@ export default {
     },
     doPrintReportFix () {
       let vm = this
+      vm.isRender = false
       vm.agencyLists = []
       vm.api = ''
       vm.dataReportXX = ''
@@ -928,7 +1212,11 @@ export default {
           docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
         }
       }
-      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
+      } else {
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      }
       for (let key in vm.agencyLists) {
         if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
           docDString = docDString.replace(/\[\$groupIds\$\]/g, vm.agencyLists[key]['text'])
@@ -954,6 +1242,10 @@ export default {
       
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null) {
+          // set dossierList
+          vm.dossierList = result
+          vm.pagination.totalItems = vm.dossierList.length
+          // 
           vm.showErrorData = false
           let index = 1
           let dataRowTotal = []
@@ -1244,20 +1536,35 @@ export default {
           vm.showCSVDownload = true
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           // console.log('docDString', docDString)
+          vm.dataExportExcel = docDString
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
           console.log('docDefinition-render-pdf', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
-          pdfDocGenerator.getBlob((blob) => {
-            vm.pdfBlob = window.URL.createObjectURL(blob)
-            vm.isShowLoading = false
-            if (vm.doExportExcel) {
-              vm.$store.dispatch('getExcelReportFromServer', {
-                data: docDString,
-                fileName: new Date().getTime() + '.xls'
-              })
-            }
-          })
+          // create blob
+          // check showTable
+          if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+            pdfDocGenerator.getBlob((blob) => {
+              vm.pdfBlob = window.URL.createObjectURL(blob)
+              if (vm.pdfBlob) {
+                vm.isRender = true
+              } else {
+                vm.isRender = false
+              }
+              vm.isShowLoading = false
+            })
+          } else {
+            pdfDocGenerator.getBlob((blob) => {
+              vm.pdfBlob = window.URL.createObjectURL(blob)
+              vm.isShowLoading = false
+              if (vm.doExportExcel) {
+                vm.$store.dispatch('getExcelReportFromServer', {
+                  data: docDString,
+                  fileName: new Date().getTime() + '.xls'
+                })
+              }
+            })
+          }
         } else {
           // vm.agencyLists = []
           vm.isShowLoading = false
@@ -1323,7 +1630,11 @@ export default {
     },
     doDynamicReportXML () {
       let vm = this
-      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
+      } else {
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      }
       vm.jsonMapperJson = {}
       vm.jsonMapperJson = vm.itemsReports[vm.index]['userConfig']
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
@@ -1433,7 +1744,28 @@ export default {
       } catch (e) {
         return ''
       }
-    }
+    },
+    paggingData (config) {
+      let vm = this
+      vm.pagination.page = config.page
+    },
+    viewDetail (item) {
+      let vm = this
+      vm.dossierInfo = item
+      vm.dialogDossierDetail = true
+    },
+    printReport () {
+      let vm = this
+      vm.dialogPDF = true
+    },
+    exportExcel () {
+      let vm = this
+      vm.$store.dispatch('getExcelReportFromServer', {
+        groupId: vm.govAgency ? vm.govAgency : window.themeDisplay.getScopeGroupId(),
+        data: vm.dataExportExcel,
+        fileName: 'baocaothongke' + '.xls'
+      })
+    },
   }
 }
 </script>

@@ -1056,6 +1056,13 @@ export default {
           vm.$store.commit('setActivePrintBienNhan', '')
         }, 500)
       }
+      try {
+        if (xacthuc_BNG) {
+          vm.xacthuc_BNG = true
+          vm.getFieldPick()
+        }
+      } catch (error) {
+      }
     })
   },
   updated () {
@@ -1743,6 +1750,9 @@ export default {
       } else {
         vm.domainCode = ''
       }
+      if(vm.xacthuc_BNG){
+        vm.postFieldPick('domain',vm.linhVucSelected)
+      }
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
@@ -1814,7 +1824,7 @@ export default {
       //
       vm.itemAction = item
       vm.indexAction = index
-      if (String(item.form) === 'NEW' || String(item.form) === 'NEW_GROUP') {
+      if (String(item.form) === 'NEW' || String(item.form) === 'NEW_GROUP' || String(item.form) === 'NEW_GROUP_CV') {
         let isOpenDialog = true
         if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
           isOpenDialog = false
@@ -1825,7 +1835,7 @@ export default {
           vm.doCreateDossier()
         }
       } else if (String(item.form) === 'UPDATE') {
-        if(dossierItem.serviceCode === 'BNG-270817' || dossierItem.serviceCode === 'BNG-270821'){
+        if(dossierItem.serviceCode === 'BNG-270817' || dossierItem.serviceCode === 'BNG-270821' || dossierItem.serviceCode === 'BNG-270820' || dossierItem.serviceCode === 'BNG-270816' || dossierItem.serviceCode === 'BNG-270819' || dossierItem.serviceCode === 'BNG-270815'){
           vm.$router.history.current.query['template_no'] = dossierItem.dossierTemplateNo
           vm.$router.history.current.query['serviceCode'] = dossierItem.serviceCode
         }
@@ -2374,7 +2384,7 @@ export default {
         serviceCode: vm.serviceCode,
         govAgencyCode: vm.govAgencyCode,
         templateNo: vm.templateNo,
-        originality: vm.itemAction['form'] === 'NEW_GROUP' ? 9 : vm.getOriginality()
+        originality: vm.itemAction['form'] === 'NEW_GROUP' || vm.itemAction['form'] === 'NEW_GROUP_CV' ? 9 : vm.getOriginality()
       }
       // add new template
       let filter = {
@@ -2665,7 +2675,7 @@ export default {
       if (item.permission) {
         if (item['originality'] === 9) {
           vm.$router.push({
-            path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/' + item.dossierId,
+            path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV/' + item.dossierId,
             query: vm.$router.history.current.query
           })
         } else {
@@ -2777,6 +2787,29 @@ export default {
         // if you use data-size show reCAPTCHA , maybe you will get empty token. 6LfuMm4UAAAAAIeNgZHhWHR-aVaqXqNUSsurnzm2
         alert('please check you are not robot')
       }
+    },
+    getFieldPick () {
+      let vm = this
+      let classPK = 'MOTCUA'
+      vm.$store.dispatch('getFieldPick', classPK).then(function (result) {
+          let formData = result
+          if(formData.domain) {
+             vm.linhVucSelected = JSON.parse(formData.domain)
+          }
+      }).catch (function (reject) {
+      }) 
+    },
+    postFieldPick(key,val){
+      let vm = this
+      let filter = {
+        classPK: 'MOTCUA',
+        key,
+        val
+      }
+      vm.$store.dispatch('postFieldPick', filter).then(function (result) {
+      
+      }).catch (function (reject) {
+      }) 
     }
   }
 }

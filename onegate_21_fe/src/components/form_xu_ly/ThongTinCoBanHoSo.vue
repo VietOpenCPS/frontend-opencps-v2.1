@@ -275,7 +275,7 @@
       try {
         if (xacthuc_BNG) {
           vm.xacthuc_BNG = true
-          vm.getFieldPick()
+          
         }
       } catch (error) {
       }

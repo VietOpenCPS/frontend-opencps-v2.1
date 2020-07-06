@@ -199,7 +199,7 @@ export default {
               let bookingDossierArray = []
               if (Array.isArray(result) && result.length > 0) {
                 let filter = {
-                  state: '',
+                  state: 4,
                   className: 'DOSSIER',
                   service: vm.columnList[index]['config'],
                   bookingFrom: vm.getCurrentDate(),

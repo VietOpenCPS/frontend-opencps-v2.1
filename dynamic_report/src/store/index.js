@@ -636,6 +636,42 @@ export const store = new Vuex.Store({
         })
       })
     },
+    loadDossierActions ({commit, state}, data) {
+      let config = {
+        headers: {
+          'groupId': data.groupId ? data.groupId : state.groupId,
+        },
+        params: {
+          stepType: data.stepType
+        }
+      }
+      let url = '/o/rest/v2/dossiers/' + data.dossierId + '/sequences'
+      return new Promise((resolve, reject) => {
+        axios.get(url, config).then(function (response) {
+          resolve(response.data)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    loadMermaidgraph ({commit, state}, data) {
+      let config = {
+        headers: {
+          groupId: state.groupId
+        },
+        params: {
+          stepType: data.stepType
+        }
+      }
+      let url = '/o/rest/v2/dossiers/' + data.dossierId + '/mermaidgraph'
+      return new Promise((resolve, reject) => {
+        axios.get(url, config).then(function (response) {
+          resolve(response.data)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    }
   },
   mutations: {
     setInitData (state, payload) {

@@ -42,7 +42,7 @@
                 </v-radio-group>
               </div>
             </div>
-            <v-flex xs12 sm12 class="mb-3 mt-3" v-if="showCaptcha">
+            <v-flex xs12 sm12 class="mx-2 my-3" v-if="showCaptcha">
               <div style="max-width: 400px;background: #dedede;margin: 0 auto;" class="pb-2">
                 <v-flex xs12 class="py-2" style="
                   display: flex;

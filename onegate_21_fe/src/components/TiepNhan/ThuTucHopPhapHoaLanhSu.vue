@@ -29,7 +29,7 @@
                 ></v-text-field>
             </v-flex>
             <v-flex xs12 sm6  class="px-2 ">
-                <label>CMND/CCCD số <span class="red--text">*</span></label>
+                <label>CMND/CCCD số <span class="red--text"></span></label>
                 <suggestions
                     v-model="dossiers.delegateIdNo"
                     :options="searchOptions"
@@ -272,7 +272,7 @@
                         persistent-hint
                         append-icon="event"
                         hint="DD/MM/YYYY"
-                        @change="dateDueDate = parseDate(dateDueDateFormated)"
+                        @change="dateDueDate = parseDate(dateDueDateFormated.substring(0,10))"
                         :rules="[rules.required]"
                         
                     ></v-text-field>
@@ -459,13 +459,15 @@
                                 <v-flex xs12> Mẫu con dấu</v-flex>
                                 <v-flex xs12>
                                     <div style="width: 100%; height: 140px; border: 0.5px solid #dedede; display:flex; justify-content: center;overflow-x: scroll;">
-                                        <img :src="'data:image/png;base64,' +  conDau" alt="" style=" height: 100%;" @click="phongTo(conDau)">
+                                        <!-- <img :src="'data:image/png;base64,' +  conDau" alt="" style=" height: 100%;" @click="phongTo(conDau)"> -->
+                                        <img :src="conDau" alt="" style=" height: 100%;" @click="phongTo(conDau)">
                                     </div>
                                 </v-flex>
                                 <v-flex xs12 class="my-2"> Mẫu chữ ký</v-flex>
                                 <v-flex xs12>
                                     <div style="width: 100%; height: 140px; border: 0.5px solid #dedede; display:flex; justify-content: center;overflow-x: scroll;">
-                                        <img :src="'data:image/png;base64,' +  chuKy" alt="" style=" height: 100%;"  @click="phongTo(chuKy)">
+                                        <!-- <img :src="'data:image/png;base64,' +  chuKy" alt="" style=" height: 100%;"  @click="phongTo(chuKy)"> -->
+                                        <img :src="chuKy" alt="" style=" height: 100%;" @click="phongTo(chuKy)">
                                     </div>
                                 </v-flex>
                             </v-layout>
@@ -546,7 +548,8 @@
                                             <div v-if="loadingImage" style="height: 140px;font-size: 16pt;color: blue;">Loading ....</div>
                                             <div v-if="!loadingImage" style="width: 100%; height: 190px;display:flex;">
                                                 <div v-for="(item, index) in listConDau" :key="index">
-                                                    <img :src="'data:image/png;base64,' +  item.strConDau" alt="" style=" height: 140px;" @click="phongTo(item.strConDau)">
+                                                    <!-- <img :src="'data:image/png;base64,' +  item.strConDau" alt="" style=" height: 140px;" @click="phongTo(item.strConDau)"> -->
+                                                    <img :src="item.strConDau" alt="" style=" height: 140px;" @click="phongTo(item.strConDau)">
                                                     <v-checkbox
                                                         v-model="chonConDau"
                                                         primary
@@ -568,7 +571,8 @@
                                             <div v-if="loadingImage" style="height: 140px;font-size: 16pt;color: blue;">Loading ....</div>
                                             <div v-if="!loadingImage" style="width: 100%; height: 190px;display:flex;">
                                                 <div v-for="(item, index) in listChuKy" :key="index">
-                                                    <img :src="'data:image/png;base64,' +  item.strChuKy" alt="" style=" height: 140px;" @click="phongTo(item.strChuKy)">
+                                                    <!-- <img :src="'data:image/png;base64,' +  item.strChuKy" alt="" style=" height: 140px;" @click="phongTo(item.strChuKy)"> -->
+                                                    <img :src="item.strChuKy" alt="" style=" height: 140px;" @click="phongTo(item.strChuKy)">
                                                     <v-checkbox
                                                         v-model="chonChuKy"
                                                         primary
@@ -614,7 +618,8 @@
                     <v-layout wrap>
                         <v-flex xs12>
                             <div width="100%; height: 500px;">
-                                <img :src="'data:image/png;base64,'+ anhPhongTo" alt="" style="width: 100%;height: 500px;">
+                                <!-- <img :src="'data:image/png;base64,'+ anhPhongTo" alt="" style="width: 100%;height: 500px;"> -->
+                                <img :src="anhPhongTo" alt="" style="width: 100%;height: 500px;">
                             </div>
                         </v-flex>
                     </v-layout>
@@ -813,6 +818,8 @@ export default {
         dateDueDateFormated: '',
         dateDueDate: new Date().toISOString().substr(0, 10),
         dateNgayKy: new Date().toISOString().substr(0, 10),
+        crurentDate: new Date(),
+        crurentHours: '',
         listQuocGia: [],
         delegateCitys: [],
         delegateCityCode: '',
@@ -897,7 +904,7 @@ export default {
             "delegateWardCode": '',
             "applicantNote": "",
             "dossierName": $('#serviceName_hidden').val(),
-            "viaPostal": 0,
+            "viaPostal": 1,
             "postalServiceCode": "VNPOST",
             "postalAddress": "",
             "postalCityCode": "",
@@ -981,7 +988,7 @@ export default {
             if(val){
                 this.dossiers.viaPostal = 2
             } else {
-                this.dossiers.viaPostal = 0
+                this.dossiers.viaPostal = 1
             }
         },
         de_nghi_chung_nhan(val){
@@ -990,11 +997,11 @@ export default {
                 if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
                     try{
                         let formData = JSON.parse(vm.dossierFileArr[i]['formData'])
-                        formData['de_nghi_chung_nhan'] = val
+                        formData['de_nghi_chung_nhan'] = val ? true : false
                         vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
                     }catch(err){
                       let formData = {
-                          de_nghi_chung_nhan: val
+                          de_nghi_chung_nhan: val ? true : false
                       }
                       vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
                     }
@@ -1071,14 +1078,30 @@ export default {
             $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))            
         },
         dateDueDate (val) {
-            this.dateDueDateFormated = this.formatDate(this.dateDueDate)
-            const [year, month, day] = this.dateDueDate.split('-')
-            let date = new Date()
-            date.setFullYear(parseInt(year), parseInt(month), parseInt(day))
-            console.log(date)
-            console.log(date.getTime())
+            this.dateDueDateFormated = this.formatDate(this.dateDueDate) 
+            // const [year, month, day] = this.dateDueDate.split('-')
+            let date = new Date(this.dateDueDate)
+            // date.setFullYear(parseInt(year), parseInt(month), parseInt(day))
+            // console.log(date)
+            // console.log(date.getTime())
             this.dossiers.dueDate = date.getTime()
-        },     
+        },
+        // tongSoBan (val) {
+        //     if(parseInt(val) >= 10){
+        //         let date = new Date(this.dateDueDate + this.crurentHours)
+        //         if(date.getDay() === 3){
+        //             date.setDate(date.getDate() + 5)
+        //         }else if (date.getDay() === 4) {
+        //             date.setDate(date.getDate() + 4)
+        //         } else if(date.getDay() === 5) {
+        //             date.setDate(date.getDate() + 3)
+        //         } else {
+        //             date.setDate(date.getDate() + 3)
+        //         }
+        //         this.dateDueDate = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate()
+                
+        //     }
+        // } 
     },
     methods: {
         getDetail(){
@@ -1100,7 +1123,8 @@ export default {
                 vm.delegateDistrictCode = vm.dossiers.delegateDistrictCode
                 vm.delegateWardCode = vm.dossiers.delegateWardCode
                 vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
-                vm.viaPostal = vm.dossiers.viaPostal ?  true : false
+                vm.crurentHours = vm.dossiers.dueDate.substring(10)
+                vm.viaPostal = vm.dossiers.viaPostal === 2 ?  true : false
                
                 vm.getThanhPhan()
                 vm.getDossierFile()
@@ -1298,68 +1322,75 @@ export default {
         },
         getDSNguoiKy(){
             let vm = this
-            let co_quan_cap = vm.co_quan_cap_tg ? vm.co_quan_cap_tg : ''
-            let nguoi_ky = vm.nguoi_ky_tg ? vm.nguoi_ky_tg : ''
-            if(co_quan_cap || nguoi_ky){
-                if(co_quan_cap){
-                    if(co_quan_cap.split(' ').length >= 2){
-                        let filter = {
-                            flagSearch: false,
-                            govAgencyName: co_quan_cap,
-                            employeeName: nguoi_ky
-                        }
-                        for (let key in filter) { 
-                            if (filter[key] === '' || filter[key] === undefined) {
-                                delete filter[key];
-                            }
-                        }
-                        let config = {
-                            url: 'o/rest/v2/serverconfigs/TICH_HOP_DM_NG_KY/protocols/API_CONNECT',
-                            params: filter,
-                            headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
-                        }
-                        axios.request(config).then(res => {
-                            vm.listNguoiKy = res.data.data
-                            vm.listConDau = []
-                            vm.listChuKy = []
-                            vm.chonChuKy = []
-                            vm.chonConDau = []
-                            vm.chuKySelected = ''
-                            vm.conDauSelected = ''
-                        }).catch(err => {}) 
-                    } else {
-                        toastr.error('Cơ quan chủ quản phải ít nhất 2 từ trở lên')
-                        return
-                    }
-                } else {
-                        let filter = {
-                            flagSearch: false,
-                            govAgencyName: co_quan_cap,
-                            employeeName: nguoi_ky
-                        }
-                        for (let key in filter) { 
-                            if (filter[key] === '' || filter[key] === undefined) {
-                                delete filter[key];
-                            }
-                        }
-                        let config = {
-                            url: 'o/rest/v2/serverconfigs/TICH_HOP_DM_NG_KY/protocols/API_CONNECT',
-                            params: filter,
-                            headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
-                        }
-                        axios.request(config).then(res => {
-                            vm.listNguoiKy = res.data.data
-                            vm.listConDau = []
-                            vm.listChuKy = []
-                            vm.chonChuKy = []
-                            vm.chonConDau = []
-                            vm.chuKySelected = ''
-                            vm.conDauSelected = ''
-                        }).catch(err => {}) 
-                }
-            } else {
-                toastr.error('Chưa nhập đối tượng để tìm kiếm')
-            }
+            // let co_quan_cap = vm.co_quan_cap_tg ? vm.co_quan_cap_tg : ''
+            // let nguoi_ky = vm.nguoi_ky_tg ? vm.nguoi_ky_tg : ''
+            // if(co_quan_cap || nguoi_ky){
+            //     if(co_quan_cap){
+            //         if(co_quan_cap.split(' ').length >= 2){
+            //             let filter = {
+            //                 flagSearch: false,
+            //                 govAgencyName: co_quan_cap,
+            //                 employeeName: nguoi_ky
+            //             }
+            //             for (let key in filter) { 
+            //                 if (filter[key] === '' || filter[key] === undefined) {
+            //                     delete filter[key];
+            //                 }
+            //             }
+            //             let config = {
+            //                 url: 'o/rest/v2/serverconfigs/TICH_HOP_DM_NG_KY/protocols/API_CONNECT',
+            //                 params: filter,
+            //                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+            //             }
+            //             axios.request(config).then(res => {
+            //                 vm.listNguoiKy = res.data.data
+            //                 vm.listConDau = []
+            //                 vm.listChuKy = []
+            //                 vm.chonChuKy = []
+            //                 vm.chonConDau = []
+            //                 vm.chuKySelected = ''
+            //                 vm.conDauSelected = ''
+            //             }).catch(err => {}) 
+            //         } else {
+            //             toastr.error('Cơ quan chủ quản phải ít nhất 2 từ trở lên')
+            //             return
+            //         }
+            //     } else {
+            //             let filter = {
+            //                 flagSearch: false,
+            //                 govAgencyName: co_quan_cap,
+            //                 employeeName: nguoi_ky
+            //             }
+            //             for (let key in filter) { 
+            //                 if (filter[key] === '' || filter[key] === undefined) {
+            //                     delete filter[key];
+            //                 }
+            //             }
+            //             let config = {
+            //                 url: 'o/rest/v2/serverconfigs/TICH_HOP_DM_NG_KY/protocols/API_CONNECT',
+            //                 params: filter,
+            //                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+            //             }
+            //             axios.request(config).then(res => {
+            //                 vm.listNguoiKy = res.data.data
+            //                 vm.listConDau = []
+            //                 vm.listChuKy = []
+            //                 vm.chonChuKy = []
+            //                 vm.chonConDau = []
+            //                 vm.chuKySelected = ''
+            //                 vm.conDauSelected = ''
+            //             }).catch(err => {}) 
+            //     }
+            // } else {
+            //     toastr.error('Chưa nhập đối tượng để tìm kiếm')
+            // }
+            vm.listNguoiKy = [{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Trưởng phòng","MA_CHUC_VU":"0413","MA":"01657fa3894247328ca9094e1d19f903","TEN":"Nguyễn Vũ Thắng","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Hiệu trưởng","MA_CHUC_VU":"0412","MA":"5ca80ae38229458fb0eefbebbac3903e","TEN":"Nguyễn Cảnh Lương","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Viện trưởng","MA_CHUC_VU":"0430","MA":"aa4581262b1b464bba7eca44a1869817","TEN":"Nguyễn Đắc Trung","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Giám đốc","MA_CHUC_VU":"0428","MA":"b2bc3aa333304829b9f09225bd281d57","TEN":"Nguyễn Phú Khánh","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Hiệu trưởng","MA_CHUC_VU":"0411","MA":"bd964127590a402e8545cd14d38dc9ae","TEN":"Nguyễn Trọng Giảng","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Viện trưởng","MA_CHUC_VU":"0454","MA":"bed1466c1bb8487883a39e8a9099a0d6","TEN":"Nguyễn Phong Điền","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Viện trưởng","MA_CHUC_VU":"0430","MA":"da4280dfedc0458bab0834672d919220","TEN":"Nguyễn Đình Bình","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Trưởng phòng","MA_CHUC_VU":"0413","MA":"e5cbf4191ee3462d964fa9e93931aae0","TEN":"Nguyễn Thị Huyền Trang","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Viện trưởng","MA_CHUC_VU":"0454","MA":"f39a8debc0dc4ba6a23d60ec3634632c","TEN":"Nguyễn Đại Thắng","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"}]
+            vm.listConDau = []
+            vm.listChuKy = []
+            vm.chonChuKy = []
+            vm.chonConDau = []
+            vm.chuKySelected = ''
+            vm.conDauSelected = ''
 
         },
         getDataEform() {
@@ -1370,35 +1401,37 @@ export default {
             }
             axios.request(config).then(res => {
                 if(Object.keys(res.data).length !== 0 && res.data.constructor === Object){
-                    if(res.data.bookingName) {
-                        vm.dossiers.delegateName = res.data.bookingName
-                        vm.dossiers.applicantName = res.data.bookingName
+                    if(Array.isArray(res.data.list_giay_to) && res.data.list_giay_to.length){
+                        if(res.data.bookingName) {
+                            vm.dossiers.delegateName = res.data.bookingName
+                            vm.dossiers.applicantName = res.data.bookingName
+                        }
+                        if(res.data.so_cmnd) {
+                        vm.dossiers.delegateIdNo = res.data.so_cmnd
+                        }
+                        if(res.data.dien_thoai) {
+                            vm.dossiers.delegateTelNo = res.data.dien_thoai
+                        }
+                        if(res.data.email) {
+                            vm.dossiers.delegateEmail = res.data.email
+                        }
+                        if(res.data.dia_chi) {
+                            vm.dossiers.delegateAddress = res.data.dia_chi.length < 100 ? res.data.dia_chi : ''
+                            vm.dossiers.address = res.data.dia_chi.length < 100 ? res.data.dia_chi : ''
+                        }
+                        if(res.data.su_dung_tai_nuoc_ma) {
+                            vm.su_dung_tai_nuoc_ma = res.data.su_dung_tai_nuoc_ma
+                        }
+                        if(res.data.de_nghi_chung_nhan) {
+                            vm.de_nghi_chung_nhan = res.data.de_nghi_chung_nhan
+                        }
+                        if(res.data.muc_dich) {
+                            vm.muc_dich = vm.listMucDichSuDung.find(e=>e.TEN === res.data.muc_dich)
+                        }
+                        if(res.data.list_giay_to) {
+                            vm.fillTableGiayTo(res.data.list_giay_to)
+                        }  
                     }
-                    if(res.data.so_cmnd) {
-                       vm.dossiers.delegateIdNo = res.data.so_cmnd
-                    }
-                    if(res.data.dien_thoai) {
-                        vm.dossiers.delegateTelNo = res.data.dien_thoai
-                    }
-                    if(res.data.email) {
-                        vm.dossiers.delegateEmail = res.data.email
-                    }
-                    if(res.data.dia_chi) {
-                        vm.dossiers.delegateAddress = res.data.dia_chi
-                        vm.dossiers.address = res.data.dia_chi
-                    }
-                    if(res.data.su_dung_tai_nuoc_ma) {
-                        vm.su_dung_tai_nuoc_ma = res.data.su_dung_tai_nuoc_ma
-                    }
-                    if(res.data.de_nghi_chung_nhan) {
-                        vm.de_nghi_chung_nhan = res.data.de_nghi_chung_nhan
-                    }
-                    if(res.data.muc_dich) {
-                        vm.muc_dich = vm.listMucDichSuDung.find(e=>e.TEN === res.data.muc_dich)
-                    }
-                    if(res.data.list_giay_to) {
-                        vm.fillTableGiayTo(res.data.list_giay_to)
-                    }      
                 }
                 else {
                     toastr.error('Mã tờ khai không hợp lệ')  
@@ -1458,7 +1491,7 @@ export default {
                         dien_thoai: vm.delegateTelNo,
                         email: vm.delegateEmail,
                         dia_chi: vm.delegateAddress,
-                        de_nghi_chung_nhan: vm.de_nghi_chung_nhan,
+                        de_nghi_chung_nhan: vm.de_nghi_chung_nhan ? true : false,
                         list_giay_to : vm.listGiayTo,
                         tong_so: vm.tongSoBan,
                         su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
@@ -1486,7 +1519,12 @@ export default {
                     
                 // let ngay = tg.getDate()+'/'+(tg.getMonth()+1)+'/'+tg.getFullYear()
                 // vm.dossiers['dueDate'] = ngay
-                 vm.dateDueDate = tg.getFullYear()+'-'+(tg.getMonth()+1)+'-'+tg.getDate()
+                // if(vm.crurentDate.getHours() < 13){
+                //     vm.crurentHours = ' 09:30:00'
+                // } else {
+                //     vm.crurentHours = ' 15:30:00'
+                // }
+                vm.dateDueDate = tg.getFullYear()+'-'+(tg.getMonth()+1)+'-'+tg.getDate()
             }).catch(err => {}) 
         },
         getTenGiayTo(){
@@ -1511,22 +1549,56 @@ export default {
                 url: 'o/rest/v2/serverconfigs/TICH_HOP_CHU_KY_CON_DAU/protocols/API_CONNECT?ma_ng_ky='+item.MA+'&ma_cqql='+item.MA_CQQL,
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
             }
-            vm.loadingImage = true
-            axios.request(config).then(res => {
-                let arrConDau = res.data.CON_DAU.map(function(el) {
-                    let o = Object.assign({}, el);
-                    o['strConDau'] = vm.hexToBase64(o.CD_IMAGE_FILE);
-                    return o;
-                })
-                let arrChuKy = res.data.CHU_KY.map(function(el) {
-                    let o = Object.assign({}, el);
-                    o['strChuKy'] = vm.hexToBase64(o.CK_IMAGE_FILE);
-                    return o;
-                })
+            //vm.loadingImage = true
+            // axios.request(config).then(res => {
+            //     let arrConDau = res.data.CON_DAU.map(function(el) {
+            //         let o = Object.assign({}, el);
+            //         o['strConDau'] = vm.hexToBase64(o.CD_IMAGE_FILE);
+            //         return o;
+            //     })
+            //     let arrChuKy = res.data.CHU_KY.map(function(el) {
+            //         let o = Object.assign({}, el);
+            //         o['strChuKy'] = vm.hexToBase64(o.CK_IMAGE_FILE);
+            //         return o;
+            //     })
+            //     vm.listConDau = vm.sortDate(arrConDau, 'CD_NGAY_HL')
+            //     vm.listChuKy = vm.sortDate (arrChuKy, 'CK_NGAY_HL')
+            //     vm.loadingImage = false
+            // }).catch(err => {})
+            let data = {
+                CHU_KY: [
+                    {
+                        CK_CHUC_DANH: 'Phó Hiệu trưởng',
+                        CK_GHI_CHU: '',
+                        strChuKy: `https://scontent-hkt1-1.xx.fbcdn.net/v/t1.0-9/83560216_2827598057470043_4398724110518723501_n.jpg?_nc_cat=102&_nc_sid=8024bb&_nc_ohc=MyytmLxn_SkAX_7NTQF&_nc_ht=scontent-hkt1-1.xx&oh=b3027bea2885a2cac1a26707f3942c41&oe=5F250B8B`,
+                        CK_MA_CAN_BO: '9fb20e67afb743a9bd3c96500c7aff82',
+                        CK_MA_CK: 'ba16b3d4286b449e854bc837e5776cd2',
+                        CK_MA_CO_QUAN: '01',
+                        CK_MA_DON_VI_XL: '1',
+                        CK_NGAY_HL: '2013-08-31 00:00:00.0',
+                        CK_PHIEN_BAN: 1,
+                        CK_TEN_CAN_BO: 'Lê Văn'
+                    }
+                ],
+                CON_DAU: [
+                    {
+                    CD_DONG_BO: true,
+                    CD_GHI_CHU: '',
+                    strConDau: `https://scontent-hkt1-1.xx.fbcdn.net/v/t1.0-9/106129297_2827598070803375_2684170447443855793_n.jpg?_nc_cat=106&_nc_sid=8024bb&_nc_ohc=tquhJOGgdC4AX8rkq1n&_nc_ht=scontent-hkt1-1.xx&oh=a61e5c4a6c36eea82444a5c1bc3c63a5&oe=5F256D5A`,
+                    CD_MA_CAN_BO: '',
+                    CD_MA_CON_DAU: '4d8d2ea84d2e41689756009c2a6b6e57',
+                    CD_MA_CQ: '661a5e7826254b58b872fa4f9c965ef8',
+                    CD_MA_DON_VI: 'HCM',
+                    CD_NGAY_HL: "2013-08-31 00:00:00.0",
+                    CD_PHIEN_BAN: 1,
+                    CD_TEN_CAN_BO: "",
+                    }
+                ]
+            }
+                let arrConDau = data.CON_DAU
+                let arrChuKy = data.CHU_KY
                 vm.listConDau = vm.sortDate(arrConDau, 'CD_NGAY_HL')
                 vm.listChuKy = vm.sortDate (arrChuKy, 'CK_NGAY_HL')
-                vm.loadingImage = false
-            }).catch(err => {})
         },
         checkedConDau (item) {
             let vm = this
@@ -1556,6 +1628,9 @@ export default {
             vm.update_giayto = 'add'
             vm.dialogGiayTo = true
             vm.$refs.formGiayTo.reset()
+            if(vm.su_dung_tai_nuoc_ma.includes('98063')){
+                vm.loai_cong_viec = {"value": "HPHLS", "text": "HPHLS"}
+            }
             vm.conDau = ''
             vm.chuKy = ''
         },
@@ -1615,6 +1690,7 @@ export default {
                 vm.listGiayTo.forEach(e=>{
                     vm.tongSoBan+=parseInt(e['so_ban'])
                 })
+
                 // 
                 for (let i=0; i<vm.dossierFileArr.length; i++){
                     if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
@@ -1644,7 +1720,7 @@ export default {
                             dien_thoai: vm.delegateTelNo,
                             email: vm.delegateEmail,
                             dia_chi: vm.delegateAddress,
-                            de_nghi_chung_nhan: vm.de_nghi_chung_nhan,
+                            de_nghi_chung_nhan: vm.de_nghi_chung_nhan ? true : false,
                             list_giay_to : arr,
                             tong_so: vm.tongSoBan,
                             su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
@@ -1887,7 +1963,7 @@ export default {
                         dien_thoai: vm.delegateTelNo,
                         email: vm.delegateEmail,
                         dia_chi: vm.delegateAddress,
-                        de_nghi_chung_nhan: vm.de_nghi_chung_nhan,
+                        de_nghi_chung_nhan: vm.de_nghi_chung_nhan ? true : false,
                         list_giay_to : arr,
                         tong_so: vm.tongSoBan,
                         su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
@@ -2001,12 +2077,12 @@ export default {
             })
         },
         onSearchItemSelected (item) {
-            var vm = this
-            vm.selectedSearchItem = item
-            let value = vm.selectedSearchItem['applicantIdNo'].toString()
-            let pattern1 = /^(([0-9]{9,9}))$/
-            let pattern2 = /^(([0-9]{12,12}))$/
-            if(pattern1.test(value) || pattern2.test(value)){
+                let vm = this
+             vm.selectedSearchItem = item
+            // let value = vm.selectedSearchItem['applicantIdNo'].toString()
+            // let pattern1 = /^(([0-9]{9,9}))$/
+            // let pattern2 = /^(([0-9]{12,12}))$/
+            // if(pattern1.test(value) || pattern2.test(value)){
                 vm.checkCMT = false
                 vm.dossiers['delegateIdNo'] = vm.selectedSearchItem['applicantIdNo']
                 vm.dossiers['delegateName'] = vm.selectedSearchItem['applicantName']
@@ -2018,22 +2094,22 @@ export default {
                 vm.delegateCityCode = vm.selectedSearchItem['cityCode']
                 vm.delegateDistrictCode = vm.selectedSearchItem['districtCode']
                 vm.delegateWardCode = vm.selectedSearchItem['wardCode']
-            } else {
-                vm.checkCMT = true
-                vm.messengeCMT = 'Số CMND gồm 9 hoặc 12 ký tự 0-9'  
-            }
+            // } else {
+            //     vm.checkCMT = true
+            //     vm.messengeCMT = 'Số CMND gồm 9 hoặc 12 ký tự 0-9'  
+            // }
 
         },
         onInputChange (query) {
             let vm = this
-            let pattern1 = /^(([0-9]{9,9}))$/
-            let pattern2 = /^(([0-9]{12,12}))$/
-            if(pattern1.test(query) || pattern2.test(query)){
-                vm.checkCMT = false
-            } else {
-                vm.checkCMT = true
-                vm.messengeCMT = 'Số CMND gồm 9 hoặc 12 ký tự 0-9'  
-            }
+            // let pattern1 = /^(([0-9]{9,9}))$/
+            // let pattern2 = /^(([0-9]{12,12}))$/
+            // if(pattern1.test(query) || pattern2.test(query)){
+            //     vm.checkCMT = false
+            // } else {
+            //     vm.checkCMT = true
+            //     vm.messengeCMT = 'Số CMND gồm 9 hoặc 12 ký tự 0-9'  
+            // }
             if (query.trim().length === 0) {
                 return null
             }

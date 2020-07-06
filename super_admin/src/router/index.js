@@ -12,6 +12,7 @@ import ThongKeTruyCap from '@/components/extform/ThongKeTruyCap.vue'
 import SyncAgency from '@/components/extform/SyncAgency.vue'
 import SyncSharingqa from '@/components/extform/SyncSharingqa.vue'
 import SyncDomain from '@/components/extform/SyncDomain.vue'
+import SoTTSoTheoDoi from '@/components/extform/SoTTSoTheoDoi.vue'
 import Report from '@/components/extform/Report.vue'
 import Import from '@/components/screens/import.vue'
 import Export from '@/components/screens/export.vue'
@@ -102,6 +103,15 @@ const routes = [
         path: '/table/opencps_mapping/sharingqa',
         name: 'SyncSharingqa',
         component: SyncSharingqa,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_stt/stt',
+        name: 'STT',
+        component: SoTTSoTheoDoi,
         props: true,
         meta: {
           requiresAuth: true

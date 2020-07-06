@@ -320,7 +320,7 @@
             <div style="text-align: justify;">
               <span class="text-bold">{{serviceDetail.serviceName}}</span>
             </div>
-            <div>
+            <div class="mt-2">
               <v-chip class="mx-0 my-0" small disabled label :color="getColor(serviceDetail.maxLevel)" text-color="white">
                 Mức độ {{serviceDetail.maxLevel}}
               </v-chip>

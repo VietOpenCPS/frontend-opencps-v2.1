@@ -308,39 +308,42 @@ export default {
     createBooking (filter) {
       let vm = this
       console.log('filter create booking', filter)
-      vm.$store.dispatch('createBooking', filter).then(function (result) {
-        vm.isActive = true
-        vm.checkinFail = false
-        vm.isScaned = false
-        vm.countBooking = result['count']
-        // 
-        let timeDelay = 5000
-        if (String(result['state']) === '4') {
-          vm.checkinFail = true
-          vm.isScaned = true
-        } else {
+      let checkCodeNumber = filter.codeNumber.split('-').length
+      if(filter.codeNumber && checkCodeNumber === 1){
+        vm.$store.dispatch('createBooking', filter).then(function (result) {
+          vm.isActive = true
+          vm.checkinFail = false
+          vm.isScaned = false
+          vm.countBooking = result['count']
           // 
-          if (filter.dossierRelease) {
-            result.state = 4
-            console.log('filter update', result)
-            vm.updateStateBooking(result)
+          let timeDelay = 5000
+          if (String(result['state']) === '4') {
+            vm.checkinFail = true
+            vm.isScaned = true
+          } else {
+            // 
+            if (filter.dossierRelease) {
+              result.state = 4
+              console.log('filter update', result)
+              vm.updateStateBooking(result)
+            }
+            vm.overMax = false
+            if (vm.currentGroup.hasOwnProperty('maxRecord') && vm.currentGroup['maxRecord'] 
+              && Number(result['count']) > Number(vm.currentGroup['maxRecord'])
+            ) {
+              vm.overMax = true
+              timeDelay = 10000
+            }
           }
-          vm.overMax = false
-          if (vm.currentGroup.hasOwnProperty('maxRecord') && vm.currentGroup['maxRecord'] 
-            && Number(result['count']) > Number(vm.currentGroup['maxRecord'])
-          ) {
-            vm.overMax = true
-            timeDelay = 10000
-          }
-        }
-        // 
-        setTimeout(function() {
-          vm.isActive = false
-        }, timeDelay)
-        vm.eformInformation = ''
-      }).catch (function (reject) {
-        vm.eformInformation = ''
-      })
+          // 
+          setTimeout(function() {
+            vm.isActive = false
+          }, timeDelay)
+          vm.eformInformation = ''
+        }).catch (function (reject) {
+          vm.eformInformation = ''
+        })
+      }
     },
     getBooking () {
       let vm = this
