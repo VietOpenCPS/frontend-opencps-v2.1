@@ -5,7 +5,7 @@
       <div class="layout row wrap header_tools row-blue">
         <div v-if="!isMobile" class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
           <v-text-field
-            v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== -1 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== -1"
+            v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
             v-model="keyword"
             placeholder="Tìm kiếm theo tên hồ sơ, mã hồ sơ, tên thủ tục, chủ hồ sơ ..."
             solo
@@ -66,7 +66,7 @@
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box" v-if="trangThaiHoSoList">
           <v-autocomplete
-            v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== -1 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== -1"
+            v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
             :items="listDichVu"
             v-model="dichVuSelected"
             label="Chọn trường hợp"
@@ -104,7 +104,7 @@
         <v-flex xs12 sm3 class="pl-2 pr-2">
           <div style="position:relative" v-if="trangThaiHoSoList">
             <v-text-field
-              v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== -1 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== -1"
+              v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
               label="Nhập mã hồ sơ"
               v-model="dossierNoKey"
               @keyup.enter="changeDossierNoKey"
