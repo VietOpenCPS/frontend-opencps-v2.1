@@ -327,7 +327,6 @@ export const store = new Vuex.Store({
             'groupId': state.initData.groupId
           }
         }
-        console.log('22222222', data)
         let paramsGet = {
           secretCode: data.secretCode
         }
@@ -365,7 +364,6 @@ export const store = new Vuex.Store({
             actionNote: filter.userNote?JSON.stringify(filter.userNote):'',
             payload: filter.payload?JSON.stringify(filter.payload):''
           }
-          console.log('paramsGet',paramsGet)
           let dataPost = new URLSearchParams()
           dataPost.append('method', 'POST')
           dataPost.append('url', '/dossiers/' + filter.dossierId + '/actions')

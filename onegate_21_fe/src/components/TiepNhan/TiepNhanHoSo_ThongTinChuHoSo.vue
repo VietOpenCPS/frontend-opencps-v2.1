@@ -692,12 +692,12 @@ export default {
       contactTelNo: true,
       contactEmail: false,
       delegateIdNo: false,
-      delegateName: false,
-      delegateAddress: false,
-      delegateCityCode: false,
-      delegateDistrictCode: false,
-      delegateWardCode: false,
-      delegateTelNo: false,
+      delegateName: true,
+      delegateAddress: true,
+      delegateCityCode: true,
+      delegateDistrictCode: true,
+      delegateWardCode: true,
+      delegateTelNo: true,
       delegateEmail: false
     },
     valid_thongtinchuhoso: false,
@@ -862,7 +862,7 @@ export default {
   created () {
     let vm = this
     if (vm.formCode === "NEW") {
-      // vm.thongTinNguoiNopHoSo.sameUser = true
+      vm.thongTinNguoiNopHoSo.sameUser = true
     }
     if (vm.hasOrganization) {
       vm.labelSwitch = {

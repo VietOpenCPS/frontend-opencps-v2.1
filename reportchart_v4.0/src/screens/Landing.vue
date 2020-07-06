@@ -138,7 +138,7 @@
           <v-flex md4 xs12 class="pa-2">
             <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
               <div class style="height: 38px; overflow: hidden;">
-                <div class="background-triangle-big1">QUẬN/ HUYỆN/ THỊ XÃ</div>
+                <div class="background-triangle-big1">HUYỆN/ THỊ XÃ/ THÀNH PHỐ</div>
               </div>
               <apexchart
                 type="pie"
@@ -185,7 +185,7 @@
                     style="cursor: pointer;"
                     :class="{'groupcode-active':  String(groupCode) === 'QUAN_HUYEN'}"
                     @click="groupCode='QUAN_HUYEN'"
-                  >QUẬN/ HUYỆN/ THỊ XÃ</span>
+                  >HUYỆN/ THỊ XÃ/ THÀNH PHỐ</span>
                   <v-menu right offset-x class="d-inline-block">
                     <span small slot="activator" color="primary" class="mx-3" :class="{'groupcode-active':  String(groupCode) === 'XA_PHUONG'}">
                       XÃ/ PHƯỜNG/ THỊ TRẤN &nbsp; <v-icon size="18" class="text-bold">arrow_drop_down</v-icon>

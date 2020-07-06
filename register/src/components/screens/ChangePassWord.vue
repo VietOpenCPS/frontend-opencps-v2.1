@@ -3,48 +3,46 @@
     <v-layout wrap class="mt-4" style="max-width:550px;margin: 0 auto">
       <nav class="v-toolbar elevation-0 theme--dark primary" data-booted="true" style="justify-content: center">
         <div class="v-toolbar__content" style="height: 40px;justify-content: center;">
-          <span class="text-bold">NHẬP MÃ BẢO MẬT</span>
+          <span class="text-bold">CẬP NHẬT MẬT KHẨU</span>
         </div>
       </nav>
       <v-flex xs12>
         <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
           <v-flex xs12>
-            <p>Bạn vui lòng kiểm tra email để lấy mã bảo mật</p>
-          </v-flex>
-          <v-flex xs12>
             <v-text-field
               box
-              placeholder="Mã bảo mật"
-              v-model="confirmCode"
-              :rules="[v => !!v || 'Mã bảo mật là bắt buộc']"
+              placeholder="Mật khẩu hiện tại"
+              v-model="oldPassWord"
+              :rules="[v => !!v || 'Mật khẩu hiện tại là bắt buộc']"
               required
             ></v-text-field>
           </v-flex>
           <v-flex xs12>
-            <captcha ref="captcha"></captcha>
+            <v-text-field
+              box
+              placeholder="Mật khẩu mới"
+              v-model="newPassWord"
+              :rules="[v => !!v || 'Mật khẩu mới là bắt buộc']"
+              required
+            ></v-text-field>
           </v-flex>
+
           <div class="text-xs-center my-2">
             <v-btn color="primary"
               :loading="loading"
               :disabled="loading"
-              @click="submitConfirmPASS"
+              @click="submitChangePass"
             >
               <v-icon>how_to_reg</v-icon>&nbsp;
               Đồng ý
             </v-btn>
-            <v-btn color="primary" v-if="!resend_mail"
+            <!-- <v-btn color="primary"
               @click="goBack"
             >
               <v-icon>reply</v-icon>&nbsp;
               Quay lại
-            </v-btn>
-            <v-btn color="primary"
-              @click="resendMail"
-              v-if="resend_mail"
-            >
-              <v-icon>replay</v-icon>&nbsp;
-              Gửi lại mã bảo mật
-            </v-btn>
+            </v-btn> -->
+            
           </div>
         </v-form>
       </v-flex>
@@ -56,18 +54,20 @@
 
 import Vue from 'vue'
 import $ from 'jquery'
+import toastr from 'toastr'
 import support from '../../store/support.json'
-import Captcha from './Captcha.vue'
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '5000'
+}
 export default {
   props: [],
   components: {
-    'captcha': Captcha
   },
   data: () => ({
     loading: false,
     valid: false,
-    confirmCode: '',
-    resend_mail: false,
+    confirmCode: ''
   }),
   computed: {
   },
@@ -77,12 +77,8 @@ export default {
       var vm = this
       let current = vm.$router.history.current
       let currentQuery = current.query
-      try {
-        if (allow_resend_mail) {
-          vm.resend_mail = allow_resend_mail
-        }
-      } catch (error) {
-      }
+      $('#app_login').css('display', 'none !important')
+      $('#navigation').css('display', 'none')
     })
   },
   updated () {
@@ -93,40 +89,26 @@ export default {
   watch: {
   },
   methods: {
-    submitConfirmPASS () {
+    submitChangePass () {
       let vm = this
       let currentQuery = vm.$router.history.current.query
       let currentParams = vm.$router.history.current.params
-      let dataForm = {
-        userCode: currentQuery.hasOwnProperty('active_user_id') ? currentQuery.active_user_id : '',
-        confirmCode: vm.confirmCode,
-        j_captcha_response: vm.$refs.captcha.j_captcha_response
-      }
-      console.log('dataForm', dataForm)
       if (vm.$refs.form.validate()) {
         vm.loading = true
-        let filter = dataForm
-        vm.$store.dispatch('confirmCodeForgotPass', filter).then(function (result) {
+        let filter = {
+          oldPassword: vm.oldPassWord,
+          newPassword: vm.newPassWord
+        }
+        vm.$store.dispatch('changePass', filter).then(function (result) {
           vm.loading = false
-          if (result === 'captcha') {
-            vm.$refs.captcha.makeImageCap()
-          }
+          toastr.success("Cập nhật mật khẩu thành công")
+          let urlDvc = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
+          window.location.href = urlDvc + '/dich-vu-cong'
         }).catch(function (reject) {
           vm.loading = false
-          vm.$refs.captcha.makeImageCap()
+          toastr.error("Cập nhật thất bại. Vui lòng thực hiện lại")
         })
       }
-    },
-    resendMail () {
-      let vm = this
-      let filter = {
-        type: ''
-      }
-      vm.$store.dispatch('resendMail', filter).then(function (result) {
-        toastr.success('Mã bảo mật đã được gửi lại. Vui lòng kiểm tra email.')
-      }).catch(function(error) {
-        toastr.error('Gửi lại không thành công.')
-      })
     },
     goBack () {
       window.history.back()

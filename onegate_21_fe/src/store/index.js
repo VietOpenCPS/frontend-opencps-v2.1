@@ -350,6 +350,18 @@ export const store = new Vuex.Store({
           if (filter.order !== '') {
             paramSearch.order = String(filter.order) === 'true' ? true : false
           }
+          if (filter.donvigui) {
+            paramSearch.donvigui = filter.donvigui
+          }
+          if (filter.donvinhan) {
+            paramSearch.donvinhan = filter.donvinhan
+          }
+          if (filter.documentNo) {
+            paramSearch.documentNo = filter.documentNo
+          }
+          if (filter.dateCv) {
+            paramSearch.documentDate = filter.dateCv
+          }
           // 
           for (let index in state.filterDateFromTo) {
             if (filter.hasOwnProperty(state.filterDateFromTo[index]) && filter[state.filterDateFromTo[index]]) {
@@ -389,6 +401,51 @@ export const store = new Vuex.Store({
             commit('setLoadingTable', false)
             commit('setUserNextAction', [])
             console.log(error)
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getHoSoAddGroup ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let paramSearch = {
+            start: filter.page * filter.numberPerPage - filter.numberPerPage,
+            end: filter.page * filter.numberPerPage,
+            service: filter.service ? filter.service : '',
+            template: filter.template ? filter.template : '',
+            status: filter.status ? filter.status : '',
+            register: filter.register ? filter.register : '',
+            keyword: filter.keyword ? filter.keyword : '',
+            domain: filter.domain ? filter.domain : '',
+            substatus: filter.substatus ? filter.substatus : '',
+            year: filter.year ? filter.year : 0,
+            month: filter.month ? filter.month : 0,
+            day: filter.day ? filter.day : 0,
+            top: filter.top ? filter.top : '',
+            dossierNo: filter.dossierNo ? filter.dossierNo : '',
+            paymentStatus: filter.paymentStatus ? filter.paymentStatus : ''
+          }
+          if (filter['originality']) {
+            paramSearch.originality = filter.originality
+          }
+          if (filter['sort']) {
+            paramSearch.sort = filter.sort
+          }
+          if (filter.order !== '') {
+            paramSearch.order = String(filter.order) === 'true' ? true : false
+          }
+          // 
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: paramSearch
+          }
+          axios.get('/o/rest/v2/dossiers/todo', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
             reject(error)
           })
         }).catch(function (){})
@@ -743,10 +800,8 @@ export const store = new Vuex.Store({
           }
         }
         axios.delete(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
-          console.log('success!')
           resolve(response)
         }).catch(function (xhr) {
-          console.log(xhr)
           reject(xhr)
         })
       })
@@ -860,6 +915,76 @@ export const store = new Vuex.Store({
           console.log(xhr)
           reject(xhr)
         })
+      })
+    },
+    uploadSingleFileGroupCongVan ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let dataOutPut = []
+        let files = $('input[id="documentFile"]')[0].files
+        let countFiles = files.length
+        let count = 0
+        if (files) {
+          for (let index = 0; index < countFiles; index++) {
+            let file = files[index]
+            let fileName = file['name']
+            if (file['name']) {
+              fileName = file['name'].replace(/\%/g, '')
+              fileName = fileName.replace(/\//g, '')
+              fileName = fileName.replace(/\\/g, '')
+            }
+            let formData = new FormData()
+            if (data.partType === 3) {
+              if (data['displayName']) {
+                fileName = data['displayName'].replace(/\%/g, '')
+                fileName = fileName.replace(/\//g, '')
+                fileName = fileName.replace(/\\/g, '')
+              }
+              formData.append('displayName', fileName)
+            } else {
+              formData.append('displayName', fileName)
+            }
+            formData.append('fileType', file.type)
+            formData.append('fileSize', file.size)
+            formData.append('isSync', 'false')
+            formData.append('file', file, fileName)
+            formData.append('dossierPartNo', data.partNo)
+            formData.append('dossierTemplateNo', data.dossierTemplateNo)
+            formData.append('fileTemplateNo', data.fileTemplateNo)
+            formData.append('formData', '')
+            formData.append('referenceUid', '')
+            let fileUpload = {
+              partTip: data.partTip,
+              file: file
+            }
+            store.dispatch('validFileUpload', fileUpload) // check size, type tài liệu upload
+            if (file && state.validFileUpload) {
+              axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
+                headers: {
+                  'groupId': state.initData.groupId,
+                  'Content-Type': 'multipart/form-data'
+                }
+              }).then(function (response) {
+                count += 1
+                dataOutPut.push(response.data)
+                if (count === countFiles) {
+                  resolve(dataOutPut)
+                }
+              }).catch(function (xhr) {
+                toastr.clear()
+                toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+                count += 1
+                if (count === countFiles) {
+                  reject(dataOutPut)
+                }
+              })
+            } else {
+              count += 1
+              if (count === countFiles) {
+                reject(dataOutPut)
+              }
+            }
+          }
+        }
       })
     },
     uploadSingleOtherFile ({ commit, state }, data) {
@@ -1240,7 +1365,7 @@ export const store = new Vuex.Store({
         }
         let dataPostdossier = new URLSearchParams()
         dataPostdossier.append('dossierId', data.dossierId)
-        dataPostdossier.append('groupDossierId', String(data.groupDossierId))
+        // dataPostdossier.append('groupDossierId', String(data.groupDossierId))
         
         axios.put('/o/rest/v2/dossiers/' + data.groupDossierId + '/groupDossier', dataPostdossier, options).then(function (response) {
           commit('setLoading', false)
@@ -1379,9 +1504,6 @@ export const store = new Vuex.Store({
           resolve(response)
         }).catch(function (error) {
           reject(error)
-          toastr.clear()
-          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
-          commit('setLoading', false)
         })
       })
     },
@@ -1573,6 +1695,9 @@ export const store = new Vuex.Store({
         }
         dataPutdossier.append('fromViaPostal', data.hasOwnProperty('fromViaPostal') ? data.fromViaPostal : '')
         dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 0)
+        if (data.formMeta) {
+          dataPutdossier.append('formMeta', data.formMeta ? data.formMeta : '')
+        }
         console.log('dataPutdossier', dataPutdossier)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)
@@ -1606,8 +1731,11 @@ export const store = new Vuex.Store({
         dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : '')
         dataPutdossier.append('contactTelNo', data.contactTelNo ? data.contactTelNo : '')
         dataPutdossier.append('contactEmail', data.contactEmail ? data.contactEmail : '')
-
-        
+        dataPutdossier.append('delegateIdNo', data.delegateIdNo ? data.delegateIdNo : '')
+        dataPutdossier.append('delegateName', data.delegateName ? data.delegateName : '')
+        if (data.hasOwnProperty('formCode') && data.formCode === 'NEW_GROUP_CV_DI') {
+          dataPutdossier.append('metadata', JSON.stringify({congVanDi: true}))
+        }
         console.log('dataPutdossier', dataPutdossier)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)
@@ -3687,7 +3815,12 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
             }
+          }
+          if (String(filter.actionId) === '9100') {
+            param.params.isActionCode = true
           }
           axios.get(state.initData.dossierApi + '/' + filter.dossierId + '/nextactions/' + filter.actionId +  '/payload', param).then(function (response) {
             let serializable = response.data
@@ -4399,6 +4532,33 @@ export const store = new Vuex.Store({
         })
       })
     },
+<<<<<<< HEAD
+    toKeypayDvcqg ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let url = filter.key === 'kpdvcqg' ? '/o/pgi/kpdvcqg/createtransaction' : '/o/pgi/ppdvcqg/inittransaction'
+        let dataPost = new URLSearchParams()
+        dataPost.append('dossierId', filter.dossierId)
+        
+        axios.post(url, dataPost, param).then(response => {
+          if (response.data && ((response.data.hasOwnProperty('error') && response.data.error == '0') || (response.data.hasOwnProperty('MaLoi') && response.data.MaLoi == '00'))) {
+            resolve(filter.key === 'kpdvcqg' ? response.data.payment_url : response.data.UrlThanhToan)
+          } else if (response.data && ((response.data.hasOwnProperty('error') && response.data.error != '0') || (response.data.hasOwnProperty('MaLoi') && response.data.MaLoi != '00'))) {
+            toastr.error(response.data.hasOwnProperty('msg') ? response.data.msg : 'Yêu cầu thực hiện thất bại')
+            reject(response)
+          } else {
+            reject(response)
+          }
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    }
+=======
     getFieldPick ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -4441,6 +4601,7 @@ export const store = new Vuex.Store({
         })
       })
     },
+>>>>>>> opencps/bgt
     // ----End---------
   },
   mutations: {

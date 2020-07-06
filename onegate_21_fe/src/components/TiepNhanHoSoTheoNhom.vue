@@ -5,7 +5,10 @@
       <div class="row-header">
         <div class="background-triangle-big">
           <span v-if="formCode === 'NEW_GROUP'">THÔNG TIN NHÓM HỒ SƠ</span>
-          <span v-if="formCode === 'NEW_GROUP_CV'">THÔNG TIN CÔNG VĂN</span>
+          <span v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'">
+            <span v-if="!activeAddDossierIntoGroup">THÔNG TIN CÔNG VĂN</span>
+            <span v-else>THÊM MỚI HỒ SƠ</span>
+          </span>
         </div>
         <div class="layout wrap header_tools row-blue">
           <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinNhomHoSo.serviceName">
@@ -33,8 +36,7 @@
 
         <thong-tin-chu-ho-so v-if="formCode === 'NEW_GROUP'" :showApplicant="true" :showDelegate="false" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
 
-        <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV'" ref="thongtincongvan"></thong-tin-cong-van>
-
+        <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" ref="thongtincongvan" :detailDossier="thongTinNhomHoSo" :tphs="tphsCV" :formCodeInput="formCode"></thong-tin-cong-van>
 
         <div v-if="formCode === 'NEW_GROUP'" style="position: relative;border-top: 1px solid #dedede;">
           <v-expansion-panel :value="0" class="expansion-pl">
@@ -66,7 +68,7 @@
                 Hồ sơ trong nhóm&nbsp;&nbsp;&nbsp;&nbsp;
               </div>
 
-              <div v-if="formCode === 'NEW_GROUP_CV'" slot="header" style="display: flex; align-items: center;">
+              <div v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" slot="header" style="display: flex; align-items: center;">
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 Danh sách hồ sơ&nbsp;&nbsp;&nbsp;&nbsp;
               </div>
@@ -102,7 +104,7 @@
                 <v-data-table
                   v-model="selected"
                   select-all
-                  :headers="headers"
+                  :headers="headersCV"
                   :items="dossiersIntoGroupRender"
                   :pagination.sync="pagination"
                   hide-actions
@@ -122,7 +124,7 @@
                         ></v-checkbox>
                       </th>
                       <th
-                        v-for="header in headers"
+                        v-for="header in headersCV"
                         :key="header.text"
                         :class="header['class'] ? header['class'] : ''"
                         :width="header['width'] ? header['width'] + 'px' : ''"
@@ -147,32 +149,76 @@
                       <td @click="viewDetail(props.item, props.index)" class="text-xs-center" width="50px" style="height: 40px !important">
                         <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
                       </td>
-                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="250px" style="height: 40px !important">
-                        {{ props.item.dossierNo }}
-                      </td>
-                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" style="height: 40px !important">
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="150px" style="height: 40px !important">
                         {{ props.item.applicantName }}
                       </td>
-                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="200px" style="height: 40px !important">
-                        {{ props.item.dossierSubStatusText ? props.item.dossierSubStatusText : props.item.dossierStatusText }}
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="100px" style="height: 40px !important">
+                        <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateDay') && getMetaData(props.item).hasOwnProperty('birthDateMonth') && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateDay}}/</span>
+                        <span v-if="props.item && getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateMonth') && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateMonth}}/</span>
+                        <span v-if="props.item && getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateYear}} </span>
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" style="height: 40px !important">
+                        <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('wardNativeName')">{{getMetaData(props.item).wardNativeName}}, </span>
+                        <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('districtNativeName')">{{getMetaData(props.item).districtNativeName}}, </span>
+                        <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('cityNativeName')">{{getMetaData(props.item).cityNativeName}} </span>
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left"  style="height: 40px !important">
+                        <span v-if="props.item.address">{{props.item.address}}, </span>
+                        <span v-if="props.item.wardName">{{props.item.wardName}}, </span>
+                        <span v-if="props.item.districtName">{{props.item.districtName}}, </span>
+                        <span v-if="props.item.cityName">{{props.item.cityName}} </span>
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="100px" style="height: 40px !important">
+                        <span v-if="props.item.metaData && getMetaData(props.item) && getMetaData(props.item).yearPayment">{{getMetaData(props.item).yearPayment}} </span>
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="100px" style="height: 40px !important">
+                        <span v-if="props.item.metaData && getMetaData(props.item) && getMetaData(props.item).subsidy">{{currency(getMetaData(props.item).subsidy)}} </span>
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="100px" style="height: 40px !important">
+                        <span v-if="props.item.applicantNote">{{props.item.applicantNote}} </span>
+                      </td>
+                      
+                      <td class="text-xs-center" width="170px" style="height: 40px !important">
+                        <v-btn flat icon color="indigo" class="mr-2 my-0" @click="viewDetail(props.item)" title="Xem chi tiết">
+                          <v-icon>fas fa fa-file-text</v-icon>
+                        </v-btn>
+                        <v-btn flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
+                          <v-icon size="22">create</v-icon>
+                        </v-btn>
+                        <v-btn flat icon color="red" class="my-0" @click="" title="Xóa">
+                          <v-icon size="22">delete</v-icon>
+                        </v-btn>
                       </td>
                     </tr>
                   </template>
                 </v-data-table>
-
-                <div v-if="dossiersIntoGroupRender.length > 10" class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
+                <v-layout wrap class="mt-3 ml-3">
+                  <v-flex xs12 sm6>
+                    <span>Tổng số đối tượng: </span>
+                    <span class="text-bold">{{dossiersIntoGroupRender.length}} </span>
+                  </v-flex>
+                  <v-flex xs12 sm6>
+                    <span>Tổng số tiền: </span>
+                    <span class="text-bold">{{currency(totalFee)}} đồng</span>
+                  </v-flex>
+                </v-layout>
+                <div v-if="dossiersIntoGroupRender.length > 30" class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
                   <div class="flex pagging-table px-2">
-                    <tiny-pagination :total="dossiersIntoGroupRender.length" :currentLimit="10" :page="pagination.page" custom-class="custom-tiny-class" 
+                    <tiny-pagination :total="dossiersIntoGroupRender.length" :currentLimit="30" :page="pagination.page" custom-class="custom-tiny-class" 
                       @tiny:change-page="paggingData" ></tiny-pagination> 
                   </div>
                 </div>
               </div>
-              <div v-else class="pl-4 py-2">Chưa có hồ sơ nào</div>
+              <div v-else class="pl-5 py-2">Chưa có hồ sơ nào</div>
 
-              <v-flex xs12 class="text-right mb-3 mr-2" v-if="formCode === 'NEW_GROUP_CV'">
-                <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2" style="height:36px !important">
+              <v-flex xs12 class="text-right mb-3 mr-2" v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'">
+                <v-btn small color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2">
                   <v-icon size="20">add</v-icon>  &nbsp;
                   <span>Thêm mới hồ sơ</span>
+                </v-btn>
+                <v-btn small color="primary" @click="showDossierToAdd" class="mx-0 my-0" >
+                  <v-icon size="20">create_new_folder</v-icon>  &nbsp;
+                  <span>Thêm hồ sơ đã có</span>
                 </v-btn>
               </v-flex>
 
@@ -205,10 +251,10 @@
       </div>
       <!-- Thông tin hồ sơ trong nhóm -->
       <div v-if="activeAddDossierIntoGroup">
-        <thong-tin-chu-ho-so-cong-van v-if="activeAddDossierIntoGroup && formCode === 'NEW_GROUP_CV'" ref="thongtinchuhosocongvan"></thong-tin-chu-ho-so-cong-van>
+        <thong-tin-chu-ho-so-cong-van v-if="activeAddDossierIntoGroup && (formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI')" ref="thongtinchuhosocongvan"></thong-tin-chu-ho-so-cong-van>
         <thong-tin-chu-ho-so :showApplicant="false" :showDelegate="true" v-if="activeAddDossierIntoGroup && formCode === 'NEW_GROUP'" ref="thongtinchuhoso"></thong-tin-chu-ho-so>
 
-        <v-expansion-panel v-if="formCode === 'NEW_GROUP_CV'" :value="[true]" expand  class="expansion-pl">
+        <v-expansion-panel v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" :value="[true]" expand  class="expansion-pl">
           <v-expansion-panel-content>
             <div slot="header" style="display: flex; align-items: center;">
               <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
@@ -237,7 +283,7 @@
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
               </div>
-              <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypesIntoGroup"></thanh-phan-ho-so>
+              <thanh-phan-ho-so ref="thanhphanhoso" :formCode="formCode" :onlyView="false" :id="'nm'" :partTypes="inputTypesIntoGroup"></thanh-phan-ho-so>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
@@ -275,7 +321,7 @@
           </v-btn>
         </v-tab>
         <!--  -->
-        <v-tab href="#tab-1" @click="tiepNhanHoSo()" v-if="!activeAddGroup" class="px-0 py-0"> 
+        <v-tab href="#tab-1" @click="tiepNhanHoSoCongVan()" v-if="!activeAddGroup && (formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI')" class="px-0 py-0"> 
           <v-btn flat class="" 
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -285,7 +331,18 @@
             <span slot="loader">Loading...</span>
           </v-btn>
         </v-tab>
-        <v-tab href="#tab-2" @click="tiepNhanHoSo('add')" v-if="!activeAddGroup" class="px-0 py-0"> 
+        <v-tab href="#tab-1" @click="tiepNhanHoSo()" v-if="!activeAddGroup && formCode === 'NEW_GROUP'" class="px-0 py-0"> 
+          <v-btn flat class="" 
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">save</v-icon>  &nbsp;
+            <span>Tiếp nhận hồ sơ</span>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+
+        <!-- <v-tab href="#tab-2" @click="tiepNhanHoSo('add')" v-if="!activeAddGroup" class="px-0 py-0"> 
           <v-btn flat class=""
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -294,7 +351,7 @@
             <span>Tiếp nhận và thêm mới</span>
             <span slot="loader">Loading...</span>
           </v-btn>
-        </v-tab>
+        </v-tab> -->
         <!--  -->
         <v-tab href="#tab-2" @click="goBack" class="px-0 py-0">
           <v-btn flat class=""
@@ -465,8 +522,8 @@
                   <td @click="viewDetail(props.item, props.index)" class="text-xs-center" width="50px" style="height: 40px !important">
                     <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
                   </td>
-                  <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="250px" style="height: 40px !important">
-                    {{ props.item.dossierNo }}
+                  <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="150px" style="height: 40px !important">
+                    {{ props.item.applicantName }}
                   </td>
                   <td @click="viewDetail(props.item, props.index)" class="text-xs-left" style="height: 40px !important">
                     {{ props.item.applicantName }}
@@ -478,9 +535,9 @@
               </template>
             </v-data-table>
 
-            <div v-if="dossiersIntoGroupRender.length > 10" class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
+            <div v-if="dossiersIntoGroupRender.length > 30" class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
               <div class="flex pagging-table px-2">
-                <tiny-pagination :total="dossiersIntoGroupRender.length" :currentLimit="10" :page="pagination.page" custom-class="custom-tiny-class" 
+                <tiny-pagination :total="dossiersIntoGroupRender.length" :currentLimit="30" :page="pagination.page" custom-class="custom-tiny-class" 
                   @tiny:change-page="paggingData" ></tiny-pagination> 
               </div>
             </div>
@@ -496,6 +553,142 @@
             >
             <v-icon>close</v-icon>&nbsp;
             Bỏ qua
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialogAddDossier" max-width="1300" transition="fade-transition">
+      <v-card flat>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Chọn hồ sơ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogAddDossier = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="pt-0 pb-0 px-0">
+          <div class="mb-3">
+            <v-layout wrap class="my-2">
+              <v-flex class="px-2 mt-3">
+                <v-text-field
+                  label="Tìm kiếm theo mã hồ sơ"
+                  v-model="dossierNoKey"
+                  @keyup.enter="searchKeyWordDossierToAdd"
+                  append-icon="search"
+                  box
+                  @click:append="searchKeyWordDossierToAdd"
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+            <v-data-table
+              :headers="headersCV"
+              :items="dossiersSelectAdd"
+              :select-all="true"
+              v-model="selectedDossierAdd"
+              hide-actions
+              class="table-landing table-bordered"
+              item-key="dossierId"
+            >
+              <!--  -->
+              <template slot="headers" slot-scope="props">
+                <tr>
+                  <th width="32px" class="v_data_table_check_all" style="padding-left: 14px !important;">
+                    <v-checkbox
+                      class="pl-1"
+                      :input-value="props.all"
+                      :indeterminate="props.indeterminate"
+                      primary
+                      hide-details
+                      @click.native="toggleAllSelectDossierAdd"
+                    ></v-checkbox>
+                  </th>
+                  <th
+                    v-for="header in headersCV"
+                    :key="header.text"
+                    :class="header['class'] ? header['class'] : ''"
+                    :width="header['width'] ? header['width'] + 'px' : ''"
+                  >
+                    <v-tooltip bottom>
+                      <span slot="activator">{{ header.text }}</span>
+                      <span>{{ header.text }}</span>
+                    </v-tooltip>
+                  </th>
+                </tr>
+              </template>
+              <!--  -->
+              <template slot="items" slot-scope="props">
+                <tr style="cursor: pointer">
+                  <td class="text-xs-center" width="30px" style="height: 40px !important">
+                    <v-checkbox
+                      class="pl-3"
+                      v-model="props.selected"
+                      @change="changeSelectedDossierAdd"
+                      primary
+                      hide-details
+                      color="primary"
+                    ></v-checkbox>
+                  </td>
+                  <td class="text-xs-center" width="50px" style="height: 40px !important">
+                    <span>{{hosoDatasPage * numberPerPageAddDossier - numberPerPageAddDossier + props.index + 1}}</span>
+                  </td>
+                  <td class="text-xs-left" width="150px" style="height: 40px !important">
+                    {{ props.item.applicantName }}
+                  </td>
+                  <td class="text-xs-left" width="100px" style="height: 40px !important">
+                    <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateDay') && getMetaData(props.item).hasOwnProperty('birthDateMonth') && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateDay}}/</span>
+                    <span v-if="props.item && getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateMonth') && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateMonth}}/</span>
+                    <span v-if="props.item && getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateYear}} </span>
+                  </td>
+                  <td class="text-xs-left" style="height: 40px !important">
+                    <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('wardNativeName')">{{getMetaData(props.item).wardNativeName}}, </span>
+                    <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('districtNativeName')">{{getMetaData(props.item).districtNativeName}}, </span>
+                    <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('cityNativeName')">{{getMetaData(props.item).cityNativeName}} </span>
+                  </td>
+                  <td class="text-xs-left"  style="height: 40px !important">
+                    <span v-if="props.item.address">{{props.item.address}}, </span>
+                    <span v-if="props.item.wardName">{{props.item.wardName}}, </span>
+                    <span v-if="props.item.districtName">{{props.item.districtName}}, </span>
+                    <span v-if="props.item.cityName">{{props.item.cityName}} </span>
+                  </td>
+                  <td class="text-xs-left" width="100px" style="height: 40px !important">
+                    <span v-if="props.item.metaData && getMetaData(props.item) && getMetaData(props.item).yearPayment">{{getMetaData(props.item).yearPayment}} </span>
+                  </td>
+                  <td class="text-xs-left" width="100px" style="height: 40px !important">
+                    <span v-if="props.item.metaData && getMetaData(props.item) && getMetaData(props.item).subsidy">{{currency(getMetaData(props.item).subsidy)}} </span>
+                  </td>
+                  <td class="text-xs-left" width="100px" style="height: 40px !important">
+                    <span v-if="props.item.applicantNote">{{props.item.applicantNote}} </span>
+                  </td>
+                  
+                  <td class="text-xs-center" width="100px" style="height: 40px !important">
+                    <v-btn small outline color="primary" @click="addDossierToGroup(props.item)" class="mr-2 my-0">
+                      <v-icon size="20">add</v-icon>  &nbsp;
+                      <span>Thêm hồ sơ</span>
+                    </v-btn>
+                  </td>
+                </tr>
+              </template>
+            </v-data-table>
+
+            <div class="text-xs-right layout wrap" style="position: relative;">
+              <div class="flex pagging-table px-2"> 
+                <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" :numberPerPage="numberPerPageAddDossier" :showLimit="false" custom-class="custom-tiny-class" 
+                 @tiny:change-page="paggingDataDossierAdd" ></tiny-pagination> 
+              </div>
+            </div>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click.native="addMultipleDossierToGroup()">
+            <v-icon>send</v-icon>&nbsp;
+            Xác nhận
+          </v-btn>
+          <v-btn color="primary" @click.native="dialogAddDossier = false"
+            >
+            <v-icon class="white--text">close</v-icon>&nbsp;
+            Thoát
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -539,8 +732,18 @@ export default {
     detailGroup: false,
     dialogImportDosier: false,
     dialogSelectDosier: false,
+    dialogAddDossier: false,
+    dossiersSelectAdd: [],
+    selectedDossierAdd: [],
+    selectMultiplePage: [],
+    selectedDoAction: [],
     groupDossierList: [],
     groupDossierSelected: '',
+    dossierNoKey: '',
+    hosoDatasPage: 1,
+    hosoDatasTotal: 0,
+    hosoTotalPage: 0,
+    numberPerPageAddDossier: 5,
     dossiersIntoGroup: [],
     dossiersIntoGroupRender: [],
     selected: [],
@@ -576,6 +779,62 @@ export default {
     loadingAction: false,
     dialogAddGroup: false,
     activeAddDossierIntoGroup: false,
+    headersCV: [
+      {
+        text: 'STT',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Họ và tên',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Năm sinh',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Quê quán',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Nơi đăng ký HKTT',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Số năm được hưởng',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Mức trợ cấp (đồng/tháng)',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Ghi chú',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Thao tác',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+    ],
     headers: [
       {
         text: 'STT',
@@ -604,7 +863,6 @@ export default {
     ],
     filesGroupDossier: [],
     countDossierProgress: 0,
-    dialogImportDosier: false,
     listDossierImport: [],
     progressUploadFile: false,
     loadingImportDossier: false,
@@ -615,9 +873,11 @@ export default {
     countDossierSuccess: 0,
     dossierNameCongVan: '',
     pagination: {
-      rowsPerPage: 10,
+      rowsPerPage: 30,
       page: 1
-    }
+    },
+    tphsCV: '',
+    totalFee: 0
   }),
   computed: {
     loading () {
@@ -668,9 +928,9 @@ export default {
         vm.filesGroupDossier = vm.$refs.thanhphanhoso1.getFilesGroupDossier()
         console.log('fileItems 1', vm.filesGroupDossier)
       }
-      if (vm.formCode === 'NEW_GROUP_CV') {
-        vm.$refs.thongtincongvan.initData(vm.thongTinNhomHoSo)
-      }
+      // if (vm.formCode === 'NEW_GROUP_CV') {
+      //   vm.$refs.thongtincongvan.initData(vm.thongTinNhomHoSo)
+      // }
     }
   },
   watch: {
@@ -690,6 +950,23 @@ export default {
         vm.getDetaiGroup(id)
       }
     },
+    dossiersIntoGroupRender (arr) {
+      let vm = this
+      let totalFee = 0
+      if (arr && arr.length > 0) {
+        for (let i = 0; i < arr.length; i++) {
+          console.log(i, arr[i])
+          let metaData = vm.getMetaData(arr[i])
+          let fee = 0
+          if (metaData) {
+            fee = Number(metaData['yearPayment'])*12*Number(metaData['subsidy'])
+            totalFee += fee
+          }
+        }
+        vm.totalFee = totalFee
+      }
+      
+    },
     thongTinNhomHoSo (val) {
       let vm = this
       if (val) {
@@ -703,8 +980,18 @@ export default {
           }).catch(reject => {
           })
         }
-        if (vm.formCode === 'NEW_GROUP_CV') {
+        if (vm.formCode === 'NEW_GROUP_CV' || vm.formCode === 'NEW_GROUP_CV_DI') {
           vm.$refs.thongtincongvan.initData(val)
+          let filter = {
+            dossierTemplateNo: val.dossierTemplateNo
+          }
+          vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result) {
+            vm.tphsCV = result['dossierParts']
+          })
+          vm.$store.dispatch('loadDossierFiles', val.dossierId).then(resFiles => {
+            vm.filesGroupDossier = resFiles
+          }).catch(reject => {
+          })
         }
         
       }
@@ -718,6 +1005,20 @@ export default {
       console.log('val activeAddFileGroup', val)
       vm.stepSelected = ''
       vm.dialogSelectDosier = val
+    },
+    selectMultiplePage: {
+      handler: function (val) {
+        let vm = this
+        if (val.length > 0) {
+          vm.selectedDoAction = []
+          for (let key in val) {
+            vm.selectedDoAction = vm.selectedDoAction.concat(val[key]['selected'])
+          }
+        } else {
+          vm.selectedDoAction = []
+        }
+      },
+      deep: true
     }
   },
   methods: {
@@ -729,6 +1030,11 @@ export default {
     paggingData (config) {
       let vm = this
       vm.pagination.page = config.page
+    },
+    paggingDataDossierAdd (config) {
+      let vm = this
+      vm.hosoDatasPage = config.page
+      vm.searchDossierToAdd()
     },
     getGroupDossier () {
       let vm = this
@@ -778,23 +1084,6 @@ export default {
               }
             }
             vm.stepList = steps
-            // if (vm.stepList.length === 1) {
-            //   vm.stepSelected = vm.stepList[0]
-            //   vm.$store.dispatch('pullProcessSteps', vm.stepList[0]).then(function (result) {
-            //     if (result.hasOwnProperty('buttonConfig') && result.buttonConfig) {
-            //       try {
-            //         vm.btnDynamics = JSON.parse(result['buttonConfig'])['buttons']
-            //         vm.btnDynamics = vm.btnDynamics.filter(function(item) {
-            //           return item['form'] === 'ACTIONS'
-            //         })
-            //       } catch (error) {
-            //         vm.btnDynamics = []
-            //       }
-            //     } else {
-            //       vm.btnDynamics = []
-            //     }
-            //   })
-            // }
           }
           vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
         })
@@ -820,9 +1109,10 @@ export default {
                       return (!item.hasOwnProperty('onlySteps') ||
                         (item.hasOwnProperty('onlySteps') && item['onlySteps'].filter(function(item2) {
                           return String(item2) === String(vm.stepSelected['stepCode']) 
-                        }) > 0)
+                        }).length >= 0)
                       )
                     })
+                    console.log('btnDynamics dossierGroup', vm.btnDynamics)
                   } catch (error) {
                     vm.btnDynamics = []
                   }
@@ -842,12 +1132,10 @@ export default {
     },
     btnActionEvent (item, index) {
       let vm = this
-      if (!vm.selected) {
-        alert('Chọn hồ sơ để thực hiện')
+      if (!vm.selected || vm.selected.length === 0) {
+        toastr.error('Chọn hồ sơ để thực hiện')
         return
       }
-      // console.log('btnAction', item)
-      // console.log('dossierSelected', vm.selected)
       vm.$store.dispatch('loadActionActive', item).then(function () {
         vm.$store.dispatch('loadDossierSelected', vm.selected).then(function () {
           let dossiersSelect = vm.selected.map(select => {
@@ -862,6 +1150,14 @@ export default {
           })
         })
       })
+    },
+    showDossierToAdd () {
+      let vm = this
+      vm.hosoDatasPage = 1
+      vm.dossierNoKey = ''
+      vm.selectMultiplePage = []
+      vm.searchDossierToAdd()
+      vm.dialogAddDossier = true
     },
     putGroupDossier () {
       let vm = this
@@ -908,13 +1204,27 @@ export default {
           }
         }
       }
-      if (vm.formCode === 'NEW_GROUP_CV') {
+      if (vm.formCode === 'NEW_GROUP_CV' || vm.formCode === 'NEW_GROUP_CV_DI') {
         let thongtincongvan = this.$refs.thongtincongvan.getThongTinCongVan()
         let tempData = thongtincongvan
+        tempData.dueDate = vm.dateTimeView(thongtincongvan.dueDate)
         vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
+          // if (vm.formCode === 'NEW_GROUP_CV_DI') {
+            let dataMetaData = {
+              id: vm.thongTinNhomHoSo.dossierId,
+              data: thongtincongvan.metaData
+            }
+            vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
+          // }
+          
           vm.loadingAction = false
           toastr.clear()
           toastr.success('Cập nhật thành công')
+          let currentParams = vm.$router.history.current.params
+          vm.$router.push({
+            path: '/danh-sach-ho-so/' + currentParams.index + '?' + window.location.href.split('?')[1]
+          })
+
         }).catch(rejectXhr => {
           vm.loadingAction = false
           toastr.clear()
@@ -942,6 +1252,10 @@ export default {
         data.dossierId = result.dossierId
         setTimeout (function () {
           result['editable'] = false
+          if (vm.formCode === 'NEW_GROUP_CV' || vm.formCode === 'NEW_GROUP_CV_DI') {
+            vm.$refs.thongtinchuhosocongvan.initData(result)
+          }
+          
           if (result.dossierStatus === '') {
             vm.$store.dispatch('pullNextactions', result).then(result2 => {
               if (result2) {
@@ -972,29 +1286,12 @@ export default {
               vm.$refs.thongtinchunghoso.initData(result)
             }
           }
-          vm.$refs.thongtinchuhosocongvan.initData(result)
           // copy file 
           let count = 0
           let files = vm.filesGroupDossier.filter(function(item) {
             return (item['dossierPartType'] === 6 || item['dossierPartType'] === 7)
           })
           if (files.length > 0) {
-            // for (let key in files) {
-            //   filterCopyFile.dossierTemplateNo = files[key]['dossierTemplateNo']
-            //   filterCopyFile.dossierPartNo = files[key]['dossierPartNo']
-            //   filterCopyFile.dossierFileId = files[key]['dossierFileId']
-            //   vm.$store.dispatch('copyFile', filterCopyFile).then(function(resultFile) {
-            //     count += 1
-            //     if (count === files.length) {
-            //       vm.$refs.thanhphanhoso.initData(result)
-            //     }
-            //   }).catch(function(reject) {
-            //     count += 1
-            //     if (count === files.length) {
-            //       vm.$refs.thanhphanhoso.initData(result)
-            //     }
-            //   })
-            // }
             let dossierFileIds = files.map(obj =>{ 
               return obj.dossierFileId
             }).toString()
@@ -1343,6 +1640,106 @@ export default {
         }
       }
     },
+    tiepNhanHoSoCongVan (type) {
+      var vm = this
+      let thongtinchuhosocongvan = this.$refs.thongtinchuhosocongvan.getThongTinChuHoSo()
+      let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
+      // let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
+      let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
+      // console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
+      // let validThongtinchuhoso = vm.$refs.thongtinchuhoso.showValid()
+      // if (validThongtinchuhoso['validForm']) {
+        let passValid = true
+        if (passValid && thongtinchuhosocongvan.validation) {
+          vm.loadingAction = true
+          if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
+            vm.loadingAction = false
+            return
+          }
+          if (dichvuchuyenphatketqua.viaPostal === 2 && !vm.$refs.dichvuchuyenphatketqua.validDichVuChuyenPhat()) {
+            vm.loadingAction = false
+            return
+          }
+          let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
+          let dossierTemplates = thanhphanhoso
+          let listAction = []
+          let listDossierMark = []
+          if (dossierFiles) {
+            dossierFiles.forEach(function (value, index) {
+              if (value.eForm) {
+                value['dossierId'] = vm.dossierId
+                listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+              }
+            })
+          }
+          console.log('assign=congvan', thongtinchuhosocongvan, dichvuchuyenphatketqua)
+          let tempData = Object.assign(thongtinchuhosocongvan, dichvuchuyenphatketqua)
+          tempData['dossierId'] = vm.currentDossierIntoGroup.dossierId
+          tempData['sampleCount'] = vm.currentDossierIntoGroup.sampleCount
+          tempData['originality'] = vm.originality
+          tempData['userType'] = '1'
+          console.log('putDossierIntoCongVan', tempData)
+          vm.$store.dispatch('putDossier', tempData).then(function (result) {
+            vm.loadingAction = false
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            if (vm.formCode === 'UPDATE') {
+              vm.goBack()
+            } else {
+              let initData = vm.$store.getters.loadingInitData
+              let actionUser = initData.user.userName ? initData.user.userName : ''
+              //
+              let paymentsOut = {}
+              if (vm.showThuPhi) {
+                paymentsOut = {
+                  requestPayment: vm.payments['requestPayment'],
+                  paymentNote: vm.payments['paymentNote'],
+                  advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                  feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                  serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                  shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+                }
+              }
+              var payloadDate = {
+                'dueDate': vm.editableDate && tempData.dueDate ? tempData.dueDate : vm.dueDateEdit,
+                'receiveDate': vm.receiveDateEdit
+              }
+              let dataPostAction = {
+                dossierId: vm.currentDossierIntoGroup.dossierId,
+                actionCode: 1100,
+                actionNote: '',
+                actionUser: actionUser,
+                payload: payloadDate,
+                security: '',
+                assignUsers: '',
+                payment: paymentsOut,
+                createDossiers: ''
+              }
+              vm.loadingAction = true
+              vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+                vm.loadingAction = false
+                if (!type) {
+                  toastr.success('Thêm hồ sơ vào nhóm thành công')
+                  vm.getDetaiGroup(vm.id)
+                  vm.activeAddDossierIntoGroup = false
+                } else {
+                  // tạo hồ sơ mới
+                  vm.createDossierIntoGroup()
+                }
+              }).catch(reject => {
+                vm.loadingAction = false
+              })
+            }
+          }).catch(rejectXhr => {
+            vm.loadingAction = false
+            toastr.clear()
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          })
+        } else {
+          toastr.clear()
+          toastr.error('Vui lòng điền đầy đủ thông tin bắt buộc')
+        }
+      // }
+    },
     changeViapostal (viapostal) {
       if (viapostal) {
         this.viaPortalDetail = 2
@@ -1373,6 +1770,16 @@ export default {
       let currentQuery = vm.$router.history.current.query
       vm.$router.push('/danh-sach-ho-so/0/chi-tiet-ho-so/' + item['dossierId'])
     },
+    editDossierIntoGroup (item) {
+      let vm = this
+      let query = vm.$router.history.current.query
+      query['template_no'] = item.dossierTemplateNo
+      query['serviceCode'] = item.serviceCode
+      vm.$router.push({
+        path: '/danh-sach-ho-so/0/ho-so/' + item.dossierId + '/UPDATE',
+        query: query
+      })
+    },
     addFileToDossier () {
       let vm = this
       // add file cho thành phần hồ sơ con
@@ -1394,6 +1801,113 @@ export default {
         })
       // }
     },
+    searchKeyWordDossierToAdd () {
+      let vm = this
+      vm.selectMultiplePage = []
+      vm.searchDossierToAdd()
+    },
+    searchDossierToAdd () {
+      let vm = this
+      let filter = {
+        dossierNo: vm.dossierNoKey,
+        service: vm.thongTinNhomHoSo.serviceCode,
+        page: vm.hosoDatasPage,
+        numberPerPage: vm.numberPerPageAddDossier,
+        originality: 3,
+        sort: 'dossierNo',
+        order: true
+      }
+      vm.$store.dispatch('getHoSoAddGroup', filter).then(function (result) {
+        vm.dossiersSelectAdd = result.data
+        vm.hosoDatasTotal = result.total
+
+        vm.hosoTotalPage = Math.ceil(vm.hosoDatasTotal / vm.numberPerPageAddDossier)
+        if (vm.hosoTotalPage > 0 && vm.selectMultiplePage.length === 0) {
+          for (let key = 0; key < vm.hosoTotalPage; key++) {
+            let item = {
+              selected: [],
+              page: key + 1
+            }
+            vm.selectMultiplePage.push(item)
+          }
+        }
+        vm.selectedDossierAdd = vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected']
+      }).catch(reject => {
+        vm.dossiersSelectAdd = []
+        vm.hosoDatasTotal = 0
+      })
+    },
+    changeSelectedDossierAdd () {
+      let vm = this
+      console.log('selectedDossierAdd', vm.selectedDossierAdd)
+      vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected'] = vm.selectedDossierAdd
+    },
+    addMultipleDossierToGroup () {
+      let vm = this
+      console.log('selectedDoAction', vm.selectedDoAction)
+      let arrDossierId = []
+      let arrLength = vm.selectedDoAction.length
+      for (let index = 0; index < arrLength; index++) {
+        let id = vm.selectedDoAction[index]['dossierId']
+        arrDossierId.push(id)
+      }
+      vm.addDossierToGroup(false, arrDossierId.toString())
+    },
+    addDossierToGroup (item, multiple) {
+      let vm = this
+      let data = {
+        groupDossierId: vm.thongTinNhomHoSo.dossierId,
+        dossierId: multiple ? multiple : item.dossierId
+      }
+      vm.$store.dispatch('postDossierIntoGroup', data).then(function (result) {
+        toastr.clear()
+        toastr.success('Thêm hồ sơ thành công')
+        vm.dialogAddDossier = false
+        vm.$store.dispatch('getDossiersIntoGroup', data).then(function (result) {
+          vm.dossiersIntoGroupRender = result
+        })
+        // copy file 
+        let count = 0
+        let files = vm.filesGroupDossier.filter(function(item) {
+          return (item['dossierPartType'] === 6 || item['dossierPartType'] === 7)
+        })
+        if (files.length > 0) {
+          let dossierFileIds = files.map(obj =>{ 
+            return obj.dossierFileId
+          }).toString()
+          let filterCopyFile = {
+            dossierIds: multiple ? multiple : item.dossierId,
+            dossierFileId: dossierFileIds
+          }
+          vm.$store.dispatch('uploadFileDossierGroup', filterCopyFile).then(function (resultFile) {
+          })
+        }
+        // 
+      }).catch(function () {})
+    },
+    getMetaData (val) {
+      let metaDataOut = ''
+      try {
+        metaDataOut = JSON.parse(val.metaData)
+      } catch (error) {
+      }
+      return metaDataOut
+    },
+    dateTimeView (arg) {
+      if (arg) {
+        let value = new Date(arg)
+        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} | ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+      } else {
+        return ''
+      }
+    },
+    currency (value) {
+      if (value) {
+        let moneyCur = (value / 1).toFixed(0).replace('.', ',')
+        return moneyCur.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+      }
+      return ''
+    },
     cancelAddFile () {
       let vm = this
       vm.$store.commit('setActiveAddFileGroup', false)
@@ -1405,6 +1919,17 @@ export default {
       } else {
         vm.selected = vm.dossiersIntoGroupRender
       }
+    },
+    toggleAllSelectDossierAdd () {
+      let vm = this
+      if (vm.selectedDossierAdd.length) {
+        vm.selectedDossierAdd = []
+      } else {
+        vm.selectedDossierAdd = vm.dossiersSelectAdd
+      }
+      vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected'] = vm.selectedDossierAdd
+      console.log('selectedDossierAdd all', vm.selectedDossierAdd)
+      console.log('selectMultiplePage all', vm.selectMultiplePage)
     },
     toggleAllSelectDialog () {
       var vm = this

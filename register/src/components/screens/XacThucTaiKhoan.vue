@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-layout :style="dialogVerify ? 'visibility: hidden;' : ''" class="mt-4" wrap style="max-width:550px;margin: 0 auto">
+    <v-layout :style="dialogVerify ? 'visibility: hidden;' : ''" class="mt-4" wrap style="max-width:350px;margin: 0 auto">
       <nav class="v-toolbar elevation-0 theme--dark primary" data-booted="true" style="justify-content: center">
         <div class="v-toolbar__content" style="height: 40px;justify-content: center;">
           <span class="text-bold">XÁC THỰC TÀI KHOẢN</span>
@@ -8,8 +8,11 @@
       </nav>
       <v-flex xs12>
         <v-form ref="form" v-model="valid" lazy-validation class="px-2 pt-3" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
-          <v-flex xs12>
+          <v-flex xs12 v-if="!xacthuc_credit">
             <p>Tài khoản chưa xác thực. Để xác thực tài khoản, vui lòng nhập mã PIN đã được gửi về email của bạn.</p>
+          </v-flex>
+          <v-flex xs12 v-if="xacthuc_credit">
+            <p>Để xác thực thông tin tài khoản. Vui lòng nhập mã PIN đã được gửi về email của bạn.</p>
           </v-flex>
           <v-flex xs12>
             <v-text-field
@@ -29,11 +32,18 @@
               <v-icon>how_to_reg</v-icon>&nbsp;
               Xác thực
             </v-btn>
-            <v-btn color="primary"
+            <v-btn color="primary" v-if="!resend_mail"
               @click="goBack"
             >
               <v-icon>reply</v-icon>&nbsp;
               Quay lại
+            </v-btn>
+            <v-btn color="primary"
+              @click="resendMail"
+              v-if="resend_mail"
+            >
+              <v-icon>replay</v-icon>&nbsp;
+              Gửi lại mã PIN
             </v-btn>
           </div>
         </v-form>
@@ -55,6 +65,24 @@
             color="white"
             class="mb-0"
           ></v-progress-linear>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialogPending" max-width="450">
+      <v-card>
+        <v-card-text class="pb-2" style="background-color: #00204a;position: relative;color:white">
+          <div class="text-xs-center">
+            <span>XÁC THỰC THÔNG TIN TÀI KHOẢN THÀNH CÔNG</span><br>
+            <span>VUI LÒNG CHỜ QUẢN TRỊ VIÊN XÁC NHẬN</span>
+          </div>
+          <div class="mt-2">
+            <span>(*) Thông báo xác nhận từ quản trị viên sẽ được gửi qua email của bạn</span>
+          </div>
+          <div class="text-xs-center mt-3">
+            <v-btn color="primary" @click.native="goBack" style="width: 120px">
+              Đồng ý
+            </v-btn>
+          </div>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -80,7 +108,9 @@ export default {
     userName: '',
     passWord: '',
     dialogVerify: false,
+    dialogPending: false,
     xacthuc_credit: false,
+    resend_mail: false
   }),
   computed: {
   },
@@ -100,6 +130,13 @@ export default {
       try {
         if (xacthuc_credit) {
           vm.xacthuc_credit = true
+        }
+      } catch (error) {
+      }
+
+      try {
+        if (allow_resend_mail) {
+          vm.resend_mail = allow_resend_mail
         }
       } catch (error) {
       }
@@ -129,13 +166,7 @@ export default {
         if(vm.xacthuc_credit){
           vm.$store.dispatch('confirmPINBXD', filter).then(function (result) {
             vm.loading = false
-            $('.login-input input[type=text]').val('')
-            $('.login-input input[type=password]').val('')
-            $('.login-input input[type=text]').val(result.email)
-            $('.login-input input[type=password]').val(result.token)
-            vm.userName = result.email
-            vm.passWord = result.token
-            vm.goToDangNhap()
+            vm.dialogPending = true
           }).catch(function (reject) {
             vm.loading = false
           })
@@ -154,6 +185,17 @@ export default {
           })
         }
       }
+    },
+    resendMail () {
+      let vm = this
+      let filter = {
+        type: ''
+      }
+      vm.$store.dispatch('resendMail', filter).then(function (result) {
+        toastr.success('Mã PIN đã được gửi lại. Vui lòng kiểm tra email.')
+      }).catch(function(error) {
+        toastr.error('Gửi lại không thành công.')
+      })
     },
     goToDangNhap() {
       let vm = this;

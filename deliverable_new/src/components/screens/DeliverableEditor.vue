@@ -11,7 +11,7 @@
             <span v-if="String(id) !== '0'">{{deName}}</span> 
             <span v-else>{{items[index]['typeName']}}</span> 
           </div>
-          <div class="flex xs4 text-right" style="margin-left: auto;">
+          <!-- <div class="flex xs4 text-right" style="margin-left: auto;">
             <v-btn v-if="showComponent && String(id) !== '0'" color="blue darken-3" dark class="ml-0 btn-border-left mr-3 my-0" @click.stop="drawer = !drawer">
               <v-icon size="22">help_outline</v-icon> &nbsp;
               Thông tin giấy phép
@@ -19,7 +19,7 @@
             <v-btn v-else icon class="ml-0 btn-border-left mr-3 my-0" @click="backToList" active-class="temp_active">
               <v-icon size="16">reply</v-icon>
             </v-btn>
-          </div>
+          </div> -->
         </div>
       </div>
       <view-pdf ref="viewpdf" v-if="showComponent && String(id) !== '0' && !editDeliverable" :id="id" :datainput="detail"></view-pdf>
@@ -31,14 +31,14 @@
         right
         temporary
       >
-        <v-toolbar height="40" color="primary" dark flat class="mb-2">
+        <!-- <v-toolbar height="40" color="primary" dark flat class="mb-2">
           <v-btn icon @click.stop="drawer = !drawer">
             <v-icon size="22">chevron_right</v-icon>
           </v-btn>
 
           <v-toolbar-title class="ml-0" style="font-size: 16px">Thông tin giấy phép</v-toolbar-title>
           <v-spacer></v-spacer>
-        </v-toolbar>
+        </v-toolbar> -->
         <bbat-table-editor-component-simple ref="bbatFormSimple" :id="id" :datainput="detail"></bbat-table-editor-component-simple>
       </v-navigation-drawer>
       

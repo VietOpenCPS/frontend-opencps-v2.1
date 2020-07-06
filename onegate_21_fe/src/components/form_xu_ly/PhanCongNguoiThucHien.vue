@@ -10,7 +10,7 @@
         <v-card >
           <div class="px-4 py-1">
             <v-layout wrap>
-              <!-- <v-checkbox v-for="(item, index) in data_uyquyen" v-bind:key="item.userId"
+              <v-checkbox v-for="(item, index) in data_uyquyen" v-bind:key="item.userId"
               slot="activator"
               v-model="item.assigned"
               @change = 'changeDelegacy($event, index)'
@@ -18,8 +18,8 @@
               :title="item.userName"
               >
                 <template slot="label"><span class="black--text">{{item.userName}}</span></template>
-              </v-checkbox> -->
-              <v-flex style="max-width:190px" v-for="(item, index) in data_uyquyen" v-bind:key="index">
+              </v-checkbox>
+              <!-- <v-flex style="max-width:190px" v-for="(item, index) in data_uyquyen" v-bind:key="index">
                 <v-list-tile>
                   <v-list-tile-action style="min-width:30px" :class="item.jobPosTitle ? 'pt-2' : ''">
                     <v-checkbox v-model="item.assigned" @change = 'changeDelegacy($event, index)'></v-checkbox>
@@ -34,7 +34,7 @@
                     </v-list-tile-sub-title>
                   </v-list-tile-content>
                 </v-list-tile>
-              </v-flex>
+              </v-flex> -->
             </v-layout>
           </div>
           <!-- <v-flex class="pl-4 pb-3">
@@ -57,7 +57,7 @@
         <v-card >
           <div v-if="type === 1 || type === 3" class="px-4 py-1">
             <v-layout wrap>
-              <!-- <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
+              <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
               slot="activator"
               v-model="item.assigned"
               @change = 'changeAssigned($event, index)'
@@ -65,9 +65,9 @@
               :title="item.userName"
               >
                 <template slot="label"><span class="black--text">{{item.userName}}</span></template>
-              </v-checkbox> -->
+              </v-checkbox>
 
-              <v-flex style="max-width:190px" v-for="(item, index) in data_phancong" v-bind:key="index">
+              <!-- <v-flex style="max-width:190px" v-for="(item, index) in data_phancong" v-bind:key="index">
                 <v-list-tile>
                   <v-list-tile-action style="min-width:30px" :class="item.jobPosTitle ? 'pt-2' : ''">
                     <v-checkbox v-model="item.assigned" @change = 'changeAssigned($event, index)'></v-checkbox>
@@ -82,7 +82,7 @@
                     </v-list-tile-sub-title>
                   </v-list-tile-content>
                 </v-list-tile>
-              </v-flex>
+              </v-flex> -->
             </v-layout>
             <!-- <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span> -->
           </div>

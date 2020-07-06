@@ -334,15 +334,31 @@
             var msg = result.msg
             if (msg === 'success') {
               vm.$store.commit('setKysoSuccess', true)
-              toastr.success('Thực hiện ký số thành công')
+              if (vm.esignType !== '') {
+                toastr.success('Thực hiện ký số thành công')
+              }
+
             } else if (msg === 'fileEntryId') {
-              alert('Không tìm thấy file bản thảo. Tạm dừng tiến trình ký số')
+              if (vm.esignType !== '') {
+                alert('Không tìm thấy file bản thảo. Tạm dừng tiến trình ký số')
+              } else {
+                toastr.error('Yêu cầu thực hiện thất bại')
+              }
             } else {
-              alert(msg)
+              if (vm.esignType !== '') {
+                alert(msg)
+              } else {
+                toastr.error('Yêu cầu thực hiện thất bại')
+              }
+              
             }
           },
           error: function () {
-            alert('Thực hiện ký số thất bại')
+            if (vm.esignType !== '') {
+              alert('Thực hiện ký số thất bại')
+            } else {
+              toastr.error('Yêu cầu thực hiện thất bại')
+            }
           }
         })
       },
@@ -373,10 +389,16 @@
           },
           success: function (result) {
             vm.$store.commit('setKysoSuccess', true)
-            toastr.success('Thực hiện ký số thành công.')
+            if (vm.esignType !== '') {
+              toastr.success('Thực hiện ký số thành công')
+            }
           },
           error: function () {
-            toastr.error('Thực hiện ký số thất bại')
+            if (vm.esignType !== '') {
+              toastr.error('Thực hiện ký số thất bại')
+            } else {
+              toastr.error('Yêu cầu thực hiện thất bại')
+            }
           }
         })
       },
@@ -409,7 +431,7 @@
             console.log(result)
             var msg = result.msg
             if (msg === 'success') {
-              toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              toastr.success('Yêu cầu của bạn được thực hiện thành công')
             } else if (msg === 'fileEntryId') {
               alert('Cảnh báo: Không tìm thấy file bản thảo. Tạm dừng tiến trình đóng dấu số')
             } else {

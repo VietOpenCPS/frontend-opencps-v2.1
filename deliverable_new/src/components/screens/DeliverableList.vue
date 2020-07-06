@@ -2,28 +2,31 @@
   <div>
     <div class="row-header no__hidden_class">
       <div class="background-triangle-big"> <span>DANH SÁCH GIẤY PHÉP</span> </div>
+
       <div class="layout row wrap header_tools row-blue">
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
           <v-text-field
             v-model="deliverableKey"
-            placeholder="Tìm kiếm theo tên giấy phép, mã giấy phép ..."
+            placeholder="Tìm kiếm theo số giấy phép ..."
             solo
             chips
             multiple
             deletable-chips
             item-value="value"
             item-text="text"
-            @keyup.enter="searchDeliverable"
+            @keyup.enter="filterDeliverable('keyword')"
             content-class="adv__search__select"
             return-object
+            autofocus
           ></v-text-field>
         </div>
         <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
-          <v-btn icon class="my-0 mx-2" v-on:click.native="searchDeliverable">
-            <v-icon size="16">search</v-icon>
+          <v-btn icon class="my-0 mx-2" v-on:click.native="menusss = !menusss">
+            <v-icon size="16">fas fa fa-filter</v-icon>
           </v-btn>
         </div>
       </div> 
+
       <!-- <div class="layout row wrap header_tools row-blue">
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
           <v-combobox
@@ -99,6 +102,132 @@
         </div>
       </v-fade-transition> -->
     </div>
+    <div class="" v-if="menusss">
+      <v-layout wrap>
+        <div class="adv_search px-2 my-2 mx-2" style="background: #eeeeee">
+          <div class="searchAdvanced-content py-2">
+            <v-layout wrap>
+              <v-flex xs12 sm6 class="mb-2 px-2">
+                <div>
+                  <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Số/ ký hiệu:</div>
+                  <v-text-field
+                    v-model="deliverableKey"
+                    class="search-input-appbar input-search d-inline-block"
+                    style="width: calc(100% - 150px);"
+                    single-lines
+                    hide-details
+                    solo
+                    flat
+                    height="32"
+                    min-height="32"
+                    clearable
+                    @keyup.enter="filterDeliverable"
+                  ></v-text-field>
+                </div>
+              </v-flex>
+              <v-flex xs12 sm6 class="mb-2 px-2">
+                <div>
+                  <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Ngày ban hành:</div>
+                  <v-menu
+                    class="d-inline-block"
+                    style="width: calc(100% - 150px);"
+                    ref="menuDate"
+                    :close-on-content-click="false"
+                    v-model="menuDate"
+                    :nudge-right="40"
+                    lazy
+                    transition="fade-transition"
+                    offset-y
+                    full-width
+                    max-width="290px"
+                    min-width="290px"
+                  >
+                    <v-text-field
+                      class="search-input-appbar input-search d-inline-block"
+                      slot="activator"
+                      append-icon="event"
+                      single-lines
+                      hide-details
+                      solo
+                      flat
+                      height="32"
+                      min-height="32"
+                      v-model="issueDate"
+                      @blur="issueDatePiecker = parseDate(issueDate)"
+                      clearable
+                      @keyup.enter="filterDeliverable"
+                    ></v-text-field>
+                    <v-date-picker ref="picker" min="1950-01-01" :first-day-of-week="1" locale="vi"
+                    v-model="issueDatePiecker" no-title @input="changeIssueDate"></v-date-picker>
+                  </v-menu>
+                </div>
+              </v-flex>
+              <v-flex xs12 sm6 class="mb-2 px-2">
+                <div>
+                  <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Đơn vị được cấp:</div>
+                  <v-text-field
+                    v-model="applicantName"
+                    class="search-input-appbar input-search d-inline-block"
+                    style="width: calc(100% - 150px);"
+                    single-lines
+                    hide-details
+                    solo
+                    flat
+                    height="32"
+                    min-height="32"
+                    clearable
+                    @keyup.enter="filterDeliverable"
+                  ></v-text-field>
+                </div>
+              </v-flex>
+              <v-flex xs12 sm6 class="mb-2 px-2">
+                <div>
+                  <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Đơn vị cử đến:</div>
+                  <v-text-field
+                    v-model="donvicu_data"
+                    class="search-input-appbar input-search d-inline-block"
+                    style="width: calc(100% - 150px);"
+                    single-lines
+                    hide-details
+                    solo
+                    flat
+                    height="32"
+                    min-height="32"
+                    clearable
+                    @keyup.enter="filterDeliverable"
+                  ></v-text-field>
+                </div>
+              </v-flex>
+              <v-flex xs12 class="mb-2 px-2">
+                <div>
+                  <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Trích yếu:</div>
+                  <v-textarea
+                    v-model="trichyeu_data"
+                    class="search-input-appbar input-search d-inline-block"
+                    style="width: calc(100% - 150px);"
+                    single-lines
+                    hide-details
+                    solo
+                    flat
+                    rows="3"
+                    clearable
+                    @keyup.enter.native="filterDeliverable"
+                  ></v-textarea>
+                </div>
+              </v-flex>
+              
+            </v-layout>
+            
+            <v-flex class="xs12 mx-2">
+              <v-btn class="mx-0 mb-0" color="primary" dark @click.native="filterDeliverable">
+                <v-icon size="18">search</v-icon> &nbsp; Tìm kiếm
+              </v-btn>
+            </v-flex>
+          </div>
+        </div>
+
+      </v-layout>
+    </div>
     <div style="text-align: right;" v-if="getUser('QUAN_LY_GIAY_PHEP') || userPermission">
       <v-btn color="blue darken-3" dark
         :to="'/danh-sach-giay-to/' + index + '/editor/0'"
@@ -106,22 +235,19 @@
         Thêm giấy phép
       </v-btn>
       <!-- import -->
-      <v-btn color="primary" class="white--text"
+      <!-- <v-btn color="primary" class="white--text"
         :loading="loadingImport"
         :disabled="loadingImport"
         @click="doImportData">
         <v-icon>exit_to_app</v-icon> &nbsp;
         Import giấy phép
-      </v-btn>
+      </v-btn> -->
     </div>
     <v-data-table
         :headers="headers"
         :items="hosoDatas"
-        :total-items="hosoDatasTotal"
         class="table-landing table-bordered"
-        no-data-text="Không có giấy phép nào"
         hide-actions
-        v-if="!loadingTable"
       >
       <template slot="items" slot-scope="props">
         <tr>
@@ -186,6 +312,11 @@
             </v-tooltip>
           </td>
         </tr>
+      </template>
+      <template slot="no-data">
+        <div class="text-xs-center mt-2">
+          Không có giấy phép nào
+        </div>
       </template>
     </v-data-table>
     <div v-if="!loadingTable" class="text-xs-right layout wrap" style="position: relative;border-top: 1px solid lightgrey;">
@@ -299,6 +430,8 @@
     },
     data () {
       return {
+        menuDate: false,
+        issueDatePiecker: '',
         filterData: {},
         menusss: false,
         loadingTable: false,
@@ -320,7 +453,13 @@
         viewAttach: false,
         fileEntryIdAttachs: [],
         deliverableSelected: '',
-        indexDeliverableSelected: ''
+        indexDeliverableSelected: '',
+
+        deliverableCode: '',
+        issueDate: null,
+        applicantName: '',
+        donvicu_data: '',
+        trichyeu_data: ''
       }
     },
     created () {
@@ -366,7 +505,13 @@
           vm.hosoDatasPage = 1
         }
         // vm.pullData(vm.items[vm.index]['typeCode'])
-        vm.filterDeliverable()
+        vm.deliverableKey = ''
+        vm.applicantName = ''
+        vm.issueDate = ''
+        vm.donvicu = ''
+        vm.trichyeu = ''
+        vm.deliverableCode = ''
+        vm.filterDeliverable('keyword')
       },
       index (val) {
         var vm = this
@@ -651,22 +796,46 @@
           })
         }, 100)
       },
-      filterDeliverable () {
+      filterDeliverable (type_search) {
         let vm = this
         let current = vm.$router.history.current
         let newQuery = current.query
+        if (vm.deliverableKey && !vm.applicantName && !vm.issueDate && !vm.donvicu_data && !vm.trichyeu_data) {
+          type_search = 'keyword'
+        }
+        let searchParams = {}
+        if (vm.applicantName ) {
+          searchParams.applicantName = vm.applicantName
+        }
+        if (vm.issueDate ) {
+          searchParams.issueDate = vm.issueDate
+        }
+        if (vm.donvicu_data ) {
+          searchParams.subject = vm.donvicu_data
+        }
+        if (vm.trichyeu_data ) {
+          searchParams.deliverableName = String(vm.trichyeu_data).replace(/\n/g, "")
+        }
+        if (vm.deliverableKey ) {
+          searchParams.deliverableCode = vm.deliverableKey
+        }
+
         let filter = {
+          typeSearch: type_search ? type_search : '',
           type: vm.items[vm.index]['typeCode'],
           page: newQuery.hasOwnProperty('page') ? newQuery['page'] : 1,
-          keyword: newQuery.hasOwnProperty('keyword') ? newQuery['keyword'] : vm.deliverableKey
+          keyword: newQuery.hasOwnProperty('keyword') ? newQuery['keyword'] : vm.deliverableKey,
+          formDataKey: JSON.stringify(searchParams)
         }
         vm.loadingTable = true
         vm.$store.dispatch('searchDeliverables', filter).then(function (result) {
-          vm.hosoDatasTotal = result['hits']['total']
-          vm.hosoDatas = result['hits']['hits']
+          vm.hosoDatasTotal = result.hasOwnProperty('hits') ? result['hits']['total'] : 0
+          vm.hosoDatas = result.hasOwnProperty('hits') ? result['hits']['hits'] : []
           vm.loadingTable = false
         }).catch(function (reject) {
           vm.loadingTable = false
+          vm.hosoDatasTotal = 0
+          vm.hosoDatas = []
           console.log(reject)
         })
       },
@@ -704,6 +873,19 @@
           })
         }
       },
+      deleteDeliverable (item) {
+        let vm = this
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        axios.delete('/o/rest/deliverables', param).then(function () {
+          resolve({status: true})
+        }).catch(function (xhr) {
+          
+        })
+      },
       getState (item) {
         let currentDate = (new Date()).getTime()
         let expireDate = Number(item['expireDate'])
@@ -730,7 +912,22 @@
         }
         let roleExits = roles.findIndex(item => String(item).indexOf(roleItem) >= 0)
         return (roleExits >= 0)
-      }
+      },
+      changeIssueDate () {
+        let vm = this
+        vm.menuDate = false
+        vm.issueDate = vm.formatDate(vm.issueDatePiecker)
+      },
+      formatDate(date) {
+        if (!date) return null
+        const [year, month, day] = date.split('-')
+        return `${day}/${month}/${year}`
+      },
+      parseDate(date) {
+        if (!date) return null
+        const [day, month, year] = date.split('/')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      },
     }
   }
 </script>

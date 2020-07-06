@@ -384,7 +384,9 @@
     methods: {
       genAllAlpacaForm (dossierFiles, createFiles) {
         var vm = this
-        if (dossierFiles.length > 0) {
+        if (dossierFiles.length > 0 && dossierFiles.filter(file => {
+          return file.eForm && file.size
+        }).length > 0) {
           var dossierFilesEform = dossierFiles.filter(file => {
             return file.eForm
           })
@@ -469,7 +471,7 @@
           }
           /* eslint-disable */
           if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
-            console.log('eformEmbed', eformScript)
+            console.log('eformEmbed', item)
             item.embed = true
             vm.active = false
             vm.active = true
@@ -481,10 +483,16 @@
             let templateNo = item.partNo
             let deliverableType = item.deliverableType ? item.deliverableType : ''
 
-            let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '___' + deliverableType + '?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+            let token = localStorage.getItem('jwt_token')
+
+            let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
             console.log('urlEmbed', urlEmbed)
             setTimeout(function () {
-              document.getElementById('formAlpaca' + item.partNo + vm.id + 'embed').src = urlEmbed
+              document.getElementById('formAlpaca' + item.partNo + vm.id + 'embed').src = ''
+              setTimeout(function () {
+                document.getElementById('formAlpaca' + item.partNo + vm.id + 'embed').src = urlEmbed
+              }, 50)
+              
             }, 300)
           } else {
             item.embed = false
@@ -527,7 +535,7 @@
             }
             /* eslint-disable */
             if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
-              console.log('eformEmbed', eformScript)
+              console.log('eformEmbed2', item)
               item.embed = true
               vm.active = false
               vm.active = true
@@ -539,7 +547,9 @@
               let templateNo = item.partNo
               let deliverableType = item.deliverableType ? item.deliverableType : ''
 
-              let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '___' + deliverableType + '?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+              let token = localStorage.getItem('jwt_token')
+
+              let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
               console.log('urlEmbed', urlEmbed)
               setTimeout(function () {
                 document.getElementById('formAlpaca' + item.partNo + vm.id + 'embed').src = urlEmbed
@@ -666,11 +676,15 @@
             return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm && itemFile.fileSize!==0
           })
           if (fileFind) {
+            let index = vm.createFiles.findIndex(item => item.partNo === dataOutPut.tp)
             fileFind['dossierId'] = vm.detailDossier.dossierId
             vm.$store.dispatch('putAlpacaFormCallBack', fileFind).then(resData => {
               setTimeout(function () {
                 toastr.clear()
                 toastr.success('Thực hiện thành công')
+                // gen lại sau cập nhật
+                vm.createFiles[index].daKhai = true
+                vm.showAlpacaJSFORM(vm.createFiles[index])
               }, 3000)
               vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
                 vm.dossierFilesItems = resFiles
@@ -689,6 +703,9 @@
                 toastr.clear()
                 toastr.success('Thực hiện thành công')
                 vm.createFiles[index].daKhai = true
+                // gen lại sau cập nhật
+                vm.createFiles[index].daKhai = true
+                vm.showAlpacaJSFORM(vm.createFiles[index])
               }, 3000)
               vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
                 vm.dossierFilesItems = resFiles
@@ -777,32 +794,42 @@
         }, 300)
         //
         var fileFind = vm.dossierFilesItems.find(itemFile => {
-          return itemFile.dossierPartNo === data.partNo && itemFile.eForm && itemFile.fileSize !== 0
+          return itemFile.dossierPartNo === data.partNo && itemFile.eForm
         })
         if (fileFind) {
-          fileFind['id'] = vm.id
-          // vm.$store.dispatch('loadAlpcaForm', fileFind)
-          // preview PDF
-          data['editForm'] = false
-          // 
-          let indexFile = ''
-          for (let i = 0; i < vm.dossierFilesItems.length; i++) {
-            if (vm.dossierFilesItems[i]['dossierPartNo'] === data['partNo'] && vm.dossierFilesItems[i]['eForm']) {
-              indexFile = i
-              break
+          if (fileFind.fileSize) {
+            fileFind['id'] = vm.id
+            // vm.$store.dispatch('loadAlpcaForm', fileFind)
+            // preview PDF
+            data['editForm'] = false
+            // 
+            let indexFile = ''
+            for (let i = 0; i < vm.dossierFilesItems.length; i++) {
+              if (vm.dossierFilesItems[i]['dossierPartNo'] === data['partNo'] && vm.dossierFilesItems[i]['eForm']) {
+                indexFile = i
+                break
+              }
             }
-          }
-          // 
-          console.log('capnhat eform', vm.dossierFilesItems[indexFile])
-          if (!vm.dossierFilesItems[indexFile]['isSigned']) {
-            vm.$store.dispatch('viewFile', fileFind).then(result => {
-              document.getElementById('displayPDF' + fileFind.dossierPartNo + vm.id).src = result
-            })
+            // 
+            console.log('capnhat eform', vm.dossierFilesItems[indexFile])
+            if (!vm.dossierFilesItems[indexFile]['isSigned']) {
+              vm.$store.dispatch('viewFile', fileFind).then(result => {
+                document.getElementById('displayPDF' + fileFind.dossierPartNo + vm.id).src = result
+              })
+            } else {
+              setTimeout(function () {
+                document.getElementById('displayPDF' + data.partNo + vm.id).src = vm.dossierFilesItems[indexFile].pdfSigned
+              }, 200)
+            }
           } else {
-            setTimeout(function () {
-              document.getElementById('displayPDF' + data.partNo + vm.id).src = vm.dossierFilesItems[indexFile].pdfSigned
-            }, 200)
+            vm.createFiles.forEach(val => {
+              if (val.eForm && data.partNo === val.partNo) {
+                val['templateNo'] = vm.detailDossier.dossierTemplateNo
+                vm.showAlpacaJSFORM(val)
+              }
+            })
           }
+
         } else {
           vm.createFiles.forEach(val => {
             if (val.eForm && data.partNo === val.partNo) {
@@ -830,7 +857,7 @@
         }
         /* eslint-disable */
         if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
-          console.log('eformEmbed', eformScript)
+          console.log('eformEmbed3', item)
           vm.createFiles[index].embed = true
           let userId = window.themeDisplay.getUserId()
           let userEmail = vm.originality === 1 ? vm.userLoginInfomation.applicantContactEmail : vm.userLoginInfomation.employeeEmail
@@ -840,7 +867,9 @@
           let templateNo = item.partNo
           let deliverableType = item.deliverableType ? item.deliverableType : ''
 
-          let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '___' + deliverableType + '?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+          let token = localStorage.getItem('jwt_token')
+
+          let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
 
           setTimeout(function () {
             document.getElementById('formAlpaca' + item.partNo + vm.id + 'embed').src = urlEmbed

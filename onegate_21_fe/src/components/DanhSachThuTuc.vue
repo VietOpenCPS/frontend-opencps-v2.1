@@ -686,6 +686,7 @@
                     j_captcha_response: ''
                   }
                   if (!vm.isOffLine) {
+                    vm.trackingBTTT(resServiceInfo.serviceCode)
                     vm.$store.dispatch('postDossier', data).then(function (result) {
                       vm.loadingAction = false
                       vm.indexAction = -1
@@ -738,6 +739,7 @@
             j_captcha_response: ''
           }
           if (!vm.isOffLine) {
+            vm.trackingBTTT(resServiceInfo.serviceCode)
             vm.$store.dispatch('postDossier', data).then(function (result) {
               vm.loadingAction = false
               vm.indexAction = -1
@@ -758,6 +760,7 @@
         vm.$store.dispatch('getServiceInfo', {
           serviceInfoId: vm.serviceInfoIdSelect
         }).then(resServiceInfo => {
+          vm.trackingBTTT(resServiceInfo.serviceCode)
           let data = {
             serviceCode: resServiceInfo.serviceCode,
             govAgencyCode: govAgencyCode,
@@ -788,6 +791,7 @@
         if (vm.serviceConfigSelect.serviceUrl) {
           window.location.href = vm.serviceConfigSelect
         } else {
+          vm.trackingBTTT(data.serviceCode)
           vm.$store.dispatch('postDossier', data).then(function (result) {
             if (result['status'] !== undefined && result['status'] === 203) {
               vm.loadingAction = false
@@ -807,6 +811,15 @@
             toastr.error('Nộp hồ sơ không thành công')
             vm.$refs.captcha.makeImageCap()
           })
+        }
+      },
+      trackingBTTT (serviceCode) {
+        try {
+          console.log('trackDVC serviceCode', serviceCode)
+          if (_govaq) {
+            _govaq.push(['trackDVC', serviceCode, '1', ''])
+          }
+        } catch (error) { 
         }
       },
       getColor (level) {

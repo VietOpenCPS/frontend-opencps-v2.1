@@ -49,6 +49,7 @@
                 required
                 prepend-inner-icon="person_outline"
                 @keyup.enter="submitConfirmLogin"
+                autofocus
               ></v-text-field>
             </v-flex>
             <v-flex xs12 class="">
@@ -80,7 +81,7 @@
                 </div>
               </v-flex>
             </v-layout>
-            <v-flex v-if="captcha" class="py-2 text-xs-center" xs12 style="
+            <v-flex v-if="captcha" class="py-2 text-xs-center captcha-element" xs12 style="
               align-items: center;
               background: #dedede;
               justify-content: center;
@@ -277,12 +278,25 @@ export default {
       }
       if (vm.$refs.form.validate()) {
         vm.$store.dispatch('goToDangNhap', filter).then(function (result) {
+          console.log('goToDangNhap', result)
           if (vm.mapping && result === 'success') {
             vm.doMappingDvcqg()
           }
           if (result === 'captcha') {
             vm.captcha = true
             vm.makeImageCap()
+          }
+          if (result === 'changeSecrect') {
+            window.location.href = window.themeDisplay ? window.themeDisplay.getLayoutURL() + '/#/thay-doi-mat-khau' : ''
+          }
+          if (result === 'verify') {
+            let applicantId = ''
+            if ( typeof(Storage) !== 'undefined') {
+              applicantId = sessionStorage.getItem('applicantId')
+            }
+            vm.$router.push({
+              path: '/xac-thuc-tai-khoan?active_user_id=' + applicantId
+            })
           }
         })
       }

@@ -3,6 +3,9 @@
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="10" />
     </content-placeholders>
+    <div class="text-xs-center" v-if="detailActive">
+      <h4 class="py-2" style="color:#065694;font-size: 1.2em !important;">ĐÁNH GIÁ MỨC ĐỘ HÀI LÒNG</h4>
+    </div>
     <chi-tiet-danh-gia v-if="detailActive" :administration="govAgencySelected"></chi-tiet-danh-gia>
   </div>
 </template>

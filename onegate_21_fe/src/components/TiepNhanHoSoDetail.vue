@@ -8,7 +8,7 @@
             <span v-else-if="formCode === 'COPY'">SAO CHÉP HỒ SƠ</span>
             <span v-else-if="isOffLine">NỘP HỒ SƠ TRỰC TUYẾN</span>
             <span v-else-if="formCode === 'NEW_GROUP'">THÊM NHÓM HỒ SƠ</span>
-            <span v-else-if="formCode === 'NEW_GROUP_CV'">THÊM MỚI CÔNG VĂN</span>
+            <span v-else-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'">THÊM MỚI CÔNG VĂN</span>
             <span v-else>THÊM MỚI HỒ SƠ</span> 
           </div>
           <div class="layout row wrap header_tools row-blue">
@@ -24,7 +24,7 @@
           </div> 
         </div>
 
-        <div v-if="formCode !== 'NEW_GROUP_CV'">
+        <div v-if="formCode !== 'NEW_GROUP_CV' && formCode !== 'NEW_GROUP_CV_DI'">
           <div :style="!isNotarization ? 'position: relative' : 'display: none'" v-if="originality !== 1 && formCode !== 'NEW_GROUP'">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content>
@@ -48,7 +48,8 @@
             </v-expansion-panel>
           </div>
           <!--  -->
-          <thong-tin-chu-ho-so ref="thongtinchuhoso" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="isNotarization ? true : false"></thong-tin-chu-ho-so>
+          <thong-tin-chu-ho-so v-if="!mauCongVan" ref="thongtinchuhoso" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="isNotarization ? true : false"></thong-tin-chu-ho-so>
+          <thong-tin-chu-ho-so-cong-van v-if="mauCongVan" ref="thongtinchuhosocongvan"></thong-tin-chu-ho-so-cong-van>
           <!--  -->
           <div v-if="!isNotarization">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -103,7 +104,7 @@
                   <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
                   <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
                 </div>
-                <thanh-phan-ho-so ref="thanhphanhoso" :formCodeInput="formCode"  :onlyView="formCode === 'NEW_GROUP' ? true : false" :id="'nm'" :partTypes="formCode === 'NEW_GROUP' ? inputTypesGroup : inputTypes"></thanh-phan-ho-so>
+                <thanh-phan-ho-so ref="thanhphanhoso" :formCodeInput="formCode"  :onlyView="formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'? true : false" :id="'nm'" :partTypes="formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI' ? inputTypesGroup : inputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
@@ -198,17 +199,17 @@
         
         </div>
 
-        <div v-if="formCode === 'NEW_GROUP_CV'">
+        <div v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'">
           <div>
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content>
-                <thong-tin-cong-van ref="thongtincongvan"></thong-tin-cong-van>
+                <thong-tin-cong-van ref="thongtincongvan" :detailDossier="thongTinChiTietHoSo" :tphs="tphsCV" :formCodeInput="formCode"></thong-tin-cong-van>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
         </div>
         
-        <v-tabs v-if="formCode !== 'NEW_GROUP_CV'" icons-and-text centered class="mb-4">
+        <v-tabs v-if="formCode !== 'NEW_GROUP_CV' && formCode !== 'NEW_GROUP_CV_DI'" icons-and-text centered class="mb-4">
           <v-tabs-slider color="primary"></v-tabs-slider>
           <!-- <v-tab href="#tab-1" @click="luuHoSo">
             <v-btn flat class="px-0 py-0 mx-0 my-0">
@@ -268,7 +269,7 @@
             </v-btn>
           </v-tab>
         </v-tabs>
-        <v-tabs v-if="formCode === 'NEW_GROUP_CV'" icons-and-text centered class="mb-4">
+        <v-tabs v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" icons-and-text centered class="mb-4">
           <v-tab href="#tab-1" @click="tiepNhanCongVan()" class="px-0 py-0"> 
             <v-btn flat class="" 
               :loading="loadingAction"
@@ -654,6 +655,7 @@ import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
 import DichVuChuyenPhatHoSo from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatHoSo.vue'
 import ThongTinCongVan from './TiepNhan/TiepNhanHoSo_ThongTinCongVan.vue'
+import ThongTinChuHoSoCongVan from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSoCongVan.vue'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -662,6 +664,7 @@ export default {
   props: ['index', 'id', 'formCode'],
   components: {
     'thong-tin-chu-ho-so': ThongTinChuHoSo,
+    'thong-tin-chu-ho-so-cong-van': ThongTinChuHoSoCongVan,
     'thanh-phan-ho-so': ThanhPhanHoSo,
     'tai-lieu-chung-thuc': TaiLieuChungThuc,
     'thong-tin-chung': ThongTinChung,
@@ -697,6 +700,7 @@ export default {
     dueDateEdit: '',
     viaPortalDetail: 0,
     showThuPhi: false,
+    // inputTypes: [1, 3],
     inputTypes: [1, 3, 6],
     inputTypesGroup: [6],
     outputTypes: [2],
@@ -704,7 +708,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: false,
+    notifyConfig: true,
     fromViaPostal: false,
     fromViaPostalConfig: false,
     smsNotify: true,
@@ -744,7 +748,9 @@ export default {
     tiltleDialog: '',
     requiredConfigData: false,
     templateDescription : '',
-    actionDetail: ''
+    actionDetail: '',
+    mauCongVan: '',
+    tphsCV: ''
   }),
   computed: {
     loading () {
@@ -816,7 +822,7 @@ export default {
       vm.isMobile = isMobile
     },
     initData: function (data) {
-      var vm = this
+      let vm = this
       let currentQuery = vm.$router.history.current.query
       let filter = {
         dossierTemplateNo: currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
@@ -828,7 +834,9 @@ export default {
         }
         vm.templateName = result['templateName']
         vm.templateDescription = result['description']
-        if (result['newFormScript']) {
+        vm.tphsCV = result['dossierParts']
+        vm.mauCongVan = result['newFormScript'] && result['newFormScript'].startsWith('MAU_CV_') ? result['newFormScript'] : false 
+        if (result['newFormScript'] && !vm.mauCongVan) {
           vm.data_form_template = eval("( " + result['newFormScript'] + " ) ")
           // console.log('data_form_template', vm.data_form_template)
           vm.formTemplate = 'version_2.0'
@@ -932,7 +940,13 @@ export default {
               }
             }
             vm.thongTinChiTietHoSo = result
-            vm.$refs.thongtinchuhoso.initData(result)
+            if (!vm.mauCongVan) {
+              vm.$refs.thongtinchuhoso.initData(result)
+            }
+            if (vm.formCode === 'UPDATE' && vm.mauCongVan) {
+              vm.$refs.thongtinchuhosocongvan.initData(result)
+            }
+            
             vm.viaPortalDetail = result.viaPostal
             if (result.viaPostal > 0) {
               let vnpostalProfile = {
@@ -976,7 +990,9 @@ export default {
 
               } else {
                 vm.isNotarization = false
-                vm.$refs.thanhphanhoso.initData(result)
+                if (!vm.mauCongVan || vm.formCode === 'UPDATE') {
+                  vm.$refs.thanhphanhoso.initData(result)
+                }
               }
             })
           }).catch(reject => {
@@ -1095,18 +1111,17 @@ export default {
       }
     },
     tiepNhanHoSo (type) {
-      var vm = this
+      let vm = this
       // console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
-      var thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
-      let thongtinchuhoso = this.$refs.thongtinchuhoso.getThongTinChuHoSo()
-      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.getThongTinNguoiNopHoSo()
+      let thongtinchunghoso = this.$refs.thongtinchunghoso ? this.$refs.thongtinchunghoso.getthongtinchunghoso() : {}
+      let thongtinchuhoso = this.$refs.thongtinchuhoso ? this.$refs.thongtinchuhoso.getThongTinChuHoSo() : {}
+      let thongtinnguoinophoso = this.$refs.thongtinchuhoso ? this.$refs.thongtinchuhoso.getThongTinNguoiNopHoSo() : []
       let thanhphanhoso = this.$refs.thanhphanhoso ? this.$refs.thanhphanhoso.dossierTemplateItems : ''
-      // let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
       let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
-      // console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
-      let validThongtinchuhoso = vm.$refs.thongtinchuhoso.showValid()
-      if (validThongtinchuhoso['validForm']) {
+      let validThongtinchuhoso = vm.$refs.thongtinchuhoso ? vm.$refs.thongtinchuhoso.showValid() : {validForm: true, validApplicant: true}
+      let thongtinchuhosocongvan = vm.$refs.thongtinchuhosocongvan ? vm.$refs.thongtinchuhosocongvan.getThongTinChuHoSo() : {validation: true}
+      if (validThongtinchuhoso['validForm'] && thongtinchuhosocongvan['validation']) {
         let passValid = false
         if (!validThongtinchuhoso['validApplicant']) {
           let x = confirm(validThongtinchuhoso['message'] + ' Bạn có muốn tiếp tục?')
@@ -1137,18 +1152,23 @@ export default {
               }
             })
           }
-          var tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
+          let tempData = ''
+          if (!vm.mauCongVan) {
+            tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
+            
+          } else {
+            tempData = Object.assign(thongtinchuhosocongvan, dichvuchuyenphatketqua, thongtinchunghoso)
+          }
           tempData['dossierId'] = vm.dossierId
           tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
           tempData['dossierName'] = vm.briefNote
           tempData['originality'] = vm.originality
           tempData['fromViaPostal'] = vm.fromViaPostal ? 1 : 0
-          // console.log('data put dossier -->', tempData)
+
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             vm.loadingAction = false
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             if (vm.formCode === 'UPDATE') {
-              // vm.goBack()
               window.history.back()
             } else {
               var initData = vm.$store.getters.loadingInitData
@@ -1238,23 +1258,36 @@ export default {
         toastr.error('Vui lòng điền đầy đủ thông tin bắt buộc')
       }
     },
-    tiepNhanCongVan (type) {
+    tiepNhanCongVan () {
       let vm = this
       vm.loadingAction = true
       let thongtincongvan = this.$refs.thongtincongvan.getThongTinCongVan()
       let tempData = thongtincongvan
+      tempData.dueDate = vm.dateTimeView(thongtincongvan.dueDate)
       console.log('data put congvan -->', tempData)
-      vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
-        vm.loadingAction = false
-        vm.$router.push({
-          path: '/danh-sach-ho-so/0/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,
-          query: vm.$router.history.current.query
+      if (thongtincongvan.validation) {
+        vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
+          let dataMetaData = {
+            id: vm.dossierId,
+            data: thongtincongvan.metaData
+          }
+          vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
+          vm.loadingAction = false
+          vm.$router.push({
+            path: '/danh-sach-ho-so/0/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,
+            query: vm.$router.history.current.query
+          })
+        }).catch(rejectXhr => {
+          vm.loadingAction = false
+          toastr.clear()
+          toastr.error('Yêu cầu của bạn thực hiện thất bại')
         })
-      }).catch(rejectXhr => {
+      } else {
         vm.loadingAction = false
         toastr.clear()
-        toastr.error('Yêu cầu của bạn thực hiện thất bại')
-      })
+        toastr.error('Vui lòng điền đầy đủ các thông tin bắt buộc')
+      }
+      
     },
     boSungHoSo () {
       var vm = this
@@ -1598,6 +1631,14 @@ export default {
         return ''
       } else {
         return (new Date(day2)).getTime()
+      }
+    },
+    dateTimeView (arg) {
+      if (arg) {
+        let value = new Date(arg)
+        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} | ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+      } else {
+        return ''
       }
     },
     goBack () {

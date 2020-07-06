@@ -121,10 +121,18 @@
                     <span v-else>Tạo tờ khai</span>
                   </v-btn>
                   <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
                     @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                   >
                     Hướng dẫn
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" 
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
+                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                  >
+                    Tạo tờ khai
                   </v-btn>
                 </v-card>
               </v-tab-item>
@@ -170,10 +178,18 @@
                     <span v-else>Tạo tờ khai</span>
                   </v-btn>
                   <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
                     @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                   >
                     Hướng dẫn
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" 
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
+                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                  >
+                    Tạo tờ khai
                   </v-btn>
                 </v-card>
               </v-tab-item>
@@ -228,10 +244,18 @@
                     <span v-if="formToKhai">Tạo tờ khai</span>
                   </v-btn>
                   <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
                     @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                   >
                     Hướng dẫn
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" 
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
+                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                  >
+                    Tạo tờ khai
                   </v-btn>
                 </v-card>
               </v-tab-item>
@@ -276,10 +300,18 @@
                     <span v-if="formToKhai">Tạo tờ khai</span>
                   </v-btn>
                   <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                    && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
                     @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                   >
                     Hướng dẫn
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" 
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                    && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
+                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                  >
+                    Tạo tờ khai
                   </v-btn>
                 </v-card>
               </v-tab-item>
@@ -421,10 +453,18 @@
                     <span v-if="formToKhai">Tạo tờ khai</span>
                   </v-btn>
                   <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
                     @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                   >
                     Xem hướng dẫn
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" 
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
+                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                  >
+                    Tạo tờ khai
                   </v-btn>
                 </v-card>
               </v-tab-item>
@@ -469,10 +509,18 @@
                     <span v-if="formToKhai">Tạo tờ khai</span>
                   </v-btn>
                   <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                    && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
                     @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                   >
                     Xem hướng dẫn
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" 
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                    && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
+                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                  >
+                    Tạo tờ khai
                   </v-btn>
                 </v-card>
               </v-tab-item>
@@ -527,10 +575,18 @@
                     <span v-if="formToKhai">Tạo tờ khai</span>
                   </v-btn>
                   <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                    && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
                     @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                   >
                     Xem hướng dẫn
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" 
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                    && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
+                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                  >
+                    Tạo tờ khai
                   </v-btn>
                 </v-card>
               </v-tab-item>
@@ -575,10 +631,18 @@
                     <span v-if="formToKhai">Tạo tờ khai</span>
                   </v-btn>
                   <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                    && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
                     @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                   >
                     Xem hướng dẫn
+                  </v-btn>
+                  <v-btn small color="primary" class="mx-2 my-2" 
+                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
+                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                  >
+                    Tạo tờ khai
                   </v-btn>
                 </v-card>
               </v-tab-item>
@@ -988,6 +1052,7 @@ export default {
             }
           }
         } else {
+          vm.trackingBTTT(vm.serviceDetail.serviceCode)
           let filterSearch = {
             serviceInfoId: vm.serviceDetail.serviceInfoId
           }
@@ -1102,6 +1167,7 @@ export default {
       var vm = this
       vm.serviceConfigDetail = item
       vm.dialogGuide = true
+      vm.trackingBTTT(vm.serviceDetail.serviceCode)
     },
     downloadFileTemplate (item) {
       var vm = this
@@ -1297,6 +1363,15 @@ export default {
         return 'orange'
       } else if (level === 4) {
         return 'red'
+      }
+    },
+    trackingBTTT (serviceCode) {
+      try {
+        console.log('trackDVC serviceCode', serviceCode)
+        if (_govaq) {
+          _govaq.push(['trackDVC', serviceCode, '1', ''])
+        }
+      } catch (error) { 
       }
     }
   }

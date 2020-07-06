@@ -253,17 +253,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- <v-dialog v-model="dialogPending" max-width="350">
-      <v-card>
-        <v-card-text class="text-xs-center" style="background-color: #00204a;position: relative;color:white">
-          <span>ĐĂNG KÝ TÀI KHOẢN THÀNH CÔNG</span><br>
-          <span>VUI LÒNG CHỜ QUẢN TRỊ VIÊN XÁC NHẬN</span>
-          <v-btn icon dark @click.native="dialogPending = false" style="position: absolute;right:0;top:0">
-            <v-icon>close</v-icon>
-          </v-btn>
-        </v-card-text>
-      </v-card>
-    </v-dialog> -->
   </div>
 </template>
 

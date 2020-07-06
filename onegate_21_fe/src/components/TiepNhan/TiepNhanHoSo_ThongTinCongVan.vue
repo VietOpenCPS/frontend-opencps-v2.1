@@ -60,7 +60,7 @@
                           @blur="documentDate = parseDate(dateFormated)"
                         >
                         </v-text-field>
-                        <v-date-picker :min="getMindate()" ref="picker" locale="vi"
+                        <v-date-picker ref="picker" locale="vi"
                         :first-day-of-week="1" v-model="documentDate" no-title @input="menuDate = false"></v-date-picker>
                       </v-menu>
                     </v-flex>
@@ -69,21 +69,18 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Đơn vị gửi công văn<span style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Số lượng hồ sơ đề nghị xét<span style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-autocomplete
+                      <v-text-field
                       v-else
-                      :items="govAgencySubmitList"
-                      item-text="govAgencyName"
-                      item-value="govAgencyCode"
-                      v-model="agencySubmit"
+                      v-model="thongTinCongVan.sampleCount"
                       :rules="[rules.required]"
                       required
-                      ></v-autocomplete>
+                      ></v-text-field>
                     </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
@@ -127,6 +124,32 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
+                      <v-subheader v-else class="pl-0">
+                        <span v-if="formCodeInput === 'NEW_GROUP_CV'">Đơn vị gửi công văn </span>
+                        <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'">Đơn vị nhận công văn </span> 
+                        <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'" style="color:red">&nbsp;*</span>: 
+                      </v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm10 class="mb-2">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-autocomplete
+                      v-else
+                      :items="govAgencySubmitList"
+                      item-text="itemName"
+                      item-value="itemCode"
+                      v-model="donvi_gui_nhan"
+                      :rules="formCodeInput === 'NEW_GROUP_CV_DI' ? [rules.required] : []"
+                      :required="formCodeInput === 'NEW_GROUP_CV_DI'"
+                      ></v-autocomplete>
+                    </v-flex>
+
+                    <!--  -->
+                    <v-flex xs12 sm2 class="mb-2">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
                       <v-subheader v-else class="pl-0">Nội dung tóm tắt <span style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm10 class="mb-2">
@@ -141,24 +164,7 @@
                       required
                       ></v-textarea>
                     </v-flex>
-                    <!--  -->
-                    <v-flex xs12 sm2 class="mb-2">
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-subheader v-else class="pl-0">Số lượng hồ sơ đề nghị xét<span style="color:red">&nbsp;*</span>: </v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm10 class="mb-2">
-                      <content-placeholders class="mt-1" v-if="loading">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
-                      <v-text-field
-                      v-else
-                      v-model="thongTinCongVan.sampleCount"
-                      :rules="[rules.required]"
-                      required
-                      ></v-text-field>
-                    </v-flex>
+                    
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
@@ -174,7 +180,7 @@
                       v-else
                       v-model="thongTinCongVan.contactTelNo"
                       append-icon="phone"
-                      :rules="thongTinCongVan.contactEmail ? [rules.telNo] : ''"
+                      :rules="thongTinCongVan.contactTelNo ? [rules.telNo] : ''"
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 class="mb-2">
@@ -193,6 +199,32 @@
                       :rules="thongTinCongVan.contactEmail ? [rules.email] : ''"
                       ></v-text-field>
                     </v-flex>
+
+                    <v-flex xs12 class="mt-2">
+                      <div class="mb-2"> <span style="color:red">(*) &nbsp;</span>Tài liệu đính kèm: <i v-if="dossierFilesItems.length === 0">(Chưa có tài liệu đính kèm)</i></div>
+                      <div v-for="(itemFileView, index) in dossierFilesItems" :key="index">
+                        <div v-if="!itemFileView.eForm">
+                          <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
+                            <v-icon class="mr-1" v-if="itemFileView.fileSize !== 0" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
+                              :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
+                              {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
+                            </v-icon>
+                            {{itemFileView.displayName}} - 
+                            <i>{{itemFileView.modifiedDate}}</i>
+                          </span>
+                          <v-btn icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView && checkInput !== 1">
+                            <v-icon style="color: red">delete_outline</v-icon>
+                          </v-btn>
+                        </div>
+                      </div>
+
+                      <input type="file" id="documentFile" @input="onUploadSingleFile($event)" style="display:none">
+                      <v-btn small color="primary" class="mx-0 mt-3" dark @click.native="uploadFile">
+                        <v-icon>fas fa fa-upload</v-icon> &nbsp; &nbsp;
+                        Chọn tài liệu tải lên
+                      </v-btn>
+                      
+                    </v-flex>
                   </v-layout>
                 </v-card-text>
               </v-card>
@@ -201,6 +233,34 @@
         </div>
       </div>
     </v-form>
+    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>
+            <span>Tài liệu đính kèm</span>
+          </v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPDF = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <div v-if="dialogPDFLoading" style="
+            min-height: 600px;
+            text-align: center;
+            margin: auto;
+            padding: 25%;
+        ">
+          <v-progress-circular
+            :size="100"
+            :width="1"
+            color="primary"
+            indeterminate
+          ></v-progress-circular>
+        </div>
+        <iframe v-show="!dialogPDFLoading" id="dialogPDFPreviewCV" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -218,12 +278,15 @@ export default {
     'suggestions': Suggestions,
     'tiny-pagination': TinyPagination
   },
-  props: ['formCode'],
+  props: ['formCodeInput', 'detailDossier', 'tphs'],
   data: () => ({
     loading: false,
+    dialogPDFLoading: false,
+    dialogPDF: false,
     valid_thongtincongvan: true,
     thongTinCongVan: '',
-    documentNo: '',
+    donvi_gui_nhan: '',
+    dossierFilesItems: '',
     menuDate: false,
     menuDueDate: false,
     documentDate: null,
@@ -250,17 +313,21 @@ export default {
         const pattern = /^([0-9]{0,})$/
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       }
-    }
+    },
+    
   }),
   computed: {
     originality () {
       var vm = this
-      console.log('originality', vm.getOriginality())
       return vm.getOriginality()
-    }
+    },
+    userLoginInfomation () {
+      return this.$store.getters.getUserLogin
+    },
   },
   created () {
     let vm = this
+    vm.getGovAgencyList()
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
@@ -287,17 +354,165 @@ export default {
     initData (data) {
       let vm = this
       vm.thongTinCongVan = data
+      try {
+        let metadata = JSON.parse(vm.thongTinCongVan.metaData)
+        vm.donvi_gui_nhan = vm.formCodeInput === 'NEW_GROUP_CV_DI' ? metadata.donvinhan : metadata.donvigui
+      } catch (error) {
+      }
+      
       vm.documentDate = vm.thongTinCongVan.hasOwnProperty('documentDate') ? vm.parseDate(vm.thongTinCongVan.documentDate) : ''
       vm.dueDate = vm.thongTinCongVan.hasOwnProperty('dueDate') ? vm.parseDate(vm.thongTinCongVan.dueDate) : ''
+      vm.$store.dispatch('loadDossierFiles', vm.thongTinCongVan.dossierId).then(result => {
+        vm.dossierFilesItems = result
+      })
       vm.$refs.formThongTinCongVan.resetValidation()
       console.log('thongtincongvanInput', vm.thongTinCongVan)
     },
     getThongTinCongVan () {
       let vm = this
+      let delegateFilter = vm.govAgencySubmitList.filter(function (item) {
+        return item.itemCode === vm.donvi_gui_nhan
+      })
+      let delegateName = delegateFilter.length > 0 ? delegateFilter[0]['itemName'] : ''
       vm.thongTinCongVan.dueDate = vm.parseDateToTimestamp(vm.dueDate)
       vm.thongTinCongVan.documentDate = vm.parseDateToTimestamp(vm.documentDate)
+      let metaDataDossier = ''
+      try {
+        metaDataDossier = JSON.parse(vm.thongTinCongVan.metaData)
+      } catch (error) {
+      }
+      let metaData = metaDataDossier ? metaDataDossier : {donvigui: '', donvinhan: '', tendonvigui: '', tendonvinhan: ''}
+
+      if (vm.formCodeInput === 'NEW_GROUP_CV') {
+        // vm.thongTinCongVan.delegateName = delegateName ? delegateName : ''
+        metaData.tendonvigui = delegateName
+        metaData.donvigui = vm.donvi_gui_nhan
+        metaData.donvinhan = vm.userLoginInfomation.hasOwnProperty('scope') && vm.userLoginInfomation.scope ? vm.userLoginInfomation.scope : vm.detailDossier.govAgencyCode
+      } else {
+        metaData.donvigui = vm.userLoginInfomation.hasOwnProperty('scope') && vm.userLoginInfomation.scope ? vm.userLoginInfomation.scope : vm.detailDossier.govAgencyCode
+        metaData.donvinhan = vm.donvi_gui_nhan
+        metaData.tendonvinhan = delegateName
+      }
+      vm.thongTinCongVan.metaData = metaData
+      vm.thongTinCongVan.validation = vm.$refs.formThongTinCongVan.validate()
       console.log('thongtincongvanOutput', vm.thongTinCongVan)
       return vm.thongTinCongVan
+    },
+    uploadFile () {
+      let vm = this
+      document.getElementById('documentFile').value = ''
+      document.getElementById('documentFile').click()
+    },
+    onUploadSingleFile () {
+      let vm = this
+      console.log('tphs', vm.tphs)
+      let tphsDungChung = vm.tphs.filter(function(item) {
+        return item.partType == 6
+      })[0]
+      let filter = Object.assign(vm.detailDossier, tphsDungChung)
+      vm.$store.dispatch('uploadSingleFileGroupCongVan', filter).then(function (result) {
+        vm.$store.dispatch('loadDossierFiles', filter.dossierId).then(result => {
+          vm.dossierFilesItems = result
+        })
+      })
+    },
+    deleteSingleFile (item, index) {
+      var vm = this
+      let x = confirm('Bạn có chắc chắn xóa file đính kèm ?')
+      if (x) {
+        item['dossierId'] = vm.detailDossier.dossierId
+        vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+            vm.dossierFilesItems = result
+          })
+        }).catch(reject => {
+          
+        })
+      }
+    },
+    viewFile2 (data) {
+      var vm = this
+      if (data.fileSize === 0) {
+        return
+      }
+      if (data['eForm']) {
+        vm.pdfEform = true
+      } else {
+        vm.pdfEform = false
+      }
+      if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt' || data.fileType === 'mp3' || data.fileType === 'mp4') {
+        var url = '/o/rest/v2/dossier/' + vm.detailDossier.dossierId + '/files/' + data.referenceUid
+        window.location.assign(url)
+      } else {
+        data['dossierId'] = vm.detailDossier.dossierId
+        if (data.referenceUid) {
+          vm.dialogPDFLoading = true
+          vm.dialogPDF = true
+          vm.$store.dispatch('viewFile', data).then(result => {
+            vm.dialogPDFLoading = false
+            document.getElementById('dialogPDFPreviewCV').src = result
+          })
+        } else {
+          toastr.clear()
+          toastr.error('File dữ liệu không tồn tại')
+        }
+      }
+    },
+    getGovAgencyList () {
+      let vm = this
+      let filter = {
+        collectionCode: 'DON_VI_CONG_VAN',
+        level: '',
+        parent: ''
+      }
+      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
+        vm.govAgencySubmitList = result.data
+      })
+    },
+    getDocumentTypeIcon (type) {
+      let vm = this
+      let typeDoc = 'doc,docx'
+      let typeExcel = 'xls,xlsx'
+      let typeImage = 'png,jpg,jpeg'
+      if (type) {
+        if (typeDoc.indexOf(type.toLowerCase()) >= 0) {
+          return {
+            icon: 'fas fa fa-file-word-o',
+            color: 'blue',
+            size: 14
+          }
+        } else if (typeExcel.indexOf(type.toLowerCase()) >= 0) {
+          return {
+            icon: 'fas fa fa-file-excel-o',
+            color: 'green',
+            size: 14
+          }
+        } else if (type.toLowerCase() === 'pdf') {
+          return {
+            icon: 'fa fa-file-pdf-o',
+            color: 'red',
+            size: 14
+          }
+        } else if (typeImage.indexOf(type.toLowerCase()) >= 0) {
+          return {
+            icon: 'fas fa fa-file-image-o',
+            color: 'primary',
+            size: 14
+          }
+        } else {
+          return {
+            icon: 'fas fa fa-paperclip',
+            color: '',
+            size: 14
+          }
+        }
+      } else {
+        return {
+          icon: 'attach_file',
+          color: 'primary',
+          size: 14
+        }
+      }
     },
     formatDate (date) {
       if (!date) return null

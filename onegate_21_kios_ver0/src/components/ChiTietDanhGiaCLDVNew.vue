@@ -1,11 +1,11 @@
 <template>
   <div class="py-0 kios-item" :class="!isMobile ? 'px-2 mt-3' : ''">
-    <div v-if="!isMobile" class="d-inline-block" style="position:absolute;top:0;right:50px">
+    <!-- <div v-if="!isMobile" class="d-inline-block" style="position:absolute;top:0;right:50px">
       <qrcode :value="urlQR" :options="{ width: 150 }"></qrcode><br>
       <v-chip class="my-0 ml-2" color="primary" text-color="white" style="width:135px;margin-top:-25px !important">
         <v-icon left class="mr-1 pl-1">center_focus_strong</v-icon> <span style="font-size:13px !important">Quét để đánh giá</span>
       </v-chip>
-    </div>
+    </div> -->
     <div class="wrap-scroll py-2" :class="!isMobile && votingItems.length > 2 ? 'wrap-scroll-votting' : ''">
       <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" :class="visible ? 'overlayActive': ''">
         <div class="text-bold">
@@ -28,8 +28,8 @@
             <div style="width:110px" class="text-bold">Mã hồ sơ <span style="color:red">*</span></div>
             <div style="width:calc(100% - 110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
               <div class="input-group__input">
-                <input id="dossierIdNoKey" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập mã hồ sơ" type="text">
-                <i v-if="visible" @click="clear('dossierIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+                <input id="dossierIdNoKey" style="width:calc(100% - 40px)" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập mã hồ sơ" type="text">
+                <i v-if="visible" @click="clear('dossierIdNoKey')" style="padding: 5px;" aria-hidden="true" class="py-0 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
               </div>
               <div class="mt-1" v-if="!validPass1">
                 <div class="input-group__messages" style="color:red">Mã hồ sơ là bắt buộc!</div>
@@ -37,16 +37,31 @@
             </div>
           </v-layout>
         </v-flex>
-        <v-flex xs12 sm6 :class="!isMobile ? 'pl-3' : 'pl-0 mt-2'">
+        <!-- <v-flex xs12 sm6 :class="!isMobile ? 'pl-3' : 'pl-0 mt-2'">
           <v-layout wrap>
             <div style="width:110px" class="text-bold">Số CMND <span style="color:red">*</span></div>
             <div style="width: calc(100% - 110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
               <div class="input-group__input">
-                <input id="applicantIdNo" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
-                <i v-if="visible" @click="clear('applicantIdNo')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+                <input id="applicantIdNo" style="width:calc(100% - 40px)" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
+                <i v-if="visible" style="padding: 5px;" @click="clear('applicantIdNo')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
               </div>
               <div class="mt-1" v-if="!validPass2">
                 <div class="input-group__messages" style="color:red">Số CMND là bắt buộc!</div>
+              </div>
+            </div>
+          </v-layout>
+        </v-flex> -->
+
+        <v-flex xs12 sm6 :class="!isMobile ? 'pl-3' : 'pl-0 mt-2'">
+          <v-layout wrap>
+            <div style="width:110px" class="text-bold">Mã bí mật<span style="color:red">*</span></div>
+            <div style="width: calc(100% - 110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
+              <div class="input-group__input">
+                <input id="applicantIdNo" style="width:calc(100% - 40px)" class="kios-input" data-layout="normal" @focus="show" aria-label="Mã bí mật" placeholder="Nhấn để nhập mã bí mật" type="text">
+                <i v-if="visible" style="padding: 5px;" @click="clear('applicantIdNo')" aria-hidden="true" class="py-0 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+              </div>
+              <div class="mt-1" v-if="!validPass2">
+                <div class="input-group__messages" style="color:red">Mã bí mật là bắt buộc!</div>
               </div>
             </div>
           </v-layout>
@@ -64,9 +79,9 @@
     <v-btn v-if="!isMobile && votingItems.length > 0" class="back-btn" @click="goBack" fab color="primary">
       <v-icon dark>arrow_back</v-icon>
     </v-btn>
-    <div class="virtual-keyboard" v-if="visible && !isMobile">
+    <!-- <div class="virtual-keyboard" v-if="visible && !isMobile">
       <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -97,7 +112,8 @@ export default {
     options: {
       useKbEvents: true,
       preventClickEvent: false
-    }
+    },
+    detailDossierMC: ''
   }),
   computed: {
     isMobile () {
@@ -130,35 +146,35 @@ export default {
   methods: {
     submitVoting () {
       var vm = this
-      if (!vm.isSigned) {
-        if ($('#applicantIdNo').val() === '') {
-          vm.validPass2 = false
-        } else {
-          vm.validPass2 = true
-        }
-        if ($('#dossierIdNoKey').val() === '') {
-          vm.validPass1 = false
-        } else {
-          vm.validPass1 = true
-        }
-        if (vm.validPass1 && vm.validPass2) {
-          let filter = {
-            applicantIdNo: $('#applicantIdNo').val(),
-            dossierNo: $('#dossierIdNoKey').val()
-          }
-          vm.$store.dispatch('checkPermisionVoting', filter).then(result => {
-            if (result.hasPermission === true || result.hasPermission === 'true') {
-              vm.doResultVoting()
-            } else {
-              toastr.error('Số CMTND hoặc Số hồ sơ không chính xác')
-            }
-          }).catch(xhr => {
-            toastr.error('Lỗi hệ thống')
-          })
-        }
+
+      if ($('#applicantIdNo').val() === '') {
+        vm.validPass2 = false
       } else {
-        vm.doResultVoting()
+        vm.validPass2 = true
       }
+      if ($('#dossierIdNoKey').val() === '') {
+        vm.validPass1 = false
+      } else {
+        vm.validPass1 = true
+      }
+      if (vm.validPass1 && vm.validPass2) {
+        let filter = {
+          password: $('#applicantIdNo').val(),
+          dossierId: $('#dossierIdNoKey').val()
+        }
+        vm.$store.dispatch('getDossierDetailPass', filter).then(function (result) {
+          if (result.status && result.status.toString() === '203') {
+            toastr.error('Mã hồ sơ hoặc mã tra cứu không chính xác. Vui lòng thử lại.')
+          } else if (result.status && result.status.toString() === '200') {
+            vm.doResultVotingMC()
+          }
+        }).catch(function (reject) {
+          vm.loading = false
+          toastr.error('Lỗi hệ thống')
+        })
+
+      }
+
     },
     doResultVoting () {
       var vm = this
@@ -173,11 +189,40 @@ export default {
         Promise.all(arrAction).then(results => {
           vm.loadingAction = false
           toastr.success('Đánh giá của bạn được gửi thành công')
-          vm.$router.push({
-            path: '/danh-gia-cldv'
+
+          $('#applicantIdNo').val('')
+          $('#dossierIdNoKey').val('')
+          let filter = {
+          }
+          vm.$store.dispatch('loadVotingNew', filter).then(function (result) {
+            vm.votingItems = result
+          }).catch(function (reject) {
           })
         }).catch(xhr => {
           vm.loadingAction = false
+        })
+      }
+    },
+    doResultVotingMC () {
+      let vm = this
+      let arrAction = []
+      if (vm.votingItems.length > 0) {
+        vm.loadingAction = true
+        for (var index in vm.votingItems) {
+          vm.votingItems[index]['className'] = 'dossier'
+          vm.votingItems[index]['classPk'] = vm.detailDossierMC.dossierId
+          vm.votingItems[index]['serverCode'] = 'SERVER_' + vm.detailDossierMC['govAgencyCode']
+          arrAction.push(vm.$store.dispatch('submitVotingMC', vm.votingItems[index]))
+        }
+        Promise.all(arrAction).then(results => {
+          vm.loadingAction = false
+          vm.loadVoting()
+          toastr.clear()
+          toastr.success('Đánh giá của bạn được gửi thành công')
+        }).catch(xhr => {
+          vm.loadingAction = false
+          toastr.clear()
+          toastr.error('Gửi đánh giá không thành công')
         })
       }
     },

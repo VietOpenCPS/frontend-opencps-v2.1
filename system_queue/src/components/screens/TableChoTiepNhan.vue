@@ -10,12 +10,12 @@
       <tr>
         <td class="text-xs-center text-bold px-0" style="">
           <div>
-            <span style="font-size:24px">{{props.index + 1}}</span>
+            <span style="font-size:22px">{{props.index + 1}}</span>
           </div>
         </td>
         <td class="text-xs-center text-bold px-0" style="">
           <div>
-            <span style="font-size:32px">{{props.item['codeNumber']}}</span>
+            <span style="font-size:26px">{{props.item['codeNumber']}}</span>
           </div>
         </td>
         <!-- <td class="text-xs-left text-bold py-2" style="">

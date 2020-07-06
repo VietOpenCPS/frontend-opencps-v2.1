@@ -177,7 +177,7 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
-        <div class="absolute__btn group__thanh_phan mr-1">
+        <div class="absolute__btn group__thanh_phan mr-1" v-if="item.partType !== 6 || (item.partType === 6 && formCode === 'NEW_GROUP')">
           <content-placeholders class="mt-1" v-if="loading">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
@@ -303,7 +303,7 @@
           </v-layout>
         </div>
       </div>
-      <div v-if="!partTypes.includes(2) && originality === 3 && !partTypes.includes(6) && !partTypes.includes(7)">
+      <div v-if="originality === 3">
         <v-card flat>
           <v-card-text flat class="py-0 px-3 pl-4">
             <div v-if="!onlyView" class="my-2">
@@ -424,6 +424,10 @@ export default {
     checkInput: {
       type: Number,
       default: () => 0
+    },
+    formCode: {
+      type: String,
+      default: () => ''
     }
   },
   data: () => ({

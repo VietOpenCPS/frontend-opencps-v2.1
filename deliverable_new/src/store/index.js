@@ -265,9 +265,15 @@ export const store = new Vuex.Store({
           },
           params: {
             start: filter.page * 15 - 15,
-            end: filter.page * 15,
-            keyword: filter.keyword ? filter.keyword : ''
+            end: filter.page * 15
           }
+        }
+        if (filter.typeSearch === 'keyword') {
+          options.params.keyword = filter.keyword
+          options.params.formDataKey = ''
+        } else {
+          options.params.keyword = ''
+          options.params.formDataKey = filter.formDataKey
         }
         axios.get('/o/v1/opencps/deliverable/' + filter['type'], options).then(function (response) {
           resolve(response.data)

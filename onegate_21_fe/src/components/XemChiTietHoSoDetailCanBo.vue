@@ -72,7 +72,7 @@
           </iframe>
         </v-card>
       </v-dialog>
-      <thong-tin-co-ban-ho-so ref="thong-tin-co-ban-ho-so" :detailDossier="thongTinChiTietHoSo"></thong-tin-co-ban-ho-so>
+      <thong-tin-co-ban-ho-so ref="thong-tin-co-ban-ho-so" :detailDossier="thongTinChiTietHoSo" :mauCongVan="mauCongVan"></thong-tin-co-ban-ho-so>
       <!--  -->
       <div>
         <v-tabs icons-and-text v-model="activeTab">
@@ -988,7 +988,8 @@ export default {
     loadingForm: false,
     hasPreviewSync: false,
     isNotarization: false,
-    sequencyDossierImport: false
+    sequencyDossierImport: false,
+    mauCongVan: ''
   }),
   computed: {
     loading () {
@@ -1178,6 +1179,7 @@ export default {
       vm.activeTab2 = 'tabs-2b'
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
+        vm.loadDetailTempalte()
         vm.loadThanhToan()
         vm.loadHoSoLienThong()
         vm.getNextActions()
@@ -1222,6 +1224,15 @@ export default {
           }
         })
         
+      })
+    },
+    loadDetailTempalte () {
+      let vm = this
+      let filter = {
+        dossierTemplateNo: vm.thongTinChiTietHoSo.dossierTemplateNo
+      }
+      vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result) {
+        vm.mauCongVan = result['newFormScript'] && result['newFormScript'].startsWith('MAU_CV_') ? result['newFormScript'] : false 
       })
     },
     recountFileTemplates () {
