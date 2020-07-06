@@ -287,7 +287,8 @@ export default {
     loadingActionProcess: false,
     loadingAction: false,
     arrDossierId: [],
-    actionActiveTmp: []
+    actionActiveTmp: [],
+    gopThuPhi: true
   }),
   computed: {
     loading () {
@@ -360,6 +361,13 @@ export default {
       //   vm.btnStateVisible = true
       //   vm.getNextActions()
       // }
+      try{
+        if(typeof gopThuPhi !== 'undefined'){
+          vm.gopThuPhi = gopThuPhi
+        }
+      } catch {
+
+      }
     })
   },
   updated () {
@@ -432,7 +440,7 @@ export default {
           vm.returnFiles = result.returnFiles
         }
         // Add thu phí
-        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
+        if (vm.gopThuPhi && result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
           if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3')) {
             isPopup = true

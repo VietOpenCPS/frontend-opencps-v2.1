@@ -5,10 +5,9 @@ import Landing from '@/components/screens/Landing'
 import ThanhToan from '@/components/screens/ThanhToanThanhCong'
 import DetailForward from '@/components/blacklist/DetailForward'
 
-
 const routes = [
   { path: '/', name: 'Landing', component: Landing, props: false },
-  { path: '/thanh-toan-tuc-tuyen', name: 'ThanhToan', component: ThanhToan, props: false },
+  { path: '/thanh-toan-truc-tuyen', name: 'ThanhToan', component: ThanhToan, props: false },
   {
     path: '/danh-sach-ho-so/:index',
     name: 'Landing',

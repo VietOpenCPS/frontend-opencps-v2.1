@@ -117,6 +117,12 @@ export const store = new Vuex.Store({
             link: '/table/export/tool_export',
             code: 'export',
             text: 'Export'
+          },
+          {
+            icon: 'arrow_right',
+            link: '/table/opencps_stt/stt',
+            code: 'stt',
+            text: 'Số TT, Số theo dõi'
           }
         ]
       },
@@ -548,6 +554,52 @@ export const store = new Vuex.Store({
             }
           }
           axios.get(state.endPointApi +'/dictcollections/GOVERNMENT_AGENCY/dictitems', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
+    REGISTER_GOVAGENCY ({state}) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            }
+          }
+          axios.get(state.endPointApi +'/dictcollections/REGISTER_GOVAGENCY/dictitems', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
+    getRegisterBookList ({state}) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            }
+          }
+          axios.get(state.endPointApi +'/dictcollections/REGISTER_BOOK/dictitems', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -1921,7 +1973,47 @@ export const store = new Vuex.Store({
           })
         })
       })
-    }
+    },
+    getCounters ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            url: '/o/rest/v2/vr-app/certnumbers/counters',
+            headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+            params: filter
+        }
+          axios.request(config).then(function (result) {
+            resolve(result.data)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    postCounters ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('registerBookCode', filter.registerBookCode)
+          dataPost.append('govAgencyCode', filter.govAgencyCode)
+          dataPost.append('countNum', filter.countNum)
+          axios.post('o/rest/v2/vr-app/certnumbers/counters', dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
   },
   mutations: {
     SOCKET_ONOPEN (state, event)  {

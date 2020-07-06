@@ -178,23 +178,23 @@
             </v-card>
           </v-tab-item>
           <v-tab-item key="3" v-if="paymentInfo">
-            <v-card style="border: 1px solid #dedede;border-top: none;">
+            <v-card class="px-2 py-2" style="border: 1px solid #dedede;border-top: none;">
               <v-card-text class="px-0 py-0">
                 <v-layout wrap>
-                  <v-flex xs12 sm2>
-                    <v-subheader class="pl-0 text-right">Lệ phí: </v-subheader>
+                  <v-flex xs12 sm2 style="height: 32px;">
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;">Lệ phí: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <p class="mt-1 mb-0">{{currency(Number(paymentInfo.feeAmount))}} &nbsp;&nbsp; vnđ</p>
                   </v-flex>
-                  <v-flex xs12 sm2>
-                    <v-subheader class="pl-0 text-right">Phí: </v-subheader>
+                  <v-flex xs12 sm2 style="height: 32px;">
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;">Phí: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <p class="mt-1 mb-0">{{currency(Number(paymentInfo.serviceAmount))}} &nbsp;&nbsp; vnđ</p>
                   </v-flex>
-                  <v-flex xs12 sm2 v-if="paymentInfo.shipAmount !== 0">
-                    <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
+                  <v-flex xs12 sm2 v-if="paymentInfo.shipAmount !== 0" style="height: 32px;">
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;">Phí chuyển phát: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <p class="mt-1 mb-0" v-if="paymentInfo.shipAmount !== 0">
@@ -205,8 +205,8 @@
               </v-card-text>
               <v-card-text class="px-0 py-0">
                 <v-layout wrap>
-                  <v-flex xs12 sm2>
-                    <v-subheader class="pl-0 text-right"><span class="text-bold">Tổng: </span></v-subheader>
+                  <v-flex xs12 sm2 style="height: 32px;">
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;"><span class="text-bold">Tổng: </span></v-subheader>
                   </v-flex>
                   <v-flex xs12 sm3 style="padding-top:7px">
                     <span>{{currency(Number(paymentInfo.paymentAmount))}} &nbsp;&nbsp; vnđ</span>
@@ -221,17 +221,18 @@
                   </v-flex>
                 </v-layout>
               </v-card-text>
+              <div class="text-xs-left mt-2 mb-3 ml-0">
+                <v-chip v-if="getEPaymentProfile(paymentInfo.epaymentProfile)" color="orange" text-color="white"
+                  @click.native="toKeyPay(getEPaymentProfile(paymentInfo.epaymentProfile).keypayUrl)"
+                >
+                  <v-avatar style="cursor: pointer">
+                    <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
+                  </v-avatar>
+                  <span class="py-2" style="cursor: pointer">Thanh toán trực tuyến</span>
+                </v-chip>
+              </div>
             </v-card>
-            <div class="text-xs-left mt-2 mb-3 ml-0">
-              <v-chip v-if="getEPaymentProfile(paymentInfo.epaymentProfile)" color="orange" text-color="white"
-                @click.native="toKeyPay(getEPaymentProfile(paymentInfo.epaymentProfile).keypayUrl)"
-              >
-                <v-avatar style="cursor: pointer">
-                  <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
-                </v-avatar>
-                <span class="py-2" style="cursor: pointer">Thanh toán trực tuyến</span>
-              </v-chip>
-            </div>
+            
           </v-tab-item>
           <v-tab-item key="4" v-if="dossierDetail['dossierStatus'] === 'done'">
             <v-card style="border: 1px solid #dedede;border-top: none;">
@@ -507,13 +508,15 @@
       },
       getPaymentInfo () {
         let vm = this
+        let scr = vm.getScr(vm.dossierDetail.referenceUid)
         let filter = {
           referenceUid: vm.dossierDetail.referenceUid,
-          secretCode: vm.secretCode
+          secretCode: scr,
+          serverCode: vm.dossierDetail['govAgencyCode']
         }
         vm.$store.dispatch('loadDossierPayments', filter).then(function (result) {
           console.log(result)
-          if (result && result.paymentStatus && String(result.paymentStatus) !== '3' && String(result.paymentStatus) !== '5') {
+          if (result && result.paymentStatus && String(result.paymentStatus) === '2') {
             vm.paymentInfo = result
           }
         })
@@ -532,6 +535,13 @@
           } catch (e) {
             return ''
           }
+        } else {
+          return ''
+        }
+      },
+      getScr (id) {
+        if (typeof(Storage) !== 'undefined') {
+          return sessionStorage.getItem(id) ? sessionStorage.getItem(id) : ''
         } else {
           return ''
         }

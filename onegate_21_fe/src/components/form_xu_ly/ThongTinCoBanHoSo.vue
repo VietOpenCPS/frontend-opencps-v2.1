@@ -158,6 +158,14 @@
                 <span class="pr-2">Trạng thái: </span>
                 <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
               </div>
+              <div class="xs12 sm12 pb-1" v-if="checkSoBan(thongTinChiTietHoSo) && thongTinChiTietHoSo.dossierStatus === 'paying' && xacthuc_BNG">
+                <span class="pr-2">Số bản: </span>
+                <span class="pl-0 text-bold "> {{JSON.parse(thongTinChiTietHoSo.metaData).tongSoBan}} bản</span>
+              </div>
+              <div class="xs12 sm12 pb-1" v-if="checkTongSoTien(thongTinChiTietHoSo) && thongTinChiTietHoSo.dossierStatus === 'paying'  && xacthuc_BNG">
+                <span class="pr-2">Tổng số tiền: </span>
+                <span class="pl-0 text-bold "> {{formarMoney(JSON.parse(thongTinChiTietHoSo.metaData).tongSoTien)}}</span>
+              </div>
               <div class="xs12 sm12 pb-1" style="color:#0b72ba" 
                 v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
                 thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
@@ -243,7 +251,8 @@
       thongTinChiTietHoSo: {},
       groupDossierNo: '',
       groupDossierName: '',
-      showContactDetail: false
+      showContactDetail: false,
+      xacthuc_BNG: false
     }),
     computed: {
       loading() {
@@ -262,6 +271,13 @@
           vm.groupDossierNo = resultDossier['dossierNo']
           vm.groupDossierName = resultDossier['dossierName']
         })
+      }
+      try {
+        if (xacthuc_BNG) {
+          vm.xacthuc_BNG = true
+          
+        }
+      } catch (error) {
       }
     },
     mounted() {
@@ -302,6 +318,40 @@
         if (vm.thongTinChiTietHoSo['permission'].indexOf('write') >= 0) {
           vm.$router.push('/danh-sach-ho-so/0/nhom-ho-so/' + vm.thongTinChiTietHoSo['groupDossierId'])
         }
+      },
+      checkSoBan (thongTinChiTietHoSo) {
+        try{
+          let metaData = JSON.parse(thongTinChiTietHoSo.metaData)
+          if('tongSoBan' in metaData){
+            return true
+          } else{
+            return false
+          }
+
+        } catch (err) {
+          return false
+        }
+      },
+      checkTongSoTien (thongTinChiTietHoSo) {
+        try{
+          let metaData = JSON.parse(thongTinChiTietHoSo.metaData)
+          if('tongSoTien' in metaData){
+            return true
+          } else{
+            return false
+          }
+
+        } catch (err) {
+          return false
+        }
+      },
+      formarMoney (str){
+        let formatter = new Intl.NumberFormat('vi-VN', {
+          style: 'currency',
+          currency: 'VND',
+        });
+
+        return formatter.format(parseFloat(str))
       }
     },
     filters: {
