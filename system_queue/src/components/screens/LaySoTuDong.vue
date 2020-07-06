@@ -334,7 +334,7 @@ export default {
       let vm = this
       console.log('filter create booking', filter)
       let checkCodeNumber = filter.hasOwnProperty('codeNumber') && filter.codeNumber.split("-").length === 1
-      if (checkCodeNumber) {
+      if(filter.codeNumber && checkCodeNumber === 1){
         vm.$store.dispatch('createBooking', filter).then(function (result) {
           vm.isActive = true
           vm.checkinFail = false
@@ -377,7 +377,6 @@ export default {
         }, 3000)
         vm.eformInformation = ''
       }
-      
     },
     getBooking () {
       let vm = this

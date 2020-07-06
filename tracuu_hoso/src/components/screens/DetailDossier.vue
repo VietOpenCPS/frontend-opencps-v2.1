@@ -516,7 +516,7 @@
         }
         vm.$store.dispatch('loadDossierPayments', filter).then(function (result) {
           console.log(result)
-          if (result && result.paymentStatus && String(result.paymentStatus) !== '3' && String(result.paymentStatus) !== '5') {
+          if (result && result.paymentStatus && String(result.paymentStatus) === '2') {
             vm.paymentInfo = result
           }
         })

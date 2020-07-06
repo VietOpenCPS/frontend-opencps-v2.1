@@ -368,8 +368,45 @@ export const store = new Vuex.Store({
           dataPost.append('method', 'POST')
           dataPost.append('url', '/dossiers/' + filter.dossierId + '/actions')
           dataPost.append('data', JSON.stringify(paramsGet))
-          dataPost.append('serverCode', 'SERVER_' + data['serverCode'])
+          dataPost.append('serverCode', 'SERVER_' + filter['serverCode'])
+          console.log('dataPost',dataPost)
           axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            let serializable = result.data
+            resolve(serializable)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+
+        }).catch(function (){})
+      })
+    },
+    checkkeypay ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append("good_code", filter.good_code)
+          dataPost.append("command", filter.command)
+          dataPost.append("merchant_trans_id", filter.merchant_trans_id)
+          dataPost.append("merchant_code", filter.merchant_code)
+          dataPost.append("response_code", filter.response_code)
+          dataPost.append("trans_id", filter.trans_id)
+          dataPost.append("net_cost", filter.net_cost)
+          dataPost.append("ship_fee", filter.ship_fee)
+          dataPost.append("tax", filter.tax)
+          dataPost.append("service_code", filter.service_code)
+          dataPost.append("currency_code", filter.currency_code)
+          dataPost.append("bank_code", filter.bank_code)
+          dataPost.append("secure_hash", filter.secure_hash)
+          dataPost.append("dossierId", filter.dossierId)
+          console.log('dataPost',dataPost)
+          axios.post('o/rest/v2/dossiers/checkkeypay', dataPost, config).then(function (result) {
             let serializable = result.data
             resolve(serializable)
           }).catch(xhr => {

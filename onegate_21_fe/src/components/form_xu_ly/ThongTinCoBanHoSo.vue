@@ -115,6 +115,7 @@
                   <span class="pl-0 text-bold " v-if="thongTinChiTietHoSo.durationCount > 0"> 
                     {{durationText(thongTinChiTietHoSo.durationUnit, thongTinChiTietHoSo.durationCount)}} làm việc 
                   </span>
+<<<<<<< HEAD
                   <span class="pl-0 text-bold " v-else>
                     Không quy định
                   </span>
@@ -143,6 +144,186 @@
                   <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dueDate}}</span>
                 </div>
               </v-flex>
+=======
+                  <v-list class="px-3 py-2">
+                    <div class="xs12 sm12 py-1">
+                      <span class="pr-2">Tên người nộp:</span>
+                      <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> 
+                        {{thongTinChiTietHoSo.applicantName}}
+                      </span>
+                      <span v-else class="pl-0 text-bold "> {{thongTinChiTietHoSo.delegateName}} </span>
+                    </div>
+                    <div class="xs12 sm12 py-1">
+                      <span class="pr-2">Số CMND/ căn cước: </span>
+                      <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> 
+                        {{thongTinChiTietHoSo.applicantIdNo}}
+                      </span>
+                      <span v-else class="pl-0 text-bold "> {{thongTinChiTietHoSo.delegateIdNo}} </span>
+                    </div>
+                    <div class="xs12 sm12 py-1">
+                      <span class="pr-2">Địa chỉ:</span>
+                      <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> 
+                        {{String(thongTinChiTietHoSo.address).replace(/\./g, "")}} {{thongTinChiTietHoSo.wardName}}
+                        <span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span>
+                      </span>
+                      <span class="pl-0 text-bold" v-else> 
+                        {{String(thongTinChiTietHoSo.delegateAddress).replace(/\./g, "")}} {{thongTinChiTietHoSo.delegateWardName}}
+                        <span v-if="thongTinChiTietHoSo.delegateWardName">, {{thongTinChiTietHoSo.delegateDistrictName}}, {{thongTinChiTietHoSo.delegateCityName}}</span>
+                      </span>
+                    </div>
+                    <div class="xs12 sm12 py-1">
+                      <span class="pr-2">Thư điện tử:</span>
+                      <span class="pl-0 text-bold " v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.contactEmail}} </span>
+                      <span class="pl-0 text-bold " v-else> {{thongTinChiTietHoSo.delegateEmail}} </span>
+                    </div>
+                    <div class="xs12 sm12 py-1">
+                      <span class="pr-2">Số điện thoại:</span>
+                      <span class="pl-0 text-bold " v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.contactTelNo}} </span>
+                      <span class="pl-0 text-bold " v-else> {{thongTinChiTietHoSo.delegateTelNo}} </span>
+                    </div>
+                  </v-list>
+                </v-menu>
+              </div>
+            </v-flex>
+            <!--  -->
+            <v-flex xs12 sm4 class="pr-3" v-if="originality === 1">
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Mã hồ sơ: </span>
+                <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierNo}} </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Cơ quan: </span>
+                <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.govAgencyName}} </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Trạng thái: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
+              </div>
+            </v-flex>
+            <!--  -->
+            <v-flex xs12 sm4 v-if="originality !== 1">
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2" v-if="thongTinChiTietHoSo.online">Ngày gửi trực tuyến: </span>
+                <span class="pr-2" v-else>Ngày nộp hồ sơ: </span>
+                <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.submitDate}} </span>
+                <span class="pl-0 text-bold" v-else> {{thongTinChiTietHoSo.receiveDate}} </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Ngày tiếp nhận: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.receiveDate}}</span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Thời hạn giải quyết: </span>
+                <span class="pl-0 text-bold " v-if="thongTinChiTietHoSo.durationCount > 0"> 
+                  {{durationText(thongTinChiTietHoSo.durationUnit, thongTinChiTietHoSo.durationCount)}} làm việc 
+                </span>
+                <span class="pl-0 text-bold " v-else>
+                  Không quy định
+                </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Ngày hẹn trả: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dueDate}}</span>
+              </div>
+            </v-flex>
+            <v-flex xs12 sm4 v-else>
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2" v-if="thongTinChiTietHoSo.online">Ngày gửi trực tuyến: </span>
+                <span class="pr-2" v-else>Ngày nộp hồ sơ: </span>
+                <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.submitDate}} </span>
+                <span class="pl-0 text-bold" v-else> {{thongTinChiTietHoSo.receiveDate}} </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Ngày tiếp nhận: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.receiveDate}}</span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Ngày hẹn trả: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dueDate}}</span>
+              </div>
+            </v-flex>
+            <!--  -->
+            <v-flex xs12 sm4 v-if="originality !== 1">
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Mã hồ sơ: </span>
+                <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierNo}} </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1" v-if="thongTinChiTietHoSo.originDossierNo">
+                <span class="pr-2">Hồ sơ gốc: </span>
+                <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.originDossierNo}} </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Trạng thái: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
+              </div>
+              <div class="xs12 sm12 pb-1" v-if="checkSoBan(thongTinChiTietHoSo) && thongTinChiTietHoSo.dossierStatus === 'paying' && xacthuc_BNG">
+                <span class="pr-2">Số bản: </span>
+                <span class="pl-0 text-bold "> {{JSON.parse(thongTinChiTietHoSo.metaData).tongSoBan}} bản</span>
+              </div>
+              <div class="xs12 sm12 pb-1" v-if="checkTongSoTien(thongTinChiTietHoSo) && thongTinChiTietHoSo.dossierStatus === 'paying'  && xacthuc_BNG">
+                <span class="pr-2">Tổng số tiền: </span>
+                <span class="pl-0 text-bold "> {{formarMoney(JSON.parse(thongTinChiTietHoSo.metaData).tongSoTien)}}</span>
+              </div>
+              <div class="xs12 sm12 pb-1" style="color:#0b72ba" 
+                v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
+                thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
+                Ghi chú:
+              </div>
+              <div class="xs12 sm12 pb-1 overHidden" 
+                v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
+                thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0&&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
+                <v-tooltip top>
+                  <span slot="activator" class="text-bold ">{{thongTinChiTietHoSo.dossierNote}} </span>
+                  <span class="pl-0"> {{thongTinChiTietHoSo.dossierNote}} </span>
+                </v-tooltip>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1" v-if="thongTinChiTietHoSo['groupDossierId']">
+                <span class="pr-2">Nhóm hồ sơ: </span>
+                <span class="pl-0 text-bold" :title="thongTinChiTietHoSo['permission'].indexOf('write') >= 0 ? 'Chi tiết nhóm hồ sơ' : ''" @click="detailGroup" 
+                  :style="thongTinChiTietHoSo['permission'].indexOf('write') >= 0 ? 'cursor: pointer; color: #0072bc' : ''">
+                  {{groupDossierName}}
+                </span>
+              </div>
+              <div class="xs12 sm12 pb-1" style="color:#0b72ba" 
+                v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
+                thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
+                Ghi chú:
+              </div>
+              <!-- brief note -->
+              <!-- <div class="xs12 sm12 pb-1 overHidden">
+                <span class="pr-2">Nội dung: </span>
+                <v-tooltip top v-if="thongTinChiTietHoSo.briefNote">
+                  <span slot="activator" class="text-bold ">{{ thongTinChiTietHoSo.briefNote}}</span>
+                  <span class="pl-0">{{thongTinChiTietHoSo.briefNote}} </span>
+                </v-tooltip>
+              </div> -->
+            </v-flex>
+            <v-flex xs12 sm4 v-else>
+              <div class="xs12 sm12 pb-1" style="color:#0b72ba" 
+                v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
+                thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
+                Ghi chú:
+              </div>
+              <div class="xs12 sm12 pb-1 overHidden" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
+                <v-tooltip top>
+                  <span slot="activator" class="text-bold ">{{thongTinChiTietHoSo.dossierNote}} </span>
+                  <span class="pl-0"> {{thongTinChiTietHoSo.dossierNote}} </span>
+                </v-tooltip>
+              </div>
+              <div class="xs12 sm12 pb-1" v-if="thongTinChiTietHoSo.extendDate">
+                <span class="pl-0 text-bold">Hẹn lại: {{thongTinChiTietHoSo.extendDate}}</span>
+              </div>
+>>>>>>> opencps/bgt
               <!--  -->
               <v-flex xs12 sm4 v-if="originality !== 1">
                 <div class="xs12 sm12 pb-1">
@@ -386,7 +567,8 @@
       metaData: '',
       groupDossierNo: '',
       groupDossierName: '',
-      showContactDetail: false
+      showContactDetail: false,
+      xacthuc_BNG: false
     }),
     computed: {
       loading() {
@@ -405,6 +587,13 @@
           vm.groupDossierNo = resultDossier['dossierNo']
           vm.groupDossierName = resultDossier['dossierName']
         })
+      }
+      try {
+        if (xacthuc_BNG) {
+          vm.xacthuc_BNG = true
+          
+        }
+      } catch (error) {
       }
     },
     mounted() {
@@ -446,6 +635,7 @@
           vm.$router.push('/danh-sach-ho-so/0/nhom-ho-so/' + vm.thongTinChiTietHoSo['groupDossierId'])
         }
       },
+<<<<<<< HEAD
       currency (value) {
         if (value) {
           let moneyCur = (value / 1).toFixed(0).replace('.', ',')
@@ -453,6 +643,42 @@
         }
         return ''
       },
+=======
+      checkSoBan (thongTinChiTietHoSo) {
+        try{
+          let metaData = JSON.parse(thongTinChiTietHoSo.metaData)
+          if('tongSoBan' in metaData){
+            return true
+          } else{
+            return false
+          }
+
+        } catch (err) {
+          return false
+        }
+      },
+      checkTongSoTien (thongTinChiTietHoSo) {
+        try{
+          let metaData = JSON.parse(thongTinChiTietHoSo.metaData)
+          if('tongSoTien' in metaData){
+            return true
+          } else{
+            return false
+          }
+
+        } catch (err) {
+          return false
+        }
+      },
+      formarMoney (str){
+        let formatter = new Intl.NumberFormat('vi-VN', {
+          style: 'currency',
+          currency: 'VND',
+        });
+
+        return formatter.format(parseFloat(str))
+      }
+>>>>>>> opencps/bgt
     },
     filters: {
       dateTimeView(arg) {

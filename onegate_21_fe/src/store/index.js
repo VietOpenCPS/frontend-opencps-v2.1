@@ -1499,11 +1499,39 @@ export const store = new Vuex.Store({
         // dataPostdossier.append('totalRecord',data.totalRecord)
         // dataPostdossier.append('dossierFilePayment',data.dossierFilePayment)
         // dataPostdossier.append('Doan_HCTN',data.Doan_HCTN)
-        dataPostdossier.append('data',JSON.stringify(data.data))
+        dataPostdossier.append('data',data.data)
         axios.put('/o/rest/v2/dossiers/'+data.id+'/metadata', dataPostdossier, options).then(function (response) {
           resolve(response)
         }).catch(function (error) {
           reject(error)
+        })
+      })
+    },
+    putPayment({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        commit('setLoading', true)
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json',
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          }
+        }
+        let dataPostdossier = new URLSearchParams()
+
+        dataPostdossier.append('requestPayment',data.payment.requestPayment)
+        dataPostdossier.append('paymentNote',data.payment.paymentNote)
+        dataPostdossier.append('advanceAmount',data.payment.advanceAmount)
+        dataPostdossier.append('feeAmount',data.payment.feeAmount)
+        dataPostdossier.append('serviceAmount',data.payment.serviceAmount)
+        dataPostdossier.append('shipAmount',data.payment.shipAmount)
+        axios.post('/o/rest/v2/dossiers/'+data.dossierId + '/payment', dataPostdossier, options).then(function (response) {
+          resolve(response)
+        }).catch(function (error) {
+          reject(error)
+          toastr.clear()
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          commit('setLoading', false)
         })
       })
     },
@@ -4504,6 +4532,7 @@ export const store = new Vuex.Store({
         })
       })
     },
+<<<<<<< HEAD
     toKeypayDvcqg ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let param = {
@@ -4529,6 +4558,50 @@ export const store = new Vuex.Store({
         })
       })
     }
+=======
+    getFieldPick ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let url = '/o/rest/v2/fieldpick/classpk/' + filter
+          axios.get(url, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    postFieldPick ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let url = '/o/rest/v2/fieldpick/classpk/' + filter.classPK
+          let dataPost = new URLSearchParams()
+          let data = {}
+          data[filter.key] = filter.val
+          dataPost.append('formData', JSON.stringify(data))
+          axios.post(url,dataPost, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+>>>>>>> opencps/bgt
     // ----End---------
   },
   mutations: {
