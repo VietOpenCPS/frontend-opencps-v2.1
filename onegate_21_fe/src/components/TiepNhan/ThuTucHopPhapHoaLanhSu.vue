@@ -459,15 +459,15 @@
                                 <v-flex xs12> Mẫu con dấu</v-flex>
                                 <v-flex xs12>
                                     <div style="width: 100%; height: 140px; border: 0.5px solid #dedede; display:flex; justify-content: center;overflow-x: scroll;">
-                                        <!-- <img :src="'data:image/png;base64,' +  conDau" alt="" style=" height: 100%;" @click="phongTo(conDau)"> -->
-                                        <img :src="conDau" alt="" style=" height: 100%;" @click="phongTo(conDau)">
+                                        <img :src="'data:image/png;base64,' +  conDau" alt="" style=" height: 100%;" @click="phongTo(conDau)">
+                                        <!-- <img :src="conDau" alt="" style=" height: 100%;" @click="phongTo(conDau)"> -->
                                     </div>
                                 </v-flex>
                                 <v-flex xs12 class="my-2"> Mẫu chữ ký</v-flex>
                                 <v-flex xs12>
                                     <div style="width: 100%; height: 140px; border: 0.5px solid #dedede; display:flex; justify-content: center;overflow-x: scroll;">
-                                        <!-- <img :src="'data:image/png;base64,' +  chuKy" alt="" style=" height: 100%;"  @click="phongTo(chuKy)"> -->
-                                        <img :src="chuKy" alt="" style=" height: 100%;" @click="phongTo(chuKy)">
+                                        <img :src="'data:image/png;base64,' +  chuKy" alt="" style=" height: 100%;"  @click="phongTo(chuKy)">
+                                        <!-- <img :src="chuKy" alt="" style=" height: 100%;" @click="phongTo(chuKy)"> -->
                                     </div>
                                 </v-flex>
                             </v-layout>
@@ -548,8 +548,8 @@
                                             <div v-if="loadingImage" style="height: 140px;font-size: 16pt;color: blue;">Loading ....</div>
                                             <div v-if="!loadingImage" style="width: 100%; height: 190px;display:flex;">
                                                 <div v-for="(item, index) in listConDau" :key="index">
-                                                    <!-- <img :src="'data:image/png;base64,' +  item.strConDau" alt="" style=" height: 140px;" @click="phongTo(item.strConDau)"> -->
-                                                    <img :src="item.strConDau" alt="" style=" height: 140px;" @click="phongTo(item.strConDau)">
+                                                    <img :src="'data:image/png;base64,' +  item.strConDau" alt="" style=" height: 140px;" @click="phongTo(item.strConDau)">
+                                                    <!-- <img :src="item.strConDau" alt="" style=" height: 140px;" @click="phongTo(item.strConDau)"> -->
                                                     <v-checkbox
                                                         v-model="chonConDau"
                                                         primary
@@ -571,8 +571,8 @@
                                             <div v-if="loadingImage" style="height: 140px;font-size: 16pt;color: blue;">Loading ....</div>
                                             <div v-if="!loadingImage" style="width: 100%; height: 190px;display:flex;">
                                                 <div v-for="(item, index) in listChuKy" :key="index">
-                                                    <!-- <img :src="'data:image/png;base64,' +  item.strChuKy" alt="" style=" height: 140px;" @click="phongTo(item.strChuKy)"> -->
-                                                    <img :src="item.strChuKy" alt="" style=" height: 140px;" @click="phongTo(item.strChuKy)">
+                                                    <img :src="'data:image/png;base64,' +  item.strChuKy" alt="" style=" height: 140px;" @click="phongTo(item.strChuKy)">
+                                                    <!-- <img :src="item.strChuKy" alt="" style=" height: 140px;" @click="phongTo(item.strChuKy)"> -->
                                                     <v-checkbox
                                                         v-model="chonChuKy"
                                                         primary
@@ -618,8 +618,8 @@
                     <v-layout wrap>
                         <v-flex xs12>
                             <div width="100%; height: 500px;">
-                                <!-- <img :src="'data:image/png;base64,'+ anhPhongTo" alt="" style="width: 100%;height: 500px;"> -->
-                                <img :src="anhPhongTo" alt="" style="width: 100%;height: 500px;">
+                                <img :src="'data:image/png;base64,'+ anhPhongTo" alt="" style="width: 100%;height: 500px;">
+                                <!-- <img :src="anhPhongTo" alt="" style="width: 100%;height: 500px;"> -->
                             </div>
                         </v-flex>
                     </v-layout>
@@ -916,7 +916,8 @@ export default {
             "dossierFilePayment": '',
             "metaData": '{}'
         },
-        payment: {}
+        payment: {},
+        tongSoBanTG: 0,
     }),
     created () {
         let vm = this
@@ -924,7 +925,6 @@ export default {
             let currentQuery = vm.$router.history.current.query
             vm.dossierTemplateNo = currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
             vm.eFormCode = currentQuery.hasOwnProperty('eformCode') && currentQuery.eformCode ? currentQuery.eformCode : ''
-            console.log(vm.dossierTemplateNo)
             if(vm.formCode==='UPDATE'){
                 vm.getDetail()
             } else {
@@ -953,7 +953,6 @@ export default {
         dossiers: {
             deep: true,
             handler:  (val, oldVal) => {
-                console.log(val.metaData)
                 $('#dossiers_hidden').val(JSON.stringify(val))
             }
         },
@@ -1080,11 +1079,10 @@ export default {
         dateDueDate (val) {
             this.dateDueDateFormated = this.formatDate(this.dateDueDate) 
             // const [year, month, day] = this.dateDueDate.split('-')
-            let date = new Date(this.dateDueDate)
+            // let date = new Date(this.dateDueDate)
             // date.setFullYear(parseInt(year), parseInt(month), parseInt(day))
-            // console.log(date)
-            // console.log(date.getTime())
-            this.dossiers.dueDate = date.getTime()
+            // this.dossiers.dueDate = date.getTime()
+            this.dossiers.dueDate = this.dateDueDateFormated
         },
         // tongSoBan (val) {
         //     if(parseInt(val) >= 10){
@@ -1104,6 +1102,39 @@ export default {
         // } 
     },
     methods: {
+        computeDate () {
+            let vm = this 
+            if(parseInt(vm.tongSoBan) >= 10 && vm.tongSoBanTG < 10){
+                let date = new Date(this.dateDueDate + this.crurentHours)
+                if(date.getDay() === 3){
+                    date.setDate(date.getDate() + 5)
+                }else if (date.getDay() === 4) {
+                    date.setDate(date.getDate() + 4)
+                } else if(date.getDay() === 5) {
+                    date.setDate(date.getDate() + 3)
+                } else {
+                    date.setDate(date.getDate() + 3)
+                }
+                // this.dateDueDate = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate()
+                this.dateDueDate = date.toISOString().substr(0, 10)
+                
+            }
+            if(parseInt(vm.tongSoBan) < 10 && vm.tongSoBanTG >= 10){
+                let date = new Date(this.dateDueDate + this.crurentHours)
+                if(date.getDay() === 3){
+                    date.setDate(date.getDate() - 5)
+                }else if (date.getDay() === 4) {
+                    date.setDate(date.getDate() - 4)
+                } else if(date.getDay() === 5) {
+                    date.setDate(date.getDate() - 3)
+                } else {
+                    date.setDate(date.getDate() - 3)
+                }
+                this.dateDueDate = date.toISOString().substr(0, 10)
+                // this.dateDueDate = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate()    
+            }
+            vm.tongSoBanTG = parseInt(vm.tongSoBan) 
+        },
         getDetail(){
             let vm = this
             let config = {
@@ -1111,8 +1142,6 @@ export default {
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
             }
             axios.request(config).then(res => {
-                console.log(res.data)
-                console.log(JSON.parse(res.data.metaData))
                 let metaData = JSON.parse(res.data.metaData)
                 if(metaData.dossierFileCustom)
                 {   
@@ -1138,7 +1167,6 @@ export default {
             }
             axios.request(config).then(res => {
                 let data = res.data.data
-                console.log('dossierFile', res.data)
                 if(data.length){
                     for(let i =0; i<data.length; i++){
                         let tg = {
@@ -1150,7 +1178,6 @@ export default {
                         vm.dossierFileArr.push(tg)
                         if(data[i]['dossierPartNo'] === 'TP01'){
                             let formData = JSON.parse(data[i]['formData'])
-                            console.log(formData)
                             vm.listGiayTo = formData.list_giay_to
                             vm.checkCKCD()
                             vm.de_nghi_chung_nhan = formData.de_nghi_chung_nhan
@@ -1163,6 +1190,8 @@ export default {
                             vm.listGiayTo.forEach(e=>{
                                 vm.tongSoBan+=parseInt(e['so_ban'])
                             })
+                            vm.tongSoBanTG = vm.tongSoBan
+                            vm.computeDate()
                             vm.genLePhi()
                         }
                     }
@@ -1214,9 +1243,7 @@ export default {
                 for(let i=0; i< file_bien_nhan.length; i++){
                     if(file_bien_nhan[i]['partNo'] === item.dossierPartNo){
                         let tp = {'partNo': item.dossierPartNo, 'partName': item.partName, 'fileMark': item.fileMark,'recordCount': item.recordCount}
-                        console.log(tp)
                         file_bien_nhan[i] = tp
-                        console.log(file_bien_nhan[i])
                     }
                 }
                 let totalRecord = 0
@@ -1227,7 +1254,6 @@ export default {
                 }
                 tg['totalRecord'] = totalRecord
                 tg['dossierFileCustom'] = file_bien_nhan
-                console.log(tg['dossierFileCustom'])
                 vm.dossiers['metaData'] = JSON.stringify(tg)
             },200)
         },
@@ -1322,75 +1348,75 @@ export default {
         },
         getDSNguoiKy(){
             let vm = this
-            // let co_quan_cap = vm.co_quan_cap_tg ? vm.co_quan_cap_tg : ''
-            // let nguoi_ky = vm.nguoi_ky_tg ? vm.nguoi_ky_tg : ''
-            // if(co_quan_cap || nguoi_ky){
-            //     if(co_quan_cap){
-            //         if(co_quan_cap.split(' ').length >= 2){
-            //             let filter = {
-            //                 flagSearch: false,
-            //                 govAgencyName: co_quan_cap,
-            //                 employeeName: nguoi_ky
-            //             }
-            //             for (let key in filter) { 
-            //                 if (filter[key] === '' || filter[key] === undefined) {
-            //                     delete filter[key];
-            //                 }
-            //             }
-            //             let config = {
-            //                 url: 'o/rest/v2/serverconfigs/TICH_HOP_DM_NG_KY/protocols/API_CONNECT',
-            //                 params: filter,
-            //                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
-            //             }
-            //             axios.request(config).then(res => {
-            //                 vm.listNguoiKy = res.data.data
-            //                 vm.listConDau = []
-            //                 vm.listChuKy = []
-            //                 vm.chonChuKy = []
-            //                 vm.chonConDau = []
-            //                 vm.chuKySelected = ''
-            //                 vm.conDauSelected = ''
-            //             }).catch(err => {}) 
-            //         } else {
-            //             toastr.error('Cơ quan chủ quản phải ít nhất 2 từ trở lên')
-            //             return
-            //         }
-            //     } else {
-            //             let filter = {
-            //                 flagSearch: false,
-            //                 govAgencyName: co_quan_cap,
-            //                 employeeName: nguoi_ky
-            //             }
-            //             for (let key in filter) { 
-            //                 if (filter[key] === '' || filter[key] === undefined) {
-            //                     delete filter[key];
-            //                 }
-            //             }
-            //             let config = {
-            //                 url: 'o/rest/v2/serverconfigs/TICH_HOP_DM_NG_KY/protocols/API_CONNECT',
-            //                 params: filter,
-            //                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
-            //             }
-            //             axios.request(config).then(res => {
-            //                 vm.listNguoiKy = res.data.data
-            //                 vm.listConDau = []
-            //                 vm.listChuKy = []
-            //                 vm.chonChuKy = []
-            //                 vm.chonConDau = []
-            //                 vm.chuKySelected = ''
-            //                 vm.conDauSelected = ''
-            //             }).catch(err => {}) 
-            //     }
-            // } else {
-            //     toastr.error('Chưa nhập đối tượng để tìm kiếm')
-            // }
-            vm.listNguoiKy = [{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Trưởng phòng","MA_CHUC_VU":"0413","MA":"01657fa3894247328ca9094e1d19f903","TEN":"Nguyễn Vũ Thắng","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Hiệu trưởng","MA_CHUC_VU":"0412","MA":"5ca80ae38229458fb0eefbebbac3903e","TEN":"Nguyễn Cảnh Lương","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Viện trưởng","MA_CHUC_VU":"0430","MA":"aa4581262b1b464bba7eca44a1869817","TEN":"Nguyễn Đắc Trung","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Giám đốc","MA_CHUC_VU":"0428","MA":"b2bc3aa333304829b9f09225bd281d57","TEN":"Nguyễn Phú Khánh","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Hiệu trưởng","MA_CHUC_VU":"0411","MA":"bd964127590a402e8545cd14d38dc9ae","TEN":"Nguyễn Trọng Giảng","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Viện trưởng","MA_CHUC_VU":"0454","MA":"bed1466c1bb8487883a39e8a9099a0d6","TEN":"Nguyễn Phong Điền","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Viện trưởng","MA_CHUC_VU":"0430","MA":"da4280dfedc0458bab0834672d919220","TEN":"Nguyễn Đình Bình","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Trưởng phòng","MA_CHUC_VU":"0413","MA":"e5cbf4191ee3462d964fa9e93931aae0","TEN":"Nguyễn Thị Huyền Trang","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Viện trưởng","MA_CHUC_VU":"0454","MA":"f39a8debc0dc4ba6a23d60ec3634632c","TEN":"Nguyễn Đại Thắng","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"}]
-            vm.listConDau = []
-            vm.listChuKy = []
-            vm.chonChuKy = []
-            vm.chonConDau = []
-            vm.chuKySelected = ''
-            vm.conDauSelected = ''
+            let co_quan_cap = vm.co_quan_cap_tg ? vm.co_quan_cap_tg : ''
+            let nguoi_ky = vm.nguoi_ky_tg ? vm.nguoi_ky_tg : ''
+            if(co_quan_cap || nguoi_ky){
+                if(co_quan_cap){
+                    if(co_quan_cap.split(' ').length >= 2){
+                        let filter = {
+                            flagSearch: false,
+                            govAgencyName: co_quan_cap,
+                            employeeName: nguoi_ky
+                        }
+                        for (let key in filter) { 
+                            if (filter[key] === '' || filter[key] === undefined) {
+                                delete filter[key];
+                            }
+                        }
+                        let config = {
+                            url: 'o/rest/v2/serverconfigs/TICH_HOP_DM_NG_KY/protocols/API_CONNECT',
+                            params: filter,
+                            headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                        }
+                        axios.request(config).then(res => {
+                            vm.listNguoiKy = res.data.data
+                            vm.listConDau = []
+                            vm.listChuKy = []
+                            vm.chonChuKy = []
+                            vm.chonConDau = []
+                            vm.chuKySelected = ''
+                            vm.conDauSelected = ''
+                        }).catch(err => {}) 
+                    } else {
+                        toastr.error('Cơ quan chủ quản phải ít nhất 2 từ trở lên')
+                        return
+                    }
+                } else {
+                        let filter = {
+                            flagSearch: false,
+                            govAgencyName: co_quan_cap,
+                            employeeName: nguoi_ky
+                        }
+                        for (let key in filter) { 
+                            if (filter[key] === '' || filter[key] === undefined) {
+                                delete filter[key];
+                            }
+                        }
+                        let config = {
+                            url: 'o/rest/v2/serverconfigs/TICH_HOP_DM_NG_KY/protocols/API_CONNECT',
+                            params: filter,
+                            headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                        }
+                        axios.request(config).then(res => {
+                            vm.listNguoiKy = res.data.data
+                            vm.listConDau = []
+                            vm.listChuKy = []
+                            vm.chonChuKy = []
+                            vm.chonConDau = []
+                            vm.chuKySelected = ''
+                            vm.conDauSelected = ''
+                        }).catch(err => {}) 
+                }
+            } else {
+                toastr.error('Chưa nhập đối tượng để tìm kiếm')
+            }
+            // vm.listNguoiKy = [{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Trưởng phòng","MA_CHUC_VU":"0413","MA":"01657fa3894247328ca9094e1d19f903","TEN":"Nguyễn Vũ Thắng","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Hiệu trưởng","MA_CHUC_VU":"0412","MA":"5ca80ae38229458fb0eefbebbac3903e","TEN":"Nguyễn Cảnh Lương","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Viện trưởng","MA_CHUC_VU":"0430","MA":"aa4581262b1b464bba7eca44a1869817","TEN":"Nguyễn Đắc Trung","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Giám đốc","MA_CHUC_VU":"0428","MA":"b2bc3aa333304829b9f09225bd281d57","TEN":"Nguyễn Phú Khánh","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Hiệu trưởng","MA_CHUC_VU":"0411","MA":"bd964127590a402e8545cd14d38dc9ae","TEN":"Nguyễn Trọng Giảng","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Viện trưởng","MA_CHUC_VU":"0454","MA":"bed1466c1bb8487883a39e8a9099a0d6","TEN":"Nguyễn Phong Điền","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Viện trưởng","MA_CHUC_VU":"0430","MA":"da4280dfedc0458bab0834672d919220","TEN":"Nguyễn Đình Bình","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Phó Trưởng phòng","MA_CHUC_VU":"0413","MA":"e5cbf4191ee3462d964fa9e93931aae0","TEN":"Nguyễn Thị Huyền Trang","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"},{"MA_CQQL":"661a5e7826254b58b872fa4f9c965ef8","TEN_CHUC_VU":"Viện trưởng","MA_CHUC_VU":"0454","MA":"f39a8debc0dc4ba6a23d60ec3634632c","TEN":"Nguyễn Đại Thắng","TEN_CQQL":"Trường ĐH Bách Khoa Hà Nội"}]
+            // vm.listConDau = []
+            // vm.listChuKy = []
+            // vm.chonChuKy = []
+            // vm.chonConDau = []
+            // vm.chuKySelected = ''
+            // vm.conDauSelected = ''
 
         },
         getDataEform() {
@@ -1471,6 +1497,7 @@ export default {
                 vm.tongSoBan+=parseInt(e['so_ban'])
             })
             // 
+            vm.computeDate()
             for (let i=0; i<vm.dossierFileArr.length; i++){
                 if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
                     let arr = ''
@@ -1524,7 +1551,7 @@ export default {
                 // } else {
                 //     vm.crurentHours = ' 15:30:00'
                 // }
-                vm.dateDueDate = tg.getFullYear()+'-'+(tg.getMonth()+1)+'-'+tg.getDate()
+                vm.dateDueDate = tg.toISOString().substr(0, 10)
             }).catch(err => {}) 
         },
         getTenGiayTo(){
@@ -1549,56 +1576,56 @@ export default {
                 url: 'o/rest/v2/serverconfigs/TICH_HOP_CHU_KY_CON_DAU/protocols/API_CONNECT?ma_ng_ky='+item.MA+'&ma_cqql='+item.MA_CQQL,
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
             }
-            //vm.loadingImage = true
-            // axios.request(config).then(res => {
-            //     let arrConDau = res.data.CON_DAU.map(function(el) {
-            //         let o = Object.assign({}, el);
-            //         o['strConDau'] = vm.hexToBase64(o.CD_IMAGE_FILE);
-            //         return o;
-            //     })
-            //     let arrChuKy = res.data.CHU_KY.map(function(el) {
-            //         let o = Object.assign({}, el);
-            //         o['strChuKy'] = vm.hexToBase64(o.CK_IMAGE_FILE);
-            //         return o;
-            //     })
-            //     vm.listConDau = vm.sortDate(arrConDau, 'CD_NGAY_HL')
-            //     vm.listChuKy = vm.sortDate (arrChuKy, 'CK_NGAY_HL')
-            //     vm.loadingImage = false
-            // }).catch(err => {})
-            let data = {
-                CHU_KY: [
-                    {
-                        CK_CHUC_DANH: 'Phó Hiệu trưởng',
-                        CK_GHI_CHU: '',
-                        strChuKy: `https://scontent-hkt1-1.xx.fbcdn.net/v/t1.0-9/83560216_2827598057470043_4398724110518723501_n.jpg?_nc_cat=102&_nc_sid=8024bb&_nc_ohc=MyytmLxn_SkAX_7NTQF&_nc_ht=scontent-hkt1-1.xx&oh=b3027bea2885a2cac1a26707f3942c41&oe=5F250B8B`,
-                        CK_MA_CAN_BO: '9fb20e67afb743a9bd3c96500c7aff82',
-                        CK_MA_CK: 'ba16b3d4286b449e854bc837e5776cd2',
-                        CK_MA_CO_QUAN: '01',
-                        CK_MA_DON_VI_XL: '1',
-                        CK_NGAY_HL: '2013-08-31 00:00:00.0',
-                        CK_PHIEN_BAN: 1,
-                        CK_TEN_CAN_BO: 'Lê Văn'
-                    }
-                ],
-                CON_DAU: [
-                    {
-                    CD_DONG_BO: true,
-                    CD_GHI_CHU: '',
-                    strConDau: `https://scontent-hkt1-1.xx.fbcdn.net/v/t1.0-9/106129297_2827598070803375_2684170447443855793_n.jpg?_nc_cat=106&_nc_sid=8024bb&_nc_ohc=tquhJOGgdC4AX8rkq1n&_nc_ht=scontent-hkt1-1.xx&oh=a61e5c4a6c36eea82444a5c1bc3c63a5&oe=5F256D5A`,
-                    CD_MA_CAN_BO: '',
-                    CD_MA_CON_DAU: '4d8d2ea84d2e41689756009c2a6b6e57',
-                    CD_MA_CQ: '661a5e7826254b58b872fa4f9c965ef8',
-                    CD_MA_DON_VI: 'HCM',
-                    CD_NGAY_HL: "2013-08-31 00:00:00.0",
-                    CD_PHIEN_BAN: 1,
-                    CD_TEN_CAN_BO: "",
-                    }
-                ]
-            }
-                let arrConDau = data.CON_DAU
-                let arrChuKy = data.CHU_KY
+            vm.loadingImage = true
+            axios.request(config).then(res => {
+                let arrConDau = res.data.CON_DAU.map(function(el) {
+                    let o = Object.assign({}, el);
+                    o['strConDau'] = vm.hexToBase64(o.CD_IMAGE_FILE);
+                    return o;
+                })
+                let arrChuKy = res.data.CHU_KY.map(function(el) {
+                    let o = Object.assign({}, el);
+                    o['strChuKy'] = vm.hexToBase64(o.CK_IMAGE_FILE);
+                    return o;
+                })
                 vm.listConDau = vm.sortDate(arrConDau, 'CD_NGAY_HL')
                 vm.listChuKy = vm.sortDate (arrChuKy, 'CK_NGAY_HL')
+                vm.loadingImage = false
+            }).catch(err => {})
+            // let data = {
+            //     CHU_KY: [
+            //         {
+            //             CK_CHUC_DANH: 'Phó Hiệu trưởng',
+            //             CK_GHI_CHU: '',
+            //             strChuKy: `https://scontent-hkt1-1.xx.fbcdn.net/v/t1.0-9/83560216_2827598057470043_4398724110518723501_n.jpg?_nc_cat=102&_nc_sid=8024bb&_nc_ohc=MyytmLxn_SkAX_7NTQF&_nc_ht=scontent-hkt1-1.xx&oh=b3027bea2885a2cac1a26707f3942c41&oe=5F250B8B`,
+            //             CK_MA_CAN_BO: '9fb20e67afb743a9bd3c96500c7aff82',
+            //             CK_MA_CK: 'ba16b3d4286b449e854bc837e5776cd2',
+            //             CK_MA_CO_QUAN: '01',
+            //             CK_MA_DON_VI_XL: '1',
+            //             CK_NGAY_HL: '2013-08-31 00:00:00.0',
+            //             CK_PHIEN_BAN: 1,
+            //             CK_TEN_CAN_BO: 'Lê Văn'
+            //         }
+            //     ],
+            //     CON_DAU: [
+            //         {
+            //         CD_DONG_BO: true,
+            //         CD_GHI_CHU: '',
+            //         strConDau: `https://scontent-hkt1-1.xx.fbcdn.net/v/t1.0-9/106129297_2827598070803375_2684170447443855793_n.jpg?_nc_cat=106&_nc_sid=8024bb&_nc_ohc=tquhJOGgdC4AX8rkq1n&_nc_ht=scontent-hkt1-1.xx&oh=a61e5c4a6c36eea82444a5c1bc3c63a5&oe=5F256D5A`,
+            //         CD_MA_CAN_BO: '',
+            //         CD_MA_CON_DAU: '4d8d2ea84d2e41689756009c2a6b6e57',
+            //         CD_MA_CQ: '661a5e7826254b58b872fa4f9c965ef8',
+            //         CD_MA_DON_VI: 'HCM',
+            //         CD_NGAY_HL: "2013-08-31 00:00:00.0",
+            //         CD_PHIEN_BAN: 1,
+            //         CD_TEN_CAN_BO: "",
+            //         }
+            //     ]
+            // }
+            //     let arrConDau = data.CON_DAU
+            //     let arrChuKy = data.CHU_KY
+            //     vm.listConDau = vm.sortDate(arrConDau, 'CD_NGAY_HL')
+            //     vm.listChuKy = vm.sortDate (arrChuKy, 'CK_NGAY_HL')
         },
         checkedConDau (item) {
             let vm = this
@@ -1690,7 +1717,7 @@ export default {
                 vm.listGiayTo.forEach(e=>{
                     vm.tongSoBan+=parseInt(e['so_ban'])
                 })
-
+                vm.computeDate()
                 // 
                 for (let i=0; i<vm.dossierFileArr.length; i++){
                     if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
@@ -1755,7 +1782,6 @@ export default {
                     i++
                 }
             })
-            console.log(file_bien_nhan2)
             let tong_so=0;
             let thanh_tien = 0;
             vm.listGiayTo.forEach(e=>{
@@ -1826,7 +1852,6 @@ export default {
         },
         openDialogUpdateGiayTo (index, item) {
             let vm = this
-            console.log(item)
             vm.update_giayto = index
             vm.ten_giay_to = item.ten_giay_to,
             vm.ma_ten_giay_to = item.ma_ten_giay_to,
@@ -1935,6 +1960,7 @@ export default {
             vm.listGiayTo.forEach(e=>{
                 vm.tongSoBan+=parseInt(e['so_ban'])
             })
+            vm.computeDate()
             // 
             for (let i=0; i<vm.dossierFileArr.length; i++){
                 if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
@@ -1987,7 +2013,6 @@ export default {
                 let tg = JSON.parse(vm.dossiers['metaData'])
                 let file_bien_nhan = tg['dossierFileCustom']
                 vm.dossierMarkArr[index]['recordCount'] = 1
-                console.log(file_bien_nhan)
                 for(let i=0; i< vm.dossierFileArr.length; i++){
                     if(vm.dossierFileArr[i]['partNo'] === item.dossierPartNo || vm.dossierFileArr[i]['dossierPartNo'] === item.dossierPartNo){
                         let tp = {'partNo': item.dossierPartNo, 'partName': item.partName, 'fileMark': item.fileMark,'recordCount': item.recordCount}
@@ -2024,30 +2049,19 @@ export default {
                             // let check = true
                 let tg = JSON.parse(vm.dossiers['metaData'])
                 let file_bien_nhan = tg['dossierFileCustom']
-                console.log(file_bien_nhan)
                 for(let i=0; i< vm.dossierFileArr.length; i++){
                     if(vm.dossierFileArr[i]['partNo'] === item.dossierPartNo || vm.dossierFileArr[i]['dossierPartNo'] === item.dossierPartNo){
                         vm.dossierFileArr.splice(i,1)
-                        // check = false
+                   
                     }
                 }
-                // if(check){
-                //     let tp = {'partNo': item.dossierPartNo, 'partName': item.partName, 'fileMark': item.fileMark,'recordCount': item.recordCount} 
-                //    vm.dossierFileArr.push(item) 
-                // }
-                // let check2 = true
                 for(let i=0; i< file_bien_nhan.length; i++){
                     if(file_bien_nhan[i]['partNo'] === item.dossierPartNo || file_bien_nhan[i]['dossierPartNo'] === item.dossierPartNo){
                         let tp = {'partNo': item.dossierPartNo, 'partName': item.partName, 'fileMark': item.fileMark,'recordCount': item.recordCount}
                         file_bien_nhan[i] = tp
                         file_bien_nhan.splice(i,1)
-                        // check2 = false
                     }
                 }
-                // if(check2){
-                //      let tp = {'partNo': item.dossierPartNo, 'partName': item.partName, 'fileMark': item.fileMark,'recordCount': item.recordCount}
-                //    file_bien_nhan.push(item) 
-                // }
                 let totalRecord = 0
                 for(let i =0; i<file_bien_nhan.length ; i++){
                     if(file_bien_nhan[i]['partNo'] === 'TP03'){
@@ -2245,7 +2259,6 @@ export default {
         },
         toggleKT(index, item){
             let vm = this
-            console.log(item)
             vm.$set(vm.listGiayTo, index, item)
             vm.checkCKCD()
         },

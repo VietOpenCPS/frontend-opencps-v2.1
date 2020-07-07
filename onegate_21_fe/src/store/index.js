@@ -4532,7 +4532,6 @@ export const store = new Vuex.Store({
         })
       })
     },
-<<<<<<< HEAD
     toKeypayDvcqg ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let param = {
@@ -4557,8 +4556,7 @@ export const store = new Vuex.Store({
           reject(xhr)
         })
       })
-    }
-=======
+    },
     getFieldPick ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -4601,7 +4599,6 @@ export const store = new Vuex.Store({
         })
       })
     },
->>>>>>> opencps/bgt
     // ----End---------
   },
   mutations: {
