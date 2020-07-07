@@ -258,6 +258,7 @@ export default {
     'captcha': Captcha
   },
   data: () => ({
+    isDVC: false,
     govAgencyName: {},
     itemName: '',
     employeeItems: [],
@@ -280,6 +281,12 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      if (isDVC) {
+        vm.isDVC = isDVC
+      }
+    } catch (error) {
+    }
     let currentQuery = vm.$router.history.current.query
     if (currentQuery.hasOwnProperty('itemName')) {
       vm.itemName = currentQuery.itemName
@@ -295,12 +302,22 @@ export default {
         }
         return employeeList.sort(compare)
       }
-      vm.$store.dispatch('loadEmployees', {
-        itemCode: vm.itemCode
-      }).then(result => {
-        vm.employeeItems = sortEmployee(result)
-      }).catch(xhr => {
-      })
+      if (vm.isDVC) {
+        vm.$store.dispatch('loadEmployeesMotcua', {
+          itemCode: vm.itemCode
+        }).then(result => {
+          vm.employeeItems = sortEmployee(result)
+        }).catch(xhr => {
+        })
+      } else {
+        vm.$store.dispatch('loadEmployees', {
+          itemCode: vm.itemCode
+        }).then(result => {
+          vm.employeeItems = sortEmployee(result)
+        }).catch(xhr => {
+        })
+      }
+      
     })
   },
   watch: {

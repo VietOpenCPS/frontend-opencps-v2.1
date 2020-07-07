@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import TiepNhanHoSoDetail from './TiepNhanHoSoDetailNew.vue'
+import TiepNhanHoSoDetail from './TiepNhanHoSoDetail.vue'
 
 export default {
   props: ['id', 'formCode'],

@@ -103,7 +103,8 @@ export default {
     lengthPage: 0,
     totalEmployee: 0,
     employeePage: 1,
-    numberPerPage: 12
+    numberPerPage: 12,
+    isDVC: false
   }),
   computed: {
     loading () {
@@ -112,6 +113,12 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      if (isDVC) {
+        vm.isDVC = isDVC
+      }
+    } catch (error) {
+    }
     let currentQuery = vm.$router.history.current.query
     vm.employeePage = currentQuery.hasOwnProperty('page') ? Number(currentQuery.page) : 1
     vm.getEmployee()
@@ -140,22 +147,41 @@ export default {
         end: vm.employeePage * vm.numberPerPage,
         itemCode: vm.itemCode
       }
-      vm.$store.dispatch('loadEmployeesProxy', filter).then(result => {
-        vm.totalEmployee = result[0]
-        vm.employeeItems = sortEmployee(result[1])
-        vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
+      if (vm.isDVC) {
+        vm.$store.dispatch('loadEmployeesMotcua', filter).then(result => {
+          vm.totalEmployee = result[0]
+          vm.employeeItems = sortEmployee(result[1])
+          vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
 
-        vm.employeeItems = vm.employeeItems.slice(filter.start, filter.end)
-        if (vm.employeeItems && vm.employeeItems.length > 0) {
-          for (let key in vm.employeeItems) {
-            vm.getAvatar(vm.employeeItems[key], key)
-            vm.getVotingEmployee(vm.employeeItems[key], key)
+          if (vm.employeeItems && vm.employeeItems.length > 0) {
+            for (let key in vm.employeeItems) {
+              vm.getAvatar(vm.employeeItems[key], key)
+              vm.getVotingEmployee(vm.employeeItems[key], key)
+            }
           }
-        }
-      }).catch(xhr => {
-        vm.totalThuTuc = 0
-        vm.thutucPage = 1
-      })
+        }).catch(xhr => {
+          vm.totalThuTuc = 0
+          vm.thutucPage = 1
+        })
+      } else {
+        vm.$store.dispatch('loadEmployeesProxy', filter).then(result => {
+          vm.totalEmployee = result[0]
+          vm.employeeItems = sortEmployee(result[1])
+          vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
+
+          vm.employeeItems = vm.employeeItems.slice(filter.start, filter.end)
+          if (vm.employeeItems && vm.employeeItems.length > 0) {
+            for (let key in vm.employeeItems) {
+              vm.getAvatar(vm.employeeItems[key], key)
+              vm.getVotingEmployee(vm.employeeItems[key], key)
+            }
+          }
+        }).catch(xhr => {
+          vm.totalThuTuc = 0
+          vm.thutucPage = 1
+        })
+      }
+      
     },
     getAvatar (item, key) {
       let vm = this

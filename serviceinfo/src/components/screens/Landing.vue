@@ -87,6 +87,7 @@
           >
           </v-autocomplete>
         </v-flex>
+
       </v-layout>
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
