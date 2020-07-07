@@ -1212,8 +1212,9 @@ export default {
           // if (vm.formCode === 'NEW_GROUP_CV_DI') {
             let dataMetaData = {
               id: vm.thongTinNhomHoSo.dossierId,
-              data: thongtincongvan.metaData
+              data: JSON.stringify(thongtincongvan.metaData)
             }
+            console.log('data put metadata 123', dataMetaData)
             vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
           // }
           
