@@ -1078,11 +1078,11 @@ export default {
         },
         dateDueDate (val) {
             this.dateDueDateFormated = this.formatDate(this.dateDueDate) 
-            // const [year, month, day] = this.dateDueDate.split('-')
-            // let date = new Date(this.dateDueDate)
-            // date.setFullYear(parseInt(year), parseInt(month), parseInt(day))
-            // this.dossiers.dueDate = date.getTime()
-            this.dossiers.dueDate = this.dateDueDateFormated
+            const [year, month, day] = this.dateDueDate.split('-')
+            let date = new Date(this.dateDueDate)
+            date.setFullYear(parseInt(year), parseInt(month), parseInt(day))
+            this.dossiers.dueDate = date.getTime()
+            //this.dossiers.dueDate = this.dateDueDateFormated
         },
         // tongSoBan (val) {
         //     if(parseInt(val) >= 10){
@@ -1103,37 +1103,35 @@ export default {
     },
     methods: {
         computeDate () {
-            let vm = this 
-            if(parseInt(vm.tongSoBan) >= 10 && vm.tongSoBanTG < 10){
-                let date = new Date(this.dateDueDate + this.crurentHours)
-                if(date.getDay() === 3){
-                    date.setDate(date.getDate() + 5)
-                }else if (date.getDay() === 4) {
-                    date.setDate(date.getDate() + 4)
-                } else if(date.getDay() === 5) {
-                    date.setDate(date.getDate() + 3)
-                } else {
-                    date.setDate(date.getDate() + 3)
-                }
-                // this.dateDueDate = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate()
-                this.dateDueDate = date.toISOString().substr(0, 10)
+            // let vm = this 
+            // if(parseInt(vm.tongSoBan) >= 10 && vm.tongSoBanTG < 10){
+            //     let date = new Date(this.dateDueDate + this.crurentHours)
+            //     if(date.getDay() === 3){
+            //         date.setDate(date.getDate() + 5)
+            //     }else if (date.getDay() === 4) {
+            //         date.setDate(date.getDate() + 4)
+            //     } else if(date.getDay() === 5) {
+            //         date.setDate(date.getDate() + 3)
+            //     } else {
+            //         date.setDate(date.getDate() + 3)
+            //     }
+            //     this.dateDueDate = date.toISOString().substr(0, 10)
                 
-            }
-            if(parseInt(vm.tongSoBan) < 10 && vm.tongSoBanTG >= 10){
-                let date = new Date(this.dateDueDate + this.crurentHours)
-                if(date.getDay() === 3){
-                    date.setDate(date.getDate() - 5)
-                }else if (date.getDay() === 4) {
-                    date.setDate(date.getDate() - 4)
-                } else if(date.getDay() === 5) {
-                    date.setDate(date.getDate() - 3)
-                } else {
-                    date.setDate(date.getDate() - 3)
-                }
-                this.dateDueDate = date.toISOString().substr(0, 10)
-                // this.dateDueDate = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate()    
-            }
-            vm.tongSoBanTG = parseInt(vm.tongSoBan) 
+            // }
+            // if(parseInt(vm.tongSoBan) < 10 && vm.tongSoBanTG >= 10){
+            //     let date = new Date(this.dateDueDate + this.crurentHours)
+            //     if(date.getDay() === 3){
+            //         date.setDate(date.getDate() - 5)
+            //     }else if (date.getDay() === 4) {
+            //         date.setDate(date.getDate() - 4)
+            //     } else if(date.getDay() === 5) {
+            //         date.setDate(date.getDate() - 3)
+            //     } else {
+            //         date.setDate(date.getDate() - 3)
+            //     }
+            //     this.dateDueDate = date.toISOString().substr(0, 10)  
+            // }
+            // vm.tongSoBanTG = parseInt(vm.tongSoBan) 
         },
         getDetail(){
             let vm = this

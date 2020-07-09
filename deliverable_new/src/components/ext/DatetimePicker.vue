@@ -7,14 +7,24 @@
         full-width
         max-width="290px"
         min-width="290px"
+        :class="classMenu"
+        style="width: calc(100% - 150px);"
+        
     >
         <v-text-field
             slot="activator"
-            box
+            hide-details
+            single-lines
+            solo
+            flat
+            height="32"
+            min-height="32"
             append-icon="event"
-            @blur="toDate = parseDate(toDateFormatted)"
+            @change="toDate = parseDate(dataValue)"
             :rules="processRules(item.rules)"
-            :value="formatDate(dataValue)"
+            v-model="dataValue"
+            :class="classTextField"
+            clearable
         >
           <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
         </v-text-field>
@@ -41,17 +51,29 @@
         }
       }
     },
-    props: ['value', 'item', 'dataValue'],
+    props: ['value', 'item', 'dataValue', 'classTextField', 'classMenu'],
     watch: {
         toDate (val) {
           let vm = this
           setTimeout(function () {
             // console.log('val toDate', val)
-            vm.toDateFormatted = vm.formatDate(val)
-            vm.$emit('input', new Date(val).getTime())
+            // vm.toDateFormatted = vm.formatDate(val)
+            const [year, month, day] = val.split('-')
+            vm.dataValue = `${day}/${month}/${year}`
+            vm.$emit('changeDate', vm.dataValue)
             // console.log('toDateFormatted 123', vm.toDateFormatted)
           }, 300)
+        },
+        dataValue (val) {
+          this.$emit('changeDate', val)
         }
+        // toDateFormatted(val){
+        //   let vm = this
+        //   setTimeout(function () {
+        //     vm.$emit('changeDate', val)
+        //     // console.log('toDateFormatted 123', vm.toDateFormatted)
+        //   }, 300)
+        // }
     },
     methods: {
         formatDate (date) {
@@ -81,7 +103,7 @@
         },
         processRules (rulesStr) {
             return eval('( ' + rulesStr + ' )')
-        }
+        },
     }
   }
 </script>

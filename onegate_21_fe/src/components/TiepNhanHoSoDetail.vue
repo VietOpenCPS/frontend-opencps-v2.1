@@ -708,7 +708,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: true,
+    notifyConfig: false,
     fromViaPostal: false,
     fromViaPostalConfig: false,
     smsNotify: true,
@@ -1269,7 +1269,7 @@ export default {
         vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
           let dataMetaData = {
             id: vm.dossierId,
-            data: thongtincongvan.metaData
+            data: JSON.stringify(thongtincongvan.metaData)
           }
           vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
           vm.loadingAction = false

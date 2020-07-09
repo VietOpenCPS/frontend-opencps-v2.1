@@ -1482,7 +1482,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    putMetaData({ commit, state }, data) {
+    putMetaData({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
         let options = {
@@ -1499,8 +1499,9 @@ export const store = new Vuex.Store({
         // dataPostdossier.append('totalRecord',data.totalRecord)
         // dataPostdossier.append('dossierFilePayment',data.dossierFilePayment)
         // dataPostdossier.append('Doan_HCTN',data.Doan_HCTN)
-        dataPostdossier.append('data',data.data)
-        axios.put('/o/rest/v2/dossiers/'+data.id+'/metadata', dataPostdossier, options).then(function (response) {
+        console.log('data put metadata111', filter.data)
+        dataPostdossier.append('data',filter.data)
+        axios.put('/o/rest/v2/dossiers/'+filter.id+'/metadata', dataPostdossier, options).then(function (response) {
           resolve(response)
         }).catch(function (error) {
           reject(error)

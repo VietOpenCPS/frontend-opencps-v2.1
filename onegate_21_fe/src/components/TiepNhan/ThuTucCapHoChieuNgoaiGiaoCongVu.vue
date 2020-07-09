@@ -2694,7 +2694,7 @@ export default {
                     
                 // let ngay = tg.getDate()+'/'+(tg.getMonth()+1)+'/'+tg.getFullYear()
                 // vm.dossiers['dueDate'] = ngay
-                vm.dateDueDate = tg.getFullYear()+'-'+(tg.getMonth()+1)+'-'+tg.getDate()
+                vm.dateDueDate = tg.toISOString().substr(0, 10)
             }).catch(err => {}) 
         },
         getThongTinNhanThan () {

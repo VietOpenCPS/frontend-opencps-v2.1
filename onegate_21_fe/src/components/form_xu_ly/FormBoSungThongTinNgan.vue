@@ -50,16 +50,6 @@
                   @change="inputChangeValue($event, index)"
                   box
                 ></v-autocomplete>
-                <!-- <v-text-field v-if="item.fieldType === 'date'"
-                  :id="item.fieldName"
-                  :value="item.value|parseDate"
-                  :placeholder="item.placeholder"
-                  readonly
-                  append-icon="event"
-                  v-on:click.native="openDialogCustom(item, item.fieldName)"
-                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
-                  :required="(item.required === true || item.required === 'true') ? true : false"
-                ></v-text-field> -->
                 <v-layout wrap class="pl-2" v-if="item.fieldType === 'date'">
                   <v-icon color="blue" class="">event</v-icon>
                   <vue-ctk-date-time-picker 
@@ -76,6 +66,23 @@
                     :without-header="true"
                     locale="vi"
                   />
+                </v-layout>
+                <v-layout wrap v-if="item.fieldType.indexOf('options_group') >= 0" class="mt-2">
+                  <v-flex xs4 v-for="(item1, index1) in optionsGroup" v-bind:key="index1" class="pr-3">
+                    <v-autocomplete 
+                      class="select-border"
+                      :items="optionsGroup[index1]['datasource']"
+                      :value="item1.value"
+                      :rules="(item1.required === true || item1.required === 'true') ? [rules.required] : []"
+                      :required="(item1.required === true || item1.required === 'true') ? true : false"
+                      :label="item1.fieldLabel"
+                      item-text="itemName"
+                      item-value="itemCode"
+                      :hide-selected="true"
+                      @change="inputChangeSelect($event, index1)"
+                      box
+                    ></v-autocomplete>
+                  </v-flex>
                 </v-layout>
               </v-flex>
             </v-layout>
@@ -154,17 +161,6 @@
               ></v-autocomplete>
             </v-flex>
             <v-flex xs12 class="px-3">
-              <!-- <v-text-field v-if="item.fieldType === 'date'"
-                box
-                :id="item.fieldName"
-                :value="item.value|parseDate"
-                :placeholder="item.placeholder"
-                readonly
-                append-icon="event"
-                v-on:click.native="openDialogCustom(item, item.fieldName)"
-                :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
-                :required="(item.required === true || item.required === 'true') ? true : false"
-              ></v-text-field> -->
               <v-layout wrap class="mt-2" v-if="item.fieldType === 'date'">
                 <v-icon color="blue" class="">event</v-icon>
                 <vue-ctk-date-time-picker 
@@ -226,7 +222,7 @@
 </template>
 <script>
   let datePicker = window.VueCtkDateTimePicker ? window.VueCtkDateTimePicker.default : window['vue-ctk-date-time-picker']
-
+  import axios from 'axios'
   export default {
     components: {
       'vue-ctk-date-time-picker': datePicker
@@ -244,6 +240,7 @@
       }
     },
     data: () => ({
+      optionsGroup: [],
       itemId: null,
       fieldNameID: '',
       date: null,
@@ -309,6 +306,13 @@
                   vm.formBuilder[key]['value'] = ''
                 } else if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && !isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
                   vm.formBuilder[key]['value'] = new Date(vm.formBuilder[key]['value'])
+                } else if (vm.formBuilder[key]['fieldType'].indexOf('options_group') >= 0) {
+                  vm.optionsGroup = JSON.parse(vm.formBuilder[key]['fieldType'])['options_group']
+                  for (let key1 in vm.optionsGroup) {
+                    if (vm.optionsGroup[key1].hasOwnProperty('api') && vm.optionsGroup[key1]['api']) {
+                      vm.getDataSource(vm.optionsGroup[key1]['api'], key1)
+                    }
+                  }
                 }
               }
               vm.allExpand(vm.formBuilder)
@@ -344,6 +348,34 @@
           item.value = document.getElementById(item.fieldName).value
         }
         console.log('formBuilder', vm.formBuilder)
+      },
+      inputChangeSelect (item, index) {
+        console.log('inputChangeSelect', item, index)
+        let vm = this
+        vm.optionsGroup[index]['value'] = item
+        if (vm.optionsGroup.length > (index + 1)) {
+          vm.getDataSource()
+        }
+      },
+      getDataSource (api, index) {
+        let vm = this
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          },
+          params: {
+            
+          }
+        }
+        axios.get(api, param).then(function (response) {
+          if (response.data && response.data['data']) {
+            vm.optionsGroup[index]['datasource'] = response.data['data']
+          } else {
+            vm.optionsGroup[index]['datasource'] = []
+          }
+        }).catch(function (xhr) {
+          vm.optionsGroup[index]['datasource'] = []
+        })
       },
       showDatePicker () {
         this.$refs.datepicker.showDatePicker()
