@@ -691,7 +691,7 @@ export default {
       wardCode: true,
       contactTelNo: true,
       contactEmail: false,
-      delegateIdNo: false,
+      delegateIdNo: true,
       delegateName: true,
       delegateAddress: true,
       delegateCityCode: true,

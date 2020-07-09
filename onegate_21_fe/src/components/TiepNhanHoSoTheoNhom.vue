@@ -662,7 +662,7 @@
                   </td>
                   
                   <td class="text-xs-center" width="100px" style="height: 40px !important">
-                    <v-btn small outline color="primary" @click="addDossierToGroup(props.item)" class="mr-2 my-0">
+                    <v-btn :disabled="loadingAction" small outline color="primary" @click="addDossierToGroup(props.item)" class="mr-2 my-0">
                       <v-icon size="20">add</v-icon>  &nbsp;
                       <span>Thêm hồ sơ</span>
                     </v-btn>
@@ -681,11 +681,11 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click.native="addMultipleDossierToGroup()">
+          <v-btn :disabled="loadingAction" color="primary" @click.native="addMultipleDossierToGroup()">
             <v-icon>send</v-icon>&nbsp;
             Xác nhận
           </v-btn>
-          <v-btn color="primary" @click.native="dialogAddDossier = false"
+          <v-btn :disabled="loadingAction" color="primary" @click.native="dialogAddDossier = false"
             >
             <v-icon class="white--text">close</v-icon>&nbsp;
             Thoát
@@ -1856,6 +1856,7 @@ export default {
     },
     addDossierToGroup (item, multiple) {
       let vm = this
+      vm.loadingAction = true
       let data = {
         groupDossierId: vm.thongTinNhomHoSo.dossierId,
         dossierId: multiple ? multiple : item.dossierId
@@ -1863,10 +1864,14 @@ export default {
       vm.$store.dispatch('postDossierIntoGroup', data).then(function (result) {
         toastr.clear()
         toastr.success('Thêm hồ sơ thành công')
-        vm.dialogAddDossier = false
-        vm.$store.dispatch('getDossiersIntoGroup', data).then(function (result) {
-          vm.dossiersIntoGroupRender = result
-        })
+        setTimeout(() => {
+          vm.loadingAction = false
+          vm.dialogAddDossier = false
+          vm.$store.dispatch('getDossiersIntoGroup', data).then(function (result) {
+            vm.dossiersIntoGroupRender = result
+          })
+        }, 500)
+        
         // copy file 
         let count = 0
         let files = vm.filesGroupDossier.filter(function(item) {
@@ -1884,7 +1889,9 @@ export default {
           })
         }
         // 
-      }).catch(function () {})
+      }).catch(function () {
+        vm.loadingAction = false
+      })
     },
     getMetaData (val) {
       let metaDataOut = ''

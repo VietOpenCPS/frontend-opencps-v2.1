@@ -382,14 +382,17 @@ export default {
       } catch (error) {
       }
       let metaData = metaDataDossier ? metaDataDossier : {donvigui: '', donvinhan: '', tendonvigui: '', tendonvinhan: ''}
-
+      let scopeUser = ''
+      if (vm.userLoginInfomation.hasOwnProperty('scope') && vm.userLoginInfomation.scope) {
+        scopeUser = String(vm.userLoginInfomation.scope).split(",")[0]
+      }
       if (vm.formCodeInput === 'NEW_GROUP_CV') {
         // vm.thongTinCongVan.delegateName = delegateName ? delegateName : ''
         metaData.tendonvigui = delegateName
         metaData.donvigui = vm.donvi_gui_nhan
-        metaData.donvinhan = vm.userLoginInfomation.hasOwnProperty('scope') && vm.userLoginInfomation.scope ? vm.userLoginInfomation.scope : vm.detailDossier.govAgencyCode
+        metaData.donvinhan = scopeUser ? scopeUser : vm.detailDossier.govAgencyCode
       } else {
-        metaData.donvigui = vm.userLoginInfomation.hasOwnProperty('scope') && vm.userLoginInfomation.scope ? vm.userLoginInfomation.scope : vm.detailDossier.govAgencyCode
+        metaData.donvigui = scopeUser ? scopeUser : vm.detailDossier.govAgencyCode
         metaData.donvinhan = vm.donvi_gui_nhan
         metaData.tendonvinhan = delegateName
       }

@@ -69,7 +69,7 @@
             v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
             :items="listDichVu"
             v-model="dichVuSelected"
-            label="Chọn trường hợp"
+            label="Chọn dịch vụ"
             item-text="optionName"
             item-value="processOptionId"
             return-object
@@ -414,7 +414,7 @@
                   :items="listDichVu"
                   v-model="dichVuSelected"
                   label="Dịch vụ:"
-                  placeholder="Chọn trường hợp"
+                  placeholder="Chọn dịch vụ"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
@@ -605,7 +605,7 @@
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
-                  placeholder="Chọn trường hợp"
+                  placeholder="Chọn dịch vụ"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
@@ -754,7 +754,7 @@
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
-                  placeholder="Chọn trường hợp"
+                  placeholder="Chọn dịch vụ"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
@@ -1027,7 +1027,9 @@ export default {
     status: '',
     top: '',
     orderSort: '',
-    sortValue: ''
+    sortValue: '',
+    govAgencyFilterMenuConfig: '',
+    groupServiceFilterMenuConfig: ''
   }),
   computed: {
     loadingDynamicBtn () {
@@ -1057,7 +1059,10 @@ export default {
     // },
     isMobile () {
       return this.$store.getters.getIsMobile
-    }
+    },
+    userLoginInfomation () {
+      return this.$store.getters.getUserLogin
+    },
   },
   created () {
     let vm = this
@@ -1309,9 +1314,21 @@ export default {
         vm.showLimit = false
         vm.limitRecord = 15
       }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchGovAgencyCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode) {
+        let govKey = vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode
+        let scopeUser = ''
+        if (vm.userLoginInfomation.hasOwnProperty('scope') && vm.userLoginInfomation.scope) {
+          scopeUser = String(vm.userLoginInfomation.scope).split(",")[0]
+        }
+        vm.govAgencyFilterMenuConfig = govKey === '_firstscope' ? scopeUser : govKey
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('groupServiceCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode) {
+        vm.groupServiceFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode
+      }
     },
     index (val) {
       let vm = this
+      console.log('indexMenu', vm.index)
       if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('pagination') && vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination']) {
         vm.limits = vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination'].filter(function (item) {
           return Number(item) <= 100
@@ -1326,6 +1343,18 @@ export default {
       } else {
         vm.showLimit = false
         vm.limitRecord = 15
+      }
+
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchGovAgencyCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode) {
+        let govKey = vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode
+        let scopeUser = ''
+        if (vm.userLoginInfomation.hasOwnProperty('scope') && vm.userLoginInfomation.scope) {
+          scopeUser = String(vm.userLoginInfomation.scope).split(",")[0]
+        }
+        vm.govAgencyFilterMenuConfig = govKey === '_firstscope' ? scopeUser : govKey
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('groupServiceCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode) {
+        vm.groupServiceFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode
       }
     }
   },
@@ -1405,6 +1434,7 @@ export default {
             // thuTuc['displayName'] = thuTuc['serviceName']
             return thuTuc
           })
+          vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
         }
         vm.listThuTuc = result.map(thuTuc => {
           thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
@@ -1473,6 +1503,8 @@ export default {
               // thuTuc['displayName'] = thuTuc['serviceName']
               return thuTuc
             })
+            vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
+            console.log('listThuTucHanhChinh2', vm.listThuTucHanhChinh)
           }).catch(function (){})
         } else {
           vm.linhVucSelected = null
@@ -1649,6 +1681,9 @@ export default {
             sort: vm.sortValue
           }
         }
+        if (vm.groupServiceFilterMenuConfig) {
+          filter.agency = ''
+        }
         // console.log('filter doLoadingData', filter)
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
@@ -1786,13 +1821,12 @@ export default {
               // thuTuc['displayName'] = thuTuc['serviceName']
               return thuTuc
             })
+            vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
           }).catch(function (){})
-          // vm.listThuTucHanhChinh = vm.listThuTuc.filter(function (itemThuTuc) {
-          //   return (itemThuTuc.serviceCode.split(itemThuTuc.serviceCode.match(/\d+/g)[0])[0] === item.domainCode)
-          // })
         }, 100)
       } else {
         vm.listThuTucHanhChinh = vm.listThuTuc
+        vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
       }
       if (item !== null && item !== undefined) {
         vm.domainCode = vm.linhVucSelected['domainCode']
@@ -2826,6 +2860,45 @@ export default {
         }
       }
       return count
+    },
+    filterServiceConfig (serviceList) {
+      let vm = this
+      if (!vm.govAgencyFilterMenuConfig && !vm.groupServiceFilterMenuConfig) {
+        return serviceList
+      } else if (vm.govAgencyFilterMenuConfig && !vm.groupServiceFilterMenuConfig) {
+        let data = serviceList.filter(function (item) {
+          return item.govAgencyCode === vm.govAgencyFilterMenuConfig
+        })
+        return data
+      } else if (!vm.govAgencyFilterMenuConfig && vm.groupServiceFilterMenuConfig) {
+        let list = []
+        for (let index in serviceList) {
+          let exits = list.filter(function(item) {
+            return item.serviceCode === serviceList[index]['serviceCode']
+          }).length
+          if (exits === 0) {
+            console.log('serviceListIndex', serviceList[index], list)
+            list.push(serviceList[index])
+            console.log('list', list)
+          }
+        }
+        return list
+      } else {
+        let data1 = serviceList.filter(function (item) {
+          return item.govAgencyCode === vm.govAgencyFilterMenuConfig
+        })
+        let list = []
+        for (let index in data1) {
+          let exits = list.filter(function(item) {
+            return item.serviceCode === data1[index]['serviceCode']
+          }).length
+          if (exits === 0) {
+            list.push(data1[index])
+          }
+        }
+        return list
+      }
+      
     },
     changeDate() {
       let vm = this

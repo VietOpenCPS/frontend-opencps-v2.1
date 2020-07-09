@@ -179,7 +179,8 @@ export const store = new Vuex.Store({
             },
             params: {
               start: filter.start,
-              end: filter.end
+              end: filter.end,
+              status: 1
             }
           }
           axios.get(state.endPointApi + '/employees', param).then(result => {
