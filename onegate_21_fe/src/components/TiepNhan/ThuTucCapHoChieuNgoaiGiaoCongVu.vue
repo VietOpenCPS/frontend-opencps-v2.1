@@ -2441,8 +2441,6 @@ export default {
                 
                 }
                 vm.so_nguoi = vm.listThanhVien.length
-                console.log(tk)
-                console.log(vm.listThanhVien)
                 for (let i=0; i<vm.dossierFileArr.length; i++){
                     if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
                         vm.dossierFileArr[i]['formData'] = JSON.stringify({'thanh_vien_doan': vm.listThanhVien })
@@ -2630,11 +2628,8 @@ export default {
            
             let nuoc_id = vm.nuoc_di.join()
             let nuoc_di = ''
-            console.log(vm.listNuocDi)
-            console.log(vm.nuoc_di)
             vm.nuoc_di.forEach((e)=>{
                 let nc = vm.listNuocDi.find(item=>item.ID === e)
-                console.log(nc)
                 if(nc){
                     if(nuoc_di){
                         nuoc_di+=', ' + nc.TEN
@@ -2644,7 +2639,6 @@ export default {
                     
                 }     
             });
-            console.log(nuoc_di)
             vm.payment = {"requestPayment":1,"paymentNote":"","advanceAmount":0,"feeAmount":le_phi,"serviceAmount":0,"shipAmount":0}
  
             let hs = JSON.parse(vm.dossiers['metaData']);
@@ -2700,7 +2694,7 @@ export default {
                     
                 // let ngay = tg.getDate()+'/'+(tg.getMonth()+1)+'/'+tg.getFullYear()
                 // vm.dossiers['dueDate'] = ngay
-                vm.dateDueDate = tg.getFullYear()+'-'+(tg.getMonth()+1)+'-'+tg.getDate()
+                vm.dateDueDate = tg.toISOString().substr(0, 10)
             }).catch(err => {}) 
         },
         getThongTinNhanThan () {
@@ -2723,8 +2717,6 @@ export default {
             axios.request(config).then(res => {
                 if(res.data.data.length > 0) {
                     let arr = res.data.data.map(obj=>{
-                        console.log(obj)
-                        console.log(vm.listNoiSinh)
                         let NoiSinhText = {}
                         if(isNaN(obj.NoiSinh)){
                             NoiSinhText = vm.listNoiSinhNuocNgoai.find(e=>e.ID===obj.NoiSinh)

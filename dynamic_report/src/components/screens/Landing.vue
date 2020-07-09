@@ -72,6 +72,19 @@
           >
         </v-autocomplete>
       </v-flex>
+      <!--  -->
+      <v-flex xs6 sm2 class="px-3" v-for="(item, index) in groupIdList" :key="index">
+        <v-autocomplete
+          :items="item.value"
+          :label="item.label"
+          v-model="filterGroup[item.key]" 
+          item-text="text"
+          item-value="value"
+          @change="changeGroupIdList(item.key)"
+          >
+        </v-autocomplete>
+      </v-flex>
+      <!--  -->
       <v-flex xs6 sm2 class="px-3" v-if="groupBy.length > 1">
         <v-autocomplete
           :items="groupBy"
@@ -428,6 +441,8 @@ export default {
     dialogPDFLoading: false,
     isRender: false,
     dataExportExcel: '',
+    groupIdList: [],
+    filterGroup: {}
   }),
   computed: {
     itemsReports () {
@@ -557,6 +572,11 @@ export default {
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
             vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
           }
+          // 
+          if(vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIdList')) {
+            vm.groupIdList = vm.itemsReports[vm.index]['filterConfig']['groupIdList']
+          }
+          // 
           for (let key in vm.filters) {
             if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
               vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
@@ -1825,6 +1845,14 @@ export default {
         fileName: 'baocaothongke' + '.xls'
       })
     },
+    changeGroupIdList(key){
+      let vm = this
+      for(let i in vm.filterGroup){
+        if(i !== key) {
+          vm.filterGroup[i] = ''
+        }
+      }
+    }
   }
 }
 </script>

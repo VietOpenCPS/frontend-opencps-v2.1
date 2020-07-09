@@ -80,6 +80,12 @@
                   Không có hồ sơ tiếp nhận ngày {{fromDate()}}
                 </v-alert>
               </v-flex>
+              <div v-if="dossierList.length > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
+                <div class="flex pagging-table px-2">
+                  <tiny-pagination :total="dossierList.length" :page="pagination.page" custom-class="custom-tiny-class" 
+                    @tiny:change-page="paggingData" ></tiny-pagination> 
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -268,6 +274,10 @@ export default {
         }
       })
     },
+    paggingData (config) {
+      let vm = this
+      vm.pagination.page = config.page
+    },
     searchDossier () {
       let vm = this
       vm.dossierList = []
@@ -282,6 +292,7 @@ export default {
         vm.loading = false
         if (result.data) {
           vm.dossierList = result.data
+          vm.pagination.page = 1
           vm.totalPages = Math.ceil(vm.dossierList.length / vm.pagination.rowsPerPage)
         }
       }).catch(reject => {

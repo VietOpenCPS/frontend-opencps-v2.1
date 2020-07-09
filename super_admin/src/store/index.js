@@ -122,7 +122,7 @@ export const store = new Vuex.Store({
             icon: 'arrow_right',
             link: '/table/opencps_stt/stt',
             code: 'stt',
-            text: 'Số TT, Số theo dõi'
+            text: 'Số TT, Sổ theo dõi'
           }
         ]
       },

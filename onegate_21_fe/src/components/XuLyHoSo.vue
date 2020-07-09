@@ -288,7 +288,8 @@ export default {
     loadingAction: false,
     arrDossierId: [],
     actionActiveTmp: [],
-    gopThuPhi: true
+    gopThuPhi: true,
+    changePaymentStatus: false
   }),
   computed: {
     loading () {
@@ -441,7 +442,6 @@ export default {
         }
         // Add thu phí
         if (vm.gopThuPhi && result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
-          // add thanh toán điện tử
           if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3')) {
             isPopup = true
             vm.showThanhToanDienTu = true
@@ -459,6 +459,11 @@ export default {
             vm.payments = result.payment
             vm.viaPortalDetail = dossierItem.viaPostal
           }
+        } else if (!vm.gopThuPhi && result.hasOwnProperty('payment') && result.payment !== null && 
+          result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0 && result.payment.requestPayment !== 3
+        ) {
+          vm.payments = result.payment
+          vm.changePaymentStatus = true
         }
         // add Thu phí
         if (result.hasOwnProperty('checkInput') && result.checkInput !== null && result.checkInput !== undefined && result.checkInput !== 'undefined') {
@@ -578,15 +583,22 @@ export default {
       }
       var paymentsOut = null
       if (vm.payments) {
-        paymentsOut = {
-          requestPayment: vm.payments['requestPayment'],
-          advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-          feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-          serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-          shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+        if (vm.showThuPhi) {
+          paymentsOut = {
+            requestPayment: vm.payments['requestPayment'],
+            advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+            feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+            serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+            shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+          }
+        } else if (!vm.showThuPhi && vm.changePaymentStatus) {
+          paymentsOut = {
+            requestPayment: vm.payments['requestPayment']
+          }
         }
+        
       }
-      if (vm.showThuPhi) {
+      if (vm.showThuPhi || vm.changePaymentStatus) {
         filter['payment'] = paymentsOut
       }
       if (vm.showFormBoSungThongTinNgan) {
