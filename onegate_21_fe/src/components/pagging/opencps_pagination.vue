@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :style="!viewMobile ? 'text-align: left;position: absolute;line-height: 46px;' : ''">Tổng số <span class="text-bold primary--text">{{total}}</span> {{nameRecord}}. </div>
+    <div :style="!viewMobile ? 'text-align: left;position: absolute;line-height: 46px;' : ''" v-if="showTotal">Tổng số <span class="text-bold primary--text">{{total}}</span> {{nameRecord}}. </div>
     <div v-if="total > 0" class="vue-tiny-pagination pagination layout" :style="!viewMobile ? 'justify-content: flex-end; -webkit-justify-content: flex-end;' : ''">
       <div v-if="showLimit" class="pr-2 xs4 sm2 flex" style="width:120px">
         Số hồ sơ mỗi trang:
@@ -90,6 +90,10 @@ export default {
     showLimit: {
       type: Boolean,
       default: false
+    },
+    showTotal: {
+      type: Boolean,
+      default: true
     }
   },
   data () {

@@ -4600,6 +4600,20 @@ export const store = new Vuex.Store({
         })
       })
     },
+    removeDossierFromGroup ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        axios.delete('/o/rest/v2/dossiers/'+ data.dossierId + '/groupDossier/' + data.groupDossierId + '/remove', param).then(function (response) {
+          resolve(response)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
     // ----End---------
   },
   mutations: {

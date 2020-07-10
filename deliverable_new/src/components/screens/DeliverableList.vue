@@ -107,7 +107,7 @@
         <div class="adv_search px-2 my-2 mx-2" style="background: #eeeeee">
           <div class="searchAdvanced-content py-2">
             <v-layout wrap>
-              <v-flex xs12 sm6 class="mb-2 px-2">
+              <!-- <v-flex xs12 sm6 class="mb-2 px-2">
                 <div>
                   <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Số/ ký hiệu:</div>
                   <v-text-field
@@ -213,6 +213,92 @@
                     clearable
                     @keyup.enter.native="filterDeliverable"
                   ></v-textarea>
+                </div>
+              </v-flex> -->
+              <v-flex v-for="(item, indexTool) in filters" v-if="item.display" v-bind:key="indexTool" :class="item.class" class="mb-2 px-2">
+                <div>
+                  <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">{{item.fieldLabel}}</div>
+                  <v-text-field
+                    v-if="item.fieldType === 'string'"
+                    v-model="filterData[item.fieldName]"
+                    class="search-input-appbar input-search d-inline-block"
+                    style="width: calc(100% - 150px);"
+                    single-lines
+                    hide-details
+                    solo
+                    flat
+                    height="32"
+                    min-height="32"
+                    clearable
+                    @keyup.enter="filterDeliverable"
+                  ></v-text-field>
+                  <v-textarea
+                    v-if="item['fieldType'] === 'textarea'"
+                    v-model="filterData[item.fieldName]"
+                    class="search-input-appbar input-search d-inline-block"
+                    style="width: calc(100% - 150px);"
+                    single-lines
+                    hide-details
+                    solo
+                    flat
+                    rows="3"
+                    clearable
+                    @keyup.enter="filterDeliverable"
+                  ></v-textarea>
+                  <v-autocomplete
+                    v-if="item['fieldType'] === 'select'"
+                    :items="item['source']"
+                    v-model="filterData[item.fieldName]"
+                    :label="item['label']"
+                    item-value="value"
+                    item-text="name"
+                    :clearable="item['clearable']"
+                  ></v-autocomplete>
+                  <datetime-picker
+                    v-if="item.fieldType === 'date'"
+                    v-model="filterData[item.fieldName]" 
+                    :item="item" 
+                    :data-value="filterData[item.fieldName]"
+                    :data-all="filterData"
+                    :classTextField="'search-input-appbar input-search d-inline-block'"
+                    :classMenu="'d-inline-block'"
+                    @changeDate="changeDate($event, item.fieldName)"
+                    >
+                    
+                  </datetime-picker>
+                  <!-- <v-menu
+                    class="d-inline-block"
+                    style="width: calc(100% - 150px);"
+                    ref="menuDate"
+                    :close-on-content-click="false"
+                    v-model="menuDate"
+                    :nudge-right="40"
+                    lazy
+                    transition="fade-transition"
+                    offset-y
+                    full-width
+                    max-width="290px"
+                    min-width="290px"
+                  >
+                    <v-text-field
+                      v-if="item['fieldType'] === 'date'"
+                      class="search-input-appbar input-search d-inline-block"
+                      slot="activator"
+                      append-icon="event"
+                      single-lines
+                      hide-details
+                      solo
+                      flat
+                      height="32"
+                      min-height="32"
+                      v-model="filterData[item.fieldName]"
+                      @blur="issueDatePiecker = parseDate(filterData[item.fieldName])"
+                      clearable
+                      @keyup.enter="filterDeliverable"
+                    ></v-text-field>
+                    <v-date-picker ref="picker" min="1950-01-01" :first-day-of-week="1" locale="vi"
+                    v-model="issueDatePiecker" no-title @input="changeIssueDate(item.fieldName)"></v-date-picker>
+                  </v-menu> -->
                 </div>
               </v-flex>
               
@@ -419,6 +505,7 @@
 <script>
   import { TinyPagination } from '@/components'
   import TemplateRendering from './template_rendering.vue'
+  import DatetimePicker from '../ext/DatetimePicker.vue'
   import axios from 'axios'
   import toastr from 'toastr'
 
@@ -426,7 +513,8 @@
     props: ['index'],
     components: {
       TinyPagination,
-      TemplateRendering
+      TemplateRendering,
+      DatetimePicker
     },
     data () {
       return {
@@ -804,22 +892,26 @@
           type_search = 'keyword'
         }
         let searchParams = {}
-        if (vm.applicantName ) {
-          searchParams.applicantName = vm.applicantName
+        // if (vm.applicantName ) {
+        //   searchParams.applicantName = vm.applicantName
+        // }
+        // if (vm.issueDate ) {
+        //   searchParams.issueDate = vm.issueDate
+        // }
+        // if (vm.donvicu_data ) {
+        //   searchParams.subject = vm.donvicu_data
+        // }
+        // if (vm.trichyeu_data ) {
+        //   searchParams.deliverableName = String(vm.trichyeu_data).replace(/\n/g, "")
+        // }
+        // if (vm.deliverableKey ) {
+        //   searchParams.deliverableCode = vm.deliverableKey
+        // }
+        for(let key in vm.filterData){
+          if(vm.filterData[key]){
+            searchParams[key] = vm.filterData[key]
+          }
         }
-        if (vm.issueDate ) {
-          searchParams.issueDate = vm.issueDate
-        }
-        if (vm.donvicu_data ) {
-          searchParams.subject = vm.donvicu_data
-        }
-        if (vm.trichyeu_data ) {
-          searchParams.deliverableName = String(vm.trichyeu_data).replace(/\n/g, "")
-        }
-        if (vm.deliverableKey ) {
-          searchParams.deliverableCode = vm.deliverableKey
-        }
-
         let filter = {
           typeSearch: type_search ? type_search : '',
           type: vm.items[vm.index]['typeCode'],
@@ -913,10 +1005,13 @@
         let roleExits = roles.findIndex(item => String(item).indexOf(roleItem) >= 0)
         return (roleExits >= 0)
       },
-      changeIssueDate () {
+      changeIssueDate (key) {
         let vm = this
         vm.menuDate = false
         vm.issueDate = vm.formatDate(vm.issueDatePiecker)
+        if(key){
+          vm.filterData[key] = vm.formatDate(vm.issueDatePiecker)
+        }
       },
       formatDate(date) {
         if (!date) return null
@@ -928,6 +1023,15 @@
         const [day, month, year] = date.split('/')
         return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
       },
+      reloadPickerChange(key){
+        console.log(key)
+      },
+      changeDate(event, key){
+        console.log(event)
+        // let date = new Date(event)
+        // const [year, month, day] = date.toISOString().substr(0, 10).split('-')
+        this.filterData[key] = event
+      }
     }
   }
 </script>

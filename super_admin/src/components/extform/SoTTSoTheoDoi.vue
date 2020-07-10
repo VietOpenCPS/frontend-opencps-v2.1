@@ -18,7 +18,7 @@
           <v-icon>edit</v-icon>
         </v-btn>
         <v-toolbar-title class="ml-0">
-          Số thứ tự, số theo dõi
+          Số thứ tự, sổ theo dõi
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn dark icon v-on:click.native="backToList">
@@ -138,7 +138,7 @@ export default {
           if(result && result.length > 0){
             vm.govAgencys = result
           } else {
-            vm.$store.dispatch('getRegisterBookList').then(function (result2) {
+            vm.$store.dispatch('getAgencyLists').then(function (result2) {
               vm.govAgencys = result2
             }).catch(function (){})
           }

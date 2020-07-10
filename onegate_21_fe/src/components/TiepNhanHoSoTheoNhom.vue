@@ -72,7 +72,7 @@
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 Danh sách hồ sơ&nbsp;&nbsp;&nbsp;&nbsp;
               </div>
-              
+         
               <div class="mb-3" v-if="dossiersIntoGroupRender.length > 0">
                 <v-layout wrap class="my-2">
                   <v-flex style="width: 120px">
@@ -105,8 +105,8 @@
                   v-model="selected"
                   select-all
                   :headers="headersCV"
-                  :items="dossiersIntoGroupRender"
-                  :pagination.sync="pagination"
+                  :items="dossiersIntoGroupRenderTemp"
+                  
                   hide-actions
                   class="table-landing table-bordered"
                   item-key="dossierId"
@@ -185,7 +185,7 @@
                         <v-btn flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
                           <v-icon size="22">create</v-icon>
                         </v-btn>
-                        <v-btn flat icon color="red" class="my-0" @click="" title="Xóa">
+                        <v-btn flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
                           <v-icon size="22">delete</v-icon>
                         </v-btn>
                       </td>
@@ -202,9 +202,9 @@
                     <span class="text-bold">{{currency(totalFee)}} đồng</span>
                   </v-flex>
                 </v-layout>
-                <div v-if="dossiersIntoGroupRender.length > 30" class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
+                <div  class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
                   <div class="flex pagging-table px-2">
-                    <tiny-pagination :total="dossiersIntoGroupRender.length" :currentLimit="30" :page="pagination.page" custom-class="custom-tiny-class" 
+                    <tiny-pagination :total="dossiersIntoGroupRender.length" :showTotal="false" :currentLimit="30" :page="pagination.page" custom-class="custom-tiny-class" 
                       @tiny:change-page="paggingData" ></tiny-pagination> 
                   </div>
                 </div>
@@ -746,6 +746,7 @@ export default {
     numberPerPageAddDossier: 5,
     dossiersIntoGroup: [],
     dossiersIntoGroupRender: [],
+    dossiersIntoGroupRenderTemp: [],
     selected: [],
     selectedAttach: [],
     stepList: [],
@@ -873,7 +874,7 @@ export default {
     countDossierSuccess: 0,
     dossierNameCongVan: '',
     pagination: {
-      rowsPerPage: 30,
+      rowsPerPage: 15,
       page: 1
     },
     tphsCV: '',
@@ -963,6 +964,7 @@ export default {
             totalFee += fee
           }
         }
+        vm.dossiersIntoGroupRenderTemp = arr.slice(0, vm.pagination.rowsPerPage )
         vm.totalFee = totalFee
       }
       
@@ -1030,6 +1032,9 @@ export default {
     paggingData (config) {
       let vm = this
       vm.pagination.page = config.page
+      let start = vm.pagination.page * vm.pagination.rowsPerPage - vm.pagination.rowsPerPage
+      let end = vm.pagination.page * vm.pagination.rowsPerPage
+      vm.dossiersIntoGroupRenderTemp = vm.dossiersIntoGroupRender.slice(start, end)
     },
     paggingDataDossierAdd (config) {
       let vm = this
@@ -1779,6 +1784,25 @@ export default {
       vm.$router.push({
         path: '/danh-sach-ho-so/0/ho-so/' + item.dossierId + '/UPDATE',
         query: query
+      })
+    },
+    removeDossierFromGroup (item) {
+      let vm = this
+      let filter = {
+        dossierId: item.dossierId,
+        groupDossierId: vm.thongTinNhomHoSo['dossierId']
+      }
+      vm.$store.dispatch('removeDossierFromGroup', filter).then(function (result) {
+        toastr.success('Yêu cầu thực hiện thành công')
+        let filter1 = {
+          groupDossierId: vm.thongTinNhomHoSo['dossierId']
+        }
+        vm.$store.dispatch('getDossiersIntoGroup', filter1).then(function (result) {
+          vm.dossiersIntoGroup = result
+          vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
+        })
+      }).catch(function () {
+        toastr.error('Yêu cầu thực hiện thất bại')
       })
     },
     addFileToDossier () {
