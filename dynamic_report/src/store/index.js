@@ -296,7 +296,6 @@ export const store = new Vuex.Store({
               Accept: 'application/json'
             },
             params: {
-
             }
           }
           for (let key in filter['data']) {
@@ -347,8 +346,20 @@ export const store = new Vuex.Store({
               let promises = []
               for (let key in agencyListsGet) {
                 if (String(agencyListsGet[key]['value']) !== '0') {
-                  param['headers']['groupId'] = agencyListsGet[key]['value']
-                  promises.push(axios.get(requestURL, param))
+                  let paramCopy = Object.assign({}, param)
+                  paramCopy['headers']['groupId'] = agencyListsGet[key]['value']
+                  paramCopy['params']['v'] = Math.random() + key
+                  
+                  promises.push(axios.get(requestURL, {
+                    headers: {
+                      groupId: agencyListsGet[key]['value'],
+                      Accept: 'application/json'
+                    },
+                    params: {
+                      v: Math.random(),
+                      ...param.params
+                    }
+                  }))
                 }
               }
               axios.all(promises)
@@ -379,6 +390,7 @@ export const store = new Vuex.Store({
               } else {
                 param['headers']['groupId'] = govAgency
               }
+              param['params']['v'] = Math.random()
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
