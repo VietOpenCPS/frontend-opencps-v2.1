@@ -123,7 +123,14 @@
                     <p class="pt-2 mb-0">{{goodCode}}</p>
                   </v-flex>
                   <v-flex xs12 sm7 v-if="payments['paymentMethod'] === 'Keypay'"></v-flex>
-                  <!--  -->
+                  <!-- end -->
+
+                  <!-- biên lai KeyPayDVCQG -->
+                  <v-flex xs12 v-if="payments['paymentMethod'] === 'KeyPayDVCQG'">
+
+                  </v-flex>
+
+                  <!-- end -->
                 </v-layout>
               </v-layout>
             </v-card-text>
@@ -372,10 +379,16 @@ export default {
       }
       vm.dialogPDFLoading = true
       vm.dialogPDF = true
-      vm.$store.dispatch('printPay', filter).then(function (result) {
+      if (vm.payments['paymentMethod'] === 'KeyPayDVCQG') {
+        let confirmPayload = vm.payments.hasOwnProperty('confirmPayload') ? vm.getEPaymentProfile(vm.payments['confirmPayload']) : ''
         vm.dialogPDFLoading = false
-        document.getElementById('dialogPaymentPreview').src = result
-      }).catch(function(){})
+        document.getElementById('dialogPaymentPreview').src = confirmPayload ? confirmPayload['url_invoice'] : ''
+      } else {
+        vm.$store.dispatch('printPay', filter).then(function (result) {
+          vm.dialogPDFLoading = false
+          document.getElementById('dialogPaymentPreview').src = result
+        }).catch(function(){})
+      }
     },
     getEinvoiceNo (string) {
       if (string && string.indexOf('#') >= 0) {

@@ -430,7 +430,7 @@ export const store = new Vuex.Store({
             } else {
               resolve(response.data)
               toastr.clear()
-              toastr.success('Xác thực thành công. Vui lòng kiểm tra email hoặc số điện thoại để có mật khẩu mới')
+              toastr.success('Xác thực thành công. Vui lòng kiểm tra email để lấy mật khẩu mới')
               setTimeout(function () {
                 let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
                 window.open(redirectURL, '_self')
@@ -536,16 +536,24 @@ export const store = new Vuex.Store({
             groupId: window.themeDisplay.getScopeGroupId()
           }
         }
-        let url = ''
-        if (filter.type === '') {
-          url = ''
-        }
+        let url = '/o/rest/v2/applicants/sendMail/' + filter.activeId + '/active'
         let dataPutUser = new URLSearchParams()
-        // dataPutUser.append('oldPassword', filter.oldPassword)
-        axios.post(url, dataPutUser, param).then(result => {
-          resolve(result)
-        }).catch(xhr => {
-          reject(xhr)
+        dataPutUser.append('notificationType', filter.notificationType)
+        dataPutUser.append('notifyMessage', filter.notifyMessage)
+        axios.post(url, dataPutUser, param).then(response => {
+          resolve(response)
+        }).catch(errorRes => {
+          let response = errorRes.response
+          if (response['status'] !== undefined && response['status'] === 403) {
+            toastr.clear()
+            toastr.error('Mã xác nhận không chính xác. Vui lòng nhập lại.')
+            reject('captcha')
+          } else {
+            toastr.clear()
+            toastr.error('Gửi lại không thành công.')
+            reject('error')
+          }
+          
         })
       })
     }

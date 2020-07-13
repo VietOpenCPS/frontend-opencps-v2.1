@@ -186,6 +186,17 @@
       axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
         let userData = response.data
         vm.$store.commit('setUserLogin', userData)
+        if (userData.hasOwnProperty('className') && userData.className === 'org.opencps.usermgt.model.Employee') {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          axios.get('/o/rest/v2/employees/byGroupId', param).then(function(response1) {
+            let employeeLogin = response1.data
+            vm.$store.commit('setEmployeeLogin', employeeLogin)
+          })
+        }
       })
       .catch(function(error) {
       })
