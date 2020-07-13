@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div style="text-align: left;position: absolute;line-height: 46px;">Tổng số <span class="text-bold primary--text">{{total}}</span> giấy phép. </div>
+    <div style="text-align: left;position: absolute;line-height: 46px;">Tổng số <span class="text-bold primary--text">{{total}}</span>. </div>
     <div v-if="total > 0" class="vue-tiny-pagination pagination layout" style="justify-content: flex-end; -webkit-justify-content: flex-end;">
       <div class="px-3 xs2 flex">
         <v-autocomplete

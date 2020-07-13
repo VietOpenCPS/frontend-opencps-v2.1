@@ -30,6 +30,7 @@ export const store = new Vuex.Store({
       'role': ''
     },
     userLogin: '',
+    employeeLogin: '',
     index: 0,
     kysoSuccess: false,
     activeGetCounter: false,
@@ -284,15 +285,24 @@ export const store = new Vuex.Store({
         })
       }
     },
-    loadListThuTucHanhChinh ({commit, state}) {
-      if (state.listThuTucHanhChinh === null) {
+    loadListThuTucHanhChinh ({commit, state}, filter) {
+      // if (state.listThuTucHanhChinh === null) {
         return new Promise((resolve, reject) => {
           store.dispatch('loadInitResource').then(function (result) {
             let param = {
               headers: {
                 groupId: state.initData.groupId
+              },
+              params: {
               }
             }
+            if (filter && filter.hasOwnProperty('searchGovAgencyCode') && filter.searchGovAgencyCode) {
+              param.params.searchGovAgencyCode = filter.searchGovAgencyCode
+            }
+            if (filter && filter.hasOwnProperty('groupServiceCode') && filter.groupServiceCode) {
+              param.params.groupServiceCode = filter.groupServiceCode
+            }
+            console.log('loadListThuTucHanhChinh', filter, param)
             axios.get(state.initData.getListThuTucHanhChinh, param).then(function (response) {
               let serializable = response.data
               let thuTucArray = Array.from(serializable.data)
@@ -304,12 +314,12 @@ export const store = new Vuex.Store({
             })
           }).catch(function (){})
         })
-      } else {
-        return new Promise((resolve, reject) => {
-          let thuTucArray = Array.from(state.listThuTucHanhChinh)
-          resolve(thuTucArray)
-        })
-      }
+      // } else {
+      //   return new Promise((resolve, reject) => {
+      //     let thuTucArray = Array.from(state.listThuTucHanhChinh)
+      //     resolve(thuTucArray)
+      //   })
+      // }
     },
     loadingDataHoSo ({commit, state}, filter) {
       console.log('filter search dossier', filter)
@@ -424,7 +434,8 @@ export const store = new Vuex.Store({
             day: filter.day ? filter.day : 0,
             top: filter.top ? filter.top : '',
             dossierNo: filter.dossierNo ? filter.dossierNo : '',
-            paymentStatus: filter.paymentStatus ? filter.paymentStatus : ''
+            paymentStatus: filter.paymentStatus ? filter.paymentStatus : '',
+            groupDossierIdHs: filter.groupDossierId ? filter.groupDossierId : ''
           }
           if (filter['originality']) {
             paramSearch.originality = filter.originality
@@ -1549,6 +1560,8 @@ export const store = new Vuex.Store({
         axios.get('/o/rest/v2/dossiers', param).then(function (response) {
           if (response.data && response.data['data']) {
             resolve(response.data['data'])
+          } else {
+            resolve([])
           }
         }).catch(function (xhr) {
           console.log(xhr)
@@ -3772,6 +3785,13 @@ export const store = new Vuex.Store({
               domain: data.domain
             }
           }
+          if (data && data.hasOwnProperty('searchGovAgencyCode') && data.searchGovAgencyCode) {
+            param.params.searchGovAgencyCode = data.searchGovAgencyCode
+          }
+          if (data && data.hasOwnProperty('groupServiceCode') && data.groupServiceCode) {
+            param.params.groupServiceCode = data.groupServiceCode
+          }
+          console.log('getServiceinfoFilter', data, param)
           axios.get(state.initData.getListThuTucHanhChinh, param).then(function (response) {
             let serializable = response.data
             let thuTucArray = Array.from(serializable.data)
@@ -4600,6 +4620,21 @@ export const store = new Vuex.Store({
         })
       })
     },
+    removeDossierFromGroup ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        let dataPut = new URLSearchParams()
+        axios.put('/o/rest/v2/dossiers/'+ data.dossierId + '/groupDossier/' + data.groupDossierId + '/remove', dataPut, param).then(function (response) {
+          resolve(response)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
     // ----End---------
   },
   mutations: {
@@ -4880,6 +4915,9 @@ export const store = new Vuex.Store({
     setUserLogin (state, payload) {
       state.userLogin = payload
     },
+    setEmployeeLogin (state, payload) {
+      state.employeeLogin = payload
+    },
     setDossierTemplateLienThong (state, payload) {
       state.dossierTemplateLienThong = payload
     },
@@ -5095,6 +5133,9 @@ export const store = new Vuex.Store({
     },
     getUserLogin (state) {
       return state.userLogin
+    },
+    getEmployeeLogin (state) {
+      return state.employeeLogin
     },
     getDossierTemplateLienThong (state) {
       return state.dossierTemplateLienThong

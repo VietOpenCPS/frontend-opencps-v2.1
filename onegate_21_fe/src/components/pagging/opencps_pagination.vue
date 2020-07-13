@@ -2,10 +2,10 @@
   <div>
     <div :style="!viewMobile ? 'text-align: left;position: absolute;line-height: 46px;' : ''" v-if="showTotal">Tổng số <span class="text-bold primary--text">{{total}}</span> {{nameRecord}}. </div>
     <div v-if="total > 0" class="vue-tiny-pagination pagination layout" :style="!viewMobile ? 'justify-content: flex-end; -webkit-justify-content: flex-end;' : ''">
-      <div v-if="showLimit" class="pr-2 xs4 sm2 flex" style="width:120px">
+      <div v-if="showLimit" class="pr-2 flex" style="width:120px">
         Số hồ sơ mỗi trang:
       </div>
-      <div v-if="showLimit" class="pr-3 xs4 sm2 flex" style="width:50px">
+      <div v-if="showLimit" class="pr-3 xs4 sm2 flex" style="max-width: 70px !important;">
         <v-autocomplete
           v-bind:items="limits"
           v-model="numberPerPage"

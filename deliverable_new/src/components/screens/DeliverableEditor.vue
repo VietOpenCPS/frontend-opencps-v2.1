@@ -3,8 +3,8 @@
     <v-form ref="form" v-model="valid" lazy-validation style="background: #ffffff;">
       <div class="row-header no__hidden_class">
         <div class="background-triangle-big"> 
-          <span v-if="String(id) !== '0'">THÔNG TIN GIẤY PHÉP</span> 
-          <span v-else>TẠO MỚI GIẤY PHÉP</span> 
+          <span v-if="String(id) !== '0'">THÔNG TIN&nbsp;{{String(loaiDuLieu).toUpperCase()}}</span> 
+          <span v-else>TẠO MỚI&nbsp;{{String(loaiDuLieu).toUpperCase()}}</span> 
         </div>
         <div class="layout row wrap header_tools row-blue">
           <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
@@ -54,7 +54,7 @@
             :disabled="loading"
           >
             <v-icon>save</v-icon> &nbsp;
-            <span v-if="String(id) === '0'">Tạo giấy phép</span>
+            <span v-if="String(id) === '0'">Tạo &nbsp;{{loaiDuLieu}}</span>
             <span v-else>Cập nhật</span>
           </v-btn>
           <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && !editDeliverable && String(id) !== '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="uploadFileDeliverable"
@@ -62,14 +62,14 @@
             :disabled="loading"
           >
           <v-icon>cloud_upload</v-icon> &nbsp;
-          Tải giấy phép từ máy tính
+          Tải&nbsp;{{String(loaiDuLieu).toLowerCase()}}&nbsp;từ máy tính
           </v-btn>
           <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && !editDeliverable" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverable = true"
             :loading="loading"
             :disabled="loading"
           >
           <v-icon>edit</v-icon> &nbsp;
-          Sửa giấy phép
+          Sửa&nbsp;{{String(loaiDuLieu).toLowerCase()}}
           </v-btn>
           <v-btn v-if="String(id) !== '0' && !editDeliverable && detail['fileAttachs']" color="blue darken-3" class="mr-1" dark  v-on:click.native="viewFileAttach(detail)"
             :loading="loading"
@@ -83,7 +83,7 @@
             :disabled="loading"
           >
           <v-icon>visibility</v-icon> &nbsp;
-          Xem giấy phép
+          Xem&nbsp;{{String(loaiDuLieu).toLowerCase()}}
           </v-btn>
           <v-btn color="red darken-3" class="mr-0" dark v-on:click.native="backToList">
             <v-icon>reply</v-icon> &nbsp;
@@ -178,7 +178,8 @@
         dialogPDF: false,
         dialogPDFLoading: false,
         fileEntryIdAttachs: [],
-        pageAttachs: 1
+        pageAttachs: 1,
+        loaiDuLieu: ''
       }
     },
     created () {
@@ -192,6 +193,12 @@
         vm.editDeliverable = String(vm.id) === '0' ? true : false
         vm.$store.dispatch('getDeliverableTypes').then(function (result) {
           setTimeout(() => {
+            let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
+            if (tableConfig.hasOwnProperty('loaiDuLieu') && tableConfig.loaiDuLieu) {
+              vm.loaiDuLieu = tableConfig.loaiDuLieu
+            } else {
+              vm.loaiDuLieu = "giấy phép"
+            }
             vm.formId = vm.items[vm.index]['formScriptFileId']
             vm.deName = ''
             // vm.$store.dispatch('getContentFile', formId)
@@ -219,6 +226,12 @@
           // console.log('watch editor')
           vm.isConnected = false
           let formId = vm.items[vm.index]['formScriptFileId']
+          let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
+          if (tableConfig.hasOwnProperty('loaiDuLieu') && tableConfig.loaiDuLieu) {
+            vm.loaiDuLieu = tableConfig.loaiDuLieu
+          } else {
+            vm.loaiDuLieu = "giấy phép"
+          }
           vm.deName = ''
           // vm.$store.dispatch('getContentFile', formId)
           vm.showComponent = false
@@ -286,7 +299,7 @@
           }
           vm.$store.dispatch('uploadSingleFile', uploadData).then(function(result) {
             setTimeout(function () {
-              toastr.success('Tải giấy phép lên thành công')
+              toastr.success('Tải ' + String(vm.loaiDuLieu).toLowerCase() + ' lên thành công')
               vm.loading = false
               vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
                 vm.detail = result
@@ -296,7 +309,7 @@
               })
             }, 2000)
           }).catch(function() {
-            toastr.error('Tải giấy phép lên thất bại')
+            toastr.error('Tải ' + String(vm.loaiDuLieu).toLowerCase() + ' lên thất bại')
             vm.loading = false
           })
         }, 200)

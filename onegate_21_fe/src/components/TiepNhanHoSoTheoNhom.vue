@@ -11,7 +11,7 @@
           </span>
         </div>
         <div class="layout wrap header_tools row-blue">
-          <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinNhomHoSo.serviceName">
+          <div class="flex pl-3 text-ellipsis text-bold" :title="thongTinNhomHoSo.serviceName">
             {{thongTinNhomHoSo.serviceName}}
           </div>
           <!-- <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
@@ -185,7 +185,7 @@
                         <v-btn flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
                           <v-icon size="22">create</v-icon>
                         </v-btn>
-                        <v-btn flat icon color="red" class="my-0" @click="" title="Xóa">
+                        <v-btn flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
                           <v-icon size="22">delete</v-icon>
                         </v-btn>
                       </td>
@@ -193,21 +193,24 @@
                   </template>
                 </v-data-table>
                 <v-layout wrap class="mt-3 ml-3">
-                  <v-flex xs12 sm6>
-                    <span>Tổng số đối tượng: </span>
+                  <v-flex xs12 sm2 class="pt-2">
+                    <span>Tổng số hồ sơ: </span>
                     <span class="text-bold">{{dossiersIntoGroupRender.length}} </span>
                   </v-flex>
-                  <v-flex xs12 sm6>
+                  <v-flex xs12 sm3 class="pt-2">
                     <span>Tổng số tiền: </span>
                     <span class="text-bold">{{currency(totalFee)}} đồng</span>
                   </v-flex>
+                  <v-flex xs12 sm7>
+                    <div  class="text-xs-center layout wrap pr-1" style="position: relative;">
+                      <div class="flex pagging-table px-2">
+                        <tiny-pagination :showLimit="true" :total="dossiersIntoGroupRender.length" :showTotal="false" :currentLimit="30" :page="pagination.page" custom-class="custom-tiny-class" 
+                          @tiny:change-page="paggingData" ></tiny-pagination> 
+                      </div>
+                    </div>
+                  </v-flex>
                 </v-layout>
-                <div  class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
-                  <div class="flex pagging-table px-2">
-                    <tiny-pagination :total="dossiersIntoGroupRender.length" :showTotal="false" :currentLimit="30" :page="pagination.page" custom-class="custom-tiny-class" 
-                      @tiny:change-page="paggingData" ></tiny-pagination> 
-                  </div>
-                </div>
+                
               </div>
               <div v-else class="pl-5 py-2">Chưa có hồ sơ nào</div>
 
@@ -662,7 +665,7 @@
                   </td>
                   
                   <td class="text-xs-center" width="100px" style="height: 40px !important">
-                    <v-btn small outline color="primary" @click="addDossierToGroup(props.item)" class="mr-2 my-0">
+                    <v-btn :disabled="loadingAction" small outline color="primary" @click="addDossierToGroup(props.item)" class="mr-2 my-0">
                       <v-icon size="20">add</v-icon>  &nbsp;
                       <span>Thêm hồ sơ</span>
                     </v-btn>
@@ -681,11 +684,11 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click.native="addMultipleDossierToGroup()">
+          <v-btn :disabled="loadingAction" color="primary" @click.native="addMultipleDossierToGroup()">
             <v-icon>send</v-icon>&nbsp;
             Xác nhận
           </v-btn>
-          <v-btn color="primary" @click.native="dialogAddDossier = false"
+          <v-btn :disabled="loadingAction" color="primary" @click.native="dialogAddDossier = false"
             >
             <v-icon class="white--text">close</v-icon>&nbsp;
             Thoát
@@ -1786,6 +1789,28 @@ export default {
         query: query
       })
     },
+    removeDossierFromGroup (item) {
+      let vm = this
+      let filter = {
+        dossierId: item.dossierId,
+        groupDossierId: vm.thongTinNhomHoSo['dossierId']
+      }
+      vm.$store.dispatch('removeDossierFromGroup', filter).then(function (result) {
+        toastr.success('Yêu cầu thực hiện thành công')
+        setTimeout(() => {
+          let filter1 = {
+            groupDossierId: vm.thongTinNhomHoSo['dossierId']
+          }
+          vm.$store.dispatch('getDossiersIntoGroup', filter1).then(function (result) {
+            vm.dossiersIntoGroup = result
+            vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
+          })
+        }, 500);
+        
+      }).catch(function () {
+        toastr.error('Yêu cầu thực hiện thất bại')
+      })
+    },
     addFileToDossier () {
       let vm = this
       // add file cho thành phần hồ sơ con
@@ -1821,7 +1846,8 @@ export default {
         numberPerPage: vm.numberPerPageAddDossier,
         originality: 3,
         sort: 'dossierNo',
-        order: true
+        order: true,
+        groupDossierId: vm.thongTinNhomHoSo.dossierId
       }
       vm.$store.dispatch('getHoSoAddGroup', filter).then(function (result) {
         vm.dossiersSelectAdd = result.data
@@ -1861,6 +1887,7 @@ export default {
     },
     addDossierToGroup (item, multiple) {
       let vm = this
+      vm.loadingAction = true
       let data = {
         groupDossierId: vm.thongTinNhomHoSo.dossierId,
         dossierId: multiple ? multiple : item.dossierId
@@ -1868,10 +1895,14 @@ export default {
       vm.$store.dispatch('postDossierIntoGroup', data).then(function (result) {
         toastr.clear()
         toastr.success('Thêm hồ sơ thành công')
-        vm.dialogAddDossier = false
-        vm.$store.dispatch('getDossiersIntoGroup', data).then(function (result) {
-          vm.dossiersIntoGroupRender = result
-        })
+        setTimeout(() => {
+          vm.loadingAction = false
+          vm.dialogAddDossier = false
+          vm.$store.dispatch('getDossiersIntoGroup', data).then(function (result) {
+            vm.dossiersIntoGroupRender = result
+          })
+        }, 500)
+        
         // copy file 
         let count = 0
         let files = vm.filesGroupDossier.filter(function(item) {
@@ -1889,7 +1920,9 @@ export default {
           })
         }
         // 
-      }).catch(function () {})
+      }).catch(function () {
+        vm.loadingAction = false
+      })
     },
     getMetaData (val) {
       let metaDataOut = ''

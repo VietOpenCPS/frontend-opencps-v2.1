@@ -310,7 +310,7 @@
                   vm.optionsGroup = JSON.parse(vm.formBuilder[key]['fieldType'])['options_group']
                   for (let key1 in vm.optionsGroup) {
                     if (vm.optionsGroup[key1].hasOwnProperty('api') && vm.optionsGroup[key1]['api']) {
-                      vm.getDataSource(vm.optionsGroup[key1]['api'], key1)
+                      vm.getDataSource(vm.optionsGroup[key1]['api'], key1, {})
                     }
                   }
                 }
@@ -352,20 +352,18 @@
       inputChangeSelect (item, index) {
         console.log('inputChangeSelect', item, index)
         let vm = this
-        vm.optionsGroup[index]['value'] = item
         if (vm.optionsGroup.length > (index + 1)) {
-          vm.getDataSource()
+          vm.optionsGroup[index + 1]['value'] = ''
+          vm.getDataSource(vm.optionsGroup[index + 1]['api'], index + 1, {parent: item})
         }
       },
-      getDataSource (api, index) {
+      getDataSource (api, index, paramInput) {
         let vm = this
         let param = {
           headers: {
             groupId: window.themeDisplay.getScopeGroupId()
           },
-          params: {
-            
-          }
+          params: paramInput ? paramInput : {}
         }
         axios.get(api, param).then(function (response) {
           if (response.data && response.data['data']) {
@@ -417,10 +415,20 @@
         let valid = true
         if (vm.formBuilder.length > 0) {
           for (let key in vm.formBuilder) {
-            if ((vm.formBuilder[key]['required'] === true || vm.formBuilder[key]['required'] === 'true') && !vm.formBuilder[key]['value']) {
-              valid = false
-              alert(vm.formBuilder[key]['fieldLabel'] + ' là bắt buộc!')
-              return valid
+            if (vm.formBuilder[key].fieldType.indexOf('options_group') >= 0) {
+              for (let key1 in vm.optionsGroup) {
+                if ((vm.optionsGroup[key1]['required'] === true || vm.optionsGroup[key1]['required'] === 'true') && !vm.optionsGroup[key1]['value']) {
+                  valid = false
+                  alert(vm.formBuilder[key]['fieldLabel'] + ' là bắt buộc!')
+                  return valid
+                }
+              }
+            } else {
+              if ((vm.formBuilder[key]['required'] === true || vm.formBuilder[key]['required'] === 'true') && !vm.formBuilder[key]['value']) {
+                valid = false
+                alert(vm.formBuilder[key]['fieldLabel'] + ' là bắt buộc!')
+                return valid
+              }
             }
           }
         }
@@ -431,11 +439,17 @@
         let objectReturn = {}
         if (vm.formBuilder.length > 0) {
           for (let key in vm.formBuilder) {
-            let valueEdit = vm.formBuilder[key].value
-            if (vm.formBuilder[key].fieldType === 'date') {
-              valueEdit = (new Date(vm.formBuilder[key].value)).getTime() ? (new Date(vm.formBuilder[key].value)).getTime() : ''
+            if (vm.formBuilder[key].fieldName) {
+              let valueEdit = vm.formBuilder[key].value
+              if (vm.formBuilder[key].fieldType === 'date') {
+                valueEdit = (new Date(vm.formBuilder[key].value)).getTime() ? (new Date(vm.formBuilder[key].value)).getTime() : ''
+              }
+              objectReturn[vm.formBuilder[key].fieldName] = valueEdit
+            } else if (!vm.formBuilder[key].fieldName && vm.formBuilder[key].fieldType.indexOf('options_group') >= 0) {
+              for (let key1 in vm.optionsGroup) {
+                objectReturn[vm.optionsGroup[key1].fieldName] = vm.optionsGroup[key1]['value']
+              }
             }
-            objectReturn[vm.formBuilder[key].fieldName] = valueEdit
           }
         } else {
           objectReturn = ''
