@@ -86,6 +86,31 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogResend" persistent max-width="400">
+      <v-card>
+        <v-card-title class="headline">
+          <div style="text-align: center;width: 100%;">NHẬP MÃ XÁC NHẬN</div>
+        </v-card-title>
+        <v-card-text class="py-2 px-2">
+          <v-form ref="formCaptcha" v-model="validResend" lazy-validation class="px-2 pt-2">
+            <v-flex xs12>
+              <captcha ref="captcha_resend"></captcha>
+            </v-flex>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" flat @click="cancelResend">
+            <v-icon>clear</v-icon>&nbsp;
+              Bỏ qua
+          </v-btn>
+          <v-btn color="primary" flat @click="submitResend">
+            <v-icon>how_to_reg</v-icon>&nbsp;
+              Xác nhận
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -96,21 +121,26 @@ import $ from 'jquery'
 import axios from 'axios'
 import support from '../../store/support.json'
 import toastr from 'toastr'
+import Captcha from './Captcha.vue'
 
 Vue.use(toastr)
 export default {
   props: [],
-  components: {},
+  components: {
+    'captcha': Captcha
+  },
   data: () => ({
     loading: false,
     valid: false,
+    validResend: false,
     pinCode: '',
     userName: '',
     passWord: '',
     dialogVerify: false,
     dialogPending: false,
     xacthuc_credit: false,
-    resend_mail: false
+    resend_mail: false,
+    dialogResend: false
   }),
   computed: {
   },
@@ -188,14 +218,33 @@ export default {
     },
     resendMail () {
       let vm = this
-      let filter = {
-        type: ''
+      vm.$refs.captcha_resend.makeImageCap()
+      vm.dialogResend = true
+    },
+    submitResend() {
+      let vm = this
+      let currentQuery = vm.$router.history.current.query
+      let currentParams = vm.$router.history.current.params
+      if (vm.$refs.formCaptcha.validate()) {
+        let filter = {
+          activeId: currentQuery.hasOwnProperty('active_user_id') ? currentQuery.active_user_id : '',
+          notificationType: 'APPLICANT-01',
+          notifyMessage: vm.$refs.captcha_resend.j_captcha_response
+        }
+        vm.$store.dispatch('resendMail', filter).then(function (result) {
+          toastr.success('Mã PIN đã được gửi lại. Vui lòng kiểm tra email.')
+          vm.dialogResend = false
+          vm.$refs.captcha.makeImageCap()
+          vm.pinCode = ''
+        }).catch(function(error) {
+          vm.$refs.captcha_resend.makeImageCap()
+        })
       }
-      vm.$store.dispatch('resendMail', filter).then(function (result) {
-        toastr.success('Mã PIN đã được gửi lại. Vui lòng kiểm tra email.')
-      }).catch(function(error) {
-        toastr.error('Gửi lại không thành công.')
-      })
+      
+    },
+    cancelResend() {
+      let vm = this
+      vm.dialogResend = false
     },
     goToDangNhap() {
       let vm = this;

@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="row-header no__hidden_class">
-      <div class="background-triangle-big"> <span>DANH SÁCH GIẤY PHÉP</span> </div>
+      <div class="background-triangle-big"> <span>{{items ? String(items[index]['typeName']) : ''}}</span> </div>
 
       <div class="layout row wrap header_tools row-blue">
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-          <v-text-field
+          <!-- <v-text-field
             v-model="deliverableKey"
             placeholder="Tìm kiếm theo số giấy phép ..."
             solo
@@ -18,89 +18,14 @@
             content-class="adv__search__select"
             return-object
             autofocus
-          ></v-text-field>
+          ></v-text-field> -->
         </div>
-        <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
-          <v-btn icon class="my-0 mx-2" v-on:click.native="menusss = !menusss">
-            <v-icon size="16">fas fa fa-filter</v-icon>
+        <div class="flex text-right" style="margin-left: auto;max-width: 115px;">
+          <v-btn color="blue darken-3" dark class="my-0 mx-2" v-on:click.native="menusss = !menusss">
+            <v-icon size="16">search</v-icon>&nbsp; Tìm kiếm
           </v-btn>
         </div>
       </div> 
-
-      <!-- <div class="layout row wrap header_tools row-blue">
-        <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-          <v-combobox
-            v-model="advSearchItems"
-            placeholder="Tìm kiếm ..."
-            solo
-            chips
-            small
-            tags
-            deletable-chips
-            item-value="value"
-            item-text="text"
-            @input="keywordEventChange"
-            return-object
-            multiple
-          ></v-combobox>
-        </div>
-        <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
-          <v-btn icon class="my-0 mx-2" v-on:click.native="menusss = !menusss">
-            <v-icon size="16">filter_list</v-icon>
-          </v-btn>
-        </div>
-      </div>
-      <v-fade-transition>
-        <div v-if="menusss" class="adv__search_container">
-          <v-layout wrap v-for="(item, indexTool) in filters" v-bind:key="indexTool" v-if="item.display">
-              <v-flex xs12 sm4>
-                <v-select
-                  :items="filters"
-                  v-model="item.fieldName"
-                  label="Chọn điều kiện lọc"
-                  single-line
-                  item-value="fieldName"
-                  item-text="fieldLabel"
-                  disabled
-                ></v-select>
-              </v-flex>
-              <v-flex xs12 sm1 class="text-center">
-                <v-btn icon class="mb-0 mx-0 mt-1">
-                  <v-icon size="16">drag_handle</v-icon>
-                </v-btn>
-              </v-flex>
-              <v-flex xs12 sm7>
-                <v-text-field v-if="item.fieldType === 'string'"
-                  v-model="filterData[item.fieldName]"
-                  :label="item['fieldLabel']"
-                  single-line
-                  clearable
-                  @change="changeAdvFilterData($event, item)"
-                ></v-text-field>
-              </v-flex>
-          </v-layout>
-          <v-layout wrap>
-            <v-flex xs12 sm10 class="no__selected__items">
-              <v-select
-                :items="filters"
-                label="Chọn điều kiện lọc"
-                single-line
-                item-value="fieldName"
-                item-text="fieldLabel"
-                @change="selectedAdvFilter"
-                hide-selected
-                return-object
-              ></v-select>
-            </v-flex>
-            <v-flex xs12 sm2 class="text-right">
-              <v-btn color="primary" class="mx-0 my-0 mt-1" v-on:click.native="menusss = false">
-                <v-icon class="mr-2">clear</v-icon>
-                Quay lại
-              </v-btn>
-            </v-flex>
-          </v-layout>
-        </div>
-      </v-fade-transition> -->
     </div>
     <div class="" v-if="menusss">
       <v-layout wrap>
@@ -217,7 +142,7 @@
               </v-flex> -->
               <v-flex v-for="(item, indexTool) in filters" v-if="item.display" v-bind:key="indexTool" :class="item.class" class="mb-2 px-2">
                 <div>
-                  <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">{{item.fieldLabel}}</div>
+                  <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">{{item.fieldLabel}}:</div>
                   <v-text-field
                     v-if="item.fieldType === 'string'"
                     v-model="filterData[item.fieldName]"
@@ -247,12 +172,19 @@
                   ></v-textarea>
                   <v-autocomplete
                     v-if="item['fieldType'] === 'select'"
+                    class="select-search d-inline-block"
                     :items="item['source']"
                     v-model="filterData[item.fieldName]"
                     :label="item['label']"
                     item-value="value"
                     item-text="name"
                     :clearable="item['clearable']"
+                    hide-details
+                    solo
+                    flat
+                    height="32"
+                    min-height="32"
+                    style="width: calc(100% - 150px);"
                   ></v-autocomplete>
                   <datetime-picker
                     v-if="item.fieldType === 'date'"
@@ -318,7 +250,7 @@
       <v-btn color="blue darken-3" dark
         :to="'/danh-sach-giay-to/' + index + '/editor/0'"
       >
-        Thêm giấy phép
+        <v-icon size="16">add</v-icon>&nbsp;Thêm&nbsp;{{String(loaiDuLieu).toLowerCase()}}
       </v-btn>
       <!-- import -->
       <!-- <v-btn color="primary" class="white--text"
@@ -401,7 +333,7 @@
       </template>
       <template slot="no-data">
         <div class="text-xs-center mt-2">
-          Không có giấy phép nào
+          Không có dữ liệu
         </div>
       </template>
     </v-data-table>
@@ -547,7 +479,8 @@
         issueDate: null,
         applicantName: '',
         donvicu_data: '',
-        trichyeu_data: ''
+        trichyeu_data: '',
+        loaiDuLieu: ''
       }
     },
     created () {
@@ -560,6 +493,12 @@
             }
             if (vm.items[vm.index]['tableConfig'] !== '') {
               vm.headers = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')['headers']
+              let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
+              if (tableConfig.hasOwnProperty('loaiDuLieu') && tableConfig.loaiDuLieu) {
+                vm.loaiDuLieu = tableConfig.loaiDuLieu
+              } else {
+                vm.loaiDuLieu = "giấy phép"
+              }
             } else {
               vm.headers = []
               vm.hosoDatas = []
@@ -616,6 +555,12 @@
         if (vm.items[val]['tableConfig'] !== '') {
           vm.hosoDatasPage = 1
           vm.headers = eval('( ' + vm.items[val]['tableConfig'] + ' )')['headers']
+          let tableConfig = eval('( ' + vm.items[val]['tableConfig'] + ' )')
+          if (tableConfig.hasOwnProperty('loaiDuLieu') && tableConfig.loaiDuLieu) {
+            vm.loaiDuLieu = tableConfig.loaiDuLieu
+          } else {
+            vm.loaiDuLieu = "giấy phép"
+          }
         } else {
           vm.headers = []
           vm.hosoDatas = []

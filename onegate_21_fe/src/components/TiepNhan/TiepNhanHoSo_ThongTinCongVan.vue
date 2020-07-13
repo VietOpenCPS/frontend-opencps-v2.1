@@ -120,7 +120,7 @@
                       </v-menu>
                     </v-flex>
                     <!--  -->
-                    <v-flex xs12 sm2 class="mb-2">
+                    <v-flex xs12 sm2 class="mb-2" v-if="formCodeInput !== 'NEW_GROUP_CV'">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
@@ -130,7 +130,7 @@
                         <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'" style="color:red">&nbsp;*</span>: 
                       </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm10 class="mb-2">
+                    <v-flex xs12 sm10 class="mb-2" v-if="formCodeInput !== 'NEW_GROUP_CV'">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
@@ -179,7 +179,6 @@
                       <v-text-field
                       v-else
                       v-model="thongTinCongVan.contactTelNo"
-                      append-icon="phone"
                       :rules="thongTinCongVan.contactTelNo ? [rules.telNo] : ''"
                       ></v-text-field>
                     </v-flex>
@@ -324,6 +323,9 @@ export default {
     userLoginInfomation () {
       return this.$store.getters.getUserLogin
     },
+    employeeLoginInfomation () {
+      return this.$store.getters.getEmployeeLogin
+    },
   },
   created () {
     let vm = this
@@ -383,8 +385,8 @@ export default {
       }
       let metaData = metaDataDossier ? metaDataDossier : {donvigui: '', donvinhan: '', tendonvigui: '', tendonvinhan: ''}
       let scopeUser = ''
-      if (vm.userLoginInfomation.hasOwnProperty('scope') && vm.userLoginInfomation.scope) {
-        scopeUser = String(vm.userLoginInfomation.scope).split(",")[0]
+      if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
+        scopeUser = String(vm.employeeLoginInfomation.scope).split(",")[0]
       }
       if (vm.formCodeInput === 'NEW_GROUP_CV') {
         // vm.thongTinCongVan.delegateName = delegateName ? delegateName : ''

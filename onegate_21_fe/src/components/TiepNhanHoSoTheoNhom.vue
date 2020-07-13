@@ -11,7 +11,7 @@
           </span>
         </div>
         <div class="layout wrap header_tools row-blue">
-          <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinNhomHoSo.serviceName">
+          <div class="flex pl-3 text-ellipsis text-bold" :title="thongTinNhomHoSo.serviceName">
             {{thongTinNhomHoSo.serviceName}}
           </div>
           <!-- <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
@@ -193,21 +193,24 @@
                   </template>
                 </v-data-table>
                 <v-layout wrap class="mt-3 ml-3">
-                  <v-flex xs12 sm6>
-                    <span>Tổng số đối tượng: </span>
+                  <v-flex xs12 sm2 class="pt-2">
+                    <span>Tổng số hồ sơ: </span>
                     <span class="text-bold">{{dossiersIntoGroupRender.length}} </span>
                   </v-flex>
-                  <v-flex xs12 sm6>
+                  <v-flex xs12 sm3 class="pt-2">
                     <span>Tổng số tiền: </span>
                     <span class="text-bold">{{currency(totalFee)}} đồng</span>
                   </v-flex>
+                  <v-flex xs12 sm7>
+                    <div  class="text-xs-center layout wrap pr-1" style="position: relative;">
+                      <div class="flex pagging-table px-2">
+                        <tiny-pagination :showLimit="true" :total="dossiersIntoGroupRender.length" :showTotal="false" :currentLimit="30" :page="pagination.page" custom-class="custom-tiny-class" 
+                          @tiny:change-page="paggingData" ></tiny-pagination> 
+                      </div>
+                    </div>
+                  </v-flex>
                 </v-layout>
-                <div  class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
-                  <div class="flex pagging-table px-2">
-                    <tiny-pagination :total="dossiersIntoGroupRender.length" :showTotal="false" :currentLimit="30" :page="pagination.page" custom-class="custom-tiny-class" 
-                      @tiny:change-page="paggingData" ></tiny-pagination> 
-                  </div>
-                </div>
+                
               </div>
               <div v-else class="pl-5 py-2">Chưa có hồ sơ nào</div>
 
@@ -1794,13 +1797,16 @@ export default {
       }
       vm.$store.dispatch('removeDossierFromGroup', filter).then(function (result) {
         toastr.success('Yêu cầu thực hiện thành công')
-        let filter1 = {
-          groupDossierId: vm.thongTinNhomHoSo['dossierId']
-        }
-        vm.$store.dispatch('getDossiersIntoGroup', filter1).then(function (result) {
-          vm.dossiersIntoGroup = result
-          vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
-        })
+        setTimeout(() => {
+          let filter1 = {
+            groupDossierId: vm.thongTinNhomHoSo['dossierId']
+          }
+          vm.$store.dispatch('getDossiersIntoGroup', filter1).then(function (result) {
+            vm.dossiersIntoGroup = result
+            vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
+          })
+        }, 500);
+        
       }).catch(function () {
         toastr.error('Yêu cầu thực hiện thất bại')
       })
@@ -1840,7 +1846,8 @@ export default {
         numberPerPage: vm.numberPerPageAddDossier,
         originality: 3,
         sort: 'dossierNo',
-        order: true
+        order: true,
+        groupDossierId: vm.thongTinNhomHoSo.dossierId
       }
       vm.$store.dispatch('getHoSoAddGroup', filter).then(function (result) {
         vm.dossiersSelectAdd = result.data

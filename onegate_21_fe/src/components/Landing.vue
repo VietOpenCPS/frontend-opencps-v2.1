@@ -1063,6 +1063,9 @@ export default {
     userLoginInfomation () {
       return this.$store.getters.getUserLogin
     },
+    employeeLoginInfomation () {
+      return this.$store.getters.getEmployeeLogin
+    },
   },
   created () {
     let vm = this
@@ -1124,6 +1127,14 @@ export default {
             vm.menuType = parseInt(vm.trangThaiHoSoList[vm.index]['menuType'])
             vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
             vm.doActionGroup = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('activeGroupAction') && vm.trangThaiHoSoList[vm.index]['tableConfig'].activeGroupAction
+            // 
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchGovAgencyCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode) {
+              vm.govAgencyFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode
+            }
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('groupServiceCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode) {
+              vm.groupServiceFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode
+            }
+            // 
             vm.processListTTHC(currentQuery)
             vm.processListDomain(currentQuery)
             // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
@@ -1253,11 +1264,12 @@ export default {
             }
           }
         }
-        if (vm.listThuTucHanhChinh === null || vm.listThuTucHanhChinh === undefined || (vm.listThuTucHanhChinh !== null && vm.listThuTucHanhChinh !== undefined && vm.listThuTucHanhChinh.length === 0)) {
+        // if (vm.listThuTucHanhChinh === null || vm.listThuTucHanhChinh === undefined || (vm.listThuTucHanhChinh !== null && vm.listThuTucHanhChinh !== undefined && vm.listThuTucHanhChinh.length === 0)) {
+          console.log('watchRouter', currentQuery)
           vm.processListTTHC(currentQuery)
-        } else {
-          vm.doLoadingDataHoSo()
-        }
+        // } else {
+          // vm.doLoadingDataHoSo()
+        // }
       }
     },
     activeLoadingDataHoSo (val) {
@@ -1315,16 +1327,12 @@ export default {
         vm.limitRecord = 15
       }
       if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchGovAgencyCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode) {
-        let govKey = vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode
-        let scopeUser = ''
-        if (vm.userLoginInfomation.hasOwnProperty('scope') && vm.userLoginInfomation.scope) {
-          scopeUser = String(vm.userLoginInfomation.scope).split(",")[0]
-        }
-        vm.govAgencyFilterMenuConfig = govKey === '_firstscope' ? scopeUser : govKey
+        vm.govAgencyFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode
       }
       if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('groupServiceCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode) {
         vm.groupServiceFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode
       }
+      console.log('govAgencyFilterMenuConfig', vm.govAgencyFilterMenuConfig, vm.groupServiceFilterMenuConfig)
     },
     index (val) {
       let vm = this
@@ -1346,16 +1354,12 @@ export default {
       }
 
       if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchGovAgencyCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode) {
-        let govKey = vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode
-        let scopeUser = ''
-        if (vm.userLoginInfomation.hasOwnProperty('scope') && vm.userLoginInfomation.scope) {
-          scopeUser = String(vm.userLoginInfomation.scope).split(",")[0]
-        }
-        vm.govAgencyFilterMenuConfig = govKey === '_firstscope' ? scopeUser : govKey
+        vm.govAgencyFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode
       }
       if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('groupServiceCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode) {
         vm.groupServiceFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode
       }
+      console.log('govAgencyFilterMenuConfig333', vm.govAgencyFilterMenuConfig, vm.groupServiceFilterMenuConfig)
     }
   },
   methods: {
@@ -1427,14 +1431,18 @@ export default {
     },
     processListTTHC (currentQuery) {
       let vm = this
-      vm.$store.dispatch('loadListThuTucHanhChinh').then(function (result) {
+      let filterGetService = {
+        searchGovAgencyCode: vm.govAgencyFilterMenuConfig,
+        groupServiceCode: vm.groupServiceFilterMenuConfig
+      }
+      vm.$store.dispatch('loadListThuTucHanhChinh', filterGetService).then(function (result) {
         if (!currentQuery.hasOwnProperty('domain') || (currentQuery.hasOwnProperty('domain') && String(currentQuery.domain) === '')) {
           vm.listThuTucHanhChinh = result.map(thuTuc => {
             thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
             // thuTuc['displayName'] = thuTuc['serviceName']
             return thuTuc
           })
-          vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
+          // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
         }
         vm.listThuTuc = result.map(thuTuc => {
           thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
@@ -1495,7 +1503,9 @@ export default {
             }
           }
           let domain = {
-            domain: vm.linhVucSelected.domainCode
+            domain: vm.linhVucSelected.domainCode,
+            searchGovAgencyCode: vm.govAgencyFilterMenuConfig,
+            groupServiceCode: vm.groupServiceFilterMenuConfig
           }
           vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
             vm.listThuTucHanhChinh = result.map(thuTuc => {
@@ -1503,7 +1513,7 @@ export default {
               // thuTuc['displayName'] = thuTuc['serviceName']
               return thuTuc
             })
-            vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
+            // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
             console.log('listThuTucHanhChinh2', vm.listThuTucHanhChinh)
           }).catch(function (){})
         } else {
@@ -1813,7 +1823,9 @@ export default {
       if (item) {
         setTimeout(function () {
           let domain = {
-            domain: vm.linhVucSelected.domainCode
+            domain: vm.linhVucSelected.domainCode,
+            searchGovAgencyCode: vm.govAgencyFilterMenuConfig,
+            groupServiceCode: vm.groupServiceFilterMenuConfig
           }
           vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
             vm.listThuTucHanhChinh = result.map(thuTuc => {
@@ -1821,12 +1833,12 @@ export default {
               // thuTuc['displayName'] = thuTuc['serviceName']
               return thuTuc
             })
-            vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
+            // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
           }).catch(function (){})
         }, 100)
       } else {
         vm.listThuTucHanhChinh = vm.listThuTuc
-        vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
+        // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
       }
       if (item !== null && item !== undefined) {
         vm.domainCode = vm.linhVucSelected['domainCode']

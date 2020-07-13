@@ -31,6 +31,7 @@
                         :disabled="loadingVerify"
                         :rules="[v => !!v || 'Thông tin bắt buộc']"
                         required
+                        readonly
                       ></v-text-field>
                       <suggestions
                         v-if="originality === 3 || originality === '3'"
@@ -72,6 +73,7 @@
                         :disabled="loadingVerify"
                         :rules="requiredOptions['applicantName'] ? [rules.required] : ''"
                         :required="requiredOptions['applicantName']"
+                        :readonly="originality === 1 || originality === '1'"
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2>

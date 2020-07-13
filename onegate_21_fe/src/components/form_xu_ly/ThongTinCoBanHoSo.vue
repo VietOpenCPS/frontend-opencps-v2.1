@@ -181,13 +181,13 @@
                   </v-tooltip>
                 </div>
                 <!--  -->
-                <div class="xs12 sm12 pb-1" v-if="thongTinChiTietHoSo['groupDossierId']">
+                <!-- <div class="xs12 sm12 pb-1" v-if="thongTinChiTietHoSo['groupDossierId']">
                   <span class="pr-2">Nhóm hồ sơ: </span>
                   <span class="pl-0 text-bold" :title="thongTinChiTietHoSo['permission'].indexOf('write') >= 0 ? 'Chi tiết nhóm hồ sơ' : ''" @click="detailGroup" 
                     :style="thongTinChiTietHoSo['permission'].indexOf('write') >= 0 ? 'cursor: pointer; color: #0072bc' : ''">
                     {{groupDossierName}}
                   </span>
-                </div>
+                </div> -->
                 <div class="xs12 sm12 pb-1" style="color:#0b72ba" 
                   v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
                   thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
