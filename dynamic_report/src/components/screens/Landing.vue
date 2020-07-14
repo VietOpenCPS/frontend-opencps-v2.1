@@ -70,6 +70,7 @@
           label="Chọn đơn vị"
           item-text="text"
           item-value="value"
+          @change="changeGovAgency()"
           >
         </v-autocomplete>
       </v-flex>
@@ -82,7 +83,7 @@
           v-model="filterGroup[item.key]" 
           item-text="text"
           item-value="value"
-          @change="changeGroupIdList(item.key)"
+          @change="changeGroupIdList(item)"
           clearable
           >
         </v-autocomplete>
@@ -98,7 +99,7 @@
           >
         </v-autocomplete>
       </v-flex>
-      <v-flex xs12 sm2 class="px-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
+      <v-flex xs12 sm2 class="px-3 mb-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
         <datetime-picker
           v-if="item['type'] === 'date' && showPicker"
           v-model="data[item.key]" 
@@ -591,6 +592,7 @@ export default {
               }
             }
             if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+              vm.filters[key]['groupId'] = vm.govAgency
               vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
                 vm.filters[key]['source'] = result
               }).catch(function(){})
@@ -705,6 +707,9 @@ export default {
         vm.groupIdList = []
         console.log('groupIdList0',vm.groupIdList)
       }
+      for(let i in vm.filterGroup){
+        vm.filterGroup[i] = null
+      }
       // 
       for (let key in vm.itemsReportsConfig) {
         vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
@@ -716,6 +721,7 @@ export default {
           vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
         }
         if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+          vm.filters[key]['groupId'] = vm.govAgency
           vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
             vm.filters[key]['source'] = result
           }).catch(function(){})
@@ -973,11 +979,11 @@ export default {
         proxyApi: vm.proxyApi
       }
       let check =  true
-      for(let key in vm.filterGroup){
-        if(key === vm.groupIdListSelected){
-          
+      for (let key in vm.filterGroup) {
+        if(key === vm.groupIdListSelected) {
+          let exits = vm.groupIdList.find(item => item.key === key)
           filter['govAgency'] = vm.filterGroup[key]
-          filter['agencyLists'] = vm.groupIdList.find(item => item.key === key).value
+          filter['agencyLists'] = exits ? exits.value : []
           check = false
           break
         }
@@ -1900,20 +1906,44 @@ export default {
         fileName: 'baocaothongke' + '.xls'
       })
     },
-    changeGroupIdList(key){
+    changeGroupIdList(item){
        let vm = this
       setTimeout(()=>{
-       
-        console.log(key)
-        console.log(vm.filterGroup[key])
-        vm.groupIdListSelected = vm.filterGroup[key] ? key : ''
+        vm.govAgency = null
+        console.log(item.key)
+        console.log(vm.filterGroup[item.key])
+        vm.groupIdListSelected = vm.filterGroup[item.key] ? item.key : ''
         for(let i in vm.filterGroup){
-          if(i !== key) {
+          if(i !== item.key) {
             vm.filterGroup[i] = null
           }
         }
         console.log(vm.filterGroup)
+        for (let key in vm.filters) {
+          if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+            vm.filters[key]['groupId'] = item.value
+            vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+              vm.filters[key]['source'] = result
+            }).catch(function(){})
+          }
+        }
       }, 200)
+    },
+    changeGovAgency () {
+      let vm = this
+      setTimeout(()=>{
+        for (let key in vm.filters) {
+          if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+            vm.filters[key]['groupId'] = vm.govAgency
+            vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+              vm.filters[key]['source'] = result
+            }).catch(function(){})
+          }
+        }
+        for(let i in vm.filterGroup){
+          vm.filterGroup[i] = null
+        }
+      }, 300)
     }
   }
 }
