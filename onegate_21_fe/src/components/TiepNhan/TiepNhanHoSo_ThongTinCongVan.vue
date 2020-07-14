@@ -127,7 +127,7 @@
                       <v-subheader v-else class="pl-0">
                         <span v-if="formCodeInput === 'NEW_GROUP_CV'">Đơn vị gửi công văn </span>
                         <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'">Đơn vị nhận công văn </span> 
-                        <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'" style="color:red">&nbsp;*</span>: 
+                        <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'  && lengthDossier !== 0  && typeof lengthDossier !== 'undefined'" style="color:red">&nbsp;*</span>: 
                       </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm10 class="mb-2" v-if="formCodeInput !== 'NEW_GROUP_CV'">
@@ -140,8 +140,9 @@
                       item-text="itemName"
                       item-value="itemCode"
                       v-model="donvi_gui_nhan"
-                      :rules="formCodeInput === 'NEW_GROUP_CV_DI' ? [rules.required] : []"
-                      :required="formCodeInput === 'NEW_GROUP_CV_DI'"
+                      :rules="formCodeInput === 'NEW_GROUP_CV_DI' && lengthDossier !== 0 && typeof lengthDossier !== 'undefined' ? [rules.required] : []"
+                      :required="formCodeInput === 'NEW_GROUP_CV_DI' && lengthDossier !== 0 && typeof lengthDossier !== 'undefined'"
+                      :readonly="formCodeInput === 'NEW_GROUP_CV_DI' && (lengthDossier === 0 ||typeof lengthDossier === 'undefined')"
                       ></v-autocomplete>
                     </v-flex>
 
@@ -277,7 +278,7 @@ export default {
     'suggestions': Suggestions,
     'tiny-pagination': TinyPagination
   },
-  props: ['formCodeInput', 'detailDossier', 'tphs'],
+  props: ['formCodeInput', 'detailDossier', 'tphs', 'lengthDossier'],
   data: () => ({
     loading: false,
     dialogPDFLoading: false,

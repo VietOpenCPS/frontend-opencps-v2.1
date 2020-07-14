@@ -36,7 +36,7 @@
 
         <thong-tin-chu-ho-so v-if="formCode === 'NEW_GROUP'" :showApplicant="true" :showDelegate="false" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
 
-        <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" ref="thongtincongvan" :detailDossier="thongTinNhomHoSo" :tphs="tphsCV" :formCodeInput="formCode"></thong-tin-cong-van>
+        <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" ref="thongtincongvan" :detailDossier="thongTinNhomHoSo" :tphs="tphsCV" :formCodeInput="formCode" :lengthDossier="dossiersIntoGroupRender.length"></thong-tin-cong-van>
 
         <div v-if="formCode === 'NEW_GROUP'" style="position: relative;border-top: 1px solid #dedede;">
           <v-expansion-panel :value="0" class="expansion-pl">
@@ -91,7 +91,7 @@
                     </v-select>
                   </v-flex>
                 </v-layout>
-                <div class="btn_wrap_actions my-2 mr-2">
+                <div class="btn_wrap_actions my-2 mr-2" v-if="formCode !== 'NEW_GROUP_CV' ">
                   <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
                     v-on:click.native="btnActionEvent(item, indexBTN)" 
                     :loading="loadingAction"
@@ -150,17 +150,15 @@
                         <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
                       </td>
                       <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="150px" style="height: 40px !important">
+                        {{ props.item.dossierNo }}
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="150px" style="height: 40px !important">
                         {{ props.item.applicantName }}
                       </td>
                       <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="100px" style="height: 40px !important">
                         <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateDay') && getMetaData(props.item).hasOwnProperty('birthDateMonth') && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateDay}}/</span>
                         <span v-if="props.item && getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateMonth') && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateMonth}}/</span>
                         <span v-if="props.item && getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateYear}} </span>
-                      </td>
-                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" style="height: 40px !important">
-                        <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('wardNativeName')">{{getMetaData(props.item).wardNativeName}}, </span>
-                        <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('districtNativeName')">{{getMetaData(props.item).districtNativeName}}, </span>
-                        <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('cityNativeName')">{{getMetaData(props.item).cityNativeName}} </span>
                       </td>
                       <td @click="viewDetail(props.item, props.index)" class="text-xs-left"  style="height: 40px !important">
                         <span v-if="props.item.address">{{props.item.address}}, </span>
@@ -173,6 +171,9 @@
                       </td>
                       <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="100px" style="height: 40px !important">
                         <span v-if="props.item.metaData && getMetaData(props.item) && getMetaData(props.item).subsidy">{{currency(getMetaData(props.item).subsidy)}} </span>
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="100px" style="height: 40px !important">
+                        <span v-if="props.item.dossierStatusText">{{props.item.dossierStatusText}} </span>
                       </td>
                       <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="100px" style="height: 40px !important">
                         <span v-if="props.item.applicantNote">{{props.item.applicantNote}} </span>
@@ -215,11 +216,11 @@
               <div v-else class="pl-5 py-2">Chưa có hồ sơ nào</div>
 
               <v-flex xs12 class="text-right mb-3 mr-2" v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'">
-                <v-btn small color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2">
+                <v-btn v-if="formCode !== 'NEW_GROUP_CV_DI'" small color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2">
                   <v-icon size="20">add</v-icon>  &nbsp;
                   <span>Thêm mới hồ sơ</span>
                 </v-btn>
-                <v-btn small color="primary" @click="showDossierToAdd" class="mx-0 my-0" >
+                <v-btn v-if="formCode !== 'NEW_GROUP_CV'" small color="primary" @click="showDossierToAdd" class="mx-0 my-0" >
                   <v-icon size="20">create_new_folder</v-icon>  &nbsp;
                   <span>Thêm hồ sơ đã có</span>
                 </v-btn>
@@ -636,17 +637,15 @@
                     <span>{{hosoDatasPage * numberPerPageAddDossier - numberPerPageAddDossier + props.index + 1}}</span>
                   </td>
                   <td class="text-xs-left" width="150px" style="height: 40px !important">
+                    {{ props.item.dossierNo }}
+                  </td>
+                  <td class="text-xs-left" width="150px" style="height: 40px !important">
                     {{ props.item.applicantName }}
                   </td>
                   <td class="text-xs-left" width="100px" style="height: 40px !important">
                     <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateDay') && getMetaData(props.item).hasOwnProperty('birthDateMonth') && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateDay}}/</span>
                     <span v-if="props.item && getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateMonth') && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateMonth}}/</span>
                     <span v-if="props.item && getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateYear}} </span>
-                  </td>
-                  <td class="text-xs-left" style="height: 40px !important">
-                    <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('wardNativeName')">{{getMetaData(props.item).wardNativeName}}, </span>
-                    <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('districtNativeName')">{{getMetaData(props.item).districtNativeName}}, </span>
-                    <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('cityNativeName')">{{getMetaData(props.item).cityNativeName}} </span>
                   </td>
                   <td class="text-xs-left"  style="height: 40px !important">
                     <span v-if="props.item.address">{{props.item.address}}, </span>
@@ -659,6 +658,9 @@
                   </td>
                   <td class="text-xs-left" width="100px" style="height: 40px !important">
                     <span v-if="props.item.metaData && getMetaData(props.item) && getMetaData(props.item).subsidy">{{currency(getMetaData(props.item).subsidy)}} </span>
+                  </td>
+                  <td class="text-xs-left" width="100px" style="height: 40px !important">
+                    <span v-if="props.item.dossierStatusText">{{props.item.dossierStatusText}} </span>
                   </td>
                   <td class="text-xs-left" width="100px" style="height: 40px !important">
                     <span v-if="props.item.applicantNote">{{props.item.applicantNote}} </span>
@@ -791,6 +793,12 @@ export default {
         class: 'text-xs-center'
       },
       {
+        text: 'Mã hồ sơ',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
         text: 'Họ và tên',
         align: 'center',
         sortable: false,
@@ -798,12 +806,6 @@ export default {
       },
       {
         text: 'Năm sinh',
-        align: 'center',
-        sortable: false,
-        class: 'text-xs-center'
-      },
-      {
-        text: 'Quê quán',
         align: 'center',
         sortable: false,
         class: 'text-xs-center'
@@ -822,6 +824,12 @@ export default {
       },
       {
         text: 'Mức trợ cấp (đồng/tháng)',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Trạng thái',
         align: 'center',
         sortable: false,
         class: 'text-xs-center'
@@ -1846,6 +1854,7 @@ export default {
         numberPerPage: vm.numberPerPageAddDossier,
         originality: 3,
         sort: 'dossierNo',
+        top: 'passed',
         order: true,
         groupDossierId: vm.thongTinNhomHoSo.dossierId
       }
