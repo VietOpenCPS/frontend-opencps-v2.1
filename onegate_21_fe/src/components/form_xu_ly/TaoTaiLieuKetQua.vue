@@ -604,11 +604,12 @@
             toastr.clear()
             toastr.success('Yêu cầu của bạn thực hiện thành công')
             vm.createFiles[index].daKhai = true
-            if (vm.dossierIntoGroup.length > 0) {
-              vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
-              vm.dialogConfirm = true
-              vm.filesAdd = [resData]
-            }
+            // Đính kèm giấy tờ hồ sơ cùng nhóm
+            // if (vm.dossierIntoGroup.length > 0) {
+            //   vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
+            //   vm.dialogConfirm = true
+            //   vm.filesAdd = [resData]
+            // }
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
               // 
@@ -634,11 +635,12 @@
           item['dossierId'] = vm.detailDossier.dossierId
           item['id'] = vm.id
           vm.$store.dispatch('postEform', item).then(resPostEform => {
-            if (vm.dossierIntoGroup.length > 0) {
-              vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
-              vm.dialogConfirm = true
-              vm.filesAdd = [resData]
-            }
+            // Đính kèm giấy tờ hồ sơ cùng nhóm
+            // if (vm.dossierIntoGroup.length > 0) {
+            //   vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
+            //   vm.dialogConfirm = true
+            //   vm.filesAdd = [resData]
+            // }
             setTimeout(function () {
               toastr.success('Yêu cầu của bạn thực hiện thành công')
               vm.createFiles[index].daKhai = true
@@ -744,12 +746,13 @@
           })
           // add hồ sơ cùng nhóm
           console.log('vm.dossierIntoGroup', vm.dossierIntoGroup)
-          if (vm.dossierIntoGroup.length > 0) {
-            // vm.dialogSelectDosier = true
-            vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
-            vm.dialogConfirm = true
-            vm.filesAdd = result
-          }
+          // Đính kèm giấy tờ hồ sơ cùng nhóm
+          // if (vm.dossierIntoGroup.length > 0) {
+          //   // vm.dialogSelectDosier = true
+          //   vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
+          //   vm.dialogConfirm = true
+          //   vm.filesAdd = result
+          // }
         }).catch(function (xhr) {
           vm.progressUploadPart = ''
         })

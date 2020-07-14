@@ -205,7 +205,7 @@
       </v-btn> -->
       <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
         v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
-        v-if="String(item.form).indexOf('VIEW') < 0 && menuType !== 3"
+        v-if="String(item.form).indexOf('VIEW') < 0 && menuType !== 3 && !hideGroupAction"
         :loading="loadingAction && indexBTN === indexAction"
         :disabled="loadingAction && indexBTN === indexAction"
       >
@@ -943,6 +943,7 @@ export default {
     loading: true,
     headers: [],
     hideAction: false,
+    hideGroupAction: false,
     hosoDatas: [],
     hosoDatasTotal: 0,
     hosoDatasPage: 1,
@@ -1144,6 +1145,9 @@ export default {
             if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideAction')) {
               vm.hideAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideAction']
             }
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideGroupAction')) {
+              vm.hideGroupAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideGroupAction']
+            }
             if (vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== null && vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['buttonConfig'].hasOwnProperty('buttons')) {
               vm.btnDynamics = vm.trangThaiHoSoList[vm.index]['buttonConfig']['buttons']
             }
@@ -1210,6 +1214,9 @@ export default {
         vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
         if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideAction')) {
           vm.hideAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideAction']
+        }
+        if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideGroupAction')) {
+          vm.hideGroupAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideGroupAction']
         }
         if (vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== null && vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['buttonConfig'].hasOwnProperty('buttons')) {
           vm.btnDynamics = vm.trangThaiHoSoList[vm.index]['buttonConfig']['buttons']
