@@ -205,7 +205,7 @@
       </v-btn> -->
       <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
         v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
-        v-if="String(item.form).indexOf('VIEW') < 0 && menuType !== 3 && !hideGroupAction"
+        v-if="(String(item.form).indexOf('VIEW') < 0 && menuType !== 3 && !hideGroupAction) || (String(item.form).indexOf('VIEW') < 0 && menuType !== 3 && hideGroupAction && String(item.form) !== 'ACTIONS') "
         :loading="loadingAction && indexBTN === indexAction"
         :disabled="loadingAction && indexBTN === indexAction"
       >

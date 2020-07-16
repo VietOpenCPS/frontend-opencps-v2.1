@@ -63,7 +63,7 @@
       </div>
     </v-flex>
     <v-layout row wrap class="filter_menu mt-4">
-      <v-flex xs6 sm2 class="px-3" v-if="agencyLists.length > 1">
+      <v-flex xs6 sm3 class="px-3 mb-3" v-if="agencyLists.length > 1">
         <v-autocomplete
           :items="agencyLists"
           v-model="govAgency"
@@ -76,7 +76,7 @@
       </v-flex>
       
       <!--  -->
-      <v-flex xs6 sm2 class="px-3" v-for="(item, indexgroupIdList) in groupIdList" v-bind:key="item.key + indexgroupIdList + index">
+      <v-flex xs6 sm3 class="px-3 mb-3" v-for="(item, indexgroupIdList) in groupIdList" v-bind:key="item.key + indexgroupIdList + index">
         <v-autocomplete
           :items="item.value"
           :label="item.label"
@@ -89,7 +89,7 @@
         </v-autocomplete>
       </v-flex>
       <!--  -->
-      <v-flex xs6 sm2 class="px-3" v-if="groupBy.length > 1">
+      <v-flex xs6 sm3 class="px-3 mb-3" v-if="groupBy.length > 1">
         <v-autocomplete
           :items="groupBy"
           v-model="groupByVal"
@@ -99,7 +99,7 @@
           >
         </v-autocomplete>
       </v-flex>
-      <v-flex xs12 sm2 class="px-3 mb-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
+      <v-flex :class="item.hasOwnProperty('class') ? item.class : 'xs12 sm3 px-3 mb-3'" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
         <datetime-picker
           v-if="item['type'] === 'date' && showPicker"
           v-model="data[item.key]" 
@@ -121,7 +121,18 @@
           item-value="value"
           item-text="name"
           :clearable="item['clearable']"
-        ></v-autocomplete>
+          :multiple="item.hasOwnProperty('multiple') && item.multiple"
+        >
+          <template v-if="item.hasOwnProperty('multiple') && item.multiple" slot="selection" slot-scope="props" >
+            <v-chip v-if="props.index === 0">
+              <span>{{ props.item.name }}</span>
+            </v-chip>
+            <span
+              v-if="props.index === 1"
+              class="grey--text caption"
+            >(+{{ data[item.key].length - 1 }})</span>
+          </template>
+        </v-autocomplete>
       </v-flex>
       <v-flex xs12 sm6 v-if="hiddenAside">
         <div class="d-inline-block right">
@@ -586,7 +597,12 @@ export default {
           // 
           for (let key in vm.filters) {
             if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
-              vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+              // if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('multiple') && vm.filters[key].multiple) {
+              //   vm.data[vm.filters[key]['key']] = vm.filters[key] && vm.filters[key]['value'] ? vm.filters[key]['value'].toString() : ''
+              // } else {
+                vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+              // }
+              
               if (vm.filters[key]['type'] === 'date' && query.hasOwnProperty(vm.filters[key]['key']) && query[vm.filters[key]['key']]) {
                 vm.data[vm.filters[key]['key']] = query[vm.filters[key]['key']]
               }
@@ -697,15 +713,15 @@ export default {
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
-        console.log('filterssssss', vm.filters)
+        // console.log('filterssssss', vm.filters)
       }
       // 
       if(vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIdList')) {
-        console.log('groupIdList', vm.itemsReports[vm.index]['filterConfig']['groupIdList'])
+        // console.log('groupIdList', vm.itemsReports[vm.index]['filterConfig']['groupIdList'])
         vm.groupIdList = vm.itemsReports[vm.index]['filterConfig']['groupIdList']
       } else {
         vm.groupIdList = []
-        console.log('groupIdList0',vm.groupIdList)
+        // console.log('groupIdList0',vm.groupIdList)
       }
       for(let i in vm.filterGroup){
         vm.filterGroup[i] = null
@@ -718,7 +734,12 @@ export default {
       vm.pdfBlob = ''
       for (let key in vm.filters) {
         if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
-          vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+          // if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('multiple') && vm.filters[key].multiple) {
+          //   vm.data[vm.filters[key]['key']] = vm.filters[key] && vm.filters[key]['value'] ? vm.filters[key]['value'].toString() : ''
+          // } else {
+            vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+          // }
+          
         }
         if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
           vm.filters[key]['groupId'] = vm.govAgency
@@ -820,7 +841,12 @@ export default {
           // 
           for (let key in vm.filters) {
             if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
-              vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+              // if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('multiple') && vm.filters[key].multiple) {
+              //   vm.data[vm.filters[key]['key']] = vm.filters[key] && vm.filters[key]['value'] ? vm.filters[key]['value'].toString() : ''
+              // } else {
+                vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+              // }
+              
             }
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
@@ -875,7 +901,7 @@ export default {
       let docDString = {}
       vm.dataReportXX = ''
       docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
-      console.log('userData', vm.userData)
+      // console.log('userData', vm.userData)
       let titleGov = vm.userData.hasOwnProperty('govAgencyName') && vm.userData.govAgencyName ? vm.userData.govAgencyName : vm.itemsReports[vm.index]['filterConfig']['govAgencyName']
       if (!titleGov) {
         titleGov = vm.$store.getters.siteName
@@ -979,6 +1005,7 @@ export default {
         proxyApi: vm.proxyApi
       }
       let check =  true
+      console.log('groupIdListSelected 555', vm.groupIdListSelected)
       for (let key in vm.filterGroup) {
         if(key === vm.groupIdListSelected) {
           let exits = vm.groupIdList.find(item => item.key === key)
@@ -994,13 +1021,14 @@ export default {
       }
       vm.pdfBlob = null
       vm.isShowLoading = true
+      console.log('getAgencyReportLists',filter)
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
-        console.log('result',result)
+        // console.log('result',result)
         if (result !== null && result !== undefined) {
           // set dossierList
           vm.dossierList = result
           vm.pagination.totalItems = vm.dossierList.length
-          console.log('dossiers', vm.dossierList)
+          // console.log('dossiers', vm.dossierList)
           // 
           vm.showErrorData = false
           let dataReport = result
@@ -1060,7 +1088,7 @@ export default {
             }
           }
           dataRaw.reverse()
-          console.log('dossierRaw 47', dataRaw)
+          // console.log('dossierRaw 47', dataRaw)
           let dataRowTotal = []
           let totalText = 'Tổng cộng'
           dataRowTotal.push({
@@ -1096,8 +1124,8 @@ export default {
             }
           }
           let indexNotShowGroup = 1
-          console.log(vm.groupByValObj)
-          console.log(vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup'))
+          // console.log(vm.groupByValObj)
+          // console.log(vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup'))
           for (let key in dataRaw) {
             if (vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup')) {
               if (dataRaw[key][vm.groupByVal] !== undefined && dataRaw[key][vm.groupByVal] !== null && dataRaw[key][vm.groupByVal] !== '') {
@@ -1208,7 +1236,7 @@ export default {
           if (vm.reportType.startsWith('REPORT_STATISTIC')) {
             vm.dataReportXX += ',' + JSON.stringify(dataRowTotal)
           }
-          console.log('dataReportXX11ZZ', vm.dataReportXX)
+          // console.log('dataReportXX11ZZ', vm.dataReportXX)
           
           vm.csvExport = []
           vm.csvExport = dataToExportCSV
@@ -1343,15 +1371,15 @@ export default {
         proxyApi: vm.proxyApi
       }
       let check =  true
-      for(let key in vm.filterGroup){
-        if(key === vm.groupIdListSelected){
-          console.log(key)
+      for (let key in vm.filterGroup) {
+        if (key === vm.groupIdListSelected) {
           filter['govAgency'] = vm.filterGroup[key]
           filter['agencyLists'] = vm.groupIdList.find(item => item.key === key).value
           check = false
           break
         }
       }
+      console.log('check-check', vm.groupIdListSelected, vm.filterGroup)
       if(check) {
         filter['govAgency'] = vm.govAgency
         filter['agencyLists'] = vm.agencyLists
@@ -1364,8 +1392,9 @@ export default {
       let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
       let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
       
+      console.log('getAgencyReportLists2', filter)
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
-        console.log('result',result)
+        // console.log('result',result)
         if (result !== null) {
           // set dossierList
           vm.dossierList = result
@@ -1451,7 +1480,7 @@ export default {
               }
             }
           })]
-         console.log('resultDataTotal 1', resultDataTotal)
+        //  console.log('resultDataTotal 1', resultDataTotal)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -1664,13 +1693,13 @@ export default {
           vm.dataExportExcel = docDString
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
-          console.log('docDefinition-render-pdf', vm.docDefinition)
+          // console.log('docDefinition-render-pdf', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           // create blob
           // check showTable
           resultData
-          console.log('resultData', resultData)
-          console.log('resultDataTotal 2', resultDataTotal)
+          // console.log('resultData', resultData)
+          // console.log('resultDataTotal 2', resultDataTotal)
           if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
             pdfDocGenerator.getBlob((blob) => {
               vm.pdfBlob = window.URL.createObjectURL(blob)
@@ -1779,10 +1808,10 @@ export default {
       filter['govAgency'] = vm.govAgency
       filter['agencyLists'] = vm.agencyLists
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
-        console.log('result',result)
+        // console.log('result',result)
         if (result !== null && result !== undefined) {
           jsonMapper({ 'content': result, 'blank': '' }, vm.jsonMapperJson).then((result) => {
-            console.log(result)
+            // console.log(result)
             const xmlOptions = {
               header: true,
               indent: '  '
@@ -1918,10 +1947,13 @@ export default {
             vm.filterGroup[i] = null
           }
         }
-        console.log(vm.filterGroup)
+        
         for (let key in vm.filters) {
           if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
-            vm.filters[key]['groupId'] = item.value
+            vm.filters[key]['value'] = ''
+            vm.data[vm.filters[key]['key']] = ''
+            vm.filters[key]['groupId'] = vm.filterGroup[item.key]
+            console.log('filter dataSource', vm.filters[key])
             vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
               vm.filters[key]['source'] = result
             }).catch(function(){})
@@ -1931,9 +1963,12 @@ export default {
     },
     changeGovAgency () {
       let vm = this
+      vm.groupIdListSelected = ''
       setTimeout(()=>{
         for (let key in vm.filters) {
           if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+            vm.filters[key]['value'] = ''
+            vm.data[vm.filters[key]['key']] = ''
             vm.filters[key]['groupId'] = vm.govAgency
             vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
               vm.filters[key]['source'] = result

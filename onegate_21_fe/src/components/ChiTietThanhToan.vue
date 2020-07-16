@@ -243,6 +243,7 @@
 <script>
 
 import Vue from 'vue'
+import axios from 'axios'
 export default {
   props: {
     payments: {
@@ -382,7 +383,28 @@ export default {
       if (vm.payments['paymentMethod'] === 'KeyPayDVCQG') {
         let confirmPayload = vm.payments.hasOwnProperty('confirmPayload') ? vm.getEPaymentProfile(vm.payments['confirmPayload']) : ''
         vm.dialogPDFLoading = false
-        document.getElementById('dialogPaymentPreview').src = confirmPayload ? confirmPayload['url_invoice'] : ''
+        let url = confirmPayload ? confirmPayload['url_invoice'] : ''
+        if (url) {
+          window.open(url, "_blank")
+        } else {
+          alert('Không có biên lai')
+        }
+        
+      } else if (vm.payments['paymentMethod'] === 'PayPlatDVCQG') {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          },
+          responseType: 'blob'
+        }
+        axios.get('/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice', param).then(function (response) {
+          vm.dialogPDFLoading = false
+          let serializable = response.data
+          let file = window.URL.createObjectURL(serializable)
+          document.getElementById('dialogPaymentPreview').src = file
+        }).catch(function (error) {
+          vm.dialogPDFLoading = false
+        })
       } else {
         vm.$store.dispatch('printPay', filter).then(function (result) {
           vm.dialogPDFLoading = false

@@ -142,7 +142,7 @@
                       v-model="donvi_gui_nhan"
                       :rules="formCodeInput === 'NEW_GROUP_CV_DI' && lengthDossier !== 0 && typeof lengthDossier !== 'undefined' ? [rules.required] : []"
                       :required="formCodeInput === 'NEW_GROUP_CV_DI' && lengthDossier !== 0 && typeof lengthDossier !== 'undefined'"
-                      :readonly="formCodeInput === 'NEW_GROUP_CV_DI' && (lengthDossier === 0 ||typeof lengthDossier === 'undefined')"
+                      :disabled="formCodeInput === 'NEW_GROUP_CV_DI' && (lengthDossier === 0 ||typeof lengthDossier === 'undefined')"
                       ></v-autocomplete>
                     </v-flex>
 

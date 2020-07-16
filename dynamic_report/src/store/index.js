@@ -299,7 +299,7 @@ export const store = new Vuex.Store({
             }
           }
           for (let key in filter['data']) {
-            let currentVal = filter['data'][key]
+            let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
               let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
               if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
@@ -743,11 +743,11 @@ export const store = new Vuex.Store({
             }
             let typeMethod = 'POST'
             let paramProxy = {
-                headers: {
-                  groupId: window.themeDisplay.getScopeGroupId(),
-                  Token: window.Liferay ? window.Liferay.authToken : ''
-                },
-                params: {}
+              headers: {
+                groupId: window.themeDisplay.getScopeGroupId(),
+                Token: window.Liferay ? window.Liferay.authToken : ''
+              },
+              params: {}
             }
             let dataUpdate = new URLSearchParams()
             let paramGetProxy = param.params

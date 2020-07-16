@@ -270,7 +270,7 @@
           </v-tab>
         </v-tabs>
         <v-tabs v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" icons-and-text centered class="mb-4">
-          <v-tab href="#tab-1" @click="tiepNhanCongVan()" class="px-0 py-0"> 
+          <v-tab href="#tab-1" @click="tiepNhanCongVan('add')" class="px-0 py-0"> 
             <v-btn flat class="" 
               :loading="loadingAction"
               :disabled="loadingAction"
@@ -1258,12 +1258,13 @@ export default {
         toastr.error('Vui lòng điền đầy đủ thông tin bắt buộc')
       }
     },
-    tiepNhanCongVan () {
+    tiepNhanCongVan (type) {
       let vm = this
       vm.loadingAction = true
       let thongtincongvan = this.$refs.thongtincongvan.getThongTinCongVan()
       let tempData = thongtincongvan
       tempData.dueDate = vm.dateTimeView(thongtincongvan.dueDate)
+      tempData = Object.assign(tempData, {typeAction: type ? type : ''})
       console.log('data put congvan -->', tempData)
       if (thongtincongvan.validation) {
         vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
@@ -1274,7 +1275,7 @@ export default {
           vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
           vm.loadingAction = false
           vm.$router.push({
-            path: '/danh-sach-ho-so/0/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,
+            path: '/danh-sach-ho-so/' + vm.index + '/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,
             query: vm.$router.history.current.query
           })
         }).catch(rejectXhr => {
