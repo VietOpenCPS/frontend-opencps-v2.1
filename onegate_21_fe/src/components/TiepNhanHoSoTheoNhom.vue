@@ -910,7 +910,10 @@ export default {
     },
     activeAddFileGroup () {
       return this.$store.getters.activeAddFileGroup
-    }
+    },
+    menuConfigs () {
+      return this.$store.getters.getMenuConfigsTodo
+    },
   },
   created () {
     var vm = this
@@ -1811,6 +1814,22 @@ export default {
           }
           vm.$store.dispatch('getDossiersIntoGroup', filter1).then(function (result) {
             vm.dossiersIntoGroup = result
+            vm.$store.commit('setSelectDossierGroup', vm.dossiersIntoGroup)
+            if (vm.dossiersIntoGroup.length > 0) {
+              let steps = []
+              for (let index in vm.dossiersIntoGroup) {
+                if (steps.filter(function (item) {
+                  return String(item['stepCode']) === String(vm.dossiersIntoGroup[index]['stepCode'])
+                }).length === 0) {
+                  steps.push({
+                    stepCode: vm.dossiersIntoGroup[index]['stepCode'],
+                    stepName: vm.dossiersIntoGroup[index]['stepName']
+                  })
+                }
+              }
+              vm.stepList = steps
+            }
+            vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
             vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
           })
         }, 500);
@@ -1847,7 +1866,9 @@ export default {
     },
     searchDossierToAdd () {
       let vm = this
+      let apiGetDossier = vm.menuConfigs[vm.index]['tableConfig'].hasOwnProperty('apiGetDossierAddGroup') ? vm.menuConfigs[vm.index]['tableConfig']['apiGetDossierAddGroup'] : ''
       let filter = {
+        api: apiGetDossier,
         dossierNo: vm.dossierNoKey,
         service: vm.thongTinNhomHoSo.serviceCode,
         page: vm.hosoDatasPage,
@@ -1858,25 +1879,31 @@ export default {
         order: true,
         groupDossierId: vm.thongTinNhomHoSo.dossierId
       }
-      vm.$store.dispatch('getHoSoAddGroup', filter).then(function (result) {
-        vm.dossiersSelectAdd = result.data
-        vm.hosoDatasTotal = result.total
+      if (apiGetDossier) {
+        vm.$store.dispatch('getHoSoAddGroup', filter).then(function (result) {
+          vm.dossiersSelectAdd = result.data
+          vm.hosoDatasTotal = result.total
 
-        vm.hosoTotalPage = Math.ceil(vm.hosoDatasTotal / vm.numberPerPageAddDossier)
-        if (vm.hosoTotalPage > 0 && vm.selectMultiplePage.length === 0) {
-          for (let key = 0; key < vm.hosoTotalPage; key++) {
-            let item = {
-              selected: [],
-              page: key + 1
+          vm.hosoTotalPage = Math.ceil(vm.hosoDatasTotal / vm.numberPerPageAddDossier)
+          if (vm.hosoTotalPage > 0 && vm.selectMultiplePage.length === 0) {
+            for (let key = 0; key < vm.hosoTotalPage; key++) {
+              let item = {
+                selected: [],
+                page: key + 1
+              }
+              vm.selectMultiplePage.push(item)
             }
-            vm.selectMultiplePage.push(item)
           }
-        }
-        vm.selectedDossierAdd = vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected']
-      }).catch(reject => {
+          vm.selectedDossierAdd = vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected']
+        }).catch(reject => {
+          vm.dossiersSelectAdd = []
+          vm.hosoDatasTotal = 0
+        })
+      } else {
         vm.dossiersSelectAdd = []
         vm.hosoDatasTotal = 0
-      })
+      }
+      
     },
     changeSelectedDossierAdd () {
       let vm = this
@@ -1908,7 +1935,23 @@ export default {
           vm.loadingAction = false
           vm.dialogAddDossier = false
           vm.$store.dispatch('getDossiersIntoGroup', data).then(function (result) {
-            vm.dossiersIntoGroupRender = result
+            vm.dossiersIntoGroup = result
+            vm.$store.commit('setSelectDossierGroup', vm.dossiersIntoGroup)
+            if (vm.dossiersIntoGroup.length > 0) {
+              let steps = []
+              for (let index in vm.dossiersIntoGroup) {
+                if (steps.filter(function (item) {
+                  return String(item['stepCode']) === String(vm.dossiersIntoGroup[index]['stepCode'])
+                }).length === 0) {
+                  steps.push({
+                    stepCode: vm.dossiersIntoGroup[index]['stepCode'],
+                    stepName: vm.dossiersIntoGroup[index]['stepName']
+                  })
+                }
+              }
+              vm.stepList = steps
+            }
+            vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
           })
         }, 500)
         

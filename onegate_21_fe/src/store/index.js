@@ -422,38 +422,18 @@ export const store = new Vuex.Store({
           let paramSearch = {
             start: filter.page * filter.numberPerPage - filter.numberPerPage,
             end: filter.page * filter.numberPerPage,
-            service: filter.service ? filter.service : '',
-            template: filter.template ? filter.template : '',
-            status: filter.status ? filter.status : '',
-            register: filter.register ? filter.register : '',
-            keyword: filter.keyword ? filter.keyword : '',
-            domain: filter.domain ? filter.domain : '',
-            substatus: filter.substatus ? filter.substatus : '',
-            year: filter.year ? filter.year : 0,
-            month: filter.month ? filter.month : 0,
-            day: filter.day ? filter.day : 0,
-            top: filter.top ? filter.top : '',
-            dossierNo: filter.dossierNo ? filter.dossierNo : '',
-            paymentStatus: filter.paymentStatus ? filter.paymentStatus : '',
-            groupDossierIdHs: filter.groupDossierId ? filter.groupDossierId : ''
-          }
-          if (filter['originality']) {
-            paramSearch.originality = filter.originality
-          }
-          if (filter['sort']) {
-            paramSearch.sort = filter.sort
-          }
-          if (filter.order !== '') {
-            paramSearch.order = String(filter.order) === 'true' ? true : false
+            groupDossierIdHs: filter.groupDossierId,
+            service: filter.service,
+            dossierNo: filter.dossierNo
           }
           // 
           let param = {
             headers: {
               groupId: state.initData.groupId
-            },
-            params: paramSearch
+            }
           }
-          axios.get('/o/rest/v2/dossiers/todo', param).then(function (response) {
+          let link = filter.api.indexOf('?') !== -1 ? '' : '?'
+          axios.get(filter.api + link + '&sort=dossierNo&order=true&start=' + paramSearch.start + '&end=' + paramSearch.end + '&groupDossierIdHs=' + paramSearch.groupDossierIdHs + '&service=' + paramSearch.service + '&dossierNo=' + paramSearch.dossierNo, param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
@@ -1753,6 +1733,9 @@ export const store = new Vuex.Store({
         console.log('dataPutdossier', dataPutdossier)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)
+          if (data.hasOwnProperty('typeAction') && data.typeAction === 'add') {
+            store.dispatch('getActiveGetCounter', !state.activeGetCounter)
+          }
         }).catch(rejectXhr => {
           reject(rejectXhr)
         })

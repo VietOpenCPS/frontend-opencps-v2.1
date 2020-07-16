@@ -299,7 +299,7 @@ export const store = new Vuex.Store({
             }
           }
           for (let key in filter['data']) {
-            let currentVal = filter['data'][key]
+            let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
               let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
               if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
@@ -686,28 +686,135 @@ export const store = new Vuex.Store({
             },
             params: {}
           }
-          axios.get(filter.api, param).then(function (result) {
-            if (result.data) {
-              let dataMapping = []
-              let dataOutput = result.data.data
-              if (filter.hasOwnProperty('valueMapping') && filter.valueMapping) {
-                for (let index in dataOutput) {
-                  let x = {
-                    value: filter.hasOwnProperty('valueMappingChild') ? dataOutput[index][filter.valueMapping][filter.valueMappingChild] : dataOutput[index][filter.valueMapping],
-                    name: dataOutput[index][filter.nameMapping]
+          if (!filter.hasOwnProperty('groupId')) {
+            axios.get(filter.api, param).then(function (result) {
+              if (result.data) {
+                let dataMapping = []
+                let dataOutput = result.data.data
+                if (filter.hasOwnProperty('valueMapping') && filter.valueMapping) {
+                  for (let index in dataOutput) {
+                    let x = {
+                      value: filter.hasOwnProperty('valueMappingChild') ? dataOutput[index][filter.valueMapping][filter.valueMappingChild] : dataOutput[index][filter.valueMapping],
+                      name: dataOutput[index][filter.nameMapping]
+                    }
+                    dataMapping.push(x)
                   }
-                  dataMapping.push(x)
+                } else {
+                  dataMapping = dataOutput
                 }
+                resolve(dataMapping)
               } else {
-                dataMapping = dataOutput
+                resolve([])
               }
-              resolve(dataMapping)
-            } else {
-              resolve([])
+            }).catch(function(xhr) {
+              reject(xhr)
+            })
+          } else if (filter.hasOwnProperty('groupId') && (filter.groupId === '' || filter.groupId === '0')) {
+            // lấy qua proxy
+            let getAllUrlParams = function(arr) {
+              let obj = {}
+              for (var i = 0; i < arr.length; i++) {
+                let a = arr[i].split('=')
+                let paramName = a[0]
+                let paramValue = typeof (a[1]) === 'undefined' ? true : a[1]
+                paramName = paramName.toLowerCase()
+                if (typeof paramValue === 'string') paramValue = paramValue.toLowerCase()
+                if (paramName.match(/\[(\d+)?\]$/)) {
+                  var key = paramName.replace(/\[(\d+)?\]/, '')
+                  if (!obj[key]) obj[key] = []
+                  if (paramName.match(/\[\d+\]$/)) {
+                    var index = /\[(\d+)\]/.exec(paramName)[1]
+                    obj[key][index] = paramValue
+                  } else {
+                    obj[key].push(paramValue)
+                  }
+                } else {
+                  if (!obj[paramName]) {
+                    obj[paramName] = paramValue
+                  } else if (obj[paramName] && typeof obj[paramName] === 'string'){
+                    obj[paramName] = [obj[paramName]]
+                    obj[paramName].push(paramValue)
+                  } else {
+                    obj[paramName].push(paramValue)
+                  }
+                }
+              }
+              return obj
             }
-          }).catch(function(xhr) {
-            reject(xhr)
-          })
+            let typeMethod = 'POST'
+            let paramProxy = {
+              headers: {
+                groupId: window.themeDisplay.getScopeGroupId(),
+                Token: window.Liferay ? window.Liferay.authToken : ''
+              },
+              params: {}
+            }
+            let dataUpdate = new URLSearchParams()
+            let paramGetProxy = param.params
+            try {
+              let paramApi = getAllUrlParams(filter.api.split('?')[1].split('&'))
+              paramGetProxy = Object.assign(param.params, paramApi)
+            } catch (error) {
+            }
+            
+            dataUpdate.append("method", "GET")
+            dataUpdate.append("url", filter['proxyApi'])
+            dataUpdate.append('data', JSON.stringify(paramGetProxy))
+            axios({
+              method: typeMethod,
+              url: '/o/rest/v2/proxy',
+              headers: paramProxy.headers,
+              params: paramProxy.params,
+              data: dataUpdate
+            }).then(function (response) {
+              if (response.data) {
+                let dataMapping = []
+                let dataOutput = response.data.data
+                if (filter.hasOwnProperty('valueMapping') && filter.valueMapping) {
+                  for (let index in dataOutput) {
+                    let x = {
+                      value: filter.hasOwnProperty('valueMappingChild') ? dataOutput[index][filter.valueMapping][filter.valueMappingChild] : dataOutput[index][filter.valueMapping],
+                      name: dataOutput[index][filter.nameMapping]
+                    }
+                    dataMapping.push(x)
+                  }
+                } else {
+                  dataMapping = dataOutput
+                }
+                resolve(dataMapping)
+              } else {
+                resolve([])
+              }
+            }).catch(function (error) {
+              reject([])
+            })
+          } else if (filter.hasOwnProperty('groupId') && filter.groupId !== '0') {
+            // lấy theo groupId
+            param.headers.groupId = filter.groupId
+            axios.get(filter.api, param).then(function (result) {
+              if (result.data) {
+                let dataMapping = []
+                let dataOutput = result.data.data
+                if (filter.hasOwnProperty('valueMapping') && filter.valueMapping) {
+                  for (let index in dataOutput) {
+                    let x = {
+                      value: filter.hasOwnProperty('valueMappingChild') ? dataOutput[index][filter.valueMapping][filter.valueMappingChild] : dataOutput[index][filter.valueMapping],
+                      name: dataOutput[index][filter.nameMapping]
+                    }
+                    dataMapping.push(x)
+                  }
+                } else {
+                  dataMapping = dataOutput
+                }
+                resolve(dataMapping)
+              } else {
+                resolve([])
+              }
+            }).catch(function(xhr) {
+              reject(xhr)
+            })
+          }
+          
         })
       })
     },
