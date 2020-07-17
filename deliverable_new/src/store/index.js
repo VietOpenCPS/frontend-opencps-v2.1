@@ -246,6 +246,19 @@ export const store = new Vuex.Store({
             'groupId': state.groupId
           },
           params: {
+          }
+        }
+        if(filter.hasOwnProperty('getAll')){
+          if(filter.getAll){
+            options['params'] = {}
+          }else{
+            options['params'] = {
+              start: filter.page * 15 - 15,
+              end: filter.page * 15
+            }
+          }
+        } else {
+          options['params'] = {
             start: filter.page * 15 - 15,
             end: filter.page * 15
           }
