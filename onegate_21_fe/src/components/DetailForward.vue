@@ -5,6 +5,7 @@
       ref="tiepnhanhosodetail"
       :formCode="formCode"
       :id="id"
+      :index="index"
     ></tiep-nhan-ho-so-detail>
   </div>
 </template>
@@ -13,7 +14,7 @@
 import TiepNhanHoSoDetail from './TiepNhanHoSoDetail.vue'
 
 export default {
-  props: ['id', 'formCode'],
+  props: ['index', 'id', 'formCode'],
   components: {
     'tiep-nhan-ho-so-detail': TiepNhanHoSoDetail
   },

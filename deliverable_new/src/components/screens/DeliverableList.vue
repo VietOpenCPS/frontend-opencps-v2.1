@@ -253,13 +253,28 @@
         <v-icon size="16">add</v-icon>&nbsp;Thêm&nbsp;{{String(loaiDuLieu).toLowerCase()}}
       </v-btn>
       <!-- import -->
-      <!-- <v-btn color="primary" class="white--text"
+      <v-btn color="primary" class="white--text"
         :loading="loadingImport"
         :disabled="loadingImport"
         @click="doImportData">
         <v-icon>exit_to_app</v-icon> &nbsp;
-        Import giấy phép
-      </v-btn> -->
+        Import&nbsp;{{String(loaiDuLieu).toLowerCase()}}
+      </v-btn>
+      <!--  -->
+      <v-btn color="primary"
+        @click="exportTracking"
+      >
+        <v-icon>import_export</v-icon>&nbsp;
+        Export&nbsp;{{String(loaiDuLieu).toLowerCase()}}
+      </v-btn>
+      <JsonExcel
+          class="btn btn-default btn-export"
+          :data="json_data"
+          style="display: none"
+          :name="items ? String(items[index]['typeName']) : ''"
+      >
+        Export Excel
+      </JsonExcel>
     </div>
     <v-data-table
         :headers="headers"
@@ -273,7 +288,7 @@
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <span v-else @click="viewDetail(props.item['_source'], props.index)" style="cursor: pointer;">
+            <span v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
               {{ hosoDatasPage * 15 - 15 + props.index + 1 }}
             </span>
           </td>
@@ -282,52 +297,67 @@
             :class="itemHeader['class_column']"
             v-if="itemHeader.hasOwnProperty('value')"
           >
-            <div v-if="itemHeader.value === 'deliverableState'" @click="viewDetail(props.item['_source'], props.index)" style="cursor: pointer;">
+            <div v-if="itemHeader.value === 'deliverableState'" @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
               <span>
-                {{getState(props.item['_source'])}}
+                {{getState(props.item)}}
               </span>
             </div>
             <div class="text-xs-center" v-else-if="itemHeader.value === 'mortgageable'" style="cursor: pointer;">
-              <v-tooltip top v-if="String(props.item['_source']['mortgageable_data']).toLowerCase() === 'true' && props.item['_source']['mortgageInfo_data']">
-                <v-btn slot="activator" flat icon class="mx-0 my-0" v-on:click.stop="showMortgage(props.item['_source'], props.index)">
+              <v-tooltip top v-if="String(props.item['mortgageable_data']).toLowerCase() === 'true' && props.item['mortgageInfo_data']">
+                <v-btn slot="activator" flat icon class="mx-0 my-0" v-on:click.stop="showMortgage(props.item, props.index)">
                   <v-icon class="green--text" size="24px">check_circle</v-icon>
                 </v-btn>
-                <span>{{props.item['_source']['mortgageInfo_data']}}</span>
+                <span>{{props.item['mortgageInfo_data']}}</span>
               </v-tooltip>
               
-              <v-tooltip top v-if="String(props.item['_source']['mortgageable_data']).toLowerCase() === 'true' && !props.item['_source']['mortgageInfo_data']">
-                <v-btn slot="activator" flat icon class="mx-0 my-0" v-on:click.stop="showMortgage(props.item['_source'], props.index)">
+              <v-tooltip top v-if="String(props.item['mortgageable_data']).toLowerCase() === 'true' && !props.item['mortgageInfo_data']">
+                <v-btn slot="activator" flat icon class="mx-0 my-0" v-on:click.stop="showMortgage(props.item, props.index)">
                   <v-icon style="color:#D32F2F" size="24px">remove_circle</v-icon>
                 </v-btn>
                 <span>Không có thông tin thế chấp</span>
               </v-tooltip>
               
             </div>
-            <div v-else @click="viewDetail(props.item['_source'], props.index)" style="cursor: pointer;">
-              <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item['_source']" :layout_view="itemHeader.layout_view"></template-rendering>
+            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
+              <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item" :layout_view="itemHeader.layout_view"></template-rendering>
               <span v-else>
-                {{ props.item['_source'][itemHeader.value] }}
+                {{ props.item[itemHeader.value] }}
               </span>
             </div>
           </td>
-          <td class="text-xs-center px-0 py-0 pt-1" v-if="!hideAction" style="width:80px">
+          <td class="text-xs-center px-0 py-0 pt-1" v-if="!hideAction" style="width:150px">
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
 
             <v-tooltip top v-if="!loadingTable">
-              <v-btn slot="activator" flat icon class="mx-0 my-0" v-on:click.native="showPDFG(props.item['_source'])">
+              <v-btn slot="activator" flat icon class="mx-0 my-0" v-on:click.native="showPDFG(props.item)">
                 <v-icon>picture_as_pdf</v-icon>
               </v-btn>
-              <span>Xem giấy phép</span>
+              <span>Xem &nbsp;{{String(loaiDuLieu).toLowerCase()}}</span>
             </v-tooltip>
             
             <v-tooltip top v-if="!loadingTable">
-              <v-btn slot="activator" flat icon class="mx-0 my-0" v-if="props.item['_source']['fileAttachs'] && !loadingTable" v-on:click.native="viewFileAttach(props.item['_source'])">
+              <v-btn slot="activator" flat icon class="mx-0 my-0" v-if="props.item['fileAttachs'] && !loadingTable" v-on:click.native="viewFileAttach(props.item)">
                 <v-icon>attach_file</v-icon>
               </v-btn>
               <span>Xem tài liệu đính kèm</span>
             </v-tooltip>
+
+            <v-tooltip top v-if="!loadingTable">
+              <v-btn slot="activator" flat icon class="mx-0 my-0" v-if="props.item['dossierId'] === '0' && !loadingTable" v-on:click.native="editDeliverables(props.item)">
+                <v-icon>edit</v-icon>
+              </v-btn>
+              <span>Sửa&nbsp;{{String(loaiDuLieu).toLowerCase()}}</span>
+            </v-tooltip>
+
+            <v-tooltip top v-if="!loadingTable">
+              <v-btn slot="activator" flat icon class="mx-0 my-0" v-if="props.item['dossierId'] === '0' && !loadingTable" v-on:click.native="deleteDeliverable(props.item)">
+                <v-icon>delete</v-icon>
+              </v-btn>
+              <span>Xóa&nbsp;{{String(loaiDuLieu).toLowerCase()}}</span>
+            </v-tooltip>
+
           </td>
         </tr>
       </template>
@@ -440,13 +470,15 @@
   import DatetimePicker from '../ext/DatetimePicker.vue'
   import axios from 'axios'
   import toastr from 'toastr'
+  import JsonExcel from 'vue-json-excel'
 
   export default {
     props: ['index'],
     components: {
       TinyPagination,
       TemplateRendering,
-      DatetimePicker
+      DatetimePicker,
+      JsonExcel
     },
     data () {
       return {
@@ -480,7 +512,18 @@
         applicantName: '',
         donvicu_data: '',
         trichyeu_data: '',
-        loaiDuLieu: ''
+        loaiDuLieu: '',
+        json_fields: {
+        },
+        json_data: [],
+        json_meta: [
+            [
+                {
+                    'key': 'charset',
+                    'value': 'utf-8'
+                }
+            ]
+        ],
       }
     },
     created () {
@@ -498,6 +541,11 @@
                 vm.loaiDuLieu = tableConfig.loaiDuLieu
               } else {
                 vm.loaiDuLieu = "giấy phép"
+              }
+              for(let i=0; i< vm.headers.length ;i++){
+                if(vm.headers[i]['text'] !== 'STT'){
+                  vm.json_fields[vm.headers[i]['text']] =  vm.headers[i]['value']
+                }
               }
             } else {
               vm.headers = []
@@ -635,8 +683,8 @@
         }
         vm.loadingTable = true
         vm.$store.dispatch('getDeliverables', filter).then(function (result) {
-          vm.hosoDatasTotal = result['hits']['total']
-          vm.hosoDatas = result['hits']['hits']
+          vm.hosoDatasTotal = result['total']
+          vm.hosoDatas = result['data']
           vm.loadingTable = false
         }).catch(function (reject) {
           vm.loadingTable = false
@@ -671,6 +719,20 @@
         }
         vm.$router.push({
           path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString
+        })
+      },
+      editDeliverables (item, index) {
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        vm.$router.push({
+          path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString + 'editForm=true'
         })
       },
       showPDFG (item) {
@@ -724,7 +786,7 @@
         vm.loading = true
         vm.$store.dispatch('putFormData', filter).then(function (data) {
           toastr.success('Cập nhật thành công')
-          vm.hosoDatas[vm.indexDeliverableSelected]['_source']['mortgageInfo_data'] = vm.mortGageInput
+          vm.hosoDatas[vm.indexDeliverableSelected]['mortgageInfo_data'] = vm.mortGageInput
           vm.loading = false
           vm.dialogMortgage = false
         }).catch(function() {
@@ -866,8 +928,8 @@
         }
         vm.loadingTable = true
         vm.$store.dispatch('searchDeliverables', filter).then(function (result) {
-          vm.hosoDatasTotal = result.hasOwnProperty('hits') ? result['hits']['total'] : 0
-          vm.hosoDatas = result.hasOwnProperty('hits') ? result['hits']['hits'] : []
+          vm.hosoDatasTotal = result.hasOwnProperty('total') ? result['total'] : 0
+          vm.hosoDatas = result.hasOwnProperty('data') ? result['data'] : []
           vm.loadingTable = false
         }).catch(function (reject) {
           vm.loadingTable = false
@@ -917,10 +979,31 @@
             groupId: window.themeDisplay.getScopeGroupId()
           }
         }
-        axios.delete('/o/rest/deliverables', param).then(function () {
-          resolve({status: true})
+        axios.delete('/o/rest/v2/deliverables/' + item.deliverableId, param).then(function () {
+          toastr.success('Thực hiện thành công')
+          vm.loadingTable = true
+          let currentQuery = vm.$router.history.current.query
+          let queryString = ''
+          for (let key in currentQuery) {
+            if (currentQuery[key] !== '' && currentQuery[key] !== 'undefined' && currentQuery[key] !== undefined) {
+              queryString += key + '=' + currentQuery[key] + '&'
+            }
+          }
+          queryString += '1=1'
+          let filter = {
+            type: vm.items[vm.index]['typeCode'],
+            page: vm.hosoDatasPage,
+            q: queryString,
+          }
+          vm.$store.dispatch('getDeliverables', filter).then(function (result) {
+            vm.hosoDatasTotal = result['total']
+            vm.hosoDatas = result['data']
+            vm.loadingTable = false
+          }).catch(function (reject) {
+            vm.loadingTable = false
+          })
         }).catch(function (xhr) {
-          
+          toastr.success('Thực hiện thất bại')
         })
       },
       getState (item) {
@@ -976,6 +1059,68 @@
         // let date = new Date(event)
         // const [year, month, day] = date.toISOString().substr(0, 10).split('-')
         this.filterData[key] = event
+      },
+      async fetchDataExcel(){
+        let vm = this
+        let currentQuery = vm.$router.history.current.query
+        let queryString = ''
+        for (let key in currentQuery) {
+          if (currentQuery[key] !== '' && currentQuery[key] !== 'undefined' && currentQuery[key] !== undefined) {
+            queryString += key + '=' + currentQuery[key] + '&'
+          }
+        }
+        queryString += '1=1'
+        let filter = {
+          type: vm.items[vm.index]['typeCode'],
+          page: vm.hosoDatasPage,
+          q: queryString,
+          getAll: true
+        }
+        const data = await vm.$store.dispatch('getDeliverables', filter)
+        console.log(data.data)
+        return data.data
+      },
+      exportTracking () {
+    
+        let vm = this
+        // let currentQuery = vm.$router.history.current.query
+        let queryString = ''
+        // for (let key in currentQuery) {
+        //   if (currentQuery[key] !== '' && currentQuery[key] !== 'undefined' && currentQuery[key] !== undefined) {
+        //     queryString += key + '=' + currentQuery[key] + '&'
+        //   }
+        // }
+        
+        for(let key in vm.filterData){
+          if(vm.filterData[key]){
+            queryString += key + '=' + vm.filterData[key]+ '&'
+          }
+        }
+        queryString += '1=1'
+        let filter = {
+          type: vm.items[vm.index]['typeCode'],
+          page: vm.hosoDatasPage,
+          q: queryString,
+          getAll: true
+        }
+        vm.$store.dispatch('getDeliverables', filter).then(result => {
+          let data = result.data
+          let dataExport = []
+          for(let i=0;i<data.length;i++){
+            let item = {}
+            for(let key in vm.json_fields){
+              console.log(vm.json_fields[key])
+              item[key]=data[i][vm.json_fields[key]]
+            }
+            console.log(item)
+            dataExport.push(item)
+          }
+          vm.json_data = dataExport
+          console.log(vm.json_data)
+          setTimeout(() => {
+            $('.btn-export').click()
+          }, 100)
+        })
       }
     }
   }

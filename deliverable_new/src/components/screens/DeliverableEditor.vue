@@ -64,7 +64,7 @@
           <v-icon>cloud_upload</v-icon> &nbsp;
           Tải&nbsp;{{String(loaiDuLieu).toLowerCase()}}&nbsp;từ máy tính
           </v-btn>
-          <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && !editDeliverable" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverable = true"
+          <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && !editDeliverable && detail.dossierId === '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverable = true"
             :loading="loading"
             :disabled="loading"
           >
@@ -185,12 +185,13 @@
     created () {
       var vm = this
       vm.$nextTick(function () {
+        let currentQuery = vm.$router.history.current.query
         // set permissionUser
         if (vm.items.length > 0) {
           vm.$store.commit('setUserPermission', vm.items[vm.index]['moderator'])
         }
         // 
-        vm.editDeliverable = String(vm.id) === '0' ? true : false
+        vm.editDeliverable = String(vm.id) === '0' || (currentQuery.hasOwnProperty('editForm') && currentQuery.editForm) ? true : false
         vm.$store.dispatch('getDeliverableTypes').then(function (result) {
           setTimeout(() => {
             let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
