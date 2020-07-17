@@ -1205,6 +1205,12 @@ export default {
       vm.documentNo = currentQuery.hasOwnProperty('documentNo') ? currentQuery.documentNo : ''
       vm.dateCv = currentQuery.hasOwnProperty('dateCv') ? vm.parseDate(currentQuery.dateCv) : ''
       vm.dateCvFormatted = vm.formatDate(vm.dateCv)
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchGovAgencyCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode) {
+        vm.govAgencyFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('groupServiceCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode) {
+        vm.groupServiceFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode
+      }
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
         vm.$store.commit('setLoadingDynamicBtn', true)

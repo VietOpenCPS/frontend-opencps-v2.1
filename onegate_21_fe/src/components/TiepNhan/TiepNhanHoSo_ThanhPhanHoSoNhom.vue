@@ -885,10 +885,12 @@ export default {
       if (data.partType !== 3) {
         vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
           console.log('vm.dossierIntoGroup', vm.dossierIntoGroup)
-          if (vm.dossierIntoGroup.length > 0) {
-            vm.$store.commit('setFilesAdd', result)
-            vm.$store.commit('setActiveAddFileGroup', true)
-          }
+          // đính kèm cho các hồ sơ khác cùng nhóm
+          // if (vm.dossierIntoGroup.length > 0) {
+          //   vm.$store.commit('setFilesAdd', result)
+          //   vm.$store.commit('setActiveAddFileGroup', true)
+          // }
+          // end
           vm.dossierTemplateItems[index]['passRequired'] = true
           vm.progressUploadPart = ''
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {

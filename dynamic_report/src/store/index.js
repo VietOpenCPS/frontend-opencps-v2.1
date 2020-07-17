@@ -211,6 +211,9 @@ export const store = new Vuex.Store({
                 })
                 indexKey = indexKey + 1
               }
+              itemsReportsData = itemsReportsData.filter(function (item) {
+                return String(item.sharing) !== '9'
+              })
               state.itemsReports = itemsReportsData
               console.log('state.itemsReports', state.itemsReports)
               resolve(itemsReportsData)
@@ -276,6 +279,9 @@ export const store = new Vuex.Store({
               })
               indexKey = indexKey + 1
             }
+            itemsReportsData = itemsReportsData.filter(function (item) {
+              return String(item.sharing) !== '9'
+            })
             state.itemsReports = itemsReportsData
             console.log('state.itemsReports', state.itemsReports)
             resolve(itemsReportsData)
