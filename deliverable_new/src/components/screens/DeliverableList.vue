@@ -260,6 +260,21 @@
         <v-icon>exit_to_app</v-icon> &nbsp;
         Import&nbsp;{{String(loaiDuLieu).toLowerCase()}}
       </v-btn>
+      <!--  -->
+      <v-btn color="primary"
+        @click="exportTracking"
+      >
+        <v-icon>import_export</v-icon>&nbsp;
+        Export&nbsp;{{String(loaiDuLieu).toLowerCase()}}
+      </v-btn>
+      <JsonExcel
+          class="btn btn-default btn-export"
+          :data="json_data"
+          style="display: none"
+          :name="items ? String(items[index]['typeName']) : ''"
+      >
+        Export Excel
+      </JsonExcel>
     </div>
     <v-data-table
         :headers="headers"
@@ -310,7 +325,7 @@
               </span>
             </div>
           </td>
-          <td class="text-xs-center px-0 py-0 pt-1" v-if="!hideAction" style="width:120px">
+          <td class="text-xs-center px-0 py-0 pt-1" v-if="!hideAction" style="width:150px">
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
@@ -455,13 +470,15 @@
   import DatetimePicker from '../ext/DatetimePicker.vue'
   import axios from 'axios'
   import toastr from 'toastr'
+  import JsonExcel from 'vue-json-excel'
 
   export default {
     props: ['index'],
     components: {
       TinyPagination,
       TemplateRendering,
-      DatetimePicker
+      DatetimePicker,
+      JsonExcel
     },
     data () {
       return {
@@ -495,7 +512,18 @@
         applicantName: '',
         donvicu_data: '',
         trichyeu_data: '',
-        loaiDuLieu: ''
+        loaiDuLieu: '',
+        json_fields: {
+        },
+        json_data: [],
+        json_meta: [
+            [
+                {
+                    'key': 'charset',
+                    'value': 'utf-8'
+                }
+            ]
+        ],
       }
     },
     created () {
@@ -513,6 +541,11 @@
                 vm.loaiDuLieu = tableConfig.loaiDuLieu
               } else {
                 vm.loaiDuLieu = "giấy phép"
+              }
+              for(let i=0; i< vm.headers.length ;i++){
+                if(vm.headers[i]['text'] !== 'STT'){
+                  vm.json_fields[vm.headers[i]['text']] =  vm.headers[i]['value']
+                }
               }
             } else {
               vm.headers = []
@@ -946,9 +979,22 @@
             groupId: window.themeDisplay.getScopeGroupId()
           }
         }
-        axios.delete('/o/rest/deliverables/' + item.deliverableId, param).then(function () {
+        axios.delete('/o/rest/v2/deliverables/' + item.deliverableId, param).then(function () {
           toastr.success('Thực hiện thành công')
           vm.loadingTable = true
+          let currentQuery = vm.$router.history.current.query
+          let queryString = ''
+          for (let key in currentQuery) {
+            if (currentQuery[key] !== '' && currentQuery[key] !== 'undefined' && currentQuery[key] !== undefined) {
+              queryString += key + '=' + currentQuery[key] + '&'
+            }
+          }
+          queryString += '1=1'
+          let filter = {
+            type: vm.items[vm.index]['typeCode'],
+            page: vm.hosoDatasPage,
+            q: queryString,
+          }
           vm.$store.dispatch('getDeliverables', filter).then(function (result) {
             vm.hosoDatasTotal = result['total']
             vm.hosoDatas = result['data']
@@ -1013,6 +1059,68 @@
         // let date = new Date(event)
         // const [year, month, day] = date.toISOString().substr(0, 10).split('-')
         this.filterData[key] = event
+      },
+      async fetchDataExcel(){
+        let vm = this
+        let currentQuery = vm.$router.history.current.query
+        let queryString = ''
+        for (let key in currentQuery) {
+          if (currentQuery[key] !== '' && currentQuery[key] !== 'undefined' && currentQuery[key] !== undefined) {
+            queryString += key + '=' + currentQuery[key] + '&'
+          }
+        }
+        queryString += '1=1'
+        let filter = {
+          type: vm.items[vm.index]['typeCode'],
+          page: vm.hosoDatasPage,
+          q: queryString,
+          getAll: true
+        }
+        const data = await vm.$store.dispatch('getDeliverables', filter)
+        console.log(data.data)
+        return data.data
+      },
+      exportTracking () {
+    
+        let vm = this
+        // let currentQuery = vm.$router.history.current.query
+        let queryString = ''
+        // for (let key in currentQuery) {
+        //   if (currentQuery[key] !== '' && currentQuery[key] !== 'undefined' && currentQuery[key] !== undefined) {
+        //     queryString += key + '=' + currentQuery[key] + '&'
+        //   }
+        // }
+        
+        for(let key in vm.filterData){
+          if(vm.filterData[key]){
+            queryString += key + '=' + vm.filterData[key]+ '&'
+          }
+        }
+        queryString += '1=1'
+        let filter = {
+          type: vm.items[vm.index]['typeCode'],
+          page: vm.hosoDatasPage,
+          q: queryString,
+          getAll: true
+        }
+        vm.$store.dispatch('getDeliverables', filter).then(result => {
+          let data = result.data
+          let dataExport = []
+          for(let i=0;i<data.length;i++){
+            let item = {}
+            for(let key in vm.json_fields){
+              console.log(vm.json_fields[key])
+              item[key]=data[i][vm.json_fields[key]]
+            }
+            console.log(item)
+            dataExport.push(item)
+          }
+          vm.json_data = dataExport
+          console.log(vm.json_data)
+          setTimeout(() => {
+            $('.btn-export').click()
+          }, 100)
+        })
       }
     }
   }
