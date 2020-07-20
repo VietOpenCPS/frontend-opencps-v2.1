@@ -391,20 +391,24 @@ export default {
         }
         
       } else if (vm.payments['paymentMethod'] === 'PayPlatDVCQG') {
-        let param = {
-          headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
-          },
-          responseType: 'blob'
-        }
-        axios.get('/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice', param).then(function (response) {
-          vm.dialogPDFLoading = false
-          let serializable = response.data
-          let file = window.URL.createObjectURL(serializable)
-          document.getElementById('dialogPaymentPreview').src = file
-        }).catch(function (error) {
-          vm.dialogPDFLoading = false
-        })
+        // let param = {
+        //   headers: {
+        //     groupId: window.themeDisplay.getScopeGroupId()
+        //   },
+        //   responseType: 'blob'
+        // }
+        // axios.get('/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice', param).then(function (response) {
+        //   vm.dialogPDFLoading = false
+        //   let serializable = response.data
+        //   let file = window.URL.createObjectURL(serializable)
+        //   document.getElementById('dialogPaymentPreview').src = file
+        // }).catch(function (error) {
+        //   vm.dialogPDFLoading = false
+        // })
+        vm.dialogPDFLoading = false
+        vm.dialogPDF = false
+        let url = '/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice'
+        window.open(url, "_blank")
       } else {
         vm.$store.dispatch('printPay', filter).then(function (result) {
           vm.dialogPDFLoading = false
