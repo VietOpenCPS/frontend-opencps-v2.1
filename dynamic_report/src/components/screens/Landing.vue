@@ -1095,12 +1095,12 @@ export default {
           let dataToExportCSV = []
           let dataRaw = []
           for (let key in dossierRaw) {
-            if (key) {
+            if (key && dossierRaw[key]['totalChild'] !== 0) {
               dataRaw.push(dossierRaw[key])
             }
           }
           dataRaw.reverse()
-          // console.log('dossierRaw 47', dataRaw)
+          console.log('dossierRaw 47', dataRaw)
           let dataRowTotal = []
           let totalText = 'Tổng cộng'
           dataRowTotal.push({
@@ -1687,10 +1687,10 @@ export default {
                 indexTotalXXTT = indexTotalXXTT + 1
               }
             }
-            console.log('dataRowTotal 666', dataRowTotal)
+            // console.log('dataRowTotal 666', dataRowTotal)
           }
           vm.dataReportXX += JSON.stringify(dataRowTotal)
-          // console.log('vm.dataReportXX 123', vm.dataReportXX)
+          // console.log('vm.dataReportXX 1231', vm.dataReportXX)
           let itemTotal = []
           for (let keyTotalCSV in dataRowTotal) {
             itemTotal.push(dataRowTotal[keyTotalCSV]['text'])

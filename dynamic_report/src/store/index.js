@@ -169,8 +169,11 @@ export const store = new Vuex.Store({
               let serializable = response.data
               let itemsReportsData = []
               let indexKey = 0
-              for (let key in serializable['getDynamicReports']) {
-                let current = serializable['getDynamicReports'][key]
+              let dynamicReportsFilterSharing = serializable['getDynamicReports'].filter(function (item) {
+                return String(item.sharing) !== '9'
+              })
+              for (let key in dynamicReportsFilterSharing) {
+                let current = dynamicReportsFilterSharing[key]
                 let typeCurrent = 'dossier'
                 if (current['reportCode'].startsWith('STATISTIC')) {
                   typeCurrent = 'thong_ke'
@@ -237,8 +240,11 @@ export const store = new Vuex.Store({
             let serializable = response.data
             let itemsReportsData = []
             let indexKey = 0
-            for (let key in serializable['getDynamicReports']) {
-              let current = serializable['getDynamicReports'][key]
+            let dynamicReportsFilterSharing = serializable['getDynamicReports'].filter(function (item) {
+              return String(item.sharing) !== '9'
+            })
+            for (let key in dynamicReportsFilterSharing) {
+              let current = dynamicReportsFilterSharing[key]
               let typeCurrent = 'dossier'
               if (current['reportCode'].startsWith('STATISTIC')) {
                 typeCurrent = 'thong_ke'
