@@ -214,9 +214,9 @@
                 
               </div>
               <div v-else class="pl-5 py-2">Chưa có hồ sơ nào</div>
-
+          
               <v-flex xs12 class="text-right mb-3 mr-2" v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'">
-                <v-btn v-if="formCode !== 'NEW_GROUP_CV_DI'" small color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2">
+                <v-btn v-if="addFormNewInGroup === 'Thêm mới hồ sơ'" small color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2">
                   <v-icon size="20">add</v-icon>  &nbsp;
                   <span>Thêm mới hồ sơ</span>
                 </v-btn>
@@ -889,7 +889,8 @@ export default {
       page: 1
     },
     tphsCV: '',
-    totalFee: 0
+    totalFee: 0,
+    addFormNewInGroup: ''
   }),
   computed: {
     loading () {
@@ -920,6 +921,11 @@ export default {
     vm.$nextTick(function () {
       let query = vm.$router.history.current.query
       let id = vm.id
+      if(vm.menuConfigs){
+        if(vm.menuConfigs.length > 0){
+          vm.addFormNewInGroup =  vm.menuConfigs[vm.index]['tableConfig'].hasOwnProperty('addFormNewInGroup') ? vm.menuConfigs[vm.index]['tableConfig']['addFormNewInGroup'] : ''
+        }
+      }
       if (id) {
         vm.getDetaiGroup(id)
       }
@@ -961,6 +967,7 @@ export default {
       let vm = this
       let currentQuery = newRoute.query
       let id = vm.id
+      vm.addFormNewInGroup =  vm.menuConfigs[vm.index]['tableConfig'].hasOwnProperty('addFormNewInGroup') ? vm.menuConfigs[vm.index]['tableConfig']['addFormNewInGroup'] : ''
       if (id) {
         vm.getDetaiGroup(id)
       }
@@ -1032,6 +1039,15 @@ export default {
           }
         } else {
           vm.selectedDoAction = []
+        }
+      },
+      deep: true
+    },
+    menuConfigs: {
+      handler: function (val) {
+        let vm = this
+        if(val.length){
+          vm.addFormNewInGroup =  vm.menuConfigs[parseInt(vm.index)]['tableConfig'].hasOwnProperty('addFormNewInGroup') ? vm.menuConfigs[vm.index]['tableConfig']['addFormNewInGroup'] : ''
         }
       },
       deep: true

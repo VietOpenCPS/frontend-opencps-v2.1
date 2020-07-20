@@ -941,7 +941,9 @@ export default {
           if (response.data.data) {
             vm.danhSachThongKeThang = response.data.data;
             let currentData = response.data.data[0]
-            vm.danhSachThongKeThang.shift()
+            if(!config.params.hasOwnProperty('parentAgency')){
+              vm.danhSachThongKeThang.shift()
+            }
             for (let i = 0; i < vm.danhSachThongKeThang.length; i++) {
               vm.statisticalMonth[0].data.push(
                 response.data.data[i].onegateCount
