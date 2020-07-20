@@ -588,7 +588,11 @@ export default {
               } else {
                 vm.govAgency = defaultVal
               }
+            } else {
+              vm.govAgency = 'site'
             }
+          } else {
+            vm.govAgency = 'site'
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
             vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
@@ -714,7 +718,11 @@ export default {
             }
           }
           vm.govAgency = defaultVal
+        } else {
+          vm.govAgency = 'site'
         }
+      } else {
+        vm.govAgency = 'site'
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
         vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
