@@ -325,7 +325,7 @@
               </span>
             </div>
           </td>
-          <td class="text-xs-center px-0 py-0 pt-1" v-if="!hideAction" style="width:150px">
+          <td class="text-xs-left px-0 py-0 pt-1" v-if="!hideAction" style="width:150px">
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>

@@ -6416,3 +6416,25 @@ body.e-colorpicker-overflow {
   background-color: #fff;
   border-color: #fff;
 }
+
+.file-preview .e-file-select-wrap:before {
+  content: "K\E9o th\1EA3 t\1EC7p tin, ch\1ECDn t\1EEB kho c\E1 nh\E2n ..." !important;
+  font-size: 14px !important;
+  position: absolute !important;
+  left: 15px !important;
+  top: 15px !important;
+}
+
+body .file-preview .e-file-select-wrap:after {
+  content: "\1F4E4";
+  font-size: 14px;
+  position: absolute;
+  right: 18px;
+  pointer-events: none;
+  top: 15px !important;
+}
+
+body #dropAreaForm, #dropAreaJasper {
+border: 1px dashed rgb(195, 195, 206) !important;
+min-height: 52px;
+}

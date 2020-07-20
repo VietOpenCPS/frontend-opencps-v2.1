@@ -123,7 +123,7 @@
           :clearable="item['clearable']"
           :multiple="item.hasOwnProperty('multiple') && item.multiple"
         >
-          <template slot="selection" slot-scope="props" >
+          <!-- <template slot="selection" slot-scope="props" >
             <v-chip v-if="props.index === 0">
               <span>{{ props.item.name }}</span>
             </v-chip>
@@ -131,7 +131,7 @@
               v-if="props.index === 1"
               class="grey--text caption"
             >(+{{ data[item.key].length - 1 }})</span>
-          </template>
+          </template> -->
         </v-autocomplete>
         <v-autocomplete
           v-if="item['type'] === 'select' && !item.hasOwnProperty('multiple') && !item.multiple"
@@ -1062,7 +1062,9 @@ export default {
           for (let key in dataReport) {
             dataReportCurrent = dataReport[key]
             if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
-              if (dossierRaw[dataReportCurrent[vm.groupByVal]][codeGroup] === dataReportCurrent[codeGroup] && dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']]) {
+              if (dossierRaw[dataReportCurrent[vm.groupByVal]][codeGroup] === dataReportCurrent[codeGroup] && 
+                (!vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumKey') || (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumKey') && dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']]))
+              ) {
                 dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
                 dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] = dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] + 1
               }
@@ -1089,7 +1091,7 @@ export default {
               }
             }
           }
-          console.log('dossier-2-Raw', dossierRaw)
+          console.log('dossier-3-Raw', dossierRaw)
           let dataToExportCSV = []
           let dataRaw = []
           for (let key in dossierRaw) {
@@ -1134,6 +1136,7 @@ export default {
             }
           }
           let indexNotShowGroup = 1
+          let indexCountTotal = 0
           // console.log(vm.groupByValObj)
           // console.log(vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup'))
           for (let key in dataRaw) {
@@ -1238,12 +1241,21 @@ export default {
               indexStt = indexStt + 1
               indexNotShowGroup = indexNotShowGroup + 1
               dataToExportCSV.push(dataToExportCSVItem)
+              // 
+              indexCountTotal += 1
             }
           }
           dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
           vm.dataReportXX += dataReportTotal
-          // console.log('dataRowTotal 777===', dataRowTotal)
+
+          console.log('itemsReportsConfig', vm.itemsReportsConfig)
+          console.log('dataRowTotal 777===', dataRowTotal)
+          console.log('percentTotal 555', dataRowTotal[dataRowTotal.length - 1]['text'], indexCountTotal, Math.round(dataRowTotal[dataRowTotal.length - 1]['text']/indexCountTotal))
+
           if (vm.reportType.startsWith('REPORT_STATISTIC')) {
+            if (vm.itemsReportsConfig[dataRowTotal.length - 2]['value'] === 'ontimePercentage') {
+              dataRowTotal[dataRowTotal.length - 1]['text'] = Math.round(dataRowTotal[dataRowTotal.length - 1]['text']/indexCountTotal)
+            }
             vm.dataReportXX += ',' + JSON.stringify(dataRowTotal)
           }
           // console.log('dataReportXX11ZZ', vm.dataReportXX)
@@ -1650,7 +1662,7 @@ export default {
               }
               break
             }
-            // console.log('dataRowTotal 555', dataRowTotal)
+            console.log('dataRowTotal 555', dataRowTotal)
           } else {
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
@@ -1675,6 +1687,7 @@ export default {
                 indexTotalXXTT = indexTotalXXTT + 1
               }
             }
+            console.log('dataRowTotal 666', dataRowTotal)
           }
           vm.dataReportXX += JSON.stringify(dataRowTotal)
           // console.log('vm.dataReportXX 123', vm.dataReportXX)
