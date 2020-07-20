@@ -114,7 +114,7 @@
           :label="item['label']">
         </v-text-field>
         <v-autocomplete
-          v-if="item['type'] === 'select'"
+          v-if="item['type'] === 'select' && item.hasOwnProperty('multiple') && item.multiple"
           :items="item['source']"
           v-model="data[item.key]"
           :label="item['label']"
@@ -123,7 +123,7 @@
           :clearable="item['clearable']"
           :multiple="item.hasOwnProperty('multiple') && item.multiple"
         >
-          <template v-if="item.hasOwnProperty('multiple') && item.multiple" slot="selection" slot-scope="props" >
+          <!-- <template slot="selection" slot-scope="props" >
             <v-chip v-if="props.index === 0">
               <span>{{ props.item.name }}</span>
             </v-chip>
@@ -131,7 +131,17 @@
               v-if="props.index === 1"
               class="grey--text caption"
             >(+{{ data[item.key].length - 1 }})</span>
-          </template>
+          </template> -->
+        </v-autocomplete>
+        <v-autocomplete
+          v-if="item['type'] === 'select' && !item.hasOwnProperty('multiple') && !item.multiple"
+          :items="item['source']"
+          v-model="data[item.key]"
+          :label="item['label']"
+          item-value="value"
+          item-text="name"
+          :clearable="item['clearable']"
+        >
         </v-autocomplete>
       </v-flex>
       <v-flex xs12 sm6 v-if="hiddenAside">
@@ -501,6 +511,7 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
+      console.log('run new ver_23')
       let query = vm.$router.history.current.query
       let param = {
         headers: {
@@ -577,7 +588,11 @@ export default {
               } else {
                 vm.govAgency = defaultVal
               }
+            } else {
+              vm.govAgency = 'site'
             }
+          } else {
+            vm.govAgency = 'site'
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
             vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
@@ -703,7 +718,11 @@ export default {
             }
           }
           vm.govAgency = defaultVal
+        } else {
+          vm.govAgency = 'site'
         }
+      } else {
+        vm.govAgency = 'site'
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
         vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
@@ -841,11 +860,8 @@ export default {
           // 
           for (let key in vm.filters) {
             if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
-              // if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('multiple') && vm.filters[key].multiple) {
-              //   vm.data[vm.filters[key]['key']] = vm.filters[key] && vm.filters[key]['value'] ? vm.filters[key]['value'].toString() : ''
-              // } else {
-                vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
-              // }
+
+              vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
               
             }
           }
@@ -1054,13 +1070,17 @@ export default {
           for (let key in dataReport) {
             dataReportCurrent = dataReport[key]
             if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
-              if (dossierRaw[dataReportCurrent[vm.groupByVal]][codeGroup] === dataReportCurrent[codeGroup]) {
+              if (dossierRaw[dataReportCurrent[vm.groupByVal]][codeGroup] === dataReportCurrent[codeGroup] && 
+                (!vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumKey') || (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumKey') && dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']]))
+              ) {
                 dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
                 dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] = dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] + 1
               }
             } else {
               let dossierRawItem = {}
-              if (!dataReportCurrent.hasOwnProperty('dossierId') && !vm.reportType.startsWith('REPORT_STATISTIC')) {
+              if ((!dataReportCurrent.hasOwnProperty('dossierId') && !vm.reportType.startsWith('REPORT_STATISTIC')) || 
+                (vm.reportType.startsWith('REPORT_STATISTIC') && !dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']])
+              ) {
                 dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
                 dossierRawItem[textGroup] = dataReportCurrent[textGroup]
                 dossierRawItem['totalChild'] = 0
@@ -1079,16 +1099,16 @@ export default {
               }
             }
           }
-          // console.log('dossierRaw', dossierRaw)
+          console.log('dossier-3-Raw', dossierRaw)
           let dataToExportCSV = []
           let dataRaw = []
           for (let key in dossierRaw) {
-            if (key) {
+            if (key && dossierRaw[key]['totalChild'] !== 0) {
               dataRaw.push(dossierRaw[key])
             }
           }
           dataRaw.reverse()
-          // console.log('dossierRaw 47', dataRaw)
+          console.log('dossierRaw 47', dataRaw)
           let dataRowTotal = []
           let totalText = 'Tổng cộng'
           dataRowTotal.push({
@@ -1124,6 +1144,7 @@ export default {
             }
           }
           let indexNotShowGroup = 1
+          let indexCountTotal = 0
           // console.log(vm.groupByValObj)
           // console.log(vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup'))
           for (let key in dataRaw) {
@@ -1228,12 +1249,21 @@ export default {
               indexStt = indexStt + 1
               indexNotShowGroup = indexNotShowGroup + 1
               dataToExportCSV.push(dataToExportCSVItem)
+              // 
+              indexCountTotal += 1
             }
           }
           dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
           vm.dataReportXX += dataReportTotal
-          // console.log('dataRowTotal 777===', dataRowTotal)
+
+          console.log('itemsReportsConfig', vm.itemsReportsConfig)
+          console.log('dataRowTotal 777===', dataRowTotal)
+          console.log('percentTotal 555', dataRowTotal[dataRowTotal.length - 1]['text'], indexCountTotal, Math.round(dataRowTotal[dataRowTotal.length - 1]['text']/indexCountTotal))
+
           if (vm.reportType.startsWith('REPORT_STATISTIC')) {
+            if (vm.itemsReportsConfig[dataRowTotal.length - 2]['value'] === 'ontimePercentage') {
+              dataRowTotal[dataRowTotal.length - 1]['text'] = Math.round(dataRowTotal[dataRowTotal.length - 1]['text']/indexCountTotal)
+            }
             vm.dataReportXX += ',' + JSON.stringify(dataRowTotal)
           }
           // console.log('dataReportXX11ZZ', vm.dataReportXX)
@@ -1640,7 +1670,7 @@ export default {
               }
               break
             }
-            // console.log('dataRowTotal 555', dataRowTotal)
+            console.log('dataRowTotal 555', dataRowTotal)
           } else {
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
@@ -1665,9 +1695,10 @@ export default {
                 indexTotalXXTT = indexTotalXXTT + 1
               }
             }
+            // console.log('dataRowTotal 666', dataRowTotal)
           }
           vm.dataReportXX += JSON.stringify(dataRowTotal)
-          // console.log('vm.dataReportXX 123', vm.dataReportXX)
+          // console.log('vm.dataReportXX 1231', vm.dataReportXX)
           let itemTotal = []
           for (let keyTotalCSV in dataRowTotal) {
             itemTotal.push(dataRowTotal[keyTotalCSV]['text'])

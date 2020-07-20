@@ -837,10 +837,10 @@ export default {
         fileFind['dossierId'] = vm.thongTinHoSo.dossierId
         fileFind['id'] = vm.id
         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
-          if (vm.dossierIntoGroup.length > 0) {
-            vm.$store.commit('setFilesAdd', [resPostEform])
-            vm.$store.commit('setActiveAddFileGroup', true)
-          }
+          // if (vm.dossierIntoGroup.length > 0) {
+          //   vm.$store.commit('setFilesAdd', [resPostEform])
+          //   vm.$store.commit('setActiveAddFileGroup', true)
+          // }
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
           }).catch(reject => {
@@ -855,10 +855,10 @@ export default {
         item['dossierId'] = vm.thongTinHoSo.dossierId
         item['id'] = vm.id
         vm.$store.dispatch('postEform', item).then(resPostEform => {
-          if (vm.dossierIntoGroup.length > 0) {
-            vm.$store.commit('setFilesAdd', [resPostEform])
-            vm.$store.commit('setActiveAddFileGroup', true)
-          }
+          // if (vm.dossierIntoGroup.length > 0) {
+          //   vm.$store.commit('setFilesAdd', [resPostEform])
+          //   vm.$store.commit('setActiveAddFileGroup', true)
+          // }
           vm.dossierTemplateItems[index].daKhai = true
           vm.dossierTemplateItems[index]['passRequired'] = true
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
@@ -914,10 +914,10 @@ export default {
       if (data.partType !== 3) {
         vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
           console.log('vm.dossierIntoGroup', vm.dossierIntoGroup)
-          if (vm.dossierIntoGroup.length > 0) {
-            vm.$store.commit('setFilesAdd', result)
-            vm.$store.commit('setActiveAddFileGroup', true)
-          }
+          // if (vm.dossierIntoGroup.length > 0) {
+          //   vm.$store.commit('setFilesAdd', result)
+          //   vm.$store.commit('setActiveAddFileGroup', true)
+          // }
           vm.dossierTemplateItems[index]['passRequired'] = true
           vm.progressUploadPart = ''
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {

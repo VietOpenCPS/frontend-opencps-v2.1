@@ -169,8 +169,11 @@ export const store = new Vuex.Store({
               let serializable = response.data
               let itemsReportsData = []
               let indexKey = 0
-              for (let key in serializable['getDynamicReports']) {
-                let current = serializable['getDynamicReports'][key]
+              let dynamicReportsFilterSharing = serializable['getDynamicReports'].filter(function (item) {
+                return String(item.sharing) !== '9'
+              })
+              for (let key in dynamicReportsFilterSharing) {
+                let current = dynamicReportsFilterSharing[key]
                 let typeCurrent = 'dossier'
                 if (current['reportCode'].startsWith('STATISTIC')) {
                   typeCurrent = 'thong_ke'
@@ -211,6 +214,9 @@ export const store = new Vuex.Store({
                 })
                 indexKey = indexKey + 1
               }
+              itemsReportsData = itemsReportsData.filter(function (item) {
+                return String(item.sharing) !== '9'
+              })
               state.itemsReports = itemsReportsData
               console.log('state.itemsReports', state.itemsReports)
               resolve(itemsReportsData)
@@ -234,8 +240,11 @@ export const store = new Vuex.Store({
             let serializable = response.data
             let itemsReportsData = []
             let indexKey = 0
-            for (let key in serializable['getDynamicReports']) {
-              let current = serializable['getDynamicReports'][key]
+            let dynamicReportsFilterSharing = serializable['getDynamicReports'].filter(function (item) {
+              return String(item.sharing) !== '9'
+            })
+            for (let key in dynamicReportsFilterSharing) {
+              let current = dynamicReportsFilterSharing[key]
               let typeCurrent = 'dossier'
               if (current['reportCode'].startsWith('STATISTIC')) {
                 typeCurrent = 'thong_ke'
@@ -276,6 +285,9 @@ export const store = new Vuex.Store({
               })
               indexKey = indexKey + 1
             }
+            itemsReportsData = itemsReportsData.filter(function (item) {
+              return String(item.sharing) !== '9'
+            })
             state.itemsReports = itemsReportsData
             console.log('state.itemsReports', state.itemsReports)
             resolve(itemsReportsData)
@@ -686,7 +698,7 @@ export const store = new Vuex.Store({
             },
             params: {}
           }
-          if (!filter.hasOwnProperty('groupId')) {
+          if (!filter.hasOwnProperty('groupId') || (filter.hasOwnProperty('groupId') && filter.groupId === 'site')) {
             axios.get(filter.api, param).then(function (result) {
               if (result.data) {
                 let dataMapping = []
@@ -709,7 +721,7 @@ export const store = new Vuex.Store({
             }).catch(function(xhr) {
               reject(xhr)
             })
-          } else if (filter.hasOwnProperty('groupId') && (filter.groupId === '' || filter.groupId === '0')) {
+          } else if (filter.hasOwnProperty('groupId') && (filter.groupId === '' || String(filter.groupId) === '0')) {
             // lấy qua proxy
             let getAllUrlParams = function(arr) {
               let obj = {}
@@ -788,7 +800,7 @@ export const store = new Vuex.Store({
             }).catch(function (error) {
               reject([])
             })
-          } else if (filter.hasOwnProperty('groupId') && filter.groupId !== '0') {
+          } else if (filter.hasOwnProperty('groupId') && String(filter.groupId) !== '0' && String(filter.groupId) !== '' && String(filter.groupId) !== 'site') {
             // lấy theo groupId
             param.headers.groupId = filter.groupId
             axios.get(filter.api, param).then(function (result) {

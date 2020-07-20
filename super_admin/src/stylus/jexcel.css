@@ -847,7 +847,7 @@ body .e-upload .e-file-select-wrap .e-file-select {
       margin-top: -45px !important;
     }
 
-    .file-preview .e-upload {
+    /* .file-preview .e-upload {
         border: none !important;
         position: absolute;
         left: 0;
@@ -870,7 +870,7 @@ body .e-upload .e-file-select-wrap .e-file-select {
         left: 0;
         top: 0;
         padding: 0;
-    }
+    } */
     body .v-autocomplete__content .v-input--selection-controls .v-input__slot {
         margin-bottom: 0 !important;
     }
