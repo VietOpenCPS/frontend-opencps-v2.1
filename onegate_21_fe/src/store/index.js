@@ -148,7 +148,8 @@ export const store = new Vuex.Store({
     createFileSigned: '',
     advSearchShow: false,
     visibleDoAction: true,
-    filterDateFromTo: ['fromReceiveDate','toReceiveDate','fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate']
+    filterDateFromTo: ['fromReceiveDate','toReceiveDate','fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate'],
+    dossierSelectedDoAction: []
   },
   actions: {
     clearError ({commit}) {
@@ -4811,6 +4812,9 @@ export const store = new Vuex.Store({
     dossierSelected (state, payload) {
       state.dossierSelected = payload
     },
+    setDossierSelectedDoAction (state, payload) {
+      state.dossierSelectedDoAction = payload
+    },
     actionActive (state, payload) {
       state.actionActive = payload
     },
@@ -4938,6 +4942,9 @@ export const store = new Vuex.Store({
     },
     dossierSelected (state) {
       return state.dossierSelected
+    },
+    dossierSelectedDoAction (state) {
+      return state.dossierSelectedDoAction
     },
     actionActive (state) {
       return state.actionActive

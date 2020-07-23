@@ -38,23 +38,23 @@
 
         <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" ref="thongtincongvan" :detailDossier="thongTinNhomHoSo" :tphs="tphsCV" :formCodeInput="formCode" :lengthDossier="dossiersIntoGroupRender.length"></thong-tin-cong-van>
 
-        <div v-if="formCode === 'NEW_GROUP'" style="position: relative;border-top: 1px solid #dedede;">
+        <div v-if="formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" style="position: relative;border-top: 1px solid #dedede;">
           <v-expansion-panel :value="0" class="expansion-pl">
             <v-expansion-panel-content>
               <div slot="header" style="display: flex; align-items: center;">
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                Thành phần hồ sơ theo nhóm&nbsp;&nbsp;&nbsp;&nbsp;
+                Thành phần hồ sơ dùng chung&nbsp;&nbsp;&nbsp;&nbsp;
               </div>
               <thanh-phan-ho-so-1 ref="thanhphanhoso1" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so-1>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
-        <div v-if="formCode === 'NEW_GROUP'" style="position: relative;">
+        <div v-if="formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" style="position: relative;">
           <v-expansion-panel :value="[true]" expand class="expansion-pl">
             <v-expansion-panel-content :key="1">
               <div slot="header" style="display: flex; align-items: center;">
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                Kết quả xử lý theo nhóm&nbsp;&nbsp;&nbsp;&nbsp;
+                Kết quả xử lý dùng chung&nbsp;&nbsp;&nbsp;&nbsp;
               </div>
               <thanh-phan-ho-so-2 ref="thanhphanhoso2" :onlyView="true" :id="'nm'" :partTypes="outputTypesGroup"></thanh-phan-ho-so-2>
             </v-expansion-panel-content>
@@ -941,8 +941,10 @@ export default {
   mounted () {
     let vm = this
     if (vm.thongTinNhomHoSo) {
-      if (vm.formCode === 'NEW_GROUP') {
-        vm.$refs.thongtinnguoinophoso.initData(vm.thongTinNhomHoSo)
+      if (vm.formCode === 'NEW_GROUP' || vm.formCode === 'NEW_GROUP_CV' || vm.formCode === 'NEW_GROUP_CV_DI') {
+        if (vm.formCode === 'NEW_GROUP') {
+          vm.$refs.thongtinnguoinophoso.initData(vm.thongTinNhomHoSo)
+        }
         vm.$refs.thanhphanhoso1.initData(vm.thongTinNhomHoSo)
         vm.$refs.thanhphanhoso2.initData(vm.thongTinNhomHoSo)
         // 
@@ -993,8 +995,11 @@ export default {
     thongTinNhomHoSo (val) {
       let vm = this
       if (val) {
-        if (vm.formCode === 'NEW_GROUP') {
-          vm.$refs.thongtinnguoinophoso.initData(val)
+        if (vm.formCode === 'NEW_GROUP' || vm.formCode === 'NEW_GROUP_CV' || vm.formCode === 'NEW_GROUP_CV_DI') {
+          if (vm.formCode === 'NEW_GROUP') {
+            vm.$refs.thongtinnguoinophoso.initData(val)
+          }
+          
           vm.$refs.thanhphanhoso1.initData(val)
           vm.$refs.thanhphanhoso2.initData(val)
           //

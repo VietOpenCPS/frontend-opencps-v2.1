@@ -918,13 +918,7 @@ export default {
     applicantNoteGuide: '',
     applicantAddressGuide: '',
     reasonNote: '',
-    dossierSelected: [
-      {
-        dossierNo: '18ACE289',
-        serviceName: '',
-        statusAction: false
-      }
-    ],
+    dossierSelected: [],
     /** */
     buttonConfigItem: {},
     /* ý kiến cán bộ */
@@ -1303,9 +1297,12 @@ export default {
           vm.selectedDoAction = []
         }
         // console.log('selectedDoAction', vm.selectedDoAction)
+        vm.$store.commit('setDossierSelectedDoAction', vm.selectedDoAction)
+        
       },
       deep: true
     },
+
     dichVuSelectedGuide (val) {
       let vm = this
       if (val) {
@@ -1941,7 +1938,10 @@ export default {
           vm.$router.history.current.query['template_no'] = dossierItem.dossierTemplateNo
           vm.$router.history.current.query['serviceCode'] = dossierItem.serviceCode
         }
-
+        // 
+        vm.$router.history.current.query['template_no'] = dossierItem.dossierTemplateNo
+        vm.$router.history.current.query['serviceCode'] = dossierItem.serviceCode
+        // 
         vm.$router.push({
             path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
             query: vm.$router.history.current.query

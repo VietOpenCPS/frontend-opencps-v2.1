@@ -77,7 +77,7 @@
                       </content-placeholders>
                       <v-text-field
                       v-else
-                      v-model="thongTinCongVan.sampleCount"
+                      v-model="lengthDossier"
                       :rules="[rules.required]"
                       required
                       ></v-text-field>
@@ -200,7 +200,7 @@
                       ></v-text-field>
                     </v-flex>
 
-                    <v-flex xs12 class="mt-2">
+                    <!-- <v-flex xs12 class="mt-2">
                       <div class="mb-2"> <span style="color:red">(*) &nbsp;</span>Tài liệu đính kèm: <i v-if="dossierFilesItems.length === 0">(Chưa có tài liệu đính kèm)</i></div>
                       <div v-for="(itemFileView, index) in dossierFilesItems" :key="index">
                         <div v-if="!itemFileView.eForm">
@@ -224,7 +224,7 @@
                         Chọn tài liệu tải lên
                       </v-btn>
                       
-                    </v-flex>
+                    </v-flex> -->
                   </v-layout>
                 </v-card-text>
               </v-card>
@@ -343,7 +343,7 @@ export default {
     },
     dueDate (val) {
       this.duedateFormated = this.formatDate(this.dueDate)
-    }
+    },
     // thongTinCongVan: {
     //   handler: function (value) {
     //     let vm = this
@@ -359,7 +359,12 @@ export default {
       vm.thongTinCongVan = data
       try {
         let metadata = JSON.parse(vm.thongTinCongVan.metaData)
-        vm.donvi_gui_nhan = vm.formCodeInput === 'NEW_GROUP_CV_DI' ? metadata.donvinhan : metadata.donvigui
+        if (vm.formCodeInput === 'NEW_GROUP_CV_DI') {
+          vm.donvi_gui_nhan = metadata.hasOwnProperty('congvandagui') && metadata.congvandagui ? metadata.donvinhan : metadata.donvinhandraf
+        } else {
+          vm.donvi_gui_nhan = metadata.donvigui
+        }
+        
       } catch (error) {
       }
       
@@ -400,6 +405,7 @@ export default {
         metaData.tendonvinhan = delegateName
       }
       vm.thongTinCongVan.metaData = metaData
+      vm.thongTinCongVan.sampleCount = vm.lengthDossier
       vm.thongTinCongVan.validation = vm.$refs.formThongTinCongVan.validate()
       console.log('thongtincongvanOutput', vm.thongTinCongVan)
       return vm.thongTinCongVan

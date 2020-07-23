@@ -31,7 +31,7 @@
                 item-text="name"
                 item-value="value"
                 single-line
-                style="float: right;"
+                style="float: right"
                 class="btn__chot"
                 @change="doChotSoLieu($event, button)"
               ></v-select>
@@ -468,7 +468,9 @@ export default {
     dataExportExcel: '',
     groupIdList: [],
     filterGroup: {},
-    groupIdListSelected: ''
+    groupIdListSelected: '',
+    dataRowRenderHtmlTable: [],
+    headerRenderHtmlTable: []
   }),
   computed: {
     itemsReports () {
@@ -903,6 +905,17 @@ export default {
   methods: {
     doCreatePDF () {
       let vm = this
+      vm.headerRenderHtmlTable = []
+      if (vm.itemsReports[vm.index]['reportCode'].indexOf('STATISTIC') === -1) {
+        vm.headerRenderHtmlTable = vm.itemsReportsConfig.filter(function(item) {
+          return item.selected
+        })
+        console.log('headerRenderHtmlTable-1', vm.headerRenderHtmlTable)
+      } else {
+        let body = vm.itemsReports[vm.index]['tableConfig']['docDefinition']['content'][2]['table']['body']
+        vm.headerRenderHtmlTable = body
+        console.log('headerRenderHtmlTable-1-a', vm.headerRenderHtmlTable)
+      }
       if (vm.reportType.startsWith('STATISTIC')) {
         vm.doPrintReportFix()
       } else {
@@ -1071,7 +1084,7 @@ export default {
             dataReportCurrent = dataReport[key]
             if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
               if (dossierRaw[dataReportCurrent[vm.groupByVal]][codeGroup] === dataReportCurrent[codeGroup] && 
-                (!vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumKey') || (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumKey') && dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']]))
+                (!vm.itemsReports[vm.index]['filterConfig']['sumKey'] || (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumKey') && vm.itemsReports[vm.index]['filterConfig']['sumKey'] && dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']]))
               ) {
                 dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
                 dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] = dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] + 1
@@ -1099,7 +1112,11 @@ export default {
               }
             }
           }
-          console.log('dossier-3-Raw', dossierRaw)
+          
+          // 
+          vm.dataRowRenderHtmlTable = dossierRaw
+          console.log('dataRowRenderHtmlTable666', vm.dataRowRenderHtmlTable)
+          // 
           let dataToExportCSV = []
           let dataRaw = []
           for (let key in dossierRaw) {
@@ -1334,6 +1351,7 @@ export default {
     },
     doPrintReportFix () {
       let vm = this
+      vm.dataRowRenderHtmlTable = []
       vm.isRender = false
       vm.agencyLists = []
       vm.api = ''
@@ -1409,7 +1427,7 @@ export default {
           break
         }
       }
-      console.log('check-check', vm.groupIdListSelected, vm.filterGroup)
+      // console.log('check-check', vm.groupIdListSelected, vm.filterGroup)
       if(check) {
         filter['govAgency'] = vm.govAgency
         filter['agencyLists'] = vm.agencyLists
@@ -1422,7 +1440,7 @@ export default {
       let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
       let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
       
-      console.log('getAgencyReportLists2', filter)
+      // console.log('getAgencyReportLists2', filter)
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         // console.log('result',result)
         if (result !== null) {
@@ -1639,12 +1657,16 @@ export default {
               } else {
                 index = index + 1
               }
-              // console.log('dataRow', dataRow)
+              
+              vm.dataRowRenderHtmlTable.push(dataRow)
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
               vm.dataReportXX += JSON.stringify(dataRow) + ','
               dataToExportCSV.push(dataToExportCSVItem)
             }
           }
+          // 
+          console.log('dataRowRenderHtmlTable777', vm.dataRowRenderHtmlTable)
+          // 
           if (vm.agencyLists.length > 0 && vm.govAgency === 0) {
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
