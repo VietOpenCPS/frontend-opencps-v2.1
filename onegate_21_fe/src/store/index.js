@@ -149,7 +149,8 @@ export const store = new Vuex.Store({
     advSearchShow: false,
     visibleDoAction: true,
     filterDateFromTo: ['fromReceiveDate','toReceiveDate','fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate'],
-    dossierSelectedDoAction: []
+    dossierSelectedDoAction: [],
+    formActionGroup: ''
   },
   actions: {
     clearError ({commit}) {
@@ -4619,6 +4620,38 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDetailActionCongVan ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          params: {
+          }
+        }
+        axios.get('/o/rest/v2/dossiers/'+ filter.dossierId + '/steps/' + filter.stepCode + '/actions/' + filter.actionCode, param).then(function (response) {
+          resolve(response)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    doActionDossierIntoGroup ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('actionUser', filter.actionUser)
+        axios.post('/o/rest/v2/dossiers/' + filter.dossierId + '/actions/' + filter.actionCode + '/groupDossier', dataPost, param).then(function (response) {
+          resolve(response)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    }
     // ----End---------
   },
   mutations: {
@@ -4815,6 +4848,9 @@ export const store = new Vuex.Store({
     setDossierSelectedDoAction (state, payload) {
       state.dossierSelectedDoAction = payload
     },
+    setFormActionGroup (state, payload) {
+      state.formActionGroup = payload
+    },
     actionActive (state, payload) {
       state.actionActive = payload
     },
@@ -4945,6 +4981,9 @@ export const store = new Vuex.Store({
     },
     dossierSelectedDoAction (state) {
       return state.dossierSelectedDoAction
+    },
+    formActionGroup (state) {
+      return state.formActionGroup
     },
     actionActive (state) {
       return state.actionActive

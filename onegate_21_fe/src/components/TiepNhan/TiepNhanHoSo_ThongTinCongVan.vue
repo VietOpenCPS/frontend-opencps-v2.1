@@ -21,11 +21,12 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-text-field
-                      v-else
+                      v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.documentNo"
                       :rules="[rules.required]"
                       required
                       ></v-text-field>
+                      <p class="pt-2" v-else>{{thongTinCongVan.documentNo}}</p>
                     </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
@@ -39,6 +40,7 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-menu
+                        v-else-if="!loading && !congVanDaGui"
                         ref="menuDate"
                         :close-on-content-click="false"
                         v-model="menuDate"
@@ -63,6 +65,7 @@
                         <v-date-picker ref="picker" locale="vi"
                         :first-day-of-week="1" v-model="documentDate" no-title @input="menuDate = false"></v-date-picker>
                       </v-menu>
+                      <p class="pt-2" v-else>{{dateFormated}}</p>
                     </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
@@ -76,11 +79,12 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-text-field
-                      v-else
+                      v-else-if="!loading && !congVanDaGui"
                       v-model="lengthDossier"
                       :rules="[rules.required]"
                       required
                       ></v-text-field>
+                      <p class="pt-2" v-else>{{lengthDossier}}</p>
                     </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
@@ -94,6 +98,7 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-menu
+                        v-else-if="!loading && !congVanDaGui"
                         ref="menuDueDate"
                         :close-on-content-click="false"
                         v-model="menuDueDate"
@@ -118,6 +123,7 @@
                         <v-date-picker :min="getMindate()" ref="picker" locale="vi"
                         :first-day-of-week="1" v-model="dueDate" no-title @input="menuDueDate = false"></v-date-picker>
                       </v-menu>
+                      <p class="pt-2" v-else>{{duedateFormated}}</p>
                     </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2" v-if="formCodeInput !== 'NEW_GROUP_CV'">
@@ -135,7 +141,7 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-autocomplete
-                      v-else
+                      v-else-if="!loading && !congVanDaGui"
                       :items="govAgencySubmitList"
                       item-text="itemName"
                       item-value="itemCode"
@@ -144,6 +150,7 @@
                       :required="formCodeInput === 'NEW_GROUP_CV_DI' && lengthDossier !== 0 && typeof lengthDossier !== 'undefined'"
                       :disabled="formCodeInput === 'NEW_GROUP_CV_DI' && (lengthDossier === 0 ||typeof lengthDossier === 'undefined')"
                       ></v-autocomplete>
+                      <p class="pt-2" v-else>{{formCodeInput === 'NEW_GROUP_CV_DI' ? metaDataDossier.tendonvinhan : metaDataDossier.tendonvigui}}</p>
                     </v-flex>
 
                     <!--  -->
@@ -158,14 +165,51 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-textarea
-                      v-else
+                      v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.briefNote"
                       rows="3"
                       :rules="[rules.required]"
                       required
                       ></v-textarea>
+                      <p class="pt-2" v-else>{{thongTinCongVan.briefNote}}</p>
                     </v-flex>
-                    
+                    <!--  -->
+                    <v-flex xs12 sm2 class="mb-2" v-if="formCodeInput === 'NEW_GROUP_CV_DI'">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-subheader v-else class="pl-0">Chức vụ người ký<span  style="color:red">&nbsp;*</span>: </v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm4 class="mb-2" v-if="formCodeInput === 'NEW_GROUP_CV_DI'">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-text-field
+                      v-else-if="!loading && !congVanDaGui"
+                      v-model="signerCongVan"
+                      :rules="[rules.required]"
+                      required
+                      ></v-text-field>
+                      <p class="pt-2" v-else>{{signerCongVan}}</p>
+                    </v-flex>
+                    <v-flex xs12 sm2 class="mb-2" v-if="formCodeInput === 'NEW_GROUP_CV_DI'">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-subheader v-else class="pl-0">Người ký<span  style="color:red">&nbsp;*</span>: </v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm4 class="mb-2" v-if="formCodeInput === 'NEW_GROUP_CV_DI'">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-text-field
+                      v-else-if="!loading && !congVanDaGui"
+                      v-model="jobposSignerCongVan"
+                      :rules="[rules.required]"
+                      required
+                      ></v-text-field>
+                      <p class="pt-2" v-else>{{jobposSignerCongVan}}</p>
+                    </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
@@ -178,10 +222,11 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-text-field
-                      v-else
+                      v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.contactTelNo"
                       :rules="thongTinCongVan.contactTelNo ? [rules.telNo] : ''"
                       ></v-text-field>
+                      <p class="pt-2" v-else>{{thongTinCongVan.contactTelNo}}</p>
                     </v-flex>
                     <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
@@ -194,10 +239,11 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-text-field
-                      v-else
+                      v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.contactEmail"
                       :rules="thongTinCongVan.contactEmail ? [rules.email] : ''"
                       ></v-text-field>
+                      <p class="pt-2" v-else>{{thongTinCongVan.contactEmail}}</p>
                     </v-flex>
 
                     <!-- <v-flex xs12 class="mt-2">
@@ -294,11 +340,15 @@ export default {
     dueDate: null,
     duedateFormated: null,
     agencySubmit: '',
-    govAgencySubmitList: '',
+    govAgencySubmitList: [],
     briefNote: '',
     sampleCount: '',
     contactTelNo: '',
     contactEmail: '',
+    congVanDaGui: '',
+    metaDataDossier: '',
+    jobposSignerCongVan: '',
+    signerCongVan: '',
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -359,8 +409,12 @@ export default {
       vm.thongTinCongVan = data
       try {
         let metadata = JSON.parse(vm.thongTinCongVan.metaData)
+        vm.metaDataDossier = metadata
+        vm.congVanDaGui = metadata.hasOwnProperty('congvandagui') && metadata.congvandagui ? true : false
         if (vm.formCodeInput === 'NEW_GROUP_CV_DI') {
           vm.donvi_gui_nhan = metadata.hasOwnProperty('congvandagui') && metadata.congvandagui ? metadata.donvinhan : metadata.donvinhandraf
+          vm.jobposSignerCongVan = metadata.hasOwnProperty('jobposSignerCongVan') ? metadata.jobposSignerCongVan : ''
+          vm.signerCongVan = metadata.hasOwnProperty('signerCongVan') ? metadata.signerCongVan : ''
         } else {
           vm.donvi_gui_nhan = metadata.donvigui
         }
@@ -395,7 +449,6 @@ export default {
         scopeUser = String(vm.employeeLoginInfomation.scope).split(",")[0]
       }
       if (vm.formCodeInput === 'NEW_GROUP_CV') {
-        // vm.thongTinCongVan.delegateName = delegateName ? delegateName : ''
         metaData.tendonvigui = delegateName
         metaData.donvigui = vm.donvi_gui_nhan
         metaData.donvinhan = scopeUser ? scopeUser : vm.detailDossier.govAgencyCode
@@ -403,6 +456,8 @@ export default {
         metaData.donvigui = scopeUser ? scopeUser : vm.detailDossier.govAgencyCode
         metaData.donvinhan = vm.donvi_gui_nhan
         metaData.tendonvinhan = delegateName
+        metaData.jobposSignerCongVan = vm.jobposSignerCongVan
+        metaData.signerCongVan = vm.signerCongVan
       }
       vm.thongTinCongVan.metaData = metaData
       vm.thongTinCongVan.sampleCount = vm.lengthDossier

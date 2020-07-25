@@ -74,7 +74,7 @@
               </div>
          
               <div class="mb-3" v-if="dossiersIntoGroupRender.length > 0">
-                <v-layout wrap class="my-2">
+                <!-- <v-layout wrap class="my-2">
                   <v-flex style="width: 120px">
                     <v-subheader class="pl-0 text-header">Bước xử lý: </v-subheader>
                   </v-flex>
@@ -100,7 +100,7 @@
                     {{item.title}}{{item.tiltle}}
                     <span slot="loader">Loading...</span>
                   </v-btn>
-                </div>
+                </div> -->
                 <v-data-table
                   v-model="selected"
                   select-all
@@ -114,7 +114,7 @@
                   <!--  -->
                   <template slot="headers" slot-scope="props">
                     <tr>
-                      <th width="32px" class="v_data_table_check_all" style="padding-left: 14px !important;">
+                      <!-- <th width="32px" class="v_data_table_check_all" style="padding-left: 14px !important;">
                         <v-checkbox
                           :input-value="props.all"
                           :indeterminate="props.indeterminate"
@@ -122,7 +122,7 @@
                           hide-details
                           @click.native="toggleAll"
                         ></v-checkbox>
-                      </th>
+                      </th> -->
                       <th
                         v-for="header in headersCV"
                         :key="header.text"
@@ -139,13 +139,13 @@
                   <!--  -->
                   <template slot="items" slot-scope="props">
                     <tr style="cursor: pointer">
-                      <td class="text-xs-center pl-3" width="32px" style="height: 40px !important">
+                      <!-- <td class="text-xs-center pl-3" width="32px" style="height: 40px !important">
                         <v-checkbox
                           v-model="props.selected"
                           primary
                           hide-details
                         ></v-checkbox>
-                      </td>
+                      </td> -->
                       <td @click="viewDetail(props.item, props.index)" class="text-xs-center" width="50px" style="height: 40px !important">
                         <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
                       </td>
@@ -186,7 +186,7 @@
                         <v-btn flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
                           <v-icon size="22">create</v-icon>
                         </v-btn>
-                        <v-btn flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
+                        <v-btn v-if="formCode !== 'NEW_GROUP_CV_DI' || (formCode === 'NEW_GROUP_CV_DI' && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
                           <v-icon size="22">delete</v-icon>
                         </v-btn>
                       </td>
@@ -220,7 +220,7 @@
                   <v-icon size="20">add</v-icon>  &nbsp;
                   <span>Thêm mới hồ sơ</span>
                 </v-btn>
-                <v-btn v-if="formCode !== 'NEW_GROUP_CV'" small color="primary" @click="showDossierToAdd" class="mx-0 my-0" >
+                <v-btn v-if="formCode !== 'NEW_GROUP_CV' && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui" small color="primary" @click="showDossierToAdd" class="mx-0 my-0" >
                   <v-icon size="20">create_new_folder</v-icon>  &nbsp;
                   <span>Thêm hồ sơ đã có</span>
                 </v-btn>
@@ -314,13 +314,35 @@
       <v-tabs icons-and-text centered class="mb-0 mt-4" v-if="activeAddDossierIntoGroup || activeAddGroup">
         <!-- <v-tabs-slider color="primary"></v-tabs-slider> -->
         <!-- Cập nhật thông tin nhóm -->
-        <v-tab href="#tab-1" @click="putGroupDossier()" v-if="activeAddGroup" class="px-0 py-0"> 
+        <v-tab href="#tab-1" @click="putGroupDossier()" v-if="activeAddGroup && formCode === 'NEW_GROUP_CV'" class="px-0 py-0"> 
           <v-btn flat class="" 
             :loading="loadingAction"
             :disabled="loadingAction"
           >
             <v-icon size="20">save</v-icon>  &nbsp;
             <span>Cập nhật</span>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+
+        <v-tab href="#tab-1" @click="putGroupDossier('save')" v-if="activeAddGroup && formCode === 'NEW_GROUP_CV_DI' && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui" class="px-0 py-0"> 
+          <v-btn flat class="" 
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">save</v-icon>  &nbsp;
+            <span>Lưu công văn</span>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+        
+        <v-tab href="#tab-1" @click="putGroupDossier('saveSend')" v-if="activeAddGroup && formCode === 'NEW_GROUP_CV_DI' && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui" class="px-0 py-0"> 
+          <v-btn flat class="" 
+            :loading="loadingAction"
+            :disabled="loadingAction || lengthDossier === 0"
+          >
+            <v-icon size="20">save</v-icon>  &nbsp;
+            <span>Lưu và gửi công văn</span>
             <span slot="loader">Loading...</span>
           </v-btn>
         </v-tab>
@@ -357,6 +379,17 @@
           </v-btn>
         </v-tab> -->
         <!--  -->
+        <v-tab v-if="formCode === 'NEW_GROUP_CV_DI' && createFileCongVan" href="#tab-4" class="px-0 py-0">
+          <v-btn flat class=""
+            :loading="loadingAction"
+            :disabled="loadingAction"
+            @click=""
+          >
+            <v-icon size="18">printer</v-icon> &nbsp;
+            In công văn
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
         <v-tab href="#tab-2" @click="goBack" class="px-0 py-0">
           <v-btn flat class=""
             :loading="loadingAction"
@@ -890,7 +923,9 @@ export default {
     },
     tphsCV: '',
     totalFee: 0,
-    addFormNewInGroup: ''
+    addFormNewInGroup: '',
+    metaDataGroupDossier: '',
+    createFileCongVan: ''
   }),
   computed: {
     loading () {
@@ -1103,6 +1138,7 @@ export default {
         vm.activeAddDossierIntoGroup = false
         vm.activeAddGroup = true
         vm.groupDossierSelected = resultDossier
+        vm.metaDataGroupDossier = vm.getMetaData(vm.thongTinNhomHoSo)
         let filter = {
           groupDossierId: id
         }
@@ -1127,6 +1163,10 @@ export default {
           }
           vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
         })
+        // lấy thông tin createFile công văn
+        if (vm.formCode === 'NEW_GROUP_CV_DI') {
+          vm.getDetailActionCongVan()
+        }
       })
     },
     changeStep () {
@@ -1199,7 +1239,7 @@ export default {
       vm.searchDossierToAdd()
       vm.dialogAddDossier = true
     },
-    putGroupDossier () {
+    putGroupDossier (draf) {
       let vm = this
       if (vm.formCode === 'NEW_GROUP') {
         let thongtinnguoinophoso = this.$refs.thongtinnguoinophoso ? this.$refs.thongtinnguoinophoso.thongTinNguoiNopHoSo : {}
@@ -1248,29 +1288,93 @@ export default {
         let thongtincongvan = this.$refs.thongtincongvan.getThongTinCongVan()
         let tempData = thongtincongvan
         tempData.dueDate = vm.dateTimeView(thongtincongvan.dueDate)
-        vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
-          // if (vm.formCode === 'NEW_GROUP_CV_DI') {
-            let dataMetaData = {
-              id: vm.thongTinNhomHoSo.dossierId,
-              data: JSON.stringify(thongtincongvan.metaData)
-            }
-            console.log('data put metadata 123', dataMetaData)
-            vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
-          // }
-          
-          vm.loadingAction = false
-          toastr.clear()
-          toastr.success('Cập nhật thành công')
-          let currentParams = vm.$router.history.current.params
-          vm.$router.push({
-            path: '/danh-sach-ho-so/' + currentParams.index + '?' + window.location.href.split('?')[1]
-          })
+        let validateThongTinCongVan = true
+        if (vm.formCode === 'NEW_GROUP_CV') {
+          validateThongTinCongVan = thongtincongvan.validation
+        }
+        if (vm.formCode === 'NEW_GROUP_CV_DI' && draf === 'save') {
+          validateThongTinCongVan = true
+        } else {
+          validateThongTinCongVan = thongtincongvan.validation
+        }
+        if (validateThongTinCongVan) {
+          vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
 
-        }).catch(rejectXhr => {
+            // let dataMetaData = {
+            //   id: vm.thongTinNhomHoSo.dossierId,
+            //   data: JSON.stringify(thongtincongvan.metaData)
+            // }
+            // console.log('data put metadata 123', dataMetaData)
+            // vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
+            
+            // vm.loadingAction = false
+            // toastr.clear()
+            // toastr.success('Cập nhật thành công')
+            // let currentParams = vm.$router.history.current.params
+            // vm.$router.push({
+            //   path: '/danh-sach-ho-so/' + currentParams.index + '?' + window.location.href.split('?')[1]
+            // })
+
+            let meta
+            if (vm.formCode === 'NEW_GROUP_CV') {
+              meta = thongtincongvan.metaData
+            } else {
+              if (draf === 'save') {
+                let metadataDraf = {
+                  congvandagui: false,
+                  donvinhan: '',
+                  tendonvinhan: '',
+                  donvinhandraf: thongtincongvan.metaData.donvinhan,
+                  tendonvinhandraf: thongtincongvan.metaData.tendonvinhan
+                }
+                meta = Object.assign(thongtincongvan.metaData, metadataDraf)
+              } else {
+                meta = Object.assign(thongtincongvan.metaData, {congvandagui: true})
+              }
+            }
+            
+            let dataMetaData = {
+              id: thongtincongvan.dossierId,
+              data: JSON.stringify(meta)
+            }
+            vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
+            vm.loadingAction = false
+            if (vm.formCode === 'NEW_GROUP_CV') {
+              vm.$router.push({
+                path: '/danh-sach-ho-so/' + currentParams.index + '?' + window.location.href.split('?')[1]
+              })
+            } else {
+              let dataAddGroup = {
+                groupDossierId: thongtincongvan.dossierId,
+                dossierId: ''
+              }
+              let dossierIdArr = []
+              for (let key in vm.dossiersIntoGroupRender) {
+                dossierIdArr.push(vm.dossiersIntoGroupRender[key]['dossierId'])
+              }
+              dataAddGroup['dossierId'] = dossierIdArr.toString()
+              if (draf === 'save') {
+                vm.$store.dispatch('postDossierIntoGroup', dataAddGroup).then(function (result) {
+                  toastr.success('Lưu công văn thành công')
+                  window.history.back()
+                })
+              } else {
+                // do action dossierIntoGroup
+                vm.processAction()
+              }
+            }
+
+          }).catch(rejectXhr => {
+            vm.loadingAction = false
+            toastr.clear()
+            toastr.error('Yêu cầu của bạn thực hiện thất bại')
+          })
+        } else {
           vm.loadingAction = false
           toastr.clear()
-          toastr.error('Yêu cầu của bạn thực hiện thất bại')
-        })
+          toastr.error('Vui lòng điền đầy đủ các thông tin bắt buộc')
+        }
+        
       }
       
     },
@@ -1995,6 +2099,32 @@ export default {
         // 
       }).catch(function () {
         vm.loadingAction = false
+      })
+    },
+    processAction () {
+      let vm = this
+      let initData = vm.$store.getters.loadingInitData
+      let actionUser = initData.user.userName ? initData.user.userName : ''
+      let filter = {
+        dossierId: vm.thongTinNhomHoSo['dossierId'],
+        actionCode: vm.metaDataGroupDossier.actioncode,
+        actionUser: actionUser
+      }
+      vm.$store.dispatch('doActionDossierIntoGroup', filter).then(function (result) {
+        toastr.success('Lưu và gửi công văn thành công')
+        window.history.back()
+      }).catch(function (reject) {
+      })
+    },
+    getDetailActionCongVan () {
+      let vm = this
+      let filter = {
+        dossierId: vm.thongTinNhomHoSo['dossierId'],
+        stepCode: vm.metaDataGroupDossier.stepcode,
+        actionCode: vm.metaDataGroupDossier.actioncode
+      }
+      vm.$store.dispatch('getDetailActionCongVan', filter).then(result => {
+        console.log('detailActionCV', result)
       })
     },
     getMetaData (val) {

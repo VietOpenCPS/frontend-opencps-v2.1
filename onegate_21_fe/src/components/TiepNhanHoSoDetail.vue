@@ -12,10 +12,10 @@
             <span v-else>THÊM MỚI HỒ SƠ</span> 
           </div>
           <div class="layout row wrap header_tools row-blue">
-            <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinChiTietHoSo.serviceName">
+            <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" style="width: calc(100% - 100px);" :title="thongTinChiTietHoSo.serviceName">
               {{thongTinChiTietHoSo.serviceName}}
             </div>
-            <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+            <div class="flex xs4 sm2 text-right" style="margin-left: auto;width: 100px">
               <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
                 <v-icon size="18">reply</v-icon> &nbsp;
                 Quay lại
@@ -407,14 +407,14 @@
               :disabled="loadingAction"
             >
               <v-icon size="20">save</v-icon>  &nbsp;
-              <span>Lưu</span>
+              <span>Lưu công văn</span>
               <span slot="loader">Loading...</span>
             </v-btn>
           </v-tab>
           <v-tab v-if="formCode === 'NEW_GROUP_CV_DI'" href="#tab-2" @click="tiepNhanCongVan('add', 'saveSend')" class="px-0 py-0"> 
             <v-btn flat class="" 
               :loading="loadingAction"
-              :disabled="loadingAction"
+              :disabled="loadingAction || lengthDossier === 0"
             >
               <v-icon size="20">save</v-icon>  &nbsp;
               <span>Lưu và gửi công văn</span>
@@ -431,6 +431,17 @@
               <span slot="loader">Loading...</span>
             </v-btn>
           </v-tab>
+          <v-tab v-if="formCode === 'NEW_GROUP_CV_DI' && createFileCongVan" href="#tab-4" class="px-0 py-0">
+            <v-btn flat class=""
+              :loading="loadingAction"
+              :disabled="loadingAction"
+              @click=""
+            >
+              <v-icon size="18">printer</v-icon> &nbsp;
+              In công văn
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-tab>
           <v-tab href="#tab-3" class="px-0 py-0">
             <v-btn flat class=""
               :loading="loadingAction"
@@ -442,6 +453,7 @@
               <span slot="loader">Loading...</span>
             </v-btn>
           </v-tab>
+          
         </v-tabs>
       </div>
       <!-- add new template -->
@@ -861,7 +873,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: false,
+    notifyConfig: true,
     fromViaPostal: false,
     fromViaPostalConfig: false,
     smsNotify: true,
@@ -972,6 +984,7 @@ export default {
       page: 1
     },
     totalFee: 0,
+    createFileCongVan: ''
   }),
   computed: {
     loading () {
@@ -993,8 +1006,10 @@ export default {
       return this.$store.getters.getMenuConfigsTodo
     },
     dossiersIntoGroupRender () {
-      console.log('dossiersIntoGroupRender', this.$store.getters.dossierSelectedDoAction)
       return this.$store.getters.dossierSelectedDoAction
+    },
+    formActionGroup () {
+      return this.$store.getters.formActionGroup
     }
   },
   created () {
@@ -1253,6 +1268,11 @@ export default {
                 }
               }
             })
+            // lấy thông tin createFile công văn
+            if (vm.formCode === 'NEW_GROUP_CV_DI') {
+              vm.getDetailActionCongVan()
+            }
+            
           }).catch(reject => {
           })
         }
@@ -1451,6 +1471,9 @@ export default {
                 'dueDate': vm.editableDate && tempData.dueDate ? tempData.dueDate : vm.dueDateEdit,
                 'receiveDate': vm.receiveDateEdit
               }
+              // 
+              payloadDate = Object.assign(tempData, payloadDate)
+              // 
               let actionCodeRequest = vm.actionDetail.actionCode
               let dataPostAction = {
                 dossierId: vm.dossierId,
@@ -1524,7 +1547,16 @@ export default {
       tempData.dueDate = vm.dateTimeView(thongtincongvan.dueDate)
       tempData = Object.assign(tempData, {typeAction: type ? type : ''})
       console.log('data put congvan -->', tempData)
-      if (thongtincongvan.validation) {
+      let validateThongTinCongVan = true
+      if (vm.formCode === 'NEW_GROUP_CV') {
+        validateThongTinCongVan = thongtincongvan.validation
+      }
+      if (vm.formCode === 'NEW_GROUP_CV_DI' && isDraf === 'save') {
+        validateThongTinCongVan = true
+      } else {
+        validateThongTinCongVan = thongtincongvan.validation
+      }
+      if (validateThongTinCongVan) {
         vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
           let meta
           if (vm.formCode === 'NEW_GROUP_CV') {
@@ -1536,11 +1568,13 @@ export default {
                 donvinhan: '',
                 tendonvinhan: '',
                 donvinhandraf: thongtincongvan.metaData.donvinhan,
-                tendonvinhandraf: thongtincongvan.metaData.tendonvinhan
+                tendonvinhandraf: thongtincongvan.metaData.tendonvinhan,
+                actioncode: vm.formActionGroup.action,
+                stepcode: vm.formActionGroup.hasOwnProperty('stepCode') ? vm.formActionGroup.stepCode : ''
               }
               meta = Object.assign(thongtincongvan.metaData, metadataDraf)
             } else {
-              meta = Object.assign(thongtincongvan.metaData, {congvandagui: true})
+              meta = Object.assign(thongtincongvan.metaData, {congvandagui: true, actioncode: vm.formActionGroup.action, stepcode: vm.formActionGroup.hasOwnProperty('stepCode') ? vm.formActionGroup.stepCode : ''})
             }
           }
           
@@ -1561,21 +1595,17 @@ export default {
               dossierId: ''
             }
             let dossierIdArr = []
-            for (let key in vm.dossierSuccess) {
-              dossierIdArr.push(vm.dossierSuccess[key]['dossierId'])
+            for (let key in vm.dossiersIntoGroupRender) {
+              dossierIdArr.push(vm.dossiersIntoGroupRender[key]['dossierId'])
             }
             dataAddGroup['dossierId'] = dossierIdArr.toString()
             vm.$store.dispatch('postDossierIntoGroup', dataAddGroup).then(function (result) {
-              // vm.$router.push({
-              //   path: '/danh-sach-ho-so/' + vm.index + '/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,
-              //   query: vm.$router.history.current.query
-              // })
-              
               if (isDraf === 'save') {
+                toastr.success('Lưu công văn thành công')
                 window.history.back()
               } else {
                 // do action dossierIntoGroup
-
+                vm.processAction()
               }
 
             })
@@ -1746,6 +1776,17 @@ export default {
         toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
         return
       }
+    },
+    getDetailActionCongVan () {
+      let vm = this
+      let filter = {
+        dossierId: vm.dossierId,
+        stepCode: vm.formActionGroup.stepCode,
+        actionCode: vm.formActionGroup.action
+      }
+      vm.$store.dispatch('getDetailActionCongVan', filter).then(result => {
+        console.log('detailActionCV', result)
+      })
     },
     getNotifyConfig (id) {
       let vm = this
@@ -1926,8 +1967,25 @@ export default {
     },
     removeDossierFromGroup (itemRemove) {
       let vm = this
-      vm.dossiersIntoGroupRender = vm.dossiersIntoGroupRender.filter(function(item) {
+      let items = vm.dossiersIntoGroupRender.filter(function(item) {
         return item.dossierId !== itemRemove.dossierId
+      })
+      console.log('itemRemove555', items)
+      vm.$store.commit('setDossierSelectedDoAction', items)
+    },
+    processAction () {
+      let vm = this
+      let initData = vm.$store.getters.loadingInitData
+      let actionUser = initData.user.userName ? initData.user.userName : ''
+      let filter = {
+        dossierId: vm.dossierId,
+        actionCode: vm.formActionGroup.action,
+        actionUser: actionUser
+      }
+      vm.$store.dispatch('doActionDossierIntoGroup', filter).then(function (result) {
+        toastr.success('Lưu và gửi công văn thành công')
+        window.history.back()
+      }).catch(function (reject) {
       })
     },
     getMetaData (val) {
