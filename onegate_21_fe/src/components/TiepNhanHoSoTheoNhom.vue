@@ -2126,7 +2126,8 @@ export default {
       vm.$store.dispatch('loadFormData', filter).then(function (result) {
         let formData = result
         formData.tp = vm.createFileCongVan
-        vm.$store.dispatch('postEformCallBack', filter).then(function (result) {})
+        console.log('postEformCallBack', formData)
+        vm.$store.dispatch('postEformCallBack', formData).then(function (result) {})
         
       }).catch(function (reject) {
       })
