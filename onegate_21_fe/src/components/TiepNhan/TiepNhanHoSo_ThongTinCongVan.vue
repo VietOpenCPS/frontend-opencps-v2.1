@@ -476,6 +476,7 @@ export default {
         metaData.donvinhan = scopeUser ? scopeUser : vm.detailDossier.govAgencyCode
       } else {
         metaData.donvigui = scopeUser ? scopeUser : vm.detailDossier.govAgencyCode
+        metaData.tendonvigui = vm.detailDossier.govAgencyName
         metaData.donvinhan = vm.donvi_gui_nhan
         metaData.tendonvinhan = delegateName
         metaData.jobposSignerCongVan = vm.jobposSignerCongVan
@@ -495,12 +496,13 @@ export default {
     onUploadSingleFile () {
       let vm = this
       console.log('tphs', vm.tphs)
+      let tphsDungChung
       if (vm.createFileCongVan) {
-        let tphsDungChung = vm.tphs.filter(function(item) {
+        tphsDungChung = vm.tphs.filter(function(item) {
           return item.partNo == vm.createFileCongVan
         })[0]
       } else {
-        let tphsDungChung = vm.tphs.filter(function(item) {
+        tphsDungChung = vm.tphs.filter(function(item) {
           return item.partType == 6
         })[0]
       }

@@ -733,6 +733,21 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogPDF" max-width="1000" transition="fade-transition" style="overflow: hidden;">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>
+            <span >In công văn</span>
+          </v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPDF = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <iframe id="dialogPdfFile" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -928,7 +943,9 @@ export default {
     addFormNewInGroup: '',
     metaDataGroupDossier: '',
     createFileCongVan: '',
-    donvinhanCollection: ''
+    postStepCodeCongVan: '',
+    donvinhanCollection: '',
+    dialogPDF: false
   }),
   computed: {
     loading () {
@@ -1257,20 +1274,6 @@ export default {
             }
           } else { passValid = true }
           if (passValid) {
-            // if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
-            //   return
-            // }
-            // let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
-            // let listAction = []
-            // let listDossierMark = []
-            // if (dossierFiles) {
-            //   dossierFiles.forEach(function (value, index) {
-            //     if (value.eForm) {
-            //       value['dossierId'] = vm.thongTinNhomHoSo.dossierId
-            //       listAction.push(vm.$store.dispatch('putAlpacaForm', value))
-            //     }
-            //   })
-            // }
             let tempData = Object.assign(vm.thongTinNhomHoSo, thongtinnguoinophoso)
             tempData['dossierId'] = vm.thongTinNhomHoSo.dossierId
             tempData['originality'] = vm.thongTinNhomHoSo.originality
@@ -1302,6 +1305,7 @@ export default {
           validateThongTinCongVan = thongtincongvan.validation
         }
         if (validateThongTinCongVan) {
+          vm.loadingAction = true
           vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
             let meta
             if (vm.formCode === 'NEW_GROUP_CV') {
@@ -1313,14 +1317,15 @@ export default {
                   donvinhan: '',
                   tendonvinhan: '',
                   donvinhandraf: thongtincongvan.metaData.donvinhan,
-                  tendonvinhandraf: thongtincongvan.metaData.tendonvinhan
+                  tendonvinhandraf: thongtincongvan.metaData.tendonvinhan,
+                  totalSubsidy: vm.totalFee
                 }
                 meta = Object.assign(thongtincongvan.metaData, metadataDraf)
               } else {
-                meta = Object.assign(thongtincongvan.metaData, {congvandagui: true})
+                meta = Object.assign(thongtincongvan.metaData, {congvandagui: true, totalSubsidy: vm.totalFee})
               }
               // tạo file in công văn
-              vm.createFileKqCongVan()
+              vm.createFileKqCongVan('send')
             }
             
             let dataMetaData = {
@@ -1328,8 +1333,8 @@ export default {
               data: JSON.stringify(meta)
             }
             vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
-            vm.loadingAction = false
             if (vm.formCode === 'NEW_GROUP_CV') {
+              vm.loadingAction = false
               vm.$router.push({
                 path: '/danh-sach-ho-so/' + currentParams.index + '?' + window.location.href.split('?')[1]
               })
@@ -1345,8 +1350,13 @@ export default {
               dataAddGroup['dossierId'] = dossierIdArr.toString()
               if (draf === 'save') {
                 vm.$store.dispatch('postDossierIntoGroup', dataAddGroup).then(function (result) {
+                  vm.loadingAction = false
                   toastr.success('Lưu công văn thành công')
-                  window.history.back()
+                  vm.$router.push({
+                    path: '/danh-sach-ho-so/' + currentParams.index + '?' + window.location.href.split('?')[1]
+                  })
+                }).catch (() => {
+                  vm.loadingAction = false
                 })
               } else {
                 // do action dossierIntoGroup
@@ -1981,7 +1991,17 @@ export default {
     },
     searchDossierToAdd () {
       let vm = this
-      let apiGetDossier = vm.menuConfigs[vm.index]['tableConfig'].hasOwnProperty('apiGetDossierAddGroup') ? vm.menuConfigs[vm.index]['tableConfig']['apiGetDossierAddGroup'] : ''
+      let menuConfigsCongVan
+      if (vm.formCode === 'NEW_GROUP_CV') {
+        menuConfigsCongVan = vm.menuConfigs.filter(function (item) {
+          return item.id.startsWith('CV_DEN')
+        })[0]
+      } else {
+        menuConfigsCongVan = vm.menuConfigs.filter(function (item) {
+          return item.id.startsWith('CV_DI')
+        })[0]
+      }
+      let apiGetDossier = menuConfigsCongVan['tableConfig'].hasOwnProperty('apiGetDossierAddGroup') ? menuConfigsCongVan['tableConfig']['apiGetDossierAddGroup'] : ''
       let filter = {
         api: apiGetDossier,
         dossierNo: vm.dossierNoKey,
@@ -2100,11 +2120,22 @@ export default {
         actionCode: vm.metaDataGroupDossier.actioncode,
         actionUser: actionUser
       }
-      vm.$store.dispatch('doActionDossierIntoGroup', filter).then(function (result) {
-        toastr.success('Lưu và gửi công văn thành công')
-        window.history.back()
-      }).catch(function (reject) {
-      })
+      if (vm.dossiersIntoGroupRender.length > 0) {
+        vm.loadingAction = true
+        vm.$store.dispatch('doActionDossierIntoGroup', filter).then(function (result) {
+          console.log('success do action')
+          vm.loadingAction = false
+          toastr.success('Lưu và gửi công văn thành công')
+          window.history.back()
+          // vm.copyFileDossierIntoGroup()
+        }).catch(function (reject) {
+          vm.loadingAction = false
+        })
+      } else {
+        vm.loadingAction = false
+        toastr.error('Công văn chưa có hồ sơ')
+      }
+
     },
     getDetailActionCongVan () {
       let vm = this
@@ -2115,19 +2146,19 @@ export default {
       }
       vm.$store.dispatch('getDetailActionCongVan', filter).then(result => {
         vm.createFileCongVan = result.createDossierFiles
+        vm.postStepCodeCongVan = result.postStepCode
       })
     },
-    createFileKqCongVan () {
+    createFileKqCongVan (action) {
       let vm = this
       let filter = {
         dossierId: vm.thongTinNhomHoSo['dossierId'],
         partNo: vm.createFileCongVan
       }
       vm.$store.dispatch('loadFormData', filter).then(function (result) {
-        let formData = result
-        formData.tp = vm.createFileCongVan
-        console.log('postEformCallBack', formData)
-        vm.$store.dispatch('postEformCallBack', formData).then(function (result) {})
+        let formData = JSON.parse(result)
+        let formDataPut = Object.assign(formData, {tp: vm.createFileCongVan, dossierId: vm.thongTinNhomHoSo['dossierId']})
+        vm.$store.dispatch('postEformCallBack', formDataPut).then(function (result) {})
         
       }).catch(function (reject) {
       })
@@ -2135,6 +2166,49 @@ export default {
     },
     printCongVan () {
       let vm = this
+      vm.loadingAction = true
+      vm.$store.dispatch('loadDossierFiles', vm.thongTinNhomHoSo['dossierId']).then(result => {
+        let files = result
+        let fileKq = files.filter(function(item) {
+          return item.dossierPartNo == vm.createFileCongVan
+        })[0]
+        if (fileKq) {
+          vm.$store.dispatch('viewFile', fileKq).then(result => {
+            vm.loadingAction = false
+            vm.dialogPDF = true
+            document.getElementById('dialogPdfFile').src = result
+          }).catch(reject => {
+            vm.loadingAction = false
+          })
+        } else {
+          vm.loadingAction = false
+        }
+      }).catch (() => {
+        vm.loadingAction = false
+      })
+    },
+    copyFileDossierIntoGroup () {
+      let vm = this
+      // copy file 
+      let dossierIdIntoGroup = vm.dossiersIntoGroupRender.map(obj =>{ 
+        return obj.dossierId
+      }).toString()
+      let filesKq = vm.$refs.thongtincongvan.getFileCongVan()
+      let files = vm.filesKq.filter(function(item) {
+        return (item['dossierPartType'] === 7 && item['dossierPartNo'] === vm.createFileCongVan)
+      })
+      if (files.length > 0 && dossierIdIntoGroup.length > 0) {
+        let dossierFileIds = files.map(obj =>{ 
+          return obj.dossierFileId
+        }).toString()
+        let filterCopyFile = {
+          dossierIds: dossierIdIntoGroup,
+          dossierFileId: dossierFileIds
+        }
+        vm.$store.dispatch('uploadFileDossierGroup', filterCopyFile).then(function (resultFile) {
+        })
+      }
+      // 
     },
     getMetaData (val) {
       let metaDataOut = ''

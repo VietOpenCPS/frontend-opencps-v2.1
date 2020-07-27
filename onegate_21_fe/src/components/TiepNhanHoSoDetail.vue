@@ -12,10 +12,10 @@
             <span v-else>THÊM MỚI HỒ SƠ</span> 
           </div>
           <div class="layout row wrap header_tools row-blue">
-            <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" style="width: calc(100% - 100px);" :title="thongTinChiTietHoSo.serviceName">
+            <div class="flex pl-3 text-ellipsis text-bold" style="width: calc(100% - 100px);" :title="thongTinChiTietHoSo.serviceName">
               {{thongTinChiTietHoSo.serviceName}}
             </div>
-            <div class="flex xs4 sm2 text-right" style="margin-left: auto;width: 100px">
+            <div class="flex text-right" style="margin-left: auto;width: 100px">
               <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
                 <v-icon size="18">reply</v-icon> &nbsp;
                 Quay lại
@@ -422,7 +422,7 @@
               <span slot="loader">Loading...</span>
             </v-btn>
           </v-tab>
-          <v-tab v-if="formCode === 'NEW_GROUP_CV_DI' && createFileCongVan" href="#tab-4" class="px-0 py-0">
+          <!-- <v-tab v-if="formCode === 'NEW_GROUP_CV_DI' && createFileCongVan" href="#tab-4" class="px-0 py-0">
             <v-btn flat class=""
               :loading="loadingAction"
               :disabled="loadingAction"
@@ -432,7 +432,7 @@
               <span style="margin-left: -30px;">In công văn</span>
               <span slot="loader">Loading...</span>
             </v-btn>
-          </v-tab>
+          </v-tab> -->
           <v-tab href="#tab-5" class="px-0 py-0">
             <v-btn flat class=""
               :loading="loadingAction"
@@ -976,6 +976,7 @@ export default {
     },
     totalFee: 0,
     createFileCongVan: '',
+    postStepCodeCongVan: '',
     donvinhanCollection: ''
   }),
   computed: {
@@ -1568,16 +1569,20 @@ export default {
                 donvinhandraf: thongtincongvan.metaData.donvinhan,
                 tendonvinhandraf: thongtincongvan.metaData.tendonvinhan,
                 actioncode: vm.formActionGroup.action,
+                postStepCode: vm.postStepCodeCongVan,
                 stepcode: vm.formActionGroup.hasOwnProperty('stepCode') ? vm.formActionGroup.stepCode : '',
-                donvinhancollection: vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : ''
+                donvinhancollection: vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : '',
+                totalSubsidy: vm.totalFee
               }
               meta = Object.assign(thongtincongvan.metaData, metadataDraf)
             } else {
               let metadataDraf = {
                 congvandagui: true, 
                 actioncode: vm.formActionGroup.action, 
+                postStepCode: vm.postStepCodeCongVan,
                 stepcode: vm.formActionGroup.hasOwnProperty('stepCode') ? vm.formActionGroup.stepCode : '',
-                donvinhancollection: vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : ''
+                donvinhancollection: vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : '',
+                totalSubsidy: vm.totalFee
               }
               meta = Object.assign(thongtincongvan.metaData, metadataDraf)
             }
@@ -1590,8 +1595,8 @@ export default {
             data: JSON.stringify(meta)
           }
           vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
-          vm.loadingAction = false
           if (vm.formCode === 'NEW_GROUP_CV') {
+            vm.loadingAction = false
             vm.$router.push({
               path: '/danh-sach-ho-so/' + vm.index + '/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,
               query: vm.$router.history.current.query
@@ -1608,8 +1613,12 @@ export default {
             dataAddGroup['dossierId'] = dossierIdArr.toString()
             vm.$store.dispatch('postDossierIntoGroup', dataAddGroup).then(function (result) {
               if (isDraf === 'save') {
+                vm.loadingAction = false
                 toastr.success('Lưu công văn thành công')
-                window.history.back()
+                vm.$router.push({
+                  path: '/danh-sach-ho-so/' + vm.index + '/nhom-ho-so/' + vm.formCode + '/' + thongtincongvan.dossierId,
+                  query: vm.$router.history.current.query
+                })
               } else {
                 // do action dossierIntoGroup
                 vm.processAction()
@@ -1793,6 +1802,7 @@ export default {
       }
       vm.$store.dispatch('getDetailActionCongVan', filter).then(result => {
         vm.createFileCongVan = result.createDossierFiles
+        vm.postStepCodeCongVan = result.postStepCode
       })
     },
     getNotifyConfig (id) {
@@ -1982,6 +1992,7 @@ export default {
     },
     processAction () {
       let vm = this
+      vm.loadingAction = true
       let initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
       let filter = {
@@ -1989,11 +2000,19 @@ export default {
         actionCode: vm.formActionGroup.action,
         actionUser: actionUser
       }
-      vm.$store.dispatch('doActionDossierIntoGroup', filter).then(function (result) {
-        toastr.success('Lưu và gửi công văn thành công')
-        window.history.back()
-      }).catch(function (reject) {
-      })
+      if (vm.dossiersIntoGroupRender.length > 0) {
+        vm.$store.dispatch('doActionDossierIntoGroup', filter).then(function (result) {
+          vm.loadingAction = false
+          toastr.success('Lưu và gửi công văn thành công')
+          window.history.back()
+          // vm.copyFileDossierIntoGroup()
+        }).catch(function (reject) {
+          vm.loadingAction = false
+        })
+      } else {
+        vm.loadingAction = false
+      }
+      
     },
     createFileKqCongVan () {
       let vm = this
@@ -2002,13 +2021,36 @@ export default {
         partNo: vm.createFileCongVan
       }
       vm.$store.dispatch('loadFormData', filter).then(function (result) {
-        let formData = result
-        formData.tp = vm.createFileCongVan
-        vm.$store.dispatch('postEformCallBack', filter).then(function (result) {})
+        let formData = JSON.parse(result) 
+        let formDataPut = Object.assign(formData, {tp: vm.createFileCongVan, dossierId: vm.dossierId})
+        vm.$store.dispatch('postEformCallBack', formData).then(function (result) {})
         
       }).catch(function (reject) {
       })
       
+    },
+    copyFileDossierIntoGroup () {
+      let vm = this
+      // copy file 
+      let dossierIdIntoGroup = vm.dossiersIntoGroupRender.map(obj =>{ 
+        return obj.dossierId
+      }).toString()
+      let filesKq = vm.$refs.thongtincongvan.getFileCongVan()
+      let files = vm.filesKq.filter(function(item) {
+        return (item['dossierPartType'] === 7 && item['dossierPartNo'] === vm.createFileCongVan)
+      })
+      if (files.length > 0 && dossierIdIntoGroup.length > 0) {
+        let dossierFileIds = files.map(obj =>{ 
+          return obj.dossierFileId
+        }).toString()
+        let filterCopyFile = {
+          dossierIds: dossierIdIntoGroup,
+          dossierFileId: dossierFileIds
+        }
+        vm.$store.dispatch('uploadFileDossierGroup', filterCopyFile).then(function (resultFile) {
+        })
+      }
+      // 
     },
     getMetaData (val) {
       let metaDataOut = ''
