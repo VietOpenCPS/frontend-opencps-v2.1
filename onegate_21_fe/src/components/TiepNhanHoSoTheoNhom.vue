@@ -36,9 +36,11 @@
 
         <thong-tin-chu-ho-so v-if="formCode === 'NEW_GROUP'" :showApplicant="true" :showDelegate="false" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
 
-        <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" ref="thongtincongvan" :detailDossier="thongTinNhomHoSo" :tphs="tphsCV" :formCodeInput="formCode" :lengthDossier="dossiersIntoGroupRender.length"></thong-tin-cong-van>
+        <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" ref="thongtincongvan" :detailDossier="thongTinNhomHoSo"
+         :tphs="tphsCV" :createFileCongVan="createFileCongVan" :formCodeInput="formCode" :donvinhanCollection="donvinhanCollection" :lengthDossier="dossiersIntoGroupRender.length">
+        </thong-tin-cong-van>
 
-        <div v-if="formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" style="position: relative;border-top: 1px solid #dedede;">
+        <div v-if="formCode === 'NEW_GROUP'" style="position: relative;border-top: 1px solid #dedede;">
           <v-expansion-panel :value="0" class="expansion-pl">
             <v-expansion-panel-content>
               <div slot="header" style="display: flex; align-items: center;">
@@ -49,7 +51,7 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
-        <div v-if="formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" style="position: relative;">
+        <div v-if="formCode === 'NEW_GROUP' " style="position: relative;">
           <v-expansion-panel :value="[true]" expand class="expansion-pl">
             <v-expansion-panel-content :key="1">
               <div slot="header" style="display: flex; align-items: center;">
@@ -336,7 +338,7 @@
           </v-btn>
         </v-tab>
         
-        <v-tab href="#tab-1" @click="putGroupDossier('saveSend')" v-if="activeAddGroup && formCode === 'NEW_GROUP_CV_DI' && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui" class="px-0 py-0"> 
+        <v-tab href="#tab-2" @click="putGroupDossier('saveSend')" v-if="activeAddGroup && formCode === 'NEW_GROUP_CV_DI' && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui" class="px-0 py-0"> 
           <v-btn flat class="" 
             :loading="loadingAction"
             :disabled="loadingAction || lengthDossier === 0"
@@ -379,18 +381,18 @@
           </v-btn>
         </v-tab> -->
         <!--  -->
-        <v-tab v-if="formCode === 'NEW_GROUP_CV_DI' && createFileCongVan" href="#tab-4" class="px-0 py-0">
+        <v-tab v-if="formCode === 'NEW_GROUP_CV_DI' && createFileCongVan" href="#tab-3" class="px-0 py-0">
           <v-btn flat class=""
             :loading="loadingAction"
             :disabled="loadingAction"
-            @click=""
+            @click="printCongVan"
           >
-            <v-icon size="18">printer</v-icon> &nbsp;
-            In công văn
+            <v-icon size="20">printer</v-icon> &nbsp;
+            <span style="margin-left: -30px;">In công văn</span>
             <span slot="loader">Loading...</span>
           </v-btn>
         </v-tab>
-        <v-tab href="#tab-2" @click="goBack" class="px-0 py-0">
+        <v-tab href="#tab-4" @click="goBack" class="px-0 py-0">
           <v-btn flat class=""
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -925,7 +927,8 @@ export default {
     totalFee: 0,
     addFormNewInGroup: '',
     metaDataGroupDossier: '',
-    createFileCongVan: ''
+    createFileCongVan: '',
+    donvinhanCollection: ''
   }),
   computed: {
     loading () {
@@ -976,7 +979,7 @@ export default {
   mounted () {
     let vm = this
     if (vm.thongTinNhomHoSo) {
-      if (vm.formCode === 'NEW_GROUP' || vm.formCode === 'NEW_GROUP_CV' || vm.formCode === 'NEW_GROUP_CV_DI') {
+      if (vm.formCode === 'NEW_GROUP' ) {
         if (vm.formCode === 'NEW_GROUP') {
           vm.$refs.thongtinnguoinophoso.initData(vm.thongTinNhomHoSo)
         }
@@ -1030,7 +1033,7 @@ export default {
     thongTinNhomHoSo (val) {
       let vm = this
       if (val) {
-        if (vm.formCode === 'NEW_GROUP' || vm.formCode === 'NEW_GROUP_CV' || vm.formCode === 'NEW_GROUP_CV_DI') {
+        if (vm.formCode === 'NEW_GROUP' ) {
           if (vm.formCode === 'NEW_GROUP') {
             vm.$refs.thongtinnguoinophoso.initData(val)
           }
@@ -1139,6 +1142,7 @@ export default {
         vm.activeAddGroup = true
         vm.groupDossierSelected = resultDossier
         vm.metaDataGroupDossier = vm.getMetaData(vm.thongTinNhomHoSo)
+        vm.donvinhanCollection = vm.metaDataGroupDossier.hasOwnProperty('donvinhancollection') ? vm.metaDataGroupDossier.donvinhancollection : ''
         let filter = {
           groupDossierId: id
         }
@@ -1299,22 +1303,6 @@ export default {
         }
         if (validateThongTinCongVan) {
           vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
-
-            // let dataMetaData = {
-            //   id: vm.thongTinNhomHoSo.dossierId,
-            //   data: JSON.stringify(thongtincongvan.metaData)
-            // }
-            // console.log('data put metadata 123', dataMetaData)
-            // vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
-            
-            // vm.loadingAction = false
-            // toastr.clear()
-            // toastr.success('Cập nhật thành công')
-            // let currentParams = vm.$router.history.current.params
-            // vm.$router.push({
-            //   path: '/danh-sach-ho-so/' + currentParams.index + '?' + window.location.href.split('?')[1]
-            // })
-
             let meta
             if (vm.formCode === 'NEW_GROUP_CV') {
               meta = thongtincongvan.metaData
@@ -1331,6 +1319,8 @@ export default {
               } else {
                 meta = Object.assign(thongtincongvan.metaData, {congvandagui: true})
               }
+              // tạo file in công văn
+              vm.createFileKqCongVan()
             }
             
             let dataMetaData = {
@@ -2124,8 +2114,26 @@ export default {
         actionCode: vm.metaDataGroupDossier.actioncode
       }
       vm.$store.dispatch('getDetailActionCongVan', filter).then(result => {
-        console.log('detailActionCV', result)
+        vm.createFileCongVan = result.createDossierFiles
       })
+    },
+    createFileKqCongVan () {
+      let vm = this
+      let filter = {
+        dossierId: vm.thongTinNhomHoSo['dossierId'],
+        partNo: vm.createFileCongVan
+      }
+      vm.$store.dispatch('loadFormData', filter).then(function (result) {
+        let formData = result
+        formData.tp = vm.createFileCongVan
+        vm.$store.dispatch('postEformCallBack', filter).then(function (result) {})
+        
+      }).catch(function (reject) {
+      })
+      
+    },
+    printCongVan () {
+      let vm = this
     },
     getMetaData (val) {
       let metaDataOut = ''

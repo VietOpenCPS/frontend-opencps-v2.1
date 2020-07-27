@@ -566,6 +566,25 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    loadDetailDictItems ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let groupIdSet = data.collectionCode === 'VNPOST_CITY_CODE' ? 0 : state.initData.groupId
+          let param = {
+            headers: {
+              groupId: groupIdSet
+            },
+            params: {
+            }
+          }
+          axios.get(state.initData.regionApi + '/' + data.collectionCode + '/dictitems/' + data.itemCode, param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
     resetThongTinChungHoSo ({ commit }) {
       let data = {
         serviceConfig: {},
@@ -4630,7 +4649,7 @@ export const store = new Vuex.Store({
           }
         }
         axios.get('/o/rest/v2/dossiers/'+ filter.dossierId + '/steps/' + filter.stepCode + '/actions/' + filter.actionCode, param).then(function (response) {
-          resolve(response)
+          resolve(response.data)
         }).catch(function (xhr) {
           reject(xhr)
         })

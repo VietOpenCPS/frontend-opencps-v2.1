@@ -170,14 +170,14 @@
             </v-expansion-panel>
           </div>
           <!--  -->
-          <!-- <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
+          <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
                 <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát hồ sơ</div>
                 <dich-vu-chuyen-phat-ho-so ref="dichvuchuyenphathoso" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-          </div> -->
+          </div>
           <!--  -->
           <div style="position: relative;" v-if="viaPortalDetail !== 0">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -203,34 +203,25 @@
           <div>
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content>
-                <thong-tin-cong-van ref="thongtincongvan" :detailDossier="thongTinChiTietHoSo" :tphs="tphsCV" :formCodeInput="formCode" :lengthDossier="dossiersIntoGroupRender.length"></thong-tin-cong-van>
+                <thong-tin-cong-van ref="thongtincongvan" :detailDossier="thongTinChiTietHoSo" :tphs="tphsCV" :createFileCongVan="createFileCongVan"
+                  :formCodeInput="formCode" :donvinhanCollection="donvinhanCollection" :lengthDossier="dossiersIntoGroupRender.length" >
+                </thong-tin-cong-van>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
           <!--  -->
-          <div style="position: relative;">
+          <!-- <div style="position: relative;">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content>
                 <div slot="header" style="display: flex; align-items: center;">
                   <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                   <span>Thành phần hồ sơ dùng chung</span>
                   &nbsp;&nbsp;&nbsp;&nbsp;
-                  <!-- <span v-if="!stateEditSample && originality !== 1">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
-                  <v-text-field
-                  class="px-0 py-0"
-                  style="width: 90px; max-width: 90px;"
-                  v-else-if="originality !== 1"
-                  v-model="thongTinChiTietHoSo.sampleCount"
-                  type="number"
-                  @click.stop=""
-                  ></v-text-field> &nbsp;
-                  <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
-                  <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon> -->
                 </div>
                 <thanh-phan-ho-so ref="thanhphanhoso" :formCodeInput="formCode"  :onlyView="false" :id="'nm'" :partTypes="formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI' ? inputTypesGroup : inputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-          </div>
+          </div> -->
           <!--  -->
           <div style="position: relative;" v-if="formCode === 'NEW_GROUP_CV_DI'">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -414,14 +405,14 @@
           <v-tab v-if="formCode === 'NEW_GROUP_CV_DI'" href="#tab-2" @click="tiepNhanCongVan('add', 'saveSend')" class="px-0 py-0"> 
             <v-btn flat class="" 
               :loading="loadingAction"
-              :disabled="loadingAction || lengthDossier === 0"
+              :disabled="loadingAction || dossiersIntoGroupRender.length === 0"
             >
               <v-icon size="20">save</v-icon>  &nbsp;
               <span>Lưu và gửi công văn</span>
               <span slot="loader">Loading...</span>
             </v-btn>
           </v-tab>
-          <v-tab v-if="formCode === 'NEW_GROUP_CV'" href="#tab-1" @click="tiepNhanCongVan('add')" class="px-0 py-0"> 
+          <v-tab v-if="formCode === 'NEW_GROUP_CV'" href="#tab-3" @click="tiepNhanCongVan('add')" class="px-0 py-0"> 
             <v-btn flat class="" 
               :loading="loadingAction"
               :disabled="loadingAction"
@@ -438,11 +429,11 @@
               @click=""
             >
               <v-icon size="18">printer</v-icon> &nbsp;
-              In công văn
+              <span style="margin-left: -30px;">In công văn</span>
               <span slot="loader">Loading...</span>
             </v-btn>
           </v-tab>
-          <v-tab href="#tab-3" class="px-0 py-0">
+          <v-tab href="#tab-5" class="px-0 py-0">
             <v-btn flat class=""
               :loading="loadingAction"
               :disabled="loadingAction"
@@ -873,9 +864,9 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: true,
+    notifyConfig: false,
     fromViaPostal: false,
-    fromViaPostalConfig: false,
+    fromViaPostalConfig: true,
     smsNotify: true,
     emailNotify: true,
     dialog_printGuide: false,
@@ -984,7 +975,8 @@ export default {
       page: 1
     },
     totalFee: 0,
-    createFileCongVan: ''
+    createFileCongVan: '',
+    donvinhanCollection: ''
   }),
   computed: {
     loading () {
@@ -1016,6 +1008,7 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       vm.dossierId = vm.id
+      vm.donvinhanCollection = vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : ''
     })
   },
   beforeDestroy () {
@@ -1070,6 +1063,10 @@ export default {
       }
       
     },
+    formActionGroup (val) {
+      let vm = this
+      vm.donvinhanCollection = val.hasOwnProperty('donvinhan') ? val.donvinhan : ''
+    }
   },
   methods: {
     onResize () {
@@ -1082,6 +1079,7 @@ export default {
       let currentQuery = vm.$router.history.current.query
       if (vm.formCode === 'NEW_GROUP_CV_DI') {
         console.log('vm.dossiersIntoGroupRender', vm.dossiersIntoGroupRender)
+        vm.donvinhanCollection = vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : ''
         let totalFee = 0
         let arr = vm.dossiersIntoGroupRender
         if (arr && arr.length > 0) {
@@ -1263,7 +1261,7 @@ export default {
 
               } else {
                 vm.isNotarization = false
-                if (!vm.mauCongVan || vm.formCode === 'UPDATE' || vm.formCode === 'NEW_GROUP_CV' || vm.formCode === 'NEW_GROUP_CV_DI') {
+                if (!vm.mauCongVan || vm.formCode === 'UPDATE') {
                   vm.$refs.thanhphanhoso.initData(result)
                 }
               }
@@ -1570,12 +1568,21 @@ export default {
                 donvinhandraf: thongtincongvan.metaData.donvinhan,
                 tendonvinhandraf: thongtincongvan.metaData.tendonvinhan,
                 actioncode: vm.formActionGroup.action,
-                stepcode: vm.formActionGroup.hasOwnProperty('stepCode') ? vm.formActionGroup.stepCode : ''
+                stepcode: vm.formActionGroup.hasOwnProperty('stepCode') ? vm.formActionGroup.stepCode : '',
+                donvinhancollection: vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : ''
               }
               meta = Object.assign(thongtincongvan.metaData, metadataDraf)
             } else {
-              meta = Object.assign(thongtincongvan.metaData, {congvandagui: true, actioncode: vm.formActionGroup.action, stepcode: vm.formActionGroup.hasOwnProperty('stepCode') ? vm.formActionGroup.stepCode : ''})
+              let metadataDraf = {
+                congvandagui: true, 
+                actioncode: vm.formActionGroup.action, 
+                stepcode: vm.formActionGroup.hasOwnProperty('stepCode') ? vm.formActionGroup.stepCode : '',
+                donvinhancollection: vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : ''
+              }
+              meta = Object.assign(thongtincongvan.metaData, metadataDraf)
             }
+            // tạo file in công văn
+            vm.createFileKqCongVan()
           }
           
           let dataMetaData = {
@@ -1785,7 +1792,7 @@ export default {
         actionCode: vm.formActionGroup.action
       }
       vm.$store.dispatch('getDetailActionCongVan', filter).then(result => {
-        console.log('detailActionCV', result)
+        vm.createFileCongVan = result.createDossierFiles
       })
     },
     getNotifyConfig (id) {
@@ -1987,6 +1994,21 @@ export default {
         window.history.back()
       }).catch(function (reject) {
       })
+    },
+    createFileKqCongVan () {
+      let vm = this
+      let filter = {
+        dossierId: vm.dossierId,
+        partNo: vm.createFileCongVan
+      }
+      vm.$store.dispatch('loadFormData', filter).then(function (result) {
+        let formData = result
+        formData.tp = vm.createFileCongVan
+        vm.$store.dispatch('postEformCallBack', filter).then(function (result) {})
+        
+      }).catch(function (reject) {
+      })
+      
     },
     getMetaData (val) {
       let metaDataOut = ''

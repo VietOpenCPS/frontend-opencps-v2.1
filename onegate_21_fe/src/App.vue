@@ -195,6 +195,7 @@
           axios.get('/o/rest/v2/employees/byGroupId', param).then(function(response1) {
             let employeeLogin = response1.data
             vm.$store.commit('setEmployeeLogin', employeeLogin)
+            console.log('setEmployeeLogin', vm.$store.getters.getEmployeeLogin)
           })
         }
       })

@@ -1130,7 +1130,7 @@ export default {
           let totalText = 'Tổng cộng'
           dataRowTotal.push({
             text: totalText, 
-            colSpan: 2,
+            colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? 2 : 1,
             bold: true,
             alignment: 'center',
             style: 'tdStyle'
@@ -1195,7 +1195,7 @@ export default {
                   dataReportTotal += ' ],'
                 } else {
                   dataReportTotal += JSON.stringify([{
-                    colSpan: colLeng + 1,
+                    colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? colLeng + 1 : colLeng,
                     text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
                     bold: true,
                     style: 'tdStyle'
@@ -1213,11 +1213,14 @@ export default {
               let dataToExportCSVItem = []
               let dossierObj = dossiersArray[keyDossier]
               dataToExportCSVItem.push(indexStt)
-              dataRow.push({
-                text: vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup') ? indexStt : indexNotShowGroup, 
-                alignment: 'center',
-                style: 'tdStyle'
-              })
+              if (!vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt')) {
+                dataRow.push({
+                  text: vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup') ? indexStt : indexNotShowGroup, 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+              }
+              
               for (let keyVal in vm.itemsReportsConfig) {
                 if (vm.itemsReportsConfig[keyVal].hasOwnProperty('selected') && vm.itemsReportsConfig[keyVal]['selected']) {
                   let alignmentConfig = 'center'

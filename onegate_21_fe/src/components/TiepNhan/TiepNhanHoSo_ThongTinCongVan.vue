@@ -81,8 +81,6 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="lengthDossier"
-                      :rules="[rules.required]"
-                      required
                       ></v-text-field>
                       <p class="pt-2" v-else>{{lengthDossier}}</p>
                     </v-flex>
@@ -246,7 +244,7 @@
                       <p class="pt-2" v-else>{{thongTinCongVan.contactEmail}}</p>
                     </v-flex>
 
-                    <!-- <v-flex xs12 class="mt-2">
+                    <v-flex xs12 class="mt-2">
                       <div class="mb-2"> <span style="color:red">(*) &nbsp;</span>Tài liệu đính kèm: <i v-if="dossierFilesItems.length === 0">(Chưa có tài liệu đính kèm)</i></div>
                       <div v-for="(itemFileView, index) in dossierFilesItems" :key="index">
                         <div v-if="!itemFileView.eForm">
@@ -270,7 +268,7 @@
                         Chọn tài liệu tải lên
                       </v-btn>
                       
-                    </v-flex> -->
+                    </v-flex>
                   </v-layout>
                 </v-card-text>
               </v-card>
@@ -324,7 +322,7 @@ export default {
     'suggestions': Suggestions,
     'tiny-pagination': TinyPagination
   },
-  props: ['formCodeInput', 'detailDossier', 'tphs', 'lengthDossier'],
+  props: ['formCodeInput', 'detailDossier', 'donvinhanCollection', 'tphs', 'lengthDossier', 'createFileCongVan'],
   data: () => ({
     loading: false,
     dialogPDFLoading: false,
@@ -394,6 +392,24 @@ export default {
     dueDate (val) {
       this.duedateFormated = this.formatDate(this.dueDate)
     },
+    employeeLoginInfomation () {
+      let vm = this
+      vm.getGovAgencyList()
+    },
+    donvinhanCollection () {
+      let vm = this
+      if (vm.employeeLoginInfomation) {
+        vm.getGovAgencyList()
+      }
+    },
+    createFileCongVan (val) {
+      let vm = this
+      if (val && vm.dossierFilesItems) {
+        vm.dossierFilesItems = vm.dossierFilesItems.filter(function (item) {
+          return item.dossierPartNo == val
+        })
+      }
+    }
     // thongTinCongVan: {
     //   handler: function (value) {
     //     let vm = this
@@ -412,6 +428,7 @@ export default {
         vm.metaDataDossier = metadata
         vm.congVanDaGui = metadata.hasOwnProperty('congvandagui') && metadata.congvandagui ? true : false
         if (vm.formCodeInput === 'NEW_GROUP_CV_DI') {
+          vm.getGovAgencyList()
           vm.donvi_gui_nhan = metadata.hasOwnProperty('congvandagui') && metadata.congvandagui ? metadata.donvinhan : metadata.donvinhandraf
           vm.jobposSignerCongVan = metadata.hasOwnProperty('jobposSignerCongVan') ? metadata.jobposSignerCongVan : ''
           vm.signerCongVan = metadata.hasOwnProperty('signerCongVan') ? metadata.signerCongVan : ''
@@ -426,6 +443,11 @@ export default {
       vm.dueDate = vm.thongTinCongVan.hasOwnProperty('dueDate') ? vm.parseDate(vm.thongTinCongVan.dueDate) : ''
       vm.$store.dispatch('loadDossierFiles', vm.thongTinCongVan.dossierId).then(result => {
         vm.dossierFilesItems = result
+        if (vm.createFileCongVan) {
+          vm.dossierFilesItems = vm.dossierFilesItems.filter(function (item) {
+            return item.dossierPartNo == vm.createFileCongVan
+          })
+        }
       })
       vm.$refs.formThongTinCongVan.resetValidation()
       console.log('thongtincongvanInput', vm.thongTinCongVan)
@@ -446,7 +468,7 @@ export default {
       let metaData = metaDataDossier ? metaDataDossier : {donvigui: '', donvinhan: '', tendonvigui: '', tendonvinhan: ''}
       let scopeUser = ''
       if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
-        scopeUser = String(vm.employeeLoginInfomation.scope).split(",")[0]
+        scopeUser = String(vm.employeeLoginInfomation.scope).split(',')[0]
       }
       if (vm.formCodeInput === 'NEW_GROUP_CV') {
         metaData.tendonvigui = delegateName
@@ -473,13 +495,25 @@ export default {
     onUploadSingleFile () {
       let vm = this
       console.log('tphs', vm.tphs)
-      let tphsDungChung = vm.tphs.filter(function(item) {
-        return item.partType == 6
-      })[0]
+      if (vm.createFileCongVan) {
+        let tphsDungChung = vm.tphs.filter(function(item) {
+          return item.partNo == vm.createFileCongVan
+        })[0]
+      } else {
+        let tphsDungChung = vm.tphs.filter(function(item) {
+          return item.partType == 6
+        })[0]
+      }
+      
       let filter = Object.assign(vm.detailDossier, tphsDungChung)
       vm.$store.dispatch('uploadSingleFileGroupCongVan', filter).then(function (result) {
         vm.$store.dispatch('loadDossierFiles', filter.dossierId).then(result => {
           vm.dossierFilesItems = result
+          if (vm.createFileCongVan) {
+            vm.dossierFilesItems =  vm.dossierFilesItems.filter(function (item) {
+              return item.dossierPartNo == vm.createFileCongVan
+            })
+          }
         })
       })
     },
@@ -491,6 +525,11 @@ export default {
         vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
+            if (vm.createFileCongVan) {
+              vm.dossierFilesItems = vm.dossierFilesItems.filter(function (item) {
+                return item.dossierPartNo == vm.createFileCongVan
+              })
+            }
           })
         }).catch(reject => {
           
@@ -527,14 +566,81 @@ export default {
     },
     getGovAgencyList () {
       let vm = this
-      let filter = {
-        collectionCode: 'DON_VI_CONG_VAN',
-        level: '',
-        parent: ''
+      console.log('employeeLoginInfomation', vm.employeeLoginInfomation)
+      if (vm.formCodeInput === 'NEW_GROUP_CV') {
+        let filter = {
+          collectionCode: 'DON_VI_CONG_VAN',
+          level: '',
+          parent: ''
+        }
+        vm.getDictGovAgency(filter)
+      } else {
+        console.log('donvinhanCollection', vm.donvinhanCollection)
+        let collectionSearch
+        try {
+          collectionSearch = vm.donvinhanCollection
+        } catch (error) {
+        }
+        if (collectionSearch) {
+          console.log('collectionSearch', collectionSearch)
+          if (collectionSearch.hasOwnProperty('parrentCode')) {
+            let itemParent
+            if (collectionSearch.parrentCode.startsWith('#')) {
+              let scopeUser = ''
+              if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
+                scopeUser = String(vm.employeeLoginInfomation.scope).split(',')[0]
+              }
+              itemParent = collectionSearch.parrentCode === '#scope' ? scopeUser : 'govAgencyCodeDVDEN'
+            } else {
+              itemParent = collectionSearch.parrentCode
+            }
+            let filterGet = {
+              collectionCode: collectionSearch.collectionCode,
+              level: '',
+              parent: itemParent
+            }
+            vm.getDictGovAgency(filterGet)
+          }
+          if (collectionSearch.hasOwnProperty('isParrentCode')) {
+            let itemChild
+            if (collectionSearch.isParrentCode.startsWith('#')) {
+              let scopeUser = ''
+              if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
+                scopeUser = String(vm.employeeLoginInfomation.scope).split(',')[0]
+              }
+              itemChild = collectionSearch.isParrentCode === '#scope' ? scopeUser : 'govAgencyCodeDVDEN'
+            } else {
+              itemChild = collectionSearch.isParrentCode
+            }
+            let filterGet = {
+              collectionCode: collectionSearch.collectionCode,
+              level: '',
+              itemCode: itemChild
+            }
+            vm.getDetailDictitem(filterGet)
+          }
+          if (collectionSearch.hasOwnProperty('itemCode')) {
+            let itemChild
+            if (collectionSearch.itemCode.startsWith('#')) {
+              let scopeUser = ''
+              if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
+                scopeUser = String(vm.employeeLoginInfomation.scope).split(',')[0]
+              }
+              itemChild = collectionSearch.itemCode === '#scope' ? scopeUser : 'govAgencyCodeDVDEN'
+            } else {
+              itemChild = collectionSearch.itemCode
+            }
+            let filterGet = {
+              collectionCode: collectionSearch.collectionCode,
+              level: '',
+              itemCode: itemChild,
+              getCurrentItem: true
+            }
+            vm.getDetailDictitem(filterGet)
+          }
+        }
+        
       }
-      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
-        vm.govAgencySubmitList = result.data
-      })
     },
     getDocumentTypeIcon (type) {
       let vm = this
@@ -580,6 +686,39 @@ export default {
           size: 14
         }
       }
+    },
+    getDictGovAgency (filterGet) {
+      let vm = this
+      let filter = {
+        collectionCode: filterGet.hasOwnProperty('collectionCode') ? filterGet.collectionCode : 'DON_VI_CONG_VAN',
+        level: filterGet.hasOwnProperty('level') ? filterGet.level : '',
+        parent: filterGet.hasOwnProperty('parent') ? filterGet.parent : ''
+      }
+      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
+        vm.govAgencySubmitList = result.data
+        if (vm.govAgencySubmitList.length === 1 && vm.formCodeInput === 'NEW_GROUP_CV_DI') {
+          vm.donvi_gui_nhan = vm.govAgencySubmitList[0]['itemCode']
+        }
+      })
+    },
+    getDetailDictitem (filterGet) {
+      let vm = this
+      let filter = {
+        collectionCode: filterGet.hasOwnProperty('collectionCode') ? filterGet.collectionCode : 'DON_VI_CONG_VAN',
+        level: filterGet.hasOwnProperty('level') ? filterGet.level : '',
+        itemCode: filterGet.itemCode
+      }
+      vm.$store.dispatch('loadDetailDictItems', filter).then(function (result) {
+        if (filterGet.hasOwnProperty('getCurrentItem')) {
+          vm.govAgencySubmitList = [result]
+        } else {
+          let parent = result.parentItem ? result.parentItem : []
+          vm.govAgencySubmitList = Array.isArray(parent) ? parent : [parent]
+        }
+        if (vm.govAgencySubmitList.length === 1 && vm.formCodeInput === 'NEW_GROUP_CV_DI') {
+          vm.donvi_gui_nhan = vm.govAgencySubmitList[0]['itemCode']
+        }
+      })
     },
     formatDate (date) {
       if (!date) return null
