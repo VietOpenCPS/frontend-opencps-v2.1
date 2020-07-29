@@ -40,8 +40,8 @@
                   <p>Đang xử lý</p>
                 </v-flex>
                 <v-flex md6 xs12 text-center>
-                  <span style="color:#1976d2;">{{statistics.cancelledCount}}</span>
-                  <p>Rút hồ sơ</p>
+                  <span style="color:#1976d2;">{{statistics.overtimeCount}}</span>
+                  <p>Trễ hạn</p>
                 </v-flex>
               </v-layout>
             </v-flex>
@@ -941,9 +941,9 @@ export default {
           if (response.data.data) {
             vm.danhSachThongKeThang = response.data.data;
             let currentData = response.data.data[0]
-            if(!config.params.hasOwnProperty('parentAgency')){
+            // if(!config.params.hasOwnProperty('parentAgency')){
               vm.danhSachThongKeThang.shift()
-            }
+            // }
             for (let i = 0; i < vm.danhSachThongKeThang.length; i++) {
               vm.statisticalMonth[0].data.push(
                 response.data.data[i].onegateCount

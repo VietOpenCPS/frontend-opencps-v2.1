@@ -417,14 +417,18 @@ export default {
     },
     exportTracking () {
       let vm = this
+      let pathName = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
       vm.loading = true
-      let pages = Math.ceil(vm.totalThuTuc / 100)
+      let pages = Math.ceil(vm.totalThuTuc / 15)
       let count = 0
       let serviceInfoMapping = []
       for (let index = 1; index <= pages; index++) {
         let filter = {
           page: index,
-          numberPerPage: 100
+          numberPerPage: 15,
+          sort: 'maxLevel',
+          order: true,
+          level: 0
         }
         vm.$store.dispatch('getServiceLists', filter).then(function (result) {
           count += 1
@@ -434,7 +438,7 @@ export default {
             let item = {
               "name": dataInput[i]['serviceName'],
               "level": dataInput[i]['maxLevel'],
-              "url": "",
+              "url": pathName + '/thu-tuc-hanh-chinh#/thu-tuc-hanh-chinh/' + dataInput[i]['serviceInfoId'],
               "idhttt": dataInput[i]['serviceCodeDVCQG'] ? dataInput[i]['serviceCodeDVCQG'] : dataInput[i]['serviceCode'],
               "iddvc": dataInput[i]['serviceCode']
             }

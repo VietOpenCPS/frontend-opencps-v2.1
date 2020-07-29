@@ -355,7 +355,7 @@
           </v-layout>
         </div>
       </div>
-      <div v-if="!partTypes.includes(2) && originality === 3 && !partTypes.includes(7)">
+      <div v-if="!partTypes.includes(2) && originality === 3 && !partTypes.includes(6) && !partTypes.includes(7)">
         <v-card flat>
           <v-card-text flat class="py-0 px-3 pl-4">
             <div v-if="!onlyView" class="my-2">
@@ -605,6 +605,7 @@ export default {
             return item['fileMark'] !== 0
           })
         }
+        console.log('dossierTemplateItemsFilter111', filterCheckInput)
         return filterCheckInput
       }
     },
@@ -645,6 +646,7 @@ export default {
       for (let key in vm.dossierTemplateItemsFilter) {
         vm.doChange[key] = ''
       }
+      console.log('dossierTemplateItemsFilter222', vm.dossierTemplateItemsFilter)
     }
   },
   methods: {
@@ -743,6 +745,7 @@ export default {
         vm.dossierMarksItems = dossierMarks
         vm.fileTemplateItems = fileTemplates
         vm.dossierTemplateItems = dossierTemplateItems
+        console.log('dossierTemplateItems555', vm.dossierTemplateItems)
         // 
         vm.saveMark()
         // console.log('vm.dossierTemplateItems', vm.dossierTemplateItems)
@@ -783,6 +786,7 @@ export default {
         }
       }).catch(reject => {
       })
+      console.log('onlyView,checkInput', vm.onlyView, vm.checkInput, vm.progressUploadPart)
     },
     genAllAlpacaForm (dossierFiles, dossierTemplateItems) {
       var vm = this

@@ -317,7 +317,15 @@ export const store = new Vuex.Store({
               if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
                 param.params[key] = dateStr
               } else {
-                param.params[key] = currentVal
+                if (String(key).indexOf('DateExtend') > 0) {
+                  let keySearch = String(key).replace('Extend', '')
+                  let dateCurrent = new Date()
+                  dateCurrent.setDate(dateCurrent.getDate() + Number(filter['data'][key]))
+                  param.params['from' + keySearch] = new Date(dateCurrent).toLocaleDateString('vi-VN')
+                  param.params['to' + keySearch] = new Date(dateCurrent).toLocaleDateString('vi-VN')
+                } else {
+                  param.params[key] = currentVal
+                }
               }
             }
           }
