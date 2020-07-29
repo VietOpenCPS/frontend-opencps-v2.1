@@ -199,7 +199,8 @@
                     <v-icon>search</v-icon> 
                     Tra cứu hóa đơn
                   </v-btn>
-                  <v-btn v-if="originality === 3" class="ml-3" color="primary" @click="printPay()">
+                  <!-- <v-btn v-if="originality === 3" class="ml-3" color="primary" @click="printPay()"> -->
+                  <v-btn class="ml-3" color="primary" @click="printPay()">
                     <v-icon>print</v-icon> &nbsp;
                     In biên lai
                   </v-btn>

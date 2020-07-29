@@ -177,7 +177,7 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
-        <div class="absolute__btn group__thanh_phan mr-1" v-if="item.partType !== 6 || (item.partType === 6 && formCode === 'NEW_GROUP')">
+        <div class="absolute__btn group__thanh_phan mr-1" v-if="item.partType !== 6 || (item.partType === 6 && (formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'))">
           <content-placeholders class="mt-1" v-if="loading">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
@@ -303,7 +303,7 @@
           </v-layout>
         </div>
       </div>
-      <div v-if="originality === 3">
+      <!-- <div v-if="originality === 3">
         <v-card flat>
           <v-card-text flat class="py-0 px-3 pl-4">
             <div v-if="!onlyView" class="my-2">
@@ -324,7 +324,7 @@
             ></v-text-field>
           </v-card-text>
         </v-card>
-      </div>
+      </div> -->
       <v-dialog v-model="dialogAddOtherTemp" max-width="400" transition="fade-transition" persistent>
         <v-card>
           <v-form ref="form" v-model="valid" lazy-validation>
@@ -837,10 +837,10 @@ export default {
         fileFind['dossierId'] = vm.thongTinHoSo.dossierId
         fileFind['id'] = vm.id
         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
-          // if (vm.dossierIntoGroup.length > 0) {
-          //   vm.$store.commit('setFilesAdd', [resPostEform])
-          //   vm.$store.commit('setActiveAddFileGroup', true)
-          // }
+          if (vm.dossierIntoGroup.length > 0) {
+            vm.$store.commit('setFilesAdd', [resPostEform])
+            vm.$store.commit('setActiveAddFileGroup', true)
+          }
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
           }).catch(reject => {
@@ -855,10 +855,10 @@ export default {
         item['dossierId'] = vm.thongTinHoSo.dossierId
         item['id'] = vm.id
         vm.$store.dispatch('postEform', item).then(resPostEform => {
-          // if (vm.dossierIntoGroup.length > 0) {
-          //   vm.$store.commit('setFilesAdd', [resPostEform])
-          //   vm.$store.commit('setActiveAddFileGroup', true)
-          // }
+          if (vm.dossierIntoGroup.length > 0) {
+            vm.$store.commit('setFilesAdd', [resPostEform])
+            vm.$store.commit('setActiveAddFileGroup', true)
+          }
           vm.dossierTemplateItems[index].daKhai = true
           vm.dossierTemplateItems[index]['passRequired'] = true
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
@@ -914,10 +914,10 @@ export default {
       if (data.partType !== 3) {
         vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
           console.log('vm.dossierIntoGroup', vm.dossierIntoGroup)
-          // if (vm.dossierIntoGroup.length > 0) {
-          //   vm.$store.commit('setFilesAdd', result)
-          //   vm.$store.commit('setActiveAddFileGroup', true)
-          // }
+          if (vm.dossierIntoGroup.length > 0) {
+            vm.$store.commit('setFilesAdd', result)
+            vm.$store.commit('setActiveAddFileGroup', true)
+          }
           vm.dossierTemplateItems[index]['passRequired'] = true
           vm.progressUploadPart = ''
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {

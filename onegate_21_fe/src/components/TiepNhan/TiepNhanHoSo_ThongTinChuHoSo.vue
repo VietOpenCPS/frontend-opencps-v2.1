@@ -685,22 +685,22 @@ export default {
   props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode'],
   data: () => ({
     requiredOptions: {
-      applicantIdNo: true,
+      applicantIdNo: false,
       applicantName: true,
       address: true,
-      cityCode: true,
-      districtCode: true,
-      wardCode: true,
+      cityCode: false,
+      districtCode: false,
+      wardCode: false,
       contactTelNo: true,
       contactEmail: false,
       delegateIdNo: true,
       delegateName: true,
       delegateAddress: true,
-      delegateCityCode: true,
-      delegateDistrictCode: true,
-      delegateWardCode: true,
+      delegateCityCode: false,
+      delegateDistrictCode: false,
+      delegateWardCode: false,
       delegateTelNo: true,
-      delegateEmail: false
+      delegateEmail: true
     },
     valid_thongtinchuhoso: false,
     loadingVerify: false,
@@ -864,7 +864,7 @@ export default {
   created () {
     let vm = this
     if (vm.formCode === "NEW") {
-      vm.thongTinNguoiNopHoSo.sameUser = true
+      // vm.thongTinNguoiNopHoSo.sameUser = true
     }
     if (vm.hasOrganization) {
       vm.labelSwitch = {

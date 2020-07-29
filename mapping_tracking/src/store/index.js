@@ -157,17 +157,9 @@ export const store = new Vuex.Store({
             agency: filter.agency ? filter.agency : '',
             keyword: filter.keyword ? filter.keyword.replace(/[!@#$%^&*(),?":{}|<>]/g, '') : '',
             level: filter.level ? filter.level : 0,
-            domain: filter.domain ? filter.domain : ''
-          }
-          if (filter.domain) {
-            paramGet.sort = "siblingSearch"
-          }
-          try {
-            if (sortLevelConfig) {
-              paramGet.sort = 'maxLevel'
-              paramGet.order = sortLevelConfig
-            }
-          } catch (error) {
+            domain: filter.domain ? filter.domain : '',
+            sort: 'maxLevel',
+            order: true
           }
           let param = {
             headers: {

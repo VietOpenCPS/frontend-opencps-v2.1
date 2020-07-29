@@ -148,7 +148,9 @@ export const store = new Vuex.Store({
     createFileSigned: '',
     advSearchShow: false,
     visibleDoAction: true,
-    filterDateFromTo: ['fromReceiveDate','toReceiveDate','fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate']
+    filterDateFromTo: ['fromReceiveDate','toReceiveDate','fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate'],
+    dossierSelectedDoAction: [],
+    formActionGroup: ''
   },
   actions: {
     clearError ({commit}) {
@@ -557,6 +559,25 @@ export const store = new Vuex.Store({
                 commit('setCitys', serializable.data)
               }
             }
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    loadDetailDictItems ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let groupIdSet = data.collectionCode === 'VNPOST_CITY_CODE' ? 0 : state.initData.groupId
+          let param = {
+            headers: {
+              groupId: groupIdSet
+            },
+            params: {
+            }
+          }
+          axios.get(state.initData.regionApi + '/' + data.collectionCode + '/dictitems/' + data.itemCode, param).then(function (response) {
             resolve(response.data)
           }, error => {
             reject(error)
@@ -1732,12 +1753,12 @@ export const store = new Vuex.Store({
         }
         console.log('dataPutdossier', dataPutdossier)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
-          resolve(response.data)
           if (data.hasOwnProperty('typeAction') && data.typeAction === 'add') {
             store.dispatch('getActiveGetCounter', !state.activeGetCounter)
           }
-        }).catch(rejectXhr => {
-          reject(rejectXhr)
+          resolve(response.data)
+        }).catch(function (xhr) {
+          reject(xhr)
         })
       })
     },
@@ -4618,6 +4639,38 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDetailActionCongVan ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          params: {
+          }
+        }
+        axios.get('/o/rest/v2/dossiers/'+ filter.dossierId + '/steps/' + filter.stepCode + '/actions/' + filter.actionCode, param).then(function (response) {
+          resolve(response.data)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    doActionDossierIntoGroup ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('actionUser', filter.actionUser)
+        axios.post('/o/rest/v2/dossiers/' + filter.dossierId + '/actions/' + filter.actionCode + '/groupDossier', dataPost, param).then(function (response) {
+          resolve(response)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    }
     // ----End---------
   },
   mutations: {
@@ -4811,6 +4864,12 @@ export const store = new Vuex.Store({
     dossierSelected (state, payload) {
       state.dossierSelected = payload
     },
+    setDossierSelectedDoAction (state, payload) {
+      state.dossierSelectedDoAction = payload
+    },
+    setFormActionGroup (state, payload) {
+      state.formActionGroup = payload
+    },
     actionActive (state, payload) {
       state.actionActive = payload
     },
@@ -4938,6 +4997,12 @@ export const store = new Vuex.Store({
     },
     dossierSelected (state) {
       return state.dossierSelected
+    },
+    dossierSelectedDoAction (state) {
+      return state.dossierSelectedDoAction
+    },
+    formActionGroup (state) {
+      return state.formActionGroup
     },
     actionActive (state) {
       return state.actionActive

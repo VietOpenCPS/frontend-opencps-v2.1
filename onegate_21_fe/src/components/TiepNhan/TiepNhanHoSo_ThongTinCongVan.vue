@@ -14,31 +14,33 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Số công văn <span style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Số công văn <span style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-text-field
-                      v-else
+                      v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.documentNo"
                       :rules="[rules.required]"
                       required
                       ></v-text-field>
+                      <p class="pt-2" v-else>{{thongTinCongVan.documentNo}}</p>
                     </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Ngày công văn <span  style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Ngày công văn <span  style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-menu
+                        v-else-if="!loading && !congVanDaGui"
                         ref="menuDate"
                         :close-on-content-click="false"
                         v-model="menuDate"
@@ -63,37 +65,38 @@
                         <v-date-picker ref="picker" locale="vi"
                         :first-day-of-week="1" v-model="documentDate" no-title @input="menuDate = false"></v-date-picker>
                       </v-menu>
+                      <p class="pt-2" v-else>{{dateFormated}}</p>
                     </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Số lượng hồ sơ đề nghị xét<span style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Số lượng hồ sơ đề nghị xét<span style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-text-field
-                      v-else
-                      v-model="thongTinCongVan.sampleCount"
-                      :rules="[rules.required]"
-                      required
+                      v-else-if="!loading && !congVanDaGui"
+                      v-model="lengthDossier"
                       ></v-text-field>
+                      <p class="pt-2" v-else>{{lengthDossier}}</p>
                     </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Ngày hẹn trả lời<span  style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Ngày hẹn trả lời<span  style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-menu
+                        v-else-if="!loading && !congVanDaGui"
                         ref="menuDueDate"
                         :close-on-content-click="false"
                         v-model="menuDueDate"
@@ -118,6 +121,7 @@
                         <v-date-picker :min="getMindate()" ref="picker" locale="vi"
                         :first-day-of-week="1" v-model="dueDate" no-title @input="menuDueDate = false"></v-date-picker>
                       </v-menu>
+                      <p class="pt-2" v-else>{{duedateFormated}}</p>
                     </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2" v-if="formCodeInput !== 'NEW_GROUP_CV'">
@@ -127,7 +131,7 @@
                       <v-subheader v-else class="pl-0">
                         <span v-if="formCodeInput === 'NEW_GROUP_CV'">Đơn vị gửi công văn </span>
                         <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'">Đơn vị nhận công văn </span> 
-                        <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'  && lengthDossier !== 0  && typeof lengthDossier !== 'undefined'" style="color:red">&nbsp;*</span>: 
+                        <span v-if="formCodeInput === 'NEW_GROUP_CV_DI' && lengthDossier !== 0  && typeof lengthDossier !== 'undefined' && !congVanDaGui" style="color:red">&nbsp;*</span>: 
                       </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm10 class="mb-2" v-if="formCodeInput !== 'NEW_GROUP_CV'">
@@ -135,7 +139,7 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-autocomplete
-                      v-else
+                      v-else-if="!loading && !congVanDaGui"
                       :items="govAgencySubmitList"
                       item-text="itemName"
                       item-value="itemCode"
@@ -144,6 +148,7 @@
                       :required="formCodeInput === 'NEW_GROUP_CV_DI' && lengthDossier !== 0 && typeof lengthDossier !== 'undefined'"
                       :disabled="formCodeInput === 'NEW_GROUP_CV_DI' && (lengthDossier === 0 ||typeof lengthDossier === 'undefined')"
                       ></v-autocomplete>
+                      <p class="pt-2" v-else>{{formCodeInput === 'NEW_GROUP_CV_DI' ? metaDataDossier.tendonvinhan : metaDataDossier.tendonvigui}}</p>
                     </v-flex>
 
                     <!--  -->
@@ -151,21 +156,58 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Nội dung tóm tắt <span style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Nội dung tóm tắt <span style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm10 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-textarea
-                      v-else
+                      v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.briefNote"
                       rows="3"
                       :rules="[rules.required]"
                       required
                       ></v-textarea>
+                      <p class="pt-2" v-else>{{thongTinCongVan.briefNote}}</p>
                     </v-flex>
-                    
+                    <!--  -->
+                    <v-flex xs12 sm2 class="mb-2">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-subheader v-else class="pl-0">Chức vụ người ký<span  style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm4 class="mb-2">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-text-field
+                      v-else-if="!loading && !congVanDaGui"
+                      v-model="signerCongVan"
+                      :rules="[rules.required]"
+                      required
+                      ></v-text-field>
+                      <p class="pt-2" v-else>{{signerCongVan}}</p>
+                    </v-flex>
+                    <v-flex xs12 sm2 class="mb-2">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-subheader v-else class="pl-0">Người ký<span  style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm4 class="mb-2">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-text-field
+                      v-else-if="!loading && !congVanDaGui"
+                      v-model="jobposSignerCongVan"
+                      :rules="[rules.required]"
+                      required
+                      ></v-text-field>
+                      <p class="pt-2" v-else>{{jobposSignerCongVan}}</p>
+                    </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
@@ -178,10 +220,11 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-text-field
-                      v-else
+                      v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.contactTelNo"
                       :rules="thongTinCongVan.contactTelNo ? [rules.telNo] : ''"
                       ></v-text-field>
+                      <p class="pt-2" v-else>{{thongTinCongVan.contactTelNo}}</p>
                     </v-flex>
                     <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
@@ -194,10 +237,11 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-text-field
-                      v-else
+                      v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.contactEmail"
                       :rules="thongTinCongVan.contactEmail ? [rules.email] : ''"
                       ></v-text-field>
+                      <p class="pt-2" v-else>{{thongTinCongVan.contactEmail}}</p>
                     </v-flex>
 
                     <v-flex xs12 class="mt-2">
@@ -219,7 +263,7 @@
                       </div>
 
                       <input type="file" id="documentFile" @input="onUploadSingleFile($event)" style="display:none">
-                      <v-btn small color="primary" class="mx-0 mt-3" dark @click.native="uploadFile">
+                      <v-btn small color="primary" class="mx-0 mt-3" dark @click.native="uploadFile" v-if="!congVanDaGui">
                         <v-icon>fas fa fa-upload</v-icon> &nbsp; &nbsp;
                         Chọn tài liệu tải lên
                       </v-btn>
@@ -278,7 +322,7 @@ export default {
     'suggestions': Suggestions,
     'tiny-pagination': TinyPagination
   },
-  props: ['formCodeInput', 'detailDossier', 'tphs', 'lengthDossier'],
+  props: ['formCodeInput', 'detailDossier', 'donvinhanCollection', 'tphs', 'lengthDossier', 'createFileCongVan'],
   data: () => ({
     loading: false,
     dialogPDFLoading: false,
@@ -286,7 +330,8 @@ export default {
     valid_thongtincongvan: true,
     thongTinCongVan: '',
     donvi_gui_nhan: '',
-    dossierFilesItems: '',
+    dossierFilesItems: [],
+    dossierFilesItemsAttach: [],
     menuDate: false,
     menuDueDate: false,
     documentDate: null,
@@ -294,11 +339,15 @@ export default {
     dueDate: null,
     duedateFormated: null,
     agencySubmit: '',
-    govAgencySubmitList: '',
+    govAgencySubmitList: [],
     briefNote: '',
     sampleCount: '',
     contactTelNo: '',
     contactEmail: '',
+    congVanDaGui: '',
+    metaDataDossier: '',
+    jobposSignerCongVan: '',
+    signerCongVan: '',
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -343,6 +392,24 @@ export default {
     },
     dueDate (val) {
       this.duedateFormated = this.formatDate(this.dueDate)
+    },
+    employeeLoginInfomation () {
+      let vm = this
+      vm.getGovAgencyList()
+    },
+    donvinhanCollection () {
+      let vm = this
+      if (vm.employeeLoginInfomation) {
+        vm.getGovAgencyList()
+      }
+    },
+    createFileCongVan (val) {
+      let vm = this
+      if (val && vm.dossierFilesItems) {
+        vm.dossierFilesItems = vm.dossierFilesItems.filter(function (item) {
+          return item.dossierPartNo == val
+        })
+      }
     }
     // thongTinCongVan: {
     //   handler: function (value) {
@@ -359,7 +426,17 @@ export default {
       vm.thongTinCongVan = data
       try {
         let metadata = JSON.parse(vm.thongTinCongVan.metaData)
-        vm.donvi_gui_nhan = vm.formCodeInput === 'NEW_GROUP_CV_DI' ? metadata.donvinhan : metadata.donvigui
+        vm.metaDataDossier = metadata
+        vm.congVanDaGui = metadata.hasOwnProperty('congvandagui') && metadata.congvandagui ? true : false
+        if (vm.formCodeInput === 'NEW_GROUP_CV_DI') {
+          vm.getGovAgencyList()
+          vm.donvi_gui_nhan = metadata.hasOwnProperty('congvandagui') && metadata.congvandagui ? metadata.donvinhan : metadata.donvinhandraf
+          vm.jobposSignerCongVan = metadata.hasOwnProperty('jobposSignerCongVan') ? metadata.jobposSignerCongVan : ''
+          vm.signerCongVan = metadata.hasOwnProperty('signerCongVan') ? metadata.signerCongVan : ''
+        } else {
+          vm.donvi_gui_nhan = metadata.donvigui
+        }
+        
       } catch (error) {
       }
       
@@ -367,6 +444,11 @@ export default {
       vm.dueDate = vm.thongTinCongVan.hasOwnProperty('dueDate') ? vm.parseDate(vm.thongTinCongVan.dueDate) : ''
       vm.$store.dispatch('loadDossierFiles', vm.thongTinCongVan.dossierId).then(result => {
         vm.dossierFilesItems = result
+        if (vm.createFileCongVan) {
+          vm.dossierFilesItems = vm.dossierFilesItems.filter(function (item) {
+            return item.dossierPartNo == vm.createFileCongVan
+          })
+        }
       })
       vm.$refs.formThongTinCongVan.resetValidation()
       console.log('thongtincongvanInput', vm.thongTinCongVan)
@@ -387,19 +469,22 @@ export default {
       let metaData = metaDataDossier ? metaDataDossier : {donvigui: '', donvinhan: '', tendonvigui: '', tendonvinhan: ''}
       let scopeUser = ''
       if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
-        scopeUser = String(vm.employeeLoginInfomation.scope).split(",")[0]
+        scopeUser = String(vm.employeeLoginInfomation.scope).split(',')[0]
       }
       if (vm.formCodeInput === 'NEW_GROUP_CV') {
-        // vm.thongTinCongVan.delegateName = delegateName ? delegateName : ''
         metaData.tendonvigui = delegateName
         metaData.donvigui = vm.donvi_gui_nhan
         metaData.donvinhan = scopeUser ? scopeUser : vm.detailDossier.govAgencyCode
       } else {
         metaData.donvigui = scopeUser ? scopeUser : vm.detailDossier.govAgencyCode
+        metaData.tendonvigui = vm.detailDossier.govAgencyName
         metaData.donvinhan = vm.donvi_gui_nhan
         metaData.tendonvinhan = delegateName
+        metaData.jobposSignerCongVan = vm.jobposSignerCongVan
+        metaData.signerCongVan = vm.signerCongVan
       }
       vm.thongTinCongVan.metaData = metaData
+      vm.thongTinCongVan.sampleCount = vm.lengthDossier
       vm.thongTinCongVan.validation = vm.$refs.formThongTinCongVan.validate()
       console.log('thongtincongvanOutput', vm.thongTinCongVan)
       return vm.thongTinCongVan
@@ -412,13 +497,26 @@ export default {
     onUploadSingleFile () {
       let vm = this
       console.log('tphs', vm.tphs)
-      let tphsDungChung = vm.tphs.filter(function(item) {
-        return item.partType == 6
-      })[0]
+      let tphsDungChung
+      if (vm.createFileCongVan) {
+        tphsDungChung = vm.tphs.filter(function(item) {
+          return item.partNo == vm.createFileCongVan
+        })[0]
+      } else {
+        tphsDungChung = vm.tphs.filter(function(item) {
+          return item.partType == 6
+        })[0]
+      }
+      
       let filter = Object.assign(vm.detailDossier, tphsDungChung)
       vm.$store.dispatch('uploadSingleFileGroupCongVan', filter).then(function (result) {
         vm.$store.dispatch('loadDossierFiles', filter.dossierId).then(result => {
           vm.dossierFilesItems = result
+          if (vm.createFileCongVan) {
+            vm.dossierFilesItems =  vm.dossierFilesItems.filter(function (item) {
+              return item.dossierPartNo == vm.createFileCongVan
+            })
+          }
         })
       })
     },
@@ -430,6 +528,11 @@ export default {
         vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
+            if (vm.createFileCongVan) {
+              vm.dossierFilesItems = vm.dossierFilesItems.filter(function (item) {
+                return item.dossierPartNo == vm.createFileCongVan
+              })
+            }
           })
         }).catch(reject => {
           
@@ -466,14 +569,81 @@ export default {
     },
     getGovAgencyList () {
       let vm = this
-      let filter = {
-        collectionCode: 'DON_VI_CONG_VAN',
-        level: '',
-        parent: ''
+      console.log('employeeLoginInfomation', vm.employeeLoginInfomation)
+      if (vm.formCodeInput === 'NEW_GROUP_CV') {
+        let filter = {
+          collectionCode: 'DON_VI_CONG_VAN',
+          level: '',
+          parent: ''
+        }
+        vm.getDictGovAgency(filter)
+      } else {
+        console.log('donvinhanCollection', vm.donvinhanCollection)
+        let collectionSearch
+        try {
+          collectionSearch = vm.donvinhanCollection
+        } catch (error) {
+        }
+        if (collectionSearch) {
+          console.log('collectionSearch', collectionSearch)
+          if (collectionSearch.hasOwnProperty('parrentCode')) {
+            let itemParent
+            if (collectionSearch.parrentCode.startsWith('#')) {
+              let scopeUser = ''
+              if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
+                scopeUser = String(vm.employeeLoginInfomation.scope).split(',')[0]
+              }
+              itemParent = collectionSearch.parrentCode === '#scope' ? scopeUser : 'govAgencyCodeDVDEN'
+            } else {
+              itemParent = collectionSearch.parrentCode
+            }
+            let filterGet = {
+              collectionCode: collectionSearch.collectionCode,
+              level: '',
+              parent: itemParent
+            }
+            vm.getDictGovAgency(filterGet)
+          }
+          if (collectionSearch.hasOwnProperty('isParrentCode')) {
+            let itemChild
+            if (collectionSearch.isParrentCode.startsWith('#')) {
+              let scopeUser = ''
+              if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
+                scopeUser = String(vm.employeeLoginInfomation.scope).split(',')[0]
+              }
+              itemChild = collectionSearch.isParrentCode === '#scope' ? scopeUser : 'govAgencyCodeDVDEN'
+            } else {
+              itemChild = collectionSearch.isParrentCode
+            }
+            let filterGet = {
+              collectionCode: collectionSearch.collectionCode,
+              level: '',
+              itemCode: itemChild
+            }
+            vm.getDetailDictitem(filterGet)
+          }
+          if (collectionSearch.hasOwnProperty('itemCode')) {
+            let itemChild
+            if (collectionSearch.itemCode.startsWith('#')) {
+              let scopeUser = ''
+              if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
+                scopeUser = String(vm.employeeLoginInfomation.scope).split(',')[0]
+              }
+              itemChild = collectionSearch.itemCode === '#scope' ? scopeUser : 'govAgencyCodeDVDEN'
+            } else {
+              itemChild = collectionSearch.itemCode
+            }
+            let filterGet = {
+              collectionCode: collectionSearch.collectionCode,
+              level: '',
+              itemCode: itemChild,
+              getCurrentItem: true
+            }
+            vm.getDetailDictitem(filterGet)
+          }
+        }
+        
       }
-      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
-        vm.govAgencySubmitList = result.data
-      })
     },
     getDocumentTypeIcon (type) {
       let vm = this
@@ -519,6 +689,39 @@ export default {
           size: 14
         }
       }
+    },
+    getDictGovAgency (filterGet) {
+      let vm = this
+      let filter = {
+        collectionCode: filterGet.hasOwnProperty('collectionCode') ? filterGet.collectionCode : 'DON_VI_CONG_VAN',
+        level: filterGet.hasOwnProperty('level') ? filterGet.level : '',
+        parent: filterGet.hasOwnProperty('parent') ? filterGet.parent : ''
+      }
+      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
+        vm.govAgencySubmitList = result.data
+        if (vm.govAgencySubmitList.length === 1 && vm.formCodeInput === 'NEW_GROUP_CV_DI') {
+          vm.donvi_gui_nhan = vm.govAgencySubmitList[0]['itemCode']
+        }
+      })
+    },
+    getDetailDictitem (filterGet) {
+      let vm = this
+      let filter = {
+        collectionCode: filterGet.hasOwnProperty('collectionCode') ? filterGet.collectionCode : 'DON_VI_CONG_VAN',
+        level: filterGet.hasOwnProperty('level') ? filterGet.level : '',
+        itemCode: filterGet.itemCode
+      }
+      vm.$store.dispatch('loadDetailDictItems', filter).then(function (result) {
+        if (filterGet.hasOwnProperty('getCurrentItem')) {
+          vm.govAgencySubmitList = [result]
+        } else {
+          let parent = result.parentItem ? result.parentItem : []
+          vm.govAgencySubmitList = Array.isArray(parent) ? parent : [parent]
+        }
+        if (vm.govAgencySubmitList.length === 1 && vm.formCodeInput === 'NEW_GROUP_CV_DI') {
+          vm.donvi_gui_nhan = vm.govAgencySubmitList[0]['itemCode']
+        }
+      })
     },
     formatDate (date) {
       if (!date) return null
