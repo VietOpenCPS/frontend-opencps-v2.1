@@ -700,7 +700,7 @@ export default {
       delegateDistrictCode: false,
       delegateWardCode: false,
       delegateTelNo: true,
-      delegateEmail: false
+      delegateEmail: true
     },
     valid_thongtinchuhoso: false,
     loadingVerify: false,

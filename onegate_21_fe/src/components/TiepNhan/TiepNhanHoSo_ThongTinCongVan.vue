@@ -14,7 +14,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Số công văn <span style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Số công văn <span style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
@@ -33,7 +33,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Ngày công văn <span  style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Ngày công văn <span  style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
@@ -72,7 +72,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Số lượng hồ sơ đề nghị xét<span style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Số lượng hồ sơ đề nghị xét<span style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
@@ -89,7 +89,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Ngày hẹn trả lời<span  style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Ngày hẹn trả lời<span  style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
@@ -131,7 +131,7 @@
                       <v-subheader v-else class="pl-0">
                         <span v-if="formCodeInput === 'NEW_GROUP_CV'">Đơn vị gửi công văn </span>
                         <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'">Đơn vị nhận công văn </span> 
-                        <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'  && lengthDossier !== 0  && typeof lengthDossier !== 'undefined'" style="color:red">&nbsp;*</span>: 
+                        <span v-if="formCodeInput === 'NEW_GROUP_CV_DI' && lengthDossier !== 0  && typeof lengthDossier !== 'undefined' && !congVanDaGui" style="color:red">&nbsp;*</span>: 
                       </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm10 class="mb-2" v-if="formCodeInput !== 'NEW_GROUP_CV'">
@@ -156,7 +156,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Nội dung tóm tắt <span style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Nội dung tóm tắt <span style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm10 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
@@ -172,13 +172,13 @@
                       <p class="pt-2" v-else>{{thongTinCongVan.briefNote}}</p>
                     </v-flex>
                     <!--  -->
-                    <v-flex xs12 sm2 class="mb-2" v-if="formCodeInput === 'NEW_GROUP_CV_DI'">
+                    <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Chức vụ người ký<span  style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Chức vụ người ký<span  style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4 class="mb-2" v-if="formCodeInput === 'NEW_GROUP_CV_DI'">
+                    <v-flex xs12 sm4 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
@@ -190,13 +190,13 @@
                       ></v-text-field>
                       <p class="pt-2" v-else>{{signerCongVan}}</p>
                     </v-flex>
-                    <v-flex xs12 sm2 class="mb-2" v-if="formCodeInput === 'NEW_GROUP_CV_DI'">
+                    <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Người ký<span  style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Người ký<span  style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4 class="mb-2" v-if="formCodeInput === 'NEW_GROUP_CV_DI'">
+                    <v-flex xs12 sm4 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
@@ -263,7 +263,7 @@
                       </div>
 
                       <input type="file" id="documentFile" @input="onUploadSingleFile($event)" style="display:none">
-                      <v-btn small color="primary" class="mx-0 mt-3" dark @click.native="uploadFile">
+                      <v-btn small color="primary" class="mx-0 mt-3" dark @click.native="uploadFile" v-if="!congVanDaGui">
                         <v-icon>fas fa fa-upload</v-icon> &nbsp; &nbsp;
                         Chọn tài liệu tải lên
                       </v-btn>
@@ -330,7 +330,8 @@ export default {
     valid_thongtincongvan: true,
     thongTinCongVan: '',
     donvi_gui_nhan: '',
-    dossierFilesItems: '',
+    dossierFilesItems: [],
+    dossierFilesItemsAttach: [],
     menuDate: false,
     menuDueDate: false,
     documentDate: null,

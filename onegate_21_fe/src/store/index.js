@@ -1753,12 +1753,12 @@ export const store = new Vuex.Store({
         }
         console.log('dataPutdossier', dataPutdossier)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
-          resolve(response.data)
           if (data.hasOwnProperty('typeAction') && data.typeAction === 'add') {
             store.dispatch('getActiveGetCounter', !state.activeGetCounter)
           }
-        }).catch(rejectXhr => {
-          reject(rejectXhr)
+          resolve(response.data)
+        }).catch(function (xhr) {
+          reject(xhr)
         })
       })
     },

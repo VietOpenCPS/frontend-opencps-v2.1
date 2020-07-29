@@ -185,10 +185,10 @@
                         <v-btn flat icon color="indigo" class="mr-2 my-0" @click="viewDetail(props.item)" title="Xem chi tiết">
                           <v-icon>fas fa fa-file-text</v-icon>
                         </v-btn>
-                        <v-btn flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
+                        <v-btn v-if="!metaDataGroupDossier.hasOwnProperty('congvandagui')" flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
                           <v-icon size="22">create</v-icon>
                         </v-btn>
-                        <v-btn v-if="formCode !== 'NEW_GROUP_CV_DI' || (formCode === 'NEW_GROUP_CV_DI' && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
+                        <v-btn v-if="!metaDataGroupDossier.hasOwnProperty('congvandagui')" flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
                           <v-icon size="22">delete</v-icon>
                         </v-btn>
                       </td>
@@ -217,7 +217,7 @@
               </div>
               <div v-else class="pl-5 py-2">Chưa có hồ sơ nào</div>
           
-              <v-flex xs12 class="text-right mb-3 mr-2" v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'">
+              <v-flex xs12 class="text-right mb-3 mr-2" v-if="(formCode === 'NEW_GROUP_CV' && !metaDataGroupDossier.hasOwnProperty('congvandagui')) || formCode === 'NEW_GROUP_CV_DI'">
                 <v-btn v-if="addFormNewInGroup === 'Thêm mới hồ sơ'" small color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2">
                   <v-icon size="20">add</v-icon>  &nbsp;
                   <span>Thêm mới hồ sơ</span>
@@ -316,7 +316,7 @@
       <v-tabs icons-and-text centered class="mb-0 mt-4" v-if="activeAddDossierIntoGroup || activeAddGroup">
         <!-- <v-tabs-slider color="primary"></v-tabs-slider> -->
         <!-- Cập nhật thông tin nhóm -->
-        <v-tab href="#tab-1" @click="putGroupDossier()" v-if="activeAddGroup && formCode === 'NEW_GROUP_CV'" class="px-0 py-0"> 
+        <v-tab href="#tab-1" @click="putGroupDossier()" v-if="activeAddGroup && formCode === 'NEW_GROUP_CV' && !metaDataGroupDossier.hasOwnProperty('congvandagui')" class="px-0 py-0"> 
           <v-btn flat class="" 
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -755,6 +755,7 @@
 
 import toastr from 'toastr'
 import $ from 'jquery'
+import axios from 'axios'
 import ThongTinChuHoSoCongVan from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSoCongVan.vue'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhomNew.vue'
@@ -945,7 +946,8 @@ export default {
     createFileCongVan: '',
     postStepCodeCongVan: '',
     donvinhanCollection: '',
-    dialogPDF: false
+    dialogPDF: false,
+    congvanguiden: false
   }),
   computed: {
     loading () {
@@ -1262,6 +1264,8 @@ export default {
     },
     putGroupDossier (draf) {
       let vm = this
+      let currentParams = vm.$router.history.current.params
+      let currentQuery = vm.$router.history.current.query
       if (vm.formCode === 'NEW_GROUP') {
         let thongtinnguoinophoso = this.$refs.thongtinnguoinophoso ? this.$refs.thongtinnguoinophoso.thongTinNguoiNopHoSo : {}
         let validThongtinnguoinophoso = vm.$refs.thongtinnguoinophoso.showValid()
