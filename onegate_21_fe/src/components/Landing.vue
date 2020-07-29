@@ -36,7 +36,7 @@
     <!--  -->
     <div class="menu_header_list py-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <v-layout wrap v-if="originality !== 1 && trangThaiHoSoList">
-        <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+        <v-flex v-if="!trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan')" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
           <v-autocomplete
             :items="listLinhVuc"
             v-model="linhVucSelected"
@@ -46,6 +46,20 @@
             return-object
             :hide-selected="true"
             @change="changeDomain"
+            clearable
+            box
+          ></v-autocomplete>
+        </v-flex>
+        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan')" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+          <v-autocomplete
+            :items="listCongVan"
+            v-model="congvanSelected"
+            label="Chọn công văn"
+            item-text="displayName"
+            item-value="documentNo"
+            return-object
+            :hide-selected="true"
+            @change="changeCongVan"
             clearable
             box
           ></v-autocomplete>
@@ -951,6 +965,8 @@ export default {
     thuTucHanhChinhSelected: null,
     thuTucHanhChinhSelectedGuide: null,
     docTypePrint: '',
+    listCongVan: [],
+    congvanSelected: null,
     listLinhVuc: [],
     linhVucSelected: null,
     listDichVuGuide: [],
@@ -1132,6 +1148,9 @@ export default {
             // 
             vm.processListTTHC(currentQuery)
             vm.processListDomain(currentQuery)
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
+              vm.processListCongVan(currentQuery)
+            }
             // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
             if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('headers')) {
               vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
@@ -1270,6 +1289,9 @@ export default {
               vm.domainCode = vm.linhVucSelected['domainCode']
             }
           }
+        }
+        if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan') && (vm.listCongVan === null || vm.listCongVan === undefined || (vm.listCongVan !== null && vm.listCongVan !== undefined && vm.listCongVan.length === 0))) {
+          vm.processListCongVan(currentQuery)
         }
         // if (vm.listThuTucHanhChinh === null || vm.listThuTucHanhChinh === undefined || (vm.listThuTucHanhChinh !== null && vm.listThuTucHanhChinh !== undefined && vm.listThuTucHanhChinh.length === 0)) {
           console.log('watchRouter', currentQuery)
@@ -1532,6 +1554,60 @@ export default {
         // vm.doLoadingDataHoSo()
       }).catch(function (){})
     },
+    processListCongVan (currentQuery) {
+      let vm = this
+      console.log('currentQuery9999999', currentQuery)
+      let getAllUrlParams = function(arr) {
+        let obj = {}
+        for (var i = 0; i < arr.length; i++) {
+          let a = arr[i].split('=')
+          let paramName = a[0]
+          let paramValue = typeof (a[1]) === 'undefined' ? true : a[1]
+          paramName = paramName.toLowerCase()
+          if (typeof paramValue === 'string') paramValue = paramValue.toLowerCase()
+          if (paramName.match(/\[(\d+)?\]$/)) {
+            var key = paramName.replace(/\[(\d+)?\]/, '')
+            if (!obj[key]) obj[key] = []
+            if (paramName.match(/\[\d+\]$/)) {
+              var index = /\[(\d+)\]/.exec(paramName)[1]
+              obj[key][index] = paramValue
+            } else {
+              obj[key].push(paramValue)
+            }
+          } else {
+            if (!obj[paramName]) {
+              obj[paramName] = paramValue
+            } else if (obj[paramName] && typeof obj[paramName] === 'string'){
+              obj[paramName] = [obj[paramName]]
+              obj[paramName].push(paramValue)
+            } else {
+              obj[paramName].push(paramValue)
+            }
+          }
+        }
+        return obj
+      }
+      let filter = {
+        paramSearch: currentQuery.hasOwnProperty('q') ? getAllUrlParams(currentQuery.q.split('?')[1].split('&')) : {}
+      }
+      vm.$store.dispatch('getListCongVan', filter).then(function (result) {
+        if (result.length > 0) {
+          vm.listCongVan = result.map(cv => {
+            cv['displayName'] = cv['documentNo'] + ' - ' + cv['govAgencyName']
+            return cv
+          })
+        }
+        if (currentQuery.hasOwnProperty('documentNo') && String(currentQuery.documentNo) !== '') {
+          for (let key in vm.listCongVan) {
+            if (String(vm.listCongVan[key]['documentNo']) === String(currentQuery.documentNo)) {
+              vm.congvanSelected = vm.listCongVan[key]
+            }
+          }
+        } else {
+          vm.congvanSelected = null
+        }
+      }).catch(function (){})
+    },
     checkPemissionSpecialAction (form, currentUser, thongtinchitiet) {
       var vm = this
       var checkValue = true
@@ -1703,6 +1779,12 @@ export default {
         }
         if (vm.groupServiceFilterMenuConfig) {
           filter.agency = ''
+        }
+        if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
+          let group = {
+            groupDossierId: currentQuery.hasOwnProperty('groupDossierId') ? currentQuery.groupDossierId : (vm.congvanSelected ? vm.congvanSelected.dossierId : '')
+          }
+          filter = Object.assign(filter, group)
         }
         // console.log('filter doLoadingData', filter)
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
@@ -1881,6 +1963,35 @@ export default {
         }
       })
     },
+    changeCongVan (item) {
+      let vm = this
+      console.log('congvanSelected', item)
+      vm.selectMultiplePage = []
+      vm.congvanSelected = item
+      let groupIdQuery = vm.congvanSelected ? vm.congvanSelected.dossierId : ''
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      newQuery['groupDossierId'] = ''
+      for (let key in newQuery) {
+        if (key === 'page') {
+          queryString += key + '=1&'
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && key !== 'step') {
+          queryString += key + '=' + newQuery[key] + '&'
+        }
+      }
+      if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
+        queryString += 'step=' + newQuery['step'] + '&'
+      }
+      queryString += 'groupDossierId=' + groupIdQuery
+      // console.log('change Domain queryString', queryString)
+      vm.$router.push({
+        path: current.path + queryString,
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
+    },
     changeDossierNoKey () {
       var vm = this
       vm.selectMultiplePage = []
@@ -1923,153 +2034,161 @@ export default {
       //
       vm.itemAction = item
       vm.indexAction = index
-      if (String(item.form) === 'NEW' || String(item.form) === 'NEW_GROUP' || String(item.form) === 'NEW_GROUP_CV' || String(item.form) === 'NEW_GROUP_CV_DI') {
-        let isOpenDialog = true
-        if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
-          isOpenDialog = false
-        }
-        if (isOpenDialog) {
-          vm.dialogAction = true
-        } else {
-          vm.$store.commit('setFormActionGroup', item)
-          vm.doCreateDossier()
-        }
-      } else if (String(item.form) === 'UPDATE') {
-        if(dossierItem.serviceCode === 'BNG-270817' || dossierItem.serviceCode === 'BNG-270821' || dossierItem.serviceCode === 'BNG-270820' || dossierItem.serviceCode === 'BNG-270816' || dossierItem.serviceCode === 'BNG-270819' || dossierItem.serviceCode === 'BNG-270815'){
+      if (item.hasOwnProperty('requiredCVDen') && (!vm.congvanSelected || !vm.thuTucHanhChinhSelected)) {
+        alert('Vui lòng chọn công văn và thủ tục để thực hiện')
+      } else {
+        if (String(item.form) === 'NEW' || String(item.form) === 'NEW_GROUP' || String(item.form) === 'NEW_GROUP_CV' || String(item.form) === 'NEW_GROUP_CV_DI') {
+          let isOpenDialog = true
+          if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
+            isOpenDialog = false
+          }
+          if (isOpenDialog) {
+            vm.dialogAction = true
+          } else {
+            if (item.hasOwnProperty('requiredCVDen')) {
+              item = Object.assign(item, {requiredCVDenGovCode: vm.congvanSelected.govAgencyCode, requiredCVDenGroupId: vm.congvanSelected.dossierId})
+            }
+            vm.$store.commit('setFormActionGroup', item)
+            vm.doCreateDossier()
+          }
+        } else if (String(item.form) === 'UPDATE') {
+          if(dossierItem.serviceCode === 'BNG-270817' || dossierItem.serviceCode === 'BNG-270821' || dossierItem.serviceCode === 'BNG-270820' || dossierItem.serviceCode === 'BNG-270816' || dossierItem.serviceCode === 'BNG-270819' || dossierItem.serviceCode === 'BNG-270815'){
+            vm.$router.history.current.query['template_no'] = dossierItem.dossierTemplateNo
+            vm.$router.history.current.query['serviceCode'] = dossierItem.serviceCode
+          }
+          // 
           vm.$router.history.current.query['template_no'] = dossierItem.dossierTemplateNo
           vm.$router.history.current.query['serviceCode'] = dossierItem.serviceCode
-        }
-        // 
-        vm.$router.history.current.query['template_no'] = dossierItem.dossierTemplateNo
-        vm.$router.history.current.query['serviceCode'] = dossierItem.serviceCode
-        // 
+          // 
+          vm.$router.push({
+              path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
+              query: vm.$router.history.current.query
+            })
+        } else if (String(item.form) === 'ADD') {
         vm.$router.push({
-            path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
+            path: '/danh-sach-ho-so/' + vm.index + '/bo-sung-ho-so/' + dossierItem.dossierId,
             query: vm.$router.history.current.query
           })
-      } else if (String(item.form) === 'ADD') {
-       vm.$router.push({
-          path: '/danh-sach-ho-so/' + vm.index + '/bo-sung-ho-so/' + dossierItem.dossierId,
-          query: vm.$router.history.current.query
-        })
-      } else if (String(item.form) === 'IMPORT') {
-        if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined) {
-          vm.doImportDossier()
-        } else {
-          alert('Chọn thủ tục để thực hiện')
+        } else if (String(item.form) === 'IMPORT') {
+          if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined) {
+            vm.doImportDossier()
+          } else {
+            alert('Chọn thủ tục để thực hiện')
+          }
+        } else if (String(item.form) === 'COPY') {
+          vm.doCopy(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'CANCEL') {
+          vm.doCancel(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'PRINT_01') {
+          // Xem trước phiếu của một hồ sơ
+          vm.doPrint01(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'PRINT_02') {
+          // Xem trước phiếu gộp của nhiều hồ sơ
+          vm.doPrint02(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'PRINT_03') {
+          // In văn bản mới nhất đã phê duyệt
+          vm.doPrint03(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'GUIDING') {
+          vm.thuTucHanhChinhSelectedGuide = ''
+          vm.dichVuSelectedGuide = ''
+          vm.tphsGuide = []
+          if (vm.thuTucHanhChinhSelected) {
+            vm.thuTucHanhChinhSelectedGuide = vm.thuTucHanhChinhSelected
+            vm.listDichVuGuide = vm.thuTucHanhChinhSelectedGuide.hasOwnProperty('options') ? vm.thuTucHanhChinhSelectedGuide['options'] : ''
+            vm.dichVuSelectedGuide = vm.dichVuSelected ? vm.dichVuSelected : ''
+            vm.templateNoGuide = vm.dichVuSelectedGuide ? vm.dichVuSelectedGuide.templateNo : ''
+          }
+          vm.docTypePrint = item.document
+          vm.dialog_printGuide = true
+          vm.$refs.formGuide.resetValidation()
+        } else if (String(item.form) === 'DENIED') {
+          vm.docTypePrint = item.document
+          vm.thuTucHanhChinhSelectedGuide = ''
+          vm.dichVuSelectedGuide = ''
+          if (vm.thuTucHanhChinhSelected) {
+            vm.thuTucHanhChinhSelectedGuide = vm.thuTucHanhChinhSelected
+            vm.listDichVuGuide = vm.thuTucHanhChinhSelectedGuide.hasOwnProperty('options') ? vm.thuTucHanhChinhSelectedGuide['options'] : ''
+            vm.dichVuSelectedGuide = vm.dichVuSelected ? vm.dichVuSelected : ''
+            vm.templateNoGuide = vm.dichVuSelectedGuide ? vm.dichVuSelectedGuide.templateNo : ''
+          }
+          vm.dialog_denied = true
+          vm.$refs.formDenied.resetValidation()
+        } else if (String(item.form) === 'PREVIEW') {
+          vm.doPreview(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'ACTIONS') {
+          vm.doActions(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'DELETE') {
+          vm.doDeleteDossier(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'ROLLBACK_01') {
+          let result = {
+            actionCode: 9000
+          }
+          vm.processAction(dossierItem, item, result, index, true)
+        } else if (String(item.form) === 'ROLLBACK_02') {
+          let result = {
+            actionCode: 9000
+          }
+          vm.processAction(dossierItem, item, result, index, true)
+        } else if (String(item.form) === 'OVERDUE') {
+          let result = {
+            actionCode: 8500,
+            dossierId: dossierItem.dossierId,
+            overdue: dossierItem['extendDate']
+          }
+          vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8500)
+        } else if (String(item.form) === 'PREOVERDUE') {
+          let result = {
+            actionCode: 8501,
+            dossierId: dossierItem.dossierId,
+            preoverdue: dossierItem['extendDate']
+          }
+          vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8501)
+        } else if (String(item.form) === 'BETIMES') {
+          let result = {
+            actionCode: 8400,
+            dossierId: dossierItem.dossierId,
+            betimes: dossierItem['extendDate']
+          }
+          vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8400)
+        } else if (String(item.form) === 'CHANGE_DATA_DOSSIER') {
+          vm.doChangeDossier(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'UNDO_DOSSIER') {
+          vm.doUndoDossier(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'RESTORE_DOSSIER') {
+          vm.doRestoreDossier(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'GOTO_DONE') {
+          if (!dossierItem) {
+            alert('Chọn hồ sơ để thực hiện')
+            return
+          }
+          let result = {
+            stepCode: 400,
+            stepName: 'hoàn thành'
+          }
+          vm.gotoStep(dossierItem, result)
+        } else if (String(item.form) === 'GOTO_CANCEL') {
+          if (!dossierItem) {
+            alert('Chọn hồ sơ để thực hiện')
+            return
+          }
+          let result = {
+            stepCode: 410,
+            stepName: 'rút'
+          }
+          vm.gotoStep(dossierItem, result)
+        } else if (String(item.form) === 'GOTO_DENY') {
+          if (!dossierItem) {
+            alert('Chọn hồ sơ để thực hiện')
+            return
+          }
+          let result = {
+            stepCode: 420,
+            stepName: 'từ chối'
+          }
+          vm.gotoStep(dossierItem, result)
         }
-      } else if (String(item.form) === 'COPY') {
-        vm.doCopy(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'CANCEL') {
-        vm.doCancel(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'PRINT_01') {
-        // Xem trước phiếu của một hồ sơ
-        vm.doPrint01(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'PRINT_02') {
-        // Xem trước phiếu gộp của nhiều hồ sơ
-        vm.doPrint02(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'PRINT_03') {
-        // In văn bản mới nhất đã phê duyệt
-        vm.doPrint03(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'GUIDING') {
-        vm.thuTucHanhChinhSelectedGuide = ''
-        vm.dichVuSelectedGuide = ''
-        vm.tphsGuide = []
-        if (vm.thuTucHanhChinhSelected) {
-          vm.thuTucHanhChinhSelectedGuide = vm.thuTucHanhChinhSelected
-          vm.listDichVuGuide = vm.thuTucHanhChinhSelectedGuide.hasOwnProperty('options') ? vm.thuTucHanhChinhSelectedGuide['options'] : ''
-          vm.dichVuSelectedGuide = vm.dichVuSelected ? vm.dichVuSelected : ''
-          vm.templateNoGuide = vm.dichVuSelectedGuide ? vm.dichVuSelectedGuide.templateNo : ''
-        }
-        vm.docTypePrint = item.document
-        vm.dialog_printGuide = true
-        vm.$refs.formGuide.resetValidation()
-      } else if (String(item.form) === 'DENIED') {
-        vm.docTypePrint = item.document
-        vm.thuTucHanhChinhSelectedGuide = ''
-        vm.dichVuSelectedGuide = ''
-        if (vm.thuTucHanhChinhSelected) {
-          vm.thuTucHanhChinhSelectedGuide = vm.thuTucHanhChinhSelected
-          vm.listDichVuGuide = vm.thuTucHanhChinhSelectedGuide.hasOwnProperty('options') ? vm.thuTucHanhChinhSelectedGuide['options'] : ''
-          vm.dichVuSelectedGuide = vm.dichVuSelected ? vm.dichVuSelected : ''
-          vm.templateNoGuide = vm.dichVuSelectedGuide ? vm.dichVuSelectedGuide.templateNo : ''
-        }
-        vm.dialog_denied = true
-        vm.$refs.formDenied.resetValidation()
-      } else if (String(item.form) === 'PREVIEW') {
-        vm.doPreview(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'ACTIONS') {
-        vm.doActions(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'DELETE') {
-        vm.doDeleteDossier(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'ROLLBACK_01') {
-        let result = {
-          actionCode: 9000
-        }
-        vm.processAction(dossierItem, item, result, index, true)
-      } else if (String(item.form) === 'ROLLBACK_02') {
-        let result = {
-          actionCode: 9000
-        }
-        vm.processAction(dossierItem, item, result, index, true)
-      } else if (String(item.form) === 'OVERDUE') {
-        let result = {
-          actionCode: 8500,
-          dossierId: dossierItem.dossierId,
-          overdue: dossierItem['extendDate']
-        }
-        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8500)
-      } else if (String(item.form) === 'PREOVERDUE') {
-        let result = {
-          actionCode: 8501,
-          dossierId: dossierItem.dossierId,
-          preoverdue: dossierItem['extendDate']
-        }
-        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8501)
-      } else if (String(item.form) === 'BETIMES') {
-        let result = {
-          actionCode: 8400,
-          dossierId: dossierItem.dossierId,
-          betimes: dossierItem['extendDate']
-        }
-        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8400)
-      } else if (String(item.form) === 'CHANGE_DATA_DOSSIER') {
-        vm.doChangeDossier(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'UNDO_DOSSIER') {
-        vm.doUndoDossier(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'RESTORE_DOSSIER') {
-        vm.doRestoreDossier(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'GOTO_DONE') {
-        if (!dossierItem) {
-          alert('Chọn hồ sơ để thực hiện')
-          return
-        }
-        let result = {
-          stepCode: 400,
-          stepName: 'hoàn thành'
-        }
-        vm.gotoStep(dossierItem, result)
-      } else if (String(item.form) === 'GOTO_CANCEL') {
-        if (!dossierItem) {
-          alert('Chọn hồ sơ để thực hiện')
-          return
-        }
-        let result = {
-          stepCode: 410,
-          stepName: 'rút'
-        }
-        vm.gotoStep(dossierItem, result)
-      } else if (String(item.form) === 'GOTO_DENY') {
-        if (!dossierItem) {
-          alert('Chọn hồ sơ để thực hiện')
-          return
-        }
-        let result = {
-          stepCode: 420,
-          stepName: 'từ chối'
-        }
-        vm.gotoStep(dossierItem, result)
       }
+      
     },
     doPrint01 (dossierItem, item, index, isGroup) {
       let vm = this

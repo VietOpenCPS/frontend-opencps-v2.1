@@ -322,7 +322,7 @@ export default {
     'suggestions': Suggestions,
     'tiny-pagination': TinyPagination
   },
-  props: ['formCodeInput', 'detailDossier', 'donvinhanCollection', 'tphs', 'lengthDossier', 'createFileCongVan'],
+  props: ['formCodeInput', 'detailDossier', 'donvinhanCollection', 'tphs', 'lengthDossier', 'createFileCongVan', 'requiredCVDenGroupId', 'requiredCVDenGovCode'],
   data: () => ({
     loading: false,
     dialogPDFLoading: false,
@@ -403,6 +403,10 @@ export default {
         vm.getGovAgencyList()
       }
     },
+    requiredCVDenGovCode () {
+      let vm = this
+      vm.getGovAgencyList()
+    },
     createFileCongVan (val) {
       let vm = this
       if (val && vm.dossierFilesItems) {
@@ -475,6 +479,8 @@ export default {
         metaData.tendonvigui = delegateName
         metaData.donvigui = vm.donvi_gui_nhan
         metaData.donvinhan = scopeUser ? scopeUser : vm.detailDossier.govAgencyCode
+        metaData.jobposSignerCongVan = vm.jobposSignerCongVan
+        metaData.signerCongVan = vm.signerCongVan
       } else {
         metaData.donvigui = scopeUser ? scopeUser : vm.detailDossier.govAgencyCode
         metaData.tendonvigui = vm.detailDossier.govAgencyName
@@ -593,7 +599,7 @@ export default {
               if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
                 scopeUser = String(vm.employeeLoginInfomation.scope).split(',')[0]
               }
-              itemParent = collectionSearch.parrentCode === '#scope' ? scopeUser : 'govAgencyCodeDVDEN'
+              itemParent = collectionSearch.parrentCode === '#scope' ? scopeUser : vm.requiredCVDenGovCode
             } else {
               itemParent = collectionSearch.parrentCode
             }
@@ -611,7 +617,7 @@ export default {
               if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
                 scopeUser = String(vm.employeeLoginInfomation.scope).split(',')[0]
               }
-              itemChild = collectionSearch.isParrentCode === '#scope' ? scopeUser : 'govAgencyCodeDVDEN'
+              itemChild = collectionSearch.isParrentCode === '#scope' ? scopeUser : vm.requiredCVDenGovCode
             } else {
               itemChild = collectionSearch.isParrentCode
             }

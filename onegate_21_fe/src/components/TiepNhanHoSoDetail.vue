@@ -204,7 +204,7 @@
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content>
                 <thong-tin-cong-van ref="thongtincongvan" :detailDossier="thongTinChiTietHoSo" :tphs="tphsCV" :createFileCongVan="createFileCongVan"
-                  :formCodeInput="formCode" :donvinhanCollection="donvinhanCollection" :lengthDossier="dossiersIntoGroupRender.length" >
+                  :formCodeInput="formCode" :donvinhanCollection="donvinhanCollection" :requiredCVDenGroupId="requiredCVDenGroupId" :requiredCVDenGovCode="requiredCVDenGovCode" :lengthDossier="dossiersIntoGroupRender.length" >
                 </thong-tin-cong-van>
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -977,7 +977,9 @@ export default {
     totalFee: 0,
     createFileCongVan: '',
     postStepCodeCongVan: '',
-    donvinhanCollection: ''
+    donvinhanCollection: '',
+    requiredCVDenGovCode: '',
+    requiredCVDenGroupId: ''
   }),
   computed: {
     loading () {
@@ -1010,6 +1012,8 @@ export default {
     vm.$nextTick(function () {
       vm.dossierId = vm.id
       vm.donvinhanCollection = vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : ''
+      vm.requiredCVDenGroupId = vm.formActionGroup.hasOwnProperty('requiredCVDenGroupId') ? vm.formActionGroup.requiredCVDenGroupId : ''
+      vm.requiredCVDenGovCode = vm.formActionGroup.hasOwnProperty('requiredCVDenGovCode') ? vm.formActionGroup.requiredCVDenGovCode : ''
     })
   },
   beforeDestroy () {
@@ -1067,6 +1071,8 @@ export default {
     formActionGroup (val) {
       let vm = this
       vm.donvinhanCollection = val.hasOwnProperty('donvinhan') ? val.donvinhan : ''
+      vm.requiredCVDenGroupId = val.hasOwnProperty('requiredCVDenGroupId') ? val.requiredCVDenGroupId : ''
+      vm.requiredCVDenGovCode = val.hasOwnProperty('requiredCVDenGovCode') ? val.requiredCVDenGovCode : ''
     }
   },
   methods: {
@@ -1081,6 +1087,8 @@ export default {
       if (vm.formCode === 'NEW_GROUP_CV_DI') {
         console.log('vm.dossiersIntoGroupRender', vm.dossiersIntoGroupRender)
         vm.donvinhanCollection = vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : ''
+        vm.requiredCVDenGroupId = vm.formActionGroup.hasOwnProperty('requiredCVDenGroupId') ? vm.formActionGroup.requiredCVDenGroupId : ''
+        vm.requiredCVDenGovCode = vm.formActionGroup.hasOwnProperty('requiredCVDenGovCode') ? vm.formActionGroup.requiredCVDenGovCode : ''
         let totalFee = 0
         let arr = vm.dossiersIntoGroupRender
         if (arr && arr.length > 0) {
@@ -1572,6 +1580,8 @@ export default {
                 postStepCode: vm.postStepCodeCongVan,
                 stepcode: vm.formActionGroup.hasOwnProperty('stepCode') ? vm.formActionGroup.stepCode : '',
                 donvinhancollection: vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : '',
+                requiredCVDenGovCode: vm.formActionGroup.hasOwnProperty('requiredCVDenGovCode') ? vm.formActionGroup.requiredCVDenGovCode : '',
+                requiredCVDenGroupId: vm.formActionGroup.hasOwnProperty('requiredCVDenGroupId') ? vm.formActionGroup.requiredCVDenGroupId : '',
                 totalSubsidy: vm.totalFee
               }
               meta = Object.assign(thongtincongvan.metaData, metadataDraf)
@@ -1582,6 +1592,8 @@ export default {
                 postStepCode: vm.postStepCodeCongVan,
                 stepcode: vm.formActionGroup.hasOwnProperty('stepCode') ? vm.formActionGroup.stepCode : '',
                 donvinhancollection: vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : '',
+                requiredCVDenGovCode: vm.formActionGroup.hasOwnProperty('requiredCVDenGovCode') ? vm.formActionGroup.requiredCVDenGovCode : '',
+                requiredCVDenGroupId: vm.formActionGroup.hasOwnProperty('requiredCVDenGroupId') ? vm.formActionGroup.requiredCVDenGroupId : '',
                 totalSubsidy: vm.totalFee
               }
               meta = Object.assign(thongtincongvan.metaData, metadataDraf)

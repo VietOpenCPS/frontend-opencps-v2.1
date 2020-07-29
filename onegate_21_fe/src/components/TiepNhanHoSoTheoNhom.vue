@@ -37,7 +37,7 @@
         <thong-tin-chu-ho-so v-if="formCode === 'NEW_GROUP'" :showApplicant="true" :showDelegate="false" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
 
         <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" ref="thongtincongvan" :detailDossier="thongTinNhomHoSo"
-         :tphs="tphsCV" :createFileCongVan="createFileCongVan" :formCodeInput="formCode" :donvinhanCollection="donvinhanCollection" :lengthDossier="dossiersIntoGroupRender.length">
+         :tphs="tphsCV" :createFileCongVan="createFileCongVan" :formCodeInput="formCode" :requiredCVDenGroupId="requiredCVDenGroupId" :requiredCVDenGovCode="requiredCVDenGovCode" :donvinhanCollection="donvinhanCollection" :lengthDossier="dossiersIntoGroupRender.length">
         </thong-tin-cong-van>
 
         <div v-if="formCode === 'NEW_GROUP'" style="position: relative;border-top: 1px solid #dedede;">
@@ -946,6 +946,8 @@ export default {
     createFileCongVan: '',
     postStepCodeCongVan: '',
     donvinhanCollection: '',
+    requiredCVDenGroupId: '',
+    requiredCVDenGovCode: '',
     dialogPDF: false,
     congvanguiden: false
   }),
@@ -1162,6 +1164,8 @@ export default {
         vm.groupDossierSelected = resultDossier
         vm.metaDataGroupDossier = vm.getMetaData(vm.thongTinNhomHoSo)
         vm.donvinhanCollection = vm.metaDataGroupDossier.hasOwnProperty('donvinhancollection') ? vm.metaDataGroupDossier.donvinhancollection : ''
+        vm.requiredCVDenGroupId = vm.metaDataGroupDossier.hasOwnProperty('requiredCVDenGroupId') ? vm.metaDataGroupDossier.requiredCVDenGroupId : ''
+        vm.requiredCVDenGovCode = vm.metaDataGroupDossier.hasOwnProperty('requiredCVDenGovCode') ? vm.metaDataGroupDossier.requiredCVDenGovCode : ''
         let filter = {
           groupDossierId: id
         }
@@ -2016,7 +2020,10 @@ export default {
         sort: 'dossierNo',
         top: 'passed',
         order: true,
-        groupDossierId: vm.thongTinNhomHoSo.dossierId
+        groupDossierIdHs: vm.thongTinNhomHoSo.dossierId
+      }
+      if (vm.metaDataGroupDossier.hasOwnProperty('requiredCVDenGroupId')) {
+        filter = Object.assign(filter, {groupDossierId: vm.metaDataGroupDossier.requiredCVDenGroupId})
       }
       if (apiGetDossier) {
         vm.$store.dispatch('getHoSoAddGroup', filter).then(function (result) {
