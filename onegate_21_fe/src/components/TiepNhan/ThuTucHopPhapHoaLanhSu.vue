@@ -50,6 +50,7 @@
                 <label>Điện thoại</label>
                 <v-text-field
                     v-model="dossiers.delegateTelNo"
+                    :rules="[rules.telNo]"
                     solo
                 ></v-text-field>
             </v-flex>
@@ -57,6 +58,7 @@
                 <label>Email</label>
                 <v-text-field
                     v-model="dossiers.delegateEmail"
+                    :rules="[rules.varChar50]"
                     solo
                 ></v-text-field>
             </v-flex>
@@ -253,12 +255,6 @@
             </v-flex>
             <v-flex xs12 sm4  class="px-2 my-2">
                 <label for="">Ngày hẹn trả</label><br/>
-                <!-- <v-text-field
-                    v-model="dossiers.dueDate"
-                    :rules="[rules.required]"
-                    required
-                    solo
-                ></v-text-field> -->
                 <v-menu
                     ref="menu5"
                     :close-on-content-click="false"
@@ -274,7 +270,6 @@
                         hint="DD/MM/YYYY"
                         @change="dateDueDate = parseDate(dateDueDateFormated.substring(0,10))"
                         :rules="[rules.required]"
-                        
                     ></v-text-field>
                     <v-date-picker v-model="dateDueDate" no-title @input="menu5 = false" locale="vi"></v-date-picker>
                 </v-menu>      
@@ -813,6 +808,20 @@ export default {
                     return value.length > 50 ?  'Số hiệu giấy tờ không được quá 50 ký tự' : true
                 }
                 else return true 
+            },
+            telNo: (value) => {
+                const pattern = /^0([1-9]{1}\d{8})$/
+                if (value) {
+                return pattern.test(value) || 'Số điện thoại gồm 10 ký tự 0-9, eg: 0989123456, ...'
+                } else {
+                return []
+                }
+            },
+            varChar50: (val) => {
+                if(val){  
+                    return val.length > 50 ?  'Thông tin không được quá 50 ký tự' : true
+                }
+                else return true   
             }
         },
         dateDueDateFormated: '',
@@ -930,7 +939,7 @@ export default {
             } else {
                 vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [],  'totalRecord': 0})
                 vm.getThanhPhan()
-                vm.genDueDate()
+                // vm.genDueDate()
                 if(vm.eFormCode){
                     setTimeout(() => {
                         vm.getDataEform()
@@ -1080,7 +1089,7 @@ export default {
             this.dateDueDateFormated = this.formatDate(this.dateDueDate) 
             const [year, month, day] = this.dateDueDate.split('-')
             let date = new Date(this.dateDueDate)
-            date.setFullYear(parseInt(year), parseInt(month), parseInt(day))
+            // date.setFullYear(parseInt(year), parseInt(month) , parseInt(day))
             this.dossiers.dueDate = date.getTime()
             //this.dossiers.dueDate = this.dateDueDateFormated
         },
@@ -1103,35 +1112,30 @@ export default {
     },
     methods: {
         computeDate () {
-            // let vm = this 
-            // if(parseInt(vm.tongSoBan) >= 10 && vm.tongSoBanTG < 10){
-            //     let date = new Date(this.dateDueDate + this.crurentHours)
-            //     if(date.getDay() === 3){
-            //         date.setDate(date.getDate() + 5)
-            //     }else if (date.getDay() === 4) {
-            //         date.setDate(date.getDate() + 4)
-            //     } else if(date.getDay() === 5) {
-            //         date.setDate(date.getDate() + 3)
-            //     } else {
-            //         date.setDate(date.getDate() + 3)
-            //     }
-            //     this.dateDueDate = date.toISOString().substr(0, 10)
-                
-            // }
-            // if(parseInt(vm.tongSoBan) < 10 && vm.tongSoBanTG >= 10){
-            //     let date = new Date(this.dateDueDate + this.crurentHours)
-            //     if(date.getDay() === 3){
-            //         date.setDate(date.getDate() - 5)
-            //     }else if (date.getDay() === 4) {
-            //         date.setDate(date.getDate() - 4)
-            //     } else if(date.getDay() === 5) {
-            //         date.setDate(date.getDate() - 3)
-            //     } else {
-            //         date.setDate(date.getDate() - 3)
-            //     }
-            //     this.dateDueDate = date.toISOString().substr(0, 10)  
-            // }
-            // vm.tongSoBanTG = parseInt(vm.tongSoBan) 
+            let vm = this 
+            if(parseInt(vm.tongSoBan) >= 10){
+                let config = {
+                    url: '/o/rest/v2/dossiers/'+ 5 +'/calculate/duedate',
+                    headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                }
+                axios.request(config).then(res => {
+                    vm.dossiers['durationCount'] = 5
+                    let dateString =  res.data.substr(0, 10)
+                    vm.dateDueDate = vm.parseDate(dateString)
+                }).catch(err => {})    
+            }
+            if(parseInt(vm.tongSoBan) < 10){
+                let config = {
+                    url: '/o/rest/v2/dossiers/'+ 2 +'/calculate/duedate',
+                    headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                }
+                axios.request(config).then(res => {
+                    vm.dossiers['durationCount'] = 2
+                    let dateString =  res.data.substr(0, 10)
+                    vm.dateDueDate = vm.parseDate(dateString)
+                }).catch(err => {})
+            }
+             vm.tongSoBanTG = parseInt(vm.tongSoBan) 
         },
         getDetail(){
             let vm = this

@@ -423,6 +423,23 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    login({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/users/login', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }, error => {
+            reject(error)
+          })
+        })
+      })     
     }
   },
   mutations: {

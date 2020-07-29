@@ -6,7 +6,7 @@
                     <label>Họ và tên<span class="red--text">*</span></label>
                     <v-text-field
                         v-model="dossiers.delegateName"
-                        :rules="[rules.required]"
+                        :rules="[rules.required,rules.varChar50]"
                         required
                         solo
                         @input="dossiers.delegateName = dossiers.delegateName.toUpperCase()"
@@ -55,6 +55,7 @@
                     <label>Điện thoại</label>
                     <v-text-field
                         v-model="dossiers.delegateTelNo"
+                        :rules="[rules.telNo]"
                         solo
                         @change="dossiers.contactTelNo = dossiers.delegateTelNo"
                     ></v-text-field>
@@ -64,6 +65,7 @@
                     <v-text-field
                         v-model="dossiers.delegateEmail"
                         solo
+                        :rules="[rules.varChar50]"
                         @change="dossiers.contactEmail = dossiers.delegateEmail"
                     ></v-text-field>
                 </v-flex>
@@ -1254,6 +1256,7 @@
                             <td>{{props.item.NoiSinhText}}</td>
                             <td>{{props.item.SoSeri}}</td>
                             <td>{{props.item.HanDungFormart}}</td>
+                            <td>{{props.item.DaHuy ? 'Đã hủy' : 'Đang sử dụng'}}</td>
                         </tr>
                         </template>
                     </v-data-table>
@@ -1409,11 +1412,6 @@ export default {
         ],
         listThanhPhanHoSo: [],
         headerDanhSach: [
-            // {
-            // text: 'Mã đoàn',
-            // align: 'center',
-            // sortable: false
-            // },
           {
             text: 'Mã nhân thân',
             align: 'center',
@@ -1441,6 +1439,11 @@ export default {
           },
           {
             text: 'Ngày hết hạn',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Trạng thái',
             align: 'center',
             sortable: false
           }
@@ -1658,6 +1661,20 @@ export default {
               } else {
                   return true
               }
+            },
+            telNo: (value) => {
+                const pattern = /^0([1-9]{1}\d{8})$/
+                if (value) {
+                return pattern.test(value) || 'Số điện thoại gồm 10 ký tự 0-9, eg: 0989123456, ...'
+                } else {
+                return []
+                }
+            },
+            varChar50: (val) => {
+                if(val){  
+                    return val.length > 50 ?  'Thông tin không được quá 50 ký tự' : true
+                }
+                else return true   
             }
         }
     }),
@@ -1782,8 +1799,8 @@ export default {
         dateDueDate (val) {
             this.dateDueDateFormated = this.formatDate(this.dateDueDate)
             const [year, month, day] = this.dateDueDate.split('-')
-            let date = new Date()
-            date.setFullYear(parseInt(year), parseInt(month), parseInt(day))
+            let date = new Date(this.dateDueDate)
+            // date.setFullYear(parseInt(year), parseInt(month), parseInt(day))
             this.dossiers.dueDate = date.getTime()
         },
         searchApplicants (val) {

@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-content>
-      <header>
+      <header v-if="!isOneGate">
         <a href="/web/cong-dich-vu-cong" :class="!isKios?'mobile':''">
           <img src="/o/opencps-store/js/kios_ver0/img/logo.png">
           <div>
@@ -41,11 +41,18 @@
                 <span>Tra cứu thông tin thủ tục</span>
               </p>
             </a>
-            <a href="javascript:;" @click="goPage('danhgia')">
+            <!-- <a href="javascript:;" @click="goPage('danhgia')">
               <p class="icon pl-1 pr-2 pt-3"><img src="/o/opencps-store/js/kios_ver0/img/icon-evaluation.png"></p>
               <p class="ml-2 my-0">
                 <span class="text-bold">Khảo sát</span><br>
                 <span>Khảo sát mức độ hài lòng</span>
+              </p>
+            </a> -->
+            <a href="javascript:;" @click="goPage('danhgiamucdohailong')">
+              <p class="icon pl-1 pr-2 pt-3"><img src="/o/opencps-store/js/kios_ver0/img/icon-evaluation.png"></p>
+              <p class="ml-2 my-0">
+                <span class="text-bold">Đánh giá</span><br>
+                <span>Đánh giá mức độ hài lòng</span>
               </p>
             </a>
           </div>
@@ -71,7 +78,8 @@
       loading: true,
       isKios: true,
       wrapStyle: true,
-      isMobile: false
+      isMobile: false,
+      isOneGate: false
     }),
     created () {
       var vm = this
@@ -95,6 +103,13 @@
           vm.wrapStyle = false
         } else {
           vm.wrapStyle = true
+        }
+        try{
+          if(typeof isOneGate !== 'undefined'){
+            vm.isOneGate = isOneGate
+          }
+        }catch(err){
+          
         }
       })
     },
@@ -187,6 +202,8 @@
           queryString = '/tra-cuu-thu-tuc'
         } else if (page === 'danhgia') {
           queryString = '/danh-gia-cldv'
+        } else if (page === 'danhgiamucdohailong') {
+          queryString = '/danh-gia-mdhl'
         }
         vm.$router.push({
           path: queryString,

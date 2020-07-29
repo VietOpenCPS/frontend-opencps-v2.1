@@ -52,8 +52,11 @@
             Buổi chiều: {{timeAfternoon ? timeAfternoon : '--:--'}}
           </span>
           <span v-else>
-            <span v-if="isScaned">
+            <!-- <span v-if="isScaned">
               Mã số không hợp lệ. Vui lòng kiểm tra lại <br>
+            </span> -->
+            <span v-if="isScaned">
+              Hồ sơ này chưa có kết quả. Vui lòng liên hệ với bộ phận một cửa <br>
             </span>
             <span v-else>
               Lỗi. Quý khách vui lòng quét lại <br>
@@ -61,6 +64,7 @@
             </span>
           </span>
         </div>
+
         <div v-else>
           <span v-if="overMax">
             Mã {{codeShow}} của quý khách đã được xếp hàng<br>
@@ -271,6 +275,8 @@ export default {
                   filterBooking.serviceCode = result.serviceCode
                   filterBooking.bookingName = result.applicantName
                   filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
+                  console.log('111111',vm.dossierStepsAllow)
+                  console.log('222222',result['stepCode'])
                   if (result['stepCode'] && vm.dossierStepsAllow.indexOf(String(result['stepCode'])) >= 0) {
                     if (vm.stepDossierRelease.indexOf(String(result['stepCode'])) >= 0) {
                       filterBooking.dossierRelease = true
@@ -334,7 +340,7 @@ export default {
       let vm = this
       console.log('filter create booking', filter)
       let checkCodeNumber = filter.hasOwnProperty('codeNumber') && filter.codeNumber.split("-").length === 1
-      if(filter.codeNumber && checkCodeNumber === 1){
+      if(filter.codeNumber && checkCodeNumber){
         vm.$store.dispatch('createBooking', filter).then(function (result) {
           vm.isActive = true
           vm.checkinFail = false
@@ -400,6 +406,7 @@ export default {
         try {
           let configs = JSON.parse(result.configs)
           vm.dossierStepsAllow = configs['dossierStepsAllow']
+          console.log('11111',vm.dossierStepsAllow)
           vm.stepDossierRelease = configs['stepDossierRelease']
           vm.bookingGroups = configs['bookings']
           vm.groupDvc = configs['groupId']

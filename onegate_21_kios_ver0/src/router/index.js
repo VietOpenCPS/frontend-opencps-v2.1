@@ -11,6 +11,7 @@ import DanhGiaCanBo from '@/components/DanhGiaCanBo'
 import DanhGiaChatLuongDichVu from '@/components/DanhGiaChatLuongDichVuNew'
 import HoSoKetQua from '@/components/HoSoKetQua'
 import HoSoTiepNhan from '@/components/HoSoTiepNhan'
+import DanhGiaMucDoHaiLong from '@/components/DanhGiaMucDoHaiLong'
 import DanhSachCanBo from '@/components/DanhSachCanBo'
 import CheckPassword from '@/components/CheckPassword'
 import CheckPasswordHP from '@/components/CheckPasswordHP'
@@ -19,6 +20,7 @@ import ChiTietHoSoQR from '@/components/ChiTietHoSoQR'
 const routes = [
   { path: '/', name: 'HoSoKetQua', component: HoSoKetQua, props: false },
   { path: '/tra-cuu-ho-so', name: 'TraCuuHoSo', component: TraCuuHoSo, props: false },
+  { path: '/danh-gia-mdhl', name: 'TraCuuHoSo', component: DanhGiaMucDoHaiLong, props: false },
   { path: '/ho-so/:index', name: 'ChiTietHoSo', component: ChiTietHoSo, props: true },
   { path: '/tra-cuu-ho-so-homepage', name: 'TraCuuHomePage', component: TraCuuHomePage, props: false },
   { path: '/thong-tin-ho-so/:index', name: 'ChiTietHoSoHomePage', component: ChiTietHoSoHomePage, props: true },
