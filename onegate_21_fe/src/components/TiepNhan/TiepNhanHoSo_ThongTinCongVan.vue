@@ -635,7 +635,7 @@ export default {
               if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
                 scopeUser = String(vm.employeeLoginInfomation.scope).split(',')[0]
               }
-              itemChild = collectionSearch.itemCode === '#scope' ? scopeUser : 'govAgencyCodeDVDEN'
+              itemChild = collectionSearch.itemCode === '#scope' ? scopeUser : vm.requiredCVDenGovCode
             } else {
               itemChild = collectionSearch.itemCode
             }
@@ -646,6 +646,14 @@ export default {
               getCurrentItem: true
             }
             vm.getDetailDictitem(filterGet)
+          }
+          if (collectionSearch.hasOwnProperty('groupCode')) {
+            let filterGet = {
+              collectionCode: collectionSearch.collectionCode,
+              level: '',
+              groupCode: collectionSearch.groupCode
+            }
+            vm.getGroupDictitem(filterGet)
           }
         }
         
@@ -724,6 +732,19 @@ export default {
           let parent = result.parentItem ? result.parentItem : []
           vm.govAgencySubmitList = Array.isArray(parent) ? parent : [parent]
         }
+        if (vm.govAgencySubmitList.length === 1 && vm.formCodeInput === 'NEW_GROUP_CV_DI') {
+          vm.donvi_gui_nhan = vm.govAgencySubmitList[0]['itemCode']
+        }
+      })
+    },
+    getGroupDictitem (filterGet) {
+      let vm = this
+      let filter = {
+        collectionCode: filterGet.hasOwnProperty('collectionCode') ? filterGet.collectionCode : 'DON_VI_CONG_VAN',
+        groupCode: filterGet.groupCode
+      }
+      vm.$store.dispatch('getGroupDictitem', filter).then(function (result) {
+        vm.govAgencySubmitList = Array.isArray(result) ? result : [result]
         if (vm.govAgencySubmitList.length === 1 && vm.formCodeInput === 'NEW_GROUP_CV_DI') {
           vm.donvi_gui_nhan = vm.govAgencySubmitList[0]['itemCode']
         }

@@ -83,7 +83,7 @@
             v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
             :items="listDichVu"
             v-model="dichVuSelected"
-            label="Chọn dịch vụ"
+            label="Chọn trường hợp"
             item-text="optionName"
             item-value="processOptionId"
             return-object
@@ -427,14 +427,14 @@
                 <v-autocomplete
                   :items="listDichVu"
                   v-model="dichVuSelected"
-                  label="Dịch vụ:"
-                  placeholder="Chọn dịch vụ"
+                  label="Trường hợp:"
+                  placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
-                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn']"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn']"
                   @change="changeDichVuConfigs"
                   required
                   box
@@ -613,18 +613,18 @@
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2 text-bold">Dịch vụ <span style="color:red">*</span>:</div>
+                <div class="my-2 text-bold">Trường hợp <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
-                  placeholder="Chọn dịch vụ"
+                  placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
-                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>
@@ -762,18 +762,18 @@
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2 text-bold">Dịch vụ <span style="color:red">*</span>:</div>
+                <div class="my-2 text-bold">Trường hợp <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
-                  placeholder="Chọn dịch vụ"
+                  placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
-                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>
@@ -1040,7 +1040,8 @@ export default {
     orderSort: '',
     sortValue: '',
     govAgencyFilterMenuConfig: '',
-    groupServiceFilterMenuConfig: ''
+    groupServiceFilterMenuConfig: '',
+    disableSearchAgency: false,
   }),
   computed: {
     loadingDynamicBtn () {
@@ -1145,6 +1146,9 @@ export default {
             if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('groupServiceCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode) {
               vm.groupServiceFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode
             }
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('disableSearchAgency') && vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency) {
+              vm.disableSearchAgency = vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency
+            }
             // 
             vm.processListTTHC(currentQuery)
             vm.processListDomain(currentQuery)
@@ -1223,6 +1227,9 @@ export default {
       }
       if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('groupServiceCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode) {
         vm.groupServiceFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('disableSearchAgency') && vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency) {
+        vm.disableSearchAgency = vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency
       }
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
@@ -1364,6 +1371,9 @@ export default {
       if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('groupServiceCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode) {
         vm.groupServiceFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode
       }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('disableSearchAgency') && vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency) {
+        vm.disableSearchAgency = vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency
+      }
       console.log('govAgencyFilterMenuConfig', vm.govAgencyFilterMenuConfig, vm.groupServiceFilterMenuConfig)
     },
     index (val) {
@@ -1390,6 +1400,9 @@ export default {
       }
       if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('groupServiceCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode) {
         vm.groupServiceFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('disableSearchAgency') && vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency) {
+        vm.disableSearchAgency = vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency
       }
       console.log('govAgencyFilterMenuConfig333', vm.govAgencyFilterMenuConfig, vm.groupServiceFilterMenuConfig)
     }
@@ -1777,7 +1790,7 @@ export default {
             sort: vm.sortValue
           }
         }
-        if (vm.groupServiceFilterMenuConfig) {
+        if (vm.groupServiceFilterMenuConfig || vm.disableSearchAgency) {
           filter.agency = ''
         }
         if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {

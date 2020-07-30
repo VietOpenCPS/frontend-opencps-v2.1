@@ -1305,6 +1305,7 @@ export default {
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           vm.dataExportExcel = docDString
+          console.log('docDString1234123', docDString)
           vm.docDefinition = JSON.parse(docDString)
 
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
@@ -1483,7 +1484,6 @@ export default {
 
           // TODO
           let resultData = result
-          // console.log('resultData 1', resultData)
           if (selection !== undefined && selection !== null && selection.length > 0) {
             // console.log('selection', selection)
             resultData = result.filter(function(obj) {
@@ -1519,7 +1519,7 @@ export default {
               }
             })
           }
-          // console.log('resultData 1', resultData)
+          console.log('resultData555', resultData)
           let resultDataTotal = [resultData.find(function(obj) {
             if (subKey !== null && subKey !== undefined && subKey !== '') {
               if ((obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) && obj[subKey] === '') {
@@ -1531,7 +1531,7 @@ export default {
               }
             }
           })]
-        //  console.log('resultDataTotal 1', resultDataTotal)
+         console.log('resultDataTotal555', resultDataTotal)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -1587,8 +1587,12 @@ export default {
             }
           }
           let dataToExportCSV = []
+          console.log('resultData 33333', resultData)
           for (let key in resultData) {
             let dataInput = resultData[key]
+            console.log('sumkey 33333', sumKey, resultData[key][sumKey])
+            console.log('subKey 33333', subKey, resultData[key][subKey] )
+            
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
                 (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0')) {
               let dataRow = []
@@ -1620,6 +1624,7 @@ export default {
                     dataText = Math.round(eval(currentConfig['calculator']))
                   }
                 } else {
+                  console.log('resultData[key]', resultData[key], currentConfig['value'] )
                   if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                     if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
                       dataText =  ' - ' + resultData[key][currentConfig['subValue']] + ' '

@@ -589,6 +589,29 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    getGroupDictitem ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+            }
+          }
+          axios.get(state.initData.regionApi + '/' + data.collectionCode + '/dictgroups/' + data.groupCode + '/dictitems', param).then(function (response) {
+            if (response.data.hasOwnProperty('data')) {
+              resolve(response.data.data)
+            } else {
+              resolve([])
+            }
+            
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
     resetThongTinChungHoSo ({ commit }) {
       let data = {
         serviceConfig: {},
