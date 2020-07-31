@@ -147,7 +147,7 @@
                     </v-flex>
 
                     <v-flex xs12 sm2 class="mb-2">
-                      <v-subheader class="pl-0"> Số năm được hưởng<span style="color:red"> &nbsp;*</span>: </v-subheader>
+                      <v-subheader class="pl-0"> Số tháng được hưởng<span style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
@@ -679,6 +679,7 @@ export default {
       let vm = this
       let formMeta = {
         gender: vm.gender,
+        genderText: vm.gender === 1 ? 'Nữ' : 'Nam',
         birthDate: vm.birthDate,
         birthDateDay: vm.birthDateDay,
         birthDateMonth: vm.birthDateMonth,
@@ -690,10 +691,12 @@ export default {
         cityNativeCode: vm.cityNativeCode,
         cityNativeName: vm.cityNativeName,
         state: vm.state,
+        stateText: vm.state === 1 ? 'Đã chết' : 'Còn sống',
         yearPayment: vm.yearPayment,
         subsidy: Number(String(vm.subsidy).replace(/\./g, '')),
         anonymName: vm.anonymName,
         incidence: vm.incidence,
+        incidenceText: vm.incidence === 1 ? 'Cơ yếu' : 'Quân nhân',
         recruitment: vm.recruitment,
         retire: vm.retire,
         reactivated: vm.reactivated,
@@ -702,6 +705,7 @@ export default {
       let dataOut = {
         applicantName: vm.applicantName,
         gender: vm.gender,
+        genderText: vm.gender === 1 ? 'Nữ' : 'Nam',
         birthDate: vm.birthDate,
         applicantIdNo: vm.applicantIdNo,
         wardNativeCode: vm.wardNativeCode,

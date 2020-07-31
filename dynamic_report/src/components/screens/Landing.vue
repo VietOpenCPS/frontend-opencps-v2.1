@@ -1531,7 +1531,10 @@ export default {
               }
             }
           })]
-         console.log('resultDataTotal555', resultDataTotal)
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('notSumkey')) {
+            resultDataTotal = resultData
+          }
+         console.log('resultDataTotal666', resultDataTotal)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -1587,12 +1590,8 @@ export default {
             }
           }
           let dataToExportCSV = []
-          console.log('resultData 33333', resultData)
           for (let key in resultData) {
-            let dataInput = resultData[key]
-            console.log('sumkey 33333', sumKey, resultData[key][sumKey])
-            console.log('subKey 33333', subKey, resultData[key][subKey] )
-            
+            let dataInput = resultData[key]            
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
                 (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0')) {
               let dataRow = []
@@ -1672,15 +1671,14 @@ export default {
               dataToExportCSV.push(dataToExportCSVItem)
             }
           }
-          // 
-          console.log('dataRowRenderHtmlTable777', vm.dataRowRenderHtmlTable)
-          // 
           if (vm.agencyLists.length > 0 && vm.govAgency === 0) {
+            console.log('resultDataTotal777', resultDataTotal)
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
               for (let keyMappingXXTT in vm.itemsReportsConfig) {
                 let dataTextXXTT = ''
                 let currentConfigXXTT = vm.itemsReportsConfig[keyMappingXXTT]
+                console.log('currentConfigXXTT777', currentConfigXXTT)
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
                   var dataInputXXTT = resultDataTotal[keyXXTT]
                   let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
@@ -1725,7 +1723,7 @@ export default {
                 indexTotalXXTT = indexTotalXXTT + 1
               }
             }
-            // console.log('dataRowTotal 666', dataRowTotal)
+            console.log('dataRowTotal 666', dataRowTotal)
           }
           vm.dataReportXX += JSON.stringify(dataRowTotal)
           // console.log('vm.dataReportXX 1231', vm.dataReportXX)

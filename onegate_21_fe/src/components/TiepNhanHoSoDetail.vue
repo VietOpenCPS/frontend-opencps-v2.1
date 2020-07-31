@@ -57,8 +57,7 @@
                 <div slot="header" style="display: flex; align-items: center;">
                   <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                   <span v-if="formCode === 'NEW_GROUP'">Tên nhóm hồ sơ</span>
-                  <span v-else>Tên hồ sơ</span>
-                  <!-- <span v-else>Nội dung giải quyết</span> -->
+                  <span v-else>{{originality === 1 ? 'Nội dung yêu cầu giải quyết' : 'Tên hồ sơ'}}</span>
                   &nbsp;&nbsp;&nbsp;&nbsp;
                 </div>
                 <div>
@@ -68,14 +67,8 @@
                         v-model="briefNote"
                         :rows="2"
                         box
-                        :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập tên hồ sơ'"
+                        :placeholder="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : (originality === 1 ? 'Nhập nội dung yêu cầu giải quyết' : 'Nhập tên hồ sơ')"
                       ></v-textarea>
-                      <!-- <v-textarea
-                        v-model="briefNote"
-                        :rows="2"
-                        box
-                        :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập nội dung giải quyết'"
-                      ></v-textarea> -->
                       <div v-if="templateDescription">(*) &nbsp; {{templateDescription}}</div>
                     </v-card-text>
                   </v-card>
@@ -854,6 +847,7 @@ export default {
     receiveDateEdit: '',
     editableDate: false,
     dueDateEdit: '',
+    durationPhase: '',
     viaPortalDetail: 0,
     showThuPhi: false,
     inputTypes: [1, 3],
@@ -864,7 +858,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: true,
+    notifyConfig: false,
     fromViaPostal: false,
     fromViaPostalConfig: false,
     smsNotify: true,
@@ -940,7 +934,7 @@ export default {
         class: 'text-xs-center'
       },
       {
-        text: 'Số năm được hưởng',
+        text: 'Số tháng được hưởng',
         align: 'center',
         sortable: false,
         class: 'text-xs-center'
@@ -1059,7 +1053,7 @@ export default {
           let metaData = vm.getMetaData(arr[i])
           let fee = 0
           if (metaData) {
-            fee = Number(metaData['yearPayment'])*12*Number(metaData['subsidy'])
+            fee = Number(metaData['yearPayment'])*Number(metaData['subsidy'])
             totalFee += fee
           }
         }
@@ -1096,7 +1090,7 @@ export default {
             let metaData = vm.getMetaData(arr[i])
             let fee = 0
             if (metaData) {
-              fee = Number(metaData['yearPayment'])*12*Number(metaData['subsidy'])
+              fee = Number(metaData['yearPayment'])*Number(metaData['subsidy'])
               totalFee += fee
             }
           }
@@ -1193,6 +1187,7 @@ export default {
                     vm.editableDate = resAction && resAction.receiving ? resAction.receiving.editable : false
                     vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
                     vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                    vm.durationPhase = resAction && resAction.receiving && resAction.receiving.hasOwnProperty('durationPhase') ? resAction.receiving.durationPhase : ''
                     if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
                       vm.showThuPhi = true
                       vm.payments = resAction.payment
@@ -1478,6 +1473,9 @@ export default {
                 'dueDate': vm.editableDate && tempData.dueDate ? tempData.dueDate : vm.dueDateEdit,
                 'receiveDate': vm.receiveDateEdit
               }
+              if (vm.durationPhase) {
+                payloadDate = Object.assign(payloadDate, {durationPhase: vm.durationPhase})
+              }
               // 
               payloadDate = Object.assign(tempData, payloadDate)
               // 
@@ -1598,44 +1596,82 @@ export default {
               }
               meta = Object.assign(thongtincongvan.metaData, metadataDraf)
             }
-            // tạo file in công văn
-            vm.createFileKqCongVan()
+            
           }
           
           let dataMetaData = {
             id: vm.dossierId,
             data: JSON.stringify(meta)
           }
-          vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
           if (vm.formCode === 'NEW_GROUP_CV') {
-            vm.loadingAction = false
-            vm.$router.push({
-              path: '/danh-sach-ho-so/' + vm.index + '/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,
-              query: vm.$router.history.current.query
+            vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
+              vm.loadingAction = false
+              vm.$router.push({
+                path: '/danh-sach-ho-so/' + vm.index + '/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,
+                query: vm.$router.history.current.query
+              })
+            }).catch(function() {
+              vm.loadingAction = false
+              toastr.clear()
+              toastr.error('Yêu cầu của bạn thực hiện thất bại')
             })
+            
           } else {
-            let dataAddGroup = {
-              groupDossierId: thongtincongvan.dossierId,
-              dossierId: ''
-            }
-            let dossierIdArr = []
-            for (let key in vm.dossiersIntoGroupRender) {
-              dossierIdArr.push(vm.dossiersIntoGroupRender[key]['dossierId'])
-            }
-            dataAddGroup['dossierId'] = dossierIdArr.toString()
-            vm.$store.dispatch('postDossierIntoGroup', dataAddGroup).then(function (result) {
-              if (isDraf === 'save') {
-                vm.loadingAction = false
-                toastr.success('Lưu công văn thành công')
-                vm.$router.push({
-                  path: '/danh-sach-ho-so/' + vm.index + '/nhom-ho-so/' + vm.formCode + '/' + thongtincongvan.dossierId,
-                  query: vm.$router.history.current.query
-                })
-              } else {
-                // do action dossierIntoGroup
-                vm.processAction()
+            vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
+              let dataAddGroup = {
+                groupDossierId: thongtincongvan.dossierId,
+                dossierId: ''
               }
-
+              let dossierIdArr = []
+              for (let key in vm.dossiersIntoGroupRender) {
+                dossierIdArr.push(vm.dossiersIntoGroupRender[key]['dossierId'])
+              }
+              dataAddGroup['dossierId'] = dossierIdArr.toString()
+              vm.$store.dispatch('postDossierIntoGroup', dataAddGroup).then(function (result) {
+                // tạo file in công văn
+                if (vm.createFileCongVan) {
+                  let filterFormData = {
+                    dossierId: vm.dossierId,
+                    partNo: vm.createFileCongVan
+                  }
+                  vm.$store.dispatch('loadFormData', filterFormData).then(function (result) {
+                    let formData = JSON.parse(result) 
+                    let formDataPut = Object.assign(formData, {tp: vm.createFileCongVan, dossierId: vm.dossierId})
+                    vm.$store.dispatch('postEformCallBack', formData).then(function (result) {
+                      if (isDraf === 'save') {
+                        vm.loadingAction = false
+                        toastr.success('Lưu công văn thành công')
+                        vm.$router.push({
+                          path: '/danh-sach-ho-so/' + vm.index + '/nhom-ho-so/' + vm.formCode + '/' + thongtincongvan.dossierId,
+                          query: vm.$router.history.current.query
+                        })
+                      } else {
+                        // do action dossierIntoGroup
+                        vm.processAction()
+                      }
+                    })
+                    
+                  }).catch(function (reject) {
+                  })
+                } else {
+                  if (isDraf === 'save') {
+                    vm.loadingAction = false
+                    toastr.success('Lưu công văn thành công')
+                    vm.$router.push({
+                      path: '/danh-sach-ho-so/' + vm.index + '/nhom-ho-so/' + vm.formCode + '/' + thongtincongvan.dossierId,
+                      query: vm.$router.history.current.query
+                    })
+                  } else {
+                    // do action dossierIntoGroup
+                    vm.processAction()
+                  }
+                }
+                
+              })
+            }).catch(function () {
+              vm.loadingAction = false
+              toastr.clear()
+              toastr.error('Yêu cầu của bạn thực hiện thất bại')
             })
           }
 
@@ -2016,8 +2052,13 @@ export default {
         vm.$store.dispatch('doActionDossierIntoGroup', filter).then(function (result) {
           vm.loadingAction = false
           toastr.success('Lưu và gửi công văn thành công')
-          window.history.back()
-          // vm.copyFileDossierIntoGroup()
+          vm.$router.push({
+            path: '/danh-sach-ho-so/' + vm.index,
+            query: {
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+              q: vm.menuConfigsToDo[vm.index]['queryParams']
+            }
+          })
         }).catch(function (reject) {
           vm.loadingAction = false
         })
