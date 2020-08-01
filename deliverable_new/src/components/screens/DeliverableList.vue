@@ -338,14 +338,14 @@
             </v-tooltip>
             
             <v-tooltip top v-if="!loadingTable">
-              <v-btn slot="activator" flat icon class="mx-0 my-0" v-if="props.item['fileAttachs'] && !loadingTable" v-on:click.native="viewFileAttach(props.item)">
+              <v-btn :disabled="props.item['fileAttachs'] ? false : true" slot="activator" flat icon class="mx-0 my-0" v-if="!loadingTable" v-on:click.native="viewFileAttach(props.item)">
                 <v-icon>attach_file</v-icon>
               </v-btn>
               <span>Xem tài liệu đính kèm</span>
             </v-tooltip>
 
             <v-tooltip top v-if="!loadingTable">
-              <v-btn slot="activator" flat icon class="mx-0 my-0" v-if="props.item['dossierId'] === '0' && !loadingTable" v-on:click.native="editDeliverables(props.item)">
+              <v-btn :disabled="props.item['dossierId'] === '0' ? false : true" slot="activator" flat icon class="mx-0 my-0" v-if="!loadingTable" v-on:click.native="editDeliverables(props.item)">
                 <v-icon>edit</v-icon>
               </v-btn>
               <span>Sửa&nbsp;{{String(loaiDuLieu).toLowerCase()}}</span>
@@ -377,8 +377,8 @@
       <v-card>
         <v-toolbar flat dark color="primary">
           <v-toolbar-title>
-           <span v-if="!viewAttach">Giấy phép</span>
-           <span v-else>Tài liệu đính kèm</span>
+           <span v-if="!viewAttach">{{String(loaiDuLieu).toUpperCase()}}</span>
+           <span v-else>TÀI LIỆU ĐÍNH KÈM</span>
           </v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="dialogPDFList = false">

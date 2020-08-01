@@ -56,7 +56,7 @@
             v-model="congvanSelected"
             label="Chọn công văn"
             item-text="displayName"
-            item-value="documentNo"
+            item-value="dossierId"
             return-object
             :hide-selected="true"
             @change="changeCongVan"
@@ -1297,7 +1297,7 @@ export default {
             }
           }
         }
-        if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan') && (vm.listCongVan === null || vm.listCongVan === undefined || (vm.listCongVan !== null && vm.listCongVan !== undefined && vm.listCongVan.length === 0))) {
+        if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
           vm.processListCongVan(currentQuery)
         }
         // if (vm.listThuTucHanhChinh === null || vm.listThuTucHanhChinh === undefined || (vm.listThuTucHanhChinh !== null && vm.listThuTucHanhChinh !== undefined && vm.listThuTucHanhChinh.length === 0)) {
@@ -1601,20 +1601,20 @@ export default {
         return obj
       }
       let filter = {
-        paramSearch: currentQuery.hasOwnProperty('q') ? getAllUrlParams(currentQuery.q.split('?')[1].split('&')) : {}
+        paramSearch: vm.trangThaiHoSoList[vm.index]['queryParams'] ? getAllUrlParams(vm.trangThaiHoSoList[vm.index]['queryParams'].split('?')[1].split('&')) : {}
       }
       let agencyDonViNhan = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVanTheoDonViNhan') ? vm.trangThaiHoSoList[vm.index]['tableConfig']['searchCongVanTheoDonViNhan'] : ''
       filter.paramSearch = Object.assign(filter.paramSearch, {searchCongVanTheoDonViNhan: agencyDonViNhan})
       vm.$store.dispatch('getListCongVan', filter).then(function (result) {
         if (result.length > 0) {
           vm.listCongVan = result.map(cv => {
-            cv['displayName'] = cv['documentNo'] + ' - ' + cv['govAgencyName']
+            cv['displayName'] = cv['documentNo'] + ' - ' + cv['documentDate'].split(' ')[0] + ' - ' + cv['govAgencyName']
             return cv
           })
         }
-        if (currentQuery.hasOwnProperty('documentNo') && String(currentQuery.documentNo) !== '') {
+        if (currentQuery.hasOwnProperty('groupDossierId') && String(currentQuery.groupDossierId) !== '') {
           for (let key in vm.listCongVan) {
-            if (String(vm.listCongVan[key]['documentNo']) === String(currentQuery.documentNo)) {
+            if (String(vm.listCongVan[key]['dossierId']) === String(currentQuery.groupDossierId)) {
               vm.congvanSelected = vm.listCongVan[key]
             }
           }
