@@ -1849,7 +1849,20 @@ export default {
         actionCode: vm.formActionGroup.action
       }
       vm.$store.dispatch('getDetailActionCongVan', filter).then(result => {
-        vm.createFileCongVan = result.createDossierFiles
+        let createFileCongVan
+        if (result.createDossierFiles) {
+          let createDossierFilesArr = result.createDossierFiles.split(',')
+          for (let index = 0; index < vm.tphsCV.length; index++) {
+            let exits = createDossierFilesArr.filter(function(item) {
+              return item === vm.tphsCV[index]['partNo']
+            })
+            if (exits.length > 0 && vm.tphsCV[index]['partType'] === 7 && vm.tphsCV[index]['hasForm']) {
+              createFileCongVan = vm.tphsCV[index]['partNo']
+            }
+          }
+        }
+        
+        vm.createFileCongVan = createFileCongVan
         vm.postStepCodeCongVan = result.postStepCode
       })
     },

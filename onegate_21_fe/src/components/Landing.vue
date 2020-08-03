@@ -1528,7 +1528,9 @@ export default {
           vm.templateNo = ''
         }
         vm.doLoadingDataHoSo()
-      }).catch(function (){})
+      }).catch(function (){
+        vm.doLoadingDataHoSo()
+      })
     },
     processListDomain (currentQuery) {
       let vm = this

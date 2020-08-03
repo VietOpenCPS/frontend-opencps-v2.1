@@ -1074,6 +1074,7 @@ export default {
           }
           vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result) {
             vm.tphsCV = result['dossierParts']
+            vm.getDetailActionCongVan()
           })
           vm.$store.dispatch('loadDossierFiles', val.dossierId).then(resFiles => {
             vm.filesGroupDossier = resFiles
@@ -1192,7 +1193,13 @@ export default {
         })
         // lấy thông tin createFile công văn
         if (vm.formCode === 'NEW_GROUP_CV_DI') {
-          vm.getDetailActionCongVan()
+          let filterGet = {
+            dossierTemplateNo: vm.thongTinNhomHoSo.dossierTemplateNo
+          }
+          vm.$store.dispatch('loadDossierFormTemplates', filterGet).then(function (result) {
+            vm.tphsCV = result['dossierParts']
+            vm.getDetailActionCongVan()
+          })
         }
       })
     },
@@ -2201,7 +2208,19 @@ export default {
         actionCode: vm.metaDataGroupDossier.actioncode
       }
       vm.$store.dispatch('getDetailActionCongVan', filter).then(result => {
-        vm.createFileCongVan = result.createDossierFiles
+        let createFileCongVan
+        if (result.createDossierFiles) {
+          let createDossierFilesArr = result.createDossierFiles.split(',')
+          for (let index = 0; index < vm.tphsCV.length; index++) {
+            let exits = createDossierFilesArr.filter(function(item) {
+              return item === vm.tphsCV[index]['partNo']
+            })
+            if (exits.length > 0 && vm.tphsCV[index]['partType'] === 7 && vm.tphsCV[index]['hasForm']) {
+              createFileCongVan = vm.tphsCV[index]['partNo']
+            }
+          }
+        }
+        vm.createFileCongVan = createFileCongVan
         vm.postStepCodeCongVan = result.postStepCode
       })
     },
@@ -2226,7 +2245,7 @@ export default {
       vm.$store.dispatch('loadDossierFiles', vm.thongTinNhomHoSo['dossierId']).then(result => {
         let files = result
         let fileKq = files.filter(function(item) {
-          return item.dossierPartNo == vm.createFileCongVan && item.eForm
+          return item.dossierPartNo == vm.createFileCongVan && item.eForm && String(item.dossierPartType) === '7'
         })[0]
         if (fileKq && fileKq['fileSize']) {
           vm.$store.dispatch('viewFile', fileKq).then(result => {
