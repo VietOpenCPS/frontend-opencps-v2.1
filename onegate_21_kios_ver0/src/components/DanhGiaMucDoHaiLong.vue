@@ -44,12 +44,9 @@
         </v-layout>
         <chi-tiet-danh-gia v-if="detailActive" :administration="govAgencySelected" :className='className'></chi-tiet-danh-gia>
         <v-alert class="mt-5 mx-2" v-if="validateTracuu === false && !activeDetailDossier" :value="true" outline color="orange" icon="priority_high">
-          Nhập thông tin tra cứu
+          Nhập thông tin đánh giá
         </v-alert>
         <!--  -->
-        <div class="mx-2 mt-3" v-if="validateTracuu === true && activeDetailDossier">
-          <chi-tiet-ho-so :index="dossierDetail.dossierId"></chi-tiet-ho-so>
-        </div>
         <div class="virtual-keyboard" v-if="visible">
           <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
         </div>

@@ -259,10 +259,17 @@ export default {
                 }, 3000)
                 vm.eformInformation = ''
               })
-            } else if (keySearch[0] === 'D' && keySearch.length !== 1) {
-              let filterDossier = {
-                dossierId: keySearch[2],
-                secretCode: keySearch[1]
+            } else if (keySearch.length !== 1) {
+              let filterDossier = {}
+              if(keySearch[0] === 'D'){
+                filterDossier = {
+                  dossierId: keySearch[2],
+                  secretCode: keySearch[1]
+                }
+              } else {
+                filterDossier = {
+                  dossierId: vm.eformInformation
+                }
               }
               vm.$store.dispatch('getDossierDetail', filterDossier).then(function (result) {
                 if (result) {
@@ -270,6 +277,9 @@ export default {
                     return (item['className'] === 'DOSSIER')
                   })[0]
                   vm.checkinFail = false
+                  if(keySearch[0] !== 'D'){
+                    filterBooking.codeNumber = result.dossierCounter
+                  }
                   filterBooking.className = 'DOSSIER'
                   filterBooking.classPK = result.dossierId
                   filterBooking.serviceCode = result.serviceCode
@@ -339,7 +349,7 @@ export default {
     createBooking (filter) {
       let vm = this
       console.log('filter create booking', filter)
-      let checkCodeNumber = filter.hasOwnProperty('codeNumber') && filter.codeNumber.split("-").length === 1
+      let checkCodeNumber = filter.hasOwnProperty('codeNumber')
       if(filter.codeNumber && checkCodeNumber){
         vm.$store.dispatch('createBooking', filter).then(function (result) {
           vm.isActive = true

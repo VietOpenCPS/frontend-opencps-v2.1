@@ -29,19 +29,19 @@
               TIẾN TRÌNH XỬ LÝ
             </v-btn>
           </v-tab>
-          <v-tab :key="2" href="#tabs-2" @click="loadDossierLogs()" >
+          <!-- <v-tab :key="2" href="#tabs-2" @click="loadDossierLogs()" >
             <v-btn flat class="px-0 py-0 mx-0 my-0">
               NHẬT KÝ SỬA ĐỔI
             </v-btn>
-          </v-tab>
+          </v-tab> -->
           <v-tabs-items v-model="activeTab" reverse-transition="fade-transition" transition="fade-transition" style="overflow: visible!important">
 
             <v-tab-item value="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
               <v-flex xs12 style="height:42px" v-if="!sequencyDossierImport">
-                <v-radio-group class="absolute__btn pt-1" style="width: 350px" v-model="typeTienTrinh" row @change="changeTypeTienTrinh($event)">
+                <!-- <v-radio-group class="absolute__btn pt-1" style="width: 350px" v-model="typeTienTrinh" row @change="changeTypeTienTrinh($event)">
                   <v-radio label="Xem dạng bảng" :value="1" ></v-radio>
                   <v-radio label="Xem dạng biểu đồ" :value="2"></v-radio>
-                </v-radio-group>
+                </v-radio-group> -->
                 <v-btn small color="primary" @click.stop="previewTienTrinh" v-if="hasPreviewSync"
                   :loading="dialogPDFLoading"
                   :disabled="dialogPDFLoading"
@@ -71,7 +71,6 @@
                   <td class="text-xs-left">{{props.item.startDate|dateTimeViewSequency}}</td>
                   <td class="text-xs-left">{{props.item.finishDate|dateTimeViewSequency}}</td>
                   <td class="text-xs-left">{{props.item.actions[0]['note']}}</td>
-
                 </template>
               </v-data-table>
 
@@ -146,7 +145,7 @@
               </div>
             </v-tab-item>
 
-            <v-tab-item value="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+            <!-- <v-tab-item value="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
               <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">
                   <td class="px-2 pt-2" :class="index % 2 !== 0 ? 'col-tien-trinh-1' : 'col-tien-trinh-2'">{{ index + 1 }}</td>
                   <td class="text-xs-left px-2 pt-2 pb-1">
@@ -173,7 +172,7 @@
                     </div>
                 </td>
               </div>
-            </v-tab-item>
+            </v-tab-item> -->
           </v-tabs-items>
         </v-tabs>
         
@@ -223,8 +222,6 @@ export default {
     listHistoryProcessing: [],
     dossierTemplatesTN: [],
     dossierTemplatesKQ: [],
-    thongTinChiTietHoSo: {
-    },
     dialogPDF: false,
     dialogPDFLoading: false,
     loadingAlpacajsForm: false,
@@ -306,12 +303,14 @@ export default {
         align: 'center',
         sortable: false,
         class: 'congviec_column'
-      }, {
+      }, 
+      {
         text: 'Thời hạn quy định',
         align: 'center',
         sortable: false,
         class: 'thoihanquydinh_column'
-      }, {
+      }, 
+      {
         text: 'Ngày bắt đầu',
         align: 'center',
         sortable: false,
@@ -424,6 +423,12 @@ export default {
     loading () {
       return this.$store.getters.loading
     },
+    submissionNote () {
+      return this.$store.getters.submissionNote
+    },
+    thongTinChiTietHoSo () {
+      return this.$store.getters.thongTinChiTietHoSo
+    },
     visibleDoAction () {
       return this.$store.getters.getVisibleDoAction
     },
@@ -473,11 +478,13 @@ export default {
     let vm = this
     window.toastr = toastr
     vm.$nextTick(function () {
-      vm.$store.dispatch('getDetailDossier', vm.index).then(resultDossier => {
-        vm.thongTinChiTietHoSo = resultDossier
-        vm.loadDossierActions()
-        vm.loadDossierLogs()
-      })
+      // vm.$store.dispatch('getDetailDossier', vm.index).then(resultDossier => {
+      //   console.log(resultDossier)
+      //   vm.thongTinChiTietHoSo = resultDossier
+      //   vm.loadDossierActions()
+      //   // vm.loadDossierLogs()
+      // })
+      vm.loadDossierActions()
     })
   },
   updated () {
@@ -543,74 +550,87 @@ export default {
     },
     loadDossierActions (data) {
       var vm = this
-      let submissionNote = ''
-      try {
-        submissionNote = vm.thongTinChiTietHoSo['submissionNote'] ? JSON.parse(vm.thongTinChiTietHoSo['submissionNote']) : ''
-      } catch (error) {
+      try{
+        let submission = JSON.parse(vm.submissionNote)
+        console.log(submission.data)
+        vm.dossierActions = submission.data
+      } catch (err) {
+        vm.dossierActions = []
       }
-      if (submissionNote && submissionNote.hasOwnProperty('dossierImport') && submissionNote.dossierImport) {
-        vm.sequencyDossierImport = true
-        vm.dossierImportActions = submissionNote['data']
-      } else {
-        vm.sequencyDossierImport = false
-        if (vm.thongTinChiTietHoSo.dossierId) {
-          let dataParams = {
-            dossierId: vm.thongTinChiTietHoSo.dossierId,
-            stepType: data
-          }
-          vm.$store.dispatch('loadDossierActions', dataParams).then(resultActions => {
-            if (resultActions.data && resultActions.data.length !== 0) {
-              let resultTemp = resultActions.data
-              for (var i = 0; i < resultTemp.length; i++) {
-                if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
-                  if (!Array.isArray(resultTemp[i]['actions'])) {
-                    let arrActionsTemp = []
-                    arrActionsTemp.push(resultTemp[i]['actions'])
-                    resultTemp[i]['actions'] = arrActionsTemp
-                  }
-                }
-              }
-              vm.dossierActions = resultTemp
-            } else {
-              if (vm.thongTinChiTietHoSo['submissionNote']) {
-                try {
-                  JSON.parse(vm.thongTinChiTietHoSo['submissionNote'])
-                  let resultTemp = JSON.parse(vm.thongTinChiTietHoSo['submissionNote']).data
-                  for (var i = 0; i < resultTemp.length; i++) {
-                    if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
-                      if (!Array.isArray(resultTemp[i]['actions'])) {
-                        let arrActionsTemp = []
-                        arrActionsTemp.push(resultTemp[i]['actions'])
-                        resultTemp[i]['actions'] = arrActionsTemp
-                      }
-                    }
-                  }
-                  vm.dossierActions = resultTemp
-                } catch (e) {
-                }
-              }
-            }
-          }).catch(function () {
-            if (vm.thongTinChiTietHoSo['submissionNote']) {
-              try {
-                JSON.parse(vm.thongTinChiTietHoSo['submissionNote'])
-                let resultTemp = JSON.parse(vm.thongTinChiTietHoSo['submissionNote']).data
-                for (var i = 0; i < resultTemp.length; i++) {
-                  if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
-                    if (!Array.isArray(resultTemp[i]['actions'])) {
-                      let arrActionsTemp = []
-                      arrActionsTemp.push(resultTemp[i]['actions'])
-                      resultTemp[i]['actions'] = arrActionsTemp
-                    }
-                  }
-                }
-                vm.dossierActions = resultTemp
-              } catch (e) {
-              }
-            }
-          })
-        }
-      }
+
+      // let submissionNote = ''
+      // try {
+      //   submissionNote = vm.thongTinChiTietHoSo['submissionNote'] ? JSON.parse(vm.thongTinChiTietHoSo['submissionNote']) : ''
+      // } catch (error) {
+      // }
+      // if (submissionNote && submissionNote.hasOwnProperty('dossierImport') && submissionNote.dossierImport) {
+      //   vm.sequencyDossierImport = true
+      //   vm.dossierImportActions = submissionNote['data']
+      //   console.log(vm.dossierImportActions)
+      // } else {
+      //   vm.sequencyDossierImport = false
+      //   if (vm.thongTinChiTietHoSo.dossierId) {
+      //     let dataParams = {
+      //       dossierId: vm.thongTinChiTietHoSo.dossierId,
+      //       stepType: data
+      //     }
+      //     // vm.$store.dispatch('loadDossierActions', dataParams).then(resultActions => {
+      //     //   if (resultActions.data && resultActions.data.length !== 0) {
+      //     //     let resultTemp = resultActions.data
+      //     //     for (var i = 0; i < resultTemp.length; i++) {
+      //     //       if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+      //     //         if (!Array.isArray(resultTemp[i]['actions'])) {
+      //     //           let arrActionsTemp = []
+      //     //           arrActionsTemp.push(resultTemp[i]['actions'])
+      //     //           resultTemp[i]['actions'] = arrActionsTemp
+      //     //         }
+      //     //       }
+      //     //     }
+      //     //     vm.dossierActions = resultTemp
+      //     //   } else {
+      //     //     if (vm.thongTinChiTietHoSo['submissionNote']) {
+      //     //       try {
+      //     //         JSON.parse(vm.thongTinChiTietHoSo['submissionNote'])
+      //     //         let resultTemp = JSON.parse(vm.thongTinChiTietHoSo['submissionNote']).data
+      //     //         for (var i = 0; i < resultTemp.length; i++) {
+      //     //           if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+      //     //             if (!Array.isArray(resultTemp[i]['actions'])) {
+      //     //               let arrActionsTemp = []
+      //     //               arrActionsTemp.push(resultTemp[i]['actions'])
+      //     //               resultTemp[i]['actions'] = arrActionsTemp
+      //     //             }
+      //     //           }
+      //     //         }
+      //     //         vm.dossierActions = resultTemp
+      //     //       } catch (e) {
+      //     //       }
+      //     //     }
+      //     //   }
+
+      //     // }).catch(function () {
+      //     //   if (vm.thongTinChiTietHoSo['submissionNote']) {
+      //     //     try {
+      //     //       JSON.parse(vm.thongTinChiTietHoSo['submissionNote'])
+      //     //       let resultTemp = JSON.parse(vm.thongTinChiTietHoSo['submissionNote']).data
+      //     //       for (var i = 0; i < resultTemp.length; i++) {
+      //     //         if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+      //     //           if (!Array.isArray(resultTemp[i]['actions'])) {
+      //     //             let arrActionsTemp = []
+      //     //             arrActionsTemp.push(resultTemp[i]['actions'])
+      //     //             resultTemp[i]['actions'] = arrActionsTemp
+      //     //           }
+      //     //         }
+      //     //       }
+      //     //       vm.dossierActions = resultTemp
+      //     //     } catch (e) {
+      //     //     }
+      //     //   }
+      //     // })
+      //       let submission = JSON.parse(vm.submissionNote)
+      //       console.log(submission.data)
+      //       vm.dossierActions = submission.data
+      //   }
+      // }
       
     },
     loadMermaidgraph (data) {
@@ -674,18 +694,18 @@ export default {
         vm.dialogPDFLoading = false
       })
     },
-    loadDossierLogs (data) {
-      var vm = this
-      // data.dossierId = vm.thongTinChiTietHoSo.dossierId
-      let dataParams = {
-        dossierId: vm.thongTinChiTietHoSo.dossierId
-      }
-      let promiseHisProcessing = vm.$store.dispatch('getListHistoryProcessingItems', dataParams)
-      promiseHisProcessing.then(function (result) {
-        vm.listHistoryProcessing = []
-        vm.listHistoryProcessing = result
-      })
-    },
+    // loadDossierLogs () {
+    //   var vm = this
+    //   // data.dossierId = vm.thongTinChiTietHoSo.dossierId
+    //   let dataParams = {
+    //     dossierId: vm.thongTinChiTietHoSo.referenceUid
+    //   }
+    //   let promiseHisProcessing = vm.$store.dispatch('getListHistoryProcessingItems', dataParams)
+    //   promiseHisProcessing.then(function (result) {
+    //     vm.listHistoryProcessing = []
+    //     vm.listHistoryProcessing = result
+    //   })
+    // },
     deleteDossierFileVersion (item) {
       var vm = this
       item['dossierId'] = vm.thongTinChiTietHoSo.dossierId

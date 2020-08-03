@@ -1,7 +1,7 @@
 if (process.env.NODE_ENV === 'production') {
   module.exports = {
     runtimeCompiler: true,
-    productionSourceMap: true,
+    productionSourceMap: false,
     chainWebpack: config => {
       config.module.rule('images').use('url-loader')
         .loader('file-loader') // replaces the url-loader

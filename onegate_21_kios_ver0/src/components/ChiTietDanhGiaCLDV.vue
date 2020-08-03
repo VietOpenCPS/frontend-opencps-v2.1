@@ -25,7 +25,7 @@
       </v-alert>
     </div>
     <div :class="visible ? 'validDanhGiaCLDV': ''">
-      <v-layout wrap :class="!isMobile ? 'mt-4' : 'mt-0'" v-if="!isSigned && votingItems.length > 0">
+      <v-layout wrap :class="!isMobile ? 'mt-4' : 'mt-0'" v-if="!isSigned && !isOneGate && votingItems.length > 0">
         <v-flex xs12 sm6 :class="!isMobile ? 'pr-3' : 'pr-0'">
           <v-layout wrap>
             <div style="width:110px" class="text-bold">Mã hồ sơ <span style="color:red">*</span></div>
@@ -197,6 +197,10 @@ export default {
             vm.$router.push({
               path: '/danh-gia-cldv'
             })
+          } else {
+            vm.$router.push({
+              path: '/danh-gia-mdhl'
+            })            
           }
         }).catch(xhr => {
           vm.loadingAction = false

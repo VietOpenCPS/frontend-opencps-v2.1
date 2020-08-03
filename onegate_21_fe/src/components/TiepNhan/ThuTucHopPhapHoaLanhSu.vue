@@ -1789,10 +1789,13 @@ export default {
             vm.listGiayTo.forEach(e=>{
                 tong_so+=parseInt(e['so_ban'])
                 file_bien_nhan2[file_bien_nhan2.length] = {'partNo': 'TP03', 'partName': e['ten_giay_to'] + ' ('+e['so_hieu_giay_to']+')', 'fileMark': '-1', 'fileMarkName': e['loai_giay_to'], 'recordCount': e['so_ban']}
-                thanh_tien = parseInt(e['so_ban']) * 30000;
-                file_payment2[file_payment2.length] = {'partNo': 'TP03', 'partName': e['ten_giay_to'] + ' ('+e['so_hieu_giay_to']+')', 'fileMark': '-1', 'fileMarkName': e['loai_giay_to'], 'recordCount': e['so_ban'], 'trang_thai': 1, 'don_gia': 30000, 'thanh_tien': thanh_tien}
+                thanh_tien += parseInt(e['so_ban']) * 30000;
+                // file_payment2[file_payment2.length] = {'partNo': 'TP03', 'partName': e['ten_giay_to'] + ' ('+e['so_hieu_giay_to']+')', 'fileMark': '-1', 'fileMarkName': e['loai_giay_to'], 'recordCount': e['so_ban'], 'trang_thai': 1, 'don_gia': 30000, 'thanh_tien': thanh_tien}
 
             })
+            file_payment2[file_payment2.length] = {'partNo': 'TP03','serviceName': vm.dossiers.dossierName.replace('Thủ tục ', '').charAt(0).toUpperCase() + vm.dossiers.dossierName.replace('Thủ tục ', '').slice(1),'partName': '', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': tong_so, 'trang_thai': 1, 'don_gia': 30000, 'thanh_tien': thanh_tien}
+            file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty' ,'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'}
+            file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty' ,'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'}
             let totalRecord = 0
             for(let i =0; i<file_bien_nhan2.length ; i++){
                 if(file_bien_nhan2[i]['partNo'] === 'TP03'){
