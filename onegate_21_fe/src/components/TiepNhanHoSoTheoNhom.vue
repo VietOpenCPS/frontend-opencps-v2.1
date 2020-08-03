@@ -37,7 +37,7 @@
         <thong-tin-chu-ho-so v-if="formCode === 'NEW_GROUP'" :showApplicant="true" :showDelegate="false" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
 
         <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" ref="thongtincongvan" :detailDossier="thongTinNhomHoSo"
-         :tphs="tphsCV" :createFileCongVan="createFileCongVan" :formCodeInput="formCode" :donvinhanCollection="donvinhanCollection" :lengthDossier="dossiersIntoGroupRender.length">
+         :tphs="tphsCV" :createFileCongVan="createFileCongVan" :formCodeInput="formCode" :requiredCVDenGroupId="requiredCVDenGroupId" :requiredCVDenGovCode="requiredCVDenGovCode" :donvinhanCollection="donvinhanCollection" :lengthDossier="dossiersIntoGroupRender.length">
         </thong-tin-cong-van>
 
         <div v-if="formCode === 'NEW_GROUP'" style="position: relative;border-top: 1px solid #dedede;">
@@ -181,7 +181,7 @@
                         <span v-if="props.item.applicantNote">{{props.item.applicantNote}} </span>
                       </td>
                       
-                      <td class="text-xs-center" width="170px" style="height: 40px !important">
+                      <td class="text-xs-center" :width="!metaDataGroupDossier.hasOwnProperty('congvandagui') ? '200px' : '70px'" style="height: 40px !important">
                         <v-btn flat icon color="indigo" class="mr-2 my-0" @click="viewDetail(props.item)" title="Xem chi tiết">
                           <v-icon>fas fa fa-file-text</v-icon>
                         </v-btn>
@@ -868,7 +868,7 @@ export default {
         class: 'text-xs-center'
       },
       {
-        text: 'Số năm được hưởng',
+        text: 'Số tháng được hưởng',
         align: 'center',
         sortable: false,
         class: 'text-xs-center'
@@ -946,6 +946,8 @@ export default {
     createFileCongVan: '',
     postStepCodeCongVan: '',
     donvinhanCollection: '',
+    requiredCVDenGroupId: '',
+    requiredCVDenGovCode: '',
     dialogPDF: false,
     congvanguiden: false
   }),
@@ -971,7 +973,7 @@ export default {
     },
     menuConfigs () {
       return this.$store.getters.getMenuConfigsTodo
-    },
+    }
   },
   created () {
     var vm = this
@@ -1040,7 +1042,7 @@ export default {
           let metaData = vm.getMetaData(arr[i])
           let fee = 0
           if (metaData) {
-            fee = Number(metaData['yearPayment'])*12*Number(metaData['subsidy'])
+            fee = Number(metaData['yearPayment'])*Number(metaData['subsidy'])
             totalFee += fee
           }
         }
@@ -1072,6 +1074,7 @@ export default {
           }
           vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result) {
             vm.tphsCV = result['dossierParts']
+            vm.getDetailActionCongVan()
           })
           vm.$store.dispatch('loadDossierFiles', val.dossierId).then(resFiles => {
             vm.filesGroupDossier = resFiles
@@ -1162,6 +1165,8 @@ export default {
         vm.groupDossierSelected = resultDossier
         vm.metaDataGroupDossier = vm.getMetaData(vm.thongTinNhomHoSo)
         vm.donvinhanCollection = vm.metaDataGroupDossier.hasOwnProperty('donvinhancollection') ? vm.metaDataGroupDossier.donvinhancollection : ''
+        vm.requiredCVDenGroupId = vm.metaDataGroupDossier.hasOwnProperty('requiredCVDenGroupId') ? vm.metaDataGroupDossier.requiredCVDenGroupId : ''
+        vm.requiredCVDenGovCode = vm.metaDataGroupDossier.hasOwnProperty('requiredCVDenGovCode') ? vm.metaDataGroupDossier.requiredCVDenGovCode : ''
         let filter = {
           groupDossierId: id
         }
@@ -1188,7 +1193,13 @@ export default {
         })
         // lấy thông tin createFile công văn
         if (vm.formCode === 'NEW_GROUP_CV_DI') {
-          vm.getDetailActionCongVan()
+          let filterGet = {
+            dossierTemplateNo: vm.thongTinNhomHoSo.dossierTemplateNo
+          }
+          vm.$store.dispatch('loadDossierFormTemplates', filterGet).then(function (result) {
+            vm.tphsCV = result['dossierParts']
+            vm.getDetailActionCongVan()
+          })
         }
       })
     },
@@ -1328,44 +1339,85 @@ export default {
               } else {
                 meta = Object.assign(thongtincongvan.metaData, {congvandagui: true, totalSubsidy: vm.totalFee})
               }
-              // tạo file in công văn
-              vm.createFileKqCongVan('send')
             }
             
             let dataMetaData = {
               id: thongtincongvan.dossierId,
               data: JSON.stringify(meta)
             }
-            vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{})
+            
             if (vm.formCode === 'NEW_GROUP_CV') {
-              vm.loadingAction = false
-              vm.$router.push({
-                path: '/danh-sach-ho-so/' + currentParams.index + '?' + window.location.href.split('?')[1]
-              })
-            } else {
-              let dataAddGroup = {
-                groupDossierId: thongtincongvan.dossierId,
-                dossierId: ''
-              }
-              let dossierIdArr = []
-              for (let key in vm.dossiersIntoGroupRender) {
-                dossierIdArr.push(vm.dossiersIntoGroupRender[key]['dossierId'])
-              }
-              dataAddGroup['dossierId'] = dossierIdArr.toString()
-              if (draf === 'save') {
-                vm.$store.dispatch('postDossierIntoGroup', dataAddGroup).then(function (result) {
-                  vm.loadingAction = false
-                  toastr.success('Lưu công văn thành công')
-                  vm.$router.push({
-                    path: '/danh-sach-ho-so/' + currentParams.index + '?' + window.location.href.split('?')[1]
-                  })
-                }).catch (() => {
-                  vm.loadingAction = false
+              vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
+                vm.loadingAction = false
+                vm.$router.push({
+                  path: '/danh-sach-ho-so/' + currentParams.index + '?' + window.location.href.split('?')[1]
                 })
-              } else {
-                // do action dossierIntoGroup
-                vm.processAction()
-              }
+              }).catch(function () {
+                vm.loadingAction = false
+                toastr.clear()
+                toastr.error('Yêu cầu của bạn thực hiện thất bại')
+              })
+              
+            } else {
+              vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
+                let dataAddGroup = {
+                  groupDossierId: thongtincongvan.dossierId,
+                  dossierId: ''
+                }
+                let dossierIdArr = []
+                for (let key in vm.dossiersIntoGroupRender) {
+                  dossierIdArr.push(vm.dossiersIntoGroupRender[key]['dossierId'])
+                }
+                dataAddGroup['dossierId'] = dossierIdArr.toString()
+                if (vm.createFileCongVan) {
+                  let filter = {
+                    dossierId: vm.thongTinNhomHoSo['dossierId'],
+                    partNo: vm.createFileCongVan
+                  }
+                  vm.$store.dispatch('loadFormData', filter).then(function (result) {
+                    let formData = JSON.parse(result)
+                    let formDataPut = Object.assign(formData, {tp: vm.createFileCongVan, dossierId: vm.thongTinNhomHoSo['dossierId']})
+                    vm.$store.dispatch('postEformCallBack', formDataPut).then(function (result) {
+                      if (draf === 'save') {
+                        vm.$store.dispatch('postDossierIntoGroup', dataAddGroup).then(function (result) {
+                          vm.loadingAction = false
+                          toastr.success('Lưu công văn thành công')
+                          vm.$router.push({
+                            path: '/danh-sach-ho-so/' + currentParams.index + '?' + window.location.href.split('?')[1]
+                          })
+                        }).catch (() => {
+                          vm.loadingAction = false
+                        })
+                      } else {
+                        // do action dossierIntoGroup
+                        vm.processAction()
+                      }
+                    })
+                    
+                  }).catch(function (reject) {
+                  })
+                } else {
+                  if (draf === 'save') {
+                    vm.$store.dispatch('postDossierIntoGroup', dataAddGroup).then(function (result) {
+                      vm.loadingAction = false
+                      toastr.success('Lưu công văn thành công')
+                      vm.$router.push({
+                        path: '/danh-sach-ho-so/' + currentParams.index + '?' + window.location.href.split('?')[1]
+                      })
+                    }).catch (() => {
+                      vm.loadingAction = false
+                    })
+                  } else {
+                    // do action dossierIntoGroup
+                    vm.processAction()
+                  }
+                }
+              }).catch(rejectXhr => {
+                vm.loadingAction = false
+                toastr.clear()
+                toastr.error('Yêu cầu của bạn thực hiện thất bại')
+              })
+              
             }
 
           }).catch(rejectXhr => {
@@ -2016,7 +2068,10 @@ export default {
         sort: 'dossierNo',
         top: 'passed',
         order: true,
-        groupDossierId: vm.thongTinNhomHoSo.dossierId
+        groupDossierIdHs: vm.thongTinNhomHoSo.dossierId
+      }
+      if (vm.metaDataGroupDossier.hasOwnProperty('requiredCVDenGroupId')) {
+        filter = Object.assign(filter, {groupDossierId: vm.metaDataGroupDossier.requiredCVDenGroupId})
       }
       if (apiGetDossier) {
         vm.$store.dispatch('getHoSoAddGroup', filter).then(function (result) {
@@ -2127,11 +2182,15 @@ export default {
       if (vm.dossiersIntoGroupRender.length > 0) {
         vm.loadingAction = true
         vm.$store.dispatch('doActionDossierIntoGroup', filter).then(function (result) {
-          console.log('success do action')
           vm.loadingAction = false
           toastr.success('Lưu và gửi công văn thành công')
-          window.history.back()
-          // vm.copyFileDossierIntoGroup()
+          vm.$router.push({
+            path: '/danh-sach-ho-so/' + vm.index,
+            query: {
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+              q: vm.menuConfigs[vm.index]['queryParams']
+            }
+          })
         }).catch(function (reject) {
           vm.loadingAction = false
         })
@@ -2149,7 +2208,19 @@ export default {
         actionCode: vm.metaDataGroupDossier.actioncode
       }
       vm.$store.dispatch('getDetailActionCongVan', filter).then(result => {
-        vm.createFileCongVan = result.createDossierFiles
+        let createFileCongVan
+        if (result.createDossierFiles) {
+          let createDossierFilesArr = result.createDossierFiles.split(',')
+          for (let index = 0; index < vm.tphsCV.length; index++) {
+            let exits = createDossierFilesArr.filter(function(item) {
+              return item === vm.tphsCV[index]['partNo']
+            })
+            if (exits.length > 0 && vm.tphsCV[index]['partType'] === 7 && vm.tphsCV[index]['hasForm']) {
+              createFileCongVan = vm.tphsCV[index]['partNo']
+            }
+          }
+        }
+        vm.createFileCongVan = createFileCongVan
         vm.postStepCodeCongVan = result.postStepCode
       })
     },
@@ -2174,9 +2245,9 @@ export default {
       vm.$store.dispatch('loadDossierFiles', vm.thongTinNhomHoSo['dossierId']).then(result => {
         let files = result
         let fileKq = files.filter(function(item) {
-          return item.dossierPartNo == vm.createFileCongVan
+          return item.dossierPartNo == vm.createFileCongVan && item.eForm && String(item.dossierPartType) === '7'
         })[0]
-        if (fileKq) {
+        if (fileKq && fileKq['fileSize']) {
           vm.$store.dispatch('viewFile', fileKq).then(result => {
             vm.loadingAction = false
             vm.dialogPDF = true
@@ -2185,6 +2256,7 @@ export default {
             vm.loadingAction = false
           })
         } else {
+          toastr.error('Bản in công văn chưa được tạo')
           vm.loadingAction = false
         }
       }).catch (() => {

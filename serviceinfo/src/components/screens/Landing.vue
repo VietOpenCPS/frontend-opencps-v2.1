@@ -729,7 +729,8 @@ export default {
     govAgencyListTiepNhan: [],
     govAgencyTiepNhanSelected: '',
     selectGuide: false,
-    onlyLoginDvcqg: false
+    onlyLoginDvcqg: false,
+    titleNopHoSo: ''
   }),
   computed: {
     govAgencyList () {

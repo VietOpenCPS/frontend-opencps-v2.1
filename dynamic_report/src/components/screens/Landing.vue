@@ -1305,6 +1305,7 @@ export default {
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           vm.dataExportExcel = docDString
+          console.log('docDString1234123', docDString)
           vm.docDefinition = JSON.parse(docDString)
 
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
@@ -1483,7 +1484,6 @@ export default {
 
           // TODO
           let resultData = result
-          // console.log('resultData 1', resultData)
           if (selection !== undefined && selection !== null && selection.length > 0) {
             // console.log('selection', selection)
             resultData = result.filter(function(obj) {
@@ -1519,7 +1519,7 @@ export default {
               }
             })
           }
-          // console.log('resultData 1', resultData)
+          console.log('resultData555', resultData)
           let resultDataTotal = [resultData.find(function(obj) {
             if (subKey !== null && subKey !== undefined && subKey !== '') {
               if ((obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) && obj[subKey] === '') {
@@ -1531,7 +1531,10 @@ export default {
               }
             }
           })]
-        //  console.log('resultDataTotal 1', resultDataTotal)
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('notSumkey')) {
+            resultDataTotal = resultData
+          }
+         console.log('resultDataTotal666', resultDataTotal)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -1588,7 +1591,7 @@ export default {
           }
           let dataToExportCSV = []
           for (let key in resultData) {
-            let dataInput = resultData[key]
+            let dataInput = resultData[key]            
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
                 (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0')) {
               let dataRow = []
@@ -1620,6 +1623,7 @@ export default {
                     dataText = Math.round(eval(currentConfig['calculator']))
                   }
                 } else {
+                  console.log('resultData[key]', resultData[key], currentConfig['value'] )
                   if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                     if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
                       dataText =  ' - ' + resultData[key][currentConfig['subValue']] + ' '
@@ -1667,15 +1671,14 @@ export default {
               dataToExportCSV.push(dataToExportCSVItem)
             }
           }
-          // 
-          console.log('dataRowRenderHtmlTable777', vm.dataRowRenderHtmlTable)
-          // 
           if (vm.agencyLists.length > 0 && vm.govAgency === 0) {
+            console.log('resultDataTotal777', resultDataTotal)
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
               for (let keyMappingXXTT in vm.itemsReportsConfig) {
                 let dataTextXXTT = ''
                 let currentConfigXXTT = vm.itemsReportsConfig[keyMappingXXTT]
+                console.log('currentConfigXXTT777', currentConfigXXTT)
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
                   var dataInputXXTT = resultDataTotal[keyXXTT]
                   let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
@@ -1720,7 +1723,7 @@ export default {
                 indexTotalXXTT = indexTotalXXTT + 1
               }
             }
-            // console.log('dataRowTotal 666', dataRowTotal)
+            console.log('dataRowTotal 666', dataRowTotal)
           }
           vm.dataReportXX += JSON.stringify(dataRowTotal)
           // console.log('vm.dataReportXX 1231', vm.dataReportXX)
