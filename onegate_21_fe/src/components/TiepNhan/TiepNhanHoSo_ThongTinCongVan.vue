@@ -8,7 +8,7 @@
               <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div> Thông tin công văn</div>
               <v-card>
                 <v-card-text class="pt-3">
-                  <v-layout wrap>
+                  <v-layout wrap v-if="!congVanDaGui">
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
@@ -74,13 +74,14 @@
                       </content-placeholders>
                       <v-subheader v-else class="pl-0">Số lượng hồ sơ đề nghị xét<span style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm4 class="mb-2">
+                    <v-flex xs12 sm4 class="mb-2 input-no-drop">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="lengthDossier"
+                      disabled
                       ></v-text-field>
                       <p class="pt-2" v-else>{{lengthDossier}}</p>
                     </v-flex>
@@ -184,11 +185,11 @@
                       </content-placeholders>
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
-                      v-model="signerCongVan"
+                      v-model="jobposSignerCongVan"
                       :rules="[rules.required]"
                       required
                       ></v-text-field>
-                      <p class="pt-2" v-else>{{signerCongVan}}</p>
+                      <p class="pt-2" v-else>{{jobposSignerCongVan}}</p>
                     </v-flex>
                     <v-flex xs12 sm2 class="mb-2">
                       <content-placeholders class="mt-1" v-if="loading">
@@ -202,11 +203,11 @@
                       </content-placeholders>
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
-                      v-model="jobposSignerCongVan"
+                      v-model="signerCongVan"
                       :rules="[rules.required]"
                       required
                       ></v-text-field>
-                      <p class="pt-2" v-else>{{jobposSignerCongVan}}</p>
+                      <p class="pt-2" v-else>{{signerCongVan}}</p>
                     </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
@@ -245,10 +246,10 @@
                     </v-flex>
 
                     <v-flex xs12 class="mt-2">
-                      <div class="mb-2"> <span style="color:red">(*) &nbsp;</span>Tài liệu đính kèm: <i v-if="dossierFilesItems.length === 0">(Chưa có tài liệu đính kèm)</i></div>
+                      <div class="mb-2"> <span style="color:red">(*) &nbsp;</span>Tài liệu đính kèm: <i v-if="fileAttachCounter === 0">(Không có tài liệu đính kèm)</i></div>
                       <div v-for="(itemFileView, index) in dossierFilesItems" :key="index">
                         <div v-if="!itemFileView.eForm">
-                          <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
+                          <span v-on:click.stop="viewFile2(itemFileView)" class="ml-0" style="cursor: pointer;">
                             <v-icon class="mr-1" v-if="itemFileView.fileSize !== 0" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
                               :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
                               {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
@@ -268,6 +269,55 @@
                         Chọn tài liệu tải lên
                       </v-btn>
                       
+                    </v-flex>
+                  </v-layout>
+                  <v-layout wrap v-else>
+                    <v-flex xs12 sm4 class="pr-3">
+                      <div class="xs12 sm12 pb-2">
+                        <span class="pr-2">Số công văn: </span>
+                        <span class="pl-0 text-bold"> {{thongTinCongVan.documentNo}}</span>
+                      </div>
+                      <div class="xs12 sm12 pb-2">
+                        <span class="pr-2">Ngày công văn: </span>
+                        <span class="pl-0 text-bold"> {{dateFormated}}</span>
+                      </div>
+                      <div class="xs12 sm12 pb-2">
+                        <span class="pr-2">Ngày hẹn trả lời: </span>
+                        <span class="pl-0 text-bold"> {{duedateFormated}}</span>
+                      </div>
+                    </v-flex>
+                    <v-flex xs12 sm4 class="pr-3">
+                      <div class="xs12 sm12 pb-2">
+                        <span v-if="formCodeInput === 'NEW_GROUP_CV'" class="pr-2">Đơn vị gửi công văn: </span>
+                        <span v-if="formCodeInput === 'NEW_GROUP_CV_DI'" class="pr-2">Đơn vị nhận công văn: </span> 
+                        <span class="pl-0 text-bold"> {{formCodeInput === 'NEW_GROUP_CV_DI' ? metaDataDossier.tendonvinhan : metaDataDossier.tendonvigui}}</span>
+                      </div>
+                      <div class="xs12 sm12 pb-2">
+                        <span class="pr-2">Chức vụ người ký: </span>
+                        <span class="pl-0 text-bold"> {{jobposSignerCongVan}}</span>
+                      </div>
+                      <div class="xs12 sm12 pb-2">
+                        <span class="pr-2">Người ký: </span>
+                        <span class="pl-0 text-bold"> {{signerCongVan}}</span>
+                      </div>
+                    </v-flex>
+                    <v-flex xs12 sm4 class="pr-3">
+                      <div class="xs12 sm12 pb-2">
+                        <span class="pr-2">Số lượng hồ sơ đề nghị xét: </span>
+                        <span class="pl-0 text-bold"> {{lengthDossier}}</span>
+                      </div>
+                      <div class="xs12 sm12 pb-2">
+                        <span class="pr-2">Số điện thoại: </span>
+                        <span class="pl-0 text-bold"> {{thongTinCongVan.contactTelNo}}</span>
+                      </div>
+                      <div class="xs12 sm12 pb-2">
+                        <span class="pr-2">Địa chỉ email: </span>
+                        <span class="pl-0 text-bold"> {{thongTinCongVan.contactEmail}}</span>
+                      </div>
+                    </v-flex>
+                    <v-flex xs12 class="pr-3">
+                      <span class="pr-2">Nội dung tóm tắt: </span>
+                      <span class="pl-0 text-bold"> {{thongTinCongVan.briefNote}}</span>
                     </v-flex>
                   </v-layout>
                 </v-card-text>
@@ -322,7 +372,7 @@ export default {
     'suggestions': Suggestions,
     'tiny-pagination': TinyPagination
   },
-  props: ['formCodeInput', 'detailDossier', 'donvinhanCollection', 'tphs', 'lengthDossier', 'createFileCongVan'],
+  props: ['formCodeInput', 'detailDossier', 'donvinhanCollection', 'tphs', 'lengthDossier', 'createFileCongVan', 'requiredCVDenGroupId', 'requiredCVDenGovCode'],
   data: () => ({
     loading: false,
     dialogPDFLoading: false,
@@ -331,7 +381,7 @@ export default {
     thongTinCongVan: '',
     donvi_gui_nhan: '',
     dossierFilesItems: [],
-    dossierFilesItemsAttach: [],
+    fileAttachCounter: 0,
     menuDate: false,
     menuDueDate: false,
     documentDate: null,
@@ -403,6 +453,10 @@ export default {
         vm.getGovAgencyList()
       }
     },
+    requiredCVDenGovCode () {
+      let vm = this
+      vm.getGovAgencyList()
+    },
     createFileCongVan (val) {
       let vm = this
       if (val && vm.dossierFilesItems) {
@@ -410,6 +464,12 @@ export default {
           return item.dossierPartNo == val
         })
       }
+    },
+    dossierFilesItems (val) {
+      let vm = this
+      vm.fileAttachCounter = val.filter(function(item) {
+        return !item.eForm
+      }).length
     }
     // thongTinCongVan: {
     //   handler: function (value) {
@@ -435,6 +495,8 @@ export default {
           vm.signerCongVan = metadata.hasOwnProperty('signerCongVan') ? metadata.signerCongVan : ''
         } else {
           vm.donvi_gui_nhan = metadata.donvigui
+          vm.jobposSignerCongVan = metadata.hasOwnProperty('jobposSignerCongVan') ? metadata.jobposSignerCongVan : ''
+          vm.signerCongVan = metadata.hasOwnProperty('signerCongVan') ? metadata.signerCongVan : ''
         }
         
       } catch (error) {
@@ -475,6 +537,8 @@ export default {
         metaData.tendonvigui = delegateName
         metaData.donvigui = vm.donvi_gui_nhan
         metaData.donvinhan = scopeUser ? scopeUser : vm.detailDossier.govAgencyCode
+        metaData.jobposSignerCongVan = vm.jobposSignerCongVan
+        metaData.signerCongVan = vm.signerCongVan
       } else {
         metaData.donvigui = scopeUser ? scopeUser : vm.detailDossier.govAgencyCode
         metaData.tendonvigui = vm.detailDossier.govAgencyName
@@ -526,7 +590,7 @@ export default {
       if (x) {
         item['dossierId'] = vm.detailDossier.dossierId
         vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
-          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+          vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
             vm.dossierFilesItems = result
             if (vm.createFileCongVan) {
               vm.dossierFilesItems = vm.dossierFilesItems.filter(function (item) {
@@ -593,7 +657,7 @@ export default {
               if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
                 scopeUser = String(vm.employeeLoginInfomation.scope).split(',')[0]
               }
-              itemParent = collectionSearch.parrentCode === '#scope' ? scopeUser : 'govAgencyCodeDVDEN'
+              itemParent = collectionSearch.parrentCode === '#scope' ? scopeUser : vm.requiredCVDenGovCode
             } else {
               itemParent = collectionSearch.parrentCode
             }
@@ -611,7 +675,7 @@ export default {
               if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
                 scopeUser = String(vm.employeeLoginInfomation.scope).split(',')[0]
               }
-              itemChild = collectionSearch.isParrentCode === '#scope' ? scopeUser : 'govAgencyCodeDVDEN'
+              itemChild = collectionSearch.isParrentCode === '#scope' ? scopeUser : vm.requiredCVDenGovCode
             } else {
               itemChild = collectionSearch.isParrentCode
             }
@@ -629,7 +693,7 @@ export default {
               if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
                 scopeUser = String(vm.employeeLoginInfomation.scope).split(',')[0]
               }
-              itemChild = collectionSearch.itemCode === '#scope' ? scopeUser : 'govAgencyCodeDVDEN'
+              itemChild = collectionSearch.itemCode === '#scope' ? scopeUser : vm.requiredCVDenGovCode
             } else {
               itemChild = collectionSearch.itemCode
             }
@@ -640,6 +704,14 @@ export default {
               getCurrentItem: true
             }
             vm.getDetailDictitem(filterGet)
+          }
+          if (collectionSearch.hasOwnProperty('groupCode')) {
+            let filterGet = {
+              collectionCode: collectionSearch.collectionCode,
+              level: '',
+              groupCode: collectionSearch.groupCode
+            }
+            vm.getGroupDictitem(filterGet)
           }
         }
         
@@ -718,6 +790,19 @@ export default {
           let parent = result.parentItem ? result.parentItem : []
           vm.govAgencySubmitList = Array.isArray(parent) ? parent : [parent]
         }
+        if (vm.govAgencySubmitList.length === 1 && vm.formCodeInput === 'NEW_GROUP_CV_DI') {
+          vm.donvi_gui_nhan = vm.govAgencySubmitList[0]['itemCode']
+        }
+      })
+    },
+    getGroupDictitem (filterGet) {
+      let vm = this
+      let filter = {
+        collectionCode: filterGet.hasOwnProperty('collectionCode') ? filterGet.collectionCode : 'DON_VI_CONG_VAN',
+        groupCode: filterGet.groupCode
+      }
+      vm.$store.dispatch('getGroupDictitem', filter).then(function (result) {
+        vm.govAgencySubmitList = Array.isArray(result) ? result : [result]
         if (vm.govAgencySubmitList.length === 1 && vm.formCodeInput === 'NEW_GROUP_CV_DI') {
           vm.donvi_gui_nhan = vm.govAgencySubmitList[0]['itemCode']
         }

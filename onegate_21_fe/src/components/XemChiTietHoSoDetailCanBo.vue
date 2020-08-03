@@ -1232,7 +1232,7 @@ export default {
         dossierTemplateNo: vm.thongTinChiTietHoSo.dossierTemplateNo
       }
       vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result) {
-        vm.mauCongVan = result['newFormScript'] && result['newFormScript'].startsWith('MAU_CV_') ? result['newFormScript'] : false 
+        vm.mauCongVan = result['newFormScript'] && result['newFormScript'].startsWith('MAU_CV_') ? result['newFormScript'] : '' 
       })
     },
     recountFileTemplates () {

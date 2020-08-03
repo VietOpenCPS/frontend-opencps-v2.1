@@ -930,7 +930,8 @@ export default {
     captcha: false,
     j_captcha_response: '',
     chapchablob: '',
-    onlyLoginDvcqg: false
+    onlyLoginDvcqg: false,
+    titleNopHoSo: ''
   }),
   computed: {
     isMobile () {

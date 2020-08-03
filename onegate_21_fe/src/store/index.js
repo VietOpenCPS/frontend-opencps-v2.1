@@ -374,6 +374,9 @@ export const store = new Vuex.Store({
           if (filter.dateCv) {
             paramSearch.documentDate = filter.dateCv
           }
+          if (filter.groupDossierId) {
+            paramSearch.groupDossierId = filter.groupDossierId
+          }
           // 
           for (let index in state.filterDateFromTo) {
             if (filter.hasOwnProperty(state.filterDateFromTo[index]) && filter[state.filterDateFromTo[index]]) {
@@ -424,7 +427,8 @@ export const store = new Vuex.Store({
           let paramSearch = {
             start: filter.page * filter.numberPerPage - filter.numberPerPage,
             end: filter.page * filter.numberPerPage,
-            groupDossierIdHs: filter.groupDossierId,
+            groupDossierIdHs: filter.groupDossierIdHs,
+            groupDossierId: filter.hasOwnProperty('groupDossierId') ? filter.groupDossierId : '',
             service: filter.service,
             dossierNo: filter.dossierNo
           }
@@ -579,6 +583,29 @@ export const store = new Vuex.Store({
           }
           axios.get(state.initData.regionApi + '/' + data.collectionCode + '/dictitems/' + data.itemCode, param).then(function (response) {
             resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getGroupDictitem ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+            }
+          }
+          axios.get(state.initData.regionApi + '/' + data.collectionCode + '/dictgroups/' + data.groupCode + '/dictitems', param).then(function (response) {
+            if (response.data.hasOwnProperty('data')) {
+              resolve(response.data.data)
+            } else {
+              resolve([])
+            }
+            
           }, error => {
             reject(error)
           })
@@ -3820,6 +3847,30 @@ export const store = new Vuex.Store({
             }
           }
           axios.get(state.endPointApi + '/serviceinfos/statistics/domains', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getListCongVan ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: data.paramSearch
+          }
+          axios.get('/o/rest/v2/dossiers/groupDossier/dossierId', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
