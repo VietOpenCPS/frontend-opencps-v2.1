@@ -327,6 +327,7 @@
         </div>
       </div>
     </v-form>
+    <thong-tin-quyet-dinh v-if="taoQuyetDinh" ref="thongtinquyetdinh" ></thong-tin-quyet-dinh>
     <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
       <v-card>
         <v-toolbar dark color="primary">
@@ -363,6 +364,7 @@ import axios from 'axios'
 import Suggestions from 'v-suggestions'
 import toastr from 'toastr'
 import TinyPagination from '../../components/pagging/opencps_pagination'
+import ThongTinQuyetDinh from './TiepNhanHoSo_ThongTinQuyetDinh'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -370,9 +372,11 @@ toastr.options = {
 export default {
   components: {
     'suggestions': Suggestions,
-    'tiny-pagination': TinyPagination
+    'tiny-pagination': TinyPagination,
+    'thong-tin-quyet-dinh': ThongTinQuyetDinh
   },
-  props: ['formCodeInput', 'detailDossier', 'donvinhanCollection', 'tphs', 'lengthDossier', 'createFileCongVan', 'requiredCVDenGroupId', 'requiredCVDenGovCode'],
+  props: ['formCodeInput', 'detailDossier', 'donvinhanCollection', 'taoQuyetDinh',
+    'tphs', 'lengthDossier', 'createFileCongVan', 'requiredCVDenGroupId', 'requiredCVDenGovCode'],
   data: () => ({
     loading: false,
     dialogPDFLoading: false,
@@ -470,6 +474,14 @@ export default {
       vm.fileAttachCounter = val.filter(function(item) {
         return !item.eForm
       }).length
+    },
+    taoQuyetDinh (val) {
+      let vm = this
+      if (val) {
+        setTimeout(function () {
+          vm.$refs.thongtinquyetdinh.initData(vm.detailDossier)
+        }, 100)
+      }
     }
     // thongTinCongVan: {
     //   handler: function (value) {
@@ -513,6 +525,9 @@ export default {
         }
       })
       vm.$refs.formThongTinCongVan.resetValidation()
+      if (vm.$refs.thongtinquyetdinh) {
+        vm.$refs.thongtinquyetdinh.initData(data)
+      }
       console.log('thongtincongvanInput', vm.thongTinCongVan)
     },
     getThongTinCongVan () {
@@ -546,10 +561,19 @@ export default {
         metaData.tendonvinhan = delegateName
         metaData.jobposSignerCongVan = vm.jobposSignerCongVan
         metaData.signerCongVan = vm.signerCongVan
+        metaData.taoQuyetDinh = vm.taoQuyetDinh
       }
-      vm.thongTinCongVan.metaData = metaData
+      let thongtinquyetdinh = {}
+      if (vm.$refs.thongtinquyetdinh) {
+        thongtinquyetdinh = vm.$refs.thongtinquyetdinh.getThongTinQuyetDinh()
+      }
+      vm.thongTinCongVan.metaData = Object.assign(metaData, thongtinquyetdinh)
       vm.thongTinCongVan.sampleCount = vm.lengthDossier
       vm.thongTinCongVan.validation = vm.$refs.formThongTinCongVan.validate()
+      if (vm.taoQuyetDinh) {
+        let validationQuyetDinh = vm.$refs.thongtinquyetdinh.getThongTinQuyetDinh()['validation']
+        vm.thongTinCongVan.validation = vm.$refs.formThongTinCongVan.validate() && validationQuyetDinh
+      }
       console.log('thongtincongvanOutput', vm.thongTinCongVan)
       return vm.thongTinCongVan
     },

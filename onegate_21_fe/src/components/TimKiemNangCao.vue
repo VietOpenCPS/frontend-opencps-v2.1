@@ -2,7 +2,7 @@
   <div class="adv_search px-2 mt-2 mx-2" style="background: #eeeeee">
     <div class="searchAdvanced-content py-2">
       <v-layout wrap>
-        <v-flex xs12 sm6 md4 class="mb-2 px-2">
+        <v-flex :class="searchAdvanceConfigDefault.status.class" v-if="searchAdvanceConfigDefault.status.visible">
           <div>
             <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Trạng thái:</div>
             <v-autocomplete
@@ -21,7 +21,7 @@
             ></v-autocomplete>
           </div>
         </v-flex>
-        <v-flex xs12 sm6 md4 class="mb-2 px-2">
+        <v-flex :class="searchAdvanceConfigDefault.substatus.class" v-if="searchAdvanceConfigDefault.substatus.visible">
           <div>
             <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Trạng thái con:</div>
             <v-autocomplete
@@ -40,7 +40,7 @@
             ></v-autocomplete>
           </div>
         </v-flex>
-        <v-flex xs12 sm6 md4 class="mb-2 px-2">
+        <v-flex :class="searchAdvanceConfigDefault.top.class" v-if="searchAdvanceConfigDefault.top.visible">
           <div>
             <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Theo tình trạng:</div>
             <v-autocomplete
@@ -60,7 +60,7 @@
           </div>
         </v-flex>
         <!--  -->
-        <v-flex xs12 sm6 md4 class="mb-2 px-2">
+        <v-flex :class="searchAdvanceConfigDefault.agency.class" v-if="searchAdvanceConfigDefault.agency.visible">
           <div>
             <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Đơn vị:</div>
             <v-autocomplete
@@ -79,7 +79,7 @@
             ></v-autocomplete>
           </div>
         </v-flex>
-        <v-flex xs12 sm6 md4 class="mb-2 px-2">
+        <v-flex :class="searchAdvanceConfigDefault.domain.class" v-if="searchAdvanceConfigDefault.domain.visible || searchAdvanceConfigDefault.documentNo.visible">
           <div v-if="menuInfo.id.indexOf('CV_DI') !== 0 && menuInfo.id.indexOf('CV_DEN') !== 0">
             <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Lĩnh vực:</div>
             <v-autocomplete
@@ -113,56 +113,54 @@
             ></v-text-field>
           </div>
         </v-flex>
-        <v-flex xs12 sm6 md4 class="mb-2 px-2">
-          <div v-if="menuInfo.id.indexOf('CV_DI') !== 0 && menuInfo.id.indexOf('CV_DEN') !== 0">
-            <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Mã sổ theo dõi:</div>
-            <v-text-field
-              v-model="register"
-              class="search-input-appbar input-search d-inline-block"
-              style="width: calc(100% - 130px);"
-              single-lines
-              hide-details
-              solo
-              flat
-              height="32"
-              min-height="32"
-              clearable
-            ></v-text-field>
-          </div>
-          <div v-else>
-            <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Ngày công văn:</div>
-            <div class="d-inline-block" style="width: calc(100% - 130px);">
-              <v-menu
-                ref="menuDateCV"
-                v-model="menuDateCV"
-                :close-on-content-click="true"
-                transition="scale-transition"
-                offset-y
-                full-width
+        <v-flex :class="searchAdvanceConfigDefault.register.class" v-if="searchAdvanceConfigDefault.register.visible && menuInfo.id.indexOf('CV_DI') !== 0 && menuInfo.id.indexOf('CV_DEN') !== 0">
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Mã sổ theo dõi:</div>
+          <v-text-field
+            v-model="register"
+            class="search-input-appbar input-search d-inline-block"
+            style="width: calc(100% - 130px);"
+            single-lines
+            hide-details
+            solo
+            flat
+            height="32"
+            min-height="32"
+            clearable
+          ></v-text-field>
+        </v-flex>
+        <v-flex :class="searchAdvanceConfigDefault.dateCv.class" v-if="searchAdvanceConfigDefault.dateCv.visible && (menuInfo.id.indexOf('CV_DI') === 0 || menuInfo.id.indexOf('CV_DEN') === 0)">
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Ngày công văn:</div>
+          <div class="d-inline-block" style="width: calc(100% - 130px);">
+            <v-menu
+              ref="menuDateCV"
+              v-model="menuDateCV"
+              :close-on-content-click="true"
+              transition="scale-transition"
+              offset-y
+              full-width
+            >
+              <v-text-field
+                slot="activator"
+                class="search-input-appbar input-search"
+                v-model="dateCvFormatted"
+                persistent-hint
+                append-icon="event"
+                @blur="dateCv = parseDate(dateCvFormatted)"
+                placeholder=""
+                hide-details
+                solo
+                flat
+                height="32"
+                min-height="32"
+                clearable
               >
-                <v-text-field
-                  slot="activator"
-                  class="search-input-appbar input-search"
-                  v-model="dateCvFormatted"
-                  persistent-hint
-                  append-icon="event"
-                  @blur="dateCv = parseDate(dateCvFormatted)"
-                  placeholder=""
-                  hide-details
-                  solo
-                  flat
-                  height="32"
-                  min-height="32"
-                  clearable
-                >
-                </v-text-field>
-                <v-date-picker v-model="dateCv" locale="vi" :first-day-of-week="1" no-title @input="changeDate('9')"></v-date-picker>
-              </v-menu>
-            </div>
+              </v-text-field>
+              <v-date-picker v-model="dateCv" locale="vi" :first-day-of-week="1" no-title @input="changeDate('9')"></v-date-picker>
+            </v-menu>
           </div>
         </v-flex>
         <!-- date -->
-        <v-flex xs12 md6 class="mb-2 px-2">
+        <v-flex :class="searchAdvanceConfigDefault.fromReceiveDate.class" v-if="searchAdvanceConfigDefault.fromReceiveDate.visible">
           <div class="layout wrap">
             <div class="d-inline-block text-bold pt-1" style="font-weight:450;width: 130px;">Ngày tiếp nhận:</div>
             <v-layout wrap style="width: calc(100% - 130px);">
@@ -230,7 +228,7 @@
             
           </div>
         </v-flex>
-        <v-flex xs12 md6 class="mb-2 px-2">
+        <v-flex :class="searchAdvanceConfigDefault.fromDueDate.class" v-if="searchAdvanceConfigDefault.fromDueDate.visible">
           <div class="layout wrap">
             <div class="d-inline-block text-bold pt-1" style="font-weight:450;width: 130px;">Ngày hẹn trả:</div>
             <v-layout wrap style="width: calc(100% - 130px);">
@@ -298,7 +296,7 @@
           </div>
         </v-flex>
 
-        <v-flex xs12 md6 class="mb-2 px-2">
+        <v-flex :class="searchAdvanceConfigDefault.fromReleaseDate.class" v-if="searchAdvanceConfigDefault.fromReleaseDate.visible">
           <div class="layout wrap">
             <div class="d-inline-block text-bold pt-1" style="font-weight:450;width: 130px;">Ngày có kết quả:</div>
             <v-layout wrap style="width: calc(100% - 130px);">
@@ -365,7 +363,7 @@
 
           </div>
         </v-flex>
-        <v-flex xs12 md6 class="mb-2 px-2">
+        <v-flex :class="searchAdvanceConfigDefault.fromFinishDate.class" v-if="searchAdvanceConfigDefault.fromFinishDate.visible">
           <div class="layout wrap">
             <div class="d-inline-block text-bold pt-1" style="font-weight:450;width: 130px;">Ngày trả hồ sơ:</div>
             <v-layout wrap style="width: calc(100% - 130px);">
@@ -449,6 +447,81 @@ export default {
   props: ['menuInfo'],
   components: {},
   data: () => ({
+    searchAdvanceConfigDefault: {
+      'status': {
+        visible: true,
+        class: 'mb-2 px-2 xs12 sm6 md4',
+        value: '',
+        source: ''
+      },
+      'substatus': {
+        visible: true,
+        class: 'mb-2 px-2 xs12 sm6 md4',
+        value: '',
+        source: ''
+      },
+      'top': {
+        visible: true,
+        class: 'mb-2 px-2 xs12 sm6 md4',
+        value: '',
+        source: ''
+      },
+      'agency': {
+        visible: true,
+        class: 'mb-2 px-2 xs12 sm6 md4',
+        value: '',
+        source: ''
+      },
+      'domain': {
+        visible: true,
+        class: 'mb-2 px-2 xs12 sm6 md4',
+        value: '',
+        source: ''
+      },
+      'dateCv': {
+        visible: true,
+        class: 'mb-2 px-2 xs12 sm6 md4',
+        value: '',
+        source: ''
+      },
+      'register': {
+        visible: true,
+        class: 'mb-2 px-2 xs12 sm6 md4',
+        value: '',
+        source: ''
+      },
+      'documentNo': {
+        visible: true,
+        class: 'mb-2 px-2 xs12 sm6 md4',
+        value: '',
+        source: ''
+      },
+      'fromReceiveDate': {
+        visible: true,
+        class: 'mb-2 px-2 xs12 sm6 md6',
+        value: '',
+        source: ''
+      },
+      'fromDueDate': {
+        visible: true,
+        class: 'mb-2 px-2 xs12 sm6 md6',
+        value: '',
+        source: ''
+      },
+      'fromReleaseDate': {
+        visible: true,
+        class: 'mb-2 px-2 xs12 sm6 md6',
+        value: '',
+        source: ''
+      },
+      'fromFinishDate': {
+        visible: true,
+        class: 'mb-2 px-2 xs12 sm6 md6',
+        value: '',
+        source: ''
+      }
+    },
+    searchAdvanceConfig: '',
     advSearchShow: false,
     itemsFilter: [],
     keyFilterItems: [],
@@ -511,14 +584,18 @@ export default {
     let vm = this
     vm.getSearchItems()
     console.log('menuInfo', vm.menuInfo)
+    vm.searchAdvanceConfig = vm.menuInfo.tableConfig.hasOwnProperty('searchAdvanceConfig') && vm.menuInfo.tableConfig.searchAdvanceConfig ? JSON.parse(vm.menuInfo.tableConfig.searchAdvanceConfig) : {}
+    vm.searchAdvanceConfigDefault = Object.assign(vm.searchAdvanceConfigDefault, vm.searchAdvanceConfig)
   },
   watch: {
+    menuInfo (val) {
+      console.log('menuInfo', val)
+      vm.searchAdvanceConfig = val.tableConfig.hasOwnProperty('searchAdvanceConfig') && val.tableConfig.searchAdvanceConfig ? JSON.parse(val.tableConfig.searchAdvanceConfig) : {}
+      vm.searchAdvanceConfigDefault = Object.assign(vm.searchAdvanceConfigDefault, vm.searchAdvanceConfig)
+    },
     '$route': function (newRoute, oldRoute) {
       let vm = this
       vm.getSearchItems()
-    },
-    menuInfo (val) {
-      console.log('menuInfo', val)
     }
   },
   methods: {
@@ -534,7 +611,11 @@ export default {
           if (vm.getUser('Administrator') || vm.getUser('Administrator_data')) {
             result.push(statusDeleted)
           }
-          vm.statusItems = result
+          if (vm.searchAdvanceConfigDefault.status.hasOwnProperty('source') && vm.searchAdvanceConfigDefault.status.source) {
+            vm.statusItems = vm.searchAdvanceConfigDefault.status.source
+          } else {
+            vm.statusItems = result
+          }
         }).catch(function (){})
       }
       if (!vm.substatusItems || vm.substatusItems.length === 0) {
@@ -542,17 +623,31 @@ export default {
           itemCode: ''
         }
         vm.$store.dispatch('getSubstatusLists', filter).then(function (result) {
-          vm.substatusItems = result
+          if (vm.searchAdvanceConfigDefault.substatus.hasOwnProperty('source') && vm.searchAdvanceConfigDefault.substatus.source) {
+            vm.substatusItems = vm.searchAdvanceConfigDefault.substatus.source
+          } else {
+            vm.substatusItems = result
+          }
+          
         }).catch(function (){})
       }
       if (!vm.agencyItems || vm.agencyItems.length === 0) {
         vm.$store.dispatch('getAgencyLists').then(function (result) {
-          vm.agencyItems = result
+          if (vm.searchAdvanceConfigDefault.agency.hasOwnProperty('source') && vm.searchAdvanceConfigDefault.agency.source) {
+            vm.agencyItems = vm.searchAdvanceConfigDefault.agency.source
+          } else {
+            vm.agencyItems = result
+          }
+          
         }).catch(function (){})
       }
       if (!vm.domainItems || vm.domainItems.length === 0) {
         vm.$store.dispatch('getDomainLists').then(function (result) {
-          vm.domainItems = result
+          if (vm.searchAdvanceConfigDefault.domain.hasOwnProperty('source') && vm.searchAdvanceConfigDefault.domain.source) {
+            vm.domainItems = vm.searchAdvanceConfigDefault.domain.source
+          } else {
+            vm.domainItems = result
+          }
         }).catch(function (){})
       }
     },
@@ -560,12 +655,13 @@ export default {
       let vm = this
       let newQuery = vm.$router.history.current.query
       console.log('newQuery', newQuery)
-      vm.status = newQuery.hasOwnProperty('status') ? newQuery.status : ''
-      vm.substatus = newQuery.hasOwnProperty('substatus') ? newQuery.substatus : ''
-      vm.top = newQuery.hasOwnProperty('top') ? newQuery.top : ''
-      vm.agency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
-      vm.domain = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
-      vm.register = newQuery.hasOwnProperty('register') ? newQuery.register : ''
+      vm.status = newQuery.hasOwnProperty('status') ? newQuery.status : vm.searchAdvanceConfigDefault.status.value
+      vm.substatus = newQuery.hasOwnProperty('substatus') ? newQuery.substatus : vm.searchAdvanceConfigDefault.substatus.value
+      vm.top = newQuery.hasOwnProperty('top') ? newQuery.top : vm.searchAdvanceConfigDefault.top.value
+      vm.agency = newQuery.hasOwnProperty('agency') ? newQuery.agency : vm.searchAdvanceConfigDefault.agency.value
+      vm.domain = newQuery.hasOwnProperty('domain') ? newQuery.domain : vm.searchAdvanceConfigDefault.domain.value
+      vm.register = newQuery.hasOwnProperty('register') ? newQuery.register : vm.searchAdvanceConfigDefault.register.value
+      vm.documentNo = newQuery.hasOwnProperty('documentNo') ? newQuery.documentNo : vm.searchAdvanceConfigDefault.documentNo.value
 
       vm.fromReceiveDate = newQuery.hasOwnProperty('fromReceiveDate') ? vm.parseDate(newQuery.fromReceiveDate) : ''
       vm.toReceiveDate = newQuery.hasOwnProperty('toReceiveDate') ? vm.parseDate(newQuery.toReceiveDate) : ''

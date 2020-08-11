@@ -949,10 +949,10 @@
           vm.loadingImport = true
           let bodyFormData = new FormData()
           bodyFormData.append('file', files[0])
-          bodyFormData.append('deliverableType', vm.items[vm.index]['typeCode'])
+          bodyFormData.append('deliverableTypeCode', vm.items[vm.index]['typeCode'])
           axios({
             method: 'post',
-            url: '/o/rest/v2/deliverables/import/files',
+            url: '/o/rest/v2/deliverables/import/files-v3',
             data: bodyFormData,
             config: { headers: {
                 'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',

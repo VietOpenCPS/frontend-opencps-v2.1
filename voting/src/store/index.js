@@ -267,7 +267,34 @@ export const store = new Vuex.Store({
           })
         })
       })
-    }
+    },
+    loadingDataHoSo ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              start: 0,
+              end: 1,
+              dossierNo: filter.dossierNo ? filter.dossierNo : ''
+            }
+          }
+          axios.get(state.endPointApi + '/dossiers', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.hasOwnProperty('data')) {
+              resolve(serializable.data[0])
+            } else {
+              reject(response)
+            }
+            
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
   },
   mutations: {
     setIndex (state, payload) {
