@@ -36,6 +36,15 @@
                           ">
                           <v-icon size="14">link</v-icon>
                         </v-btn>
+                        <v-btn flat icon color="primary" 
+                          v-on:click.native="processUpdateFileAttach(item, index)"
+                          style="
+                            position: absolute;
+                            right: 5px;
+                            top: 52px;
+                          ">
+                          <v-icon size="14">create</v-icon>
+                        </v-btn>
                         <v-btn flat icon color="red darken-3" 
                           v-on:click.native="processDeleteFileAttach(item)"
                           :loading="loadingRemove"
@@ -47,22 +56,32 @@
                           <v-icon size="14">delete</v-icon>
                         </v-btn>
                         <v-layout row wrap>
-                          <v-flex xs12 sm4>
-                            <v-text-field
-                              label="Số biểu mẫu" 
-                              v-model="item['fileTemplateNo']"
-                              @change="processUpdateDataFileAttach($event, item, index)"
-                            >
-                            </v-text-field>
-                          </v-flex>
-                          <v-flex xs12 sm8>
-                            <v-text-field
-                              label="Tên biểu mẫu" 
-                              v-model="item['templateName']"
-                              @change="processUpdateDataFileAttach($event, item, index)"
-                            >
-                            </v-text-field>
-                          </v-flex>
+                          <v-form ref="form" v-model="valid" lazy-validation>
+                            <v-layout wrap>
+                            <v-flex xs12 sm4>
+                              <input
+                                type="file"
+                                style="display: none"
+                                ref="refFileUpdate"
+                                id="inputFileUpdate"
+                                @change="onFileUpdatePicked">
+                              <v-text-field
+                                label="Số biểu mẫu" 
+                                v-model="item['fileTemplateNo']"
+                                @change="processUpdateDataFileAttach($event, item, index)"
+                              >
+                              </v-text-field>
+                            </v-flex>
+                            <v-flex xs12 sm8>
+                              <v-text-field
+                                label="Tên biểu mẫu" 
+                                v-model="item['templateName']"
+                                @change="processUpdateDataFileAttach($event, item, index)"
+                              >
+                              </v-text-field>
+                            </v-flex>
+                            </v-layout>
+                          </v-form>
                         </v-layout>
                         </span>
                       </div>
@@ -98,6 +117,15 @@
                           ">
                           <v-icon size="14">link</v-icon>
                         </v-btn>
+                        <v-btn flat icon color="primary" 
+                          v-on:click.native="processUpdateFileAttach(item, index)"
+                          style="
+                            position: absolute;
+                            right: 5px;
+                            top: 32px;
+                          ">
+                          <v-icon size="14">create</v-icon>
+                        </v-btn>
                         <v-btn flat icon color="red darken-3" 
                           v-on:click.native="processDeleteFileAttach(item)"
                           :loading="loadingRemove"
@@ -117,6 +145,7 @@
         </div>
       </div>
     </v-flex>
+    
   </v-layout>
 </template>
 
@@ -132,6 +161,7 @@
       return {
         loadingRemove: false,
         loading: false,
+        valid: false,
         fileTemplateData: [],
         fileTemplateTotal: 0,
         path:  {
@@ -141,7 +171,9 @@
         extensions: '.pdf, .txt, .rtf, .doc, .docx, .xls, .xlsx, .jpg, .png',
         dropArea: "dropArea",
         rawData: [],
-        className: ''
+        className: '',
+        fileUpdate: null,
+        indexFile: null
       }
     },
     props: ['pickItem', 'pk', 'code'],
@@ -248,6 +280,47 @@
           vm.loading = false
           alert('Tải file xảy ra lỗi.' + reject)
         })
+      },
+      processUpdateFileAttach (item, index ) {
+        // this.$refs.refFileUpdate.click()
+        console.log(item)
+        let vm = this
+        vm.fileUpdate = item
+        vm.indexFile = index
+        document.getElementById("inputFileUpdate").click()
+      },
+      onFileUpdatePicked(){
+      let vm = this
+        const files = event.target.files
+        if(files.length){
+          const file = files[0]
+          console.log(file)
+          let filter = {
+            fileEntryId: vm.fileUpdate.fileEntryId,
+            file: file,
+            fileName: files[0].name,
+            fileType:files[0].type,
+            fileSize:files[0].size,
+          }
+          vm.$store.dispatch('putFileAttach', filter).then(function () {
+              vm.loading = true
+              let data = {
+                item: vm.rawData[vm.indexFile],
+                fileTemplateNo: vm.fileUpdate['fileTemplateNo'],
+                templateName: files[0].name
+              }
+              vm.$store.dispatch('updateServiceFileTemplate', data).then(function () {
+                vm.loadFileTemplate()
+                vm.loading = false
+              }).catch(reject => {
+                vm.loading = false
+                alert('Tải file xảy ra lỗi.' + reject)
+              })
+          }).catch(reject => {
+            alert('Tải file xảy ra lỗi.' + reject)
+            alert('Tải file xảy ra lỗi.' + reject)
+          }) 
+        }
       },
       processUpdateDataFileAttach (val, item, index) {
         let vm = this

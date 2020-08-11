@@ -144,7 +144,7 @@ export default {
   methods: {
     submitVoting () {
       var vm = this
-      if (!vm.isSigned) {
+      if (!vm.isSigned && !vm.isOneGate) {
         if ($('#applicantIdNo').val() === '') {
           vm.validPass2 = false
         } else {

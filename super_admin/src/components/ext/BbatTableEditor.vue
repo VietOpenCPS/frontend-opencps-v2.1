@@ -73,6 +73,7 @@
         nameScreen: '',
         showDetailForm: false,
         noDetail: false,
+        idCopy: '',
         dataSocket: {}
       }
     },
@@ -208,6 +209,11 @@
           }
         }
         */
+        if(vm.$router.history.current.query.hasOwnProperty('idCopy')){
+           vm.idCopy =  vm.$router.history.current.query.idCopy
+        } else {
+          vm.idCopy = ''
+        }
         setTimeout(() => {
           let dataPost = new URLSearchParams()
           //dataPost.append('delegacy', filter.delegacy)
@@ -231,7 +237,7 @@
               'filter': [
                 {
                   'key': 'id',
-                  'value_filter': vm.id,
+                  'value_filter': vm.idCopy ? vm.idCopy : vm.id,
                   'compare': '=',
                   'type': 'number'
                 }

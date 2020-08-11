@@ -180,12 +180,15 @@
         <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
           <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
         </v-btn>
+        <v-btn v-if="itemsReports[index]['filterConfig']['showHTML']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="viewHTML()">
+          <v-icon>save_alt</v-icon> &nbsp; Xem HTML
+        </v-btn>
         <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
       </v-flex>
     </v-layout>
     <!-- table bao cao -->
     <div>
-      <div v-if="!itemsReports[index]['filterConfig']['showTable']">
+      <div v-if="!itemsReports[index]['filterConfig']['showTable'] && !showHTML">
         <vue-friendly-iframe v-if="showGuilds" :src="'/documents/' + groupId + '/0/hdsd.pdf'"></vue-friendly-iframe>
         <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' && !showGuilds" :src="pdfBlob"></vue-friendly-iframe>
       </div>
@@ -283,6 +286,49 @@
           </div>
         </div>
       </div>
+      <!-- view HTML -->
+      <div v-if="showHTML">
+              <table v-if="tableType === 'table-1'" class="my-2 table-report" hide-default-footer>
+                <thead>
+                  <tr>
+                    <th v-for="(header, index) in headerRenderHtmlTable" :key="index">
+                      <span>{{header.text}}</span>
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr class="note__column">
+                    <td align="center" class="px-2" v-for="(header, index) in headerRenderHtmlTable" :key="index">({{index + 1}})</td>
+                  </tr>
+                  <tr v-for="(item,index) in dataBodyHTML" :key="index">
+                    <td v-if="item.colSpan > 1" :colspan="item.colSpan" class="font-weight-bold">
+                      <span>{{item.text}}({{item.totalChild}})</span>
+                    </td>
+                    <td v-else v-for="(val, name) in headerRenderHtmlTable" :key="name" :align="val.align">
+                      <span>{{item.dossier[val.value]}}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <table v-if="tableType === 'table-2'" class="my-2 table-report" hide-default-footer>
+                <thead>
+                  <tr v-for="(header, index) in headerRenderHtmlTable" :key="index" v-if="header !== '[$report$]'">
+                    <td v-for="(item, index2)  in header" :key="index2" v-if="item" :rowspan="item.rowSpan ? item.rowSpan  : 1" :colspan="item.colSpan ? item.colSpan : 1" :align="item.alignment" :class="{'font-weight-bold': item.bold}">
+                      <span>{{item.text}}</span>
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item, index) in dataRowRenderHtmlTable" :key="index">
+                    <td v-for="(item2, index2) in item" :key="index2" :align="item2.alignment" :style="{width: widthRenderHtmlTable[index2] + 'px'}"> 
+                      <span>{{item2.text}}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+      </div>
+      <!--  -->
       <div class="mx-3 my-4" v-if="showErrorData">
         <v-alert :value="true" outline color="info" icon="info">
           Không có dữ liệu báo cáo.
@@ -357,6 +403,7 @@ export default {
     'thong-tin-ho-so': ThongTinHoSo
   },
   data: () => ({
+    showHTML: false,
     hiddenAside: false,
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
     doExportExcel: false,
@@ -459,6 +506,7 @@ export default {
       rowsPerPage: 15,
       totalItems: 0
     },
+    tableType: '',
     dossierList: [],
     dossierInfo: '',
     dialogDossierDetail: false,
@@ -469,8 +517,10 @@ export default {
     groupIdList: [],
     filterGroup: {},
     groupIdListSelected: '',
+    dataBodyHTML: [],
     dataRowRenderHtmlTable: [],
-    headerRenderHtmlTable: []
+    headerRenderHtmlTable: [],
+    widthRenderHtmlTable: [],
   }),
   computed: {
     itemsReports () {
@@ -664,6 +714,7 @@ export default {
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
+      vm.showHTML = false
       vm.showErrorData = false
       vm.showCSVDownload = false
       vm.itemsReportsConfig = []
@@ -1307,7 +1358,7 @@ export default {
           vm.dataExportExcel = docDString
           console.log('docDString1234123', docDString)
           vm.docDefinition = JSON.parse(docDString)
-
+          console.log('vm.docDefinition', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           // create blob
           // check showTable
@@ -1790,6 +1841,7 @@ export default {
     },
     doCreateReport(isExportExcel) {
       let vm = this
+      vm.showHTML = false
       vm.showGuilds = false
       if (vm.$refs.form.validate()) {
         vm.doExportExcel = isExportExcel
@@ -2038,6 +2090,66 @@ export default {
           vm.filterGroup[i] = null
         }
       }, 300)
+    },
+    viewHTML () {
+      let vm = this
+      vm.headerRenderHtmlTable = []
+      vm.widthRenderHtmlTable = []
+      vm.tableType = ''
+      console.log('vm.itemsReportsConfig:',vm.itemsReportsConfig)
+      if (vm.itemsReports[vm.index]['reportCode'].indexOf('STATISTIC') === -1) {
+        vm.headerRenderHtmlTable = vm.itemsReportsConfig.filter(function(item) {
+          return item.selected
+        })
+        console.log('headerRenderHtmlTable-1', vm.headerRenderHtmlTable)
+        let textGroup = ''
+        let codeGroup = ''
+        for (let keyGroup in vm.groupBy) {
+          if (String(vm.groupBy[keyGroup]['key']) === String(vm.groupByVal)) {
+            textGroup = vm.groupBy[keyGroup]['display']
+            codeGroup = vm.groupBy[keyGroup]['key']
+            break
+          }
+        }
+        let dataBody = []
+        for(let key in vm.dataRowRenderHtmlTable){
+          let rowTotal = {
+            colSpan: vm.headerRenderHtmlTable.length,
+            text: vm.dataRowRenderHtmlTable[key][textGroup],
+            bold: true,
+            style: 'trStyle',
+            totalChild: vm.dataRowRenderHtmlTable[key]['dossiers'].length,
+            dossier: {}
+          }
+          dataBody.push(rowTotal)
+          for(let i=0; i< vm.dataRowRenderHtmlTable[key]['dossiers'].length; i++){
+            let row = {
+              colSpan: 1,
+              text: '',
+              bold: false,
+              style: 'tdStyle',
+              dossier: {}
+            }
+            for(let j=0;j<vm.headerRenderHtmlTable.length;j++){
+              row.dossier[vm.headerRenderHtmlTable[j]['value']] = vm.dataRowRenderHtmlTable[key]['dossiers'][i][vm.headerRenderHtmlTable[j]['value']]
+            }
+            dataBody.push(row)
+          }
+        } 
+        vm.dataBodyHTML = dataBody
+        console.log('dataBody',dataBody)
+        vm.tableType = 'table-1'
+      } else {
+        let body = vm.itemsReports[vm.index]['tableConfig']['docDefinition']['content'][2]['table']['body']
+        let widths = vm.itemsReports[vm.index]['tableConfig']['docDefinition']['content'][2]['table']['widths']
+        vm.widthRenderHtmlTable = widths
+        vm.headerRenderHtmlTable = body
+        console.log('headerRenderHtmlTable-1-a', vm.headerRenderHtmlTable)
+        console.log('dataRowRenderHtmlTable', vm.dataRowRenderHtmlTable)
+        vm.tableType = 'table-2'
+      }
+
+      vm.showHTML = true
     }
   }
 }

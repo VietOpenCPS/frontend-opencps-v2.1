@@ -2119,7 +2119,7 @@ export default {
             if(res.vb_so_hieu_van_ban && res.vb_co_quan_chu_quan && res.vb_ma_co_quan_chu_quan)
             {
                 let tg = {
-                    vb_so_hieu_van_ban: res.vb_so_hieu_van_ban,
+                    vb_so_hieu_van_ban: res.vb_so_hieu_van_ban.toUpperCase(),
                     vb_co_quan_chu_quan: res.vb_co_quan_chu_quan,
                     vb_ma_co_quan_chu_quan: res.vb_ma_co_quan_chu_quan,
                     vb_ngay_ky: res.vb_ngay_ky,
@@ -2145,6 +2145,7 @@ export default {
         },
         fillTableThanhVien (res) {
             let vm = this
+            vm.vb_so_thu_tu = res.vb_so_thu_tu ? res.vb_so_thu_tu : ''
             if(res.vb_so_hieu_van_ban && res.vb_co_quan_chu_quan && res.vb_ma_co_quan_chu_quan){
                 let tg = {
                     bookingName: res.bookingName ? res.bookingName : '',
@@ -2152,7 +2153,7 @@ export default {
                     applicantIdNo: res.applicantIdNo ? res.applicantIdNo : '',
                     address: res.address ? res.address : '',
                     vb_so_thu_tu: res.vb_so_thu_tu ? res.vb_so_thu_tu : '',
-                    vb_so_hieu_van_ban: res.vb_so_hieu_van_ban ? res.vb_so_hieu_van_ban : '',
+                    vb_so_hieu_van_ban: res.vb_so_hieu_van_ban ? res.vb_so_hieu_van_ban.toUpperCase() : '',
                     vb_ngay_ky: res.vb_ngay_ky ? res.vb_ngay_ky : '',
                     vb_co_quan_chu_quan: res.vb_co_quan_chu_quan ? res.vb_co_quan_chu_quan : '',
                     vb_ma_co_quan_chu_quan: res.vb_ma_co_quan_chu_quan ? res.vb_ma_co_quan_chu_quan : '',
@@ -2164,7 +2165,7 @@ export default {
                     ho_chieu_cong_vu: res.ho_chieu_cong_vu ? res.ho_chieu_cong_vu : false,
                     cong_ham: res.cong_ham ? res.cong_ham : false,
                     so_ho_chieu: res.so_ho_chieu ? res.so_ho_chieu : '',
-                    so_hieu_van_ban: res.vb_so_hieu_van_ban ? res.vb_so_hieu_van_ban : '',
+                    so_hieu_van_ban: res.vb_so_hieu_van_ban ? res.vb_so_hieu_van_ban.toUpperCase() : '',
                     co_quan_chu_quan: res.vb_ma_co_quan_chu_quan ? res.vb_ma_co_quan_chu_quan : '',
                     co_quan_chu_quan_text: res.vb_co_quan_chu_quan ? res.vb_co_quan_chu_quan : '',
                     ho_ten: res.ho_ten  ? res.ho_ten : '',
@@ -2392,17 +2393,17 @@ export default {
             if(this.$refs.formThanhVien.validate() && (this.ho_chieu_ngoai_giao || this.ho_chieu_cong_vu || this.cong_ham)){
                 const [day, month, year] = vm.birthdayFormated.split('/')
                 let tk = {
-                    // bookingName: res.bookingName,
-                    // applicantName: res.applicantName,
-                    // applicantIdNo: res.applicantIdNo,
-                    // address: res.address,
-                    // vb_so_thu_tu: res.vb_so_thu_tu,
-                    // vb_so_hieu_van_ban: res.vb_so_hieu_van_ban,
-                    // vb_ngay_ky: res.vb_ngay_ky,
-                    // vb_co_quan_chu_quan: res.vb_co_quan_chu_quan,
-                    // vb_ma_co_quan_chu_quan: res.vb_ma_co_quan_chu_quan,
-                    // vb_nguoi_ky: res.vb_nguoi_ky,
-                    // vb_co_quan_tieng_anh: res.vb_co_quan_tieng_anh,
+                    bookingName: vm.dossiers.delegateName,
+                    applicantName: vm.dossiers.applicantName,
+                    applicantIdNo: vm.dossiers.applicantIdNo,
+                    address: vm.dossiers.address,
+                    vb_so_thu_tu: vm.vb_so_thu_tu,
+                    vb_so_hieu_van_ban: vm.co_quan_chu_quan_thanh_vien_select.vb_so_hieu_van_ban,
+                    vb_ngay_ky: vm.co_quan_chu_quan_thanh_vien_select.vb_ngay_ky,
+                    vb_co_quan_chu_quan: vm.co_quan_chu_quan_thanh_vien_select.vb_co_quan_chu_quan,
+                    vb_ma_co_quan_chu_quan: vm.co_quan_chu_quan_thanh_vien_select.vb_ma_co_quan_chu_quan,
+                    vb_nguoi_ky: vm.co_quan_chu_quan_thanh_vien_select.vb_nguoi_ky,
+                    vb_co_quan_tieng_anh: vm.co_quan_chu_quan_thanh_vien_select.vb_co_quan_tieng_anh,
 
                     ma_nhan_than: vm.ma_nhan_than,
                     ho_chieu_ngoai_giao: vm.ho_chieu_ngoai_giao,
@@ -2532,11 +2533,12 @@ export default {
             this.dialogThemThanhVien = true
             let tg = 'ma_nhan_than,ho_chieu_ngoai_giao,ho_chieu_cong_vu,cong_ham,so_ho_chieu,so_hieu_van_ban,ho_ten,gioi_tinh,ngay_sinh,thang_sinh,nam_sinh,noi_sinh_khac,noi_sinh,noi_sinh_text,ho_khau,so_cmt,ngay_cap_cmt,noi_cap_cmt,co_quan_cong_tac,dien_thoai,chuc_vu,cap_bac_ham,chuc_vu_tieng_anh,cong_chuc_loai,cong_chuc_bac,cong_chuc_ngach,can_bo_bo_nhiem,so_ho_chieu_ngoai_giao,ngay_ho_chieu_ngoai_giao,noi_cap_ho_chieu_ngoai_giao,so_ho_chieu_cong_vu,ngay_ho_chieu_cong_vu,noi_cap_ho_chieu_cong_vu,gia_dinh'
             let mang_key = tg.split(',')
-
+            console.log(item)
+            console.log(vm.co_quan_chu_quan_thanh_vien)
             mang_key.forEach( e => {
                
                 if (e === 'so_hieu_van_ban'){
-                    vm.co_quan_chu_quan_thanh_vien_select = vm.co_quan_chu_quan_thanh_vien.find(item2 => item2['vb_so_hieu_van_ban'] === item[e])
+                    vm.co_quan_chu_quan_thanh_vien_select = vm.co_quan_chu_quan_thanh_vien.find(item2 => item2['vb_so_hieu_van_ban'].toLowerCase() === item[e].toLowerCase())
                 } else if (e === 'nam_sinh' ||e === 'thang_sinh' || e === 'ngay_sinh') {
                     vm.birthday = vm.parseDate(item['ngay_sinh']+'/'+item['thang_sinh']+'/'+item['nam_sinh'])
                 } else if (e === 'noi_sinh') {
@@ -2568,7 +2570,12 @@ export default {
                         value: e.vb_so_hieu_van_ban + '-' + e.vb_co_quan_chu_quan,
                         vb_ma_co_quan_chu_quan: e.vb_ma_co_quan_chu_quan,
                         vb_co_quan_chu_quan: e.vb_co_quan_chu_quan,
-                        vb_so_hieu_van_ban: e.vb_so_hieu_van_ban
+                        vb_so_hieu_van_ban: e.vb_so_hieu_van_ban,
+                        vb_ngay_ky: e.vb_ngay_ky,
+                        vb_co_quan_tieng_anh: e.vb_co_quan_tieng_anh,
+                        vb_nguoi_ky: e.vb_nguoi_ky,
+                        ho_ten_nguoi_ky: e.ho_ten_nguoi_ky,
+                        chuc_vu_nguoi_ky: e.chuc_vu_nguoi_ky
                     }
                 )
             })

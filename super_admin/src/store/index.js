@@ -123,6 +123,18 @@ export const store = new Vuex.Store({
             link: '/table/opencps_stt/stt',
             code: 'stt',
             text: 'Số TT, Sổ theo dõi'
+          },
+          {
+            icon: 'arrow_right',
+            link: '/table/sync/statistics',
+            code: 'statistics',
+            text: 'Đồng bộ thống kê hồ sơ'
+          },
+          {
+            icon: 'arrow_right',
+            link: '/table/dossierlogs/revesionLog',
+            code: 'revesionLog',
+            text: 'Nhật ký phiên bản'
           }
         ]
       },
@@ -2014,6 +2026,117 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getServerconfigs ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/serverconfigs/' + filter, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getStatistics ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: filter
+          }
+          axios.get('/o/rest/statistics', param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    postSyncStatistics ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              "Content-Type": "application/json"
+            }
+          }
+          axios.post('/o/rest/v2/nps/getsharingdata', filter).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getRevesionLog ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              groupId: state.initData.groupId
+            },
+            params: filter
+          }
+          axios.get('/o/rest/v2/dossierlogs/revesionLog', param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    putFileAttach ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+          let dataPost = new FormData()
+          dataPost.append('file', filter.file)
+          dataPost.append('fileName', filter.fileName)
+          dataPost.append('fileType', filter.fileType)
+          dataPost.append('fileSize', filter.fileSize)
+          axios.put('/o/rest/v2/fileattachs/versions/' + filter.fileEntryId, dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+
   },
   mutations: {
     SOCKET_ONOPEN (state, event)  {
