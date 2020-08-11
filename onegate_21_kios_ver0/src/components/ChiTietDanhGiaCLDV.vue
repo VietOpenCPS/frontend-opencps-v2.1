@@ -1,18 +1,18 @@
 <template>
   <div class="py-0 kios-item" :class="!isMobile ? 'px-2 mt-3' : ''">
-    <div v-if="!isMobile" class="d-inline-block" style="position:absolute;top:0;right:50px">
+    <div v-if="!isMobile && !isOneGate" class="d-inline-block" style="position:absolute;top:0;right:50px">
       <qrcode :value="urlQR" :options="{ width: 150 }"></qrcode><br>
       <v-chip class="my-0 ml-2" color="primary" text-color="white" style="width:135px;margin-top:-25px !important">
         <v-icon left class="mr-1 pl-1">center_focus_strong</v-icon> <span style="font-size:13px !important">Quét để đánh giá</span>
       </v-chip>
     </div>
     <div class="wrap-scroll py-2" :class="!isMobile && votingItems.length > 2 ? 'wrap-scroll-votting' : ''">
-      <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" :class="visible ? 'overlayActive': ''">
+      <div v-if="votingItems && votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" :class="visible ? 'overlayActive mx-2': 'mx-2'">
         <div class="text-bold">
           {{index + 1}}.&nbsp; {{ item.subject }}
         </div>
         <v-radio-group class="ml-3 pt-2 mt-0" v-model="item.selected" row>
-          <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1"></v-radio>
+          <v-radio class="mx-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1"></v-radio>
         </v-radio-group>
         <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
           <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
@@ -20,9 +20,12 @@
           </v-flex>
         </v-layout> -->
       </div>
+      <v-alert v-else class="mt-5 mx-2" :value="true" outline color="orange" icon="priority_high">
+        Không có dữ liệu đánh giá
+      </v-alert>
     </div>
     <div :class="visible ? 'validDanhGiaCLDV': ''">
-      <v-layout wrap :class="!isMobile ? 'mt-4' : 'mt-0'" v-if="!isSigned && votingItems.length > 0">
+      <v-layout wrap :class="!isMobile ? 'mt-4' : 'mt-0'" v-if="!isSigned && !isOneGate && votingItems.length > 0">
         <v-flex xs12 sm6 :class="!isMobile ? 'pr-3' : 'pr-0'">
           <v-layout wrap>
             <div style="width:110px" class="text-bold">Mã hồ sơ <span style="color:red">*</span></div>
@@ -54,6 +57,7 @@
       </v-layout>
       <div class="text-xs-center mt-4">
         <v-btn color="primary"
+          v-if="votingItems && votingItems.length > 0"
           :loading="loadingAction"
           :disabled="loadingAction"
           @click="submitVoting"
@@ -79,7 +83,7 @@ import VueTouchKeyBoard from './keyboard.vue'
 import VueQrcode from '@chenfengyuan/vue-qrcode'
 Vue.component(VueQrcode.name, VueQrcode)
 export default {
-  props: ['administration'],
+  props: ['administration', 'className'],
   components: {
     'vue-touch-keyboard': VueTouchKeyBoard
   },
@@ -97,7 +101,8 @@ export default {
     options: {
       useKbEvents: true,
       preventClickEvent: false
-    }
+    },
+    isOneGate: false
   }),
   computed: {
     isMobile () {
@@ -112,7 +117,7 @@ export default {
       // vm.isSigned = true
       vm.validPass2 = true
       let filter = {
-        className: 'govagency',
+        className: vm.className ? vm.className : 'govagency',
         classPk: vm.administration
       }
       vm.$store.dispatch('loadVoting', filter).then(function (result) {
@@ -122,6 +127,13 @@ export default {
       }).catch(function (reject) {
         vm.loading = false
       })
+      try{
+        if(typeof isOneGate !== 'undefined'){
+          vm.isOneGate = isOneGate
+        }
+      }catch(err){
+        
+      }
     })
   },
   mounted () {
@@ -132,7 +144,7 @@ export default {
   methods: {
     submitVoting () {
       var vm = this
-      if (!vm.isSigned) {
+      if (!vm.isSigned && !vm.isOneGate) {
         if ($('#applicantIdNo').val() === '') {
           vm.validPass2 = false
         } else {
@@ -168,16 +180,28 @@ export default {
       if (vm.votingItems.length > 0) {
         vm.loadingAction = true
         for (var index in vm.votingItems) {
-          vm.votingItems[index]['className'] = 'govagency'
+          vm.votingItems[index]['className'] = vm.className ? vm.className : 'govagency'
           vm.votingItems[index]['classPk'] = vm.administration
-          arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
+          if(!vm.isOneGate) {
+             arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
+          } else {
+            if(vm.votingItems[index]['selected']) {
+              arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
+            }
+          }
         }
         Promise.all(arrAction).then(results => {
           vm.loadingAction = false
           toastr.success('Đánh giá của bạn được gửi thành công')
-          vm.$router.push({
-            path: '/danh-gia-cldv'
-          })
+          if(!vm.isOneGate){
+            vm.$router.push({
+              path: '/danh-gia-cldv'
+            })
+          } else {
+            vm.$router.push({
+              path: '/danh-gia-mdhl'
+            })            
+          }
         }).catch(xhr => {
           vm.loadingAction = false
         })

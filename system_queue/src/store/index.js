@@ -87,6 +87,30 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDossiers ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+              dossierNo: filter.dossierNo
+            }
+          }
+          axios.get(state.endPoint + '/dossiers', param).then(function (response) {
+            let serializable = response.data
+            if (serializable) {
+              resolve(serializable)
+            } else {
+              resolve('')
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
     getEformBarcode ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -124,9 +148,12 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-              secretCode: filter.secretCode
+              
             },
             params: {}
+          }
+          if(filter.hasOwnProperty('secretCode')){
+            param['headers']['secretCode'] = filter.hasOwnProperty('secretCode') ? filter.secretCode : ''
           }
           axios.get(state.endPoint + '/dossiers/' + filter.dossierId, param).then(function (response) {
             let serializable = response.data

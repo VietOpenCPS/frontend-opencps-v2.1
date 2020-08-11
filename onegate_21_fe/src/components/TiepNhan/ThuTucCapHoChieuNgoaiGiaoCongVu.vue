@@ -6,7 +6,7 @@
                     <label>Họ và tên<span class="red--text">*</span></label>
                     <v-text-field
                         v-model="dossiers.delegateName"
-                        :rules="[rules.required]"
+                        :rules="[rules.required,rules.varChar50]"
                         required
                         solo
                         @input="dossiers.delegateName = dossiers.delegateName.toUpperCase()"
@@ -55,6 +55,7 @@
                     <label>Điện thoại</label>
                     <v-text-field
                         v-model="dossiers.delegateTelNo"
+                        :rules="[rules.telNo]"
                         solo
                         @change="dossiers.contactTelNo = dossiers.delegateTelNo"
                     ></v-text-field>
@@ -64,6 +65,7 @@
                     <v-text-field
                         v-model="dossiers.delegateEmail"
                         solo
+                        :rules="[rules.varChar50]"
                         @change="dossiers.contactEmail = dossiers.delegateEmail"
                     ></v-text-field>
                 </v-flex>
@@ -1254,6 +1256,7 @@
                             <td>{{props.item.NoiSinhText}}</td>
                             <td>{{props.item.SoSeri}}</td>
                             <td>{{props.item.HanDungFormart}}</td>
+                            <td>{{props.item.DaHuy ? 'Đã hủy' : 'Đang sử dụng'}}</td>
                         </tr>
                         </template>
                     </v-data-table>
@@ -1409,11 +1412,6 @@ export default {
         ],
         listThanhPhanHoSo: [],
         headerDanhSach: [
-            // {
-            // text: 'Mã đoàn',
-            // align: 'center',
-            // sortable: false
-            // },
           {
             text: 'Mã nhân thân',
             align: 'center',
@@ -1441,6 +1439,11 @@ export default {
           },
           {
             text: 'Ngày hết hạn',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Trạng thái',
             align: 'center',
             sortable: false
           }
@@ -1658,6 +1661,20 @@ export default {
               } else {
                   return true
               }
+            },
+            telNo: (value) => {
+                const pattern = /^0([1-9]{1}\d{8})$/
+                if (value) {
+                return pattern.test(value) || 'Số điện thoại gồm 10 ký tự 0-9, eg: 0989123456, ...'
+                } else {
+                return []
+                }
+            },
+            varChar50: (val) => {
+                if(val){  
+                    return val.length > 50 ?  'Thông tin không được quá 50 ký tự' : true
+                }
+                else return true   
             }
         }
     }),
@@ -1782,8 +1799,8 @@ export default {
         dateDueDate (val) {
             this.dateDueDateFormated = this.formatDate(this.dateDueDate)
             const [year, month, day] = this.dateDueDate.split('-')
-            let date = new Date()
-            date.setFullYear(parseInt(year), parseInt(month), parseInt(day))
+            let date = new Date(this.dateDueDate)
+            // date.setFullYear(parseInt(year), parseInt(month), parseInt(day))
             this.dossiers.dueDate = date.getTime()
         },
         searchApplicants (val) {
@@ -2102,7 +2119,7 @@ export default {
             if(res.vb_so_hieu_van_ban && res.vb_co_quan_chu_quan && res.vb_ma_co_quan_chu_quan)
             {
                 let tg = {
-                    vb_so_hieu_van_ban: res.vb_so_hieu_van_ban,
+                    vb_so_hieu_van_ban: res.vb_so_hieu_van_ban.toUpperCase(),
                     vb_co_quan_chu_quan: res.vb_co_quan_chu_quan,
                     vb_ma_co_quan_chu_quan: res.vb_ma_co_quan_chu_quan,
                     vb_ngay_ky: res.vb_ngay_ky,
@@ -2128,6 +2145,7 @@ export default {
         },
         fillTableThanhVien (res) {
             let vm = this
+            vm.vb_so_thu_tu = res.vb_so_thu_tu ? res.vb_so_thu_tu : ''
             if(res.vb_so_hieu_van_ban && res.vb_co_quan_chu_quan && res.vb_ma_co_quan_chu_quan){
                 let tg = {
                     bookingName: res.bookingName ? res.bookingName : '',
@@ -2135,7 +2153,7 @@ export default {
                     applicantIdNo: res.applicantIdNo ? res.applicantIdNo : '',
                     address: res.address ? res.address : '',
                     vb_so_thu_tu: res.vb_so_thu_tu ? res.vb_so_thu_tu : '',
-                    vb_so_hieu_van_ban: res.vb_so_hieu_van_ban ? res.vb_so_hieu_van_ban : '',
+                    vb_so_hieu_van_ban: res.vb_so_hieu_van_ban ? res.vb_so_hieu_van_ban.toUpperCase() : '',
                     vb_ngay_ky: res.vb_ngay_ky ? res.vb_ngay_ky : '',
                     vb_co_quan_chu_quan: res.vb_co_quan_chu_quan ? res.vb_co_quan_chu_quan : '',
                     vb_ma_co_quan_chu_quan: res.vb_ma_co_quan_chu_quan ? res.vb_ma_co_quan_chu_quan : '',
@@ -2147,7 +2165,7 @@ export default {
                     ho_chieu_cong_vu: res.ho_chieu_cong_vu ? res.ho_chieu_cong_vu : false,
                     cong_ham: res.cong_ham ? res.cong_ham : false,
                     so_ho_chieu: res.so_ho_chieu ? res.so_ho_chieu : '',
-                    so_hieu_van_ban: res.vb_so_hieu_van_ban ? res.vb_so_hieu_van_ban : '',
+                    so_hieu_van_ban: res.vb_so_hieu_van_ban ? res.vb_so_hieu_van_ban.toUpperCase() : '',
                     co_quan_chu_quan: res.vb_ma_co_quan_chu_quan ? res.vb_ma_co_quan_chu_quan : '',
                     co_quan_chu_quan_text: res.vb_co_quan_chu_quan ? res.vb_co_quan_chu_quan : '',
                     ho_ten: res.ho_ten  ? res.ho_ten : '',
@@ -2375,17 +2393,17 @@ export default {
             if(this.$refs.formThanhVien.validate() && (this.ho_chieu_ngoai_giao || this.ho_chieu_cong_vu || this.cong_ham)){
                 const [day, month, year] = vm.birthdayFormated.split('/')
                 let tk = {
-                    // bookingName: res.bookingName,
-                    // applicantName: res.applicantName,
-                    // applicantIdNo: res.applicantIdNo,
-                    // address: res.address,
-                    // vb_so_thu_tu: res.vb_so_thu_tu,
-                    // vb_so_hieu_van_ban: res.vb_so_hieu_van_ban,
-                    // vb_ngay_ky: res.vb_ngay_ky,
-                    // vb_co_quan_chu_quan: res.vb_co_quan_chu_quan,
-                    // vb_ma_co_quan_chu_quan: res.vb_ma_co_quan_chu_quan,
-                    // vb_nguoi_ky: res.vb_nguoi_ky,
-                    // vb_co_quan_tieng_anh: res.vb_co_quan_tieng_anh,
+                    bookingName: vm.dossiers.delegateName,
+                    applicantName: vm.dossiers.applicantName,
+                    applicantIdNo: vm.dossiers.applicantIdNo,
+                    address: vm.dossiers.address,
+                    vb_so_thu_tu: vm.vb_so_thu_tu,
+                    vb_so_hieu_van_ban: vm.co_quan_chu_quan_thanh_vien_select.vb_so_hieu_van_ban,
+                    vb_ngay_ky: vm.co_quan_chu_quan_thanh_vien_select.vb_ngay_ky,
+                    vb_co_quan_chu_quan: vm.co_quan_chu_quan_thanh_vien_select.vb_co_quan_chu_quan,
+                    vb_ma_co_quan_chu_quan: vm.co_quan_chu_quan_thanh_vien_select.vb_ma_co_quan_chu_quan,
+                    vb_nguoi_ky: vm.co_quan_chu_quan_thanh_vien_select.vb_nguoi_ky,
+                    vb_co_quan_tieng_anh: vm.co_quan_chu_quan_thanh_vien_select.vb_co_quan_tieng_anh,
 
                     ma_nhan_than: vm.ma_nhan_than,
                     ho_chieu_ngoai_giao: vm.ho_chieu_ngoai_giao,
@@ -2515,11 +2533,12 @@ export default {
             this.dialogThemThanhVien = true
             let tg = 'ma_nhan_than,ho_chieu_ngoai_giao,ho_chieu_cong_vu,cong_ham,so_ho_chieu,so_hieu_van_ban,ho_ten,gioi_tinh,ngay_sinh,thang_sinh,nam_sinh,noi_sinh_khac,noi_sinh,noi_sinh_text,ho_khau,so_cmt,ngay_cap_cmt,noi_cap_cmt,co_quan_cong_tac,dien_thoai,chuc_vu,cap_bac_ham,chuc_vu_tieng_anh,cong_chuc_loai,cong_chuc_bac,cong_chuc_ngach,can_bo_bo_nhiem,so_ho_chieu_ngoai_giao,ngay_ho_chieu_ngoai_giao,noi_cap_ho_chieu_ngoai_giao,so_ho_chieu_cong_vu,ngay_ho_chieu_cong_vu,noi_cap_ho_chieu_cong_vu,gia_dinh'
             let mang_key = tg.split(',')
-
+            console.log(item)
+            console.log(vm.co_quan_chu_quan_thanh_vien)
             mang_key.forEach( e => {
                
                 if (e === 'so_hieu_van_ban'){
-                    vm.co_quan_chu_quan_thanh_vien_select = vm.co_quan_chu_quan_thanh_vien.find(item2 => item2['vb_so_hieu_van_ban'] === item[e])
+                    vm.co_quan_chu_quan_thanh_vien_select = vm.co_quan_chu_quan_thanh_vien.find(item2 => item2['vb_so_hieu_van_ban'].toLowerCase() === item[e].toLowerCase())
                 } else if (e === 'nam_sinh' ||e === 'thang_sinh' || e === 'ngay_sinh') {
                     vm.birthday = vm.parseDate(item['ngay_sinh']+'/'+item['thang_sinh']+'/'+item['nam_sinh'])
                 } else if (e === 'noi_sinh') {
@@ -2551,7 +2570,12 @@ export default {
                         value: e.vb_so_hieu_van_ban + '-' + e.vb_co_quan_chu_quan,
                         vb_ma_co_quan_chu_quan: e.vb_ma_co_quan_chu_quan,
                         vb_co_quan_chu_quan: e.vb_co_quan_chu_quan,
-                        vb_so_hieu_van_ban: e.vb_so_hieu_van_ban
+                        vb_so_hieu_van_ban: e.vb_so_hieu_van_ban,
+                        vb_ngay_ky: e.vb_ngay_ky,
+                        vb_co_quan_tieng_anh: e.vb_co_quan_tieng_anh,
+                        vb_nguoi_ky: e.vb_nguoi_ky,
+                        ho_ten_nguoi_ky: e.ho_ten_nguoi_ky,
+                        chuc_vu_nguoi_ky: e.chuc_vu_nguoi_ky
                     }
                 )
             })
@@ -2598,31 +2622,50 @@ export default {
             }
             let lp_moi = (hcng_moi + hccv_moi)*giaLePhiMoi;
             let lp_gia_han = hc_gh * 100000;
-            let lp_hong = (hc_hong + hc_mat) * 400000;
+            let lp_hong = (hc_hong + hc_mat) * 320000;
             let lp_schengen = so_schengen * 10000;
             let lp_nhap = so_nuoc * so_nhap_canh * 10000;
             let lp_qua = so_nuoc * so_qua_canh * 10000;
+            let so_cong_ham = so_schengen + so_nhap_canh + so_qua_canh
+            let lp_cong_ham = lp_schengen + lp_nhap + lp_qua
             
             let le_phi = lp_moi + lp_gia_han + lp_hong + lp_schengen + lp_nhap + lp_qua;
             
             let file_payment2 = new Array();
             if(lp_moi > 0)
-                file_payment2[file_payment2.length] = {'partNo': '', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 160000, 'thanh_tien': lp_moi};
+                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 160000, 'thanh_tien': lp_moi};
+            // if((hcng_moi <= 0 || hccv_moi <=0) && lp_gia_han <=0 && lp_hong <=0 && lp_cong_ham <=0 )
+            // {
+            //     file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'}; 
+            //     file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'};   
+            // }
             if(lp_gia_han > 0)
-                file_payment2[file_payment2.length] = {'partNo': '', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_gia_han};
+                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_gia_han};
             
             if(lp_hong > 0)
-                file_payment2[file_payment2.length] = {'partNo': '', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 400000, 'thanh_tien': lp_hong};
+                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 320000, 'thanh_tien': lp_hong};
             
-            if(lp_schengen > 0)
-                file_payment2[file_payment2.length] = {'partNo': '', 'partName': 'Schengen', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_schengen, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_schengen};
+            // if(lp_schengen > 0)
+            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': vm.dossiers.dossierName + ' (Số công hàm)', 'partName': 'Schengen', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_schengen, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_schengen};
             
-            if(lp_nhap > 0)
-                file_payment2[file_payment2.length] = {'partNo': '', 'partName': 'Nhập cảnh '+so_nuoc +' quốc gia', 'fileMark': '-1', 'fileMarkName': '', 'so_nuoc': so_nuoc, 'recordCount': so_nhap_canh, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_nhap};
+            // if(lp_nhap > 0)
+            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': vm.dossiers.dossierName + ' (Số công hàm)', 'partName': 'Nhập cảnh '+so_nuoc +' quốc gia', 'fileMark': '-1', 'fileMarkName': '', 'so_nuoc': so_nuoc, 'recordCount': so_nhap_canh, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_nhap};
             
-            if(lp_qua > 0)
-                file_payment2[file_payment2.length] = {'partNo': '', 'partName': 'Quá cảnh '+so_nuoc +' quốc gia', 'fileMark': '-1', 'fileMarkName': '', 'so_nuoc': so_nuoc, 'recordCount': so_qua_canh, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_qua};
+            // if(lp_qua > 0)
+            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': vm.dossiers.dossierName + ' (Số công hàm)', 'partName': 'Quá cảnh '+so_nuoc +' quốc gia', 'fileMark': '-1', 'fileMarkName': '', 'so_nuoc': so_nuoc, 'recordCount': so_qua_canh, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_qua};
             
+            if (lp_cong_ham > 0 ){
+                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp công hàm đề nghị cấp thị thực', 'partName': '', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_cong_ham, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_cong_ham};
+            }
+            if(file_payment2.length === 2)
+            {
+                file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'}; 
+                file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'};   
+            }
+            if(file_payment2.length === 3)
+            {
+                file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'}; 
+            }
             if(le_phi != '' && le_phi != null)
                 vm.le_phi_format = le_phi.toString()
            

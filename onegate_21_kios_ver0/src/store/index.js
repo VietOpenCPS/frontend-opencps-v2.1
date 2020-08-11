@@ -100,6 +100,27 @@ export const store = new Vuex.Store({
         })
       })
     },
+    loadingDanhSachHoSo ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              dossierNo: filter.dossierNo ? filter.dossierNo : '',
+            }
+          }
+          axios.get(state.endPoint + '/dossiers', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     loadingDataHoSoKQ ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -360,8 +381,10 @@ export const store = new Vuex.Store({
             },
             params: {}
           }
+          console.log('getDossierDetailPass')
           axios.get(state.endPoint + '/dossiers/' + filter.dossierId, param).then(function (response) {
             let serializable = response.data
+            console.log('responsegetDossierDetailPass')
             console.log('response', response)
             resolve(response)
           }).catch(function (error) {
@@ -465,6 +488,7 @@ export const store = new Vuex.Store({
           // test local
           axios.get(state.endPoint + '/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
           // axios.get('http://127.0.0.1:8081/api/votings/12/' + data.classPK, param).then(result => {
+            console.log('loadVoting',result)
             if (result.data) {
               resolve(result.data.data)
             } else {

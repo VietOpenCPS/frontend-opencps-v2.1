@@ -404,15 +404,20 @@ export default {
       {text: 'Trực tiếp', value: false},
       {text: 'Trực tuyến', value: true}
     ],
-    bookingMethodSelected: false
+    bookingMethodSelected: false,
+    roles: []
   }),
   computed: {
   },
   created () {
     var vm = this
-    vm.$nextTick(function () {
+    vm.$nextTick(async function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
+      await vm.$store.dispatch('login').then((res)=>{
+        vm.roles = res
+        console.log(vm.roles)
+      })
       vm.getServerConfig()
       vm.getServiceInfo()
       vm.getGateLists()
@@ -476,7 +481,23 @@ export default {
       }
       vm.$store.dispatch('getServerConfig', filter).then(function (result) {
         let configs = JSON.parse(result.configs)
-        vm.serviceGroupList = configs['bookings']
+        let role = vm.roles
+        console.log(role)
+        vm.serviceGroupList = configs['bookings'].filter(e => {
+          for(let i=0 ; i< role.length ; i++){
+            let arrRoleCode=e.roleCode.split(',')
+            console.log(i, arrRoleCode)
+            for(let j=0; j<arrRoleCode.length; j++){
+              if(role[i]['role'].includes(arrRoleCode[j])){
+                return e
+              }
+            }
+          }
+          // return role['role'].includes(e.roleCode)
+        })
+
+        // vm.serviceGroupList = configs['bookings']
+        console.log(vm.serviceGroupList)
         vm.apiRelease = configs['bookings'].filter(function (item) {
           return item.key === 'API'
         })[0]['url']
@@ -870,6 +891,7 @@ export default {
     },
     receiveBooking (item) {
       let vm = this
+      console.log(item)
       vm.currentBooking = item
       vm.filterCreateDossier = ''
       if (item['className'] === 'EFORM') {
@@ -895,17 +917,22 @@ export default {
         }).catch (function (reject) {
         })
       } else if (item['className'] === 'DOSSIER') {
-        if (item.state === 4) {
+        if (item.state === 4 ) {
           vm.currentBooking.state = 3
         } else {
-          vm.currentBooking.state = 4
+          if(vm.serviceGroupSelected['key'] === 'API' && item.state === 2) {
+            vm.currentBooking.state = 3
+          } else {
+            vm.currentBooking.state = 4
+          }
+          
         }
         
         vm.$store.dispatch('updateBooking', vm.currentBooking).then(function (result1) {
         }).catch (function (reject1) {
         })
         let dossierId = item['classPK']
-        let urlRedirect = '/web/cuc-lanh-su#/danh-sach-ho-so/0/chi-tiet-ho-so/' + dossierId
+        let urlRedirect = '/web/cuc-lanh-su#/danh-sach-ho-so/0/chi-tiet-ho-so/' + dossierId + '?activeAction=true'
         window.open(urlRedirect, '_blank')
       }
     },
@@ -990,6 +1017,7 @@ export default {
           let formData = result
           vm.serviceInfoSelected = formData.serviceCode
           vm.serviceGroupSelected = vm.serviceGroupList.find(e=> e.groupCode === formData.groupCode)
+          vm.filterBooking()
         } catch (err) {
         }
 

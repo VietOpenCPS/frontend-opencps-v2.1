@@ -11,12 +11,15 @@ import MappingTTHC from '@/components/extform/MappingTTHC.vue'
 import ThongKeTruyCap from '@/components/extform/ThongKeTruyCap.vue'
 import SyncAgency from '@/components/extform/SyncAgency.vue'
 import SyncSharingqa from '@/components/extform/SyncSharingqa.vue'
+import SyncStatistics from '@/components/extform/SyncStatistics.vue'
+import RevesionLog from '@/components/extform/RevesionLog.vue'
 import SyncDomain from '@/components/extform/SyncDomain.vue'
 import SoTTSoTheoDoi from '@/components/extform/SoTTSoTheoDoi.vue'
 import Report from '@/components/extform/Report.vue'
 import Import from '@/components/screens/import.vue'
 import Export from '@/components/screens/export.vue'
 import FlowChartView from '@/components/screens/FlowChartView.vue'
+
 const routes = [
   {
     path: '/table/:tableName',
@@ -112,6 +115,24 @@ const routes = [
         path: '/table/opencps_stt/stt',
         name: 'STT',
         component: SoTTSoTheoDoi,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/sync/statistics',
+        name: 'SyncStatistics',
+        component: SyncStatistics,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/dossierlogs/revesionLog',
+        name: 'RevesionLog',
+        component: RevesionLog,
         props: true,
         meta: {
           requiresAuth: true
