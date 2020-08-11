@@ -3,14 +3,14 @@
         <div class="content-wrapper">
             <div class="search-section" style="height: calc(100vh - 162px) !important">
                 <div class="note">
-                    <span style="font-size: 18px;">Nhập mã số hồ sơ để tra cứu thông tin </span>
+                    <span style="font-size: 18px;">NHẬP MÃ HỒ SƠ ĐỂ TRA CỨU THÔNG TIN </span>
                 </div>
 
                 
                 <div class="search-wrapper mt-3">
                     <div class="search">
                         <input type="text" class="form-control" placeholder="Nhập mã hồ sơ" id="dossierNoSearch" name="dossierNoSearch">
-                        <button type="button" @click="toDetailDossier">Tra cứu thông tin</button>
+                        <button type="button" @click="toDetailDossier">TRA CỨU THÔNG TIN</button>
                     </div>
                 </div>
 
@@ -109,8 +109,10 @@
             axios.post('/o/rest/v2/proxy', dataPost, config).then(function (response) {
               if (response.data && response.data.hasOwnProperty('data') && response.data.data.length > 0) {
                 let dossierId = response.data.data[0]['dossierId']
+                vm.$store.dispatch('setSubmissionNote', response.data.data[0]['submissionNote'])
+                vm.$store.dispatch('setThongTinChiTietHoSo', response.data.data[0])
                 vm.$router.push({
-                  path: '/thong-tin-ho-so/' + result.dossierId,
+                  path: '/thong-tin-ho-so/' + dossierId,
                   query: {
                     renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
                   }

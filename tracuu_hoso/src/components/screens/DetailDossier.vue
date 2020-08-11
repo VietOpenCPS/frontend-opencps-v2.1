@@ -514,6 +514,8 @@
           secretCode: scr,
           serverCode: vm.dossierDetail['govAgencyCode']
         }
+        console.log(filter)
+
         vm.$store.dispatch('loadDossierPayments', filter).then(function (result) {
           console.log(result)
           if (result && result.paymentStatus && String(result.paymentStatus) === '2') {

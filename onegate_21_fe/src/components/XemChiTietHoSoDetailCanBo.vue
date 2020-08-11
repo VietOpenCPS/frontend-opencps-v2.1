@@ -2591,6 +2591,12 @@ export default {
       vm.dossierId = vm.thongTinChiTietHoSo.dossierId
       vm.$store.dispatch('pullNextactions', filter).then(function (result) {
         vm.btnDossierDynamics = result
+        
+        let btnEnable = vm.btnDossierDynamics.filter(e => e.enable === 1)
+        console.log(btnEnable)
+        if(btnEnable.length === 1 &&  currentQuery.hasOwnProperty('activeAction') && currentQuery.activeAction === 'true'){
+          vm.processPullBtnDetail(btnEnable[0], 0)
+        }
         if (currentQuery.hasOwnProperty('btnIndex') && currentQuery.btnIndex !== null && currentQuery.btnIndex !== '') {
           vm.btnStateVisible = true
           vm.dialogActionProcess = true

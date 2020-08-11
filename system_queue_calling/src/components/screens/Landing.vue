@@ -960,7 +960,7 @@ export default {
         }).catch (function (reject1) {
         })
         let dossierId = item['classPK']
-        let urlRedirect = '/web/cuc-lanh-su#/danh-sach-ho-so/9/chi-tiet-ho-so/' + dossierId
+        let urlRedirect = '/web/cuc-lanh-su#/danh-sach-ho-so/9/chi-tiet-ho-so/' + dossierId + '?activeAction=true'
         window.open(urlRedirect, '_blank')
       }
     },

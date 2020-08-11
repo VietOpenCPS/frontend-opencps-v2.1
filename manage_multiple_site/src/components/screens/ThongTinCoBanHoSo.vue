@@ -401,10 +401,6 @@
       loading() {
         return this.$store.getters.loading
       },
-      originality() {
-        var vm = this
-        return vm.getOriginality()
-      }
     },
     created() {
       var vm = this

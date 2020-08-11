@@ -1567,10 +1567,10 @@ header a {
 header a div>p{
     color: #00204f
 }
-header img {
+/* header img {
 	width: 50px;
 	margin-right: 10px;
-}
+} */
 header p {
 	margin-bottom: 0;
 }

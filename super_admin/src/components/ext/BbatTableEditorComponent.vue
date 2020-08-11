@@ -222,6 +222,16 @@
           <v-icon>reply</v-icon> &nbsp;
           Quay lại
         </v-btn>
+        <!-- Thao tác preview -->
+        <v-btn color="blue darken-3" class="mr-0" dark v-on:click.native="viewForm"
+          v-if="tableName === 'opencps_dossierpart' && data['EForm']"
+        >Xem trước form nhập</v-btn>
+        <v-btn color="blue darken-3" class="mr-0" dark v-on:click.native="viewPdf(false)"
+          :loading="loadingPdf"
+          :disabled="loadingPdf"
+          v-if="tableName === 'opencps_dossierpart' && data['EForm']"
+        >Xem trước bản in</v-btn>
+        <!--  -->
       </v-flex>
     </v-layout>
     <v-layout v-else row wrap>
@@ -458,6 +468,35 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+  <!--  -->
+  <v-dialog v-model="dialogEform" fullscreen hide-overlay transition="dialog-bottom-transition">
+    <div class="">
+      <v-toolbar class="toolbar-script" flat height="36" dark color="#1867c0">
+        <v-toolbar-title class="white--text">
+          <span v-if="viewFormInput">Form nhập</span>
+          <span v-else>Bản in</span>
+        </v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn v-if="!viewFormInput" round dark small color="blue" @click="viewForm"
+        >
+          <v-icon size="18" class="white--text">description</v-icon> &nbsp; Form nhập
+        </v-btn>
+        <v-btn v-else round dark small color="green" @click="viewPdf(true)" class="mr-2"
+          :loading="loadingPdf"
+          :disabled="loadingPdf"
+        >
+          <v-icon size="16" class="white--text">fa fa-file-pdf-o</v-icon> &nbsp; Bản in
+          <span slot="loader">Loading...</span>
+        </v-btn>
+        <v-btn flat small color="blue" icon @click="dialogEform = false">
+          <v-icon size="28" class="white--text">clear</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <div v-if="viewFormInput === true" id="formInput" style="background: #fafafa;color: black;padding: 15px;"></div>
+      <iframe v-else id="pdfPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;height: 100vh" frameborder="0">
+      </iframe>
+    </div>
+  </v-dialog>
 </div>
 </template>
 
@@ -540,7 +579,10 @@
               return []
             }
           },
-        }
+        },
+        loadingPdf: false,
+        viewFormInput: true,
+        dialogEform: false
       }
     },
     computed: {
@@ -560,11 +602,14 @@
     },
     created() {
       console.log('created')
+      
       var vm = this
       vm.$nextTick(function() {
+        
         if (vm.tableConfig !== null && vm.tableConfig !== undefined) {
           if (vm.tableConfig['detailColumns'] !== '') {
             vm.detailForm = eval('( ' + vm.tableConfig['detailColumns'] + ' )')
+            console.log('1',vm.detailForm)
           } else {
             let videoElement = document.getElementById('editor-video-preloader')
             if (videoElement !== null && videoElement !== undefined) {
@@ -572,8 +617,30 @@
             }
           }
           if (vm.detailData !== null && vm.detailData !== undefined && Array.isArray(vm.detailData) && vm.detailData.length > 0) {
-            vm.data = vm.detailData[0]
-            vm.processDataSourceVerify()
+             console.log(vm.tableName.split('_')[vm.tableName.split('_').length])
+            if(vm.$router.history.current.query.idCopy){
+              let data = {}
+              for (let i=0; i< vm.detailForm.length; i++) {
+                data[vm.detailForm[i]['model']] = vm.detailData[0][vm.detailForm[i]['model']]
+              }
+              for(let key in data) {
+                if(!data[key]){
+                  delete data[key]
+                }
+               
+                if(key === vm.tableName.split('_')[vm.tableName.split('_').length] + 'Id') {
+                  delete data[key]
+                }
+              }
+              vm.data = data
+              console.log('data1-a', vm.data)
+              vm.processDataSourceVerify()
+            } else {
+              vm.data = vm.detailData[0]
+              console.log('data1-b', vm.data)
+              vm.processDataSourceVerify()
+            }
+
           } else {
             vm.data = {}
           }
@@ -594,6 +661,7 @@
             if (dataObj.respone === 'tableConfig' && vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
               vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')
               console.log('load tableConfig')
+              console.log('2',vm.detailForm)
               vm.processDataSource()
             }
             textPost = {
@@ -622,6 +690,7 @@
                     vm.data = {}
                   } else {
                     vm.data = vm.dataSocket[dataObj.respone][0]
+                    console.log('data1', vm.data)
                   }
                   vm.processDataSourceVerify()
                 } else {
@@ -712,6 +781,7 @@
             } 
             if (dataObj.respone === 'tableConfig' && vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
               vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')
+              console.log('3',vm.detailForm)
               console.log('load tableConfig')
               vm.processDataSource()
             }
@@ -1093,7 +1163,93 @@
                 return false;
             }
             return true;
-      }
+      },
+      viewForm () {
+        let vm = this
+        let formScript, formData
+        /* eslint-disable */
+        try {
+          formScript =  eval('(' + vm.data.formScript + ')')
+        } catch (error) {
+          if (vm.data.formScript === '') {
+            toastr.error('Chưa có cấu hình mã tạo form')
+          } else {
+            toastr.error('Lỗi cấu hình mã tạo form')
+          }
+          return
+        }
+        formData = {}
+        /* eslint-disable */
+        try {
+          formScript.data = eval('(' + vm.data.sampleData + ')')
+          vm.viewFormInput = true
+          vm.dialogEform = true
+          setTimeout(function () {
+            window.$('#formInput').empty()
+            window.$('#formInput').alpaca(formScript)
+          }, 200)
+        } catch (error) {
+          if (vm.data.sampleData === '') {
+            toastr.error('Chưa có cấu hình dữ liệu mẫu')
+            formScript.data = {}
+          } else {
+            toastr.error('Lỗi cấu hình dữ liệu mẫu')
+            return
+          }
+          vm.viewFormInput = true
+          vm.dialogEform = true
+          setTimeout(function () {
+            window.$('#formInput').empty()
+            window.$('#formInput').alpaca(formScript)
+          }, 200)
+          
+        }
+        
+      },
+      viewPdf (t) {
+        let vm = this
+        if (vm.data.formReport === '') {
+          toastr.error('Chưa có cấu hình mã thiết kế xml jasper')
+          return
+        }
+        let formData = {}
+        try {
+          if (t) {
+            let control = window.$('#formInput').alpaca('get')
+            formData = control.getValue()
+          } else {
+            formData = vm.data.sampleData ? eval('(' + vm.data.sampleData + ')') : {}
+          }
+        } catch (error) {
+          
+        }
+        vm.loadingPdf = true
+        let options = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          responseType: 'blob'
+        }
+        if (!formData) {
+          formData = {}
+        }
+        let dataCreate = new URLSearchParams()
+        dataCreate.append('scriptStr', vm.data.formReport)
+        dataCreate.append('jsonDataStr', JSON.stringify(formData))
+        axios.post('/o/rest/v2/jaspers/preview', dataCreate, options).then(function (response) {
+          vm.loadingPdf = false
+          vm.dialogEform = true
+          vm.viewFormInput = false
+          let serializable = response.data
+          let file = window.URL.createObjectURL(serializable)
+          setTimeout(() => {
+            document.getElementById('pdfPreview').src = file
+          }, 200)
+        }).catch(function (response) {
+          vm.loadingPdf = false
+        })
+      },
     }
   }
 </script>

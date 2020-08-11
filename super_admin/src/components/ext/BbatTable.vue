@@ -36,6 +36,12 @@
         <v-btn dark flat v-if="tableName === 'opencps_applicant'" @click="filterApplicantType('business')" v-bind:style="{ background: applicantType === 'business' ? '#f1eeee6e': 'none'}">
           Tài khoản tổ chức
         </v-btn>
+        <v-btn dark flat v-if="exportExcel" @click="exportTableData()">
+          Export Excel
+        </v-btn>
+        <v-btn dark flat v-if="showWorkingunits" @click="getWorkingunits()">
+          Cấu trúc phòng ban
+        </v-btn>
         <v-btn dark icon v-on:click.native="rePullData">
           <v-icon>refresh</v-icon>
         </v-btn>
@@ -96,6 +102,12 @@
           </v-list-tile-action>
           <v-list-tile-title>Sao chép quy trình</v-list-tile-title>
         </v-list-tile>
+        <v-list-tile v-if="showCopy" v-on:click.native="copyRecord(-1)">
+          <v-list-tile-action>
+            <v-icon color="red darken-3">content_copy</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-title>Copy</v-list-tile-title>
+        </v-list-tile>
         <v-list-tile v-on:click.native="deleteRecord()">
           <v-list-tile-action>
             <v-icon color="red darken-3">clear</v-icon>
@@ -104,6 +116,29 @@
         </v-list-tile>
       </v-list>
     </v-menu>
+        <v-dialog
+            v-model="dialog"
+            max-width="800px"
+            persistent
+        >    
+            <v-card>
+                <div style="width: 100%;height: 45px; background-color: #115ebe; display: flex;justify-content: space-between; align-items: center;">
+                  <span class="mx-2" style="font-size: 20px; font-weight: bold;color: #fff;">Cấu trúc phòng ban</span>
+                  <v-btn color="#115ebe" fab small dark  @click="dialog = false">
+                      <v-icon>cancel</v-icon>
+                  </v-btn>
+                </div>
+                <v-card-text class="form_vuejs">
+                  <v-treeview open-all :items="itemTree">
+                    <template v-slot:prepend>
+                      <v-icon >
+                        folder
+                      </v-icon>
+                    </template>
+                  </v-treeview>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
   </div>
 </template>
 
@@ -138,8 +173,6 @@
         showMenu: false,
         x: 0,
         y: 0,
-        items: [
-        ],
         tableData: [],
         tableConfig: {},
         dataSocket: {},
@@ -147,7 +180,141 @@
         filterData: {},
         columnsDataFilter: [],
         page: 1,
-        pageTotalCounter: 0
+        pageTotalCounter: 0,
+        showCopy: false,
+        tableConfigExport: '',
+        tableDataExport: '',
+        exportExcel: false,
+        showWorkingunits: false,
+        dialog: false,
+        tree: [],
+        itemTree: [],
+        dataTest:  [
+          {
+            "workingUnitId": 301,
+            "createDate": "2020-08-08T09:52:23.000Z",
+            "modifiedDate": "2020-08-10T10:12:01.000Z",
+            "name": "Phòng 1.0",
+            "enName": "Phòng 1.0",
+            "govAgencyCode": "CUC_CHINH_SACH",
+            "parentWorkingUnitId": 0,
+            "sibling": 1,
+            "address": "",
+            "telNo": "",
+            "faxNo": "",
+            "email": "abc@gmail.com",
+            "website": "",
+            "treeIndex": "0001",
+            "level": 0
+          },
+          {
+            "workingUnitId": 401,
+            "createDate": "2020-08-10T10:10:55.000Z",
+            "modifiedDate": "2020-08-10T10:12:18.000Z",
+            "name": "Phòng 1.1",
+            "enName": "Phòng 1.1",
+            "govAgencyCode": "CUC_CHINH_SACH",
+            "parentWorkingUnitId": 301,
+            "sibling": 1,
+            "address": "",
+            "telNo": "",
+            "faxNo": "",
+            "email": "abc@gmail.com",
+            "website": "",
+            "treeIndex": "0001.0001",
+            "level": 1
+          },
+          {
+            "workingUnitId": 402,
+            "createDate": "2020-08-10T10:12:49.000Z",
+            "modifiedDate": "2020-08-10T10:12:49.000Z",
+            "name": "Phòng 2.0",
+            "enName": "Phòng 2.0",
+            "govAgencyCode": "CUC_CHINH_SACH",
+            "parentWorkingUnitId": 0,
+            "sibling": 2,
+            "address": "",
+            "telNo": "",
+            "faxNo": "",
+            "email": "abc@gmail.com",
+            "website": "",
+            "treeIndex": "0002",
+            "level": 0
+          }
+        ],
+        open: [],
+        items: [
+          {
+            id: 1,
+            name: 'Applications :',
+            children: [
+              { id: 2, name: 'Calendar : app' },
+              { id: 3, name: 'Chrome : app' },
+              { id: 4, name: 'Webstorm : app' }
+            ]
+          },
+          {
+            id: 5,
+            name: 'Documents :',
+            children: [
+              {
+                id: 6,
+                name: 'vuetify :',
+                children: [
+                  {
+                    id: 7,
+                    name: 'src :',
+                    children: [
+                      { id: 8, name: 'index : ts' },
+                      { id: 9, name: 'bootstrap : ts' }
+                    ]
+                  }
+                ]
+              },
+              {
+                id: 10,
+                name: 'material2 :',
+                children: [
+                  {
+                    id: 11,
+                    name: 'src :',
+                    children: [
+                      { id: 12, name: 'v-btn : ts' },
+                      { id: 13, name: 'v-card : ts' },
+                      { id: 14, name: 'v-window : ts' }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 15,
+            name: 'Downloads :',
+            children: [
+              { id: 16, name: 'October : pdf' },
+              { id: 17, name: 'November : pdf' },
+              { id: 18, name: 'Tutorial : html' }
+            ]
+          },
+          {
+            id: 19,
+            name: 'Videos :',
+            children: [
+              {
+                id: 20,
+                name: 'Tutorials :',
+                children: [
+                  { id: 21, name: 'Basic layouts : mp4' },
+                  { id: 22, name: 'Advanced techniques : mp4' },
+                  { id: 23, name: 'All about app : dir' }
+                ]
+              },
+              { id: 24, name: 'Intro : mov' },
+              { id: 25, name: 'Conference introduction : avi' }
+            ]
+          }
+        ]
       }
     },
     computed: {
@@ -209,7 +376,6 @@
         if (videoElement !== null && videoElement !== undefined) {
           videoElement.play()
         }
-
         setTimeout(() => {
           vm.getData()
         }, 10)
@@ -286,10 +452,30 @@
         dataPost.append('text', JSON.stringify(textPost))
         axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
           let dataObj = response.data
+          vm.tableConfigExport = dataObj
           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
             if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && dataObj.respone === 'tableConfig') {              
               vm.nameScreen = vm.dataSocket['tableConfig']['name']
               vm.backTableName = vm.dataSocket['tableConfig']['dependency_title']
+              if(vm.dataSocket['tableConfig']['detailColumns']){
+                try{
+                  let detailColumns = JSON.parse(vm.dataSocket['tableConfig']['detailColumns'])
+                  console.log(detailColumns)
+                  for(let i=0; i<detailColumns.length; i++){
+                    if(detailColumns[i]['showCopy']){
+                      vm.showCopy = true
+                    }
+                    if(detailColumns[i]['exportExcel']){
+                      vm.exportExcel = true
+                    }
+                    if(detailColumns[i]['showWorkingunits']){
+                      vm.showWorkingunits = true
+                    }
+                  }
+                } catch (err) {
+
+                }
+              }
               if (vm.dataSocket['tableConfig'].hasOwnProperty('dependency_title')) {
                 vm.depen = true
               } else {
@@ -322,6 +508,7 @@
               dataPost.append('text', JSON.stringify(textPost))
               axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
                 let dataObj = response.data
+                vm.tableDataExport = Object.assign(textPost, {start: -1, end: -1})
                 vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
                   if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['tableData'] !== null && vm.dataSocket['tableData'] !== undefined && (dataObj.respone === 'tableData' || dataObj.respone === 'tableConfig')) {
                     vm.nameScreen = vm.dataSocket['tableConfig']['name']
@@ -554,6 +741,30 @@
           path: vm.dataSocket['tableConfig']['dependency_link'] + '/' + query['pk']
         })
       },
+      copyRecord (id) {
+        let vm = this
+        let idEditor = 0
+        if (id === -1) {
+          let tempTableData = vm.dataSocket['tableData']
+          idEditor = tempTableData[vm.currentIndex][0]
+        } else {
+          idEditor = id
+        }
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        newQuery['idCopy'] = idEditor
+        if (vm.dataSocket['tableConfig']['extForm']) {
+          vm.$router.push({
+            path: '/table/' + vm.tableName + '/ext/editor/' + 0,
+            query: newQuery
+          })
+        } else {
+          vm.$router.push({
+            path: '/table/' + vm.tableName + '/editor/' + 0,
+            query: newQuery
+          })
+        }
+      },
       deleteRecord () {
         let vm = this
         var result = confirm('Bạn có muốn xoá bản ghi này?');
@@ -640,6 +851,55 @@
         vm.$router.push({
           path: current.path + queryString
         })
+      },
+      exportTableData () {
+        let vm = this
+        let options = {
+          headers: {
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Token': window.Liferay !== undefined ? window.Liferay.authToken : ''
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('columnName', JSON.stringify(vm.tableConfigExport))
+        dataPost.append('content', JSON.stringify(vm.tableDataExport))
+        axios.post('/o/rest/v2/socket/web/export-excel', dataPost, options).then(function (response) {
+        }).catch(function (error) {
+        })
+      },
+      getWorkingunits () {
+        let vm = this
+        vm.dialog = true
+        let options = {
+          headers: {
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Token': window.Liferay !== undefined ? window.Liferay.authToken : ''
+          }
+        }
+        axios.get('/o/rest/v2/workingunits',options).then(function (response) {
+          let data= response.data.data
+          vm.itemTree = vm.list_to_tree(data, 'workingUnitId', 'parentWorkingUnitId')
+          console.log('vm.itemTree',vm.itemTree)
+        }).catch(function (error) {
+        })
+      },
+      list_to_tree (list, id, parentId) {
+        var map = {}, node, roots = [], i;
+        
+        for (i = 0; i < list.length; i += 1) {
+          map[list[i][id]] = i; 
+          list[i]['children'] = []; 
+        }
+        
+        for (i = 0; i < list.length; i += 1) {
+          node = list[i];
+          if (node[parentId] !== 0) {
+            list[map[node[parentId]]].children.push(node);
+          } else {
+            roots.push(node);
+          }
+        }
+        return roots;
       }
     }
   }
