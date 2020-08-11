@@ -39,7 +39,7 @@
         <v-btn dark flat v-if="exportExcel" @click="exportTableData()">
           Export Excel
         </v-btn>
-        <v-btn dark flat @click="dialog = true">
+        <v-btn dark flat v-if="showWorkingunits" @click="getWorkingunits()">
           Cấu trúc phòng ban
         </v-btn>
         <v-btn dark icon v-on:click.native="rePullData">
@@ -185,6 +185,7 @@
         tableConfigExport: '',
         tableDataExport: '',
         exportExcel: false,
+        showWorkingunits: false,
         dialog: false,
         tree: [],
         itemTree: [],
@@ -375,7 +376,6 @@
         if (videoElement !== null && videoElement !== undefined) {
           videoElement.play()
         }
-        vm.getWorkingunits()
         setTimeout(() => {
           vm.getData()
         }, 10)
@@ -467,6 +467,9 @@
                     }
                     if(detailColumns[i]['exportExcel']){
                       vm.exportExcel = true
+                    }
+                    if(detailColumns[i]['showWorkingunits']){
+                      vm.showWorkingunits = true
                     }
                   }
                 } catch (err) {
@@ -866,6 +869,7 @@
       },
       getWorkingunits () {
         let vm = this
+        vm.dialog = true
         let options = {
           headers: {
             'groupId': window.themeDisplay.getScopeGroupId(),
