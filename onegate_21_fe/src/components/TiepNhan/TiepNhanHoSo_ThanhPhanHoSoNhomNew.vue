@@ -839,7 +839,7 @@ export default {
         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
           if (vm.dossierIntoGroup.length > 0) {
             vm.$store.commit('setFilesAdd', [resPostEform])
-            vm.$store.commit('setActiveAddFileGroup', true)
+            // vm.$store.commit('setActiveAddFileGroup', true)
           }
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
@@ -857,7 +857,7 @@ export default {
         vm.$store.dispatch('postEform', item).then(resPostEform => {
           if (vm.dossierIntoGroup.length > 0) {
             vm.$store.commit('setFilesAdd', [resPostEform])
-            vm.$store.commit('setActiveAddFileGroup', true)
+            // vm.$store.commit('setActiveAddFileGroup', true)
           }
           vm.dossierTemplateItems[index].daKhai = true
           vm.dossierTemplateItems[index]['passRequired'] = true
@@ -916,7 +916,7 @@ export default {
           console.log('vm.dossierIntoGroup', vm.dossierIntoGroup)
           if (vm.dossierIntoGroup.length > 0) {
             vm.$store.commit('setFilesAdd', result)
-            vm.$store.commit('setActiveAddFileGroup', true)
+            // vm.$store.commit('setActiveAddFileGroup', true)
           }
           vm.dossierTemplateItems[index]['passRequired'] = true
           vm.progressUploadPart = ''

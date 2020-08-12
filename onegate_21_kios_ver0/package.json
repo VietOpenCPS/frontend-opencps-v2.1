@@ -2,7 +2,7 @@
   "name": "onegate",
   "version": "1.0.0",
   "description": "onegate project",
-  "author": "binhth.vuejx@gmail.com",
+  "author": "opencps_team@fds.vn",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",

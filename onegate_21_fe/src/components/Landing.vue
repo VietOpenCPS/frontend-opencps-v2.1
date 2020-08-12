@@ -375,7 +375,9 @@
                   <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
                 </v-list-tile>
                 <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId"
-                  v-if="String(props.item['permission']).indexOf('write') !== -1 && String(item.form) !== 'NEW' && menuType !== 3"
+                  v-if="String(props.item['permission']).indexOf('write') !== -1 && String(item.form) !== 'NEW' && menuType !== 3
+                    && (!item.hasOwnProperty('roleCode') || item.hasOwnProperty('roleCode') && getUser(item.roleCode))
+                  "
                   @click="btnActionEvent(props.item, item, index, false)"
                 >
                   <v-list-tile-title>{{ item.title }}</v-list-tile-title>

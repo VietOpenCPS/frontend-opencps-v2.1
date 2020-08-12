@@ -2316,7 +2316,7 @@ export default {
     },
     cancelAddFile () {
       let vm = this
-      vm.$store.commit('setActiveAddFileGroup', false)
+      // vm.$store.commit('setActiveAddFileGroup', false)
     },
     toggleAll () {
       var vm = this

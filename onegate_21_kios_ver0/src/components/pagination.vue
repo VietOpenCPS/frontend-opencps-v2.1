@@ -2,42 +2,17 @@
   <div>
     <!-- <div style="text-align: left;position: absolute;line-height: 46px;">Tổng số <span class="text-bold primary--text">{{total}}</span> bản ghi. </div> -->
     <div v-if="total > currentLimit" class="vue-tiny-pagination pagination layout" style="justify-content: center; -webkit-justify-content: center;">
-      <!-- <div class="px-3 xs2 flex">
-        <v-select
-          v-bind:items="totalPagesData"
-          v-model="currentPage"
-          item-text="text"
-          item-value="value"
-          autocomplete
-          @input="goToPage"
-        ></v-select>
-      </div> -->
       <ul class="tiny-pagination" :class="customClass">
-        <!-- <li class="page-item" :class="classFirstPage">
-          <button @click.prevent="lastPageLast" :class="classFirstPage" class="pagination__navigation">
-            <i aria-hidden="true" class="material-icons icon">first_page</i>
-          </button>
-        </li> -->
-        <li class="page-item" :class="classFirstPage">
+        <li class="page-item" :class="classFirstPage" style="border: none !important;">
           <button @click.prevent="lastPage" :class="classFirstPage" class="pagination__navigation primary">
             <i aria-hidden="true" class="material-icons icon">arrow_left</i>
           </button>
         </li>
-        <!-- <li class="page-item" style="margin-right: 0;">
-          <button class="pagination__navigation pagination__navigation--disabled text-bold primary--text" style="border-right: 0; border-left: 0;">
-            {{titlePage}}
-          </button>
-        </li> -->
-        <li class="page-item ml-4" :class="classLastPage" style="margin-right: 0;">
+        <li class="page-item ml-4" :class="classLastPage" style="margin-right: 0;border: none !important;">
           <button @click.prevent="nextPage" :class="classLastPage" class="pagination__navigation primary">
             <i aria-hidden="true" class="material-icons icon">arrow_right</i>
           </button>
         </li>
-        <!-- <li class="page-item" :class="classLastPage">
-          <button @click.prevent="nextPageLast" :class="classLastPage" class="pagination__navigation">
-            <i aria-hidden="true" class="material-icons icon">last_page</i>
-          </button>
-        </li> -->
       </ul>
     </div>
   </div>

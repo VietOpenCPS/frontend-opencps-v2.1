@@ -1187,6 +1187,11 @@ export default {
         if (resultDossier['dossierSubStatus']) {
           vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result => {
             vm.btnStepsDynamics = result
+            if (vm.btnStepsDynamics.length > 0) {
+              vm.btnStepsDynamics = vm.btnStepsDynamics.filter(function (item) {
+                return !item.hasOwnProperty('roleCode') || (item.hasOwnProperty('roleCode') && vm.getUser(item.roleCode))
+              })
+            }
           })
         }
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'done') {

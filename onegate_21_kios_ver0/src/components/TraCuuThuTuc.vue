@@ -1,9 +1,9 @@
 <template>
   <div class="px-2 py-0 kios-item">
-    <h4 class="pt-2 pb-3 ml-2 text-xs-center">
+    <h4 class="py-2 ml-2 text-xs-center">
       <span style="color:#065694;font-size: 1.2em !important;">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
     </h4>
-    <v-layout wrap class="mt-2">
+    <v-layout wrap class="mt-0">
       <v-flex xs4 class="pl-2 pr-2">
         <v-autocomplete
           :items="govAgencyList"
@@ -88,14 +88,14 @@
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="10" />
     </content-placeholders>
-    <div class="mt-4" v-if="!loading && !activeDetailService && !showListThuTuc && govAgencyList && !govAgencySelected && govAgencyList.length > 0" :class="visible ? 'overlayActive': ''">
+    <div class="mt-0" v-if="!loading && !activeDetailService && !showListThuTuc && govAgencyList && !govAgencySelected && govAgencyList.length > 1" :class="visible ? 'overlayActive': ''">
       <v-layout class="wrap">
         <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
           <v-btn outline flat color="primary" class="btn-select" @click="filterAdministration(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.administrationName}}</v-btn>
         </v-flex>
       </v-layout>
     </div>
-    <div class="mt-4 mx-2" v-if="!loading && !activeDetailService && !showListThuTuc && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0" :class="visible ? 'overlayActive': ''">
+    <div class="mt-0 mx-2" v-if="!loading && !activeDetailService && !showListThuTuc && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0" :class="visible ? 'overlayActive': ''">
       <!-- danh sách lĩnh vực -->
       <div class="wrap-scroll wrap-scroll-domain list-domain">
         <v-list class="py-0">
@@ -108,12 +108,12 @@
           </template>
         </v-list>
       </div>
-      <div v-if="totalPaggingLinhVuc > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
+      <!-- <div v-if="totalPaggingLinhVuc > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
         <div class="flex pagging-table px-2"> 
           <tiny-pagination :total="totalPaggingLinhVuc" :page="pageListLinhVuc" custom-class="custom-tiny-class" 
             @tiny:change-page="paggingData" ></tiny-pagination> 
         </div>
-      </div>
+      </div> -->
     </div>
     <!-- danh sách thủ tục -->
     <div class="mt-4" v-if="!loading && !activeDetailService && showListThuTuc" :class="visible ? 'overlayActive': ''">
@@ -346,40 +346,62 @@ export default {
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
       vm.govAgencySelected = currentQuery.hasOwnProperty('administration') ? currentQuery.administration : ''
-      // vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
-      $('#serviceNameKey').val(currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '')
-      vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
-      vm.linhVucSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      if (vm.govAgencySelected && !vm.linhVucSelected) {
-        vm.loading = true
+      if (!vm.govAgencySelected) {
+        vm.showListThuTuc = false
         let filter = {
-          page: currentQuery.page ? currentQuery.page : 1,
-          administrationCode: vm.govAgencySelected
+          groupId: ''
         }
-        vm.$store.dispatch('getDomainListsPublic', filter).then(function (result) {
+        vm.$store.dispatch('getGovAgency', filter).then(function (result) {
+          vm.govAgencyList = result
           vm.loading = false
-          if (result.data) {
-            vm.listLinhVuc = result.data
-            vm.totalPaggingLinhVuc = Number(result.total)
-          } else {
-            vm.listLinhVuc = []
-            vm.totalPaggingLinhVuc = 0
+          if (vm.govAgencyList.length > 0) {
+            $('#serviceNameKey').val(currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '')
+            vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
+            vm.linhVucSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
+            vm.govAgencySelected = currentQuery.hasOwnProperty('administration') ? currentQuery.administration : ''
+            if (vm.govAgencyList.length === 1) {
+              vm.govAgencySelected = vm.govAgencyList[0]['administrationCode']
+            }
+            vm.filterGovagency()
           }
-          vm.pageListLinhVuc = Number(currentQuery.page) ? Number(currentQuery.page) : 1
         }).catch(reject => {
           vm.loading = false
-          vm.listLinhVuc = []
-          vm.totalPaggingLinhVuc = 0
         })
-      }
-      if (vm.linhVucSelected || $('#serviceNameKey').val() !== '') {
-        vm.doLoadingThuTuc()
-        vm.showListThuTuc = true
-      }
-      if (currentQuery.hasOwnProperty('detail')) {
-        vm.$store.commit('setActiveDetailService', true)
       } else {
-        vm.$store.commit('setActiveDetailService', false)
+        $('#serviceNameKey').val(currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '')
+        vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
+        vm.linhVucSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
+        if (vm.govAgencySelected && !vm.linhVucSelected) {
+          vm.loading = true
+          let filter = {
+            page: currentQuery.page ? currentQuery.page : 1,
+            administrationCode: vm.govAgencySelected
+          }
+          vm.$store.dispatch('getDomainListsPublic', filter).then(function (result) {
+            vm.loading = false
+            if (result.data) {
+              vm.listLinhVuc = result.data
+              vm.totalPaggingLinhVuc = Number(result.total)
+            } else {
+              vm.listLinhVuc = []
+              vm.totalPaggingLinhVuc = 0
+            }
+            vm.pageListLinhVuc = Number(currentQuery.page) ? Number(currentQuery.page) : 1
+          }).catch(reject => {
+            vm.loading = false
+            vm.listLinhVuc = []
+            vm.totalPaggingLinhVuc = 0
+          })
+        }
+        if (vm.linhVucSelected || $('#serviceNameKey').val() !== '') {
+          vm.doLoadingThuTuc()
+          vm.showListThuTuc = true
+        }
+        if (currentQuery.hasOwnProperty('detail')) {
+          vm.$store.commit('setActiveDetailService', true)
+        } else {
+          vm.$store.commit('setActiveDetailService', false)
+        }
       }
     }
   },

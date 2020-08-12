@@ -36,8 +36,9 @@
         <v-btn dark flat v-if="tableName === 'opencps_applicant'" @click="filterApplicantType('business')" v-bind:style="{ background: applicantType === 'business' ? '#f1eeee6e': 'none'}">
           Tài khoản tổ chức
         </v-btn>
-        <v-btn dark flat v-if="exportExcel" @click="exportTableData()">
-          Export Excel
+        <v-btn dark flat v-if="exportExcel" :loading="exportLoading" :disabled="exportLoading"
+         @click="exportTableData()">
+          <v-icon right dark>cloud_download</v-icon> &nbsp; Xuất file Excel 
         </v-btn>
         <v-btn dark flat v-if="showWorkingunits" @click="getWorkingunits()">
           Cấu trúc phòng ban
@@ -116,36 +117,59 @@
         </v-list-tile>
       </v-list>
     </v-menu>
-        <v-dialog
-            v-model="dialog"
-            max-width="800px"
-            persistent
-        >    
-            <v-card>
-                <div style="width: 100%;height: 45px; background-color: #115ebe; display: flex;justify-content: space-between; align-items: center;">
-                  <span class="mx-2" style="font-size: 20px; font-weight: bold;color: #fff;">Cấu trúc phòng ban</span>
-                  <v-btn color="#115ebe" fab small dark  @click="dialog = false">
-                      <v-icon>cancel</v-icon>
-                  </v-btn>
-                </div>
-                <v-card-text class="form_vuejs">
-                  <v-treeview open-all :items="itemTree">
-                    <template v-slot:prepend>
-                      <v-icon >
-                        folder
-                      </v-icon>
-                    </template>
-                  </v-treeview>
-                </v-card-text>
-            </v-card>
-        </v-dialog>
+    <v-dialog
+        v-model="dialog"
+        max-width="800px"
+        persistent
+    >    
+        <v-card>
+            <div style="width: 100%;height: 45px; background-color: #115ebe; display: flex;justify-content: space-between; align-items: center;">
+              <span class="mx-2" style="font-size: 20px; font-weight: bold;color: #fff;">Cấu trúc phòng ban</span>
+              <v-btn color="#115ebe" fab small dark  @click="dialog = false">
+                  <v-icon>cancel</v-icon>
+              </v-btn>
+            </div>
+            <v-card-text class="form_vuejs" style="min-height: 150px;">
+              <v-list>
+                <v-list-group
+                  v-for="item in itemTree"
+                  :key="item.workingUnitId"
+                  :value="true"
+                  prepend-icon="account_balance"
+                  no-action
+                >
+                  <template slot="activator">
+                    <v-list-tile>
+                      <v-list-tile-content>
+                        <v-list-tile-title>{{ item.name }}</v-list-tile-title>
+                      </v-list-tile-content>
+                    </v-list-tile>
+                  </template>
+
+                  <v-list-tile
+                    v-for="subItem in item.children"
+                    :key="subItem.workingUnitId"
+                    style="padding-left: 42px !important"
+                  >
+                    <v-list-tile-content>
+                      <v-list-tile-title>
+                        <v-icon>label_important</v-icon>&nbsp; {{ subItem.name }}
+                      </v-list-tile-title>
+                    </v-list-tile-content>
+                  </v-list-tile>
+                </v-list-group>
+              </v-list>
+            </v-card-text>
+        </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
   import TinyPagination from './TinyPagination.vue'
   import axios from 'axios'
-  
+  import saveAs from 'file-saver'
+
   export default {
     props: ['tableName'],
     components: {
@@ -183,12 +207,12 @@
         pageTotalCounter: 0,
         showCopy: false,
         tableConfigExport: '',
-        tableDataExport: '',
         exportExcel: false,
         showWorkingunits: false,
         dialog: false,
         tree: [],
         itemTree: [],
+        exportLoading: false,
         dataTest:  [
           {
             "workingUnitId": 301,
@@ -508,7 +532,6 @@
               dataPost.append('text', JSON.stringify(textPost))
               axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
                 let dataObj = response.data
-                vm.tableDataExport = Object.assign(textPost, {start: -1, end: -1})
                 vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
                   if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['tableData'] !== null && vm.dataSocket['tableData'] !== undefined && (dataObj.respone === 'tableData' || dataObj.respone === 'tableConfig')) {
                     vm.nameScreen = vm.dataSocket['tableConfig']['name']
@@ -854,18 +877,42 @@
       },
       exportTableData () {
         let vm = this
+        let tableDataExport = {
+          'type': 'admin',
+          'cmd': 'get',
+          'code': vm.$router.history.current.params.tableName,
+          'respone': 'tableData',
+          'filter': [],
+          'start': -1,
+          'end': -1
+        }
         let options = {
           headers: {
             'groupId': window.themeDisplay.getScopeGroupId(),
             'Token': window.Liferay !== undefined ? window.Liferay.authToken : ''
           }
         }
+        let paramGet = {}
         let dataPost = new URLSearchParams()
         dataPost.append('columnName', JSON.stringify(vm.tableConfigExport))
-        dataPost.append('content', JSON.stringify(vm.tableDataExport))
-        axios.post('/o/rest/v2/socket/web/export-excel', dataPost, options).then(function (response) {
+        dataPost.append('content', JSON.stringify(tableDataExport))
+        vm.exportLoading = true
+        axios({
+          method: 'POST',
+          url: '/o/rest/v2/socket/web/export-excel',
+          headers: options.headers,
+          params: paramGet,
+          data: dataPost
+        }).then(function (response) {
+          vm.exportLoading = false
+          let serializable = response.data
+          if (serializable) {
+            saveAs(serializable, 'DataExport.xls')
+          }
         }).catch(function (error) {
+          vm.exportLoading = false
         })
+
       },
       getWorkingunits () {
         let vm = this
