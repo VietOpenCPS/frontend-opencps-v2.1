@@ -131,11 +131,12 @@ export const store = new Vuex.Store({
             params: {
               step: '300,310,400',
               fromReleaseDate: filter.fromDate,
-              toReleaseDate: filter.toDate
+              toReleaseDate: filter.toDate,
+              keyword: filter.keyword
             }
           }
           // test local
-          axios.get(state.endPoint + '/dossiers/publish/searchDossiers', param).then(function (response) {
+          axios.get(filter.url, param).then(function (response) {
           // axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
@@ -155,7 +156,8 @@ export const store = new Vuex.Store({
             },
             params: {
               fromReceiveDate: filter.fromDate,
-              toReceiveDate: filter.toDate
+              toReceiveDate: filter.toDate,
+              keyword: filter.keyword
             }
           }
           axios.get(state.endPoint + '/dossiers', param).then(function (response) {

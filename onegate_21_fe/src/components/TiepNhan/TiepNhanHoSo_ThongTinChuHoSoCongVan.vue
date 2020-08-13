@@ -680,7 +680,7 @@ export default {
       let formMeta = {
         gender: vm.gender,
         genderText: vm.gender === 1 ? 'Nữ' : 'Nam',
-        birthDate: vm.birthDate,
+        birthDate: vm.birthDateDay + '/' + vm.birthDateMonth + '/' + vm.birthDateYear,
         birthDateDay: vm.birthDateDay,
         birthDateMonth: vm.birthDateMonth,
         birthDateYear: vm.birthDateYear,
@@ -706,7 +706,7 @@ export default {
         applicantName: vm.applicantName,
         gender: vm.gender,
         genderText: vm.gender === 1 ? 'Nữ' : 'Nam',
-        birthDate: vm.birthDate,
+        birthDate: vm.birthDateDay + '/' + vm.birthDateMonth + '/' + vm.birthDateYear,
         applicantIdNo: vm.applicantIdNo,
         wardNativeCode: vm.wardNativeCode,
         wardNativeName: vm.wardNativeName,
@@ -768,7 +768,6 @@ export default {
       // metaData
       if (metaData) {
         vm.gender = metaData.hasOwnProperty('gender') ? metaData.gender : ''
-        vm.birthDate = metaData.hasOwnProperty('birthDate') ? metaData.birthDate : ''
         vm.birthDateDay = metaData.hasOwnProperty('birthDateDay') ? metaData.birthDateDay : ''
         vm.birthDateMonth = metaData.hasOwnProperty('birthDateMonth') ? metaData.birthDateMonth : ''
         vm.birthDateYear = metaData.hasOwnProperty('birthDateYear') ? metaData.birthDateYear : ''

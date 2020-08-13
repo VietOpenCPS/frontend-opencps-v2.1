@@ -131,8 +131,7 @@ export default {
         if(typeof isOneGate !== 'undefined'){
           vm.isOneGate = isOneGate
         }
-      }catch(err){
-        
+      }catch(err){ 
       }
     })
   },

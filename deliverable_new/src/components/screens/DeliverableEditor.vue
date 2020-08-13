@@ -24,6 +24,25 @@
       </div>
       <view-pdf ref="viewpdf" v-if="showComponent && String(id) !== '0' && !editDeliverable" :id="id" :datainput="detail"></view-pdf>
       <bbat-table-editor-component v-if="showComponent && editDeliverable" ref="bbatForm" :id="id" :formid="formId" :datainput="detail['formData']"></bbat-table-editor-component>
+      <v-flex xs12 class="px-4" v-if="String(id) === '0'">
+        <div class="mb-2" style="font-size: 14px"> <span style="color:red">(*) &nbsp;</span>Tài liệu đính kèm:</div>
+        <div v-if="fileNameAttach" class="ml-1">
+          <span class="ml-0">
+            <v-icon class="mr-1" color="blue" size="16px">
+              fas fa fa-paperclip
+            </v-icon> &nbsp;
+            {{fileNameAttach}} 
+            <i>({{fileNameAttachDate}})</i>
+          </span>
+        </div>
+        
+        <input type="file" id="documentFileAttach" @input="onUploadSingleFile($event)" style="display:none">
+        <v-btn small color="primary" class="mx-0 mt-3" dark @click.native="uploadFile">
+          <v-icon>fas fa fa-upload</v-icon> &nbsp; &nbsp;
+          Chọn tài liệu tải lên
+        </v-btn>
+        
+      </v-flex>
       <v-navigation-drawer
         v-model="drawer"
         absolute
@@ -54,7 +73,7 @@
             :disabled="loading"
           >
             <v-icon>save</v-icon> &nbsp;
-            <span v-if="String(id) === '0'">Tạo &nbsp;{{loaiDuLieu}}</span>
+            <span v-if="String(id) === '0'">Tạo&nbsp;{{String(loaiDuLieu).toLowerCase()}}</span>
             <span v-else>Cập nhật</span>
           </v-btn>
           <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && !editDeliverable && String(id) !== '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="uploadFileDeliverable"
@@ -85,16 +104,18 @@
           <v-icon>visibility</v-icon> &nbsp;
           Xem&nbsp;{{String(loaiDuLieu).toLowerCase()}}
           </v-btn>
-          <v-btn color="red darken-3" class="mr-0" dark v-on:click.native="backToList">
+          <v-btn color="blue darken-3" class="mr-0" dark v-on:click.native="backToList">
             <v-icon>reply</v-icon> &nbsp;
             Quay lại
           </v-btn>
         </v-flex>
-
-        <ejs-uploader style="display: none !important" :multiple="false" :autoUpload="auto" id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions'
-        ref="uploadObj" :dropArea= "dropArea" :maxFileSize="10485760"
-        :success= "onSuccess" :uploading= "addHeaders">
-        </ejs-uploader>
+        <div style="display: none">
+          <ejs-uploader :multiple="false" :autoUpload="auto" id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions'
+          ref="uploadObj" :dropArea= "dropArea" :maxFileSize="10485760"
+          :success= "onSuccess" :uploading= "addHeaders">
+          </ejs-uploader>
+        </div>
+        
       </v-layout>
     </v-form>
     <v-dialog v-model="dialogPDF" max-width="1200" transition="fade-transition" fullscreen>
@@ -143,6 +164,7 @@
 
 <script>
   import Vue from 'vue'
+  import axios from 'axios'
   import $ from 'jquery'
   import { BbatTableEditorComponent, BbatTableEditorComponentSimple, ViewPdf, ViewLogs, AttachedFileTemplate } from '@/components'
   import toastr from 'toastr'
@@ -179,7 +201,9 @@
         dialogPDFLoading: false,
         fileEntryIdAttachs: [],
         pageAttachs: 1,
-        loaiDuLieu: ''
+        loaiDuLieu: '',
+        fileNameAttach: '',
+        fileNameAttachDate: ''
       }
     },
     created () {
@@ -380,8 +404,21 @@
             }
             vm.$store.dispatch('createDeliverable', submitDataObject).then(function (data) {
               if (String(vm.id) === '0') {
+                let deliverableId = data.createDeliverable.deliverableId
+                let files = window.$('#documentFileAttach')[0].files
+                let file = files[0]
+                if (file) {
+                  let formData = new FormData()
+                  formData.append('UploadFiles', file)
+                  axios.post('/o/v1/opencps/users/upload/opencps_deliverable/org.opencps.deliverable.model.OpenCPSDeliverableFileEntryId/' + deliverableId, formData, {
+                    headers: {
+                      'groupId': window.themeDisplay.getScopeGroupId(),
+                      'Content-Type': 'multipart/form-data'
+                    }
+                  })
+                }
+                
                 vm.loading = false
-                // vm.$refs.attachedObj.doUploadLate(data['createDeliverable']['deliverableId'])
                 vm.backToList()
               } else {
                 setTimeout(function () {
@@ -442,7 +479,23 @@
         }
         let roleExits = roles.findIndex(item => String(item).indexOf(roleItem) >= 0)
         return (roleExits >= 0)
-      }
+      },
+      uploadFile () {
+        let vm = this
+        document.getElementById('documentFileAttach').value = ''
+        document.getElementById('documentFileAttach').click()
+      },
+      onUploadSingleFile () {
+        let vm = this
+        let files = window.$('#documentFileAttach')[0].files
+        let file = files[0]
+        vm.fileNameAttach = file.name
+        vm.fileNameAttachDate = vm.getCurentDateTime()
+      },
+      getCurentDateTime () {
+        let date = new Date()
+        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} | ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+      },
     }
   }
 </script>

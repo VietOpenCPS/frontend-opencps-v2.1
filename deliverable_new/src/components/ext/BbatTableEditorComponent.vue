@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" v-model="valid" lazy-validation class="px-3 py-3 vuejx__form">
+  <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3 vuejx__form">
     <v-layout row wrap>
       <v-flex xs12>
         <div id="formDelivert" class="mb-5 pt-0"></div>

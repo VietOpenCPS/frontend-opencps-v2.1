@@ -454,7 +454,7 @@ export default {
       }
     ],
     chartOptionsYear: {
-      labels: ["Hoàn thành đúng hạn", "Hoàn thành quá hạn"],
+      labels: ["Hoàn thành đúng hạn", "Hoàn thành trễ hạn"],
       legend: {
         position: 'bottom'
       },
@@ -642,7 +642,8 @@ export default {
     },
     danhSachThongKeThang: [],
     quanhuyenSelected: '',
-    totalCounter: {}
+    totalCounter: {},
+    labelPieChartConfig: ''
   }),
   computed: {
     yearList() {
@@ -658,7 +659,14 @@ export default {
     }
   },
   created() {
-    let vm = this;
+    let vm = this
+    // 
+    try {
+      vm.labelPieChartConfig = labelPieChartConfig ? labelPieChartConfig : ''
+    } catch (error) {
+      vm.labelPieChartConfig = ''
+    }
+    // 
     vm.groupCode = 'SBN'
     this.$nextTick(() => {
       vm.getDictgroups('QUAN_HUYEN');
@@ -672,6 +680,13 @@ export default {
   },
   watch: {
     yearSelected() {
+      // 
+      try {
+        this.labelPieChartConfig = labelPieChartConfig ? labelPieChartConfig : ''
+      } catch (error) {
+        this.labelPieChartConfig = ''
+      }
+      // 
       this.getStatisticsYear();
       this.getStatisticsYearSBN();
       this.getStatisticsYearQUAN_HUYEN();
@@ -771,7 +786,9 @@ export default {
         },
         params: {
           year: vm.yearSelected,
-          month: 0
+          month: 0,
+          domain: 'total',
+          agency: 'total'
         }
       };
       axios
@@ -785,12 +802,19 @@ export default {
             ];
           } else {
             vm.statisticalYear = [0, 0]
+            vm.statistics = {
+              receivedCount: 0,
+              releaseCount: 0,
+              processingCount: 0,
+              overtimeCount: 0
+            }
           }
         })
         .catch();
     },
     getStatisticsYearSBN() {
       let vm = this;
+      vm.getLabelPieChartConfig()
       let originUrl = window.location.origin;
       let config = {
         url: originUrl + "/o/rest/statistics",
@@ -810,22 +834,27 @@ export default {
         .request(config)
         .then(function(response) {
           if (response.data.data) {
-            vm.statisticalSBN = [
-              response.data.data[0].undueCount,
-              response.data.data[0].overdueCount,
-              response.data.data[0].ontimeCount,
-              response.data.data[0].overtimeCount,
-              response.data.data[0].cancelledCount,
-              response.data.data[0].waitingCount
-            ];
+            if (vm.labelPieChartConfig) {
+              vm.statisticalSBN = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
+            } else {
+              vm.statisticalSBN = [
+                response.data.data[0].undueCount,
+                response.data.data[0].overdueCount,
+                response.data.data[0].ontimeCount,
+                response.data.data[0].overtimeCount,
+                response.data.data[0].cancelledCount,
+                response.data.data[0].waitingCount
+              ];
+            }
           } else {
-            vm.statisticalSBN = [0, 0, 0, 0, 0, 0];
+            vm.statisticalSBN = vm.labelPieChartConfig ? vm.labelPieChartConfig.map(x => 0) : [0, 0, 0, 0, 0, 0]
           }
         })
         .catch();
     },
     getStatisticsYearQUAN_HUYEN() {
       let vm = this;
+      vm.getLabelPieChartConfig();
       let originUrl = window.location.origin;
       let config = {
         url: originUrl + "/o/rest/statistics",
@@ -845,22 +874,27 @@ export default {
         .request(config)
         .then(function(response) {
           if (response.data.data) {
-            vm.statisticalQUAN_HUYEN = [
-              response.data.data[0].undueCount,
-              response.data.data[0].overdueCount,
-              response.data.data[0].ontimeCount,
-              response.data.data[0].overtimeCount,
-              response.data.data[0].cancelledCount,
-              response.data.data[0].waitingCount
-            ];
+            if (vm.labelPieChartConfig) {
+              vm.statisticalQUAN_HUYEN = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
+            } else {
+              vm.statisticalQUAN_HUYEN = [
+                response.data.data[0].undueCount,
+                response.data.data[0].overdueCount,
+                response.data.data[0].ontimeCount,
+                response.data.data[0].overtimeCount,
+                response.data.data[0].cancelledCount,
+                response.data.data[0].waitingCount
+              ];
+            }
           } else {
-            vm.statisticalQUAN_HUYEN = [0, 0, 0, 0, 0, 0];
+            vm.statisticalQUAN_HUYEN = vm.labelPieChartConfig ? vm.labelPieChartConfig.map(x => 0) : [0, 0, 0, 0, 0, 0];
           }
         })
         .catch();
     },
     getStatisticsYearXA_PHUONG() {
       let vm = this;
+      vm.getLabelPieChartConfig();
       let originUrl = window.location.origin;
       let config = {
         url: originUrl + "/o/rest/statistics",
@@ -880,16 +914,20 @@ export default {
         .request(config)
         .then(function(response) {
           if (response.data.data) {
-            vm.statisticalXA_PHUONG = [
-              response.data.data[0].undueCount,
-              response.data.data[0].overdueCount,
-              response.data.data[0].ontimeCount,
-              response.data.data[0].overtimeCount,
-              response.data.data[0].cancelledCount,
-              response.data.data[0].waitingCount
-            ];
+            if (vm.labelPieChartConfig) {
+              vm.statisticalXA_PHUONG = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
+            } else {
+              vm.statisticalXA_PHUONG = [
+                response.data.data[0].undueCount,
+                response.data.data[0].overdueCount,
+                response.data.data[0].ontimeCount,
+                response.data.data[0].overtimeCount,
+                response.data.data[0].cancelledCount,
+                response.data.data[0].waitingCount
+              ];
+            }
           } else {
-            vm.statisticalXA_PHUONG = [0, 0, 0, 0, 0, 0];
+            vm.statisticalXA_PHUONG = vm.labelPieChartConfig ? vm.labelPieChartConfig.map(x => 0) : [0, 0, 0, 0, 0, 0];
           }
         })
         .catch();
@@ -1002,6 +1040,36 @@ export default {
       vm.totalCounter['total_18'] = 0
       vm.totalCounter['total_19'] = 0
       vm.totalCounter['total_20'] = 0
+    },
+    getLabelPieChartConfig () {
+      let vm = this
+      if (vm.labelPieChartConfig) {
+        vm.chartOptionsSoQuanXa = {
+          labels: vm.labelPieChartConfig.map(x => x['text']),
+          colors: vm.labelPieChartConfig.map(x => x['color']),
+          states: {
+            normal: {
+              filter: {
+                type: 'none',
+                value: 0,
+              }
+            },
+            hover: {
+              filter: {
+                type: 'none',
+                value: 0,
+              }
+            },
+            active: {
+              allowMultipleDataPointsSelection: false,
+              filter: {
+                type: 'none',
+                value: 0,
+              }
+            },
+          }
+        }
+      }
     }
   }
 };

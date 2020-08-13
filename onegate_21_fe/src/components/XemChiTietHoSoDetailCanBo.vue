@@ -35,10 +35,10 @@
       <div v-else class="row-header">
         <div class="background-triangle-big"> <span>CHI TIẾT HỒ SƠ</span> </div>
         <div class="layout row wrap header_tools row-blue">
-          <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinChiTietHoSo.serviceName">
+          <div class="flex pl-3 text-ellipsis text-bold" style="width: calc(100% - 100px);" :title="thongTinChiTietHoSo.serviceName">
             {{thongTinChiTietHoSo.serviceName}}
           </div>
-          <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+          <div class="flex text-right" style="margin-left: auto;width: 100px">
             <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
               <v-icon size="18">reply</v-icon> &nbsp;
               Quay lại
@@ -136,17 +136,11 @@
                         </span>
                       </span>
                     </v-flex>
-                    <v-flex id="reAssign" v-if="showReasign && checkPemissionPhanCongLai(currentUser)" class="text-xs-right" style="width:100px">
+                    <!-- <v-flex id="reAssign" v-if="showReasign && checkPemissionPhanCongLai(currentUser)" class="text-xs-right" style="width:100px">
                       <v-btn @click="reAsign" class="mx-0 my-0 right" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" small color="primary" style="height:26px">
-                        <!-- <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus !== 'new'">
-                          <span>Phân công lại</span>
-                        </span> -->
                         Ủy quyền
-                        <!-- <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && 
-                          thongTinChiTietHoSo.dossierStatus === 'new' && !checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
-                        <span v-if="!getUser('Administrator_data') && !getUser('Administrator') && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span> -->
                       </v-btn>
-                    </v-flex>
+                    </v-flex> -->
                   </v-layout>
                 </div>
 
@@ -1187,6 +1181,11 @@ export default {
         if (resultDossier['dossierSubStatus']) {
           vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result => {
             vm.btnStepsDynamics = result
+            if (vm.btnStepsDynamics.length > 0) {
+              vm.btnStepsDynamics = vm.btnStepsDynamics.filter(function (item) {
+                return !item.hasOwnProperty('roleCode') || (item.hasOwnProperty('roleCode') && vm.getUserEmployee(item.roleCode))
+              })
+            }
           })
         }
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'done') {
@@ -2006,7 +2005,12 @@ export default {
           'dueDate': date,
           'receiveDate': vm.receiveDateEdit
         }
-        filter['payload'] = payload
+        if (filter.hasOwnProperty('payload')) {
+          filter['payload'] = Object.assign(filter['payload'], payload)
+        } else {
+          filter['payload'] = payload
+        }
+        
       }
       if (vm.showExtendDateEdit) {
         let data = vm.$refs.ngaygiahan.doExport()
@@ -2031,10 +2035,19 @@ export default {
             'lockState': 'CONFIRM'
           }
         }
-        filter['payload'] = payload
+        if (filter.hasOwnProperty('payload')) {
+          filter['payload'] = Object.assign(filter['payload'], payload)
+        } else {
+          filter['payload'] = payload
+        }
       }
       if (vm.showFormBoSungThongTinNgan) {
-        filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
+        let payload = vm.$refs.formBoSungThongTinNgan.formSubmitData()
+        if (filter.hasOwnProperty('payload')) {
+          filter['payload'] = Object.assign(filter['payload'], payload)
+        } else {
+          filter['payload'] = payload
+        }
         let validation = vm.$refs.formBoSungThongTinNgan.checkValid()
         if (validation) {
           validFormBoSung = true
@@ -2068,8 +2081,13 @@ export default {
         }
       }
       if (vm.showThanhPhanLienThong) {
-        filter['payload'] = {
+        let payload = {
           'dossierParts': vm.dossierTemplateLienThong.toString()
+        }
+        if (filter.hasOwnProperty('payload')) {
+          filter['payload'] = Object.assign(filter['payload'], payload)
+        } else {
+          filter['payload'] = payload
         }
       }
       if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu && validFormBoSung && validCreateFiles) {
@@ -3084,6 +3102,15 @@ export default {
       let roleExits = roles.findIndex(item => item === roleItem)
       return (roleExits >= 0)
 
+    },
+    getUserEmployee (roleItem) {
+      let vm = this
+      let roles = vm.$store.getters.getUser.role
+      if (!roles) {
+        return false
+      }
+      let roleExits = roles.findIndex(item => item.indexOf(roleItem) === 0)
+      return (roleExits >= 0)
     },
     checkActionSpecial (btnAction) {
       var vm = this
