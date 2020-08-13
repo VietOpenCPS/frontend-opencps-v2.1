@@ -1388,6 +1388,7 @@ export default {
     tiepNhanHoSoNewTemplate (type) {
       let vm = this
       vm.loadingAction = true
+      console.log(vm.checkQuyetDinh())
       let dataCreate = {
         originality: vm.getOriginality(),
         serviceCode: $('#serviceCode_hidden').val(),
@@ -1510,99 +1511,99 @@ export default {
       }
       if(vm.data_form_template === 'formCH'){
         if(vm.$refs.formTiepNhan.validate()){
-          if(vm.checkCKCD){
-           if(vm.formCode === 'NEW') {
-            vm.loadingAction = true
-            vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
-                let metaData = dossiers.metaData
-                let dataMetaData = {
-                  id: result.dossierId,
-                  data: metaData
-                }
-                vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
-                  vm.loadingAction = false
-                  vm.$store.commit('setActivePrintBienNhan', result.dossierId)
-                  vm.goBack() 
-                }).catch(()=>{
+            if(vm.checkCKCD){
+              if(vm.formCode === 'NEW') {
+                vm.loadingAction = true
+                vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
+                    let metaData = dossiers.metaData
+                    let dataMetaData = {
+                      id: result.dossierId,
+                      data: metaData
+                    }
+                    vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
+                      vm.loadingAction = false
+                      vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+                      vm.goBack() 
+                    }).catch(()=>{
+                      vm.loadingAction = false
+                    })
+                }).catch(reject => {
                   vm.loadingAction = false
                 })
-            }).catch(reject => {
-              vm.loadingAction = false
-            })
-           } else {
-            let dataPUTDossier = {
-              id: vm.id,
-              dossier: dossiers
-            }
-            vm.loadingAction = true
-            vm.$store.dispatch('putDossierNew', dataPUTDossier).then(function (result) {
-                let metaData = dossiers.metaData
-                let dataMetaData = {
+              } else {
+                let dataPUTDossier = {
                   id: vm.id,
-                  data: metaData
+                  dossier: dossiers
                 }
-              vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
-                console.log(result)
-                let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
-                dossierFile.forEach(async (e)=>{
-                  if(vm.data_form_template === 'formCH'){
-                    if(e.partNo === 'TP01' || e.partNo === 'TP02'){
-                      let dataPUTDossierFile = {
-                        id: vm.id,
-                        referenceUid: e.referenceUid,
-                        formData: e.formData
-                      }
-                      await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-
-                      }).catch(reject=>{
-                        
-                      })
+                vm.loadingAction = true
+                vm.$store.dispatch('putDossierNew', dataPUTDossier).then(function (result) {
+                    let metaData = dossiers.metaData
+                    let dataMetaData = {
+                      id: vm.id,
+                      data: metaData
                     }
-                  }
-                  if(vm.data_form_template === 'formHPH'){
-                    if(e.partNo === 'TP01'){
-                      let dataPUTDossierFile = {
-                        id: vm.id,
-                        referenceUid: e.referenceUid,
-                        formData: e.formData
+                  vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
+                    console.log(result)
+                    let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+                    dossierFile.forEach(async (e)=>{
+                      if(vm.data_form_template === 'formCH'){
+                        if(e.partNo === 'TP01' || e.partNo === 'TP02'){
+                          let dataPUTDossierFile = {
+                            id: vm.id,
+                            referenceUid: e.referenceUid,
+                            formData: e.formData
+                          }
+                          await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+
+                          }).catch(reject=>{
+                            
+                          })
+                        }
                       }
-                      await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+                      if(vm.data_form_template === 'formHPH'){
+                        if(e.partNo === 'TP01'){
+                          let dataPUTDossierFile = {
+                            id: vm.id,
+                            referenceUid: e.referenceUid,
+                            formData: e.formData
+                          }
+                          await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
 
-                      }).catch(reject=>{
-                        
-                      })
+                          }).catch(reject=>{
+                            
+                          })
+                        }
+                      }
+
+                    })
+                    let dataPayment = {
+                      dossierId: vm.id,
+                      payment: {}
                     }
-                  }
+                    if($('#payment_hidden').val()){
+                      dataPayment['payment'] = JSON.parse($('#payment_hidden').val())
+                    }
+                    vm.$store.dispatch('putPayment', dataPayment).then(()=>{
+                      vm.loadingAction = false
+                      vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+                      vm.goBack()
+                    }).catch(()=>{
+                      vm.loadingAction = false
+                    })
+                  }).catch(err=> {
+                    vm.loadingAction = false
+                  })
+      
 
-                })
-                let dataPayment = {
-                  dossierId: vm.id,
-                  payment: {}
-                }
-                if($('#payment_hidden').val()){
-                  dataPayment['payment'] = JSON.parse($('#payment_hidden').val())
-                }
-                vm.$store.dispatch('putPayment', dataPayment).then(()=>{
+
+                }).catch(reject => {
                   vm.loadingAction = false
-                  vm.$store.commit('setActivePrintBienNhan', result.dossierId)
-                  vm.goBack()
-                }).catch(()=>{
-                  vm.loadingAction = false
                 })
-              }).catch(err=> {
-                vm.loadingAction = false
-              })
-  
-
-
-            }).catch(reject => {
-              vm.loadingAction = false
-            })
-           }
-          } else {
-            vm.dialogXacNhanThaoTac = true
-            vm.loadingAction = false 
-          }
+              }
+            } else {
+              vm.dialogXacNhanThaoTac = true
+              vm.loadingAction = false 
+            }
         } else {
           toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
           vm.loadingAction = false
@@ -2032,6 +2033,26 @@ export default {
     changeCheckCKCD(val){
       console.log(val)
       this.checkCKCD = val
+    },
+    checkQuyetDinh(){
+      try{
+        let dossierFileArr = JSON.parse($('#dossierFileArr_hidden').val())
+        console.log(dossierFileArr)
+        let listVanBan = dossierFileArr.find(e=>e.partNo === 'TP02')
+        console.log(listVanBan)
+        let listThanhVien = dossierFileArr.find(e=>e.partNo === 'TP01')
+        console.log(listThanhVien)
+        for(let i=0; i< listThanhVien.length ; i++){
+          let vanban = listVanBan.find(e=> e.vb_so_hieu_van_ban === listThanhVien[i]['listThanhVien'] && e.vb_ngay_ky === listThanhVien[i]['vb_ngay_ky'] && e.vb_ma_co_quan_chu_quan === listThanhVien[i]['vb_ma_co_quan_chu_quan'])
+          console.log(i, vanban)
+          if(!vanban) {
+            return false
+          }
+        }
+        return true
+      } catch (err) {
+        return false
+      }
     }
   }
 }
