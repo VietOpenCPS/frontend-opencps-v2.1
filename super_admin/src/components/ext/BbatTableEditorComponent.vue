@@ -1076,6 +1076,10 @@
         let vm = this
         vm.layoutNameDynamic = item['label']
         vm.pickItem = item
+        if(vm.tableName === 'opencps_deliverabletype') {
+          vm.pickItem['fileTemplateId'] = vm.data['fileTemplateId']
+          vm.pickItem['deliverableTypeId'] = vm.data['deliverableTypeId']
+        }
         vm.rightAttached = !vm.rightAttached
       },
       unlock () {

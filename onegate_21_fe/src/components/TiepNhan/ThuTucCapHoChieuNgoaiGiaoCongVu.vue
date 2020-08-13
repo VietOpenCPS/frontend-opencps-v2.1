@@ -192,11 +192,12 @@
                     >
                         <template slot="items" slot-scope="props">
                         <tr>
+                            <td>{{props.index + 1}}</td>
                             <td>{{props.item.ho_ten}}</td>
                             <td>{{props.item.so_cmt}}</td>
                             <td>{{props.item.ngay_sinh}}/{{props.item.thang_sinh}}/{{props.item.nam_sinh}}</td>
                             <td>{{props.item.noi_sinh_text}}</td>
-                            <td>{{props.item.co_quan_chu_quan_text}}</td>
+                            <td>{{props.item.vb_so_hieu_van_ban}} - {{props.item.vb_ngay_ky}} - {{props.item.co_quan_chu_quan_text}}</td>
                             <td>
                                 <v-btn flat icon color="primary" @click="openDialogUpdateThanhVien(props.index,props.item)">
                                     <v-icon>create</v-icon>
@@ -517,6 +518,7 @@
                                             :rules="[rules.required]"
                                             required
                                             solo
+                                            @input="vb_so_hieu_van_ban = vb_so_hieu_van_ban.toUpperCase()"
                                         ></v-text-field>
                                     </v-flex>
                                     <v-flex xs12 class="px-2 my-2">
@@ -1351,6 +1353,11 @@ export default {
         ],
         listVanBan: [],
         headerThanhVien: [
+        {
+            text: 'STT',
+            align: 'center',
+            sortable: false
+          },
           {
             text: 'Họ tên',
             align: 'center',
@@ -1372,7 +1379,7 @@ export default {
             sortable: false
           },
           {
-            text: 'Cơ quan chủ quản	',
+            text: 'Văn bản quyết định',
             align: 'center',
             sortable: false
           },
@@ -2538,7 +2545,7 @@ export default {
             mang_key.forEach( e => {
                
                 if (e === 'so_hieu_van_ban'){
-                    vm.co_quan_chu_quan_thanh_vien_select = vm.co_quan_chu_quan_thanh_vien.find(item2 => item2['vb_so_hieu_van_ban'].toLowerCase() === item[e].toLowerCase())
+                    vm.co_quan_chu_quan_thanh_vien_select = vm.co_quan_chu_quan_thanh_vien.find(item2 => item2['vb_so_hieu_van_ban'].toLowerCase() === item[e].toLowerCase() && item2['vb_ngay_ky'] === item['vb_ngay_ky']  && item2['vb_ma_co_quan_chu_quan'] === item['vb_ma_co_quan_chu_quan'])
                 } else if (e === 'nam_sinh' ||e === 'thang_sinh' || e === 'ngay_sinh') {
                     vm.birthday = vm.parseDate(item['ngay_sinh']+'/'+item['thang_sinh']+'/'+item['nam_sinh'])
                 } else if (e === 'noi_sinh') {
@@ -2566,8 +2573,8 @@ export default {
             vm.listVanBan.forEach(e=> {
                 vm.co_quan_chu_quan_thanh_vien.push(
                     {
-                        name: e.vb_so_hieu_van_ban + '-' + e.vb_co_quan_chu_quan,
-                        value: e.vb_so_hieu_van_ban + '-' + e.vb_co_quan_chu_quan,
+                        name: e.vb_so_hieu_van_ban + '-'+ e.vb_ngay_ky + '-' + e.vb_co_quan_chu_quan,
+                        value: e.vb_so_hieu_van_ban + '-'+ e.vb_ngay_ky + '-' + e.vb_co_quan_chu_quan,
                         vb_ma_co_quan_chu_quan: e.vb_ma_co_quan_chu_quan,
                         vb_co_quan_chu_quan: e.vb_co_quan_chu_quan,
                         vb_so_hieu_van_ban: e.vb_so_hieu_van_ban,
@@ -2592,17 +2599,28 @@ export default {
             vm.so_nguoi = vm.listThanhVien.length
             $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
         },
+        checkThanhVien (index) {
+            let vm = this
+            console.log(vm.listVanBan[index])
+            let thanhvien =  vm.listThanhVien.find(e => e.vb_so_hieu_van_ban === vm.listVanBan[index].vb_so_hieu_van_ban && e.vb_ngay_ky === vm.listVanBan[index].vb_ngay_ky && e.vb_ma_co_quan_chu_quan === vm.listVanBan[index].vb_ma_co_quan_chu_quan)
+            console.log(thanhvien)
+            return thanhvien ? true : false
+        },
         deleteVanBan(index){
             let vm = this
-            vm.listVanBan.splice(index,1)
-            for (let i =0; i< vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] === 'TP02'){
-                    vm.dossierFileArr[i]['formData'] = JSON.stringify({'van_ban': vm.listVanBan})
-                    vm.dossierFileArr[i]['eform'] = 'true'
+            if(!vm.checkThanhVien(index)){
+                vm.listVanBan.splice(index,1)
+                for (let i =0; i< vm.dossierFileArr.length; i++){
+                    if(vm.dossierFileArr[i]['partNo'] === 'TP02'){
+                        vm.dossierFileArr[i]['formData'] = JSON.stringify({'van_ban': vm.listVanBan})
+                        vm.dossierFileArr[i]['eform'] = 'true'
+                    }
                 }
+                $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+                this.genSelectCQCQ()
+            } else {
+                toastr.error('Văn bản quyết định đã được sử dụng. Phải xóa thành viên sử dụng văn bản quyết định ' + vm.listVanBan[index].vb_so_hieu_van_ban + ' - ' + vm.listVanBan[index].vb_ngay_ky + ' - ' + vm.listVanBan[index].vb_co_quan_chu_quan)
             }
-            $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
-            this.genSelectCQCQ()
         },
         genLePhi(){
             let vm = this

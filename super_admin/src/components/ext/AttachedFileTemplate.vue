@@ -5,7 +5,7 @@
         <div class="sample_wrapper">
             <div id="dropArea">
                 <span id="drop" class="droparea" style="" > Kéo thả tệp tin hoặc <a href="javascript:;" id="browse">Chọn từ máy tính &nbsp; 📤</a></span>
-                <ejs-uploader id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
+                <ejs-uploader id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders" :selected= "onFileSelect">
                 </ejs-uploader>
                 <div class="e-upload-done-list" v-if="fileTemplateTotal > 0 && code === 'opencps_serviceinfo'">
                   <ul class="e-upload-files">
@@ -118,6 +118,7 @@
                           <v-icon size="14">link</v-icon>
                         </v-btn>
                         <v-btn flat icon color="primary" 
+                          v-if="code !== 'opencps_deliverabletype'"
                           v-on:click.native="processUpdateFileAttach(item, index)"
                           style="
                             position: absolute;
@@ -127,6 +128,7 @@
                           <v-icon size="14">create</v-icon>
                         </v-btn>
                         <v-btn flat icon color="red darken-3" 
+                          v-if="code !== 'opencps_deliverabletype'"
                           v-on:click.native="processDeleteFileAttach(item)"
                           :loading="loadingRemove"
                           :disabled="loadingRemove"
@@ -184,10 +186,25 @@
       })
     },
     mounted: function () {
-      this.path = {
-        saveUrl: this.pickItem['upload_api'] + '/' + this.pk,
-        removeUrl: this.pickItem['remove_api'] + '/' + this.pk,
+      if(this.code === 'opencps_deliverabletype'){
+        if(this.pickItem.fileTemplateId === 1 || this.pickItem.fileTemplateId === 0) {
+          this.path = {
+            saveUrl: '',
+            removeUrl: '',
+          }
+        } else {
+          this.path = {
+            saveUrl: '',
+            removeUrl: '',
+          }
+        }
+      } else {
+        this.path = {
+          saveUrl: this.pickItem['upload_api'] + '/' + this.pk,
+          removeUrl: this.pickItem['remove_api'] + '/' + this.pk,
+        }
       }
+
       this.className = this.pickItem['class_name']
       document.getElementById('browse').onclick = function() {
           document.getElementsByClassName('e-file-select-wrap')[0].querySelector('button').click();
@@ -231,6 +248,19 @@
           }).catch(reject => {
             console.log(reject)
           })
+        } else if(vm.code === 'opencps_deliverabletype') {
+          console.log(vm.pickItem)
+          vm.fileTemplateData = []
+          vm.$store.dispatch('getFileattachsVersions', vm.pickItem.fileTemplateId).then(function (result) {
+            console.log(result)
+            vm.fileTemplateTotal = result.total
+            for(let i = 0; i < result.data.length ; i++){
+              vm.fileTemplateData.push(JSON.parse(result.data[i]))
+            }
+            
+          }).catch(reject => {
+            console.log(reject)
+          })              
         } else {
           let filter = {
             className: vm.className,
@@ -274,12 +304,21 @@
       processDownloadFileAttach (item) {
         let vm = this
         vm.loading = true
-        vm.$store.dispatch('downloadServiceFileTemplate', item).then(function () {
-          vm.loading = false
-        }).catch(reject => {
-          vm.loading = false
-          alert('Tải file xảy ra lỗi.' + reject)
-        })
+        if(vm.code === 'opencps_deliverabletype') {
+          vm.$store.dispatch('detailFileAttachsVersions', item).then(function () {
+            vm.loading = false
+          }).catch(reject => {
+            vm.loading = false
+            alert('Tải file xảy ra lỗi.' + reject)
+          })
+        } else {
+          vm.$store.dispatch('downloadServiceFileTemplate', item).then(function () {
+            vm.loading = false
+          }).catch(reject => {
+            vm.loading = false
+            alert('Tải file xảy ra lỗi.' + reject)
+          })
+        }
       },
       processUpdateFileAttach (item, index ) {
         // this.$refs.refFileUpdate.click()
@@ -290,7 +329,7 @@
         document.getElementById("inputFileUpdate").click()
       },
       onFileUpdatePicked(){
-      let vm = this
+        let vm = this
         const files = event.target.files
         if(files.length){
           const file = files[0]
@@ -336,6 +375,41 @@
           vm.loading = false
           alert('Tải file xảy ra lỗi.' + reject)
         })
+      },
+      onFileSelect (arr) {
+        console.log(arr)
+        let vm = this
+        if(vm.code === 'opencps_deliverabletype'){
+          if(vm.pickItem.fileTemplateId !== 1 && vm.pickItem.fileTemplateId !== 0) {
+            const file = arr.filesData[0].rawFile
+            let filter = {
+              fileEntryId: vm.pickItem.fileTemplateId,
+              file: file,
+              fileName: file.name,
+              fileType:file.type,
+              fileSize:file.size,
+            }
+            vm.$store.dispatch('putFileAttach', filter).then(function () {
+              vm.loadFileTemplate()
+            }).catch(reject => {
+              alert('Tải file xảy ra lỗi.' + reject)
+              alert('Tải file xảy ra lỗi.' + reject)
+            }) 
+          } else {
+            const file = arr.filesData[0].rawFile
+            let filter = {
+              deliverableTypeId: vm.pickItem.deliverableTypeId,
+              file: file,
+            }
+            vm.$store.dispatch('postDeliverabletypes', filter).then(function (res) {
+              vm.pickItem['fileTemplateId'] = res.fileTemplateId
+              vm.loadFileTemplate()
+            }).catch(reject => {
+              alert('Tải file xảy ra lỗi.' + reject)
+              alert('Tải file xảy ra lỗi.' + reject)
+            }) 
+          }  
+        }
       }
     }
   }
