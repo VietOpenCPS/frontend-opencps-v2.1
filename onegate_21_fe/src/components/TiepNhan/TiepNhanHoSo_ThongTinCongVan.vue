@@ -58,7 +58,7 @@
                           slot="activator"
                           v-model="dateFormated"
                           append-icon="event"
-                          readonly
+                          placeholder="dd/mm/yyyy"
                           @blur="documentDate = parseDate(dateFormated)"
                         >
                         </v-text-field>
@@ -115,7 +115,7 @@
                           slot="activator"
                           v-model="duedateFormated"
                           append-icon="event"
-                          readonly
+                          placeholder="dd/mm/yyyy"
                           @blur="dueDate = parseDate(duedateFormated)"
                         >
                         </v-text-field>
@@ -246,7 +246,7 @@
                     </v-flex>
 
                     <v-flex xs12 class="mt-2">
-                      <div class="mb-2"> <span style="color:red">(*) &nbsp;</span>Tài liệu đính kèm: <i v-if="fileAttachCounter === 0">(Không có tài liệu đính kèm)</i></div>
+                      <div class="mb-2">Tài liệu đính kèm: <i v-if="fileAttachCounter === 0">(Không có tài liệu đính kèm)</i></div>
                       <div v-for="(itemFileView, index) in dossierFilesItems" :key="index">
                         <div v-if="!itemFileView.eForm">
                           <span v-on:click.stop="viewFile2(itemFileView)" class="ml-0" style="cursor: pointer;">

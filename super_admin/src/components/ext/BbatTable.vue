@@ -442,6 +442,9 @@
       },
       getData () {
         let vm = this
+        vm.showCopy = false
+        vm.exportExcel = false
+        vm.showWorkingunits = false
         if (!vm.showFilter && vm.applicantType === '') {
           vm.columnsDataFilter = []
         } else {
@@ -889,28 +892,35 @@
         let options = {
           headers: {
             'groupId': window.themeDisplay.getScopeGroupId(),
-            'Token': window.Liferay !== undefined ? window.Liferay.authToken : ''
-          }
+            'Token': window.Liferay !== undefined ? window.Liferay.authToken : '',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json'
+          },
+          responseType: 'blob'
         }
         let paramGet = {}
         let dataPost = new URLSearchParams()
         dataPost.append('columnName', JSON.stringify(vm.tableConfigExport))
         dataPost.append('content', JSON.stringify(tableDataExport))
         vm.exportLoading = true
-        axios({
-          method: 'POST',
-          url: '/o/rest/v2/socket/web/export-excel',
-          headers: options.headers,
-          params: paramGet,
-          data: dataPost
-        }).then(function (response) {
+        axios.post('/o/rest/v2/socket/web/export-excel',
+        dataPost, options)
+        .then(function (response) {
           vm.exportLoading = false
-          let serializable = response.data
-          if (serializable) {
-            saveAs(serializable, 'DataExport.xls')
-          }
+          var fileNames = response.headers['content-disposition']
+          var fileName = fileNames.split('filename=')[1] || dataReq.fileName
+          fileName = fileName.split('"').join('')
+          var a = document.createElement('a')
+          document.body.appendChild(a)
+          a.style = 'display: none'
+          var urlFile = window.URL.createObjectURL(response.data)
+          a.href = urlFile
+          a.download = fileName
+          a.click()
+          window.URL.revokeObjectURL(urlFile)
         }).catch(function (error) {
           vm.exportLoading = false
+          console.log(error)
         })
 
       },

@@ -113,11 +113,18 @@ export default {
         }
         let dataPostApplicant = new URLSearchParams()
         axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
-          if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha' && response.data !== "lockout" && response.data === 'pending') {
+          if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha' && response.data !== "lockout" && (response.data === 'pending' || response.data === 'verify')) {
             vm.loading = false
             vm.$refs.captcha.makeImageCap()
             vm.dialogConfirm = true
-            vm.userIdLogin = response.headers.hasOwnProperty('userid') ? response.headers.userid : ''
+            let idUser = ''
+            if (response.data === 'pending' && response.headers.hasOwnProperty('userid')) {
+              idUser = response.headers.userid
+            }
+            if (response.data === 'verify' && response.headers.hasOwnProperty('applicantid')) {
+              idUser = response.headers.applicantid
+            }
+            vm.userIdLogin = idUser
           } else {
             let filter = {
               confirmCode: vm.confirmCode,
@@ -152,6 +159,7 @@ export default {
     },
     confirmXacThuc () {
       let vm = this
+      console.log('vm.userIdLogin234', vm.userIdLogin)
       let url = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
       window.location.href = url + vm.pathNameConfig + 
       "#/xac-thuc-tai-khoan?active_user_id=" + vm.userIdLogin +

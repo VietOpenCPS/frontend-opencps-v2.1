@@ -136,17 +136,11 @@
                         </span>
                       </span>
                     </v-flex>
-                    <v-flex id="reAssign" v-if="showReasign && checkPemissionPhanCongLai(currentUser)" class="text-xs-right" style="width:100px">
+                    <!-- <v-flex id="reAssign" v-if="showReasign && checkPemissionPhanCongLai(currentUser)" class="text-xs-right" style="width:100px">
                       <v-btn @click="reAsign" class="mx-0 my-0 right" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" small color="primary" style="height:26px">
-                        <!-- <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus !== 'new'">
-                          <span>Phân công lại</span>
-                        </span> -->
                         Ủy quyền
-                        <!-- <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && 
-                          thongTinChiTietHoSo.dossierStatus === 'new' && !checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
-                        <span v-if="!getUser('Administrator_data') && !getUser('Administrator') && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span> -->
                       </v-btn>
-                    </v-flex>
+                    </v-flex> -->
                   </v-layout>
                 </div>
 
@@ -1189,7 +1183,7 @@ export default {
             vm.btnStepsDynamics = result
             if (vm.btnStepsDynamics.length > 0) {
               vm.btnStepsDynamics = vm.btnStepsDynamics.filter(function (item) {
-                return !item.hasOwnProperty('roleCode') || (item.hasOwnProperty('roleCode') && vm.getUser(item.roleCode))
+                return !item.hasOwnProperty('roleCode') || (item.hasOwnProperty('roleCode') && vm.getUserEmployee(item.roleCode))
               })
             }
           })
@@ -3108,6 +3102,15 @@ export default {
       let roleExits = roles.findIndex(item => item === roleItem)
       return (roleExits >= 0)
 
+    },
+    getUserEmployee (roleItem) {
+      let vm = this
+      let roles = vm.$store.getters.getUser.role
+      if (!roles) {
+        return false
+      }
+      let roleExits = roles.findIndex(item => item.indexOf(roleItem) === 0)
+      return (roleExits >= 0)
     },
     checkActionSpecial (btnAction) {
       var vm = this
