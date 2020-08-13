@@ -164,7 +164,7 @@
         } else if (page === 'tracuuthutuc') {
           queryString = '/tra-cuu-thu-tuc'
         } else if (page === 'danhgia') {
-          queryString = '/danh-gia-cldv'
+          queryString = '/danh-gia-mdhl'
         }
         vm.$router.push({
           path: queryString,

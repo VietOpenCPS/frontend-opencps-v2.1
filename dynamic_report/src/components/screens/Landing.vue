@@ -71,6 +71,7 @@
           item-text="text"
           item-value="value"
           @change="changeGovAgency()"
+          clearable
           >
         </v-autocomplete>
       </v-flex>
@@ -96,6 +97,7 @@
           label="Nhóm dữ liệu"
           item-text="label"
           item-value="key"
+          clearable
           >
         </v-autocomplete>
       </v-flex>
@@ -678,6 +680,9 @@ export default {
               vm.filters[key]['groupId'] = vm.govAgency
               vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
                 vm.filters[key]['source'] = result
+                if (vm.filters[key]['appendItem']) {
+                  vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
+                }
               }).catch(function(){})
             }
           }
@@ -817,6 +822,9 @@ export default {
           vm.filters[key]['groupId'] = vm.govAgency
           vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
             vm.filters[key]['source'] = result
+            if (vm.filters[key]['appendItem']) {
+              vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
+            }
           }).catch(function(){})
         }
       }
@@ -987,7 +995,7 @@ export default {
         titleGov = vm.$store.getters.siteName
       }
       console.log('titleGov', titleGov)
-      docDString = docDString.replace(/\[\$siteName\$\]/g, titleGov)
+      docDString = docDString.replace(/\[\$siteName\$\]/g, String(titleGov).toUpperCase())
 
       for (let key in vm.filters) {
         let find = vm.filters[key]['key']
@@ -1421,7 +1429,7 @@ export default {
         titleGov = vm.$store.getters.siteName
       }
       // console.log('titleGov', titleGov)
-      docDString = docDString.replace(/\[\$siteName\$\]/g, titleGov)
+      docDString = docDString.replace(/\[\$siteName\$\]/g, String(titleGov).toUpperCase())
       //console.log('docDString', docDString)
       for (let key in vm.filters) {
         let find = vm.filters[key]['key']
@@ -2067,6 +2075,9 @@ export default {
             console.log('filter dataSource', vm.filters[key])
             vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
               vm.filters[key]['source'] = result
+              if (vm.filters[key]['appendItem']) {
+                vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
+              }
             }).catch(function(){})
           }
         }
@@ -2083,6 +2094,9 @@ export default {
             vm.filters[key]['groupId'] = vm.govAgency
             vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
               vm.filters[key]['source'] = result
+              if (vm.filters[key]['appendItem']) {
+                vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
+              }
             }).catch(function(){})
           }
         }

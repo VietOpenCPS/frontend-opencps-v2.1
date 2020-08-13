@@ -196,7 +196,7 @@
           <div>
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content>
-                <thong-tin-cong-van ref="thongtincongvan" :detailDossier="thongTinChiTietHoSo" :tphs="tphsCV" :createFileCongVan="createFileCongVan"
+                <thong-tin-cong-van ref="thongtincongvan" :taoQuyetDinh="hasTaoQuyetDinh" :detailDossier="thongTinChiTietHoSo" :tphs="tphsCV" :createFileCongVan="createFileCongVan"
                   :formCodeInput="formCode" :donvinhanCollection="donvinhanCollection" :requiredCVDenGroupId="requiredCVDenGroupId" :requiredCVDenGovCode="requiredCVDenGovCode" :lengthDossier="dossiersIntoGroupRender.length" >
                 </thong-tin-cong-van>
               </v-expansion-panel-content>
@@ -973,7 +973,9 @@ export default {
     postStepCodeCongVan: '',
     donvinhanCollection: '',
     requiredCVDenGovCode: '',
-    requiredCVDenGroupId: ''
+    requiredCVDenGroupId: '',
+    formActionGroup: '',
+    hasTaoQuyetDinh: false
   }),
   computed: {
     loading () {
@@ -997,17 +999,23 @@ export default {
     dossiersIntoGroupRender () {
       return this.$store.getters.dossierSelectedDoAction
     },
-    formActionGroup () {
-      return this.$store.getters.formActionGroup
-    }
+    // formActionGroup () {
+    //   return this.$store.getters.formActionGroup
+    // }
   },
   created () {
     var vm = this
     vm.$nextTick(function () {
+      let currentQuery = vm.$router.history.current.query
+      if (currentQuery.hasOwnProperty('formActionGroup') && currentQuery.formActionGroup) {
+        vm.formActionGroup = JSON.parse(currentQuery.formActionGroup)
+      }
+      console.log('currentQueryTiepNhanHoSoDetail_created', vm.formActionGroup)
       vm.dossierId = vm.id
       vm.donvinhanCollection = vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : ''
       vm.requiredCVDenGroupId = vm.formActionGroup.hasOwnProperty('requiredCVDenGroupId') ? vm.formActionGroup.requiredCVDenGroupId : ''
       vm.requiredCVDenGovCode = vm.formActionGroup.hasOwnProperty('requiredCVDenGovCode') ? vm.formActionGroup.requiredCVDenGovCode : ''
+      vm.hasTaoQuyetDinh = vm.formActionGroup.hasOwnProperty('taoQuyetDinh') ? vm.formActionGroup.taoQuyetDinh : false
     })
   },
   beforeDestroy () {
@@ -1022,6 +1030,14 @@ export default {
     window.addEventListener('resize', this.onResize, { passive: true })
   },
   watch: {
+    '$route': function (newRoute, oldRoute) {
+      let vm = this
+      let currentQuery = newRoute.query
+      if (currentQuery.hasOwnProperty('formActionGroup') && currentQuery.formActionGroup) {
+        vm.formActionGroup = JSON.parse(currentQuery.formActionGroup)
+      }
+      console.log('currentQueryTiepNhanHoSoDetail_watch', vm.formActionGroup)
+    },
     isMobile (val) {
       let viewport = $('meta[name="viewport"]')
       if (val) {
@@ -1038,7 +1054,7 @@ export default {
       if (vm.thongTinChiTietHoSo.serviceName && !vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
         vm.briefNote = vm.briefNote + ' cho ' + vm.thongTinChuHoSo['applicantName']
       } else if (vm.thongTinChiTietHoSo.serviceName && vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
-        vm.briefNote = vm.briefNote + ' cho ông/bà ' + vm.thongTinChuHoSo['applicantName']
+        vm.briefNote = vm.briefNote + ' cho ông/bà/tổ chức ' + vm.thongTinChuHoSo['applicantName']
       }
       // end
       if (vm.formCode === 'UPDATE') {
@@ -1067,6 +1083,7 @@ export default {
       vm.donvinhanCollection = val.hasOwnProperty('donvinhan') ? val.donvinhan : ''
       vm.requiredCVDenGroupId = val.hasOwnProperty('requiredCVDenGroupId') ? val.requiredCVDenGroupId : ''
       vm.requiredCVDenGovCode = val.hasOwnProperty('requiredCVDenGovCode') ? val.requiredCVDenGovCode : ''
+      vm.hasTaoQuyetDinh = val.hasOwnProperty('taoQuyetDinh') ? val.taoQuyetDinh : false
     }
   },
   methods: {
@@ -1083,6 +1100,7 @@ export default {
         vm.donvinhanCollection = vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : ''
         vm.requiredCVDenGroupId = vm.formActionGroup.hasOwnProperty('requiredCVDenGroupId') ? vm.formActionGroup.requiredCVDenGroupId : ''
         vm.requiredCVDenGovCode = vm.formActionGroup.hasOwnProperty('requiredCVDenGovCode') ? vm.formActionGroup.requiredCVDenGovCode : ''
+        vm.hasTaoQuyetDinh = vm.formActionGroup.hasOwnProperty('taoQuyetDinh') ? vm.formActionGroup.taoQuyetDinh : false
         let totalFee = 0
         let arr = vm.dossiersIntoGroupRender
         if (arr && arr.length > 0) {
@@ -1567,6 +1585,7 @@ export default {
           if (vm.formCode === 'NEW_GROUP_CV') {
             meta = thongtincongvan.metaData
           } else {
+            let totalSubsidy_text = vm.currentcyToString(String(vm.totalFee))
             if (isDraf === 'save') {
               let metadataDraf = {
                 congvandagui: false,
@@ -1580,7 +1599,8 @@ export default {
                 donvinhancollection: vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : '',
                 requiredCVDenGovCode: vm.formActionGroup.hasOwnProperty('requiredCVDenGovCode') ? vm.formActionGroup.requiredCVDenGovCode : '',
                 requiredCVDenGroupId: vm.formActionGroup.hasOwnProperty('requiredCVDenGroupId') ? vm.formActionGroup.requiredCVDenGroupId : '',
-                totalSubsidy: vm.totalFee
+                totalSubsidy: vm.totalFee,
+                totalSubsidyText: totalSubsidy_text
               }
               meta = Object.assign(thongtincongvan.metaData, metadataDraf)
             } else {
@@ -1592,7 +1612,8 @@ export default {
                 donvinhancollection: vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : '',
                 requiredCVDenGovCode: vm.formActionGroup.hasOwnProperty('requiredCVDenGovCode') ? vm.formActionGroup.requiredCVDenGovCode : '',
                 requiredCVDenGroupId: vm.formActionGroup.hasOwnProperty('requiredCVDenGroupId') ? vm.formActionGroup.requiredCVDenGroupId : '',
-                totalSubsidy: vm.totalFee
+                totalSubsidy: vm.totalFee,
+                totalSubsidyText: totalSubsidy_text
               }
               meta = Object.assign(thongtincongvan.metaData, metadataDraf)
             }
@@ -2183,7 +2204,168 @@ export default {
     },
     goBackHistory () {
       window.history.back()
-    }
+    },
+    currentcyToString (so) {
+      var i;
+      var j;
+      var kq = "";
+      var l;
+      var dk;
+      var tmp = "";
+      var check = false;
+      var a = new Array(32);
+      while (so.length > 0 && so.charAt(0) == "0"){
+        so = so.substring(1,so.length);
+      }
+      l = so.length;
+      if (l > 28){
+        return "So khong hop le";
+      }
+          for (var i=1;i<=l;i++){
+            so = so.replace(',','');
+          }
+          l = so.length;
+      for (var i=1;i<=l;i++){
+        a[i] = parseInt(so.charAt(i-1));
+      }
+      //Bat dau doc tu trai sang phai
+      for (var i=1;i<=l;i++){
+      
+        if((l - i) % 3 == 2 && a[i] == 0 && (l - i >= 2)) {
+          if (a[i + 1] != 0 || a[i + 2] != 0) {
+            kq = kq + "không ";
+          }
+        }
+
+        if (a[i] == 2){  kq = kq + "hai ";}
+        if (a[i] == 3){  kq = kq + "ba ";}
+        if (a[i] == 6){  kq = kq + "sáu ";}
+        if (a[i] == 7){  kq = kq + "bảy ";}
+        if (a[i] == 8){  kq = kq + "tám ";}
+        if (a[i] == 9){  kq = kq + "chín ";}
+        
+        //Xu ly cach doc so 4
+        if (a[i] == 4) {
+          if (i > 1 && (l - i) % 3 == 0){
+            if (a[i - 1] > 1){
+              kq = kq + "tư ";
+            }else{
+              kq = kq + "bốn ";
+            }
+          }else{
+            kq = kq + "bốn ";
+          }
+        }
+
+        //Xu ly cach doc so 5
+        if (a[i] == 5){
+          if (i > 1 && (l - i)% 3 == 0){
+            if (a[i - 1] != 0 ){
+              kq = kq + "lăm ";
+            }else{
+              kq = kq + "năm ";
+            }
+          }else{
+            kq = kq + "năm ";
+          }
+        } 
+      
+        //Xu ly cach doc so 1
+        if (a[i] == 1) {
+          //doc la muoi neu no la hang chuc
+          if ((l - i) % 3 == 1) {
+            kq = kq + "mười ";	//doc la mot neu la hang don vi	//va hang chuc >1
+          }else{
+            if ((l - i) % 3 == 0 && (i > 1)){
+              if (a[i - 1] > 1){
+                kq = kq + "mốt ";
+              }else{
+                kq = kq + "một ";
+              }
+            }else{
+              kq = kq + "một ";
+            }
+          }
+        } 
+        if ((l - i) % 3 == 1 && a[i] != 0 && a[i] != 1){
+          kq = kq + "mươi ";
+        }
+        
+        if ((l - i) % 3 == 1 && a[i] == 0 && a[i + 1] != 0){
+          kq = kq + "linh ";
+        }
+        
+        if ((l - i) % 3 == 2 && (a[i + 1] != 0 || a[i + 2] != 0)){
+          kq = kq + "trăm ";
+        }
+        
+        if ((i + 2) <= l) {
+          if (a[i] != 0 && (l - i) % 3 == 2){
+            if (a[i + 1] == 0 && a[i + 2] == 0){
+              kq = kq + "trăm ";
+            }
+          }
+        }
+        
+        if ((l - i) == 3){ kq = kq + "nghìn ";}
+        if ((l - i) == 6){ kq = kq + "triệu ";}
+        if ((l - i) == 9){ kq = kq + "tỷ ";}
+        
+        if ((l - i) == 12){
+          check = true;
+          for (j=i+1;i<l;i++){
+            if (a[i + 1] != 0){ 
+              check = false;
+            }
+          }
+          if (check == false) {
+            kq = kq + "nghìn ";
+          }else{
+            kq = kq + "nghìn tỷ ";
+          }
+        }
+
+        if ((l - i) == 15){ kq = kq + "triệu tỷ ";}
+        if ((l - i) == 18){ kq = kq + "tỷ tỷ ";}
+        if ((l - i) == 21){ kq = kq + "nghìn tỷ tỷ ";}
+        if ((l - i) == 24){ kq = kq + "triệu tỷ tỷ ";}
+        if ((l - i) == 27){ kq = kq + "tỷ tỷ tỷ ";}
+        if ((l - i) == 30){ kq = kq + "nghìn tỷ tỷ ";}
+      
+        //Xu ly bo 3 so khong
+        if (((l - i) % 3 == 2) && (a[i] == 0) && (a[i + 1] == 0) && (a[i + 2] == 0)){
+          i = i + 2;
+        }
+      
+        //Xu ly tat ca so khong con lai
+        if ((l - i) % 3 == 0){
+          dk = 1;
+          for (j=i+1;j<=l;j++){
+            if (a[j] != 0){
+              dk = 0;
+            }
+          }
+        }
+        if (dk == 1){
+          break;
+        }
+        
+      }
+    
+          //Viet hoa chu cai dau tien
+          if (kq == "") kq = "không "
+          while (kq.charAt(kq.length) == ","){
+              kq = kq.substring(0,kq.length-1);
+          }
+          kq = kq.charAt(0).toUpperCase() + kq.substring(1,kq.length);
+      if (kq!="So khong hop le")
+      {
+        kq = kq +"đồng chẵn";
+      }else{
+        kq = kq ;
+      }
+      return kq
+    },
   }
 }
 </script>

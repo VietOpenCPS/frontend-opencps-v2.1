@@ -329,10 +329,7 @@ export const store = new Vuex.Store({
           }
         }).then(function (response) {
           resolve(response.data)
-          // console.log('upload file success!')
         }).catch(function (xhr) {
-          console.log(xhr)
-          // toastr.error('Tải file thất bại.')
           reject(xhr)
         })
       })

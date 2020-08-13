@@ -255,7 +255,7 @@
             <v-checkbox v-else
               :input-value="props.all"
               :indeterminate="props.indeterminate"
-              :disabled="!thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
+              :disabled="!thuTucHanhChinhSelected && (!doActionGroup || !doActionGroupKhacThuTuc) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0' && (!doActionGroup || !doActionGroupKhacThuTuc)) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '' && (!doActionGroup || !doActionGroupKhacThuTuc))"
               primary
               hide-details
               @click.native="toggleAll"
@@ -301,7 +301,8 @@
               v-if="getUser('Administrator') || getUser('Administrator_data')"
             ></v-checkbox>
             <v-checkbox v-else
-              :disabled="props.item['assigned'] === 0 && !doActionGroup || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
+              :disabled="props.item['assigned'] === 0 && (!doActionGroup || !doActionGroupKhacThuTuc) || (!thuTucHanhChinhSelected && !doActionGroupKhacThuTuc) || 
+              (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0' && !doActionGroupKhacThuTuc) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '' && !doActionGroupKhacThuTuc)"
               v-model="props.selected"
               @change="changeSelected"
               primary
@@ -374,7 +375,9 @@
                   <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
                 </v-list-tile>
                 <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId"
-                  v-if="String(props.item['permission']).indexOf('write') !== -1 && String(item.form) !== 'NEW' && menuType !== 3"
+                  v-if="String(props.item['permission']).indexOf('write') !== -1 && String(item.form) !== 'NEW' && menuType !== 3
+                    && (!item.hasOwnProperty('roleCode') || item.hasOwnProperty('roleCode') && getUserEmployee(item.roleCode))
+                  "
                   @click="btnActionEvent(props.item, item, index, false)"
                 >
                   <v-list-tile-title>{{ item.title }}</v-list-tile-title>
@@ -502,7 +505,7 @@
         </v-form>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition">
+    <v-dialog v-model="dialogPDF" max-width="1000" transition="fade-transition">
       <v-card>
         <v-toolbar flat dark color="primary">
           <v-toolbar-title>{{itemAction.title}}{{itemAction.tiltle}}</v-toolbar-title>
@@ -899,6 +902,7 @@ export default {
   data: () => ({
     xacthuc_BNG: false,
     doActionGroup: false,
+    doActionGroupKhacThuTuc: false,
     isAdminSuper: false,
     actionId: '',
     dossierIdSelected: '',
@@ -1139,6 +1143,7 @@ export default {
             vm.menuType = parseInt(vm.trangThaiHoSoList[vm.index]['menuType'])
             vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
             vm.doActionGroup = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('activeGroupAction') && vm.trangThaiHoSoList[vm.index]['tableConfig'].activeGroupAction
+            vm.doActionGroupKhacThuTuc = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('activeGroupActionService') && vm.trangThaiHoSoList[vm.index]['tableConfig'].activeGroupActionService
             // 
             if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchGovAgencyCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode) {
               vm.govAgencyFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode
@@ -1214,6 +1219,7 @@ export default {
       let currentQueryOld = oldRoute.query
       vm.currentQueryState = currentQuery
       vm.doActionGroup = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('activeGroupAction') && vm.trangThaiHoSoList[vm.index]['tableConfig'].activeGroupAction
+      vm.doActionGroupKhacThuTuc = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('activeGroupActionService') && vm.trangThaiHoSoList[vm.index]['tableConfig'].activeGroupActionService
       vm.keyword = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.status = currentQuery.hasOwnProperty('status') ? currentQuery.status : ''
       vm.top = currentQuery.hasOwnProperty('top') ? currentQuery.top : ''
@@ -1293,6 +1299,9 @@ export default {
           for (let key in vm.listLinhVuc) {
             if (String(vm.listLinhVuc[key]['domainCode']) === String(currentQuery.domain)) {
               vm.linhVucSelected = vm.listLinhVuc[key]
+              vm.domainCode = vm.linhVucSelected['domainCode']
+            } else if (vm.listLinhVuc.length === 1) {
+              vm.linhVucSelected = vm.listLinhVuc[0]
               vm.domainCode = vm.linhVucSelected['domainCode']
             }
           }
@@ -1415,7 +1424,7 @@ export default {
         vm.isAdminSuper = true
       }
       */
-      if (vm.getUser('Administrator') || vm.doActionGroup) {
+      if (vm.getUser('Administrator') || vm.doActionGroup || vm.doActionGroupKhacThuTuc) {
         if (vm.selected.length) {
           vm.selected = []
         } else {
@@ -1444,6 +1453,15 @@ export default {
         return false
       }
       let roleExits = roles.findIndex(item => item === roleItem)
+      return (roleExits >= 0)
+    },
+    getUserEmployee (roleItem) {
+      let vm = this
+      let roles = vm.$store.getters.getUser.role
+      if (!roles) {
+        return false
+      }
+      let roleExits = roles.findIndex(item => item.indexOf(roleItem) === 0)
       return (roleExits >= 0)
     },
     changeSelected () {
@@ -1563,6 +1581,9 @@ export default {
             // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
             console.log('listThuTucHanhChinh2', vm.listThuTucHanhChinh)
           }).catch(function (){})
+        } else if (vm.listLinhVuc.length === 1) {
+          vm.linhVucSelected = vm.listLinhVuc[0]
+          vm.domainCode = vm.linhVucSelected['domainCode']
         } else {
           vm.linhVucSelected = null
         }
@@ -2226,7 +2247,7 @@ export default {
     doPrint02 (dossierItem, item, index, isGroup) {
       let vm = this
       // console.log('vm.selectedDoAction', vm.selectedDoAction)
-      if (vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
+      if ((vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') && (!vm.doActionGroup || !vm.doActionGroupKhacThuTuc)) {
         alert('Loại thủ tục bắt buộc phải chọn')
       } else {
         if (vm.selectedDoAction.length === 0) {
@@ -2235,8 +2256,8 @@ export default {
         }
         let filter = {
           document: item.document,
-          'serviceCode': vm.thuTucHanhChinhSelected.serviceCode,
-          'govAgencyCode': vm.thuTucHanhChinhSelected.govAgencyCode,
+          // 'serviceCode': vm.thuTucHanhChinhSelected.serviceCode,
+          // 'govAgencyCode': vm.thuTucHanhChinhSelected.govAgencyCode,
           dossiers: JSON.stringify(vm.selectedDoAction)
         }
         vm.dialogPDFLoading = true
@@ -2642,12 +2663,17 @@ export default {
         } else {
           vm.$store.commit('setDataCreateDossier', data)
           vm.loadingAction = true
+          let query_redirect = vm.$router.history.current.query
+          if (vm.itemAction['form'] === 'NEW_GROUP_CV' || vm.itemAction['form'] === 'NEW_GROUP_CV_DI') {
+            query_redirect = Object.assign(query_redirect, {formActionGroup: JSON.stringify(vm.itemAction)})
+            console.log('query_redirect_Landing', query_redirect)
+          }
           vm.$store.dispatch('postDossier', data).then(function (result) {
             vm.loadingAction = false
             vm.indexAction = -1
             vm.$router.push({
               path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
-              query: vm.$router.history.current.query
+              query: query_redirect
             })
           }).catch(reject => {
             vm.loadingAction = false

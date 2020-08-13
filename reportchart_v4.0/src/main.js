@@ -7,7 +7,7 @@ Vue.use(VueApexCharts)
 Vue.component('apexchart', VueApexCharts)
 Vue.config.productionTip = false
 
-let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 223437
+let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : ''
 
 axios.defaults.withCredentials = true
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''

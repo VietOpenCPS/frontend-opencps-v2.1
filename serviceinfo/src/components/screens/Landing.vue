@@ -152,7 +152,7 @@
 
                   <v-menu bottom right offset-y v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 1 && serviceConfigs(props.item.serviceConfigs).length <= 5">
                     <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel >= 3" style="min-width: 110px;">
-                      <span v-if="!formToKhai">Nộp hồ sơ</span>
+                      <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
                       <span v-else>Tạo tờ khai</span>
                     </v-btn>
                     <v-btn small slot="activator" color="primary" v-else style="min-width: 110px;">Hướng dẫn</v-btn>
@@ -168,7 +168,7 @@
                     v-if="props.item.maxLevel >= 3 && props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 5"
                     @click="showSelectGov(props.item, props.item.serviceConfigs)"
                   >
-                    <span v-if="!formToKhai">Nộp hồ sơ</span>
+                    <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
                     <span v-else>Tạo tờ khai</span>
                   </v-btn>
 
@@ -183,7 +183,7 @@
                     v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) > 2"
                     @click="createDossier(serviceConfigs(props.item.serviceConfigs)[0], props.item)"
                   >
-                    <span v-if="!formToKhai">Nộp hồ sơ</span>
+                    <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
                     <span v-else>Tạo tờ khai</span>
                   </v-btn>
 
@@ -330,7 +330,7 @@
                     <v-list>
                       <v-menu :close-on-content-click="false" bottom right offset-y v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 1 && serviceConfigs(item.serviceConfigs).length <=5" style="position:relative !important;">
                         <v-btn class="mx-0 my-0" small slot="activator" color="primary" v-if="item.maxLevel >= 3">
-                          <span v-if="!formToKhai">Nộp hồ sơ</span>
+                          <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
                           <span v-if="formToKhai">Tạo tờ khai</span> &nbsp; 
                           <v-icon size="18">arrow_drop_down</v-icon>
                         </v-btn>
@@ -347,7 +347,7 @@
                         v-if="item.maxLevel >= 3 && item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 5"
                         @click="showSelectGov(item, item.serviceConfigs)"
                       >
-                        <span v-if="!formToKhai">Nộp hồ sơ</span>
+                        <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
                         <span v-else>Tạo tờ khai</span>
                       </v-btn>
                       <v-btn small color="primary" class="my-1" style="min-width: 110px;"
@@ -360,7 +360,7 @@
                         v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length === 1 && Number(serviceConfigs(item.serviceConfigs)[0]['serviceLevel']) > 2"
                         @click="createDossier(serviceConfigs(item.serviceConfigs)[0], item)"
                       >
-                        <span v-if="!formToKhai">Nộp hồ sơ</span>
+                        <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
                         <span v-else>Tạo tờ khai</span>
                       </v-btn>
                       <v-btn class="mx-0 my-0" small color="primary" 
@@ -784,6 +784,11 @@ export default {
     // 
     try {
       vm.onlyLoginDvcqg = hasOnlyLoginDvcqg
+    } catch (error) {
+    }
+    //
+    try {
+      vm.titleNopHoSo = titleNopHoSo ? titleNopHoSo : ''
     } catch (error) {
     }
     // 

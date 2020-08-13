@@ -3217,8 +3217,8 @@ export const store = new Vuex.Store({
             responseType: 'blob'
           }
           let formData = new URLSearchParams()
-          formData.append('serviceCode', filter.serviceCode)
-          formData.append('govAgencyCode', filter.govAgencyCode)
+          // formData.append('serviceCode', filter.serviceCode)
+          // formData.append('govAgencyCode', filter.govAgencyCode)
           formData.append('dossiers', filter.dossiers)
           formData.append('payload', filter.payload)
           axios.post(state.initData.getNextAction + '/preview/' + filter.document ,formData , param).then(function (response) {

@@ -284,20 +284,25 @@
       >
       <template slot="items" slot-scope="props">
         <tr>
-          <td class="text-xs-center px-0 py-0 pt-1">
+          <!-- <td class="text-xs-center px-0 py-0 pt-1">
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
             <span v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
               {{ hosoDatasPage * 15 - 15 + props.index + 1 }}
             </span>
-          </td>
+          </td> -->
 
           <td class="pt-1" v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item['_id']"
             :class="itemHeader['class_column']"
             v-if="itemHeader.hasOwnProperty('value')"
           >
-            <div v-if="itemHeader.value === 'deliverableState'" @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
+            <div v-if="itemHeader.value === 'counter'">
+              <span @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
+                {{ hosoDatasPage * 15 - 15 + props.index + 1 }}
+              </span>
+            </div>
+            <div v-else-if="itemHeader.value === 'deliverableState'" @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
               <span>
                 {{getState(props.item)}}
               </span>
@@ -325,24 +330,24 @@
               </span>
             </div>
           </td>
-          <td class="text-xs-left px-0 py-0 pt-1" v-if="!hideAction" style="width:150px">
+          <td class="text-xs-left px-0 py-0 pt-1" v-if="!hideAction" style="width:120px">
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
 
             <v-tooltip top v-if="!loadingTable">
               <v-btn slot="activator" flat icon class="mx-0 my-0" v-on:click.native="showPDFG(props.item)">
-                <v-icon>picture_as_pdf</v-icon>
+                <v-icon>attach_file</v-icon>
               </v-btn>
               <span>Xem &nbsp;{{String(loaiDuLieu).toLowerCase()}}</span>
             </v-tooltip>
             
-            <v-tooltip top v-if="!loadingTable">
+            <!-- <v-tooltip top v-if="!loadingTable">
               <v-btn :disabled="props.item['fileAttachs'] ? false : true" slot="activator" flat icon class="mx-0 my-0" v-if="!loadingTable" v-on:click.native="viewFileAttach(props.item)">
                 <v-icon>attach_file</v-icon>
               </v-btn>
               <span>Xem tài liệu đính kèm</span>
-            </v-tooltip>
+            </v-tooltip> -->
 
             <v-tooltip top v-if="!loadingTable">
               <v-btn :disabled="props.item['dossierId'] === '0' ? false : true" slot="activator" flat icon class="mx-0 my-0" v-if="!loadingTable" v-on:click.native="editDeliverables(props.item)">
@@ -492,6 +497,7 @@
         dialogPDFList: false,
         dialogMortgage: false,
         mortGageInput: '',
+        headerExport: [],
         headers: [],
         hideAction: false,
         hosoDatas: [],
@@ -535,17 +541,20 @@
               vm.filters = eval('( ' + vm.items[vm.index]['dataConfig'] + ' )')
             }
             if (vm.items[vm.index]['tableConfig'] !== '') {
-              vm.headers = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')['headers']
+              vm.headerExport = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')['headers']
+              vm.headers = vm.headerExport.filter(function (item) {
+                return !item.hasOwnProperty('show') || (item.hasOwnProperty('show') && item.show)
+              })
               let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
               if (tableConfig.hasOwnProperty('loaiDuLieu') && tableConfig.loaiDuLieu) {
                 vm.loaiDuLieu = tableConfig.loaiDuLieu
               } else {
                 vm.loaiDuLieu = "giấy phép"
               }
-              for(let i=0; i< vm.headers.length ;i++){
-                if(vm.headers[i]['text'] !== 'STT'){
-                  vm.json_fields[vm.headers[i]['text']] =  vm.headers[i]['value']
-                }
+              for(let i=0; i< vm.headerExport.length ;i++){
+                // if(vm.headerExport[i]['text'] !== 'STT'){
+                  vm.json_fields[vm.headerExport[i]['text']] =  vm.headerExport[i]['value']
+                // }
               }
             } else {
               vm.headers = []
@@ -602,7 +611,15 @@
         }
         if (vm.items[val]['tableConfig'] !== '') {
           vm.hosoDatasPage = 1
-          vm.headers = eval('( ' + vm.items[val]['tableConfig'] + ' )')['headers']
+          vm.headerExport = eval('( ' + vm.items[val]['tableConfig'] + ' )')['headers']
+          vm.headers = vm.headerExport.filter(function (item) {
+            return !item.hasOwnProperty('show') || (item.hasOwnProperty('show') && item.show)
+          })
+          for(let i=0; i< vm.headerExport.length ;i++){
+            // if(vm.headerExport[i]['text'] !== 'STT'){
+              vm.json_fields[vm.headerExport[i]['text']] =  vm.headerExport[i]['value']
+            // }
+          }
           let tableConfig = eval('( ' + vm.items[val]['tableConfig'] + ' )')
           if (tableConfig.hasOwnProperty('loaiDuLieu') && tableConfig.loaiDuLieu) {
             vm.loaiDuLieu = tableConfig.loaiDuLieu
@@ -949,10 +966,10 @@
           vm.loadingImport = true
           let bodyFormData = new FormData()
           bodyFormData.append('file', files[0])
-          bodyFormData.append('deliverableType', vm.items[vm.index]['typeCode'])
+          bodyFormData.append('deliverableTypeCode', vm.items[vm.index]['typeCode'])
           axios({
             method: 'post',
-            url: '/o/rest/v2/deliverables/import/files',
+            url: '/o/rest/v2/deliverables/import/files-v3',
             data: bodyFormData,
             config: { headers: {
                 'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
@@ -1081,16 +1098,8 @@
         return data.data
       },
       exportTracking () {
-    
         let vm = this
-        // let currentQuery = vm.$router.history.current.query
-        let queryString = ''
-        // for (let key in currentQuery) {
-        //   if (currentQuery[key] !== '' && currentQuery[key] !== 'undefined' && currentQuery[key] !== undefined) {
-        //     queryString += key + '=' + currentQuery[key] + '&'
-        //   }
-        // }
-        
+        let queryString = ''       
         for(let key in vm.filterData){
           if(vm.filterData[key]){
             queryString += key + '=' + vm.filterData[key]+ '&'
@@ -1106,11 +1115,22 @@
         vm.$store.dispatch('getDeliverables', filter).then(result => {
           let data = result.data
           let dataExport = []
-          for(let i=0;i<data.length;i++){
+          console.log('headerExport', vm.headerExport)
+          console.log('json_fields', vm.json_fields)
+          for (let i=0;i<data.length;i++) {
             let item = {}
-            for(let key in vm.json_fields){
-              console.log(vm.json_fields[key])
-              item[key]=data[i][vm.json_fields[key]]
+            let indexFields = 0
+            for (let key in vm.json_fields) {
+              let valueTemplate
+              if (vm.headerExport[indexFields].hasOwnProperty('layoutViewExport') && vm.headerExport[indexFields].layoutViewExport) {
+                let str = vm.headerExport[indexFields]['layoutViewExport'].replace('itemData', JSON.stringify(data[i]))
+                valueTemplate = eval(str)
+              }
+              item[key]=valueTemplate ? valueTemplate : data[i][vm.json_fields[key]]
+              if (vm.headerExport[indexFields]['value'] === 'counter') {
+                item[key] = i + 1
+              }
+              indexFields += 1
             }
             console.log(item)
             dataExport.push(item)

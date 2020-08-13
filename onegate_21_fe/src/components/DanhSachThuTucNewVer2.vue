@@ -57,16 +57,10 @@
           <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
             <v-text-field
               v-model="serviceNameKey"
-              placeholder="Tìm kiếm theo tên thủ tục"
+              placeholder="Tìm kiếm theo tên thủ tục, mã thủ tục"
               solo
-              chips
-              multiple
-              deletable-chips
-              item-value="value"
-              item-text="text"
               @keyup.enter="filterService"
               content-class="adv__search__select"
-              return-object
             ></v-text-field>
           </div>
           <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
@@ -93,6 +87,7 @@
                       :hide-selected="true"
                       @change="filterService"
                       box
+                      clearable
                     ></v-autocomplete>
                   </v-flex>
                   <v-flex xs12 sm6 class="px-2">
@@ -147,7 +142,7 @@
                   <v-btn class="mx-2 my-0 mt-0 white--text" depressed readonly small :color="getColor(itemServiceConfig.maxLevel)"
                     style="pointer-events: none;min-width: 90px;">Mức độ {{itemServiceConfig.maxLevel}}
                   </v-btn>
-                  <v-menu class="right" left offset-x v-if="itemServiceConfig.serviceConfigs && serviceConfigs(itemServiceConfig.serviceConfigs).length === 1">
+                  <!-- <v-menu class="right" left offset-x v-if="itemServiceConfig.serviceConfigs && serviceConfigs(itemServiceConfig.serviceConfigs).length === 1">
                     <v-btn color="primary" class="mx-2 my-0" slot="activator" small 
                       @click="pullServiceOptions(serviceConfigs(itemServiceConfig.serviceConfigs)[0], itemServiceConfig)" style="min-width: 90px;"
                     >
@@ -159,9 +154,9 @@
                         <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
                       </v-list-tile>
                     </v-list>
-                  </v-menu>
+                  </v-menu> -->
                   <v-btn small color="primary" class="mx-2 my-0 right" style="min-width: 90px;"
-                    v-if="itemServiceConfig.serviceConfigs && serviceConfigs(itemServiceConfig.serviceConfigs).length > 1"
+                    v-if="itemServiceConfig.serviceConfigs && serviceConfigs(itemServiceConfig.serviceConfigs).length >= 1"
                     @click="showSelectGov(itemServiceConfig.serviceConfigs, itemServiceConfig)"
                   >
                     Chọn
@@ -194,7 +189,7 @@
                   <v-btn class="mx-0 my-0 mt-0 white--text" depressed readonly small :color="getColor(item.maxLevel)"
                     style="pointer-events: none;min-width: 90px;">Mức độ {{item.maxLevel}}
                   </v-btn>
-                  <v-menu class="right" left offset-x v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length === 1">
+                  <!-- <v-menu class="right" left offset-x v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length === 1">
                     <v-btn color="primary" class="mx-0 my-0" slot="activator" small 
                       @click="pullServiceOptions(serviceConfigs(item.serviceConfigs)[0], item)" style="min-width: 90px;"
                     >
@@ -206,9 +201,9 @@
                         <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
                       </v-list-tile>
                     </v-list>
-                  </v-menu>
+                  </v-menu> -->
                   <v-btn small color="primary" class="mx-0 my-0 right" style="min-width: 90px;"
-                    v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 1"
+                    v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length >= 1"
                     @click="showSelectGov(item.serviceConfigs, item)"
                   >
                     Chọn
@@ -298,7 +293,7 @@
       <v-dialog v-model="dialog_selectAgency" scrollable persistent max-width="700px">
         <v-card>
           <v-toolbar flat dark color="primary">
-            <v-toolbar-title>Chọn cơ quan tiếp nhận</v-toolbar-title>
+            <v-toolbar-title>Đơn vị tiếp nhận</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn icon dark @click.native="dialog_selectAgency = false">
               <v-icon>close</v-icon>
@@ -308,13 +303,12 @@
             <v-form ref="formSelect" v-model="validFormSelectGov" lazy-validation>
               <v-autocomplete
                 class="mt-3"
-                placeholder="Chọn cơ quan"
+                placeholder="Chọn đơn vị"
                 :items="govAgencyListTiepNhan"
                 v-model="govAgencyTiepNhanSelected"
                 item-text="govAgencyName"
                 item-value="govAgencyCode"
-                clearable
-                :rules="[v => !!v || 'Chọn cơ quan tiếp nhận']"
+                :rules="[v => !!v || 'Chọn đơn vị tiếp nhận']"
                 required
                 return-object
                 @change="changeGovSelected"
@@ -339,7 +333,7 @@
             <v-btn color="primary" @click="submitSelectGov">
               <v-icon size="20">save</v-icon>&nbsp; Đồng ý
             </v-btn>
-            <v-btn class="white--text" color="red"  @click="dialog_selectAgency = false">
+            <v-btn class="white--text" color="primary"  @click="dialog_selectAgency = false">
               <v-icon size="20">clear</v-icon>&nbsp; Thoát
             </v-btn>
           </v-card-actions>
@@ -445,11 +439,11 @@
 
       vm.domainFilter = newQuery['domain'] ? newQuery['domain'] : ''
       vm.leverFilter = newQuery['lever'] ? Number(newQuery['lever']) : ''
-      vm.serviceNameKey = newQuery['keyword'] ? Number(newQuery['keyword']) : ''
+      vm.serviceNameKey = newQuery['keyword'] ? newQuery['keyword'] : ''
       vm.serviceLastest = String(newQuery['lastest']) === 'true' ? true : false
-      if (vm.domainFilter || vm.serviceLastest) {
+      // if (vm.domainFilter || vm.serviceLastest) {
         vm.filterAndSort()
-      }
+      // }
 
       if (String(vm.serviceCode) !== '0') {
         let params = {
@@ -471,11 +465,11 @@
         
         vm.domainFilter = newQuery['domain'] ? newQuery['domain'] : ''
         vm.leverFilter = newQuery['lever'] ? Number(newQuery['lever']) : ''
-        vm.serviceNameKey = newQuery['keyword'] ? Number(newQuery['keyword']) : ''
+        vm.serviceNameKey = newQuery['keyword'] ? newQuery['keyword'] : ''
         vm.serviceLastest = String(newQuery['lastest']) === 'true' ? true : false
-        if (vm.domainFilter || vm.serviceLastest) {
+        // if (vm.domainFilter || vm.serviceLastest) {
           vm.filterAndSort()
-        }
+        // }
       },
       serviceLastest (val) {
         let vm = this
@@ -542,38 +536,40 @@
         let vm = this
         let current = vm.$router.history.current
         let newQuery = current.query
-        if (vm.domainFilter || vm.serviceLastest) {
-          setTimeout (function () {
-            let queryString = '?'
-            newQuery['domain'] = vm.domainFilter
-            newQuery['keyword'] = String(vm.serviceNameKey).trim()
-            newQuery['lever'] = vm.leverFilter
-            newQuery['page'] = 1
-            if (vm.serviceLastest) {
-              newQuery['lastest'] = vm.serviceLastest
-            } else {
-              newQuery['lastest'] = ''
-            }
+        setTimeout(function() {
+          // if (vm.domainFilter || vm.serviceLastest) {
+            // setTimeout (function () {
+              let queryString = '?'
+              newQuery['domain'] = vm.domainFilter
+              newQuery['keyword'] = String(vm.serviceNameKey).trim()
+              newQuery['lever'] = vm.leverFilter
+              newQuery['page'] = 1
+              if (vm.serviceLastest) {
+                newQuery['lastest'] = vm.serviceLastest
+              } else {
+                newQuery['lastest'] = ''
+              }
 
-            for (let key in newQuery) {
-              if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
-                queryString += key + '=' + newQuery[key] + '&'
+              for (let key in newQuery) {
+                if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+                  queryString += key + '=' + newQuery[key] + '&'
+                }
               }
-            }
-            vm.$router.push({
-              path: current.path + queryString,
-              query: {
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-              }
-            })
-          }, 10)
-        } else {
-          if (vm.serviceLastest) {
-            newQuery['lastest'] = vm.serviceLastest
-          } else {
-            newQuery['lastest'] = ''
-          }
-        }
+              vm.$router.push({
+                path: current.path + queryString,
+                query: {
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                }
+              })
+            // }, 10)
+          // } else {
+          //   if (vm.serviceLastest) {
+          //     newQuery['lastest'] = vm.serviceLastest
+          //   } else {
+          //     newQuery['lastest'] = ''
+          //   }
+          // }
+        }, 100)
         
       },
       filterAndSort () {
@@ -613,8 +609,13 @@
           }
           vm.$store.dispatch('getServiceRecently', params).then(function (result) {
             vm.loading = false
-            vm.serviceLastestTotal = result.total
-            vm.serviceInfoLastestList = result.data
+            if (result.hasOwnProperty('data')) {
+              vm.serviceLastestTotal = result.total
+              vm.serviceInfoLastestList = result.data
+            } else {
+              vm.serviceInfoLastestList = []
+              vm.serviceLastestTotal = 0
+            }
           }).catch (function () {
             vm.loading = false
             vm.serviceInfoLastestList = []
@@ -839,6 +840,9 @@
         vm.govAgencyTiepNhanSelected = ''
         vm.serviceOptionsSelect = ''
         vm.govAgencyListTiepNhan = vm.serviceConfigs(govList)
+        if ( vm.govAgencyListTiepNhan.length === 1) {
+          vm.govAgencyTiepNhanSelected = vm.govAgencyListTiepNhan[0]
+        }
         vm.dialog_selectAgency = true
       },
       changeGovSelected () {

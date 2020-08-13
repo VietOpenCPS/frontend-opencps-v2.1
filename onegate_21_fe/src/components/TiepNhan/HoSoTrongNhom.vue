@@ -271,13 +271,13 @@ export default {
       //   filterCopyFile.dossierFileId = vm.filesAdd[index]['dossierFileId']
         vm.$store.dispatch('uploadFileDossierGroup', filterCopyFile).then(function (result) {
           toastr.success('Đính kèm tài liệu thành công')
-          vm.$store.commit('setActiveAddFileGroup', false)
+          // vm.$store.commit('setActiveAddFileGroup', false)
         })
       // }
     },
     cancelAddFile () {
       let vm = this
-      vm.$store.commit('setActiveAddFileGroup', false)
+      // vm.$store.commit('setActiveAddFileGroup', false)
     },
     toggleAll () {
       var vm = this
