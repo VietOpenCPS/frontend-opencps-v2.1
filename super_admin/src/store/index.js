@@ -419,6 +419,26 @@ export const store = new Vuex.Store({
         })
       })
     },
+    detailFileAttachsVersions ({commit, state}, item) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              'Content-Type': 'application/octet-stream'
+            },
+            responseType: 'blob'
+          }
+          axios.get('/o/rest/v2/fileattachs/versions/'+item.fileEntryId+'/'+item.version, param).then(function (data) {
+            saveAs(data.data, item['uuid'] + '.' + item['extension'])
+            resolve({status: true})
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
     updateServiceFileTemplate ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -2136,7 +2156,51 @@ export const store = new Vuex.Store({
         })
       })
     },
-
+    postDeliverabletypes ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+          let dataPost = new FormData()
+          dataPost.append('file', filter.file)
+          axios.post('/o/rest/v2/deliverabletypes/'+ filter.deliverableTypeId +'/fileTemplateId', dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getFileattachsVersions ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/fileattachs/versions/'+  filter).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
   },
   mutations: {
     SOCKET_ONOPEN (state, event)  {

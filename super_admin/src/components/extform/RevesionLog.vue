@@ -88,7 +88,7 @@
                 </v-menu>
               </v-flex>
               <v-flex xs12  md4 class="text-xs-right">
-                <v-btn  color="blue darken-3" class="white--text" @click="getRevesionLog()">Tìm kiếm</v-btn>
+                <v-btn  color="blue darken-3" class="white--text" @click="search()">Tìm kiếm</v-btn>
               </v-flex>
           </v-layout>
           <v-layout wrap>
@@ -221,6 +221,11 @@ export default {
         const [month, day, year] = date.split("/");
         return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
+    search(){
+      let vm = this
+      vm.page = 1
+      vm.getRevesionLog()
+    },
     getRevesionLog () {
         let vm = this
         let filter = {
@@ -230,6 +235,7 @@ export default {
             createDateStart: vm.createDateStartFomarted,
             createDateEnd: vm.createDateEndFomarted
         }
+        vm.revesionLogs = []
         vm.$store.dispatch('getRevesionLog',filter).then(function (result) {
           console.log(result)
           vm.revesionLogs=result.data
