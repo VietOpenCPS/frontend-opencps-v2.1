@@ -1511,6 +1511,7 @@ export default {
       }
       if(vm.data_form_template === 'formCH'){
         if(vm.$refs.formTiepNhan.validate()){
+          if(vm.checkQuyetDinh()){
             if(vm.checkCKCD){
               if(vm.formCode === 'NEW') {
                 vm.loadingAction = true
@@ -1604,6 +1605,9 @@ export default {
               vm.dialogXacNhanThaoTac = true
               vm.loadingAction = false 
             }
+          } else {
+            vm.loadingAction = false
+          }
         } else {
           toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
           vm.loadingAction = false
@@ -2038,14 +2042,23 @@ export default {
       try{
         let dossierFileArr = JSON.parse($('#dossierFileArr_hidden').val())
         console.log(dossierFileArr)
-        let listVanBan = dossierFileArr.find(e=>e.partNo === 'TP02')
-        console.log(listVanBan)
-        let listThanhVien = dossierFileArr.find(e=>e.partNo === 'TP01')
+        let TP02 = dossierFileArr.find(e=>e.partNo === 'TP02')
+        console.log(TP01)
+        let listVanBan = JSON.parse(TP02.formData).van_ban
+        let TP01 = dossierFileArr.find(e=>e.partNo === 'TP01')
+        console.log(TP01)
+        let listThanhVien = JSON.parse(TP01.formData).thanh_vien_doan
         console.log(listThanhVien)
-        for(let i=0; i< listThanhVien.length ; i++){
-          let vanban = listVanBan.find(e=> e.vb_so_hieu_van_ban === listThanhVien[i]['listThanhVien'] && e.vb_ngay_ky === listThanhVien[i]['vb_ngay_ky'] && e.vb_ma_co_quan_chu_quan === listThanhVien[i]['vb_ma_co_quan_chu_quan'])
-          console.log(i, vanban)
-          if(!vanban) {
+        console.log(listVanBan)
+        for(let i =0; i<listVanBan.length;i++){
+          let vb_so_hieu_van_ban = listVanBan.filter(e => e.vb_so_hieu_van_ban === listVanBan[i]['vb_so_hieu_van_ban']) 
+          if(vb_so_hieu_van_ban.length > 1){
+            toastr.error('Văn bản quyết định số ' + listVanBan[i]['vb_so_hieu_van_ban'] + ' bị trùng')
+            return false
+          }
+          let thanh_vien_doan = listThanhVien.find(e => e.vb_so_hieu_van_ban === listVanBan[i]['vb_so_hieu_van_ban'])
+          if(!thanh_vien_doan) {
+            toastr.error('Văn bản quyết định số ' + listVanBan[i]['vb_so_hieu_van_ban'] + ' chưa có thành viên nào')
             return false
           }
         }

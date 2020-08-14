@@ -124,12 +124,12 @@
       <v-toolbar color="blue darken-3" dark height="48">
         <v-toolbar-title class="ml-2">
           <v-btn
-            :loading="importLoading"
-            :disabled="importLoading"
+            :loading="importPhongBanLoading"
+            :disabled="importPhongBanLoading"
             color="blue darken-3"
             dark
             class="mx-0"
-           
+            @click.native="doImportPhongBanExcelData()"
           >
             Upload
             <v-icon right dark>cloud_upload</v-icon>
@@ -146,8 +146,8 @@
           type="file"
           ref="importPhongBanData"
           name="importPhongBanData"
-          :accept="accept"
-          @change="onFilePicked"
+          
+          @change="onFilePhongBanPicked"
           v-show="false"
         >
       </div>
@@ -206,6 +206,7 @@
         importMessage: false,
         importLoading: false,
         importExcelLoading: false,
+        importPhongBanLoading: false,
         showFilter: false,
         accept: 'text/xml,application/zip',
         breadCrumbsitems: [
@@ -250,6 +251,11 @@
         this.importExcelLoading = true
         this.importMessage = false
         this.$refs.importExcelData.click()
+      },
+      doImportPhongBanExcelData () {
+        this.importPhongBanLoading = true
+        this.importMessage = false
+        this.$refs.importPhongBanData.click()  
       },
       onFilePicked(event) {
         let vm = this
@@ -301,10 +307,37 @@
             //handle error
             console.log(response)
             vm.importExcelLoading = false
-            vm.snackbarsuccess =  false
+            vm.snackbarerror =  true
           })
         }
-      }, 
+      },
+      onFilePhongBanPicked(event) {
+        let vm = this
+        const files = event.target.files || event.dataTransfer.files
+        if (files && files[0]) {
+          var bodyFormData = new FormData()
+          bodyFormData.append('file', files[0])
+          axios({
+            method: 'post',
+            url: '/o/rest/v2/workingunits/import/files',
+            data: bodyFormData,
+            config: { headers: {'Content-Type': 'multipart/form-data' }}
+          })
+          .then(function (response) {
+            //handle success
+            console.log(response)
+            vm.snackbarsuccess = true
+            vm.importPhongBanLoading = false
+        
+          })
+          .catch(function (response) {
+            //handle error
+            console.log(response)
+            vm.importPhongBanLoading = false
+            vm.snackbarerror =  true
+          })
+        }
+      },
     }
   }
 </script>
