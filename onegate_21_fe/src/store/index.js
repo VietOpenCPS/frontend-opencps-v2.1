@@ -4721,7 +4721,24 @@ export const store = new Vuex.Store({
           reject(xhr)
         })
       })
-    }
+    },
+    checkDaCapPhep ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            formDataKey: JSON.stringify(filter.formDataKey)
+          }
+        }
+        axios.get('/o/v1/opencps/deliverable/KQGP', options).then(function (response) {
+          resolve(response.data)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
     // ----End---------
   },
   mutations: {
