@@ -1884,62 +1884,109 @@ export default {
           tempData['originality'] = vm.originality
           tempData['userType'] = '1'
           console.log('putDossierIntoCongVan', tempData)
-          vm.$store.dispatch('putDossier', tempData).then(function (result) {
-            vm.loadingAction = false
-            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            if (vm.formCode === 'UPDATE') {
-              vm.goBack()
-            } else {
-              let initData = vm.$store.getters.loadingInitData
-              let actionUser = initData.user.userName ? initData.user.userName : ''
-              //
-              let paymentsOut = {}
-              if (vm.showThuPhi) {
-                paymentsOut = {
-                  requestPayment: vm.payments['requestPayment'],
-                  paymentNote: vm.payments['paymentNote'],
-                  advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-                  feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-                  serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-                  shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+          let doAction = function () {
+            // ham put hồ sơ công văn
+            vm.$store.dispatch('putDossier', tempData).then(function (result) {
+              vm.loadingAction = false
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              if (vm.formCode === 'UPDATE') {
+                vm.goBack()
+              } else {
+                let initData = vm.$store.getters.loadingInitData
+                let actionUser = initData.user.userName ? initData.user.userName : ''
+                //
+                let paymentsOut = {}
+                if (vm.showThuPhi) {
+                  paymentsOut = {
+                    requestPayment: vm.payments['requestPayment'],
+                    paymentNote: vm.payments['paymentNote'],
+                    advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                    feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                    serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                    shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+                  }
                 }
-              }
-              var payloadDate = {
-                'dueDate': vm.editableDate && tempData.dueDate ? tempData.dueDate : vm.dueDateEdit,
-                'receiveDate': vm.receiveDateEdit
-              }
-              let dataPostAction = {
-                dossierId: vm.currentDossierIntoGroup.dossierId,
-                actionCode: 1100,
-                actionNote: '',
-                actionUser: actionUser,
-                payload: payloadDate,
-                security: '',
-                assignUsers: '',
-                payment: paymentsOut,
-                createDossiers: ''
-              }
-              vm.loadingAction = true
-              vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-                vm.loadingAction = false
-                if (!type) {
-                  toastr.success('Thêm hồ sơ vào nhóm thành công')
-                  vm.getDetaiGroup(vm.id)
-                  vm.activeAddDossierIntoGroup = false
-                } else {
-                  // tạo hồ sơ mới
-                  vm.createDossierIntoGroup()
+                var payloadDate = {
+                  'dueDate': vm.editableDate && tempData.dueDate ? tempData.dueDate : vm.dueDateEdit,
+                  'receiveDate': vm.receiveDateEdit
                 }
-              }).catch(reject => {
-                vm.loadingAction = false
-              })
+                let dataPostAction = {
+                  dossierId: vm.currentDossierIntoGroup.dossierId,
+                  actionCode: 1100,
+                  actionNote: '',
+                  actionUser: actionUser,
+                  payload: payloadDate,
+                  security: '',
+                  assignUsers: '',
+                  payment: paymentsOut,
+                  createDossiers: ''
+                }
+                vm.loadingAction = true
+                vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+                  vm.loadingAction = false
+                  if (!type) {
+                    toastr.success('Thêm hồ sơ vào nhóm thành công')
+                    vm.getDetaiGroup(vm.id)
+                    vm.activeAddDossierIntoGroup = false
+                  } else {
+                    // tạo hồ sơ mới
+                    vm.createDossierIntoGroup()
+                  }
+                }).catch(reject => {
+                  vm.loadingAction = false
+                })
+              }
+            }).catch(rejectXhr => {
+              vm.loadingAction = false
+              toastr.clear()
+              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            })
+            // 
+          }
+          // 
+          let filterCheck = {
+            formDataKey: {
+              hoten: thongtinchuhosocongvan.applicantName
             }
+          }
+          vm.$store.dispatch('checkDaCapPhep', filterCheck).then(function (result) {
+            let userExits = false
+            let quyetdinhItems = []
+            let thongTinCapPhep = result.hasOwnProperty('data') ? result.data : []
+            thongTinCapPhep = thongTinCapPhep.filter(function (item) {
+              return item.hasOwnProperty('hoten_data') && item.hasOwnProperty('ngaysinh_data')
+            })
+            if (thongTinCapPhep.length > 0) {
+              try {
+                let birthDate = vm.parseDate(thongtinchuhosocongvan.birthDate)
+                quyetdinhItems = thongTinCapPhep.filter(function (item) {
+                  return String(item.hoten_data).toLocaleLowerCase() === String(thongtinchuhosocongvan.applicantName).toLocaleLowerCase() 
+                  && vm.parseDate(item.ngaysinh_data) === birthDate
+                })
+                if (quyetdinhItems && quyetdinhItems.length > 0) {
+                  userExits = true
+                }
+              } catch (error) {
+              }
+            }
+            if (userExits) {
+              let x = confirm('Đối tượng đã cấp phép. Bạn có muốn tiếp tục?')
+              if (x) {
+                doAction()
+              } else {
+                vm.loadingAction = false
+              }
+            } else {
+              doAction()
+            }
+            
           }).catch(rejectXhr => {
-            vm.loadingAction = false
-            toastr.clear()
-            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            doAction()
           })
+          // 
+          
         } else {
+          vm.loadingAction = false
           toastr.clear()
           toastr.error('Vui lòng điền đầy đủ thông tin bắt buộc')
         }
@@ -2359,6 +2406,14 @@ export default {
           path: '/danh-sach-ho-so/' + currentParams.index,
           query: currentQuery
         })
+      }
+    },
+    parseDate (date) {
+      try {
+        let [day, month, year] = date.split('/')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      } catch (error) {
+        return ''
       }
     },
     currentcyToString (so) {

@@ -1710,7 +1710,8 @@ export default {
         }
       }
       if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
-        queryString += 'step=' + newQuery['step'] + '&'
+        let stepQuery = newQuery.hasOwnProperty('step') ? newQuery['step'] : ''
+        queryString += 'step=' + stepQuery + '&'
       }
       vm.$router.push({
         path: current.path + queryString,
@@ -1912,7 +1913,8 @@ export default {
         }
       }
       if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
-        queryString += 'step=' + newQuery['step'] + '&'
+        let stepQuery = newQuery.hasOwnProperty('step') ? newQuery['step'] : ''
+        queryString += 'step=' + stepQuery + '&'
       }
       if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
         queryString += 'service_config=' + item.serviceConfigId
@@ -1990,7 +1992,8 @@ export default {
         }
       }
       if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
-        queryString += 'step=' + newQuery['step'] + '&'
+        let stepQuery = newQuery.hasOwnProperty('step') ? newQuery['step'] : ''
+        queryString += 'step=' + stepQuery + '&'
       }
       queryString += 'domain=' + vm.domainCode
       // console.log('change Domain queryString', queryString)
@@ -2019,7 +2022,8 @@ export default {
         }
       }
       if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
-        queryString += 'step=' + newQuery['step'] + '&'
+        let stepQuery = newQuery.hasOwnProperty('step') ? newQuery['step'] : ''
+        queryString += 'step=' + stepQuery + '&'
       }
       queryString += 'groupDossierId=' + groupIdQuery
       // console.log('change Domain queryString', queryString)
