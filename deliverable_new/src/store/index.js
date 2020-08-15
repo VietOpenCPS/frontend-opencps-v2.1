@@ -263,6 +263,9 @@ export const store = new Vuex.Store({
             end: filter.page * 15
           }
         }
+        if (filter.hasOwnProperty('formDataKey') && filter.formDataKey) {
+          options['params'] = Object.assign(options['params'], {formDataKey: filter.formDataKey})
+        }
         axios.get('/o/v1/opencps/deliverable/' + filter['type'] + '?' + filter['q'], options).then(function (response) {
           resolve(response.data)
         }).catch(function (error) {
@@ -276,7 +279,7 @@ export const store = new Vuex.Store({
           headers: {
             'groupId': state.groupId
           },
-          params: {
+          params: filter.hasOwnProperty('export') && filter.export ? {} : {
             start: filter.page * 15 - 15,
             end: filter.page * 15
           }
