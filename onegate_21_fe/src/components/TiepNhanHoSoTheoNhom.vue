@@ -181,14 +181,14 @@
                         <span v-if="props.item.applicantNote">{{props.item.applicantNote}} </span>
                       </td>
                       
-                      <td class="text-xs-center" :width="!metaDataGroupDossier.hasOwnProperty('congvandagui') ? '200px' : '70px'" style="height: 40px !important">
+                      <td class="text-xs-center" :width="!metaDataGroupDossier.hasOwnProperty('congvandagui') || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui) ? '170px' : '70px'" style="height: 40px !important">
                         <v-btn flat icon color="indigo" class="mr-2 my-0" @click="viewDetail(props.item)" title="Xem chi tiết">
                           <v-icon>fas fa fa-file-text</v-icon>
                         </v-btn>
-                        <v-btn v-if="!metaDataGroupDossier.hasOwnProperty('congvandagui')" flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
+                        <v-btn v-if="!metaDataGroupDossier.hasOwnProperty('congvandagui') || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
                           <v-icon size="22">create</v-icon>
                         </v-btn>
-                        <v-btn v-if="!metaDataGroupDossier.hasOwnProperty('congvandagui')" flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
+                        <v-btn v-if="!metaDataGroupDossier.hasOwnProperty('congvandagui') || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
                           <v-icon size="22">delete</v-icon>
                         </v-btn>
                       </td>

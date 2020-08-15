@@ -1205,7 +1205,14 @@
           { text: 'Không phân công', value: 0 },
           { text: 'Chỉ phân công người thực hiện', value: 1 },
           { text: 'Phân công thực hiện và phối hợp', value: 2 },
-          { text: 'Phân công thực hiện,phối hợp và theo dõi', value: 3 }
+          { text: 'Phân công thực hiện,phối hợp và theo dõi', value: 3 },
+
+          { text: 'Phân công thực hiện, phối hợp và ủy quyền theo dõi', value: 4 },
+          { text: 'Phân công chỉ chọn một người', value: 5 },
+          { text: 'Phân công theo danh sách role', value: 6 },
+          { text: 'Phân công theo danh sách role, chỉ chọn được một role', value: 7 },
+          { text: 'Phân công theo danh sách role, trừ những role của người dùng hiện tại', value: 8 },
+          { text: 'Phân công theo danh sách role, trừ những role của người dùng hiện tại, chỉ chọn một role', value: 9 }
         ],
         dossierTemplateList: [],
         dossierPartList: [],
