@@ -21,9 +21,15 @@
           ></v-text-field> -->
         </div>
         <div class="flex text-right" style="margin-left: auto;max-width: 115px;">
-          <v-btn color="blue darken-3" dark class="my-0 mx-2" v-on:click.native="menusss = !menusss">
+          <v-tooltip top>
+            <v-btn  slot="activator" icon class="my-0 mx-0 mr-2 px-0" v-on:click.native="menusss = !menusss">
+              <v-icon size="20">fas fa fa-filter</v-icon>
+            </v-btn>
+            <span>Tìm kiếm nâng cao</span>
+          </v-tooltip>
+          <!-- <v-btn color="blue darken-3" dark class="my-0 mx-2" v-on:click.native="menusss = !menusss">
             <v-icon size="16">search</v-icon>&nbsp; Tìm kiếm
-          </v-btn>
+          </v-btn> -->
         </div>
       </div> 
     </div>

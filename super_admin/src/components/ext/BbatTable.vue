@@ -43,6 +43,9 @@
         <v-btn dark flat v-if="showWorkingunits" @click="getWorkingunits()">
           Cấu trúc phòng ban
         </v-btn>
+        <v-btn dark flat v-if="downloadFileTemplate" @click="downloadFile(downloadFileTemplate)">
+          Tải tệp mẫu
+        </v-btn>
         <v-btn dark icon v-on:click.native="rePullData">
           <v-icon>refresh</v-icon>
         </v-btn>
@@ -338,7 +341,8 @@
               { id: 25, name: 'Conference introduction : avi' }
             ]
           }
-        ]
+        ],
+        downloadFileTemplate: ''
       }
     },
     computed: {
@@ -445,6 +449,7 @@
         vm.showCopy = false
         vm.exportExcel = false
         vm.showWorkingunits = false
+        vm.downloadFileTemplate =  ''
         if (!vm.showFilter && vm.applicantType === '') {
           vm.columnsDataFilter = []
         } else {
@@ -497,6 +502,9 @@
                     }
                     if(detailColumns[i]['showWorkingunits']){
                       vm.showWorkingunits = true
+                    }
+                    if(detailColumns[i]['downloadFileTemplate']){
+                      vm.downloadFileTemplate = detailColumns[i]['downloadFileTemplate']
                     }
                   }
                 } catch (err) {
@@ -957,6 +965,16 @@
           }
         }
         return roots;
+      },
+      downloadFile (string) {
+        //const url = window.URL.createObjectURL(new Blob([response.data]))
+        console.log(string)
+        const link = document.createElement('a')
+        link.href = string
+        
+        // link.setAttribute('download', 'file.png') //or any other extension
+        document.body.appendChild(link)
+        link.click()
       }
     }
   }

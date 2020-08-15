@@ -23,7 +23,8 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.documentNo"
-                      :rules="[rules.required]"
+                      :rules="[rules.required, rules.checkSpace, rules.checkLength]"
+                      @change="thongTinCongVan.documentNo=thongTinCongVan.documentNo.trim()"
                       required
                       ></v-text-field>
                       <p class="pt-2" v-else>{{thongTinCongVan.documentNo}}</p>
@@ -59,7 +60,9 @@
                           v-model="dateFormated"
                           append-icon="event"
                           placeholder="dd/mm/yyyy"
-                          @blur="documentDate = parseDate(dateFormated)"
+                          @input="inputDate('dateFormated')"
+                          @change="changeDocumentDate()"
+                       
                         >
                         </v-text-field>
                         <v-date-picker ref="picker" locale="vi"
@@ -116,7 +119,8 @@
                           v-model="duedateFormated"
                           append-icon="event"
                           placeholder="dd/mm/yyyy"
-                          @blur="dueDate = parseDate(duedateFormated)"
+                          @input="inputDate('duedateFormated')"
+                          @change="changeDueDate()"
                         >
                         </v-text-field>
                         <v-date-picker :min="getMindate()" ref="picker" locale="vi"
@@ -167,7 +171,8 @@
                       v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.briefNote"
                       rows="3"
-                      :rules="[rules.required]"
+                      :rules="[rules.required,rules.checkSpace, rules.checkLength]"
+                      @change="thongTinCongVan.briefNote=thongTinCongVan.briefNote.trim()"
                       required
                       ></v-textarea>
                       <p class="pt-2" v-else>{{thongTinCongVan.briefNote}}</p>
@@ -186,7 +191,8 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="jobposSignerCongVan"
-                      :rules="[rules.required]"
+                      :rules="[rules.required,rules.checkSpace, rules.checkLength]"
+                       @change="jobposSignerCongVan=jobposSignerCongVan.trim()"
                       required
                       ></v-text-field>
                       <p class="pt-2" v-else>{{jobposSignerCongVan}}</p>
@@ -204,7 +210,8 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="signerCongVan"
-                      :rules="[rules.required]"
+                      :rules="[rules.required,rules.checkSpace, rules.checkLength]"
+                      @change="signerCongVan=signerCongVan.trim()"
                       required
                       ></v-text-field>
                       <p class="pt-2" v-else>{{signerCongVan}}</p>
@@ -224,6 +231,7 @@
                       v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.contactTelNo"
                       :rules="thongTinCongVan.contactTelNo ? [rules.telNo] : ''"
+                      @change="thongTinCongVan.contactTelNo=thongTinCongVan.contactTelNo.trim()"
                       ></v-text-field>
                       <p class="pt-2" v-else>{{thongTinCongVan.contactTelNo}}</p>
                     </v-flex>
@@ -240,6 +248,7 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.contactEmail"
+                      @change="thongTinCongVan.contactEmail=thongTinCongVan.contactEmail.trim()"
                       :rules="thongTinCongVan.contactEmail ? [rules.email] : ''"
                       ></v-text-field>
                       <p class="pt-2" v-else>{{thongTinCongVan.contactEmail}}</p>
@@ -415,6 +424,16 @@ export default {
       telNo: (value) => {
         const pattern = /^([0-9]{0,})$/
         return pattern.test(value) || 'Gồm các ký tự 0-9'
+      },
+      checkSpace: (val) => {
+        if(val){
+          return val.replace(/\s/g, '').length ? true : 'Không hợp lệ'
+        }
+      },
+      checkLength: (val) => {
+        if(val){
+          return val.length < 255 ? true : 'Không được nhập quá 255 ký tự'
+        }      
       }
     },
     
@@ -433,6 +452,7 @@ export default {
   },
   created () {
     let vm = this
+    vm.documentDate = new Date().toISOString().substr(0, 10)
     vm.getGovAgencyList()
   },
   watch: {
@@ -514,7 +534,7 @@ export default {
       } catch (error) {
       }
       
-      vm.documentDate = vm.thongTinCongVan.hasOwnProperty('documentDate') ? vm.parseDate(vm.thongTinCongVan.documentDate) : ''
+      vm.documentDate = vm.thongTinCongVan.hasOwnProperty('documentDate') ? vm.parseDate(vm.thongTinCongVan.documentDate) : new Date().toISOString().substr(0, 10)
       vm.dueDate = vm.thongTinCongVan.hasOwnProperty('dueDate') ? vm.parseDate(vm.thongTinCongVan.dueDate) : ''
       vm.$store.dispatch('loadDossierFiles', vm.thongTinCongVan.dossierId).then(result => {
         vm.dossierFilesItems = result
@@ -862,6 +882,62 @@ export default {
       } else {
         return (new Date(date)).getTime()
       }
+    },
+    validateDate(str){
+        return str.replace(/[^\d\/]/g, "");
+    },
+    inputDate (key) {
+        let vm = this
+        let gt = vm.validateDate(vm[key]);
+        if (gt.match(/^\d{2}$/) !== null) {
+            vm[key] = gt + '/'
+        } else if (gt.match(/^\d{2}\/\d{2}$/) !== null) {
+            vm[key] = gt + '/'
+        }else
+            vm[key] = gt
+    },
+    changeDocumentDate() {
+      let vm = this
+      vm.changeDate('dateFormated')
+      vm.documentDate = vm.parseDate(vm.dateFormated)
+    },
+    changeDueDate() {
+      let vm = this
+      vm.changeDate('duedateFormated')
+      vm.dueDate = vm.parseDate(vm.duedateFormated)
+    },
+    changeDate(key){
+        let vm = this 
+        let dateString = vm[key];
+        let regex = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/
+        let regex2 = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{2}$/
+        if (!regex.test(dateString) && !regex2.test(dateString)) {
+            vm[key] = ''
+        }
+        else{
+            let date = vm[key].split("/");
+            let day = date[0];
+            let month = date[1];
+            if (day > 31) {
+                vm[key] = ''
+            }
+            else
+                if (month > 12) {
+                vm[key] = ''
+                }else
+                if(date[2].length == 2){
+                    if(key==="birthdayFormated"){
+                        if(date[2] <= 20){
+                            vm[key] = day+'/'+month+'/20'+date[2]
+                        } else {
+                            vm[key] = day+'/'+month+'/19'+date[2]
+                        }
+                        
+                    }else{
+                        vm[key] = day+'/'+month+'/20'+date[2]
+                    }
+                }
+        }
     },
   }
 }
