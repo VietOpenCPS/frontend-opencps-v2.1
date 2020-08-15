@@ -21,9 +21,15 @@
           ></v-text-field> -->
         </div>
         <div class="flex text-right" style="margin-left: auto;max-width: 115px;">
-          <v-btn color="blue darken-3" dark class="my-0 mx-2" v-on:click.native="menusss = !menusss">
+          <v-tooltip top>
+            <v-btn  slot="activator" icon class="my-0 mx-0 mr-2 px-0" v-on:click.native="menusss = !menusss">
+              <v-icon size="20">fas fa fa-filter</v-icon>
+            </v-btn>
+            <span>Tìm kiếm nâng cao</span>
+          </v-tooltip>
+          <!-- <v-btn color="blue darken-3" dark class="my-0 mx-2" v-on:click.native="menusss = !menusss">
             <v-icon size="16">search</v-icon>&nbsp; Tìm kiếm
-          </v-btn>
+          </v-btn> -->
         </div>
       </div> 
     </div>
@@ -295,7 +301,7 @@
 
           <td class="pt-1" v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item['_id']"
             :class="itemHeader['class_column']"
-            v-if="itemHeader.hasOwnProperty('value')"
+            v-if="itemHeader.hasOwnProperty('value') && itemHeader.value !== 'action'"
           >
             <div v-if="itemHeader.value === 'counter'">
               <span @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
@@ -498,6 +504,7 @@
         dialogMortgage: false,
         mortGageInput: '',
         headerExport: [],
+        headerExportRemoveAction: [],
         headers: [],
         hideAction: false,
         hosoDatas: [],
@@ -551,9 +558,12 @@
               } else {
                 vm.loaiDuLieu = "giấy phép"
               }
-              for(let i=0; i< vm.headerExport.length ;i++){
-                // if(vm.headerExport[i]['text'] !== 'STT'){
-                  vm.json_fields[vm.headerExport[i]['text']] =  vm.headerExport[i]['value']
+              vm.headerExportRemoveAction = vm.headerExport.filter(function (item) {
+                return item.value !== 'action'
+              })
+              for(let i=0; i< vm.headerExportRemoveAction.length ;i++){
+                // if(vm.headerExportRemoveAction[i]['text'] !== 'STT'){
+                  vm.json_fields[vm.headerExportRemoveAction[i]['text']] =  vm.headerExportRemoveAction[i]['value']
                 // }
               }
             } else {
@@ -615,9 +625,12 @@
           vm.headers = vm.headerExport.filter(function (item) {
             return !item.hasOwnProperty('show') || (item.hasOwnProperty('show') && item.show)
           })
-          for(let i=0; i< vm.headerExport.length ;i++){
-            // if(vm.headerExport[i]['text'] !== 'STT'){
-              vm.json_fields[vm.headerExport[i]['text']] =  vm.headerExport[i]['value']
+          vm.headerExportRemoveAction = vm.headerExport.filter(function (item) {
+            return item.value !== 'action'
+          })
+          for(let i=0; i< vm.headerExportRemoveAction.length ;i++){
+            // if(vm.headerExportRemoveAction[i]['text'] !== 'STT'){
+              vm.json_fields[vm.headerExportRemoveAction[i]['text']] =  vm.headerExportRemoveAction[i]['value']
             // }
           }
           let tableConfig = eval('( ' + vm.items[val]['tableConfig'] + ' )')
@@ -1115,19 +1128,19 @@
         vm.$store.dispatch('getDeliverables', filter).then(result => {
           let data = result.data
           let dataExport = []
-          console.log('headerExport', vm.headerExport)
+          console.log('headerExport', vm.headerExportRemoveAction)
           console.log('json_fields', vm.json_fields)
           for (let i=0;i<data.length;i++) {
             let item = {}
             let indexFields = 0
             for (let key in vm.json_fields) {
               let valueTemplate
-              if (vm.headerExport[indexFields].hasOwnProperty('layoutViewExport') && vm.headerExport[indexFields].layoutViewExport) {
-                let str = vm.headerExport[indexFields]['layoutViewExport'].replace('itemData', JSON.stringify(data[i]))
+              if (vm.headerExportRemoveAction[indexFields].hasOwnProperty('layoutViewExport') && vm.headerExportRemoveAction[indexFields].layoutViewExport) {
+                let str = vm.headerExportRemoveAction[indexFields]['layoutViewExport'].replace('itemData', JSON.stringify(data[i]))
                 valueTemplate = eval(str)
               }
               item[key]=valueTemplate ? valueTemplate : data[i][vm.json_fields[key]]
-              if (vm.headerExport[indexFields]['value'] === 'counter') {
+              if (vm.headerExportRemoveAction[indexFields]['value'] === 'counter') {
                 item[key] = i + 1
               }
               indexFields += 1

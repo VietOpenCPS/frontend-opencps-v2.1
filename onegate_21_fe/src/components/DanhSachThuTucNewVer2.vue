@@ -842,6 +842,7 @@
         vm.govAgencyListTiepNhan = vm.serviceConfigs(govList)
         if ( vm.govAgencyListTiepNhan.length === 1) {
           vm.govAgencyTiepNhanSelected = vm.govAgencyListTiepNhan[0]
+          vm.pullServiceOptionsLastest(vm.govAgencyTiepNhanSelected)
         }
         vm.dialog_selectAgency = true
       },
