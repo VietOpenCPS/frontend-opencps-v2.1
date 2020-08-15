@@ -269,6 +269,8 @@
       <!--  -->
       <v-btn color="primary"
         @click="exportTracking"
+        :loading="loadingImport"
+        :disabled="loadingImport"
       >
         <v-icon>import_export</v-icon>&nbsp;
         Export&nbsp;{{String(loaiDuLieu).toLowerCase()}}
@@ -537,6 +539,7 @@
                 }
             ]
         ],
+        filterExport: ''
       }
     },
     created () {
@@ -712,6 +715,13 @@
           q: queryString
         }
         vm.loadingTable = true
+        try {
+          let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
+          if (tableConfig.hasOwnProperty('paramUrl') && tableConfig.paramUrl) {
+            filter = Object.assign(filter, {formDataKey: JSON.stringify(tableConfig.paramUrl)})
+          }
+        } catch (error) {
+        }
         vm.$store.dispatch('getDeliverables', filter).then(function (result) {
           vm.hosoDatasTotal = result['total']
           vm.hosoDatas = result['data']
@@ -900,29 +910,9 @@
           }
         }
       },
-      searchDeliverable () {
-        let vm = this
-        setTimeout(function () {
-          let current = vm.$router.history.current
-          let newQuery = current.query
-          let queryString = '?'
-          newQuery['page'] = 1
-          newQuery['keyword'] = vm.deliverableKey
-          for (let key in newQuery) {
-            if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
-              queryString += key + '=' + newQuery[key] + '&'
-            }
-          }
-          vm.$router.push({
-            path: current.path + queryString,
-            query: {
-              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-            }
-          })
-        }, 100)
-      },
       filterDeliverable (type_search) {
         let vm = this
+        vm.filterExport = ''
         let current = vm.$router.history.current
         let newQuery = current.query
         if (vm.deliverableKey && !vm.applicantName && !vm.issueDate && !vm.donvicu_data && !vm.trichyeu_data) {
@@ -949,6 +939,14 @@
             searchParams[key] = vm.filterData[key]
           }
         }
+        try {
+          let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
+          if (tableConfig.hasOwnProperty('paramUrl') && tableConfig.paramUrl) {
+            searchParams = Object.assign(searchParams, tableConfig.paramUrl)
+          }
+        } catch (error) {
+        }
+        
         let filter = {
           typeSearch: type_search ? type_search : '',
           type: vm.items[vm.index]['typeCode'],
@@ -956,6 +954,7 @@
           keyword: newQuery.hasOwnProperty('keyword') ? newQuery['keyword'] : vm.deliverableKey,
           formDataKey: JSON.stringify(searchParams)
         }
+        vm.filterExport = filter
         vm.loadingTable = true
         vm.$store.dispatch('searchDeliverables', filter).then(function (result) {
           vm.hosoDatasTotal = result.hasOwnProperty('total') ? result['total'] : 0
@@ -1024,6 +1023,13 @@
             type: vm.items[vm.index]['typeCode'],
             page: vm.hosoDatasPage,
             q: queryString,
+          }
+          try {
+            let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
+            if (tableConfig.hasOwnProperty('paramUrl') && tableConfig.paramUrl) {
+              filter = Object.assign(filter, {formDataKey: JSON.stringify(tableConfig.paramUrl)})
+            }
+          } catch (error) {
           }
           vm.$store.dispatch('getDeliverables', filter).then(function (result) {
             vm.hosoDatasTotal = result['total']
@@ -1112,20 +1118,10 @@
       },
       exportTracking () {
         let vm = this
-        let queryString = ''       
-        for(let key in vm.filterData){
-          if(vm.filterData[key]){
-            queryString += key + '=' + vm.filterData[key]+ '&'
-          }
-        }
-        queryString += '1=1'
-        let filter = {
-          type: vm.items[vm.index]['typeCode'],
-          page: vm.hosoDatasPage,
-          q: queryString,
-          getAll: true
-        }
-        vm.$store.dispatch('getDeliverables', filter).then(result => {
+        vm.loadingImport = true
+        vm.filterExport = Object.assign(vm.filterExport, {export: true})
+        vm.$store.dispatch('searchDeliverables', vm.filterExport).then(function (result) {
+          vm.loadingImport = false
           let data = result.data
           let dataExport = []
           console.log('headerExport', vm.headerExportRemoveAction)
@@ -1153,6 +1149,8 @@
           setTimeout(() => {
             $('.btn-export').click()
           }, 100)
+        }).catch(function (reject) {
+          vm.loadingImport = false
         })
       }
     }
