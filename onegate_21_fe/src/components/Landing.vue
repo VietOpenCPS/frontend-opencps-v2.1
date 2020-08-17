@@ -376,7 +376,7 @@
                 </v-list-tile>
                 <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId"
                   v-if="String(props.item['permission']).indexOf('write') !== -1 && String(item.form) !== 'NEW' && menuType !== 3
-                    && (!item.hasOwnProperty('roleCode') || item.hasOwnProperty('roleCode') && getUserEmployee(item.roleCode))
+                    && (!item.hasOwnProperty('roleCode') || item.hasOwnProperty('roleCode') && getUser(item.roleCode))
                   "
                   @click="btnActionEvent(props.item, item, index, false)"
                 >
@@ -1453,15 +1453,6 @@ export default {
         return false
       }
       let roleExits = roles.findIndex(item => item === roleItem)
-      return (roleExits >= 0)
-    },
-    getUserEmployee (roleItem) {
-      let vm = this
-      let roles = vm.$store.getters.getUser.role
-      if (!roles) {
-        return false
-      }
-      let roleExits = roles.findIndex(item => item.indexOf(roleItem) === 0)
       return (roleExits >= 0)
     },
     changeSelected () {
