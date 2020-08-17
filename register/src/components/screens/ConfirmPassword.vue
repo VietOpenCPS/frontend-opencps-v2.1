@@ -54,7 +54,7 @@
         <v-card-title class="headline">
           <div style="text-align: center;width: 100%;">NHẬP MÃ XÁC NHẬN</div>
         </v-card-title>
-        <v-card-text class="py-2 px-2">
+        <v-card-text class="py-2 px-2" v-if="dialogResend">
           <v-form ref="formCaptcha" v-model="validResend" lazy-validation class="px-2 pt-2">
             <v-flex xs12>
               <captcha ref="captcha_resend"></captcha>

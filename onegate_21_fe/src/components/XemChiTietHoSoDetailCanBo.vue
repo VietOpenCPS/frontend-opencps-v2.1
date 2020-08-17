@@ -233,6 +233,17 @@
                 <content-placeholders-heading />
               </content-placeholders>
               <!--  -->
+              <div class="px-4 pt-2" v-if="originality === 1 && thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(thongTinChiTietHoSo.dossierSyncState) === '1'">
+                <v-alert
+                  :value="true"
+                  color="warning"
+                  icon="priority_high"
+                  outline
+                >
+                  Hồ sơ đang đồng bộ trạng thái về cổng dịch vụ công, vui lòng chờ giây lát
+                </v-alert>
+              </div>
+              <!--  -->
               <v-layout wrap v-if="dialogActionProcess && !loadingAction">
                 <v-expansion-panel v-if="showThanhPhanLienThong" :value="[true]" expand class="expansion-pl ext__form">
                   <v-expansion-panel-content :key="1">
@@ -245,7 +256,7 @@
                   </v-expansion-panel-content>
                 </v-expansion-panel>
                 <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
-                <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :detailDossier="thongTinChiTietHoSo" :data_uyquyen="reAsignUsers" :type="type_assign"></phan-cong>
+                <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :data_rolegroup="roleGroupPhanCong" :detailDossier="thongTinChiTietHoSo" :data_uyquyen="reAsignUsers" :type="type_assign"></phan-cong>
                 <tai-lieu-ket-qua :esignType="typeEsign" ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
                 <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
                 <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
@@ -842,6 +853,7 @@ export default {
     payment_type: 0,
     type_assign: 0,
     assign_items: [],
+    roleGroupPhanCong: [],
     btnStateVisible: true,
     extendDateEdit: '',
     typeExtendDate: '',
@@ -1183,7 +1195,7 @@ export default {
             vm.btnStepsDynamics = result
             if (vm.btnStepsDynamics.length > 0) {
               vm.btnStepsDynamics = vm.btnStepsDynamics.filter(function (item) {
-                return !item.hasOwnProperty('roleCode') || (item.hasOwnProperty('roleCode') && vm.getUserEmployee(item.roleCode))
+                return !item.hasOwnProperty('roleCode') || (item.hasOwnProperty('roleCode') && vm.getUser(item.roleCode))
               })
             }
           })
@@ -1551,6 +1563,17 @@ export default {
             vm.assign_items = result.toUsers
           } else {
             vm.assign_items = [result.toUsers]
+          }
+          if (result.hasOwnProperty('postProcessStepRole') && result.postProcessStepRole) {
+            if (Array.isArray(result.postProcessStepRole)) {
+              vm.roleGroupPhanCong = result.postProcessStepRole
+            } else {
+              vm.roleGroupPhanCong = [result.postProcessStepRole]
+            }
+            vm.roleGroupPhanCong = vm.roleGroupPhanCong.map(item => {
+              item = Object.assign(item, {assigned: 0})
+              return item
+            })
           }
           vm.type_assign = result.allowAssignUser
           isPopup = true
@@ -1929,7 +1952,12 @@ export default {
         actionUser: actionUser
       }
       if (vm.showPhanCongNguoiThucHien) {
-        filter['toUsers'] = vm.assign_items
+        if (vm.type_assign === 6 || vm.type_assign === 7 || vm.type_assign === 8 || vm.type_assign === 9) {
+          filter['toUsers'] = vm.$refs.phancong.getToUsersExport()
+        } else {
+          filter['toUsers'] = vm.assign_items
+        }
+        
         let result = vm.$refs.phancong.doExport()
         if (result) {
           validPhanCong = true
@@ -3102,15 +3130,6 @@ export default {
       let roleExits = roles.findIndex(item => item === roleItem)
       return (roleExits >= 0)
 
-    },
-    getUserEmployee (roleItem) {
-      let vm = this
-      let roles = vm.$store.getters.getUser.role
-      if (!roles) {
-        return false
-      }
-      let roleExits = roles.findIndex(item => item.indexOf(roleItem) === 0)
-      return (roleExits >= 0)
     },
     checkActionSpecial (btnAction) {
       var vm = this
