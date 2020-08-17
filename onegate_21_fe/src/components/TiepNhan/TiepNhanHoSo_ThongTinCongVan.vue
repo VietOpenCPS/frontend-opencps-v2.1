@@ -23,7 +23,7 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.documentNo"
-                      :rules="[rules.required, rules.checkSpace, rules.checkLength]"
+                      :rules="[rules.required, rules.checkSpace, rules.varchar100]"
                       @change="thongTinCongVan.documentNo=thongTinCongVan.documentNo.trim()"
                       required
                       ></v-text-field>
@@ -171,7 +171,7 @@
                       v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.briefNote"
                       rows="3"
-                      :rules="[rules.required,rules.checkSpace, rules.checkLength]"
+                      :rules="[rules.required,rules.checkSpace, rules.varchar5000]"
                       @change="thongTinCongVan.briefNote=thongTinCongVan.briefNote.trim()"
                       required
                       ></v-textarea>
@@ -191,7 +191,7 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="jobposSignerCongVan"
-                      :rules="[rules.required,rules.checkSpace, rules.checkLength]"
+                      :rules="[rules.required,rules.checkSpace, rules.varchar100]"
                        @change="jobposSignerCongVan=jobposSignerCongVan.trim()"
                       required
                       ></v-text-field>
@@ -210,7 +210,7 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="signerCongVan"
-                      :rules="[rules.required,rules.checkSpace, rules.checkLength]"
+                      :rules="[rules.required,rules.checkSpace, rules.varchar100]"
                       @change="signerCongVan=signerCongVan.trim()"
                       required
                       ></v-text-field>
@@ -249,7 +249,7 @@
                       v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.contactEmail"
                       @change="thongTinCongVan.contactEmail=thongTinCongVan.contactEmail.trim()"
-                      :rules="thongTinCongVan.contactEmail ? [rules.email] : ''"
+                      :rules="thongTinCongVan.contactEmail ? [rules.email] : rules.varchar100"
                       ></v-text-field>
                       <p class="pt-2" v-else>{{thongTinCongVan.contactEmail}}</p>
                     </v-flex>
@@ -434,7 +434,27 @@ export default {
         if(val){
           return val.length < 255 ? true : 'Không được nhập quá 255 ký tự'
         }      
-      }
+      },
+      varchar100: (val) => {
+        if(val){
+          return val.length < 100 ? true : 'Không được nhập quá 100 ký tự'
+        }      
+      },
+      varchar255: (val) => {
+        if(val){
+          return val.length < 255 ? true : 'Không được nhập quá 255 ký tự'
+        }      
+      },
+      varchar500: (val) => {
+        if(val){
+          return val.length < 255 ? true : 'Không được nhập quá 500 ký tự'
+        }      
+      },
+      varchar5000: (val) => {
+        if(val){
+          return val.length < 255 ? true : 'Không được nhập quá 5000 ký tự'
+        }      
+      },
     },
     
   }),

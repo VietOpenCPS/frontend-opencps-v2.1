@@ -5,6 +5,7 @@ import NotFound from '@/components/NotFound'
 import TableEditor from '@/components/screens/TableEditor'
 import TableEditorForm from '@/components/screens/TableEditorForm.vue'
 import QuyTrinhThuTuc from '@/components/extform/QuyTrinhThuTuc.vue'
+import DinhKemThuTuc from '@/components/extform/DinhKemThuTuc.vue'
 import ThamSoHeThong from '@/components/extform/ThamSoHeThong.vue'
 import Voting from '@/components/extform/Voting.vue'
 import MappingTTHC from '@/components/extform/MappingTTHC.vue'
@@ -52,6 +53,15 @@ const routes = [
         path: '/table/opencps_serviceprocess/ext/editor/:id',
         name: 'QuyTrinhThuTuc',
         component: QuyTrinhThuTuc,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_services_filetemplates/ext/editor/:id',
+        name: 'DinhKemThuTuc',
+        component: DinhKemThuTuc,
         props: true,
         meta: {
           requiresAuth: true
