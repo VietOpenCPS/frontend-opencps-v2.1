@@ -16,7 +16,7 @@
                       <v-text-field
                         v-model="applicantName"
                         :disabled="loadingVerify"
-                        :rules="requiredOptions['applicantName'] ? [rules.required,rules.varchar255] : ''"
+                        :rules="requiredOptions['applicantName'] ? [rules.required,rules.varchar500] : ''"
                         :required="requiredOptions['applicantName']"
                         @change="applicantName=applicantName.trim()"
                       ></v-text-field>
@@ -83,7 +83,7 @@
                       </suggestions> -->
                       <v-text-field
                       v-model="applicantIdNo"
-                      :rules="requiredOptions['applicantIdNo'] ? [rules.required] : ''"
+                      :rules="requiredOptions['applicantIdNo'] ? [rules.required, rules.varchar100] : [rules.varchar100]"
                       :required="requiredOptions['applicantIdNo']"
                       @change="applicantIdNo=applicantIdNo.trim()"
                       ></v-text-field>
@@ -128,7 +128,7 @@
                       <v-subheader class="pl-0"> Nơi đăng ký HKTT<span style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm10 class="mb-2">
-                      <v-text-field  v-model="address" clearable :rules="[rules.required,rules.varchar255]" required @change="address=address.trim()"></v-text-field>
+                      <v-text-field  v-model="address" clearable :rules="[rules.required,rules.varchar500]" required @change="address=address.trim()"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 class="mb-2"></v-flex>
                     <v-flex xs12 sm10 class="mb-2">
@@ -154,8 +154,9 @@
                     <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
                         v-model="yearPayment"
+                        @keyup="formatCurrentYearPayment($event)"
                         @change="yearPayment=yearPayment.trim()"
-                        :rules="[rules.required]" required
+                        :rules="[rules.required,rules.varchar50]" required
                       ></v-text-field>
                     </v-flex>
 
@@ -167,7 +168,7 @@
                         v-model="subsidy"
                         @keyup="formatCurrent($event)"
                         @change="subsidy=subsidy.trim()"
-                        :rules="[rules.required]" required
+                        :rules="[rules.required,rules.varchar100]" required
                       ></v-text-field>
                     </v-flex>
                     
@@ -179,7 +180,7 @@
                       v-model="contactTelNo"
                       append-icon="phone"
                       @change="contactTelNo=contactTelNo.trim()"
-                      :rules="[rules.telNo]"
+                      :rules="[rules.telNo, rules.varchar100]"
                       ></v-text-field>
                     </v-flex>
 
@@ -202,7 +203,7 @@
                       <v-text-field
                         v-model="anonymName"
                         @change="anonymName=anonymName.trim()"
-                        :rules="requiredOptions['anonymName'] ? [rules.required] : ''"
+                        :rules="requiredOptions['anonymName'] ? [rules.required, rules.varchar500] : [rules.varchar500]"
                         :required="requiredOptions['anonymName']"
                       ></v-text-field>
                     </v-flex>
@@ -224,7 +225,7 @@
                     <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
                         v-model="recruitment"
-                        :rules="requiredOptions['recruitment'] ? [rules.required] : ''"
+                        :rules="requiredOptions['recruitment'] ? [rules.required, rules.varchar500] : [rules.varchar500]"
                         :required="requiredOptions['recruitment']"
                         @change="recruitment=recruitment.trim()"
                       ></v-text-field>
@@ -237,7 +238,7 @@
                     <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
                         v-model="retire"
-                        :rules="requiredOptions['retire'] ? [rules.required] : ''"
+                        :rules="requiredOptions['retire'] ? [rules.required, rules.varchar500] : [rules.varchar500]"
                         :required="requiredOptions['retire']"
                         @change="retire=retire.trim()"
                       ></v-text-field>
@@ -250,7 +251,7 @@
                     <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
                         v-model="reactivated"
-                        :rules="requiredOptions['reactivated'] ? [rules.required] : ''"
+                        :rules="requiredOptions['reactivated'] ? [rules.required, rules.varchar500] : [rules.varchar500]"
                         :required="requiredOptions['reactivated']"
                         @change="reactivated=reactivated.trim()"
                       ></v-text-field>
@@ -264,7 +265,7 @@
                       <!-- <v-autocomplete :items="publishedItems" v-model="published" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete> -->
                       <v-text-field
                         v-model="published"
-                        :rules="requiredOptions['published'] ? [rules.required] : ''"
+                        :rules="requiredOptions['published'] ? [rules.required, rules.varchar500] : [rules.varchar500]"
                         :required="requiredOptions['published']"
                         @change="published=published.trim()"
                       ></v-text-field>
@@ -300,7 +301,7 @@
                         </suggestions> -->
                         <v-text-field
                         v-model="delegateIdNo"
-                        :rules="requiredOptions['delegateIdNo'] ? [rules.required] : ''"
+                        :rules="requiredOptions['delegateIdNo'] ? [rules.required, rules.varchar100] : [rules.varchar100]"
                         :required="requiredOptions['delegateIdNo']"
                         @change="delegateIdNo=delegateIdNo.trim()"
                         ></v-text-field>
@@ -311,7 +312,7 @@
                       <v-flex xs12 sm6>
                         <v-text-field
                         v-model="delegateName"
-                        :rules="requiredOptions['delegateName'] ? [rules.required] : ''"
+                        :rules="requiredOptions['delegateName'] ? [rules.required, rules.varchar500] : [rules.varchar500]"
                         :required="requiredOptions['delegateName']"
                         @change="delegateName=delegateName.trim()"
                         ></v-text-field>
@@ -323,7 +324,7 @@
                         <v-textarea
                         v-model="delegateAddress"
                         rows="2"
-                        :rules="requiredOptions['delegateAddress'] ? [rules.required,,rules.varchar500] : ''"
+                        :rules="requiredOptions['delegateAddress'] ? [rules.required,rules.varchar500] : [rules.varchar500]"
                         :required="requiredOptions['delegateAddress']"
                         @change="delegateAddress=delegateAddress.trim()"
                         ></v-textarea>
@@ -376,7 +377,7 @@
                         <v-text-field
                         v-model="delegateTelNo"
                         append-icon="phone"
-                        :rules="requiredOptions['delegateTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
+                        :rules="requiredOptions['delegateTelNo'] ? [rules.telNo, rules.required, rules.varchar100] : [rules.telNo, rules.varchar100]"
                         :required="requiredOptions['delegateTelNo']"
                         @change="delegateTelNo=delegateTelNo.trim()"
                         ></v-text-field>
@@ -387,7 +388,7 @@
                       <v-flex xs12 sm6>
                         <v-text-field
                         v-model="delegateEmail"
-                        :rules="requiredOptions['delegateEmail'] ? [rules.email, rules.required] : (delegateEmail ? [rules.email] : '')"
+                        :rules="requiredOptions['delegateEmail'] ? [rules.email, rules.required, rules.varchar100] : (delegateEmail ? [rules.email, rules.varchar100] : [rules.varchar100])"
                         :required="requiredOptions['delegateEmail']"
                         @change="delegateEmail=delegateEmail.trim()"
                         ></v-text-field>
@@ -527,6 +528,21 @@ export default {
         const pattern = /^([0-9]{0,})$/
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       },
+      varchar100: (val) => {
+        if(val){
+          return val.length < 100 ? true : 'Không được nhập quá 100 ký tự'
+        }      
+      },
+      varchar50: (val) => {
+        if(val){
+          return val.length < 50 ? true : 'Không được nhập quá 50 ký tự'
+        }      
+      },
+      varchar5000: (val) => {
+        if(val){
+          return val.length < 5000 ? true : 'Không được nhập quá 5000 ký tự'
+        }      
+      },
       varchar255: (val) => {
         if(val){
           return val.length < 255 ? true : 'Không được nhập quá 255 ký tự'
@@ -534,7 +550,7 @@ export default {
       },
       varchar500: (val) => {
         if(val){
-          return val.length < 255 ? true : 'Không được nhập quá 255 ký tự'
+          return val.length < 500 ? true : 'Không được nhập quá 500 ký tự'
         }      
       },
     },
@@ -817,6 +833,10 @@ export default {
     formatCurrent (event) {
       let vm = this
       vm.subsidy = vm.currency(String(vm.subsidy).replace(/\D/g,''))
+    },
+    formatCurrentYearPayment (event) {
+      let vm = this
+      vm.yearPayment = vm.currency(String(vm.yearPayment).replace(/\D/g,''))
     },
     currency (value) {
       if (value) {
