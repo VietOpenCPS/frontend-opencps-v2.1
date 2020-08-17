@@ -168,8 +168,7 @@
               </div>
               <!-- Action button -->
               <div class="px-4 py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
-              <v-hover v-slot:default="{ hover }">
-                <v-btn color="primary" class="ml-0 mr-2" :class='{"deactive__btn": String(btnIndex) === String(index), "on-hover-btn": hover }' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
+                <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" :class='{"deactive__btn": String(btnIndex) === String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                   v-on:click.native="processPullBtnDetail(item, index)" 
                   :loading="loadingAction && index === btnIndex"
                   :disabled="loadingAction || item.enable === 2"
@@ -178,9 +177,7 @@
                   {{item.actionName}}
                   <span slot="loader">Loading...</span>
                 </v-btn>
-              </v-hover>
-              <v-hover v-slot:default="{ hover }">
-                <v-btn color="primary" class="ml-0 mr-2" :class="{'on-hover-btn': hover}" v-for="(item, index) in btnPlugins" v-bind:key="index" 
+                <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" v-for="(item, index) in btnPlugins" v-bind:key="index" 
                   v-on:click.native="processPullBtnplugin(item, index)"
                   :loading="loadingPlugin"
                   :disabled="loadingPlugin"
@@ -188,11 +185,8 @@
                   {{item.pluginName}} 
                   <span slot="loader">Loading...</span>
                 </v-btn>
-              </v-hover>
-
                 <!--  -->
-              <v-hover v-slot:default="{ hover }">
-                <v-btn color="primary" class="ml-0 mr-2" :class="{'on-hover-btn': hover}" v-if="detailPreAction && Number(detailPreAction['allowAssignUser']) > 2"
+                <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" v-if="detailPreAction && Number(detailPreAction['allowAssignUser']) > 2"
                   v-on:click.native="phanCongLai" 
                   :loading="loadingAction"
                   :disabled="loadingAction"
@@ -200,17 +194,14 @@
                   Phân công lại
                   <span slot="loader">Loading...</span>
                 </v-btn>
-              </v-hover>
                 <!--  -->
-              <v-hover v-slot:default="{ hover }">
-                <v-btn v-for="(item, index) in btnStepsDynamics" :class="{'on-hover-btn': hover}" :key="index" color="primary" class="ml-0 mr-2" v-if="item.form === 'UPDATE'"
+                <v-btn v-for="(item, index) in btnStepsDynamics" :key="index" color="primary" class="ml-0 mr-2 on-hover-btn" v-if="item.form === 'UPDATE'"
                   @click="btnActionEvent(item, index)"
                   :loading="loadingAction"
                   :disabled="loadingAction"
                 >
                   {{ item.title }}
                 </v-btn>
-              </v-hover>
                 <!-- Thao tác thu hồi hồ sơ -->
                 <!-- <v-btn color="primary" class="ml-0 mr-2" v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId)
                 && thongTinChiTietHoSo['dossierStatus'] !== 'new' && originality === 3"
@@ -223,7 +214,7 @@
                 </v-btn> -->
                 <!--  -->
                 <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
-                  <v-btn slot="activator" class="" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn slot="activator" class="on-hover-btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list>
                     <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" @click="btnActionEvent(item, index)" v-if="item.form !== 'UPDATE'">
                       <v-list-tile-title>{{ item.title }}</v-list-tile-title>

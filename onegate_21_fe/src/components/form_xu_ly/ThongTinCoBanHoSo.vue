@@ -9,7 +9,7 @@
               <v-flex xs12 sm4 class="pr-3" v-if="originality !== 1">
                 <div class="xs12 sm12 pb-1">
                   <span class="pr-2">Chủ hồ sơ: </span>
-                  <span class="pl-0 text-bold"> {{thongTinChiTietHoSo.applicantName}}</span>
+                  <span class="pl-0 text-bold"> {{thongTinChiTietHoSo.applicantName.length > 100 ? thongTinChiTietHoSo.applicantName.substr(0, 100) + '...' : thongTinChiTietHoSo.applicantName}}</span>
                 </div>
                 <div class="xs12 sm12 pb-1">
                   <span class="pr-2">Số CMND/ căn cước: </span>
@@ -19,7 +19,9 @@
                 <div class="xs12 sm12 pb-1 overHidden">
                   <span class="pr-2">Địa chỉ: </span>
                   <v-tooltip top>
-                    <span slot="activator" class="text-bold ">{{ String(thongTinChiTietHoSo.address).replace(/\./g, "") }} {{thongTinChiTietHoSo.wardName}}<span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span></span>
+                    <span slot="activator" class="text-bold ">{{ String(thongTinChiTietHoSo.address).replace(/\./g, "").length < 100 ?  String(thongTinChiTietHoSo.address).replace(/\./g, "") : String(thongTinChiTietHoSo.address).replace(/\./g, "").substr(100) + '...'}} {{thongTinChiTietHoSo.wardName}}
+                      <span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span>
+                    </span>
                     <span class="pl-0"> {{String(thongTinChiTietHoSo.address).replace(/\./g, "")}} {{thongTinChiTietHoSo.wardName}}<span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span></span>
                   </v-tooltip>
                 </div>
