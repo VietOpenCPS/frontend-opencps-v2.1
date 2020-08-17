@@ -16,8 +16,9 @@
                       <v-text-field
                         v-model="applicantName"
                         :disabled="loadingVerify"
-                        :rules="requiredOptions['applicantName'] ? [rules.required] : ''"
+                        :rules="requiredOptions['applicantName'] ? [rules.required,rules.varchar255] : ''"
                         :required="requiredOptions['applicantName']"
+                        @change="applicantName=applicantName.trim()"
                       ></v-text-field>
                     </v-flex>
                     
@@ -36,7 +37,7 @@
                     <v-flex xs12 sm4 class="mb-2" style="position:relative">
                       <v-layout wrap>
                         <v-flex xs12 sm4 class="pr-2">
-                          <v-autocomplete :items="days" placeholder="Ngày" v-model="birthDateDay" :hide-selected="true" ></v-autocomplete>
+                          <v-autocomplete :items="days" placeholder="Ngày" v-model="birthDateDay" :hide-selected="true"  @change="changeDate()"></v-autocomplete>
                         </v-flex>
                         <v-flex xs12 sm4 class="pr-2">
                           <v-layout wrap>
@@ -44,7 +45,7 @@
                               <span>/</span>
                             </v-flex>
                             <v-flex style="width: calc(100% - 20px)">
-                              <v-autocomplete :items="months" placeholder="Tháng" v-model="birthDateMonth"></v-autocomplete>
+                              <v-autocomplete :items="months" placeholder="Tháng" v-model="birthDateMonth"   @change="changeDate()"></v-autocomplete>
                             </v-flex>
                           </v-layout>
                         </v-flex>
@@ -54,7 +55,7 @@
                               <span>/</span>
                             </v-flex>
                             <v-flex style="width: calc(100% - 20px)">
-                              <v-autocomplete placeholder="Năm" :items="years" v-model="birthDateYear" :rules="[rules.required]" required></v-autocomplete>
+                              <v-autocomplete placeholder="Năm" :items="years" v-model="birthDateYear" :rules="[rules.required]" required   @change="changeDate()"></v-autocomplete>
                             </v-flex>
                           </v-layout>
                         </v-flex>
@@ -84,6 +85,7 @@
                       v-model="applicantIdNo"
                       :rules="requiredOptions['applicantIdNo'] ? [rules.required] : ''"
                       :required="requiredOptions['applicantIdNo']"
+                      @change="applicantIdNo=applicantIdNo.trim()"
                       ></v-text-field>
                     </v-flex>
 
@@ -126,7 +128,7 @@
                       <v-subheader class="pl-0"> Nơi đăng ký HKTT<span style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm10 class="mb-2">
-                      <v-text-field  v-model="address" clearable :rules="[rules.required]" required></v-text-field>
+                      <v-text-field  v-model="address" clearable :rules="[rules.required,rules.varchar255]" required @change="address=address.trim()"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 class="mb-2"></v-flex>
                     <v-flex xs12 sm10 class="mb-2">
@@ -152,6 +154,7 @@
                     <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
                         v-model="yearPayment"
+                        @change="yearPayment=yearPayment.trim()"
                         :rules="[rules.required]" required
                       ></v-text-field>
                     </v-flex>
@@ -163,6 +166,7 @@
                       <v-text-field
                         v-model="subsidy"
                         @keyup="formatCurrent($event)"
+                        @change="subsidy=subsidy.trim()"
                         :rules="[rules.required]" required
                       ></v-text-field>
                     </v-flex>
@@ -174,6 +178,7 @@
                       <v-text-field
                       v-model="contactTelNo"
                       append-icon="phone"
+                      @change="contactTelNo=contactTelNo.trim()"
                       :rules="[rules.telNo]"
                       ></v-text-field>
                     </v-flex>
@@ -184,6 +189,7 @@
                     <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
                       v-model="contactEmail"
+                      @change="contactEmail=contactEmail.trim()"
                       :rules="requiredOptions['contactEmail'] ? [rules.email, rules.required] : (contactEmail ? [rules.email] : '')"
                       :required="requiredOptions['contactEmail']"
                       ></v-text-field>
@@ -195,6 +201,7 @@
                     <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
                         v-model="anonymName"
+                        @change="anonymName=anonymName.trim()"
                         :rules="requiredOptions['anonymName'] ? [rules.required] : ''"
                         :required="requiredOptions['anonymName']"
                       ></v-text-field>
@@ -219,6 +226,7 @@
                         v-model="recruitment"
                         :rules="requiredOptions['recruitment'] ? [rules.required] : ''"
                         :required="requiredOptions['recruitment']"
+                        @change="recruitment=recruitment.trim()"
                       ></v-text-field>
                       <!-- <v-autocomplete :items="recruitmentItems" v-model="recruitment" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete> -->
                     </v-flex>
@@ -231,6 +239,7 @@
                         v-model="retire"
                         :rules="requiredOptions['retire'] ? [rules.required] : ''"
                         :required="requiredOptions['retire']"
+                        @change="retire=retire.trim()"
                       ></v-text-field>
                       <!-- <v-autocomplete :items="retireItems" v-model="retire" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete> -->
                     </v-flex>
@@ -243,6 +252,7 @@
                         v-model="reactivated"
                         :rules="requiredOptions['reactivated'] ? [rules.required] : ''"
                         :required="requiredOptions['reactivated']"
+                        @change="reactivated=reactivated.trim()"
                       ></v-text-field>
                       <!-- <v-autocomplete :items="reactivatedItems" v-model="reactivated" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete> -->
                     </v-flex>
@@ -256,6 +266,7 @@
                         v-model="published"
                         :rules="requiredOptions['published'] ? [rules.required] : ''"
                         :required="requiredOptions['published']"
+                        @change="published=published.trim()"
                       ></v-text-field>
                     </v-flex>
 
@@ -291,6 +302,7 @@
                         v-model="delegateIdNo"
                         :rules="requiredOptions['delegateIdNo'] ? [rules.required] : ''"
                         :required="requiredOptions['delegateIdNo']"
+                        @change="delegateIdNo=delegateIdNo.trim()"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -301,6 +313,7 @@
                         v-model="delegateName"
                         :rules="requiredOptions['delegateName'] ? [rules.required] : ''"
                         :required="requiredOptions['delegateName']"
+                        @change="delegateName=delegateName.trim()"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -310,8 +323,9 @@
                         <v-textarea
                         v-model="delegateAddress"
                         rows="2"
-                        :rules="requiredOptions['delegateAddress'] ? [rules.required] : ''"
+                        :rules="requiredOptions['delegateAddress'] ? [rules.required,,rules.varchar500] : ''"
                         :required="requiredOptions['delegateAddress']"
+                        @change="delegateAddress=delegateAddress.trim()"
                         ></v-textarea>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -364,6 +378,7 @@
                         append-icon="phone"
                         :rules="requiredOptions['delegateTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
                         :required="requiredOptions['delegateTelNo']"
+                        @change="delegateTelNo=delegateTelNo.trim()"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -374,6 +389,7 @@
                         v-model="delegateEmail"
                         :rules="requiredOptions['delegateEmail'] ? [rules.email, rules.required] : (delegateEmail ? [rules.email] : '')"
                         :required="requiredOptions['delegateEmail']"
+                        @change="delegateEmail=delegateEmail.trim()"
                         ></v-text-field>
                       </v-flex>
                     </v-layout>
@@ -414,6 +430,9 @@ export default {
   data: () => ({
     applicantName: '',
     birthDate: '',
+    birthDateDay: '',
+    birthDateMonth: '',
+    birthDateYear: '',
     applicantIdNo: '',
     cityItems: [],
     districtNativeItems: [],
@@ -507,7 +526,17 @@ export default {
       telNo: (value) => {
         const pattern = /^([0-9]{0,})$/
         return pattern.test(value) || 'Gồm các ký tự 0-9'
-      }
+      },
+      varchar255: (val) => {
+        if(val){
+          return val.length < 255 ? true : 'Không được nhập quá 255 ký tự'
+        }      
+      },
+      varchar500: (val) => {
+        if(val){
+          return val.length < 255 ? true : 'Không được nhập quá 255 ký tự'
+        }      
+      },
     },
     valid: false,
     loadingTable: false,
@@ -1289,6 +1318,35 @@ export default {
         fullAddress += city
       }
       return fullAddress
+    },
+    changeDate() {
+      let vm = this
+      setTimeout (()=>{
+        console.log(vm.birthDateDay,vm.birthDateMonth,vm.birthDateYear)
+        if (vm.birthDateDay && vm.birthDateMonth && vm.birthDateYear) {
+          let today = new Date()
+          let newDate = new Date()
+          newDate.setFullYear(vm.birthDateYear, vm.birthDateMonth  - 1 , vm.birthDateDay) 
+          if(today < newDate){
+            vm.birthDateDay = ''
+            vm.birthDateMonth = ''
+            vm.birthDateYear = ''
+            toastr.error('Ngày sinh không được lớn hơn ngày hiện tại')
+          }
+        } else {
+          if (vm.birthDateMonth && vm.birthDateYear) {
+            let today = new Date()
+            let newDate = new Date()
+            newDate.setFullYear(vm.birthDateYear, vm.birthDateMonth  - 1 , 1) 
+            if(today < newDate){
+              vm.birthDateDay = ''
+              vm.birthDateMonth = ''
+              vm.birthDateYear = ''
+              toastr.error('Ngày sinh không được lớn hơn ngày hiện tại')
+            }
+          }
+        }
+      },200)
     }
   }
 }
