@@ -23,8 +23,9 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="soQuyetDinh"
-                      :rules="[rules.required]"
+                      :rules="[rules.required, rules.varchar100]"
                       required
+                      @change="soQuyetDinh=soQuyetDinh.trim()"
                       ></v-text-field>
                       <p class="pt-2" v-else>{{soQuyetDinh}}</p>
                     </v-flex>
@@ -81,8 +82,9 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="jobposSignerQuyetDinh"
-                      :rules="[rules.required]"
+                      :rules="[rules.required, rules.varchar100]"
                       required
+                      @change="jobposSignerQuyetDinh=jobposSignerQuyetDinh.trim()"
                       ></v-text-field>
                       <p class="pt-2" v-else>{{jobposSignerQuyetDinh}}</p>
                     </v-flex>
@@ -99,8 +101,9 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="signerQuyetDinh"
-                      :rules="[rules.required]"
+                      :rules="[rules.required,rules.varchar100]"
                       required
+                      @change="signerQuyetDinh=signerQuyetDinh.trim()"
                       ></v-text-field>
                       <p class="pt-2" v-else>{{signerQuyetDinh}}</p>
                     </v-flex>
@@ -192,7 +195,27 @@ export default {
       telNo: (value) => {
         const pattern = /^([0-9]{0,})$/
         return pattern.test(value) || 'Gồm các ký tự 0-9'
-      }
+      },
+      varchar100: (val) => {
+        if(val){
+          return val.length < 100 ? true : 'Không được nhập quá 100 ký tự'
+        }      
+      },
+      varchar255: (val) => {
+        if(val){
+          return val.length < 255 ? true : 'Không được nhập quá 255 ký tự'
+        }      
+      },
+      varchar500: (val) => {
+        if(val){
+          return val.length < 255 ? true : 'Không được nhập quá 500 ký tự'
+        }      
+      },
+      varchar5000: (val) => {
+        if(val){
+          return val.length < 255 ? true : 'Không được nhập quá 5000 ký tự'
+        }      
+      },
     },
     
   }),

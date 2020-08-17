@@ -665,6 +665,7 @@
                 <div class="my-2 text-bold">Số điện thoại:</div>
                 <v-text-field
                   box
+                  placeholder="Nhập số điện thoại"
                   v-model="applicantTelNoGuide"
                 ></v-text-field>
               </v-flex>
@@ -1215,6 +1216,7 @@ export default {
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
+      vm.dossierNoKey = ''
       let currentQuery = newRoute.query
       let currentQueryOld = oldRoute.query
       vm.currentQueryState = currentQuery
@@ -2145,7 +2147,7 @@ export default {
           }
           vm.docTypePrint = item.document
           vm.dialog_printGuide = true
-          vm.$refs.formGuide.resetValidation()
+          vm.$refs.formGuide.reset()
         } else if (String(item.form) === 'DENIED') {
           vm.docTypePrint = item.document
           vm.thuTucHanhChinhSelectedGuide = ''
@@ -2157,7 +2159,7 @@ export default {
             vm.templateNoGuide = vm.dichVuSelectedGuide ? vm.dichVuSelectedGuide.templateNo : ''
           }
           vm.dialog_denied = true
-          vm.$refs.formDenied.resetValidation()
+          vm.$refs.formDenied.reset()
         } else if (String(item.form) === 'PREVIEW') {
           vm.doPreview(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'ACTIONS') {
