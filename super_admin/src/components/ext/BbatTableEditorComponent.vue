@@ -229,7 +229,7 @@
         <v-btn color="blue darken-3" class="mr-0" dark v-on:click.native="viewPdf(false)"
           :loading="loadingPdf"
           :disabled="loadingPdf"
-          v-if="tableName === 'opencps_dossierpart' && data['EForm']"
+          v-if="(tableName === 'opencps_dossierpart' && data['EForm']) || tableName === 'opencps_documenttype'"
         >Xem trước bản in</v-btn>
         <!--  -->
       </v-flex>
@@ -477,7 +477,7 @@
           <span v-else>Bản in</span>
         </v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn v-if="!viewFormInput" round dark small color="blue" @click="viewForm"
+        <v-btn v-if="tableName === 'opencps_dossierpart' && !viewFormInput" round dark small color="blue" @click="viewForm"
         >
           <v-icon size="18" class="white--text">description</v-icon> &nbsp; Form nhập
         </v-btn>
@@ -1212,7 +1212,7 @@
       },
       viewPdf (t) {
         let vm = this
-        if (vm.data.formReport === '') {
+        if ((vm.tableName === 'opencps_dossierpart' && vm.data.formReport === '') || (vm.tableName === 'opencps_documenttype' && vm.data.documentScript === '')) {
           toastr.error('Chưa có cấu hình mã thiết kế xml jasper')
           return
         }
@@ -1238,8 +1238,15 @@
         if (!formData) {
           formData = {}
         }
+        let formReport
+        if (vm.tableName === 'opencps_dossierpart') {
+          formReport = vm.data.formReport
+        }
+        if (vm.tableName === 'opencps_documenttype') {
+          formReport = vm.data.documentScript
+        }
         let dataCreate = new URLSearchParams()
-        dataCreate.append('scriptStr', vm.data.formReport)
+        dataCreate.append('scriptStr', formReport)
         dataCreate.append('jsonDataStr', JSON.stringify(formData))
         axios.post('/o/rest/v2/jaspers/preview', dataCreate, options).then(function (response) {
           vm.loadingPdf = false

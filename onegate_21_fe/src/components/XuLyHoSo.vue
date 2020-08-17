@@ -289,7 +289,8 @@ export default {
     arrDossierId: [],
     actionActiveTmp: [],
     gopThuPhi: true,
-    changePaymentStatus: false
+    changePaymentStatus: false,
+    createFiles: []
   }),
   computed: {
     loading () {
@@ -326,6 +327,7 @@ export default {
             arrDossier.push(vm.$store.dispatch('getDetailDossier', dossierId))
           })
           Promise.all(arrDossier).then(results => {
+            vm.thongTinChiTietHoSo = results[0]
             vm.$store.dispatch('loadDossierSelected', results)
           }).catch(reject => {
           })
@@ -339,6 +341,7 @@ export default {
             arrDossier.push(vm.$store.dispatch('getDetailDossier', dossierId))
           })
           Promise.all(arrDossier).then(results => {
+            vm.thongTinChiTietHoSo = results[0]
             vm.$store.dispatch('loadDossierSelected', results)
           }).catch(reject => {
           })
@@ -426,10 +429,11 @@ export default {
           isPopup = true
           vm.showPhanCongNguoiThucHien = true
         }
-        if (result.hasOwnProperty('createFiles') && result.createFiles !== null && result.createFiles !== undefined && result.createFiles !== 'undefined' && result.createFiles.length > 0) {
+        if (result.hasOwnProperty('createFiles') && result.createFiles && result.createFiles !== null && result.createFiles !== undefined && result.createFiles !== 'undefined' && (result.createFiles.length > 0 || [result.createFiles].length > 0)) {
           isPopup = true
           vm.showTaoTaiLieuKetQua = true
-          vm.createFiles = result.createFiles
+          vm.createFiles = Array.isArray(result.createFiles) ? result.createFiles : [result.createFiles]
+          console.log('showTaoTaiLieuKetQua5555', vm.createFiles)
         }
         if (result.hasOwnProperty('eSignature') && result.eSignature) {
           isPopup = true

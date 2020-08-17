@@ -233,6 +233,17 @@
                 <content-placeholders-heading />
               </content-placeholders>
               <!--  -->
+              <div class="px-4 pt-2" v-if="originality === 1 && thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(thongTinChiTietHoSo.dossierSyncState) === '1'">
+                <v-alert
+                  :value="true"
+                  color="warning"
+                  icon="priority_high"
+                  outline
+                >
+                  Hồ sơ đang đồng bộ trạng thái về cổng dịch vụ công, vui lòng chờ giây lát
+                </v-alert>
+              </div>
+              <!--  -->
               <v-layout wrap v-if="dialogActionProcess && !loadingAction">
                 <v-expansion-panel v-if="showThanhPhanLienThong" :value="[true]" expand class="expansion-pl ext__form">
                   <v-expansion-panel-content :key="1">
