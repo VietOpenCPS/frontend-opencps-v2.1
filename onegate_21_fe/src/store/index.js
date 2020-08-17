@@ -198,10 +198,17 @@ export const store = new Vuex.Store({
             let roles = []
             for (let key in serializable) {
               if (serializable[key]['role']) {
-                roles.push(serializable[key]['role'])
+                let role = serializable[key]['role'].split('_')
+                let roleLength = role.length
+                if (isNaN((Number(role[roleLength - 1])))) {
+                  roles.push(serializable[key]['role'])
+                } else {
+                  let item = serializable[key]['role'].replace('_' + role[roleLength - 1], '')
+                  roles.push(item)
+                }
+                
               }
             }
-            // console.log('roles', roles)
             resolve(roles)
           } else {
             resolve(['default'])

@@ -206,12 +206,18 @@
     created () {
       var vm = this
       vm.$nextTick(function () {
+        try {
+          if (reportTypeFilter) {
+            vm.reportTypeFilter = reportTypeFilter
+          }
+        } catch (error) {
+        }
         if (vm.$route.query.hasOwnProperty('doreport')) {
           vm.hiddenAside = true
         } else {
           vm.hiddenAside = false
         }
-        if (vm.$route.query.reportType !== undefined && vm.$route.query.reportType !== null) {
+        if (vm.$route.query.reportType !== undefined && vm.$route.query.reportType !== null && vm.$route.query.reportType !== '') {
           vm.reportTypeFilter = vm.$route.query.reportType
         }
         vm.$store.dispatch('getDynamicReports', vm.reportTypeFilter).then(function (result) {
