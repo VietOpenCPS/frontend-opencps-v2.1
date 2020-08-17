@@ -168,7 +168,8 @@
               </div>
               <!-- Action button -->
               <div class="px-4 py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
-                <v-btn color="primary" class="ml-0 mr-2" :class='{"deactive__btn": String(btnIndex) === String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
+              <v-hover v-slot:default="{ hover }">
+                <v-btn color="primary" class="ml-0 mr-2" :class='{"deactive__btn": String(btnIndex) === String(index), "on-hover-btn": hover }' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                   v-on:click.native="processPullBtnDetail(item, index)" 
                   :loading="loadingAction && index === btnIndex"
                   :disabled="loadingAction || item.enable === 2"
@@ -177,7 +178,9 @@
                   {{item.actionName}}
                   <span slot="loader">Loading...</span>
                 </v-btn>
-                <v-btn color="primary" class="ml-0 mr-2" v-for="(item, index) in btnPlugins" v-bind:key="index" 
+              </v-hover>
+              <v-hover v-slot:default="{ hover }">
+                <v-btn color="primary" class="ml-0 mr-2" :class="{'on-hover-btn': hover}" v-for="(item, index) in btnPlugins" v-bind:key="index" 
                   v-on:click.native="processPullBtnplugin(item, index)"
                   :loading="loadingPlugin"
                   :disabled="loadingPlugin"
@@ -185,8 +188,11 @@
                   {{item.pluginName}} 
                   <span slot="loader">Loading...</span>
                 </v-btn>
+              </v-hover>
+
                 <!--  -->
-                <v-btn color="primary" class="ml-0 mr-2" v-if="detailPreAction && Number(detailPreAction['allowAssignUser']) > 2"
+              <v-hover v-slot:default="{ hover }">
+                <v-btn color="primary" class="ml-0 mr-2" :class="{'on-hover-btn': hover}" v-if="detailPreAction && Number(detailPreAction['allowAssignUser']) > 2"
                   v-on:click.native="phanCongLai" 
                   :loading="loadingAction"
                   :disabled="loadingAction"
@@ -194,14 +200,17 @@
                   Phân công lại
                   <span slot="loader">Loading...</span>
                 </v-btn>
+              </v-hover>
                 <!--  -->
-                <v-btn v-for="(item, index) in btnStepsDynamics" :key="index" color="primary" class="ml-0 mr-2" v-if="item.form === 'UPDATE'"
+              <v-hover v-slot:default="{ hover }">
+                <v-btn v-for="(item, index) in btnStepsDynamics" :class="{'on-hover-btn': hover}" :key="index" color="primary" class="ml-0 mr-2" v-if="item.form === 'UPDATE'"
                   @click="btnActionEvent(item, index)"
                   :loading="loadingAction"
                   :disabled="loadingAction"
                 >
                   {{ item.title }}
                 </v-btn>
+              </v-hover>
                 <!-- Thao tác thu hồi hồ sơ -->
                 <!-- <v-btn color="primary" class="ml-0 mr-2" v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId)
                 && thongTinChiTietHoSo['dossierStatus'] !== 'new' && originality === 3"

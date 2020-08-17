@@ -218,7 +218,7 @@
               <span slot="loader">Loading...</span>
             </v-btn>
           </v-tab>
-          <v-tab href="#tab-5" class="px-0 py-0">
+          <v-tab href="#tab-5" class="px-0 py-0" @click="goBackHistory">
             <v-btn flat class=""
               :loading="loadingAction"
               :disabled="loadingAction"
