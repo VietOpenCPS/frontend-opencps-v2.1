@@ -324,7 +324,7 @@
       }
       vm.page = 1
       vm.$nextTick(function () {
-        // console.log('vm.detailDossier------------', vm.detailDossier)
+        console.log('vm.detailDossier--TLKQ--', vm.detailDossier)
         if (vm.detailDossier['dossierId']) {
           var arrTemp = []
           arrTemp.push(vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId))
