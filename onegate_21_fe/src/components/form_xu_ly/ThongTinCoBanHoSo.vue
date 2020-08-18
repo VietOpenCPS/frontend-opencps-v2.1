@@ -9,7 +9,10 @@
               <v-flex xs12 sm4 class="pr-3" v-if="originality !== 1">
                 <div class="xs12 sm12 pb-1">
                   <span class="pr-2">Chủ hồ sơ: </span>
-                  <span class="pl-0 text-bold"> {{thongTinChiTietHoSo.applicantName.length > 100 ? thongTinChiTietHoSo.applicantName.substr(0, 100) + '...' : thongTinChiTietHoSo.applicantName}}</span>
+                  <v-tooltip top>
+                    <span  class="text-bold ">{{thongTinChiTietHoSo.applicantName}}</span>
+                    <span  slot="activator" class="pl-0 text-bold"> {{thongTinChiTietHoSo.applicantName.length > 100 ? thongTinChiTietHoSo.applicantName.substr(0, 100) + '...' : thongTinChiTietHoSo.applicantName}}</span>
+                  </v-tooltip>
                 </div>
                 <div class="xs12 sm12 pb-1">
                   <span class="pr-2">Số CMND/ căn cước: </span>

@@ -209,11 +209,13 @@ export default {
     rules: {
       required: (value) => !!value || 'Trường dữ liệu bắt buộc',
       email: (value) => {
+        value = value.trim()
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
       },
       telNo: (value) => {
         const pattern = /^([0-9]{0,})$/
+        value = value.trim()
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       }
     }

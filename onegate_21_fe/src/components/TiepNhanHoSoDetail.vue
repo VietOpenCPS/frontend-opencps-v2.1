@@ -48,7 +48,7 @@
             </v-expansion-panel>
           </div>
           <!--  -->
-          <thong-tin-chu-ho-so v-if="!mauCongVan" ref="thongtinchuhoso" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="isNotarization ? true : false"></thong-tin-chu-ho-so>
+          <thong-tin-chu-ho-so v-if="!mauCongVan" ref="thongtinchuhoso" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="isNotarization ? true : false" :applicantIdRequired="applicantIdRequired"></thong-tin-chu-ho-so>
           <thong-tin-chu-ho-so-cong-van v-if="mauCongVan" ref="thongtinchuhosocongvan"></thong-tin-chu-ho-so-cong-van>
           <!--  -->
           <div v-if="!isNotarization">
@@ -1017,6 +1017,7 @@ export default {
         }      
       },
     },
+    applicantIdRequired :false
   }),
   computed: {
     loading () {
@@ -1646,6 +1647,8 @@ export default {
         }
       } else {
         toastr.error('Vui lòng điền đầy đủ thông tin bắt buộc')
+        vm.applicantIdRequired = validThongtinchuhoso['applicantIdRequired']
+       
       }
     },
     tiepNhanCongVan (type, isDraf) {
