@@ -936,7 +936,7 @@
         // }
         for(let key in vm.filterData){
           if(vm.filterData[key]){
-            searchParams[key] = vm.filterData[key]
+            searchParams[key] = typeof vm.filterData[key] === 'string' ? vm.filterData[key].trim() : vm.filterData[key]
           }
         }
         try {

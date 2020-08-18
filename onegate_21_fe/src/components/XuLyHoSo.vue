@@ -6,10 +6,10 @@
     <div v-else-if="dossierSelected.length > 0" class="row-header">
       <div class="background-triangle-big"> <span>{{actionActive['tiltle'] ? actionActive['tiltle'] : 'XỬ LÝ HỒ SƠ'}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
-        <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="dossierSelected[0].serviceName">
+        <div class="flex pl-3 text-ellipsis text-bold" :title="dossierSelected[0].serviceName" style="width: calc(100% - 100px);">
           {{dossierSelected[0].serviceName}}
         </div>
-        <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+        <div class="flex text-right" style="margin-left: auto; width: 100px">
           <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
             <v-icon size="16">reply</v-icon> &nbsp;
             Quay lại
@@ -98,7 +98,7 @@
       <v-layout wrap v-if="btnStateVisible">
         <form-bo-sung-thong-tin v-if="showFormBoSungThongTinNgan" ref="formBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
         <phan-cong v-if="showPhanCongNguoiThucHien" ref="phancong" v-model="assign_items" :type="type_assign" ></phan-cong>
-        <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
+        <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" ref="tailieuketqua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
         <ngay-gia-han v-if="showExtendDateEdit" ref="ngaygiahan" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
         <ngay-hen-tra v-if="showEditDate" ref="ngayhentra" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
         <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
@@ -182,6 +182,8 @@
 </template>
 
 <script>
+
+import toastr from 'toastr'
 
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
@@ -300,6 +302,9 @@ export default {
       var vm = this
       return vm.getOriginality()
     },
+    dossierSelectedDoAction () {
+      return this.$store.getters.dossierSelectedDoAction
+    },
     dossierSelected () {
       var vm = this
       return vm.$store.getters.dossierSelected
@@ -318,7 +323,27 @@ export default {
       vm.btnIndex = -1
       let currentQuery = vm.$router.history.current.query
       console.log('currentQuery', currentQuery)
-      if (vm.dossierSelected.length === 0) {
+      let doAction = function () {
+        try {
+          if (vm.actionActive.action === undefined || vm.actionActive.action === null || vm.actionActive.action === '') {
+            let actionActive = JSON.parse(currentQuery.actionActive)
+            if (actionActive) {
+              vm.$store.dispatch('loadActionActive', actionActive)
+            }
+          }
+        } catch (e) {
+          console.log(e)
+        }
+        vm.getNextActions()
+        try{
+          if(typeof gopThuPhi !== 'undefined'){
+            vm.gopThuPhi = gopThuPhi
+          }
+        } catch {
+
+        }
+      }
+      if (vm.dossierSelectedDoAction.length === 0) {
         let arrDossier = []
         if (currentQuery.hasOwnProperty('dossiers')) {
           let arrDossierIdTemp = currentQuery.dossiers.split(',')
@@ -329,49 +354,16 @@ export default {
           Promise.all(arrDossier).then(results => {
             vm.thongTinChiTietHoSo = results[0]
             vm.$store.dispatch('loadDossierSelected', results)
+            doAction()
           }).catch(reject => {
           })
         }
       } else {
-        let arrDossier = []
-        if (currentQuery.hasOwnProperty('dossiers')) {
-          let arrDossierIdTemp = currentQuery.dossiers.split(',')
-          vm.arrDossierId = arrDossierIdTemp
-          arrDossierIdTemp.forEach(dossierId => {
-            arrDossier.push(vm.$store.dispatch('getDetailDossier', dossierId))
-          })
-          Promise.all(arrDossier).then(results => {
-            vm.thongTinChiTietHoSo = results[0]
-            vm.$store.dispatch('loadDossierSelected', results)
-          }).catch(reject => {
-          })
-        }
+        vm.thongTinChiTietHoSo = vm.dossierSelectedDoAction[0]
+        vm.$store.dispatch('loadDossierSelected', vm.dossierSelectedDoAction)
+        doAction()
       }
-      try {
-        if (vm.actionActive.action === undefined || vm.actionActive.action === null || vm.actionActive.action === '') {
-          let actionActive = JSON.parse(currentQuery.actionActive)
-          if (actionActive) {
-            vm.$store.dispatch('loadActionActive', actionActive)
-          }
-        }
-      } catch (e) {
-        console.log(e)
-      }
-      vm.getNextActions()
-      // if (currentQuery.hasOwnProperty('activeTab')) {
-      //   vm.activeTab = currentQuery.activeTab
-      //   vm.btnIndex = currentQuery['btnIndex']
-      //   vm.thongTinChiTietHoSo['dossierId'] = vm.id
-      //   vm.btnStateVisible = true
-      //   vm.getNextActions()
-      // }
-      try{
-        if(typeof gopThuPhi !== 'undefined'){
-          vm.gopThuPhi = gopThuPhi
-        }
-      } catch {
-
-      }
+      
     })
   },
   updated () {
@@ -544,31 +536,59 @@ export default {
       vm.dossierProcess = vm.dossierSelected.filter(function (item) {
         return (item['statusAction'] === false || !item['statusAction'])
       })
-      vm.countProcessed = 0
-      if (vm.mutilpleAction) {
-        for (let key in vm.actionExits) {
-          for (let key2 in vm.dossierSelected) {
-            if (vm.dossierSelected[key2]['statusAction'] === false || !vm.dossierSelected[key2]['statusAction']) {
+      let idDossiers = vm.dossierProcess.map(obj =>{
+        return obj.dossierId
+      }).toString()
+      let doAction = function () {
+        vm.countProcessed = 0
+        if (vm.mutilpleAction) {
+          for (let key in vm.actionExits) {
+            for (let key2 in vm.dossierSelected) {
+              if (vm.dossierSelected[key2]['statusAction'] === false || !vm.dossierSelected[key2]['statusAction']) {
+                let filter = {
+                  dossierId: vm.dossierSelected[key2].dossierId,
+                  actionCode: vm.actionExits[key].actionCode,
+                  actionUser: actionUser
+                }
+                vm.postAction(filter, vm.dossierSelected[key2], key2)
+              }
+            }
+          }
+        } else {
+          for (let key in vm.dossierSelected) {
+            if (vm.dossierSelected[key]['statusAction'] === false || !vm.dossierSelected[key]['statusAction']) {
               let filter = {
-                dossierId: vm.dossierSelected[key2].dossierId,
-                actionCode: vm.actionExits[key].actionCode,
+                dossierId: vm.dossierSelected[key].dossierId,
+                actionCode: vm.actionActive.action,
                 actionUser: actionUser
               }
-              vm.postAction(filter, vm.dossierSelected[key2], key2)
+              vm.postAction(filter, vm.dossierSelected[key], key)
             }
           }
         }
+      }
+      if (vm.showTaoTaiLieuKetQua) {
+        let createFileAttach = vm.$refs.tailieuketqua.getCreateFileAttach()
+        let arrFileAttach = []
+        for (let key in createFileAttach) {
+          if (createFileAttach[key].hasOwnProperty('filesAttach') && createFileAttach[key]['filesAttach'].length > 0) {
+            createFileAttach[key]['filesAttach'].forEach(item => {
+              arrFileAttach.push(vm.$store.dispatch('attachFileThaoTacGop', Object.assign(item, {dossierIds: idDossiers})))
+            })
+          }
+        }
+        if (arrFileAttach.length > 0) {
+          Promise.all(arrFileAttach).then(results => {
+            doAction()
+          }).catch(reject => {
+            toastr.error('Đính kèm tài liệu không thành công. Vui lòng thử lại')
+          })
+        } else {
+          doAction()
+        }
+        
       } else {
-        for (let key in vm.dossierSelected) {
-          if (vm.dossierSelected[key]['statusAction'] === false || !vm.dossierSelected[key]['statusAction']) {
-            let filter = {
-              dossierId: vm.dossierSelected[key].dossierId,
-              actionCode: vm.actionActive.action,
-              actionUser: actionUser
-            }
-            vm.postAction(filter, vm.dossierSelected[key], key)
-          }
-        }
+        doAction()
       }
     },
     postAction (filter, dossier, index) {

@@ -233,11 +233,11 @@
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
                         <v-text-field
-                        v-if="originality === 1 || originality === '1'"
-                        v-model="thongTinNguoiNopHoSo.delegateIdNo"
-                        :rules="[rules.required, rules.varchar100]"
-                        required
-                        @change="thongTinNguoiNopHoSo.delegateIdNo=thongTinNguoiNopHoSo.delegateIdNo.trim()"
+                          v-if="originality === 1 || originality === '1'"
+                          v-model="thongTinNguoiNopHoSo.delegateIdNo"
+                          :rules="[rules.required, rules.varchar100]"
+                          required
+                          @change="thongTinNguoiNopHoSo.delegateIdNo=thongTinNguoiNopHoSo.delegateIdNo.trim()"
                         ></v-text-field>
                         <!--  -->
                         <suggestions
@@ -817,6 +817,10 @@ export default {
     dialog_editApplicant: false,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
+      cmndHoChieu: (value) => {
+        const pattern = /^(?![0-9]{4,12})[0-9a-zA-Z]{4,12}$/
+        return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 4-12 ký tự'
+      },
       email: (value) => {
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
@@ -841,12 +845,12 @@ export default {
       },
       varchar500: (val) => {
         if(val){
-          return val.length < 255 ? true : 'Không được nhập quá 500 ký tự'
+          return val.length < 500 ? true : 'Không được nhập quá 500 ký tự'
         }      
       },
       varchar5000: (val) => {
         if(val){
-          return val.length < 255 ? true : 'Không được nhập quá 5000 ký tự'
+          return val.length < 5000 ? true : 'Không được nhập quá 5000 ký tự'
         }      
       },
     },

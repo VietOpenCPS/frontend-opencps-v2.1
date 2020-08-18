@@ -116,7 +116,7 @@
               <div class="px-4 pt-2">
                 <div class="px-2 py-2" :style="(filterNextActionEnable(btnDossierDynamics) || (usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0)) ? 'border:1px solid #4caf50;border-radius: 3px' : ''" v-if="btnStateVisible && originality === 3 && !thongTinChiTietHoSo.finishDate">
                   <p class="mb-2">
-                    <span>Chuyển đến bởi: </span>
+                    <span>Chuyển đến bởi: &nbsp;</span>
                     <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
                     <span v-if="thongTinChiTietHoSo.lastActionNote && thongTinChiTietHoSo.lastActionNote !== 'null'">
                       <span> - Ý kiến: </span>
@@ -128,7 +128,7 @@
                       <span>Người thực hiện: &nbsp;</span>
                       <span v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
                         <span v-for="(item, index) in usersNextAction" :key="item.userId">
-                          &nbsp;<b>{{item.userName}}</b><span v-if="index !== (usersNextAction.length - 1)">,</span>
+                          <b>{{item.userName}}</b><span v-if="index !== (usersNextAction.length - 1)">,</span>
                         </span>
                         <span v-if="stepOverdueNextAction"> - </span>
                         <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
@@ -136,11 +136,11 @@
                         </span>
                       </span>
                     </v-flex>
-                    <!-- <v-flex id="reAssign" v-if="showReasign && checkPemissionPhanCongLai(currentUser)" class="text-xs-right" style="width:100px">
+                    <v-flex id="reAssign" v-if="thaoTacUyQuyen && showReasign && checkPemissionPhanCongLai(currentUser)" class="text-xs-right" style="width:100px">
                       <v-btn @click="reAsign" class="mx-0 my-0 right" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" small color="primary" style="height:26px">
                         Ủy quyền
                       </v-btn>
-                    </v-flex> -->
+                    </v-flex>
                   </v-layout>
                 </div>
 
@@ -168,7 +168,7 @@
               </div>
               <!-- Action button -->
               <div class="px-4 py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
-                <v-btn color="primary" class="ml-0 mr-2" :class='{"deactive__btn": String(btnIndex) === String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
+                <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" :class='{"deactive__btn": String(btnIndex) === String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                   v-on:click.native="processPullBtnDetail(item, index)" 
                   :loading="loadingAction && index === btnIndex"
                   :disabled="loadingAction || item.enable === 2"
@@ -177,7 +177,7 @@
                   {{item.actionName}}
                   <span slot="loader">Loading...</span>
                 </v-btn>
-                <v-btn color="primary" class="ml-0 mr-2" v-for="(item, index) in btnPlugins" v-bind:key="index" 
+                <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" v-for="(item, index) in btnPlugins" v-bind:key="index" 
                   v-on:click.native="processPullBtnplugin(item, index)"
                   :loading="loadingPlugin"
                   :disabled="loadingPlugin"
@@ -186,7 +186,7 @@
                   <span slot="loader">Loading...</span>
                 </v-btn>
                 <!--  -->
-                <v-btn color="primary" class="ml-0 mr-2" v-if="detailPreAction && Number(detailPreAction['allowAssignUser']) > 2"
+                <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" v-if="thaoTacPhanCongLai && detailPreAction && Number(detailPreAction['allowAssignUser']) > 2"
                   v-on:click.native="phanCongLai" 
                   :loading="loadingAction"
                   :disabled="loadingAction"
@@ -195,7 +195,7 @@
                   <span slot="loader">Loading...</span>
                 </v-btn>
                 <!--  -->
-                <v-btn v-for="(item, index) in btnStepsDynamics" :key="index" color="primary" class="ml-0 mr-2" v-if="item.form === 'UPDATE'"
+                <v-btn v-for="(item, index) in btnStepsDynamics" :key="index" color="primary" class="ml-0 mr-2 on-hover-btn" v-if="item.form === 'UPDATE'"
                   @click="btnActionEvent(item, index)"
                   :loading="loadingAction"
                   :disabled="loadingAction"
@@ -214,7 +214,7 @@
                 </v-btn> -->
                 <!--  -->
                 <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
-                  <v-btn slot="activator" class="" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn slot="activator" class="on-hover-btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list>
                     <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" @click="btnActionEvent(item, index)" v-if="item.form !== 'UPDATE'">
                       <v-list-tile-title>{{ item.title }}</v-list-tile-title>
@@ -233,14 +233,14 @@
                 <content-placeholders-heading />
               </content-placeholders>
               <!--  -->
-              <div class="px-4 pt-2" v-if="originality === 1 && thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(thongTinChiTietHoSo.dossierSyncState) === '1'">
+              <div class="px-4 pt-2" v-if="thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(thongTinChiTietHoSo.dossierSyncState) === '1'">
                 <v-alert
                   :value="true"
                   color="warning"
                   icon="priority_high"
                   outline
                 >
-                  Hồ sơ đang đồng bộ trạng thái về cổng dịch vụ công, vui lòng chờ giây lát
+                  Hồ sơ đang đồng bộ trạng thái, vui lòng chờ giây lát.
                 </v-alert>
               </div>
               <!--  -->
@@ -814,6 +814,8 @@ export default {
     dossierImportActions: [],
     reAsignUsers: [],
     showReasign: false,
+    thaoTacUyQuyen: false,
+    thaoTacPhanCongLai: false,
     itemselect: '',
     dossierSyncs: [],
     stepModel: null,
