@@ -392,7 +392,17 @@
             <span slot="loader">Loading...</span>
           </v-btn>
         </v-tab>
-        <v-tab href="#tab-4" @click="goBack" class="px-0 py-0">
+        <v-tab href="#tab-4" @click="deleteCongVan()" v-if="metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui" class="px-0 py-0"> 
+          <v-btn flat class="" 
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">clear</v-icon>  &nbsp;
+            <span>Xóa công văn</span>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+        <v-tab href="#tab-5" @click="goBack" class="px-0 py-0">
           <v-btn flat class=""
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -2337,6 +2347,25 @@ export default {
         })
       }
       // 
+    },
+    deleteCongVan () {
+      let vm = this
+      let filter = {
+        dossierId: vm.thongTinNhomHoSo['dossierId']
+      }
+      let x = confirm('Bạn có chắc chắn thực hiện xóa công văn?')
+      if (x) {
+        vm.$store.dispatch('deleteDossier', filter).then(function (result) {
+          toastr.success('Xóa công văn thành công')
+          vm.$router.push({
+            path: '/danh-sach-ho-so/' + vm.index,
+            query: {
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+              q: vm.menuConfigs[vm.index]['queryParams']
+            }
+          })
+        }).catch(function (){})
+      }
     },
     getMetaData (val) {
       let metaDataOut = ''

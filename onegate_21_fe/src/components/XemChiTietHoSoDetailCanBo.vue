@@ -136,11 +136,11 @@
                         </span>
                       </span>
                     </v-flex>
-                    <!-- <v-flex id="reAssign" v-if="showReasign && checkPemissionPhanCongLai(currentUser)" class="text-xs-right" style="width:100px">
+                    <v-flex id="reAssign" v-if="thaoTacUyQuyen && showReasign && checkPemissionPhanCongLai(currentUser)" class="text-xs-right" style="width:100px">
                       <v-btn @click="reAsign" class="mx-0 my-0 right" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" small color="primary" style="height:26px">
                         Ủy quyền
                       </v-btn>
-                    </v-flex> -->
+                    </v-flex>
                   </v-layout>
                 </div>
 
@@ -186,7 +186,7 @@
                   <span slot="loader">Loading...</span>
                 </v-btn>
                 <!--  -->
-                <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" v-if="detailPreAction && Number(detailPreAction['allowAssignUser']) > 2"
+                <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" v-if="thaoTacPhanCongLai && detailPreAction && Number(detailPreAction['allowAssignUser']) > 2"
                   v-on:click.native="phanCongLai" 
                   :loading="loadingAction"
                   :disabled="loadingAction"
@@ -233,14 +233,14 @@
                 <content-placeholders-heading />
               </content-placeholders>
               <!--  -->
-              <div class="px-4 pt-2" v-if="originality === 1 && thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(thongTinChiTietHoSo.dossierSyncState) === '1'">
+              <div class="px-4 pt-2" v-if="thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(thongTinChiTietHoSo.dossierSyncState) === '1'">
                 <v-alert
                   :value="true"
                   color="warning"
                   icon="priority_high"
                   outline
                 >
-                  Hồ sơ đang đồng bộ trạng thái về cổng dịch vụ công, vui lòng chờ giây lát
+                  Hồ sơ đang đồng bộ trạng thái, vui lòng chờ giây lát.
                 </v-alert>
               </div>
               <!--  -->
@@ -814,6 +814,8 @@ export default {
     dossierImportActions: [],
     reAsignUsers: [],
     showReasign: false,
+    thaoTacUyQuyen: false,
+    thaoTacPhanCongLai: false,
     itemselect: '',
     dossierSyncs: [],
     stepModel: null,

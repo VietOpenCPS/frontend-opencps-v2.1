@@ -34,12 +34,12 @@
                           {{itemFileView.displayName}} - 
                           <i>{{itemFileView.modifiedDate}}</i>
                         </span>
-                        <v-btn title="Xóa" icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index2)" class="mx-0 my-0">
+                        <v-btn title="Xóa" icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index2, index)" class="mx-0 my-0">
                           <v-icon style="color: red">delete_outline</v-icon>
                         </v-btn>
-                        <v-btn title="Đính kèm cho hồ sơ khác" v-if="itemFileView['dossierPartType'] === 7" icon ripple v-on:click.stop="attachOtherDossier(itemFileView)" class="mx-0 my-0">
+                        <!-- <v-btn title="Đính kèm cho hồ sơ khác" v-if="itemFileView['dossierPartType'] === 7" icon ripple v-on:click.stop="attachOtherDossier(itemFileView)" class="mx-0 my-0">
                           <v-icon color="primary" size="13">fas fa fa-clone</v-icon>
-                        </v-btn>
+                        </v-btn> -->
                         <v-tooltip top v-if="esignType === 'plugin' && itemFileView.fileType.toLowerCase() === 'pdf'">
                           <v-btn slot="activator" flat icon color="indigo" v-on:click.stop="signAction(itemFileView, index2)" class="my-0">
                             <v-icon size="18">fa fa-pencil-square-o</v-icon>
@@ -102,7 +102,7 @@
                   type="file"
                   style="display: none"
                   :id="'file' + item.partNo"
-                  @change="onUploadSingleFile($event,item)"
+                  @change="onUploadSingleFile($event, item, index)"
                   >
                   <v-progress-circular
                   :width="2"
@@ -227,6 +227,8 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!--  -->
+
   </div>
 </template>
 
@@ -294,7 +296,8 @@
       documentType: 'Tài liệu đính kèm',
       receiveMessage: '',
       active: true,
-      loadingApacal: false
+      loadingApacal: false,
+      thaoTacGop: false
     }),
     computed: {
       loading () {
@@ -319,49 +322,59 @@
     },
     created () {
       let vm = this
+      let currentQuery = vm.$router.history.current.query
+      if (currentQuery.hasOwnProperty('dossiers')) {
+        vm.thaoTacGop = true
+      }
       vm.receiveMessage = function (event) {
         vm.saveAlpacaFormCallBack(event)
       }
       vm.page = 1
       vm.$nextTick(function () {
-        // console.log('vm.detailDossier------------', vm.detailDossier)
+        console.log('vm.detailDossier--TLKQ--', vm.detailDossier)
         if (vm.detailDossier['dossierId']) {
-          var arrTemp = []
-          arrTemp.push(vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId))
-          arrTemp.push(vm.$store.dispatch('loadDossierTemplates', vm.detailDossier))
-          Promise.all(arrTemp).then(values => {
-            var dossierTemplates = values[1]['dossierParts']
-            var dossierFiles = values[0]
-            vm.dossierFilesItems = dossierFiles
-            //
-            vm.dossierFilesItems.forEach((template, index) => {
-              if (vm.detailDossier['dossierId'] === vm.createFileSignedSync['dossierId']) {
-                template['isSigned'] = vm.createFileSignedSync['createFiles'][index]['isSigned']
-                template['fileEntryId'] = vm.createFileSignedSync['createFiles'][index]['fileEntryId']
-                template['pdfSigned'] = vm.createFileSignedSync['createFiles'][index]['pdfSigned']
-              } else {
-                template['isSigned'] = false
-                template['fileEntryId'] = ''
-                template['pdfSigned'] = ''
-              }
-            })
-            // 
-            vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, dossierFiles)
-            if (dossierTemplates.length !== 0) {
-              vm.createFiles.forEach(template => {
-                var itemFind = dossierTemplates.find(part => {
-                  return template.partNo === part.partNo
-                })
-                if (itemFind) {
-                  template['required'] = itemFind['required']
-                  template['partTip'] = itemFind['partTip']
+          if (!vm.thaoTacGop) {
+            var arrTemp = []
+            arrTemp.push(vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId))
+            arrTemp.push(vm.$store.dispatch('loadDossierTemplates', vm.detailDossier))
+            Promise.all(arrTemp).then(values => {
+              var dossierTemplates = values[1]['dossierParts']
+              var dossierFiles = values[0]
+              vm.dossierFilesItems = dossierFiles
+              //
+              vm.dossierFilesItems.forEach((template, index) => {
+                if (vm.detailDossier['dossierId'] === vm.createFileSignedSync['dossierId']) {
+                  template['isSigned'] = vm.createFileSignedSync['createFiles'][index]['isSigned']
+                  template['fileEntryId'] = vm.createFileSignedSync['createFiles'][index]['fileEntryId']
+                  template['pdfSigned'] = vm.createFileSignedSync['createFiles'][index]['pdfSigned']
+                } else {
+                  template['isSigned'] = false
+                  template['fileEntryId'] = ''
+                  template['pdfSigned'] = ''
                 }
               })
+              // 
+              vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, dossierFiles)
+              if (dossierTemplates.length !== 0) {
+                vm.createFiles.forEach(template => {
+                  var itemFind = dossierTemplates.find(part => {
+                    return template.partNo === part.partNo
+                  })
+                  if (itemFind) {
+                    template['required'] = itemFind['required']
+                    template['partTip'] = itemFind['partTip']
+                  }
+                })
+              }
+            })
+            // danh sách hồ sơ cùng group
+            if (vm.detailDossier['groupDossierId']) {
+              vm.getDossierIntoGroup(vm.detailDossier['groupDossierId'])
             }
-          })
-          // danh sách hồ sơ cùng group
-          if (vm.detailDossier['groupDossierId']) {
-            vm.getDossierIntoGroup(vm.detailDossier['groupDossierId'])
+          } else {
+            vm.createFiles = vm.createFiles.map(obj =>{
+              return obj = Object.assign(obj, {filesAttach: []})
+            })
           }
         }
       })
@@ -374,7 +387,7 @@
     mounted () {
       var vm = this
       vm.$nextTick(function () {
-        if (vm.createFiles.length > 0) {
+        if (vm.createFiles.length > 0 && !vm.thaoTacGop) {
           setTimeout(function () {
             vm.genAllAlpacaForm(vm.dossierFilesItems, vm.createFiles)
           }, 300)
@@ -439,7 +452,7 @@
             })
             if (itemFind) {
               template['daKhai'] = true
-            } else if (!itemFind && template.eForm) {
+            } else if (!itemFind) {
               template['daKhai'] = false
             }
           })
@@ -728,34 +741,77 @@
         document.getElementById('file' + item.partNo).value = ''
         document.getElementById('file' + item.partNo).click()
       },
-      onUploadSingleFile (e, data) {
-        var vm = this
+      onUploadSingleFile (e, data, indexItem) {
+        let vm = this
         vm.dossierTemplatesItemSelect = data
         vm.progressUploadPart = data.partNo
         data['dossierId'] = vm.detailDossier.dossierId
         data['dossierTemplateNo'] = vm.detailDossier.dossierTemplateNo
-        vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
-          vm.progressUploadPart = ''
-          vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
-            vm.dossierFilesItems = result
-            vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, vm.dossierFilesItems)
-            console.log('createFiles', vm.createFiles)
-            // 
-            vm.createFileSigned()
-            // 
+        if (!vm.thaoTacGop) {
+          vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
+            vm.progressUploadPart = ''
+            vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
+              vm.dossierFilesItems = result
+              vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, vm.dossierFilesItems)
+              console.log('createFiles', vm.createFiles)
+              // 
+              vm.createFileSigned()
+              // 
+            })
+            // add hồ sơ cùng nhóm
+            console.log('vm.dossierIntoGroup', vm.dossierIntoGroup)
+            // Đính kèm giấy tờ hồ sơ cùng nhóm
+            // if (vm.dossierIntoGroup.length > 0) {
+            //   // vm.dialogSelectDosier = true
+            //   vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
+            //   vm.dialogConfirm = true
+            //   vm.filesAdd = result
+            // }
+          }).catch(function (xhr) {
+            vm.progressUploadPart = ''
           })
-          // add hồ sơ cùng nhóm
-          console.log('vm.dossierIntoGroup', vm.dossierIntoGroup)
-          // Đính kèm giấy tờ hồ sơ cùng nhóm
-          // if (vm.dossierIntoGroup.length > 0) {
-          //   // vm.dialogSelectDosier = true
-          //   vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
-          //   vm.dialogConfirm = true
-          //   vm.filesAdd = result
-          // }
-        }).catch(function (xhr) {
+        } else {
           vm.progressUploadPart = ''
-        })
+          let files = $('input[id="file' + data.partNo + '"]')[0].files
+          let countFiles = files.length
+          if (files) {
+            for (let index = 0; index < countFiles; index++) {
+              let file = files[index]
+              let fileName = file['name']
+              if (file['name']) {
+                fileName = file['name'].replace(/\%/g, '')
+                fileName = fileName.replace(/\//g, '')
+                fileName = fileName.replace(/\\/g, '')
+              }
+              if (data.partType === 3) {
+                if (data['displayName']) {
+                  fileName = data['displayName'].replace(/\%/g, '')
+                  fileName = fileName.replace(/\//g, '')
+                  fileName = fileName.replace(/\\/g, '')
+                }
+              }
+              let fileCreate = {
+                displayName: fileName,
+                fileType: file.type,
+                fileSize: file.size,
+                isSync: false,
+                file: file,
+                dossierPartNo: data.partNo,
+                dossierTemplateNo: data.dossierTemplateNo,
+                fileTemplateNo: data.templateFileNo,
+                formData: '',
+                referenceUid: '',
+                modifiedDate: vm.getCurentDateTime(),
+                createDate: (new Date()).getTime()
+              }
+              vm.dossierFilesItems.push(fileCreate)
+              console.log('dossierFilesItems', vm.dossierFilesItems)
+              vm.createFiles[indexItem]['filesAttach'].push(fileCreate)
+              console.log('createFilesAttachThaoTacGop', vm.createFiles)
+            }
+          }
+        }
+        
       },
       loadAlpcaForm (data) {
         var vm = this
@@ -1155,25 +1211,35 @@
           toastr.error('Chưa có tài liệu ký duyệt')
         }
       },
-      deleteSingleFile (item, index) {
+      deleteSingleFile (item, index, indexPart) {
         var vm = this
         let x = confirm('Bạn có muốn xóa?')
         if (x) {
-          item['dossierId'] = vm.detailDossier.dossierId
-          vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
-            vm.fileViews.splice(index, 1)
-            vm.partView = item.dossierPartNo
-            vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
-              vm.dossierFilesItems = result
-              // 
-              vm.createFileSigned()
-              // 
-              vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, vm.dossierFilesItems)
+          if (!vm.thaoTacGop) {
+            item['dossierId'] = vm.detailDossier.dossierId
+            vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
+              vm.fileViews.splice(index, 1)
+              vm.partView = item.dossierPartNo
+              vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
+                vm.dossierFilesItems = result
+                // 
+                vm.createFileSigned()
+                // 
+                vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, vm.dossierFilesItems)
+              })
+            }).catch(reject => {
+              toastr.clear()
+              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
-          }).catch(reject => {
-            toastr.clear()
-            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
-          })
+          } else {
+            vm.dossierFilesItems = vm.dossierFilesItems.filter(function (x) {
+              return x.createDate !== item.createDate
+            })
+            vm.createFiles[indexPart]['filesAttach'] = vm.createFiles[indexPart]['filesAttach'].filter(function (x) {
+              return x.createDate !== item.createDate
+            })
+            console.log('createFilesAttachThaoTacGop123', vm.createFiles)
+          }
         }
       },
       viewFile (data) {
@@ -1401,6 +1467,14 @@
         let vm = this
         vm.dialogConfirm = false
         vm.dialogSelectDosier = true
+      },
+      getCreateFileAttach () {
+        let vm = this
+        return vm.createFiles
+      },
+      getCurentDateTime () {
+        let date = new Date()
+        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} | ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
       },
       getDocumentTypeIcon (type) {
         let vm = this

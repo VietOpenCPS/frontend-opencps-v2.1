@@ -50,7 +50,7 @@
                           </v-list-tile-content>
                         </div>
                       </suggestions>
-                      <span style="color:#ff5252;font-size: 12px;" v-if="(originality === 3 || originality === '3') && applicantIdRequired">Thông tin bắt buộc</span>
+                      <span style="color:#ff5252;font-size: 12px;" v-if="(originality === 3 || originality === '3') && !applicantIdRequired && !thongTinChuHoSo.applicantIdNo">Thông tin bắt buộc</span>
                       <v-tooltip top v-if="(originality === 3 || originality === '3') && applicantConfig">
                         <v-btn @click="showDialogApplicantList('ChuHoSo')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
                           <v-icon size="14">fas fa fa-address-card</v-icon>
@@ -239,6 +239,7 @@
                           :rules="[rules.required, rules.varchar100]"
                           required
                           @change="thongTinNguoiNopHoSo.delegateIdNo=thongTinNguoiNopHoSo.delegateIdNo.trim()"
+                          :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
                         <!--  -->
                         <suggestions
@@ -246,7 +247,8 @@
                           v-model="thongTinNguoiNopHoSo.delegateIdNo"
                           :options="searchOptions"
                           :onItemSelected="onSearchItemSelected1"
-                          :onInputChange="onInputChange1">
+                          :onInputChange="onInputChange1"
+                          :style="thongTinNguoiNopHoSo.sameUser ? 'pointer-events: none;opacity: 0.7' : ''">
                           <div slot="item" slot-scope="props" class="single-item">
                             <v-list-tile-content>
                               <v-list-tile-title v-html="props.item.applicantName"></v-list-tile-title>
@@ -254,7 +256,7 @@
                             </v-list-tile-content>
                           </div>
                         </suggestions>
-                        <span style="color:#ff5252;font-size: 12px" v-if="(originality === 3 || originality === '3') && checkDelegateIdNo">Thông tin bắt buộc</span>
+                        <span style="color:#ff5252;font-size: 12px" v-if="(originality === 3 || originality === '3') && !applicantIdRequired && !thongTinNguoiNopHoSo.delegateIdNo">Thông tin bắt buộc</span>
                         <v-tooltip top v-if="(originality === 3 || originality === '3') && applicantConfig">
                           <v-btn @click="showDialogApplicantList('NguoiNop')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
                             <v-icon size="14">fas fa fa-address-card</v-icon>
@@ -278,6 +280,7 @@
                         :rules="requiredOptions['delegateName'] ? [rules.required, rules.varchar500] : ''"
                         :required="requiredOptions['delegateName']"
                         @change="thongTinNguoiNopHoSo.delegateName=thongTinNguoiNopHoSo.delegateName.trim()"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -296,6 +299,7 @@
                         rows="2"
                         :rules="requiredOptions['delegateAddress'] ? [rules.required, rules.varchar500] : ''"
                         :required="requiredOptions['delegateAddress']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-textarea>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -317,6 +321,7 @@
                         v-model="thongTinNguoiNopHoSo.delegateCityCode"
                         :rules="requiredOptions['delegateCityCode'] ? [rules.required] : ''"
                         :required="requiredOptions['delegateCityCode']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -338,6 +343,7 @@
                         v-model="thongTinNguoiNopHoSo.delegateDistrictCode"
                         :rules="requiredOptions['delegateDistrictCode'] ? [rules.required] : ''"
                         :required="requiredOptions['delegateDistrictCode']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -358,6 +364,7 @@
                         v-model="thongTinNguoiNopHoSo.delegateWardCode"
                         :rules="requiredOptions['delegateWardCode'] ? [rules.required] : ''"
                         :required="requiredOptions['delegateWardCode']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -377,6 +384,7 @@
                         @change="thongTinNguoiNopHoSo.delegateName=thongTinNguoiNopHoSo.delegateName.trim()"
                         :rules="requiredOptions['delegateTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
                         :required="requiredOptions['delegateTelNo']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -395,6 +403,7 @@
                         @change="thongTinNguoiNopHoSo.delegateEmail=thongTinNguoiNopHoSo.delegateEmail.trim()"
                         :rules="requiredOptions['delegateEmail'] ? [rules.email, rules.required] : (thongTinNguoiNopHoSo.delegateEmail ? [rules.email] : '')"
                         :required="requiredOptions['delegateEmail']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
                       </v-flex>
                     </v-layout>
@@ -836,24 +845,26 @@ export default {
       },
       telNo: (value) => {
         const pattern = /^([0-9]{0,})$/
-        value = value.trim()
+        if(typeof value === 'string'){
+          value = value.trim()
+        }
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       },
       varchar100: (val) => {
           val = val.trim()
-          return val.length < 100 ? true : 'Không được nhập quá 100 ký tự'    
+          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'    
       },
       varchar255: (val) => {
           val = val.trim()
-          return val.length < 255 ? true : 'Không được nhập quá 255 ký tự'      
+          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'      
       },
       varchar500: (val) => {
         val = val.trim()
-        return val.length < 500 ? true : 'Không được nhập quá 500 ký tự'     
+        return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'     
       },
       varchar5000: (val) => {
         val = val.trim()
-        return val.length < 5000 ? true : 'Không được nhập quá 5000 ký tự'      
+        return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'      
       },
     },
     typeSearch: '',
@@ -900,7 +911,7 @@ export default {
   created () {
     let vm = this
     if (vm.formCode === "NEW") {
-      vm.thongTinNguoiNopHoSo.sameUser = true
+      // vm.thongTinNguoiNopHoSo.sameUser = true
     }
     if (vm.hasOrganization) {
       vm.labelSwitch = {
@@ -1301,7 +1312,7 @@ export default {
               let items = []
               if (response.data.hasOwnProperty('data')) {
                 items = response.data.data
-                if(query.trim().length >= 100) {
+                if(query.trim().length > 100) {
                   toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
                   vm.thongTinChuHoSo.applicantIdNo = ''
                   return null
@@ -1309,7 +1320,7 @@ export default {
                   vm.thongTinChuHoSo.applicantIdNo = query.trim()
                 }
               } else {
-                  if(query.trim().length >= 100) {
+                  if(query.trim().length > 100) {
                     toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
                     vm.thongTinChuHoSo.applicantIdNo = ''
                     return null
@@ -1345,7 +1356,21 @@ export default {
               let items = []
               if (response.data.hasOwnProperty('data')) {
                 items = response.data.data
+                if(query.trim().length > 100) {
+                  toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
+                  vm.thongTinNguoiNopHoSo.delegateIdNo = ''
+                  return null
+                } else {
+                  vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
+                }
               } else {
+                if(query.trim().length > 100) {
+                  toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
+                  vm.thongTinNguoiNopHoSo.delegateIdNo = ''
+                  return null
+                } else {
+                  vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
+                }
               }
               resolve(items)
             })
