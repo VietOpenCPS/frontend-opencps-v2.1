@@ -50,7 +50,7 @@
                           </v-list-tile-content>
                         </div>
                       </suggestions>
-                      <span style="color:#ff5252;font-size: 12px;" v-if="(originality === 3 || originality === '3') && applicantIdRequired">Thông tin bắt buộc</span>
+                      <span style="color:#ff5252;font-size: 12px;" v-if="(originality === 3 || originality === '3') && !applicantIdRequired && !thongTinChuHoSo.applicantIdNo">Thông tin bắt buộc</span>
                       <v-tooltip top v-if="(originality === 3 || originality === '3') && applicantConfig">
                         <v-btn @click="showDialogApplicantList('ChuHoSo')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
                           <v-icon size="14">fas fa fa-address-card</v-icon>
@@ -256,7 +256,7 @@
                             </v-list-tile-content>
                           </div>
                         </suggestions>
-                        <span style="color:#ff5252;font-size: 12px" v-if="(originality === 3 || originality === '3') && checkDelegateIdNo">Thông tin bắt buộc</span>
+                        <span style="color:#ff5252;font-size: 12px" v-if="(originality === 3 || originality === '3') && !applicantIdRequired && !thongTinNguoiNopHoSo.delegateIdNo">Thông tin bắt buộc</span>
                         <v-tooltip top v-if="(originality === 3 || originality === '3') && applicantConfig">
                           <v-btn @click="showDialogApplicantList('NguoiNop')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
                             <v-icon size="14">fas fa fa-address-card</v-icon>
@@ -845,32 +845,26 @@ export default {
       },
       telNo: (value) => {
         const pattern = /^([0-9]{0,})$/
-        value = value.trim()
+        if(typeof value === 'string'){
+          value = value.trim()
+        }
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       },
       varchar100: (val) => {
-        if(val){
           val = val.trim()
-          return val.length < 100 ? true : 'Không được nhập quá 100 ký tự'
-        }      
+          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'    
       },
       varchar255: (val) => {
-        if(val){
           val = val.trim()
-          return val.length < 255 ? true : 'Không được nhập quá 255 ký tự'
-        }      
+          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'      
       },
       varchar500: (val) => {
-        if(val){
-          val = val.trim()
-          return val.length < 500 ? true : 'Không được nhập quá 500 ký tự'
-        }      
+        val = val.trim()
+        return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'     
       },
       varchar5000: (val) => {
-        if(val){
-          val = val.trim()
-          return val.length < 5000 ? true : 'Không được nhập quá 5000 ký tự'
-        }      
+        val = val.trim()
+        return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'      
       },
     },
     typeSearch: '',
@@ -1318,7 +1312,7 @@ export default {
               let items = []
               if (response.data.hasOwnProperty('data')) {
                 items = response.data.data
-                if(query.trim().length >= 100) {
+                if(query.trim().length > 100) {
                   toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
                   vm.thongTinChuHoSo.applicantIdNo = ''
                   return null
@@ -1326,7 +1320,7 @@ export default {
                   vm.thongTinChuHoSo.applicantIdNo = query.trim()
                 }
               } else {
-                  if(query.trim().length >= 100) {
+                  if(query.trim().length > 100) {
                     toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
                     vm.thongTinChuHoSo.applicantIdNo = ''
                     return null
@@ -1362,7 +1356,21 @@ export default {
               let items = []
               if (response.data.hasOwnProperty('data')) {
                 items = response.data.data
+                if(query.trim().length > 100) {
+                  toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
+                  vm.thongTinNguoiNopHoSo.delegateIdNo = ''
+                  return null
+                } else {
+                  vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
+                }
               } else {
+                if(query.trim().length > 100) {
+                  toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
+                  vm.thongTinNguoiNopHoSo.delegateIdNo = ''
+                  return null
+                } else {
+                  vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
+                }
               }
               resolve(items)
             })

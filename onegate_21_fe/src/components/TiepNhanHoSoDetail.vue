@@ -1017,7 +1017,7 @@ export default {
         }      
       },
     },
-    applicantIdRequired :false
+    applicantIdRequired :true
   }),
   computed: {
     loading () {
@@ -1647,7 +1647,9 @@ export default {
         }
       } else {
         toastr.error('Vui lòng điền đầy đủ thông tin bắt buộc')
+        console.log(validThongtinchuhoso)
         vm.applicantIdRequired = validThongtinchuhoso['applicantIdRequired']
+        console.log(validThongtinchuhoso['applicantIdRequired'])
        
       }
     },
