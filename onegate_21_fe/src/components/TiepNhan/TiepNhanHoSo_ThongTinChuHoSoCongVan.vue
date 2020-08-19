@@ -517,6 +517,7 @@ export default {
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
+        value = value.trim()
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
       },
@@ -526,30 +527,36 @@ export default {
       },
       telNo: (value) => {
         const pattern = /^([0-9]{0,})$/
+        value = value.trim()
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       },
       varchar100: (val) => {
         if(val){
+          val = val.trim()
           return val.length < 100 ? true : 'Không được nhập quá 100 ký tự'
         }      
       },
       varchar50: (val) => {
         if(val){
+          val = val.trim()
           return val.length < 50 ? true : 'Không được nhập quá 50 ký tự'
         }      
       },
       varchar5000: (val) => {
         if(val){
+          val = val.trim()
           return val.length < 5000 ? true : 'Không được nhập quá 5000 ký tự'
         }      
       },
       varchar255: (val) => {
         if(val){
+          val = val.trim()
           return val.length < 255 ? true : 'Không được nhập quá 255 ký tự'
         }      
       },
       varchar500: (val) => {
         if(val){
+          val = val.trim()
           return val.length < 500 ? true : 'Không được nhập quá 500 ký tự'
         }      
       },
