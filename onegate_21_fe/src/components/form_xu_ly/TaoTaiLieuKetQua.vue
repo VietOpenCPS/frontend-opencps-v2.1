@@ -452,7 +452,7 @@
             })
             if (itemFind) {
               template['daKhai'] = true
-            } else if (!itemFind && template.eForm) {
+            } else if (!itemFind) {
               template['daKhai'] = false
             }
           })

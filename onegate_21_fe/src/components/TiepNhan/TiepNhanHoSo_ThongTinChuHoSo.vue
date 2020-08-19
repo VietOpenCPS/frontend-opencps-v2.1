@@ -238,6 +238,7 @@
                           :rules="[rules.required, rules.varchar100]"
                           required
                           @change="thongTinNguoiNopHoSo.delegateIdNo=thongTinNguoiNopHoSo.delegateIdNo.trim()"
+                          :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
                         <!--  -->
                         <suggestions
@@ -245,7 +246,8 @@
                           v-model="thongTinNguoiNopHoSo.delegateIdNo"
                           :options="searchOptions"
                           :onItemSelected="onSearchItemSelected1"
-                          :onInputChange="onInputChange1">
+                          :onInputChange="onInputChange1"
+                          :style="thongTinNguoiNopHoSo.sameUser ? 'pointer-events: none;opacity: 0.7' : ''">
                           <div slot="item" slot-scope="props" class="single-item">
                             <v-list-tile-content>
                               <v-list-tile-title v-html="props.item.applicantName"></v-list-tile-title>
@@ -276,6 +278,7 @@
                         :rules="requiredOptions['delegateName'] ? [rules.required, rules.varchar500] : ''"
                         :required="requiredOptions['delegateName']"
                         @change="thongTinNguoiNopHoSo.delegateName=thongTinNguoiNopHoSo.delegateName.trim()"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -294,6 +297,7 @@
                         rows="2"
                         :rules="requiredOptions['delegateAddress'] ? [rules.required, rules.varchar500] : ''"
                         :required="requiredOptions['delegateAddress']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-textarea>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -315,6 +319,7 @@
                         v-model="thongTinNguoiNopHoSo.delegateCityCode"
                         :rules="requiredOptions['delegateCityCode'] ? [rules.required] : ''"
                         :required="requiredOptions['delegateCityCode']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -336,6 +341,7 @@
                         v-model="thongTinNguoiNopHoSo.delegateDistrictCode"
                         :rules="requiredOptions['delegateDistrictCode'] ? [rules.required] : ''"
                         :required="requiredOptions['delegateDistrictCode']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -356,6 +362,7 @@
                         v-model="thongTinNguoiNopHoSo.delegateWardCode"
                         :rules="requiredOptions['delegateWardCode'] ? [rules.required] : ''"
                         :required="requiredOptions['delegateWardCode']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -375,6 +382,7 @@
                         @change="thongTinNguoiNopHoSo.delegateName=thongTinNguoiNopHoSo.delegateName.trim()"
                         :rules="requiredOptions['delegateTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
                         :required="requiredOptions['delegateTelNo']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -393,6 +401,7 @@
                         @change="thongTinNguoiNopHoSo.delegateEmail=thongTinNguoiNopHoSo.delegateEmail.trim()"
                         :rules="requiredOptions['delegateEmail'] ? [rules.email, rules.required] : (thongTinNguoiNopHoSo.delegateEmail ? [rules.email] : '')"
                         :required="requiredOptions['delegateEmail']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
                       </v-flex>
                     </v-layout>
