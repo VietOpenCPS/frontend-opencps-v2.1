@@ -1648,6 +1648,7 @@ export default {
       } else {
         toastr.error('Vui lòng điền đầy đủ thông tin bắt buộc')
         vm.applicantIdRequired = validThongtinchuhoso['applicantIdRequired']
+        console.log(validThongtinchuhoso['applicantIdRequired'])
        
       }
     },
