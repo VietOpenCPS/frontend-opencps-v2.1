@@ -50,6 +50,7 @@
                           </v-list-tile-content>
                         </div>
                       </suggestions>
+                      <span style="color:#ff5252;font-size: 12px;" v-if="(originality === 3 || originality === '3') && applicantIdRequired">Thông tin bắt buộc</span>
                       <v-tooltip top v-if="(originality === 3 || originality === '3') && applicantConfig">
                         <v-btn @click="showDialogApplicantList('ChuHoSo')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
                           <v-icon size="14">fas fa fa-address-card</v-icon>
@@ -255,6 +256,7 @@
                             </v-list-tile-content>
                           </div>
                         </suggestions>
+                        <span style="color:#ff5252;font-size: 12px" v-if="(originality === 3 || originality === '3') && checkDelegateIdNo">Thông tin bắt buộc</span>
                         <v-tooltip top v-if="(originality === 3 || originality === '3') && applicantConfig">
                           <v-btn @click="showDialogApplicantList('NguoiNop')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
                             <v-icon size="14">fas fa fa-address-card</v-icon>
@@ -701,8 +703,10 @@ export default {
     'suggestions': Suggestions,
     'tiny-pagination': TinyPagination
   },
-  props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode'],
+  props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode', 'applicantIdRequired'],
   data: () => ({
+    checkDelegateIdNo: false,
+    checkApplicantId: false,
     requiredOptions: {
       applicantIdNo: true,
       applicantName: true,
@@ -831,6 +835,7 @@ export default {
         return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 4-12 ký tự'
       },
       email: (value) => {
+        value = value.trim()
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
       },
@@ -840,25 +845,30 @@ export default {
       },
       telNo: (value) => {
         const pattern = /^([0-9]{0,})$/
+        value = value.trim()
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       },
       varchar100: (val) => {
         if(val){
+          val = val.trim()
           return val.length < 100 ? true : 'Không được nhập quá 100 ký tự'
         }      
       },
       varchar255: (val) => {
         if(val){
+          val = val.trim()
           return val.length < 255 ? true : 'Không được nhập quá 255 ký tự'
         }      
       },
       varchar500: (val) => {
         if(val){
+          val = val.trim()
           return val.length < 500 ? true : 'Không được nhập quá 500 ký tự'
         }      
       },
       varchar5000: (val) => {
         if(val){
+          val = val.trim()
           return val.length < 5000 ? true : 'Không được nhập quá 5000 ký tự'
         }      
       },
@@ -907,7 +917,7 @@ export default {
   created () {
     let vm = this
     if (vm.formCode === "NEW") {
-      vm.thongTinNguoiNopHoSo.sameUser = true
+      // vm.thongTinNguoiNopHoSo.sameUser = true
     }
     if (vm.hasOrganization) {
       vm.labelSwitch = {
@@ -933,6 +943,9 @@ export default {
     thongTinChuHoSo: {
       handler: function (value) {
         let vm = this
+        if(!value.applicantIdNo) {
+          vm.checkApplicantId = true
+        }
         vm.$store.commit('setThongTinChuHoSo', value)
         let tempData = {
           delegateName: value.applicantName,
@@ -1002,6 +1015,9 @@ export default {
       handler: function (value) {
         var vm = this
         let dataChuHoSo = vm.thongTinChuHoSo
+        if(!value.delegateIdNo) {
+          vm.checkDelegateIdNo = true
+        }
         if (value.sameUser) {
           let dataNguoiNopHoSo = {
             delegateName: dataChuHoSo.applicantName,
@@ -1250,7 +1266,8 @@ export default {
       let result = {
         validForm: vm.$refs.formChuHoSo.validate() && applicantIdRequired,
         message: vm.messageCheckApplicant,
-        validApplicant: vm.validBussinessInfos
+        validApplicant: vm.validBussinessInfos,
+        applicantIdRequired: applicantIdRequired
       }
       return result
     },
@@ -1271,16 +1288,18 @@ export default {
     },
     onInputChange (query) {
       let vm = this
+      vm.thongTinChuHoSo.applicantIdNo = query.trim()
       if (vm.functionTimeOut) {
         clearTimeout(vm.functionTimeOut)
       }
       vm.functionTimeOut = setTimeout(function () {
         if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2') || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
           vm.checkApplicantInfos()
+          vm.thongTinChuHoSo.applicantIdNo = query.trim()
         }
         vm.$store.commit('setApplicantId', query)
       }, 2000)
-      if (query.trim().length === 0) {
+      if (query.trim().length === 0 ) {
         return null
       }
       let url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
@@ -1299,7 +1318,21 @@ export default {
               let items = []
               if (response.data.hasOwnProperty('data')) {
                 items = response.data.data
+                if(query.trim().length >= 100) {
+                  toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
+                  vm.thongTinChuHoSo.applicantIdNo = ''
+                  return null
+                } else {
+                  vm.thongTinChuHoSo.applicantIdNo = query.trim()
+                }
               } else {
+                  if(query.trim().length >= 100) {
+                    toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
+                    vm.thongTinChuHoSo.applicantIdNo = ''
+                    return null
+                  } else {
+                    vm.thongTinChuHoSo.applicantIdNo = query.trim()
+                  }
               }
               resolve(items)
             })
@@ -1309,6 +1342,7 @@ export default {
     },
     onInputChange1 (query) {
       let vm = this
+      vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
       if (query.trim().length === 0) {
         return null
       }

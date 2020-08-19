@@ -962,7 +962,13 @@ export default {
         dossiers: {
             deep: true,
             handler:  (val, oldVal) => {
-                $('#dossiers_hidden').val(JSON.stringify(val))
+                try{
+                    val['applicantIdNo'] = val.delegateIdNo
+                    $('#dossiers_hidden').val(JSON.stringify(val))
+                } catch{
+                    val['applicantIdNo'] = val.delegateIdNo
+                    $('#dossiers_hidden').val(JSON.stringify(val))
+                }
             }
         },
         dossierFileArr: {

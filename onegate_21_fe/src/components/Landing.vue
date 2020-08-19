@@ -46,7 +46,7 @@
             return-object
             :hide-selected="true"
             @change="changeDomain"
-            clearable
+            :clearable="Array.isArray(listLinhVuc) && listLinhVuc.length === 1"
             box
           ></v-autocomplete>
         </v-flex>
@@ -383,7 +383,7 @@
                   <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                 </v-list-tile>
                 <v-list-tile v-if="(trangThaiHoSoList[index]['id'].indexOf('CV_DI') === 0 || trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0) &&
-                props.item.metaData && !getMetaData(props.item)['congvandagui']" @click="deleteCongVan(props.item, props.index)">
+                props.item.metaData && getMetaData(props.item).hasOwnProperty('congvandagui') && !getMetaData(props.item)['congvandagui']" @click="deleteCongVan(props.item, props.index)">
                   Xóa công văn
                 </v-list-tile>
                 <v-list-tile @click="viewDetail(props.item, props.index)" :disabled="!props.item['permission']">
