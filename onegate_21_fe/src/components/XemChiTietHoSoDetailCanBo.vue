@@ -72,7 +72,7 @@
           </iframe>
         </v-card>
       </v-dialog>
-      <thong-tin-co-ban-ho-so ref="thong-tin-co-ban-ho-so" :detailDossier="thongTinChiTietHoSo" :mauCongVan="mauCongVan"></thong-tin-co-ban-ho-so>
+      <thong-tin-co-ban-ho-so v-if="reRender" ref="thong-tin-co-ban-ho-so" :detailDossier="thongTinChiTietHoSo" :mauCongVan="mauCongVan"></thong-tin-co-ban-ho-so>
       <!--  -->
       <div>
         <v-tabs icons-and-text v-model="activeTab">
@@ -997,7 +997,8 @@ export default {
     hasPreviewSync: false,
     isNotarization: false,
     sequencyDossierImport: false,
-    mauCongVan: ''
+    mauCongVan: '',
+    reRender: true
   }),
   computed: {
     loading () {
@@ -2339,6 +2340,7 @@ export default {
                   vm.checkInput = 0
                   vm.$store.commit('setCheckInput', 0)
                   if (String(item.form) === 'ACTIONS') {
+                    vm.getDetailDossier()
                   } else {
                     vm.$router.push({
                       path: vm.$router.history.current.path,
@@ -2434,6 +2436,7 @@ export default {
                     vm.checkInput = 0
                     vm.$store.commit('setCheckInput', 0)
                     if (String(item.form) === 'ACTIONS') {
+                      vm.getDetailDossier()
                     } else {
                       vm.$router.push({
                         path: vm.$router.history.current.path,
@@ -2492,6 +2495,7 @@ export default {
                 vm.checkInput = 0
                 vm.$store.commit('setCheckInput', 0)
                 if (String(item.form) === 'ACTIONS') {
+                  vm.getDetailDossier()
                 } else {
                   vm.$router.push({
                     path: vm.$router.history.current.path,
@@ -3117,6 +3121,14 @@ export default {
       } else {
         toastr.error('Vui lòng chọn người thực hiện')
       }
+    },
+    getDetailDossier () {
+      let vm = this
+      vm.$store.dispatch('getDetailDossier', vm.id).then(resultDossier => {
+        vm.reRender = false
+        vm.thongTinChiTietHoSo = resultDossier
+        vm.reRender = true
+      })
     },
     changeStateViewResult (data) {
       // console.log('state view result', data)
