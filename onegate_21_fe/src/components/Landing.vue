@@ -46,7 +46,7 @@
             return-object
             :hide-selected="true"
             @change="changeDomain"
-            :clearable="Array.isArray(listLinhVuc) && listLinhVuc.length === 1"
+            :clearable="Array.isArray(listLinhVuc) && listLinhVuc.length > 1"
             box
           ></v-autocomplete>
         </v-flex>
