@@ -4723,6 +4723,7 @@ export const store = new Vuex.Store({
         let dataPost = new URLSearchParams()
         dataPost.append('actionUser', filter.actionUser)
         axios.post('/o/rest/v2/dossiers/' + filter.dossierId + '/actions/' + filter.actionCode + '/groupDossier', dataPost, param).then(function (response) {
+          store.dispatch('getActiveGetCounter', !state.activeGetCounter)
           resolve(response)
         }).catch(function (xhr) {
           reject(xhr)
@@ -4744,6 +4745,30 @@ export const store = new Vuex.Store({
         }).catch(function (error) {
           reject(error)
         })
+      })
+    },
+    attachFileThaoTacGop ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        try {
+          let dataPostEform = new FormData()
+          dataPostEform.append('dossierIds', data.dossierIds)
+          dataPostEform.append('file', data.file)
+          let url = state.initData.dossierApi + '/eforms/' + data.dossierPartNo
+          axios.post(url, dataPostEform, options).then(function (response) {
+            resolve(response.data)
+          }).catch(function (xhr) {
+            reject(data)
+          })
+        } catch (e) {
+          console.log(e)
+          reject(data)
+        }
       })
     },
     // ----End---------

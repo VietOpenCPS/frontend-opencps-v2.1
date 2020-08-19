@@ -46,7 +46,7 @@
             return-object
             :hide-selected="true"
             @change="changeDomain"
-            clearable
+            :clearable="Array.isArray(listLinhVuc) && listLinhVuc.length === 1"
             box
           ></v-autocomplete>
         </v-flex>
@@ -381,6 +381,10 @@
                   @click="btnActionEvent(props.item, item, index, false)"
                 >
                   <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile v-if="(trangThaiHoSoList[index]['id'].indexOf('CV_DI') === 0 || trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0) &&
+                props.item.metaData && getMetaData(props.item).hasOwnProperty('congvandagui') && !getMetaData(props.item)['congvandagui']" @click="deleteCongVan(props.item, props.index)">
+                  Xóa công văn
                 </v-list-tile>
                 <v-list-tile @click="viewDetail(props.item, props.index)" :disabled="!props.item['permission']">
                   Xem chi tiết
@@ -881,6 +885,7 @@
 
 <script>
 // import Vue from 'vue'
+import toastr from 'toastr'
 import $ from 'jquery'
 import TemplateRendering from './pagging/template_rendering.vue'
 import TinyPagination from './pagging/opencps_pagination.vue'
@@ -1217,6 +1222,8 @@ export default {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       vm.dossierNoKey = ''
+      vm.linhVucSelected = ''
+      vm.domainCode = ''
       let currentQuery = newRoute.query
       let currentQueryOld = oldRoute.query
       vm.currentQueryState = currentQuery
@@ -1298,13 +1305,20 @@ export default {
         if (vm.listLinhVuc === null || vm.listLinhVuc === undefined || (vm.listLinhVuc !== null && vm.listLinhVuc !== undefined && vm.listLinhVuc.length === 0)) {
           vm.processListDomain(currentQuery)
         } else {
+          if (vm.listLinhVuc.length === 1 && !vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
+            vm.linhVucSelected = vm.listLinhVuc[0]
+            vm.domainCode = vm.linhVucSelected['domainCode']
+          } else {
+            vm.linhVucSelected = ''
+            vm.domainCode = ''
+          }
           for (let key in vm.listLinhVuc) {
-            if (String(vm.listLinhVuc[key]['domainCode']) === String(currentQuery.domain)) {
-              vm.linhVucSelected = vm.listLinhVuc[key]
-              vm.domainCode = vm.linhVucSelected['domainCode']
-            } else if (vm.listLinhVuc.length === 1) {
-              vm.linhVucSelected = vm.listLinhVuc[0]
-              vm.domainCode = vm.linhVucSelected['domainCode']
+            if (!vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
+              if (String(vm.listLinhVuc[key]['domainCode']) === String(currentQuery.domain)) {
+                vm.linhVucSelected = vm.listLinhVuc[key]
+                vm.domainCode = vm.linhVucSelected['domainCode']
+              }
+              console.log('linhVucSelected watch', vm.linhVucSelected)
             }
           }
         }
@@ -1575,12 +1589,14 @@ export default {
             console.log('listThuTucHanhChinh2', vm.listThuTucHanhChinh)
           }).catch(function (){})
         } else if (vm.listLinhVuc.length === 1) {
-          vm.linhVucSelected = vm.listLinhVuc[0]
-          vm.domainCode = vm.linhVucSelected['domainCode']
+          if (!vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
+            vm.linhVucSelected = vm.listLinhVuc[0]
+            vm.domainCode = vm.linhVucSelected['domainCode']
+          }
         } else {
           vm.linhVucSelected = null
         }
-        // vm.doLoadingDataHoSo()
+        vm.doLoadingDataHoSo()
       }).catch(function (){})
     },
     processListCongVan (currentQuery) {
@@ -1941,7 +1957,7 @@ export default {
       }, 300)
     },
     changeDomain (item) {
-      // console.log('change Domain')
+      console.log('change Domain', item)
       let vm = this
       vm.selectMultiplePage = []
       vm.linhVucSelected = item
@@ -2624,7 +2640,7 @@ export default {
           vm.$store.dispatch('deleteDossier', filter).then(function (result) {
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
-           vm.$router.push({
+            vm.$router.push({
               path: vm.$router.history.current.path,
               query: {
                 recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -2636,6 +2652,19 @@ export default {
         }
       } else {
         return false
+      }
+    },
+    deleteCongVan (item, index) {
+      let vm = this
+      let filter = {
+        dossierId: item.dossierId
+      }
+      let x = confirm('Bạn có chắc chắn thực hiện xóa công văn?')
+      if (x) {
+        vm.$store.dispatch('deleteDossier', filter).then(function (result) {
+          toastr.success('Xóa công văn thành công')
+          vm.doLoadingDataHoSo()
+        }).catch(function (){})
       }
     },
     doCreateDossier () {
@@ -3149,7 +3178,15 @@ export default {
       
       }).catch (function (reject) {
       }) 
-    }
+    },
+    getMetaData (val) {
+      let metaDataOut = ''
+      try {
+        metaDataOut = JSON.parse(val.metaData)
+      } catch (error) {
+      }
+      return metaDataOut
+    },
   }
 }
 </script>

@@ -471,7 +471,7 @@
       ref="importData"
       name="importData"
       accept=""
-      @change="onFilePicked"
+      @input="onFilePicked"
       v-show="false"
     >
   </div>
