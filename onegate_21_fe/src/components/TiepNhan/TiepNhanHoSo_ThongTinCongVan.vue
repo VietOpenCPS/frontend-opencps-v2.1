@@ -424,7 +424,9 @@ export default {
       },
       telNo: (value) => {
         const pattern = /^([0-9]{0,})$/
-        value = value.trim()
+        if(typeof value === 'string'){
+          value = value.trim()
+        }
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       },
       checkSpace: (val) => {
@@ -433,34 +435,24 @@ export default {
         }
       },
       checkLength: (val) => {
-        if(val){
           val = val.trim()
-          return val.length < 255 ? true : 'Không được nhập quá 255 ký tự'
-        }      
+          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'    
       },
       varchar100: (val) => {
-        if(val){
           val = val.trim()
-          return val.length < 100 ? true : 'Không được nhập quá 100 ký tự'
-        }      
+          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'    
       },
       varchar255: (val) => {
-        if(val){
           val = val.trim()
-          return val.length < 255 ? true : 'Không được nhập quá 255 ký tự'
-        }      
+          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'     
       },
       varchar500: (val) => {
-        if(val){
           val = val.trim()
-          return val.length < 500 ? true : 'Không được nhập quá 500 ký tự'
-        }      
+          return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'     
       },
       varchar5000: (val) => {
-        if(val){
-          val = val.trim()
-          return val.length < 5000 ? true : 'Không được nhập quá 5000 ký tự'
-        }      
+        val = val.trim()
+        return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'    
       },
     },
     
