@@ -59,11 +59,12 @@
                           slot="activator"
                           v-model="dateFormated"
                           append-icon="event"
-                          readonly
-                          @blur="documentDate = parseDate(dateFormated)"
+                          placeholder="dd/mm/yyyy"
+                          @input="inputDate('dateFormated')"
+                          @change="changeDocumentDate()"
                         >
                         </v-text-field>
-                        <v-date-picker ref="picker" locale="vi"
+                        <v-date-picker ref="picker" locale="vi" :max="getMindate()"
                         :first-day-of-week="1" v-model="documentDate" no-title @input="menuDate = false"></v-date-picker>
                       </v-menu>
                       <p class="pt-2" v-else>{{dateFormated}}</p>
@@ -167,7 +168,7 @@ export default {
     fileAttachCounter: 0,
     menuDate: false,
     menuDueDate: false,
-    documentDate: null,
+    documentDate: new Date().toISOString().substr(0, 10),
     dateFormated: null,
     dueDate: null,
     duedateFormated: null,
@@ -301,6 +302,57 @@ export default {
       } else {
         return (new Date(date)).getTime()
       }
+    },
+    validateDate(str){
+        return str.replace(/[^\d\/]/g, "");
+    },
+    inputDate (key) {
+        let vm = this
+        let gt = vm.validateDate(vm[key]);
+        if (gt.match(/^\d{2}$/) !== null) {
+            vm[key] = gt + '/'
+        } else if (gt.match(/^\d{2}\/\d{2}$/) !== null) {
+            vm[key] = gt + '/'
+        }else
+            vm[key] = gt
+    },
+    changeDocumentDate () {
+      let vm = this
+      vm.changeDate('dateFormated')
+      vm.documentDate = vm.parseDate(vm.dateFormated)
+    },
+    changeDate(key){
+        let vm = this 
+        let dateString = vm[key];
+        let regex = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/
+        let regex2 = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{2}$/
+        if (!regex.test(dateString) && !regex2.test(dateString)) {
+            vm[key] = ''
+        }
+        else{
+            let date = vm[key].split("/");
+            let day = date[0];
+            let month = date[1];
+            if (day > 31) {
+                vm[key] = ''
+            }
+            else
+                if (month > 12) {
+                vm[key] = ''
+                }else
+                if(date[2].length == 2){
+                    if(key==="birthdayFormated"){
+                        if(date[2] <= 20){
+                            vm[key] = day+'/'+month+'/20'+date[2]
+                        } else {
+                            vm[key] = day+'/'+month+'/19'+date[2]
+                        }
+                        
+                    }else{
+                        vm[key] = day+'/'+month+'/20'+date[2]
+                    }
+                }
+        }
     },
   }
 }

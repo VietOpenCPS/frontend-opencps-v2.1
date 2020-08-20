@@ -447,7 +447,7 @@
             template['editForm'] = true
             template['embed'] = false
             let itemFind = dossierFiles.find(file => {
-              return template.partNo === file.dossierPartNo && file.fileSize !== 0
+              return (template.partNo === file.dossierPartNo && file.fileSize !== 0 && file.eForm) || (template.partNo === file.dossierPartNo && !file.eForm)
               // return template.partNo === file.dossierPartNo && file.eForm
             })
             if (itemFind) {

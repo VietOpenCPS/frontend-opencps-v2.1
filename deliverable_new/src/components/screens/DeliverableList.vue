@@ -722,6 +722,7 @@
           }
         } catch (error) {
         }
+        vm.filterExport = filter
         vm.$store.dispatch('getDeliverables', filter).then(function (result) {
           vm.hosoDatasTotal = result['total']
           vm.hosoDatas = result['data']
