@@ -824,7 +824,7 @@ export default {
     functionTimeOut: null,
     dialog_applicantInfos: false,
     dialog_applicantList: false,
-    applicantConfig: false,
+    applicantConfig: true,
     titleEdit: 'Thông tin công dân, tổ chức, doanh nghiệp',
     applicantEdit: '',
     dialog_editApplicant: false,
@@ -911,7 +911,7 @@ export default {
   created () {
     let vm = this
     if (vm.formCode === "NEW") {
-      // vm.thongTinNguoiNopHoSo.sameUser = true
+      vm.thongTinNguoiNopHoSo.sameUser = true
     }
     if (vm.hasOrganization) {
       vm.labelSwitch = {
