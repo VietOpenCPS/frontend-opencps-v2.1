@@ -250,6 +250,7 @@ export default {
   },
   created () {
     let vm = this
+    vm.documentDate = new Date().toISOString().substr(0, 10)
   },
   watch: {
     '$route': function (newRoute, oldRoute) {

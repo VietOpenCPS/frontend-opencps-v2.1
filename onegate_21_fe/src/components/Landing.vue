@@ -641,7 +641,7 @@
                   placeholder="Nhập tên người làm thủ tục"
                   box
                   v-model="applicantNameGuide"
-                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  :rules="[rules.required, rules.varchar500]"
                   required
                 ></v-text-field>
                 <v-radio-group class="my-0" v-model="applicantTypeGuide" row style="position:absolute;right:0;top:0">
@@ -654,6 +654,7 @@
                 <v-text-field
                   placeholder="Nhập địa chỉ"
                   box
+                  :rules="[rules.varchar500]"
                   v-model="applicantAddressGuide"
                 ></v-text-field>
               </v-flex>
@@ -663,6 +664,7 @@
                   box
                   placeholder="Nhập thư điện tử"
                   v-model="applicantEmailGuide"
+                  :rules="[rules.varchar100]"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -671,6 +673,7 @@
                   box
                   placeholder="Nhập số điện thoại"
                   v-model="applicantTelNoGuide"
+                  :rules="[rules.varchar100]"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -715,6 +718,7 @@
                 box
                 v-model="applicantNoteGuide"
                 rows="3"
+                :rules="[rules.varchar5000]"
                 ></v-textarea>
               </v-flex>
             </v-layout>
@@ -791,7 +795,7 @@
                   placeholder="Nhập tên người làm thủ tục"
                   box
                   v-model="applicantNameGuide"
-                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  :rules="[rules.required, rules.varchar500]"
                   required
                 ></v-text-field>
                 <v-radio-group class="my-0" v-model="applicantTypeGuide" row style="position:absolute;right:0;top:0">
@@ -805,6 +809,7 @@
                   placeholder="Nhập địa chỉ"
                   box
                   v-model="applicantAddressGuide"
+                  :rules="[rules.varchar500]"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -813,6 +818,7 @@
                   box
                   placeholder="Nhập thư điện tử"
                   v-model="applicantEmailGuide"
+                  :rules="[rules.varchar100]"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -820,6 +826,7 @@
                 <v-text-field
                   box
                   v-model="applicantTelNoGuide"
+                  :rules="[rules.varchar100]"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -828,6 +835,7 @@
                 box
                 v-model="applicantNoteGuide"
                 rows="3"
+                :rules="[rules.varchar5000]"
                 ></v-textarea>
               </v-flex>
             </v-layout>
@@ -1052,6 +1060,69 @@ export default {
     govAgencyFilterMenuConfig: '',
     groupServiceFilterMenuConfig: '',
     disableSearchAgency: false,
+    rules: {
+      required: (value) => !!value || 'Thông tin bắt buộc',
+      cmndHoChieu: (value) => {
+        const pattern = /^(?![0-9]{4,12})[0-9a-zA-Z]{4,12}$/
+        return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 4-12 ký tự'
+      },
+      email: (value) => {
+        value = value.trim()
+        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
+      },
+      passWord: (value) => {
+        const pattern = /^(?![0-9]{6,})[0-9a-zA-Z]{6,}$/
+        return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 6 ký tự'
+      },
+      telNo: (value) => {
+        const pattern = /^([0-9]{0,})$/
+        if(typeof value === 'string'){
+          value = value.trim()
+        }
+        return pattern.test(value) || 'Gồm các ký tự 0-9'
+      },
+      varchar50: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar100: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar255: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar500: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar5000: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+        } else {
+          return true
+        }
+      },
+    },
   }),
   computed: {
     loadingDynamicBtn () {
@@ -2099,11 +2170,23 @@ export default {
           if (isOpenDialog) {
             vm.dialogAction = true
           } else {
-            if (item.hasOwnProperty('requiredCVDen')) {
-              item = Object.assign(item, {requiredCVDenGovCode: vm.congvanSelected.govAgencyCode, requiredCVDenGroupId: vm.congvanSelected.dossierId})
+            if(String(item.form) === 'NEW_GROUP_CV_DI') {
+              if(vm.serviceCode && vm.templateNo) {
+                if (item.hasOwnProperty('requiredCVDen')) {
+                  item = Object.assign(item, {requiredCVDenGovCode: vm.congvanSelected.govAgencyCode, requiredCVDenGroupId: vm.congvanSelected.dossierId})
+                }
+                vm.$store.commit('setFormActionGroup', item)
+                vm.doCreateDossier() 
+              } else {
+                toastr.error('Chưa chọn thủ tục hành chính')
+              }
+            } else {
+              if (item.hasOwnProperty('requiredCVDen')) {
+                item = Object.assign(item, {requiredCVDenGovCode: vm.congvanSelected.govAgencyCode, requiredCVDenGroupId: vm.congvanSelected.dossierId})
+              }
+              vm.$store.commit('setFormActionGroup', item)
+              vm.doCreateDossier()
             }
-            vm.$store.commit('setFormActionGroup', item)
-            vm.doCreateDossier()
           }
         } else if (String(item.form) === 'UPDATE') {
           if(dossierItem.serviceCode === 'BNG-270817' || dossierItem.serviceCode === 'BNG-270821' || dossierItem.serviceCode === 'BNG-270820' || dossierItem.serviceCode === 'BNG-270816' || dossierItem.serviceCode === 'BNG-270819' || dossierItem.serviceCode === 'BNG-270815'){
