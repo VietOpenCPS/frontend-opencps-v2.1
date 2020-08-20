@@ -1977,6 +1977,10 @@ export default {
             validPhanCong = false
           }
         }
+        if (!validPhanCong) {
+          let title = vm.type_assign === 6 || vm.type_assign === 7 || vm.type_assign === 8 || vm.type_assign === 9 ? 'Vui lòng chọn phòng ban thực hiện' : 'Vui lòng chọn người thực hiện'
+          toastr.error(title)
+        }
       }
       var paymentsOut = null
       if (vm.payments) {

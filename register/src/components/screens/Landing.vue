@@ -366,6 +366,7 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       var vm = this
+      $('body').removeClass('body_login')
       try {
         if (rulesConfig) {
           vm.rules = Object.assign({}, vm.rules, rulesConfig)

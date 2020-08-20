@@ -10,6 +10,8 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    groupConfig: '',
+    indexReport: '',
     groupId: window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0,
     snackbarerror: false,
     snackbarsocket: false,
@@ -39,7 +41,8 @@ export const store = new Vuex.Store({
     reportType: 'REPORT_01',
     groupType: 'domain',
     siteName: '',
-    itemsReports: support['trangThaiHoSoList']
+    itemsReports: support['trangThaiHoSoList'],
+    isMobile: false
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -59,20 +62,27 @@ export const store = new Vuex.Store({
             'userId': 20103
           }
         }
-        let param = {
-          headers: {
-            groupId: state.initData['groupId']
+        try {
+          if (groupStatisticConfig) {
+            state['groupConfig'] = groupStatisticConfig
           }
+        } catch (error) {
         }
-        axios.get('/o/v1/opencps/site/name', param).then(function (response) {
-          let serializable = response.data
-          state.siteName = serializable
-          console.log(state.siteName)
-          commit('setsiteName', serializable)
-          resolve(state.initData)
-        }).catch(function (error) {
-          console.log(error)
-        })
+        resolve(state.initData)
+        // let param = {
+        //   headers: {
+        //     groupId: state.initData['groupId']
+        //   }
+        // }
+        // axios.get('/o/v1/opencps/site/name', param).then(function (response) {
+        //   let serializable = response.data
+        //   state.siteName = serializable
+        //   console.log(state.siteName)
+        //   commit('setsiteName', serializable)
+        //   resolve(state.initData)
+        // }).catch(function (error) {
+        //   console.log(error)
+        // })
       })
     },
     getLevelList ({commit, state}, data) {
@@ -98,6 +108,34 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getLevelListMC ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          let textPost = {}
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/serviceinfos/statistics/levels')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function () {
+            reject()
+          })
+        })
+      })
+    },
     getReportTotal ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -105,15 +143,9 @@ export const store = new Vuex.Store({
             headers: {
               groupId: state.initData.groupId,
               Accept: 'application/json'
-            },
-            params: {
-              year: filter.year,
-              month: filter.month,
-              agency: filter.agency,
-              domain: filter.domain
             }
           }
-          axios.get('/o/rest/statistics', param).then(function (response) {
+          axios.get('/o/rest/statistics?year=' + filter.year + '&month=' + filter.month + '&domain=total&agency=total&system=total', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -124,6 +156,42 @@ export const store = new Vuex.Store({
           }).catch(function (error) {
             console.log(error)
             reject(error)
+          })
+        })
+      })
+    },
+    getReportTotalMC ({commit, state}, year) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            }
+          }
+          // 
+          let dataPost = new URLSearchParams()
+          let textPost = {
+            year: year,
+            month: 0,
+            domain: 'total',
+            agency: 'total',
+            system: 'total'
+          }
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/statistics')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve(null)
+            }
+          }).catch(function () {
+            reject()
           })
         })
       })
@@ -150,16 +218,397 @@ export const store = new Vuex.Store({
           if (filter['report'] === 'linemonth') {
             param.params['domain'] = ''
           }
+          // 
+          // let childsCode = []
+          // if (state.groupConfig) {
+          //   for (let key in state.groupConfig) {
+          //     childsCode = childsCode.concat(state.groupConfig[key][1].split(','))
+          //   }
+          // }
+          // 
           axios.get('/o/rest/statistics', param).then(function (response) {
             let serializable = response.data
-            if (serializable.data) {
-              let dataReturn = serializable.data
-              resolve(dataReturn)
-            } else {
-              resolve(null)
+            // Khởi tạo group cha với fix trường hợp group cha không có dữ liệu, group con có dữ liệu
+            let childsCode = []
+            if (state.groupConfig) {
+              for (let key in state.groupConfig) {
+                childsCode = childsCode.concat(state.groupConfig[key][1].split(','))
+                if (param.params['agency'] !== 'total') {
+                  if (param.params.hasOwnProperty('month') && param.params['month']) {
+                    let groupExits = serializable['data'].filter(function (item) {
+                      return item['govAgencyCode'] === key && Number(item['month']) === Number(param.params['month'])
+                    })
+                    if (groupExits.length === 0) {
+                      let group = {
+                        govAgencyCode: key,
+                        govAgencyName: state.groupConfig[key][0],
+                        domainCode: '',
+                        domainName: '',
+                        processingCount: 0,
+                        waitingCount: 0,
+                        releaseCount: 0,
+                        onlineCount: 0,
+                        onegateCount: 0,
+                        month: Number(param.params['month']),
+                        year: Number(param.params['year']),
+                        betimesCount: 0,
+                        cancelledCount: 0,
+                        deniedCount: 0,
+                        doneCount: 0,
+                        insideCount: 0,
+                        interoperatingCount: 0,
+                        ontimeCount: 0,
+                        ontimePercentage: 0,
+                        outsideCount: 0,
+                        overdueCount: 0,
+                        overtimeCount: 0,
+                        overtimeInside: 0,
+                        overtimeOutside: 0,
+                        processCount: 0,
+                        receivedCount: 0,
+                        releasingCount: 0,
+                        remainingCount: 0,
+                        totalCount: 0,
+                        undueCount: 0,
+                        unresolvedCount: 0
+                      }
+                      serializable['data'] = serializable['data'].concat([group])
+                    }
+                  } else {
+                    for (let indexMonth = 1; indexMonth <= 12; indexMonth++) {
+                      let groupExits = serializable['data'].filter(function (item) {
+                        return item['govAgencyCode'] === key && Number(item['month']) === Number(indexMonth)
+                      })
+                      if (groupExits.length === 0) {
+                        let group = {
+                          govAgencyCode: key,
+                          govAgencyName: state.groupConfig[key][0],
+                          domainCode: '',
+                          domainName: '',
+                          processingCount: 0,
+                          receivedCount: 0,
+                          waitingCount: 0,
+                          releaseCount: 0,
+                          onlineCount: 0,
+                          onegateCount: 0,
+                          month: Number(indexMonth),
+                          year: Number(param.params['year']),
+                          betimesCount: 0,
+                          cancelledCount: 0,
+                          deniedCount: 0,
+                          doneCount: 0,
+                          insideCount: 0,
+                          interoperatingCount: 0,
+                          ontimeCount: 0,
+                          ontimePercentage: 0,
+                          outsideCount: 0,
+                          overdueCount: 0,
+                          overtimeCount: 0,
+                          overtimeInside: 0,
+                          overtimeOutside: 0,
+                          processCount: 0,
+                          receivedCount: 0,
+                          releasingCount: 0,
+                          remainingCount: 0,
+                          totalCount: 0,
+                          undueCount: 0,
+                          unresolvedCount: 0
+                        }
+                        serializable['data'] = serializable['data'].concat([group])
+                      }
+                    }
+                  }
+                }
+              }
             }
+            // 
+            if (param.params.hasOwnProperty('month') && String(param.params['month']) !== 'undefined' && param.params['agency'] !== 'total' 
+              && param.params.hasOwnProperty('domain') && param.params['domain'] === 'total' && state.groupConfig) {
+              let childsData = function (code) {
+                return serializable['data'].filter(function (item) {
+                  return item['govAgencyCode'] === code
+                })
+              }
+              let resultData = serializable['data']
+              let resultOutput = []
+              for (let index in resultData) {
+                let groupCode = resultData[index]['govAgencyCode']
+                if (state.groupConfig.hasOwnProperty(groupCode)) {
+                  let childs = state.groupConfig[groupCode][1].split(',')
+                  for (let index2 in childs) {
+                    // resultData[index]['processingCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['processingCount']) + Number(childsData(childs[index2])[0]['processingCount']) : resultData[index]['processingCount']
+                    // resultData[index]['waitingCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['waitingCount']) + Number(childsData(childs[index2])[0]['waitingCount']) : resultData[index]['waitingCount']
+                    // resultData[index]['releaseCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['releaseCount']) + Number(childsData(childs[index2])[0]['releaseCount']) : resultData[index]['releaseCount']
+                    // resultData[index]['onlineCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['onlineCount']) + Number(childsData(childs[index2])[0]['onlineCount']) : resultData[index]['onlineCount']
+                    // resultData[index]['onegateCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['onegateCount']) + Number(childsData(childs[index2])[0]['onegateCount']) : resultData[index]['onegateCount']
+                    for (let prop in resultData[index]) {
+                      if (String(prop).indexOf('Count') > 0) {
+                        resultData[index][prop] = childsData(childs[index2])[0] ? Number(resultData[index][prop]) + Number(childsData(childs[index2])[0][prop]) : resultData[index][prop]
+                      }
+                    }
+                  }
+                }
+                let removeItems = childsCode.filter(function (item) {
+                  return item !== resultData[index]['govAgencyCode']
+                })
+                if (removeItems.length === childsCode.length) {
+                  resultOutput.push(resultData[index])
+                }
+              }
+              resolve(resultOutput)
+            } else if (param.params.hasOwnProperty('month') && String(param.params['month']) === 'undefined' && param.params['agency'] !== 'total' 
+              && param.params.hasOwnProperty('domain') && param.params['domain'] === 'total' && state.groupConfig) {
+                let childsData = function (code) {
+                  return serializable['data'].filter(function (item) {
+                    return item['govAgencyCode'] === code
+                  })
+                }
+                let resultData = serializable['data']
+                let resultOutput = []
+                for (let index in resultData) {
+                  let groupCode = resultData[index]['govAgencyCode']
+                  if (state.groupConfig.hasOwnProperty(groupCode)) {
+                    let childs = state.groupConfig[groupCode][1].split(',')
+                    for (let index2 in childs) {
+                      // if (groupCode === 'BGTVT-CDTND') {
+                      //   console.log('resultOutput', resultData[index]['month'], childs[index2], childsData(childs[index2]))
+                      // }
+                      let childMonth = childsData(childs[index2]).filter(function (item) {
+                        return item['month'] === resultData[index]['month']
+                      })
+                      resultData[index]['receivedCount'] = childMonth[0] ? Number(resultData[index]['receivedCount']) + Number(childMonth[0]['receivedCount']) : resultData[index]['receivedCount']
+                    }
+                  }
+                  let removeItems = childsCode.filter(function (item) {
+                    return item !== resultData[index]['govAgencyCode']
+                  })
+                  if (removeItems.length === childsCode.length) {
+                    resultOutput.push(resultData[index])
+                  }
+                }
+                resolve(resultOutput)
+            } else {
+              if (serializable.data) {
+                let dataReturn = serializable.data
+                resolve(dataReturn)
+              } else {
+                resolve(null)
+              }
+            }
+            // 
           }).catch(function (error) {
             console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getAgencyReportListsMC ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            }
+          }
+          let params = {
+            year: filter.year,
+            month: filter.month,
+            group: filter.group,
+            agency: filter['agency'],
+            system: filter['system']
+          }
+          if (filter['report']) {
+            params['domain'] = 'total'
+          }
+          if (filter['report'] === 'linemonth') {
+            params['domain'] = ''
+          }
+          // 
+          // let childsCode = []
+          // if (state.groupConfig) {
+          //   for (let key in state.groupConfig) {
+          //     childsCode = childsCode.concat(state.groupConfig[key].split(','))
+          //   }
+          // }
+          // 
+          let dataPost = new URLSearchParams()
+          let url = '/statistics'
+          // for (let index in params) {
+          //   url += index + '=' + params[index] + '&'
+          // }
+          dataPost.append('method', 'GET')
+          dataPost.append('url', url)
+          dataPost.append('data', JSON.stringify(params))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+            let serializable = response.data
+            // 
+            let childsCode = []
+            if (state.groupConfig) {
+              for (let key in state.groupConfig) {
+                childsCode = childsCode.concat(state.groupConfig[key][1].split(','))
+                if (params['agency'] !== 'total') {
+                  if (params.hasOwnProperty('month') && params['month']) {
+                    let groupExits = serializable['data'].filter(function (item) {
+                      return item['govAgencyCode'] === key && Number(item['month']) === Number(params['month'])
+                    })
+                    if (groupExits.length === 0) {
+                      let group = {
+                        govAgencyCode: key,
+                        govAgencyName: state.groupConfig[key][0],
+                        domainCode: '',
+                        domainName: '',
+                        processingCount: 0,
+                        waitingCount: 0,
+                        releaseCount: 0,
+                        onlineCount: 0,
+                        onegateCount: 0,
+                        month: Number(params['month']),
+                        year: Number(params['year']),
+                        betimesCount: 0,
+                        cancelledCount: 0,
+                        deniedCount: 0,
+                        doneCount: 0,
+                        insideCount: 0,
+                        interoperatingCount: 0,
+                        ontimeCount: 0,
+                        ontimePercentage: 0,
+                        outsideCount: 0,
+                        overdueCount: 0,
+                        overtimeCount: 0,
+                        overtimeInside: 0,
+                        overtimeOutside: 0,
+                        processCount: 0,
+                        receivedCount: 0,
+                        releasingCount: 0,
+                        remainingCount: 0,
+                        totalCount: 0,
+                        undueCount: 0,
+                        unresolvedCount: 0
+                      }
+                      serializable['data'] = serializable['data'].concat([group])
+                    }
+                  } else {
+                    for (let indexMonth = 1; indexMonth <= 12; indexMonth++) {
+                      let groupExits = serializable['data'].filter(function (item) {
+                        return item['govAgencyCode'] === key && Number(item['month']) === Number(indexMonth)
+                      })
+                      if (groupExits.length === 0) {
+                        let group = {
+                          govAgencyCode: key,
+                          govAgencyName: state.groupConfig[key][0],
+                          domainCode: '',
+                          domainName: '',
+                          receivedCount: 0,
+                          processingCount: 0,
+                          waitingCount: 0,
+                          releaseCount: 0,
+                          onlineCount: 0,
+                          onegateCount: 0,
+                          month: Number(indexMonth),
+                          year: Number(params['year']),
+                          betimesCount: 0,
+                          cancelledCount: 0,
+                          deniedCount: 0,
+                          doneCount: 0,
+                          insideCount: 0,
+                          interoperatingCount: 0,
+                          ontimeCount: 0,
+                          ontimePercentage: 0,
+                          outsideCount: 0,
+                          overdueCount: 0,
+                          overtimeCount: 0,
+                          overtimeInside: 0,
+                          overtimeOutside: 0,
+                          processCount: 0,
+                          receivedCount: 0,
+                          releasingCount: 0,
+                          remainingCount: 0,
+                          totalCount: 0,
+                          undueCount: 0,
+                          unresolvedCount: 0
+                        }
+                        serializable['data'] = serializable['data'].concat([group])
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            // 
+            if (params.hasOwnProperty('month') && String(params['month']) !== 'undefined' && params['agency'] !== 'total' 
+              && params.hasOwnProperty('domain') && params['domain'] === 'total' && state.groupConfig) {
+              let childsData = function (code) {
+                return serializable['data'].filter(function (item) {
+                  return item['govAgencyCode'] === code
+                })
+              }
+              let resultData = serializable['data']
+              let resultOutput = []
+              for (let index in resultData) {
+                let groupCode = resultData[index]['govAgencyCode']
+                if (state.groupConfig.hasOwnProperty(groupCode)) {
+                  let childs = state.groupConfig[groupCode][1].split(',')
+                  for (let index2 in childs) {
+                    // resultData[index]['processingCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['processingCount']) + Number(childsData(childs[index2])[0]['processingCount']) : resultData[index]['processingCount']
+                    // resultData[index]['waitingCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['waitingCount']) + Number(childsData(childs[index2])[0]['waitingCount']) : resultData[index]['waitingCount']
+                    // resultData[index]['releaseCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['releaseCount']) + Number(childsData(childs[index2])[0]['releaseCount']) : resultData[index]['releaseCount']
+                    // resultData[index]['onlineCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['onlineCount']) + Number(childsData(childs[index2])[0]['onlineCount']) : resultData[index]['onlineCount']
+                    // resultData[index]['onegateCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['onegateCount']) + Number(childsData(childs[index2])[0]['onegateCount']) : resultData[index]['onegateCount']
+                    for (let prop in resultData[index]) {
+                      if (String(prop).indexOf('Count') > 0) {
+                        resultData[index][prop] = childsData(childs[index2])[0] ? Number(resultData[index][prop]) + Number(childsData(childs[index2])[0][prop]) : resultData[index][prop]
+                      }
+                    }
+                  }
+                }
+                let removeItems = childsCode.filter(function (item) {
+                  return item !== resultData[index]['govAgencyCode']
+                })
+                if (removeItems.length === childsCode.length) {
+                  resultOutput.push(resultData[index])
+                }
+              }
+              resolve(resultOutput)
+            } else if (params.hasOwnProperty('month') && String(params['month']) === 'undefined' && params['agency'] !== 'total' 
+              && params.hasOwnProperty('domain') && params['domain'] === 'total' && state.groupConfig) {
+                let childsData = function (code) {
+                  return serializable['data'].filter(function (item) {
+                    return item['govAgencyCode'] === code
+                  })
+                }
+                let resultData = serializable['data']
+                let resultOutput = []
+                for (let index in resultData) {
+                  let groupCode = resultData[index]['govAgencyCode']
+                  if (state.groupConfig.hasOwnProperty(groupCode)) {
+                    let childs = state.groupConfig[groupCode][1].split(',')
+                    for (let index2 in childs) {
+                      let childMonth = childsData(childs[index2]).filter(function (item) {
+                        return item['month'] === resultData[index]['month']
+                      })
+                      resultData[index]['receivedCount'] = childMonth[0] ? Number(resultData[index]['receivedCount']) + Number(childMonth[0]['receivedCount']) : resultData[index]['receivedCount']
+                    }
+                  }
+                  let removeItems = childsCode.filter(function (item) {
+                    return item !== resultData[index]['govAgencyCode']
+                  })
+                  if (removeItems.length === childsCode.length) {
+                    resultOutput.push(resultData[index])
+                  }
+                }
+                resolve(resultOutput)
+            } else {
+              if (serializable.data) {
+                let dataReturn = serializable.data
+                resolve(dataReturn)
+              } else {
+                resolve(null)
+              }
+            }
+          }).catch(function (error) {
             reject(error)
           })
         })
@@ -181,6 +630,253 @@ export const store = new Vuex.Store({
             let serializable = response.data
             let file = window.URL.createObjectURL(serializable)
             resolve(file)
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
+    loadVoting ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // 
+          let dataPost = new URLSearchParams()
+          let textPost = {}
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/votings/' + data.className + '/' + data.classPk)
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+            if (response.data) {
+              let dataVoting = response.data.data
+              for (let i = 0; i < dataVoting.length; i++) {
+                dataVoting[i]['answerPercent'] = []
+                dataVoting[i]['averageScore'] = 0
+              }
+              resolve(dataVoting)
+            } else {
+              resolve([])
+            }
+          }).catch(function () {
+            reject()
+          })
+        })
+      })
+    },
+    getDynamicReports ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Content-Type': 'text/plain',
+              'Accept': 'application/json',
+              'reportType': ''
+            }
+          }
+          let body = `
+            {
+              getDynamicReports(start: -1, end: -1) {
+                dynamicReportId
+                reportCode
+                reportName
+                filterConfig
+                tableConfig
+                userConfig
+                sharing
+              }
+            }
+          `
+          axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
+            let serializable = response.data
+            var currentReport = ''
+            if (serializable['getDynamicReports']) {
+              for (let key in serializable['getDynamicReports']) {
+                if (filter['reportCode'] === serializable['getDynamicReports'][key]['reportCode']) {
+                  currentReport = serializable['getDynamicReports'][key]
+                  commit('setIndexReport', key)
+                }
+              }
+              resolve(currentReport)
+            } else {
+              resolve('')
+            }
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
+    getDataReports ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: filter.groupId,
+              Accept: 'application/json'
+            },
+            params: {
+              serviceCode: filter.serviceCode ? filter.serviceCode : ''
+            }
+          }
+          for (let key in filter['data']) {
+            let currentVal = filter['data'][key]
+            if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
+              let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+                param.params[key] = dateStr
+              } else {
+                param.params[key] = currentVal
+              }
+            }
+          }
+          axios.get(filter.api, param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              if (Array.isArray(serializable.data)) {
+                resolve(serializable.data)
+              } else {
+                resolve([serializable.data])
+              }
+            } else {
+              resolve('')
+            }
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
+    getEmployee ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: filter['groupId']
+            },
+            params: {
+              jobposCode: filter['jobposCode'],
+              keyword: filter['keyword']
+            }
+          }
+          axios.get('/o/rest/v2/employees', param).then(result => {
+            if (result.data) {
+              let employees = result.data.data
+              if (employees && employees.length > 0) {
+                for (let key in employees) {
+                  if (employees[key]['employeeNo'] === 'EMPVPB101') {
+                    employees[key].titleJobpos = 'Trưởng bộ phận'
+                  } else if (employees[key]['employeeNo'] === 'EMPVPB102') {
+                    employees[key].titleJobpos = 'Phó trưởng bộ phận'
+                  } else if (employees[key]['employeeNo'] === 'EMPVPB103' || employees[key]['employeeNo'] === 'EMPVPB104' || employees[key]['employeeNo'] === 'EMPVPB105') {
+                    employees[key].titleJobpos = 'Cán bộ thường trực'
+                  }
+                  employees[key].imgSrc = ''
+                  employees[key].score = 0
+                  employees[key].totalVoting = 0
+                }
+              }
+              let dataOutput = [employees.length, employees]
+              resolve(dataOutput)
+            } else {
+              resolve([0, []])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    loadImageEmployee ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: filter.groupId
+            }
+          }
+          axios.get('/o/v1/opencps/users/avatar/org.opencps.usermgt.model.Employee/' + filter['employeeId'], param).then(function (response) {
+            let seriable = response.data
+            resolve(seriable)
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    loadVotingEmployee ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: filter.groupId
+            },
+            params: {
+              fromVotingDate: filter.fromVotingDate,
+              toVotingDate: filter.toVotingDate
+            }
+          }
+          axios.get('/o/rest/v2/postal/votings/' + filter.className + '/' + filter.classPk, param).then(result => {
+            if (result.data) {
+              resolve(result.data.data)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getReportDossierEmployee ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: filter['groupId']
+            },
+            params: {
+              from: filter['from'],
+              to: filter['to'],
+              employeeName: filter['employeeName']
+            }
+          }
+          axios.get('/o/rest/v2/statistics/dossiers/person', param).then(result => {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getThuTucHanhChinh ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: filter.groupId,
+              Accept: 'application/json'
+            },
+            params: {
+              administration: filter.administration ? filter.administration : ''
+            }
+          }
+          axios.get(filter.api, param).then(function (response) {
+            let serializable = response.data
+              if (Array.isArray(serializable.data)) {
+                resolve(serializable.data)
+              } else {
+                resolve([serializable.data])
+              }
           }).catch(function (error) {
             reject(error)
           })
@@ -218,6 +914,12 @@ export const store = new Vuex.Store({
     },
     setitemsReports (state, payload) {
       state.itemsReports = payload
+    },
+    setIsMobile (state, payload) {
+      state.isMobile = payload
+    },
+    setIndexReport (state, payload) {
+      state.indexReport = payload
     }
   },
   getters: {
@@ -256,6 +958,12 @@ export const store = new Vuex.Store({
     },
     itemsReports (state) {
       return state.itemsReports
+    },
+    getIsMobile (state) {
+      return state.isMobile
+    },
+    getIndexReport (state) {
+      return state.indexReport
     }
   }
 })
