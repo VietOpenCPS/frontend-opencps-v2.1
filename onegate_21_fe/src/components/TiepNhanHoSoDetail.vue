@@ -373,7 +373,7 @@
               <span slot="loader">Loading...</span>
             </v-btn>
           </v-tab>
-          <v-tab href="#tab-5" class="px-0 py-0">
+          <v-tab href="#tab-5" class="px-0 py-0"  @click="goBackHistory">
             <v-btn flat class=""
               :loading="loadingAction"
               :disabled="loadingAction"
@@ -1655,7 +1655,7 @@ export default {
           }
         }
       } else {
-        toastr.error('Vui lòng điền đầy đủ thông tin bắt buộc')
+        toastr.error('Dữ liệu không hợp lệ')
         console.log(validThongtinchuhoso)
         vm.applicantIdRequired = validThongtinchuhoso['applicantIdRequired']
         console.log(validThongtinchuhoso['applicantIdRequired'])
@@ -1804,7 +1804,7 @@ export default {
       } else {
         vm.loadingAction = false
         toastr.clear()
-        toastr.error('Vui lòng điền đầy đủ các thông tin bắt buộc')
+        toastr.error('Dữ liệu không hợp lệ')
       }
       
     },

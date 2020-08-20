@@ -205,7 +205,16 @@
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-radio-group class="mt-2" v-if="!loading && !hasOrganization" v-model="thongTinChuHoSo.userType" row @change="checkApplicantInfos">
+            <v-radio-group class="mt-2" v-if="!loading && !hasOrganization" v-model="thongTinChuHoSo.userType" row @change="checkUserType">
+              <v-radio label="Công dân" :value="'1'"></v-radio>
+              <v-radio label="Tổ chức, doanh nghiệp" :value="'2'"></v-radio>
+            </v-radio-group>
+            <v-radio-group class="mt-2" v-if="!loading && hasOrganization" v-model="thongTinChuHoSo.userType" row @change="checkUserType">
+              <v-radio label="Công dân" :value="'1'"></v-radio>
+              <v-radio label="Doanh nghiệp" :value="'2'"></v-radio>
+              <v-radio label="Cơ quan, tổ chức" :value="'3'"></v-radio>
+            </v-radio-group>
+            <!-- <v-radio-group class="mt-2" v-if="!loading && !hasOrganization" v-model="thongTinChuHoSo.userType" row @change="checkApplicantInfos">
               <v-radio label="Công dân" :value="'1'"></v-radio>
               <v-radio label="Tổ chức, doanh nghiệp" :value="'2'"></v-radio>
             </v-radio-group>
@@ -213,7 +222,7 @@
               <v-radio label="Công dân" :value="'1'"></v-radio>
               <v-radio label="Doanh nghiệp" :value="'2'"></v-radio>
               <v-radio label="Cơ quan, tổ chức" :value="'3'"></v-radio>
-            </v-radio-group>
+            </v-radio-group> -->
           </div>
           <div style="position: relative;" v-if="originality !== 1  && !showDelegate">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -1520,6 +1529,7 @@ export default {
     },
     checkApplicantInfos () {
       let vm = this
+      
       if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2' && vm.thongTinChuHoSo.applicantIdNo) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
         let filter = {
           applicantIdNo: vm.thongTinChuHoSo.applicantIdNo,
@@ -1811,6 +1821,20 @@ export default {
         fullAddress += city
       }
       return fullAddress
+    },
+    checkUserType () {
+      let vm = this
+      vm.thongTinChuHoSo['cityCode'] = ''
+      vm.thongTinChuHoSo['districtCode'] = ''
+      vm.thongTinChuHoSo['wardCode'] = ''
+      vm.thongTinChuHoSo['applicantIdNo'] = ''
+      vm.thongTinChuHoSo['applicantIdType'] = ''
+      vm.thongTinChuHoSo['contactEmail'] = ''
+      vm.thongTinChuHoSo['contactTelNo'] = ''
+      vm.thongTinChuHoSo['contactName'] = ''
+      vm.thongTinChuHoSo['address'] = ''
+      vm.thongTinChuHoSo['applicantName'] = ''
+
     }
   }
 }

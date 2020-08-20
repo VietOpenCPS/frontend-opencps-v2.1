@@ -23,7 +23,7 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.documentNo"
-                      :rules="[rules.required, rules.checkSpace, rules.varchar100]"
+                      :rules="[rules.required, rules.varchar100]"
                       @change="thongTinCongVan.documentNo=String(thongTinCongVan.documentNo).trim()"
                       required
                       ></v-text-field>
@@ -171,7 +171,7 @@
                       v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.briefNote"
                       rows="3"
-                      :rules="[rules.required,rules.checkSpace, rules.varchar5000]"
+                      :rules="[rules.required, rules.varchar5000]"
                       @change="thongTinCongVan.briefNote=String(thongTinCongVan.briefNote).trim()"
                       required
                       ></v-textarea>
@@ -191,7 +191,7 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="jobposSignerCongVan"
-                      :rules="[rules.required,rules.checkSpace, rules.varchar100]"
+                      :rules="[rules.required, rules.varchar100]"
                        @change="jobposSignerCongVan=String(jobposSignerCongVan).trim()"
                       required
                       ></v-text-field>
@@ -210,7 +210,7 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="signerCongVan"
-                      :rules="[rules.required,rules.checkSpace, rules.varchar100]"
+                      :rules="[rules.required, rules.varchar100]"
                       @change="signerCongVan=String(signerCongVan).trim()"
                       required
                       ></v-text-field>
@@ -428,11 +428,6 @@ export default {
           value = value.trim()
         }
         return pattern.test(value) || 'Gồm các ký tự 0-9'
-      },
-      checkSpace: (val) => {
-        if(val){
-          return val.replace(/\s/g, '').length ? true : 'Không hợp lệ'
-        }
       },
       varchar100: (val) => {
         if(val){
