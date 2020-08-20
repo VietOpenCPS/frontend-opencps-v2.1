@@ -215,7 +215,9 @@ export default {
       },
       telNo: (value) => {
         const pattern = /^([0-9]{0,})$/
-        value = value.trim()
+        if(typeof value === 'string'){
+          value = value.trim()
+        }
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       }
     }

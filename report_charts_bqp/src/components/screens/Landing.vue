@@ -777,7 +777,7 @@ export default {
         })
         let filterMonth = {
           year: vm.year,
-          month: vm.month
+          month: String(vm.month) === '0' ? ((new Date()).getMonth() + 1) + '' : vm.month
         }
         vm.$store.dispatch('getReportTotal', filterMonth).then(function (result) {
           if (result) {
@@ -1155,7 +1155,7 @@ export default {
       })
       let filterMonth = {
         year: vm.year,
-        month: vm.month
+        month: String(vm.month) === '0' ? ((new Date()).getMonth() + 1) + '' : vm.month
       }
       vm.$store.dispatch('getReportTotal', filterMonth).then(function (result) {
         if (result) {
