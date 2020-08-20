@@ -32,7 +32,7 @@
                         :rules="[rules.required, rules.varchar100]"
                         required
                         readonly
-                        @change="thongTinChuHoSo.applicantIdNo=thongTinChuHoSo.applicantIdNo.trim()"
+                        @change="thongTinChuHoSo.applicantIdNo=String(thongTinChuHoSo.applicantIdNo).trim()"
                       ></v-text-field>
                       <suggestions
                         v-if="originality === 3 || originality === '3'"
@@ -72,7 +72,7 @@
                         v-else
                         v-model="thongTinChuHoSo.applicantName"
                         @input="changeApplicantInfos"
-                        @change="thongTinChuHoSo.applicantName=thongTinChuHoSo.applicantName.trim()"
+                        @change="thongTinChuHoSo.applicantName=String(thongTinChuHoSo.applicantName).trim()"
                         :disabled="loadingVerify"
                         :rules="requiredOptions['applicantName'] ? [rules.required,rules.varchar500] : ''"
                         :required="requiredOptions['applicantName']"
@@ -93,6 +93,7 @@
                       v-else
                       v-model="thongTinChuHoSo.address"
                       rows="2"
+                      @change="thongTinChuHoSo.address=String(thongTinChuHoSo.address).trim()"
                       :rules="requiredOptions['address'] ? [rules.required,rules.varchar500] : ''"
                       :required="requiredOptions['address']"
                       ></v-textarea>
@@ -173,7 +174,7 @@
                       <v-text-field
                       v-else
                       v-model="thongTinChuHoSo.contactTelNo"
-                      @change="thongTinChuHoSo.contactTelNo=thongTinChuHoSo.contactTelNo.trim()"
+                      @change="thongTinChuHoSo.contactTelNo=String(thongTinChuHoSo.contactTelNo).trim()"
                       append-icon="phone"
                       :rules="requiredOptions['contactTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
                       :required="requiredOptions['contactTelNo']"
@@ -192,7 +193,7 @@
                       <v-text-field
                       v-else
                       v-model="thongTinChuHoSo.contactEmail"
-                       @change="thongTinChuHoSo.contactEmail=thongTinChuHoSo.contactEmail.trim()"
+                       @change="thongTinChuHoSo.contactEmail=String(thongTinChuHoSo.contactEmail).trim()"
                       :rules="requiredOptions['contactEmail'] ? [rules.email, rules.required, rules.varchar100] : (thongTinChuHoSo.contactEmail ? [rules.email, rules.varchar100] : '')"
                       :required="requiredOptions['contactEmail']"
                       ></v-text-field>
@@ -238,7 +239,7 @@
                           v-model="thongTinNguoiNopHoSo.delegateIdNo"
                           :rules="[rules.required, rules.varchar100]"
                           required
-                          @change="thongTinNguoiNopHoSo.delegateIdNo=thongTinNguoiNopHoSo.delegateIdNo.trim()"
+                          @change="thongTinNguoiNopHoSo.delegateIdNo=String(thongTinNguoiNopHoSo.delegateIdNo).trim()"
                           :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
                         <!--  -->
@@ -279,7 +280,7 @@
                         v-model="thongTinNguoiNopHoSo.delegateName"
                         :rules="requiredOptions['delegateName'] ? [rules.required, rules.varchar500] : ''"
                         :required="requiredOptions['delegateName']"
-                        @change="thongTinNguoiNopHoSo.delegateName=thongTinNguoiNopHoSo.delegateName.trim()"
+                        @change="thongTinNguoiNopHoSo.delegateName=String(thongTinNguoiNopHoSo.delegateName).trim()"
                         :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
                       </v-flex>
@@ -297,6 +298,7 @@
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateAddress"
                         rows="2"
+                        @change="thongTinNguoiNopHoSo.delegateAddress=String(thongTinNguoiNopHoSo.delegateAddress).trim()"
                         :rules="requiredOptions['delegateAddress'] ? [rules.required, rules.varchar500] : ''"
                         :required="requiredOptions['delegateAddress']"
                         :disabled="thongTinNguoiNopHoSo.sameUser"
@@ -381,7 +383,7 @@
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateTelNo"
                         append-icon="phone"
-                        @change="thongTinNguoiNopHoSo.delegateName=thongTinNguoiNopHoSo.delegateName.trim()"
+                        @change="thongTinNguoiNopHoSo.delegateName=String(thongTinNguoiNopHoSo.delegateName).trim()"
                         :rules="requiredOptions['delegateTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
                         :required="requiredOptions['delegateTelNo']"
                         :disabled="thongTinNguoiNopHoSo.sameUser"
@@ -400,7 +402,7 @@
                         <v-text-field
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateEmail"
-                        @change="thongTinNguoiNopHoSo.delegateEmail=thongTinNguoiNopHoSo.delegateEmail.trim()"
+                        @change="thongTinNguoiNopHoSo.delegateEmail=String(thongTinNguoiNopHoSo.delegateEmail).trim()"
                         :rules="requiredOptions['delegateEmail'] ? [rules.email, rules.required] : (thongTinNguoiNopHoSo.delegateEmail ? [rules.email] : '')"
                         :required="requiredOptions['delegateEmail']"
                         :disabled="thongTinNguoiNopHoSo.sameUser"
@@ -604,7 +606,7 @@
           <v-form ref="form" v-model="valid" lazy-validation class="py-3 px-0 grid-list">
             <v-layout row wrap class="px-0 py-3">
               <v-flex xs12 sm12>
-                <v-text-field v-model="applicantEdit['applicantName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required  @change="applicantEdit['applicantName']=applicantEdit['applicantName'].trim()">
+                <v-text-field v-model="applicantEdit['applicantName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required  @change="applicantEdit['applicantName']=String(applicantEdit['applicantName']).trim()">
                   <template slot="label"> 
                     <span v-if="applicantEdit['applicantIdType'] === 'business'">Tên doanh nghiệp</span>
                     <span v-if="applicantEdit['applicantIdType'] === 'citizen'">Họ tên</span> 
@@ -645,7 +647,7 @@
                     box append-icon="event"
                     v-model="applicantEdit['applicantIdDate']"
                     label="Ngày cấp"
-                    @change="applicantEdit['applicantIdDate']=applicantEdit['applicantIdDate'].trim()"
+                    @change="applicantEdit['applicantIdDate']=String(applicantEdit['applicantIdDate']).trim()"
                     @blur="ngayCap = parseDate(applicantEdit['applicantIdDate'])"
                   ></v-text-field>
                   <v-date-picker ref="picker" min="1950-01-01" :max="getMaxdate()" :first-day-of-week="1" locale="vi"
@@ -653,13 +655,13 @@
                 </v-menu>
               </v-flex>
               <v-flex xs12 sm6>
-                <v-text-field label="Số điện thoại" v-model="applicantEdit['contactTelNo']" box @change="applicantEdit['contactTelNo']=applicantEdit['contactTelNo'].trim()"></v-text-field>
+                <v-text-field label="Số điện thoại" v-model="applicantEdit['contactTelNo']" box @change="applicantEdit['contactTelNo']=String(applicantEdit['contactTelNo']).trim()"></v-text-field>
               </v-flex>
               <v-flex xs12 sm6>
-                <v-text-field label="Thư điện tử" v-model="applicantEdit['contactEmail']" box disabled @change="applicantEdit['contactEmail']=applicantEdit['contactEmail'].trim()"></v-text-field>
+                <v-text-field label="Thư điện tử" v-model="applicantEdit['contactEmail']" box disabled @change="applicantEdit['contactEmail']=String(applicantEdit['contactEmail']).trim()"></v-text-field>
               </v-flex>
               <v-flex xs12 sm12>
-                <v-text-field label="Địa chỉ" v-model="applicantEdit['address']" box clearable @change="applicantEdit['address']=applicantEdit['address'].trim()"></v-text-field>
+                <v-text-field label="Địa chỉ" v-model="applicantEdit['address']" box clearable @change="applicantEdit['address']=String(applicantEdit['address']).trim()"></v-text-field>
               </v-flex>
               <v-flex xs12 sm4>
                 <v-autocomplete :items="cityItems" label="Tỉnh/thành phố" v-model="applicantEdit['cityCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeCityEditApplicant($event)"></v-autocomplete>
@@ -850,21 +852,45 @@ export default {
         }
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       },
+      varchar50: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+        } else {
+          return true
+        }  
+      },
       varchar100: (val) => {
-          val = val.trim()
-          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'    
+        if(val){
+          val = String(val).trim()
+          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+        } else {
+          return true
+        }  
       },
       varchar255: (val) => {
-          val = val.trim()
-          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'      
+        if(val){
+          val = String(val).trim()
+          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+        } else {
+          return true
+        }  
       },
       varchar500: (val) => {
-        val = val.trim()
-        return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'     
+        if(val){
+          val = String(val).trim()
+          return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+        } else {
+          return true
+        }  
       },
       varchar5000: (val) => {
-        val = val.trim()
-        return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'      
+        if(val){
+          val = String(val).trim()
+          return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+        } else {
+          return true
+        }
       },
     },
     typeSearch: '',

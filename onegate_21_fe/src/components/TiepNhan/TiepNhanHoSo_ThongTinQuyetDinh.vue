@@ -25,7 +25,7 @@
                       v-model="soQuyetDinh"
                       :rules="[rules.required, rules.varchar100]"
                       required
-                      @change="soQuyetDinh=soQuyetDinh.trim()"
+                      @change="soQuyetDinh=String(soQuyetDinh).trim()"
                       ></v-text-field>
                       <p class="pt-2" v-else>{{soQuyetDinh}}</p>
                     </v-flex>
@@ -85,7 +85,7 @@
                       v-model="jobposSignerQuyetDinh"
                       :rules="[rules.required, rules.varchar100]"
                       required
-                      @change="jobposSignerQuyetDinh=jobposSignerQuyetDinh.trim()"
+                      @change="jobposSignerQuyetDinh=String(jobposSignerQuyetDinh).trim()"
                       ></v-text-field>
                       <p class="pt-2" v-else>{{jobposSignerQuyetDinh}}</p>
                     </v-flex>
@@ -104,7 +104,7 @@
                       v-model="signerQuyetDinh"
                       :rules="[rules.required,rules.varchar100]"
                       required
-                      @change="signerQuyetDinh=signerQuyetDinh.trim()"
+                      @change="signerQuyetDinh=String(signerQuyetDinh).trim()"
                       ></v-text-field>
                       <p class="pt-2" v-else>{{signerQuyetDinh}}</p>
                     </v-flex>
@@ -202,20 +202,36 @@ export default {
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       },
       varchar100: (val) => {
-          val = val.trim()
+        if(val){
+          val = String(val).trim()
           return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+        } else {
+          return true
+        }  
       },
       varchar255: (val) => {
-          val = val.trim()
-          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'    
+        if(val){
+          val = String(val).trim()
+          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+        } else {
+          return true
+        }  
       },
       varchar500: (val) => {
-          val = val.trim()
+        if(val){
+          val = String(val).trim()
           return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+        } else {
+          return true
+        }  
       },
       varchar5000: (val) => {
-          val = val.trim()
+        if(val){
+          val = String(val).trim()
           return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+        } else {
+          return true
+        }
       },
     },
     
@@ -256,9 +272,10 @@ export default {
         vm.soQuyetDinh = metadata.hasOwnProperty('soquyetdinh') ? metadata.soquyetdinh : ''
         vm.jobposSignerQuyetDinh = metadata.hasOwnProperty('jobposSignerQuyetDinh') ? metadata.jobposSignerQuyetDinh : ''
         vm.signerQuyetDinh = metadata.hasOwnProperty('signerQuyetDinh') ? metadata.signerQuyetDinh : ''
-        vm.documentDate = metadata.hasOwnProperty('ngayquyetdinh') ? vm.parseDate(metadata.ngayquyetdinh) : ''
+        vm.documentDate = metadata.hasOwnProperty('ngayquyetdinh') ? vm.parseDate(metadata.ngayquyetdinh) : new Date().toISOString().substr(0, 10)
         
       } catch (error) {
+        vm.documentDate = new Date().toISOString().substr(0, 10)
       }
       vm.$refs.formThongTinQuyetDinh.resetValidation()
       console.log('thongtinquyetdinhInput', vm.thongTinCongVan)

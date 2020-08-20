@@ -24,7 +24,7 @@
                       v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.documentNo"
                       :rules="[rules.required, rules.checkSpace, rules.varchar100]"
-                      @change="thongTinCongVan.documentNo=thongTinCongVan.documentNo.trim()"
+                      @change="thongTinCongVan.documentNo=String(thongTinCongVan.documentNo).trim()"
                       required
                       ></v-text-field>
                       <p class="pt-2" v-else>{{thongTinCongVan.documentNo}}</p>
@@ -172,7 +172,7 @@
                       v-model="thongTinCongVan.briefNote"
                       rows="3"
                       :rules="[rules.required,rules.checkSpace, rules.varchar5000]"
-                      @change="thongTinCongVan.briefNote=thongTinCongVan.briefNote.trim()"
+                      @change="thongTinCongVan.briefNote=String(thongTinCongVan.briefNote).trim()"
                       required
                       ></v-textarea>
                       <p class="pt-2" v-else>{{thongTinCongVan.briefNote}}</p>
@@ -192,7 +192,7 @@
                       v-else-if="!loading && !congVanDaGui"
                       v-model="jobposSignerCongVan"
                       :rules="[rules.required,rules.checkSpace, rules.varchar100]"
-                       @change="jobposSignerCongVan=jobposSignerCongVan.trim()"
+                       @change="jobposSignerCongVan=String(jobposSignerCongVan).trim()"
                       required
                       ></v-text-field>
                       <p class="pt-2" v-else>{{jobposSignerCongVan}}</p>
@@ -211,7 +211,7 @@
                       v-else-if="!loading && !congVanDaGui"
                       v-model="signerCongVan"
                       :rules="[rules.required,rules.checkSpace, rules.varchar100]"
-                      @change="signerCongVan=signerCongVan.trim()"
+                      @change="signerCongVan=String(signerCongVan).trim()"
                       required
                       ></v-text-field>
                       <p class="pt-2" v-else>{{signerCongVan}}</p>
@@ -231,7 +231,7 @@
                       v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.contactTelNo"
                       :rules="thongTinCongVan.contactTelNo ? [rules.telNo] : ''"
-                      @change="thongTinCongVan.contactTelNo=thongTinCongVan.contactTelNo.trim()"
+                      @change="thongTinCongVan.contactTelNo=String(thongTinCongVan.contactTelNo).trim()"
                       ></v-text-field>
                       <p class="pt-2" v-else>{{thongTinCongVan.contactTelNo}}</p>
                     </v-flex>
@@ -248,7 +248,7 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.contactEmail"
-                      @change="thongTinCongVan.contactEmail=thongTinCongVan.contactEmail.trim()"
+                      @change="thongTinCongVan.contactEmail=String(thongTinCongVan.contactEmail).trim()"
                       :rules="thongTinCongVan.contactEmail ? [rules.email] : rules.varchar100"
                       ></v-text-field>
                       <p class="pt-2" v-else>{{thongTinCongVan.contactEmail}}</p>
@@ -434,25 +434,37 @@ export default {
           return val.replace(/\s/g, '').length ? true : 'Không hợp lệ'
         }
       },
-      checkLength: (val) => {
-          val = val.trim()
-          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'    
-      },
       varchar100: (val) => {
-          val = val.trim()
-          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'    
+        if(val){
+          val = String(val).trim()
+          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+        } else {
+          return true
+        }  
       },
       varchar255: (val) => {
-          val = val.trim()
-          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'     
+        if(val){
+          val = String(val).trim()
+          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+        } else {
+          return true
+        }  
       },
       varchar500: (val) => {
-          val = val.trim()
-          return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'     
+        if(val){
+          val = String(val).trim()
+          return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+        } else {
+          return true
+        }  
       },
       varchar5000: (val) => {
-        val = val.trim()
-        return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'    
+        if(val){
+          val = String(val).trim()
+          return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+        } else {
+          return true
+        }
       },
     },
     

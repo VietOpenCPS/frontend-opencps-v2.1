@@ -45,7 +45,7 @@
                   v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck"
                   :rules="[v => !!v || 'Bạn phải nhập lý do trước khi gửi']"
                   required
-                  @change="item.fileComment=item.fileComment.trim()"
+                  @change="item.fileComment=String(item.fileComment).trim()"
                   @keyup.enter="changeFileComment(item, index)"
                   ></v-text-field>
                   <v-tooltip top v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck">
@@ -344,7 +344,7 @@
                   v-model="otherDossierTemplate"
                   :rules="[v => !!v || 'Bạn phải điền tên giấy tờ.']"
                   required
-                  @change="otherDossierTemplate=otherDossierTemplate.trim()"
+                  @change="otherDossierTemplate=String(otherDossierTemplate).trim()"
                   ></v-text-field>
                 </v-flex>
               </v-layout>
