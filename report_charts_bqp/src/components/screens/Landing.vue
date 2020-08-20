@@ -27,11 +27,11 @@
                 >
               </v-select>
             </v-flex>
-            <v-flex xs12 sm8 class="px-2 text-right" style="    padding-top: 1px;">
-              <v-btn v-if="govAgencyCode === ''" flat class="mx-0 my-0" v-on:click.native="toNativeViewType()">
+            <v-flex xs12 sm8 class="px-2 text-right" style="padding-top: 1px;">
+              <!-- <v-btn v-if="govAgencyCode === ''" flat class="mx-0 my-0" v-on:click.native="toNativeViewType()">
                 <span v-if="chartView">Lĩnh vực</span>
                 <span v-else>Đơn vị</span>
-              </v-btn>
+              </v-btn> -->
               <v-tooltip bottom>
                 <v-btn icon class="mx-0 my-0" slot="activator" v-on:click.native="toNativeView(0)">
                   <v-icon size="14">pie_chart</v-icon>
@@ -81,7 +81,7 @@
       <v-flex xs12 sm4 class="mt-4">
         <v-card class="wrap_report report_piechart ml-2 mr-0" style="border-radius: 0;">
           <v-card-title class="headline">
-            <span>Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}</span>
+            <span>Tình hình giải quyết hồ sơ tháng {{String(month) === '0' ? monthDefault : month}} năm {{year}}</span>
           </v-card-title>
           <v-card-text class="py-0 px-0" style="height: 285px;">
             <!-- report_1 -->
@@ -307,7 +307,7 @@ export default {
     itemTotalMonth: {},
     levelList: [],
     totalTTHC: 0,
-    chartView: true,
+    chartView: false,
     currentMonth: ((new Date()).getMonth() + 1) < 10 ? '0' + ((new Date()).getMonth() + 1) : ((new Date()).getMonth() + 1),
     currentDay: (new Date()).getDate() < 10 ? '0' + (new Date()).getDate() : (new Date()).getDate(),
     agencyGroups: [],
@@ -394,6 +394,7 @@ export default {
       }
     ],
     month: ((new Date()).getMonth() + 1) + '',
+    monthDefault: ((new Date()).getMonth() + 1) + '',
     danhSachBaoCaos: [],
     totalCounter: {},
     reportGovName: '',
@@ -558,7 +559,7 @@ export default {
         fontFamily: 'Roboto, Arial, sans-serif',
         formatter: function(seriesName, opts) {
           return '<span class="text-bold" style="color:' + opts.w.globals.colors[opts.seriesIndex]+ '">' +
-           opts.w.globals.series[opts.seriesIndex] + '</span>&nbsp; &nbsp;' + seriesName
+           opts.w.globals.series[opts.seriesIndex] + '</span>&nbsp;' + seriesName
         }
       },
       tooltip: {
@@ -651,7 +652,7 @@ export default {
         fontFamily: 'Roboto, Arial, sans-serif',
         formatter: function(seriesName, opts) {
           return '<span class="text-bold" style="color:' + opts.w.globals.colors[opts.seriesIndex]+ '">' +
-           opts.w.globals.series[opts.seriesIndex] + '</span>&nbsp; &nbsp;' + seriesName
+           opts.w.globals.series[opts.seriesIndex] + '</span>&nbsp;' + seriesName
         }
       },
       tooltip: {

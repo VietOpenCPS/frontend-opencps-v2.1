@@ -851,8 +851,8 @@ export default {
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       },
       varchar100: (val) => {
-          val = val.trim()
-          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'    
+          val = String(val).trim()
+          return String(val).length <= 100 ? true : 'Không được nhập quá 100 ký tự'    
       },
       varchar255: (val) => {
           val = val.trim()
