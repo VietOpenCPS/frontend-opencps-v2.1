@@ -817,12 +817,46 @@ export default {
                 return []
                 }
             },
-            varChar50: (val) => {
-                if(val){  
-                    return val.length > 50 ?  'Thông tin không được quá 50 ký tự' : true
+            varchar50: (val) => {
+                if(val){
+                val = String(val).trim()
+                return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+                } else {
+                return true
+                }  
+            },
+            varchar100: (val) => {
+                if(val){
+                val = String(val).trim()
+                return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+                } else {
+                return true
+                }  
+            },
+            varchar255: (val) => {
+                if(val){
+                val = String(val).trim()
+                return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+                } else {
+                return true
+                }  
+            },
+            varchar500: (val) => {
+                if(val){
+                val = String(val).trim()
+                return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+                } else {
+                return true
+                }  
+            },
+            varchar5000: (val) => {
+                if(val){
+                val = String(val).trim()
+                return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+                } else {
+                return true
                 }
-                else return true   
-            }
+            },
         },
         dateDueDateFormated: '',
         dateDueDate: new Date().toISOString().substr(0, 10),

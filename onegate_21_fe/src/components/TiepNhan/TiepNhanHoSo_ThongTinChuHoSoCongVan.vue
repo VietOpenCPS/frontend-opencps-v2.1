@@ -18,7 +18,7 @@
                         :disabled="loadingVerify"
                         :rules="requiredOptions['applicantName'] ? [rules.required,rules.varchar500] : ''"
                         :required="requiredOptions['applicantName']"
-                        @change="applicantName=applicantName.trim()"
+                        @change="applicantName=String(applicantName).trim()"
                       ></v-text-field>
                     </v-flex>
                     
@@ -85,7 +85,7 @@
                       v-model="applicantIdNo"
                       :rules="requiredOptions['applicantIdNo'] ? [rules.required, rules.varchar100] : [rules.varchar100]"
                       :required="requiredOptions['applicantIdNo']"
-                      @change="applicantIdNo=applicantIdNo.trim()"
+                      @change="applicantIdNo=String(applicantIdNo).trim()"
                       ></v-text-field>
                     </v-flex>
 
@@ -128,7 +128,7 @@
                       <v-subheader class="pl-0"> Nơi đăng ký HKTT<span style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm10 class="mb-2">
-                      <v-text-field  v-model="address" clearable :rules="[rules.required,rules.varchar500]" required @change="address=address.trim()"></v-text-field>
+                      <v-text-field  v-model="address" clearable :rules="[rules.required,rules.varchar500]" required @change="address=String(address).trim()"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 class="mb-2"></v-flex>
                     <v-flex xs12 sm10 class="mb-2">
@@ -155,7 +155,7 @@
                       <v-text-field
                         v-model="yearPayment"
                         @keyup="formatCurrentYearPayment($event)"
-                        @change="yearPayment=yearPayment.trim()"
+                        @change="yearPayment=String(yearPayment).trim()"
                         :rules="[rules.required,rules.varchar50]" required
                       ></v-text-field>
                     </v-flex>
@@ -167,7 +167,7 @@
                       <v-text-field
                         v-model="subsidy"
                         @keyup="formatCurrent($event)"
-                        @change="subsidy=subsidy.trim()"
+                        @change="subsidy=String(subsidy).trim()"
                         :rules="[rules.required,rules.varchar100]" required
                       ></v-text-field>
                     </v-flex>
@@ -179,7 +179,7 @@
                       <v-text-field
                       v-model="contactTelNo"
                       append-icon="phone"
-                      @change="contactTelNo=contactTelNo.trim()"
+                      @change="contactTelNo=String(contactTelNo).trim()"
                       :rules="[rules.telNo, rules.varchar100]"
                       ></v-text-field>
                     </v-flex>
@@ -190,7 +190,7 @@
                     <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
                       v-model="contactEmail"
-                      @change="contactEmail=contactEmail.trim()"
+                      @change="contactEmail=String(contactEmail).trim()"
                       :rules="requiredOptions['contactEmail'] ? [rules.email, rules.required] : (contactEmail ? [rules.email] : '')"
                       :required="requiredOptions['contactEmail']"
                       ></v-text-field>
@@ -202,7 +202,7 @@
                     <v-flex xs12 sm4 class="mb-2">
                       <v-text-field
                         v-model="anonymName"
-                        @change="anonymName=anonymName.trim()"
+                        @change="anonymName=String(anonymName).trim()"
                         :rules="requiredOptions['anonymName'] ? [rules.required, rules.varchar500] : [rules.varchar500]"
                         :required="requiredOptions['anonymName']"
                       ></v-text-field>
@@ -227,7 +227,7 @@
                         v-model="recruitment"
                         :rules="requiredOptions['recruitment'] ? [rules.required, rules.varchar500] : [rules.varchar500]"
                         :required="requiredOptions['recruitment']"
-                        @change="recruitment=recruitment.trim()"
+                        @change="recruitment=String(recruitment).trim()"
                       ></v-text-field>
                       <!-- <v-autocomplete :items="recruitmentItems" v-model="recruitment" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete> -->
                     </v-flex>
@@ -240,7 +240,7 @@
                         v-model="retire"
                         :rules="requiredOptions['retire'] ? [rules.required, rules.varchar500] : [rules.varchar500]"
                         :required="requiredOptions['retire']"
-                        @change="retire=retire.trim()"
+                        @change="retire=String(retire).trim()"
                       ></v-text-field>
                       <!-- <v-autocomplete :items="retireItems" v-model="retire" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete> -->
                     </v-flex>
@@ -253,7 +253,7 @@
                         v-model="reactivated"
                         :rules="requiredOptions['reactivated'] ? [rules.required, rules.varchar500] : [rules.varchar500]"
                         :required="requiredOptions['reactivated']"
-                        @change="reactivated=reactivated.trim()"
+                        @change="reactivated=String(reactivated).trim()"
                       ></v-text-field>
                       <!-- <v-autocomplete :items="reactivatedItems" v-model="reactivated" item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete> -->
                     </v-flex>
@@ -267,7 +267,7 @@
                         v-model="published"
                         :rules="requiredOptions['published'] ? [rules.required, rules.varchar500] : [rules.varchar500]"
                         :required="requiredOptions['published']"
-                        @change="published=published.trim()"
+                        @change="published=String(published).trim()"
                       ></v-text-field>
                     </v-flex>
 
@@ -303,7 +303,7 @@
                         v-model="delegateIdNo"
                         :rules="requiredOptions['delegateIdNo'] ? [rules.required, rules.varchar100] : [rules.varchar100]"
                         :required="requiredOptions['delegateIdNo']"
-                        @change="delegateIdNo=delegateIdNo.trim()"
+                        @change="delegateIdNo=String(delegateIdNo).trim()"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -314,7 +314,7 @@
                         v-model="delegateName"
                         :rules="requiredOptions['delegateName'] ? [rules.required, rules.varchar500] : [rules.varchar500]"
                         :required="requiredOptions['delegateName']"
-                        @change="delegateName=delegateName.trim()"
+                        @change="delegateName=String(delegateName).trim()"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -326,7 +326,7 @@
                         rows="2"
                         :rules="requiredOptions['delegateAddress'] ? [rules.required,rules.varchar500] : [rules.varchar500]"
                         :required="requiredOptions['delegateAddress']"
-                        @change="delegateAddress=delegateAddress.trim()"
+                        @change="delegateAddress=String(delegateAddress).trim()"
                         ></v-textarea>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -379,7 +379,7 @@
                         append-icon="phone"
                         :rules="requiredOptions['delegateTelNo'] ? [rules.telNo, rules.required, rules.varchar100] : [rules.telNo, rules.varchar100]"
                         :required="requiredOptions['delegateTelNo']"
-                        @change="delegateTelNo=delegateTelNo.trim()"
+                        @change="delegateTelNo=String(delegateTelNo).trim()"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -390,7 +390,7 @@
                         v-model="delegateEmail"
                         :rules="requiredOptions['delegateEmail'] ? [rules.email, rules.required, rules.varchar100] : (delegateEmail ? [rules.email, rules.varchar100] : [rules.varchar100])"
                         :required="requiredOptions['delegateEmail']"
-                        @change="delegateEmail=delegateEmail.trim()"
+                        @change="delegateEmail=String(delegateEmail).trim()"
                         ></v-text-field>
                       </v-flex>
                     </v-layout>
@@ -532,25 +532,45 @@ export default {
         }
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       },
-      varchar100: (val) => {
-          val = val.trim()
-          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'      
-      },
       varchar50: (val) => {
-          val = val.trim()
-          return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'  
+        if(val){
+          val = String(val).trim()
+          return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+        } else {
+          return true
+        }  
       },
-      varchar5000: (val) => {
-          val = val.trim()
-          return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'  
+      varchar100: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+        } else {
+          return true
+        }  
       },
       varchar255: (val) => {
-          val = val.trim()
-          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'    
+        if(val){
+          val = String(val).trim()
+          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+        } else {
+          return true
+        }  
       },
       varchar500: (val) => {
-          val = val.trim()
+        if(val){
+          val = String(val).trim()
           return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar5000: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+        } else {
+          return true
+        }
       },
     },
     valid: false,
