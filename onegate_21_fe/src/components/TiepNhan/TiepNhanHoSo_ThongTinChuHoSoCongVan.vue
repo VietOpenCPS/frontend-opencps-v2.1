@@ -427,7 +427,7 @@ export default {
     'suggestions': Suggestions,
     'tiny-pagination': TinyPagination
   },
-  props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode'],
+  props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode', 'mauCongVan'],
   data: () => ({
     applicantName: '',
     birthDate: '',
@@ -764,7 +764,8 @@ export default {
         recruitment: vm.recruitment,
         retire: vm.retire,
         reactivated: vm.reactivated,
-        published: vm.published
+        published: vm.published,
+        trocapmotlan: vm.mauCongVan === 'MAU_CV_TRO_CAP_MOT_LAN' ? true : false
       }
       let dataOut = {
         applicantName: vm.applicantName,

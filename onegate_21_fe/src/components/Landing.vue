@@ -62,6 +62,7 @@
             @change="changeCongVan"
             clearable
             box
+            :autofocus="focusSelect === 1"
           ></v-autocomplete>
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
@@ -76,6 +77,7 @@
             @change="changeServiceConfigs"
             clearable
             box
+            :autofocus="focusSelect === 2"
           ></v-autocomplete>
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box" v-if="trangThaiHoSoList">
@@ -1052,6 +1054,7 @@ export default {
     govAgencyFilterMenuConfig: '',
     groupServiceFilterMenuConfig: '',
     disableSearchAgency: false,
+    focusSelect: 0
   }),
   computed: {
     loadingDynamicBtn () {
@@ -2086,7 +2089,17 @@ export default {
       vm.itemAction = item
       vm.indexAction = index
       if (item.hasOwnProperty('requiredCVDen') && (!vm.congvanSelected || !vm.thuTucHanhChinhSelected)) {
-        alert('Chọn công văn và thủ tục để thực hiện')
+        if (!vm.congvanSelected && !vm.thuTucHanhChinhSelected) {
+          alert('Vui lòng chọn công văn và thủ tục để thực hiện')
+          vm.focusSelect = 1
+        } else if (!vm.congvanSelected && vm.thuTucHanhChinhSelected) {
+          alert('Vui lòng chọn công văn để thực hiện')
+          vm.focusSelect = 1
+        } else {
+          alert('Vui lòng chọn thủ tục để thực hiện')
+          vm.focusSelect = 2
+        }
+        
       } else {
         if (String(item.form) === 'NEW' || String(item.form) === 'NEW_GROUP' || String(item.form) === 'NEW_GROUP_CV' || String(item.form) === 'NEW_GROUP_CV_DI') {
           let isOpenDialog = true

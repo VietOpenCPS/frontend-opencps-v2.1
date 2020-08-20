@@ -181,14 +181,14 @@
                         <span v-if="props.item.applicantNote">{{props.item.applicantNote}} </span>
                       </td>
                       
-                      <td class="text-xs-center" :width="!metaDataGroupDossier.hasOwnProperty('congvandagui') || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui) ? '170px' : '70px'" style="height: 40px !important">
+                      <td class="text-xs-center" :width="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(props.item['groupDossierId'])) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui) ? '170px' : '70px'" style="height: 40px !important">
                         <v-btn flat icon color="indigo" class="mr-2 my-0" @click="viewDetail(props.item)" title="Xem chi tiết">
                           <v-icon>fas fa fa-file-text</v-icon>
                         </v-btn>
-                        <v-btn v-if="!metaDataGroupDossier.hasOwnProperty('congvandagui') || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
+                        <v-btn v-if="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(props.item['groupDossierId'])) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
                           <v-icon size="22">create</v-icon>
                         </v-btn>
-                        <v-btn v-if="!metaDataGroupDossier.hasOwnProperty('congvandagui') || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
+                        <v-btn v-if="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(props.item['groupDossierId'])) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
                           <v-icon size="22">delete</v-icon>
                         </v-btn>
                       </td>
@@ -257,7 +257,7 @@
       </div>
       <!-- Thông tin hồ sơ trong nhóm -->
       <div v-if="activeAddDossierIntoGroup">
-        <thong-tin-chu-ho-so-cong-van v-if="activeAddDossierIntoGroup && (formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI')" ref="thongtinchuhosocongvan"></thong-tin-chu-ho-so-cong-van>
+        <thong-tin-chu-ho-so-cong-van v-if="activeAddDossierIntoGroup && (formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI')" ref="thongtinchuhosocongvan" :mauCongVan="mauCongVan"></thong-tin-chu-ho-so-cong-van>
         <thong-tin-chu-ho-so :showApplicant="false" :showDelegate="true" v-if="activeAddDossierIntoGroup && formCode === 'NEW_GROUP'" ref="thongtinchuhoso"></thong-tin-chu-ho-so>
 
         <v-expansion-panel v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" :value="[true]" expand  class="expansion-pl">
@@ -960,7 +960,8 @@ export default {
     requiredCVDenGovCode: '',
     hasTaoQuyetDinh: false,
     dialogPDF: false,
-    congvanguiden: false
+    congvanguiden: false,
+    mauCongVan: false
   }),
   computed: {
     loading () {
@@ -1053,7 +1054,8 @@ export default {
           let metaData = vm.getMetaData(arr[i])
           let fee = 0
           if (metaData) {
-            fee = Number(metaData['yearPayment'])*Number(metaData['subsidy'])
+            let trocapmotlan = metaData.hasOwnProperty('trocapmotlan') && metaData['trocapmotlan'] ? true : false
+            fee = trocapmotlan ? Number(metaData['subsidy']) : Number(metaData['yearPayment'])*Number(metaData['subsidy'])
             totalFee += fee
           }
         }
@@ -1211,6 +1213,7 @@ export default {
         vm.$store.dispatch('loadDossierFormTemplates', filterGet).then(function (result) {
           vm.tphsCV = result['dossierParts']
           vm.getDetailActionCongVan()
+          vm.mauCongVan = result['newFormScript'] && result['newFormScript'].startsWith('MAU_CV_') ? result['newFormScript'] : false 
         })
         
       })
@@ -2374,6 +2377,19 @@ export default {
       } catch (error) {
       }
       return metaDataOut
+    },
+    checkGroupDossierIdCvDen (childGroupDossierId) {
+      let vm = this
+      let owner = true
+      if (childGroupDossierId) {
+        if (childGroupDossierId.split(',').length > 1 || (childGroupDossierId.split(',').length === 1 && childGroupDossierId.split(',')[0] != vm.thongTinNhomHoSo['dossierId'])) {
+          owner = false
+        }
+      }
+      if (vm.formCode === 'NEW_GROUP_CV_DI') {
+        owner = true
+      }
+      return owner
     },
     dateTimeView (arg) {
       if (arg) {
