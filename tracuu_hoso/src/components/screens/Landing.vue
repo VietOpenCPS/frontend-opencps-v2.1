@@ -6,7 +6,7 @@
           {{!qrscan ? 'TRA CỨU HỒ SƠ' : 'THÔNG TIN HỒ SƠ'}}
         </div>
         <v-card v-if="!qrscan" flat color="#ffffff" class="px-2 py-2">
-          <v-flex xs12 class="mb-2">
+          <v-flex xs12 class="mb-1">
             <v-text-field
               label="Mã số hồ sơ"
               v-model="dossierNoKey"
@@ -14,13 +14,28 @@
               @keyup.enter="changeDataSearch"
             ></v-text-field>
           </v-flex>
-          <v-flex xs12 class="mb-2">
+          <v-flex xs12 class="mb-1">
             <v-text-field
               label="Số CMND/ hộ chiếu"
               v-model="applicantIdNo"
               box
               @keyup.enter="changeDataSearch"
             ></v-text-field>
+          </v-flex>
+          <v-flex xs12 class="my-3">
+            <v-autocomplete
+              :items="statusList"
+              v-model="status"
+              label="Trạng thái hồ sơ"
+              item-text="text"
+              item-value="value"
+              :hide-selected="true"
+              @change="changeStatus"
+              clearable
+            ></v-autocomplete>
+          </v-flex>
+          <v-flex xs12 class="mb-1">
+            <div><span style="color: red">(*) </span> Nhập mã hồ sơ hoặc số CMND/ hộ chiếu để thực hiện tra cứu hồ sơ.</div>
           </v-flex>
           <v-flex xs12 :class="isMobile ? 'mb-2 right' : 'mb-2'">
             <v-btn class="mr-2 ml-0" color="primary" @click="changeDataSearch"
@@ -45,7 +60,7 @@
       <v-flex xs12 md9 :class="isMobile ? 'pt-1 mb-2' : 'pl-3 pt-1 mb-2'">
         <v-card flat class="" v-if="!detail">
           <div class="" v-if="totalDossier > 0">
-            <div class="mx-2">Có <span class="text-bold" style="color:#0167d3">{{totalDossier}}</span> hồ sơ được tìm thấy</div>
+            <div class="px-2">Có <span class="text-bold" style="color:#0167d3">{{totalDossier}}</span> hồ sơ được tìm thấy</div>
             <v-data-table
               :headers="headers"
               :items="dossierList"
@@ -68,7 +83,9 @@
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
                     <div v-else>
-                      <span>{{props.item.dossierNo}}</span>
+                      <p>{{props.item.dossierNo}}</p>
+                      <p v-if="props.item.online" style="color: blue;">Hồ sơ nộp trực tuyến</p>
+                      <p v-if="!props.item.online" style="color: green;">Hồ sơ nộp trực tiếp</p>
                     </div>
                   </td>
                   <td class="text-xs-left py-2" style="min-width: 150px;">
@@ -239,7 +256,16 @@ export default {
       }
     ],
     isMobile: false,
-    qrscan: false
+    qrscan: false,
+    statusList: [
+      {text: 'Chờ xử lý', value: 'receiving'},
+      {text: 'Đang xử lý', value: 'processing'},
+      {text: 'Yêu cầu bổ sung giấy tờ', value: 'waiting'},
+      {text: 'Từ chối xử lý', value: 'denied'},
+      {text: 'Đã xử lý xong', value: 'releasing'},
+      {text: 'Đã trả kết quả', value: 'done'}
+    ],
+    status: null
   }),
   computed: {
     originality () {
@@ -273,6 +299,12 @@ export default {
         vm.qrscan = false
         vm.doSearchDossier()
       }
+      try {
+        if (statusListConfig) {
+          vm.statusList = statusListConfig
+        }
+      } catch (error) {
+      }
     })
   },
   updated () {
@@ -304,11 +336,13 @@ export default {
       vm.dossierList = []
       vm.dossierNoKey = newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : ''
       vm.applicantIdNo = newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : ''
+      vm.status = newQuery.hasOwnProperty('status') && newQuery.status !== 'null' ? newQuery.status : ''
       vm.dossierPage = newQuery.hasOwnProperty('page') ? Number(newQuery.page) : 1
       let filter = {
         page: vm.dossierPage,
         dossierNo: vm.dossierNoKey,
-        applicantIdNo: vm.applicantIdNo
+        applicantIdNo: vm.applicantIdNo,
+        status: vm.status
       }
       if (vm.dossierNoKey || vm.applicantIdNo) {
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
@@ -324,14 +358,16 @@ export default {
     },
     changeDataSearch () {
       let vm = this
-      if (String(vm.dossierNoKey).length > 3 || String(vm.applicantIdNo).length > 3) {
+      if (vm.dossierNoKey || vm.applicantIdNo) {
         setTimeout(function () {
+          vm.dossierPage = 1
           let current = vm.$router.history.current
           let newQuery = current.query
           let queryString = '?'
           newQuery['page'] = vm.dossierPage
           newQuery['dossierNo'] = vm.dossierNoKey
           newQuery['applicantIdNo'] = vm.applicantIdNo
+          newQuery['status'] = vm.status
           for (let key in newQuery) {
             if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
               queryString += key + '=' + newQuery[key] + '&'
@@ -344,8 +380,15 @@ export default {
             }
           })
         }, 100)
+      } else {
+        toastr.error('Vui lòng nhập mã hồ sơ hoặc số CMND/ hộ chiếu để tra cứu')
       }
-      
+    },
+    changeStatus () {
+      let vm = this
+      if (vm.dossierNoKey || vm.applicantIdNo) {
+        vm.changeDataSearch()
+      }
     },
     viewDetail (item) {
       let vm = this
