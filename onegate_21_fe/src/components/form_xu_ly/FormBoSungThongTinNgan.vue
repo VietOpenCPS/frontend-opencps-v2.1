@@ -7,7 +7,7 @@
         </div>
         <v-card>
           <v-card-text class="py-2 px-2">
-            <v-form ref="form1" v-model="valid1" lazy-validation>
+            <v-form ref="form1" v-model="valid1" lazy-validation :id="'form_' + item.fieldName">
               <v-layout wrap>
                 <v-flex xs12 class="mx-3">
                   <v-text-field v-if="item.fieldType === 'textarea'"
@@ -19,7 +19,6 @@
                     @input="inputChangeValue(item)"
                     :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
                     :required="(item.required === true || item.required === 'true') ? true : false"
-                    :autofocus="index == focusSelect"
                   ></v-text-field>
                   <v-text-field v-if="item.fieldType === 'string'"
                     box
@@ -29,7 +28,6 @@
                     @input="inputChangeValue(item)"
                     :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
                     :required="(item.required === true || item.required === 'true') ? true : false"
-                    :autofocus="index == focusSelect"
                   ></v-text-field>
                   <v-text-field v-if="item.fieldType === 'number'"
                     box
@@ -39,7 +37,6 @@
                     @input="inputChangeValue(item)"
                     :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
                     :required="(item.required === true || item.required === 'true') ? true : false"
-                    :autofocus="index == focusSelect"
                   ></v-text-field>
                   <v-autocomplete v-if="item.fieldType.indexOf('select') >= 0"
                     class="select-border"
@@ -53,7 +50,6 @@
                     :hide-selected="true"
                     @change="inputChangeValue($event, index)"
                     box
-                    :autofocus="index == focusSelect"
                   ></v-autocomplete>
                   <v-layout wrap class="pl-2" v-if="item.fieldType === 'date'">
                     <v-icon color="blue" class="">event</v-icon>
@@ -228,6 +224,7 @@
 </template>
 <script>
   let datePicker = window.VueCtkDateTimePicker ? window.VueCtkDateTimePicker.default : window['vue-ctk-date-time-picker']
+  import $ from 'jquery'
   import axios from 'axios'
   export default {
     components: {
@@ -256,7 +253,6 @@
       valid: false,
       valid1: false,
       valid2: false,
-      focusSelect: -1,
       rulesValid: {
         number: function (value) {
           var pattern = /^\d+$/
@@ -462,7 +458,6 @@
         let vm = this
         let valid = true
         if (vm.formBuilder.length > 0) {
-          let indexForm = 0
           for (let key in vm.formBuilder) {
             if (vm.formBuilder[key].fieldType.indexOf('options_group') >= 0) {
               for (let key1 in vm.optionsGroup) {
@@ -476,8 +471,7 @@
               if ((vm.formBuilder[key]['required'] === true || vm.formBuilder[key]['required'] === 'true') && !vm.formBuilder[key]['value']) {
                 valid = false
                 alert(vm.formBuilder[key]['fieldLabel'] + ' là bắt buộc!')
-                vm.focusSelect = indexForm
-                indexForm += 1
+                $('#form_' + vm.formBuilder[key].fieldName)[0].__vue__.validate()
                 return valid
               }
             }
