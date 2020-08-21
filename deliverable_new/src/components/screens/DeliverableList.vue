@@ -331,6 +331,11 @@
               </v-tooltip>
               
             </div>
+            <div v-else-if="itemHeader.type === 'currency'">
+              <span>
+                {{currency(props.item[itemHeader.value])}}
+              </span>
+            </div>
             <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
               <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item" :layout_view="itemHeader.layout_view"></template-rendering>
               <span v-else>
@@ -1153,7 +1158,13 @@
         }).catch(function (reject) {
           vm.loadingImport = false
         })
-      }
+      },
+      currency (value) {
+        if (value) {
+          return String(value).replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+        }
+        return ''
+      },
     }
   }
 </script>

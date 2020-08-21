@@ -2088,6 +2088,7 @@ export default {
           validFormBoSung = true
         } else {
           validFormBoSung = false
+          return
         }
       }
       if (vm.showYkienCanBoThucHien) {
@@ -2103,6 +2104,9 @@ export default {
       }
       if (vm.showTaoTaiLieuKetQua) {
         validCreateFiles = vm.$refs.tailieuketqua.validCreateFileTemplate()
+        if (!validCreateFiles) {
+          return
+        }
       }
       if (vm.showKyPheDuyetTaiLieu) {
         let resultTmp = vm.$refs.kypheduyettailieu.doExport()
@@ -2312,6 +2316,7 @@ export default {
                 return Number(item.assigned) > 0
               }).length > 0 ) {
                 vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                  vm.getDetailDossier()
                   if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
                     vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
                     })
@@ -2344,7 +2349,6 @@ export default {
                   vm.checkInput = 0
                   vm.$store.commit('setCheckInput', 0)
                   if (String(item.form) === 'ACTIONS') {
-                    vm.getDetailDossier()
                   } else {
                     vm.$router.push({
                       path: vm.$router.history.current.path,
@@ -2408,6 +2412,7 @@ export default {
                 vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
                   // 1
                   vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                    vm.getDetailDossier()
                     if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
                       vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
                       })
@@ -2440,7 +2445,6 @@ export default {
                     vm.checkInput = 0
                     vm.$store.commit('setCheckInput', 0)
                     if (String(item.form) === 'ACTIONS') {
-                      vm.getDetailDossier()
                     } else {
                       vm.$router.push({
                         path: vm.$router.history.current.path,
@@ -2467,6 +2471,7 @@ export default {
             } else {
               // 1
               vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                vm.getDetailDossier()
                 if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
                   vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
                   })
@@ -2499,7 +2504,6 @@ export default {
                 vm.checkInput = 0
                 vm.$store.commit('setCheckInput', 0)
                 if (String(item.form) === 'ACTIONS') {
-                  vm.getDetailDossier()
                 } else {
                   vm.$router.push({
                     path: vm.$router.history.current.path,
