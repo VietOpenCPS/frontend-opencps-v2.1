@@ -264,6 +264,17 @@ export default {
     vm.$nextTick(function () {
     })
   },
+  mounted () {
+    let vm = this
+    vm.$nextTick(function () {
+      try {
+        if (addScrLogin) {
+          addScrLogin()
+        }
+      } catch (error) {
+      }
+    })
+  },
   watch: {
   },
   methods: {

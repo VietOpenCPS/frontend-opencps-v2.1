@@ -49,7 +49,7 @@
           </div>
           <!--  -->
           <thong-tin-chu-ho-so v-if="!mauCongVan" ref="thongtinchuhoso" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="isNotarization ? true : false" :applicantIdRequired="applicantIdRequired"></thong-tin-chu-ho-so>
-          <thong-tin-chu-ho-so-cong-van v-if="mauCongVan" ref="thongtinchuhosocongvan"></thong-tin-chu-ho-so-cong-van>
+          <thong-tin-chu-ho-so-cong-van v-if="mauCongVan" ref="thongtinchuhosocongvan" :mauCongVan="mauCongVan"></thong-tin-chu-ho-so-cong-van>
           <!--  -->
           <div v-if="!isNotarization">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -1118,7 +1118,8 @@ export default {
           let metaData = vm.getMetaData(arr[i])
           let fee = 0
           if (metaData) {
-            fee = Number(metaData['yearPayment'])*Number(metaData['subsidy'])
+            let trocapmotlan = metaData.hasOwnProperty('trocapmotlan') && metaData['trocapmotlan'] ? true : false
+            fee = trocapmotlan ? Number(metaData['subsidy']) : Number(metaData['yearPayment'])*Number(metaData['subsidy'])
             totalFee += fee
           }
         }
@@ -1157,7 +1158,8 @@ export default {
             let metaData = vm.getMetaData(arr[i])
             let fee = 0
             if (metaData) {
-              fee = Number(metaData['yearPayment'])*Number(metaData['subsidy'])
+              let trocapmotlan = metaData.hasOwnProperty('trocapmotlan') && metaData['trocapmotlan'] ? true : false
+              fee = trocapmotlan ? Number(metaData['subsidy']) : Number(metaData['yearPayment'])*Number(metaData['subsidy'])
               totalFee += fee
             }
           }

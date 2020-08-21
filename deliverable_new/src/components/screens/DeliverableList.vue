@@ -258,6 +258,14 @@
       >
         <v-icon size="16">add</v-icon>&nbsp;Thêm&nbsp;{{String(loaiDuLieu).toLowerCase()}}
       </v-btn>
+      <!-- download -->
+      <v-btn color="primary" class="white--text"
+        @click="downloadBieuMau(downloadFileTemplate.url)"
+        v-if="downloadFileTemplate.url">
+        <v-icon>get_app</v-icon> &nbsp;
+        {{downloadFileTemplate.lable}}
+      </v-btn>
+      <!--  -->
       <!-- import -->
       <v-btn color="primary" class="white--text"
         :loading="loadingImport"
@@ -539,7 +547,11 @@
                 }
             ]
         ],
-        filterExport: ''
+        filterExport: '',
+        downloadFileTemplate: {
+          lable: '',
+          url: '',
+        }
       }
     },
     created () {
@@ -551,6 +563,16 @@
               vm.filters = eval('( ' + vm.items[vm.index]['dataConfig'] + ' )')
             }
             if (vm.items[vm.index]['tableConfig'] !== '') {
+              try{
+                console.log(eval('( ' + vm.items[vm.index]['tableConfig'] + ' )'))
+               
+                let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
+                console.log(tableConfig)
+                vm.downloadFileTemplate = tableConfig['downloadFileTemplate'] ? tableConfig['downloadFileTemplate'] : {url: '', lable: ''}
+              }
+              catch (err) {
+                vm.downloadFileTemplate = {url: '', lable: ''}
+              }
               vm.headerExport = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')['headers']
               vm.headers = vm.headerExport.filter(function (item) {
                 return !item.hasOwnProperty('show') || (item.hasOwnProperty('show') && item.show)
@@ -624,7 +646,16 @@
         }
         if (vm.items[val]['tableConfig'] !== '') {
           vm.hosoDatasPage = 1
+          console.log('ưqe',vm.items[vm.index]['tableConfig'])
           vm.headerExport = eval('( ' + vm.items[val]['tableConfig'] + ' )')['headers']
+          try{
+            let tableConfig = JSON.parse(vm.items[vm.index]['tableConfig'])
+            vm.downloadFileTemplate = tableConfig['downloadFileTemplate'] ? tableConfig['downloadFileTemplate'] : {url: '', lable: ''}
+          }
+          catch (err) {
+            vm.downloadFileTemplate = {url: '', lable: ''}
+          }
+      
           vm.headers = vm.headerExport.filter(function (item) {
             return !item.hasOwnProperty('show') || (item.hasOwnProperty('show') && item.show)
           })
@@ -749,18 +780,18 @@
         }, 200)
       },
       viewDetail (item, index) {
-        let vm = this
-        let current = vm.$router.history.current
-        let newQuery = current.query
-        let queryString = '?'
-        for (let key in newQuery) {
-          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
-            queryString += key + '=' + newQuery[key] + '&'
-          }
-        }
-        vm.$router.push({
-          path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString
-        })
+        // let vm = this
+        // let current = vm.$router.history.current
+        // let newQuery = current.query
+        // let queryString = '?'
+        // for (let key in newQuery) {
+        //   if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+        //     queryString += key + '=' + newQuery[key] + '&'
+        //   }
+        // }
+        // vm.$router.push({
+        //   path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString
+        // })
       },
       editDeliverables (item, index) {
         let vm = this
@@ -1153,6 +1184,16 @@
         }).catch(function (reject) {
           vm.loadingImport = false
         })
+      },
+      downloadBieuMau (string) {
+        //const url = window.URL.createObjectURL(new Blob([response.data]))
+        console.log(string)
+        const link = document.createElement('a')
+        link.href = string
+        
+        // link.setAttribute('download', 'file.png') //or any other extension
+        document.body.appendChild(link)
+        link.click()
       }
     }
   }

@@ -1,6 +1,6 @@
 <template>
   <div class="form-chitiet">
-    <!-- <div class="row-header">
+    <div class="row-header">
       <div class="background-triangle-big"> <span>BÁO CÁO</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
@@ -27,17 +27,11 @@
                 >
               </v-select>
             </v-flex>
-            <v-flex xs12 sm8 class="px-2 text-right" style="    padding-top: 1px;">
-              <v-btn v-if="govAgencyCode === ''" flat class="mx-0 my-0" v-on:click.native="toNativeViewType()">
+            <v-flex xs12 sm8 class="px-2 text-right" style="padding-top: 1px;">
+              <!-- <v-btn v-if="govAgencyCode === ''" flat class="mx-0 my-0" v-on:click.native="toNativeViewType()">
                 <span v-if="chartView">Lĩnh vực</span>
                 <span v-else>Đơn vị</span>
-              </v-btn>
-              <v-btn icon class="mx-0 my-0" v-on:click.native="toNativeView(0,'lineChart')">
-                <v-icon size="14">show_chart</v-icon>
-              </v-btn>
-              <v-btn v-if="reportGovName.length > 0 && String(index) !== '1'" flat class="mx-0 my-0" v-on:click.native="toNativeViewBack(index)">
-                <v-icon class="mr-2">undo</v-icon> Quay lại 
-              </v-btn>
+              </v-btn> -->
               <v-tooltip bottom>
                 <v-btn icon class="mx-0 my-0" slot="activator" v-on:click.native="toNativeView(0)">
                   <v-icon size="14">pie_chart</v-icon>
@@ -54,97 +48,56 @@
           </v-layout>
         </div>
       </div>
-    </div> -->
+    </div>
     <v-layout row wrap style="margin: 0;" v-if="String(index) === '0'">
-      <v-flex xs12 sm4 class="mt-4 pl-2" style="">
-        <v-card class="wrap_report report_service" style="border-radius: 0;">
+      <v-flex xs12 sm4 class="mt-4" style="">
+        <v-card class="wrap_report report_service mr-2" style="border-radius: 0;">
           <v-card-title class="headline">
             Thống kê thủ tục hành chính
           </v-card-title>
-          <v-card-text class="py-0 px-0">
+          <v-card-text class="py-0 px-0" style="height: 285px;">
             <apexchart type="donut" :options="chartDonutOptions" :series="seriesDonut" height="250"></apexchart>
           </v-card-text>
         </v-card>
       </v-flex>
       <v-flex xs12 sm4 class="mt-4">
-        <v-card class="wrap_report mx-2" style="border-radius: 0;">
-          <v-card-title class="headline px-2">
-            <v-layout wrap class="chart__report">
-              <v-flex class="px-2" style="calc(100% - 200px)">
-                <span>Tình hình xử lý hồ sơ</span>
-              </v-flex>
-              <v-flex class="px-2" style="width: 100px">
-                <v-select
-                  :items="months"
-                  v-model="month"
-                  item-text="name"
-                  item-value="value"
-                  :hide-selected="true"
-                  @change="changeMonth"
-                  >
-                </v-select>
-              </v-flex>
-              <v-flex class="px-2" style="width: 100px">
-                <v-select
-                  :items="years"
-                  v-model="year"
-                  item-text="name"
-                  item-value="value"
-                  :hide-selected="true"
-                  @change="changeYear"
-                  >
-                </v-select>
-              </v-flex>
-            </v-layout>
+        <v-card class="wrap_report report_piechart" style="border-radius: 0;">
+          <v-card-title class="headline">
+            <span>Tình hình giải quyết hồ sơ năm {{year}}</span>
           </v-card-title>
-          <v-card-text class="pt-2 pb-0 px-0" v-if="showTableTotal" style="padding-bottom: 46px !important;">
-            <pie-chart-report-public :item="itemTotal" :year="year" :month="month" :chart_view="chartView"></pie-chart-report-public>
+          <v-card-text class="py-0 px-0" style="height: 285px;">
+            <!-- report_1 -->
+            <apexchart v-if="showTableTotal" type=donut height=250 :options="chartDonutOptionsChart1" :series="seriesDonutChart1" />
+            <span class="d-inline-block total-pie-text">
+              <p class="mb-0 text-bold" style="color: #ca0202">Tổng số tiếp nhận: 
+                <span style="font-size: 20px">
+                  {{itemTotal.processCount}}
+                </span>
+              </p>
+            </span>
           </v-card-text>
         </v-card>
       </v-flex>
       <v-flex xs12 sm4 class="mt-4">
-        <v-card class="wrap_report mr-2" style="border-radius: 0;">
-          <v-card-title class="headline px-2">
-            <v-layout wrap class="chart__report">
-              <v-flex class="px-2" style="width: calc(100% - 130px);">
-                <span>Tổng hợp tình hình xử lý hồ sơ</span>
-              </v-flex>
-              <v-flex class="px-2" style="width: 130px">
-                <v-select
-                  :items="years"
-                  v-model="yearReport1"
-                  item-text="name"
-                  item-value="value"
-                  :hide-selected="true"
-                  @change="changeYearReport1"
-                  >
-                </v-select>
-              </v-flex>
-            </v-layout>
+        <v-card class="wrap_report report_piechart ml-2 mr-0" style="border-radius: 0;">
+          <v-card-title class="headline">
+            <span>Tình hình giải quyết hồ sơ tháng {{String(month) === '0' ? monthDefault : month}} năm {{year}}</span>
           </v-card-title>
-          <v-card-text class="pb-0 px-0" v-if="showTableTotal" style="padding-top: 30px;">
-            <div>
-              <div class="numbers align-space-between" style="margin: 5px 0px;overflow: hidden;">
-                <div class="tiepnhan" style="width: 50%; text-align: center; float: left;">
-                  <div class="mb-2">
-                    <div style="text-transform: uppercase; margin-bottom: 5px;">Tổng giải quyết</div><span id="da_tiep_nhan" style="font-size: 24px;font-weight: 700;">{{itemTotal['processCount']}}</span></div>
-                  <div class="mb-2">
-                    <div style="text-transform: uppercase; margin-bottom: 5px;">Đã giải quyết</div><span id="da_tiep_nhan" style="font-size: 24px; font-weight: 700;">{{itemTotal['releaseCount']}}</span></div>
-                </div>
-                <div class="giaiquyet" style="width: 50%; text-align: center; float: left;">
-                  <div class="mb-2">
-                    <div style="text-transform: uppercase; margin-bottom: 5px;">Nhận Trong kỳ</div><span id="da_tiep_nhan" style="font-size: 24px; font-weight: 700;">{{itemTotal['receivedCount']}}</span></div>
-                  <div class="mb-2">
-                    <div style="text-transform: uppercase; margin-bottom: 5px;">Đang giải quyết</div><span id="da_tiep_nhan" style="font-size: 24px; font-weight: 700;">{{itemTotal['processingCount']}}</span></div>
-                </div>
-              </div>
-              <div class="mb-2 text-center"><div style="text-transform: uppercase; margin-bottom: 5px;">Tỉ lệ sớm và đúng hạn</div><span id="da_tiep_nhan" style="font-size: 36px;font-weight: 700;color: rgb(253, 180, 75);">{{Math.round(itemTotal['ontimePercentage'])}} %</span></div>
-            </div>
+          <v-card-text class="py-0 px-0" style="height: 285px;">
+            <!-- report_1 -->
+            <apexchart v-if="showTableTotalMonth" type=donut height=250 :options="chartDonutOptionsChart2" :series="seriesDonutChart2" />
+            <span class="d-inline-block total-pie-text">
+              <p class="mb-0 text-bold" style="color: #ca0202">Tổng số tiếp nhận: 
+                <span style="font-size: 20px">
+                  {{itemTotalMonth.processCount}}
+                </span>
+              </p>
+            </span>
           </v-card-text>
         </v-card>
       </v-flex>
 
-      <v-flex xs12 class="row_3 mt-4 ml-2 mr-2" v-if="!reloadBar">
+      <v-flex xs12 class="row_3 mt-4 mx-0" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline" v-if="String(month) !== '0'">
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
@@ -168,7 +121,7 @@
         </v-card>
       </v-flex>
 
-      <!-- <v-flex xs12 class="row_4 mt-4 ml-2 mr-2" v-if="!reloadBar">
+      <v-flex xs12 class="row_4 mt-4 mx-0" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline" v-if="String(month) !== '0'">
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
@@ -183,8 +136,21 @@
             ></apexchart>
           </v-card-text>
         </v-card>
-      </v-flex> -->
+      </v-flex>
 
+      <v-flex xs12 class="row_5 mt-4 mx-0" v-if="!reloadLine" id="lineChartID">
+        <v-card class="wrap_report" style="border-radius: 0;">
+          <v-card-title class="headline">
+            Tình hình giải quyết hồ sơ năm {{year}}
+          </v-card-title>
+          <v-card-text class="pt-2 pb-0 px-0">
+            <apexchart type="line" height="450"
+              :options="chartOptions" 
+              :series="seriesChart"
+            ></apexchart>
+          </v-card-text>
+        </v-card>
+      </v-flex>
       <content-placeholders class="my-4 flex xs12 px-2" v-else>
         <content-placeholders-heading />
         <content-placeholders-img />
@@ -338,9 +304,10 @@ export default {
   data: () => ({
     showDetailReport: false,
     itemTotal: {},
+    itemTotalMonth: {},
     levelList: [],
     totalTTHC: 0,
-    chartView: true,
+    chartView: false,
     currentMonth: ((new Date()).getMonth() + 1) < 10 ? '0' + ((new Date()).getMonth() + 1) : ((new Date()).getMonth() + 1),
     currentDay: (new Date()).getDate() < 10 ? '0' + (new Date()).getDate() : (new Date()).getDate(),
     agencyGroups: [],
@@ -372,7 +339,6 @@ export default {
       }
     ],
     year: (new Date()).getFullYear() + '',
-    yearReport1: (new Date()).getFullYear() + '',
     months: [
       {
         'value': '0',
@@ -428,6 +394,7 @@ export default {
       }
     ],
     month: ((new Date()).getMonth() + 1) + '',
+    monthDefault: ((new Date()).getMonth() + 1) + '',
     danhSachBaoCaos: [],
     totalCounter: {},
     reportGovName: '',
@@ -471,6 +438,7 @@ export default {
     seriesChartBarTotal: [],
     labelOfLine: [],
     showTableTotal: false,
+    showTableTotalMonth: false,
     typeMonthChart: 'stacked',
     chartOptionColumn: {},
     seriesChartColumn: [],
@@ -482,6 +450,20 @@ export default {
           donut: {
             labels: {
               show: true,
+              name: {
+                show: true,
+                fontSize: '16px',
+                fontFamily: 'Roboto, Arial, sans-serif',
+                color: undefined,
+                offsetY: 5
+              },
+              value: {
+                show: true,
+                fontSize: '24px',
+                fontFamily: 'Roboto, Arial, sans-serif',
+                color: undefined,
+                offsetY: 20
+              },
               total: {
                 show: true,
                 label: 'Tổng số',
@@ -492,17 +474,215 @@ export default {
         }
       },
       dataLabels: {
-        enabled: true,
+        enabled: false,
         formatter: function(value, { seriesIndex, dataPointIndex, w }) {
           return w.config.series[seriesIndex]
         }
       },
       legend: {
         position: 'bottom',
-        bottom: 0
+        bottom: 0,
+        fontFamily: 'Roboto, Arial, sans-serif',
+        formatter: function(seriesName, opts) {
+          return '<span class="text-bold" style="color:' + opts.w.globals.colors[opts.seriesIndex]+ '">' +
+           opts.w.globals.series[opts.seriesIndex] + '</span>&nbsp;' + seriesName
+        }
+      },
+    },
+    seriesDonut: [0, 0, 0],
+    chartDonutOptionsChart1: {
+      labels: ['Đang giải quyết', 'Đã giải quyết'],
+      colors: ['#8BC34A', '#2196F3'],
+      plotOptions: {
+        pie: {
+          donut: {
+            labels: {
+              show: true,
+              name: {
+                show: true,
+                fontSize: '16px',
+                fontFamily: 'Roboto, Arial, sans-serif',
+                color: undefined,
+                offsetY: 5
+              },
+              value: {
+                show: true,
+                fontSize: '24px',
+                fontFamily: 'Roboto, Arial, sans-serif',
+                color: undefined,
+                offsetY: 20,
+                formatter: function (val, w) {
+                  let total = w.globals.seriesTotals.reduce((a, b) => {
+                    return a + b
+                  }, 0)
+                  return Math.round((val/total)*100)+' %'
+                }
+              },
+              total: {
+                show: true,
+                label: 'Đúng hạn',
+                color: '#ff5c24',
+                formatter: function (w) {
+                }
+              }
+            }
+          }
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      states: {
+        normal: {
+          filter: {
+            type: 'none',
+            value: 0,
+          }
+        },
+        hover: {
+          filter: {
+            type: 'none',
+            value: 0,
+          }
+        },
+        active: {
+          allowMultipleDataPointsSelection: false,
+          filter: {
+            type: 'none',
+            value: 0,
+          }
+        },
+      },
+      legend: {
+        position: 'bottom',
+        bottom: 0,
+        fontFamily: 'Roboto, Arial, sans-serif',
+        formatter: function(seriesName, opts) {
+          return '<span class="text-bold" style="color:' + opts.w.globals.colors[opts.seriesIndex]+ '">' +
+           opts.w.globals.series[opts.seriesIndex] + '</span>&nbsp;' + seriesName
+        }
+      },
+      tooltip: {
+        enabled: true,
+        y: {
+          formatter: function(val) {
+            return val + " hồ sơ"
+          },
+          title: {
+            formatter: function (seriesName) {
+              return ''
+            }
+          }
+        },
+        fixed: {
+          enabled: true,
+          position: 'topRight',
+          offsetX: 0,
+          offsetY: 0,
+        }
       }
     },
-    seriesDonut: [0, 0, 0]
+    seriesDonutChart1: [0, 0],
+    chartDonutOptionsChart2: {
+      labels: ['Đang giải quyết', 'Đã giải quyết'],
+      colors: ['#8BC34A', '#2196F3'],
+      plotOptions: {
+        pie: {
+          donut: {
+            labels: {
+              show: true,
+              name: {
+                show: true,
+                fontSize: '16px',
+                fontFamily: 'Roboto, Arial, sans-serif',
+                color: undefined,
+                offsetY: 5
+              },
+              value: {
+                show: true,
+                fontSize: '24px',
+                fontFamily: 'Roboto, Arial, sans-serif',
+                color: undefined,
+                offsetY: 20,
+                formatter: function (val, w) {
+                  let total = w.globals.seriesTotals.reduce((a, b) => {
+                    return a + b
+                  }, 0)
+                  return Math.round((val/total)*100)+' %'
+                }
+              },
+              total: {
+                show: true,
+                label: 'Đúng hạn',
+                color: '#ff5c24',
+                formatter: function (w) {
+                }
+              }
+            }
+          }
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      states: {
+        normal: {
+          filter: {
+            type: 'none',
+            value: 0,
+          }
+        },
+        hover: {
+          filter: {
+            type: 'none',
+            value: 0,
+          }
+        },
+        active: {
+          allowMultipleDataPointsSelection: false,
+          filter: {
+            type: 'none',
+            value: 0,
+          }
+        },
+      },
+      legend: {
+        position: 'bottom',
+        bottom: 0,
+        fontFamily: 'Roboto, Arial, sans-serif',
+        formatter: function(seriesName, opts) {
+          return '<span class="text-bold" style="color:' + opts.w.globals.colors[opts.seriesIndex]+ '">' +
+           opts.w.globals.series[opts.seriesIndex] + '</span>&nbsp;' + seriesName
+        }
+      },
+      tooltip: {
+        enabled: true,
+        y: {
+          formatter: function(val) {
+            return val + " hồ sơ"
+          },
+          title: {
+            formatter: function (seriesName) {
+              return ''
+            }
+          }
+        },
+        fixed: {
+          enabled: true,
+          position: 'topRight',
+          offsetX: 0,
+          offsetY: 0,
+        }
+      }
+    },
+    seriesDonutChart2: [0, 0],
+    dataDefault: {
+      processCount: 0,
+      processingCount: 0,
+      releaseCount: 0,
+      waitingCount: 0,
+      cancelledCount: 0
+    }
   }),
   computed: {
     loadingMenuConfigToDo () {
@@ -570,21 +750,53 @@ export default {
           vm.seriesDonut = [level2, level3, level4]
         })
         vm.showTableTotal = false
-        vm.itemTotal = null
+        vm.showTableTotalMonth = false
+        vm.itemTotal = vm.dataDefault
+        vm.itemTotalMonth = vm.dataDefault
         let filter = {
           year: vm.year,
-          month: ((new Date()).getMonth() + 1) + '',
-          domain: 'total',
-          agency: 'total'
+          month: 0
         }
-        vm.getReportChart(filter)
-        let filter1 = {
+        vm.$store.dispatch('getReportTotal', filter).then(function (result) {
+          if (result) {
+            let agencyListsTotal = result
+            for (let key in agencyListsTotal) {
+              let currentData = agencyListsTotal[key]
+              if (currentData.domainName === '' && currentData.domainName === '') {
+                vm.itemTotal = currentData
+                vm.showTableTotal = true
+                break
+              }
+            }
+            if (vm.itemTotal === null) {
+              vm.itemTotal = vm.dataDefault
+              vm.showTableTotal = false
+            }
+          }
+          
+        })
+        let filterMonth = {
           year: vm.year,
-          month: 0,
-          domain: 'total',
-          agency: 'total'
+          month: String(vm.month) === '0' ? ((new Date()).getMonth() + 1) + '' : vm.month
         }
-        vm.getReportChart1(filter1)
+        vm.$store.dispatch('getReportTotal', filterMonth).then(function (result) {
+          if (result) {
+            let agencyListsTotal = result
+            for (let key in agencyListsTotal) {
+              let currentData = agencyListsTotal[key]
+              if (currentData.domainName === '' && currentData.domainName === '') {
+                vm.itemTotalMonth = currentData
+                vm.showTableTotalMonth = true
+                break
+              }
+            }
+            if (vm.itemTotalMonth === null) {
+              vm.itemTotalMonth = vm.dataDefault
+              vm.showTableTotalMonth = false
+            }
+          }
+          
+        })
       }
     })
   },
@@ -594,7 +806,6 @@ export default {
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
-      console.debug(oldRoute)
       let currentQuerys = newRoute.query
       vm.reportGovName = ''
       vm.govAgencyCode = ''
@@ -638,6 +849,101 @@ export default {
         setTimeout(function () {
           vm.$vuetify.goTo('#lineChartID', vm.options)
         }, 300)
+      }
+    },
+    itemTotal (val) {
+      // data report_1
+      let vm = this
+      if (val) {
+        vm.seriesDonutChart1[0] = val['processingCount'] 
+        vm.seriesDonutChart1[1] = val['releaseCount'] + val['waitingCount'] + val['cancelledCount']
+        vm.chartDonutOptionsChart1.plotOptions = {
+          pie: {
+            donut: {
+              labels: {
+                show: true,
+                name: {
+                  show: true,
+                  fontSize: '16px',
+                  fontFamily: 'Roboto, Arial, sans-serif',
+                  color: undefined,
+                  offsetY: 5
+                },
+                value: {
+                  show: true,
+                  fontSize: '24px',
+                  fontFamily: 'Roboto, Arial, sans-serif',
+                  color: undefined,
+                  offsetY: 20,
+                  formatter: function (val, w) {
+                    let total = w.globals.seriesTotals.reduce((a, b) => {
+                      return a + b
+                    }, 0)
+                    return Math.round((val/total)*100)+' %'
+                  }
+                },
+                total: {
+                  show: true,
+                  label: 'Đúng hạn',
+                  color: '#ff5c24',
+                  formatter: function (w) {
+                    return val['ontimePercentage']+' %'
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else {
+        vm.seriesDonutChart1[0] = 0
+        vm.seriesDonutChart1[1] = 0
+      }
+    },
+    itemTotalMonth (val) {
+      let vm = this
+      if (val) {
+        vm.seriesDonutChart2[0] = val['processingCount'] 
+        vm.seriesDonutChart2[1] = val['releaseCount'] + val['waitingCount'] + val['cancelledCount']
+        vm.chartDonutOptionsChart2.plotOptions = {
+          pie: {
+            donut: {
+              labels: {
+                show: true,
+                name: {
+                  show: true,
+                  fontSize: '16px',
+                  fontFamily: 'Roboto, Arial, sans-serif',
+                  color: undefined,
+                  offsetY: 5
+                },
+                value: {
+                  show: true,
+                  fontSize: '24px',
+                  fontFamily: 'Roboto, Arial, sans-serif',
+                  color: undefined,
+                  offsetY: 20,
+                  formatter: function (val, w) {
+                    let total = w.globals.seriesTotals.reduce((a, b) => {
+                      return a + b
+                    }, 0)
+                    return Math.round((val/total)*100)+' %'
+                  }
+                },
+                total: {
+                  show: true,
+                  label: 'Đúng hạn',
+                  color: '#ff5c24',
+                  formatter: function (w) {
+                    return val['ontimePercentage']+' %'
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else {
+        vm.seriesDonutChart2[0] = 0 
+        vm.seriesDonutChart2[1] = 0
       }
     }
   },
@@ -818,41 +1124,102 @@ export default {
         })
       }, 200)
     },
-    changeMonth () {
+    changeYear (item) {
       let vm = this
-      setTimeout(function () {
-        let filter = {
+      vm.year = item
+      vm.showTableTotal = false
+      vm.showTableTotalMonth = false
+      vm.itemTotal = vm.dataDefault
+      vm.itemTotalMonth = vm.dataDefault
+      let filter = {
+        year: vm.year,
+        month: 0
+      }
+      vm.$store.dispatch('getReportTotal', filter).then(function (result) {
+        if (result) {
+          let agencyListsTotal = result
+          for (let key in agencyListsTotal) {
+            let currentData = agencyListsTotal[key]
+            if (currentData.domainName === '' && currentData.domainName === '') {
+              vm.itemTotal = currentData
+              vm.showTableTotal = true
+              break
+            }
+          }
+          if (vm.itemTotal === null) {
+            vm.itemTotal = vm.dataDefault
+            vm.showTableTotal = false
+          }
+        }
+        
+      })
+      let filterMonth = {
+        year: vm.year,
+        month: String(vm.month) === '0' ? ((new Date()).getMonth() + 1) + '' : vm.month
+      }
+      vm.$store.dispatch('getReportTotal', filterMonth).then(function (result) {
+        if (result) {
+          let agencyListsTotal = result
+          for (let key in agencyListsTotal) {
+            let currentData = agencyListsTotal[key]
+            if (currentData.domainName === '' && currentData.domainName === '') {
+              vm.itemTotalMonth = currentData
+              vm.showTableTotalMonth = true
+              break
+            }
+          }
+          if (vm.itemTotalMonth === null) {
+            vm.itemTotalMonth = vm.dataDefault
+            vm.showTableTotalMonth = false
+          }
+        }
+        
+      })
+      vm.$router.push({
+        path: '/bao-cao/' + vm.index,
+        query: {
           year: vm.year,
           month: vm.month,
-          domain: 'total',
-          agency: 'total'
+          group: vm.group,
+          reportGovName: vm.reportGovName,
+          govAgencyCode: vm.govAgencyCode
         }
-        vm.getReportChart(filter)
-      }, 200)
+      })
     },
-    changeYear () {
+    changeMonth (item) {
       let vm = this
-      setTimeout(function () {
-        let filter = {
+      vm.month = item
+      vm.itemTotalMonth = vm.dataDefault
+      vm.showTableTotalMonth = false
+      let filterMonth = {
+        year: vm.year,
+        month: String(vm.month) === '0' ? ((new Date()).getMonth() + 1) + '' : vm.month
+      }
+      vm.$store.dispatch('getReportTotal', filterMonth).then(function (result) {
+        let agencyListsTotal = result
+        for (let key in agencyListsTotal) {
+          let currentData = agencyListsTotal[key]
+          if (currentData.domainName === '' && currentData.domainName === '') {
+            vm.itemTotalMonth = currentData
+            vm.showTableTotalMonth = true
+            break
+          }
+        }
+        if (vm.itemTotalMonth === null) {
+          vm.itemTotalMonth = vm.dataDefault
+          vm.showTableTotalMonth = false
+        }
+      })
+      vm.$router.push({
+        path: '/bao-cao/' + vm.index,
+        query: {
           year: vm.year,
           month: vm.month,
-          domain: 'total',
-          agency: 'total'
+          group: vm.group,
+          reportGovName: vm.reportGovName,
+          govAgencyCode: vm.govAgencyCode
         }
-        vm.getReportChart(filter)
-      }, 200)
-    },
-    changeYearReport1 () {
-      let vm = this
-      setTimeout(function () {
-        let filter = {
-          year: vm.yearReport1,
-          month: 0,
-          domain: 'total',
-          agency: 'total'
-        }
-        vm.getReportChart1(filter)
-      }, 200)
+      })
     },
     changeDonVi (item) {
       let vm = this
@@ -1172,42 +1539,6 @@ export default {
           }
         }
       }
-    },
-    getReportChart (filter) {
-      let vm = this
-      vm.$store.dispatch('getReportTotal', filter).then(function (result) {
-        console.log('dataReport', result)
-        let agencyListsTotal = result
-        for (let key in agencyListsTotal) {
-          let currentData = agencyListsTotal[key]
-          if (currentData.domainName === '' && currentData.domainName === '') {
-            vm.itemTotal = currentData
-            vm.showTableTotal = true
-            break
-          }
-        }
-        if (vm.itemTotal === null) {
-          vm.showTableTotal = false
-        }
-      })
-    },
-    getReportChart1 (filter) {
-      let vm = this
-      vm.$store.dispatch('getReportTotal', filter).then(function (result) {
-        console.log('dataReport1', result)
-        let agencyListsTotal = result
-        for (let key in agencyListsTotal) {
-          let currentData = agencyListsTotal[key]
-          if (currentData.domainName === '' && currentData.domainName === '') {
-            vm.itemTotal = currentData
-            vm.showTableTotal = true
-            break
-          }
-        }
-        if (vm.itemTotal === null) {
-          vm.showTableTotal = false
-        }
-      })
     },
     hashCode (str) {
       var hash = 0

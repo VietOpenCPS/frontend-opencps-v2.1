@@ -7,85 +7,91 @@
         </div>
         <v-card>
           <v-card-text class="py-2 px-2">
-            <v-layout wrap>
-              <v-flex xs12 class="mx-3">
-                <v-text-field v-if="item.fieldType === 'textarea'"
-                  box
-                  :id="item.fieldName"
-                  :value="item.value"
-                  :placeholder="item.placeholder"
-                  multi-line
-                  @input="inputChangeValue(item)"
-                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
-                  :required="(item.required === true || item.required === 'true') ? true : false"
-                ></v-text-field>
-                <v-text-field v-if="item.fieldType === 'string'"
-                  box
-                  :id="item.fieldName"
-                  :value="item.value"
-                  :placeholder="item.placeholder"
-                  @input="inputChangeValue(item)"
-                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
-                  :required="(item.required === true || item.required === 'true') ? true : false"
-                ></v-text-field>
-                <v-text-field v-if="item.fieldType === 'number'"
-                  box
-                  :id="item.fieldName"
-                  :value="item.value"
-                  :placeholder="item.placeholder"
-                  @input="inputChangeValue(item)"
-                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
-                  :required="(item.required === true || item.required === 'true') ? true : false"
-                ></v-text-field>
-                <v-autocomplete v-if="item.fieldType.indexOf('select') >= 0"
-                  class="select-border"
-                  :items="validDatasourceSelect(item.fieldType) ? JSON.parse(item.fieldType)['select'] : []"
-                  :value="item.value"
-                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
-                  :required="(item.required === true || item.required === 'true') ? true : false"
-                  :placeholder="item.placeholder"
-                  item-text="text"
-                  item-value="value"
-                  :hide-selected="true"
-                  @change="inputChangeValue($event, index)"
-                  box
-                ></v-autocomplete>
-                <v-layout wrap class="pl-2" v-if="item.fieldType === 'date'">
-                  <v-icon color="blue" class="">event</v-icon>
-                  <vue-ctk-date-time-picker 
-                    ref="datepicker"
-                    :label="item.value ? '' : 'Chọn ngày'"
-                    style="width:auto!important"
-                    class="ml-2"
+            <v-form ref="form1" v-model="valid1" lazy-validation>
+              <v-layout wrap>
+                <v-flex xs12 class="mx-3">
+                  <v-text-field v-if="item.fieldType === 'textarea'"
+                    box
                     :id="item.fieldName"
-                    v-model="item.value"
-                    formatted="DD/MM/YYYY HH:mm"
-                    format="YYYY-MM-DDTHH:mm"
-                    time-format="HH:mm"
-                    :min-date="getCurentDateTime()"
-                    :without-header="true"
-                    locale="vi"
-                  />
-                </v-layout>
-                <v-layout wrap v-if="item.fieldType.indexOf('options_group') >= 0" class="mt-2">
-                  <v-flex xs4 v-for="(item1, index1) in optionsGroup" v-bind:key="index1" class="pr-3">
-                    <v-autocomplete 
-                      class="select-border"
-                      :items="optionsGroup[index1]['datasource']"
-                      :value="item1.value"
-                      :rules="(item1.required === true || item1.required === 'true') ? [rules.required] : []"
-                      :required="(item1.required === true || item1.required === 'true') ? true : false"
-                      :label="item1.fieldLabel"
-                      item-text="itemName"
-                      item-value="itemCode"
-                      :hide-selected="true"
-                      @change="inputChangeSelect($event, index1)"
-                      box
-                    ></v-autocomplete>
-                  </v-flex>
-                </v-layout>
-              </v-flex>
-            </v-layout>
+                    :value="item.value"
+                    :placeholder="item.placeholder"
+                    multi-line
+                    @input="inputChangeValue(item)"
+                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                    :required="(item.required === true || item.required === 'true') ? true : false"
+                    :autofocus="index == focusSelect"
+                  ></v-text-field>
+                  <v-text-field v-if="item.fieldType === 'string'"
+                    box
+                    :id="item.fieldName"
+                    :value="item.value"
+                    :placeholder="item.placeholder"
+                    @input="inputChangeValue(item)"
+                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                    :required="(item.required === true || item.required === 'true') ? true : false"
+                    :autofocus="index == focusSelect"
+                  ></v-text-field>
+                  <v-text-field v-if="item.fieldType === 'number'"
+                    box
+                    :id="item.fieldName"
+                    :value="item.value"
+                    :placeholder="item.placeholder"
+                    @input="inputChangeValue(item)"
+                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
+                    :required="(item.required === true || item.required === 'true') ? true : false"
+                    :autofocus="index == focusSelect"
+                  ></v-text-field>
+                  <v-autocomplete v-if="item.fieldType.indexOf('select') >= 0"
+                    class="select-border"
+                    :items="validDatasourceSelect(item.fieldType) ? JSON.parse(item.fieldType)['select'] : []"
+                    :value="item.value"
+                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                    :required="(item.required === true || item.required === 'true') ? true : false"
+                    :placeholder="item.placeholder"
+                    item-text="text"
+                    item-value="value"
+                    :hide-selected="true"
+                    @change="inputChangeValue($event, index)"
+                    box
+                    :autofocus="index == focusSelect"
+                  ></v-autocomplete>
+                  <v-layout wrap class="pl-2" v-if="item.fieldType === 'date'">
+                    <v-icon color="blue" class="">event</v-icon>
+                    <vue-ctk-date-time-picker 
+                      ref="datepicker"
+                      :label="item.value ? '' : 'Chọn ngày'"
+                      style="width:auto!important"
+                      class="ml-2"
+                      :id="item.fieldName"
+                      v-model="item.value"
+                      formatted="DD/MM/YYYY HH:mm"
+                      format="YYYY-MM-DDTHH:mm"
+                      time-format="HH:mm"
+                      :min-date="getCurentDateTime()"
+                      :without-header="true"
+                      locale="vi"
+                    />
+                  </v-layout>
+                  <v-layout wrap v-if="item.fieldType.indexOf('options_group') >= 0" class="mt-2">
+                    <v-flex xs4 v-for="(item1, index1) in optionsGroup" v-bind:key="index1" class="pr-3">
+                      <v-autocomplete 
+                        class="select-border"
+                        :items="optionsGroup[index1]['datasource']"
+                        :value="item1.value"
+                        :rules="(item1.required === true || item1.required === 'true') ? [rules.required] : []"
+                        :required="(item1.required === true || item1.required === 'true') ? true : false"
+                        :label="item1.fieldLabel"
+                        item-text="itemName"
+                        item-value="itemCode"
+                        :hide-selected="true"
+                        @change="inputChangeSelect($event, index1)"
+                        box
+                      ></v-autocomplete>
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
+              </v-layout>
+            </v-form>
           </v-card-text>
           <v-dialog v-model="dialog" width="500">
             <v-date-picker
@@ -119,7 +125,7 @@
                 :placeholder="item.placeholder"
                 multi-line
                 @input="inputChangeValue(item)"
-                :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                :rules="(item.required === true || item.required === 'true') ? [rules.required, rules.varchar5000] : [rules.varchar5000]"
                 :required="(item.required === true || item.required === 'true') ? true : false"
               ></v-text-field>
             </v-flex>
@@ -130,7 +136,7 @@
                 :value="item.value"
                 :placeholder="item.placeholder"
                 @input="inputChangeValue(item)"
-                :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                :rules="(item.required === true || item.required === 'true') ? [rules.required, rules.varchar5000] : [rules.varchar5000]"
                 :required="(item.required === true || item.required === 'true') ? true : false"
               ></v-text-field>
             </v-flex>
@@ -248,19 +254,61 @@
       formBuilder: [],
       panel: [],
       valid: false,
+      valid1: false,
       valid2: false,
+      focusSelect: -1,
       rulesValid: {
         number: function (value) {
           var pattern = /^\d+$/
-          return pattern.test(value) || 'Kiểu dữ liệu sai định dạng.'
+          return pattern.test(value) || 'Kiểu dữ liệu sai định dạng'
         }
       },
       rules: {
         required: (value) => !!value || 'Trường dữ liệu bắt buộc',
         number: function (value) {
           const pattern = /^\d+$/
-          return pattern.test(value) || 'Kiểu dữ liệu sai định dạng.'
-        }
+          return pattern.test(value) || 'Kiểu dữ liệu sai định dạng'
+        },
+        varchar50: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+          } else {
+            return true
+          }  
+        },
+        varchar100: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+          } else {
+            return true
+          }
+        },
+        varchar255: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+          } else {
+            return true
+          }  
+        },
+        varchar500: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+          } else {
+            return true
+          }  
+        },
+        varchar5000: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+          } else {
+            return true
+          }
+        },
       }
     }),
     watch: {
@@ -414,6 +462,7 @@
         let vm = this
         let valid = true
         if (vm.formBuilder.length > 0) {
+          let indexForm = 0
           for (let key in vm.formBuilder) {
             if (vm.formBuilder[key].fieldType.indexOf('options_group') >= 0) {
               for (let key1 in vm.optionsGroup) {
@@ -427,6 +476,8 @@
               if ((vm.formBuilder[key]['required'] === true || vm.formBuilder[key]['required'] === 'true') && !vm.formBuilder[key]['value']) {
                 valid = false
                 alert(vm.formBuilder[key]['fieldLabel'] + ' là bắt buộc!')
+                vm.focusSelect = indexForm
+                indexForm += 1
                 return valid
               }
             }

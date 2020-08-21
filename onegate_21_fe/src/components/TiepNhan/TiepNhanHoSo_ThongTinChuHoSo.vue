@@ -31,7 +31,6 @@
                         :disabled="loadingVerify"
                         :rules="[rules.required, rules.varchar100]"
                         required
-                        readonly
                         @change="thongTinChuHoSo.applicantIdNo=String(thongTinChuHoSo.applicantIdNo).trim()"
                       ></v-text-field>
                       <suggestions
@@ -76,7 +75,6 @@
                         :disabled="loadingVerify"
                         :rules="requiredOptions['applicantName'] ? [rules.required,rules.varchar500] : ''"
                         :required="requiredOptions['applicantName']"
-                        :readonly="originality === 1 || originality === '1'"
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2>
@@ -875,7 +873,7 @@ export default {
           return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
         } else {
           return true
-        }  
+        }
       },
       varchar255: (val) => {
         if(val){

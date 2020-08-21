@@ -589,6 +589,7 @@ export default {
   },
   watch: {
     menuInfo (val) {
+      let vm = this
       console.log('menuInfo', val)
       vm.searchAdvanceConfig = val.tableConfig.hasOwnProperty('searchAdvanceConfig') && val.tableConfig.searchAdvanceConfig ? JSON.parse(val.tableConfig.searchAdvanceConfig) : {}
       vm.searchAdvanceConfigDefault = Object.assign(vm.searchAdvanceConfigDefault, vm.searchAdvanceConfig)

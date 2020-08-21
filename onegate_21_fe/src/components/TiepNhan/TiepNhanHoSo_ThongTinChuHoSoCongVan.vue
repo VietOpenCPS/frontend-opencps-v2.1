@@ -427,7 +427,7 @@ export default {
     'suggestions': Suggestions,
     'tiny-pagination': TinyPagination
   },
-  props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode'],
+  props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode', 'mauCongVan'],
   data: () => ({
     applicantName: '',
     birthDate: '',
@@ -616,6 +616,48 @@ export default {
     }
   },
   watch: {
+    birthDateDay (val) {
+      let vm = this
+      if(parseInt(val)=== 31) {
+        vm.months = [1,3,5,7,8,10,12]
+      } else if(parseInt(val)=== 30) {
+        vm.months = [4,6,9,11]
+      } else {
+        vm.months = [1,2,3,4,5,6,7,8,9,10,11,12]
+      }
+    },
+    birthDateMonth (val) {
+      let vm = this
+      switch(parseInt(val)){
+        case 1:
+        case 3:
+        case 5:
+        case 7:
+        case 8:
+        case 10:
+        case 12:
+          vm.days = []
+          for(let i = 1 ; i<=31;i++){
+            vm.days.push(i)
+          }
+          break;
+        case 4:
+        case 6:
+        case 9:
+        case 11:
+          vm.days = []
+          for(let i = 1 ; i<=30;i++){
+            vm.days.push(i)
+          } 
+          break;
+        case 2:
+          vm.days = []
+          for(let i = 1 ; i<=29;i++){
+            vm.days.push(i)
+          } 
+          break;
+      }
+    },
     ThongTinChuHoSoBindChuyenPhat (val) {
       this.$store.commit('setThongTinChuHoSoBindChuyenPhat', val)
     },
@@ -764,7 +806,8 @@ export default {
         recruitment: vm.recruitment,
         retire: vm.retire,
         reactivated: vm.reactivated,
-        published: vm.published
+        published: vm.published,
+        trocapmotlan: vm.mauCongVan === 'MAU_CV_TRO_CAP_MOT_LAN' ? true : false
       }
       let dataOut = {
         applicantName: vm.applicantName,

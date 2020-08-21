@@ -53,7 +53,7 @@
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div>
-          <span v-if="type === 6 || type === 7 || type === 8 || type === 9">Chọn bộ phận thực hiện</span>
+          <span v-if="type === 6 || type === 7 || type === 8 || type === 9">Chọn phòng ban thực hiện</span>
           <span v-else>Chọn người thực hiện</span>
         </div>
         <v-card >
