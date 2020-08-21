@@ -1002,6 +1002,7 @@ export const store = new Vuex.Store({
               partTip: data.partTip,
               file: file
             }
+            console.log('dataFILEELLELE', data, data.partTip)
             store.dispatch('validFileUpload', fileUpload) // check size, type tài liệu upload
             if (file && state.validFileUpload) {
               axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
@@ -4095,26 +4096,37 @@ export const store = new Vuex.Store({
     validFileUpload ({commit, state}, data) {
       let getFileType = data.file.name ? data.file.name.split('.') : ''
       let fileType = getFileType ? getFileType[getFileType.length - 1] : ''
-      let fileTypeAllow = data.partTip['extensions'] ? (data.partTip['extensions'] + ',' + data.partTip['extensions'].toUpperCase()).split(',') : ''
-      let fileSizeAllow = data.partTip['maxSize']
+      let tips
+      try {
+        tips = JSON.parse(data.partTip)
+      } catch (error) {
+        tips = data.partTip
+      }
+      let fileTypeAllow = tips['extensions'] ? (tips['extensions'] + ',' + tips['extensions'].toUpperCase()).split(',') : ''
+      let fileSizeAllow = tips['maxSize']
       let fileTypeInput = fileTypeAllow ? fileTypeAllow.filter(function (item) {
         return item === fileType
       }) : ''
       store.commit('setValidFileUpload', false)
+      // console.log('dataPart', data)
+      // console.log('fileType', fileType)
+      // console.log('fileTypeAllow', fileTypeAllow)
+      // console.log('fileTypeInput', fileTypeInput)
+      
       if (fileTypeInput && fileTypeInput.length > 0) {
-        if (Number(data.file.size) <= data.partTip['maxSize'] * 1048576 || !data.partTip['maxSize']) {
+        if (Number(data.file.size) <= tips['maxSize'] * 1048576 || !tips['maxSize']) {
           store.commit('setValidFileUpload', true)
         } else {
           toastr.clear()
-          toastr.error('Tài liệu tải lên dung lượng tối đa là ' + data.partTip['maxSize'] + ' MB')
+          toastr.error('Tài liệu tải lên dung lượng tối đa là ' + tips['maxSize'] + ' MB')
           store.commit('setValidFileUpload', false)
         }
       } else {
-        if (!data.partTip['extensions']) {
+        if (!tips['extensions']) {
           store.commit('setValidFileUpload', true)
         } else {
           toastr.clear()
-          toastr.error('Tài liệu tải lên chỉ chấp nhận các định dạng ' + data.partTip['extensions'])
+          toastr.error('Tài liệu tải lên chỉ chấp nhận các định dạng ' + tips['extensions'])
           store.commit('setValidFileUpload', false)
         }
       }

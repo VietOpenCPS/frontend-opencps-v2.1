@@ -68,7 +68,8 @@ export const store = new Vuex.Store({
               start: filter.page * 10 - 10,
               end: filter.page * 10,
               dossierNo: filter.dossierNo ? filter.dossierNo : '',
-              applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : ''
+              applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : '',
+              status: filter.status ? filter.status : ''
             }
           }
           axios.get(state.endPointApi + '/dossiers', param).then(function (response) {

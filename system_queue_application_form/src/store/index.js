@@ -57,6 +57,9 @@ export const store = new Vuex.Store({
             start: filter.page * 15 - 15,
             end: filter.page * 15
           }
+          if (filter.hasOwnProperty('keyword')) {
+            paramGet = Object.assign(paramGet, {keyword: filter.keyword})
+          }
           let param = {
             headers: {
               groupId: state.initData.groupId
