@@ -1,6 +1,24 @@
 <template>
   <div style="border: 1px solid #dedede;border-top:0;">
-    <v-layout wrap>
+    <v-dialog
+      v-model="dialogLoadingCreate"
+      persistent
+      width="450"
+    >
+      <v-card
+        color="primary"
+        dark
+      >
+        <v-card-text>
+          <v-progress-linear
+            indeterminate
+            color="white"
+            class="mb-0"
+          ></v-progress-linear>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-layout wrap v-if="!dialogLoadingCreate">
       <v-flex xs12 md8>
         <div class="row-header no__hidden_class">
           <!-- <div class="">
@@ -302,6 +320,7 @@ export default {
     'captcha': Captcha
   },
   data: () => ({
+    dialogLoadingCreate: false,
     isSlot: true,
     groupDvc: '',
     bookingGroups: '',
@@ -395,24 +414,62 @@ export default {
       vm.formTemplateList = []
       vm.loading = true
       let currentQuery = vm.$router.history.current.query
-      var filter = null
-      filter = {
-        page: currentQuery.page ? currentQuery.page : 1
-      }
-      vm.$store.dispatch('getServiceLists', filter).then(function (result) {
-        vm.loading = false
-        if (result.data) {
-          vm.serviceInfoList = result.data
-          for (let index in vm.serviceInfoList) {
-            vm.getFileTemplate(index, vm.serviceInfoList[index])
-          }
-        } else {
-          vm.serviceInfoList = []
+      let doLoadService = function () {
+        vm.dialogLoadingCreate = false
+        let filter = {
+          page: currentQuery.page ? currentQuery.page : 1
         }
-      }).catch(reject => {
-        vm.loading = false
-        vm.serviceInfoList = []
-      })
+        vm.$store.dispatch('getServiceLists', filter).then(function (result) {
+          vm.loading = false
+          if (result.data) {
+            vm.serviceInfoList = result.data
+            for (let index in vm.serviceInfoList) {
+              vm.getFileTemplate(index, vm.serviceInfoList[index])
+            }
+          } else {
+            vm.serviceInfoList = []
+          }
+        }).catch(reject => {
+          vm.loading = false
+          vm.serviceInfoList = []
+        })
+      }
+      let searchParams = window.location.href.split("?")
+      
+      if (searchParams[1] && searchParams[1].indexOf("vnconnect=1") !== -1 && searchParams[1].indexOf("MaTTHCDP=") !== -1) {
+        vm.dialogLoadingCreate = true
+        let maDVCQG = vm.getSearchParams(searchParams[1], "MaTTHCDP")
+        let filterGet = {
+          page: 1,
+          keyword: maDVCQG
+        }
+        vm.$store.dispatch('getServiceLists', filterGet).then(function (result) {
+          if (result.data) {
+            let serviceInfoListFilter = result.data.filter(function (item) {
+              return item.serviceCodeDVCQG == maDVCQG
+            })
+            if (serviceInfoListFilter.length > 0) {
+              vm.$store.dispatch('getFileTemplateEform', serviceInfoListFilter[0]).then(response => {
+                if (response.data) {
+                  let fileTemplateNo = response.data[0]['fileTemplateNo']
+                  let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web') + '/to-khai-truc-tuyen#/thong-tin-to-khai?service='+ serviceInfoListFilter[0].serviceInfoId + '&template=' + fileTemplateNo
+                  window.location.href = url
+                } else {
+                  doLoadService()
+                }
+              })
+            } else {
+              doLoadService()
+            }
+          } else {
+            doLoadService()
+          }
+        }).catch(reject => {
+          doLoadService()
+        })
+      } else {
+        doLoadService()
+      }
     },
     getFileTemplate (index, item) {
       let vm = this
@@ -718,6 +775,18 @@ export default {
         }
       }
       return str.substr(pstBN + 1)
+    },
+    getSearchParams (prams, key) {
+      let value = ""
+      let headers = prams.split("&")
+      headers.forEach(function (header) {
+        header = header.split("=");
+        let keyHeader = header[0];
+        if (keyHeader === key) {
+          value = header[1]
+        }
+      });
+      return value
     },
     formatDate (date) {
       if (!date) return null
