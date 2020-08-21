@@ -121,7 +121,7 @@
                 :placeholder="item.placeholder"
                 multi-line
                 @input="inputChangeValue(item)"
-                :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                :rules="(item.required === true || item.required === 'true') ? [rules.required, rules.varchar5000] : [rules.varchar5000]"
                 :required="(item.required === true || item.required === 'true') ? true : false"
               ></v-text-field>
             </v-flex>
@@ -132,7 +132,7 @@
                 :value="item.value"
                 :placeholder="item.placeholder"
                 @input="inputChangeValue(item)"
-                :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                :rules="(item.required === true || item.required === 'true') ? [rules.required, rules.varchar5000] : [rules.varchar5000]"
                 :required="(item.required === true || item.required === 'true') ? true : false"
               ></v-text-field>
             </v-flex>
@@ -264,7 +264,47 @@
         number: function (value) {
           const pattern = /^\d+$/
           return pattern.test(value) || 'Kiểu dữ liệu sai định dạng'
-        }
+        },
+        varchar50: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+          } else {
+            return true
+          }  
+        },
+        varchar100: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+          } else {
+            return true
+          }
+        },
+        varchar255: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+          } else {
+            return true
+          }  
+        },
+        varchar500: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+          } else {
+            return true
+          }  
+        },
+        varchar5000: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+          } else {
+            return true
+          }
+        },
       }
     }),
     watch: {

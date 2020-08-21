@@ -230,7 +230,7 @@
                       <v-text-field
                       v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.contactTelNo"
-                      :rules="thongTinCongVan.contactTelNo ? [rules.telNo] : ''"
+                      :rules="thongTinCongVan.contactTelNo ? [rules.telNo, rules.varchar100] : [rules.varchar100]"
                       @change="thongTinCongVan.contactTelNo=String(thongTinCongVan.contactTelNo).trim()"
                       ></v-text-field>
                       <p class="pt-2" v-else>{{thongTinCongVan.contactTelNo}}</p>
@@ -249,7 +249,7 @@
                       v-else-if="!loading && !congVanDaGui"
                       v-model="thongTinCongVan.contactEmail"
                       @change="thongTinCongVan.contactEmail=String(thongTinCongVan.contactEmail).trim()"
-                      :rules="thongTinCongVan.contactEmail ? [rules.email] : rules.varchar100"
+                      :rules="thongTinCongVan.contactEmail ? [rules.email,rules.varchar100] : [rules.varchar100]"
                       ></v-text-field>
                       <p class="pt-2" v-else>{{thongTinCongVan.contactEmail}}</p>
                     </v-flex>

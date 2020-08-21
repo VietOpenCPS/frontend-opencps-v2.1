@@ -251,6 +251,7 @@ export default {
   created () {
     let vm = this
     vm.documentDate = new Date().toISOString().substr(0, 10)
+    vm.dateFormated = vm.formatDate(vm.documentDate)
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
@@ -260,6 +261,7 @@ export default {
     },
     documentDate (val) {
       this.dateFormated = this.formatDate(this.documentDate)
+      console.log(this.dateFormated)
     }
   },
   methods: {
@@ -274,9 +276,10 @@ export default {
         vm.jobposSignerQuyetDinh = metadata.hasOwnProperty('jobposSignerQuyetDinh') ? metadata.jobposSignerQuyetDinh : ''
         vm.signerQuyetDinh = metadata.hasOwnProperty('signerQuyetDinh') ? metadata.signerQuyetDinh : ''
         vm.documentDate = metadata.hasOwnProperty('ngayquyetdinh') ? vm.parseDate(metadata.ngayquyetdinh) : new Date().toISOString().substr(0, 10)
-        
+        vm.dateFormated = this.formatDate(vm.documentDate)
       } catch (error) {
         vm.documentDate = new Date().toISOString().substr(0, 10)
+        vm.dateFormated = vm.formatDate(this.documentDate)
       }
       vm.$refs.formThongTinQuyetDinh.resetValidation()
       console.log('thongtinquyetdinhInput', vm.thongTinCongVan)
