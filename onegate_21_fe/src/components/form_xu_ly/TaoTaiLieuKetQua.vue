@@ -578,7 +578,7 @@
                 if (item.formScript) {
                   formScript = eval('(' + item.formScript + ')')
                 } else {
-                  formScript = {}
+                  formScript = eformScript
                 }
                 if (resData) {
                   formData = eval('(' + resData + ')')
