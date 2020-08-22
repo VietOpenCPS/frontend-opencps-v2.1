@@ -6,7 +6,7 @@
         <v-card v-if="!mauCongVan">
           <v-card-text class="py-0">
             <v-layout wrap class="px-2 py-2">
-              <v-flex xs12 sm4 class="pr-3" v-if="originality !== 1">
+              <v-flex xs12 sm4 class="pr-3" v-if="originality !== 1" style="word-break: break-word;">
                 <div class="xs12 sm12 pb-1">
                   <span class="pr-2">Chủ hồ sơ: </span>
                   <v-tooltip top>
@@ -85,7 +85,7 @@
                 </div>
               </v-flex>
               <!--  -->
-              <v-flex xs12 sm4 class="pr-3" v-if="originality === 1">
+              <v-flex xs12 sm4 class="pr-3" v-if="originality === 1" style="word-break: break-word;">
                 <div class="xs12 sm12 pb-1">
                   <span class="pr-2">Mã hồ sơ: </span>
                   <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierNo}} </span>
@@ -102,7 +102,7 @@
                 </div>
               </v-flex>
               <!--  -->
-              <v-flex xs12 sm4 v-if="originality !== 1">
+              <v-flex xs12 sm4 v-if="originality !== 1" style="word-break: break-word;">
                 <div class="xs12 sm12 pb-1">
                   <span class="pr-2" v-if="thongTinChiTietHoSo.online">Ngày gửi trực tuyến: </span>
                   <span class="pr-2" v-else>Ngày nộp hồ sơ: </span>
@@ -149,7 +149,7 @@
                 </div>
               </v-flex>
               <!--  -->
-              <v-flex xs12 sm4 v-if="originality !== 1">
+              <v-flex xs12 sm4 v-if="originality !== 1" style="word-break: break-word;">
                 <div class="xs12 sm12 pb-1">
                   <span class="pr-2">Mã hồ sơ: </span>
                   <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierNo}} </span>
@@ -207,7 +207,7 @@
                   </v-tooltip>
                 </div> -->
               </v-flex>
-              <v-flex xs12 sm4 v-else>
+              <v-flex xs12 sm4 v-else style="word-break: break-word;">
                 <div class="xs12 sm12 pb-1" style="color:#0b72ba" 
                   v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
                   thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
