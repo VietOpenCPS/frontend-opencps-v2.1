@@ -328,7 +328,7 @@
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
+            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;word-break: break-word;" :class="{'no_acction__event': !props.item['permission']}">
               <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item" :layout_view="itemHeader.layout_view"></template-rendering>
               <span v-else>
                 {{ props.item[itemHeader.value] }}
@@ -340,7 +340,7 @@
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
+            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;word-break: break-word;" :class="{'no_acction__event': !props.item['permission']}">
               <span class="primary--text" v-if="props.item.dossierNo"> {{ props.item.dossierNo }} - </span><span class="primary--text"> {{ props.item.online ? 'Hồ sơ trực tuyến' : 'Hồ sơ một cửa' }}</span><br>
               <span class="primary--text text-bold"> {{ props.item.serviceName }} </span><br>
               <span class="text-bold">Chủ hồ sơ: </span> <span>{{ props.item.applicantName }}</span><br>
