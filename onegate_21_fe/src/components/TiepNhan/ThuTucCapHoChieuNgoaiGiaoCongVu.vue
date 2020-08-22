@@ -1734,6 +1734,15 @@ export default {
                     val['contactTelNo'] = val.delegateTelNo
                     val['contactEmail'] = val.delegateEmail
                     val['contactName'] = val.delegateName
+                    
+                    val['applicantIdNo'] = val.delegateIdNo
+                    val['address'] = val.delegateAddress
+                    val['cityCode'] = val.delegateCityCode
+                    val['districtCode'] = val.delegateDistrictCode
+                    val['wardCode'] = val.delegateWardCode
+                    val['contactTelNo'] = val.delegateTelNo
+                    val['contactEmail'] = val.delegateEmail
+
                     val['metaData'] = JSON.stringify(metaData)
                     $('#dossiers_hidden').val(JSON.stringify(val))
                 } catch{
@@ -1742,6 +1751,15 @@ export default {
                     metaData['delegateName']=val.delegateName
                     metaData['delegateTelNo']=val.delegateTelNo
                     
+                    val['applicantIdNo'] = val.delegateIdNo
+                    val['address'] = val.delegateAddress
+                    val['cityCode'] = val.delegateCityCode
+                    val['districtCode'] = val.delegateDistrictCode
+                    val['wardCode'] = val.delegateWardCode
+                    val['contactTelNo'] = val.delegateTelNo
+                    val['contactEmail'] = val.delegateEmail
+
+
                     val['contactTelNo'] = val.delegateTelNo
                     val['contactEmail'] = val.delegateEmail
                     val['contactName'] = val.delegateName

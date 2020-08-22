@@ -1190,7 +1190,6 @@
           vm.loadingImport = false
         })
       },
-<<<<<<< HEAD
       downloadBieuMau (string) {
         //const url = window.URL.createObjectURL(new Blob([response.data]))
         console.log(string)
@@ -1200,15 +1199,13 @@
         // link.setAttribute('download', 'file.png') //or any other extension
         document.body.appendChild(link)
         link.click()
-      }
-=======
+      },
       currency (value) {
         if (value) {
           return String(value).replace(/\B(?=(\d{3})+(?!\d))/g, '.')
         }
         return ''
-      },
->>>>>>> company/bgt
+      }
     }
   }
 </script>

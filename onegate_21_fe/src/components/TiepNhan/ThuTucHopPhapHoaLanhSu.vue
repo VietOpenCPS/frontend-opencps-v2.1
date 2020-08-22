@@ -998,10 +998,26 @@ export default {
             handler:  (val, oldVal) => {
                 try{
                     val['applicantIdNo'] = val.delegateIdNo
+                    val['address'] = val.delegateAddress
+                    val['cityCode'] = val.delegateCityCode
+                    val['districtCode'] = val.delegateDistrictCode
+                    val['wardCode'] = val.delegateWardCode
+                    val['contactTelNo'] = val.delegateTelNo
+                    val['contactEmail'] = val.delegateEmail
                     $('#dossiers_hidden').val(JSON.stringify(val))
+                    console.log(val['applicantIdNo'],val.delegateIdNo)
+                    console.log($('#dossiers_hidden').val(JSON.stringify(val)))
                 } catch{
                     val['applicantIdNo'] = val.delegateIdNo
+                    val['address'] = val.delegateAddress
+                    val['cityCode'] = val.delegateCityCode
+                    val['districtCode'] = val.delegateDistrictCode
+                    val['wardCode'] = val.delegateWardCode
+                    val['contactTelNo'] = val.delegateTelNo
+                    val['contactEmail'] = val.delegateEmail
                     $('#dossiers_hidden').val(JSON.stringify(val))
+                    console.log(val['applicantIdNo'],val.delegateIdNo)
+                    console.log($('#dossiers_hidden').val(JSON.stringify(val)))
                 }
             }
         },
