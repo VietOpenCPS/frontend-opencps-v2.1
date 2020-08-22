@@ -20,9 +20,9 @@
               </vue-csv-downloader>
               -->
               
-              <v-btn flat v-if="!itemsReports[index]['filterConfig']['showTable']" class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds" :style="showGuilds ? 'color: #1565c0' : ''">
+              <!-- <v-btn flat v-if="!itemsReports[index]['filterConfig']['showTable']" class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds" :style="showGuilds ? 'color: #1565c0' : ''">
                 <v-icon>receipt</v-icon> &nbsp; Hướng dẫn PDF -> Excel
-              </v-btn>
+              </v-btn> -->
               <v-select v-if="buttonsShow"
                 v-for="(button, btnIndex) in buttons" v-bind:key="btnIndex"
                 :items="button['source']"
@@ -35,12 +35,12 @@
                 class="btn__chot"
                 @change="doChotSoLieu($event, button)"
               ></v-select>
-              <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
+              <!-- <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
                 <v-icon v-if="showConfig">reply</v-icon>
                 <v-icon v-else>settings</v-icon> &nbsp;
                 <span v-if="showConfig">Quay lại</span>
                 <span v-else>Tuỳ chọn</span>
-              </v-btn>
+              </v-btn> -->
             </v-flex>
           </v-layout>
         </div>
