@@ -268,6 +268,7 @@
       <!--  -->
       <!-- import -->
       <v-btn color="primary" class="white--text"
+        v-if="importDeliverable"
         :loading="loadingImport"
         :disabled="loadingImport"
         @click="doImportData">
@@ -276,6 +277,7 @@
       </v-btn>
       <!--  -->
       <v-btn color="primary"
+        v-if="exportDeliverable"
         @click="exportTracking"
         :loading="loadingImport"
         :disabled="loadingImport"
@@ -556,7 +558,10 @@
         downloadFileTemplate: {
           lable: '',
           url: '',
-        }
+        },
+        importDeliverable: true,
+        exportDeliverable: true,
+        urlRedirectDossier: ''
       }
     },
     created () {
@@ -587,6 +592,15 @@
                 vm.loaiDuLieu = tableConfig.loaiDuLieu
               } else {
                 vm.loaiDuLieu = "giấy phép"
+              }
+              if (tableConfig.hasOwnProperty('importDeliverable') && !tableConfig.importDeliverable) {
+                vm.importDeliverable = false
+              }
+              if (tableConfig.hasOwnProperty('exportDeliverable') && !tableConfig.exportDeliverable) {
+                vm.exportDeliverable = false
+              }
+              if (tableConfig.hasOwnProperty('urlRedirectDossier') && tableConfig.urlRedirectDossier) {
+                vm.urlRedirectDossier = tableConfig.urlRedirectDossier
               }
               vm.headerExportRemoveAction = vm.headerExport.filter(function (item) {
                 return item.value !== 'action'
@@ -677,6 +691,15 @@
             vm.loaiDuLieu = tableConfig.loaiDuLieu
           } else {
             vm.loaiDuLieu = "giấy phép"
+          }
+          if (tableConfig.hasOwnProperty('importDeliverable') && !tableConfig.importDeliverable) {
+            vm.importDeliverable = false
+          }
+          if (tableConfig.hasOwnProperty('exportDeliverable') && !tableConfig.exportDeliverable) {
+            vm.exportDeliverable = false
+          }
+          if (tableConfig.hasOwnProperty('urlRedirectDossier') && tableConfig.urlRedirectDossier) {
+            vm.urlRedirectDossier = tableConfig.urlRedirectDossier
           }
         } else {
           vm.headers = []
@@ -785,7 +808,8 @@
         }, 200)
       },
       viewDetail (item, index) {
-        // let vm = this
+        let vm = this
+        // ---- Xem chi tiết giấy phép
         // let current = vm.$router.history.current
         // let newQuery = current.query
         // let queryString = '?'
@@ -797,6 +821,12 @@
         // vm.$router.push({
         //   path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString
         // })
+        // ----Xem chi tiết hồ sơ
+        if (item.hasOwnProperty('dossierId') && item.dossierId) {
+          let url = vm.urlRedirectDossier + '/' + item.dossierId
+          window.open(url, "_blank")
+        }
+        
       },
       editDeliverables (item, index) {
         let vm = this
