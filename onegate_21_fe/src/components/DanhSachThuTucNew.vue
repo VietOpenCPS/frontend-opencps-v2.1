@@ -101,6 +101,7 @@
                       item-value="itemCode"
                       clearable
                       hide-details
+                      hide-no-data
                       solo
                       flat
                       height="32"
@@ -120,6 +121,7 @@
                       item-text="itemName"
                       item-value="itemCode"
                       hide-details
+                      hide-no-data
                       solo
                       flat
                       height="32"
@@ -146,6 +148,7 @@
                       item-text="domainName"
                       item-value="domainCode"
                       hide-details
+                      hide-no-data
                       solo
                       flat
                       height="32"
@@ -166,6 +169,7 @@
                       item-text="levelName"
                       item-value="level"
                       hide-details
+                      hide-no-data
                       solo
                       flat
                       height="32"
@@ -396,6 +400,7 @@
             <v-form ref="formSelect" v-model="validFormSelectGov" lazy-validation>
               <v-autocomplete
                 class="mt-3"
+                hide-no-data
                 placeholder="Chọn cơ quan"
                 :items="govAgencyListTiepNhan"
                 v-model="govAgencyTiepNhanSelected"
@@ -410,6 +415,7 @@
               <v-autocomplete
                 v-if="serviceOptions.length > 1"
                 class="mt-3"
+                hide-no-data
                 placeholder="Chọn trường hợp"
                 :items="serviceOptions"
                 v-model="serviceOptionsSelect"

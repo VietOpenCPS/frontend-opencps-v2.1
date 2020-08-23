@@ -247,6 +247,7 @@
             <v-flex style="width: 100px;" class="layout wrap" v-if="originality !== 1 && (item.partType === 1 || item.partType === 3) && !thongTinHoSo.online && checkInput !== 1">
               <v-autocomplete
                 :items="fileMarkItems"
+                hide-no-data
                 v-model="dossierTemplateItemsFilter[index].fileMark"
                 :style="onlyView ? 'pointer-events: none' : ''"
                 @change="changeFileMark($event, index)"

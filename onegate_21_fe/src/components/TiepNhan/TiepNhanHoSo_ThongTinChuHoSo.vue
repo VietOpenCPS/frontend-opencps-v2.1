@@ -112,6 +112,7 @@
                       item-text="itemName"
                       item-value="itemCode"
                       v-model="thongTinChuHoSo.cityCode"
+                      hide-no-data
                       @change="onChangeCity"
                       :rules="requiredOptions['cityCode'] ? [rules.required] : ''"
                       :required="requiredOptions['cityCode']"
@@ -136,6 +137,7 @@
                       @change="onChangeDistrict"
                       :rules="requiredOptions['districtCode'] ? [rules.required] : ''"
                       :required="requiredOptions['districtCode']"
+                      hide-no-data
                       ></v-autocomplete>
                     </v-flex>
                     <v-flex xs12 sm2>
@@ -157,6 +159,7 @@
                       @change="onChangeWard"
                       :rules="requiredOptions['wardCode'] ? [rules.required] : ''"
                       :required="requiredOptions['wardCode']"
+                      hide-no-data
                       ></v-autocomplete>
                     </v-flex>
                     <v-flex xs12 sm2>
@@ -331,6 +334,7 @@
                         :rules="requiredOptions['delegateCityCode'] ? [rules.required] : ''"
                         :required="requiredOptions['delegateCityCode']"
                         :disabled="thongTinNguoiNopHoSo.sameUser"
+                        hide-no-data
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -353,6 +357,7 @@
                         :rules="requiredOptions['delegateDistrictCode'] ? [rules.required] : ''"
                         :required="requiredOptions['delegateDistrictCode']"
                         :disabled="thongTinNguoiNopHoSo.sameUser"
+                        hide-no-data
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -374,6 +379,7 @@
                         :rules="requiredOptions['delegateWardCode'] ? [rules.required] : ''"
                         :required="requiredOptions['delegateWardCode']"
                         :disabled="thongTinNguoiNopHoSo.sameUser"
+                        hide-no-data
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -671,13 +677,13 @@
                 <v-text-field label="Địa chỉ" v-model="applicantEdit['address']" box clearable @change="applicantEdit['address']=String(applicantEdit['address']).trim()"></v-text-field>
               </v-flex>
               <v-flex xs12 sm4>
-                <v-autocomplete :items="cityItems" label="Tỉnh/thành phố" v-model="applicantEdit['cityCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeCityEditApplicant($event)"></v-autocomplete>
+                <v-autocomplete :items="cityItems" hide-no-data label="Tỉnh/thành phố" v-model="applicantEdit['cityCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeCityEditApplicant($event)"></v-autocomplete>
               </v-flex>
               <v-flex xs12 sm4>
-                <v-autocomplete :items="districtItems" label="Quận/huyện" v-model="applicantEdit['districtCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeDistrictEditApplicant($event)"></v-autocomplete>
+                <v-autocomplete :items="districtItems" hide-no-data label="Quận/huyện" v-model="applicantEdit['districtCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeDistrictEditApplicant($event)"></v-autocomplete>
               </v-flex>
               <v-flex xs12 sm4>
-                <v-autocomplete label="Xã/phường" :items="wardItems" v-model="applicantEdit['wardCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeWardEditApplicant($event)"></v-autocomplete>
+                <v-autocomplete label="Xã/phường" hide-no-data :items="wardItems" v-model="applicantEdit['wardCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeWardEditApplicant($event)"></v-autocomplete>
               </v-flex>
             </v-layout>
           </v-form>

@@ -81,6 +81,7 @@
                 <v-flex xs12 sm3 class="px-2 ">
                     <label>Tỉnh/thành</label>
                     <v-autocomplete
+                        hide-no-data
                         :items="delegateCitys"
                         v-model="delegateCityCode"
                         item-text="itemName"
@@ -96,6 +97,7 @@
                         v-model="delegateDistrictCode"
                         item-text="itemName"
                         item-value="itemCode"
+                        hide-no-data
                         clearable
                         solo
                     ></v-autocomplete>
@@ -107,6 +109,7 @@
                         v-model="delegateWardCode"
                         item-text="itemName"
                         item-value="itemCode"
+                        hide-no-data
                         clearable
                         solo
                     ></v-autocomplete>
@@ -277,7 +280,7 @@
                         item-text="TEN"
                         item-value="ID"
                         clearable
-                        
+                        hide-no-data
                         multiple
 
                         solo
@@ -559,6 +562,7 @@
                                             item-text="CQTen"
                                             item-value="CQID"
                                             clearable
+                                            hide-no-data
                                             return-object
                                             :rules="[rules.required]"
                                             required
@@ -582,6 +586,7 @@
                                             clearable
                                             :rules="[rules.required]"
                                             required
+                                            hide-no-data
                                             solo
                                             return-object
                                         >
@@ -679,6 +684,7 @@
                                             item-value="value"
                                             return-object
                                             clearable
+                                            hide-no-data
                                             :rules="[rules.required]"
                                             required
                                             solo
@@ -774,6 +780,7 @@
                                                     item-text="name"
                                                     item-value="value"
                                                     clearable
+                                                    hide-no-data
                                                     :rules="[rules.required]"
                                                     required
                                                     solo                  
@@ -789,6 +796,7 @@
                                                 item-text="TEN"
                                                 item-value="ID"
                                                 clearable
+                                                hide-no-data
                                                 :rules="[rules.required]"
                                                 required
                                                 solo
@@ -961,6 +969,7 @@
                                             item-text="itemName"
                                             item-value="itemName"
                                             clearable
+                                            hide-no-data
                                             solo                               
                                         ></v-autocomplete>
                                     </v-flex>
@@ -1004,6 +1013,7 @@
                                             item-text="itemName"
                                             item-value="itemName"
                                             clearable
+                                            hide-no-data
                                             solo
                                         ></v-autocomplete>
                                     </v-flex>
@@ -1734,6 +1744,15 @@ export default {
                     val['contactTelNo'] = val.delegateTelNo
                     val['contactEmail'] = val.delegateEmail
                     val['contactName'] = val.delegateName
+                    
+                    val['applicantIdNo'] = val.delegateIdNo
+                    val['address'] = val.delegateAddress
+                    val['cityCode'] = val.delegateCityCode
+                    val['districtCode'] = val.delegateDistrictCode
+                    val['wardCode'] = val.delegateWardCode
+                    val['contactTelNo'] = val.delegateTelNo
+                    val['contactEmail'] = val.delegateEmail
+
                     val['metaData'] = JSON.stringify(metaData)
                     $('#dossiers_hidden').val(JSON.stringify(val))
                 } catch{
@@ -1742,6 +1761,15 @@ export default {
                     metaData['delegateName']=val.delegateName
                     metaData['delegateTelNo']=val.delegateTelNo
                     
+                    val['applicantIdNo'] = val.delegateIdNo
+                    val['address'] = val.delegateAddress
+                    val['cityCode'] = val.delegateCityCode
+                    val['districtCode'] = val.delegateDistrictCode
+                    val['wardCode'] = val.delegateWardCode
+                    val['contactTelNo'] = val.delegateTelNo
+                    val['contactEmail'] = val.delegateEmail
+
+
                     val['contactTelNo'] = val.delegateTelNo
                     val['contactEmail'] = val.delegateEmail
                     val['contactName'] = val.delegateName

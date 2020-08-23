@@ -214,6 +214,7 @@
                 v-model="dossierTemplateItems[index].fileMark"
                 :style="onlyView ? 'pointer-events: none' : ''"
                 @change="changeFileMark($event, index)"
+                hide-no-data
               ></v-autocomplete>
             </v-flex>
             <v-flex style="width: 120px;" class="layout wrap" v-if="checkInput === 1">

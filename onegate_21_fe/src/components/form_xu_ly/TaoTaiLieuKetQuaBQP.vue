@@ -9,7 +9,7 @@
         </div>
         <v-card>
           <div class="form_alpaca" style="position: relative;" v-for="(item, index) in createFiles" v-bind:key="item.partNo + 'cr'">
-            <v-expansion-panel expand :value="currentFormView === ('formAlpaca' + item.partNo + id) ? [true] : [false]" class="expaned__list__data">
+            <v-expansion-panel expand :value="[true]" class="expaned__list__data">
               <v-expansion-panel-content hide-actions>
                 <div slot="header" @click="stateView = false" style="background-color:#fff">
                   <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
@@ -61,20 +61,20 @@
                             <v-icon color="white" v-else>save</v-icon>&nbsp;
                             Lưu lại
                           </v-btn>
-                          <v-btn color="primary" @click.stop="previewFormAlpaca(item, index)" v-if="item['editForm'] && item.daKhai && item.eForm">
+                          <!-- <v-btn color="primary" @click.stop="previewFormAlpaca(item, index)" v-if="item['editForm'] && item.daKhai && item.eForm">
                             <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
                             <v-icon color="white" v-else>print</v-icon>&nbsp;
                             Xem
-                          </v-btn>
-                          <v-btn color="primary" @click.stop="editFormAlpaca(item, index)" v-if="!item['editForm'] && item.eForm">
+                          </v-btn> -->
+                          <!-- <v-btn color="primary" @click.stop="editFormAlpaca(item, index)" v-if="!item['editForm'] && item.eForm">
                             <v-icon color="white">edit</v-icon>&nbsp;
                             Sửa
-                          </v-btn>
-                          <v-btn color="primary" @click.stop="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.eForm">
+                          </v-btn> -->
+                          <!-- <v-btn color="primary" @click.stop="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.eForm">
                             <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
                             <v-icon color="white" v-else>delete</v-icon>&nbsp;
                             Xóa
-                          </v-btn>
+                          </v-btn> -->
                         </div>
                         <!--  -->
                         <div v-if="createFiles[index]['editForm'] && !createFiles[index].embed" :id="'formAlpaca' + item.partNo + id"></div>
@@ -525,6 +525,12 @@
               } else {
                 formData = {}
               }
+              let hasFormDataFile = vm.dossierFilesItems.filter(function (item) {
+                return item.dossierPartNo == item.partNo && item.eForm && item.formData
+              })
+              if (hasFormDataFile && hasFormDataFile.length > 0) {
+                formData = eval('(' + hasFormDataFile[0]['formData'] + ')')
+              }
               // giấy phép
               formData.dossierId_hidden = vm.detailDossier.dossierId
               formData.dossierStatus_hidden = vm.detailDossier.dossierStatus
@@ -575,15 +581,17 @@
                 window.$('#formAlpaca' + item.partNo + vm.id).empty()
                 let formScript, formData
                 /* eslint-disable */
-                if (item.formScript) {
-                  formScript = eval('(' + item.formScript + ')')
-                } else {
-                  formScript = eformScript
-                }
+                formScript = eformScript
                 if (resData) {
                   formData = eval('(' + resData + ')')
                 } else {
                   formData = {}
+                }
+                let hasFormDataFile = vm.dossierFilesItems.filter(function (item) {
+                  return item.dossierPartNo == item.partNo && item.eForm && item.formData
+                })
+                if (hasFormDataFile && hasFormDataFile.length > 0) {
+                  formData = eval('(' + hasFormDataFile[0]['formData'] + ')')
                 }
                 // giấy phép
                 formData.dossierId_hidden = vm.detailDossier.dossierId
@@ -855,48 +863,13 @@
         var fileFind = vm.dossierFilesItems.find(itemFile => {
           return itemFile.dossierPartNo === data.partNo && itemFile.eForm
         })
-        if (fileFind) {
-          if (fileFind.fileSize) {
-            fileFind['id'] = vm.id
-            // vm.$store.dispatch('loadAlpcaForm', fileFind)
-            // preview PDF
-            data['editForm'] = false
-            // 
-            let indexFile = ''
-            for (let i = 0; i < vm.dossierFilesItems.length; i++) {
-              if (vm.dossierFilesItems[i]['dossierPartNo'] === data['partNo'] && vm.dossierFilesItems[i]['eForm']) {
-                indexFile = i
-                break
-              }
-            }
-            // 
-            console.log('capnhat eform', vm.dossierFilesItems[indexFile])
-            if (!vm.dossierFilesItems[indexFile]['isSigned']) {
-              vm.$store.dispatch('viewFile', fileFind).then(result => {
-                document.getElementById('displayPDF' + fileFind.dossierPartNo + vm.id).src = result
-              })
-            } else {
-              setTimeout(function () {
-                document.getElementById('displayPDF' + data.partNo + vm.id).src = vm.dossierFilesItems[indexFile].pdfSigned
-              }, 200)
-            }
-          } else {
-            vm.createFiles.forEach(val => {
-              if (val.eForm && data.partNo === val.partNo) {
-                val['templateNo'] = vm.detailDossier.dossierTemplateNo
-                vm.showAlpacaJSFORM(val)
-              }
-            })
-          }
 
-        } else {
-          vm.createFiles.forEach(val => {
-            if (val.eForm && data.partNo === val.partNo) {
-              val['templateNo'] = vm.detailDossier.dossierTemplateNo
-              vm.showAlpacaJSFORM(val)
-            }
-          })
-        }       
+        vm.createFiles.forEach(val => {
+          if (val.eForm && data.partNo === val.partNo) {
+            val['templateNo'] = vm.detailDossier.dossierTemplateNo
+            vm.showAlpacaJSFORM(val)
+          }
+        })   
       },
       editFormAlpaca (item, index) {
         var vm = this
@@ -1073,6 +1046,12 @@
                           formData = eval('(' + resData + ')')
                         } else {
                           formData = {}
+                        }
+                        let hasFormDataFile = vm.dossierFilesItems.filter(function (item) {
+                          return item.dossierPartNo == item.partNo && item.eForm && item.formData
+                        })
+                        if (hasFormDataFile && hasFormDataFile.length > 0) {
+                          formData = eval('(' + hasFormDataFile[0]['formData'] + ')')
                         }
                         // giấy phép
                         formData.dossierId_hidden = vm.detailDossier.dossierId
@@ -1352,8 +1331,24 @@
         var vm = this
         if (vm.createFiles.length > 0) {
           for (var i = 0; i < vm.createFiles.length; i++) {
-            if (vm.createFiles[i]['required'] && !vm.createFiles[i]['daKhai']) {
-              let message = 'Chú ý :' + vm.createFiles[i].partName + ' là thành phần bắt buộc!'
+            let hasFileEform = vm.dossierFilesItems.filter(function (item) {
+              return item.dossierPartNo === vm.createFiles[i].partNo && item.eForm
+            }).length
+            let hasFileAttach = vm.dossierFilesItems.filter(function (item) {
+              return item.dossierPartNo === vm.createFiles[i].partNo
+            }).length
+            if (vm.createFiles[i]['required'] && vm.createFiles[i]['eForm'] && hasFileEform === 0) {
+              let message = 'Thông tin ' + vm.createFiles[i].partName + ' chưa được lưu!'
+              toastr.error(message)
+              return false
+            }
+            if (vm.createFiles[i]['required'] && vm.createFiles[i]['eForm'] && hasFileAttach === 0) {
+              let message = vm.createFiles[i].partName + ' chưa có tài liệu đính kèm!'
+              toastr.error(message)
+              return false
+            }
+            if (vm.createFiles[i]['required'] && !vm.createFiles[i]['eForm'] && hasFileAttach === 0) {
+              let message = vm.createFiles[i].partName + ' chưa có tài liệu đính kèm!'
               toastr.error(message)
               return false
             }

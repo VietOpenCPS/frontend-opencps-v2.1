@@ -90,6 +90,7 @@
                 item-value="govAgencyCode"
                 :hide-selected="true"
                 clearable
+                hide-no-data
                 @change="changeFilterAgency"
                 box
               ></v-autocomplete>
@@ -103,6 +104,7 @@
                 item-text="domainName"
                 item-value="domainCode"
                 :hide-selected="true"
+                hide-no-data
                 clearable
                 @change="changeFilterDomain"
                 box

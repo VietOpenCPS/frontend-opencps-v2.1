@@ -37,7 +37,7 @@
                     <v-flex xs12 sm4 class="mb-2" style="position:relative">
                       <v-layout wrap>
                         <v-flex xs12 sm4 class="pr-2">
-                          <v-autocomplete :items="days" placeholder="Ngày" v-model="birthDateDay" :hide-selected="true"  @change="changeDate()"></v-autocomplete>
+                          <v-autocomplete  hide-no-data :items="days" placeholder="Ngày" v-model="birthDateDay" :hide-selected="true"  @change="changeDate()"></v-autocomplete>
                         </v-flex>
                         <v-flex xs12 sm4 class="pr-2">
                           <v-layout wrap>
@@ -45,7 +45,7 @@
                               <span>/</span>
                             </v-flex>
                             <v-flex style="width: calc(100% - 20px)">
-                              <v-autocomplete :items="months" placeholder="Tháng" v-model="birthDateMonth"   @change="changeDate()"></v-autocomplete>
+                              <v-autocomplete hide-no-data :items="months" placeholder="Tháng" v-model="birthDateMonth"   @change="changeDate()"></v-autocomplete>
                             </v-flex>
                           </v-layout>
                         </v-flex>
@@ -55,7 +55,7 @@
                               <span>/</span>
                             </v-flex>
                             <v-flex style="width: calc(100% - 20px)">
-                              <v-autocomplete placeholder="Năm" :items="years" v-model="birthDateYear" :rules="[rules.required]" required   @change="changeDate()"></v-autocomplete>
+                              <v-autocomplete hide-no-data placeholder="Năm" :items="years" v-model="birthDateYear" :rules="[rules.required]" required   @change="changeDate()"></v-autocomplete>
                             </v-flex>
                           </v-layout>
                         </v-flex>
@@ -95,17 +95,17 @@
                     <v-flex xs12 sm10 class="mb-2">
                       <v-layout wrap>
                         <v-flex xs12 sm4 class="pr-3">
-                          <v-autocomplete :items="cityItems" placeholder="Tỉnh/thành phố" v-model="cityNativeCode" :rules="[rules.required]" required
+                          <v-autocomplete hide-no-data :items="cityItems" placeholder="Tỉnh/thành phố" v-model="cityNativeCode" :rules="[rules.required]" required
                             item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeCity($event, 'districtNativeItems', 'wardNativeItems')">
                           </v-autocomplete>
                         </v-flex>
                         <v-flex xs12 sm4 class="px-3">
-                          <v-autocomplete :items="districtNativeItems" placeholder="Quận/huyện" v-model="districtNativeCode" :rules="[rules.required]" required
+                          <v-autocomplete hide-no-data :items="districtNativeItems" placeholder="Quận/huyện" v-model="districtNativeCode" :rules="[rules.required]" required
                           item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeDistrict($event, 'wardNativeItems')">
                           </v-autocomplete>
                         </v-flex>
                         <v-flex xs12 sm4 class="pl-3">
-                          <v-autocomplete placeholder="Xã/phường" :items="wardNativeItems" v-model="wardNativeCode" :rules="[rules.required]" required
+                          <v-autocomplete hide-no-data placeholder="Xã/phường" :items="wardNativeItems" v-model="wardNativeCode" :rules="[rules.required]" required
                            item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeWard($event, 'wardNative')">
                           </v-autocomplete>
                         </v-flex>
@@ -134,15 +134,15 @@
                     <v-flex xs12 sm10 class="mb-2">
                       <v-layout wrap>
                         <v-flex xs12 sm4 class="pr-3">
-                          <v-autocomplete :items="cityItems" placeholder="Tỉnh/thành phố" v-model="cityCode" :rules="[rules.required]" required
+                          <v-autocomplete hide-no-data :items="cityItems" placeholder="Tỉnh/thành phố" v-model="cityCode" :rules="[rules.required]" required
                            item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeCity($event, 'districtItems', 'wardItems')"></v-autocomplete>
                         </v-flex>
                         <v-flex xs12 sm4 class="px-3">
-                          <v-autocomplete :items="districtItems" placeholder="Quận/huyện" v-model="districtCode" :rules="[rules.required]" required
+                          <v-autocomplete hide-no-data :items="districtItems" placeholder="Quận/huyện" v-model="districtCode" :rules="[rules.required]" required
                            item-text="itemName" item-value="itemCode" :hide-selected="true" @change="onChangeDistrict($event, 'wardItems')"></v-autocomplete>
                         </v-flex>
                         <v-flex xs12 sm4 class="pl-3">
-                          <v-autocomplete placeholder="Xã/phường" :items="wardItems" v-model="wardCode" :rules="[rules.required]" required
+                          <v-autocomplete hide-no-data placeholder="Xã/phường" :items="wardItems" v-model="wardCode" :rules="[rules.required]" required
                           item-text="itemName" item-value="itemCode" :hide-selected="true"></v-autocomplete>
                         </v-flex>
                       </v-layout>
@@ -334,6 +334,7 @@
                       </v-flex>
                       <v-flex xs12 sm2>
                         <v-autocomplete
+                        hide-no-data
                         :items="cityItems"
                         item-text="itemName"
                         item-value="itemCode"
@@ -348,6 +349,7 @@
                       </v-flex>
                       <v-flex xs12 sm2>
                         <v-autocomplete
+                        hide-no-data
                         :items="delegateDistricts"
                         item-text="itemName"
                         item-value="itemCode"
@@ -362,6 +364,7 @@
                       </v-flex>
                       <v-flex xs12 sm2>
                         <v-autocomplete
+                        hide-no-data
                         :items="delegateWards"
                         item-text="itemName"
                         item-value="itemCode"

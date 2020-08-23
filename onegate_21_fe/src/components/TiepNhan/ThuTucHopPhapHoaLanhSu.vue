@@ -79,6 +79,7 @@
                     item-text="itemName"
                     item-value="itemCode"
                     clearable
+                    hide-no-data
                     solo
                 ></v-autocomplete>
             </v-flex>
@@ -90,6 +91,7 @@
                     item-text="itemName"
                     item-value="itemCode"
                     clearable
+                    hide-no-data
                     solo
                 ></v-autocomplete>
             </v-flex>
@@ -101,6 +103,7 @@
                     item-text="itemName"
                     item-value="itemCode"
                     clearable
+                    hide-no-data
                     solo
                 ></v-autocomplete>
             </v-flex>
@@ -227,6 +230,7 @@
                     item-value="MA"
                     clearable
                     multiple
+                    hide-no-data
                     :rules="[rules.required, rules.requiredArr,]"
                     required
                     solo
@@ -241,7 +245,7 @@
                     item-value="ID"
                     clearable
                     return-object
-                    
+                    hide-no-data
 
                     solo
                 ></v-autocomplete>
@@ -323,6 +327,7 @@
                                             item-value="MA"
                                             clearable
                                             solo
+                                            hide-no-data
                                             return-object
                                             required
                                             :rules="[rules.required]"
@@ -337,6 +342,7 @@
                                             item-value="value"
                                             clearable
                                             solo
+                                            hide-no-data
                                             return-object
                                             required
                                             :rules="[rules.required]"
@@ -375,6 +381,7 @@
                                             item-value="value"
                                             clearable
                                             solo
+                                            hide-no-data
                                             return-object
                                             required
                                             :rules="[rules.required]"
@@ -996,13 +1003,18 @@ export default {
         dossiers: {
             deep: true,
             handler:  (val, oldVal) => {
-                try{
-                    val['applicantIdNo'] = val.delegateIdNo
-                    $('#dossiers_hidden').val(JSON.stringify(val))
-                } catch{
-                    val['applicantIdNo'] = val.delegateIdNo
-                    $('#dossiers_hidden').val(JSON.stringify(val))
-                }
+                console.log(val)
+                console.log(oldVal)
+                val['applicantIdNo'] = val.delegateIdNo
+                val['address'] = val.delegateAddress
+                val['cityCode'] = val.delegateCityCode
+                val['districtCode'] = val.delegateDistrictCode
+                val['wardCode'] = val.delegateWardCode
+                val['contactTelNo'] = val.delegateTelNo
+                val['contactEmail'] = val.delegateEmail
+                $('#dossiers_hidden').val(JSON.stringify(val))
+                console.log(val['applicantIdNo'],val.delegateIdNo)
+                console.log($('#dossiers_hidden').val(JSON.stringify(val)))
             }
         },
         dossierFileArr: {
