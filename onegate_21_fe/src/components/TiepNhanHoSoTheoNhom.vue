@@ -2102,41 +2102,45 @@ export default {
     },
     removeDossierFromGroup (item) {
       let vm = this
-      let filter = {
-        dossierId: item.dossierId,
-        groupDossierId: vm.thongTinNhomHoSo['dossierId']
-      }
-      vm.$store.dispatch('removeDossierFromGroup', filter).then(function (result) {
-        toastr.success('Yêu cầu thực hiện thành công')
-        setTimeout(() => {
-          let filter1 = {
-            groupDossierId: vm.thongTinNhomHoSo['dossierId']
-          }
-          vm.$store.dispatch('getDossiersIntoGroup', filter1).then(function (result) {
-            vm.dossiersIntoGroup = result
-            vm.$store.commit('setSelectDossierGroup', vm.dossiersIntoGroup)
-            if (vm.dossiersIntoGroup.length > 0) {
-              let steps = []
-              for (let index in vm.dossiersIntoGroup) {
-                if (steps.filter(function (item) {
-                  return String(item['stepCode']) === String(vm.dossiersIntoGroup[index]['stepCode'])
-                }).length === 0) {
-                  steps.push({
-                    stepCode: vm.dossiersIntoGroup[index]['stepCode'],
-                    stepName: vm.dossiersIntoGroup[index]['stepName']
-                  })
-                }
-              }
-              vm.stepList = steps
+      let x = confirm('Bạn có muốn thực hiện thao tác này?')
+      console.log(x)
+      if (x) {
+        let filter = {
+          dossierId: item.dossierId,
+          groupDossierId: vm.thongTinNhomHoSo['dossierId']
+        }
+        vm.$store.dispatch('removeDossierFromGroup', filter).then(function (result) {
+          toastr.success('Yêu cầu thực hiện thành công')
+          setTimeout(() => {
+            let filter1 = {
+              groupDossierId: vm.thongTinNhomHoSo['dossierId']
             }
-            vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
-            vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
-          })
-        }, 500);
-        
-      }).catch(function () {
-        toastr.error('Yêu cầu thực hiện thất bại')
-      })
+            vm.$store.dispatch('getDossiersIntoGroup', filter1).then(function (result) {
+              vm.dossiersIntoGroup = result
+              vm.$store.commit('setSelectDossierGroup', vm.dossiersIntoGroup)
+              if (vm.dossiersIntoGroup.length > 0) {
+                let steps = []
+                for (let index in vm.dossiersIntoGroup) {
+                  if (steps.filter(function (item) {
+                    return String(item['stepCode']) === String(vm.dossiersIntoGroup[index]['stepCode'])
+                  }).length === 0) {
+                    steps.push({
+                      stepCode: vm.dossiersIntoGroup[index]['stepCode'],
+                      stepName: vm.dossiersIntoGroup[index]['stepName']
+                    })
+                  }
+                }
+                vm.stepList = steps
+              }
+              vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
+              vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
+            })
+          }, 500);
+          
+        }).catch(function () {
+          toastr.error('Yêu cầu thực hiện thất bại')
+        })
+      }
     },
     addFileToDossier () {
       let vm = this

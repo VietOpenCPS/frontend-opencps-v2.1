@@ -14,6 +14,7 @@
             item-text="displayName"
             item-value="domainCode"
             return-object
+            hide-no-data
             :hide-selected="true"
             @change="changeDomain"
             clearable
@@ -28,6 +29,7 @@
             item-text="displayName"
             item-value="serviceConfigId"
             return-object
+            hide-no-data
             :hide-selected="true"
             @change="changeServiceConfigs"
             clearable
@@ -42,6 +44,7 @@
             item-text="optionName"
             item-value="processOptionId"
             return-object
+            hide-no-data
             :hide-selected="true"
             @change="changeDichVuConfigs"
             box
@@ -304,6 +307,7 @@
                   item-text="serviceName"
                   item-value="serviceConfigId"
                   return-object
+                  hide-no-data
                   :hide-selected="true"
                   @change = "changeServiceConfigs"
                 ></v-autocomplete>
@@ -317,6 +321,7 @@
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
+                  hide-no-data
                   :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
@@ -483,6 +488,7 @@
                   item-text="serviceName"
                   item-value="serviceConfigId"
                   return-object
+                  hide-no-data
                   :hide-selected="true"
                   @change = "changeServiceConfigsGuide"
                   :rules="[v => !!v || 'Thủ tục bắt buộc phải chọn.']"
@@ -499,6 +505,7 @@
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
+                  hide-no-data
                   :hide-selected="true"
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
                   required

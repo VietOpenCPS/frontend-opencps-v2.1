@@ -20,9 +20,9 @@
               </vue-csv-downloader>
               -->
               
-              <v-btn flat v-if="!itemsReports[index]['filterConfig']['showTable']" class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds" :style="showGuilds ? 'color: #1565c0' : ''">
+              <!-- <v-btn flat v-if="!itemsReports[index]['filterConfig']['showTable']" class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds" :style="showGuilds ? 'color: #1565c0' : ''">
                 <v-icon>receipt</v-icon> &nbsp; Hướng dẫn PDF -> Excel
-              </v-btn>
+              </v-btn> -->
               <v-select v-if="buttonsShow"
                 v-for="(button, btnIndex) in buttons" v-bind:key="btnIndex"
                 :items="button['source']"
@@ -35,12 +35,12 @@
                 class="btn__chot"
                 @change="doChotSoLieu($event, button)"
               ></v-select>
-              <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
+              <!-- <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
                 <v-icon v-if="showConfig">reply</v-icon>
                 <v-icon v-else>settings</v-icon> &nbsp;
                 <span v-if="showConfig">Quay lại</span>
                 <span v-else>Tuỳ chọn</span>
-              </v-btn>
+              </v-btn> -->
             </v-flex>
           </v-layout>
         </div>
@@ -1232,34 +1232,36 @@ export default {
                   csvGroup.push('')
                 }
                 dataToExportCSV.push(csvGroup)
-                if (vm.doExportExcel) {
-                  dataReportTotal += '[ '
-                  dataReportTotal += JSON.stringify({
-                    text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
-                    bold: true,
-                    style: 'tdStyle'
-                  }) + ','
-                  for (let csvIndexXXX = 0; csvIndexXXX < colLeng - 1; csvIndexXXX ++) {
-                    dataReportTotal += JSON.stringify({
-                      text: '',
-                      bold: true,
-                      style: 'tdStyle'
-                    }) + ','
-                  }
-                  dataReportTotal += JSON.stringify({
-                    text: '',
-                    bold: true,
-                    style: 'tdStyle'
-                  })
-                  dataReportTotal += ' ],'
-                } else {
+                // if (vm.doExportExcel) {
+                //   console.log('case1')
+                //   dataReportTotal += '[ '
+                //   dataReportTotal += JSON.stringify({
+                //     text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
+                //     bold: true,
+                //     style: 'tdStyle'
+                //   }) + ','
+                //   for (let csvIndexXXX = 0; csvIndexXXX < colLeng - 1; csvIndexXXX ++) {
+                //     dataReportTotal += JSON.stringify({
+                //       text: '',
+                //       bold: true,
+                //       style: 'tdStyle'
+                //     }) + ','
+                //   }
+                //   dataReportTotal += JSON.stringify({
+                //     text: '',
+                //     bold: true,
+                //     style: 'tdStyle'
+                //   })
+                //   dataReportTotal += ' ],'
+                // } else {
+                  console.log('case2')
                   dataReportTotal += JSON.stringify([{
                     colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? colLeng + 1 : colLeng,
                     text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
                     bold: true,
                     style: 'tdStyle'
                   }]) + ','
-                }
+                // }
               }
             }
             
@@ -1364,9 +1366,9 @@ export default {
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           vm.dataExportExcel = docDString
-          console.log('docDString1234123', docDString)
+          console.log('docDString1234123, dataExportExcelReport', docDString)
           vm.docDefinition = JSON.parse(docDString)
-          console.log('vm.docDefinition', vm.docDefinition)
+          // console.log('vm.docDefinition', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           // create blob
           // check showTable
@@ -1385,19 +1387,6 @@ export default {
               vm.pdfBlob = window.URL.createObjectURL(blob)
               vm.isShowLoading = false
               if (vm.doExportExcel) {
-                /** TODO: Call API
-                let currentTimestemp = new Date().getTime()
-                let fileToExcel = new File([blob], currentTimestemp + '.pdf')
-                {
-                  var reader = new FileReader()
-                  reader.onload = function(e) {
-                      var data = e.target.result
-                      console.log('data', data)
-                      vm.convertPDFToHTML(data)
-                  };
-                  reader.readAsArrayBuffer(fileToExcel)
-                }
-                */
                 vm.$store.dispatch('getExcelReportFromServer', {
                   data: docDString,
                   fileName: 'baocaothongke' + '.xls'
@@ -1807,7 +1796,7 @@ export default {
           }
           vm.showCSVDownload = true
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
-          // console.log('docDString', docDString)
+          console.log('docDString,dataExportExcelStatistic', docDString)
           vm.dataExportExcel = docDString
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
@@ -1815,7 +1804,6 @@ export default {
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           // create blob
           // check showTable
-          resultData
           // console.log('resultData', resultData)
           // console.log('resultDataTotal 2', resultDataTotal)
           if(vm.itemsReports[vm.index]['filterConfig']['showTable']){

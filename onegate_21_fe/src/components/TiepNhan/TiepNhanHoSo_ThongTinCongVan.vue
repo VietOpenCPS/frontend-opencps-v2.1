@@ -144,6 +144,7 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-autocomplete
+                      hide-no-data
                       v-else-if="!loading && !congVanDaGui"
                       :items="govAgencySubmitList"
                       item-text="itemName"

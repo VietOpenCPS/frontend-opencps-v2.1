@@ -24,7 +24,7 @@
       </div>
       <view-pdf ref="viewpdf" v-if="showComponent && String(id) !== '0' && !editDeliverable" :id="id" :datainput="detail"></view-pdf>
       <bbat-table-editor-component v-if="showComponent && editDeliverable" ref="bbatForm" :id="id" :formid="formId" :datainput="detail['formData']"></bbat-table-editor-component>
-      <v-flex xs12 class="px-4" v-if="String(id) === '0'">
+      <v-flex xs12 class="px-4" v-if="String(id) === '0' || (String(id) !== '0' && editDeliverable)">
         <div class="mb-2" style="font-size: 14px">Tài liệu đính kèm:</div>
         <div v-if="fileNameAttach" class="ml-1">
           <span class="ml-0">
@@ -83,7 +83,7 @@
           <v-icon>cloud_upload</v-icon> &nbsp;
           Tải&nbsp;{{String(loaiDuLieu).toLowerCase()}}&nbsp;từ máy tính
           </v-btn>
-          <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && !editDeliverable && detail.dossierId === '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverable = true"
+          <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && !editDeliverable && detail.dossierId === '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverableAction()"
             :loading="loading"
             :disabled="loading"
           >
@@ -271,6 +271,9 @@
             vm.showComponent = true
             vm.$store.dispatch('getContentFileSimple')
             vm.tempCounter = vm.pullCounter
+            if (String(vm.id) === '0' || (String(vm.id) !== '0' && vm.editDeliverable)) {
+              document.getElementById('documentFileAttach').value = ''
+            }
           })
           
         }
@@ -403,10 +406,10 @@
               submitDataObject['deliverableId'] = vm.detail['deliverableId']
             }
             vm.$store.dispatch('createDeliverable', submitDataObject).then(function (data) {
-              if (String(vm.id) === '0') {
+              let attachFiles = function () {
                 let deliverableId = data.createDeliverable.deliverableId
                 let files = window.$('#documentFileAttach')[0].files
-                let file = files[0]
+                let file = files ? files[0] : ''
                 if (file) {
                   let formData = new FormData()
                   formData.append('UploadFiles', file)
@@ -415,14 +418,20 @@
                       'groupId': window.themeDisplay.getScopeGroupId(),
                       'Content-Type': 'multipart/form-data'
                     }
+                  }).then(function (){}).catch(function () {
+                    toastr.error('Đính kèm tài liệu không thành công')
                   })
                 }
-                
+              }
+              
+              if (String(vm.id) === '0') {
+                attachFiles()
                 vm.loading = false
                 vm.backToList()
               } else {
                 setTimeout(function () {
                   toastr.success('Cập nhật thành công')
+                  attachFiles()
                   vm.loading = false
                   vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
                     vm.detail = result
@@ -454,6 +463,15 @@
           vm.loading = false
           vm.dialogPDFLoading = false
         })
+      },
+      editDeliverableAction() {
+        let vm = this
+        vm.editDeliverable = true
+        setTimeout(function(){
+          if (String(vm.id) === '0' || (String(vm.id) !== '0' && vm.editDeliverable)) {
+            document.getElementById('documentFileAttach').value = ''
+          }
+        }, 100)
       },
       changePage(page) {
         let vm = this

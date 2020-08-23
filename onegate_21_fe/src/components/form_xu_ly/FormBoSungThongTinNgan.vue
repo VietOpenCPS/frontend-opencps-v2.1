@@ -47,6 +47,7 @@
                     :placeholder="item.placeholder"
                     item-text="text"
                     item-value="value"
+                    hide-no-data
                     :hide-selected="true"
                     @change="inputChangeValue($event, index)"
                     box
@@ -80,6 +81,7 @@
                         item-text="itemName"
                         item-value="itemCode"
                         :hide-selected="true"
+                        hide-no-data
                         @change="inputChangeSelect($event, index1)"
                         box
                       ></v-autocomplete>
@@ -157,6 +159,7 @@
                 :placeholder="item.placeholder"
                 item-text="text"
                 item-value="value"
+                hide-no-data
                 :hide-selected="true"
                 @change="inputChangeValue($event, index)"
                 box

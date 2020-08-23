@@ -44,6 +44,7 @@
             item-text="displayName"
             item-value="domainCode"
             return-object
+            hide-no-data
             :hide-selected="true"
             @change="changeDomain"
             :clearable="Array.isArray(listLinhVuc) && listLinhVuc.length > 1"
@@ -58,6 +59,7 @@
             item-text="displayName"
             item-value="dossierId"
             return-object
+            hide-no-data
             :hide-selected="true"
             @change="changeCongVan"
             clearable
@@ -73,6 +75,7 @@
             item-text="displayName"
             item-value="serviceConfigId"
             return-object
+            hide-no-data
             :hide-selected="true"
             @change="changeServiceConfigs"
             clearable
@@ -89,6 +92,7 @@
             item-text="optionName"
             item-value="processOptionId"
             return-object
+            hide-no-data
             :hide-selected="true"
             @change="changeDichVuConfigs"
             box
@@ -328,7 +332,7 @@
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
+            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;word-break: break-word;" :class="{'no_acction__event': !props.item['permission']}">
               <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item" :layout_view="itemHeader.layout_view"></template-rendering>
               <span v-else>
                 {{ props.item[itemHeader.value] }}
@@ -340,7 +344,7 @@
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
+            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;word-break: break-word;" :class="{'no_acction__event': !props.item['permission']}">
               <span class="primary--text" v-if="props.item.dossierNo"> {{ props.item.dossierNo }} - </span><span class="primary--text"> {{ props.item.online ? 'Hồ sơ trực tuyến' : 'Hồ sơ một cửa' }}</span><br>
               <span class="primary--text text-bold"> {{ props.item.serviceName }} </span><br>
               <span class="text-bold">Chủ hồ sơ: </span> <span>{{ props.item.applicantName }}</span><br>
@@ -427,6 +431,7 @@
                   item-text="displayName"
                   item-value="serviceConfigId"
                   return-object
+                  hide-no-data
                   :hide-selected="true"
                   @change ="changeServiceConfigs"
                   box
@@ -441,6 +446,7 @@
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
+                  hide-no-data
                   :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
                   :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn']"
@@ -615,6 +621,7 @@
                   item-text="displayName"
                   item-value="serviceConfigId"
                   return-object
+                  hide-no-data
                   :hide-selected="true"
                   @change="changeServiceConfigsGuide"
                   :rules="[v => !!v || 'Thủ tục bắt buộc phải chọn.']"
@@ -632,6 +639,7 @@
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
+                  hide-no-data
                   :hide-selected="true"
                   :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
                   required
@@ -769,6 +777,7 @@
                   item-text="displayName"
                   item-value="serviceConfigId"
                   return-object
+                  hide-no-data
                   :hide-selected="true"
                   @change="changeServiceConfigsGuide"
                   :rules="[v => !!v || 'Thủ tục bắt buộc phải chọn.']"
@@ -786,6 +795,7 @@
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
+                  hide-no-data
                   :hide-selected="true"
                   :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
                   required

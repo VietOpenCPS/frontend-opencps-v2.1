@@ -2960,6 +2960,7 @@ export default {
           resultAction['userNote'] = result.text
         }
         vm.$refs.kypheduyettailieu.kySo(resultAction)
+        vm.getDetailDossier()
       }).catch(function (reject) {
         vm.loadingAction = false
         vm.loadingActionProcess = false

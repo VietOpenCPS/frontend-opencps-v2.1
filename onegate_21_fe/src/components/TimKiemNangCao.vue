@@ -13,6 +13,7 @@
               item-text="itemName"
               item-value="itemCode"
               hide-details
+              hide-no-data
               solo
               flat
               height="32"
@@ -32,6 +33,7 @@
               item-text="itemName"
               item-value="itemCode"
               hide-details
+              hide-no-data
               solo
               flat
               height="32"
@@ -51,6 +53,7 @@
               item-text="text"
               item-value="value"
               hide-details
+              hide-no-data
               solo
               flat
               height="32"
@@ -71,6 +74,7 @@
               item-text="administrationName"
               item-value="administrationCode"
               hide-details
+              hide-no-data
               solo
               flat
               height="32"
@@ -90,6 +94,7 @@
               item-text="domainName"
               item-value="domainCode"
               hide-details
+              hide-no-data
               solo
               flat
               height="32"
