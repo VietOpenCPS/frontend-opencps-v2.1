@@ -27,6 +27,7 @@
                   v-model="dichVuChuyenPhatKetQua.postalServiceCode"
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
+                  hide-no-data
                 ></v-autocomplete>
               </v-flex>
               <!--  -->
@@ -111,6 +112,7 @@
                   v-model="dichVuChuyenPhatKetQua.postalCityCode"
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
+                  hide-no-data
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 sm2>
@@ -132,6 +134,7 @@
                   v-model="dichVuChuyenPhatKetQua.postalDistrictCode"
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
+                  hide-no-data
                 ></v-autocomplete>
               </v-flex>
               <!-- <v-flex xs12 sm2>

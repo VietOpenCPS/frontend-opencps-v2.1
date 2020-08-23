@@ -87,6 +87,7 @@
                       :hide-selected="true"
                       @change="filterService"
                       box
+                      hide-no-data
                       clearable
                     ></v-autocomplete>
                   </v-flex>
@@ -100,6 +101,7 @@
                       item-value="level"
                       :hide-selected="true"
                       clearable
+                      hide-no-data
                       @change="filterService"
                       box
                     ></v-autocomplete>
@@ -310,6 +312,7 @@
                 item-value="govAgencyCode"
                 :rules="[v => !!v || 'Chọn đơn vị tiếp nhận']"
                 required
+                hide-no-data
                 return-object
                 @change="changeGovSelected"
               ></v-autocomplete>
@@ -322,6 +325,7 @@
                 item-text="optionName"
                 item-value="processOptionId"
                 clearable
+                hide-no-data
                 :rules="[v => !!v || 'Chọn dịch vụ']"
                 required
                 return-object

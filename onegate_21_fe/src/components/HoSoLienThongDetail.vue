@@ -19,6 +19,7 @@
                   item-text="itemName"
                   item-value="itemCode"
                   placeholder="Chọn cơ quan liên thông"
+                  hide-no-data
                   return-object
                   hide-selected
                 ></v-autocomplete>

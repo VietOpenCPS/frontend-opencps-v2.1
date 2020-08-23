@@ -21,6 +21,7 @@
                   :items="postalServiceItems"
                   item-text="itemName"
                   item-value="itemCode"
+                  hide-no-data
                   v-model="dichVuChuyenPhatHoSo.postalServiceCode"
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
@@ -61,6 +62,7 @@
                   item-text="itemName"
                   item-value="itemCode"
                   @change="onChangeResultCity"
+                  hide-no-data
                   v-model="dichVuChuyenPhatHoSo.postalCityCode"
                 ></v-autocomplete>
               </v-flex>
@@ -80,6 +82,7 @@
                   item-text="itemName"
                   item-value="itemCode"
                   @change="onChangeResultDistrict"
+                  hide-no-data
                   v-model="dichVuChuyenPhatHoSo.postalDistrictCode"
                 ></v-autocomplete>
               </v-flex>

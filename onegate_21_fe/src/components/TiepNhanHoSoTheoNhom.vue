@@ -270,12 +270,15 @@
             <div>
               <v-card>
                 <v-card-text>
+                  <v-form v-model="valid_tenHoSo" ref="formTenHoSo" lazy-validation>
                   <v-textarea
                     v-model="dossierNameCongVan"
                     :rows="2"
                     box
                     :label="'Nhập tên hồ sơ'"
+                    :rules="[rules.varchar5000]"
                   ></v-textarea>
+                  </v-form>
                 </v-card-text>
               </v-card>
             </div>
@@ -795,6 +798,7 @@ export default {
     'thong-tin-cong-van': ThongTinCongVan
   },
   data: () => ({
+    valid_tenHoSo: false,
     detailGroup: false,
     dialogImportDosier: false,
     dialogSelectDosier: false,
@@ -961,7 +965,58 @@ export default {
     hasTaoQuyetDinh: false,
     dialogPDF: false,
     congvanguiden: false,
-    mauCongVan: false
+    mauCongVan: false,
+    rules: {
+      required: (value) => !!value || 'Thông tin bắt buộc',
+      email: (value) => {
+        value = value.trim()
+        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
+      },
+      passWord: (value) => {
+        const pattern = /^(?![0-9]{6,})[0-9a-zA-Z]{6,}$/
+        return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 6 ký tự'
+      },
+      telNo: (value) => {
+        const pattern = /^([0-9]{0,})$/
+        if(typeof value === 'string'){
+          value = value.trim()
+        }
+        return pattern.test(value) || 'Gồm các ký tự 0-9'
+      },
+      varchar100: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar255: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar500: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar5000: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+        } else {
+          return true
+        }
+      },
+    },
   }),
   computed: {
     loading () {
@@ -1868,7 +1923,7 @@ export default {
       // let validThongtinchuhoso = vm.$refs.thongtinchuhoso.showValid()
       // if (validThongtinchuhoso['validForm']) {
         let passValid = true
-        if (passValid && thongtinchuhosocongvan.validation) {
+        if (passValid && thongtinchuhosocongvan.validation && vm.$refs.formTenHoSo.validate()) {
           vm.loadingAction = true
           if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
             vm.loadingAction = false
@@ -2047,41 +2102,45 @@ export default {
     },
     removeDossierFromGroup (item) {
       let vm = this
-      let filter = {
-        dossierId: item.dossierId,
-        groupDossierId: vm.thongTinNhomHoSo['dossierId']
-      }
-      vm.$store.dispatch('removeDossierFromGroup', filter).then(function (result) {
-        toastr.success('Yêu cầu thực hiện thành công')
-        setTimeout(() => {
-          let filter1 = {
-            groupDossierId: vm.thongTinNhomHoSo['dossierId']
-          }
-          vm.$store.dispatch('getDossiersIntoGroup', filter1).then(function (result) {
-            vm.dossiersIntoGroup = result
-            vm.$store.commit('setSelectDossierGroup', vm.dossiersIntoGroup)
-            if (vm.dossiersIntoGroup.length > 0) {
-              let steps = []
-              for (let index in vm.dossiersIntoGroup) {
-                if (steps.filter(function (item) {
-                  return String(item['stepCode']) === String(vm.dossiersIntoGroup[index]['stepCode'])
-                }).length === 0) {
-                  steps.push({
-                    stepCode: vm.dossiersIntoGroup[index]['stepCode'],
-                    stepName: vm.dossiersIntoGroup[index]['stepName']
-                  })
-                }
-              }
-              vm.stepList = steps
+      let x = confirm('Bạn có muốn thực hiện thao tác này?')
+      console.log(x)
+      if (x) {
+        let filter = {
+          dossierId: item.dossierId,
+          groupDossierId: vm.thongTinNhomHoSo['dossierId']
+        }
+        vm.$store.dispatch('removeDossierFromGroup', filter).then(function (result) {
+          toastr.success('Yêu cầu thực hiện thành công')
+          setTimeout(() => {
+            let filter1 = {
+              groupDossierId: vm.thongTinNhomHoSo['dossierId']
             }
-            vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
-            vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
-          })
-        }, 500);
-        
-      }).catch(function () {
-        toastr.error('Yêu cầu thực hiện thất bại')
-      })
+            vm.$store.dispatch('getDossiersIntoGroup', filter1).then(function (result) {
+              vm.dossiersIntoGroup = result
+              vm.$store.commit('setSelectDossierGroup', vm.dossiersIntoGroup)
+              if (vm.dossiersIntoGroup.length > 0) {
+                let steps = []
+                for (let index in vm.dossiersIntoGroup) {
+                  if (steps.filter(function (item) {
+                    return String(item['stepCode']) === String(vm.dossiersIntoGroup[index]['stepCode'])
+                  }).length === 0) {
+                    steps.push({
+                      stepCode: vm.dossiersIntoGroup[index]['stepCode'],
+                      stepName: vm.dossiersIntoGroup[index]['stepName']
+                    })
+                  }
+                }
+                vm.stepList = steps
+              }
+              vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
+              vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
+            })
+          }, 500);
+          
+        }).catch(function () {
+          toastr.error('Yêu cầu thực hiện thất bại')
+        })
+      }
     },
     addFileToDossier () {
       let vm = this

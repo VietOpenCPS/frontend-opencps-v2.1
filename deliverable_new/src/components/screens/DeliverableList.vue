@@ -1040,44 +1040,48 @@
       },
       deleteDeliverable (item) {
         let vm = this
-        let param = {
-          headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
-          }
-        }
-        axios.delete('/o/rest/v2/deliverables/' + item.deliverableId, param).then(function () {
-          toastr.success('Thực hiện thành công')
-          vm.loadingTable = true
-          let currentQuery = vm.$router.history.current.query
-          let queryString = ''
-          for (let key in currentQuery) {
-            if (currentQuery[key] !== '' && currentQuery[key] !== 'undefined' && currentQuery[key] !== undefined) {
-              queryString += key + '=' + currentQuery[key] + '&'
+        let x = confirm('Bạn có muốn thực hiện thao tác này?')
+        if(x){
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
             }
           }
-          queryString += '1=1'
-          let filter = {
-            type: vm.items[vm.index]['typeCode'],
-            page: vm.hosoDatasPage,
-            q: queryString,
-          }
-          try {
-            let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
-            if (tableConfig.hasOwnProperty('paramUrl') && tableConfig.paramUrl) {
-              filter = Object.assign(filter, {formDataKey: JSON.stringify(tableConfig.paramUrl)})
+          axios.delete('/o/rest/v2/deliverables/' + item.deliverableId, param).then(function () {
+            toastr.success('Thực hiện thành công')
+            vm.loadingTable = true
+            let currentQuery = vm.$router.history.current.query
+            let queryString = ''
+            for (let key in currentQuery) {
+              if (currentQuery[key] !== '' && currentQuery[key] !== 'undefined' && currentQuery[key] !== undefined) {
+                queryString += key + '=' + currentQuery[key] + '&'
+              }
             }
-          } catch (error) {
-          }
-          vm.$store.dispatch('getDeliverables', filter).then(function (result) {
-            vm.hosoDatasTotal = result['total']
-            vm.hosoDatas = result['data']
-            vm.loadingTable = false
-          }).catch(function (reject) {
-            vm.loadingTable = false
+            queryString += '1=1'
+            let filter = {
+              type: vm.items[vm.index]['typeCode'],
+              page: vm.hosoDatasPage,
+              q: queryString,
+            }
+            try {
+              let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
+              if (tableConfig.hasOwnProperty('paramUrl') && tableConfig.paramUrl) {
+                filter = Object.assign(filter, {formDataKey: JSON.stringify(tableConfig.paramUrl)})
+              }
+            } catch (error) {
+            }
+            vm.$store.dispatch('getDeliverables', filter).then(function (result) {
+              vm.hosoDatasTotal = result['total']
+              vm.hosoDatas = result['data']
+              vm.loadingTable = false
+            }).catch(function (reject) {
+              vm.loadingTable = false
+            })
+          }).catch(function (xhr) {
+            toastr.success('Thực hiện thất bại')
           })
-        }).catch(function (xhr) {
-          toastr.success('Thực hiện thất bại')
-        })
+        }
+
       },
       getState (item) {
         let currentDate = (new Date()).getTime()
