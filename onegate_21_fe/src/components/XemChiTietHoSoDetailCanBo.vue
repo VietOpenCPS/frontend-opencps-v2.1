@@ -136,11 +136,11 @@
                         </span>
                       </span>
                     </v-flex>
-                    <v-flex id="reAssign" v-if="thaoTacUyQuyen && showReasign && checkPemissionPhanCongLai(currentUser)" class="text-xs-right" style="width:100px">
+                    <!-- <v-flex id="reAssign" v-if="thaoTacUyQuyen && showReasign && checkPemissionPhanCongLai(currentUser)" class="text-xs-right" style="width:100px">
                       <v-btn @click="reAsign" class="mx-0 my-0 right" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" small color="primary" style="height:26px">
                         Ủy quyền
                       </v-btn>
-                    </v-flex>
+                    </v-flex> -->
                   </v-layout>
                 </div>
 
@@ -738,7 +738,7 @@ import ChiTietThanhToan from './ChiTietThanhToan.vue'
 import ThucHienThanhToanDienTu from './form_xu_ly/ThucHienThanhToanDienTu.vue'
 import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
-import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
+import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQuaBQP.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
 import TaiLieuChungThuc from './TiepNhan/TaiLieuChungThuc.vue'
@@ -998,7 +998,8 @@ export default {
     isNotarization: false,
     sequencyDossierImport: false,
     mauCongVan: '',
-    reRender: true
+    reRender: true,
+    activeReload: false
   }),
   computed: {
     loading () {
@@ -1067,6 +1068,14 @@ export default {
           formScript = eval('(' + data + ')')
           vm.$store.dispatch('getDetailDossier', vm.id).then(resultDossier => {
             vm.thongTinChiTietHoSo = resultDossier
+            if (vm.thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(vm.thongTinChiTietHoSo.dossierSyncState) === '1') {
+              vm.activeReload = true
+              // setInterval(function () {
+              //   vm.reloadDetailDossier()
+              // }, 3*1000)
+            } else {
+              vm.activeReload = false
+            }
             formData = resultDossier
             formScript.data = formData
             window.$('#formScriptTemplate').alpaca(formScript)
@@ -3138,6 +3147,38 @@ export default {
         vm.thongTinChiTietHoSo = resultDossier
         vm.reRender = true
       })
+    },
+    reloadDetailDossier () {
+      let vm = this
+      var getSyncDossier = setInterval(frame, 3500)
+      function frame() {
+        if (vm.activeReload == false) {
+          clearInterval(getSyncDossier)
+        } else {
+          vm.$store.dispatch('getDetailDossier', vm.thongTinChiTietHoSo.dossierId).then(resultDossier => {
+            vm.thongTinChiTietHoSo = resultDossier
+            if (vm.thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(vm.thongTinChiTietHoSo.dossierSyncState) === '1') {
+              vm.activeReload = true
+            } else {
+              vm.activeReload = false
+            }
+            let filter = {
+              dossierId: vm.thongTinChiTietHoSo.dossierId
+            }
+            vm.$store.dispatch('pullNextactions', filter).then(function (result) {
+              vm.btnDossierDynamics = result
+              vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result1 => {
+                vm.btnStepsDynamics = result1
+                if (vm.btnStepsDynamics.length > 0) {
+                  vm.btnStepsDynamics = vm.btnStepsDynamics.filter(function (item) {
+                    return !item.hasOwnProperty('roleCode') || (item.hasOwnProperty('roleCode') && vm.getUser(item.roleCode))
+                  })
+                }
+              })
+            })
+          })
+        }
+      }
     },
     changeStateViewResult (data) {
       // console.log('state view result', data)

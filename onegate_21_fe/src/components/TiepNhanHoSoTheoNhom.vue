@@ -181,14 +181,14 @@
                         <span v-if="props.item.applicantNote">{{props.item.applicantNote}} </span>
                       </td>
                       
-                      <td class="text-xs-center" :width="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(String(props.item['groupDossierId']))) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui) ? '170px' : '70px'" style="height: 40px !important">
+                      <td class="text-xs-center" :width="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(String(props.item['groupDossierIds']))) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui) ? '170px' : '70px'" style="height: 40px !important">
                         <v-btn flat icon color="indigo" class="mr-2 my-0" @click="viewDetail(props.item)" title="Xem chi tiết">
                           <v-icon>fas fa fa-file-text</v-icon>
                         </v-btn>
-                        <v-btn v-if="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(String(props.item['groupDossierId']))) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
+                        <v-btn v-if="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(String(props.item['groupDossierIds']))) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
                           <v-icon size="22">create</v-icon>
                         </v-btn>
-                        <v-btn v-if="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(String(props.item['groupDossierId']))) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
+                        <v-btn v-if="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(String(props.item['groupDossierIds']))) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
                           <v-icon size="22">delete</v-icon>
                         </v-btn>
                       </td>
@@ -395,7 +395,7 @@
             <span slot="loader">Loading...</span>
           </v-btn>
         </v-tab>
-        <v-tab href="#tab-4" @click="deleteCongVan()" v-if="metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui" class="px-0 py-0"> 
+        <v-tab href="#tab-4" @click="deleteCongVan()" v-if="(metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui) || activeDeleteCongVan" class="px-0 py-0"> 
           <v-btn flat class="" 
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -966,6 +966,7 @@ export default {
     dialogPDF: false,
     congvanguiden: false,
     mauCongVan: false,
+    activeDeleteCongVan: false,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -1243,6 +1244,9 @@ export default {
         vm.dossiersIntoGroupRender = []
         vm.$store.dispatch('getDossiersIntoGroup', filter).then(function (result) {
           vm.dossiersIntoGroup = result
+          if ((vm.metaDataGroupDossier.hasOwnProperty('congvandagui') && vm.metaDataGroupDossier.congvandagui) || !vm.metaDataGroupDossier.hasOwnProperty('congvandagui')) {
+            vm.activeDeleteCongVan = vm.dossiersIntoGroup.length === 0 ? true : false
+          }
           vm.$store.commit('setSelectDossierGroup', vm.dossiersIntoGroup)
           if (vm.dossiersIntoGroup.length > 0) {
             let steps = []
@@ -2102,13 +2106,12 @@ export default {
     },
     removeDossierFromGroup (item) {
       let vm = this
+      let filter = {
+        dossierId: item.dossierId,
+        groupDossierId: vm.thongTinNhomHoSo['dossierId']
+      }
       let x = confirm('Bạn có muốn thực hiện thao tác này?')
-      console.log(x)
       if (x) {
-        let filter = {
-          dossierId: item.dossierId,
-          groupDossierId: vm.thongTinNhomHoSo['dossierId']
-        }
         vm.$store.dispatch('removeDossierFromGroup', filter).then(function (result) {
           toastr.success('Yêu cầu thực hiện thành công')
           setTimeout(() => {
@@ -2117,6 +2120,9 @@ export default {
             }
             vm.$store.dispatch('getDossiersIntoGroup', filter1).then(function (result) {
               vm.dossiersIntoGroup = result
+              if ((vm.metaDataGroupDossier.hasOwnProperty('congvandagui') && vm.metaDataGroupDossier.congvandagui) || !vm.metaDataGroupDossier.hasOwnProperty('congvandagui')) {
+                vm.activeDeleteCongVan = vm.dossiersIntoGroup.length === 0 ? true : false
+              }
               vm.$store.commit('setSelectDossierGroup', vm.dossiersIntoGroup)
               if (vm.dossiersIntoGroup.length > 0) {
                 let steps = []
@@ -2129,16 +2135,15 @@ export default {
                       stepName: vm.dossiersIntoGroup[index]['stepName']
                     })
                   }
+                  vm.stepList = steps
                 }
-                vm.stepList = steps
+                vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
+                vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
               }
-              vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
-              vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
+            }).catch(function () {
+              toastr.error('Yêu cầu thực hiện thất bại')
             })
-          }, 500);
-          
-        }).catch(function () {
-          toastr.error('Yêu cầu thực hiện thất bại')
+          }, 100)
         })
       }
     },
@@ -2253,6 +2258,9 @@ export default {
           vm.dialogAddDossier = false
           vm.$store.dispatch('getDossiersIntoGroup', data).then(function (result) {
             vm.dossiersIntoGroup = result
+            if ((vm.metaDataGroupDossier.hasOwnProperty('congvandagui') && vm.metaDataGroupDossier.congvandagui) || !vm.metaDataGroupDossier.hasOwnProperty('congvandagui')) {
+              vm.activeDeleteCongVan = vm.dossiersIntoGroup.length === 0 ? true : false
+            }
             vm.$store.commit('setSelectDossierGroup', vm.dossiersIntoGroup)
             if (vm.dossiersIntoGroup.length > 0) {
               let steps = []
