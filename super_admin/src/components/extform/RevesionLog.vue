@@ -89,6 +89,7 @@
               </v-flex>
               <v-flex xs12  md4 class="text-xs-right">
                 <v-btn  color="blue darken-3" class="white--text" @click="search()">Tìm kiếm</v-btn>
+                <!-- <v-btn  color="blue darken-3" class="white--text" @click="downLoadExcelRevesionLog()">Xuất Excel</v-btn> -->
               </v-flex>
           </v-layout>
           <v-layout wrap>
@@ -248,6 +249,14 @@ export default {
         vm.getRevesionLog()
       
     },
+    downLoadExcelRevesionLog () {
+      let vm = this
+      vm.$store.dispatch('downLoadExcelRevesionLog', {
+        groupId: window.themeDisplay.getScopeGroupId(),
+        data: vm.dataExportExcel,
+        fileName: 'danhsach' + '.xls'
+      })
+    }
   }
 }
 </script>

@@ -2201,6 +2201,40 @@ export const store = new Vuex.Store({
         })
       })
     },
+    downLoadExcelRevesionLog ({state}, dataReq) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.groupId,
+            'Content-Type': 'x-www-form-urlencoded',
+            'Accept': 'application/json'
+          },
+          responseType: 'blob'
+        }
+        let params = new URLSearchParams()
+        params.append('data', dataReq.data)
+        axios.post(state.endPointApi + '/statistics/dossiers/export',
+          params, options)
+          .then(function (response) {
+            console.log(response)
+            var fileNames = response.headers['content-disposition']
+            var fileName = fileNames.split('filename=')[1] || dataReq.fileName
+            fileName = fileName.split('"').join('')
+            var a = document.createElement('a')
+            document.body.appendChild(a)
+            a.style = 'display: none'
+            var url = window.URL.createObjectURL(response.data)
+            a.href = url
+            a.download = fileName
+            a.click()
+            window.URL.revokeObjectURL(url)
+            resolve(response.data)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+      })
+    },
   },
   mutations: {
     SOCKET_ONOPEN (state, event)  {
