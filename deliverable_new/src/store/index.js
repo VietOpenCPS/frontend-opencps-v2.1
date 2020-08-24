@@ -286,7 +286,7 @@ export const store = new Vuex.Store({
         }
         if (filter.typeSearch === 'keyword') {
           options.params.keyword = filter.keyword
-          options.params.formDataKey = ''
+          options.params.formDataKey = filter.formDataKey
         } else {
           options.params.keyword = ''
           options.params.formDataKey = filter.formDataKey
