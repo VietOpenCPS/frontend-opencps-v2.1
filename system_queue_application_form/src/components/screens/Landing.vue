@@ -452,7 +452,7 @@ export default {
               vm.$store.dispatch('getFileTemplateEform', serviceInfoListFilter[0]).then(response => {
                 if (response.data) {
                   let fileTemplateNo = response.data[0]['fileTemplateNo']
-                  let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web') + '/to-khai-truc-tuyen#/thong-tin-to-khai?service='+ serviceInfoListFilter[0].serviceInfoId + '&template=' + fileTemplateNo
+                  let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web') + '/to-khai-truc-tuyen#/thong-tin-to-khai?service='+ serviceInfoListFilter[0].serviceInfoId + '&template=' + fileTemplateNo + '&vnconnect=1'
                   window.location.href = url
                 } else {
                   doLoadService()

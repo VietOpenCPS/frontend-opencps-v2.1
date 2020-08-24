@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import DetailForward from '@/components/blacklist/DetailForward'
 import NotFound from '@/components/NotFound'
 import Landing from '@/components/screens/Landing'
 import ChiTietToKhai from '@/components/screens/ChiTietToKhai'
 import TaoFormThanhCong from '@/components/screens/TaoFormThanhCong'
+import DetailForward from '@/components/blacklist/DetailForward'
 const routes = [
   { path: '/', name: 'Landing', component: Landing, props: true },
   { path: '/thong-tin-to-khai', name: 'ChiTietToKhai', component: ChiTietToKhai, props: true },

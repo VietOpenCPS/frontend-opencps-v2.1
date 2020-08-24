@@ -1,44 +1,65 @@
 <template>
   <div style="border: 1px solid #dedede;border-top:0;">
-    <div class="row-header no__hidden_class">
-      <div class="background-triangle-big">
-        <span>TỜ KHAI TRỰC TUYẾN</span>
-      </div>
-      <div class="layout row wrap header_tools row-blue">
-        <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-          {{serviceinfoSelected.serviceName}}
-        </div>
-        <!-- <div class="flex text-right" style="margin-left: auto;max-width: 150px;height:37px">
-          <v-btn color="primary" class="my-0 mx-0 white--text" v-on:click.native="searchEform" style="height:100%">
-            <v-icon size="16">search</v-icon> &nbsp;
-            Tìm kiếm tờ khai
-          </v-btn>
-        </div> -->
-      </div> 
-    </div>
-    <div>
-      <div v-if="!serviceinfoSelected" class="pt-5 text-xs-center">
-        <h2 class="mb-3" style="opacity:0.2;font-style:italic">Vui lòng chọn thủ tục để tạo tờ khai trực tuyến !</h2>
-        <img style="opacity:0.1" src="https://i1.wp.com/www.onsitebristol.co.uk/wp-content/uploads/2016/06/application-form-icon-school-admission-form-512.png?fit=300%2C300&ssl=1" alt="">
-      </div>
-      <v-card flat color="#fff">
-        <div id="formAlpacaEform" class="mb-5 pt-3"></div>
+    <v-dialog
+      v-model="dialogLoadingCreate"
+      persistent
+      width="450"
+    >
+      <v-card
+        color="primary"
+        dark
+      >
+        <v-card-text>
+          <v-progress-linear
+            indeterminate
+            color="white"
+            class="mb-0"
+          ></v-progress-linear>
+        </v-card-text>
       </v-card>
+    </v-dialog>
+    <div v-if="!dialogLoadingCreate">
+      <div class="row-header no__hidden_class">
+        <div class="background-triangle-big">
+          <span>TỜ KHAI TRỰC TUYẾN</span>
+        </div>
+        <div class="layout row wrap header_tools row-blue">
+          <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
+            {{serviceinfoSelected.serviceName}}
+          </div>
+          <!-- <div class="flex text-right" style="margin-left: auto;max-width: 150px;height:37px">
+            <v-btn color="primary" class="my-0 mx-0 white--text" v-on:click.native="searchEform" style="height:100%">
+              <v-icon size="16">search</v-icon> &nbsp;
+              Tìm kiếm tờ khai
+            </v-btn>
+          </div> -->
+        </div> 
+      </div>
+      <div>
+        <div v-if="!serviceinfoSelected" class="pt-5 text-xs-center">
+          <h2 class="mb-3" style="opacity:0.2;font-style:italic">Vui lòng chọn thủ tục để tạo tờ khai trực tuyến !</h2>
+          <img style="opacity:0.1" src="https://i1.wp.com/www.onsitebristol.co.uk/wp-content/uploads/2016/06/application-form-icon-school-admission-form-512.png?fit=300%2C300&ssl=1" alt="">
+        </div>
+        <v-card flat color="#fff">
+          <div id="formAlpacaEform" class="mb-5 pt-3"></div>
+        </v-card>
+      </div>
+      <v-flex xs12 class="text-xs-right my-3 mr-2">
+        <v-btn v-if="!isUpdate" color="primary" @click.stop="postEform()" class="">
+          <v-icon color="white">save</v-icon>&nbsp;
+          Tạo tờ khai
+        </v-btn>
+        <v-btn v-else color="primary" @click.stop="putEform()" class="">
+          <v-icon color="white">save</v-icon>&nbsp;
+          Cập nhật tờ khai
+        </v-btn>
+        <v-btn color="primary" class="ml-3 white--text" @click="goBack">
+          <v-icon>reply</v-icon> &nbsp;
+          Quay lại
+        </v-btn>
+      </v-flex>
     </div>
-    <v-flex xs12 class="text-xs-right my-3 mr-2">
-      <v-btn v-if="!isUpdate" color="primary" @click.stop="postEform()" class="">
-        <v-icon color="white">save</v-icon>&nbsp;
-        Tạo tờ khai
-      </v-btn>
-      <v-btn v-else color="primary" @click.stop="putEform()" class="">
-        <v-icon color="white">save</v-icon>&nbsp;
-        Cập nhật tờ khai
-      </v-btn>
-      <v-btn color="primary" class="ml-3 white--text" @click="goBack">
-        <v-icon>reply</v-icon> &nbsp;
-        Quay lại
-      </v-btn>
-    </v-flex>
+    
     <!--  -->
     <v-dialog v-model="dialogSecret" persistent max-width="400">
       <v-form v-model="validSecret" ref="formSecret" lazy-validation>
@@ -73,6 +94,90 @@
         </v-card>
       </v-form>
     </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialogLogin" max-width="550">
+      <v-card class="px-0">
+        <v-card-text class="px-0 py-0">
+          <v-flex v-if="!isSigned" xs12>
+            <nav class="toolbar theme--dark primary py-2" data-booted="true">
+              <div class="toolbar__content"  style="justify-content: center">
+                <div class="white--text text-bold" style="font-size: 1.25em;">ĐĂNG NHẬP</div>
+              </div>
+            </nav>
+            <v-flex xs12 class="px-2 pb-2" style="border: 1px solid #dddddd;">
+              <v-form ref="form" v-model="valid" lazy-validation class="mt-3">
+                <v-flex xs12>
+                  <v-text-field
+                    box
+                    placeholder="Email đăng nhập"
+                    v-model="userName"
+                    :rules="[v => !!v || 'Email đăng nhập là bắt buộc']"
+                    required
+                    prepend-inner-icon="person_outline"
+                    @keyup.enter="submitConfirmLogin"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs12 class="">
+                  <v-text-field
+                    box
+                    placeholder="Mật khẩu"
+                    v-model="passWord"
+                    :type="'password'"
+                    :rules="[v => !!v || 'Mật khẩu là bắt buộc']"
+                    required
+                    prepend-inner-icon="vpn_key"
+                    @keyup.enter="submitConfirmLogin"
+                  ></v-text-field>
+                </v-flex>
+                <!-- <v-layout wrap class="ml-2">
+                  <v-flex @click="getPassword" style="font-size: 12px;cursor: pointer;padding:7px">
+                    <div class="primary--text right" >
+                      Quên mật khẩu?
+                    </div>
+                  </v-flex>
+                </v-layout> -->
+                <!--  -->
+                <v-flex v-if="captcha" class="py-2 text-xs-center" xs12 style="
+                  align-items: center;
+                  background: #dedede;
+                  justify-content: center;
+                ">
+                  <img :src="chapchablob" alt="capcha" style="border-radius: 5px;">
+                  <v-btn flat icon v-on:click.native="makeImageCap">
+                    <v-icon color="white" size="26">refresh</v-icon>
+                  </v-btn>
+                </v-flex>
+                <v-flex xs12 class="mt-2 text-xs-center" v-if="captcha">
+                  <v-text-field
+                    box
+                    v-model="j_captcha_response"
+                    placeholder="Nhập captcha"
+                    :rules="[v => !!v || 'Mã captcha là bắt buộc']"
+                    required
+                  ></v-text-field>
+                </v-flex>
+                <!--  -->
+                <v-flex xs12 class="text-xs-left text-xs-center">
+                  <v-btn class="ml-0 mr-1 my-0 white--text" color="primary"
+                    :loading="loadingLogin"
+                    :disabled="loadingLogin"
+                    @click="submitConfirmLogin"
+                  >
+                    <v-icon>how_to_reg</v-icon>&nbsp;
+                    Đăng nhập
+                  </v-btn>
+                  <v-btn @click="dialogLogin = false" color="primary">
+                    <v-icon>reply</v-icon>&nbsp;
+                    Thoát
+                  </v-btn>
+                </v-flex>
+                
+              </v-form>
+            </v-flex>
+          </v-flex>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -100,7 +205,18 @@ export default {
     validSecret: false,
     isUpdate: false,
     dataCheck: '',
-    loadingForm: false
+    loadingForm: false,
+    isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false,
+    dialogLogin: false,
+    userName: '',
+    passWord: '',
+    valid: false,
+    captcha: false,
+    j_captcha_response: '',
+    loadingLogin: false,
+    dataMapping: '',
+    mapping: false,
+    dialogLoadingCreate: false,
   }),
   computed: {
     serviceinfoSelected () {
@@ -122,6 +238,23 @@ export default {
         vm.loadScriptTemplate(vm.fileTemplateSelected)
       } else {
         if (currentQuery.hasOwnProperty('service') && currentQuery.service && currentQuery.hasOwnProperty('template') && currentQuery.template) {
+          if (currentQuery.hasOwnProperty('vnconnect') && String(currentQuery['vnconnect']) === '1' && !window.themeDisplay.isSignedIn()) {
+            vm.checkVNConect()
+          }
+          let searchParams = window.location.href.split("?")
+          if (searchParams[1]) {
+            let dataDVCQG = decodeURIComponent(String(vm.getSearchParams(searchParams[1], "data")))
+            // console.log('dataDVCQG', dataDVCQG)
+            if (dataDVCQG) {
+              let dataObj = JSON.parse(atob(dataDVCQG))
+              console.log('dataObj', dataObj)
+              if (dataObj && dataObj.hasOwnProperty('userId') && String(dataObj.userId) === '0') {
+                vm.mapping = true
+                vm.dataMapping = dataObj
+                vm.dialogLogin = true
+              }
+            }
+          }
           vm.loadingForm = true
           let filter = {
             index: currentQuery.service
@@ -335,6 +468,87 @@ export default {
     },
     deleteAlpacaForm () {
       let vm = this
+    },
+    checkVNConect () {
+      let vm = this
+      let current = vm.$router.history.current
+      let query = vm.$router.history.current.query
+      let service = ''
+      let template = ''
+      if (query.hasOwnProperty('service') && query.service) {
+        service = query.service
+      }
+      if (query.hasOwnProperty('template') && query.template) {
+        template = query.template
+      }
+      let filter = {
+        state: '',
+        redirectURL: service && template ? window.location.href.split("?")[0] + '?service=' +  service + '&template=' + template : window.location.href.split("?")[0]
+      }
+      setTimeout (function () {
+        if (!vm.isSigned) {
+          vm.dialogLoadingCreate = true
+          vm.$store.dispatch('getVNConect', filter).then(function (result) {
+            if (result) {
+              window.location.href = result
+            } else {
+              alert('Chức năng đang cập nhật')
+            }
+            vm.dialogLoadingCreate = false
+          }).catch(function () {
+            vm.dialogLoadingCreate = false
+            if (!vm.isSigned) {
+              vm.dialogLogin = true
+            }
+          })
+        }
+      }, 300)
+    },
+    submitConfirmLogin () {
+      let vm = this
+      let current = vm.$router.history.current
+      let filter = {
+        npmreactlogin_login: vm.userName,
+        npmreactlogin_password: vm.passWord,
+        j_captcha_response: vm.j_captcha_response
+      }
+      if (vm.$refs.form.validate() && vm.userName && vm.passWord) {
+        vm.loadingLogin = true
+        vm.$store.dispatch('goToDangNhap', filter).then(function(result) {
+          vm.loadingLogin = false
+          if (vm.mapping && result === 'success') {
+            vm.doMappingDvcqg()
+          }
+          if (result === 'success') {
+            vm.dialogLogin = false
+          } 
+          if (result === 'captcha') {
+            vm.captcha = true
+            vm.makeImageCap()
+          }
+        }).catch(function(){
+          vm.loadingLogin = false
+          vm.makeImageCap()
+        })
+      }
+    },
+    makeImageCap () {
+      var vm = this
+      vm.chapchablob = ''
+      vm.$store.dispatch('makeImageCapLogin').then(function (result) {
+        vm.chapchablob = result
+      }).catch(function (reject) {
+        vm.chapchablob = ''
+      })
+    },
+    doMappingDvcqg () {
+      let vm = this
+      let filter = {
+        dataMapping: vm.dataMapping
+      }
+      vm.$store.dispatch('mappingDvcqg', filter).then(function (result) {
+      }).catch(function () {
+      })
     },
     goBack () {
       let vm = this
