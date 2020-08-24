@@ -1009,7 +1009,12 @@
         try {
           let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
           if (tableConfig.hasOwnProperty('paramUrl') && tableConfig.paramUrl) {
-            searchParams = Object.assign(searchParams, tableConfig.paramUrl)
+            if (typeSearch === 'keyword') {
+              searchParams = Object.assign({}, tableConfig.paramUrl)
+            } else {
+              searchParams = Object.assign(searchParams, tableConfig.paramUrl)
+            }
+            
           }
         } catch (error) {
         }

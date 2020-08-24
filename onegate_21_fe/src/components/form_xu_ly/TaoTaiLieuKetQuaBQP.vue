@@ -55,7 +55,7 @@
                     <v-layout wrap>
                       <v-flex xs12 class="text-xs-right">
                         <div :id="'wrapForm' + item.partNo + id" :style="(pstFixed > pstEl && pstFixed < endEl + pstEl) ? 'position:fixed;top:5px;z-index:101' : ''">
-                          <v-btn color="primary" @click.stop="saveAlpacaForm(item, index)" :id="'saveBtn' + item.partNo + item.templateNo"
+                          <v-btn :disabled="loadingApacal" color="primary" @click.stop="saveAlpacaForm(item, index)" :id="'saveBtn' + item.partNo + item.templateNo"
                           v-if="item.eForm && item['editForm'] && !item.embed">
                             <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
                             <v-icon color="white" v-else>save</v-icon>&nbsp;
@@ -525,8 +525,8 @@
               } else {
                 formData = {}
               }
-              let hasFormDataFile = vm.dossierFilesItems.filter(function (item) {
-                return item.dossierPartNo == item.partNo && item.eForm && item.formData
+              let hasFormDataFile = vm.dossierFilesItems.filter(function (itemFile) {
+                return itemFile.dossierPartNo == item.partNo && itemFile.eForm && itemFile.formData
               })
               if (hasFormDataFile && hasFormDataFile.length > 0) {
                 formData = eval('(' + hasFormDataFile[0]['formData'] + ')')
@@ -587,8 +587,8 @@
                 } else {
                   formData = {}
                 }
-                let hasFormDataFile = vm.dossierFilesItems.filter(function (item) {
-                  return item.dossierPartNo == item.partNo && item.eForm && item.formData
+                let hasFormDataFile = vm.dossierFilesItems.filter(function (itemFile) {
+                  return itemFile.dossierPartNo == item.partNo && itemFile.eForm && itemFile.formData
                 })
                 if (hasFormDataFile && hasFormDataFile.length > 0) {
                   formData = eval('(' + hasFormDataFile[0]['formData'] + ')')
@@ -619,9 +619,11 @@
           return itemFile.dossierPartNo === item.partNo && itemFile.eForm
         })
         if (fileFind) {
+          vm.loadingApacal = true
           fileFind['dossierId'] = vm.detailDossier.dossierId
           fileFind['id'] = vm.id
           vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
+            vm.loadingApacal = false
             toastr.clear()
             toastr.success('Yêu cầu của bạn thực hiện thành công')
             vm.createFiles[index].daKhai = true
@@ -648,11 +650,12 @@
             // }
             // vm.$store.commit('setCreateFileSigned', createFileSigned)
           }).catch(reject => {
-            console.log('run saveForm')
+            vm.loadingApacal = false
             toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         } else {
+          vm.loadingApacal = true
           item['dossierId'] = vm.detailDossier.dossierId
           item['id'] = vm.id
           vm.$store.dispatch('postEform', item).then(resPostEform => {
@@ -663,6 +666,7 @@
             //   vm.filesAdd = [resData]
             // }
             setTimeout(function () {
+              vm.loadingApacal = false
               toastr.success('Yêu cầu của bạn thực hiện thành công')
               vm.createFiles[index].daKhai = true
             }, 3000)
@@ -685,6 +689,7 @@
             // }
             // vm.$store.commit('setCreateFileSigned', createFileSigned)
           }).catch(reject => {
+            vm.loadingApacal = false
             toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
@@ -1048,7 +1053,7 @@
                           formData = {}
                         }
                         let hasFormDataFile = vm.dossierFilesItems.filter(function (item) {
-                          return item.dossierPartNo == item.partNo && item.eForm && item.formData
+                          return itemFile.dossierPartNo == item.partNo && itemFile.eForm && itemFile.formData
                         })
                         if (hasFormDataFile && hasFormDataFile.length > 0) {
                           formData = eval('(' + hasFormDataFile[0]['formData'] + ')')

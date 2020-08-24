@@ -233,7 +233,12 @@
                 <content-placeholders-heading />
               </content-placeholders>
               <!--  -->
-              <div class="px-4 pt-2" v-if="thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(thongTinChiTietHoSo.dossierSyncState) === '1'">
+              <div class="px-4 pt-2" v-if="btnStateVisible && thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(thongTinChiTietHoSo.dossierSyncState) === '1'">
+                <v-progress-circular
+                  indeterminate
+                  color="amber"
+                  style="position: absolute; bottom: 13px; left: 36px;"
+                ></v-progress-circular>
                 <v-alert
                   :value="true"
                   color="warning"
@@ -465,7 +470,7 @@
                       </div>
                     </div>
                     <div v-if="props.item.statusText">
-                      <span style="color: green" v-if="thongTinChiTietHoSo['dossierStatus'] === 'done' || thongTinChiTietHoSo['dossierStatus'] === 'unresolved'">
+                      <span style="color: green" v-if="thongTinChiTietHoSo['dossierStatus'] === 'done' || thongTinChiTietHoSo['dossierStatus'] === 'unresolved' || thongTinChiTietHoSo['dossierStatus'] === 'denied'">
                         {{props.item.statusText.replace("Đang thực hiện:", "")}}
                       </span>
                       <span style="color: green" v-else>
@@ -1068,14 +1073,6 @@ export default {
           formScript = eval('(' + data + ')')
           vm.$store.dispatch('getDetailDossier', vm.id).then(resultDossier => {
             vm.thongTinChiTietHoSo = resultDossier
-            if (vm.thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(vm.thongTinChiTietHoSo.dossierSyncState) === '1') {
-              vm.activeReload = true
-              // setInterval(function () {
-              //   vm.reloadDetailDossier()
-              // }, 3*1000)
-            } else {
-              vm.activeReload = false
-            }
             formData = resultDossier
             formScript.data = formData
             window.$('#formScriptTemplate').alpaca(formScript)
@@ -1197,6 +1194,12 @@ export default {
       vm.activeTab2 = 'tabs-2b'
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
+        if (vm.thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(vm.thongTinChiTietHoSo.dossierSyncState) === '1') {
+          vm.activeReload = true
+          vm.reloadDetailDossier()
+        } else {
+          vm.activeReload = false
+        }
         vm.loadDetailTempalte()
         vm.loadThanhToan()
         vm.loadHoSoLienThong()
@@ -2097,6 +2100,7 @@ export default {
           validFormBoSung = true
         } else {
           validFormBoSung = false
+          vm.loadingAction = false
           return
         }
       }
@@ -2114,10 +2118,12 @@ export default {
       if (vm.showTaoTaiLieuKetQua) {
         validCreateFiles = vm.$refs.tailieuketqua.validCreateFileTemplate()
         if (!validCreateFiles) {
+          vm.loadingAction = false
           return
         }
       }
       if (vm.showKyPheDuyetTaiLieu) {
+        vm.loadingActionProcess = false
         let resultTmp = vm.$refs.kypheduyettailieu.doExport()
         if (resultTmp.required) {
           useKySo = true
@@ -2535,6 +2541,8 @@ export default {
             
           }
         }
+      } else if (!vm.validateAction) {
+        vm.loadingActionProcess = false
       }
     },
     kyDuyetPlugin () {
@@ -3155,6 +3163,7 @@ export default {
         if (vm.activeReload == false) {
           clearInterval(getSyncDossier)
         } else {
+          console.log('RUN setInterval2')
           vm.$store.dispatch('getDetailDossier', vm.thongTinChiTietHoSo.dossierId).then(resultDossier => {
             vm.thongTinChiTietHoSo = resultDossier
             if (vm.thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(vm.thongTinChiTietHoSo.dossierSyncState) === '1') {
@@ -3175,7 +3184,11 @@ export default {
                   })
                 }
               })
+            }).catch(function() {
+              vm.activeReload = false
             })
+          }).catch(function () {
+            vm.activeReload = false
           })
         }
       }

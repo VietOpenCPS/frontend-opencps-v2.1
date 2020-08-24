@@ -125,7 +125,7 @@
           <div style="position:relative" v-if="trangThaiHoSoList">
             <v-text-field
               v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
-              label="Nhập mã hồ sơ"
+              label="Nhập mã hồ sơ đầy đủ"
               v-model="dossierNoKey"
               @keyup.enter="changeDossierNoKey"
               append-icon="search"
@@ -134,7 +134,7 @@
             ></v-text-field>
             <v-text-field
               v-else
-              label="Nhập số công văn"
+              label="Nhập số công văn đầy đủ"
               v-model="documentNo"
               @keyup.enter="changeDossierNoKey"
               append-icon="search"
@@ -411,7 +411,7 @@
     </div>
     <v-dialog v-model="dialogAction" max-width="700" transition="fade-transition" persistent>
       <v-card>
-        <v-form ref="form" v-model="valid" lazy-validation>
+        <v-form ref="form1" v-model="valid" lazy-validation>
           <v-toolbar dark color="primary">
             <v-toolbar-title>{{itemAction.title}}{{itemAction.tiltle}}</v-toolbar-title>
             <v-spacer></v-spacer>
@@ -427,6 +427,7 @@
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelected"
                   :rules="[v => !!v || 'Thủ tục hành chính bắt buộc phải chọn']"
+                  required
                   placeholder="Chọn thủ tục hành chính"
                   item-text="displayName"
                   item-value="serviceConfigId"
@@ -2818,7 +2819,7 @@ export default {
       let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
-      if (vm.$refs.form.validate()) {
+      if (vm.$refs.form1.validate()) {
         vm.doCreateDossier()
       }
     },
