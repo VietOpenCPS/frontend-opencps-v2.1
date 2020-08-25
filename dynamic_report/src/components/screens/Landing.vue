@@ -2036,6 +2036,7 @@ export default {
     },
     exportExcel () {
       let vm = this
+      console.log('sadsadas',vm.dataExportExcel)
       vm.$store.dispatch('getExcelReportFromServer', {
         groupId: vm.govAgency ? vm.govAgency : window.themeDisplay.getScopeGroupId(),
         data: vm.dataExportExcel,

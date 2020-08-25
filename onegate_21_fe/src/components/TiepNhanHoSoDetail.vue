@@ -63,13 +63,15 @@
                 <div>
                   <v-card>
                     <v-card-text>
-                      <v-textarea
-                        v-model="briefNote"
-                        :rows="2"
-                        box
-                        :rules="originality === 1 ? '' : [rules.varchar5000]"
-                        :placeholder="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : (originality === 1 ? 'Nhập nội dung yêu cầu giải quyết' : 'Nhập tên hồ sơ')"
-                      ></v-textarea>
+                      <v-form v-model="valid_tenHoSo" ref="formTenHoSo" lazy-validation>
+                        <v-textarea
+                          v-model="briefNote"
+                          :rows="2"
+                          box
+                          :rules="originality === 1 ? '' : [rules.varchar5000]"
+                          :placeholder="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : (originality === 1 ? 'Nhập nội dung yêu cầu giải quyết' : 'Nhập tên hồ sơ')"
+                        ></v-textarea>
+                      </v-form>
                       <div v-if="templateDescription">(*) &nbsp; {{templateDescription}}</div>
                     </v-card-text>
                   </v-card>
@@ -824,6 +826,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    valid_tenHoSo: false,
     // add new template
     isNotarization: false,
     templateName: '',
@@ -1467,10 +1470,12 @@ export default {
       let thongtinchuhoso = this.$refs.thongtinchuhoso ? this.$refs.thongtinchuhoso.getThongTinChuHoSo() : {}
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso ? this.$refs.thongtinchuhoso.getThongTinNguoiNopHoSo() : []
       let thanhphanhoso = this.$refs.thanhphanhoso ? this.$refs.thanhphanhoso.dossierTemplateItems : ''
+      let validThanhPhanHoSo = this.$refs.thanhphanhoso ? vm.$refs.thanhphanhoso.showValid() : {validForm: true}
       let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
       let validThongtinchuhoso = vm.$refs.thongtinchuhoso ? vm.$refs.thongtinchuhoso.showValid() : {validForm: true, validApplicant: true}
       let thongtinchuhosocongvan = vm.$refs.thongtinchuhosocongvan ? vm.$refs.thongtinchuhosocongvan.getThongTinChuHoSo() : {validation: true}
-      if (validThongtinchuhoso['validForm'] && thongtinchuhosocongvan['validation']) {
+      
+      if (validThongtinchuhoso['validForm'] && thongtinchuhosocongvan['validation'] && vm.$refs.formTenHoSo.validate() && validThanhPhanHoSo['validForm']) {
         let passValid = false
         if (!validThongtinchuhoso['validApplicant']) {
           let x = confirm(validThongtinchuhoso['message'] + ' Bạn có muốn tiếp tục?')
