@@ -1412,7 +1412,7 @@ export default {
           let today = new Date()
           let newDate = new Date()
           newDate.setFullYear(vm.birthDateYear, vm.birthDateMonth  - 1 , vm.birthDateDay) 
-          if(today < newDate){
+          if(today <= newDate){
             vm.birthDateDay = ''
             vm.birthDateMonth = ''
             vm.birthDateYear = ''

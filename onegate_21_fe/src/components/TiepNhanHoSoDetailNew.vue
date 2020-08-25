@@ -64,7 +64,7 @@
                       v-model="briefNote"
                       :rows="2"
                       box
-                      :rules="rules.varchar500"
+                      :rules="[rules.varchar500]"
                       :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập tên hồ sơ'"
                     ></v-textarea>
                     <!-- <v-textarea

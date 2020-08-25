@@ -359,22 +359,25 @@
       <div v-if="!partTypes.includes(2) && originality === 3 && !partTypes.includes(6) && !partTypes.includes(7)">
         <v-card flat>
           <v-card-text flat class="py-0 px-3 pl-4">
-            <div v-if="!onlyView" class="my-2">
-              <v-textarea class="py-0"
-              box
-              v-model="applicantNoteDossier"
-              rows="3"
-              @input="changeApplicantNote"
-              label="Ghi chú"
-              ></v-textarea>
-            </div>
-            <v-text-field class="my-2"
-              v-if="onlyView && applicantNoteDossier"
-              v-model="applicantNoteDossier"
-              label="Ghi chú"
-              readonly
-              box
-            ></v-text-field>
+            <v-form v-model="valid_ghichu" ref="formGhiChuThanhPhan" lazy-validation>
+              <div v-if="!onlyView" class="my-2">
+                  <v-textarea class="py-0"
+                  box
+                  v-model="applicantNoteDossier"
+                  rows="3"
+                  :rules="[rules.varchar5000]"
+                  @input="changeApplicantNote"
+                  label="Ghi chú"
+                  ></v-textarea>
+              </div>
+              <v-text-field class="my-2"
+                v-if="onlyView && applicantNoteDossier"
+                v-model="applicantNoteDossier"
+                label="Ghi chú"
+                readonly
+                box
+              ></v-text-field>
+            </v-form>
           </v-card-text>
         </v-card>
       </div>
@@ -507,6 +510,7 @@ export default {
     'kho-tai-lieu': KhoTaiLieu,
   },
   data: () => ({
+    valid_ghichu: false,
     dossierTemplateItems: [],
     dossierMarksItems: [],
     dossierFilesItems: [],
@@ -573,7 +577,70 @@ export default {
     receiveMessage: '',
     dialog_documentApplicant: false,
     dossierPartAttach: '',
-    indexPart: ''
+    indexPart: '',
+    rules: {
+      required: (value) => !!value || 'Thông tin bắt buộc',
+      cmndHoChieu: (value) => {
+        const pattern = /^(?![0-9]{4,12})[0-9a-zA-Z]{4,12}$/
+        return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 4-12 ký tự'
+      },
+      email: (value) => {
+        value = value.trim()
+        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
+      },
+      passWord: (value) => {
+        const pattern = /^(?![0-9]{6,})[0-9a-zA-Z]{6,}$/
+        return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 6 ký tự'
+      },
+      telNo: (value) => {
+        const pattern = /^([0-9]{0,})$/
+        if(typeof value === 'string'){
+          value = value.trim()
+        }
+        return pattern.test(value) || 'Gồm các ký tự 0-9'
+      },
+      varchar50: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar100: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+        } else {
+          return true
+        }
+      },
+      varchar255: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar500: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar5000: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+        } else {
+          return true
+        }
+      },
+    },
   }),
   created () {
     let vm = this
@@ -651,6 +718,13 @@ export default {
     }
   },
   methods: {
+    showValid () {
+      var vm = this
+      let result = {
+        validForm: vm.$refs.formGhiChuThanhPhan.validate(),
+      }
+      return result
+    },
     markAll () {
       let vm = this
       if (vm.dossierTemplateItemsFilter && vm.markCheck !== '') {
