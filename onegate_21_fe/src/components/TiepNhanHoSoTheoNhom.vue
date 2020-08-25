@@ -1117,6 +1117,9 @@ export default {
         }
         vm.dossiersIntoGroupRenderTemp = arr.slice(0, vm.pagination.rowsPerPage )
         vm.totalFee = totalFee
+      } else {
+        vm.dossiersIntoGroupRenderTemp = []
+        vm.totalFee = 0
       }
       
     },

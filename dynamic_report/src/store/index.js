@@ -873,7 +873,41 @@ export const store = new Vuex.Store({
           reject(xhr)
         })
       })
-    }
+    },
+    getRoleUser ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/users/login', param).then(function (response) {
+          let serializable = response.data
+          if (serializable && serializable.length > 0) {
+            let roles = []
+            for (let key in serializable) {
+              if (serializable[key]['role']) {
+                let role = serializable[key]['role'].split('_')
+                let roleLength = role.length
+                if (isNaN((Number(role[roleLength - 1])))) {
+                  roles.push(serializable[key]['role'])
+                } else {
+                  let item = serializable[key]['role'].replace('_' + role[roleLength - 1], '')
+                  roles.push(item)
+                }
+                
+              }
+            }
+            resolve(roles)
+          } else {
+            resolve('')
+          }
+        }).catch(function (error) {
+          console.log(error)
+          reject('default')
+        })
+      })
+    },
   },
   mutations: {
     setInitData (state, payload) {

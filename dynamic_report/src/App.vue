@@ -122,7 +122,8 @@
         }
       ],
       userConfig: [],
-      reportTypeFilter: ''
+      reportTypeFilter: '',
+      reportTypeMappingRole: ''
     }),
     computed: {
       itemsReports () {
@@ -212,52 +213,84 @@
           }
         } catch (error) {
         }
-        if (vm.$route.query.hasOwnProperty('doreport')) {
-          vm.hiddenAside = true
-        } else {
-          vm.hiddenAside = false
+        try {
+          if (reportTypeMappingRole) {
+            vm.reportTypeMappingRole = reportTypeMappingRole
+          }
+        } catch (error) {
         }
-        if (vm.$route.query.reportType !== undefined && vm.$route.query.reportType !== null && vm.$route.query.reportType !== '') {
-          vm.reportTypeFilter = vm.$route.query.reportType
-        }
-        vm.$store.dispatch('getDynamicReports', vm.reportTypeFilter).then(function (result) {
-          vm.itemsReportsConfig = []
-          vm.userConfig = []
-          if (String(vm.index) !== '0') {
-            for (let key in vm.itemsReports) {
-              if (vm.itemsReports[key]['code'] === String(vm.index)) {
-                vm.reportType = vm.itemsReports[key]['document']
-                vm.itemsReportsConfig = vm.itemsReports[key]['filterConfig']['reportConfig']
-                if (vm.itemsReports[key]['userConfig'] !== '') {
-                  let userConfigObjec = vm.itemsReports[key]['userConfig']
-                  if (userConfigObjec.hasOwnProperty(vm.getUserId())) {
-                    vm.userConfig = userConfigObjec[vm.getUserId()]
+        let doGetReport = function () {
+          if (vm.$route.query.hasOwnProperty('doreport')) {
+            vm.hiddenAside = true
+          } else {
+            vm.hiddenAside = false
+          }
+          if (vm.$route.query.reportType !== undefined && vm.$route.query.reportType !== null && vm.$route.query.reportType !== '') {
+            vm.reportTypeFilter = vm.$route.query.reportType
+          }
+          vm.$store.dispatch('getDynamicReports', vm.reportTypeFilter).then(function (result) {
+            vm.itemsReportsConfig = []
+            vm.userConfig = []
+            if (String(vm.index) !== '0') {
+              for (let key in vm.itemsReports) {
+                if (vm.itemsReports[key]['code'] === String(vm.index)) {
+                  vm.reportType = vm.itemsReports[key]['document']
+                  vm.itemsReportsConfig = vm.itemsReports[key]['filterConfig']['reportConfig']
+                  if (vm.itemsReports[key]['userConfig'] !== '') {
+                    let userConfigObjec = vm.itemsReports[key]['userConfig']
+                    if (userConfigObjec.hasOwnProperty(vm.getUserId())) {
+                      vm.userConfig = userConfigObjec[vm.getUserId()]
+                    }
                   }
+                  break
                 }
-                break
+              }
+            } else {
+              vm.reportType = vm.itemsReports[0]['document']
+              vm.itemsReportsConfig = vm.itemsReports[0]['filterConfig']['reportConfig']
+              if (vm.itemsReports[0]['userConfig'] !== '') {
+                let userConfigObjec = vm.itemsReports[0]['userConfig']
+                if (userConfigObjec.hasOwnProperty(vm.getUserId())) {
+                  vm.userConfig = userConfigObjec[vm.getUserId()]
+                }
               }
             }
-          } else {
-            vm.reportType = vm.itemsReports[0]['document']
-            vm.itemsReportsConfig = vm.itemsReports[0]['filterConfig']['reportConfig']
-            if (vm.itemsReports[0]['userConfig'] !== '') {
-              let userConfigObjec = vm.itemsReports[0]['userConfig']
-              if (userConfigObjec.hasOwnProperty(vm.getUserId())) {
-                vm.userConfig = userConfigObjec[vm.getUserId()]
+            vm.selected = []
+            if (vm.userConfig.length > 0) {
+              vm.selected = vm.userConfig
+            } else {
+              for (let keySelected in vm.itemsReportsConfig) {
+                if (vm.itemsReportsConfig[keySelected]['selected']) {
+                  vm.selected.push(vm.itemsReportsConfig[keySelected]['value'])
+                }
               }
             }
-          }
-          vm.selected = []
-          if (vm.userConfig.length > 0) {
-            vm.selected = vm.userConfig
-          } else {
-            for (let keySelected in vm.itemsReportsConfig) {
-              if (vm.itemsReportsConfig[keySelected]['selected']) {
-                vm.selected.push(vm.itemsReportsConfig[keySelected]['value'])
+          })
+        }
+        if (vm.reportTypeMappingRole) {
+          let roles = ''
+          vm.$store.dispatch('getRoleUser').then(function (result) {
+            roles = result
+            if (roles) {
+              let roleList = roles.split(',')
+              roleList = roleList.filter(function (item) {
+                return vm.reportTypeMappingRole.hasOwnProperty('item') && vm.reportTypeMappingRole[item]
+              })
+              if (roleList && roleList.length > 0) {
+                vm.reportTypeFilter = vm.reportTypeMappingRole[roleList[0]]
+              } else {
+                doGetReport()
               }
+            } else {
+              doGetReport()
             }
-          }
-        })
+          }).catch(function (error) {
+            doGetReport()
+          })
+        } else {
+          doGetReport()
+        }
+
       })
     },
     methods: {

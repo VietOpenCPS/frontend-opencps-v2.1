@@ -64,6 +64,8 @@
                   @change="onChangeResultCity"
                   hide-no-data
                   v-model="dichVuChuyenPhatHoSo.postalCityCode"
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  required
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 sm2>
@@ -84,6 +86,8 @@
                   @change="onChangeResultDistrict"
                   hide-no-data
                   v-model="dichVuChuyenPhatHoSo.postalDistrictCode"
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  required
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 sm2>
