@@ -203,7 +203,9 @@
         pageAttachs: 1,
         loaiDuLieu: '',
         fileNameAttach: '',
-        fileNameAttachDate: ''
+        fileNameAttachDate: '',
+        extensionsFileUpLoad: '',
+        maxSizeFileUpLoad: ''
       }
     },
     created () {
@@ -223,6 +225,16 @@
               vm.loaiDuLieu = tableConfig.loaiDuLieu
             } else {
               vm.loaiDuLieu = "giấy phép"
+            }
+            if (tableConfig.hasOwnProperty('extensions') && tableConfig.extensions) {
+              vm.extensionsFileUpLoad = tableConfig.extensions
+            } else {
+              vm.extensionsFileUpLoad = ''
+            }
+            if (tableConfig.hasOwnProperty('maxSize') && tableConfig.maxSize) {
+              vm.maxSizeFileUpLoad = tableConfig.maxSize
+            } else {
+              vm.maxSizeFileUpLoad = ''
             }
             vm.formId = vm.items[vm.index]['formScriptFileId']
             vm.deName = ''
@@ -256,6 +268,16 @@
             vm.loaiDuLieu = tableConfig.loaiDuLieu
           } else {
             vm.loaiDuLieu = "giấy phép"
+          }
+          if (tableConfig.hasOwnProperty('extensions') && tableConfig.extensions) {
+            vm.extensionsFileUpLoad = tableConfig.extensions
+          } else {
+            vm.extensionsFileUpLoad = ''
+          }
+          if (tableConfig.hasOwnProperty('maxSize') && tableConfig.maxSize) {
+            vm.maxSizeFileUpLoad = tableConfig.maxSize
+          } else {
+            vm.maxSizeFileUpLoad = ''
           }
           vm.deName = ''
           // vm.$store.dispatch('getContentFile', formId)
@@ -507,8 +529,58 @@
         let vm = this
         let files = window.$('#documentFileAttach')[0].files
         let file = files[0]
-        vm.fileNameAttach = file.name
-        vm.fileNameAttachDate = vm.getCurentDateTime()
+        // 
+        let fileUpload = {
+          file: file
+        }
+        let valid = vm.validFileUpload(fileUpload)
+        // 
+        if (valid) {
+          vm.fileNameAttach = file.name
+          vm.fileNameAttachDate = vm.getCurentDateTime()
+        } else {
+          document.getElementById('documentFileAttach').value = ''
+          vm.fileNameAttach = ''
+          vm.fileNameAttachDate = ''
+        }
+        
+      },
+      validFileUpload (fileUpload) {
+        let vm = this
+        let validation = true
+        console.log('fileUpload', fileUpload)
+        console.log('fileUploadValid', vm.extensionsFileUpLoad, vm.maxSizeFileUpLoad)
+        let getFileType = fileUpload.file.name ? fileUpload.file.name.split('.') : ''
+        let fileType = getFileType ? getFileType[getFileType.length - 1] : ''
+        let tips = {
+          extensions: vm.extensionsFileUpLoad,
+          maxSize: vm.maxSizeFileUpLoad
+        }
+        let fileTypeAllow = tips['extensions'] ? (tips['extensions'] + ',' + tips['extensions'].toUpperCase()).split(',') : ''
+        let fileSizeAllow = tips['maxSize']
+        let fileTypeInput = fileTypeAllow ? fileTypeAllow.filter(function (item) {
+          return item === fileType
+        }) : ''
+        validation = false
+        if (fileTypeInput && fileTypeInput.length > 0) {
+          if (Number(fileUpload.file.size) <= tips['maxSize'] * 1048576 || !tips['maxSize']) {
+            validation = true
+          } else {
+            toastr.clear()
+            toastr.error('Tài liệu tải lên dung lượng tối đa là ' + tips['maxSize'] + ' MB')
+            validation = false
+          }
+        } else {
+          if (!tips['extensions']) {
+            validation = true
+          } else {
+            toastr.clear()
+            toastr.error('Tài liệu tải lên chỉ chấp nhận các định dạng ' + tips['extensions'])
+            validation = false
+          }
+        }
+
+        return validation
       },
       getCurentDateTime () {
         let date = new Date()
