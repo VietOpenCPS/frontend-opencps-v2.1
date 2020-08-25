@@ -2201,6 +2201,71 @@ export const store = new Vuex.Store({
         })
       })
     },
+    downLoadExcelRevesionLog ({state}, filter) {
+      // return new Promise((resolve, reject) => {
+      //   let options = {
+      //     headers: {
+      //       'groupId': state.groupId,
+      //       'Content-Type': 'x-www-form-urlencoded',
+      //       'Accept': 'application/json'
+      //     },
+      //     responseType: 'blob'
+      //   }
+      //   let params = new URLSearchParams()
+      //   params.append('data', dataReq.data)
+      //   axios.post(state.endPointApi + '/statistics/dossiers/export',
+      //     params, options)
+      //     .then(function (response) {
+      //       console.log(response)
+      //       var fileNames = response.headers['content-disposition']
+      //       var fileName = fileNames.split('filename=')[1] || dataReq.fileName
+      //       fileName = fileName.split('"').join('')
+      //       var a = document.createElement('a')
+      //       document.body.appendChild(a)
+      //       a.style = 'display: none'
+      //       var url = window.URL.createObjectURL(response.data)
+      //       a.href = url
+      //       a.download = fileName
+      //       a.click()
+      //       window.URL.revokeObjectURL(url)
+      //       resolve(response.data)
+      //     }).catch(function (error) {
+      //       console.log(error)
+      //       reject(error)
+      //     })
+
+          
+      // })
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+             'Content-Type': 'x-www-form-urlencoded',
+             'Accept': 'application/json',
+              groupId: state.initData.groupId
+            },
+            responseType: 'blob',
+            params: filter
+          }
+          axios.get('/o/rest/v2/dossierlogs/revesionLog', param).then(function (response) {
+            let fileNames = response.headers['content-disposition']
+            let fileName = fileNames.split('filename=')[1] || 'danhsach'
+            fileName = fileName.split('"').join('')
+            let a = document.createElement('a')
+            document.body.appendChild(a)
+            a.style = 'display: none'
+            let url = window.URL.createObjectURL(response.data)
+            a.href = url
+            a.download = fileName
+            a.click()
+            window.URL.revokeObjectURL(url)
+            resolve(response.data)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
   },
   mutations: {
     SOCKET_ONOPEN (state, event)  {

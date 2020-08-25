@@ -27,7 +27,7 @@
       </v-toolbar>
       <div class="grid-list mt-3">
           <v-layout wrap>
-              <v-flex xs12 md4>
+              <v-flex xs12 md3>
                 <v-menu
                     ref="menu1"
                     :close-on-content-click="false"
@@ -57,7 +57,7 @@
                   ></v-date-picker>
                 </v-menu>
               </v-flex>
-              <v-flex xs12 md4>
+              <v-flex xs12 md3>
                 <v-menu
                     ref="menu2"
                     :close-on-content-click="false"
@@ -87,8 +87,19 @@
                   ></v-date-picker>
                 </v-menu>
               </v-flex>
-              <v-flex xs12  md4 class="text-xs-right">
+              <v-flex xs12 md3>
+                  <v-text-field
+                   
+                    v-model="actionUser"
+                    label="Người thao tác"
+            
+                    box
+          
+                  ></v-text-field>
+              </v-flex>
+              <v-flex xs12  md3 class="text-xs-right">
                 <v-btn  color="blue darken-3" class="white--text" @click="search()">Tìm kiếm</v-btn>
+                <v-btn  color="blue darken-3" class="white--text" @click="downLoadExcelRevesionLog()">Xuất Excel</v-btn>
               </v-flex>
           </v-layout>
           <v-layout wrap>
@@ -189,6 +200,7 @@ export default {
     revesionLogs: [],
     page: 1,
     total: 0,
+    actionUser: ''
   }),
   computed: {
 
@@ -233,7 +245,8 @@ export default {
             end: vm.page*10,
             order: true,
             createDateStart: vm.createDateStartFomarted,
-            createDateEnd: vm.createDateEndFomarted
+            createDateEnd: vm.createDateEndFomarted,
+            actionUser: vm.actionUser,
         }
         vm.revesionLogs = []
         vm.$store.dispatch('getRevesionLog',filter).then(function (result) {
@@ -248,6 +261,19 @@ export default {
         vm.getRevesionLog()
       
     },
+    downLoadExcelRevesionLog () {
+      let vm = this
+      let filter = {
+          order: true,
+          createDateStart: vm.createDateStartFomarted,
+          createDateEnd: vm.createDateEndFomarted,
+          actionUser: vm.actionUser,
+          export: true
+      }
+      vm.$store.dispatch('downLoadExcelRevesionLog', filter).then(()=>{
+
+      })
+    }
   }
 }
 </script>

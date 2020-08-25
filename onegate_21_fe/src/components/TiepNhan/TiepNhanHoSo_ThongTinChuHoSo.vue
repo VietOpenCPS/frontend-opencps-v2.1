@@ -976,6 +976,7 @@ export default {
     thongTinChuHoSo: {
       handler: function (value) {
         let vm = this
+        value['applicantIdNo'] = String(value['applicantIdNo']).trim()
         if(!value.applicantIdNo) {
           vm.checkApplicantId = true
         }
@@ -1048,6 +1049,7 @@ export default {
       handler: function (value) {
         var vm = this
         let dataChuHoSo = vm.thongTinChuHoSo
+        value['delegateIdNo'] = String(value['delegateIdNo']).trim()
         if(!value.delegateIdNo) {
           vm.checkDelegateIdNo = true
         }
@@ -1332,7 +1334,10 @@ export default {
         }
         vm.$store.commit('setApplicantId', query)
       }, 2000)
+      console.log(query)
       if (query.trim().length === 0 ) {
+        vm.thongTinChuHoSo.applicantIdNo = ''
+        console.log(vm.thongTinChuHoSo.applicantIdNo)
         return null
       }
       let url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
@@ -1377,6 +1382,7 @@ export default {
       let vm = this
       vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
       if (query.trim().length === 0) {
+        vm.thongTinNguoiNopHoSo.delegateIdNo = ''
         return null
       }
       let url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
