@@ -36,7 +36,7 @@
     <!--  -->
     <div class="menu_header_list py-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <v-layout wrap v-if="originality !== 1 && trangThaiHoSoList">
-        <v-flex v-if="!trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan')" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+        <v-flex v-if="!trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && !hiddenFilterDomain" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
           <v-autocomplete
             :items="listLinhVuc"
             v-model="linhVucSelected"
@@ -67,7 +67,7 @@
             :autofocus="focusSelect === 1"
           ></v-autocomplete>
         </v-flex>
-        <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+        <v-flex :class="!hiddenFilterDomain ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'">
           <v-autocomplete
             :items="listThuTucHanhChinh"
             v-model="thuTucHanhChinhSelected"
@@ -83,7 +83,7 @@
             :autofocus="focusSelect === 2"
           ></v-autocomplete>
         </v-flex>
-        <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box" v-if="trangThaiHoSoList">
+        <v-flex :class="!hiddenFilterDomain ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'" v-if="trangThaiHoSoList">
           <v-autocomplete
             v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
             :items="listDichVu"
@@ -121,7 +121,7 @@
           </v-menu>
         </v-flex>
 
-        <v-flex xs12 sm3 class="pl-2 pr-2">
+        <v-flex :class="!hiddenFilterDomain ? 'xs12 sm3 pl-2 pr-2' : 'xs12 sm4 pl-2 pr-2'">
           <div style="position:relative" v-if="trangThaiHoSoList">
             <v-text-field
               v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
@@ -1073,6 +1073,7 @@ export default {
     govAgencyFilterMenuConfig: '',
     groupServiceFilterMenuConfig: '',
     disableSearchAgency: false,
+    hiddenFilterDomain: false,
     focusSelect: 0,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
@@ -1245,6 +1246,9 @@ export default {
             if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('disableSearchAgency') && vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency) {
               vm.disableSearchAgency = vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency
             }
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hiddenFilterDomain') && vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain) {
+              vm.hiddenFilterDomain = vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain
+            }
             // 
             vm.processListTTHC(currentQuery)
             vm.processListDomain(currentQuery)
@@ -1330,6 +1334,9 @@ export default {
       }
       if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('disableSearchAgency') && vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency) {
         vm.disableSearchAgency = vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hiddenFilterDomain') && vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain) {
+        vm.hiddenFilterDomain = vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain
       }
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
@@ -1484,6 +1491,9 @@ export default {
       if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('disableSearchAgency') && vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency) {
         vm.disableSearchAgency = vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency
       }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hiddenFilterDomain') && vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain) {
+        vm.hiddenFilterDomain = vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain
+      }
       console.log('govAgencyFilterMenuConfig', vm.govAgencyFilterMenuConfig, vm.groupServiceFilterMenuConfig)
     },
     index (val) {
@@ -1513,6 +1523,9 @@ export default {
       }
       if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('disableSearchAgency') && vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency) {
         vm.disableSearchAgency = vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hiddenFilterDomain') && vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain) {
+        vm.hiddenFilterDomain = vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain
       }
       console.log('govAgencyFilterMenuConfig333', vm.govAgencyFilterMenuConfig, vm.groupServiceFilterMenuConfig)
     }

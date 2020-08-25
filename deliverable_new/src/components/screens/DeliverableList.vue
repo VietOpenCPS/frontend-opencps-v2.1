@@ -822,7 +822,7 @@
         //   path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString
         // })
         // ----Xem chi tiết hồ sơ
-        if (item.hasOwnProperty('dossierId') && item.dossierId && vm.urlRedirectDossier) {
+        if (item.hasOwnProperty('dossierId') && item.dossierId && item.dossierId !== '0' && vm.urlRedirectDossier) {
           let url = vm.urlRedirectDossier + '/' + item.dossierId
           window.open(url, "_blank")
         }
@@ -1009,16 +1009,20 @@
         try {
           let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
           if (tableConfig.hasOwnProperty('paramUrl') && tableConfig.paramUrl) {
-            if (typeSearch === 'keyword') {
+            if (type_search === 'keyword') {
               searchParams = Object.assign({}, tableConfig.paramUrl)
             } else {
               searchParams = Object.assign(searchParams, tableConfig.paramUrl)
             }
-            
+          } else {
+            if (type_search === 'keyword') {
+              searchParams = Object.assign({})
+            } else {
+              searchParams = Object.assign(searchParams, {})
+            }
           }
         } catch (error) {
         }
-        
         let filter = {
           typeSearch: type_search ? type_search : '',
           type: vm.items[vm.index]['typeCode'],
@@ -1026,6 +1030,7 @@
           keyword: newQuery.hasOwnProperty('keyword') ? newQuery['keyword'] : vm.deliverableKey,
           formDataKey: JSON.stringify(searchParams)
         }
+        console.log('filter', filter)
         vm.filterExport = filter
         vm.loadingTable = true
         vm.$store.dispatch('searchDeliverables', filter).then(function (result) {

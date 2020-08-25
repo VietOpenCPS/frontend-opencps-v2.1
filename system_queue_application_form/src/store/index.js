@@ -587,6 +587,107 @@ export const store = new Vuex.Store({
         })
       })
     },
+    makeImageCapLogin ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            'Accept': 'application/json'
+          },
+          responseType: 'blob'
+        }
+        // test local
+        var url = '/o/v1/opencps/users/login/jcaptcha'
+        axios.get(url, param).then(response => {
+          var url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
+    goToDangNhap({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let configs = {
+            headers: {
+              'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
+            }
+          }
+          let dataPostApplicant = new URLSearchParams()
+          if (filter.j_captcha_response) {
+            dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
+          }
+          axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
+            if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha' && response.data !== "lockout") {
+              if (response.data === 'pending') {
+                window.location.href = window.themeDisplay.getURLHome() +
+                "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
+                  "&redirectURL=" + window.themeDisplay.getURLHome()
+              } else {
+                window.location.href = response.data
+              }
+            } else if (response.data === 'ok') {
+              resolve('success')
+            } else if (response.data === 'captcha') {
+              if (response['status'] !== undefined && response['status'] === 203) {
+                toastr.error("Mã captcha không chính xác")
+              }
+              resolve('captcha')
+            } else if (response.data === "lockout") {
+              resolve('lockout')
+              toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị tạm khóa trong 10 phút.")
+            } else {
+              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 })
+              resolve('error')
+            }
+          }).catch(function (error) {
+            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 })
+            reject(error)
+          })
+        })
+      })
+    },
+    getVNConect ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            },
+            params: {
+              state: filter.state,
+              redirectURL: filter.redirectURL
+            }
+          }
+          axios.get(state.endPoint + '/dvcqgsso/authurl', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    mappingDvcqg ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            },
+            params: {}
+          }
+          let data = filter.dataMapping
+          axios.post('/o/rest/v2/dvcqgsso/auth', data, param).then(function (response) {
+            resolve(response)
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
   },
   mutations: {
     setLoading (state, payload) {

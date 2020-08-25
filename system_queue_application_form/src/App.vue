@@ -1,5 +1,7 @@
 <template>
   <v-app id="app_application_form" style="max-width:1300px;margin:0 auto">
+    <v-navigation-drawer app clipped floating width="310" v-if="false">
+    </v-navigation-drawer>
     <v-content>
       <router-view></router-view>
     </v-content>

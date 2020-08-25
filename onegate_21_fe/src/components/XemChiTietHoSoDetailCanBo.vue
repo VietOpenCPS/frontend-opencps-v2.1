@@ -470,7 +470,8 @@
                       </div>
                     </div>
                     <div v-if="props.item.statusText">
-                      <span style="color: green" v-if="thongTinChiTietHoSo['dossierStatus'] === 'done' || thongTinChiTietHoSo['dossierStatus'] === 'unresolved' || thongTinChiTietHoSo['dossierStatus'] === 'denied'">
+                      <span style="color: green" v-if="thongTinChiTietHoSo['dossierStatus'] === 'done' || thongTinChiTietHoSo['dossierStatus'] === 'unresolved' 
+                        || thongTinChiTietHoSo['dossierStatus'] === 'denied' || thongTinChiTietHoSo['dossierStatus'] === 'cancelled'">
                         {{props.item.statusText.replace("Đang thực hiện:", "")}}
                       </span>
                       <span style="color: green" v-else>
@@ -485,7 +486,7 @@
                   <content-placeholders-img />
                   <content-placeholders-heading />
                 </content-placeholders>
-                <div id="mermaid_dossier" class="mermaid" style="padding: 15px;"></div>
+                <div id="mermaid_dossier" class="mermaid" style="padding: 15px;min-height: 350px;"></div>
               </div>
             </v-tab-item>
           </v-tabs-items>
@@ -1403,6 +1404,15 @@ export default {
           mermaid.render('theGraph', chartData, function (svgCode) {
             document.getElementById('mermaid_dossier').innerHTML = svgCode
           })
+          setTimeout(function () {
+            window.svgPanZoom('#theGraph', {
+              zoomEnabled: true,
+              controlIconsEnabled: true,
+              fit: true,
+              center: true,
+              minZoom: 0.1
+            })
+          }, 500)
         }).catch(function () {
           vm.loadingMermaidgraph = false
         })
