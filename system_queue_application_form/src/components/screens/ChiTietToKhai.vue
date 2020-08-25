@@ -101,7 +101,7 @@
           <v-flex v-if="!isSigned" xs12>
             <nav class="toolbar theme--dark primary py-2" data-booted="true">
               <div class="toolbar__content"  style="justify-content: center">
-                <div class="white--text text-bold" style="font-size: 1.25em;">ĐĂNG NHẬP</div>
+                <div class="white--text text-bold" style="font-size: 1.25em;">ĐĂNG NHẬP ĐỒNG BỘ TÀI KHOẢN</div>
               </div>
             </nav>
             <v-flex xs12 class="px-2 pb-2" style="border: 1px solid #dddddd;">
@@ -252,6 +252,29 @@ export default {
                 vm.mapping = true
                 vm.dataMapping = dataObj
                 vm.dialogLogin = true
+                // 
+                let typeAccount = ''
+                let title = ''
+                let idType = ''
+                if (dataObj.LoaiTaiKhoan === '1') {
+                  typeAccount = 'Số CMND/ Căn cước '
+                  idType = dataObj.SoCMND
+                } else if (dataObj.LoaiTaiKhoan === '2') {
+                  typeAccount = 'Mã số thuế '
+                  idType = dataObj.MaSoThue
+                }
+                if (typeAccount && (dataObj.SoCMND || dataObj.MaSoThue)) {
+                  title = typeAccount + idType + ' đã tạo tài khoản trên hệ thống. Vui lòng đăng nhập để đồng bộ với tài khoản Cổng Dịch vụ công Quốc gia.'
+                }
+                if (title) {
+                  toastr.options = {
+                    'positionClass': 'toast-top-center',
+                    'closeButton': true,
+                    'timeOut': '30000'
+                  }
+                  toastr.info(title)
+                }
+                // 
               }
             }
           }
@@ -531,6 +554,18 @@ export default {
           vm.makeImageCap()
         })
       }
+    },
+    getSearchParams (prams, key) {
+      let value = ""
+      let headers = prams.split("&")
+      headers.forEach(function (header) {
+        header = header.split("=");
+        let keyHeader = header[0];
+        if (keyHeader === key) {
+          value = header[1]
+        }
+      });
+      return value
     },
     makeImageCap () {
       var vm = this
