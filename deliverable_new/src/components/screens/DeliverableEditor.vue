@@ -27,8 +27,8 @@
       <v-flex xs12 class="px-4" v-if="String(id) === '0' || (String(id) !== '0' && editDeliverable)">
         <div class="mb-2" style="font-size: 14px">
           Tài liệu đính kèm <span v-if="requiredAttachFile" style="color:red">(*) </span>:
-          <i v-if="detail['fileEntryId'] && detail['fileEntryId'] !== '0'" style="color:blue"> (Đã có tài liệu đính kèm) </i>
-          <i v-if="requiredAttachFile && !fileNameAttach && (!detail['fileEntryId'] || detail['fileEntryId'] === '0')" style="color:red"> (Chưa có tài liệu đính kèm) </i>
+          <a v-if="detail['fileEntryId'] && detail['fileEntryId'] !== '0'" :href="urlFileAttach" download
+           style="color:blue; font-style: italic; text-decoration: underline;"> Tải xuống </a>
         </div>
         <div v-if="fileNameAttach" class="ml-1">
           <span class="ml-0">
@@ -212,7 +212,8 @@
         fileNameAttachDate: '',
         extensionsFileUpLoad: '',
         maxSizeFileUpLoad: '',
-        requiredAttachFile: false
+        requiredAttachFile: false,
+        urlFileAttach: ''
       }
     },
     created () {
@@ -258,6 +259,9 @@
                 // test multiple fileAttachs
                 // vm.detail['fileAttachs'] = '1300487,1289275'
                 // 
+                if (vm.detail['fileEntryId'] && vm.detail['fileEntryId'] !== '0') {
+                  vm.getFileAttach()
+                }
               }
               vm.deName = vm.detail['deliverableName']
               vm.showComponent = true
@@ -305,6 +309,9 @@
               // test multiple fileAttachs
               // vm.detail['fileAttachs'] = '1300487,1289275'
               // 
+              if (vm.detail['fileEntryId'] && vm.detail['fileEntryId'] !== '0') {
+                vm.getFileAttach()
+              }
             }
             vm.deName = vm.detail['deliverableName']
             vm.showComponent = true
@@ -428,7 +435,7 @@
           } catch (error) {
           }
           // 
-          if (vm.requiredAttachFile && (!vm.detail['fileEntryId'] || vm.detail['fileEntryId'] !== '0') && window.$('#documentFileAttach')[0].files.length === 0) {
+          if (vm.requiredAttachFile && (!vm.detail['fileEntryId'] || vm.detail['fileEntryId'] == '0') && window.$('#documentFileAttach')[0].files.length === 0) {
             toastr.error('Vui lòng đính kèm tài liệu!')
             vm.loading = false
             return
@@ -609,6 +616,14 @@
         let date = new Date()
         return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} | ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
       },
+      getFileAttach () {
+        let vm = this
+        vm.$store.dispatch('viewPDF', vm.detail['fileEntryId']).then(function (result) {
+          vm.urlFileAttach = result
+        }).catch(function () {
+          vm.urlFileAttach = ''
+        })
+      }
     }
   }
 </script>
