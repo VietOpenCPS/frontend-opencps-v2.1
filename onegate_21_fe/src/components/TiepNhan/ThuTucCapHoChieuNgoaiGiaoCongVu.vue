@@ -9,7 +9,8 @@
                         :rules="[rules.required,rules.varChar50]"
                         required
                         solo
-                        @input="dossiers.delegateName = dossiers.delegateName.toUpperCase()"
+                        @input="dossiers.delegateName = dossiers.delegateName.toUpperCase()"         
+                        @change="changeDossier()"
                     ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6  class="px-2 ">
@@ -57,6 +58,7 @@
                         v-model="dossiers.delegateTelNo"
                         :rules="[rules.telNo]"
                         solo
+                        @change="changeDossier()"
                     ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6  class="px-2 ">
@@ -65,6 +67,7 @@
                         v-model="dossiers.delegateEmail"
                         solo
                         :rules="[rules.varChar50]"
+                        @change="changeDossier()"
                     ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm3 class="px-2 ">
@@ -73,7 +76,7 @@
                         v-model="dossiers.delegateAddress"
                         solo
                         placeholder="Không quá 100 ký tự"
-                        @change="changeAdress()"
+                        @change="changeDossier()"
                     ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm3 class="px-2 ">
@@ -85,6 +88,7 @@
                         item-text="itemName"
                         item-value="itemCode"
                         clearable
+                        @change="changeDossier()"
                         solo
                     ></v-autocomplete>
                 </v-flex>
@@ -96,6 +100,7 @@
                         item-text="itemName"
                         item-value="itemCode"
                         hide-no-data
+                        @change="changeDossier()"
                         clearable
                         solo
                     ></v-autocomplete>
@@ -107,6 +112,7 @@
                         v-model="delegateWardCode"
                         item-text="itemName"
                         item-value="itemCode"
+                        @change="changeDossier()"
                         hide-no-data
                         clearable
                         solo
@@ -119,7 +125,7 @@
                         :rules="[rules.required]"
                         required
                         solo
-                        @change="genLePhi()"
+                       @change="changeDossier()"
                     ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6  class="px-2 ">
@@ -1709,8 +1715,8 @@ export default {
             setTimeout(()=>{
                 if(vm.formCode==='UPDATE'){
                     vm.getDetail()
-                } else {
-                    vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [], 'ma_to_khai': [], 'totalRecord': 0})
+                } else {                   
+                    vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [], 'ma_to_khai': [], 'totalRecord': 0, 'delegateIdNo': '','delegateName': '','delegateTelNo': ''})
                     vm.getThanhPhan()
                     vm.genDueDate()
                     if(vm.eFormCode){
@@ -1732,48 +1738,77 @@ export default {
         dossiers: {
             deep: true,
             handler:  (val, oldVal) => {
-                let metaData= {}
-                try{
-                    metaData = JSON.parse(val.metaData)
-                    metaData['delegateIdNo']= val.delegateIdNo
-                    metaData['delegateName']=val.delegateName
-                    metaData['delegateTelNo']=val.delegateTelNo
-                    
-                    val['contactTelNo'] = val.delegateTelNo
-                    val['contactEmail'] = val.delegateEmail
-                    val['contactName'] = val.delegateName
-                    
-                    val['applicantIdNo'] = val.delegateIdNo
-                    val['address'] = val.delegateAddress
-                    val['cityCode'] = val.delegateCityCode
-                    val['districtCode'] = val.delegateDistrictCode
-                    val['wardCode'] = val.delegateWardCode
-                    val['contactTelNo'] = val.delegateTelNo
-                    val['contactEmail'] = val.delegateEmail
+                // let vm = this
+                // let metaData = JSON.parse(val.metaData)
+                // console.log(metaData)
+                // metaData['delegateIdNo']= val.delegateIdNo
+                // metaData['delegateName']=val.delegateName
+                // metaData['delegateTelNo']=val.delegateTelNo
 
-                    val['metaData'] = JSON.stringify(metaData)
-                    $('#dossiers_hidden').val(JSON.stringify(val))
-                } catch{
-                    metaData = val.metaData
-                    metaData['delegateIdNo']= val.delegateIdNo
-                    metaData['delegateName']=val.delegateName
-                    metaData['delegateTelNo']=val.delegateTelNo
+                // if( vm.eFormCodeArr.length === 0 ) {
+                //     val['contactTelNo'] = val.delegateTelNo
+                //     val['contactEmail'] = val.delegateEmail
+                //     val['contactName'] = val.delegateName
                     
-                    val['applicantIdNo'] = val.delegateIdNo
-                    val['address'] = val.delegateAddress
-                    val['cityCode'] = val.delegateCityCode
-                    val['districtCode'] = val.delegateDistrictCode
-                    val['wardCode'] = val.delegateWardCode
-                    val['contactTelNo'] = val.delegateTelNo
-                    val['contactEmail'] = val.delegateEmail
+                //     val['applicantIdNo'] = val.delegateIdNo
+                //     val['applicantName'] = val.delegateName
+                //     val['address'] = val.delegateAddress
+                //     val['cityCode'] = val.delegateCityCode
+                //     val['districtCode'] = val.delegateDistrictCode
+                //     val['wardCode'] = val.delegateWardCode
+                //     val['contactTelNo'] = val.delegateTelNo
+                //     val['contactEmail'] = val.delegateEmail
+                // }
+                // val['metaData'] = JSON.stringify(metaData)
+                // $('#dossiers_hidden').val(JSON.stringify(val))
+                // try{
+                    
+                //     metaData = JSON.parse(val.metaData)
+                //     console.log(metaData)
+                //     metaData['delegateIdNo']= val.delegateIdNo
+                //     metaData['delegateName']=val.delegateName
+                //     metaData['delegateTelNo']=val.delegateTelNo
 
-
-                    val['contactTelNo'] = val.delegateTelNo
-                    val['contactEmail'] = val.delegateEmail
-                    val['contactName'] = val.delegateName
-                    val['metaData'] = JSON.stringify(metaData)
-                    $('#dossiers_hidden').val(JSON.stringify(val))
-                }
+                //     if( vm.eFormCodeArr.length === 0 ) {
+                //         val['contactTelNo'] = val.delegateTelNo
+                //         val['contactEmail'] = val.delegateEmail
+                //         val['contactName'] = val.delegateName
+                        
+                //         val['applicantIdNo'] = val.delegateIdNo
+                //         val['applicantName'] = val.delegateName
+                //         val['address'] = val.delegateAddress
+                //         val['cityCode'] = val.delegateCityCode
+                //         val['districtCode'] = val.delegateDistrictCode
+                //         val['wardCode'] = val.delegateWardCode
+                //         val['contactTelNo'] = val.delegateTelNo
+                //         val['contactEmail'] = val.delegateEmail
+                //     }
+                //     val['metaData'] = JSON.stringify(metaData)
+                //     $('#dossiers_hidden').val(JSON.stringify(val))
+                // } catch (err) {
+                //     metaData = val.metaData
+                //     console.log(metaData)
+                //     metaData['delegateIdNo']= val.delegateIdNo
+                //     metaData['delegateName']=val.delegateName
+                //     metaData['delegateTelNo']=val.delegateTelNo
+                    
+                //     if( vm.eFormCodeArr.length === 0 ) {
+                //         val['contactTelNo'] = val.delegateTelNo
+                //         val['contactEmail'] = val.delegateEmail
+                //         val['contactName'] = val.delegateName
+                        
+                //         val['applicantIdNo'] = val.delegateIdNo
+                //         val['applicantName'] = val.delegateName
+                //         val['address'] = val.delegateAddress
+                //         val['cityCode'] = val.delegateCityCode
+                //         val['districtCode'] = val.delegateDistrictCode
+                //         val['wardCode'] = val.delegateWardCode
+                //         val['contactTelNo'] = val.delegateTelNo
+                //         val['contactEmail'] = val.delegateEmail
+                //     }
+                //     val['metaData'] = JSON.stringify(metaData)
+                //     $('#dossiers_hidden').val(JSON.stringify(val))
+                // }
 
             }
         },
@@ -2157,7 +2192,13 @@ export default {
                             if(res.data.address ){
                                 vm.dossiers.address = res.data.address.length < 100 ? res.data.address : ''
                             } 
-                        }             
+                        }
+                        if(!vm.dossiers.bookingName){
+                            if(res.data.bookingName ){
+                                vm.dossiers.bookingName = res.data.bookingName
+                            } 
+                        }
+                        vm.changeDossier()            
                         vm.fillDataEform(res.data)
                     } else {
                         vm.eFormCode = ''
@@ -3023,12 +3064,14 @@ export default {
                 vm.dossiers['delegateIdNo'] = vm.selectedSearchItem['applicantIdNo']
                 vm.dossiers['delegateName'] = vm.selectedSearchItem['applicantName']
                 vm.dossiers['delegateTelNo'] = vm.selectedSearchItem['contactTelNo']
-                vm.dossiers['contactTelNo'] = vm.selectedSearchItem['contactTelNo']
+               // vm.dossiers['contactTelNo'] = vm.selectedSearchItem['contactTelNo']
                 vm.dossiers['delegateEmail'] = vm.selectedSearchItem['contactEmail']
-                vm.dossiers['contactEmail'] = vm.selectedSearchItem['contactEmail']
+               // vm.dossiers['contactEmail'] = vm.selectedSearchItem['contactEmail']
+                
                 vm.delegateCityCode = vm.selectedSearchItem['cityCode']
                 vm.delegateDistrictCode = vm.selectedSearchItem['districtCode']
                 vm.delegateWardCode = vm.selectedSearchItem['wardCode']
+                vm.changeDossier()
             // } else {
             //     vm.checkCMT = true
             //     vm.messengeCMT = 'Số CMND gồm 9 hoặc 12 ký tự 0-9'  
@@ -3060,7 +3103,9 @@ export default {
                     let items = []
                     if (response.data.hasOwnProperty('data')) {
                         items = response.data.data
+                        vm.changeDossier()
                     } else {
+                        vm.changeDossier()
                     }
                         resolve(items)
                     })
@@ -3236,6 +3281,47 @@ export default {
                 }).catch(err => {})
             }
             
+        },
+        changeDossier(){
+            let vm = this
+            console.log(vm.dossiers)
+            let metaData = JSON.parse(vm.dossiers.metaData)
+            console.log(metaData)
+            metaData['delegateIdNo']= vm.dossiers.delegateIdNo
+            console.log('1')
+            metaData['delegateName']=vm.dossiers.delegateName
+             console.log('2')
+            metaData['delegateTelNo']=vm.dossiers.delegateTelNo
+            console.log('3')
+            if( vm.eFormCodeArr.length === 0 ) {
+                 console.log('4')
+                vm.dossiers['contactTelNo'] = vm.dossiers['delegateTelNo']
+                 console.log('5')
+                vm.dossiers['contactEmail'] = vm.dossiers['delegateEmail']
+                 console.log('6')
+                vm.dossiers['contactName'] = vm.dossiers['delegateName']
+                 console.log('7')
+                vm.dossiers['applicantIdNo'] = vm.dossiers['delegateIdNo']
+                 console.log('8')
+                vm.dossiers['applicantName'] = vm.dossiers['delegateName']
+                 console.log('9')
+                vm.dossiers['address'] = vm.dossiers['delegateAddress']
+                 console.log('10')
+                vm.dossiers['cityCode'] = vm.dossiers['delegateCityCode']
+                 console.log('11')
+                vm.dossiers['districtCode'] = vm.dossiers['delegateDistrictCode']
+                 console.log('12')
+                vm.dossiers['wardCode'] = vm.dossiers['delegateWardCode']
+                 console.log('13')
+                vm.dossiers['contactTelNo'] = vm.dossiers['delegateTelNo']
+                 console.log('14')
+                vm.dossiers['contactEmail'] = vm.dossiers['delegateEmail']
+                 console.log('15')
+            }
+            vm.dossiers['metaData'] = JSON.stringify(metaData)
+            console.log('16')
+            $('#dossiers_hidden').val(JSON.stringify(vm.dossiers))
+            console.log('17')
         }
     }
 }
