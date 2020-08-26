@@ -1238,6 +1238,7 @@ export default {
   },
   updated () {
     var vm = this
+    console.log('run updated')
     vm.$nextTick(function () {
       let currentParams = vm.$router.history.current.params
       let currentQuery = vm.$router.history.current.query
@@ -1268,7 +1269,9 @@ export default {
             }
             // 
             vm.processListTTHC(currentQuery)
-            vm.processListDomain(currentQuery)
+            if (!vm.hiddenFilterDomain) {
+              vm.processListDomain(currentQuery)
+            }
             if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
               vm.processListCongVan(currentQuery)
             }
@@ -1329,6 +1332,7 @@ export default {
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
+      console.log('run watched')
       let vm = this
       vm.dossierNoKey = ''
       vm.linhVucSelected = ''
@@ -1414,26 +1418,29 @@ export default {
           vm.selectMultiplePage = []
         }
         vm.$store.commit('setLoadingDynamicBtn', false)
-        if (vm.listLinhVuc === null || vm.listLinhVuc === undefined || (vm.listLinhVuc !== null && vm.listLinhVuc !== undefined && vm.listLinhVuc.length === 0)) {
-          vm.processListDomain(currentQuery)
-        } else {
-          if (vm.listLinhVuc.length === 1 && !vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
-            vm.linhVucSelected = vm.listLinhVuc[0]
-            vm.domainCode = vm.linhVucSelected['domainCode']
+        if (!vm.hiddenFilterDomain) {
+          if (vm.listLinhVuc === null || vm.listLinhVuc === undefined || (vm.listLinhVuc !== null && vm.listLinhVuc !== undefined && vm.listLinhVuc.length === 0)) {
+            vm.processListDomain(currentQuery)
           } else {
-            vm.linhVucSelected = ''
-            vm.domainCode = ''
-          }
-          for (let key in vm.listLinhVuc) {
-            if (!vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
-              if (String(vm.listLinhVuc[key]['domainCode']) === String(currentQuery.domain)) {
-                vm.linhVucSelected = vm.listLinhVuc[key]
-                vm.domainCode = vm.linhVucSelected['domainCode']
+            if (vm.listLinhVuc.length === 1 && !vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
+              vm.linhVucSelected = vm.listLinhVuc[0]
+              vm.domainCode = vm.linhVucSelected['domainCode']
+            } else {
+              vm.linhVucSelected = ''
+              vm.domainCode = ''
+            }
+            for (let key in vm.listLinhVuc) {
+              if (!vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
+                if (String(vm.listLinhVuc[key]['domainCode']) === String(currentQuery.domain)) {
+                  vm.linhVucSelected = vm.listLinhVuc[key]
+                  vm.domainCode = vm.linhVucSelected['domainCode']
+                }
+                console.log('linhVucSelected watch', vm.linhVucSelected)
               }
-              console.log('linhVucSelected watch', vm.linhVucSelected)
             }
           }
         }
+        
         if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
           vm.processListCongVan(currentQuery)
         }
@@ -1666,6 +1673,7 @@ export default {
               break
             }
           }
+          console.log('thuTucHanhChinhSelected---999', vm.thuTucHanhChinhSelected, vm.dichVuSelected)
         } else {
           vm.thuTucHanhChinhSelected = null
           vm.dichVuSelected = null
@@ -1673,6 +1681,7 @@ export default {
           vm.serviceCode = ''
           vm.templateNo = ''
         }
+        console.log('thuTucHanhChinhSelected---7777', vm.thuTucHanhChinhSelected, vm.dichVuSelected)
         vm.doLoadingDataHoSo()
       }).catch(function (){
         vm.doLoadingDataHoSo()
@@ -1722,7 +1731,7 @@ export default {
     },
     processListCongVan (currentQuery) {
       let vm = this
-      console.log('currentQuery9999999', currentQuery)
+      console.log('currentQuery9999999 -- processListCongVan', currentQuery)
       let getAllUrlParams = function(arr) {
         let obj = {}
         for (var i = 0; i < arr.length; i++) {
@@ -1769,7 +1778,6 @@ export default {
           for (let key in vm.listCongVan) {
             if (String(vm.listCongVan[key]['dossierId']) === String(currentQuery.groupDossierId)) {
               vm.congvanSelected = vm.listCongVan[key]
-<<<<<<< HEAD
               // test ----
               let thutuccongvan = vm.congvanSelected ? vm.congvanSelected.serviceCode : ''
               if (thutuccongvan) {
@@ -1792,8 +1800,6 @@ export default {
                 }
               }
               // end test -------
-=======
->>>>>>> opencps/bgt
             }
           }
         } else {
@@ -2228,7 +2234,7 @@ export default {
       }
       queryString += 'groupDossierId=' + groupIdQuery
       if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
-        queryString += 'service_config=' + vm.thuTucHanhChinhSelected.serviceConfigId
+        queryString += '&service_config=' + vm.thuTucHanhChinhSelected.serviceConfigId
         queryString += '&template_no=' + vm.dichVuSelected.templateNo
         vm.govAgencyCode = vm.thuTucHanhChinhSelected.govAgencyCode
         vm.serviceCode = vm.thuTucHanhChinhSelected.serviceCode
