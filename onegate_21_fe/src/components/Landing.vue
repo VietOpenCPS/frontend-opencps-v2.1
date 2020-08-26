@@ -2167,12 +2167,25 @@ export default {
       })
       if (chonthutuc && chonthutuc.length > 0) {
         vm.thuTucHanhChinhSelected = chonthutuc[0]
+        if (vm.thuTucHanhChinhSelected !== null && vm.thuTucHanhChinhSelected !== 'null' && vm.thuTucHanhChinhSelected !== undefined && vm.thuTucHanhChinhSelected.hasOwnProperty('options')) {
+          vm.listDichVu = vm.thuTucHanhChinhSelected.options
+        } else {
+          vm.listDichVu = []
+        }
+        if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
+          vm.dichVuSelected = vm.listDichVu[0]
+          vm.templateNo = vm.dichVuSelected.templateNo
+        } else {
+          vm.dichVuSelected = null
+        }
       }
       let groupIdQuery = vm.congvanSelected ? vm.congvanSelected.dossierId : ''
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
       newQuery['groupDossierId'] = ''
+      newQuery['service_config'] = ''
+      newQuery['template_no'] = ''
       for (let key in newQuery) {
         if (key === 'page') {
           queryString += key + '=1&'
@@ -2185,7 +2198,16 @@ export default {
         queryString += 'step=' + stepQuery + '&'
       }
       queryString += 'groupDossierId=' + groupIdQuery
-      // console.log('change Domain queryString', queryString)
+      if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
+        queryString += 'service_config=' + vm.thuTucHanhChinhSelected.serviceConfigId
+        queryString += '&template_no=' + vm.dichVuSelected.templateNo
+        vm.govAgencyCode = vm.thuTucHanhChinhSelected.govAgencyCode
+        vm.serviceCode = vm.thuTucHanhChinhSelected.serviceCode
+      } else {
+        vm.templateNo = ''
+        vm.govAgencyCode = ''
+        vm.serviceCode = ''
+      }
       vm.$router.push({
         path: current.path + queryString,
         query: {

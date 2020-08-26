@@ -25,7 +25,11 @@
       <view-pdf ref="viewpdf" v-if="showComponent && String(id) !== '0' && !editDeliverable" :id="id" :datainput="detail"></view-pdf>
       <bbat-table-editor-component v-if="showComponent && editDeliverable" ref="bbatForm" :id="id" :formid="formId" :datainput="detail['formData']"></bbat-table-editor-component>
       <v-flex xs12 class="px-4" v-if="String(id) === '0' || (String(id) !== '0' && editDeliverable)">
-        <div class="mb-2" style="font-size: 14px">Tài liệu đính kèm <span style="color:red">(*) </span>:</div>
+        <div class="mb-2" style="font-size: 14px">
+          Tài liệu đính kèm <span v-if="requiredAttachFile" style="color:red">(*) </span>:
+          <i v-if="detail['fileEntryId'] && detail['fileEntryId'] !== '0'" style="color:blue"> (Đã có tài liệu đính kèm) </i>
+          <i v-if="requiredAttachFile && !fileNameAttach && (!detail['fileEntryId'] || detail['fileEntryId'] === '0')" style="color:red"> (Chưa có tài liệu đính kèm) </i>
+        </div>
         <div v-if="fileNameAttach" class="ml-1">
           <span class="ml-0">
             <v-icon class="mr-1" color="blue" size="16px">
@@ -37,9 +41,10 @@
         </div>
         
         <input type="file" id="documentFileAttach" @input="onUploadSingleFile($event)" style="display:none">
-        <v-btn small color="primary" class="mx-0 mt-3" dark @click.native="uploadFile">
+        <v-btn small color="primary" class="mx-0 mt-2" dark @click.native="uploadFile">
           <v-icon>fas fa fa-upload</v-icon> &nbsp; &nbsp;
-          Chọn tài liệu tải lên
+          <span v-if="String(id) !== '0' && editDeliverable && detail['fileEntryId'] && detail['fileEntryId'] !== '0'">Cập nhật tài liệu đính kèm</span>
+          <span v-else>Chọn tài liệu tải lên</span>
         </v-btn>
         
       </v-flex>
@@ -68,7 +73,8 @@
             :loading="loading"
             :disabled="loading"
           >Ghi lại và thêm mới</v-btn> -->
-          <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && editDeliverable" color="blue darken-3" class="mr-1" dark  v-on:click.native="saveToData(0)"
+          <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && editDeliverable" color="blue darken-3" class="mr-1" dark  
+            v-on:click.native="saveToData(0)"
             :loading="loading"
             :disabled="loading"
           >
@@ -205,7 +211,8 @@
         fileNameAttach: '',
         fileNameAttachDate: '',
         extensionsFileUpLoad: '',
-        maxSizeFileUpLoad: ''
+        maxSizeFileUpLoad: '',
+        requiredAttachFile: false
       }
     },
     created () {
@@ -230,6 +237,11 @@
               vm.extensionsFileUpLoad = tableConfig.extensions
             } else {
               vm.extensionsFileUpLoad = ''
+            }
+            if (tableConfig.hasOwnProperty('attachFile') && tableConfig.attachFile) {
+              vm.requiredAttachFile = tableConfig.attachFile
+            } else {
+              vm.requiredAttachFile = false
             }
             if (tableConfig.hasOwnProperty('maxSize') && tableConfig.maxSize) {
               vm.maxSizeFileUpLoad = tableConfig.maxSize
@@ -273,6 +285,11 @@
             vm.extensionsFileUpLoad = tableConfig.extensions
           } else {
             vm.extensionsFileUpLoad = ''
+          }
+          if (tableConfig.hasOwnProperty('attachFile') && tableConfig.attachFile) {
+            vm.requiredAttachFile = tableConfig.attachFile
+          } else {
+            vm.requiredAttachFile = false
           }
           if (tableConfig.hasOwnProperty('maxSize') && tableConfig.maxSize) {
             vm.maxSizeFileUpLoad = tableConfig.maxSize
@@ -409,6 +426,12 @@
               }
             }
           } catch (error) {
+          }
+          // 
+          if (vm.requiredAttachFile && (!vm.detail['fileEntryId'] || vm.detail['fileEntryId'] !== '0') && window.$('#documentFileAttach')[0].files.length === 0) {
+            toastr.error('Vui lòng đính kèm tài liệu!')
+            vm.loading = false
+            return
           }
           // 
           vm.loading = true

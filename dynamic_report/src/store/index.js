@@ -898,8 +898,10 @@ export const store = new Vuex.Store({
                 
               }
             }
+            console.log('roles store1', roles)
             resolve(roles)
           } else {
+            console.log('roles store2')
             resolve('')
           }
         }).catch(function (error) {
