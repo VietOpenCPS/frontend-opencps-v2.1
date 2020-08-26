@@ -2060,7 +2060,7 @@ export default {
         } else {
           vm.loadingAction = false
           toastr.clear()
-          toastr.error('Vui lòng điền đầy đủ thông tin bắt buộc')
+          toastr.error('Dữ liệu không hợp lệ')
         }
       // }
     },
