@@ -1769,26 +1769,6 @@ export default {
           for (let key in vm.listCongVan) {
             if (String(vm.listCongVan[key]['dossierId']) === String(currentQuery.groupDossierId)) {
               vm.congvanSelected = vm.listCongVan[key]
-              // let thutuccongvan = vm.congvanSelected ? vm.congvanSelected.serviceCode : ''
-              // if (thutuccongvan) {
-              //   let chonthutuc = vm.listThuTucHanhChinh.filter(function (item) {
-              //     return item.serviceCode == thutuccongvan
-              //   })
-              //   if (chonthutuc && chonthutuc.length > 0) {
-              //     vm.thuTucHanhChinhSelected = chonthutuc[0]
-              //     if (vm.thuTucHanhChinhSelected !== null && vm.thuTucHanhChinhSelected !== 'null' && vm.thuTucHanhChinhSelected !== undefined && vm.thuTucHanhChinhSelected.hasOwnProperty('options')) {
-              //       vm.listDichVu = vm.thuTucHanhChinhSelected.options
-              //     } else {
-              //       vm.listDichVu = []
-              //     }
-              //     if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
-              //       vm.dichVuSelected = vm.listDichVu[0]
-              //       vm.templateNo = vm.dichVuSelected.templateNo
-              //     } else {
-              //       vm.dichVuSelected = null
-              //     }
-              //   }
-              // }
             }
           }
         } else {
@@ -1927,7 +1907,7 @@ export default {
             keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
-            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
+            dossierNo: vm.dossierNoKey ? String(vm.dossierNoKey).trim() : '',
             follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : '',
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : '',
             viapostal: currentQuery.hasOwnProperty('viapostal') ? currentQuery.viapostal : '',
@@ -1969,7 +1949,7 @@ export default {
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : originalityDossierDeleted,
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
-            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
+            dossierNo: vm.dossierNoKey ? String(vm.dossierNoKey).trim() : '',
             follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : '',
             viapostal: currentQuery.hasOwnProperty('viapostal') ? currentQuery.viapostal : '',
 
@@ -2181,27 +2161,24 @@ export default {
       console.log('congvanSelected', item)
       vm.selectMultiplePage = []
       vm.congvanSelected = item
-      // let thutuccongvan = item ? item.serviceCode : ''
-      // if (thutuccongvan) {
-      //   let chonthutuc = vm.listThuTucHanhChinh.filter(function (item) {
-      //     return item.serviceCode == thutuccongvan
-      //   })
-      //   if (chonthutuc && chonthutuc.length > 0) {
-      //     vm.thuTucHanhChinhSelected = chonthutuc[0]
-      //     if (vm.thuTucHanhChinhSelected !== null && vm.thuTucHanhChinhSelected !== 'null' && vm.thuTucHanhChinhSelected !== undefined && vm.thuTucHanhChinhSelected.hasOwnProperty('options')) {
-      //       vm.listDichVu = vm.thuTucHanhChinhSelected.options
-      //     } else {
-      //       vm.listDichVu = []
-      //     }
-      //     if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
-      //       vm.dichVuSelected = vm.listDichVu[0]
-      //       vm.templateNo = vm.dichVuSelected.templateNo
-      //     } else {
-      //       vm.dichVuSelected = null
-      //     }
-      //   }
-      // }
-      
+      let thutuccongvan = item.serviceCode
+      let chonthutuc = vm.listThuTucHanhChinh.filter(function (item) {
+        return item.serviceCode == thutuccongvan
+      })
+      if (chonthutuc && chonthutuc.length > 0) {
+        vm.thuTucHanhChinhSelected = chonthutuc[0]
+        if (vm.thuTucHanhChinhSelected !== null && vm.thuTucHanhChinhSelected !== 'null' && vm.thuTucHanhChinhSelected !== undefined && vm.thuTucHanhChinhSelected.hasOwnProperty('options')) {
+          vm.listDichVu = vm.thuTucHanhChinhSelected.options
+        } else {
+          vm.listDichVu = []
+        }
+        if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
+          vm.dichVuSelected = vm.listDichVu[0]
+          vm.templateNo = vm.dichVuSelected.templateNo
+        } else {
+          vm.dichVuSelected = null
+        }
+      }
       let groupIdQuery = vm.congvanSelected ? vm.congvanSelected.dossierId : ''
       let current = vm.$router.history.current
       let newQuery = current.query
@@ -2221,13 +2198,11 @@ export default {
         queryString += 'step=' + stepQuery + '&'
       }
       queryString += 'groupDossierId=' + groupIdQuery
-      // let serviceConfigIdSelect = vm.thuTucHanhChinhSelected ? vm.thuTucHanhChinhSelected.serviceConfigId : ''
-      // let templateNoSelect = vm.dichVuSelected ? vm.dichVuSelected.templateNo : ''
       if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
-        queryString += 'service_config=' + serviceConfigIdSelect
-        queryString += '&template_no=' + templateNoSelect
-        vm.govAgencyCode = vm.thuTucHanhChinhSelected ? vm.thuTucHanhChinhSelected.govAgencyCode : ''
-        vm.serviceCode = vm.thuTucHanhChinhSelected ? vm.thuTucHanhChinhSelected.serviceCode : ''
+        queryString += 'service_config=' + vm.thuTucHanhChinhSelected.serviceConfigId
+        queryString += '&template_no=' + vm.dichVuSelected.templateNo
+        vm.govAgencyCode = vm.thuTucHanhChinhSelected.govAgencyCode
+        vm.serviceCode = vm.thuTucHanhChinhSelected.serviceCode
       } else {
         vm.templateNo = ''
         vm.govAgencyCode = ''
@@ -3260,7 +3235,7 @@ export default {
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
-      newQuery['keyword'] = vm.keyword
+      newQuery['keyword'] = String(vm.keyword).trim()
       newQuery['status'] = vm.status
       newQuery['top'] = vm.top
       for (let key in newQuery) {
