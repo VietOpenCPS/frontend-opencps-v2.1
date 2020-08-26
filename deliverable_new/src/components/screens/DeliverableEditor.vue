@@ -25,7 +25,7 @@
       <view-pdf ref="viewpdf" v-if="showComponent && String(id) !== '0' && !editDeliverable" :id="id" :datainput="detail"></view-pdf>
       <bbat-table-editor-component v-if="showComponent && editDeliverable" ref="bbatForm" :id="id" :formid="formId" :datainput="detail['formData']"></bbat-table-editor-component>
       <v-flex xs12 class="px-4" v-if="String(id) === '0' || (String(id) !== '0' && editDeliverable)">
-        <div class="mb-2" style="font-size: 14px">Tài liệu đính kèm:</div>
+        <div class="mb-2" style="font-size: 14px">Tài liệu đính kèm <span style="color:red">(*) </span>:</div>
         <div v-if="fileNameAttach" class="ml-1">
           <span class="ml-0">
             <v-icon class="mr-1" color="blue" size="16px">
