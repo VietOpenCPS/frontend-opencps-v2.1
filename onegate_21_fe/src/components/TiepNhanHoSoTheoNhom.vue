@@ -185,7 +185,8 @@
                         <v-btn flat icon color="indigo" class="mr-2 my-0" @click="viewDetail(props.item)" title="Xem chi tiết">
                           <v-icon>fas fa fa-file-text</v-icon>
                         </v-btn>
-                        <v-btn v-if="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(String(props.item['groupDossierIds']))) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
+                        <v-btn v-if="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(String(props.item['groupDossierIds']), 'editAction', props.item)) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui) && checkGroupDossierIdCvDen(String(props.item['groupDossierIds']), 'editAction', props.item)"
+                         flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
                           <v-icon size="22">create</v-icon>
                         </v-btn>
                         <v-btn v-if="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(String(props.item['groupDossierIds']))) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
@@ -2448,7 +2449,7 @@ export default {
       }
       return metaDataOut
     },
-    checkGroupDossierIdCvDen (childGroupDossierId) {
+    checkGroupDossierIdCvDen (childGroupDossierId, action, dossier) {
       let vm = this
       let owner = true
       if (childGroupDossierId) {
@@ -2458,6 +2459,9 @@ export default {
       }
       if (vm.formCode === 'NEW_GROUP_CV_DI') {
         owner = true
+      }
+      if (action === 'editAction' && vm.formCode === 'NEW_GROUP_CV_DI' && vm.thongTinNhomHoSo['govAgencyCode'] !== dossier['govAgencyCode']) {
+        owner = false
       }
       return owner
     },

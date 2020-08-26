@@ -272,12 +272,13 @@
           vm.$store.dispatch('getRoleUser').then(function (result) {
             roles = result
             if (roles) {
-              let roleList = roles.split(',')
+              let roleList = roles
               roleList = roleList.filter(function (item) {
-                return vm.reportTypeMappingRole.hasOwnProperty('item') && vm.reportTypeMappingRole[item]
+                return vm.reportTypeMappingRole.hasOwnProperty(item) && vm.reportTypeMappingRole[item]
               })
               if (roleList && roleList.length > 0) {
                 vm.reportTypeFilter = vm.reportTypeMappingRole[roleList[0]]
+                doGetReport()
               } else {
                 doGetReport()
               }

@@ -1337,10 +1337,10 @@
         if (vm.createFiles.length > 0) {
           for (var i = 0; i < vm.createFiles.length; i++) {
             let hasFileEform = vm.dossierFilesItems.filter(function (item) {
-              return item.dossierPartNo === vm.createFiles[i].partNo && item.eForm
+              return item.dossierPartNo === vm.createFiles[i].partNo && item.eForm && (item.fileSize !== 0 || (item.fileSize === 0 && item.modifiedDate != item.createDate))
             }).length
             let hasFileAttach = vm.dossierFilesItems.filter(function (item) {
-              return item.dossierPartNo === vm.createFiles[i].partNo
+              return item.dossierPartNo === vm.createFiles[i].partNo && !item.eForm
             }).length
             if (vm.createFiles[i]['required'] && vm.createFiles[i]['eForm'] && hasFileEform === 0) {
               let message = 'Thông tin ' + vm.createFiles[i].partName + ' chưa được lưu!'

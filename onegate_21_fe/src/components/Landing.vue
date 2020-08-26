@@ -67,7 +67,22 @@
             :autofocus="focusSelect === 1"
           ></v-autocomplete>
         </v-flex>
-        <v-flex :class="!hiddenFilterDomain ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'">
+        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+          <v-autocomplete
+            :items="listDonviCongVan"
+            v-model="donviguiSelected"
+            label="Chọn đơn vị gửi công văn"
+            item-text="itemName"
+            item-value="itemCode"
+            return-object
+            hide-no-data
+            :hide-selected="true"
+            @change="changeDonViGuiCongVan"
+            clearable
+            box
+          ></v-autocomplete>
+        </v-flex>
+        <v-flex :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'">
           <v-autocomplete
             :items="listThuTucHanhChinh"
             v-model="thuTucHanhChinhSelected"
@@ -83,7 +98,7 @@
             :autofocus="focusSelect === 2"
           ></v-autocomplete>
         </v-flex>
-        <v-flex :class="!hiddenFilterDomain ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'" v-if="trangThaiHoSoList">
+        <v-flex :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'" v-if="trangThaiHoSoList">
           <v-autocomplete
             v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
             :items="listDichVu"
@@ -121,7 +136,7 @@
           </v-menu>
         </v-flex>
 
-        <v-flex :class="!hiddenFilterDomain ? 'xs12 sm3 pl-2 pr-2' : 'xs12 sm4 pl-2 pr-2'">
+        <v-flex :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2' : 'xs12 sm4 pl-2 pr-2'">
           <div style="position:relative" v-if="trangThaiHoSoList">
             <v-text-field
               v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
@@ -998,6 +1013,8 @@ export default {
     docTypePrint: '',
     listCongVan: [],
     congvanSelected: null,
+    listDonviCongVan: [],
+    donviguiSelected: null,
     listLinhVuc: [],
     linhVucSelected: null,
     listDichVuGuide: [],
@@ -1255,6 +1272,9 @@ export default {
             if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
               vm.processListCongVan(currentQuery)
             }
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')) {
+              vm.getDonViCongVan(currentQuery)
+            }
             // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
             if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('headers')) {
               vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
@@ -1416,6 +1436,9 @@ export default {
         }
         if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
           vm.processListCongVan(currentQuery)
+        }
+        if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')) {
+          vm.getDonViCongVan(currentQuery)
         }
         // if (vm.listThuTucHanhChinh === null || vm.listThuTucHanhChinh === undefined || (vm.listThuTucHanhChinh !== null && vm.listThuTucHanhChinh !== undefined && vm.listThuTucHanhChinh.length === 0)) {
           console.log('watchRouter', currentQuery)
@@ -1752,6 +1775,28 @@ export default {
           vm.congvanSelected = null
         }
       }).catch(function (){})
+    },
+    getDonViCongVan (currentQuery) {
+      let vm = this
+      let filter = {
+        collectionCode: 'DON_VI_CONG_VAN',
+        level: '',
+        parent: ''
+      }
+      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
+        vm.listDonviCongVan = result.data
+        if (currentQuery.hasOwnProperty('donvigui') && String(currentQuery.donvigui) !== '') {
+          for (let key in vm.listDonviCongVan) {
+            if (String(vm.listDonviCongVan[key]['itemCode']) === String(currentQuery.donvigui)) {
+              vm.donviguiSelected = vm.listDonviCongVan[key]
+            }
+          }
+        } else {
+          vm.donviguiSelected = null
+        }
+      }).catch(function () {
+        vm.listDonviCongVan = []
+      })
     },
     checkPemissionSpecialAction (form, currentUser, thongtinchitiet) {
       var vm = this
@@ -2116,11 +2161,31 @@ export default {
       console.log('congvanSelected', item)
       vm.selectMultiplePage = []
       vm.congvanSelected = item
+      let thutuccongvan = item.serviceCode
+      let chonthutuc = vm.listThuTucHanhChinh.filter(function (item) {
+        return item.serviceCode == thutuccongvan
+      })
+      if (chonthutuc && chonthutuc.length > 0) {
+        vm.thuTucHanhChinhSelected = chonthutuc[0]
+        if (vm.thuTucHanhChinhSelected !== null && vm.thuTucHanhChinhSelected !== 'null' && vm.thuTucHanhChinhSelected !== undefined && vm.thuTucHanhChinhSelected.hasOwnProperty('options')) {
+          vm.listDichVu = vm.thuTucHanhChinhSelected.options
+        } else {
+          vm.listDichVu = []
+        }
+        if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
+          vm.dichVuSelected = vm.listDichVu[0]
+          vm.templateNo = vm.dichVuSelected.templateNo
+        } else {
+          vm.dichVuSelected = null
+        }
+      }
       let groupIdQuery = vm.congvanSelected ? vm.congvanSelected.dossierId : ''
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
       newQuery['groupDossierId'] = ''
+      newQuery['service_config'] = ''
+      newQuery['template_no'] = ''
       for (let key in newQuery) {
         if (key === 'page') {
           queryString += key + '=1&'
@@ -2133,6 +2198,44 @@ export default {
         queryString += 'step=' + stepQuery + '&'
       }
       queryString += 'groupDossierId=' + groupIdQuery
+      if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
+        queryString += 'service_config=' + vm.thuTucHanhChinhSelected.serviceConfigId
+        queryString += '&template_no=' + vm.dichVuSelected.templateNo
+        vm.govAgencyCode = vm.thuTucHanhChinhSelected.govAgencyCode
+        vm.serviceCode = vm.thuTucHanhChinhSelected.serviceCode
+      } else {
+        vm.templateNo = ''
+        vm.govAgencyCode = ''
+        vm.serviceCode = ''
+      }
+      vm.$router.push({
+        path: current.path + queryString,
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
+    },
+    changeDonViGuiCongVan (item) {
+      let vm = this
+      vm.selectMultiplePage = []
+      vm.donviguiSelected = item
+      let donvigui = vm.donviguiSelected ? vm.donviguiSelected.itemCode : ''
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      newQuery['donvigui'] = ''
+      for (let key in newQuery) {
+        if (key === 'page') {
+          queryString += key + '=1&'
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && key !== 'step') {
+          queryString += key + '=' + newQuery[key] + '&'
+        }
+      }
+      if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
+        let stepQuery = newQuery.hasOwnProperty('step') ? newQuery['step'] : ''
+        queryString += 'step=' + stepQuery + '&'
+      }
+      queryString += 'donvigui=' + donvigui
       // console.log('change Domain queryString', queryString)
       vm.$router.push({
         path: current.path + queryString,
@@ -3155,12 +3258,14 @@ export default {
           vm.top = ''
         } else {
           vm.top = item.key
+          vm.status = ''
         }
       } else {
         if (vm.status === item.key) {
           vm.status = ''
         } else {
           vm.status = item.key
+          vm.top = ''
         }
       }
       vm.doRedirectFilter()

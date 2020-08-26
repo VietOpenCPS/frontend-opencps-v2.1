@@ -1,156 +1,179 @@
 <template>
 <v-form ref="form" v-model="valid" lazy-validation>
   <div class="form-chitiet">
-    <div class="row-header" v-if="!hiddenAside">
-      <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
-      <div class="layout row wrap header_tools row-blue">
-        <div class="flex xs12 pl-3 text-ellipsis text-bold">
-          <v-layout wrap class="chart__report">
-            <v-flex class="px-2 text-right">
-              <!--
-              <v-btn flat class="mx-0 my-0" v-if="showConfig" v-on:click.native="doSaveConfig">
-                <v-icon>settings</v-icon> &nbsp;
-                Lưu thay đổi
-              </v-btn>
-              <vue-csv-downloader
-                :data="csvExport"
-                :fields="fields"
-                :downloadname="nameReport"
-              >
-              </vue-csv-downloader>
-              -->
-              
-              <!-- <v-btn flat v-if="!itemsReports[index]['filterConfig']['showTable']" class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds" :style="showGuilds ? 'color: #1565c0' : ''">
-                <v-icon>receipt</v-icon> &nbsp; Hướng dẫn PDF -> Excel
-              </v-btn> -->
-              <v-select v-if="buttonsShow"
-                v-for="(button, btnIndex) in buttons" v-bind:key="btnIndex"
-                :items="button['source']"
-                :label="button['label']"
-                v-model="buttonsVal"
-                item-text="name"
-                item-value="value"
-                single-line
-                style="float: right"
-                class="btn__chot"
-                @change="doChotSoLieu($event, button)"
-              ></v-select>
-              <!-- <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
-                <v-icon v-if="showConfig">reply</v-icon>
-                <v-icon v-else>settings</v-icon> &nbsp;
-                <span v-if="showConfig">Quay lại</span>
-                <span v-else>Tuỳ chọn</span>
-              </v-btn> -->
-            </v-flex>
-          </v-layout>
+    <div v-if="itemsReports && itemsReports.length > 0">
+      <div class="row-header" v-if="!hiddenAside">
+        <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
+        <div class="layout row wrap header_tools row-blue">
+          <div class="flex xs12 pl-3 text-ellipsis text-bold">
+            <v-layout wrap class="chart__report">
+              <v-flex class="px-2 text-right">
+                <!--
+                <v-btn flat class="mx-0 my-0" v-if="showConfig" v-on:click.native="doSaveConfig">
+                  <v-icon>settings</v-icon> &nbsp;
+                  Lưu thay đổi
+                </v-btn>
+                <vue-csv-downloader
+                  :data="csvExport"
+                  :fields="fields"
+                  :downloadname="nameReport"
+                >
+                </vue-csv-downloader>
+                -->
+                
+                <!-- <v-btn flat v-if="!itemsReports[index]['filterConfig']['showTable']" class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds" :style="showGuilds ? 'color: #1565c0' : ''">
+                  <v-icon>receipt</v-icon> &nbsp; Hướng dẫn PDF -> Excel
+                </v-btn> -->
+                <v-select v-if="buttonsShow"
+                  v-for="(button, btnIndex) in buttons" v-bind:key="btnIndex"
+                  :items="button['source']"
+                  :label="button['label']"
+                  v-model="buttonsVal"
+                  item-text="name"
+                  item-value="value"
+                  single-line
+                  style="float: right"
+                  class="btn__chot"
+                  @change="doChotSoLieu($event, button)"
+                ></v-select>
+                <!-- <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
+                  <v-icon v-if="showConfig">reply</v-icon>
+                  <v-icon v-else>settings</v-icon> &nbsp;
+                  <span v-if="showConfig">Quay lại</span>
+                  <span v-else>Tuỳ chọn</span>
+                </v-btn> -->
+              </v-flex>
+            </v-layout>
+          </div>
         </div>
       </div>
-    </div>
-    <v-flex v-if="hiddenAside" class="xs12" style="
-      background-color: #004b94 !important;
-      height: 36px;
-      padding: 9px 15px;
-      font-weight: 600;
-      color: white;">
-      <span>Đánh giá hài lòng của người sử dụng đối với dịch vụ công trực tuyến mức độ 3 và 4</span>
-      <div class="d-inline-block right" style="margin-top: -5px;">
-        <v-tooltip top>
-          <v-btn icon class="mx-0 my-0" slot="activator" @click="goToThongKe">
-            <v-icon size="20" color="white">assignment</v-icon>
-          </v-btn>
-          <span>Báo cáo tổng hợp</span>
-        </v-tooltip>
-      </div>
-    </v-flex>
-    <v-layout row wrap class="filter_menu mt-4">
-      <v-flex xs6 sm3 class="px-3 mb-3" v-if="agencyLists.length > 1">
-        <v-autocomplete
-          :items="agencyLists"
-          v-model="govAgency"
-          label="Chọn đơn vị"
-          item-text="text"
-          item-value="value"
-          @change="changeGovAgency()"
-          clearable
+      <v-flex v-if="hiddenAside" class="xs12" style="
+        background-color: #004b94 !important;
+        height: 36px;
+        padding: 9px 15px;
+        font-weight: 600;
+        color: white;">
+        <span>Đánh giá hài lòng của người sử dụng đối với dịch vụ công trực tuyến mức độ 3 và 4</span>
+        <div class="d-inline-block right" style="margin-top: -5px;">
+          <v-tooltip top>
+            <v-btn icon class="mx-0 my-0" slot="activator" @click="goToThongKe">
+              <v-icon size="20" color="white">assignment</v-icon>
+            </v-btn>
+            <span>Báo cáo tổng hợp</span>
+          </v-tooltip>
+        </div>
+      </v-flex>
+      <v-layout row wrap class="filter_menu mt-4">
+        <v-flex xs6 sm3 class="px-3 mb-3" v-if="agencyLists.length > 1">
+          <v-autocomplete
+            :items="agencyLists"
+            v-model="govAgency"
+            label="Chọn đơn vị"
+            item-text="text"
+            item-value="value"
+            @change="changeGovAgency()"
+            clearable
+            >
+          </v-autocomplete>
+        </v-flex>
+        
+        <!--  -->
+        <v-flex xs6 sm3 class="px-3 mb-3" v-for="(item, indexgroupIdList) in groupIdList" v-bind:key="item.key + indexgroupIdList + index">
+          <v-autocomplete
+            :items="item.value"
+            :label="item.label"
+            v-model="filterGroup[item.key]" 
+            item-text="text"
+            item-value="value"
+            @change="changeGroupIdList(item)"
+            clearable
+            >
+          </v-autocomplete>
+        </v-flex>
+        <!--  -->
+        <v-flex xs6 sm3 class="px-3 mb-3" v-if="groupBy.length > 1">
+          <v-autocomplete
+            :items="groupBy"
+            v-model="groupByVal"
+            label="Nhóm dữ liệu"
+            item-text="label"
+            item-value="key"
+            clearable
+            >
+          </v-autocomplete>
+        </v-flex>
+        <v-flex :class="item.hasOwnProperty('class') ? item.class : 'xs12 sm3 px-3 mb-3'" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
+          <datetime-picker
+            v-if="item['type'] === 'date' && showPicker"
+            v-model="data[item.key]" 
+            :item="item" 
+            :data-value="data[item.key]"
+            :data-all="data"
+            @change="reloadPickerChange(item.key)">
+          </datetime-picker>
+          <v-text-field 
+            v-if="item['type'] === 'text'"
+            v-model="data[item.key]" 
+            :label="item['label']">
+          </v-text-field>
+          <v-autocomplete
+            v-if="item['type'] === 'select' && item.hasOwnProperty('multiple') && item.multiple"
+            :items="item['source']"
+            v-model="data[item.key]"
+            :label="item['label']"
+            item-value="value"
+            item-text="name"
+            :clearable="item['clearable']"
+            :multiple="item.hasOwnProperty('multiple') && item.multiple"
           >
-        </v-autocomplete>
-      </v-flex>
-      
-      <!--  -->
-      <v-flex xs6 sm3 class="px-3 mb-3" v-for="(item, indexgroupIdList) in groupIdList" v-bind:key="item.key + indexgroupIdList + index">
-        <v-autocomplete
-          :items="item.value"
-          :label="item.label"
-          v-model="filterGroup[item.key]" 
-          item-text="text"
-          item-value="value"
-          @change="changeGroupIdList(item)"
-          clearable
+            <!-- <template slot="selection" slot-scope="props" >
+              <v-chip v-if="props.index === 0">
+                <span>{{ props.item.name }}</span>
+              </v-chip>
+              <span
+                v-if="props.index === 1"
+                class="grey--text caption"
+              >(+{{ data[item.key].length - 1 }})</span>
+            </template> -->
+          </v-autocomplete>
+          <v-autocomplete
+            v-if="item['type'] === 'select' && !item.hasOwnProperty('multiple') && !item.multiple"
+            :items="item['source']"
+            v-model="data[item.key]"
+            :label="item['label']"
+            item-value="value"
+            item-text="name"
+            :clearable="item['clearable']"
           >
-        </v-autocomplete>
-      </v-flex>
-      <!--  -->
-      <v-flex xs6 sm3 class="px-3 mb-3" v-if="groupBy.length > 1">
-        <v-autocomplete
-          :items="groupBy"
-          v-model="groupByVal"
-          label="Nhóm dữ liệu"
-          item-text="label"
-          item-value="key"
-          clearable
-          >
-        </v-autocomplete>
-      </v-flex>
-      <v-flex :class="item.hasOwnProperty('class') ? item.class : 'xs12 sm3 px-3 mb-3'" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
-        <datetime-picker
-          v-if="item['type'] === 'date' && showPicker"
-          v-model="data[item.key]" 
-          :item="item" 
-          :data-value="data[item.key]"
-          :data-all="data"
-          @change="reloadPickerChange(item.key)">
-        </datetime-picker>
-        <v-text-field 
-          v-if="item['type'] === 'text'"
-          v-model="data[item.key]" 
-          :label="item['label']">
-        </v-text-field>
-        <v-autocomplete
-          v-if="item['type'] === 'select' && item.hasOwnProperty('multiple') && item.multiple"
-          :items="item['source']"
-          v-model="data[item.key]"
-          :label="item['label']"
-          item-value="value"
-          item-text="name"
-          :clearable="item['clearable']"
-          :multiple="item.hasOwnProperty('multiple') && item.multiple"
-        >
-          <!-- <template slot="selection" slot-scope="props" >
-            <v-chip v-if="props.index === 0">
-              <span>{{ props.item.name }}</span>
-            </v-chip>
-            <span
-              v-if="props.index === 1"
-              class="grey--text caption"
-            >(+{{ data[item.key].length - 1 }})</span>
-          </template> -->
-        </v-autocomplete>
-        <v-autocomplete
-          v-if="item['type'] === 'select' && !item.hasOwnProperty('multiple') && !item.multiple"
-          :items="item['source']"
-          v-model="data[item.key]"
-          :label="item['label']"
-          item-value="value"
-          item-text="name"
-          :clearable="item['clearable']"
-        >
-        </v-autocomplete>
-      </v-flex>
-      <v-flex xs12 sm6 v-if="hiddenAside">
-        <div class="d-inline-block right">
-          <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> 
-            <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
-          </v-btn>
+          </v-autocomplete>
+        </v-flex>
+        <v-flex xs12 sm6 v-if="hiddenAside">
+          <div class="d-inline-block right">
+            <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> 
+              <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
+            </v-btn>
+            <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
+              <v-icon>print</v-icon> &nbsp; In báo cáo
+            </v-btn>
+            <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
+              <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
+            </v-btn>
+            <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
+              <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
+            </v-btn>
+            <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
+          </div>
+        </v-flex>
+      </v-layout>
+      <v-layout align-start justify-start row wrap class="filter_menu my-3 px-4" v-if="showConfig">
+        <v-flex class="mx-2" v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
+          <v-checkbox v-if="!reportType.startsWith('STATISTIC')" @change="changeConfig(index)" :label="item.text" v-model="item.selected"></v-checkbox>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap class="mx-2 my-2" v-if="!hiddenAside">
+        <v-flex xs12>
+          <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo</v-btn>
+          
           <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
             <v-icon>print</v-icon> &nbsp; In báo cáo
           </v-btn>
@@ -160,193 +183,173 @@
           <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
             <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
           </v-btn>
+          <v-btn v-if="itemsReports[index]['filterConfig']['showHTML']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="viewHTML()">
+            <v-icon>save_alt</v-icon> &nbsp; Xem HTML
+          </v-btn>
           <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
-        </div>
-      </v-flex>
-    </v-layout>
-    <v-layout align-start justify-start row wrap class="filter_menu my-3 px-4" v-if="showConfig">
-      <v-flex class="mx-2" v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
-        <v-checkbox v-if="!reportType.startsWith('STATISTIC')" @change="changeConfig(index)" :label="item.text" v-model="item.selected"></v-checkbox>
-      </v-flex>
-    </v-layout>
-    <v-layout row wrap class="mx-2 my-2" v-if="!hiddenAside">
-      <v-flex xs12>
-        <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo</v-btn>
-        
-        <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
-          <v-icon>print</v-icon> &nbsp; In báo cáo
-        </v-btn>
-        <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
-          <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
-        </v-btn>
-        <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
-          <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
-        </v-btn>
-        <v-btn v-if="itemsReports[index]['filterConfig']['showHTML']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="viewHTML()">
-          <v-icon>save_alt</v-icon> &nbsp; Xem HTML
-        </v-btn>
-        <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
-      </v-flex>
-    </v-layout>
-    <!-- table bao cao -->
-    <div>
-      <div v-if="!itemsReports[index]['filterConfig']['showTable'] && !showHTML">
-        <vue-friendly-iframe v-if="showGuilds" :src="'/documents/' + groupId + '/0/hdsd.pdf'"></vue-friendly-iframe>
-        <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' && !showGuilds" :src="pdfBlob"></vue-friendly-iframe>
-      </div>
-      <div v-if="itemsReports[index]['filterConfig']['showTable'] && isRender && !showErrorData && !isShowLoading">
-        <v-data-table
-          :headers="headers"
-          :items="dossierList"
-          :pagination.sync="pagination"
-          hide-actions
-          class="table-landing table-bordered"
-        >
-          <template slot="items" slot-scope="props">
-            <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;" @click="viewDetail(props.item)">
-              <td class="text-xs-center">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span><br>
-                </div>
-              </td>
-              <td class="text-xs-left" style="min-width: 135px;">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>{{props.item.dossierNo}}</span>
-                </div>
-              </td>
-              <td class="text-xs-left">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>{{props.item.dossierName}}</span>
-                </div>
-              </td>
-              <td class="text-xs-left" style="min-width: 135px">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>
-                    <span>{{props.item.applicantName}}</span>
-                  </span>
-                </div>
-              </td>
-              <td class="text-xs-center">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>
-                    <span>{{props.item.receiveDate}}</span>
-                  </span>
-                </div>
-              </td>
-              <td class="text-xs-center">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>
-                    <span>{{props.item.dueDate}}</span>
-                  </span>
-                </div>
-              </td>
-              <td class="text-xs-left">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>
-                    <span>{{props.item.dossierStatusText}}</span>
-                  </span>
-                </div>
-              </td>
-              <td class="text-xs-left">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>
-                    <span>{{props.item.dossierOverdue}}</span>
-                  </span>
-                </div>
-              </td>
-            </tr>
-          </template>
-        </v-data-table>
-        <div class="text-xs-right layout wrap mt-2" style="position: relative;">
-          <div class="flex pagging-table px-2"> 
-            <tiny-pagination :total="pagination.totalItems" :page="pagination.page" custom-class="custom-tiny-class" 
-              @tiny:change-page="paggingData" ></tiny-pagination> 
-          </div>
-        </div>
-      </div>
-      <!-- view HTML -->
-      <div v-if="showHTML">
-              <table v-if="tableType === 'table-1'" class="my-2 table-report" hide-default-footer>
-                <thead>
-                  <tr>
-                    <th v-for="(header, index) in headerRenderHtmlTable" :key="index">
-                      <span>{{header.text}}</span>
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <tr class="note__column">
-                    <td align="center" class="px-2" v-for="(header, index) in headerRenderHtmlTable" :key="index">({{index + 1}})</td>
-                  </tr>
-                  <tr v-for="(item,index) in dataBodyHTML" :key="index">
-                    <td v-if="item.colSpan > 1" :colspan="item.colSpan" class="font-weight-bold">
-                      <span>{{item.text}}({{item.totalChild}})</span>
-                    </td>
-                    <td v-else v-for="(val, name) in headerRenderHtmlTable" :key="name" :align="val.align">
-                      <span>{{item.dossier[val.value]}}</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <table v-if="tableType === 'table-2'" class="my-2 table-report" hide-default-footer>
-                <thead>
-                  <tr v-for="(header, index) in headerRenderHtmlTable" :key="index" v-if="header !== '[$report$]'">
-                    <td v-for="(item, index2)  in header" :key="index2" v-if="item" :rowspan="item.rowSpan ? item.rowSpan  : 1" :colspan="item.colSpan ? item.colSpan : 1" :align="item.alignment" :class="{'font-weight-bold': item.bold}">
-                      <span>{{item.text}}</span>
-                    </td>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(item, index) in dataRowRenderHtmlTable" :key="index">
-                    <td v-for="(item2, index2) in item" :key="index2" :align="item2.alignment" :style="{width: widthRenderHtmlTable[index2] + 'px'}"> 
-                      <span>{{item2.text}}</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-      </div>
-      <!--  -->
-      <div class="mx-3 my-4" v-if="showErrorData">
-        <v-alert :value="true" outline color="info" icon="info">
-          Không có dữ liệu báo cáo.
-        </v-alert>
-      </div>
-      <v-layout row wrap v-if="isShowLoading">
-        <v-flex xs12 class="text-xs-center" mt-5>
-          <v-progress-circular
-            :size="100"
-            :width="1"
-            color="primary"
-            indeterminate
-          ></v-progress-circular>
         </v-flex>
       </v-layout>
+      <!-- table bao cao -->
+      <div>
+        <div v-if="!itemsReports[index]['filterConfig']['showTable'] && !showHTML">
+          <vue-friendly-iframe v-if="showGuilds" :src="'/documents/' + groupId + '/0/hdsd.pdf'"></vue-friendly-iframe>
+          <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' && !showGuilds" :src="pdfBlob"></vue-friendly-iframe>
+        </div>
+        <div v-if="itemsReports[index]['filterConfig']['showTable'] && isRender && !showErrorData && !isShowLoading">
+          <v-data-table
+            :headers="headers"
+            :items="dossierList"
+            :pagination.sync="pagination"
+            hide-actions
+            class="table-landing table-bordered"
+          >
+            <template slot="items" slot-scope="props">
+              <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;" @click="viewDetail(props.item)">
+                <td class="text-xs-center">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span><br>
+                  </div>
+                </td>
+                <td class="text-xs-left" style="min-width: 135px;">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{props.item.dossierNo}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{props.item.dossierName}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left" style="min-width: 135px">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>
+                      <span>{{props.item.applicantName}}</span>
+                    </span>
+                  </div>
+                </td>
+                <td class="text-xs-center">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>
+                      <span>{{props.item.receiveDate}}</span>
+                    </span>
+                  </div>
+                </td>
+                <td class="text-xs-center">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>
+                      <span>{{props.item.dueDate}}</span>
+                    </span>
+                  </div>
+                </td>
+                <td class="text-xs-left">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>
+                      <span>{{props.item.dossierStatusText}}</span>
+                    </span>
+                  </div>
+                </td>
+                <td class="text-xs-left">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>
+                      <span>{{props.item.dossierOverdue}}</span>
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
+          <div class="text-xs-right layout wrap mt-2" style="position: relative;">
+            <div class="flex pagging-table px-2"> 
+              <tiny-pagination :total="pagination.totalItems" :page="pagination.page" custom-class="custom-tiny-class" 
+                @tiny:change-page="paggingData" ></tiny-pagination> 
+            </div>
+          </div>
+        </div>
+        <!-- view HTML -->
+        <div v-if="showHTML">
+                <table v-if="tableType === 'table-1'" class="my-2 table-report" hide-default-footer>
+                  <thead>
+                    <tr>
+                      <th v-for="(header, index) in headerRenderHtmlTable" :key="index">
+                        <span>{{header.text}}</span>
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr class="note__column">
+                      <td align="center" class="px-2" v-for="(header, index) in headerRenderHtmlTable" :key="index">({{index + 1}})</td>
+                    </tr>
+                    <tr v-for="(item,index) in dataBodyHTML" :key="index">
+                      <td v-if="item.colSpan > 1" :colspan="item.colSpan" class="font-weight-bold">
+                        <span>{{item.text}}({{item.totalChild}})</span>
+                      </td>
+                      <td v-else v-for="(val, name) in headerRenderHtmlTable" :key="name" :align="val.align">
+                        <span>{{item.dossier[val.value]}}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table v-if="tableType === 'table-2'" class="my-2 table-report" hide-default-footer>
+                  <thead>
+                    <tr v-for="(header, index) in headerRenderHtmlTable" :key="index" v-if="header !== '[$report$]'">
+                      <td v-for="(item, index2)  in header" :key="index2" v-if="item" :rowspan="item.rowSpan ? item.rowSpan  : 1" :colspan="item.colSpan ? item.colSpan : 1" :align="item.alignment" :class="{'font-weight-bold': item.bold}">
+                        <span>{{item.text}}</span>
+                      </td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item, index) in dataRowRenderHtmlTable" :key="index">
+                      <td v-for="(item2, index2) in item" :key="index2" :align="item2.alignment" :style="{width: widthRenderHtmlTable[index2] + 'px'}"> 
+                        <span>{{item2.text}}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+        </div>
+        <!--  -->
+        <div class="mx-3 my-4" v-if="showErrorData">
+          <v-alert :value="true" outline color="info" icon="info">
+            Không có dữ liệu báo cáo.
+          </v-alert>
+        </div>
+        <v-layout row wrap v-if="isShowLoading">
+          <v-flex xs12 class="text-xs-center" mt-5>
+            <v-progress-circular
+              :size="100"
+              :width="1"
+              color="primary"
+              indeterminate
+            ></v-progress-circular>
+          </v-flex>
+        </v-layout>
+      </div>
     </div>
+    
     <!-- thong tin ho so -->
     <v-dialog v-model="dialogDossierDetail" max-width="1200" transition="fade-transition">
       <v-card>
