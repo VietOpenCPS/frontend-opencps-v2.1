@@ -144,7 +144,7 @@
                   style="pointer-events: none;min-width: 110px;">Mức độ {{props.item.maxLevel}}</v-btn>
                 </div>
               </td>
-              <td class="text-xs-center">
+              <td class="text-xs-center" v-if="!userLoginInfomation || !userLoginInfomation.hasOwnProperty('className') || (userLoginInfomation && userLoginInfomation.hasOwnProperty('className') &&  userLoginInfomation.className !== 'org.opencps.usermgt.model.Employee')">
                 <content-placeholders v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -709,7 +709,8 @@ export default {
       {
         text: 'Thao tác',
         align: 'center',
-        sortable: false
+        sortable: false,
+        type: 'action'
       }
     ],
     isLogin: false,
@@ -904,6 +905,14 @@ export default {
       vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.doLoadingThuTuc()
+    },
+    userLoginInfomation (val) {
+      let vm = this
+      if (val.className === 'org.opencps.usermgt.model.Employee') {
+        vm.headers = vm.headers.filter(function (item) {
+          return !item.hasOwnProperty('type')
+        })
+      }
     }
   },
   methods: {
@@ -931,6 +940,11 @@ export default {
         }
         vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
           vm.domainListCurrent = result
+        })
+      }
+      if (vm.userLoginInfomation && vm.userLoginInfomation.className === 'org.opencps.usermgt.model.Employee') {
+        vm.headers = vm.headers.filter(function (item) {
+          return !item.hasOwnProperty('type')
         })
       }
       vm.doLoadingThuTuc()

@@ -85,55 +85,57 @@
                       </div>
                     </div>
                   </v-card-text>
-                  <v-menu bottom right offset-y class="ml-2 my-2" style="display: inline-block;position:relative !important;"
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
-                  >
-                    <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">
+                  <div v-if="!userLoginInfomation || !userLoginInfomation.hasOwnProperty('className') || (userLoginInfomation && userLoginInfomation.hasOwnProperty('className') &&  userLoginInfomation.className !== 'org.opencps.usermgt.model.Employee')">
+                    <v-menu bottom right offset-y class="ml-2 my-2" style="display: inline-block;position:relative !important;"
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
+                    >
+                      <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">
+                        <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
+                        <span v-if="formToKhai">Tạo tờ khai</span> &nbsp; <v-icon size="18">arrow_drop_down</v-icon>
+                      </v-btn>
+                      <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                      <v-list v-if="serviceDetail.serviceConfigs">
+                        <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
+                          <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
+                          <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                        </v-list-tile>
+                      </v-list>
+                    </v-menu>
+                    <v-btn class="mx-2 my-2" small color="primary" 
+                      v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                      @click="showSelectGov(serviceDetail.serviceConfigs)"
+                    >
                       <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
-                      <span v-if="formToKhai">Tạo tờ khai</span> &nbsp; <v-icon size="18">arrow_drop_down</v-icon>
+                      <span v-else>Tạo tờ khai</span>
                     </v-btn>
-                    <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                    <v-list v-if="serviceDetail.serviceConfigs">
-                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
-                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
-                        <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
-                      </v-list-tile>
-                    </v-list>
-                  </v-menu>
-                  <v-btn class="mx-2 my-2" small color="primary" 
-                    v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
-                    @click="showSelectGov(serviceDetail.serviceConfigs)"
-                  >
-                    <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
-                    <span v-else>Tạo tờ khai</span>
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
-                    v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
-                    @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
-                  >
-                    Hướng dẫn
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-3 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
-                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
-                  >
-                    <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
-                    <span v-else>Tạo tờ khai</span>
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
-                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
-                    @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
-                  >
-                    Hướng dẫn
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
-                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
-                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
-                  >
-                    Tạo tờ khai
-                  </v-btn>
+                    <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
+                      v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                      @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
+                    >
+                      Hướng dẫn
+                    </v-btn>
+                    <v-btn small color="primary" class="mx-3 my-2" 
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
+                      @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                    >
+                      <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
+                      <span v-else>Tạo tờ khai</span>
+                    </v-btn>
+                    <v-btn small color="primary" class="mx-2 my-2" 
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                        && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
+                      @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                    >
+                      Hướng dẫn
+                    </v-btn>
+                    <v-btn small color="primary" class="mx-2 my-2" 
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                        && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
+                      @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                    >
+                      Tạo tờ khai
+                    </v-btn>
+                  </div>
                 </v-card>
               </v-tab-item>
               <v-tab-item key="2" transition="fade-transition" reverse-transition="fade-transition">
@@ -141,56 +143,59 @@
                   <v-card-text>
                     <div v-html="serviceDetail.processText"></div>
                   </v-card-text>
-                  <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
-                  >
-                    <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">
+                  <div v-if="!userLoginInfomation || !userLoginInfomation.hasOwnProperty('className') || (userLoginInfomation && userLoginInfomation.hasOwnProperty('className') &&  userLoginInfomation.className !== 'org.opencps.usermgt.model.Employee')">
+                    <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
+                    >
+                      <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">
+                        <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
+                        <span v-if="formToKhai">Tạo tờ khai</span>
+                        &nbsp; <v-icon size="18">arrow_drop_down</v-icon>
+                      </v-btn>
+                      <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                      <v-list v-if="serviceDetail.serviceConfigs">
+                        <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
+                          <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
+                          <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                        </v-list-tile>
+                      </v-list>
+                    </v-menu>
+                    <v-btn class="mx-2 my-2" small color="primary" 
+                      v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                      @click="showSelectGov(serviceDetail.serviceConfigs)"
+                    >
                       <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
-                      <span v-if="formToKhai">Tạo tờ khai</span>
-                      &nbsp; <v-icon size="18">arrow_drop_down</v-icon>
+                      <span v-else>Tạo tờ khai</span>
                     </v-btn>
-                    <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                    <v-list v-if="serviceDetail.serviceConfigs">
-                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
-                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
-                        <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
-                      </v-list-tile>
-                    </v-list>
-                  </v-menu>
-                  <v-btn class="mx-2 my-2" small color="primary" 
-                    v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
-                    @click="showSelectGov(serviceDetail.serviceConfigs)"
-                  >
-                    <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
-                    <span v-else>Tạo tờ khai</span>
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
-                    v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
-                    @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
-                  >
-                    Hướng dẫn
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-3 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
-                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
-                  >
-                    <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
-                    <span v-else>Tạo tờ khai</span>
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
-                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
-                    @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
-                  >
-                    Hướng dẫn
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
-                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
-                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
-                  >
-                    Tạo tờ khai
-                  </v-btn>
+                    <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
+                      v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                      @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
+                    >
+                      Hướng dẫn
+                    </v-btn>
+                    <v-btn small color="primary" class="mx-3 my-2" 
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
+                      @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                    >
+                      <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
+                      <span v-else>Tạo tờ khai</span>
+                    </v-btn>
+                    <v-btn small color="primary" class="mx-2 my-2" 
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                        && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
+                      @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                    >
+                      Hướng dẫn
+                    </v-btn>
+                    <v-btn small color="primary" class="mx-2 my-2" 
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                        && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
+                      @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                    >
+                      Tạo tờ khai
+                    </v-btn>
+                  </div>
+                  
                 </v-card>
               </v-tab-item>
               <v-tab-item key="3" transition="fade-transition" reverse-transition="fade-transition">
@@ -208,55 +213,58 @@
                       </div>
                     </div>
                   </v-card-text>
-                  <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
-                  >
-                    <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">
+                  <div v-if="!userLoginInfomation || !userLoginInfomation.hasOwnProperty('className') || (userLoginInfomation && userLoginInfomation.hasOwnProperty('className') &&  userLoginInfomation.className !== 'org.opencps.usermgt.model.Employee')">
+                    <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
+                    >
+                      <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">
+                        <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
+                        <span v-if="formToKhai">Tạo tờ khai</span> &nbsp; <v-icon size="18">arrow_drop_down</v-icon>
+                      </v-btn>
+                      <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                      <v-list v-if="serviceDetail.serviceConfigs">
+                        <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
+                          <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
+                          <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                        </v-list-tile>
+                      </v-list>
+                    </v-menu>
+                    <v-btn class="mx-2 my-2" small color="primary" 
+                      v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                      @click="showSelectGov(serviceDetail.serviceConfigs)"
+                    >
                       <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
-                      <span v-if="formToKhai">Tạo tờ khai</span> &nbsp; <v-icon size="18">arrow_drop_down</v-icon>
+                      <span v-if="formToKhai">Tạo tờ khai</span>
                     </v-btn>
-                    <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                    <v-list v-if="serviceDetail.serviceConfigs">
-                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
-                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
-                        <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
-                      </v-list-tile>
-                    </v-list>
-                  </v-menu>
-                  <v-btn class="mx-2 my-2" small color="primary" 
-                    v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
-                    @click="showSelectGov(serviceDetail.serviceConfigs)"
-                  >
-                    <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
-                    <span v-if="formToKhai">Tạo tờ khai</span>
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
-                    v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
-                    @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
-                  >
-                    Hướng dẫn
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-3 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
-                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
-                  >
-                    <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
-                    <span v-if="formToKhai">Tạo tờ khai</span>
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
-                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
-                    @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
-                  >
-                    Hướng dẫn
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
-                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
-                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
-                  >
-                    Tạo tờ khai
-                  </v-btn>
+                    <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
+                      v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                      @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
+                    >
+                      Hướng dẫn
+                    </v-btn>
+                    <v-btn small color="primary" class="mx-3 my-2" 
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
+                      @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                    >
+                      <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
+                      <span v-if="formToKhai">Tạo tờ khai</span>
+                    </v-btn>
+                    <v-btn small color="primary" class="mx-2 my-2" 
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                        && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
+                      @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                    >
+                      Hướng dẫn
+                    </v-btn>
+                    <v-btn small color="primary" class="mx-2 my-2" 
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                        && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
+                      @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                    >
+                      Tạo tờ khai
+                    </v-btn>
+                  </div>
+                  
                 </v-card>
               </v-tab-item>
               <v-tab-item key="4" transition="fade-transition" reverse-transition="fade-transition">
@@ -264,55 +272,58 @@
                   <v-card-text>
                     <div v-html="serviceDetail.conditionText"></div>
                   </v-card-text>
-                  <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
-                  >
-                    <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">
+                  <div v-if="!userLoginInfomation || !userLoginInfomation.hasOwnProperty('className') || (userLoginInfomation && userLoginInfomation.hasOwnProperty('className') &&  userLoginInfomation.className !== 'org.opencps.usermgt.model.Employee')">
+                    <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
+                    >
+                      <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">
+                        <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
+                        <span v-if="formToKhai">Tạo tờ khai</span> &nbsp; <v-icon size="18">arrow_drop_down</v-icon>
+                      </v-btn>
+                      <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                      <v-list v-if="serviceDetail.serviceConfigs">
+                        <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
+                          <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
+                          <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                        </v-list-tile>
+                      </v-list>
+                    </v-menu>
+                    <v-btn class="mx-2 my-2" small color="primary" 
+                      v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                      @click="showSelectGov(serviceDetail.serviceConfigs)"
+                    >
                       <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
-                      <span v-if="formToKhai">Tạo tờ khai</span> &nbsp; <v-icon size="18">arrow_drop_down</v-icon>
+                      <span v-if="formToKhai">Tạo tờ khai</span>
                     </v-btn>
-                    <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                    <v-list v-if="serviceDetail.serviceConfigs">
-                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
-                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
-                        <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
-                      </v-list-tile>
-                    </v-list>
-                  </v-menu>
-                  <v-btn class="mx-2 my-2" small color="primary" 
-                    v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
-                    @click="showSelectGov(serviceDetail.serviceConfigs)"
-                  >
-                    <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
-                    <span v-if="formToKhai">Tạo tờ khai</span>
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
-                    v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
-                    @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
-                  >
-                    Hướng dẫn
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-3 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
-                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
-                  >
-                    <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
-                    <span v-if="formToKhai">Tạo tờ khai</span>
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
-                    && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
-                    @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
-                  >
-                    Hướng dẫn
-                  </v-btn>
-                  <v-btn small color="primary" class="mx-2 my-2" 
-                    v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
-                    && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
-                    @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
-                  >
-                    Tạo tờ khai
-                  </v-btn>
+                    <v-btn small color="primary" class="mx-2 my-2" style="min-width: 110px;"
+                      v-if="serviceDetail.maxLevel < 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
+                      @click="showSelectGov(serviceDetail.serviceConfigs, 'guide')"
+                    >
+                      Hướng dẫn
+                    </v-btn>
+                    <v-btn small color="primary" class="mx-3 my-2" 
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
+                      @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                    >
+                      <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
+                      <span v-if="formToKhai">Tạo tờ khai</span>
+                    </v-btn>
+                    <v-btn small color="primary" class="mx-2 my-2" 
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
+                      @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                    >
+                      Hướng dẫn
+                    </v-btn>
+                    <v-btn small color="primary" class="mx-2 my-2" 
+                      v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 
+                      && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2 && formToKhai"
+                      @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                    >
+                      Tạo tờ khai
+                    </v-btn>
+                  </div>
+                  
                 </v-card>
               </v-tab-item>
             </v-tabs>
