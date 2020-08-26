@@ -1769,6 +1769,7 @@ export default {
           for (let key in vm.listCongVan) {
             if (String(vm.listCongVan[key]['dossierId']) === String(currentQuery.groupDossierId)) {
               vm.congvanSelected = vm.listCongVan[key]
+<<<<<<< HEAD
               // test ----
               let thutuccongvan = vm.congvanSelected ? vm.congvanSelected.serviceCode : ''
               if (thutuccongvan) {
@@ -1791,6 +1792,8 @@ export default {
                 }
               }
               // end test -------
+=======
+>>>>>>> opencps/bgt
             }
           }
         } else {
@@ -1929,7 +1932,7 @@ export default {
             keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
-            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
+            dossierNo: vm.dossierNoKey ? String(vm.dossierNoKey).trim() : '',
             follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : '',
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : '',
             viapostal: currentQuery.hasOwnProperty('viapostal') ? currentQuery.viapostal : '',
@@ -1971,7 +1974,7 @@ export default {
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : originalityDossierDeleted,
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
-            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
+            dossierNo: vm.dossierNoKey ? String(vm.dossierNoKey).trim() : '',
             follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : '',
             viapostal: currentQuery.hasOwnProperty('viapostal') ? currentQuery.viapostal : '',
 
@@ -2224,13 +2227,11 @@ export default {
         queryString += 'step=' + stepQuery + '&'
       }
       queryString += 'groupDossierId=' + groupIdQuery
-      // let serviceConfigIdSelect = vm.thuTucHanhChinhSelected ? vm.thuTucHanhChinhSelected.serviceConfigId : ''
-      // let templateNoSelect = vm.dichVuSelected ? vm.dichVuSelected.templateNo : ''
       if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
-        queryString += 'service_config=' + serviceConfigIdSelect
-        queryString += '&template_no=' + templateNoSelect
-        vm.govAgencyCode = vm.thuTucHanhChinhSelected ? vm.thuTucHanhChinhSelected.govAgencyCode : ''
-        vm.serviceCode = vm.thuTucHanhChinhSelected ? vm.thuTucHanhChinhSelected.serviceCode : ''
+        queryString += 'service_config=' + vm.thuTucHanhChinhSelected.serviceConfigId
+        queryString += '&template_no=' + vm.dichVuSelected.templateNo
+        vm.govAgencyCode = vm.thuTucHanhChinhSelected.govAgencyCode
+        vm.serviceCode = vm.thuTucHanhChinhSelected.serviceCode
       } else {
         vm.templateNo = ''
         vm.govAgencyCode = ''
@@ -3263,7 +3264,7 @@ export default {
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
-      newQuery['keyword'] = vm.keyword
+      newQuery['keyword'] = String(vm.keyword).trim()
       newQuery['status'] = vm.status
       newQuery['top'] = vm.top
       for (let key in newQuery) {

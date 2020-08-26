@@ -53,6 +53,9 @@
         <v-btn dark icon v-on:click.native="toEditor(0)">
           <v-icon>add_circle</v-icon>
         </v-btn>
+        <v-btn dark icon v-on:click.native="backToList">
+          <v-icon>reply</v-icon>
+        </v-btn>
       </v-toolbar>
       <v-layout v-if="pageTotalCounter > 0" row wrap style="
         position: fixed;
@@ -981,7 +984,26 @@
         // link.setAttribute('download', 'file.png') //or any other extension
         document.body.appendChild(link)
         link.click()
-      }
+      },
+      backToList () {
+        let vm = this
+        // let current = vm.$router.history.current
+        // let newQuery = current.query
+        // let currentPath = current.path
+        // let queryString = '?'
+        // newQuery['state_change'] = '0'
+        // newQuery['renew'] = ''
+        // for (let key in newQuery) {
+        //   if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+        //     queryString += key + '=' + newQuery[key] + '&'
+        //   }
+        // }
+        // queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        // vm.$router.push({
+        //   path: currentPath.substring(0, currentPath.indexOf('/editor/')) + queryString
+        // })
+        vm.$router.go(-1)
+      },
     }
   }
 </script>
