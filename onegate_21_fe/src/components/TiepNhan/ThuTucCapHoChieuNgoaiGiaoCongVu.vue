@@ -57,7 +57,6 @@
                         v-model="dossiers.delegateTelNo"
                         :rules="[rules.telNo]"
                         solo
-                        @change="dossiers.contactTelNo = dossiers.delegateTelNo"
                     ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6  class="px-2 ">
@@ -66,7 +65,6 @@
                         v-model="dossiers.delegateEmail"
                         solo
                         :rules="[rules.varChar50]"
-                        @change="dossiers.contactEmail = dossiers.delegateEmail"
                     ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm3 class="px-2 ">
@@ -117,7 +115,7 @@
                 <v-flex xs12  class="px-2 ">
                     <label for="">Thông tin đoàn <span class="red--text">*</span></label>
                     <v-text-field
-                        v-model="dossiers.applicantName"
+                        v-model="dossiers.bookingName"
                         :rules="[rules.required]"
                         required
                         solo
@@ -2105,23 +2103,18 @@ export default {
                         vm.dossiers['metaData'] = JSON.stringify(metaData)
                         vm.eFormCode = ''
                         if(!vm.dossiers.delegateName){
-                            if(res.data.ho_ten) {
+                            if(res.data.delegateName) {
                                 vm.dossiers.delegateName = res.data.ho_ten
                             }
                         }
                         if(!vm.dossiers.delegateIdNo){
-                            if(res.data.so_cmt) {
-                                 vm.dossiers.delegateIdNo = res.data.so_cmt
-                            }
-                        }
-                        if(!vm.dossiers.applicantName){
-                            if(res.data.vb_co_quan_chu_quan) {
-                                vm.dossiers.applicantName = res.data.vb_co_quan_chu_quan
+                            if(res.data.delegateIdNo) {
+                                 vm.dossiers.delegateIdNo = res.data.delegateIdNo
                             }
                         }
                         if(!vm.dossiers.delegateTelNo){
-                            if(res.data.dien_thoai) {
-                                vm.dossiers.delegateTelNo = res.data.dien_thoai
+                            if(res.data.delegateTelNo) {
+                                vm.dossiers.delegateTelNo = res.data.delegateTelNo
                             }
                         }
                         if(!vm.dossiers.delegateAddress){
@@ -2130,7 +2123,41 @@ export default {
                                 vm.dossiers.address = res.data.address.length < 100 ? res.data.address : ''
                             } 
                         }
-                        
+                        if(!vm.dossiers.delegateEmail){
+                            if(res.data.delegateEmail ){
+                                vm.dossiers.delegateEmail = res.data.delegateEmail
+                            } 
+                        }
+                        if(!vm.dossiers.applicantName){
+                            if(res.data.applicantName) {
+                                vm.dossiers.applicantName = res.data.applicantName
+                            }
+                        }
+                        if(!vm.dossiers.applicantIdNo){
+                            if(res.data.applicantIdNo) {
+                                vm.dossiers.applicantIdNo = res.data.applicantIdNo
+                            }
+                        }
+                        if(!vm.dossiers.contactTelNo){
+                            if(res.data.contactTelNo) {
+                                vm.dossiers.contactTelNo = res.data.contactTelNo
+                            }
+                        }
+                        if(!vm.dossiers.contactEmail){
+                            if(res.data.contactEmail) {
+                                vm.dossiers.contactEmail = res.data.contactEmail
+                            }
+                        }
+                        if(!vm.dossiers.contactName){
+                            if(res.data.contactName) {
+                                vm.dossiers.contactName = res.data.contactName
+                            }
+                        }
+                        if(!vm.dossiers.address){
+                            if(res.data.address ){
+                                vm.dossiers.address = res.data.address.length < 100 ? res.data.address : ''
+                            } 
+                        }             
                         vm.fillDataEform(res.data)
                     } else {
                         vm.eFormCode = ''
