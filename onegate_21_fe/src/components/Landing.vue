@@ -1769,26 +1769,28 @@ export default {
           for (let key in vm.listCongVan) {
             if (String(vm.listCongVan[key]['dossierId']) === String(currentQuery.groupDossierId)) {
               vm.congvanSelected = vm.listCongVan[key]
-              // let thutuccongvan = vm.congvanSelected ? vm.congvanSelected.serviceCode : ''
-              // if (thutuccongvan) {
-              //   let chonthutuc = vm.listThuTucHanhChinh.filter(function (item) {
-              //     return item.serviceCode == thutuccongvan
-              //   })
-              //   if (chonthutuc && chonthutuc.length > 0) {
-              //     vm.thuTucHanhChinhSelected = chonthutuc[0]
-              //     if (vm.thuTucHanhChinhSelected !== null && vm.thuTucHanhChinhSelected !== 'null' && vm.thuTucHanhChinhSelected !== undefined && vm.thuTucHanhChinhSelected.hasOwnProperty('options')) {
-              //       vm.listDichVu = vm.thuTucHanhChinhSelected.options
-              //     } else {
-              //       vm.listDichVu = []
-              //     }
-              //     if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
-              //       vm.dichVuSelected = vm.listDichVu[0]
-              //       vm.templateNo = vm.dichVuSelected.templateNo
-              //     } else {
-              //       vm.dichVuSelected = null
-              //     }
-              //   }
-              // }
+              // test ----
+              let thutuccongvan = vm.congvanSelected ? vm.congvanSelected.serviceCode : ''
+              if (thutuccongvan) {
+                let chonthutuc = vm.listThuTucHanhChinh.filter(function (item) {
+                  return item.serviceCode == thutuccongvan
+                })
+                if (chonthutuc && chonthutuc.length > 0) {
+                  vm.thuTucHanhChinhSelected = chonthutuc[0]
+                  if (vm.thuTucHanhChinhSelected !== null && vm.thuTucHanhChinhSelected !== 'null' && vm.thuTucHanhChinhSelected !== undefined && vm.thuTucHanhChinhSelected.hasOwnProperty('options')) {
+                    vm.listDichVu = vm.thuTucHanhChinhSelected.options
+                  } else {
+                    vm.listDichVu = []
+                  }
+                  if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
+                    vm.dichVuSelected = vm.listDichVu[0]
+                    vm.templateNo = vm.dichVuSelected.templateNo
+                  } else {
+                    vm.dichVuSelected = null
+                  }
+                }
+              }
+              // end test -------
             }
           }
         } else {
@@ -2181,27 +2183,28 @@ export default {
       console.log('congvanSelected', item)
       vm.selectMultiplePage = []
       vm.congvanSelected = item
-      // let thutuccongvan = item ? item.serviceCode : ''
-      // if (thutuccongvan) {
-      //   let chonthutuc = vm.listThuTucHanhChinh.filter(function (item) {
-      //     return item.serviceCode == thutuccongvan
-      //   })
-      //   if (chonthutuc && chonthutuc.length > 0) {
-      //     vm.thuTucHanhChinhSelected = chonthutuc[0]
-      //     if (vm.thuTucHanhChinhSelected !== null && vm.thuTucHanhChinhSelected !== 'null' && vm.thuTucHanhChinhSelected !== undefined && vm.thuTucHanhChinhSelected.hasOwnProperty('options')) {
-      //       vm.listDichVu = vm.thuTucHanhChinhSelected.options
-      //     } else {
-      //       vm.listDichVu = []
-      //     }
-      //     if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
-      //       vm.dichVuSelected = vm.listDichVu[0]
-      //       vm.templateNo = vm.dichVuSelected.templateNo
-      //     } else {
-      //       vm.dichVuSelected = null
-      //     }
-      //   }
-      // }
-      
+      // test -----
+      let thutuccongvan = item ? item.serviceCode : ''
+      if (thutuccongvan) {
+        let chonthutuc = vm.listThuTucHanhChinh.filter(function (item) {
+          return item.serviceCode == thutuccongvan
+        })
+        if (chonthutuc && chonthutuc.length > 0) {
+          vm.thuTucHanhChinhSelected = chonthutuc[0]
+          if (vm.thuTucHanhChinhSelected !== null && vm.thuTucHanhChinhSelected !== 'null' && vm.thuTucHanhChinhSelected !== undefined && vm.thuTucHanhChinhSelected.hasOwnProperty('options')) {
+            vm.listDichVu = vm.thuTucHanhChinhSelected.options
+          } else {
+            vm.listDichVu = []
+          }
+          if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
+            vm.dichVuSelected = vm.listDichVu[0]
+            vm.templateNo = vm.dichVuSelected.templateNo
+          } else {
+            vm.dichVuSelected = null
+          }
+        }
+      }
+      // end test -------
       let groupIdQuery = vm.congvanSelected ? vm.congvanSelected.dossierId : ''
       let current = vm.$router.history.current
       let newQuery = current.query

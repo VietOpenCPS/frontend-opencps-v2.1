@@ -40,7 +40,8 @@
           </span>
         </div>
         
-        <input type="file" id="documentFileAttach" @input="onUploadSingleFile($event)" style="display:none">
+        <input type="file" id="documentFileAttach" @input="onUploadSingleFile($event, 0)" style="display:none">
+        <input type="file" id="documentFileAttachSub" @input="onUploadSingleFile($event, 1)" style="display:none">
         <v-btn small color="primary" class="mx-0 mt-2" dark @click.native="uploadFile">
           <v-icon>fas fa fa-upload</v-icon> &nbsp; &nbsp;
           <span v-if="String(id) !== '0' && editDeliverable && detail['fileEntryId'] && detail['fileEntryId'] !== '0'">Cập nhật tài liệu đính kèm</span>
@@ -213,7 +214,8 @@
         extensionsFileUpLoad: '',
         maxSizeFileUpLoad: '',
         requiredAttachFile: false,
-        urlFileAttach: ''
+        urlFileAttach: '',
+        indexFile: 0
       }
     },
     created () {
@@ -318,7 +320,9 @@
             vm.$store.dispatch('getContentFileSimple')
             vm.tempCounter = vm.pullCounter
             if (String(vm.id) === '0' || (String(vm.id) !== '0' && vm.editDeliverable)) {
+              vm.indexFile = 0
               document.getElementById('documentFileAttach').value = ''
+              vm.fileNameAttach = ''
             }
           })
           
@@ -435,7 +439,9 @@
           } catch (error) {
           }
           // 
-          if (vm.requiredAttachFile && (!vm.detail['fileEntryId'] || vm.detail['fileEntryId'] == '0') && window.$('#documentFileAttach')[0].files.length === 0) {
+          let fileCheck = vm.indexFile == 0 ? window.$('#documentFileAttachSub')[0].files : window.$('#documentFileAttach')[0].files
+          console.log('fileNameAttach', fileCheck)
+          if (vm.requiredAttachFile && (!vm.detail['fileEntryId'] || vm.detail['fileEntryId'] == '0') && fileCheck.length === 0) {
             toastr.error('Vui lòng đính kèm tài liệu!')
             vm.loading = false
             return
@@ -460,7 +466,7 @@
             vm.$store.dispatch('createDeliverable', submitDataObject).then(function (data) {
               let attachFiles = function () {
                 let deliverableId = data.createDeliverable.deliverableId
-                let files = window.$('#documentFileAttach')[0].files
+                let files = vm.indexFile == 0 ? window.$('#documentFileAttachSub')[0].files : window.$('#documentFileAttach')[0].files
                 let file = files ? files[0] : ''
                 if (file) {
                   let formData = new FormData()
@@ -482,18 +488,21 @@
                 vm.backToList()
               } else {
                 setTimeout(function () {
-                  toastr.success('Cập nhật thành công')
                   attachFiles()
-                  vm.loading = false
-                  vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
-                    vm.detail = result
-                    vm.editDeliverable = false
-                    vm.showComponent = true
-                    setTimeout(function () {
-                      vm.$refs.viewpdf.pullPDF(vm.detail['fileEntryId'])
-                    }, 200)
-                  })
-                }, 2000)
+                  setTimeout(function () {
+                    toastr.success('Cập nhật thành công')
+                    vm.loading = false
+                    vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
+                      vm.detail = result
+                      vm.editDeliverable = false
+                      vm.showComponent = true
+                      setTimeout(function () {
+                        vm.$refs.viewpdf.pullPDF(vm.detail['fileEntryId'])
+                      }, 200)
+                    })
+                  }, 5000)
+                  
+                }, 500)
               }
             }).catch(function() {
               vm.loading = false
@@ -521,7 +530,9 @@
         vm.editDeliverable = true
         setTimeout(function(){
           if (String(vm.id) === '0' || (String(vm.id) !== '0' && vm.editDeliverable)) {
+            vm.indexFile = 0
             document.getElementById('documentFileAttach').value = ''
+            vm.fileNameAttach = ''
           }
         }, 100)
       },
@@ -552,13 +563,22 @@
       },
       uploadFile () {
         let vm = this
-        document.getElementById('documentFileAttach').value = ''
-        document.getElementById('documentFileAttach').click()
+        if (vm.indexFile === 0) {
+          document.getElementById('documentFileAttach').value = ''
+          document.getElementById('documentFileAttach').click()
+        } else {
+          document.getElementById('documentFileAttachSub').value = ''
+          document.getElementById('documentFileAttachSub').click()
+        }
       },
-      onUploadSingleFile () {
+      onUploadSingleFile (event, index) {
         let vm = this
-        let files = window.$('#documentFileAttach')[0].files
-        let file = files[0]
+        let file
+        if (vm.indexFile == 0) {
+          file = window.$('#documentFileAttach')[0].files[0]
+        } else {
+          file = window.$('#documentFileAttachSub')[0].files[0]
+        }
         // 
         let fileUpload = {
           file: file
@@ -566,12 +586,19 @@
         let valid = vm.validFileUpload(fileUpload)
         // 
         if (valid) {
+          if (vm.indexFile == 0) {
+            vm.indexFile = 1
+          } else {
+            vm.indexFile = 0
+          }
           vm.fileNameAttach = file.name
           vm.fileNameAttachDate = vm.getCurentDateTime()
         } else {
-          document.getElementById('documentFileAttach').value = ''
-          vm.fileNameAttach = ''
-          vm.fileNameAttachDate = ''
+          if (vm.indexFile == 0) {
+            document.getElementById('documentFileAttach').value = ''
+          } else {
+            document.getElementById('documentFileAttachSub').value = ''
+          }
         }
         
       },
