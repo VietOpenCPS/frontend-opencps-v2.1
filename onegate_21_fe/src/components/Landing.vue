@@ -376,7 +376,7 @@
             <v-menu left :nudge-left="50" :nudge-top="15" 
               v-if="!loadingTable && ((btnDynamics !== null || btnDynamics !== undefined || btnDynamics !== 'undefined') || 
                 (btnDossierDynamics !== null || btnDossierDynamics !== undefined || btnDossierDynamics !== 'undefined'))">
-              <v-btn class="mx-0 my-0" slot="activator" icon v-on:click.native="processPullBtnDynamics(props.item)">
+              <v-btn class="mx-0 my-0" slot="activator" icon @click="processPullBtnDynamics(props.item)">
                 <v-icon>filter_list</v-icon>
               </v-btn>
               <v-list>
@@ -1907,7 +1907,7 @@ export default {
             keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
-            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
+            dossierNo: vm.dossierNoKey ? String(vm.dossierNoKey).trim() : '',
             follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : '',
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : '',
             viapostal: currentQuery.hasOwnProperty('viapostal') ? currentQuery.viapostal : '',
@@ -1949,7 +1949,7 @@ export default {
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : originalityDossierDeleted,
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
-            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
+            dossierNo: vm.dossierNoKey ? String(vm.dossierNoKey).trim() : '',
             follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : '',
             viapostal: currentQuery.hasOwnProperty('viapostal') ? currentQuery.viapostal : '',
 
@@ -3235,7 +3235,7 @@ export default {
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
-      newQuery['keyword'] = vm.keyword
+      newQuery['keyword'] = String(vm.keyword).trim()
       newQuery['status'] = vm.status
       newQuery['top'] = vm.top
       for (let key in newQuery) {
