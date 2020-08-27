@@ -1680,7 +1680,8 @@ export default {
         validateThongTinCongVan = thongtincongvan.validation
       }
       if (vm.formCode === 'NEW_GROUP_CV_DI' && isDraf === 'save') {
-        validateThongTinCongVan = true
+        // validateThongTinCongVan = true
+        validateThongTinCongVan = thongtincongvan.validation
       } else {
         validateThongTinCongVan = thongtincongvan.validation
       }
