@@ -61,7 +61,7 @@
           :item-text="item.itemText"
           :item-value="item.itemValue"
           box
-          :rules="processRules(item.rules, item)"
+          :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
           :chips="item['chips']"
@@ -77,7 +77,7 @@
           :item-text="item.itemText"
           :item-value="item.itemValue"
           box
-          :rules="processRules(item.rules, item)"
+          :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
           :chips="item['chips']"
@@ -89,7 +89,7 @@
         </v-autocomplete>
         <v-text-field :class="item['class_component']" v-if="item.type === 'text-fields'"
           v-model="data[item.model]"
-          :rules="processRules(item.rules, item)"
+          :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
           :disabled="item['disabled']"
           box 
@@ -99,7 +99,7 @@
         </v-text-field>
         <v-textarea :class="item['class_component']" v-if="item.type === 'textarea'"
           v-model="data[item.model]"
-          :rules="processRules(item.rules, item)"
+          :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
           :disabled="item['disabled']"
           box 
@@ -146,7 +146,7 @@
             :item-text="itemChild.itemText"
             :item-value="itemChild.itemValue"
             box
-            :rules="processRules(item.rules, item)"
+            :rules="processRules(itemChild.rules)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
             @change="processChangeDataSource($event, itemChild)"
             :chips="item['chips']"
@@ -162,7 +162,7 @@
             :item-text="itemChild.itemText"
             :item-value="itemChild.itemValue"
             box
-            :rules="processRules(item.rules, item)"
+            :rules="processRules(itemChild.rules)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
             @change="processChangeDataSource($event, itemChild)"
             :chips="item['chips']"
@@ -174,7 +174,7 @@
           </v-autocomplete>
           <v-text-field :class="itemChild['class_component']" v-if="itemChild.type === 'text-fields'"
             v-model="data[itemChild.model]"
-            :rules="processRules(item.rules, item)"
+            :rules="processRules(itemChild.rules)"
             :placeholder="itemChild['placeholder']"
             box
             clearable
@@ -183,7 +183,7 @@
           </v-text-field>
           <v-textarea :class="itemChild['class_component']" v-if="itemChild.type === 'textarea'"
             v-model="data[itemChild.model]"
-            :rules="processRules(item.rules, item)"
+            :rules="processRules(itemChild.rules)"
             :placeholder="itemChild['placeholder']"
             box
             clearable
@@ -579,46 +579,6 @@
               return []
             }
           },
-          varchar50: (val) => {
-            if(val){
-              val = String(val).trim()
-              return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
-            } else {
-              return true
-            }  
-          },
-          varchar100: (val) => {
-            if(val){
-              val = String(val).trim()
-              return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
-            } else {
-              return true
-            }
-          },
-          varchar255: (val) => {
-            if(val){
-              val = String(val).trim()
-              return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
-            } else {
-              return true
-            }  
-          },
-          varchar500: (val) => {
-            if(val){
-              val = String(val).trim()
-              return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
-            } else {
-              return true
-            }  
-          },
-          varchar5000: (val) => {
-            if(val){
-              val = String(val).trim()
-              return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
-            } else {
-              return true
-            }
-          },
         },
         loadingPdf: false,
         viewFormInput: true,
@@ -856,33 +816,7 @@
           })
         }
       },
-      processRules (rulesStr, itemData) {
-        // let maxLength
-        // if (itemData.hasOwnProperty('type') && (itemData.type === 'text-fields' || itemData.type === 'textarea')) {
-        //   maxLength = 500
-        //   if (itemData.hasOwnProperty('model') && (itemData.model.endsWith('Code') || itemData.model.endsWith('No') || itemData.model.endsWith('Id'))) {
-        //     maxLength = 100
-        //   }
-        // }
-        // let rules = []
-        // if (rulesStr) {
-        //   let hasRuleVarChar = rulesStr.indexOf(varchar) >= 0 ? true : false
-        //   rules = eval('( ' + rulesStr + ' )')
-        //   if (maxLength == 500 && !hasRuleVarChar) {
-        //     rules.push(vm.required.varchar500)
-        //   }
-        //   if (maxLength == 100 && !hasRuleVarChar) {
-        //     rules.push(vm.required.varchar100)
-        //   }
-        // } else {
-        //   if (maxLength == 500) {
-        //     rules.push(vm.required.varchar500)
-        //   }
-        //   if (maxLength == 100) {
-        //     rules.push(vm.required.varchar100)
-        //   }
-        // }
-        // return rules
+      processRules (rulesStr) {
         return eval('( ' + rulesStr + ' )')
       },
       processChangeDataSource (data, item) {
