@@ -92,6 +92,8 @@
           :rules="processRules(item.rules, item)"
           :placeholder="item['placeholder']"
           :disabled="item['disabled']"
+          :maxlength="getMaxLength(item)"
+          :counter="getMaxLength(item)"
           box 
           clearable
         >
@@ -102,6 +104,8 @@
           :rules="processRules(item.rules, item)"
           :placeholder="item['placeholder']"
           :disabled="item['disabled']"
+          :maxlength="getMaxLength(item)"
+          :counter="getMaxLength(item)"
           box 
           clearable
         >
@@ -579,6 +583,14 @@
               return []
             }
           },
+          syntaxError: (value) => {
+            if (value) {
+              value = String(value).trim()
+              return value.indexOf('</') < 0 ? true : 'Không được có ký tự </'   
+            } else {
+              return true
+            }  
+          },
           varchar50: (val) => {
             if(val){
               val = String(val).trim()
@@ -587,10 +599,10 @@
               return true
             }  
           },
-          varchar100: (val) => {
+          varchar75: (val) => {
             if(val){
               val = String(val).trim()
-              return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+              return val.length <= 75 ? true : 'Không được nhập quá 75 ký tự'   
             } else {
               return true
             }
@@ -610,6 +622,14 @@
             } else {
               return true
             }  
+          },
+          varchar2000: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+            } else {
+              return true
+            }
           },
           varchar5000: (val) => {
             if(val){
@@ -857,33 +877,61 @@
         }
       },
       processRules (rulesStr, itemData) {
-        // let maxLength
-        // if (itemData.hasOwnProperty('type') && (itemData.type === 'text-fields' || itemData.type === 'textarea')) {
-        //   maxLength = 500
-        //   if (itemData.hasOwnProperty('model') && (itemData.model.endsWith('Code') || itemData.model.endsWith('No') || itemData.model.endsWith('Id'))) {
-        //     maxLength = 100
-        //   }
-        // }
-        // let rules = []
-        // if (rulesStr) {
-        //   let hasRuleVarChar = rulesStr.indexOf(varchar) >= 0 ? true : false
-        //   rules = eval('( ' + rulesStr + ' )')
-        //   if (maxLength == 500 && !hasRuleVarChar) {
-        //     rules.push(vm.required.varchar500)
-        //   }
-        //   if (maxLength == 100 && !hasRuleVarChar) {
-        //     rules.push(vm.required.varchar100)
-        //   }
-        // } else {
-        //   if (maxLength == 500) {
-        //     rules.push(vm.required.varchar500)
-        //   }
-        //   if (maxLength == 100) {
-        //     rules.push(vm.required.varchar100)
-        //   }
-        // }
-        // return rules
-        return eval('( ' + rulesStr + ' )')
+        let maxLength
+        let syntaxErrorInput = false
+        let vm = this
+        if (itemData.hasOwnProperty('type') && (itemData.type === 'text-fields' || itemData.type === 'textarea')) {
+          maxLength = 500
+          if (itemData.type === 'textarea') {
+            maxLength = 2000
+          }
+          if (itemData.hasOwnProperty('model') && (itemData.model.endsWith('Code') || itemData.model.endsWith('No') || itemData.model.endsWith('Id'))) {
+            maxLength = 75
+          }
+          syntaxErrorInput = true
+        }
+        let rulesInput = []
+        if (rulesStr) {
+          let hasRuleVarChar = rulesStr.indexOf('varchar') >= 0 ? true : false
+          rulesInput = eval('( ' + rulesStr + ' )')
+          if (maxLength == 2000 && !hasRuleVarChar) {
+            rulesInput.push(vm.rules.varchar2000)
+          }
+          if (maxLength == 500 && !hasRuleVarChar) {
+            rulesInput.push(vm.rules.varchar500)
+          }
+          if (maxLength == 75 && !hasRuleVarChar) {
+            rulesInput.push(vm.rules.varchar75)
+          }
+        } else {
+          if (maxLength == 2000) {
+            rulesInput.push(vm.rules.varchar2000)
+          }
+          if (maxLength == 500) {
+            rulesInput.push(vm.rules.varchar500)
+          }
+          if (maxLength == 75) {
+            rulesInput.push(vm.rules.varchar75)
+          }
+        }
+        if (syntaxErrorInput) {
+          rulesInput.push(vm.rules.syntaxError)
+        }
+        return rulesInput
+        // return eval('( ' + rulesStr + ' )')
+      },
+      getMaxLength(itemData) {
+        let maxLength
+        if (itemData.hasOwnProperty('type') && (itemData.type === 'text-fields' || itemData.type === 'textarea')) {
+          maxLength = 500
+          if (itemData.type === 'textarea') {
+            maxLength = 2000
+          }
+          if (itemData.hasOwnProperty('model') && (itemData.model.endsWith('Code') || itemData.model.endsWith('No') || itemData.model.endsWith('Id'))) {
+            maxLength = 100
+          }
+        }
+        return maxLength
       },
       processChangeDataSource (data, item) {
         let vm = this
