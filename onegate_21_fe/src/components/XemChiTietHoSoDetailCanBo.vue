@@ -590,13 +590,17 @@
                           </div>
                           <!--  -->
                           <div style="position:relative">
+                            <v-form v-model="validTraoDoi" ref="formTraoDoi" lazy-validation>
                             <v-text-field class="pl-4 my-3"
                             v-model="messageChat"
                             label="Nhập trao đổi"
                             @keyup.enter="postChat"
+                            :rules="[rules.varchar5000]"
                             box
                             ></v-text-field>
+                            
                             <v-icon @click="postChat" color="blue" class="hover-pointer" style="position: absolute;right: 10px;bottom: 18px;font-size: 14px;">send</v-icon>
+                             </v-form>
                           </div>
                         </v-flex>
                       </v-card-text>
@@ -781,6 +785,7 @@ export default {
     'phan-cong-lai': PhanCongLai
   },
   data: () => ({
+    validTraoDoi: false,
     isMobile: false,
     inputTypes: [1, 3, 6],
     inputTypesLienThong: [1, 2, 3, 6, 7],
@@ -1005,7 +1010,58 @@ export default {
     sequencyDossierImport: false,
     mauCongVan: '',
     reRender: true,
-    activeReload: false
+    activeReload: false,
+    rules: {
+      required: (value) => !!value || 'Thông tin bắt buộc',
+      email: (value) => {
+        value = value.trim()
+        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
+      },
+      passWord: (value) => {
+        const pattern = /^(?![0-9]{6,})[0-9a-zA-Z]{6,}$/
+        return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 6 ký tự'
+      },
+      telNo: (value) => {
+        const pattern = /^([0-9]{0,})$/
+        if(typeof value === 'string'){
+          value = value.trim()
+        }
+        return pattern.test(value) || 'Gồm các ký tự 0-9'
+      },
+      varchar100: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar255: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar500: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar5000: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+        } else {
+          return true
+        }
+      },
+    },
   }),
   computed: {
     loading () {
@@ -1484,17 +1540,23 @@ export default {
     },
     postChat () {
       var vm = this
-      if (vm.messageChat) {
-        let params = {
-          dossierId: vm.thongTinChiTietHoSo.dossierId,
-          actionCode: vm.originality === 3 ? '8200' : '8100',
-          actionNote: vm.messageChat,
-          actionUser: ''
+      if(vm.$refs.formTraoDoi.validate()){
+        if (vm.messageChat) {
+          let params = {
+            dossierId: vm.thongTinChiTietHoSo.dossierId,
+            actionCode: vm.originality === 3 ? '8200' : '8100',
+            actionNote: vm.messageChat,
+            actionUser: ''
+          }
+          vm.$store.dispatch('postAction', params).then(result => {
+            vm.loadDossierSyncs()
+          })
+          vm.messageChat = ''
+        } else {
+           toastr.error('Chưa nhập dữ liệu trao đổi')
         }
-        vm.$store.dispatch('postAction', params).then(result => {
-          vm.loadDossierSyncs()
-        })
-        vm.messageChat = ''
+      } else {
+        toastr.error('Dữ liệu trao đổi không hợp lệ')
       }
     },
     getNextAction (item) {

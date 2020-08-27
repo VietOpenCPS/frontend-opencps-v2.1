@@ -2144,6 +2144,7 @@ export default {
                 vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
                 vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
               }
+              vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
             }).catch(function () {
               toastr.error('Yêu cầu thực hiện thất bại')
             })

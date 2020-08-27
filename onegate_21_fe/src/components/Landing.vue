@@ -9,6 +9,7 @@
             v-model="keyword"
             placeholder="Tìm kiếm theo tên hồ sơ, mã hồ sơ, tên thủ tục, chủ hồ sơ ..."
             solo
+            @change="keyword=String(keyword).trim()"
             @keyup.enter="keywordEventChange"
           ></v-text-field>
         </div>
@@ -145,6 +146,7 @@
               @keyup.enter="changeDossierNoKey"
               append-icon="search"
               box
+              @change="dossierNoKey=String(dossierNoKey).trim()"
               @click:append="changeDossierNoKey"
             ></v-text-field>
             <v-text-field
