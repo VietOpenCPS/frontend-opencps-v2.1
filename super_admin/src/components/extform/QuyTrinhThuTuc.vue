@@ -54,7 +54,9 @@
                     <v-text-field
                       v-model="currentProcess.processNo"
                       box
-                      :rules="[rules.required]"
+                      :rules="[rules.required, rules.varchar75, rules.syntaxError]"
+                      :maxlength="75"
+                      :counter="75"
                       required
                     >
                       <template slot="label">Số hiệu quy trình <span class="red--text darken-3">*</span></template>
@@ -65,7 +67,9 @@
                     <v-text-field
                       v-model="currentProcess.processName"
                       box
-                      :rules="[rules.required]"
+                      :rules="[rules.required, rules.varchar500, rules.syntaxError]"
+                      :maxlength="500"
+                      :counter="500"
                       required
                     >
                       <template slot="label">Tên quy trình <span class="red--text darken-3">*</span></template>
@@ -77,6 +81,9 @@
                       label="Mô tả"
                       v-model="currentProcess.description"
                       box
+                      :rules="[rules.varchar2000, rules.syntaxError]"
+                      :maxlength="2000"
+                      :counter="2000"
                     ></v-text-field>
                   </v-flex>
                   <!--  -->
@@ -86,7 +93,9 @@
                         <v-text-field
                           v-model="currentProcess.durationCount"
                           box
-                          :rules="[rules.required]"
+                          :rules="[rules.required, rules.varchar75, rules.syntaxError]"
+                          :maxlength="75"
+                          :counter="75"
                           required
                         >
                         <template slot="label">Thời gian xử lý <span class="red--text darken-3">*</span></template>
@@ -137,6 +146,9 @@
                           v-model="processCondition"
                           :disabled="processRoleId?false:true"
                           box
+                          :rules="[rules.varchar500, rules.syntaxError]"
+                          :maxlength="500"
+                          :counter="500"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2 class="pl-2 text-xs-right">
@@ -182,6 +194,9 @@
                           label="Tên tiến trình"
                           v-model="sequenceName"
                           box
+                          :rules="[rules.varchar500, rules.syntaxError]"
+                          :maxlength="500"
+                          :counter="500"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2 class="pl-2">
@@ -189,6 +204,9 @@
                           label="Thứ tự thực hiện"
                           v-model="sequenceNo"
                           box
+                          :rules="[rules.varchar75, rules.syntaxError]"
+                          :maxlength="75"
+                          :counter="75"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2 class="pl-2">
@@ -196,6 +214,9 @@
                           label="Vai trò thực hiện"
                           v-model="sequenceRole"
                           box
+                          :rules="[rules.varchar500, rules.syntaxError]"
+                          :maxlength="500"
+                          :counter="500"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2 class="pl-2">
@@ -204,6 +225,9 @@
                           v-model="sequenceDurationCount"
                           box
                           type="Number"
+                          :rules="[rules.varchar75]"
+                          :maxlength="75"
+                          :counter="75"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2 class="pl-2 text-xs-right">
@@ -250,9 +274,11 @@
                         <v-text-field
                           v-model="currentProcess.dossierNoPattern"
                           box
-                          :rules="currentProcess.generateDossierNo ? [rules.required] : []"
+                          :rules="currentProcess.generateDossierNo ? [rules.required, rules.varchar500, rules.syntaxError] : []"
                           :required="currentProcess.generateDossierNo"
                           :disabled="currentProcess.generateDossierNo?false:true"
+                          :maxlength="500"
+                          :counter="500"
                         >
                           <template slot="label">Cấu hình sinh mã số hồ sơ <span v-if="currentProcess.generateDossierNo" class="red--text darken-3">*</span></template>
                         </v-text-field>
@@ -262,9 +288,11 @@
                         <v-text-field
                           v-model="currentProcess.dueDatePattern"
                           box
-                          :rules="currentProcess.generateDueDate ? [rules.required] : []"
+                          :rules="currentProcess.generateDueDate ? [rules.required, rules.varchar500, rules.syntaxError] : []"
                           :required="currentProcess.generateDueDate"
                           :disabled="currentProcess.generateDueDate?false:true"
+                          :maxlength="500"
+                          :counter="500"
                         >
                           <template slot="label">Cấu hình sinh ngày hẹn trả <span v-if="currentProcess.generateDueDate" class="red--text darken-3">*</span></template>
                         </v-text-field>
@@ -288,6 +316,9 @@
                       <v-text-field
                         v-model="currentProcess.dossierGroupPattern"
                         box
+                        :rules="[rules.varchar500, rules.syntaxError]"
+                        :maxlength="500"
+                        :counter="500"
                       >
                         <template slot="label">Cấu hình sinh mã nhóm hồ sơ</template>
                       </v-text-field>
@@ -296,8 +327,10 @@
                       <v-text-field
                         v-model="currentProcess.serverNo"
                         box
-                        :rules="[rules.required]"
                         required
+                        :rules="[rules.required, rules.varchar75, rules.syntaxError]"
+                        :maxlength="75"
+                        :counter="75"
                       >
                         <template slot="label">Server đồng bộ  <span class="red--text darken-3">*</span></template>
                       </v-text-field>
@@ -410,7 +443,9 @@
                     <v-text-field
                       v-model="currentStep.stepName"
                       box
-                      :rules="[rules.required]"
+                      :rules="[rules.required, rules.varchar500, rules.syntaxError]"
+                      :maxlength="500"
+                      :counter="500"
                       required
                     >
                       <template slot="label">Tên bước  <span class="red--text darken-3">*</span></template>
@@ -421,6 +456,9 @@
                       label="Số thứ tự"
                       v-model="currentStep.sequenceNo"
                       box
+                      :rules="[rules.varchar75, rules.syntaxError]"
+                      :maxlength="75"
+                      :counter="75"
                     ></v-text-field>
                   </v-flex>
                   <!--  -->
@@ -450,7 +488,9 @@
                     <v-text-field
                       v-model="currentStep.stepCode"
                       box
-                      :rules="[rules.required]"
+                      :rules="[rules.required, rules.varchar75, rules.syntaxError]"
+                      :maxlength="75"
+                      :counter="75"
                       required
                     >
                       <template slot="label">Mã bước quy trình <span class="red--text darken-3">*</span></template>
@@ -481,6 +521,9 @@
                       label="Thời gian xử lý"
                       v-model="currentStep.durationCount"
                       box
+                      :rules="[rules.varchar500, rules.syntaxError]"
+                      :maxlength="500"
+                      :counter="500"
                     ></v-text-field>
                   </v-flex>
                   <!--  -->
@@ -517,6 +560,9 @@
                           v-model="stepCondition"
                           :disabled="stepRoleId?false:true"
                           box
+                          :rules="[rules.varchar500, rules.syntaxError]"
+                          :maxlength="500"
+                          :counter="500"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2 class="pl-2 text-xs-right">
@@ -711,8 +757,10 @@
                     <v-text-field
                       v-model="currentAction.actionName"
                       box
-                      :rules="[rules.required]"
                       required
+                      :rules="[rules.required, rules.varchar500, rules.syntaxError]"
+                      :maxlength="500"
+                      :counter="500"
                     >
                       <template slot="label">Tên thao tác <span class="red--text darken-3">*</span></template>
                     </v-text-field>
@@ -721,6 +769,9 @@
                     <v-text-field
                       v-model="currentAction.actionCode"
                       box
+                      :rules="[rules.required, rules.varchar75, rules.syntaxError]"
+                      :maxlength="75"
+                      :counter="75"
                     >
                       <template slot="label">Mã thao tác <span class="red--text darken-3">*</span></template>
                     </v-text-field>
@@ -731,6 +782,9 @@
                       label="Điều kiện kiểm tra"
                       v-model="currentAction.preCondition"
                       box
+                      :rules="[rules.varchar500, rules.syntaxError]"
+                      :maxlength="500"
+                      :counter="500"
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
@@ -924,6 +978,9 @@
                       label="Thao tác thực hiện sau"
                       v-model="currentAction.postAction"
                       box
+                      :rules="[rules.varchar500, rules.syntaxError]"
+                      :maxlength="500"
+                      :counter="500"
                     ></v-text-field>
                   </v-flex>
                   <!--  -->
@@ -1258,8 +1315,84 @@
         validAddAction: false,
         //
         rules: {
-          required: (value) => (!!value || value === 0) || 'Trường dữ liệu bắt buộc'
-        }
+          required: value => !!value || 'Bắt buộc phải nhập.',
+          number: value => {
+            const pattern = /^\d+$/
+            return pattern.test(value) || 'Bắt buộc phải nhập kiểu số.'
+          },
+          email: value => {
+            const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            return pattern.test(value) || 'Sai định dạng thư điện tử.'
+          },
+          passWord: (value) => {
+            const pattern = /^((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])([0-9a-zA-Z@$!%*#?&]{8,}))$/
+            return pattern.test(value) || 'Ít nhất 8 ký tự và có chữ hoa, chữ thường, ký tự đặc biệt @$!%*#?&'
+          },
+          telNo: (value) => {
+            const pattern = /^0([1-9]{1}\d{8})$/
+            if (value) {
+              return pattern.test(value) || 'Số điện thoại gồm 10 ký tự 0-9, eg: 0989123456, ...'
+            } else {
+              return []
+            }
+          },
+          syntaxError: (value) => {
+            if (value) {
+              value = String(value).trim()
+              return value.indexOf('</') < 0 ? true : 'Không được có ký tự </'   
+            } else {
+              return true
+            }  
+          },
+          varchar50: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+            } else {
+              return true
+            }  
+          },
+          varchar75: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 75 ? true : 'Không được nhập quá 75 ký tự'   
+            } else {
+              return true
+            }
+          },
+          varchar255: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+            } else {
+              return true
+            }  
+          },
+          varchar500: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+            } else {
+              return true
+            }  
+          },
+          varchar2000: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+            } else {
+              return true
+            }
+          },
+          varchar5000: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+            } else {
+              return true
+            }
+          },
+        },
       }
     },
     created () {

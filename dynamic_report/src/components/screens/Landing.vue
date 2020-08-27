@@ -1350,7 +1350,7 @@ export default {
             }
             vm.dataReportXX += ',' + JSON.stringify(dataRowTotal)
           }
-          // console.log('dataReportXX11ZZ', vm.dataReportXX)
+          console.log('dataReportXX11ZZ', vm.dataReportXX)
           
           vm.csvExport = []
           vm.csvExport = dataToExportCSV
