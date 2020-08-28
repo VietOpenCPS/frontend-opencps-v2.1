@@ -417,6 +417,32 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    getDomain ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+              agency: data.agencyCode,
+              sort: 'siblingSearch'
+            }
+          }
+          axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
+        })
+      })
+    },
   },
   mutations: {
     setLoading (state, payload) {

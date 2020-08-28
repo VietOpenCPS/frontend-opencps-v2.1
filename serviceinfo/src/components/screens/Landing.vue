@@ -890,7 +890,7 @@ export default {
       vm.domainListCurrent = []
       if ((currentQuery.hasOwnProperty('agency') && currentQuery['agency']) || vm.index) {
         let filterDomain = {
-          agencyCode: currentQuery['agency'] ? currentQuery['agency'] : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : '')
+          agencyCode: ''
         }
         vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
           vm.domainListCurrent = result

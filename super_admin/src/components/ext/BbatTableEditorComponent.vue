@@ -92,6 +92,8 @@
           :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
           :disabled="item['disabled']"
+          :maxlength="getMaxLength(item)"
+          :counter="getMaxLength(item)"
           box 
           clearable
         >
@@ -102,6 +104,8 @@
           :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
           :disabled="item['disabled']"
+          :maxlength="getMaxLength(item)"
+          :counter="getMaxLength(item)"
           box 
           clearable
         >
@@ -579,6 +583,62 @@
               return []
             }
           },
+          syntaxError: (value) => {
+            if (value) {
+              value = String(value).trim()
+              return value.indexOf('</') < 0 ? true : 'Không được có ký tự </'   
+            } else {
+              return true
+            }  
+          },
+          varchar50: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+            } else {
+              return true
+            }  
+          },
+          varchar75: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 75 ? true : 'Không được nhập quá 75 ký tự'   
+            } else {
+              return true
+            }
+          },
+          varchar255: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+            } else {
+              return true
+            }  
+          },
+          varchar500: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+            } else {
+              return true
+            }  
+          },
+          varchar2000: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+            } else {
+              return true
+            }
+          },
+          varchar5000: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+            } else {
+              return true
+            }
+          },
         },
         loadingPdf: false,
         viewFormInput: true,
@@ -816,8 +876,63 @@
           })
         }
       },
-      processRules (rulesStr) {
-        return eval('( ' + rulesStr + ' )')
+      processRules (rulesStr, itemData) {
+        let maxLength
+        let syntaxErrorInput = false
+        let vm = this
+        if (itemData.hasOwnProperty('type') && (itemData.type === 'text-fields' || itemData.type === 'textarea')) {
+          maxLength = 500
+          if (itemData.type === 'textarea') {
+            maxLength = 2000
+          }
+          if (itemData.hasOwnProperty('model') && (itemData.model.endsWith('Code') || itemData.model.endsWith('No') || itemData.model.endsWith('Id'))) {
+            maxLength = 75
+          }
+          syntaxErrorInput = true
+        }
+        let rulesInput = []
+        if (rulesStr) {
+          let hasRuleVarChar = rulesStr.indexOf('varchar') >= 0 ? true : false
+          rulesInput = eval('( ' + rulesStr + ' )')
+          if (maxLength == 2000 && !hasRuleVarChar) {
+            rulesInput.push(vm.rules.varchar2000)
+          }
+          if (maxLength == 500 && !hasRuleVarChar) {
+            rulesInput.push(vm.rules.varchar500)
+          }
+          if (maxLength == 75 && !hasRuleVarChar) {
+            rulesInput.push(vm.rules.varchar75)
+          }
+        } else {
+          if (maxLength == 2000) {
+            rulesInput.push(vm.rules.varchar2000)
+          }
+          if (maxLength == 500) {
+            rulesInput.push(vm.rules.varchar500)
+          }
+          if (maxLength == 75) {
+            rulesInput.push(vm.rules.varchar75)
+          }
+        }
+        if (syntaxErrorInput) {
+          rulesInput.push(vm.rules.syntaxError)
+        }
+        return rulesInput
+        // return eval('( ' + rulesStr + ' )')
+      },
+      getMaxLength(itemData) {
+        let maxLength
+        if (itemData.hasOwnProperty('type') && (itemData.type === 'text-fields' || itemData.type === 'textarea')) {
+          maxLength = 500
+          if (itemData.type === 'textarea') {
+            maxLength = 2000
+          }
+          if (itemData.hasOwnProperty('model') && (itemData.model.endsWith('Code') || itemData.model.endsWith('No') || itemData.model.endsWith('Id'))) {
+            maxLength = 100
+          }
+        }
+        return maxLength
+
       },
       processChangeDataSource (data, item) {
         let vm = this

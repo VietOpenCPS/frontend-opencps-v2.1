@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import TiepNhanHoSoDetail from './TiepNhanHoSoDetail.vue'
+import TiepNhanHoSoDetail from './TiepNhanHoSoDetailNew.vue'
 
 export default {
   props: ['index', 'id', 'formCode'],

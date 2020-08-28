@@ -2153,9 +2153,8 @@ export default {
                             }
                         }
                         if(!vm.dossiers.delegateAddress){
-                            if(res.data.address ){
-                                vm.dossiers.delegateAddress = res.data.address.length < 100 ? res.data.address : ''
-                                vm.dossiers.address = res.data.address.length < 100 ? res.data.address : ''
+                            if(res.data.delegateAddress ){
+                                vm.dossiers.delegateAddress = res.data.delegateAddress.length < 100 ? res.data.delegateAddress : ''
                             } 
                         }
                         if(!vm.dossiers.delegateEmail){
