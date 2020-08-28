@@ -140,7 +140,7 @@
                   </template>
                   <!--  -->
                   <template slot="items" slot-scope="props">
-                    <tr :style="formCode === 'NEW_GROUP_CV_DI' && String(metaDataGroupDossier['stepcode']) !== String(props.item.stepCode) && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui ? 'cursor: no-drop;' : 'cursor: pointer'" 
+                    <tr style="cursor: pointer" 
                       :title="formCode === 'NEW_GROUP_CV_DI' && String(metaDataGroupDossier['stepcode']) !== String(props.item.stepCode) && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui ? 'Hồ sơ đã xử lý' : ''"
                     >
                       <!-- <td class="text-xs-center pl-3" width="32px" style="height: 40px !important">
@@ -203,7 +203,7 @@
                 </v-data-table>
                 <v-layout wrap class="mt-3 ml-3">
                   <v-flex xs12 sm2 class="pt-2">
-                    <span>Tổng số hồ sơ: </span>
+                    <span>Tổng số hồ sơ xử lý: </span>
                     <span class="text-bold">{{dossiersCounterIntoGroupFilter}} </span>
                   </v-flex>
                   <v-flex xs12 sm3 class="pt-2">
@@ -219,16 +219,25 @@
                     </div>
                   </v-flex>
                 </v-layout>
-                
+                <div v-if="formCode === 'NEW_GROUP_CV_DI' && hoSoDaXuLy.length > 0" class="ml-2">
+                  <v-icon color="red darken-2" size="24">report_problem</v-icon> &nbsp;
+                  <span style="font-size:14px">Hồ sơ 
+                    <span style="font-weight: bold;">{{hoSoDaXuLyList}}</span> đã xử lý. Vui lòng xóa khỏi công văn trước khi gửi.
+                  </span>
+                </div>
               </div>
               <div v-else class="pl-5 py-2">Chưa có hồ sơ nào</div>
           
               <v-flex xs12 class="text-right mb-3 mr-2" v-if="(formCode === 'NEW_GROUP_CV' && !metaDataGroupDossier.hasOwnProperty('congvandagui')) || formCode === 'NEW_GROUP_CV_DI'">
-                <v-btn v-if="addFormNewInGroup === 'Thêm mới hồ sơ'" small color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2">
+                <v-btn :disabled="loadingAction" v-if="formCode === 'NEW_GROUP_CV_DI' && hoSoDaXuLy.length > 0" small color="primary" @click="removeAllDossierFromGroup" class="mx-0 my-0 mr-2" >
+                  <v-icon size="20">delete</v-icon> &nbsp;
+                  <span>Xóa hồ sơ đã xử lý</span>
+                </v-btn>
+                <v-btn :disabled="loadingAction" v-if="addFormNewInGroup === 'Thêm mới hồ sơ'" small color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2">
                   <v-icon size="20">add</v-icon>  &nbsp;
                   <span>Thêm mới hồ sơ</span>
                 </v-btn>
-                <v-btn v-if="formCode !== 'NEW_GROUP_CV' && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui" small color="primary" @click="showDossierToAdd" class="mx-0 my-0" >
+                <v-btn :disabled="loadingAction" v-if="formCode !== 'NEW_GROUP_CV' && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui" small color="primary" @click="showDossierToAdd" class="mx-0 my-0" >
                   <v-icon size="20">create_new_folder</v-icon>  &nbsp;
                   <span>Thêm hồ sơ đã có</span>
                 </v-btn>
@@ -962,6 +971,8 @@ export default {
     tphsCV: '',
     totalFee: 0,
     dossiersCounterIntoGroupFilter: 0,
+    hoSoDaXuLy: [],
+    hoSoDaXuLyList: '',
     addFormNewInGroup: '',
     metaDataGroupDossier: '',
     createFileCongVan: '',
@@ -1118,6 +1129,14 @@ export default {
         vm.dossiersCounterIntoGroupFilter = arr.filter(function (item) {
           return String(item.stepCode) === String(vm.metaDataGroupDossier.stepcode)
         }).length
+        vm.hoSoDaXuLy = vm.dossiersIntoGroupRender.filter(function (item) {
+          return String(item.stepCode) !== String(vm.metaDataGroupDossier.stepcode)
+        })
+        if (vm.hoSoDaXuLy.length > 0) {
+          vm.hoSoDaXuLyList = vm.hoSoDaXuLy.map(obj =>{ 
+            return obj.dossierNo
+          }).toString()
+        }
       }
       if (arr && arr.length > 0) {
         for (let i = 0; i < arr.length; i++) {
@@ -1421,6 +1440,12 @@ export default {
           validateThongTinCongVan = true
         } else {
           validateThongTinCongVan = thongtincongvan.validation
+        }
+        if (vm.formCode === 'NEW_GROUP_CV_DI' && draf === 'saveSend') {
+          if (vm.hoSoDaXuLy.length > 0) {
+            alert('Vui lòng xóa hồ sơ đã xử lý trước khi gửi công văn')
+            return
+          }
         }
         if (validateThongTinCongVan) {
           vm.loadingAction = true
@@ -2176,6 +2201,49 @@ export default {
           }, 100)
         })
       }
+    },
+    removeAllDossierFromGroup () {
+      let vm = this
+      let arrRemove = []
+      for (let i = 0; i < vm.hoSoDaXuLy.length; i++) {
+        arrRemove.push(vm.$store.dispatch('removeDossierFromGroup', {dossierId: vm.hoSoDaXuLy[i].dossierId, groupDossierId: vm.thongTinNhomHoSo['dossierId']}))
+      }
+      vm.loadingAction = true
+      Promise.all(arrRemove).then(function () {
+        vm.loadingAction = false
+        toastr.success('Yêu cầu thực hiện thành công')
+        setTimeout(() => {
+          let filter1 = {
+            groupDossierId: vm.thongTinNhomHoSo['dossierId']
+          }
+          vm.$store.dispatch('getDossiersIntoGroup', filter1).then(function (result) {
+            vm.dossiersIntoGroup = result
+            if ((vm.metaDataGroupDossier.hasOwnProperty('congvandagui') && vm.metaDataGroupDossier.congvandagui) || !vm.metaDataGroupDossier.hasOwnProperty('congvandagui')) {
+              vm.activeDeleteCongVan = vm.dossiersIntoGroup.length === 0 ? true : false
+            }
+            vm.$store.commit('setSelectDossierGroup', vm.dossiersIntoGroup)
+            if (vm.dossiersIntoGroup.length > 0) {
+              let steps = []
+              for (let index in vm.dossiersIntoGroup) {
+                if (steps.filter(function (item) {
+                  return String(item['stepCode']) === String(vm.dossiersIntoGroup[index]['stepCode'])
+                }).length === 0) {
+                  steps.push({
+                    stepCode: vm.dossiersIntoGroup[index]['stepCode'],
+                    stepName: vm.dossiersIntoGroup[index]['stepName']
+                  })
+                }
+                vm.stepList = steps
+              }
+              vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
+            }
+            vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
+          }).catch(function () {
+          })
+        }, 100)
+      }).catch(function () {
+        vm.loadingAction = false
+      })
     },
     addFileToDossier () {
       let vm = this

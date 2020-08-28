@@ -259,7 +259,10 @@
                             <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
                           </td>
                           <td class="text-xs-left" width="150px" style="height: 40px !important">
-                            {{ props.item.dossierNo }}
+                            <span :style="formCode === 'NEW_GROUP_CV_DI' && String(formActionGroup['stepCode']) !== String(props.item.stepCode) ? 'text-decoration: underline;color: red;' : ''">
+                              {{ props.item.dossierNo }}
+                            </span><br> 
+                            <span v-if="formCode === 'NEW_GROUP_CV_DI' && String(formActionGroup['stepCode']) !== String(props.item.stepCode)" style="color: red;">Hồ sơ đã xử lý</span>
                           </td>
                           <td class="text-xs-left" width="150px" style="height: 40px !important">
                             {{ props.item.applicantName }}
@@ -301,7 +304,7 @@
                     </v-data-table>
                     <v-layout wrap class="mt-3 ml-3">
                       <v-flex xs12 sm2 class="pt-2">
-                        <span>Tổng số hồ sơ: </span>
+                        <span>Tổng số hồ sơ xử lý: </span>
                         <span class="text-bold">{{dossiersCounterIntoGroupFilter}} </span>
                       </v-flex>
                       <v-flex xs12 sm3 class="pt-2">
@@ -317,9 +320,21 @@
                         </div>
                       </v-flex>
                     </v-layout>
-                    
+                    <div v-if="formCode === 'NEW_GROUP_CV_DI' && hoSoDaXuLy.length > 0" class="ml-2">
+                      <v-icon color="red darken-2" size="24">report_problem</v-icon> &nbsp;
+                      <span style="font-size:14px">Hồ sơ 
+                        <span style="font-weight: bold;">{{hoSoDaXuLyList}}</span>
+                       đã xử lý. Vui lòng xóa khỏi công văn trước khi gửi.
+                      </span>
+                    </div>
                   </div>
                   <div v-else class="pl-5 py-2">Chưa có hồ sơ nào</div>
+                  <v-flex xs12 class="text-right mb-3 mr-2" v-if="formCode === 'NEW_GROUP_CV_DI' && hoSoDaXuLy.length > 0">
+                    <v-btn small color="primary" @click="removeAllDossierFromGroup" class="mx-0 my-0" >
+                      <v-icon size="20">delete</v-icon> &nbsp;
+                      <span>Xóa hồ sơ đã xử lý</span>
+                    </v-btn>
+                  </v-flex>
                 </div>
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -974,6 +989,8 @@ export default {
     },
     totalFee: 0,
     dossiersCounterIntoGroupFilter: 0,
+    hoSoDaXuLy: [],
+    hoSoDaXuLyList: '',
     createFileCongVan: '',
     postStepCodeCongVan: '',
     donvinhanCollection: '',
@@ -1124,6 +1141,15 @@ export default {
         vm.dossiersCounterIntoGroupFilter = arr.filter(function (item) {
           return String(item.stepCode) === String(vm.formActionGroup.stepCode)
         }).length
+        vm.hoSoDaXuLy = vm.dossiersIntoGroupRender.filter(function (item) {
+          return String(item.stepCode) !== String(vm.formActionGroup.stepCode)
+        })
+        if (vm.hoSoDaXuLy.length > 0) {
+          vm.hoSoDaXuLyList = vm.hoSoDaXuLy.map(obj =>{ 
+            return obj.dossierNo
+          }).toString()
+        }
+        
       }
       if (arr && arr.length > 0) {
         for (let i = 0; i < arr.length; i++) {
@@ -1182,6 +1208,14 @@ export default {
           vm.dossiersCounterIntoGroupFilter = arr.filter(function (item) {
             return String(item.stepCode) === String(vm.formActionGroup.stepCode)
           }).length
+          vm.hoSoDaXuLy = vm.dossiersIntoGroupRender.filter(function (item) {
+            return String(item.stepCode) !== String(vm.formActionGroup.stepCode)
+          })
+          if (vm.hoSoDaXuLy.length > 0) {
+            vm.hoSoDaXuLyList = vm.hoSoDaXuLy.map(obj =>{ 
+              return obj.dossierNo
+            }).toString()
+          }
         }
         if (arr && arr.length > 0) {
           for (let i = 0; i < arr.length; i++) {
@@ -1708,7 +1742,6 @@ export default {
     },
     tiepNhanCongVan (type, isDraf) {
       let vm = this
-      vm.loadingAction = true
       let thongtincongvan = this.$refs.thongtincongvan.getThongTinCongVan()
       let tempData = thongtincongvan
       tempData.dueDate = vm.dateTimeView(thongtincongvan.dueDate)
@@ -1724,6 +1757,13 @@ export default {
       } else {
         validateThongTinCongVan = thongtincongvan.validation
       }
+      if (vm.formCode === 'NEW_GROUP_CV_DI' && isDraf === 'saveSend') {
+        if (vm.hoSoDaXuLy.length > 0) {
+          alert('Vui lòng xóa hồ sơ đã xử lý trước khi gửi công văn')
+          return
+        }
+      }
+      vm.loadingAction = true
       if (validateThongTinCongVan) {
         vm.$store.dispatch('putDossierCongVan', tempData).then(function (result) {
           let meta
@@ -2214,7 +2254,13 @@ export default {
       let items = vm.dossiersIntoGroupRender.filter(function(item) {
         return item.dossierId !== itemRemove.dossierId
       })
-      console.log('itemRemove555', items)
+      vm.$store.commit('setDossierSelectedDoAction', items)
+    },
+    removeAllDossierFromGroup () {
+      let vm = this
+      let items = vm.dossiersIntoGroupRender.filter(function(item) {
+        return String(item.stepCode) === String(vm.formActionGroup.stepCode)
+      })
       vm.$store.commit('setDossierSelectedDoAction', items)
     },
     processAction () {
