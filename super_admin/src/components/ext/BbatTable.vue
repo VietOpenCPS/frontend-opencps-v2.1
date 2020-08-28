@@ -463,7 +463,7 @@
           vm.columnsDataFilter = []
         } else {
           for (var key in vm.filterData) {
-            vm.columnsDataFilter[key]['value_filter'] = vm.filterData[key].trim()
+            vm.columnsDataFilter[key]['value_filter'] = String(vm.filterData[key]).trim()
             delete vm.columnsDataFilter[key]['source']
             delete vm.columnsDataFilter[key]['options']
           }
@@ -476,7 +476,7 @@
           }
           vm.columnsDataFilter.push({
             key: query['col'],
-            value_filter: query['pk'].trim(),
+            value_filter: String(query['pk']).trim(),
             compare: "=",
             type: pk_type
           })
