@@ -213,7 +213,7 @@
                   <span slot="loader">Loading...</span>
                 </v-btn> -->
                 <!--  -->
-                <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
+                <v-menu bottom offset-y v-if="showMenuActionKhac && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
                   <v-btn slot="activator" class="on-hover-btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list>
                     <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" @click="btnActionEvent(item, index)" v-if="item.form !== 'UPDATE'">
@@ -880,6 +880,7 @@ export default {
     loadingPlugin: false,
     listDossierFiles: [],
     detailPreAction: '',
+    showMenuActionKhac: true,
     headers: [
       {
         text: '#',
@@ -1270,6 +1271,12 @@ export default {
                 return !item.hasOwnProperty('roleCode') || (item.hasOwnProperty('roleCode') && vm.getUser(item.roleCode))
               })
             }
+            if (vm.btnStepsDynamics.filter(function(item) {
+              return item.form !== 'UPDATE'
+            }).length !== 0) {
+              vm.showMenuActionKhac = true
+            }
+            
           })
         }
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'done') {
@@ -3254,6 +3261,11 @@ export default {
                   vm.btnStepsDynamics = vm.btnStepsDynamics.filter(function (item) {
                     return !item.hasOwnProperty('roleCode') || (item.hasOwnProperty('roleCode') && vm.getUser(item.roleCode))
                   })
+                }
+                if (vm.btnStepsDynamics.filter(function(item) {
+                  item.form !== 'UPDATE'
+                }).length !== 0) {
+                  vm.showMenuActionKhac = true
                 }
               })
             }).catch(function() {

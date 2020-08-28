@@ -61,7 +61,7 @@
           :item-text="item.itemText"
           :item-value="item.itemValue"
           box
-          :rules="processRules(item.rules)"
+          :rules="processRules(item.rules, item)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
           :chips="item['chips']"
@@ -77,7 +77,7 @@
           :item-text="item.itemText"
           :item-value="item.itemValue"
           box
-          :rules="processRules(item.rules)"
+          :rules="processRules(item.rules, item)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
           :chips="item['chips']"
@@ -89,7 +89,7 @@
         </v-autocomplete>
         <v-text-field :class="item['class_component']" v-if="item.type === 'text-fields'"
           v-model="data[item.model]"
-          :rules="processRules(item.rules)"
+          :rules="processRules(item.rules, item)"
           :placeholder="item['placeholder']"
           :disabled="item['disabled']"
           :maxlength="getMaxLength(item)"
@@ -101,7 +101,7 @@
         </v-text-field>
         <v-textarea :class="item['class_component']" v-if="item.type === 'textarea'"
           v-model="data[item.model]"
-          :rules="processRules(item.rules)"
+          :rules="processRules(item.rules, item)"
           :placeholder="item['placeholder']"
           :disabled="item['disabled']"
           :maxlength="getMaxLength(item)"
@@ -150,7 +150,7 @@
             :item-text="itemChild.itemText"
             :item-value="itemChild.itemValue"
             box
-            :rules="processRules(itemChild.rules)"
+            :rules="processRules(itemChild.rules, itemChild)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
             @change="processChangeDataSource($event, itemChild)"
             :chips="item['chips']"
@@ -166,7 +166,7 @@
             :item-text="itemChild.itemText"
             :item-value="itemChild.itemValue"
             box
-            :rules="processRules(itemChild.rules)"
+            :rules="processRules(itemChild.rules, itemChild)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
             @change="processChangeDataSource($event, itemChild)"
             :chips="item['chips']"
@@ -178,7 +178,7 @@
           </v-autocomplete>
           <v-text-field :class="itemChild['class_component']" v-if="itemChild.type === 'text-fields'"
             v-model="data[itemChild.model]"
-            :rules="processRules(itemChild.rules)"
+            :rules="processRules(itemChild.rules, itemChild)"
             :placeholder="itemChild['placeholder']"
             box
             clearable
@@ -187,7 +187,7 @@
           </v-text-field>
           <v-textarea :class="itemChild['class_component']" v-if="itemChild.type === 'textarea'"
             v-model="data[itemChild.model]"
-            :rules="processRules(itemChild.rules)"
+            :rules="processRules(itemChild.rules, itemChild)"
             :placeholder="itemChild['placeholder']"
             box
             clearable

@@ -1050,6 +1050,7 @@
 </template>
 
 <script>
+  import toastr from 'toastr'
   import TinyPagination from '../ext/TinyPagination.vue'
   export default {
     props: ['id'],
@@ -1748,12 +1749,14 @@
                   vm.createProcessSequence(result.serviceProcessId, vm.processSequenceList[key])
                 }
               }
-              vm.$router.push({
-                path: currentPath.replace(0, result.serviceProcessId),
-                query: {
-                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-                }
-              })
+              toastr.success('Thực hiện thành công')
+              window.history.back()
+              // vm.$router.push({
+              //   path: currentPath.replace(0, result.serviceProcessId),
+              //   query: {
+              //     renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              //   }
+              // })
               // vm.$router.push(currentPath.replace(0, result.serviceProcessId))
             } else {
               vm.currentProcess = result
@@ -2022,12 +2025,13 @@
               postAction: vm.currentAction['postAction']
             }
             vm.$store.dispatch('postAction', data).then( res => {
-                vm.$router.push({
-                  path: currentPath + '?action=true',
-                  query: {
-                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-                  }
-                })
+              window.history.back()
+                // vm.$router.push({
+                //   path: currentPath + '?action=true',
+                //   query: {
+                //     renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                //   }
+                // })
             }).catch(() => {})
             console.log(result)
           }).catch(reject => {
