@@ -1716,7 +1716,7 @@ export default {
                 if(vm.formCode==='UPDATE'){
                     vm.getDetail()
                 } else {                   
-                    vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [], 'ma_to_khai': [], 'totalRecord': 0, 'delegateIdNo': '','delegateName': '','delegateTelNo': ''})
+                    vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [], 'ma_to_khai': [], 'totalRecord': 0, 'delegateIdNo': '','delegateName': '','delegateTelNo': '','Doan_HCTN': ''})
                     vm.getThanhPhan()
                     vm.genDueDate()
                     if(vm.eFormCode){
@@ -1809,7 +1809,7 @@ export default {
                 //     val['metaData'] = JSON.stringify(metaData)
                 //     $('#dossiers_hidden').val(JSON.stringify(val))
                 // }
-
+                $('#dossiers_hidden').val(JSON.stringify(val))
             }
         },
         dossierFileArr: {
@@ -1957,13 +1957,14 @@ export default {
                     vm.eFormCodeArr = metaData.ma_to_khai
                 }
                 vm.dossiers = res.data
+                vm.dossiers['bookingName'] = res.data['applicantName']
                 vm.delegateCityCode = vm.dossiers.delegateCityCode
                 vm.delegateDistrictCode = vm.dossiers.delegateDistrictCode
                 vm.delegateWardCode = vm.dossiers.delegateWardCode
                 vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
                 vm.viaPostal = vm.dossiers.viaPostal === 2 ?  true : false
                 vm.nuoc_di = metaData.Doan_HCTN.CacNuocDi_ma.split(',')
-
+                
 
                 vm.ho_chieu_ngoai_giao_cu = metaData.Doan_HCTN.SoHCCu_NG ? parseInt(metaData.Doan_HCTN.SoHCCu_NG) : 0
                 vm.ho_chieu_cong_vu_cu = metaData.Doan_HCTN.SoHCCu_CV ? parseInt(metaData.Doan_HCTN.SoHCCu_CV) : 0
@@ -2163,8 +2164,8 @@ export default {
                             } 
                         }
                         if(!vm.dossiers.applicantName){
-                            if(res.data.applicantName) {
-                                vm.dossiers.applicantName = res.data.applicantName
+                            if(res.data.vb_co_quan_chu_quan) {
+                                vm.dossiers.applicantName = res.data.vb_co_quan_chu_quan
                             }
                         }
                         if(!vm.dossiers.applicantIdNo){
@@ -2193,8 +2194,8 @@ export default {
                             } 
                         }
                         if(!vm.dossiers.bookingName){
-                            if(res.data.bookingName ){
-                                vm.dossiers.bookingName = res.data.bookingName
+                            if(res.data.vb_co_quan_chu_quan ){
+                                vm.dossiers.bookingName = res.data.vb_co_quan_chu_quan
                             } 
                         }
                         vm.changeDossier()            
@@ -2796,13 +2797,13 @@ export default {
                 }     
             });
             vm.payment = {"requestPayment":1,"paymentNote":"","advanceAmount":0,"feeAmount":le_phi,"serviceAmount":0,"shipAmount":0}
- 
+            console.log(vm.dossiers['metaData'] , typeof vm.dossiers['metaData'])   
             let hs = JSON.parse(vm.dossiers['metaData']);
             hs['dossierFilePayment'] = file_payment2
             hs['Doan_HCTN'] = {
                 "CQCuDi": vm.dossiers.applicantName, 
                 "QD_CV": "", 
-                "SoNguoi": vm.so_nguoi.toString(), 
+                "SoNguoi": String(vm.so_nguoi), 
                 "MucDich": "", 
                 "TaiChinh": "", 
                 "CQChuQuan": 0, 

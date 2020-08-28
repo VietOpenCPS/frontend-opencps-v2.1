@@ -50,7 +50,7 @@
           <v-icon>refresh</v-icon>
         </v-btn>
         <v-icon dark>more_vert</v-icon>
-        <v-btn dark icon v-on:click.native="toEditor(0)">
+        <v-btn dark icon v-if="tableName !== 'opencps_userlogin'" v-on:click.native="toEditor(0)">
           <v-icon>add_circle</v-icon>
         </v-btn>
         <v-btn dark icon v-on:click.native="backToList">
@@ -91,7 +91,7 @@
       content-class="box_shadow_custom"
     >
       <v-list>
-        <v-list-tile v-if="tableName !== 'opencps_services_filetemplates'" v-on:click.native="toEditor(-1)">
+        <v-list-tile v-if="tableName !== 'opencps_services_filetemplates' && tableName !== 'opencps_userlogin'" v-on:click.native="toEditor(-1)">
           <v-list-tile-action>
             <v-icon>edit</v-icon>
           </v-list-tile-action>
@@ -121,7 +121,7 @@
           </v-list-tile-action>
           <v-list-tile-title>Xem</v-list-tile-title>
         </v-list-tile>
-        <v-list-tile v-if="tableName !== 'opencps_services_filetemplates'" v-on:click.native="deleteRecord()">
+        <v-list-tile v-if="tableName !== 'opencps_services_filetemplates' && tableName !== 'opencps_userlogin'" v-on:click.native="deleteRecord()">
           <v-list-tile-action>
             <v-icon color="red darken-3">clear</v-icon>
           </v-list-tile-action>
