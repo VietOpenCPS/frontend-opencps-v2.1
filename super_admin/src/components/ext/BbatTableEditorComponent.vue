@@ -68,6 +68,7 @@
           :multiple="item['multiple']"
           clearable
           :disabled="item['disabled']"
+          :value-comparator="(a, b)=> {return a == b}" 
         >
           <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
         </v-autocomplete>
@@ -84,6 +85,7 @@
           :multiple="item['multiple']"
           clearable
           :disabled="item['disabled']"
+          :value-comparator="(a, b)=> {return a == b}" 
         >
           <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
         </v-autocomplete>
@@ -157,6 +159,7 @@
             :multiple="item['multiple']"
             clearable
             :disabled="item['disabled']"
+            :value-comparator="(a, b)=> {return a == b}" 
           >
             <template slot="label">{{itemChild['label']}} <span v-if="itemChild.required" class="red--text darken-3">*</span></template>
           </v-autocomplete>
@@ -173,6 +176,7 @@
             :multiple="item['multiple']"
             clearable
             :disabled="item['disabled']"
+            :value-comparator="(a, b)=> {return a == b}" 
           >
             <template slot="label">{{itemChild['label']}} <span v-if="itemChild.required" class="red--text darken-3">*</span></template>
           </v-autocomplete>
