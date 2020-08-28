@@ -11,6 +11,7 @@
           <v-text-field
             class="search-input-appbar input-search d-inline-block"
             style="width: calc(100% - 130px);"
+            v-model="dossierNoKey"
             single-lines
             hide-details
             solo
@@ -28,6 +29,7 @@
             class="search-input-appbar input-search d-inline-block"
             style="width: calc(100% - 130px);"
             single-lines
+            v-model="applicantIdNo"
             hide-details
             solo
             flat
@@ -43,6 +45,7 @@
           <v-autocomplete
             class="select-search d-inline-block"
             style="width: calc(100% - 130px);"
+            :items="domainListCurrent"
             item-text="domainName"
             item-value="domainCode"
             hide-details
@@ -79,8 +82,9 @@
           <v-autocomplete
             class="select-search d-inline-block"
             style="width: calc(100% - 130px);"
-            item-text="domainName"
-            item-value="domainCode"
+            item-text="text"
+            item-value="value"
+            :items="statusList"
             hide-details
             hide-no-data
             solo
@@ -97,8 +101,9 @@
           <v-autocomplete
             class="select-search d-inline-block"
             style="width: calc(100% - 130px);"
-            item-text="domainName"
-            item-value="domainCode"
+            :items="methods"
+            item-text="text"
+            item-value="value"
             hide-details
             hide-no-data
             solo
@@ -242,6 +247,7 @@ export default {
     'chi-tiet-ho-so': ChiTietHoSo
   },
   data: () => ({
+    domainListCurrent: [],
     dossierList: [],
     dossierSelected: '',
     detail: false,
@@ -306,6 +312,10 @@ export default {
       {text: 'Đã xử lý xong', value: 'releasing'},
       {text: 'Đã trả kết quả', value: 'done'}
     ],
+    methods: [
+      {text: 'Trực tuyến', value: 'true'},
+      {text: 'Trực tiếp', value: 'false'}
+    ],
     status: null,
     captchaCode: '',
   }),
@@ -326,13 +336,14 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
-
+      vm.createCaptcha()
+      vm.getDomain()
     })
   },
   updated () {
     var vm = this
     vm.$nextTick(function () {
-      vm.createCaptcha()
+
     })
   },
   watch: {
@@ -350,6 +361,15 @@ export default {
     }
   },
   methods: {
+    getDomain(){
+      let vm = this
+      let filterDomain = {
+        agencyCode: ''
+      }
+      vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+        vm.domainListCurrent = result
+      })
+    },
     doSearchDossier () {
       let vm = this
       vm.detail = false

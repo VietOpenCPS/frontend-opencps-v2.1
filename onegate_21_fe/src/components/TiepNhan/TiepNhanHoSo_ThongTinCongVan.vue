@@ -616,6 +616,8 @@ export default {
       }
       vm.thongTinCongVan.metaData = Object.assign(metaData, thongtinquyetdinh)
       vm.thongTinCongVan.sampleCount = vm.lengthDossier
+      // let validationQuyetDinh = vm.$refs.thongtinquyetdinh.getThongTinQuyetDinh()['validation']
+      // vm.thongTinCongVan.validation = vm.$refs.formThongTinCongVan.validate() && validationQuyetDinh
       vm.thongTinCongVan.validation = vm.$refs.formThongTinCongVan.validate()
       if (vm.taoQuyetDinh) {
         let validationQuyetDinh = vm.$refs.thongtinquyetdinh.getThongTinQuyetDinh()['validation']
