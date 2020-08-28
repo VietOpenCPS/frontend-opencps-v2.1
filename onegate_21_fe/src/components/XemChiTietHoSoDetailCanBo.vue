@@ -1273,8 +1273,8 @@ export default {
             }
             if (vm.btnStepsDynamics.filter(function(item) {
               return item.form !== 'UPDATE'
-            }).length !== 0) {
-              vm.showMenuActionKhac = true
+            }).length === 0) {
+              vm.showMenuActionKhac = false
             }
             
           })
@@ -3265,7 +3265,7 @@ export default {
                 if (vm.btnStepsDynamics.filter(function(item) {
                   item.form !== 'UPDATE'
                 }).length !== 0) {
-                  vm.showMenuActionKhac = true
+                  vm.showMenuActionKhac = false
                 }
               })
             }).catch(function() {

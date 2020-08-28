@@ -2379,7 +2379,7 @@ export default {
               query: vm.$router.history.current.query
             })
         } else if (String(item.form) === 'ADD') {
-        vm.$router.push({
+          vm.$router.push({
             path: '/danh-sach-ho-so/' + vm.index + '/bo-sung-ho-so/' + dossierItem.dossierId,
             query: vm.$router.history.current.query
           })
