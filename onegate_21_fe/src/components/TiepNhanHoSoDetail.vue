@@ -292,7 +292,7 @@
                             <v-btn flat icon color="indigo" class="mr-2 my-0" @click="viewDetail(props.item)" title="Xem chi tiết">
                               <v-icon>fas fa fa-file-text</v-icon>
                             </v-btn>
-                            <v-btn flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
+                            <v-btn flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa khỏi công văn">
                               <v-icon size="22">delete</v-icon>
                             </v-btn>
                           </td>
@@ -1667,30 +1667,34 @@ export default {
               }
             } 
             let filterCheck = {
-              formDataKey: vm.mappingValidateGP ? vm.mappingValidateGP : {},
+              formDataKey: vm.mappingValidateGP ? vm.mappingValidateGP : '',
               deliverableType: vm.mauGiayPhep
             }
-            vm.$store.dispatch('checkDaCapPhep', filterCheck).then(function (result) {
-              let userExits = false
-              let quyetdinhItems = []
-              let thongTinCapPhep = result.hasOwnProperty('data') ? result.data : []
-              if (thongTinCapPhep.length > 0) {
-                userExits = true
-              }
-              if (userExits) {
-                let x = confirm('Đối tượng đã cấp phép. Bạn có muốn tiếp tục?')
-                if (x) {
-                  doAction()
-                } else {
-                  vm.loadingAction = false
-                }
-              } else {
-                doAction()
-              }
-              
-            }).catch(rejectXhr => {
+            if (filterCheck.formDataKey === '') {
               doAction()
-            })
+            } else {
+              vm.$store.dispatch('checkDaCapPhep', filterCheck).then(function (result) {
+                let userExits = false
+                let quyetdinhItems = []
+                let thongTinCapPhep = result.hasOwnProperty('data') ? result.data : []
+                if (thongTinCapPhep.length > 0) {
+                  userExits = true
+                }
+                if (userExits) {
+                  let x = confirm('Đối tượng đã cấp phép. Bạn có muốn tiếp tục?')
+                  if (x) {
+                    doAction()
+                  } else {
+                    vm.loadingAction = false
+                  }
+                } else {
+                  doAction()
+                }
+                
+              }).catch(rejectXhr => {
+                doAction()
+              })
+            }
             // 
           }
         }
@@ -2355,6 +2359,7 @@ export default {
       window.history.back()
     },
     getThongTinValidateGp (serverNoConfig) {
+      let vm = this
       let filter = {
         serverNo: serverNoConfig
       }

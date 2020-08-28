@@ -27,7 +27,7 @@
       <v-flex xs12 class="px-4" v-if="String(id) === '0' || (String(id) !== '0' && editDeliverable)">
         <div class="mb-2" style="font-size: 14px">
           Tài liệu đính kèm <span v-if="requiredAttachFile" style="color:red">(*) </span>:
-          <a v-if="detail['fileEntryId'] && detail['fileEntryId'] !== '0'" :href="urlFileAttach" download
+          <a v-if="detail['fileAttachs'] && detail['fileAttachs'] !== '0'" :href="urlFileAttach" download
            style="color:blue; font-style: italic; text-decoration: underline;"> Tải xuống </a>
         </div>
         <div v-if="fileNameAttach" class="ml-1">
@@ -44,7 +44,7 @@
         <input type="file" id="documentFileAttachSub" @input="onUploadSingleFile($event, 1)" style="display:none">
         <v-btn small color="primary" class="mx-0 mt-2" dark @click.native="uploadFile">
           <v-icon>fas fa fa-upload</v-icon> &nbsp; &nbsp;
-          <span v-if="String(id) !== '0' && editDeliverable && detail['fileEntryId'] && detail['fileEntryId'] !== '0'">Cập nhật tài liệu đính kèm</span>
+          <span v-if="String(id) !== '0' && editDeliverable && detail['fileAttachs'] && detail['fileAttachs'] !== '0'">Cập nhật tài liệu đính kèm</span>
           <span v-else>Chọn tài liệu tải lên</span>
         </v-btn>
         
@@ -97,14 +97,14 @@
           <v-icon>edit</v-icon> &nbsp;
           Sửa&nbsp;{{String(loaiDuLieu).toLowerCase()}}
           </v-btn>
-          <v-btn v-if="String(id) !== '0' && !editDeliverable && detail['fileAttachs']" color="blue darken-3" class="mr-1" dark  v-on:click.native="viewFileAttach(detail)"
+          <!-- <v-btn v-if="String(id) !== '0' && !editDeliverable && detail['fileAttachs']" color="blue darken-3" class="mr-1" dark  v-on:click.native="viewFileAttach(detail)"
             :loading="loading"
             :disabled="loading"
           >
           <v-icon>visibility</v-icon> &nbsp;
             Tài liệu đính kèm
-          </v-btn>
-          <v-btn v-if="String(id) !== '0' && editDeliverable" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverable = false"
+          </v-btn> -->
+          <v-btn v-if="String(id) !== '0' && editDeliverable && detail['fileAttachs'] && detail['fileAttachs'] !== '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverable = false"
             :loading="loading"
             :disabled="loading"
           >
@@ -261,7 +261,7 @@
                 // test multiple fileAttachs
                 // vm.detail['fileAttachs'] = '1300487,1289275'
                 // 
-                if (vm.detail['fileEntryId'] && vm.detail['fileEntryId'] !== '0') {
+                if (vm.detail['fileAttachs'] && vm.detail['fileAttachs'] !== '0') {
                   vm.getFileAttach()
                 }
               }
@@ -311,7 +311,7 @@
               // test multiple fileAttachs
               // vm.detail['fileAttachs'] = '1300487,1289275'
               // 
-              if (vm.detail['fileEntryId'] && vm.detail['fileEntryId'] !== '0') {
+              if (vm.detail['fileAttachs'] && vm.detail['fileAttachs'] !== '0') {
                 vm.getFileAttach()
               }
             }
@@ -491,16 +491,17 @@
                   attachFiles()
                   setTimeout(function () {
                     toastr.success('Cập nhật thành công')
+                    vm.backToList()
                     vm.loading = false
-                    vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
-                      vm.detail = result
-                      vm.editDeliverable = false
-                      vm.showComponent = true
-                      setTimeout(function () {
-                        vm.$refs.viewpdf.pullPDF(vm.detail['fileEntryId'])
-                      }, 200)
-                    })
-                  }, 5000)
+                    // vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
+                    //   vm.detail = result
+                    //   vm.editDeliverable = false
+                    //   vm.showComponent = true
+                    //   setTimeout(function () {
+                    //     vm.$refs.viewpdf.pullPDF(vm.detail['fileEntryId'])
+                    //   }, 200)
+                    // })
+                  }, 2000)
                   
                 }, 500)
               }
@@ -645,7 +646,7 @@
       },
       getFileAttach () {
         let vm = this
-        vm.$store.dispatch('viewPDF', vm.detail['fileEntryId']).then(function (result) {
+        vm.$store.dispatch('viewPDF', vm.detail['fileAttachs']).then(function (result) {
           vm.urlFileAttach = result
         }).catch(function () {
           vm.urlFileAttach = ''

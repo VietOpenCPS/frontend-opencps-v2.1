@@ -359,7 +359,7 @@
             </content-placeholders>
 
             <v-tooltip top v-if="!loadingTable">
-              <v-btn slot="activator" flat icon class="mx-0 my-0" v-on:click.native="showPDFG(props.item)">
+              <v-btn :disabled="props.item['fileAttachs'] && String(props.item['fileAttachs']) !== '0' ? false : true" slot="activator" flat icon class="mx-0 my-0" v-on:click.native="showPDFG(props.item)">
                 <v-icon>attach_file</v-icon>
               </v-btn>
               <span>Xem &nbsp;{{String(loaiDuLieu).toLowerCase()}}</span>
@@ -847,7 +847,7 @@
         vm.viewAttach = false
         vm.dialogPDFList = true
         vm.dialogPDFLoading = true
-        vm.$store.dispatch('viewPDF', item['fileEntryId']).then(function (result) {
+        vm.$store.dispatch('viewPDF', item['fileAttachs']).then(function (result) {
           vm.dialogPDFLoading = false
           document.getElementById('pdfViewerListComponent').src = result
         })

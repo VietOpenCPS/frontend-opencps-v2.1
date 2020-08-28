@@ -140,8 +140,8 @@
                   </template>
                   <!--  -->
                   <template slot="items" slot-scope="props">
-                    <tr :style="formCode === 'NEW_GROUP_CV_DI' && String(metaDataGroupDossier['stepcode']) !== String(props.item.stepCode) ? 'cursor: no-drop;' : 'cursor: pointer'" 
-                      :title="formCode === 'NEW_GROUP_CV_DI' && String(metaDataGroupDossier['stepcode']) !== String(props.item.stepCode) ? 'Hồ sơ đã xử lý' : ''"
+                    <tr :style="formCode === 'NEW_GROUP_CV_DI' && String(metaDataGroupDossier['stepcode']) !== String(props.item.stepCode) && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui ? 'cursor: no-drop;' : 'cursor: pointer'" 
+                      :title="formCode === 'NEW_GROUP_CV_DI' && String(metaDataGroupDossier['stepcode']) !== String(props.item.stepCode) && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui ? 'Hồ sơ đã xử lý' : ''"
                     >
                       <!-- <td class="text-xs-center pl-3" width="32px" style="height: 40px !important">
                         <v-checkbox
@@ -154,10 +154,10 @@
                         <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
                       </td>
                       <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="150px" style="height: 40px !important">
-                        <span :style="formCode === 'NEW_GROUP_CV_DI' && String(metaDataGroupDossier['stepcode']) !== String(props.item.stepCode) ? 'text-decoration: underline;color: red;' : ''">
+                        <span :style="formCode === 'NEW_GROUP_CV_DI' && String(metaDataGroupDossier['stepcode']) !== String(props.item.stepCode) && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui ? 'text-decoration: underline;color: red;' : ''">
                           {{ props.item.dossierNo }}
                         </span><br> 
-                        <span v-if="formCode === 'NEW_GROUP_CV_DI' && String(metaDataGroupDossier['stepcode']) !== String(props.item.stepCode)" style="color: red;">Hồ sơ đã xử lý</span>
+                        <span v-if="formCode === 'NEW_GROUP_CV_DI' && String(metaDataGroupDossier['stepcode']) !== String(props.item.stepCode) && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui" style="color: red;">Hồ sơ đã xử lý</span>
                       </td>
                       <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="150px" style="height: 40px !important">
                         {{ props.item.applicantName }}
@@ -194,7 +194,7 @@
                          flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
                           <v-icon size="22">create</v-icon>
                         </v-btn>
-                        <v-btn v-if="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(String(props.item['groupDossierIds']))) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
+                        <v-btn v-if="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(String(props.item['groupDossierIds']))) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa khỏi công văn">
                           <v-icon size="22">delete</v-icon>
                         </v-btn>
                       </td>
@@ -1114,14 +1114,14 @@ export default {
       let vm = this
       let totalFee = 0
       vm.dossiersCounterIntoGroupFilter = arr.length
-      if (vm.formCode === 'NEW_GROUP_CV_DI') {
+      if (vm.formCode === 'NEW_GROUP_CV_DI' && vm.metaDataGroupDossier.hasOwnProperty('congvandagui') && !vm.metaDataGroupDossier.congvandagui) {
         vm.dossiersCounterIntoGroupFilter = arr.filter(function (item) {
           return String(item.stepCode) === String(vm.metaDataGroupDossier.stepcode)
         }).length
       }
       if (arr && arr.length > 0) {
         for (let i = 0; i < arr.length; i++) {
-          if (vm.formCode === 'NEW_GROUP_CV_DI') {
+          if (vm.formCode === 'NEW_GROUP_CV_DI' && vm.metaDataGroupDossier.hasOwnProperty('congvandagui') && !vm.metaDataGroupDossier.congvandagui) {
             if (String(arr[i].stepCode) === String(vm.metaDataGroupDossier.stepcode)) {
               let metaData = vm.getMetaData(arr[i])
               let fee = 0
@@ -2056,30 +2056,35 @@ export default {
             }
           } 
           let filterCheck = {
-            formDataKey: vm.mappingValidateGP ? vm.mappingValidateGP : {},
+            formDataKey: vm.mappingValidateGP ? vm.mappingValidateGP : '',
             deliverableType: vm.mauGiayPhep
           }
-          vm.$store.dispatch('checkDaCapPhep', filterCheck).then(function (result) {
-            let userExits = false
-            let quyetdinhItems = []
-            let thongTinCapPhep = result.hasOwnProperty('data') ? result.data : []
-            if (thongTinCapPhep.length > 0) {
-              userExits = true
-            }
-            if (userExits) {
-              let x = confirm('Đối tượng đã cấp phép. Bạn có muốn tiếp tục?')
-              if (x) {
-                doAction()
-              } else {
-                vm.loadingAction = false
-              }
-            } else {
-              doAction()
-            }
-            
-          }).catch(rejectXhr => {
+          if (filterCheck.formDataKey === '') {
             doAction()
-          })
+          } else {
+            vm.$store.dispatch('checkDaCapPhep', filterCheck).then(function (result) {
+              let userExits = false
+              let quyetdinhItems = []
+              let thongTinCapPhep = result.hasOwnProperty('data') ? result.data : []
+              if (thongTinCapPhep.length > 0) {
+                userExits = true
+              }
+              if (userExits) {
+                let x = confirm('Đối tượng đã cấp phép. Bạn có muốn tiếp tục?')
+                if (x) {
+                  doAction()
+                } else {
+                  vm.loadingAction = false
+                }
+              } else {
+                doAction()
+              }
+              
+            }).catch(rejectXhr => {
+              doAction()
+            })
+          }
+          
           // 
           
         } else {
