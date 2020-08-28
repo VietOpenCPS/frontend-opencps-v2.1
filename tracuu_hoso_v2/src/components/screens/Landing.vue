@@ -45,6 +45,7 @@
           <v-autocomplete
             class="select-search d-inline-block"
             style="width: calc(100% - 130px);"
+            v-model="domain"
             :items="domainListCurrent"
             item-text="domainName"
             item-value="domainCode"
@@ -84,6 +85,7 @@
             style="width: calc(100% - 130px);"
             item-text="text"
             item-value="value"
+            v-model="status"
             :items="statusList"
             hide-details
             hide-no-data
@@ -101,7 +103,8 @@
           <v-autocomplete
             class="select-search d-inline-block"
             style="width: calc(100% - 130px);"
-            :items="methods"
+            :items="onlines"
+            v-model="online"
             item-text="text"
             item-value="value"
             hide-details
@@ -120,6 +123,7 @@
           <div style="width: calc(100% - 130px);display: inline-block;">
             <div style="display:flex; align-items: center;justify-content: center;">
               <v-text-field
+                v-model="captchaValue"
                 class="search-input-appbar input-search d-inline-block"
                 style="width: 75%"
                 single-lines
@@ -141,7 +145,7 @@
         </div>
       </v-flex>
       <v-flex xs12 class="text-xs-center">
-        <v-btn color="primary">
+        <v-btn color="primary" @click="changeStatus">
           Tìm kiếm
         </v-btn>
       </v-flex>
@@ -165,6 +169,14 @@
                   <span>{{dossierPage * 10 - 10 + props.index + 1}}</span><br>
                 </div>
               </td>
+              <td class="text-xs-left py-2" style="min-width: 150px;">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.dossierName}}</span>
+                </div>
+              </td>
               <td class="text-xs-left py-2" :style="isMobile ? 'min-width: 110px' : 'min-width: 135px'">
                 <content-placeholders v-if="loading">
                   <content-placeholders-text :lines="1" />
@@ -183,13 +195,13 @@
                   <span>{{props.item.dossierName}}</span>
                 </div>
               </td>
-              <td class="text-xs-left py-2" style="min-width: 135px">
+              <td class="text-xs-left py-2" :style="isMobile ? 'min-width: 100px' : 'min-width: 135px'">
                 <content-placeholders v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
                   <span>
-                    <span>{{props.item.applicantName}}</span>
+                    <span>{{props.item.receiveDate}}</span>
                   </span>
                 </div>
               </td>
@@ -199,7 +211,7 @@
                 </content-placeholders>
                 <div v-else>
                   <span>
-                    <span>{{props.item.receiveDate}}</span>
+                    <span>{{props.item.dueDate}}</span>
                   </span>
                 </div>
               </td>
@@ -247,6 +259,8 @@ export default {
     'chi-tiet-ho-so': ChiTietHoSo
   },
   data: () => ({
+    methodSelected: '',
+    domain: '',
     domainListCurrent: [],
     dossierList: [],
     dossierSelected: '',
@@ -312,12 +326,14 @@ export default {
       {text: 'Đã xử lý xong', value: 'releasing'},
       {text: 'Đã trả kết quả', value: 'done'}
     ],
-    methods: [
+    onlines: [
       {text: 'Trực tuyến', value: 'true'},
       {text: 'Trực tiếp', value: 'false'}
     ],
     status: null,
     captchaCode: '',
+    online: '',
+    captchaValue: '',
   }),
   computed: {
     originality () {
@@ -380,12 +396,16 @@ export default {
       vm.dossierNoKey = newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : ''
       vm.applicantIdNo = newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : ''
       vm.status = newQuery.hasOwnProperty('status') && newQuery.status !== 'null' ? newQuery.status : ''
+      vm.online = newQuery.hasOwnProperty('online') && newQuery.online !== 'null' ? newQuery.online : ''
+      vm.domain = newQuery.hasOwnProperty('domain') && newQuery.domain !== 'null' ? newQuery.domain : ''
       vm.dossierPage = newQuery.hasOwnProperty('page') ? Number(newQuery.page) : 1
       let filter = {
         page: vm.dossierPage,
         dossierNo: vm.dossierNoKey,
         applicantIdNo: vm.applicantIdNo,
-        status: vm.status
+        status: vm.status,
+        online: vm.online,
+        domain: vm.domain
       }
       if (vm.dossierNoKey || vm.applicantIdNo) {
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
@@ -402,27 +422,32 @@ export default {
     changeDataSearch () {
       let vm = this
       if (vm.dossierNoKey || vm.applicantIdNo) {
-        setTimeout(function () {
-          vm.dossierPage = 1
-          let current = vm.$router.history.current
-          let newQuery = current.query
-          let queryString = '?'
-          newQuery['page'] = vm.dossierPage
-          newQuery['dossierNo'] = vm.dossierNoKey
-          newQuery['applicantIdNo'] = vm.applicantIdNo
-          newQuery['status'] = vm.status
-          for (let key in newQuery) {
-            if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
-              queryString += key + '=' + newQuery[key] + '&'
+        if(vm.validateCaptcha()){
+          setTimeout(function () {
+            vm.dossierPage = 1
+            let current = vm.$router.history.current
+            let newQuery = current.query
+            let queryString = '?'
+            newQuery['page'] = vm.dossierPage
+            newQuery['domain'] = vm.domain
+            newQuery['dossierNo'] = vm.dossierNoKey
+            newQuery['applicantIdNo'] = vm.applicantIdNo
+            newQuery['status'] = vm.status
+            newQuery['online'] = vm.online
+            
+            for (let key in newQuery) {
+              if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+                queryString += key + '=' + newQuery[key] + '&'
+              }
             }
-          }
-          vm.$router.push({
-            path: current.path + queryString,
-            query: {
-              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-            }
-          })
-        }, 100)
+            vm.$router.push({
+              path: current.path + queryString,
+              query: {
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              }
+            })
+          }, 100)
+        }
       } else {
         toastr.error('Vui lòng nhập mã hồ sơ hoặc số CMND/ hộ chiếu để tra cứu')
       }
@@ -431,6 +456,8 @@ export default {
       let vm = this
       if (vm.dossierNoKey || vm.applicantIdNo) {
         vm.changeDataSearch()
+      } else {
+        toastr.error('Vui lòng nhập mã hồ sơ hoặc số CMND/ hộ chiếu để tra cứu')
       }
     },
     viewDetail (item) {
