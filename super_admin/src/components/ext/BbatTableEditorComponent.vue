@@ -7,7 +7,7 @@
       <v-flex v-for="(item, index) in detailForm" v-bind:key="index" :class="item['class']">
         <v-subheader class="px-0" v-if="item.type === 'ricktext'">{{item['label']}}</v-subheader>
         <trumbowyg v-if="item.type === 'ricktext'" v-model="data[item.model]" :config="config"></trumbowyg>
-        <attached-file-avatar v-if="item.type === 'avatar'" :pk="data[item.model]" :pick-item="item" :current-data="data"></attached-file-avatar>
+        <!-- <attached-file-avatar v-if="item.type === 'avatar'" :pk="data[item.model]" :pick-item="item" :current-data="data"></attached-file-avatar> -->
         <datetime-picker :class="item['class_component']" v-if="item.type === 'date'" v-model="data[item.model]" :item="item" :data-value="data[item.model]"></datetime-picker>
         <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['link'] && ((item.dependency && String(id) !== '0') || !item.dependency)" :to="item.url + '?pk=' + data[item.pk] + '&col=' + (item.hasOwnProperty('pk_foreign') ? item.pk_foreign : item.pk) + '&pk_type=' + (item.hasOwnProperty('pk_type') ? item.pk_type : 'number') ">
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
@@ -122,7 +122,7 @@
         <div v-if="item.hasOwnProperty('alongside')" v-for="(itemChild, indexChild) in item['alongside']" v-bind:key="indexChild">
           <v-subheader class="px-0" v-if="itemChild.type === 'ricktext'">{{itemChild['label']}}</v-subheader>
           <trumbowyg v-if="itemChild.type === 'ricktext'" v-model="data[itemChild.model]" :config="config"></trumbowyg>
-          <attached-file-avatar :class="itemChild['class_component']" v-if="itemChild.type === 'avatar'" :pk="data[itemChild.model]" :pick-item="itemChild"></attached-file-avatar>
+          <!-- <attached-file-avatar :class="itemChild['class_component']" v-if="itemChild.type === 'avatar'" :pk="data[itemChild.model]" :pick-item="itemChild"></attached-file-avatar> -->
           <datetime-picker :class="itemChild['class_component']" v-if="itemChild.type === 'date'" v-model="data[itemChild.model]" :item="itemChild" :data-value="data[itemChild.model]"></datetime-picker>
           <v-btn :class="itemChild['class_component']" color="blue darken-3" dark v-if="itemChild.type === 'button' && itemChild['link'] && ((itemChild.dependency && String(id) !== '0') || !itemChild.dependency)" :to="itemChild.url + '?pk=' + data[itemChild.pk] + '&col=' + itemChild.pk">
             <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'link'">how_to_vote</v-icon>

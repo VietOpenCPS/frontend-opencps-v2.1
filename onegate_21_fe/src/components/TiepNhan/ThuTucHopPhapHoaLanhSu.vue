@@ -1534,8 +1534,8 @@ export default {
                             } 
                         }
                         if(!vm.dossiers.applicantName){
-                            if(res.data.applicantName) {
-                                vm.dossiers.applicantName = res.data.applicantName
+                            if(res.data.delegateName) {
+                                vm.dossiers.applicantName = res.data.delegateName
                             }
                         }
                         if(!vm.dossiers.applicantIdNo){
@@ -1554,8 +1554,8 @@ export default {
                             }
                         }
                         if(!vm.dossiers.contactName){
-                            if(res.data.contactName) {
-                                vm.dossiers.contactName = res.data.contactName
+                            if(res.data.delegateName) {
+                                vm.dossiers.contactName = res.data.delegateName
                             }
                         }
                         if(!vm.dossiers.address){
@@ -1564,8 +1564,8 @@ export default {
                             } 
                         }
                         if(!vm.dossiers.bookingName){
-                            if(res.data.bookingName ){
-                                vm.dossiers.bookingName = res.data.bookingName
+                            if(res.data.delegateName ){
+                                vm.dossiers.bookingName = res.data.delegateName
                             } 
                         }
                         if(res.data.su_dung_tai_nuoc_ma) {
