@@ -2567,12 +2567,15 @@ export default {
       return owner
     },
     getThongTinValidateGp (serverNoConfig) {
+      let vm = this
       let filter = {
         serverNo: serverNoConfig
       }
       vm.$store.dispatch('getServerConfig', filter).then(function (result) {
-        vm.mauGiayPhep = result.deliverableType
-        vm.mappingValidateGP = JSON.parse(result.mapping)
+        let configs = JSON.parse(result.configs)
+        vm.mauGiayPhep = configs.deliverableType
+        vm.mappingValidateGP = configs.mapping
+        console.log('mauGiayPhep', vm.mauGiayPhep, vm.mappingValidateGP)
       }).catch(function (reject) {
       })
     },
