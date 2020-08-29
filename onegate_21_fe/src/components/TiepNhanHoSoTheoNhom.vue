@@ -37,7 +37,7 @@
         <thong-tin-chu-ho-so v-if="formCode === 'NEW_GROUP'" :showApplicant="true" :showDelegate="false" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
 
         <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" ref="thongtincongvan" :detailDossier="thongTinNhomHoSo"
-         :tphs="tphsCV" :taoQuyetDinh="hasTaoQuyetDinh" :createFileCongVan="createFileCongVan" :formCodeInput="formCode" :requiredCVDenGroupId="requiredCVDenGroupId" :requiredCVDenGovCode="requiredCVDenGovCode" :donvinhanCollection="donvinhanCollection" :lengthDossier="dossiersIntoGroupRender.length">
+         :tphs="tphsCV" :taoQuyetDinh="hasTaoQuyetDinh" :createFileCongVan="createFileCongVan" :formCodeInput="formCode" :requiredCVDenGroupId="requiredCVDenGroupId" :requiredCVDenGovCode="requiredCVDenGovCode" :donvinhanCollection="donvinhanCollection" :lengthDossier="dossiersCounterIntoGroupFilter">
         </thong-tin-cong-van>
 
         <div v-if="formCode === 'NEW_GROUP'" style="position: relative;border-top: 1px solid #dedede;">
@@ -140,7 +140,9 @@
                   </template>
                   <!--  -->
                   <template slot="items" slot-scope="props">
-                    <tr style="cursor: pointer">
+                    <tr :style="formCode === 'NEW_GROUP_CV_DI' && String(metaDataGroupDossier['stepcode']) !== String(props.item.stepCode) && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui ? 'cursor: no-drop;' : 'cursor: pointer'" 
+                      :title="formCode === 'NEW_GROUP_CV_DI' && String(metaDataGroupDossier['stepcode']) !== String(props.item.stepCode) && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui ? 'Hồ sơ đã xử lý' : ''"
+                    >
                       <!-- <td class="text-xs-center pl-3" width="32px" style="height: 40px !important">
                         <v-checkbox
                           v-model="props.selected"
@@ -152,7 +154,10 @@
                         <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
                       </td>
                       <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="150px" style="height: 40px !important">
-                        {{ props.item.dossierNo }}
+                        <span :style="formCode === 'NEW_GROUP_CV_DI' && String(metaDataGroupDossier['stepcode']) !== String(props.item.stepCode) && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui ? 'text-decoration: underline;color: red;' : ''">
+                          {{ props.item.dossierNo }}
+                        </span><br> 
+                        <span v-if="formCode === 'NEW_GROUP_CV_DI' && String(metaDataGroupDossier['stepcode']) !== String(props.item.stepCode) && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui" style="color: red;">Hồ sơ đã xử lý</span>
                       </td>
                       <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="150px" style="height: 40px !important">
                         {{ props.item.applicantName }}
@@ -189,7 +194,7 @@
                          flat icon color="green" class="mr-2 my-0" @click="editDossierIntoGroup(props.item)" title="Sửa hồ sơ">
                           <v-icon size="22">create</v-icon>
                         </v-btn>
-                        <v-btn v-if="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(String(props.item['groupDossierIds']))) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
+                        <v-btn v-if="(!metaDataGroupDossier.hasOwnProperty('congvandagui') && checkGroupDossierIdCvDen(String(props.item['groupDossierIds']))) || (metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui)" flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa khỏi công văn">
                           <v-icon size="22">delete</v-icon>
                         </v-btn>
                       </td>
@@ -199,7 +204,7 @@
                 <v-layout wrap class="mt-3 ml-3">
                   <v-flex xs12 sm2 class="pt-2">
                     <span>Tổng số hồ sơ: </span>
-                    <span class="text-bold">{{dossiersIntoGroupRender.length}} </span>
+                    <span class="text-bold">{{dossiersCounterIntoGroupFilter}} </span>
                   </v-flex>
                   <v-flex xs12 sm3 class="pt-2">
                     <span>Tổng số tiền: </span>
@@ -345,7 +350,7 @@
         <v-tab href="#tab-2" @click="putGroupDossier('saveSend')" v-if="activeAddGroup && formCode === 'NEW_GROUP_CV_DI' && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui" class="px-0 py-0"> 
           <v-btn flat class="" 
             :loading="loadingAction"
-            :disabled="loadingAction || lengthDossier === 0"
+            :disabled="loadingAction || dossiersCounterIntoGroupFilter === 0"
           >
             <v-icon size="20">save</v-icon>  &nbsp;
             <span>Lưu và gửi công văn</span>
@@ -956,6 +961,7 @@ export default {
     },
     tphsCV: '',
     totalFee: 0,
+    dossiersCounterIntoGroupFilter: 0,
     addFormNewInGroup: '',
     metaDataGroupDossier: '',
     createFileCongVan: '',
@@ -968,6 +974,8 @@ export default {
     congvanguiden: false,
     mauCongVan: false,
     activeDeleteCongVan: false,
+    mauGiayPhep: 'KQGP',
+    mappingValidateGP: '',
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -1105,15 +1113,32 @@ export default {
     dossiersIntoGroupRender (arr) {
       let vm = this
       let totalFee = 0
+      vm.dossiersCounterIntoGroupFilter = arr.length
+      if (vm.formCode === 'NEW_GROUP_CV_DI' && vm.metaDataGroupDossier.hasOwnProperty('congvandagui') && !vm.metaDataGroupDossier.congvandagui) {
+        vm.dossiersCounterIntoGroupFilter = arr.filter(function (item) {
+          return String(item.stepCode) === String(vm.metaDataGroupDossier.stepcode)
+        }).length
+      }
       if (arr && arr.length > 0) {
         for (let i = 0; i < arr.length; i++) {
-          console.log(i, arr[i])
-          let metaData = vm.getMetaData(arr[i])
-          let fee = 0
-          if (metaData) {
-            let trocapmotlan = metaData.hasOwnProperty('trocapmotlan') && metaData['trocapmotlan'] ? true : false
-            fee = trocapmotlan ? Number(metaData['subsidy']) : Number(metaData['yearPayment'])*Number(metaData['subsidy'])
-            totalFee += fee
+          if (vm.formCode === 'NEW_GROUP_CV_DI' && vm.metaDataGroupDossier.hasOwnProperty('congvandagui') && !vm.metaDataGroupDossier.congvandagui) {
+            if (String(arr[i].stepCode) === String(vm.metaDataGroupDossier.stepcode)) {
+              let metaData = vm.getMetaData(arr[i])
+              let fee = 0
+              if (metaData) {
+                let trocapmotlan = metaData.hasOwnProperty('trocapmotlan') && metaData['trocapmotlan'] ? true : false
+                fee = trocapmotlan ? Number(metaData['subsidy']) : Number(metaData['yearPayment'])*Number(metaData['subsidy'])
+                totalFee += fee
+              }
+            }
+          } else {
+            let metaData = vm.getMetaData(arr[i])
+            let fee = 0
+            if (metaData) {
+              let trocapmotlan = metaData.hasOwnProperty('trocapmotlan') && metaData['trocapmotlan'] ? true : false
+              fee = trocapmotlan ? Number(metaData['subsidy']) : Number(metaData['yearPayment'])*Number(metaData['subsidy'])
+              totalFee += fee
+            }
           }
         }
         vm.dossiersIntoGroupRenderTemp = arr.slice(0, vm.pagination.rowsPerPage )
@@ -1556,6 +1581,11 @@ export default {
                   if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
                     vm.showThuPhi = true
                     vm.payments = resAction.payment
+                  }
+                  // 
+                  let mauGP = vm.getSearchParams(resAction['preCondition'], 'validateDeliverable')
+                  if (mauGP) {
+                    vm.getThongTinValidateGp(mauGP)
                   }
                 })
               } else {
@@ -2019,46 +2049,42 @@ export default {
             })
             // 
           }
-          // 
+          //
+          if (vm.mappingValidateGP) {
+            for (let key in vm.mappingValidateGP) {
+              vm.mappingValidateGP[key] = thongtinchuhosocongvan[vm.mappingValidateGP[key]]
+            }
+          } 
           let filterCheck = {
-            formDataKey: {
-              hoten: thongtinchuhosocongvan.applicantName
-            }
+            formDataKey: vm.mappingValidateGP ? vm.mappingValidateGP : '',
+            deliverableType: vm.mauGiayPhep
           }
-          vm.$store.dispatch('checkDaCapPhep', filterCheck).then(function (result) {
-            let userExits = false
-            let quyetdinhItems = []
-            let thongTinCapPhep = result.hasOwnProperty('data') ? result.data : []
-            thongTinCapPhep = thongTinCapPhep.filter(function (item) {
-              return item.hasOwnProperty('hoten_data') && item.hasOwnProperty('ngaysinh_data')
-            })
-            if (thongTinCapPhep.length > 0) {
-              try {
-                let birthDate = vm.parseDate(thongtinchuhosocongvan.birthDate)
-                quyetdinhItems = thongTinCapPhep.filter(function (item) {
-                  return String(item.hoten_data).toLocaleLowerCase() === String(thongtinchuhosocongvan.applicantName).toLocaleLowerCase() 
-                  && vm.parseDate(item.ngaysinh_data) === birthDate
-                })
-                if (quyetdinhItems && quyetdinhItems.length > 0) {
-                  userExits = true
-                }
-              } catch (error) {
-              }
-            }
-            if (userExits) {
-              let x = confirm('Đối tượng đã cấp phép. Bạn có muốn tiếp tục?')
-              if (x) {
-                doAction()
-              } else {
-                vm.loadingAction = false
-              }
-            } else {
-              doAction()
-            }
-            
-          }).catch(rejectXhr => {
+          if (filterCheck.formDataKey === '') {
             doAction()
-          })
+          } else {
+            vm.$store.dispatch('checkDaCapPhep', filterCheck).then(function (result) {
+              let userExits = false
+              let quyetdinhItems = []
+              let thongTinCapPhep = result.hasOwnProperty('data') ? result.data : []
+              if (thongTinCapPhep.length > 0) {
+                userExits = true
+              }
+              if (userExits) {
+                let x = confirm('Đối tượng đã cấp phép. Bạn có muốn tiếp tục?')
+                if (x) {
+                  doAction()
+                } else {
+                  vm.loadingAction = false
+                }
+              } else {
+                doAction()
+              }
+              
+            }).catch(rejectXhr => {
+              doAction()
+            })
+          }
+          
           // 
           
         } else {
@@ -2142,7 +2168,6 @@ export default {
                   vm.stepList = steps
                 }
                 vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
-                vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
               }
               vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
             }).catch(function () {
@@ -2208,8 +2233,12 @@ export default {
       }
       if (apiGetDossier) {
         vm.$store.dispatch('getHoSoAddGroup', filter).then(function (result) {
-          vm.dossiersSelectAdd = result.data
-          vm.hosoDatasTotal = result.total
+          let resultFilter = result.hasOwnProperty('data') ? result.data : []
+          resultFilter = resultFilter.filter(function (item) {
+            return String(item.stepCode) === String(vm.metaDataGroupDossier.stepcode)
+          })
+          vm.dossiersSelectAdd = resultFilter
+          vm.hosoDatasTotal = resultFilter.length
 
           vm.hosoTotalPage = Math.ceil(vm.hosoDatasTotal / vm.numberPerPageAddDossier)
           if (vm.hosoTotalPage > 0 && vm.selectMultiplePage.length === 0) {
@@ -2464,7 +2493,20 @@ export default {
       if (action === 'editAction' && vm.formCode === 'NEW_GROUP_CV_DI' && vm.thongTinNhomHoSo['govAgencyCode'] !== dossier['govAgencyCode']) {
         owner = false
       }
+      if (vm.formCode === 'NEW_GROUP_CV_DI' && dossier.stepCode != vm.metaDataGroupDossier.stepcode) {
+        owner = false
+      }
       return owner
+    },
+    getThongTinValidateGp (serverNoConfig) {
+      let filter = {
+        serverNo: serverNoConfig
+      }
+      vm.$store.dispatch('getServerConfig', filter).then(function (result) {
+        vm.mauGiayPhep = result.deliverableType
+        vm.mappingValidateGP = JSON.parse(result.mapping)
+      }).catch(function (reject) {
+      })
     },
     dateTimeView (arg) {
       if (arg) {
@@ -2535,6 +2577,18 @@ export default {
       } catch (error) {
         return ''
       }
+    },
+    getSearchParams (strings, key) {
+      let value = ""
+      let headers = strings.split(",")
+      headers.forEach(function (header) {
+        header = header.split("=")
+        let keyHeader = header[0]
+        if (keyHeader === key) {
+          value = header[1]
+        }
+      })
+      return value
     },
     currentcyToString (so) {
       var i;

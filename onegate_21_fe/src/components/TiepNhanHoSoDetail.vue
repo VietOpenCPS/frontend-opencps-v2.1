@@ -200,7 +200,7 @@
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content>
                 <thong-tin-cong-van ref="thongtincongvan" :taoQuyetDinh="hasTaoQuyetDinh" :detailDossier="thongTinChiTietHoSo" :tphs="tphsCV" :createFileCongVan="createFileCongVan"
-                  :formCodeInput="formCode" :donvinhanCollection="donvinhanCollection" :requiredCVDenGroupId="requiredCVDenGroupId" :requiredCVDenGovCode="requiredCVDenGovCode" :lengthDossier="dossiersIntoGroupRender.length" >
+                  :formCodeInput="formCode" :donvinhanCollection="donvinhanCollection" :requiredCVDenGroupId="requiredCVDenGroupId" :requiredCVDenGovCode="requiredCVDenGovCode" :lengthDossier="dossiersCounterIntoGroupFilter" >
                 </thong-tin-cong-van>
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -292,7 +292,7 @@
                             <v-btn flat icon color="indigo" class="mr-2 my-0" @click="viewDetail(props.item)" title="Xem chi tiết">
                               <v-icon>fas fa fa-file-text</v-icon>
                             </v-btn>
-                            <v-btn flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa">
+                            <v-btn flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa khỏi công văn">
                               <v-icon size="22">delete</v-icon>
                             </v-btn>
                           </td>
@@ -302,7 +302,7 @@
                     <v-layout wrap class="mt-3 ml-3">
                       <v-flex xs12 sm2 class="pt-2">
                         <span>Tổng số hồ sơ: </span>
-                        <span class="text-bold">{{dossiersIntoGroupRender.length}} </span>
+                        <span class="text-bold">{{dossiersCounterIntoGroupFilter}} </span>
                       </v-flex>
                       <v-flex xs12 sm3 class="pt-2">
                         <span>Tổng số tiền: </span>
@@ -401,7 +401,7 @@
           <v-tab v-if="formCode === 'NEW_GROUP_CV_DI'" href="#tab-2" @click="tiepNhanCongVan('add', 'saveSend')" class="px-0 py-0"> 
             <v-btn flat class="" 
               :loading="loadingAction"
-              :disabled="loadingAction || dossiersIntoGroupRender.length === 0"
+              :disabled="loadingAction || dossiersCounterIntoGroupFilter === 0"
             >
               <v-icon size="20">save</v-icon>  &nbsp;
               <span>Lưu và gửi công văn</span>
@@ -973,6 +973,7 @@ export default {
       page: 1
     },
     totalFee: 0,
+    dossiersCounterIntoGroupFilter: 0,
     createFileCongVan: '',
     postStepCodeCongVan: '',
     donvinhanCollection: '',
@@ -980,6 +981,8 @@ export default {
     requiredCVDenGroupId: '',
     formActionGroup: '',
     hasTaoQuyetDinh: false,
+    mauGiayPhep: 'KQGP',
+    mappingValidateGP: '',
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -1116,14 +1119,32 @@ export default {
     dossiersIntoGroupRender (arr) {
       let vm = this
       let totalFee = 0
+      vm.dossiersCounterIntoGroupFilter = arr.length
+      if (vm.formCode === 'NEW_GROUP_CV_DI') {
+        vm.dossiersCounterIntoGroupFilter = arr.filter(function (item) {
+          return String(item.stepCode) === String(vm.formActionGroup.stepCode)
+        }).length
+      }
       if (arr && arr.length > 0) {
         for (let i = 0; i < arr.length; i++) {
-          let metaData = vm.getMetaData(arr[i])
-          let fee = 0
-          if (metaData) {
-            let trocapmotlan = metaData.hasOwnProperty('trocapmotlan') && metaData['trocapmotlan'] ? true : false
-            fee = trocapmotlan ? Number(metaData['subsidy']) : Number(metaData['yearPayment'])*Number(metaData['subsidy'])
-            totalFee += fee
+          if (vm.formCode === 'NEW_GROUP_CV_DI') {
+            if (String(arr[i].stepCode) === String(vm.formActionGroup.stepCode)) {
+              let metaData = vm.getMetaData(arr[i])
+              let fee = 0
+              if (metaData) {
+                let trocapmotlan = metaData.hasOwnProperty('trocapmotlan') && metaData['trocapmotlan'] ? true : false
+                fee = trocapmotlan ? Number(metaData['subsidy']) : Number(metaData['yearPayment'])*Number(metaData['subsidy'])
+                totalFee += fee
+              }
+            }
+          } else {
+            let metaData = vm.getMetaData(arr[i])
+            let fee = 0
+            if (metaData) {
+              let trocapmotlan = metaData.hasOwnProperty('trocapmotlan') && metaData['trocapmotlan'] ? true : false
+              fee = trocapmotlan ? Number(metaData['subsidy']) : Number(metaData['yearPayment'])*Number(metaData['subsidy'])
+              totalFee += fee
+            }
           }
         }
         vm.dossiersIntoGroupRenderTemp = arr.slice(0, vm.pagination.rowsPerPage )
@@ -1156,14 +1177,32 @@ export default {
         vm.hasTaoQuyetDinh = vm.formActionGroup.hasOwnProperty('taoQuyetDinh') ? vm.formActionGroup.taoQuyetDinh : false
         let totalFee = 0
         let arr = vm.dossiersIntoGroupRender
+        vm.dossiersCounterIntoGroupFilter = arr.length
+        if (vm.formCode === 'NEW_GROUP_CV_DI') {
+          vm.dossiersCounterIntoGroupFilter = arr.filter(function (item) {
+            return String(item.stepCode) === String(vm.formActionGroup.stepCode)
+          }).length
+        }
         if (arr && arr.length > 0) {
           for (let i = 0; i < arr.length; i++) {
-            let metaData = vm.getMetaData(arr[i])
-            let fee = 0
-            if (metaData) {
-              let trocapmotlan = metaData.hasOwnProperty('trocapmotlan') && metaData['trocapmotlan'] ? true : false
-              fee = trocapmotlan ? Number(metaData['subsidy']) : Number(metaData['yearPayment'])*Number(metaData['subsidy'])
-              totalFee += fee
+            if (vm.formCode === 'NEW_GROUP_CV_DI') {
+              if (String(arr[i].stepCode) === String(vm.formActionGroup.stepCode)) {
+                let metaData = vm.getMetaData(arr[i])
+                let fee = 0
+                if (metaData) {
+                  let trocapmotlan = metaData.hasOwnProperty('trocapmotlan') && metaData['trocapmotlan'] ? true : false
+                  fee = trocapmotlan ? Number(metaData['subsidy']) : Number(metaData['yearPayment'])*Number(metaData['subsidy'])
+                  totalFee += fee
+                }
+              }
+            } else {
+              let metaData = vm.getMetaData(arr[i])
+              let fee = 0
+              if (metaData) {
+                let trocapmotlan = metaData.hasOwnProperty('trocapmotlan') && metaData['trocapmotlan'] ? true : false
+                fee = trocapmotlan ? Number(metaData['subsidy']) : Number(metaData['yearPayment'])*Number(metaData['subsidy'])
+                totalFee += fee
+              }
             }
           }
           vm.dossiersIntoGroupRenderTemp = arr.slice(0, vm.pagination.rowsPerPage )
@@ -1271,6 +1310,11 @@ export default {
                     // call initData thong tin cong van
                     if (vm.$refs.thongtincongvan) {
                       vm.$refs.thongtincongvan.initData(result)
+                    }
+                    // 
+                    let mauGP = vm.getSearchParams(resAction['preCondition'], 'validateDeliverable')
+                    if (mauGP) {
+                      vm.getThongTinValidateGp(mauGP)
                     }
                   }).catch(function(){})
                 } else {
@@ -1616,46 +1660,41 @@ export default {
           if (!vm.mauCongVan) {
             doAction()
           } else {
-            // 
+            //
+            if (vm.mappingValidateGP) {
+              for (let key in vm.mappingValidateGP) {
+                vm.mappingValidateGP[key] = thongtinchuhosocongvan[vm.mappingValidateGP[key]]
+              }
+            } 
             let filterCheck = {
-              formDataKey: {
-                hoten: thongtinchuhosocongvan.applicantName
-              }
+              formDataKey: vm.mappingValidateGP ? vm.mappingValidateGP : '',
+              deliverableType: vm.mauGiayPhep
             }
-            vm.$store.dispatch('checkDaCapPhep', filterCheck).then(function (result) {
-              let userExits = false
-              let quyetdinhItems = []
-              let thongTinCapPhep = result.hasOwnProperty('data') ? result.data : []
-              thongTinCapPhep = thongTinCapPhep.filter(function (item) {
-                return item.hasOwnProperty('hoten_data') && item.hasOwnProperty('ngaysinh_data')
-              })
-              if (thongTinCapPhep.length > 0) {
-                try {
-                  let birthDate = vm.parseDate(thongtinchuhosocongvan.birthDate)
-                  quyetdinhItems = thongTinCapPhep.filter(function (item) {
-                    return String(item.hoten_data).toLocaleLowerCase() === String(thongtinchuhosocongvan.applicantName).toLocaleLowerCase() 
-                    && vm.parseDate(item.ngaysinh_data) === birthDate
-                  })
-                  if (quyetdinhItems && quyetdinhItems.length > 0) {
-                    userExits = true
-                  }
-                } catch (error) {
-                }
-              }
-              if (userExits) {
-                let x = confirm('Đối tượng đã cấp phép. Bạn có muốn tiếp tục?')
-                if (x) {
-                  doAction()
-                } else {
-                  vm.loadingAction = false
-                }
-              } else {
-                doAction()
-              }
-              
-            }).catch(rejectXhr => {
+            if (filterCheck.formDataKey === '') {
               doAction()
-            })
+            } else {
+              vm.$store.dispatch('checkDaCapPhep', filterCheck).then(function (result) {
+                let userExits = false
+                let quyetdinhItems = []
+                let thongTinCapPhep = result.hasOwnProperty('data') ? result.data : []
+                if (thongTinCapPhep.length > 0) {
+                  userExits = true
+                }
+                if (userExits) {
+                  let x = confirm('Đối tượng đã cấp phép. Bạn có muốn tiếp tục?')
+                  if (x) {
+                    doAction()
+                  } else {
+                    vm.loadingAction = false
+                  }
+                } else {
+                  doAction()
+                }
+                
+              }).catch(rejectXhr => {
+                doAction()
+              })
+            }
             // 
           }
         }
@@ -2318,6 +2357,29 @@ export default {
     },
     goBackHistory () {
       window.history.back()
+    },
+    getThongTinValidateGp (serverNoConfig) {
+      let vm = this
+      let filter = {
+        serverNo: serverNoConfig
+      }
+      vm.$store.dispatch('getServerConfig', filter).then(function (result) {
+        vm.mauGiayPhep = result.deliverableType
+        vm.mappingValidateGP = JSON.parse(result.mapping)
+      }).catch(function (reject) {
+      })
+    },
+    getSearchParams (strings, key) {
+      let value = ""
+      let headers = strings.split(",")
+      headers.forEach(function (header) {
+        header = header.split("=")
+        let keyHeader = header[0]
+        if (keyHeader === key) {
+          value = header[1]
+        }
+      })
+      return value
     },
     currentcyToString (so) {
       var i;

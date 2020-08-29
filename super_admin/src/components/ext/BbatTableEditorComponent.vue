@@ -932,7 +932,7 @@
             maxLength = 2000
           }
           if (itemData.hasOwnProperty('model') && (itemData.model.endsWith('Code') || itemData.model.endsWith('No') || itemData.model.endsWith('Id'))) {
-            maxLength = 100
+            maxLength = 75
           }
         }
         return maxLength
