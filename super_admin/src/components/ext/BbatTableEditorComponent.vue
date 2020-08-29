@@ -897,9 +897,7 @@
           if (itemData.type === 'textarea') {
             maxLength = 2000
           }
-          if (itemData.hasOwnProperty('model') && (itemData.model.endsWith('Code') || itemData.model.endsWith('No') || 
-            itemData.model.endsWith('Id') || itemData.model == 'menuGroup')
-          ) {
+          if (itemData.hasOwnProperty('model') && (itemData.model.endsWith('Code') || itemData.model.endsWith('No') || itemData.model.endsWith('Id') || itemData.model == 'menuGroup')) {
             maxLength = 75
           }
           if (itemData.model == 'order') {
