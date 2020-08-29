@@ -3606,6 +3606,23 @@ export const store = new Vuex.Store({
         }).catch(function (){})     
       })     
     },
+    getGovAgency ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let paramGetGovAgency = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            sort: 'sibling'
+          }
+        }
+        axios.get('/o/rest/v2/dictcollections/SERVICE_ADMINISTRATION/dictitems', paramGetGovAgency).then(function (response) {
+          resolve(response.data.data)
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
     getDomains ({commit,state}, data) {
       return new Promise((resolve, reject)=>{
         store.dispatch('loadInitResource').then(function (result) {
