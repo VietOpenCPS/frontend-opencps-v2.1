@@ -74,13 +74,13 @@
                   <v-text-field
                     :rules="[rules.required]"
                     box
-                    readonly
                     style="pointer-events:none"
                     slot="activator"
                     v-model="applicantIdDateFormatted"
                     append-icon="event"
                     @blur="date = parseDate(applicantIdDateFormatted)"
-                    placeholder="Ngày/tháng/năm"
+                    placeholder="dd/mm/yyyy"
+                    :mask="maskDate"
                   ></v-text-field>
                   <v-date-picker min="1950-01-01" :max="getMaxdate()" ref="picker"
                   :first-day-of-week="1" locale="vi" v-model="date" no-title @input="menuApplicantIdDate = false"></v-date-picker>
@@ -310,6 +310,7 @@ export default {
     ruleContent: '',
     fileCMNDName: '',
     fileCMND: '',
+    maskDate: '##/##/####',
     e1: true,
     e2: true,
     rules: {

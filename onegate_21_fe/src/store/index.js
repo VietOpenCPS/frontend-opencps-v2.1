@@ -4752,7 +4752,7 @@ export const store = new Vuex.Store({
             formDataKey: JSON.stringify(filter.formDataKey)
           }
         }
-        axios.get('/o/v1/opencps/deliverable/KQGP', options).then(function (response) {
+        axios.get('/o/v1/opencps/deliverable/' + filter.deliverableType, options).then(function (response) {
           resolve(response.data)
         }).catch(function (error) {
           reject(error)
@@ -4781,6 +4781,23 @@ export const store = new Vuex.Store({
           console.log(e)
           reject(data)
         }
+      })
+    },
+    getServerConfig ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        let url = '/o/rest/v2/serverconfigs/' + filter.serverNo
+        axios.get(url, param).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          reject(error)
+        })
       })
     },
     // ----End---------
