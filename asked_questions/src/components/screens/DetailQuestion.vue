@@ -354,7 +354,13 @@ export default {
     },
     submitAddAnswer () {
       let vm = this
-      if (vm.contentAnswer) {
+      let validateSyntax = true
+      if (String(vm.contentAnswer).indexOf('<img') >= 0 || String(vm.contentAnswer).indexOf('<script') >= 0) {
+        validateSyntax = false
+        alert('Nội dung câu trả lời không hợp lệ!')
+        return
+      }
+      if (vm.contentAnswer && validateSyntax) {
         let filter = {
           questionId: vm.index,
           content: vm.contentAnswer,
@@ -372,7 +378,13 @@ export default {
     },
     submitEditAnswer () {
       let vm = this
-      if (vm.contentAnswer && vm.answerSelected) {
+      let validateSyntax = true
+      if (String(vm.contentAnswer).indexOf('<img') >= 0 || String(vm.contentAnswer).indexOf('<script') >= 0) {
+        validateSyntax = false
+        alert('Nội dung câu trả lời không hợp lệ!')
+        return
+      }
+      if (vm.contentAnswer && vm.answerSelected && validateSyntax) {
         let filter = {
           questionId: vm.answerSelected.questionId,
           answerId: vm.answerSelected.answerId,

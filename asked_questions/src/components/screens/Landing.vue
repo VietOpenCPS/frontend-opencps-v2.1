@@ -111,7 +111,7 @@
                 <v-icon slot="actions" color="primary" style="position:absolute;right:5px;top:10px" @click="getAnswers(itemQuestion, indexQuestion)">$vuetify.icons.expand</v-icon>
                 <div class="ml-2" slot="header" @click="getAnswers(itemQuestion, indexQuestion)">
                   <span class="text-bold primary--text">Câu hỏi {{questionPage * 20 - 20 + indexQuestion + 1}}: </span>
-                  <div class="primary--text" v-html="itemQuestion.content"></div>
+                  <div class="primary--text" v-html="String(itemQuestion.content).replace(/\<img/g, '')"></div>
                 </div>
                 <div v-if="itemQuestion['loading']">
                   <content-placeholders class="mt-3">
@@ -131,7 +131,7 @@
                       >
                         <div>
                           <div style="position:relative">
-                            <div class="" v-html="itemAnswer.content"></div>
+                            <div class="" v-html="String(itemAnswer.content).replace(/\<img/g, '')"></div>
                             <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:18px;top:-15px">
                               <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
                                 <v-icon>settings</v-icon>
@@ -240,7 +240,7 @@
                   box
                   placeholder="Ghi rõ họ tên"
                   v-model="fullName"
-                  :rules="[rules.required]"
+                  :rules="[rules.required, rules.syntaxError]"
                   min="6"
                   required
                 ></v-text-field>
@@ -275,6 +275,7 @@
                   box
                   placeholder="Nhập địa chỉ"
                   v-model="address"
+                  :rules="[rules.syntaxError]"
                 ></v-text-field>
               </v-flex>
               <!-- <v-flex xs12>
@@ -292,7 +293,7 @@
                   row="5"
                   placeholder="Nhập nội dung câu hỏi"
                   v-model="content"
-                  :rules="[rules.required]"
+                  :rules="[rules.required, rules.syntaxError]"
                   required
                 ></v-textarea>
               </v-flex>
@@ -391,7 +392,7 @@
                   box
                   placeholder="Ghi rõ họ tên"
                   v-model="fullName"
-                  :rules="[rules.required]"
+                  :rules="[rules.required, rules.syntaxError]"
                   min="6"
                   required
                 ></v-text-field>
@@ -425,6 +426,7 @@
                 <v-text-field
                   box
                   placeholder="Nhập địa chỉ"
+                  :rules="[rules.syntaxError]"
                   v-model="address"
                 ></v-text-field>
               </v-flex>
@@ -535,7 +537,15 @@ export default {
         } else {
           return []
         }
-      }
+      },
+      syntaxError: (value) => {
+        if (value) {
+          value = String(value).trim()
+          return value.indexOf('</') >= 0 || value.indexOf('<img') >= 0 || value.indexOf('<script') >= 0 ? 'Dữ liệu nhập không hợp lệ' : true
+        } else {
+          return true
+        }  
+      },
     },
     customToolbar: [
       [{ header: [false, 1, 2, 3, 4, 5, 6] }],
