@@ -608,6 +608,9 @@
             color="primary"
             small
             @click="xacNhan()"
+            :loading="loadingAction"
+            :disabled="loadingAction"
+
           >
             Xác nhận
           </v-btn>

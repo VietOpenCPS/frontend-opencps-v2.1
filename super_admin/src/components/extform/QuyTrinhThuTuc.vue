@@ -1760,6 +1760,8 @@
               // vm.$router.push(currentPath.replace(0, result.serviceProcessId))
             } else {
               vm.currentProcess = result
+              toastr.success('Thực hiện thành công')
+              window.history.back()
             }
           }).catch(reject => {
             console.log(reject)
