@@ -590,7 +590,7 @@
           syntaxError: (value) => {
             if (value) {
               value = String(value).trim()
-              return value.indexOf('</') < 0 ? true : 'Không được có ký tự </'   
+              return value.indexOf('</') >= 0 || value.indexOf('<img') >= 0 || value.indexOf('<script') >= 0 ? 'Dữ liệu nhập không hợp lệ' : true
             } else {
               return true
             }  
