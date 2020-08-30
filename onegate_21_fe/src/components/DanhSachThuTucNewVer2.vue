@@ -76,7 +76,22 @@
             <v-layout wrap class="white pt-3">
               <v-flex :style="!isMobile ? 'width:calc(100% - 220px)' : ''">
                 <v-layout wrap class="">
-                  <v-flex xs12 sm6 class="px-2">
+                  <v-flex v-if="hasFilterAgency" xs12 sm4 class="px-2">
+                    <v-autocomplete
+                      class="select-border"
+                      :items="agencyListXuLyThuTuc"
+                      v-model="agencyXuLyThuTuc"
+                      label="Chọn đơn vị"
+                      item-text="domainName"
+                      item-value="domainCode"
+                      :hide-selected="true"
+                      @change="changeAgencyXuLy"
+                      box
+                      hide-no-data
+                      clearable
+                    ></v-autocomplete>
+                  </v-flex>
+                  <v-flex :class="!hasFilterAgency ? 'xs12 sm6 px-2' : 'xs12 sm4 px-2'">
                     <v-autocomplete
                       class="select-border"
                       :items="domainList"
@@ -91,7 +106,7 @@
                       clearable
                     ></v-autocomplete>
                   </v-flex>
-                  <v-flex xs12 sm6 class="px-2">
+                  <v-flex :class="!hasFilterAgency ? 'xs12 sm6 px-2' : 'xs12 sm4 px-2'">
                     <v-autocomplete
                       class="select-border"
                       :items="listLerver"
@@ -414,7 +429,10 @@
       hasVerify: false,
       dialogLoadingCreate: true,
       dialog_selectOption: true,
-      serviceInfoLastestList: []
+      serviceInfoLastestList: [],
+      hasFilterAgency: false,
+      agencyListXuLyThuTuc: [],
+      agencyXuLyThuTuc: ''
     }),
     computed: {
       currentIndex () {
@@ -435,6 +453,10 @@
       //
       try {
         vm.verificationApplicantCreateDossier = hasVerificationCreateDossier
+      } catch (error) {
+      }
+      try {
+        vm.hasFilterAgency = hasFilterAgency
       } catch (error) {
       }
       // 
@@ -459,6 +481,9 @@
       }
       vm.getLevers()
       vm.getDomains()
+      if (vm.hasFilterAgency) {
+        vm.getAgencysXuLyThuTuc()
+      }
     },
     updated () {
     },
@@ -466,7 +491,9 @@
       '$route': function (newRoute, oldRoute) {
         let vm = this
         let newQuery = newRoute.query
-        
+        if (vm.hasFilterAgency) {
+          vm.agencyXuLyThuTuc = newQuery['agency'] ? newQuery['agency'] : ''
+        }
         vm.domainFilter = newQuery['domain'] ? newQuery['domain'] : ''
         vm.leverFilter = newQuery['lever'] ? Number(newQuery['lever']) : ''
         vm.serviceNameKey = newQuery['keyword'] ? newQuery['keyword'] : ''
@@ -544,6 +571,9 @@
           // if (vm.domainFilter || vm.serviceLastest) {
             // setTimeout (function () {
               let queryString = '?'
+              if (vm.hasFilterAgency) {
+                newQuery['agency'] = vm.agencyXuLyThuTuc
+              }
               newQuery['domain'] = vm.domainFilter
               newQuery['keyword'] = String(vm.serviceNameKey).trim()
               newQuery['lever'] = vm.leverFilter
@@ -590,6 +620,7 @@
             level: newQuery.hasOwnProperty('lever') && newQuery.lever ? newQuery.lever : '3,4',
             domain: newQuery.hasOwnProperty('domain') && newQuery.domain ? newQuery.domain : '',
             keyword: newQuery.hasOwnProperty('keyword') && newQuery.keyword ? newQuery.keyword : '',
+            agency: vm.hasFilterAgency && newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
           }
           vm.$store.dispatch('getServiceInfos', params).then(res => {
             vm.loading = false
@@ -914,6 +945,20 @@
         ).catch(()=>{
           vm.domainList = []
         })      
+      },
+      getAgencysXuLyThuTuc () {
+        let vm = this
+        vm.$store.dispatch('getGovAgency').then(function(result) {
+          vm.agencyListXuLyThuTuc = result ? result : []
+        })
+      },
+      changeAgencyXuLy () {
+        let vm = this
+        setTimeout (function () {
+          vm.domainFilter = ''
+          vm.getDomains(vm.agencyXuLyThuTuc)
+          vm.filterService()
+        }, 200)
       },
       closeSelectOption () {
         let vm = this

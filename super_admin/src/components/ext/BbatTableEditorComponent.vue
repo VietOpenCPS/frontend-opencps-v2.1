@@ -595,6 +595,14 @@
               return true
             }  
           },
+          varchar10: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 10 ? true : 'Không được nhập quá 10 ký tự'   
+            } else {
+              return true
+            }  
+          },
           varchar50: (val) => {
             if(val){
               val = String(val).trim()
@@ -889,8 +897,11 @@
           if (itemData.type === 'textarea') {
             maxLength = 2000
           }
-          if (itemData.hasOwnProperty('model') && (itemData.model.endsWith('Code') || itemData.model.endsWith('No') || itemData.model.endsWith('Id'))) {
+          if (itemData.hasOwnProperty('model') && (itemData.model.endsWith('Code') || itemData.model.endsWith('No') || itemData.model.endsWith('Id') || itemData.model == 'menuGroup')) {
             maxLength = 75
+          }
+          if (itemData.model == 'order') {
+            maxLength = 10
           }
           syntaxErrorInput = true
         }
@@ -907,6 +918,9 @@
           if (maxLength == 75 && !hasRuleVarChar) {
             rulesInput.push(vm.rules.varchar75)
           }
+          if (maxLength == 10 && !hasRuleVarChar) {
+            rulesInput.push(vm.rules.varchar10)
+          }
         } else {
           if (maxLength == 2000) {
             rulesInput.push(vm.rules.varchar2000)
@@ -916,6 +930,9 @@
           }
           if (maxLength == 75) {
             rulesInput.push(vm.rules.varchar75)
+          }
+          if (maxLength == 10) {
+            rulesInput.push(vm.rules.varchar10)
           }
         }
         if (syntaxErrorInput) {
@@ -931,8 +948,12 @@
           if (itemData.type === 'textarea') {
             maxLength = 2000
           }
-          if (itemData.hasOwnProperty('model') && (itemData.model.endsWith('Code') || itemData.model.endsWith('No') || itemData.model.endsWith('Id'))) {
+          if (itemData.hasOwnProperty('model') && (itemData.model.endsWith('Code') || itemData.model.endsWith('No') || 
+            itemData.model.endsWith('Id') || itemData.model == 'menuGroup')) {
             maxLength = 75
+          }
+          if (itemData.model == 'order') {
+            maxLength = 10
           }
         }
         return maxLength
