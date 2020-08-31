@@ -125,6 +125,22 @@
             <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
               <div class style="height: 38px; overflow: hidden;background: #fff">
                 <div class="background-triangle-big1">SỞ BAN NGÀNH</div>
+                <v-flex class="right">
+                  <div class="agencyFilter agencyFilter1">
+                    <v-autocomplete
+                      :items="listDonViSBN"
+                      v-model="donViSBN"
+                      placeholder="Chọn đơn vị"
+                      item-text="itemName"
+                      item-value="itemCode"
+                      return-object
+                      hide-no-data
+                      :hide-selected="true"
+                      @change=""
+                      clearable
+                    ></v-autocomplete>
+                  </div>
+                </v-flex>
               </div>
               <apexchart
                 type="pie"
@@ -135,10 +151,26 @@
               ></apexchart>
             </div>
           </v-flex>
-          <v-flex md4 xs12 class="pa-2">
+          <v-flex md4 xs12 class="pt-2 pr-2 pb-2 pl-0">
             <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
               <div class style="height: 38px; overflow: hidden;">
                 <div class="background-triangle-big1">HUYỆN/ THỊ XÃ/ THÀNH PHỐ</div>
+                <v-flex class="right">
+                  <div class="agencyFilter agencyFilter2">
+                    <v-autocomplete
+                      :items="listDonViHuyen"
+                      v-model="donViHuyen"
+                      placeholder="Chọn đơn vị"
+                      item-text="itemName"
+                      item-value="itemCode"
+                      return-object
+                      hide-no-data
+                      :hide-selected="true"
+                      @change=""
+                      clearable
+                    ></v-autocomplete>
+                  </div>
+                </v-flex>
               </div>
               <apexchart
                 type="pie"
@@ -149,10 +181,26 @@
               ></apexchart>
             </div>
           </v-flex>
-          <v-flex md4 xs12 class="pa-2">
+          <v-flex md4 xs12 class="pt-2 pr-2 pb-2 pl-0">
             <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
               <div class style="height: 38px; overflow: hidden;">
                 <div class="background-triangle-big1">XÃ/ PHƯỜNG/ THỊ TRẤN</div>
+                <v-flex class="right">
+                  <div class="agencyFilter agencyFilter3">
+                    <v-autocomplete
+                      :items="listDonViXa"
+                      v-model="donViXa"
+                      placeholder="Chọn đơn vị"
+                      item-text="itemName"
+                      item-value="itemCode"
+                      return-object
+                      hide-no-data
+                      :hide-selected="true"
+                      @change=""
+                      clearable
+                    ></v-autocomplete>
+                  </div>
+                </v-flex>
               </div>
               <div style="width: 100%;">
                 <apexchart
@@ -426,6 +474,12 @@ import axios from "axios";
 export default {
   components: {},
   data: () => ({
+    listDonViSBN: [],
+    donViSBN: '',
+    listDonViHuyen: [],
+    donViHuyen: '',
+    listDonViXa: [],
+    donViXa: '',
     levelList: [
       {level: 2, count: "0", levelName: 2},
       {level: 3, count: "0", levelName: 3},
@@ -669,7 +723,9 @@ export default {
     // 
     vm.groupCode = 'SBN'
     this.$nextTick(() => {
+      vm.getDictgroups('SBN');
       vm.getDictgroups('QUAN_HUYEN');
+      vm.getDictgroups('XA_PHUONG');
       vm.getStatisticsYear();
       vm.getStatisticsYearSBN();
       vm.getStatisticsYearQUAN_HUYEN();
@@ -768,9 +824,23 @@ export default {
         .request(config)
         .then(function(response) {
           if (response.data.data) {
-            vm.listDoiTuong = response.data.data
+            if (key === 'SBN') {
+              vm.listDonViSBN = response.data.data
+            } else if (key === 'QUAN_HUYEN') {
+              vm.listDoiTuong = response.data.hasOwnProperty('data') ? response.data.data : []
+              vm.listDonViHuyen = response.data.hasOwnProperty('data') ? response.data.data : []
+            } else {
+              vm.listDonViXa = response.data.hasOwnProperty('data') ? response.data.data : []
+            }
           } else {
-            vm.listDoiTuong = []
+            if (key === 'SBN') {
+              vm.listDonViSBN = []
+            } else if (key === 'QUAN_HUYEN') {
+              vm.listDoiTuong = []
+              vm.listDonViHuyen = []
+            } else {
+              vm.listDonViXa = []
+            }
           }
         })
         .catch()
