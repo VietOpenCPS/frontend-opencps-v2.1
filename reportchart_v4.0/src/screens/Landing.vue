@@ -56,7 +56,7 @@
           <v-card-text class="px-0 py-3 pt-4">
             <v-layout wrap class="custom-class">
               <v-flex xs12 sm6 class="px-2 pb-3">
-                <v-card color="green lighten-1" class="white--text" height="70px" style="border-radius: 4px;">
+                <v-card @click="changeLevel(2)" color="green lighten-1" class="white--text" height="70px" style="border-radius: 4px;cursor: pointer;">
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
                       <v-btn outline fab color="white" depressed style="pointer-events:none;height:52px">
@@ -71,7 +71,7 @@
                 </v-card>
               </v-flex>
               <v-flex xs12 sm6 class="px-2 pb-3">
-                <v-card color="orange lighten-1" class="white--text" height="70px" style="border-radius: 4px;">
+                <v-card @click="changeLevel(3)" color="orange lighten-1" class="white--text" height="70px" style="border-radius: 4px;cursor: pointer;">
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
                       <v-btn outline fab color="white" depressed style="pointer-events:none;height:52px">
@@ -86,7 +86,7 @@
                 </v-card>
               </v-flex>
               <v-flex xs12 sm6 class="px-2 pt-2 pb-3">
-                <v-card color="red lighten-1" class="white--text" height="70px">
+                <v-card @click="changeLevel(4)" color="red lighten-1" class="white--text" height="70px" style="cursor: pointer;">
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
                       <v-btn outline fab color="white" depressed style="pointer-events:none;height:52px">
@@ -133,10 +133,9 @@
                       placeholder="Chọn đơn vị"
                       item-text="itemName"
                       item-value="itemCode"
-                      return-object
                       hide-no-data
                       :hide-selected="true"
-                      @change=""
+                      @change="getStatisticsYearSBN"
                       clearable
                     ></v-autocomplete>
                   </div>
@@ -163,10 +162,9 @@
                       placeholder="Chọn đơn vị"
                       item-text="itemName"
                       item-value="itemCode"
-                      return-object
                       hide-no-data
                       :hide-selected="true"
-                      @change=""
+                      @change="getStatisticsYearQUAN_HUYEN"
                       clearable
                     ></v-autocomplete>
                   </div>
@@ -193,10 +191,9 @@
                       placeholder="Chọn đơn vị"
                       item-text="itemName"
                       item-value="itemCode"
-                      return-object
                       hide-no-data
                       :hide-selected="true"
-                      @change=""
+                      @change="getStatisticsYearXA_PHUONG"
                       clearable
                     ></v-autocomplete>
                   </div>
@@ -466,13 +463,85 @@
         </div>
       </v-flex>
     </v-layout>
+
+    <v-dialog v-model="dialogServiceInfo" max-width="1300" transition="fade-transition">
+      <v-card flat>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>THỦ TỤC HÀNH CHÍNH MỨC ĐỘ {{levelFilter}}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogServiceInfo = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="pt-0 pb-0 px-0">
+          <div class="mb-3">
+            <v-data-table
+              :headers="headersThuTuc"
+              :items="serviceInfoList"
+              hide-actions
+              class="table-landing table-bordered"
+              item-key="serviceInfoId"
+            >
+              <!--  -->
+              <template slot="headers" slot-scope="props">
+                <tr>
+                  <th
+                    v-for="header in headersThuTuc"
+                    :key="header.text"
+                    :class="header['class'] ? header['class'] : ''"
+                  >
+                    <span>{{ header.text }}</span>
+                  </th>
+                </tr>
+              </template>
+              <!--  -->
+              <template slot="items" slot-scope="props">
+                <tr style="cursor: pointer">
+                  <td class="text-xs-center" width="50px" style="height: 40px !important">
+                    <span>{{hosoDatasPage * numberPerPageAddDossier - numberPerPageAddDossier + props.index + 1}}</span>
+                  </td>
+                  <td class="text-xs-left" width="150px" style="height: 40px !important">
+                    {{ props.item.serviceCodeDVCQG ? props.item.serviceCodeDVCQG : props.item.serviceCode }}
+                  </td>
+                  <td class="text-xs-left" style="height: 40px !important">
+                    {{ props.item.serviceName }}
+                  </td>
+                  <td class="text-xs-left" width="200px" style="height: 40px !important">
+                    {{props.item.domainName}}
+                  </td>
+                  
+                </tr>
+              </template>
+            </v-data-table>
+
+            <div class="text-xs-right layout wrap" style="position: relative;">
+              <div class="flex pagging-table px-2"> 
+                <tiny-pagination :total="totalThuTuc" :page="thutucPage" custom-class="custom-tiny-class" 
+                 @tiny:change-page="paggingData" ></tiny-pagination> 
+              </div>
+            </div>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn :disabled="loadingAction" color="primary" @click.native="dialogServiceInfo = false"
+            >
+            <v-icon class="white--text">close</v-icon>&nbsp;
+            Thoát
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import TinyPagination from './Pagination.vue'
 export default {
-  components: {},
+  components: {
+    'tiny-pagination': TinyPagination
+  },
   data: () => ({
     listDonViSBN: [],
     donViSBN: '',
@@ -697,7 +766,38 @@ export default {
     danhSachThongKeThang: [],
     quanhuyenSelected: '',
     totalCounter: {},
-    labelPieChartConfig: ''
+    labelPieChartConfig: '',
+    serviceInfoList: [],
+    totalThuTuc: 0,
+    thutucPage: 1,
+    dialogServiceInfo: false,
+    levelFilter: '',
+    headersThuTuc: [
+      {
+        text: 'STT',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Mã thủ tục',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Tên thủ tục',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      },
+      {
+        text: 'Lĩnh vực',
+        align: 'center',
+        sortable: false,
+        class: 'text-xs-center'
+      }
+    ],
   }),
   computed: {
     yearList() {
@@ -777,6 +877,46 @@ export default {
     }
   },
   methods: {
+    changeLevel (levelSelect) {
+      let vm = this
+      vm.thutucPage = 1
+      vm.levelFilter = levelSelect
+      vm.doLoadingThuTuc()
+      vm.dialogServiceInfo = true
+    },
+    doLoadingThuTuc () {
+      let vm = this
+      vm.serviceInfoList = []
+      let paramGet = {
+        start: vm.thutucPage * 15 - 15,
+        end: vm.thutucPage * 15,
+        level: vm.levelFilter
+      }
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId()
+        },
+        params: paramGet
+      }
+      axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
+        let serializable = response.data
+        if (serializable.data) {
+          vm.serviceInfoList = serializable.data
+          vm.totalThuTuc = serializable.total
+        } else {
+          vm.totalThuTuc = 0
+          vm.serviceInfoList = []
+        }
+      }).catch(function (error) {
+        vm.totalThuTuc = 0
+        vm.serviceInfoList = []
+      })
+    },
+    paggingData (config) {
+      let vm = this
+      vm.thutucPage = config.page
+      vm.doLoadingThuTuc()
+    },
     getLevelService () {
       let vm = this
       let param = {
@@ -882,7 +1022,7 @@ export default {
         })
         .catch();
     },
-    getStatisticsYearSBN() {
+    getStatisticsYearSBN(agency) {
       let vm = this;
       vm.getLabelPieChartConfig()
       let originUrl = window.location.origin;
@@ -900,27 +1040,38 @@ export default {
           groupCode: "SBN"
         }
       };
-      axios
-        .request(config)
-        .then(function(response) {
-          if (response.data.data) {
-            if (vm.labelPieChartConfig) {
-              vm.statisticalSBN = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
-            } else {
-              vm.statisticalSBN = [
-                response.data.data[0].undueCount,
-                response.data.data[0].overdueCount,
-                response.data.data[0].ontimeCount,
-                response.data.data[0].overtimeCount,
-                response.data.data[0].cancelledCount,
-                response.data.data[0].waitingCount
-              ];
-            }
-          } else {
-            vm.statisticalSBN = vm.labelPieChartConfig ? vm.labelPieChartConfig.map(x => 0) : [0, 0, 0, 0, 0, 0]
+      setTimeout(function () {
+        if (vm.donViSBN) {
+          config.params = {
+            year: vm.yearSelected,
+            month: 0,
+            domain: "total",
+            agency: vm.donViSBN,
           }
-        })
-        .catch();
+        }
+        axios
+          .request(config)
+          .then(function(response) {
+            if (response.data.data) {
+              if (vm.labelPieChartConfig) {
+                vm.statisticalSBN = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
+              } else {
+                vm.statisticalSBN = [
+                  response.data.data[0].undueCount,
+                  response.data.data[0].overdueCount,
+                  response.data.data[0].ontimeCount,
+                  response.data.data[0].overtimeCount,
+                  response.data.data[0].cancelledCount,
+                  response.data.data[0].waitingCount
+                ];
+              }
+            } else {
+              vm.statisticalSBN = vm.labelPieChartConfig ? vm.labelPieChartConfig.map(x => 0) : [0, 0, 0, 0, 0, 0]
+            }
+          })
+          .catch();
+      }, 50)
+      
     },
     getStatisticsYearQUAN_HUYEN() {
       let vm = this;
@@ -940,27 +1091,38 @@ export default {
           groupCode: "QUAN_HUYEN"
         }
       };
-      axios
-        .request(config)
-        .then(function(response) {
-          if (response.data.data) {
-            if (vm.labelPieChartConfig) {
-              vm.statisticalQUAN_HUYEN = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
-            } else {
-              vm.statisticalQUAN_HUYEN = [
-                response.data.data[0].undueCount,
-                response.data.data[0].overdueCount,
-                response.data.data[0].ontimeCount,
-                response.data.data[0].overtimeCount,
-                response.data.data[0].cancelledCount,
-                response.data.data[0].waitingCount
-              ];
-            }
-          } else {
-            vm.statisticalQUAN_HUYEN = vm.labelPieChartConfig ? vm.labelPieChartConfig.map(x => 0) : [0, 0, 0, 0, 0, 0];
+      setTimeout(function () {
+        if (vm.donViHuyen) {
+          config.params = {
+            year: vm.yearSelected,
+            month: 0,
+            domain: "total",
+            agency: vm.donViHuyen
           }
-        })
-        .catch();
+        }
+        axios
+          .request(config)
+          .then(function(response) {
+            if (response.data.data) {
+              if (vm.labelPieChartConfig) {
+                vm.statisticalQUAN_HUYEN = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
+              } else {
+                vm.statisticalQUAN_HUYEN = [
+                  response.data.data[0].undueCount,
+                  response.data.data[0].overdueCount,
+                  response.data.data[0].ontimeCount,
+                  response.data.data[0].overtimeCount,
+                  response.data.data[0].cancelledCount,
+                  response.data.data[0].waitingCount
+                ];
+              }
+            } else {
+              vm.statisticalQUAN_HUYEN = vm.labelPieChartConfig ? vm.labelPieChartConfig.map(x => 0) : [0, 0, 0, 0, 0, 0];
+            }
+          })
+          .catch();
+      }, 50)
+      
     },
     getStatisticsYearXA_PHUONG() {
       let vm = this;
@@ -980,27 +1142,37 @@ export default {
           groupCode: "XA_PHUONG"
         }
       };
-      axios
-        .request(config)
-        .then(function(response) {
-          if (response.data.data) {
-            if (vm.labelPieChartConfig) {
-              vm.statisticalXA_PHUONG = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
-            } else {
-              vm.statisticalXA_PHUONG = [
-                response.data.data[0].undueCount,
-                response.data.data[0].overdueCount,
-                response.data.data[0].ontimeCount,
-                response.data.data[0].overtimeCount,
-                response.data.data[0].cancelledCount,
-                response.data.data[0].waitingCount
-              ];
-            }
-          } else {
-            vm.statisticalXA_PHUONG = vm.labelPieChartConfig ? vm.labelPieChartConfig.map(x => 0) : [0, 0, 0, 0, 0, 0];
+      setTimeout (function () {
+        if (vm.donViXa) {
+          config.params = {
+            domain: "total",
+            agency: vm.donViXa,
+            year: vm.yearSelected,
+            month: 0
           }
-        })
-        .catch();
+        }
+        axios
+          .request(config)
+          .then(function(response) {
+            if (response.data.data) {
+              if (vm.labelPieChartConfig) {
+                vm.statisticalXA_PHUONG = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
+              } else {
+                vm.statisticalXA_PHUONG = [
+                  response.data.data[0].undueCount,
+                  response.data.data[0].overdueCount,
+                  response.data.data[0].ontimeCount,
+                  response.data.data[0].overtimeCount,
+                  response.data.data[0].cancelledCount,
+                  response.data.data[0].waitingCount
+                ];
+              }
+            } else {
+              vm.statisticalXA_PHUONG = vm.labelPieChartConfig ? vm.labelPieChartConfig.map(x => 0) : [0, 0, 0, 0, 0, 0];
+            }
+          })
+          .catch();
+      }, 50)
     },
     getStatisticsMonth(groupCode, itemQH) {
       let vm = this;
