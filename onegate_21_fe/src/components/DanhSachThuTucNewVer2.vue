@@ -875,11 +875,34 @@
         vm.govAgencyTiepNhanSelected = ''
         vm.serviceOptionsSelect = ''
         vm.govAgencyListTiepNhan = vm.serviceConfigs(govList)
-        if ( vm.govAgencyListTiepNhan.length === 1) {
-          vm.govAgencyTiepNhanSelected = vm.govAgencyListTiepNhan[0]
-          vm.pullServiceOptionsLastest(vm.govAgencyTiepNhanSelected)
+        if (vm.hasFilterAgency && vm.agencyXuLyThuTuc) {
+          let agency = vm.govAgencyListTiepNhan.filter(function (item) {
+            return item.govAgencyCode == vm.agencyXuLyThuTuc
+          })
+          if (agency && agency.length > 0) {
+            vm.govAgencyTiepNhanSelected = agency[0]
+          } else {
+            return
+          }
+          vm.$store.dispatch('getServiceOpionByProcess', vm.govAgencyTiepNhanSelected).then(result => {
+            if (result) {
+              vm.serviceOptions = result
+              vm.govAgencyTiepNhanSelected.serviceInfoId = vm.serviceInfoIdSelect
+              if (vm.serviceOptions.length === 1) {
+                vm.selectServiceOption(vm.serviceOptions[0], vm.govAgencyTiepNhanSelected)
+              } else {
+                vm.dialog_selectAgency = true
+              }
+            }
+          })
+        } else {
+          if ( vm.govAgencyListTiepNhan.length === 1) {
+            vm.govAgencyTiepNhanSelected = vm.govAgencyListTiepNhan[0]
+            vm.pullServiceOptionsLastest(vm.govAgencyTiepNhanSelected)
+          }
+          vm.dialog_selectAgency = true
+          //
         }
-        vm.dialog_selectAgency = true
       },
       changeGovSelected () {
         let vm = this

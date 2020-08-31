@@ -26,18 +26,6 @@ export default {
   props: ['classPK', 'className'],
   data: () => ({
     usersComment: [
-      // {
-      //   id: 1,
-      //   fullname: 'Trịnh Công Trình',
-      //   email: 'trinhtc@fds.vn.com',
-      //   pictureUrl: 'https://app.viima.com/static/media/user_profiles/user-icon.png'
-      // },
-      // {
-      //   id: 2,
-      //   fullname: 'Thái Hoàng Anh',
-      //   email: 'anhth@fds.vn',
-      //   pictureUrl: 'https://app.viima.com/static/media/user_profiles/user-icon.png'
-      // }
     ],
     comment: [],
     argShowMore: true,
