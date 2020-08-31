@@ -75,8 +75,7 @@
             clearable
             >
           </v-autocomplete>
-        </v-flex>
-        
+        </v-flex>  
         <!--  -->
         <v-flex xs6 sm3 class="px-3 mb-3" v-for="(item, indexgroupIdList) in groupIdList" v-bind:key="item.key + indexgroupIdList + index">
           <v-autocomplete
@@ -1120,7 +1119,7 @@ export default {
           vm.dossierList = result
           vm.pagination.totalItems = vm.dossierList.length
           // console.log('dossiers', vm.dossierList)
-          // 
+          //
           vm.showErrorData = false
           let dataReport = result
           let dossierRaw = {}
@@ -1502,7 +1501,7 @@ export default {
           // set dossierList
           vm.dossierList = result
           vm.pagination.totalItems = vm.dossierList.length
-          // 
+          //
           vm.showErrorData = false
           let index = 1
           let dataRowTotal = []
