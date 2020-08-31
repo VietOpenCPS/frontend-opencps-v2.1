@@ -6,7 +6,7 @@
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
             <v-flex xs6 sm2 class="px-2">
-              <v-autocomplete
+              <v-select
                 :items="years"
                 v-model="year"
                 item-text="name"
@@ -14,10 +14,10 @@
                 :hide-selected="true"
                 @change="changeYear"
                 >
-              </v-autocomplete>
+              </v-select>
             </v-flex>
             <v-flex xs6 sm2 class="px-2">
-              <v-autocomplete
+              <v-select
                 :items="months"
                 v-model="month"
                 item-text="name"
@@ -25,14 +25,14 @@
                 :hide-selected="true"
                 @change="changeMonth"
                 >
-              </v-autocomplete>
+              </v-select>
             </v-flex>
             <v-flex xs12 sm8 class="px-2 text-right" style="    padding-top: 1px;">
               <v-btn v-if="govAgencyCode === ''" flat class="mx-0 my-0" v-on:click.native="toNativeViewType()">
                 <span v-if="chartView">Lĩnh vực</span>
                 <span v-else>Đơn vị</span>
               </v-btn>
-              <v-btn icon class="mx-0 my-0" v-on:click.native="$vuetify.goTo('#lineChartID', options)">
+              <v-btn icon class="mx-0 my-0" v-on:click.native="toNativeView(0,'lineChart')">
                 <v-icon size="14">show_chart</v-icon>
               </v-btn>
               <v-btn v-if="reportGovName.length > 0 && String(index) !== '1'" flat class="mx-0 my-0" v-on:click.native="toNativeViewBack(index)">
@@ -56,13 +56,13 @@
       </div>
     </div>
     <v-layout row wrap style="margin: 0;" v-if="String(index) === '0'">
-      <v-flex xs12 sm4 class="mt-4" style="    padding-left: 15px;">
-        <v-card class="wrap_report" style="border-radius: 0;">
+      <v-flex xs12 sm4 class="mt-4" style="">
+        <v-card class="wrap_report report_service" style="border-radius: 0;">
           <v-card-title class="headline">
             Thống kê thủ tục hành chính
           </v-card-title>
-          <v-card-text class="pt-2 py-0 px-0">
-            <v-list class="pt-0">
+          <v-card-text class="py-0 px-0">
+            <!-- <v-list class="pt-0">
               <v-list-tile v-for="item in levelList" :key="item.level">
                 <v-list-tile-content>
                   <v-list-tile-title>Mức độ {{item.level}}</v-list-tile-title>
@@ -79,7 +79,9 @@
                   </span>
                 </v-list-tile-content>
               </v-list-tile>
-            </v-list>
+            </v-list> -->
+
+            <apexchart type="donut" :options="chartDonutOptions" :series="seriesDonut" height="250"></apexchart>
           </v-card-text>
         </v-card>
       </v-flex>
@@ -102,7 +104,7 @@
           <v-card-title class="headline">
             Tình hình xử lý hồ sơ năm {{year}}
           </v-card-title>
-          <v-card-text class="pt-2 pb-0 px-0" v-if="showTableTotal">
+          <v-card-text class="pb-0 px-0" v-if="showTableTotal" style="padding-top: 30px;">
             <div>
               <div class="numbers align-space-between" style="margin: 5px 0px;overflow: hidden;">
                 <div class="tiepnhan" style="width: 50%; text-align: center; float: left;">
@@ -123,7 +125,7 @@
           </v-card-text>
         </v-card>
       </v-flex>
-      <v-card v-if="showDetailReport" class="wrap_report xs12 flex" style="border-radius: 0;">
+      <v-card v-if="showDetailReport" class="row_2 wrap_report xs12 flex" style="border-radius: 0;">
         <v-card-text class="py-2 px-1 layout row wrap" style="
             background: #fafafa;
             margin: 0;
@@ -133,28 +135,37 @@
           </v-flex>
         </v-card-text>
       </v-card>
-      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadBar">
+      <v-flex xs12 class="row_3 mt-4 ml-2 mr-2" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
-          <v-card-title class="headline">
+          <v-card-title class="headline" v-if="String(month) !== '0'">
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
           </v-card-title>
+          <v-card-title class="headline" v-else>
+            Tình hình giải quyết hồ sơ năm {{year}}
+          </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
-            <apexchart type="bar" height="350"
+            <apexchart type="bar" height="350"  v-if="typeMonthChart === 'stacked'"
               :options="chartOptionsBarTotal" 
               :series="seriesChartBarTotal" 
               :stacked="true"
             ></apexchart>
+            <!--  -->
+            <apexchart type="bar" height="400" v-else
+              :options="chartOptionColumn" 
+              :series="seriesChartColumn" 
+            ></apexchart>
+
           </v-card-text>
         </v-card>
       </v-flex>
-      <content-placeholders class="my-4 flex xs12 px-2" v-else>
-        <content-placeholders-heading />
-        <content-placeholders-img />
-      </content-placeholders>
-      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadBar">
+
+      <v-flex xs12 class="row_4 mt-4 ml-2 mr-2" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
-          <v-card-title class="headline">
+          <v-card-title class="headline" v-if="String(month) !== '0'">
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
+          </v-card-title>
+          <v-card-title class="headline" v-else>
+            Tình hình giải quyết hồ sơ năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
             <apexchart type="bar" height="350"
@@ -164,11 +175,8 @@
           </v-card-text>
         </v-card>
       </v-flex>
-      <content-placeholders class="my-4 flex xs12 px-2" v-else>
-        <content-placeholders-heading />
-        <content-placeholders-img />
-      </content-placeholders>
-      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadLine" id="lineChartID">
+
+      <v-flex xs12 class="row_5 mt-4 ml-2 mr-2" v-if="!reloadLine" id="lineChartID">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline">
             Tình hình giải quyết hồ sơ năm {{year}}
@@ -176,7 +184,7 @@
           <v-card-text class="pt-2 pb-0 px-0">
             <apexchart type="line" height="450"
               :options="chartOptions" 
-              :series="seriesChart" 
+              :series="seriesChart"
             ></apexchart>
           </v-card-text>
         </v-card>
@@ -324,7 +332,7 @@
 <script>
 
 import { PieChartReport, PieChartReportPublic } from '@/components'
-
+import $ from 'jquery'
 export default {
   props: ['index', 'id'],
   components: {
@@ -351,20 +359,20 @@ export default {
     group: '',
     years: [
       {
-        'value': '',
-        'name': 'Lọc theo năm'
-      },
-      {
-        'value': '2017',
-        'name': 'năm 2017'
-      },
-      {
-        'value': '2018',
-        'name': 'năm 2018'
+        'value': '2020',
+        'name': 'Năm 2020'
       },
       {
         'value': '2019',
-        'name': 'năm 2019'
+        'name': 'Năm 2019'
+      },
+      {
+        'value': '2018',
+        'name': 'Năm 2018'
+      },
+      {
+        'value': '2017',
+        'name': 'Năm 2017'
       }
     ],
     year: (new Date()).getFullYear() + '',
@@ -465,7 +473,39 @@ export default {
     },
     seriesChartBarTotal: [],
     labelOfLine: [],
-    showTableTotal: false
+    showTableTotal: false,
+    typeMonthChart: 'stacked',
+    chartOptionColumn: {},
+    seriesChartColumn: [],
+    chartDonutOptions: {
+      labels: ['Mức độ 2', 'Mức độ 3', 'Mức độ 4'],
+      colors: ['#8BC34A', '#FFC107', '#FF4560'],
+      plotOptions: {
+        pie: {
+          donut: {
+            labels: {
+              show: true,
+              total: {
+                show: true,
+                label: 'Tổng số',
+                color: '#ff5c24'
+              }
+            }
+          }
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function(value, { seriesIndex, dataPointIndex, w }) {
+          return w.config.series[seriesIndex]
+        }
+      },
+      legend: {
+        position: 'bottom',
+        bottom: 0
+      }
+    },
+    seriesDonut: [0, 0, 0]
   }),
   computed: {
     loadingMenuConfigToDo () {
@@ -481,6 +521,10 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      vm.typeMonthChart = typeMonthChartConfig ? typeMonthChartConfig : 'stacked'
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       let currentParams = vm.$router.history.current.params
       let currentQuerys = vm.$router.history.current.query
@@ -510,10 +554,23 @@ export default {
         vm.$store.dispatch('getLevelList').then(function (result) {
           vm.levelList = result
           let totalXXX = 0
+          let level2 = 0 
+          let level3 = 0
+          let level4 = 0  
           for (let key in vm.levelList) {
+            if (vm.levelList[key]['level'] === 2) {
+              level2 = parseInt(vm.levelList[key]['count'])
+            }
+            if (vm.levelList[key]['level'] === 3) {
+              level3 = parseInt(vm.levelList[key]['count'])
+            }
+            if (vm.levelList[key]['level'] === 4) {
+              level4 = parseInt(vm.levelList[key]['count'])
+            }
             totalXXX = totalXXX + parseInt(vm.levelList[key]['count'])
           }
           vm.totalTTHC = totalXXX
+          vm.seriesDonut = [level2, level3, level4]
         })
         vm.showTableTotal = false
         vm.itemTotal = null
@@ -533,6 +590,9 @@ export default {
         })
       }
     })
+  },
+  mounted () {
+    let vm = this
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
@@ -569,6 +629,19 @@ export default {
         }
       }
       vm.doStaticsReport()
+    },
+    reloadLine (val) {
+      let vm = this
+      setTimeout(function() {
+        $('.apexcharts-menu > .apexcharts-menu-item.exportSVG').text('Tải xuống SVG')
+        $('.apexcharts-menu > .apexcharts-menu-item.exportPNG').text('Tải xuống PNG')
+      }, 300)
+      let currentQuerys = vm.$router.history.current.query
+      if (!val && String(vm.index) !== '0' && currentQuerys.hasOwnProperty('lineChart') && currentQuerys['lineChart']) {
+        setTimeout(function () {
+          vm.$vuetify.goTo('#lineChartID', vm.options)
+        }, 300)
+      }
     }
   },
   methods: {
@@ -610,18 +683,23 @@ export default {
         }
       })
     },
-    toNativeView (data) {
+    toNativeView (data, lineChart) {
       let vm = this
+      let query = {
+        year: vm.year,
+        month: vm.month,
+        group: vm.group,
+        reportGovName: vm.reportGovName,
+        govAgencyCode: vm.govAgencyCode,
+        lineChart: lineChart ? true : false
+      }
       vm.$router.push({
         path: '/bao-cao/' + data,
-        query: {
-          year: vm.year,
-          month: vm.month,
-          group: vm.group,
-          reportGovName: vm.reportGovName,
-          govAgencyCode: vm.govAgencyCode
-        }
+        query: query
       })
+      if (lineChart) {
+        vm.$vuetify.goTo('#lineChartID', vm.options)
+      }
     },
     doStaticsReport () {
       let vm = this
@@ -683,9 +761,11 @@ export default {
           vm.noReportData = false
           vm.agencyLists = result
         }
+        console.log('agencyLists', vm.agencyLists)
         vm.doProcessReport2(vm.agencyLists)
         for (let key in vm.agencyLists) {
           let currentData = vm.agencyLists[key]
+          console.log('currentData', currentData)
           if (currentData.domainName === '' && currentData.domainName === '') {
             vm.totalCounter['total_3'] = currentData.processCount
             vm.totalCounter['total_4'] = currentData.remainingCount
@@ -805,12 +885,14 @@ export default {
       let datasetsCustom = []
       let labelsCustomMonth = {}
       let monthData = {}
+      console.log('dataReport1', data)
+      // Bind data report NĂM
       for (let key in data) {
         if (String(data[key].govAgencyCode) === '' && String(data[key].domainName) === '') {
         } else {
           if (data[key].month > 0) {
             labelsCustomMonth['' + data[key].month] = 'T ' + data[key].month
-            if (data[key].govAgencyName !== '') {
+            if (data[key].govAgencyName !== '' && String(data[key].domainName) === '') {
               if (monthData[data[key].govAgencyName] !== null && monthData[data[key].govAgencyName] !== undefined) {
                 monthData[data[key].govAgencyName].push({
                   month: data[key].month,
@@ -823,10 +905,24 @@ export default {
                   total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
                 })
               }
+            } else {
+              if (monthData[data[key].domainName] !== null && monthData[data[key].domainName] !== undefined) {
+                monthData[data[key].domainName].push({
+                  month: data[key].month,
+                  total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+                })
+              } else {
+                monthData[data[key].domainName] = []
+                monthData[data[key].domainName].push({
+                  month: data[key].month,
+                  total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+                })
+              }
             }
           }
         }
       }
+      console.log('monthData', monthData)
       for (let key in monthData) {
         let lineProcessData = {
           label: key,
@@ -850,6 +946,7 @@ export default {
         vm.chartOptions.colors.push(datasetsCustom[key]['borderColor'])
       }
       vm.reloadLine = false
+      console.log('vm.seriesChart', vm.seriesChart)
     },
     doProcessReport2 (data) {
       let vm = this
@@ -862,11 +959,14 @@ export default {
       let ontimeCountData = []
       let overtimeCountData = []
       let currentQuerys = vm.$router.history.current.query
+      console.log('dataReport2', data)
+      // Bind data report THÁNG
       for (let key in data) {
         if (String(data[key].govAgencyName) === '' && String(data[key].domainName) === '') {
         } else {
-          if (data[key].month > 0) {
-            if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== undefined && currentQuerys['govAgencyCode'] !== '' && String(data[key].domainName) !== '') {
+          // if (data[key].month > 0) {
+            // if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== undefined && currentQuerys['govAgencyCode'] !== '' && String(data[key].domainName) !== '') {
+            if (String(data[key].govAgencyName) === '' && String(data[key].domainName) !== '') {
               labelsCustomMonth[data[key].domainName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
             } else {
               labelsCustomMonth[data[key].govAgencyName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
@@ -875,12 +975,13 @@ export default {
             overdueCountData.push(data[key].overdueCount)
             waitingCountData.push(data[key].waitingCount)
             betimesCountData.push(data[key].betimesCount)
-            ontimeCountData.push(data[key].ontimeCount)
+            ontimeCountData.push(Number(data[key].betimesCount) + data[key].ontimeCount)
             overtimeCountData.push(data[key].overtimeCount)
-          }
+          // }
         }
       }
       vm.labelOfLine = []
+      console.log('labelsCustomMonth ---', labelsCustomMonth)
       for (let key in labelsCustomMonth) {
         if (key === '') {
           vm.labelOfLine.push('Toàn bộ lĩnh vực')
@@ -895,9 +996,9 @@ export default {
         }
         datasetsCustom.push(lineProcessData)
       }
-       if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== undefined && currentQuerys['govAgencyCode'] !== '') {
-          delete datasetsCustom[0]
-        }
+      if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== undefined && currentQuerys['govAgencyCode'] !== '') {
+        delete datasetsCustom[0]
+      }
      let colorDK = []
      let seriesChartBarData = []
      for (let key in datasetsCustom) {
@@ -1037,6 +1138,49 @@ export default {
                 return ''
               }
             }
+          }
+        }
+      }
+      // for report month type column 
+      vm.seriesChartColumn = []
+      vm.seriesChartColumn = [{
+        name: 'Đã giải quyết đúng hạn',
+        data: ontimeCountData
+      },{
+        name: 'Đang xử lý còn hạn',
+        data: undueCountData
+      },{
+        name: 'Đang xử lý quá hạn',
+        data: overdueCountData
+      }]
+      vm.chartOptionColumn = {}
+      vm.chartOptionColumn = {
+        plotOptions: {
+          bar: {
+            barHeight: '100%',
+            columnWidth: '70%',
+            type: 'bar'
+          },
+        },
+        chart: {
+          stacked: false
+        },
+        colors: ['#00E396', '#FEB019', '#FF4560'],
+        stroke: {
+          width: 1,
+          colors: ['#fff']
+        },
+        xaxis: {
+          categories: vm.labelOfLine,
+          labels: {
+            formatter: function(val) {
+              return val
+            }
+          }
+        },
+        yaxis: {
+          title: {
+            text: undefined
           }
         }
       }

@@ -1,6 +1,6 @@
 <template>
-  <v-app id="app_dynamic_report">
-    <v-navigation-drawer app clipped floating width="240">
+  <v-app id="app_dynamic_report" :class="hiddenAside ? 'px-3' : ''">
+    <v-navigation-drawer app clipped floating width="300">
       <div class="drawer__filter">
         <v-list dense style="padding: 0;" class="report_list">
           <v-list-tile
@@ -14,13 +14,13 @@
             </v-list-tile-action>
 
             <v-list-tile-content>
-              <v-list-tile-title>{{ item.reportName }}</v-list-tile-title>
+              <v-list-tile-title :title="item.reportName" style="font-size:13px">{{ item.reportName }}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
       </div>
     </v-navigation-drawer>
-    <v-content>
+    <v-content :style="hiddenAside ? 'background: #ffffff' : ''">
       <router-view></router-view>
     </v-content>
     <v-snackbar
@@ -69,6 +69,34 @@
         <v-icon>replay</v-icon>
       </v-btn>
     </v-snackbar>
+    <!--  -->
+    <div v-if="isChildPage" style="position:fixed;top:250px;right:0;width: 34px;background-color:#ffffff;
+      border-radius:15px;border-top-right-radius: 0;border-bottom-right-radius: 0;border: 1.5px solid #dedede;border-right: 0">
+      <v-tooltip left>
+        <v-btn slot="activator" flat icon color="blue" class="mx-0 my-0" style="width: 32px; height:32px" @click="goTo('thong-ke')">
+          <v-icon size="20">pie_chart</v-icon>
+        </v-btn>
+        <span>Thống kê chung</span>
+      </v-tooltip>
+      <v-tooltip left>
+        <v-btn slot="activator" flat icon color="green" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('bao-cao')">
+          <v-icon size="20">book</v-icon>
+        </v-btn>
+        <span>Báo cáo tình hình giải quyết</span>
+      </v-tooltip>
+      <v-tooltip left>
+        <v-btn slot="activator" flat icon color="orange" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('thong-ke#/danh-gia-thu-tuc')">
+          <v-icon size="20">assignment_turned_in</v-icon>
+        </v-btn>
+        <span>Theo dõi tình hình đánh giá thủ tục</span>
+      </v-tooltip>
+      <v-tooltip left>
+        <v-btn slot="activator" flat icon color="teal" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('thong-ke#/danh-gia-can-bo')">
+          <v-icon size="20">perm_identity</v-icon>
+        </v-btn>
+        <span>Theo dõi tình hình đánh giá cán bộ</span>
+      </v-tooltip>
+    </div>
   </v-app>
 </template>
 
@@ -77,6 +105,7 @@
   export default {
     props: ['index'],
     data: () => ({
+      hiddenAside: false,
       dialog: false,
       drawer: null,
       dataSocket: {},
@@ -93,7 +122,8 @@
         }
       ],
       userConfig: [],
-      reportTypeFilter: ''
+      reportTypeFilter: '',
+      reportTypeMappingRole: ''
     }),
     computed: {
       itemsReports () {
@@ -161,52 +191,107 @@
         set: function(newValue) {
           this.$store.commit('setsnackbarsocket', newValue)
         }
+      },
+      isChildPage () {
+        // giám sát
+        try {
+          if (childPage) {
+            return true
+          }
+          return false
+        } catch (error) {
+          return false
+        }
       }
     },
     created () {
-    var vm = this
+      var vm = this
       vm.$nextTick(function () {
-        if (vm.$route.query.reportType !== undefined && vm.$route.query.reportType !== null) {
-          vm.reportTypeFilter = vm.$route.query.reportType
+        try {
+          if (reportTypeFilter) {
+            vm.reportTypeFilter = reportTypeFilter
+          }
+        } catch (error) {
         }
-        vm.$store.dispatch('getDynamicReports', vm.reportTypeFilter).then(function (result) {
-          vm.itemsReportsConfig = []
-          vm.userConfig = []
-          if (String(vm.index) !== '0') {
-            for (let key in vm.itemsReports) {
-              if (vm.itemsReports[key]['code'] === String(vm.index)) {
-                vm.reportType = vm.itemsReports[key]['document']
-                vm.itemsReportsConfig = vm.itemsReports[key]['filterConfig']['reportConfig']
-                if (vm.itemsReports[key]['userConfig'] !== '') {
-                  let userConfigObjec = vm.itemsReports[key]['userConfig']
-                  if (userConfigObjec.hasOwnProperty(vm.getUserId())) {
-                    vm.userConfig = userConfigObjec[vm.getUserId()]
+        try {
+          if (reportTypeMappingRole) {
+            vm.reportTypeMappingRole = reportTypeMappingRole
+          }
+        } catch (error) {
+        }
+        let doGetReport = function () {
+          if (vm.$route.query.hasOwnProperty('doreport')) {
+            vm.hiddenAside = true
+          } else {
+            vm.hiddenAside = false
+          }
+          if (vm.$route.query.reportType !== undefined && vm.$route.query.reportType !== null && vm.$route.query.reportType !== '') {
+            vm.reportTypeFilter = vm.$route.query.reportType
+          }
+          vm.$store.dispatch('getDynamicReports', vm.reportTypeFilter).then(function (result) {
+            vm.itemsReportsConfig = []
+            vm.userConfig = []
+            if (String(vm.index) !== '0') {
+              for (let key in vm.itemsReports) {
+                if (vm.itemsReports[key]['code'] === String(vm.index)) {
+                  vm.reportType = vm.itemsReports[key]['document']
+                  vm.itemsReportsConfig = vm.itemsReports[key]['filterConfig']['reportConfig']
+                  if (vm.itemsReports[key]['userConfig'] !== '') {
+                    let userConfigObjec = vm.itemsReports[key]['userConfig']
+                    if (userConfigObjec.hasOwnProperty(vm.getUserId())) {
+                      vm.userConfig = userConfigObjec[vm.getUserId()]
+                    }
                   }
+                  break
                 }
-                break
+              }
+            } else {
+              vm.reportType = vm.itemsReports[0]['document']
+              vm.itemsReportsConfig = vm.itemsReports[0]['filterConfig']['reportConfig']
+              if (vm.itemsReports[0]['userConfig'] !== '') {
+                let userConfigObjec = vm.itemsReports[0]['userConfig']
+                if (userConfigObjec.hasOwnProperty(vm.getUserId())) {
+                  vm.userConfig = userConfigObjec[vm.getUserId()]
+                }
               }
             }
-          } else {
-            vm.reportType = vm.itemsReports[0]['document']
-            vm.itemsReportsConfig = vm.itemsReports[0]['filterConfig']['reportConfig']
-            if (vm.itemsReports[0]['userConfig'] !== '') {
-              let userConfigObjec = vm.itemsReports[0]['userConfig']
-              if (userConfigObjec.hasOwnProperty(vm.getUserId())) {
-                vm.userConfig = userConfigObjec[vm.getUserId()]
+            vm.selected = []
+            if (vm.userConfig.length > 0) {
+              vm.selected = vm.userConfig
+            } else {
+              for (let keySelected in vm.itemsReportsConfig) {
+                if (vm.itemsReportsConfig[keySelected]['selected']) {
+                  vm.selected.push(vm.itemsReportsConfig[keySelected]['value'])
+                }
               }
             }
-          }
-          vm.selected = []
-          if (vm.userConfig.length > 0) {
-            vm.selected = vm.userConfig
-          } else {
-            for (let keySelected in vm.itemsReportsConfig) {
-              if (vm.itemsReportsConfig[keySelected]['selected']) {
-                vm.selected.push(vm.itemsReportsConfig[keySelected]['value'])
+          })
+        }
+        if (vm.reportTypeMappingRole) {
+          let roles = ''
+          vm.$store.dispatch('getRoleUser').then(function (result) {
+            roles = result
+            if (roles) {
+              let roleList = roles
+              roleList = roleList.filter(function (item) {
+                return vm.reportTypeMappingRole.hasOwnProperty(item) && vm.reportTypeMappingRole[item]
+              })
+              if (roleList && roleList.length > 0) {
+                vm.reportTypeFilter = vm.reportTypeMappingRole[roleList[0]]
+                doGetReport()
+              } else {
+                doGetReport()
               }
+            } else {
+              doGetReport()
             }
-          }
-        })
+          }).catch(function (error) {
+            doGetReport()
+          })
+        } else {
+          doGetReport()
+        }
+
       })
     },
     methods: {
@@ -257,6 +342,11 @@
             break
           }
         }
+      },
+      goTo (page) {
+        let vm = this
+        let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
+        window.location.href = url + '/' + page
       }
     }
   }

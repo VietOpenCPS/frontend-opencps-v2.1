@@ -7,60 +7,89 @@
         </div>
         <v-card>
           <v-card-text class="py-2 px-2">
-            <v-layout wrap>
-              <v-flex xs12>
-                <v-text-field v-if="item.fieldType === 'textarea'"
-                  :id="item.fieldName"
-                  :value="item.value"
-                  :placeholder="item.placeholder"
-                  multi-line
-                  @input="inputChangeValue(item)"
-                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
-                  :required="(item.required === true || item.required === 'true') ? true : false"
-                ></v-text-field>
-                <v-text-field v-if="item.fieldType === 'string'"
-                  :id="item.fieldName"
-                  :value="item.value"
-                  :placeholder="item.placeholder"
-                  @input="inputChangeValue(item)"
-                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
-                  :required="(item.required === true || item.required === 'true') ? true : false"
-                ></v-text-field>
-                <v-text-field v-if="item.fieldType === 'number'"
-                  :id="item.fieldName"
-                  :value="item.value"
-                  :placeholder="item.placeholder"
-                  @input="inputChangeValue(item)"
-                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
-                  :required="(item.required === true || item.required === 'true') ? true : false"
-                ></v-text-field>
-                <!-- <v-text-field v-if="item.fieldType === 'date'"
-                  :id="item.fieldName"
-                  :value="item.value|parseDate"
-                  :placeholder="item.placeholder"
-                  readonly
-                  append-icon="event"
-                  v-on:click.native="openDialogCustom(item, item.fieldName)"
-                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
-                  :required="(item.required === true || item.required === 'true') ? true : false"
-                ></v-text-field> -->
-                <v-layout wrap class="pl-2" v-if="item.fieldType === 'date'">
-                  <v-icon color="blue" class="ml-3">event</v-icon>
-                  <vue-ctk-date-time-picker 
-                    ref="datepicker"
-                    :label="item.value ? '' : 'Chọn ngày'"
-                    style="width:auto!important"
-                    class="ml-2"
+            <v-form ref="form1" v-model="valid1" lazy-validation :id="'form_' + item.fieldName">
+              <v-layout wrap>
+                <v-flex xs12 class="mx-3">
+                  <v-text-field v-if="item.fieldType === 'textarea'"
+                    box
                     :id="item.fieldName"
-                    v-model="item.value"
-                    formatted="DD/MM/YYYY HH:mm"
-                    format="YYYY-MM-DDTHH:mm"
-                    time-format="HH:mm"
-                    :without-header="true"
-                  />
-                </v-layout>
-              </v-flex>
-            </v-layout>
+                    :value="item.value"
+                    :placeholder="item.placeholder"
+                    multi-line
+                    @input="inputChangeValue(item)"
+                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                    :required="(item.required === true || item.required === 'true') ? true : false"
+                  ></v-text-field>
+                  <v-text-field v-if="item.fieldType === 'string'"
+                    box
+                    :id="item.fieldName"
+                    :value="item.value"
+                    :placeholder="item.placeholder"
+                    @input="inputChangeValue(item)"
+                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                    :required="(item.required === true || item.required === 'true') ? true : false"
+                  ></v-text-field>
+                  <v-text-field v-if="item.fieldType === 'number'"
+                    box
+                    :id="item.fieldName"
+                    :value="item.value"
+                    :placeholder="item.placeholder"
+                    @input="inputChangeValue(item)"
+                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
+                    :required="(item.required === true || item.required === 'true') ? true : false"
+                  ></v-text-field>
+                  <v-autocomplete v-if="item.fieldType.indexOf('select') >= 0"
+                    class="select-border"
+                    :items="validDatasourceSelect(item.fieldType) ? JSON.parse(item.fieldType)['select'] : []"
+                    :value="item.value"
+                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                    :required="(item.required === true || item.required === 'true') ? true : false"
+                    :placeholder="item.placeholder"
+                    item-text="text"
+                    item-value="value"
+                    hide-no-data
+                    :hide-selected="true"
+                    @change="inputChangeValue($event, index)"
+                    box
+                  ></v-autocomplete>
+                  <v-layout wrap class="pl-2" v-if="item.fieldType === 'date'">
+                    <v-icon color="blue" class="">event</v-icon>
+                    <vue-ctk-date-time-picker 
+                      ref="datepicker"
+                      :label="item.value ? '' : 'Chọn ngày'"
+                      style="width:auto!important"
+                      class="ml-2"
+                      :id="item.fieldName"
+                      v-model="item.value"
+                      formatted="DD/MM/YYYY HH:mm"
+                      format="YYYY-MM-DDTHH:mm"
+                      time-format="HH:mm"
+                      :min-date="getCurentDateTime()"
+                      :without-header="true"
+                      locale="vi"
+                    />
+                  </v-layout>
+                  <v-layout wrap v-if="item.fieldType.indexOf('options_group') >= 0" class="mt-2">
+                    <v-flex xs4 v-for="(item1, index1) in optionsGroup" v-bind:key="index1" class="pr-3">
+                      <v-autocomplete 
+                        class="select-border"
+                        :items="optionsGroup[index1]['datasource']"
+                        :value="item1.value"
+                        :rules="(item1.required === true || item1.required === 'true') ? [rules.required] : []"
+                        :required="(item1.required === true || item1.required === 'true') ? true : false"
+                        :label="item1.fieldLabel"
+                        item-text="itemName"
+                        item-value="itemCode"
+                        :hide-selected="true"
+                        hide-no-data
+                        @change="inputChangeSelect($event, index1)"
+                        box
+                      ></v-autocomplete>
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
+              </v-layout>
+            </v-form>
           </v-card-text>
           <v-dialog v-model="dialog" width="500">
             <v-date-picker
@@ -94,7 +123,7 @@
                 :placeholder="item.placeholder"
                 multi-line
                 @input="inputChangeValue(item)"
-                :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                :rules="(item.required === true || item.required === 'true') ? [rules.required, rules.varchar5000] : [rules.varchar5000]"
                 :required="(item.required === true || item.required === 'true') ? true : false"
               ></v-text-field>
             </v-flex>
@@ -105,7 +134,7 @@
                 :value="item.value"
                 :placeholder="item.placeholder"
                 @input="inputChangeValue(item)"
-                :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                :rules="(item.required === true || item.required === 'true') ? [rules.required, rules.varchar5000] : [rules.varchar5000]"
                 :required="(item.required === true || item.required === 'true') ? true : false"
               ></v-text-field>
             </v-flex>
@@ -121,17 +150,22 @@
               ></v-text-field>
             </v-flex>
             <v-flex xs12 class="px-3">
-              <!-- <v-text-field v-if="item.fieldType === 'date'"
-                box
-                :id="item.fieldName"
-                :value="item.value|parseDate"
-                :placeholder="item.placeholder"
-                readonly
-                append-icon="event"
-                v-on:click.native="openDialogCustom(item, item.fieldName)"
+              <v-autocomplete v-if="item.fieldType.indexOf('select') >= 0"
+                class="select-border"
+                :items="validDatasourceSelect(item.fieldType) ? JSON.parse(item.fieldType)['select'] : []"
+                :value="item.value"
                 :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
                 :required="(item.required === true || item.required === 'true') ? true : false"
-              ></v-text-field> -->
+                :placeholder="item.placeholder"
+                item-text="text"
+                item-value="value"
+                hide-no-data
+                :hide-selected="true"
+                @change="inputChangeValue($event, index)"
+                box
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 class="px-3">
               <v-layout wrap class="mt-2" v-if="item.fieldType === 'date'">
                 <v-icon color="blue" class="">event</v-icon>
                 <vue-ctk-date-time-picker 
@@ -145,6 +179,7 @@
                   format="YYYY-MM-DDTHH:mm"
                   time-format="HH:mm"
                   :without-header="true"
+                  locale="vi"
                 />
               </v-layout>
             </v-flex>
@@ -191,10 +226,12 @@
   </div>
 </template>
 <script>
-  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
+  let datePicker = window.VueCtkDateTimePicker ? window.VueCtkDateTimePicker.default : window['vue-ctk-date-time-picker']
+  import $ from 'jquery'
+  import axios from 'axios'
   export default {
     components: {
-      'vue-ctk-date-time-picker': VueCtkDateTimePicker
+      'vue-ctk-date-time-picker': datePicker
     },
     props: {
       dossier_id: {
@@ -209,6 +246,7 @@
       }
     },
     data: () => ({
+      optionsGroup: [],
       itemId: null,
       fieldNameID: '',
       date: null,
@@ -216,19 +254,60 @@
       formBuilder: [],
       panel: [],
       valid: false,
+      valid1: false,
       valid2: false,
       rulesValid: {
         number: function (value) {
           var pattern = /^\d+$/
-          return pattern.test(value) || 'Kiểu dữ liệu sai định dạng.'
+          return pattern.test(value) || 'Kiểu dữ liệu sai định dạng'
         }
       },
       rules: {
         required: (value) => !!value || 'Trường dữ liệu bắt buộc',
         number: function (value) {
           const pattern = /^\d+$/
-          return pattern.test(value) || 'Kiểu dữ liệu sai định dạng.'
-        }
+          return pattern.test(value) || 'Kiểu dữ liệu sai định dạng'
+        },
+        varchar50: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+          } else {
+            return true
+          }  
+        },
+        varchar100: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+          } else {
+            return true
+          }
+        },
+        varchar255: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+          } else {
+            return true
+          }  
+        },
+        varchar500: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+          } else {
+            return true
+          }  
+        },
+        varchar5000: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+          } else {
+            return true
+          }
+        },
       }
     }),
     watch: {
@@ -274,6 +353,13 @@
                   vm.formBuilder[key]['value'] = ''
                 } else if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && !isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
                   vm.formBuilder[key]['value'] = new Date(vm.formBuilder[key]['value'])
+                } else if (vm.formBuilder[key]['fieldType'].indexOf('options_group') >= 0) {
+                  vm.optionsGroup = JSON.parse(vm.formBuilder[key]['fieldType'])['options_group']
+                  for (let key1 in vm.optionsGroup) {
+                    if (vm.optionsGroup[key1].hasOwnProperty('api') && vm.optionsGroup[key1]['api']) {
+                      vm.getDataSource(vm.optionsGroup[key1]['api'], key1, {})
+                    }
+                  }
                 }
               }
               vm.allExpand(vm.formBuilder)
@@ -301,9 +387,40 @@
         }
         vm.dialog = false
       },
-      inputChangeValue (item) {
+      inputChangeValue (item, index) {
         let vm = this
-        item.value = document.getElementById(item.fieldName).value
+        if (index !== undefined && index !== null && index !== 'undefined' && index !== 'null') {
+          vm.formBuilder[index]['value'] = item
+        } else {
+          item.value = document.getElementById(item.fieldName).value
+        }
+        console.log('formBuilder', vm.formBuilder)
+      },
+      inputChangeSelect (item, index) {
+        console.log('inputChangeSelect', item, index)
+        let vm = this
+        if (vm.optionsGroup.length > (index + 1)) {
+          vm.optionsGroup[index + 1]['value'] = ''
+          vm.getDataSource(vm.optionsGroup[index + 1]['api'], index + 1, {parent: item})
+        }
+      },
+      getDataSource (api, index, paramInput) {
+        let vm = this
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          },
+          params: paramInput ? paramInput : {}
+        }
+        axios.get(api, param).then(function (response) {
+          if (response.data && response.data['data']) {
+            vm.optionsGroup[index]['datasource'] = response.data['data']
+          } else {
+            vm.optionsGroup[index]['datasource'] = []
+          }
+        }).catch(function (xhr) {
+          vm.optionsGroup[index]['datasource'] = []
+        })
       },
       showDatePicker () {
         this.$refs.datepicker.showDatePicker()
@@ -325,15 +442,41 @@
         // let [hh, mm, ss] = `${time}`.split(':')
         return `${year}-${month.padStart(2, '0')}-${day2.padStart(2, '0')}`
       },
+      validDatasourceSelect (fieldType) {
+        if (fieldType) {
+          try {
+            let x = JSON.parse(fieldType)
+            if (x) {
+              return true
+            }
+            return false
+          } catch (error) {
+            return false
+          }
+        } else {
+          return false
+        }
+      },
       checkValid () {
         let vm = this
         let valid = true
         if (vm.formBuilder.length > 0) {
           for (let key in vm.formBuilder) {
-            if ((vm.formBuilder[key]['required'] === true || vm.formBuilder[key]['required'] === 'true') && !vm.formBuilder[key]['value']) {
-              valid = false
-              alert(vm.formBuilder[key]['fieldLabel'] + ' là bắt buộc!')
-              return valid
+            if (vm.formBuilder[key].fieldType.indexOf('options_group') >= 0) {
+              for (let key1 in vm.optionsGroup) {
+                if ((vm.optionsGroup[key1]['required'] === true || vm.optionsGroup[key1]['required'] === 'true') && !vm.optionsGroup[key1]['value']) {
+                  valid = false
+                  alert(vm.formBuilder[key]['fieldLabel'] + ' là bắt buộc!')
+                  return valid
+                }
+              }
+            } else {
+              if ((vm.formBuilder[key]['required'] === true || vm.formBuilder[key]['required'] === 'true') && !vm.formBuilder[key]['value']) {
+                valid = false
+                alert(vm.formBuilder[key]['fieldLabel'] + ' là bắt buộc!')
+                $('#form_' + vm.formBuilder[key].fieldName)[0].__vue__.validate()
+                return valid
+              }
             }
           }
         }
@@ -344,16 +487,27 @@
         let objectReturn = {}
         if (vm.formBuilder.length > 0) {
           for (let key in vm.formBuilder) {
-            let valueEdit = vm.formBuilder[key].value
-            if (vm.formBuilder[key].fieldType === 'date') {
-              valueEdit = (new Date(vm.formBuilder[key].value)).getTime() ? (new Date(vm.formBuilder[key].value)).getTime() : ''
+            if (vm.formBuilder[key].fieldName) {
+              let valueEdit = vm.formBuilder[key].value
+              if (vm.formBuilder[key].fieldType === 'date') {
+                valueEdit = (new Date(vm.formBuilder[key].value)).getTime() ? (new Date(vm.formBuilder[key].value)).getTime() : ''
+              }
+              objectReturn[vm.formBuilder[key].fieldName] = valueEdit
+            } else if (!vm.formBuilder[key].fieldName && vm.formBuilder[key].fieldType.indexOf('options_group') >= 0) {
+              for (let key1 in vm.optionsGroup) {
+                objectReturn[vm.optionsGroup[key1].fieldName] = vm.optionsGroup[key1]['value']
+              }
             }
-            objectReturn[vm.formBuilder[key].fieldName] = valueEdit
           }
         } else {
           objectReturn = ''
         }
+        console.log('form-thong-tin', objectReturn)
         return objectReturn
+      },
+      getCurentDateTime () {
+        let date = new Date()
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
       }
     },
     filters: {

@@ -1,17 +1,13 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import DetailForward from '@/components/blacklist/DetailForward'
 import NotFound from '@/components/NotFound'
 import LandingServiceInfo from '@/components/screens/Landing'
-import LandingMobile from '@/components/screens/LandingMobile'
 import ChiTietThuTuc from '@/components/screens/ChiTietThuTuc'
-import ChiTietThuTucMobile from '@/components/screens/ChiTietThuTucMobile'
-
+import DetailForward from '@/components/blacklist/DetailForward'
 const routes = [
+  { path: '/:index', name: 'LandingServiceInfo', component: LandingServiceInfo, props: true },
   { path: '/thu-tuc-hanh-chinh', name: 'LandingServiceInfo', component: LandingServiceInfo, props: true },
-  { path: '/m/thu-tuc-hanh-chinh', name: 'LandingMobile', component: LandingMobile, props: true },
   { path: '/thu-tuc-hanh-chinh/:index', name: 'ChiTietThuTuc', component: ChiTietThuTuc, props: true },
-  { path: '/m/thu-tuc-hanh-chinh/:index', name: 'ChiTietThuTucMobile', component: ChiTietThuTucMobile, props: true },
   {
     path: '/danh-sach-ho-so/:index',
     name: 'Landing',

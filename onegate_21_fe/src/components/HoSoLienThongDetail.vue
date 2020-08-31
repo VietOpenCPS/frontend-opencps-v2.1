@@ -19,6 +19,7 @@
                   item-text="itemName"
                   item-value="itemCode"
                   placeholder="Chọn cơ quan liên thông"
+                  hide-no-data
                   return-object
                   hide-selected
                 ></v-autocomplete>
@@ -64,7 +65,7 @@
 <script>
 
 import thongtinchunghoso from './form_xu_ly/ThongTinChungHoSo.vue'
-import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
 export default {
   components: {
     'thongtinchunghoso': thongtinchunghoso,

@@ -27,6 +27,7 @@
 <script>
 
 import Vue from 'vue'
+import axios from 'axios'
 export default {
   props: ['index'],
   components: {
@@ -42,11 +43,54 @@ export default {
   },
   created () {
     var vm = this
-    console.log('landing---------')
     vm.$nextTick(function () {
+      let viewListEmployee = function (item) {
+        vm.$router.push({
+          path: '/danh-gia-can-bo/' + item.itemCode,
+          query: {
+            itemName: item.itemName
+          }
+        })
+      }
       vm.$store.dispatch('loadGovAgencys', {}).then(result => {
-        vm.govAgencys = result
-        console.log(vm.govAgencys)
+        let agencyList = result
+        let agencyLength = agencyList.length
+        if (agencyLength > 1) {
+          let count = 0
+          for (let i = 0; i < agencyLength; i++) {
+            let param = {
+              headers: {
+                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+              },
+              params: {
+                start: 0,
+                end: 1,
+                jobposCode: 'DANHGIA_' + agencyList[i].itemCode
+              }
+            }
+            axios.get('/o/rest/v2/employees/publish/' + agencyList[i].itemCode, param).then(result => {
+              count += 1
+              if (result.data.data) {
+                vm.govAgencys.push(agencyList[i])
+              }
+              if (count === agencyLength) {
+                if (vm.govAgencys.length === 1) {
+                  viewListEmployee(vm.govAgencys[0])
+                }
+              }
+            }).catch(xhr => {
+              count += 1
+              if (count === agencyLength) {
+                if (vm.govAgencys.length === 1) {
+                  viewListEmployee(vm.govAgencys[0])
+                }
+              }
+            })
+          }
+        } else if (agencyLength === 1) {
+          vm.govAgencys = agencyList
+          viewListEmployee(vm.govAgencys[0])
+        }
       }).catch(xhr => {
       })
     })
@@ -56,7 +100,7 @@ export default {
   methods: {
     viewListEmployee (item) {
      this.$router.push({
-        path: '/danh-sach-can-bo/' + item.itemCode,
+        path: '/danh-gia-can-bo/' + item.itemCode,
         query: {
           itemName: item.itemName
         }

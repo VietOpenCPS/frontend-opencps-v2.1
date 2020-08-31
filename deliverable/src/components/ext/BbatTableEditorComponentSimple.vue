@@ -33,7 +33,7 @@
           :item-text="item.itemText"
           :item-value="item.itemValue"
           box
-          :label="item.required ? item['label'] + ' 💥': item['label']" 
+          :label="item.required ? item['label'] + ' *': item['label']" 
           :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
@@ -42,50 +42,53 @@
           clearable
         ></v-combobox>
         <v-autocomplete :class="item['class_component']" v-if="item.type === 'selects' && pullOk && item.hasOwnProperty('datasource_key')"
-          v-model="data[item.model]"
-          :items="dataSocket[item['datasource_key']]"
+          v-model="data[item['model']]"
+          :items="data[item['datasource_key']]"
           :item-text="item.itemText"
           :item-value="item.itemValue"
           box
-          :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
           :chips="item['chips']"
           :multiple="item['multiple']"
-          clearable
-        ></v-autocomplete>
+          :style="item['disable'] ? 'pointer-events: none' : ''"
+        >
+          <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+        </v-autocomplete>
         <v-autocomplete :class="item['class_component']" v-if="item.type === 'selects' && !item.hasOwnProperty('datasource_key')"
           v-model="data[item.model]"
           :items="item.datasource"
           :item-text="item.itemText"
           :item-value="item.itemValue"
           box
-          :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
           :chips="item['chips']"
           :multiple="item['multiple']"
           clearable
-        ></v-autocomplete>
+        >
+          <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+        </v-autocomplete>
         <v-text-field :class="item['class_component']" v-if="item.type === 'text-fields'"
           v-model="data[item.model]"
-          :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
           box 
           clearable
         >
+          <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
         </v-text-field>
         <v-textarea :class="item['class_component']" v-if="item.type === 'textarea'"
           v-model="data[item.model]"
-          :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
           box 
           clearable
-        ></v-textarea>
+        >
+          <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+        </v-textarea>
         <v-subheader class="px-0" v-if="item.type === 'codemirror'">{{item['label']}}</v-subheader>
         <codemirror v-if="item.type === 'codemirror'" v-model="data[item.model]" :options="cmOptions"></codemirror>
         <v-switch :class="item['class_component']" v-if="item.type === 'v-switch'"
@@ -119,7 +122,7 @@
             :item-text="itemChild.itemText"
             :item-value="itemChild.itemValue"
             box
-            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
+            :label="itemChild.required ? itemChild['label'] + ' *': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
             @change="processChangeDataSource($event, itemChild)"
@@ -133,7 +136,7 @@
             :item-text="itemChild.itemText"
             :item-value="itemChild.itemValue"
             box
-            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
+            :label="itemChild.required ? itemChild['label'] + ' *': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
             @change="processChangeDataSource($event, itemChild)"
@@ -143,7 +146,7 @@
           ></v-autocomplete>
           <v-text-field :class="itemChild['class_component']" v-if="itemChild.type === 'text-fields'"
             v-model="data[itemChild.model]"
-            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
+            :label="itemChild.required ? itemChild['label'] + ' *': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :placeholder="itemChild['placeholder']"
             box
@@ -152,7 +155,7 @@
           </v-text-field>
           <v-textarea :class="itemChild['class_component']" v-if="itemChild.type === 'textarea'"
             v-model="data[itemChild.model]"
-            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
+            :label="itemChild.required ? itemChild['label'] + ' *': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :placeholder="itemChild['placeholder']"
             box
@@ -167,18 +170,12 @@
         </div>
       </v-flex>
     </v-layout>
-    <v-layout v-else row wrap>
-      <v-flex xs12>
-        <div id="video-preloader" class="video-preloader">
-          <video loop id="editor-video-preloader" width="100%" height="350" muted="true" src="https://editorassets.parastorage.com/video-preloader/editor-video-preloader-2-@2x.mp4"></video>
-        </div>
-      </v-flex>
-    </v-layout>
   </v-form>
 </template>
 
 <script>
   import DatetimePicker from './DatetimePicker.vue'
+  import axios from 'axios'
 
   export default {
     props: ['id', 'datainput'],
@@ -214,6 +211,14 @@
         }
       }
     },
+    created () {
+      let vm = this
+      if (String(vm.id) !== '0') {
+        vm.data = vm.datainput
+      } else {
+        vm.processDataSource()
+      }
+    },
     computed: {
       detailForm () {
         let detailDynamic = this.$store.getters.getContentFileSimple
@@ -236,16 +241,18 @@
       },
       pullCounterOrg () {
         return this.$store.getters.pullCounter
+      },
+      activeBindFormData () {
+        return this.$store.getters.getActiveBindFormData
       }
     },
-    updated() {
+    updated () {
       var vm = this
       vm.$nextTick(function () {
         if (vm.isCallBack) {
           vm.isCallBack = false
           vm.processDataSource()
           setTimeout(() => {
-            vm.processDataSourceVerify()
             if (String(vm.id) !== '0') {
               vm.data = vm.datainput
             }
@@ -259,6 +266,21 @@
         }
       })
     },
+    mounted () {
+      let vm = this
+      vm.processDataSource()
+    },
+    watch: {
+      data: {
+        handler (val) {
+          // console.log('watch data', val)
+          let vm = this
+          vm.$store.commit('setChangeFormData', val)
+          vm.$store.commit('setActiveBindFormData', !vm.activeBindFormData)
+        },
+        deep: true
+      }
+    },
     methods: {
       clearLoading () {
         this.loading = false
@@ -271,20 +293,6 @@
         if (item.hasOwnProperty('concatina')) {
           vm.pullOk = false
           vm.pullCounter = vm.pullCounter + 1
-          console.log('vm.pullCounter', vm.pullCounter)
-          vm.$socket.sendObj(
-            {
-              type: 'api',
-              cmd: 'get',
-              respone: item.concatina['datasource_key'],
-              api: item.concatina['datasource_api'] + '?' + item.concatina['query'] + '=' + data,
-              headers: {
-                'Token': vm.getAuthToken(),
-                'groupId': vm.getScopeGroupId(),
-                'USER_ID': vm.getUserId()
-              }
-            }
-          )
         }
       },
       processDataSourceVerify () {
@@ -295,32 +303,43 @@
               vm.data[vm.detailForm[key]['model']] = JSON.parse(vm.data[vm.detailForm[key]['model']])
             }
           }
+          if (String(vm.id) === '0' && vm.detailForm[key]['model'] === 'subject') {
+            vm.detailForm[key]['model'] = '  '
+            setTimeout (function () {
+              vm.detailForm[key]['model'] = 'subject'
+            }, 200)
+          }
         }
       },
       processDataSource () {
         let vm = this
         for (let key in vm.detailForm) {
           if (vm.detailForm[key].hasOwnProperty('datasource_api') && vm.detailForm[key].hasOwnProperty('datasource_key')) {
-            vm.pullOk = false
+            // vm.pullOk = false
             vm.pullCounter = vm.pullCounter + 1
-            console.log('vm.pullCounter', vm.pullCounter)
+            // console.log('vm.pullCounter 1', vm.pullCounter)
             let apiURL = vm.detailForm[key]['datasource_api']
             if (vm.detailForm[key]['dependency'] && vm.detailForm[key].hasOwnProperty('pk')) {
               apiURL = apiURL + '?pk' + '=' + vm.id + '&col=' + vm.detailForm[key]['pk']
             }
-            vm.$socket.sendObj(
-              {
-                type: 'api',
-                cmd: 'get',
-                respone: vm.detailForm[key]['datasource_key'],
-                api: apiURL,
-                headers: {
-                  'Token': vm.getAuthToken(),
-                  'groupId': vm.getScopeGroupId(),
-                  'USER_ID': vm.getUserId()
-                }
+            let param = {
+              headers: {
+                groupId: vm.getScopeGroupId()
               }
-            )
+            }
+            axios.get(apiURL, param).then(function (response) {
+              let seriable = response.data
+              if (seriable['data']) {
+                vm.data[vm.detailForm[key]['datasource_key']] = seriable['data']
+              } else {
+                vm.data[vm.detailForm[key]['datasource_key']] = seriable
+              }
+              if (vm.detailForm[key]['value'] && String(vm.id) === '0') {
+                vm.data[vm.detailForm[key]['model']] = vm.detailForm[key]['value']
+              }
+              vm.processDataSourceVerify()
+            }).catch(function (xhr) {
+            })
           }
         }
       }

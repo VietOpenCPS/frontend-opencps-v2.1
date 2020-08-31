@@ -1,13 +1,13 @@
 <template>
   <div>
-    <v-layout row wrap class="mb-3">
+    <v-layout wrap class="mb-3">
       <v-card flat style="width:100%">
-        <v-btn v-if="getUser('Administrator')" @click.native="toAnswer()" round color="primary" dark style="position:absolute;top:0px;right:10px;z-index:101">
+        <!-- <v-btn v-if="getUser('Administrator') || getUser('Administrator_data')" @click.native="toAnswer()" round color="primary" dark style="position:absolute;top:0px;right:10px;z-index:101">
           <v-icon>add</v-icon>&nbsp;
           Thêm câu trả lời
-        </v-btn>
+        </v-btn> -->
         <v-flex xs12 sm12 class="text-xs-center" style="margin-bottom: 20px;">
-          <h3 v-if="getUser('Administrator')" class="text-xs-center mt-2" style="color:#065694">QUẢN LÝ CÂU HỎI</h3>
+          <h3 v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" class="text-xs-center mt-2" style="color:#065694">QUẢN LÝ CÂU HỎI</h3>
           <h3 v-else class="text-xs-center mt-2" style="color:#065694">HỎI ĐÁP THÔNG TIN</h3>
         </v-flex>
         <v-flex xs12 sm12>
@@ -15,27 +15,69 @@
             class="mx-3 mb-2 px-2 py-2"
             style="border:1px solid #0072bc;border-radius:3px;color:#0072bc"
           >
-            Người hỏi: <span class="text-bold">{{questionDetail.fullname}}</span><i v-if="getUser('Administrator')"> ({{questionDetail.email}})</i>
-            <span style="color:#993131"> (Ngày {{questionDetail.createDate}})</span>
+            <p>
+              Người hỏi: <span class="text-bold">{{questionDetail.fullname}}</span><i> ({{questionDetail.email}})</i>
+            </p>
+            <p v-if="questionDetail.address">
+              Địa chỉ: <span class="text-bold">{{questionDetail.address}}</span>
+            </p>
+            <p v-if="questionDetail.telNo">
+              Số điện thoại: <span class="text-bold">{{questionDetail.telNo}}</span>
+            </p>
+            <p>
+              Ngày gửi: <span class="text-bold">{{questionDetail.createDate}}</span>
+            </p>
           </div>
-          <div class="ml-3 mt-3">
+          <div class="mx-3 mt-3">
             <div class="py-1">
-              <span class="primary--text text-bold">NỘI DUNG HỎI: </span>
+              <span class="primary--text text-bold">NỘI DUNG CÂU HỎI: </span>
             </div>
-            <div class="mx-2 mt-2" v-html="questionDetail.content"></div>
+            <div
+              class="my-2 px-2 py-2"
+              style="border:1px solid #dedede;border-radius:3px"
+            >
+              <div v-html="String(questionDetail.content.split('&&')[0]).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
+            </div>
           </div>
           <div v-if="loadingAnswer">
             <content-placeholders v-if="loading" class="mt-3">
               <content-placeholders-text :lines="10" />
             </content-placeholders>
           </div>
-          <div v-else class="mt-4">
+          <div v-else class="mt-3">
             <div class="ml-3 my-1 py-1">
-              <span class="primary--text text-bold">CƠ QUAN HÀNH CHÍNH TRẢ LỜI: </span>
+              <span class="primary--text text-bold">TRẢ LỜI: </span>
             </div>
-            <v-card flat v-if="answerList.length = 1 && !getUser('Administrator')">
+            <v-card flat v-if="answerList.length === 1">
               <v-card-text class="px-3 py-1">
-                <div class="ml-2 mt-1 mb-3" v-html="answerList[0].content"></div>
+                <!-- <div class="ml-2 mt-1 mb-3" v-html="answerList[0] ? answerList[0].content : ''"></div> -->
+                <div
+                  class="my-2 px-2 py-2"
+                  style="border:1px solid #dedede;border-radius:3px"
+                >
+                  <div style="position:relative">
+                    <i class="text-bold">Ngày {{answerList[0].createDate}}</i>
+                    <div class="ml-2 mt-2" v-html="String(answerList[0].content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
+                    <div v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:10px;top:0">
+                      <v-tooltip top>
+                        <v-btn slot="activator" icon ripple @click="editAnswer(answerList[0])" style="margin-top:-3px!important">
+                          <v-icon color="primary">edit</v-icon>
+                        </v-btn>
+                        <span>Sửa</span>
+                      </v-tooltip>
+                      <v-tooltip top class="mr-3">
+                        <v-btn slot="activator" icon ripple @click="deleteAnswer(answerList[0])" style="margin-top:-3px!important">
+                          <v-icon color="red lighten-1">delete</v-icon>
+                        </v-btn>
+                        <span>Xóa</span>
+                      </v-tooltip>
+                      <v-checkbox class="mt-1" style="display: inline-block" @click.stop="changePublicAnswer(answerList[0], 0)"
+                        label="Công khai"
+                        v-model="answerList[0]['publish']"
+                      ></v-checkbox>
+                    </div>
+                  </div>
+                </div>
               </v-card-text>
             </v-card>
             <v-card flat v-if="answerList.length > 1">
@@ -48,9 +90,15 @@
                 >
                   <div style="position:relative">
                     <span class="text-bold">Câu trả lời {{ indexAnswer + 1}} </span> <i>(Ngày {{itemAnswer.createDate}})</i>
-                    <div class="ml-2 mt-2" v-html="itemAnswer.content"></div>
-                    <div v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:10px;top:0">
-                      <v-tooltip top class="mr-2">
+                    <div class="ml-2 mt-2" v-html="String(itemAnswer.content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
+                    <div v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:10px;top:0">
+                      <v-tooltip top >
+                        <v-btn slot="activator" icon ripple @click="editAnswer(itemAnswer)" style="margin-top:-3px!important">
+                          <v-icon color="primary">edit</v-icon>
+                        </v-btn>
+                        <span>Sửa</span>
+                      </v-tooltip>
+                      <v-tooltip top class="mr-3">
                         <v-btn slot="activator" icon ripple @click="deleteAnswer(itemAnswer)" style="margin-top:-3px!important">
                           <v-icon color="red lighten-1">delete</v-icon>
                         </v-btn>
@@ -72,88 +120,57 @@
             </div>
           </div>
           
-          <div class="mx-2 my-3" id="contentAnswer" v-if="getUser('Administrator')">
+          <div class="mx-2 my-3" id="contentAnswer" v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')">
             <div class="mx-3">
               <span class="mr-2"><v-icon class="blue--text">announcement</v-icon> </span>
-              <span class="text-bold primary--text">THÊM CÂU TRẢ LỜI:</span>
+              <span class="text-bold primary--text">NỘI DUNG TRẢ LỜI:</span>
             </div>
             <div class="px-2 pt-3">
               <v-flex xs12 sm12 style="margin:0 auto">
-                <vue-editor v-model="contentAnswer" :editorToolbar="customToolbar"></vue-editor>
+                <!-- <vue-editor v-model="contentAnswer" :editorToolbar="customToolbar"></vue-editor> -->
+                <v-textarea
+                  box
+                  rows="5"
+                  v-model="contentAnswer"
+                ></v-textarea>
               </v-flex>
-              <div>
+              <div v-if="!activeEdit">
                 <v-checkbox class="mt-0"
                   label="Công khai"
                   v-model="publishAnswer"
                 ></v-checkbox>
               </div>
               <div class="text-xs-center my-3">
-                <v-btn color="primary"
+                <!-- Thêm mới -->
+                <v-btn v-if="!activeEdit" color="primary"
                   :loading="loading"
                   :disabled="loading"
                   @click="submitAddAnswer"
                 >
-                  <v-icon>how_to_reg</v-icon>&nbsp;
+                  <v-icon>library_add</v-icon>&nbsp;
                   Gửi câu trả lời
+                </v-btn>
+                <v-btn v-if="!activeEdit" @click="goBack" color="primary">
+                  <v-icon>reply</v-icon>&nbsp;
+                  Quay lại
+                </v-btn>
+                <!-- Sửa -->
+                <v-btn v-if="activeEdit" color="primary"
+                  :loading="loading"
+                  :disabled="loading"
+                  @click="submitEditAnswer"
+                >
+                  <v-icon>spellcheck</v-icon>&nbsp;
+                  Cập nhật câu trả lời
+                </v-btn>
+                <v-btn v-if="activeEdit" @click="cancelEdit" color="primary">
+                  <v-icon>clear</v-icon>&nbsp;
+                  Hủy
                 </v-btn>
               </div>
             </div>
           </div>
         </v-flex>
-        <!-- <v-flex xs12 sm12 class="mx-3 mt-4" v-if="activeAddQuestion">
-          <div id="contentQuestion">
-            <span><v-icon class="blue--text">contact_support</v-icon> </span>
-            <span class="text-bold primary--text">Tạo câu hỏi:</span>
-          </div>
-          <div class="mx-1 my-2">
-            <vue-editor v-model="content" :editorToolbar="customToolbar"></vue-editor>
-          </div>
-          <div class="mx-2">
-            <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3">
-              <v-flex xs12 sm6 class="text-xs-center" style="margin:0 auto">
-                <v-text-field
-                  box
-                  label="Họ tên"
-                  v-model="fullName"
-                  :rules="[rules.required]"
-                  name="input-10-2"
-                  min="6"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm6 class="text-xs-center" style="margin:0 auto">
-                <v-text-field
-                  box
-                  label="Thư điện tử"
-                  v-model="contactEmail"
-                  :rules="[rules.required, rules.email]"
-                  name="input-10-2"
-                  min="6"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm6 v-if="captchaActive" style="margin:0 auto">
-                <captcha ref="captcha"></captcha>
-              </v-flex>
-              <div class="text-xs-center my-2">
-                <v-btn color="primary"
-                  :loading="loading"
-                  :disabled="loading"
-                  @click="submitAddQuestion"
-                >
-                  <v-icon>how_to_reg</v-icon>&nbsp;
-                  Gửi câu hỏi
-                </v-btn>
-                <v-btn color="primary"
-                  @click="cancelAddQuestion"
-                >
-                  <v-icon>clear</v-icon>&nbsp;
-                  Hủy
-                </v-btn>
-              </div>
-            </v-form>
-          </div>
-        </v-flex> -->
       </v-card>
       
     </v-layout>
@@ -161,7 +178,6 @@
 </template>
 
 <script>
-
 import Vue from 'vue'
 import $ from 'jquery'
 import support from '../../store/support.json'
@@ -169,7 +185,6 @@ import toastr from 'toastr'
 import Captcha from './Captcha.vue'
 import { VueEditor, Quill } from 'vue2-editor'
 Vue.use(toastr)
-
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -182,6 +197,9 @@ export default {
   },
   data: () => ({
     answerList: [],
+    answersDefault: [],
+    answerSelected: '',
+    activeEdit: false,
     content: '',
     contentAnswer: '',
     loadingAnswer: false,
@@ -193,7 +211,7 @@ export default {
     fullName: '',
     questionSelected: '',
     openQuestion: '',
-    publishAnswer: false,
+    publishAnswer: true,
     rules: {
       required: (value) => !!value || 'Trường dữ liệu bắt buộc',
       email: (value) => {
@@ -243,6 +261,12 @@ export default {
     },
     totalQuestion () {
       return this.$store.getters.getTotalQuestion
+    },
+    indexQuestion () {
+      return this.$store.getters.getIndexQuestion
+    },
+    activeCounter () {
+      return this.$store.getters.getCounter
     }
   },
   created () {
@@ -267,6 +291,8 @@ export default {
   methods: {
     getAnswers () {
       let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
       vm.loadingAnswer = true
       vm.answerList = []
       let filter = {
@@ -274,15 +300,23 @@ export default {
       }
       vm.$store.dispatch('getAnswers', filter).then(function (result) {
         vm.loadingAnswer = false
-        console.log(result)
         if (Array.isArray(result)) {
           vm.answerList = result
         } else {
           vm.answerList = [result]
         }
+        if (newQuery.hasOwnProperty('editAnswer')) {
+          vm.editAnswer(vm.answerList[newQuery.editAnswer], 'focus')
+        } else {
+          if (vm.answerList[0]) {
+            vm.editAnswer(vm.answerList[0])
+          } else {
+            vm.activeEdit = false
+          }
+        }
       }).catch(function (reject) {
         vm.loadingAnswer = false
-        console.log(reject)
+        vm.answerList = vm.answersDefault[vm.indexQuestion] ? [vm.answersDefault[vm.indexQuestion]] : []
       })
     },
     submitAddQuestion () {
@@ -312,7 +346,6 @@ export default {
     },
     addAnswer (event, item, index) {
       let vm = this
-      console.log(item)
       if (vm.openQuestion === index) {
         event.stopPropagation()
         vm.questionSelected = index
@@ -326,7 +359,13 @@ export default {
     },
     submitAddAnswer () {
       let vm = this
-      if (vm.contentAnswer) {
+      let validateSyntax = true
+      if (String(vm.contentAnswer).indexOf('<img') >= 0 || String(vm.contentAnswer).indexOf('<script') >= 0) {
+        validateSyntax = false
+        alert('Nội dung câu trả lời không hợp lệ!')
+        return
+      }
+      if (vm.contentAnswer && validateSyntax) {
         let filter = {
           questionId: vm.index,
           content: vm.contentAnswer,
@@ -334,8 +373,33 @@ export default {
         }
         vm.$store.dispatch('addAnswer', filter).then(function (result) {
           toastr.success('Thêm câu trả lời thành công')
+          vm.$store.commit('setCounter', !vm.activeCounter)
           vm.getAnswers()
-          vm.contentAnswer = ''
+          vm.editAnswer(result)
+        }).catch(function (reject) {
+          console.log(reject)
+        })
+      }
+    },
+    submitEditAnswer () {
+      let vm = this
+      let validateSyntax = true
+      if (String(vm.contentAnswer).indexOf('<img') >= 0 || String(vm.contentAnswer).indexOf('<script') >= 0) {
+        validateSyntax = false
+        alert('Nội dung câu trả lời không hợp lệ!')
+        return
+      }
+      if (vm.contentAnswer && vm.answerSelected && validateSyntax) {
+        let filter = {
+          questionId: vm.answerSelected.questionId,
+          answerId: vm.answerSelected.answerId,
+          content: vm.contentAnswer,
+          publish: vm.answerSelected.publish ? 1 : 0
+        }
+        vm.$store.dispatch('putAnswer', filter).then(function (result) {
+          toastr.success('Cập nhật câu trả lời thành công')
+          vm.getAnswers()
+          vm.cancelEdit()
         }).catch(function (reject) {
           console.log(reject)
         })
@@ -363,7 +427,14 @@ export default {
       let filter = {
         questionId: item['questionId'],
         publish: vm.questionList[index]['publish'],
-        content: vm.questionList[index]['content']
+        content: vm.questionList[index]['content'],
+        email: vm.questionList[index]['email'],
+        fullname: vm.questionList[index]['fullname'],
+        govAgencyCode: vm.questionList[index]['govAgencyCode'],
+        govAgencyName: vm.questionList[index]['govAgencyName'],
+        domainCode: vm.questionList[index]['domainCode'],
+        domainName: vm.questionList[index]['domainName'],
+        questionType: vm.questionList[index]['questionType']
       }
       vm.$store.dispatch('putQuestion', filter).then(function (result) {
         toastr.success('Cập nhật thành công')
@@ -384,7 +455,6 @@ export default {
       } else {
         vm.answerList[index]['publish'] = 1
       }
-
       let filter = {
         questionId: item['questionId'],
         answerId: item['answerId'],
@@ -404,8 +474,24 @@ export default {
         elmnt.scrollIntoView()
       }, 300)
     },
-    editAnswer (item) {
-      console.log(item)
+    editAnswer (item, focus) {
+      let vm = this
+      vm.activeEdit = true
+      vm.answerSelected = item
+      vm.contentAnswer = item.content
+      if (focus) {
+        setTimeout (function () {
+          let elmnt = document.getElementById("contentAnswer")
+          elmnt.scrollIntoView()
+        }, 300)
+      }
+    },
+    cancelEdit () {
+      let vm = this
+      vm.activeEdit = false
+      vm.answerSelected = ''
+      vm.contentAnswer = ''
+      vm.goBack()
     },
     getAnswerList () {
       let vm = this
@@ -416,7 +502,6 @@ export default {
       }
       vm.$store.dispatch('getAnswers', filter).then(function (result) {
         vm.loadingAnswer = false
-        console.log(result)
         if (Array.isArray(result)) {
           vm.answerList = result
         } else {
@@ -424,7 +509,7 @@ export default {
         }
       }).catch(function (reject) {
         vm.loadingAnswer = false
-        console.log(reject)
+        vm.answerList = vm.answersDefault[vm.indexQuestion] ? [vm.answersDefault[vm.indexQuestion]] : []
       })
     },
     deleteAnswer (item) {
@@ -437,6 +522,7 @@ export default {
         }
         vm.$store.dispatch('deleteAnswer', filter).then(function (result) {
           toastr.success('Xóa câu trả lời thành công')
+          vm.$store.commit('setCounter', !vm.activeCounter)
           vm.getAnswerList()
         }).catch(function (reject) {
           console.log(reject)
@@ -458,6 +544,9 @@ export default {
       }
       let roleExits = roles.findIndex(item => item === roleItem)
       return (roleExits >= 0)
+    },
+    goBack () {
+      window.history.back()
     }
   },
   filters: {

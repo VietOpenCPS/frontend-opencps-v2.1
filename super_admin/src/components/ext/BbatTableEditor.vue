@@ -51,6 +51,7 @@
 
 <script>
   import BbatTableEditorComponent from './BbatTableEditorComponent.vue'
+  import axios from 'axios'
 
   export default {
     props: ['tableName', 'id'],
@@ -72,6 +73,7 @@
         nameScreen: '',
         showDetailForm: false,
         noDetail: false,
+        idCopy: '',
         dataSocket: {}
       }
     },
@@ -118,6 +120,63 @@
             }
           }
           */
+          let dataPost = new URLSearchParams()
+          //dataPost.append('delegacy', filter.delegacy)
+          let textPost = {
+            'type': 'admin',
+            'cmd': 'get',
+            'config': 'true',
+            'code': vm.$router.history.current.params.tableName,
+            'respone': 'tableConfig'
+          }
+          dataPost.append('text', JSON.stringify(textPost))
+          axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+            let dataObj = response.data
+            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+            textPost = {
+              'type': 'admin',
+              'cmd': 'get',
+              'code': vm.$router.history.current.params.tableName,
+              'respone': 'detail',
+              'responeType': 'detail',
+              'filter': [
+                {
+                  'key': 'id',
+                  'value_filter': vm.id,
+                  'compare': '=',
+                  'type': 'number'
+                }
+              ]
+            }
+            dataPost = new URLSearchParams();
+            dataPost.append('text', JSON.stringify(textPost))
+            axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+              let dataObj = response.data
+              vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+              if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined && (dataObj.respone === 'detail' || dataObj.respone === 'tableConfig')) {
+                if (vm.dataSocket['detail'] !== []) {
+                  vm.nameScreen = vm.dataSocket['detail'][0][dataObj.title]
+                  vm.showDetailForm = true
+                  vm.noDetail = false
+                } else {
+                  vm.noDetail = true
+                }
+              }
+              if (dataObj.respone === 'listTableMenu') {
+                vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
+              } else if (dataObj.respone === 'loginUser') {
+                vm.$store.commit('setloginUser', dataObj['loginUser'])
+              } 
+              if (String(vm.id) === '0') {
+                console.log('Thêm mới 1 -=-=-=-=')
+                vm.nameScreen = 'Thêm mới dữ liệu'
+                vm.showDetailForm = true
+                vm.noDetail = false
+              }
+            }).catch(function (error) {
+            })
+          }).catch(function (error) {
+          })
         }
       }
     },
@@ -150,6 +209,11 @@
           }
         }
         */
+        if(vm.$router.history.current.query.hasOwnProperty('idCopy')){
+           vm.idCopy =  vm.$router.history.current.query.idCopy
+        } else {
+          vm.idCopy = ''
+        }
         setTimeout(() => {
           let dataPost = new URLSearchParams()
           //dataPost.append('delegacy', filter.delegacy)
@@ -161,20 +225,9 @@
             'respone': 'tableConfig'
           }
           dataPost.append('text', JSON.stringify(textPost))
-
           axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
             let dataObj = response.data
             vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-            if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined && (dataObj.respone === 'detail' || dataObj.respone === 'tableConfig')) {
-              if (vm.dataSocket['detail'] !== '[]') {
-                vm.nameScreen = vm.dataSocket['detail'][0][dataObj.title]
-                vm.showDetailForm = true
-                vm.noDetail = false
-              } else {
-                vm.noDetail = true
-              }
-            }
-
             textPost = {
               'type': 'admin',
               'cmd': 'get',
@@ -184,34 +237,45 @@
               'filter': [
                 {
                   'key': 'id',
-                  'value_filter': vm.id,
+                  'value_filter': vm.idCopy ? vm.idCopy : vm.id,
                   'compare': '=',
                   'type': 'number'
                 }
               ]
             }
             dataPost = new URLSearchParams();
-
             dataPost.append('text', JSON.stringify(textPost))
             axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
               let dataObj = response.data
               vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-
+              console.log('dataObj44 = ', dataObj)
+              console.log('dataSocket44 = ', vm.dataSocket)
+              if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined && (dataObj.respone === 'detail' || dataObj.respone === 'tableConfig')) {
+                if (Array.isArray(vm.dataSocket['detail']) && vm.dataSocket['detail'].length > 0) {
+                  vm.nameScreen = vm.dataSocket['detail'][0][dataObj.title]
+                  vm.showDetailForm = true
+                  vm.noDetail = false
+                  console.log('Sửa -=-=-=-=')
+                } else {
+                  vm.noDetail = true
+                }
+              }
+              console.log('run 1 -=-=-=-=', vm.id)
               if (dataObj.respone === 'listTableMenu') {
                 vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
               } else if (dataObj.respone === 'loginUser') {
                 vm.$store.commit('setloginUser', dataObj['loginUser'])
-              } 
+              }
+              console.log('run 2 -=-=-=-=')
               if (String(vm.id) === '0') {
+                console.log('Thêm mới -=-=-=-=')
                 vm.nameScreen = 'Thêm mới dữ liệu'
                 vm.showDetailForm = true
                 vm.noDetail = false
               }
             }).catch(function (error) {
-
             })
           }).catch(function (error) {
-
           })
           /*
           vm.$socket.sendObj(
@@ -267,17 +331,46 @@
         let vm = this
         var result = confirm('Bạn có muốn xoá bản ghi này?');
         if (result) {
-          /*
-          vm.$socket.sendObj(
-            {
-              type: 'admin',
-              cmd:  'delete',
-              respone: 'detail',
-              id: vm.id,
-              code: vm.$router.history.current.params.tableName
+          let dataPost = new URLSearchParams()
+          let textPost = {
+            'type': 'admin',
+            'cmd': 'delete',
+            'respone': 'detail',
+            'id': vm.id,
+            'code': vm.$router.history.current.params.tableName
+          }
+          dataPost = new URLSearchParams();
+          dataPost.append('text', JSON.stringify(textPost))
+          axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+            let dataObj = response.data
+            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+            if (dataObj['cmd'] !== 'get') {
+              let current = vm.$router.history.current
+              let newQuery = current.query
+              let queryString = '?'
+              newQuery['state_change'] = '0'
+              newQuery['renew'] = ''
+              for (let key in newQuery) {
+                if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+                  queryString += key + '=' + newQuery[key] + '&'
+                }
+              }
+              queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              vm.$router.push({
+                path: current.path.substring(0, current.path.indexOf('/editor/')) + queryString
+              })
             }
-          )
-          */
+          }).catch(function (error) {
+          })
+          // vm.$socket.sendObj(
+          //   {
+          //     type: 'admin',
+          //     cmd:  'delete',
+          //     respone: 'detail',
+          //     id: vm.id,
+          //     code: vm.$router.history.current.params.tableName
+          //   }
+          // )
         }
       }
     }

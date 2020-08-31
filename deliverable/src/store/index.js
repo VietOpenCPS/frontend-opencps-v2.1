@@ -41,7 +41,9 @@ export const store = new Vuex.Store({
     // endPointApi: 'http://127.0.0.1:8081/api',
     getDeliverableTypes: [],
     getContentFile: '',
-    getContentFileSimple: []
+    getContentFileSimple: [],
+    changeFormData: '',
+    activeBindFormData: false
   },
   actions: {
     loadInitResource ({state}) {
@@ -160,7 +162,7 @@ export const store = new Vuex.Store({
       })
     },
     getDeliverableTypes ({ commit, state }) {
-      return new Promise(() => {
+      return new Promise((resolve, reject) => {
         let options = {
           headers: {
             'groupId': state.groupId,
@@ -171,14 +173,16 @@ export const store = new Vuex.Store({
         let body = DeliverableTypes.getDeliverableTypes
         axios.post('/o/v1/opencps/deliverable', body, options).then(function (response) {
           state.getDeliverableTypes = response.data['getDeliverableTypes']
+          resolve(response.data['getDeliverableTypes'])
         }).catch(function () {
           state.getDeliverableTypes = []
           commit('setsnackbarerror', true)
+          reject(state.getDeliverableTypes)
         })
       })
     },
     getContentFile ({ commit, state }, fileEntryId) {
-      return new Promise(() => {
+      return new Promise((resolve, reject) => {
         let options = {
           headers: {
             'groupId': state.groupId,
@@ -187,13 +191,15 @@ export const store = new Vuex.Store({
         }
         axios.get('/o/v1/opencps/fileattach/' + fileEntryId + '/text', options).then(function (response) {
           state.getContentFile = eval('( ' + response.data + ' )')
+          resolve(state.getContentFile)
         }).catch(function () {
           state.getContentFile = ''
+          reject(state.getContentFile)
         })
       })
     },
     getContentFileSimple ({ commit, state }) {
-      return new Promise(() => {
+      return new Promise((resolve, reject) => {
         let options = {
           headers: {
             'groupId': state.groupId,
@@ -204,10 +210,11 @@ export const store = new Vuex.Store({
         let body = AdminConfig.getAdminConfig
         axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
           state.getContentFileSimple = eval('( ' + response.data['getAdminConfig']['detailColumns'] + ' )')
-          console.log('state.getContentFileSimple', state.getContentFileSimple)
+          resolve(state.getContentFileSimple)
         }).catch(function () {
           state.getContentFileSimple = []
           commit('setsnackbarerror', true)
+          reject(state.getContentFileSimple)
         })
       })
     },
@@ -229,6 +236,25 @@ export const store = new Vuex.Store({
         })
       })
     },
+    searchDeliverables ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.groupId
+          },
+          params: {
+            start: filter.page * 15 - 15,
+            end: filter.page * 15,
+            keyword: filter.keyword ? filter.keyword : ''
+          }
+        }
+        axios.get('/o/v1/opencps/deliverable/' + filter['type'], options).then(function (response) {
+          resolve(response.data)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
     getDeliverableById ({ commit, state }, id) {
       return new Promise((resolve, reject) => {
         let options = {
@@ -237,8 +263,10 @@ export const store = new Vuex.Store({
           }
         }
         axios.get('/o/v1/opencps/deliverable/' + id + '/detail', options).then(function (response) {
-          if (response.data['hits']['hits'].length > 0) {
-            resolve(response.data['hits']['hits'][0]['_source'])
+          if (response.data) {
+            response.data.govAgenciesItems = []
+            response.data.applicantIdNoItems = []
+            resolve(response.data)
           } else {
             resolve({})
           }
@@ -330,6 +358,12 @@ export const store = new Vuex.Store({
     },
     setisConnected (state, payload) {
       state.isConnected = payload
+    },
+    setChangeFormData (state, payload) {
+      state.changeFormData = payload
+    },
+    setActiveBindFormData (state, payload) {
+      state.activeBindFormData = payload
     }
   },
   getters: {
@@ -357,5 +391,11 @@ export const store = new Vuex.Store({
     getisConnected (state) {
       return state.isConnected
     },
+    getChangeFormData (state) {
+      return state.changeFormData
+    },
+    getActiveBindFormData (state) {
+      return state.activeBindFormData
+    }
   }
 })

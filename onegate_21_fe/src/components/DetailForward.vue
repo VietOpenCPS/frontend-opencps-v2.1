@@ -1,54 +1,22 @@
 <template>
   <div>
     <tiep-nhan-ho-so-detail 
-      v-if="formCode === 'NEW' || formCode === 'UPDATE' || formCode === 'COPY'" 
+      v-if="formCode === 'NEW' || formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI' || formCode === 'UPDATE' || formCode === 'COPY'" 
       ref="tiepnhanhosodetail"
       :formCode="formCode"
+      :id="id"
+      :index="index"
     ></tiep-nhan-ho-so-detail>
-    <!--
-    <xem-chi-tiet-ho-so-detail 
-      v-if="formCode === 'VIEW_01'" 
-      ref="xemchitiethosodetail"></xem-chi-tiet-ho-so-detail>
-    <hoan-thien-bo-sung-ho-so-detail
-      v-if="formCode === 'ACTION_03' && (step === '500' || step === '510')"
-      ref="hoanthienbosunghosodetail"></hoan-thien-bo-sung-ho-so-detail>
-    <tiep-nhan-ho-so-truc-tuyen-detail ref="tiepnhanhosotructuyendetail"></tiep-nhan-ho-so-truc-tuyen-detail>
-    <tra-ket-qua-detail 
-      ref="traketquadetail"></tra-ket-qua-detail> 
-    <fee-detail 
-      v-if="formCode === 'ACTION_03' && step === '600'"
-      ref="feedetail"></fee-detail>-->
-      <!-- <xem-chi-tiet-ho-so-detail-can-bo ref="xemchitiethosodetailcanbo"></xem-chi-tiet-ho-so-detail-can-bo> -->
-    <!-- <chuyen-phat-ket-qua-detail ref="chuyenphatketquadetail"></chuyen-phat-ket-qua-detail> -->
-    <!-- <chi-tiet-tinh-trang-lien-thong v-if="formCode === 'NEW'"  ref="xemchitiethosotinhtrangxulylienthong"></chi-tiet-tinh-trang-lien-thong> -->
-    <!-- <chi-tiet-ho-so-lien-thong v-if="formCode === 'NEW'"  ref="xemchitiethosolienthong"></chi-tiet-ho-so-lien-thong> -->
   </div>
 </template>
 
 <script>
-import ChamQuaHanDetail from './ChamQuaHanDetail.vue'
-// import ChuyenPhatKetQuaDetail from './ChuyenPhatKetQuaDetail.vue'
-// import FeeDetail from './FeeDetail.vue'
-import HoanThienBoSungHoSoDetail from './HoanThienBoSungHoSoDetail.vue'
-import HoSoLienThongDetail from './HoSoLienThongDetail.vue'
-// import HoSoLienThongTinhTrangXuLyDetail from './HoSoLienThongTinhTrangXuLyDetail.vue'
 import TiepNhanHoSoDetail from './TiepNhanHoSoDetail.vue'
-// import TiepNhanHoSoTrucTuyenDetail from './TiepNhanHoSoTrucTuyenDetail.vue'
-// import TraKetQuaDetail from './TraKetQuaDetail.vue'
-// import XemChiTietHoSoDetail from './XemChiTietHoSoDetail.vue'
-import XemChiTietHoSoDetailCanBo from './XemChiTietHoSoDetailCanBo.vue'
 
 export default {
-  props: ['id', 'formCode'],
+  props: ['index', 'id', 'formCode'],
   components: {
-    'cham-qua-han-detail': ChamQuaHanDetail,
-    'hoan-thien-bo-sung-ho-so-detail': HoanThienBoSungHoSoDetail,
-    'ho-so-lien-thong-detail': HoSoLienThongDetail,
-    // 'ho-so-lien-thong-tinh-trang-xu-ly-detail': HoSoLienThongTinhTrangXuLyDetail,
-    'tiep-nhan-ho-so-detail': TiepNhanHoSoDetail,
-    'xem-chi-tiet-ho-so-detail-can-bo': XemChiTietHoSoDetailCanBo,
-    // 'chi-tiet-tinh-trang-lien-thong': HoSoLienThongTinhTrangXuLyDetail,
-    'chi-tiet-ho-so-lien-thong': HoSoLienThongDetail
+    'tiep-nhan-ho-so-detail': TiepNhanHoSoDetail
   },
   data: () => ({
     initData: null,

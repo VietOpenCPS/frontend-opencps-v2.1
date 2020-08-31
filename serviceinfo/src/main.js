@@ -6,10 +6,9 @@ import router from './router_dev'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import axios from 'axios'
-import { isMobile } from 'mobile-device-detect'
+// import { isMobile } from 'mobile-device-detect'
 
 Vue.use(VueContentPlaceholders)
-
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
 
 axios.defaults.withCredentials = true
@@ -50,18 +49,18 @@ new Vue({
   created () {
     let vm = this
     vm.$nextTick(function () {
-      if (isMobile) {
-        vm.$router.push('/m')
-        window.$('.mWrapper > header').css('display', 'none')
-        window.$('.mWrapper > footer').css('display', 'none')
-        window.$('.mWrapper > nav').css('display', 'none')
-        window.$('.mWrapper > footer > .container > .left').css('width', '100%')
-        window.$('.mWrapper > footer > .container > .right').css('width', '100%')
-      } else {
-        window.$('.mWrapper > header').css('display', 'block')
-        window.$('.mWrapper > footer').css('display', 'block')
-        window.$('.mWrapper > nav').css('display', 'block')
-      }
+      // if (isMobile) {
+      //   vm.$router.push('/m')
+      //   window.$('.mWrapper > header').css('display', 'none')
+      //   window.$('.mWrapper > footer').css('display', 'none')
+      //   window.$('.mWrapper > nav').css('display', 'none')
+      //   window.$('.mWrapper > footer > .container > .left').css('width', '100%')
+      //   window.$('.mWrapper > footer > .container > .right').css('width', '100%')
+      // } else {
+      //   window.$('.mWrapper > header').css('display', 'block')
+      //   window.$('.mWrapper > footer').css('display', 'block')
+      //   window.$('.mWrapper > nav').css('display', 'block')
+      // }
     })
   },
   render: function (h) { return h(App) }

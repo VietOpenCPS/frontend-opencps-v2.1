@@ -1,133 +1,390 @@
 <template>
 <v-form ref="form" v-model="valid" lazy-validation>
   <div class="form-chitiet">
-    <div class="row-header">
-      <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
-      <div class="layout row wrap header_tools row-blue">
-        <div class="flex xs12 pl-3 text-ellipsis text-bold">
-          <v-layout wrap class="chart__report">
-            <v-flex class="px-2 text-right">
-              <!--
-              <v-btn flat class="mx-0 my-0" v-if="showConfig" v-on:click.native="doSaveConfig">
-                <v-icon>settings</v-icon> &nbsp;
-                Lưu thay đổi
-              </v-btn>
-              <vue-csv-downloader
-                :data="csvExport"
-                :fields="fields"
-                :downloadname="nameReport"
-              >
-              </vue-csv-downloader>
-              -->
-              <v-btn flat class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds">
-                <v-icon>receipt</v-icon> &nbsp; Hướng dẫn PDF -> Excel
-              </v-btn>
-              <v-select v-if="buttonsShow"
-                v-for="(button, btnIndex) in buttons" v-bind:key="btnIndex"
-                :items="button['source']"
-                :label="button['label']"
-                v-model="buttonsVal"
-                item-text="name"
-                item-value="value"
-                single-line
-                style="float: right;"
-                class="btn__chot"
-                @change="doChotSoLieu($event, button)"
-              ></v-select>
-              <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
-                <v-icon v-if="showConfig">reply</v-icon>
-                <v-icon v-else>settings</v-icon> &nbsp;
-                <span v-if="showConfig">Quay lại</span>
-                <span v-else>Tuỳ chọn</span>
-              </v-btn>
-            </v-flex>
-          </v-layout>
+    <div v-if="itemsReports && itemsReports.length > 0">
+      <div class="row-header" v-if="!hiddenAside">
+        <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
+        <div class="layout row wrap header_tools row-blue">
+          <div class="flex xs12 pl-3 text-ellipsis text-bold">
+            <v-layout wrap class="chart__report">
+              <v-flex class="px-2 text-right">
+                <!--
+                <v-btn flat class="mx-0 my-0" v-if="showConfig" v-on:click.native="doSaveConfig">
+                  <v-icon>settings</v-icon> &nbsp;
+                  Lưu thay đổi
+                </v-btn>
+                <vue-csv-downloader
+                  :data="csvExport"
+                  :fields="fields"
+                  :downloadname="nameReport"
+                >
+                </vue-csv-downloader>
+                -->
+                
+                <!-- <v-btn flat v-if="!itemsReports[index]['filterConfig']['showTable']" class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds" :style="showGuilds ? 'color: #1565c0' : ''">
+                  <v-icon>receipt</v-icon> &nbsp; Hướng dẫn PDF -> Excel
+                </v-btn> -->
+                <v-select v-if="buttonsShow"
+                  v-for="(button, btnIndex) in buttons" v-bind:key="btnIndex"
+                  :items="button['source']"
+                  :label="button['label']"
+                  v-model="buttonsVal"
+                  item-text="name"
+                  item-value="value"
+                  single-line
+                  style="float: right"
+                  class="btn__chot"
+                  @change="doChotSoLieu($event, button)"
+                ></v-select>
+                <!-- <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
+                  <v-icon v-if="showConfig">reply</v-icon>
+                  <v-icon v-else>settings</v-icon> &nbsp;
+                  <span v-if="showConfig">Quay lại</span>
+                  <span v-else>Tuỳ chọn</span>
+                </v-btn> -->
+              </v-flex>
+            </v-layout>
+          </div>
         </div>
       </div>
-    </div>
-    <v-layout row wrap class="filter_menu mt-4">
-      <v-flex xs6 sm2 class="mx-3" v-if="agencyLists.length > 1">
-        <v-autocomplete
-          :items="agencyLists"
-          v-model="govAgency"
-          label="Chọn đơn vị"
-          item-text="text"
-          item-value="value"
+      <v-flex v-if="hiddenAside" class="xs12" style="
+        background-color: #004b94 !important;
+        height: 36px;
+        padding: 9px 15px;
+        font-weight: 600;
+        color: white;">
+        <span>Đánh giá hài lòng của người sử dụng đối với dịch vụ công trực tuyến mức độ 3 và 4</span>
+        <div class="d-inline-block right" style="margin-top: -5px;">
+          <v-tooltip top>
+            <v-btn icon class="mx-0 my-0" slot="activator" @click="goToThongKe">
+              <v-icon size="20" color="white">assignment</v-icon>
+            </v-btn>
+            <span>Báo cáo tổng hợp</span>
+          </v-tooltip>
+        </div>
+      </v-flex>
+      <v-layout row wrap class="filter_menu mt-4">
+        <v-flex xs6 sm3 class="px-3 mb-3" v-if="agencyLists.length > 1">
+          <v-autocomplete
+            :items="agencyLists"
+            v-model="govAgency"
+            label="Chọn đơn vị"
+            item-text="text"
+            item-value="value"
+            @change="changeGovAgency()"
+            clearable
+            >
+          </v-autocomplete>
+        </v-flex>  
+        <!--  -->
+        <v-flex xs6 sm3 class="px-3 mb-3" v-for="(item, indexgroupIdList) in groupIdList" v-bind:key="item.key + indexgroupIdList + index">
+          <v-autocomplete
+            :items="item.value"
+            :label="item.label"
+            v-model="filterGroup[item.key]" 
+            item-text="text"
+            item-value="value"
+            @change="changeGroupIdList(item)"
+            clearable
+            >
+          </v-autocomplete>
+        </v-flex>
+        <!--  -->
+        <v-flex xs6 sm3 class="px-3 mb-3" v-if="groupBy.length > 1">
+          <v-autocomplete
+            :items="groupBy"
+            v-model="groupByVal"
+            label="Nhóm dữ liệu"
+            item-text="label"
+            item-value="key"
+            clearable
+            >
+          </v-autocomplete>
+        </v-flex>
+        <v-flex :class="item.hasOwnProperty('class') ? item.class : 'xs12 sm3 px-3 mb-3'" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
+          <datetime-picker
+            v-if="item['type'] === 'date' && showPicker"
+            v-model="data[item.key]" 
+            :item="item" 
+            :data-value="data[item.key]"
+            :data-all="data"
+            @change="reloadPickerChange(item.key)">
+          </datetime-picker>
+          <v-text-field 
+            v-if="item['type'] === 'text'"
+            v-model="data[item.key]" 
+            :label="item['label']">
+          </v-text-field>
+          <v-autocomplete
+            v-if="item['type'] === 'select' && item.hasOwnProperty('multiple') && item.multiple"
+            :items="item['source']"
+            v-model="data[item.key]"
+            :label="item['label']"
+            item-value="value"
+            item-text="name"
+            :clearable="item['clearable']"
+            :multiple="item.hasOwnProperty('multiple') && item.multiple"
           >
-        </v-autocomplete>
-      </v-flex>
-      <v-flex xs6 sm2 class="mx-3" v-if="groupBy.length > 1">
-        <v-autocomplete
-          :items="groupBy"
-          v-model="groupByVal"
-          label="Nhóm dữ liệu"
-          item-text="label"
-          item-value="key"
+            <!-- <template slot="selection" slot-scope="props" >
+              <v-chip v-if="props.index === 0">
+                <span>{{ props.item.name }}</span>
+              </v-chip>
+              <span
+                v-if="props.index === 1"
+                class="grey--text caption"
+              >(+{{ data[item.key].length - 1 }})</span>
+            </template> -->
+          </v-autocomplete>
+          <v-autocomplete
+            v-if="item['type'] === 'select' && !item.hasOwnProperty('multiple') && !item.multiple"
+            :items="item['source']"
+            v-model="data[item.key]"
+            :label="item['label']"
+            item-value="value"
+            item-text="name"
+            :clearable="item['clearable']"
           >
-        </v-autocomplete>
-      </v-flex>
-      <v-flex xs12 sm2 class="mx-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
-        <datetime-picker
-          v-if="item['type'] === 'date' && showPicker"
-          v-model="data[item.key]" 
-          :item="item" 
-          :data-value="data[item.key]"
-          :data-all="data"
-          @change="reloadPickerChange(item.key)">
-        </datetime-picker>
-        <v-text-field 
-          v-if="item['type'] === 'text'"
-          v-model="data[item.key]" 
-          :label="item['label']">
-        </v-text-field>
-        <v-select
-          v-if="item['type'] === 'select'"
-          :items="item['source']"
-          v-model="data[item.key]"
-          :label="item['label']"
-          item-value="value"
-          item-text="name"
-        ></v-select>
-      </v-flex>
-    </v-layout>
-    <v-layout align-start justify-start row wrap class="filter_menu my-3 px-4" v-if="showConfig">
-      <v-flex class="mx-2" v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
-        <v-checkbox v-if="!reportType.startsWith('STATISTIC')" @change="changeConfig(index)" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
-      </v-flex>
-    </v-layout>
-    <v-layout row wrap>
-      <v-flex xs12>
-        <v-btn dark v-on:click.native="doCreateReport(false)" color="blue darken-3">Tạo báo cáo</v-btn>
-        <v-btn flat class="mx-0 my-0" v-on:click.native="doCreateReport(true)">
-          <v-icon>receipt</v-icon> &nbsp; Tải xuống Excel
-        </v-btn>
-        <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
-      </v-flex>
-    </v-layout>
-    <div>
-      <vue-friendly-iframe v-if="showGuilds" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/dynamic_report/app/assets/hdsd_bvh.pdf"></vue-friendly-iframe>
-      <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== ''" :src="pdfBlob"></vue-friendly-iframe>
-      <div class="mx-2" v-if="showErrorData">
-        <v-alert :value="true" outline color="info" icon="info">
-          Không có dữ liệu báo cáo.
-        </v-alert>
-      </div>
-      <v-layout row wrap v-if="isShowLoading">
-        <v-flex xs12 class="text-xs-center" mt-5>
-          <v-progress-circular
-            :size="100"
-            :width="1"
-            color="primary"
-            indeterminate
-          ></v-progress-circular>
+          </v-autocomplete>
+        </v-flex>
+        <v-flex xs12 sm6 v-if="hiddenAside">
+          <div class="d-inline-block right">
+            <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> 
+              <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
+            </v-btn>
+            <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
+              <v-icon>print</v-icon> &nbsp; In báo cáo
+            </v-btn>
+            <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
+              <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
+            </v-btn>
+            <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
+              <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
+            </v-btn>
+            <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
+          </div>
         </v-flex>
       </v-layout>
+      <v-layout align-start justify-start row wrap class="filter_menu my-3 px-4" v-if="showConfig">
+        <v-flex class="mx-2" v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
+          <v-checkbox v-if="!reportType.startsWith('STATISTIC')" @change="changeConfig(index)" :label="item.text" v-model="item.selected"></v-checkbox>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap class="mx-2 my-2" v-if="!hiddenAside">
+        <v-flex xs12>
+          <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo</v-btn>
+          
+          <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
+            <v-icon>print</v-icon> &nbsp; In báo cáo
+          </v-btn>
+          <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
+            <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
+          </v-btn>
+          <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
+            <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
+          </v-btn>
+          <v-btn v-if="itemsReports[index]['filterConfig']['showHTML']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="viewHTML()">
+            <v-icon>save_alt</v-icon> &nbsp; Xem HTML
+          </v-btn>
+          <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
+        </v-flex>
+      </v-layout>
+      <!-- table bao cao -->
+      <div>
+        <div v-if="!itemsReports[index]['filterConfig']['showTable'] && !showHTML">
+          <vue-friendly-iframe v-if="showGuilds" :src="'/documents/' + groupId + '/0/hdsd.pdf'"></vue-friendly-iframe>
+          <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' && !showGuilds" :src="pdfBlob"></vue-friendly-iframe>
+        </div>
+        <div v-if="itemsReports[index]['filterConfig']['showTable'] && isRender && !showErrorData && !isShowLoading">
+          <v-data-table
+            :headers="headers"
+            :items="dossierList"
+            :pagination.sync="pagination"
+            hide-actions
+            class="table-landing table-bordered"
+          >
+            <template slot="items" slot-scope="props">
+              <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;" @click="viewDetail(props.item)">
+                <td class="text-xs-center">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span><br>
+                  </div>
+                </td>
+                <td class="text-xs-left" style="min-width: 135px;">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{props.item.dossierNo}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{props.item.dossierName}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left" style="min-width: 135px">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>
+                      <span>{{props.item.applicantName}}</span>
+                    </span>
+                  </div>
+                </td>
+                <td class="text-xs-center">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>
+                      <span>{{props.item.receiveDate}}</span>
+                    </span>
+                  </div>
+                </td>
+                <td class="text-xs-center">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>
+                      <span>{{props.item.dueDate}}</span>
+                    </span>
+                  </div>
+                </td>
+                <td class="text-xs-left">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>
+                      <span>{{props.item.dossierStatusText}}</span>
+                    </span>
+                  </div>
+                </td>
+                <td class="text-xs-left">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>
+                      <span>{{props.item.dossierOverdue}}</span>
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
+          <div class="text-xs-right layout wrap mt-2" style="position: relative;">
+            <div class="flex pagging-table px-2"> 
+              <tiny-pagination :total="pagination.totalItems" :page="pagination.page" custom-class="custom-tiny-class" 
+                @tiny:change-page="paggingData" ></tiny-pagination> 
+            </div>
+          </div>
+        </div>
+        <!-- view HTML -->
+        <div v-if="showHTML">
+                <table v-if="tableType === 'table-1'" class="my-2 table-report" hide-default-footer>
+                  <thead>
+                    <tr>
+                      <th v-for="(header, index) in headerRenderHtmlTable" :key="index">
+                        <span>{{header.text}}</span>
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr class="note__column">
+                      <td align="center" class="px-2" v-for="(header, index) in headerRenderHtmlTable" :key="index">({{index + 1}})</td>
+                    </tr>
+                    <tr v-for="(item,index) in dataBodyHTML" :key="index">
+                      <td v-if="item.colSpan > 1" :colspan="item.colSpan" class="font-weight-bold">
+                        <span>{{item.text}}({{item.totalChild}})</span>
+                      </td>
+                      <td v-else v-for="(val, name) in headerRenderHtmlTable" :key="name" :align="val.align">
+                        <span>{{item.dossier[val.value]}}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table v-if="tableType === 'table-2'" class="my-2 table-report" hide-default-footer>
+                  <thead>
+                    <tr v-for="(header, index) in headerRenderHtmlTable" :key="index" v-if="header !== '[$report$]'">
+                      <td v-for="(item, index2)  in header" :key="index2" v-if="item" :rowspan="item.rowSpan ? item.rowSpan  : 1" :colspan="item.colSpan ? item.colSpan : 1" :align="item.alignment" :class="{'font-weight-bold': item.bold}">
+                        <span>{{item.text}}</span>
+                      </td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item, index) in dataRowRenderHtmlTable" :key="index">
+                      <td v-for="(item2, index2) in item" :key="index2" :align="item2.alignment" :style="{width: widthRenderHtmlTable[index2] + 'px'}"> 
+                        <span>{{item2.text}}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+        </div>
+        <!--  -->
+        <div class="mx-3 my-4" v-if="showErrorData">
+          <v-alert :value="true" outline color="info" icon="info">
+            Không có dữ liệu báo cáo.
+          </v-alert>
+        </div>
+        <v-layout row wrap v-if="isShowLoading">
+          <v-flex xs12 class="text-xs-center" mt-5>
+            <v-progress-circular
+              :size="100"
+              :width="1"
+              color="primary"
+              indeterminate
+            ></v-progress-circular>
+          </v-flex>
+        </v-layout>
+      </div>
     </div>
+    
+    <!-- thong tin ho so -->
+    <v-dialog v-model="dialogDossierDetail" max-width="1200" transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Thông tin hồ sơ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogDossierDetail = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-0 px-0">
+          <thong-tin-ho-so :detailDossier="dossierInfo"></thong-tin-ho-so>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <!-- dialog pdf -->
+    <v-dialog v-model="dialogPDF" max-width="1200" transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Báo cáo thống kê</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPDF = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <vue-friendly-iframe :src="pdfBlob"></vue-friendly-iframe>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+
   </div>
 </v-form>
 </template>
 
 <script>
+import axios from 'axios'
 import VueFriendlyIframe from 'vue-friendly-iframe'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
@@ -135,6 +392,8 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs
 import DatetimePicker from './DatetimePicker.vue'
 import CsvDownload from './CsvDownload.vue'
 import { toXML } from 'jstoxml'
+import TinyPagination from './Pagination.vue'
+import ThongTinHoSo from './ThongTinHoSo.vue'
 const jsonMapper = require('json-mapper-json')
 var FileSaver = require('file-saver-fixed')
 
@@ -143,9 +402,14 @@ export default {
   components: {
     'vue-friendly-iframe': VueFriendlyIframe,
     DatetimePicker,
-    'vue-csv-downloader': CsvDownload
+    'vue-csv-downloader': CsvDownload,
+    'tiny-pagination': TinyPagination,
+    'thong-tin-ho-so': ThongTinHoSo
   },
   data: () => ({
+    showHTML: false,
+    hiddenAside: false,
+    groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
     doExportExcel: false,
     showGuilds: false,
     showPicker: true,
@@ -155,6 +419,7 @@ export default {
     fields: [],
     valid: false,
     api: '',
+    proxyApi: '',
     onlines: [],
     online: '',
     itemsReportsConfig: [],
@@ -189,13 +454,77 @@ export default {
     customize: false,
     groupBy: [],
     groupByVal: '',
+    groupByValObj: '',
     dataReportXX: '',
     buttons: [],
     buttonsVal: '',
     buttonsShow: false,
     noHeader: true,
     exportXML: false,
-    jsonMapperJson: {}
+    jsonMapperJson: {},
+    userData: '',
+    headers: [
+      {
+        text: 'STT',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Mã hồ sơ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Tên hồ sơ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Chủ hồ sơ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Ngày tiếp nhận',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Ngày hẹn trả',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Trạng thái',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Hạn xử lý',
+        align: 'center',
+        sortable: false
+      }
+    ],
+    pagination: {
+      page: 1,
+      rowsPerPage: 15,
+      totalItems: 0
+    },
+    tableType: '',
+    dossierList: [],
+    dossierInfo: '',
+    dialogDossierDetail: false,
+    dialogPDF: false,
+    dialogPDFLoading: false,
+    isRender: false,
+    dataExportExcel: '',
+    groupIdList: [],
+    filterGroup: {},
+    groupIdListSelected: '',
+    dataBodyHTML: [],
+    dataRowRenderHtmlTable: [],
+    headerRenderHtmlTable: [],
+    widthRenderHtmlTable: [],
   }),
   computed: {
     itemsReports () {
@@ -238,11 +567,30 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
+      console.log('run new ver_23')
+      let query = vm.$router.history.current.query
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId()
+        },
+        params: {
+        }
+      }
+      axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId(), param).then(function(response) {
+        vm.userData = response.data
+      }).catch(function(error) {
+      })
+      if (query.hasOwnProperty('doreport')) {
+        vm.hiddenAside = true
+      } else {
+        vm.hiddenAside = false
+      }
       setTimeout(() => {
         vm.showErrorData = false
         vm.showCSVDownload = false
         vm.agencyLists = []
         vm.api = ''
+        vm.proxyApi = ''
         vm.filters = []
         vm.customize = false
         vm.data = {}
@@ -253,81 +601,127 @@ export default {
         vm.buttonsVal = ''
         vm.buttonsShow = false
         vm.exportXML = false
-        vm.nameReport = vm.itemsReports[vm.index]['reportName']
-        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
-          vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
-        }
-        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
-          vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
-        }
-        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
-          vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']
-        }
-        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
-          vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
-          let defaultValGroup = vm.groupBy[0]['key']
-          for (let keyGroup in vm.groupBy) {
-            if (vm.groupBy[keyGroup]['selected']) {
-              defaultValGroup = vm.groupBy[keyGroup]['key']
-              break
-            }
+        if (vm.itemsReports[vm.index]) {
+          vm.nameReport = vm.itemsReports[vm.index]['reportName']
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
+            vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
           }
-          vm.groupByVal = defaultValGroup
-        }
-        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
-          vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
-          if (vm.agencyLists.length > 0) {
-            let defaultVal = vm.agencyLists[0]['value']
-            for (let key in vm.agencyLists) {
-              if (vm.agencyLists[key]['selected']) {
-                defaultVal = vm.agencyLists[key]['value']
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
+            vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
+            vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
+            vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
+            let defaultValGroup = vm.groupBy[0]['key']
+            for (let keyGroup in vm.groupBy) {
+              if (vm.groupBy[keyGroup]['selected']) {
+                defaultValGroup = vm.groupBy[keyGroup]['key']
                 break
               }
             }
-            vm.govAgency = defaultVal
+            vm.groupByVal = defaultValGroup
           }
-        }
-        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
-          vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
-        }
-        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
-          vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
-        }
-        for (let key in vm.filters) {
-          if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
-            vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
+            // set list filter
+            if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+              vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
+            } else {
+              vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+            }
+            
+            if (vm.agencyLists.length > 0) {
+              let defaultVal = vm.agencyLists[0]['value']
+              for (let key in vm.agencyLists) {
+                if (vm.agencyLists[key]['selected']) {
+                  defaultVal = vm.agencyLists[key]['value']
+                  break
+                }
+              }
+              if (query.hasOwnProperty('groupId') && query['groupId']) {
+              vm.govAgency = Number(query['groupId'])
+              } else {
+                vm.govAgency = defaultVal
+              }
+            } else {
+              vm.govAgency = 'site'
+            }
+          } else {
+            vm.govAgency = 'site'
           }
-        }
-        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
-          vm.buttons = vm.itemsReports[vm.index]['filterConfig']['buttons']
-          if (vm.buttons.length > 0) {
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
+            vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+            vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
+            vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+          }
+          // 
+          if(vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIdList')) {
+            vm.groupIdList = vm.itemsReports[vm.index]['filterConfig']['groupIdList']
+          } else {
+            vm.groupIdList = []
+          }
+          // 
+          for (let key in vm.filters) {
+            if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
+              // if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('multiple') && vm.filters[key].multiple) {
+              //   vm.data[vm.filters[key]['key']] = vm.filters[key] && vm.filters[key]['value'] ? vm.filters[key]['value'].toString() : ''
+              // } else {
+                vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+              // }
+              
+              if (vm.filters[key]['type'] === 'date' && query.hasOwnProperty(vm.filters[key]['key']) && query[vm.filters[key]['key']]) {
+                vm.data[vm.filters[key]['key']] = query[vm.filters[key]['key']]
+              }
+            }
+            if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+              vm.filters[key]['groupId'] = vm.govAgency
+              vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+                vm.filters[key]['source'] = result
+                if (vm.filters[key]['appendItem']) {
+                  vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
+                }
+              }).catch(function(){})
+            }
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
+            vm.buttons = vm.itemsReports[vm.index]['filterConfig']['buttons']
+            if (vm.buttons.length > 0) {
+              setTimeout(() => {
+                vm.buttonsShow = true
+              }, 100)
+            }
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('exportXML')) {
+            vm.exportXML = vm.itemsReports[vm.index]['filterConfig']['exportXML']
+          }
+          vm.report1Def = {}
+          for (let key in vm.itemsReportsConfig) {
+            vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
+          }
+          vm.reportType = vm.itemsReports[vm.index]['document']
+          if (vm.showConfig) {
+            vm.showConfig = false
             setTimeout(() => {
-              vm.buttonsShow = true
-            }, 100)
+              vm.showConfig = true
+            }, 200)
           }
+          vm.pdfBlob = ''
         }
-        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('exportXML')) {
-          vm.exportXML = vm.itemsReports[vm.index]['filterConfig']['exportXML']
+        if (query.hasOwnProperty('doreport')) {
+          vm.doCreateReport(false)
         }
-        vm.report1Def = {}
-        for (let key in vm.itemsReportsConfig) {
-          vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
-        }
-        vm.reportType = vm.itemsReports[vm.index]['document']
-        if (vm.showConfig) {
-          vm.showConfig = false
-          setTimeout(() => {
-            vm.showConfig = true
-          }, 200)
-        }
-        vm.pdfBlob = ''
-      }, 500)
+      }, 1000)
     })
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
-      console.debug(oldRoute)
+      vm.showHTML = false
       vm.showErrorData = false
       vm.showCSVDownload = false
       vm.itemsReportsConfig = []
@@ -335,6 +729,7 @@ export default {
       vm.customize = false
       vm.data = {}
       vm.api = ''
+      vm.proxyApi = ''
       vm.filters = []
       vm.report1Def = {}
       vm.dataReportXX = ''
@@ -342,16 +737,20 @@ export default {
       vm.buttonsVal = ''
       vm.buttonsShow = false
       vm.exportXML = false
-      vm.nameReport = vm.itemsReports[vm.index]['reportName']
+      vm.nameReport = vm.itemsReports[vm.index] ? vm.itemsReports[vm.index]['reportName'] : ''
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
         vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
       }
+      // bug unsupported number: NaN
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
         vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']
+      } else {
+        vm.noHeader = true
       }
+      // 
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
         vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
         let defaultValGroup = vm.groupBy[0]['key']
@@ -364,7 +763,12 @@ export default {
         vm.groupByVal = defaultValGroup
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
-        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+        // set list filter
+        if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+          vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
+        } else {
+          vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+        }
         if (vm.agencyLists.length > 0) {
           let defaultVal = vm.agencyLists[0]['value']
           for (let key in vm.agencyLists) {
@@ -374,14 +778,34 @@ export default {
             }
           }
           vm.govAgency = defaultVal
+        } else {
+          vm.govAgency = 'site'
         }
+      } else {
+        vm.govAgency = 'site'
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
         vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
       }
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+        vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+        // console.log('filterssssss', vm.filters)
       }
+      // 
+      if(vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIdList')) {
+        // console.log('groupIdList', vm.itemsReports[vm.index]['filterConfig']['groupIdList'])
+        vm.groupIdList = vm.itemsReports[vm.index]['filterConfig']['groupIdList']
+      } else {
+        vm.groupIdList = []
+        // console.log('groupIdList0',vm.groupIdList)
+      }
+      for(let i in vm.filterGroup){
+        vm.filterGroup[i] = null
+      }
+      // 
       for (let key in vm.itemsReportsConfig) {
         vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
       }
@@ -389,7 +813,21 @@ export default {
       vm.pdfBlob = ''
       for (let key in vm.filters) {
         if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
-          vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+          // if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('multiple') && vm.filters[key].multiple) {
+          //   vm.data[vm.filters[key]['key']] = vm.filters[key] && vm.filters[key]['value'] ? vm.filters[key]['value'].toString() : ''
+          // } else {
+            vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+          // }
+          
+        }
+        if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+          vm.filters[key]['groupId'] = vm.govAgency
+          vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+            vm.filters[key]['source'] = result
+            if (vm.filters[key]['appendItem']) {
+              vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
+            }
+          }).catch(function(){})
         }
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
@@ -409,11 +847,136 @@ export default {
           vm.showConfig = true
         }, 200)
       }
-    }
+    },
+    itemsReports () {
+      let vm = this
+      setTimeout(() => {
+        vm.showErrorData = false
+        vm.showCSVDownload = false
+        vm.agencyLists = []
+        vm.api = ''
+        vm.proxyApi = ''
+        vm.filters = []
+        vm.customize = false
+        vm.data = {}
+        vm.groupBy = []
+        vm.itemsReportsConfig = []
+        vm.dataReportXX = ''
+        vm.buttons = []
+        vm.buttonsVal = ''
+        vm.buttonsShow = false
+        vm.exportXML = false
+        if (vm.itemsReports[vm.index]) {
+          vm.nameReport = vm.itemsReports[vm.index]['reportName']
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
+            vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
+            vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
+            vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
+            vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
+            let defaultValGroup = vm.groupBy[0]['key']
+            for (let keyGroup in vm.groupBy) {
+              if (vm.groupBy[keyGroup]['selected']) {
+                defaultValGroup = vm.groupBy[keyGroup]['key']
+                break
+              }
+            }
+            vm.groupByVal = defaultValGroup
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
+            if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+              vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
+            } else {
+              vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+            }
+            if (vm.agencyLists.length > 0) {
+              let defaultVal = vm.agencyLists[0]['value']
+              for (let key in vm.agencyLists) {
+                if (vm.agencyLists[key]['selected']) {
+                  defaultVal = vm.agencyLists[key]['value']
+                  break
+                }
+              }
+              vm.govAgency = defaultVal
+            }
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
+            vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+            vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
+            vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+          }
+          // 
+          if(vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIdList')) {
+            vm.groupIdList = vm.itemsReports[vm.index]['filterConfig']['groupIdList']
+          } else {
+            vm.groupIdList = []
+          }
+          // 
+          for (let key in vm.filters) {
+            if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
+
+              vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+              
+            }
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
+            vm.buttons = vm.itemsReports[vm.index]['filterConfig']['buttons']
+            if (vm.buttons.length > 0) {
+              setTimeout(() => {
+                vm.buttonsShow = true
+              }, 100)
+            }
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('exportXML')) {
+            vm.exportXML = vm.itemsReports[vm.index]['filterConfig']['exportXML']
+          }
+          vm.report1Def = {}
+          for (let key in vm.itemsReportsConfig) {
+            vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
+          }
+          vm.reportType = vm.itemsReports[vm.index]['document']
+          if (vm.showConfig) {
+            vm.showConfig = false
+            setTimeout(() => {
+              vm.showConfig = true
+            }, 200)
+          }
+          vm.pdfBlob = ''
+        }
+      }, 200)
+    },
+    // groupByVal (val) {
+    //   let vm = this
+    //   if (val) {
+    //     vm.groupByValObj = vm.groupBy.filter(function (item) {
+    //       return item.key === val
+    //     })[0]
+    //   }
+    // }
   },
   methods: {
     doCreatePDF () {
       let vm = this
+      vm.headerRenderHtmlTable = []
+      if (vm.itemsReports[vm.index]['reportCode'].indexOf('STATISTIC') === -1) {
+        vm.headerRenderHtmlTable = vm.itemsReportsConfig.filter(function(item) {
+          return item.selected
+        })
+        console.log('headerRenderHtmlTable-1', vm.headerRenderHtmlTable)
+      } else {
+        let body = vm.itemsReports[vm.index]['tableConfig']['docDefinition']['content'][2]['table']['body']
+        vm.headerRenderHtmlTable = body
+        console.log('headerRenderHtmlTable-1-a', vm.headerRenderHtmlTable)
+      }
       if (vm.reportType.startsWith('STATISTIC')) {
         vm.doPrintReportFix()
       } else {
@@ -423,11 +986,19 @@ export default {
     },
     doDynamicReport () {
       let vm = this
+      vm.isRender = false
       vm.docDefinition = {}
       let docDString = {}
       vm.dataReportXX = ''
       docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
-      docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
+      // console.log('userData', vm.userData)
+      let titleGov = vm.userData.hasOwnProperty('govAgencyName') && vm.userData.govAgencyName ? vm.userData.govAgencyName : vm.itemsReports[vm.index]['filterConfig']['govAgencyName']
+      if (!titleGov) {
+        titleGov = vm.$store.getters.siteName
+      }
+      console.log('titleGov', titleGov)
+      docDString = docDString.replace(/\[\$siteName\$\]/g, String(titleGov).toUpperCase())
+
       for (let key in vm.filters) {
         let find = vm.filters[key]['key']
         let currentVal = vm.data[vm.filters[key]['key']]
@@ -456,14 +1027,22 @@ export default {
           docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
         }
       }
-      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
+      } else {
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      }
       for (let key in vm.agencyLists) {
         if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
           docDString = docDString.replace(/\[\$groupIds\$\]/g, vm.agencyLists[key]['text'])
+          docDString = docDString.replace(/\[\$groupIdsHeader\$\]/g, vm.agencyLists[key]['text'].toUpperCase())
           break
         }
       }
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+        vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
       let widthsConfig = []
       widthsConfig.push(30)
       let headerTableReport = '['
@@ -482,8 +1061,9 @@ export default {
       let colLeng = 0
       for (let key in vm.itemsReportsConfig) {
         if (vm.itemsReportsConfig[key].hasOwnProperty('selected') && vm.itemsReportsConfig[key]['selected']) {
+          let widthConfig = vm.itemsReportsConfig[key].hasOwnProperty('width') ? vm.itemsReportsConfig[key] : 'auto'
           colLeng = colLeng + 1
-          widthsConfig.push('auto')
+          widthsConfig.push(widthConfig)
           // vm.docDefinition['content'][2]['table']['widths'].push('auto')
           let str1 = ' '
           if (vm.report1Def[vm.itemsReportsConfig[key]['value']] !== undefined && vm.report1Def[vm.itemsReportsConfig[key]['value']] !== null && vm.report1Def[vm.itemsReportsConfig[key]['value']] !== '') {
@@ -507,95 +1087,188 @@ export default {
         vm.dataReportXX += header2TableReport.substring(0, header2TableReport.length - 1) + '],'
       }
       
-      // bild data
+      // build data
       let filter = {
         document: vm.reportType,
         data: vm.data,
-        api: vm.api
+        api: vm.api,
+        proxyApi: vm.proxyApi
       }
-      filter['govAgency'] = vm.govAgency
-      filter['agencyLists'] = vm.agencyLists
+      let check =  true
+      console.log('groupIdListSelected 555', vm.groupIdListSelected)
+      for (let key in vm.filterGroup) {
+        if(key === vm.groupIdListSelected) {
+          let exits = vm.groupIdList.find(item => item.key === key)
+          filter['govAgency'] = vm.filterGroup[key]
+          filter['agencyLists'] = exits ? exits.value : []
+          check = false
+          break
+        }
+      }
+      if(check) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
+      }
       vm.pdfBlob = null
       vm.isShowLoading = true
+      console.log('getAgencyReportLists',filter)
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        // console.log('result',result)
         if (result !== null && result !== undefined) {
+          // set dossierList
+          vm.dossierList = result
+          vm.pagination.totalItems = vm.dossierList.length
+          // console.log('dossiers', vm.dossierList)
+          //
           vm.showErrorData = false
           let dataReport = result
           let dossierRaw = {}
           let dataReportCurrent = {}
           let dataReportTotal = ''
           let textGroup = ''
+          let codeGroup = ''
           for (let keyGroup in vm.groupBy) {
             if (String(vm.groupBy[keyGroup]['key']) === String(vm.groupByVal)) {
               textGroup = vm.groupBy[keyGroup]['display']
+              codeGroup = vm.groupBy[keyGroup]['key']
               break
             }
           }
+          try {
+            vm.groupByValObj = vm.groupBy.filter(function (item) {
+              return item.key === vm.groupByVal
+            })[0]
+          } catch (error) {
+          }
+          
           for (let key in dataReport) {
             dataReportCurrent = dataReport[key]
             if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
-              if (dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] === dataReportCurrent[textGroup]) {
+              if (dossierRaw[dataReportCurrent[vm.groupByVal]][codeGroup] === dataReportCurrent[codeGroup] && 
+                (!vm.itemsReports[vm.index]['filterConfig']['sumKey'] || (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumKey') && vm.itemsReports[vm.index]['filterConfig']['sumKey'] && dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']]))
+              ) {
                 dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
                 dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] = dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] + 1
               }
             } else {
               let dossierRawItem = {}
-              dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
-              dossierRawItem[textGroup] = dataReportCurrent[textGroup]
-              dossierRawItem['totalChild'] = 1
-              dossierRawItem['dossiers'] = []
-              dossierRaw[dataReportCurrent[vm.groupByVal]] = dossierRawItem
-              dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] = dataReportCurrent[textGroup]
-              dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
+              if ((!dataReportCurrent.hasOwnProperty('dossierId') && !vm.reportType.startsWith('REPORT_STATISTIC')) || 
+                (vm.reportType.startsWith('REPORT_STATISTIC') && !dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']])
+              ) {
+                dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
+                dossierRawItem[textGroup] = dataReportCurrent[textGroup]
+                dossierRawItem['totalChild'] = 0
+                dossierRawItem['dossiers'] = []
+                dossierRaw[dataReportCurrent[vm.groupByVal]] = dossierRawItem
+                dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] = dataReportCurrent[textGroup]
+                dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'] = []
+              } else {
+                dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
+                dossierRawItem[textGroup] = dataReportCurrent[textGroup]
+                dossierRawItem['totalChild'] = 1
+                dossierRawItem['dossiers'] = []
+                dossierRaw[dataReportCurrent[vm.groupByVal]] = dossierRawItem
+                dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] = dataReportCurrent[textGroup]
+                dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
+              }
             }
           }
+          
+          // 
+          vm.dataRowRenderHtmlTable = dossierRaw
+          console.log('dataRowRenderHtmlTable666', vm.dataRowRenderHtmlTable)
+          // 
           let dataToExportCSV = []
+          let dataRaw = []
           for (let key in dossierRaw) {
-            if (dossierRaw[key][vm.groupByVal] !== undefined && dossierRaw[key][vm.groupByVal] !== null && dossierRaw[key][vm.groupByVal] !== '') {
-              let csvGroup = []
-              csvGroup.push(dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ')
-              for (let colLengIndex in colLeng) {
-                csvGroup.push('')
-              }
-              dataToExportCSV.push(csvGroup)
-              if (vm.doExportExcel) {
-                dataReportTotal += '[ '
-                dataReportTotal += JSON.stringify({
-                  text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ',
-                  bold: true,
-                  style: 'tdStyle'
-                }) + ','
-                for (let csvIndexXXX = 0; csvIndexXXX < colLeng - 1; csvIndexXXX ++) {
-                  dataReportTotal += JSON.stringify({
-                    text: '',
-                    bold: true,
-                    style: 'tdStyle'
-                  }) + ','
-                }
-                dataReportTotal += JSON.stringify({
-                  text: '',
-                  bold: true,
+            if (key && dossierRaw[key]['totalChild'] !== 0) {
+              dataRaw.push(dossierRaw[key])
+            }
+          }
+          dataRaw.reverse()
+          console.log('dossierRaw 47', dataRaw)
+          let dataRowTotal = []
+          let totalText = 'Tổng cộng'
+          dataRowTotal.push({
+            text: totalText, 
+            colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? 2 : 1,
+            bold: true,
+            alignment: 'center',
+            style: 'tdStyle'
+          })
+          for (let keyMapping in vm.itemsReportsConfig) {
+            if (vm.itemsReportsConfig[keyMapping]['value'] === 'note') {
+              dataRowTotal.push({
+                text: '', 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            }  else {
+              if (vm.itemsReportsConfig[keyMapping].hasOwnProperty('type') && vm.itemsReportsConfig[keyMapping].type === 'currency') {
+                dataRowTotal.push({
+                  text: 0, 
+                  alignment: 'center',
+                  style: 'tdStyle',
+                  type: 'currency'
+                })
+              } else {
+                dataRowTotal.push({
+                  text: 0, 
+                  alignment: 'center',
                   style: 'tdStyle'
                 })
-                dataReportTotal += ' ],'
-              } else {
-                dataReportTotal += JSON.stringify([{
-                  colSpan: colLeng + 1,
-                  text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ',
-                  bold: true,
-                  style: 'tdStyle'
-                }]) + ','
+              }
+              
+            }
+          }
+          let indexNotShowGroup = 1
+          let indexCountTotal = 0
+          // console.log(vm.groupByValObj)
+          // console.log(vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup'))
+          for (let key in dataRaw) {
+            if (vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup')) {
+              if (dataRaw[key][vm.groupByVal] !== undefined && dataRaw[key][vm.groupByVal] !== null && dataRaw[key][vm.groupByVal] !== '') {
+                let csvGroup = []
+                csvGroup.push( dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ')
+                for (let colLengIndex in colLeng) {
+                  csvGroup.push('')
+                }
+                dataToExportCSV.push(csvGroup)
+                // if (vm.doExportExcel) {
+                //   console.log('case1')
+                //   dataReportTotal += '[ '
+                //   dataReportTotal += JSON.stringify({
+                //     text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
+                //     bold: true,
+                //     style: 'tdStyle'
+                //   }) + ','
+                //   for (let csvIndexXXX = 0; csvIndexXXX < colLeng - 1; csvIndexXXX ++) {
+                //     dataReportTotal += JSON.stringify({
+                //       text: '',
+                //       bold: true,
+                //       style: 'tdStyle'
+                //     }) + ','
+                //   }
+                //   dataReportTotal += JSON.stringify({
+                //     text: '',
+                //     bold: true,
+                //     style: 'tdStyle'
+                //   })
+                //   dataReportTotal += ' ],'
+                // } else {
+                  console.log('case2')
+                  dataReportTotal += JSON.stringify([{
+                    colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? colLeng + 1 : colLeng,
+                    text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
+                    bold: true,
+                    style: 'tdStyle'
+                  }]) + ','
+                // }
               }
             }
-            /*
-            vm.docDefinition['content'][2]['table']['body'].push([{
-              colSpan: val.length + 1,
-              text: '- ' + domains[0]['services'][key]['serviceCode'] + ' - ' + domains[0]['services'][key]['serviceName'],
-              bold: true,
-              style: 'tdStyle'
-            }])
-            */
-            let dossiersArray = dossierRaw[key]['dossiers']
+            
+           
+            let dossiersArray = dataRaw[key]['dossiers']
             let indexStt = 1
             let dataRow = []
             for (let keyDossier in dossiersArray) {
@@ -603,11 +1276,14 @@ export default {
               let dataToExportCSVItem = []
               let dossierObj = dossiersArray[keyDossier]
               dataToExportCSVItem.push(indexStt)
-              dataRow.push({
-                text: indexStt, 
-                alignment: 'center',
-                style: 'tdStyle'
-              })
+              if (!vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt')) {
+                dataRow.push({
+                  text: vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup') ? indexStt : indexNotShowGroup, 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+              }
+              
               for (let keyVal in vm.itemsReportsConfig) {
                 if (vm.itemsReportsConfig[keyVal].hasOwnProperty('selected') && vm.itemsReportsConfig[keyVal]['selected']) {
                   let alignmentConfig = 'center'
@@ -630,22 +1306,51 @@ export default {
                     }
                   }
                   dataToExportCSVItem.push(ddStr)
+                  // convert value currency
                   dataRow.push({
-                    text: ddStr, 
+                    text: currentConfig.hasOwnProperty('type') && currentConfig.type === 'currency' ? vm.currency(ddStr) : ddStr, 
                     alignment: alignmentConfig,
                     style: 'tdStyle'
                   })
+                  // caculator count total
+                  if (vm.reportType.startsWith('REPORT_STATISTIC')) {
+                    let indexRow = dataRow.length - 1
+                    dataRowTotal[indexRow]['text'] = Number(dataRowTotal[indexRow]['text'].toString().replace(/\./g, '')) + Number(dataRow[indexRow]['text'].toString().replace(/\./g, ''))
+                    if (dataRowTotal[indexRow]['type'] === 'currency') {
+                      dataRowTotal[indexRow]['text'] = vm.currency(dataRowTotal[indexRow]['text'])
+                    }
+                    if (vm.itemsReportsConfig[keyVal]['value'] === 'note') {
+                      dataRowTotal[indexRow]['text'] = ''
+                    }
+                  }
+                  
+                  // 
                 }
               }
               dataReportTotal += JSON.stringify(dataRow) + ','
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
               indexStt = indexStt + 1
+              indexNotShowGroup = indexNotShowGroup + 1
               dataToExportCSV.push(dataToExportCSVItem)
+              // 
+              indexCountTotal += 1
             }
           }
           dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
           vm.dataReportXX += dataReportTotal
-          // }
+
+          console.log('itemsReportsConfig', vm.itemsReportsConfig)
+          console.log('dataRowTotal 777===', dataRowTotal)
+          console.log('percentTotal 555', dataRowTotal[dataRowTotal.length - 1]['text'], indexCountTotal, Math.round(dataRowTotal[dataRowTotal.length - 1]['text']/indexCountTotal))
+
+          if (vm.reportType.startsWith('REPORT_STATISTIC')) {
+            if (vm.itemsReportsConfig[dataRowTotal.length - 2]['value'] === 'ontimePercentage') {
+              dataRowTotal[dataRowTotal.length - 1]['text'] = Math.round(dataRowTotal[dataRowTotal.length - 1]['text']/indexCountTotal)
+            }
+            vm.dataReportXX += ',' + JSON.stringify(dataRowTotal)
+          }
+          console.log('dataReportXX11ZZ', vm.dataReportXX)
+          
           vm.csvExport = []
           vm.csvExport = dataToExportCSV
           vm.fields = []
@@ -662,26 +1367,35 @@ export default {
           vm.showCSVDownload = true
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
+          vm.dataExportExcel = docDString
+          console.log('docDString1234123, dataExportExcelReport', docDString)
           vm.docDefinition = JSON.parse(docDString)
+          // console.log('vm.docDefinition', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
-          pdfDocGenerator.getBlob((blob) => {
-            vm.pdfBlob = window.URL.createObjectURL(blob)
-            vm.isShowLoading = false
-            if (vm.doExportExcel) {
-              
-              let currentTimestemp = new Date().getTime()
-              let fileToExcel = new File([blob], currentTimestemp + '.pdf')
-              {
-                var reader = new FileReader()
-                reader.onload = function(e) {
-                    var data = e.target.result
-                    console.log('data', data)
-                    vm.convertPDFToHTML(data)
-                };
-                reader.readAsArrayBuffer(fileToExcel)
+          // create blob
+          // check showTable
+          if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+            pdfDocGenerator.getBlob((blob) => {
+              vm.pdfBlob = window.URL.createObjectURL(blob)
+              if (vm.pdfBlob) {
+                vm.isRender = true
+              } else {
+                vm.isRender = false
               }
-            }
-          })
+              vm.isShowLoading = false
+            })
+          } else {
+            pdfDocGenerator.getBlob((blob) => {
+              vm.pdfBlob = window.URL.createObjectURL(blob)
+              vm.isShowLoading = false
+              if (vm.doExportExcel) {
+                vm.$store.dispatch('getExcelReportFromServer', {
+                  data: docDString,
+                  fileName: 'baocaothongke' + '.xls'
+                })
+              }
+            })
+          }
         } else {
           // vm.agencyLists = []
           vm.isShowLoading = false
@@ -691,13 +1405,23 @@ export default {
     },
     doPrintReportFix () {
       let vm = this
+      vm.dataRowRenderHtmlTable = []
+      vm.isRender = false
       vm.agencyLists = []
       vm.api = ''
+      vm.proxyApi = ''
       vm.dataReportXX = ''
       vm.docDefinition = {}
       let docDString = {}
       docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
-      docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
+      // console.log('userData', vm.userData)
+      let titleGov = vm.userData.hasOwnProperty('govAgencyName') && vm.userData.govAgencyName ? vm.userData.govAgencyName : vm.itemsReports[vm.index]['filterConfig']['govAgencyName']
+      if (!titleGov) {
+        titleGov = vm.$store.getters.siteName
+      }
+      // console.log('titleGov', titleGov)
+      docDString = docDString.replace(/\[\$siteName\$\]/g, String(titleGov).toUpperCase())
+      //console.log('docDString', docDString)
       for (let key in vm.filters) {
         let find = vm.filters[key]['key']
         let currentVal = vm.data[vm.filters[key]['key']]
@@ -726,7 +1450,11 @@ export default {
           docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
         }
       }
-      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
+      } else {
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      }
       for (let key in vm.agencyLists) {
         if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
           docDString = docDString.replace(/\[\$groupIds\$\]/g, vm.agencyLists[key]['text'])
@@ -734,14 +1462,30 @@ export default {
         }
       }
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+        vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
       vm.isShowLoading = true
       let filter = {
         document: vm.reportType,
         data: vm.data,
-        api: vm.api
+        api: vm.api,
+        proxyApi: vm.proxyApi
       }
-      filter['govAgency'] = vm.govAgency
-      filter['agencyLists'] = vm.agencyLists
+      let check =  true
+      for (let key in vm.filterGroup) {
+        if (key === vm.groupIdListSelected) {
+          filter['govAgency'] = vm.filterGroup[key]
+          filter['agencyLists'] = vm.groupIdList.find(item => item.key === key).value
+          check = false
+          break
+        }
+      }
+      // console.log('check-check', vm.groupIdListSelected, vm.filterGroup)
+      if(check) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
+      }
       vm.pdfBlob = null
       vm.isShowLoading = true
       let sumKey = vm.itemsReports[vm.index]['filterConfig']['sumKey']
@@ -749,8 +1493,15 @@ export default {
       let merge = vm.itemsReports[vm.index]['filterConfig']['merge']
       let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
       let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
+      
+      // console.log('getAgencyReportLists2', filter)
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        // console.log('result',result)
         if (result !== null) {
+          // set dossierList
+          vm.dossierList = result
+          vm.pagination.totalItems = vm.dossierList.length
+          //
           vm.showErrorData = false
           let index = 1
           let dataRowTotal = []
@@ -780,28 +1531,30 @@ export default {
               })
             }
           }
-          
+
           // TODO
           let resultData = result
           if (selection !== undefined && selection !== null && selection.length > 0) {
+            // console.log('selection', selection)
             resultData = result.filter(function(obj) {
               let totalCHK = 0
               for (let keySe in selection) {
                 if (selection[keySe]['compare'] === '#') {
                   if (String(obj[selection[keySe]['key']]) !== String(selection[keySe]['value'])) {
                     totalCHK = totalCHK + 1
-                    // return obj
+                    return obj
                   }
                 } else if (selection[keySe]['compare'] === '=') {
                   if (selection[keySe]['value'] === '') {
                     if (String(obj[selection[keySe]['key']]) === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
                       totalCHK = totalCHK + 1
-                      // return obj
+                      return obj
                     }
                   } else {
+                    console.log('compare', selection[keySe], obj[selection[keySe]['key']], selection[keySe]['value'])
                     if (String(obj[selection[keySe]['key']]) === String(selection[keySe]['value'])) {
                       totalCHK = totalCHK + 1
-                      // return obj
+                      return obj
                     }
                   }
                 } else {
@@ -816,7 +1569,8 @@ export default {
               }
             })
           }
-          let resultDataTotal = resultData.filter(function(obj) {
+          console.log('resultData555', resultData)
+          let resultDataTotal = [resultData.find(function(obj) {
             if (subKey !== null && subKey !== undefined && subKey !== '') {
               if ((obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) && obj[subKey] === '') {
                 return obj
@@ -826,7 +1580,11 @@ export default {
                 return obj
               }
             }
-          })
+          })]
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('notSumkey')) {
+            resultDataTotal = resultData
+          }
+         console.log('resultDataTotal666', resultDataTotal)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -883,7 +1641,7 @@ export default {
           }
           let dataToExportCSV = []
           for (let key in resultData) {
-            let dataInput = resultData[key]
+            let dataInput = resultData[key]            
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
                 (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0')) {
               let dataRow = []
@@ -915,6 +1673,7 @@ export default {
                     dataText = Math.round(eval(currentConfig['calculator']))
                   }
                 } else {
+                  console.log('resultData[key]', resultData[key], currentConfig['value'] )
                   if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                     if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
                       dataText =  ' - ' + resultData[key][currentConfig['subValue']] + ' '
@@ -929,16 +1688,20 @@ export default {
                 }
                 dataToExportCSVItem.push(dataText)
                 dataRow.push({
-                  text: dataText, 
+                  text: currentConfig['value'] === 'note' ? ' ' : (dataText === ' ' ? ' 0 ' : dataText), 
                   alignment: alignmentConfig,
                   style: 'tdStyle'
                 })
+
                 if (vm.govAgency === 0) {
-                  if (dataRowTotal[indexTotal] !== null && dataRowTotal[indexTotal] !== undefined && dataRowTotal[indexTotal]['text'] !== '') {
+                  if (dataRowTotal[indexTotal] !== null && dataRowTotal[indexTotal] !== undefined) {
                     if (currentConfig['value'] === 'ontimePercentage') {
                       dataRowTotal[indexTotal]['text'] = parseInt(dataText)
-                    } else if (isNaN(dataText)) {
+                    } else if (currentConfig['value'] === 'note') {
                       dataRowTotal[indexTotal]['text'] = ' '
+                    } else if (isNaN(dataText)) {
+                      // dataRowTotal[indexTotal]['text'] = ' '
+                      dataRowTotal[indexTotal]['text'] = ' 0 '
                     } else {
                       dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(dataText)
                     }
@@ -951,47 +1714,21 @@ export default {
               } else {
                 index = index + 1
               }
+              
+              vm.dataRowRenderHtmlTable.push(dataRow)
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
               vm.dataReportXX += JSON.stringify(dataRow) + ','
               dataToExportCSV.push(dataToExportCSVItem)
             }
           }
           if (vm.agencyLists.length > 0 && vm.govAgency === 0) {
-            /*
-            let resultDataVariTotal = {}
-            for (let key in resultDataTotal) {
-              let keyVari = ''
-              for (let keysd in merge) {
-                keyVari += resultDataTotal[key][merge[keysd]] + '_'
-              }
-              if (resultDataVariTotal[keyVari] === undefined || resultDataVariTotal[keyVari] === null || resultDataVariTotal[keyVari] === '') {
-                resultDataVariTotal[keyVari] = resultDataTotal[key]
-              } else {
-                for (let kkey in resultDataVariTotal[keyVari]) {
-                  if (resultDataVariTotal[keyVari][kkey] !== '' && resultDataVariTotal[keyVari][kkey] !== undefined && resultDataVariTotal[keyVari][kkey] !== null) {
-                    if (String(parseInt(resultDataVariTotal[keyVari][kkey])) === 'NaN') {
-                      resultDataVariTotal[keyVari][kkey] = resultDataTotal[key][kkey]
-                    } else if (kkey === 'ontimePercentage') {
-                      resultDataVariTotal[keyVari][kkey] = parseInt(resultDataVariTotal[keyVari][kkey])
-                    } else {
-                      resultDataVariTotal[keyVari][kkey] = parseInt(resultDataTotal[key][kkey]) + parseInt(resultDataVariTotal[keyVari][kkey])
-                    }
-                  }
-                }
-              }
-            }
-            resultDataTotal = []
-            for (let key in resultDataVariTotal) {
-              if (key === undefined || key === 'undefined_') {
-                resultDataTotal.push(resultDataVariTotal[key])
-              }
-            }
-            */
+            console.log('resultDataTotal777', resultDataTotal)
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
               for (let keyMappingXXTT in vm.itemsReportsConfig) {
                 let dataTextXXTT = ''
                 let currentConfigXXTT = vm.itemsReportsConfig[keyMappingXXTT]
+                console.log('currentConfigXXTT777', currentConfigXXTT)
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
                   var dataInputXXTT = resultDataTotal[keyXXTT]
                   let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
@@ -1003,11 +1740,15 @@ export default {
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
-                dataRowTotal[indexTotalXXTT]['text'] = parseInt(dataTextXXTT) + ' '
+                dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? '0 '  : parseInt(dataTextXXTT) + ' '
+                if (currentConfigXXTT['value'] === 'note') {
+                  dataRowTotal[indexTotalXXTT]['text'] = ' '
+                }
                 indexTotalXXTT = indexTotalXXTT + 1
               }
               break
             }
+            console.log('dataRowTotal 555', dataRowTotal)
           } else {
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
@@ -1026,12 +1767,16 @@ export default {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
                 dataRowTotal[indexTotalXXTT]['text'] = parseInt(dataTextXXTT) + ' '
+                if (currentConfigXXTT['value'] === 'note') {
+                  dataRowTotal[indexTotalXXTT]['text'] = ' '
+                }
                 indexTotalXXTT = indexTotalXXTT + 1
               }
             }
+            console.log('dataRowTotal 666', dataRowTotal)
           }
           vm.dataReportXX += JSON.stringify(dataRowTotal)
-          dataToExportCSV
+          // console.log('vm.dataReportXX 1231', vm.dataReportXX)
           let itemTotal = []
           for (let keyTotalCSV in dataRowTotal) {
             itemTotal.push(dataRowTotal[keyTotalCSV]['text'])
@@ -1053,26 +1798,38 @@ export default {
           }
           vm.showCSVDownload = true
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
+          console.log('docDString,dataExportExcelStatistic', docDString)
+          vm.dataExportExcel = docDString
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
+          // console.log('docDefinition-render-pdf', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
-          pdfDocGenerator.getBlob((blob) => {
-            vm.pdfBlob = window.URL.createObjectURL(blob)
-            vm.isShowLoading = false
-            if (vm.doExportExcel) {
-              let currentTimestemp = new Date().getTime()
-              let fileToExcel = new File([blob], currentTimestemp + '.pdf')
-              {
-                var reader = new FileReader()
-                reader.onload = function(e) {
-                    var data = e.target.result
-                    console.log('data', data)
-                    vm.convertPDFToHTML(data)
-                };
-                reader.readAsArrayBuffer(fileToExcel)
+          // create blob
+          // check showTable
+          // console.log('resultData', resultData)
+          // console.log('resultDataTotal 2', resultDataTotal)
+          if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+            pdfDocGenerator.getBlob((blob) => {
+              vm.pdfBlob = window.URL.createObjectURL(blob)
+              if (vm.pdfBlob) {
+                vm.isRender = true
+              } else {
+                vm.isRender = false
               }
-            }
-          })
+              vm.isShowLoading = false
+            })
+          } else {
+            pdfDocGenerator.getBlob((blob) => {
+              vm.pdfBlob = window.URL.createObjectURL(blob)
+              vm.isShowLoading = false
+              if (vm.doExportExcel) {
+                vm.$store.dispatch('getExcelReportFromServer', {
+                  data: docDString,
+                  fileName: new Date().getTime() + '.xls'
+                })
+              }
+            })
+          }
         } else {
           // vm.agencyLists = []
           vm.isShowLoading = false
@@ -1082,6 +1839,7 @@ export default {
     },
     doCreateReport(isExportExcel) {
       let vm = this
+      vm.showHTML = false
       vm.showGuilds = false
       if (vm.$refs.form.validate()) {
         vm.doExportExcel = isExportExcel
@@ -1097,15 +1855,17 @@ export default {
     },
     changeConfig (index) {
       let vm = this
-      if (vm.itemsReportsConfig[index].hasOwnProperty('selected')) {
-        if (vm.itemsReportsConfig[index]['selected']) {
-          vm.itemsReportsConfig[index]['selected'] = false
-        } else {
-          vm.itemsReportsConfig[index]['selected'] = true
-        }
-      } else {
-        vm.itemsReportsConfig[index]['selected'] = true
-      }
+      // if (vm.itemsReportsConfig[index].hasOwnProperty('selected')) {
+      //   if (vm.itemsReportsConfig[index]['selected']) {
+      //     vm.itemsReportsConfig[index]['selected'] = false
+      //   } else {
+      //     vm.itemsReportsConfig[index]['selected'] = true
+      //   }
+      // } else {
+      //   vm.itemsReportsConfig[index]['selected'] = true
+      // }
+      // console.log('itemsReportsConfig index', vm.itemsReportsConfig[index])
+      // console.log('itemsReportsConfig', vm.itemsReportsConfig)
     },
     doChotSoLieu (dataSelect, button) {
       let vm = this
@@ -1136,22 +1896,31 @@ export default {
     },
     doDynamicReportXML () {
       let vm = this
-      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
+      } else {
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      }
       vm.jsonMapperJson = {}
       vm.jsonMapperJson = vm.itemsReports[vm.index]['userConfig']
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+        vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
       // bild data
       let filter = {
         document: vm.reportType,
         data: vm.data,
-        api: vm.api
+        api: vm.api,
+        proxyApi: vm.proxyApi
       }
       filter['govAgency'] = vm.govAgency
       filter['agencyLists'] = vm.agencyLists
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        // console.log('result',result)
         if (result !== null && result !== undefined) {
           jsonMapper({ 'content': result, 'blank': '' }, vm.jsonMapperJson).then((result) => {
-            console.log(result)
+            // console.log(result)
             const xmlOptions = {
               header: true,
               indent: '  '
@@ -1221,11 +1990,171 @@ export default {
         FileSaver.saveAs(blob, new Date().getTime() + ".xls");
       })
     },
+    goToThongKe () {
+      let vm = this
+      let fromStatisticDate = vm.data['fromStatisticDate']
+      let toStatisticDate = vm.data['toStatisticDate']
+      let site = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
+      let urlReport = site + '/thong-ke#/danh-gia-thu-tuc?groupId=' + vm.govAgency + '&fromStatisticDate=' +
+      fromStatisticDate + '&toStatisticDate=' + toStatisticDate
+      window.location.href = urlReport
+    },
     s2ab (s) {
       var buf = new ArrayBuffer(s.length);
       var view = new Uint8Array(buf);
       for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
       return buf;
+    },
+    parseCurrentDate (date) {
+      if (!date) {
+        return null
+      }
+      try {
+        let [day, month, year] = date.split('/')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      } catch (e) {
+        return ''
+      }
+    },
+    currency (value) {
+      if (value) {
+        let moneyCur = (value / 1).toFixed(0).replace('.', ',')
+        return moneyCur.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+      }
+      return ''
+    },
+    paggingData (config) {
+      let vm = this
+      vm.pagination.page = config.page
+    },
+    viewDetail (item) {
+      let vm = this
+      vm.dossierInfo = item
+      vm.dialogDossierDetail = true
+    },
+    printReport () {
+      let vm = this
+      vm.dialogPDF = true
+    },
+    exportExcel () {
+      let vm = this
+      console.log('sadsadas',vm.dataExportExcel)
+      vm.$store.dispatch('getExcelReportFromServer', {
+        groupId: vm.govAgency ? vm.govAgency : window.themeDisplay.getScopeGroupId(),
+        data: vm.dataExportExcel,
+        fileName: 'baocaothongke' + '.xls'
+      })
+    },
+    changeGroupIdList(item){
+       let vm = this
+      setTimeout(()=>{
+        vm.govAgency = null
+        console.log(item.key)
+        console.log(vm.filterGroup[item.key])
+        vm.groupIdListSelected = vm.filterGroup[item.key] ? item.key : ''
+        for(let i in vm.filterGroup){
+          if(i !== item.key) {
+            vm.filterGroup[i] = null
+          }
+        }
+        
+        for (let key in vm.filters) {
+          if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+            vm.filters[key]['value'] = ''
+            vm.data[vm.filters[key]['key']] = ''
+            vm.filters[key]['groupId'] = vm.filterGroup[item.key]
+            console.log('filter dataSource', vm.filters[key])
+            vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+              vm.filters[key]['source'] = result
+              if (vm.filters[key]['appendItem']) {
+                vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
+              }
+            }).catch(function(){})
+          }
+        }
+      }, 200)
+    },
+    changeGovAgency () {
+      let vm = this
+      vm.groupIdListSelected = ''
+      setTimeout(()=>{
+        for (let key in vm.filters) {
+          if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+            vm.filters[key]['value'] = ''
+            vm.data[vm.filters[key]['key']] = ''
+            vm.filters[key]['groupId'] = vm.govAgency
+            vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+              vm.filters[key]['source'] = result
+              if (vm.filters[key]['appendItem']) {
+                vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
+              }
+            }).catch(function(){})
+          }
+        }
+        for(let i in vm.filterGroup){
+          vm.filterGroup[i] = null
+        }
+      }, 300)
+    },
+    viewHTML () {
+      let vm = this
+      vm.headerRenderHtmlTable = []
+      vm.widthRenderHtmlTable = []
+      vm.tableType = ''
+      console.log('vm.itemsReportsConfig:',vm.itemsReportsConfig)
+      if (vm.itemsReports[vm.index]['reportCode'].indexOf('STATISTIC') === -1) {
+        vm.headerRenderHtmlTable = vm.itemsReportsConfig.filter(function(item) {
+          return item.selected
+        })
+        console.log('headerRenderHtmlTable-1', vm.headerRenderHtmlTable)
+        let textGroup = ''
+        let codeGroup = ''
+        for (let keyGroup in vm.groupBy) {
+          if (String(vm.groupBy[keyGroup]['key']) === String(vm.groupByVal)) {
+            textGroup = vm.groupBy[keyGroup]['display']
+            codeGroup = vm.groupBy[keyGroup]['key']
+            break
+          }
+        }
+        let dataBody = []
+        for(let key in vm.dataRowRenderHtmlTable){
+          let rowTotal = {
+            colSpan: vm.headerRenderHtmlTable.length,
+            text: vm.dataRowRenderHtmlTable[key][textGroup],
+            bold: true,
+            style: 'trStyle',
+            totalChild: vm.dataRowRenderHtmlTable[key]['dossiers'].length,
+            dossier: {}
+          }
+          dataBody.push(rowTotal)
+          for(let i=0; i< vm.dataRowRenderHtmlTable[key]['dossiers'].length; i++){
+            let row = {
+              colSpan: 1,
+              text: '',
+              bold: false,
+              style: 'tdStyle',
+              dossier: {}
+            }
+            for(let j=0;j<vm.headerRenderHtmlTable.length;j++){
+              row.dossier[vm.headerRenderHtmlTable[j]['value']] = vm.dataRowRenderHtmlTable[key]['dossiers'][i][vm.headerRenderHtmlTable[j]['value']]
+            }
+            dataBody.push(row)
+          }
+        } 
+        vm.dataBodyHTML = dataBody
+        console.log('dataBody',dataBody)
+        vm.tableType = 'table-1'
+      } else {
+        let body = vm.itemsReports[vm.index]['tableConfig']['docDefinition']['content'][2]['table']['body']
+        let widths = vm.itemsReports[vm.index]['tableConfig']['docDefinition']['content'][2]['table']['widths']
+        vm.widthRenderHtmlTable = widths
+        vm.headerRenderHtmlTable = body
+        console.log('headerRenderHtmlTable-1-a', vm.headerRenderHtmlTable)
+        console.log('dataRowRenderHtmlTable', vm.dataRowRenderHtmlTable)
+        vm.tableType = 'table-2'
+      }
+
+      vm.showHTML = true
     }
   }
 }

@@ -1,48 +1,134 @@
 <template>
-  <div style="height: 100%; background-color: #ffff; padding-top: 20px;">
+  <div :class="!isMobile ? 'pt-3' : 'pt-0'" style="max-width:1300px;height: 100%; background-color: #ffff;" >
     <v-layout row wrap>
-      <v-flex xs12 sm12 class="text-xs-center" style="margin-bottom: 20px;">
-        <h3 class="text-xs-center mt-2" style="color:#065694">CÂU HỎI KHẢO SÁT</h3>
-      </v-flex>
-      <v-flex xs12 sm2>
-      </v-flex>
-      <v-flex xs12 sm8>
+      <v-flex xs12 md9 v-if="votingItems.length > 0">
         <v-layout row wrap>
+          <v-flex xs12 sm12 class="mb-4 px-2" v-if="!isMobile">
+            <div id="title" class="text-bold" style="color:#034687">
+            </div>
+          </v-flex>
+          <v-flex xs12 sm12 class="mb-2" v-else>
+            <div class="row-header" style="background-color: #0054a6">
+              <div class="ml-2 py-2 text-bold white--text"> <span>KHẢO SÁT MỨC ĐỘ HÀI LÒNG</span> </div>
+              <div class="layout row wrap header_tools row-blue">
+                <div class="flex text-right" style="margin-left: auto;">
+                  <v-btn icon class="my-0 white--text" @click="dialogMobile = true">
+                    <v-icon size="18">star</v-icon>
+                  </v-btn>
+                </div>
+              </div> 
+            </div>
+          </v-flex>
           <v-flex xs12 sm12>
             <div v-for="(item, index) in votingItems" style="margin-bottom: 5px;" :key="index">
-              <div class="text-bold primary--text">{{index + 1}}. {{ item.subject }}</div>
-              <div class="ml-4">
+              <v-layout wrap class="text-bold" v-if="!isMobile">
+                <div class="flex px-3 py-1" style="height:26px;max-width:87px;background-color: #034687;transform: skew(-25deg)">
+                  <span class="d-block white--text" style="transform: skew(25deg)">Chỉ số {{index + 1}} : </span>
+                </div>
+                <div class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687">
+                  {{ item.subject }}
+                </div>
+              </v-layout>
+              <div class="text-bold px-2" v-if="isMobile">
+                <div class="" style="text-align: justify;color:#034687">
+                  Chỉ số {{index + 1}}: {{ item.subject }}
+                </div>
+              </div>
+              <div :class="!isMobile ? 'ml-4' : 'ml-2'">
                 <v-radio-group v-model="item.selected" column class="mt-1">
-                  <v-radio :label="itemChoise" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                  <v-radio :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                    <div style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{itemChoise}}</div>
                   </v-radio>
                 </v-radio-group>
               </div>
-              <!-- <div class="mt-3 ml-4 mr-3" v-if="item.commentable">
-                <v-text-field
-                v-model="item['comment']"
-                label="Ý kiến khác"
-                multi-line
-                rows="2"
-                ></v-text-field>
-              </div> -->
             </div>
-            <v-flex xs12 sm12 class="mb-3 mt-3" v-if="showCaptcha">
-              <captcha ref="captcha"></captcha>
+            <v-flex xs12 sm12 class="mx-2 my-3" v-if="showCaptcha">
+              <div style="max-width: 400px;background: #dedede;margin: 0 auto;" class="pb-2">
+                <v-flex xs12 class="py-2" style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                ">
+                  <div id="captcha" class="d-inline-block text-xs-center" style="padding-top: 15px;background: #fff;border-radius: 5px;"></div>
+                  <v-btn class="right ml-3 mx-0 my-0" title="refresh" flat icon v-on:click.native="createCaptcha">
+                    <v-icon color="primary" size="32">refresh</v-icon>
+                  </v-btn>
+                </v-flex>
+                <v-text-field
+                  class="mx-3"
+                  single-lines
+                  hide-details
+                  solo
+                  flat
+                  height="36"
+                  min-height="36"
+                  clearable
+                  v-model="captchaValue"
+                  placeholder="Nhập mã captcha"
+                ></v-text-field>
+              </div>
+              
             </v-flex>
-            <v-flex xs12 sm12 class="text-xs-center mt-2">
-              <v-btn @click="doVottingResultSubmit" color="primary" :loading="btnLoading" :disabled="btnLoading">
+            <v-flex xs12 sm12 :class="!isMobile ? 'text-xs-left mt-2' : 'text-xs-left mt-2 px-2'">
+              <v-btn class="white--text" @click="doVottingResultSubmit" color="#004C98" :loading="btnLoading" :disabled="btnLoading">
                 <v-icon>save</v-icon>&nbsp;
                 Gửi đánh giá
-              </v-btn>
-              <v-btn class="ml-3" @click="showVotingResult" color="primary" :loading="btnLoading" :disabled="btnLoading">
-                <v-icon>bookmark</v-icon>&nbsp;
-                Xem kết quả đánh giá
               </v-btn>
             </v-flex>
           </v-flex>
         </v-layout>
       </v-flex>
-      <v-flex xs12 sm2>
+      <v-flex xs12 md9 v-else>
+        <div class="px-3">
+          <v-alert outline color="warning" icon="priority_high" :value="true">
+            Chưa có câu hỏi khảo sát
+          </v-alert>
+        </div>
+      </v-flex>
+      <v-flex xs12 md3 v-if="!isMobile">
+        <div >
+          <v-card color="#034687" flat class="white--text px-2 py-2" style="border-radius: 7px;">
+            <v-card-text class="px-2 py-1 pr-0 ">
+              <div class="text-xs-center text-bold">Tổng số lượt đánh giá</div>
+              <div class="text-xs-center"> trong năm {{(new Date()).getFullYear()}}</div>
+              <div class="text-xs-center text-bold" style="font-size:24px">{{totalAnswer}}</div>
+              <div class="text-xs-center">lượt đánh giá</div>
+            </v-card-text>
+          </v-card>
+          <v-card color="#0072bc" flat :class="isMobile ? 'px-2 py-2 mt-4' : 'px-2 py-2 mt-2'" style="border-radius: 7px;">
+            <v-card-text class="px-2 py-1 pr-0">
+              <div class="text-xs-center white--text text-bold">Kết quả đánh giá các chỉ số</div>
+              <div class="text-xs-center white--text" >Năm {{(new Date()).getFullYear()}}</div>
+              <v-flex xs12 v-for="(item, index) in votingItems" :key="index" class="white--text mt-2">
+                <v-layout row justify-center>
+                  <v-flex xs7 class="text-xs-center">
+                    <span>Chỉ số {{index + 1}}: </span>
+                    <span style="color:#6dcff6">{{item.answersCount ? item.averageScore + ' / 2 điểm' : 'Chưa có đánh giá'}}</span>
+                  </v-flex>
+                </v-layout>
+              </v-flex>
+            </v-card-text>
+          </v-card>
+          <!-- Thống kê chi tiết các chỉ số. Sử dụng sau -->
+          <!-- <v-card v-for="(item, index) in votingItems" :key="index" color="#0072bc" flat class="px-2 py-2 mt-4" style="border-radius: 7px;">
+            <v-card-text class="px-2 py-1 pr-0">
+              <div class="text-xs-center white--text text-bold">Kết quả đánh giá Chỉ số {{index + 1}}</div>
+              <div class="text-xs-center white--text" >Năm {{(new Date()).getFullYear()}}</div>
+              <div class="mt-3" v-for="(item1, index1) in item['answerPercent']" :key="index1">
+                <v-layout wrap class="mb-2">
+                  <div class="flex white--text" style="width:70px">{{item1.name}} : </div>
+                  <progress-bar class="flex pt-1" size="13" :spacing="1" bar-transition="all 1s ease"
+                  :val="Number(item1.percent)" 
+                  bg-color="#e0e0e0" bar-color="#6dcff6" text-fg-color="#fff" style="z-index:10000;width: calc(100% - 120px)">
+                  </progress-bar>
+                  <div style="width:50px;color:#6dcff6" class="flex pl-2 text-bold">{{item1.percent}} % </div>
+                </v-layout>
+              </div>
+            </v-card-text>
+          </v-card> -->
+        </div>
+      </v-flex>
+      <v-flex xs12 sm1>
       </v-flex>
     </v-layout>
     <v-dialog v-model="dialog_voting_result" fullscreen hide-overlay transition="dialog-bottom-transition">
@@ -98,13 +184,54 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="dialogMobile" width="320">
+      <v-card>
+        <v-card-text class="px-1 py-1">
+          <div>
+            <v-card color="#034687" flat class="white--text px-2 py-2" style="border-radius: 7px;">
+              <v-card-text class="px-2 py-1 pr-0 ">
+                <div class="text-xs-center text-bold">Tổng số lượt đánh giá</div>
+                <div class="text-xs-center"> trong năm {{(new Date()).getFullYear()}}</div>
+                <div class="text-xs-center text-bold" style="font-size:24px">{{totalAnswer}}</div>
+                <div class="text-xs-center">lượt đánh giá</div>
+              </v-card-text>
+            </v-card>
+            <v-card color="#0072bc" flat :class="isMobile ? 'px-2 py-2 mt-4' : 'px-2 py-2 mt-2'" style="border-radius: 7px;">
+              <v-card-text class="px-2 py-1 pr-0">
+                <div class="text-xs-center white--text text-bold">Kết quả đánh giá các chỉ số</div>
+                <div class="text-xs-center white--text" >Năm {{(new Date()).getFullYear()}}</div>
+                <v-flex xs12 v-for="(item, index) in votingItems" :key="index" class="white--text mt-2">
+                  <v-layout row justify-center>
+                    <v-flex xs7 class="text-xs-center">
+                      <span>Chỉ số {{index + 1}}: </span>
+                      <span style="color:#6dcff6">{{item.answersCount ? item.averageScore + ' / 2 điểm' : 'Chưa có đánh giá'}}</span>
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
+              </v-card-text>
+            </v-card>
+          </div>
+        </v-card-text>
+        <v-divider class="my-0"></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            small
+            color="primary"
+            @click="dialogMobile = false"
+          >
+            Thoát
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 
 import Vue from 'vue'
-import Captcha from './Captcha.vue'
 import toastr from 'toastr'
 import ProgressBar from 'vue-simple-progress'
 Vue.use(toastr)
@@ -115,7 +242,6 @@ toastr.options = {
 export default {
   props: ['index'],
   components: {
-    'captcha': Captcha,
     ProgressBar
   },
   data: () => ({
@@ -123,22 +249,35 @@ export default {
     btnLoading: false,
     showCaptcha: false,
     barColor: ['#5cb85c', '#f0ad4e', '#d9534f', '#2e4fc8', '#2ec8bad9', '#142f14'],
-    dialog_voting_result: false
+    dialog_voting_result: false,
+    resultTotal: [],
+    totalAnswer: 0,
+    dialogMobile: false,
+    captchaCode: '',
+    captchaValue: ''
   }),
   computed: {
     loading () {
       return this.$store.getters.loading
+    },
+    isMobile () {
+      return this.$store.getters.getIsMobile
     }
   },
   created () {
     var vm = this
-    console.log('landing---------')
     vm.$nextTick(function () {
       vm.$store.dispatch('loadVoting', {
         className: 'survey',
         classPk: 0
       }).then(result => {
         vm.votingItems = result
+        vm.totalAnswer = 0
+        for (let i = 0; i < vm.votingItems.length; i++) {
+          vm.totalAnswer += Number(vm.votingItems[i]['answersCount'])
+          vm.getPercentItem(vm.votingItems[i], i)
+        }
+        // vm.getPercentTotal(vm.votingItems)
         console.log(vm.votingItems)
       }).catch(xhr => {
       })
@@ -157,32 +296,57 @@ export default {
     },
     doVottingResultSubmit: function () {
       var vm = this
-      if (vm.$refs.captcha) {
-        if (!vm.$refs.captcha.checkValidCaptcha()) {
-          toastr.error('Mã captcha không đúng. Vui lòng kiểm tra lại')
+      if (vm.showCaptcha) {
+        let valid = vm.validateCaptcha()
+        if (!valid) {
           return
         }
       } else {
         vm.showCaptcha = true
+        setTimeout (function () {
+          vm.createCaptcha()
+        }, 100)
         return
       }
       vm.btnLoading = true
       let arrAction = []
+      let valid = false
       for (var key in vm.votingItems) {
         vm.votingItems[key]['className'] = 'survey'
         vm.votingItems[key]['classPk'] = 0
-        arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
-      }
-      Promise.all(arrAction).then(results => {
-        toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-        vm.btnLoading = false
-        if (vm.$refs.captcha) {
-          vm.$refs.captcha.makeRandomString()
+        if (String(vm.votingItems[key]['selected']) !== '0') {
+          valid = true
+          arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
         }
-      }).catch(xhr => {
-        toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+      }
+      if (valid) {
+        Promise.all(arrAction).then(results => {
+          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          vm.createCaptcha()
+          vm.captchaValue = ''
+          vm.btnLoading = false
+          vm.$store.dispatch('loadVoting', {
+            className: 'survey',
+            classPk: 0
+          }).then(result => {
+            vm.votingItems = result
+            vm.totalAnswer = 0
+            for (let i = 0; i < vm.votingItems.length; i++) {
+              vm.totalAnswer += Number(vm.votingItems[i]['answersCount'])
+              vm.getPercentItem(vm.votingItems[i], i)
+            }
+            // vm.getPercentTotal(vm.votingItems)
+          }).catch( function () {
+          })
+        }).catch(xhr => {
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          vm.btnLoading = false
+        })
+      } else {
         vm.btnLoading = false
-      })
+        toastr.error('Bạn chưa chọn đánh giá nào')
+      }
+      
     },
     showVotingResult () {
       let vm = this
@@ -192,10 +356,8 @@ export default {
       }).then(result => {
         vm.votingItems = result
         vm.dialog_voting_result = true
-        console.log(vm.votingItems)
       }).catch(xhr => {
       })
-      
     },
     getPercent (answers, index) {
       let totalVoted = 0
@@ -205,6 +367,103 @@ export default {
       }
       percent = ((answers[index] / totalVoted) * 100).toFixed(1)
       return percent
+    },
+    getPercentItem (votingItems, index) {
+      let vm = this
+      let votingPercent = []
+      let lengthVotingAnswer = votingItems['answers'].length
+      let totalScore = 0
+      for (var i = lengthVotingAnswer - 1; i >= 0; i--) {
+        totalScore += Number(votingItems['answers'][i]*(lengthVotingAnswer - i - 1))
+        let indexAnswer = lengthVotingAnswer - i - 1
+        let result = {
+          name: 'Điểm ' + indexAnswer,
+          count: Number(votingItems['answersCount']),
+          percent: Number(((Number(votingItems['answers'][i]) / Number(votingItems['answersCount'])) * 100).toFixed(1))
+        }
+        votingPercent.push(result)
+      }
+      vm.votingItems[index]['answerPercent'] = votingPercent.reverse()
+      vm.votingItems[index]['averageScore'] = (Number(totalScore) / Number(votingItems['answersCount'])).toFixed(1)
+    },
+    getPercentTotal (votingItems) {
+      let vm = this
+      if (votingItems && votingItems.length > 0) {
+        let votingPercent = []
+        let totalAnswer = 0
+        for (var i = votingItems[0]['answers'].length - 1; i >= 0; i--) {
+          // let result = {
+          //   name: 'Điểm ' + (i + 1),
+          //   count: 0,
+          //   percent: 0
+          // }
+          let result = {
+            name: 'Điểm ' + (i),
+            count: 0,
+            percent: 0
+          }
+          votingPercent.push(result)
+        }
+        for (var j = votingItems.length -1 ; j >= 0; j--) {
+          totalAnswer += votingItems[j]['answersCount']
+          let itemAnswer
+          for (var k = votingItems[j]['answers'].length - 1; k >= 0; k--) {
+            votingPercent[k]['count'] += votingItems[j]['answers'][k]
+          }
+        }
+        // for (var i = votingPercent.length - 1; i >= 0; i--) {
+        //   totalAnswer += votingPercent[i]['count']
+        // }
+        for (var i = votingPercent.length - 1; i >= 0; i--) {
+          if (totalAnswer) {
+            let percent = ((votingPercent[i]['count'] / totalAnswer) * 100).toFixed(0)
+            votingPercent[i]['percent'] = percent
+          } else {
+            votingPercent[i]['percent'] = 0
+          }
+        }
+        vm.totalAnswer = totalAnswer
+        vm.resultTotal = votingPercent
+        console.log('votingPercent', votingPercent)
+      }
+    },
+    changeVoting () {
+    },
+    getQuarters () {
+      let month = (new Date()).getMonth() + 1;
+      return (Math.ceil(month / 3));
+    },
+    createCaptcha () {
+      let vm = this
+      document.getElementById('captcha').innerHTML = "";
+      let charsArray = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@!#&*"
+      let lengthOtp = 6
+      let captcha = []
+      for (var i = 0; i < lengthOtp; i++) {
+        var index = Math.floor(Math.random() * charsArray.length + 1)
+        if (captcha.indexOf(charsArray[index]) == -1)
+          captcha.push(charsArray[index])
+        else i--
+      }
+      let canv = document.createElement("canvas")
+      canv.id = "captcha"
+      canv.width = 150
+      canv.height = 50
+      let ctx = canv.getContext("2d")
+      ctx.font = "32px Georgia"
+      ctx.strokeText(captcha.join(""), 0, 30)
+      vm.captchaCode = captcha.join("")
+      document.getElementById("captcha").appendChild(canv)
+    },
+    validateCaptcha () {
+      let vm = this
+      if (vm.captchaValue == vm.captchaCode) {
+        return true
+      } else {
+        toastr.error('Mã captcha không đúng. Vui lòng thử lại.')
+        vm.createCaptcha()
+        return false
+      }
     }
   },
   filters: {

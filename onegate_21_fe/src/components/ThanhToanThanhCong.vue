@@ -52,7 +52,7 @@
                       <td><span>{{dossierDetail.transId}}</span></td>
                     </tr>
                     <tr v-if="statusDeal">
-                      <td><span class="text-bold">Mã đơn hàng</span></td>
+                      <td><span class="text-bold">Mã hóa đơn</span></td>
                       <td><span>{{dossierDetail.goodCode}}</span></td>
                     </tr>
                     <tr v-if="statusDeal">
@@ -156,7 +156,7 @@ export default {
           vm.statusDeal = false
           vm.keypayStatusText = vm.keypayStatusCode['responseCode'] ? vm.keypayStatusCode['responseCode'] : ''
         }
-        vm.$store.dispatch('getDetailDossier', dossierId).then(resultDossier => {
+        vm.$store.dispatch('getDetailDossier', referenceUidQuery).then(resultDossier => {
           vm.dossierDetail['serviceName'] = resultDossier.serviceName
           vm.dossierDetail['dossierNo'] = resultDossier.dossierNo
           vm.dossierDetail['govAgencyName'] = resultDossier.govAgencyName

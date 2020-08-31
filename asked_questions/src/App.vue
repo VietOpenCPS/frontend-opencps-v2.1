@@ -1,45 +1,72 @@
 <template>
-  <v-app id="app_asked_questions" >
-    <v-navigation-drawer app clipped floating width="250" v-if="getUser('Administrator')">
-      <div class="mx-2 mb-2">
-        <v-btn class="mx-0" block color="primary" v-on:click.native="addQuestion()"
+  <v-app id="app_asked_questions" style="background: #fff !important">
+    <v-navigation-drawer app clipped floating width="255" v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')">
+      <!-- <div class="">
+        <v-btn class="px-0 my-0 ml-0" block color="primary" v-on:click.native="addQuestion"
+          style="height:36px"
         >
-          <v-icon>add</v-icon>&nbsp;
+          <v-icon size="22" color="white">add</v-icon>&nbsp;
           Thêm mới câu hỏi
         </v-btn>
-      </div>
+      </div> -->
       <v-list class="pt-0">
-        <v-list-tile @click="viewList">
-          <v-list-tile-action class="ml-3">
-            <v-icon color="primary">dashboard</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-badge color="blue" right class="mt-1">
-              <span slot="badge">{{totalQuestion}}</span>
-              <span class="mr-2">Danh sách câu hỏi</span>
-            </v-badge>
+        <v-list-tile :style="activeTab === 0 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(0, 'all')">
+            <v-list-tile-title>Tất cả câu hỏi</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalQuestionCounter}}
+            </span>
           </v-list-tile-content>
         </v-list-tile>
-        <v-divider></v-divider>
-        <!-- <v-list-tile @click="getQuestionList" v-if="getUser('Administrator')">
-          <v-list-tile-action class="ml-3">
-            <v-icon color="green">question_answer</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-badge color="green" right class="mt-1">
-              <span slot="badge" >{{questionListNew.length}}</span>
-              <span class="mr-2">Câu hỏi mới</span>
-            </v-badge>
+        <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 5 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(5, 'questionType=FAQ')">
+            <v-list-tile-title>Công dân hỏi đáp</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalFAQ}}
+            </span>
           </v-list-tile-content>
         </v-list-tile>
-        <v-divider v-if="getUser('Administrator')"></v-divider> -->
+        <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 1 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(1, 'answered=true')">
+            <v-list-tile-title>Câu hỏi đã trả lời</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalAnswered}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 2 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(2, 'answered=false')">
+            <v-list-tile-title>Câu hỏi chưa trả lời</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalNotAnswer}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 3 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(3, 'publish=1')">
+            <v-list-tile-title>Câu hỏi công khai</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalPublished}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 4 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(4, 'publish=0')">
+            <v-list-tile-title>Câu hỏi không công khai</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalNotPublish}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
       </v-list>
     </v-navigation-drawer>
-    <v-content :style="!getUser('Administrator') ? 'width: 100%;max-width: 1200px;margin: 0 auto' : ''">
-      <v-btn v-if="!getUser('Administrator')" @click.native="addQuestion()" round color="primary" dark style="position:absolute;top:0px;right:20px;z-index:101">
-        <v-icon>near_me</v-icon>&nbsp;
-        Gửi câu hỏi
-      </v-btn>
+    <v-content :style="(!getUser('Administrator') && !getUser('Administrator_data') && !getUser('Administrator_Employee')) ? 'width: 100%;max-width: 1300px;margin: 0 auto' : ''">
       <router-view></router-view>
     </v-content>
   </v-app>
@@ -48,6 +75,14 @@
 <script>
   export default {
     data: () => ({
+      activeTab: 0,
+      totalQuestionCounter: 0,
+      totalAnswered: 0,
+      totalNotAnswer: 0,
+      totalPublished: 0,
+      totalNotPublish: 0,
+      totalFAQ: 0,
+      agencyList: []
     }),
     computed: {
       loading () {
@@ -56,18 +91,32 @@
       questionList () {
         return this.$store.getters.getQuestionList
       },
-      questionListNew () {
-        let vm = this
-        return vm.getQuestionListNew(vm.questionList)
-      },
       activeAddQuestion () {
         return this.$store.getters.getActiveAddQuestion
       },
       activeGetQuestion () {
         return this.$store.getters.getActiveGetQuestion
       },
-      totalQuestion () {
-        return this.$store.getters.getTotalQuestion
+      keyword () {
+        return this.$store.getters.getKeywordFilter
+      },
+      agencyFilterSelected () {
+        return this.$store.getters.getAgencyFilter
+      },
+      lvdsFilterSelected () {
+        return this.$store.getters.getLvdsFilter
+      },
+      lvttFilterSelected () {
+        return this.$store.getters.getLvttFilter
+      },
+      typeFilterSelected () {
+        return this.$store.getters.getTypeFilter
+      },
+      activeCounter () {
+        return this.$store.getters.getCounter
+      },
+      isMobile () {
+        return this.$store.getters.getIsMobile
       }
     },
     created () {
@@ -76,43 +125,164 @@
         let current = vm.$router.history.current
         let newQuery = current.query
         vm.getQuestionList()
+        vm.getCounter()
       })
+    },
+    beforeDestroy () {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', this.onResize, { passive: true })
+      }
+    },
+    mounted () {
+      this.onResize()
+      window.addEventListener('resize', this.onResize, { passive: true })
+      if (this.isMobile) {
+        $('section#content').css('padding-left', '0px')
+      }
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
         let vm = this
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
+        vm.getQuestionList()
       },
       activeGetQuestion () {
         let vm = this
         vm.getQuestionList()
+        vm.getCounter()
+      },
+      activeCounter () {
+        let vm = this
+        vm.getQuestionList()
+        vm.getCounter()
       }
     },
     methods: {
       getQuestionList () {
         let vm = this
+        let current = vm.$router.history.current
+        let query = current.query
+        let filter = {
+          agencyCode: vm.agencyFilterSelected && vm.agencyFilterSelected['itemCode'] ? vm.agencyFilterSelected['itemCode'] : '',
+          domainCode: vm.lvttFilterSelected ? vm.lvttFilterSelected['domainCode'] : '',
+          subDomainCode: vm.lvdsFilterSelected ? vm.lvdsFilterSelected['itemCode'] : '',
+          keyword: vm.keyword ? vm.keyword : '',
+          publish: query.hasOwnProperty('publish') ? query['publish'] : '',
+          answered: query.hasOwnProperty('answered') ? query['answered'] : '',
+          questionType: vm.typeFilterSelected ? vm.typeFilterSelected : (query.hasOwnProperty('questionType') ? query['questionType'] : '')
+        }
+        try {
+          if (agencyCodeSite) {
+            filter.agencyCode = agencyCodeSite
+          }
+        } catch (error) {
+        }
         vm.$store.commit('setLoading', true)
-        vm.$store.dispatch('getQuestions').then(function (result) {
+        vm.$store.dispatch('getQuestions', filter).then(function (result) {
           vm.$store.commit('setLoading', false)
+          let questionList = []
           if (Array.isArray(result)) {
-            vm.$store.commit('setQuestionList', result)
+            questionList = result
+            vm.$store.commit('setQuestionList', questionList)
           } else {
-            vm.$store.commit('setQuestionList', [result])
+            questionList = [result]
+            vm.$store.commit('setQuestionList', questionList)
           }
         }).catch(function (reject) {
           vm.$store.commit('setLoading', false)
+          vm.$store.commit('setQuestionList', reject)
         })
       },
-      getQuestionListNew (questionList) {
+      getCounter () {
         let vm = this
-        let readed = []
-        if (questionList.length > 0) {
-          readed = questionList.filter(function (item) {
-            return item.hasOwnProperty('read') && item['read'] === false
-          })
+        let current = vm.$router.history.current
+        let query = current.query
+        let filter = {
+          agencyCode: '',
+          publish: '',
+          answered: ''
         }
-        return readed
+        // vm.$store.commit('setLoading', true)
+        try {
+          if (agencyCodeSite) {
+            filter.agencyCode = agencyCodeSite
+          }
+        } catch (error) {
+        }
+        
+        vm.$store.dispatch('getQuestionsCounter', filter).then(function (result) {
+          vm.$store.commit('setLoading', false)
+          vm.totalQuestionCounter = result['total']
+          // 
+          let filter1 = {
+            agencyCode: '',
+            publish: 1,
+            answered: ''
+          }
+          try {
+            if (agencyCodeSite) {
+              filter1.agencyCode = agencyCodeSite
+            }
+          } catch (error) {
+          }
+          
+          // console.log('filterCounter 1', filter1)
+          vm.$store.dispatch('getQuestionsCounter', filter1).then(function (result1) {
+            vm.totalPublished = result1['total']
+            vm.totalNotPublish = Number(vm.totalQuestionCounter) - Number(vm.totalPublished)
+          }).catch(function(reject) {
+            vm.totalPublished = 0
+            vm.totalNotPublish = Number(vm.totalQuestionCounter) - Number(vm.totalPublished)
+          })
+          //
+          let filter2 = {
+            agencyCode: '',
+            publish: '',
+            answered: true
+          }
+          try {
+            if (agencyCodeSite) {
+              filter2.agencyCode = agencyCodeSite
+            }
+          } catch (error) { 
+          }
+          // console.log('filterCounter 2', filter2)
+          vm.$store.dispatch('getQuestionsCounter', filter2).then(function (result2) {
+            vm.totalAnswered = result2['total']
+            vm.totalNotAnswer = Number(vm.totalQuestionCounter) - Number(vm.totalAnswered)
+          }).catch(function(reject) {
+            vm.totalAnswered = 0
+            vm.totalNotAnswer = Number(vm.totalQuestionCounter) - Number(vm.totalAnswered)
+          })
+          // 
+          let filter3 = {
+            agencyCode: '',
+            publish: '',
+            questionType: 'FAQ'
+          }
+          vm.$store.dispatch('getQuestionsCounter', filter3).then(function (result2) {
+            vm.totalFAQ = result2['total']
+          }).catch(function(reject) {
+            vm.totalFAQ = 0
+          })
+        }).catch(function (reject) {
+          vm.totalQuestionCounter = 0
+          vm.totalPublished = 0
+          vm.totalNotPublish = 0
+          vm.totalAnswered = 0
+          vm.totalNotAnswer = 0
+          vm.totalFAQ = 0
+        })
+      },
+      filterQuestion (index, target) {
+        let vm = this
+        vm.$store.commit('setAgencyFilter', '')
+        vm.$store.commit('setKeywordFilter', '')
+        vm.activeTab = index
+        vm.$router.push({
+          path: '/?' + target 
+        })
       },
       addQuestion () {
         let vm = this
@@ -120,11 +290,8 @@
         let newQuery = current.query
         if (current['name'] === 'Landing') {
           vm.$store.commit('setActiveAddQuestion', true)
-          setTimeout (function () {
-            let elmnt = document.getElementById("contentQuestion")
-            elmnt.scrollIntoView()
-          }, 300)
         } else {
+          vm.$store.commit('setActiveAddQuestion', true)
           vm.$router.push({
             path: '/',
             query: {
@@ -147,6 +314,29 @@
         vm.$router.push({
           path: '/'
         })
+      },
+      onResize () {
+        let vm = this
+        let isMobile = window.innerWidth < 1024
+        vm.$store.commit('setIsMobile', isMobile)
+      },
+      convertString(str) {
+        str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
+        str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
+        str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i')
+        str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
+        str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
+        str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
+        str = str.replace(/đ/g, 'd')
+        str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, 'A')
+        str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, 'E')
+        str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, 'I')
+        str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, 'O')
+        str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
+        str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
+        str = str.replace(/Đ/g, 'D')
+        str = str.toLocaleLowerCase().replace(/\s/g, '')
+        return str
       }
     }
   }

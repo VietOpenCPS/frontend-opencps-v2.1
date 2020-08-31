@@ -1,4 +1,5 @@
 module.exports = {
+  productionSourceMap: false,
   runtimeCompiler: true,
   chainWebpack: config => {
     config.module.rule('images').use('url-loader')
@@ -24,3 +25,4 @@ module.exports = {
     }
   }
 }
+// report_charts_v3.,report_charts_motcu

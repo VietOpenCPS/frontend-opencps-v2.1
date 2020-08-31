@@ -3,6 +3,23 @@ import Router from 'vue-router'
 import Home from '@/components/Home'
 import NotFound from '@/components/NotFound'
 import TableEditor from '@/components/screens/TableEditor'
+import TableEditorForm from '@/components/screens/TableEditorForm.vue'
+import QuyTrinhThuTuc from '@/components/extform/QuyTrinhThuTuc.vue'
+import DinhKemThuTuc from '@/components/extform/DinhKemThuTuc.vue'
+import ThamSoHeThong from '@/components/extform/ThamSoHeThong.vue'
+import Voting from '@/components/extform/Voting.vue'
+import MappingTTHC from '@/components/extform/MappingTTHC.vue'
+import ThongKeTruyCap from '@/components/extform/ThongKeTruyCap.vue'
+import SyncAgency from '@/components/extform/SyncAgency.vue'
+import SyncSharingqa from '@/components/extform/SyncSharingqa.vue'
+import SyncStatistics from '@/components/extform/SyncStatistics.vue'
+import RevesionLog from '@/components/extform/RevesionLog.vue'
+import SyncDomain from '@/components/extform/SyncDomain.vue'
+import SoTTSoTheoDoi from '@/components/extform/SoTTSoTheoDoi.vue'
+import Report from '@/components/extform/Report.vue'
+import Import from '@/components/screens/import.vue'
+import Export from '@/components/screens/export.vue'
+import FlowChartView from '@/components/screens/FlowChartView.vue'
 
 const routes = [
   {
@@ -26,7 +43,7 @@ const routes = [
       {
         path: '/table/:tableName/editor/:id',
         name: 'TableEditorForm',
-        component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/TableEditorForm.vue'),
+        component: TableEditorForm,
         props: true,
         meta: {
           requiresAuth: true
@@ -35,7 +52,16 @@ const routes = [
       {
         path: '/table/opencps_serviceprocess/ext/editor/:id',
         name: 'QuyTrinhThuTuc',
-        component: () => import(/* webpackChunkName: "Home" */ '@/components/extform/QuyTrinhThuTuc.vue'),
+        component: QuyTrinhThuTuc,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_services_filetemplates/ext/editor/:id',
+        name: 'DinhKemThuTuc',
+        component: DinhKemThuTuc,
         props: true,
         meta: {
           requiresAuth: true
@@ -44,7 +70,7 @@ const routes = [
       {
         path: '/table/opencps_certnumbers/certnumbers',
         name: 'ThamSoHeThong',
-        component: () => import(/* webpackChunkName: "Home" */ '@/components/extform/ThamSoHeThong.vue'),
+        component: ThamSoHeThong,
         props: true,
         meta: {
           requiresAuth: true
@@ -53,7 +79,88 @@ const routes = [
       {
         path: '/table/opencps_voting/votings',
         name: 'Voting',
-        component: () => import(/* webpackChunkName: "Home" */ '@/components/extform/Voting.vue'),
+        component: Voting,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_mapping/tthc',
+        name: 'MappingTTHC',
+        component: MappingTTHC,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_mapping/domain',
+        name: 'SyncDomain',
+        component: SyncDomain,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_mapping/agency',
+        name: 'SyncAgency',
+        component: SyncAgency,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_mapping/sharingqa',
+        name: 'SyncSharingqa',
+        component: SyncSharingqa,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_stt/stt',
+        name: 'STT',
+        component: SoTTSoTheoDoi,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/sync/statistics',
+        name: 'SyncStatistics',
+        component: SyncStatistics,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/dossierlogs/revesionLog',
+        name: 'RevesionLog',
+        component: RevesionLog,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_config_report/reports',
+        name: 'Report',
+        component: Report,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_statists/statists',
+        name: 'ThongKeTruyCap',
+        component: ThongKeTruyCap,
         props: true,
         meta: {
           requiresAuth: true
@@ -62,7 +169,7 @@ const routes = [
       {
         path: '/table/:tableName/tool_import',
         name: 'Import',
-        component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/import.vue'),
+        component: Import,
         props: true,
         meta: {
           requiresAuth: true
@@ -71,7 +178,7 @@ const routes = [
       {
         path: '/table/:tableName/tool_export',
         name: 'Export',
-        component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/export.vue'),
+        component: Export,
         props: true,
         meta: {
           requiresAuth: true
@@ -80,7 +187,7 @@ const routes = [
       {
         path: '/table/:tableName/flowchart/:id',
         name: 'FlowChartView',
-        component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/FlowChartView.vue'),
+        component: FlowChartView,
         props: true,
         meta: {
           requiresAuth: true

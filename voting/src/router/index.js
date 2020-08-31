@@ -5,7 +5,7 @@ const routes = [
   {
     path: '/',
     name: 'LandingVoting',
-    component: () => import(/* webpackChunkName: "LandingVoting" */ '@/components/screens/Landing.vue'),
+    component: () => import('@/components/screens/Landing.vue'),
     props: true,
     meta: {
       requiresAuth: false
@@ -14,7 +14,7 @@ const routes = [
   {
     path: '/danh-sach-can-bo/:itemCode',
     name: 'Employees',
-    component: () => import(/* webpackChunkName: "Employees" */ '@/components/screens/Employees.vue'),
+    component: () => import('@/components/screens/Employees.vue'),
     props: true,
     meta: {
       requiresAuth: false
@@ -23,7 +23,7 @@ const routes = [
   {
     path: '/danh-sach-can-bo/:itemCode/:id',
     name: 'EmployeeDetail',
-    component: () => import(/* webpackChunkName: "EmployeeDetail" */ '@/components/screens/EmployeeDetail.vue'),
+    component: () => import('@/components/screens/EmployeeDetail.vue'),
     props: true,
     meta: {
       requiresAuth: false
@@ -32,7 +32,7 @@ const routes = [
   {
     path: '*',
     name: 'NotFound',
-    component: () => import(/* webpackChunkName: "NotFound" */ '@/components/NotFound.vue'),
+    component: () => import('@/components/NotFound.vue'),
     props: true,
     meta: {
       requiresAuth: false

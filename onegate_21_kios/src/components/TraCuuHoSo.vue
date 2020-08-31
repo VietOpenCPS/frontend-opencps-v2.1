@@ -1,52 +1,102 @@
 <template>
   <div class="py-0 kios-item">
     <div>
-      <v-card class="pb-2">
-        <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
+      <v-card color="transparent" flat class="pb-2" style="">
+        <!-- <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase;font-size: 1.2em !important;">
           {{agencies[0]['administrationName']}}
-        </h4>
-        <h4 class="py-2 ml-2">
-          <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
+        </h4> -->
+        <h4 class="py-4 ml-2 text-xs-center">
+          <span style="color:#065694;font-size: 1.2em !important;">TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h4>
         <v-layout wrap class="px-0 py-0">
-          <div style="width: calc(100% - 150px)">
+          <div :style="!isMobile ? 'width: calc(100% - 120px)' : 'width: 100%'">
             <v-layout wrap>
-              <v-flex xs6 class="pl-2 pr-3">
-                <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-                  <!-- <label>Mã số hồ sơ</label> -->
-                  <div class="input-group__input">
-                    <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số hồ sơ" placeholder="Nhấn để nhập mã số hồ sơ" type="text">
-                    <i v-if="visible" @click="clear('dossierNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-                  </div>
+              <v-flex xs12 md6 class="px-2">
+                <!-- <v-text-field class="input-border input-search"
+                  label="Mã hồ sơ"
+                  v-model="dossierNoKey"
+                  @keyup.enter="filterDossier"
+                  @click:append="filterDossier"
+                  box
+                ></v-text-field> -->
+                <div class="input-custom">
+                  <input id="dossierNoKey" type="text" @focus="show" @keyup.enter="filterDossier" />
+                  <span class="bar"></span>
+                  <label for="dossierNoKey">Mã hồ sơ</label>
                 </div>
               </v-flex>
-              <v-flex xs6 class="pl-3 pr-2">
-                <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-                  <div class="input-group__input">
-                    <input id="applicantIdNoKey" class="kios-input" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
-                    <i v-if="visible" @click="clear('applicantIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-                  </div>
+              <v-flex xs12 md6 class="px-2" :class="isMobile ? 'mt-3' : ''">
+                <div class="input-custom">
+                  <input id="applicantIdNoKey" type="text" @focus="show" @keyup.enter="filterDossier" />
+                  <span class="bar"></span>
+                  <label for="applicantIdNoKey">Số CMND/ hộ chiếu</label>
                 </div>
               </v-flex>
             </v-layout>
           </div>
-          <div class="text-right" style="width: 150px;margin-top:12px">
+          <div class="text-right px-2" :style="!isMobile ? 'width: 120px' : 'width: 100%'">
             <v-btn color="primary"
               :loading="loadingTable"
               :disabled="loadingTable"
               @click="filterDossier"
-              class="kios-btn"
+              class="kios-btn mx-0 my-0"
+              style="height: 48px !important;"
             >
-              <v-icon size="18">search</v-icon>
+              <v-icon style="font-size: 22px !important;">search</v-icon>
               &nbsp;
-              Tra Cứu
+              Tra cứu
               <span slot="loader">Loading...</span>
             </v-btn>
           </div>
         </v-layout>
-        <v-alert class="mt-5 mx-2" v-if="validateTracuu === false && !activeDetailDossier" :value="true" outline color="orange" icon="priority_high">
-          Nhập thông tin tra cứu
-        </v-alert>
+        <div class="mt-5 mx-2 px-4 py-2" v-if="validateTracuu === false && !activeDetailDossier"
+        style="border: 1px solid #ff9800; border-radius: 5px"
+        >
+          <p class="py-2">
+            <span class="text-bold" style="color:#065694;font-size: 1.2em !important;">HƯỚNG DẪN TRA CỨU THÔNG TIN HỒ SƠ: </span>
+          </p>
+          <div class="layout wrap">
+            <v-flex xs12 md4 class="pr-3">
+              <p style="font-size: 1.2em !important;">
+                <span class="text-bold" style="color:#065694;font-size: 1.2em !important;">Bước 1: </span>
+                <span style="font-size: 1.2em !important;">Nhập vào Mã hồ sơ hoặc Số CMND/Hộ chiếu</span>
+              </p>
+              <p style="font-size: 1.2em !important;">
+                <span class="text-bold" style="color:#065694;font-size: 1.2em !important;">Bước 2: </span>
+                <span style="font-size: 1.2em !important;">Nhấn nút Tra cứu để xem danh sách các hồ sơ</span>
+              </p>
+              <p style="font-size: 1.2em !important;">
+                Ví dụ thông tin cơ bản của mỗi hồ sơ như sau:<br>
+                  - Mã số hồ sơ: 000.00.06.G04.190701.0501<br>
+                  - Người nộp: Nguyễn Văn A<br>
+                  - Ngày nộp: 01/07/2019 15:56:26<br>
+              </p>
+              <p style="font-size: 1.2em !important;">
+                <span class="text-bold" style="color:#065694;font-size: 1.2em !important;">Bước 3: </span>
+                <span style="font-size: 1.2em !important;">Nhấn vào một hồ sơ để xem chi tiết</span>
+              </p>
+              <p style="font-size: 1.2em !important;">
+                <span class="text-bold" style="color:#065694;font-size: 1.2em !important;">Bước 4: </span>
+                <span style="font-size: 1.2em !important;">Nhập mã tra cứu</span>
+              </p>
+            </v-flex>
+            <v-flex xs12 md4 class="px-3">
+              <p style="font-size: 1.2em !important;">
+                <span class="text-bold" style="color:#065694;font-size: 1.2em !important;">Bước 5: </span>
+                <span style="font-size: 1.2em !important;">Nhấn nút Tra cứu để xem chi tiết tình trạng xử lý hồ sơ</span>
+              </p>
+              <p style="font-size: 1.2em !important;">
+                Ví dụ thông tin chi tiết hồ sơ:<br>
+                - Mã hồ sơ: 000.00.06.G04.190701.0501<br>
+                - Cơ quan tiếp nhận: Cơ quan Bộ<br>
+                - Trạng thái: Đang giải quyết thụ lý<br>
+                - Ngày gửi: 01/07/2019 15:56:26<br>
+                - Ngày tiếp nhận: 01/07/2019 15:56:56<br>
+                - Ngày hẹn trả: 08/07/2019 16:00:00<br>
+              </p>
+            </v-flex>
+          </div>
+        </div>
         <!--  -->
         <div class="wrap-scroll wrap-scroll-tabledossier mx-2 mt-4" v-if="validateTracuu === true && !activeDetailDossier" :class="visible ? 'overlayActive': ''" style="position:relative">
           <v-data-table
@@ -103,9 +153,23 @@
         <div class="mx-2 mt-3" v-if="validateTracuu === true && activeDetailDossier">
           <chi-tiet-ho-so :index="dossierDetail.dossierId"></chi-tiet-ho-so>
         </div>
-        <div class="virtual-keyboard" v-if="visible">
+        <div class="virtual-keyboard" v-if="visible && !isMobile">
+          <v-btn small fab color="#383533" @click="visible = false" style="position:absolute;right:0;top:0">
+            <v-icon color="#fff">clear</v-icon>
+          </v-btn>
           <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
         </div>
+        <!-- <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
+          <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
+          <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
+        </v-btn> -->
+        <v-btn class="back-home" fab dark color="primary" @click="goHome"> 
+          <v-icon style="font-size: 24px !important;" class="white--text">home</v-icon>
+        </v-btn>
+        <v-btn class="back-btn" outline large color="primary" @click="goBack" style="width: 120px !important;">
+          <v-icon style="font-size: 24px !important;">reply</v-icon>&nbsp;
+          Quay lại 
+        </v-btn>
       </v-card>
       <v-dialog v-model="dialogError" persistent max-width="290">
         <v-card>
@@ -191,6 +255,12 @@ export default {
     },
     groupIdArr () {
       return this.getGroupIdArr(this.groupIds)
+    },
+    isMobile () {
+      return this.$store.getters.getIsMobile
+    },
+    fullScreen () {
+      return this.$store.getters.getFullScreen
     }
   },
   created () {
@@ -203,15 +273,13 @@ export default {
       vm.$store.commit('setFullScreen', false)
       let current = vm.$router.history.current
       let newQuery = current.query
-      $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
-      $('#applicantIdNoKey').val(newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : '')
-      if (!newQuery.hasOwnProperty('detail') && $('#dossierNoKey').val() === '') {
-        let inputs = document.querySelectorAll('input')
-        inputs[0].focus()
-      }
+      vm.dossierNoKey = newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : ''
+      vm.applicantIdNoKey = newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : ''
+      $('#dossierNoKey').val(vm.dossierNoKey)
+      $('#applicantIdNoKey').val(vm.applicantIdNoKey)
       // $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
       vm.hosoDatasPage = 1
-      if (($('#dossierNoKey').val() !== '' || $('#applicantIdNoKey').val() !== '') && !newQuery.hasOwnProperty('detail') && !newQuery['detail']) {
+      if ((vm.dossierNoKey !== '' || vm.applicantIdNoKey !== '') && !newQuery.hasOwnProperty('detail') && !newQuery['detail']) {
         vm.validateTracuu = true
         vm.doLoadingDataHoSo()
       } else {
@@ -230,11 +298,12 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
-      $('#dossierNoKey').val(currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '')
-      $('#applicantIdNoKey').val(currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '')
-      // $('#applicantNameKey').val(currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : '')
+      vm.dossierNoKey = currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : ''
+      vm.applicantIdNoKey = currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : ''
+      $('#dossierNoKey').val(vm.dossierNoKey)
+      $('#applicantIdNoKey').val(vm.applicantIdNoKey)
       vm.hosoDatasPage = 1
-      if (($('#dossierNoKey').val() || $('#applicantIdNoKey').val()) && !currentQuery.hasOwnProperty('detail') && !currentQuery['detail']) {
+      if ((vm.dossierNoKey || vm.applicantIdNoKey) && !currentQuery.hasOwnProperty('detail') && !currentQuery['detail']) {
         vm.validateTracuu = true
         vm.doLoadingDataHoSo()
       } else {
@@ -246,10 +315,10 @@ export default {
       } else {
         vm.activeDetailDossier = false
       }
-      if (!currentQuery.hasOwnProperty('detail') && $('#dossierNoKey').val() === '') {
-        let inputs = document.querySelectorAll('input')
-        inputs[0].focus()
-      }
+      // if (!currentQuery.hasOwnProperty('detail') && vm.dossierNoKey === '') {
+      //   let inputs = document.querySelectorAll('input')
+      //   inputs[0].focus()
+      // }
     }
   },
   methods: {
@@ -259,50 +328,121 @@ export default {
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
-      newQuery['dossierNo'] = $('#dossierNoKey').val()
-      vm.$store.commit('setDossierNoSearch', $('#dossierNoKey').val())
-      newQuery['applicantIdNo'] = $('#applicantIdNoKey').val()
-      vm.$store.commit('setApplicantIdNoSearch', $('#applicantIdNoKey').val())
-      newQuery['applicantName'] = $('#applicantNameKey').val()
-      newQuery['detail'] = ''
-      for (let key in newQuery) {
-        if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
-          queryString += key + '=' + newQuery[key] + '&'
-        }
-      }
-      if ($('#dossierNoKey').val() || $('#applicantIdNoKey').val() || $('#applicantNameKey').val()) {
-        vm.validateTracuu = true
-        vm.$router.push({
-          path: current.path + queryString,
-          query: {
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+      vm.dossierNoKey = $('#dossierNoKey').val()
+      vm.applicantIdNoKey = $('#applicantIdNoKey').val()
+      if (vm.dossierNoKey.indexOf('D-') < 0) {
+        newQuery['dossierNo'] = vm.dossierNoKey
+        newQuery['applicantIdNo'] = vm.applicantIdNoKey
+        vm.$store.commit('setDossierNoSearch', vm.dossierNoKey)
+        vm.$store.commit('setApplicantIdNoSearch', vm.applicantIdNoKey)
+        newQuery['detail'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+            queryString += key + '=' + newQuery[key] + '&'
           }
+        }
+        if (vm.dossierNoKey || vm.applicantIdNoKey) {
+          vm.validateTracuu = true
+          vm.$router.push({
+            path: current.path + queryString,
+            query: {
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        } else {
+          vm.validateTracuu = false
+        }
+      } else if (vm.dossierNoKey.indexOf('D-') >= 0 && String(vm.dossierNoKey).split('-').length === 3) {
+        console.log('run run run')
+        let filter = {
+          password: String(vm.dossierNoKey).split('-')[1],
+          dossierId: String(vm.dossierNoKey).split('-')[2]
+        }
+        console.log('filter', filter)
+        vm.$store.dispatch('getDossierDetailPass', filter).then(function (result) {
+          if (result.status && result.status.toString() === '203') {
+            vm.dialogError = true
+          } else if (result.status && result.status.toString() === '200') {
+            vm.$store.commit('setDossierDetail', result.data)
+            let queryString = '?detail=true'
+            vm.$router.push({
+              path: '/tra-cuu-ho-so' + queryString
+            })
+          }
+        }).catch(function (reject) {
+          vm.dialogCheckPass = false
+          vm.visible = false
+          vm.loading = false
+          console.log('reject', reject)
         })
-      } else {
-        vm.validateTracuu = false
       }
     },
-    // setFilterKey () {
-    //   var vm = this
-    //   setTimeout(function () {
-    //     let payload = {
-    //       dossierNo: $('#dossierNoKey').val(),
-    //       applicantIdNo: $('#applicantIdNoKey').val(),
-    //       secretCode: vm.filterDossierKey.secretCode ? vm.filterDossierKey.secretCode : ''
-    //     }
-    //     vm.$store.commit('setFilterDossierKey', payload)
-    //     console.log('payloadFilter', vm.$store.getters.getFilterDossierKey)
-    //   }, 200)
-    // },
+    submitPass () {
+      var vm = this
+      if ($('#passCheck').val() !== '') {
+        vm.validPass = true
+        if (vm.targetCheckPass === 'tracuuhoso') {
+          let payload = {
+            dossierNo: vm.filterDossierKey.dossierNo ? vm.filterDossierKey.dossierNo : '',
+            applicantIdNo: vm.filterDossierKey.applicantIdNo ? vm.filterDossierKey.applicantIdNo : '',
+            secretCode: $('#passCheck').val()
+          }
+          vm.$store.commit('setFilterDossierKey', payload)
+          let newQuery = {
+            dossierNo: vm.filterDossierKey.dossierNo,
+            applicantIdNo: vm.filterDossierKey.applicantIdNo
+          }
+          let queryString = '?'
+          for (let key in newQuery) {
+            if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+              queryString += key + '=' + newQuery[key] + '&'
+            }
+          }
+          vm.$router.push({
+            path: '/tra-cuu-ho-so' + queryString,
+            query: {
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        } else {
+          console.log('vm.dossierDetail', vm.dossierDetail)
+          let filter = {
+            password: $('#passCheck').val(),
+            dossierId: vm.dossierDetail.dossierId
+          }
+          vm.$store.dispatch('getDossierDetailPass', filter).then(function (result) {
+            vm.loading = false
+            vm.dialogCheckPass = false
+            vm.clearDialog()
+            if (result.status && result.status.toString() === '203') {
+              vm.dialogError = true
+            } else if (result.status && result.status.toString() === '200') {
+              vm.$store.commit('setDossierDetail', result.data)
+              let queryString = '?dossierNo=' + vm.dossierNoSearch + '&applicantIdNo=' + vm.applicantIdNoSearch + '&detail=true'
+              vm.$router.push({
+                path: '/tra-cuu-ho-so' + queryString
+              })
+            }
+          }).catch(function (reject) {
+            vm.dialogCheckPass = false
+            vm.visible = false
+            vm.loading = false
+            console.log('reject', reject)
+          })
+        }
+      } else {
+        vm.validPass = false
+      }
+    },
     confirmPass () {
       var vm = this
       let payload = {
-        dossierNo: $('#dossierNoKey').val(),
-        applicantIdNo: $('#applicantIdNoKey').val(),
+        dossierNo: vm.dossierNoKey,
+        applicantIdNo: vm.applicantIdNoKey,
         secretCode: vm.filterDossierKey.secretCode ? vm.filterDossierKey.secretCode : ''
       }
       vm.$store.commit('setFilterDossierKey', payload)
-      if ($('#dossierNoKey').val() || $('#applicantIdNoKey').val()) {
+      if (vm.dossierNoKey || vm.applicantIdNoKey) {
         vm.validateTracuu = true
         vm.$router.push({
           path: '/ma-truy-cap',
@@ -318,10 +458,9 @@ export default {
       let vm = this
       vm.dossierList = []
       vm.loadingTable = true
-      let currentQuery = router.history.current.query
+      let currentQuery = vm.$router.history.current.query
       var filter = null
       let groupIds = vm.groupIdArr.length
-      console.log('groupIds', groupIds)
       if (groupIds > 0) {
         let totalRecord = 0
         let count = 0
@@ -397,7 +536,6 @@ export default {
         vm.validPass = true
         vm.loading = true
         let filter = {
-          // password: vm.passCheck ? vm.passCheck : '',
           password: $('#passCheck').val(),
           dossierId: vm.dossierDetail.dossierId
         }
@@ -427,6 +565,13 @@ export default {
         return []
       }
     },
+    changeScreen () {
+      var vm = this
+      vm.$store.commit('setFullScreen', !vm.fullScreen)
+    },
+    goBack () {
+      window.history.back()
+    },
     paggingData (config) {
       let vm = this
       let current = vm.$router.history.current
@@ -449,12 +594,6 @@ export default {
       this.visible = false
     },
     //
-    clear (id) {
-      $(`#${id}`).val('')
-    },
-    accept (text) {
-      this.hide()
-    },
     show (e) {
       this.validPass = true
       this.input = e.target
@@ -471,36 +610,16 @@ export default {
       }
       this.bindClick('view')
     },
-    hide () {
-      this.visible = false
-    },
-    next () {
-      let inputs = document.querySelectorAll('input')
-      let found = false
-      let arr1 = []
-      arr1.forEach.call(inputs, (item, i) => {
-        if (!found && item === this.input && i < inputs.length - 1) {
-          found = true
-          this.$nextTick(() => {
-            inputs[i + 1].focus()
-          })
-        }
-      })
-      if (!found) {
-        this.input.blur()
-        this.hide()
-      }
-    },
     bindClick (type) {
       var vm = this
       setTimeout(function () {
-        $('.keyboard .line:nth-child(2) .key:last-child').unbind('click')
+        $('.keyboard .enter').unbind('click')
         if (type === 'search') {
-          $('.keyboard .line:nth-child(2) .key:last-child').bind('click', function () {
+          $('.keyboard .enter').bind('click', function () {
             vm.filterDossier()
           })
         } else if (type === 'view') {
-          $('.keyboard .line:nth-child(2) .key:last-child').bind('click', function () {
+          $('.keyboard .enter').bind('click', function () {
             vm.submitViewDetail()
           })
         }

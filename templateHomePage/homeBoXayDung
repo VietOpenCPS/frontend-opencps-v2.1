@@ -1,0 +1,810 @@
+// HTML
+<div class="first-section">
+	<div class="mSlide">
+		<div class="slider">
+			<div>
+				<img src="/o/boxaydung-theme/images/slide-1.jpg">
+			</div>
+			<div>
+				<img src="/o/boxaydung-theme/images/slide-2.jpg">
+			</div>
+			<div>
+				<img src="/o/boxaydung-theme/images/slide-3.jpg">
+			</div>
+			<div>
+				<img src="/o/boxaydung-theme/images/slide-4.jpg">
+			</div>
+		</div>
+	</div>
+	<div class="row-wrapper">
+		<div class="left">
+			<div class="mLogo">
+				<img src="/o/boxaydung-theme/images/logo-with-text.png" alt="logo">
+			</div>
+			<div class="group-actions-wrapper">
+				<div class="search-box">
+					<input id="keyword" type="text" placeholder="Tìm kiếm theo mã số hồ sơ">
+					<a class="search_btn" onclick="window.location.href='/web/cong-dich-vu-cong/kios#/tra-cuu-ho-so-homepage?keyword=' + document.getElementById('keyword').value "><i class="fa fa-search"></i></a>
+				</div>
+				<a href="/web/cong-dich-vu-cong/thu-tuc-hanh-chinh#" class="submit-dossier">
+					<span>Nộp hồ sơ trực tuyến</span>
+					<i class="fa fa-upload"></i>
+				</a>
+			</div>
+			<div class="note">* Nhập mã số hồ sơ mà bạn nhận được từ hệ thống hoặc Bộ phận Một cửa</div>
+		</div>
+		<div class="right">
+			<div class="sTitle" id="title-report"></div>
+			<div class="sContent">
+				<div class="recieved">
+					Đã tiếp nhận
+					<span id="count-received">0</span>
+					hồ sơ
+				</div>
+				<div class="solved">
+					Đã giải quyết
+					<span id="count-solved">0</span>
+					hồ sơ
+				</div>
+				<div class="result">
+					<span id="count-percent">0%</span>
+					trong hạn
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="second-section">
+	<div class="left">
+		<!--<a href="/web/cong-dich-vu-cong/khao-sat" class="single-panel">
+			<i class="fa fa-bar-chart"></i>
+			<span>Khảo sát</span>
+		</a>
+		<a href="/web/cong-dich-vu-cong/danh-gia-can-bo" class="single-panel">
+			<i class="fa fa-id-card-o"></i>
+			<span>Đánh giá cán bộ</span>
+		</a>
+		<a href="/web/cong-dich-vu-cong/hoi-dap" class="single-panel">
+			<i class="fa fa-comments-o"></i>
+			<span>Hỏi - Đáp</span>
+		</a>-->
+		<div class="info-wrapper">
+			<div class="sTitle">
+				<span>Hồ sơ đã có kết quả</span>
+			</div>
+			<div class="sContent">
+			  <div class="search-box">
+  				<div class="search">
+  					<input type="text" class="form-control pl-1" placeholder="Nhập mã số hồ sơ/ tên chủ hồ sơ" id="keywordDossier" name="keywordDossier">
+  					<button id="searchDossier" type="button" onclick="getDossierRelease()"><i class="fa fa-search"></i></button>
+  				</div>
+  			</div>
+				<div id="dossierReleased"></div>
+				<!--<div>-->
+				<!--	<label>000.00.12.G17.090102018024</label>-->
+				<!--	TRẦN KHẮC HIẾU <span>(31/10/2018)</span>-->
+				<!--</div>-->
+			</div>
+		</div>
+	</div>
+	<div class="right">
+		<div class="categories">
+			<div class="sTitle">Các lĩnh vực cung cấp dịch vụ công trực tuyến</div>
+			<div class="sContent">
+				<a href="/web/cong-dich-vu-cong/thu-tuc-hanh-chinh#/thu-tuc-hanh-chinh?domain=HDXD" class="box">
+					<img src="/o/boxaydung-theme/images/icon-cat-1.png" class="original">
+					<img src="/o/boxaydung-theme/images/icon-cat-1w.png" class="hover">
+					<span>Hoạt động xây dựng</span>
+				</a>
+				<a href="/web/cong-dich-vu-cong/thu-tuc-hanh-chinh#/thu-tuc-hanh-chinh?domain=KDKTATLD" class="box">
+					<img src="/o/boxaydung-theme/images/icon-cat-2.png" class="original">
+					<img src="/o/boxaydung-theme/images/icon-cat-2w.png" class="hover">
+					<span>Kiểm định - Giám định - Quản lý</span>
+				</a>
+				<a href="/web/cong-dich-vu-cong/thu-tuc-hanh-chinh#/thu-tuc-hanh-chinh?domain=TNCNXD" class="box">
+					<img src="/o/boxaydung-theme/images/icon-cat-3.png" class="original">
+					<img src="/o/boxaydung-theme/images/icon-cat-3w.png" class="hover">
+					<span>Thí nghiệm chuyên ngành XD</span>
+				</a>
+				<a href="/web/cong-dich-vu-cong/thu-tuc-hanh-chinh#/thu-tuc-hanh-chinh?domain=QHKT" class="box">
+					<img src="/o/boxaydung-theme/images/icon-cat-4.png" class="original">
+					<img src="/o/boxaydung-theme/images/icon-cat-4w.png" class="hover">
+					<span>Quy hoạch - Kiến trúc</span>
+				</a>
+				<a href="/web/cong-dich-vu-cong/thu-tuc-hanh-chinh#/thu-tuc-hanh-chinh?domain=PTDT" class="box">
+					<img src="/o/boxaydung-theme/images/icon-cat-5.png" class="original">
+					<img src="/o/boxaydung-theme/images/icon-cat-5w.png" class="hover">
+					<span>Phát triển đô thị</span>
+				</a>
+				<a href="/web/cong-dich-vu-cong/thu-tuc-hanh-chinh#/thu-tuc-hanh-chinh?domain=NO" class="box">
+					<img src="/o/boxaydung-theme/images/icon-cat-6.png" class="original">
+					<img src="/o/boxaydung-theme/images/icon-cat-6w.png" class="hover">
+					<span>Lĩnh vực nhà ở</span>
+				</a>
+			</div>
+		</div>
+		<img src="/o/boxaydung-theme/images/manual-step.jpg" alt="Quy trình các bước" class="manual-steps">
+	</div>
+</div>
+<script>
+  var yearReport = (new Date()).getFullYear()
+var portalUrl = window.themeDisplay.getPortalURL();
+var dossierRelease = []
+$("#title-report").html('TÌNH HÌNH XỬ LÝ HỒ SƠ NĂM ' + yearReport);
+// Data report1
+var dataReport;
+var getReport = function(){
+  $.ajax({
+    url: '/o/rest/statistics?domain=total&agency=total&month=0&year=' + yearReport,
+    dataType: 'json',
+    type: 'GET',
+    async: false,
+    headers: {
+      'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId(): ''
+    },
+    success: function (result) {
+      if (result.data) {
+        dataReport = result.data;
+        $('#count-percent').html(dataReport[0].ontimePercentage+"%")
+        $('#count-received').html(dataReport[0].receivedCount);
+        $('#count-solved').html(dataReport[0].releaseCount);
+      }
+    },
+    error: function (xhr) {
+      
+    }
+  })
+
+};
+getReport();
+// Hồ sơ có kết quả
+$("#keywordDossier").keyup(function(event) {
+	if (event.keyCode === 13) {
+		event.preventDefault();
+		$("#searchDossier").click();
+	}
+});
+function getDossierRelease () {
+    $.ajax({
+      url: '/o/rest/v2/dossiers?step=300,310,400&keyword=' + $('#keywordDossier').val(),
+      dataType: 'json',
+      type: 'GET',
+      async: false,
+      headers: {
+        'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId(): ''
+      },
+      success: function (result) {
+    		if (result.data) {
+  				dossierRelease = result.data
+    		}
+    		renderListDossier()
+      },
+      error: function (xhr) {
+      }
+    })
+  }
+  function renderListDossier () {
+    var htmlList = ""
+  	var htmlWrap = ""
+    for (var i = 0; i < dossierRelease.length; i++) {
+    	htmlList += '<li><b>' + dossierRelease[i]['dossierNo'] + '</b> - <span>' + dossierRelease[i]['applicantName'] + '</span> - (' + dossierRelease[i]['releaseDate'].split(' ')[0] + ')</li>'
+  	}
+  	if (dossierRelease.length > 10) {
+  		htmlWrap = '<ul>' + htmlList + '</ul>'
+  	} else if (dossierRelease.length === 0) {
+  		htmlWrap = '<div class="lContent"><div style="color: #0072bc;text-transform: none;">Không có hồ sơ nào</div></div>'
+  	} else {
+  	  htmlWrap = '<ul class="lContent">' + htmlList + '</ul>'
+  	}
+    $('#dossierReleased').html(htmlWrap)
+  }
+  getDossierRelease()
+</script>
+
+
+/// CSS
+
+.first-section {
+	position: relative;
+	height: 400px;
+	margin-bottom: 45px;
+}
+.first-section .mSlide {
+	clip-path: ellipse(80% 400px at 50% 0%);
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 400px;
+}
+.first-section .mSlide .slick-slider {
+	height: auto;
+}
+.first-section .mSlide .slick-dots {
+	bottom: 25px;
+}
+.first-section .mSlide li {
+	margin: 0 2px;
+}
+.first-section .mSlide .slick-dots button:before {
+	opacity: 1;
+	content: "\f10c";
+	color: white;
+	font-family: FontAwesome;
+	font-size: 12px;
+}
+.first-section .mSlide .slick-dots li.slick-active button:before {
+	content: "\f111";
+}
+.first-section .row-wrapper {
+	width: 1300px;
+	margin: auto;
+	position: relative;
+    padding-top: 45px;
+    display: -webkit-box;
+    display: flex;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+}
+.first-section .right {
+	width: 360px;
+	padding: 15px;
+	text-transform: uppercase;
+	text-align: center;
+	position: relative;
+}
+.first-section .right:before {
+	content: "";
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	background-color: #0072bc;
+	mix-blend-mode: multiply;
+}
+.first-section .right .sTitle {
+	color: #6dcff6;
+	border-bottom: 1px solid #6dcff6;
+	padding-bottom: 15px;
+	font-weight: bold;
+	position: relative;
+}
+.first-section .right .sContent {
+	color: white;
+	position: relative;
+	display: -webkit-box;
+	display: flex;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+	-webkit-justify-content: space-around;
+    justify-content: space-around;
+}
+.first-section .right span {
+	font-size: 30px;
+	font-weight: bold;
+	line-height: 50px;
+	display: block;
+}
+.first-section .right .recieved, 
+.first-section .right .solved {
+	display: inline-block;
+	margin: 15px 0;
+}
+.first-section .right .result {
+	width: 100%;
+}
+.first-section .group-actions-wrapper {
+	margin: 30px 0 15px;
+}
+.first-section .group-actions-wrapper .search-box {
+	position: relative;
+	display: inline-block;
+}
+.first-section .group-actions-wrapper .search-box input {
+	width: 425px;
+	height: 50px;
+	padding-left: 20px;
+	border: 0;
+	outline: 0;
+	background-color: white;
+}
+.first-section .group-actions-wrapper .search-box a {
+	position: absolute;
+    right: 15px;
+    top: 7px;
+    display: inline-block;
+    padding: 5px 20px;
+    color: white;
+    background-color: #0072bc;
+    border-radius: 20px;
+    font-size: 18px;
+}
+.first-section .group-actions-wrapper .submit-dossier {
+	display: inline-block;
+	padding: 10px 25px;
+	background-color: white;
+	color: #0072bc;
+	border-radius: 20px;
+	margin-left: 15px;
+}
+.first-section .group-actions-wrapper .submit-dossier i {
+	margin-left: 5px;
+}
+.first-section .group-actions-wrapper .submit-dossier:hover {
+	color: white;
+	background-color: #0072bc;
+}
+.note {
+	text-shadow: -1px -1px 0 #00426d,  
+			     1px -1px 0 #00426d,
+			     -1px 1px 0 #00426d,
+			     1px 1px 0 #00426d;
+	color: white;
+	max-width: 75%;
+}
+
+@media screen and (min-width: 1367px) {
+	.first-section .mSlide {
+		clip-path: ellipse(65% 400px at 50% 0%);
+	}
+}
+
+.second-section {
+	width: 1300px;
+	margin: auto;
+	position: relative;
+	margin-bottom: 30px;
+    display: -webkit-box;
+    display: flex;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+}
+.second-section .left {
+	width: 300px;
+}
+.second-section .single-panel {
+	background-color: #f6f6f6;
+	border-bottom: 2px solid #0072bc;
+	color: #0072bc;
+	padding: 15px;
+	margin-bottom: 15px;
+	font-weight: bold;
+	display: block;
+	-webkit-transform: perspective(1px) translateZ(0);
+    transform: perspective(1px) translateZ(0);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+    position: relative;
+    -webkit-transition-property: color;
+    transition-property: color;
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+}
+.second-section .single-panel:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #0072bc;
+    -webkit-transform: scaleY(0);
+    transform: scaleY(0);
+    -webkit-transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
+    -webkit-transition-property: transform;
+    transition-property: transform;
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -webkit-transition-timing-function: ease-out;
+    transition-timing-function: ease-out;
+}
+.second-section .single-panel:hover {
+	color: white;
+}
+.second-section .single-panel:hover:before {
+	-webkit-transform: scaleY(1);
+    transform: scaleY(1);
+}
+.second-section .single-panel i {
+	margin-right: 10px;
+}
+.second-section .info-wrapper {
+	background-color: #f6f6f6;
+	padding: 15px 10px;
+}
+.second-section .info-wrapper .sTitle {
+	padding-bottom: 10px;
+	border-bottom: 1px solid #0072bc;
+	background: url("/o/boxaydung-theme/images/icon-info-box-home.png") right 10px top 2px no-repeat;
+}
+.second-section .info-wrapper .sContent > div {
+	margin-top: 10px;
+	text-transform: uppercase;
+}
+.second-section .info-wrapper .sContent label {
+	font-weight: bold;
+	display: block;
+	text-transform: none;
+	margin: 0;
+}
+.second-section .info-wrapper .sContent span {
+	color: #ed1c24;
+	text-transform: none;
+}
+.second-section .right {
+	width: 955px;
+}
+.second-section .sTitle {
+	font-size: 16px;
+	color: #0072bc;
+	text-transform: uppercase;
+	font-weight: bold;
+}
+.second-section .categories .sTitle {
+	margin-top: 13px;
+}
+.second-section .right > img {
+	display: block;
+	width: 100%;
+	margin-top: 50px;
+}
+.second-section .categories .sContent {
+	display: -webkit-box;
+    display: flex;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+	-webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+.second-section .categories .box {
+	background-size: 100% 100%;
+	width: 307px;
+	height: 67px;
+	margin-top: 30px;
+	display: -webkit-box;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    box-shadow: 0 0 5px 2px rgba(0,0,0,0.2);
+    border-radius: 60px 0;
+}
+.second-section .categories .box:hover {
+	background-color: #0072bc;
+	color: white;
+}
+.second-section .categories .box:hover img.original, 
+.second-section .categories .box img.hover {
+    display: none;
+}
+.second-section .categories .box:hover img.hover {
+    display: inline-block;
+}
+.second-section .categories .box span {
+	margin-left: 10px;
+}
+.second-section .categories .box img {
+	margin-left: 30px;
+}
+.search_btn {
+  cursor: pointer;
+}
+.second-section .search-box {
+	position: relative;
+	display: inline-block;
+	width: 100%;
+}
+.second-section .search-box input {
+	background-color: transparent;
+  border: 1px solid #0072bc;
+  border-radius: 4px;
+  width: 100%;
+  height: 34px;
+}
+.second-section .search-box .search button {
+	width: 34px;
+  height: 34px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #0072bc;
+  line-height: 0;
+  font-size: 18px;
+  background-color: transparent;
+  border: 0;
+}
+#dossierReleased {
+	color: #0072bc;
+	background-color: #f8f8f8;
+	overflow: hidden;
+}
+.mContent {
+	height: 375px;
+	animation: marquee 30s linear infinite
+}
+
+@keyframes marquee {
+    0%   { transform: translate(0, 100%); }
+    100% { transform: translate(0, -100%); }
+}
+
+/// JS
+
+(function($) {
+
+$.fn.scrollbox = function(config) {
+  //default config
+  var defConfig = {
+    linear: false,          // Scroll method
+    startDelay: 2,          // Start delay (in seconds)
+    delay: 3,               // Delay after each scroll event (in seconds)
+    step: 5,                // Distance of each single step (in pixels)
+    speed: 32,              // Delay after each single step (in milliseconds)
+    switchItems: 1,         // Items to switch after each scroll event
+    direction: 'vertical',
+    distance: 'auto',
+    autoPlay: true,
+    onMouseOverPause: true,
+    paused: false,
+    queue: null,
+    listElement: 'ul',
+    listItemElement:'li',
+    infiniteLoop: true,     // Infinite loop or not
+    switchAmount: 0,        // Give a number if you don't want to have infinite loop
+    afterForward: null,     // Callback function after each forward action
+    afterBackward: null,    // Callback function after each backward action
+    triggerStackable: false // Allow triggers when action is not finish yet
+  };
+  config = $.extend(defConfig, config);
+  config.scrollOffset = config.direction === 'vertical' ? 'scrollTop' : 'scrollLeft';
+  if (config.queue) {
+    config.queue = $('#' + config.queue);
+  }
+
+  return this.each(function() {
+    var container = $(this),
+        containerUL,
+        scrollingId = null,
+        nextScrollId = null,
+        paused = false,
+        releaseStack,
+        backward,
+        forward,
+        resetClock,
+        scrollForward,
+        scrollBackward,
+        forwardHover,
+        pauseHover,
+        switchCount = 0,
+        stackedTriggerIndex = 0;
+
+    if (config.onMouseOverPause) {
+      container.bind('mouseover', function() { paused = true; });
+      container.bind('mouseout', function() { paused = false; });
+    }
+    containerUL = container.children(config.listElement + ':first-child');
+
+    // init default switchAmount
+    if (config.infiniteLoop === false && config.switchAmount === 0) {
+      config.switchAmount = containerUL.children().length;
+    }
+
+    scrollForward = function() {
+      if (paused) {
+        return;
+      }
+      var curLi,
+          i,
+          newScrollOffset,
+          scrollDistance,
+          theStep;
+
+      curLi = containerUL.children(config.listItemElement + ':first-child');
+
+      scrollDistance = config.distance !== 'auto' ? config.distance :
+        config.direction === 'vertical' ? curLi.outerHeight(true) : curLi.outerWidth(true);
+
+      // offset
+      if (!config.linear) {
+        theStep = Math.max(3, parseInt((scrollDistance - container[0][config.scrollOffset]) * 0.3, 10));
+        newScrollOffset = Math.min(container[0][config.scrollOffset] + theStep, scrollDistance);
+      } else {
+        newScrollOffset = Math.min(container[0][config.scrollOffset] + config.step, scrollDistance);
+      }
+      container[0][config.scrollOffset] = newScrollOffset;
+
+      if (newScrollOffset >= scrollDistance) {
+        for (i = 0; i < config.switchItems; i++) {
+          if (config.queue && config.queue.find(config.listItemElement).length > 0) {
+            containerUL.append(config.queue.find(config.listItemElement)[0]);
+            containerUL.children(config.listItemElement + ':first-child').remove();
+          } else {
+            containerUL.append(containerUL.children(config.listItemElement + ':first-child'));
+          }
+          ++switchCount;
+        }
+        container[0][config.scrollOffset] = 0;
+        clearInterval(scrollingId);
+        scrollingId = null;
+
+        if ($.isFunction(config.afterForward)) {
+          config.afterForward.call(container, {
+            switchCount: switchCount,
+            currentFirstChild: containerUL.children(config.listItemElement + ':first-child')
+          });
+        }
+        if (config.triggerStackable && stackedTriggerIndex !== 0) {
+          releaseStack();
+          return;
+        }
+        if (config.infiniteLoop === false && switchCount >= config.switchAmount) {
+          return;
+        }
+        if (config.autoPlay) {
+          nextScrollId = setTimeout(forward, config.delay * 1000);
+        }
+      }
+    };
+
+    // Backward
+    // 1. If forwarding, then reverse
+    // 2. If stoping, then backward once
+    scrollBackward = function() {
+      if (paused) {
+        return;
+      }
+      var curLi,
+          i,
+          newScrollOffset,
+          scrollDistance,
+          theStep;
+
+      // init
+      if (container[0][config.scrollOffset] === 0) {
+        for (i = 0; i < config.switchItems; i++) {
+          containerUL.children(config.listItemElement + ':last-child').insertBefore(containerUL.children(config.listItemElement+':first-child'));
+        }
+
+        curLi = containerUL.children(config.listItemElement + ':first-child');
+        scrollDistance = config.distance !== 'auto' ?
+            config.distance :
+            config.direction === 'vertical' ? curLi.height() : curLi.width();
+        container[0][config.scrollOffset] = scrollDistance;
+      }
+
+      // new offset
+      if (!config.linear) {
+        theStep = Math.max(3, parseInt(container[0][config.scrollOffset] * 0.3, 10));
+        newScrollOffset = Math.max(container[0][config.scrollOffset] - theStep, 0);
+      } else {
+        newScrollOffset = Math.max(container[0][config.scrollOffset] - config.step, 0);
+      }
+      container[0][config.scrollOffset] = newScrollOffset;
+
+      if (newScrollOffset === 0) {
+        --switchCount;
+        clearInterval(scrollingId);
+        scrollingId = null;
+
+        if ($.isFunction(config.afterBackward)) {
+          config.afterBackward.call(container, {
+            switchCount: switchCount,
+            currentFirstChild: containerUL.children(config.listItemElement + ':first-child')
+          });
+        }
+        if (config.triggerStackable && stackedTriggerIndex !== 0) {
+          releaseStack();
+          return;
+        }
+        if (config.autoPlay) {
+          nextScrollId = setTimeout(forward, config.delay * 1000);
+        }
+      }
+    };
+
+    releaseStack = function () {
+      if (stackedTriggerIndex === 0) {
+        return;
+      }
+      if (stackedTriggerIndex > 0) {
+        stackedTriggerIndex--;
+        nextScrollId = setTimeout(forward, 0);
+      } else {
+        stackedTriggerIndex++;
+        nextScrollId = setTimeout(backward, 0);
+      }
+    };
+
+    forward = function() {
+      clearInterval(scrollingId);
+      scrollingId = setInterval(scrollForward, config.speed);
+    };
+
+    backward = function() {
+      clearInterval(scrollingId);
+      scrollingId = setInterval(scrollBackward, config.speed);
+    };
+
+    // Implements mouseover function.
+    forwardHover = function() {
+        config.autoPlay = true;
+        paused = false;
+        clearInterval(scrollingId);
+        scrollingId = setInterval(scrollForward, config.speed);
+    };
+    pauseHover = function() {
+        paused = true;
+    };
+
+    resetClock = function(delay) {
+      config.delay = delay || config.delay;
+      clearTimeout(nextScrollId);
+      if (config.autoPlay) {
+        nextScrollId = setTimeout(forward, config.delay * 1000);
+      }
+    };
+
+    if (config.autoPlay) {
+      nextScrollId = setTimeout(forward, config.startDelay * 1000);
+    }
+
+    // bind events for container
+    container.bind('resetClock', function(delay) { resetClock(delay); });
+    container.bind('forward', function() {
+      if (config.triggerStackable) {
+        if (scrollingId !== null) {
+          stackedTriggerIndex++;
+        } else {
+          forward();
+        }
+      } else {
+        clearTimeout(nextScrollId);
+        forward();
+      }
+    });
+    container.bind('backward', function() {
+      if (config.triggerStackable) {
+        if (scrollingId !== null) {
+          stackedTriggerIndex--;
+        } else {
+          backward();
+        }
+      } else {
+        clearTimeout(nextScrollId);
+        backward();
+      }
+    });
+    container.bind('pauseHover', function() { pauseHover(); });
+    container.bind('forwardHover', function() { forwardHover(); });
+    container.bind('speedUp', function(event, speed) {
+      if (speed === 'undefined') {
+        speed = Math.max(1, parseInt(config.speed / 2, 10));
+      }
+      config.speed = speed;
+    });
+
+    container.bind('speedDown', function(event, speed) {
+      if (speed === 'undefined') {
+        speed = config.speed * 2;
+      }
+      config.speed = speed;
+    });
+
+    container.bind('updateConfig', function (event, options) {
+        config = $.extend(config, options);
+    });
+
+  });
+};
+$('#dossierReleased').scrollbox({switchItems: 3,});
+}(jQuery));
+
+$('.mSlide .slider').slick({
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  dots: true,
+  arrows: false,
+  autoplay: true
+});
