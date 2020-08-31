@@ -464,7 +464,7 @@
       </v-flex>
     </v-layout>
 
-    <v-dialog v-model="dialogServiceInfo" max-width="1300" transition="fade-transition">
+    <v-dialog v-model="dialogServiceInfo" fullscreen hide-overlay transition="fade-transition">
       <v-card flat>
         <v-toolbar flat dark color="primary">
           <v-toolbar-title>THỦ TỤC HÀNH CHÍNH MỨC ĐỘ {{levelFilter}}</v-toolbar-title>
@@ -475,7 +475,9 @@
         </v-toolbar>
         <v-card-text class="pt-0 pb-0 px-0">
           <div class="mb-3">
+            <v-progress-linear v-if="loadingService" :indeterminate="true"></v-progress-linear>
             <v-data-table
+              v-else
               :headers="headersThuTuc"
               :items="serviceInfoList"
               hide-actions
@@ -498,7 +500,7 @@
               <template slot="items" slot-scope="props">
                 <tr style="cursor: pointer">
                   <td class="text-xs-center" width="50px" style="height: 40px !important">
-                    <span>{{hosoDatasPage * numberPerPageAddDossier - numberPerPageAddDossier + props.index + 1}}</span>
+                    <span>{{thutucPage * 15 - 15 + props.index + 1}}</span>
                   </td>
                   <td class="text-xs-left" width="150px" style="height: 40px !important">
                     {{ props.item.serviceCodeDVCQG ? props.item.serviceCodeDVCQG : props.item.serviceCode }}
@@ -515,7 +517,7 @@
             </v-data-table>
 
             <div class="text-xs-right layout wrap" style="position: relative;">
-              <div class="flex pagging-table px-2"> 
+              <div class="flex pagging-table px-2 mt-2"> 
                 <tiny-pagination :total="totalThuTuc" :page="thutucPage" custom-class="custom-tiny-class" 
                  @tiny:change-page="paggingData" ></tiny-pagination> 
               </div>
@@ -772,6 +774,7 @@ export default {
     thutucPage: 1,
     dialogServiceInfo: false,
     levelFilter: '',
+    loadingService: false,
     headersThuTuc: [
       {
         text: 'STT',
@@ -898,7 +901,9 @@ export default {
         },
         params: paramGet
       }
+      vm.loadingService = true
       axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
+        vm.loadingService = false
         let serializable = response.data
         if (serializable.data) {
           vm.serviceInfoList = serializable.data
@@ -908,6 +913,7 @@ export default {
           vm.serviceInfoList = []
         }
       }).catch(function (error) {
+        vm.loadingService = false
         vm.totalThuTuc = 0
         vm.serviceInfoList = []
       })
