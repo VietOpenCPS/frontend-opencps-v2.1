@@ -72,15 +72,13 @@
                   min-width="290px"
                 >
                   <v-text-field
-                    :rules="[rules.required]"
+                    :rules="[rules.required, rules.birthDate]"
                     box
-                    style="pointer-events:none"
                     slot="activator"
                     v-model="applicantIdDateFormatted"
                     append-icon="event"
                     @blur="date = parseDate(applicantIdDateFormatted)"
                     placeholder="dd/mm/yyyy"
-                    :mask="maskDate"
                   ></v-text-field>
                   <v-date-picker min="1950-01-01" :max="getMaxdate()" ref="picker"
                   :first-day-of-week="1" locale="vi" v-model="date" no-title @input="menuApplicantIdDate = false"></v-date-picker>
@@ -323,6 +321,14 @@ export default {
         const pattern = /^0([1-9]{1}\d{8})$/
         if (value) {
           return pattern.test(value) || 'Số điện thoại gồm 10 ký tự 0-9, eg: 0989123456, ...'
+        } else {
+          return []
+        }
+      },
+      birthDate: (value) => {
+        const pattern = /^(0[1-9]|[12][0-9]|3[01])(0[1-9]|1[012])(19|20)\d\d$/
+        if (value) {
+          return pattern.test(value) || 'Ngày tháng năm không hợp lệ, eg: 31/11/1990, ...'
         } else {
           return []
         }
@@ -584,8 +590,12 @@ export default {
     },
     parseDate (date) {
       if (!date) return null
-      const [day, month, year] = date.split('/')
-      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      // const [day, month, year] = date.split('/')
+      // return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      let day = date.slice(0, 2)
+      let month = date.slice(2, 4)
+      let year = date.slice(4, 8)
+      return year + '-' + month + '-' + day
     },
     getMaxdate () {
       let date = new Date()

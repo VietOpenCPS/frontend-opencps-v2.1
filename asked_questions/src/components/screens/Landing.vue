@@ -111,7 +111,7 @@
                 <v-icon slot="actions" color="primary" style="position:absolute;right:5px;top:10px" @click="getAnswers(itemQuestion, indexQuestion)">$vuetify.icons.expand</v-icon>
                 <div class="ml-2" slot="header" @click="getAnswers(itemQuestion, indexQuestion)">
                   <span class="text-bold primary--text">Câu hỏi {{questionPage * 20 - 20 + indexQuestion + 1}}: </span>
-                  <div class="primary--text" v-html="String(itemQuestion.content).replace(/\<img/g, '')"></div>
+                  <div class="primary--text" v-html="String(itemQuestion.content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
                 </div>
                 <div v-if="itemQuestion['loading']">
                   <content-placeholders class="mt-3">
@@ -131,7 +131,7 @@
                       >
                         <div>
                           <div style="position:relative">
-                            <div class="" v-html="String(itemAnswer.content).replace(/\<img/g, '')"></div>
+                            <div class="" v-html="String(itemAnswer.content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
                             <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:18px;top:-15px">
                               <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
                                 <v-icon>settings</v-icon>

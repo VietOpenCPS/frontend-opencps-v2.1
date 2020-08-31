@@ -696,8 +696,19 @@
           colAlignments.push(columns[key]['colAlignments'])
         }
         vm.columnsDataFilter = columns
+        let dataEnCode = vm.dataSocket['tableData']
+        if (dataEnCode.length > 0) {
+          for (let key in dataEnCode) {
+            if (dataEnCode[key].length > 0) {
+              for (let index in dataEnCode[key]) {
+                dataEnCode[key][index] = String(dataEnCode[key][index]).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')
+              }
+            }
+          }
+        }
+        
         window.$('#table_database_' + vm.tableName).jexcel({
-          data: vm.dataSocket['tableData'],
+          data: dataEnCode,
           colHeaders: objectConfig.headersName,
           colWidths: colWidths,
           colAlignments: colAlignments,
