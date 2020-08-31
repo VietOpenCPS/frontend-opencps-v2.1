@@ -127,11 +127,11 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let configs = {
             headers: {
-              // 'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
+              'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
             },
           }
           let dataPostApplicant = new URLSearchParams()
-          dataPostApplicant.append('Authorization', 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']))
+          // dataPostApplicant.append('Authorization', 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']))
           if (filter.j_captcha_response) {
             dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
           }

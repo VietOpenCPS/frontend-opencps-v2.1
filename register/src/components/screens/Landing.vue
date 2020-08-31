@@ -79,6 +79,7 @@
                     append-icon="event"
                     @blur="date = parseDate(applicantIdDateFormatted)"
                     placeholder="dd/mm/yyyy"
+                    mask="##/##/####"
                   ></v-text-field>
                   <v-date-picker min="1950-01-01" :max="getMaxdate()" ref="picker"
                   :first-day-of-week="1" locale="vi" v-model="date" no-title @input="menuApplicantIdDate = false"></v-date-picker>
@@ -455,7 +456,7 @@ export default {
         applicantName: vm.applicantName,
         applicantType: vm.applicantType === '1' ? 'citizen' : (vm.applicantType === '2' ? 'business' : 'organization'),
         applicantIdNo: vm.applicantIdNo,
-        applicantIdNoDate: vm.applicantIdDateFormatted,
+        applicantIdNoDate: String(vm.applicantIdDateFormatted).indexOf('/') > 0 ? vm.applicantIdDateFormatted : vm.formatDateCreate(vm.applicantIdDateFormatted),
         contactTelNo: vm.contactTelNo,
         contactEmail: vm.contactEmail,
         password: vm.passWord,
@@ -596,6 +597,15 @@ export default {
       let month = date.slice(2, 4)
       let year = date.slice(4, 8)
       return year + '-' + month + '-' + day
+    },
+    formatDateCreate (date) {
+      if (!date) return null
+      // const [day, month, year] = date.split('/')
+      // return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      let day = date.slice(0, 2)
+      let month = date.slice(2, 4)
+      let year = date.slice(4, 8)
+      return day + '/' + month + '/' + year
     },
     getMaxdate () {
       let date = new Date()
