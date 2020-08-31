@@ -275,6 +275,8 @@ export const store = new Vuex.Store({
           dataPostApplicant.append('contactTelNo', data.contactTelNo)
           dataPostApplicant.append('password', data.password)
           dataPostApplicant.append('j_captcha_response', data.j_captcha_response)
+          // dataPostApplicant.append('Authorization', 'BASIC ' + window.btoa(data['contactEmail'] + ":" + data['password']))
+
           console.log('dataPostApplicant', dataPostApplicant)
           // test local
           // axios.post('/o/rest/v2/applicants/lgsp/withcaptcha', dataPostApplicant, configs).then(function (response) {

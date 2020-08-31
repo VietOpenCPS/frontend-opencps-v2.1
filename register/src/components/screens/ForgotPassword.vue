@@ -112,6 +112,7 @@ export default {
           }
         }
         let dataPostApplicant = new URLSearchParams()
+        // dataPostApplicant.append('Authorization', 'BASIC ' + window.btoa(vm.confirmCode + ":0"))
         axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
           if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha' && response.data !== "lockout" && (response.data === 'pending' || response.data === 'verify')) {
             vm.loading = false

@@ -248,11 +248,14 @@ export default {
     },
     goToDangNhap() {
       let vm = this;
-      axios.post('/o/v1/opencps/login', {}, {
+      let configs = {
         headers: {
-          Authorization: 'BASIC ' + window.btoa(vm.userName + ':' + vm.passWord)
-        }
-      }).then(function(response) {
+          'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
+        },
+      }
+      let dataPostApplicant = new URLSearchParams()
+      // dataPostApplicant.append('Authorization', 'BASIC ' + window.btoa(vm.userName + ':' + vm.passWord))
+      axios.post('/o/v1/opencps/login', dataPostApplicant,configs).then(function(response) {
         if (
           response.data !== '' &&
           response.data !== 'ok' &&
