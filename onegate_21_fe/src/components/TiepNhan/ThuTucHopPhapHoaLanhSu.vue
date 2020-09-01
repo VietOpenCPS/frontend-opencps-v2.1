@@ -984,7 +984,7 @@ export default {
             if(vm.formCode==='UPDATE'){
                 vm.getDetail()
             } else {
-                vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [],  'totalRecord': 0, })
+                vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [],  'totalRecord': 0, 'ma_to_khai':[] })
                 vm.getThanhPhan()
                 // vm.genDueDate()
                 if(vm.eFormCode){
@@ -1491,6 +1491,10 @@ export default {
                 if(Object.keys(res.data).length !== 0 && res.data.constructor === Object){
                     if(Array.isArray(res.data.list_giay_to) && res.data.list_giay_to.length){
                         vm.eFormCodeArr.push(vm.eFormCode)
+                        let metaData = JSON.parse(vm.dossiers['metaData'])
+                        metaData['ma_to_khai'].push(vm.eFormCode)
+                        vm.dossiers['metaData'] = JSON.stringify(metaData)
+                        vm.eFormCode = ''
                         // if(res.data.bookingName) {
                         //     vm.dossiers.delegateName = res.data.bookingName
                         //     vm.dossiers.applicantName = res.data.bookingName
