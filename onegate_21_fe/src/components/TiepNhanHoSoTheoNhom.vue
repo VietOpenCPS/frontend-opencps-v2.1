@@ -360,6 +360,7 @@
           <v-btn flat class="" 
             :loading="loadingAction"
             :disabled="loadingAction || dossiersCounterIntoGroupFilter === 0"
+            :style="dossiersCounterIntoGroupFilter === 0 ? 'pointer-events: none;' : ''"
           >
             <v-icon size="20">save</v-icon>  &nbsp;
             <span>Lưu và gửi công văn</span>

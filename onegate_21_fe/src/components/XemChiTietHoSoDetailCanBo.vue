@@ -1264,7 +1264,7 @@ export default {
         vm.getNextActions()
         vm.getPreAction()
         if (resultDossier['dossierSubStatus']) {
-          vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result => {
+           vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result => {
             vm.btnStepsDynamics = result
             if (vm.btnStepsDynamics.length > 0) {
               vm.btnStepsDynamics = vm.btnStepsDynamics.filter(function (item) {
@@ -1278,6 +1278,8 @@ export default {
             }
             
           })
+        } else {
+          vm.showMenuActionKhac = false
         }
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'done') {
           vm.activeTab2 = 'tabs-1b'

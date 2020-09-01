@@ -2678,19 +2678,7 @@ export default {
       }
       if (isGroup) {
         vm.countSelected = 0
-        if (vm.selectedDoAction.length === 1) {
-          for (let key in vm.selectedDoAction) {
-            let actionDossierItem = vm.selectedDoAction[key]
-           vm.$router.push({
-              path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + actionDossierItem['dossierId'],
-              query: {
-                activeTab: 'tabs-1',
-                btnIndex: null
-              }
-            })
-            // vm.processAction(actionDossierItem, item, result, key, false)
-          }
-        } else if (vm.selectedDoAction.length > 1) {
+        if (vm.selectedDoAction.length > 0) {
           // console.log('run doActions Landing')
           vm.$store.dispatch('loadActionActive', item).then(function () {
             vm.$store.dispatch('loadDossierSelected', vm.selectedDoAction).then(function () {

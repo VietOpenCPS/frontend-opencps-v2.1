@@ -427,6 +427,10 @@
         }
       } catch (error) {
       }
+      try {
+        vm.metaData = JSON.parse(vm.detailDossier['metaData'])
+      } catch (error) {
+      }
     },
     mounted() {
       var vm = this

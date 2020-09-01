@@ -82,8 +82,8 @@
                       :items="agencyListXuLyThuTuc"
                       v-model="agencyXuLyThuTuc"
                       label="Chọn đơn vị"
-                      item-text="domainName"
-                      item-value="domainCode"
+                      item-text="itemName"
+                      item-value="itemCode"
                       :hide-selected="true"
                       @change="changeAgencyXuLy"
                       box

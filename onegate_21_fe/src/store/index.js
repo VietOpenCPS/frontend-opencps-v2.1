@@ -3484,7 +3484,8 @@ export const store = new Vuex.Store({
             end: filter.end ? filter.end : 10,
             keyword: filter.keyword ? filter.keyword.replace(/[!@#$%^&*(),?":{}|<>]/g, '') : '',
             level: filter.level ? filter.level : 0,
-            domain: filter.domain ? filter.domain : ''
+            domain: filter.domain ? filter.domain : '',
+            agency: filter.agency ? filter.agency : ''
           }
 
           if (filter.domain) {
