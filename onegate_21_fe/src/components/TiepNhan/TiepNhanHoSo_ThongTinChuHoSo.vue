@@ -21,7 +21,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span v-if="requiredOptions['applicantIdNo']" style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span v-if="requiredOptions['applicantIdNo'] || originality === 1" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2 style="position:relative">
                       <v-text-field
@@ -723,21 +723,21 @@ export default {
     checkDelegateIdNo: false,
     checkApplicantId: false,
     requiredOptions: {
-      applicantIdNo: true,
+      applicantIdNo: false,
       applicantName: true,
       address: true,
       cityCode: true,
       districtCode: true,
       wardCode: true,
-      contactTelNo: true,
+      contactTelNo: false,
       contactEmail: false,
-      delegateIdNo: true,
-      delegateName: true,
-      delegateAddress: true,
-      delegateCityCode: true,
-      delegateDistrictCode: true,
-      delegateWardCode: true,
-      delegateTelNo: true,
+      delegateIdNo: false,
+      delegateName: false,
+      delegateAddress: false,
+      delegateCityCode: false,
+      delegateDistrictCode: false,
+      delegateWardCode: false,
+      delegateTelNo: false,
       delegateEmail: false
     },
     valid_thongtinchuhoso: false,
@@ -839,7 +839,7 @@ export default {
     functionTimeOut: null,
     dialog_applicantInfos: false,
     dialog_applicantList: false,
-    applicantConfig: false,
+    applicantConfig: true,
     titleEdit: 'Thông tin công dân, tổ chức, doanh nghiệp',
     applicantEdit: '',
     dialog_editApplicant: false,

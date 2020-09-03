@@ -3871,8 +3871,8 @@ export const store = new Vuex.Store({
               sort: 'siblingSearch'
             }
           }
-          // axios.get(state.endPointApi + '/serviceinfos/statistics/domains', param).then(function (response) {
-          axios.get('/o/rest/v2/serviceinfos/domains', param).then(function (response) {
+          axios.get(state.endPointApi + '/serviceinfos/statistics/domains', param).then(function (response) {
+          // axios.get('/o/rest/v2/serviceinfos/domains', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data

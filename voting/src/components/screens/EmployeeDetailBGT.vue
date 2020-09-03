@@ -294,6 +294,12 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      if (isDVC) {
+        vm.isDVC = isDVC
+      }
+    } catch (error) {
+    }
     let currentQuery = vm.$router.history.current.query
     vm.$nextTick(function () {
       vm.getVotingEmployee()
@@ -355,14 +361,29 @@ export default {
     },
     getVotingEmployee () {
       let vm = this
-      vm.$store.dispatch('loadVoting', {
-        className: 'employee',
-        classPk: vm.id
-      }).then(result => {
-        vm.votingItems = result
-        vm.getScoreVoting(vm.votingItems)
-      }).catch(xhr => {
-      })
+      let currentQuery = vm.$router.history.current.query
+      let maDonVi = currentQuery.hasOwnProperty('itemCode') ? currentQuery.itemCode : ''
+      if (vm.isDVC) {
+        vm.$store.dispatch('loadVoting', {
+          className: 'employee',
+          classPk: vm.id
+        }).then(result => {
+          vm.votingItems = result
+          vm.getScoreVoting(vm.votingItems)
+        }).catch(xhr => {
+        })
+      } else {
+        vm.$store.dispatch('loadVotingMotcua', {
+          className: 'employee',
+          classPk: vm.id,
+          itemCode: maDonVi
+        }).then(result => {
+          vm.votingItems = result
+          vm.getScoreVoting(vm.votingItems)
+        }).catch(xhr => {
+        })
+      }
+      
     },
     getScoreVoting (votingItems) {
       let vm = this
@@ -426,12 +447,19 @@ export default {
     },
     doVottingResultSubmit () {
       let vm = this
+      let currentQuery = vm.$router.history.current.query
+      let maDonVi = currentQuery.hasOwnProperty('itemCode') ? currentQuery.itemCode : ''
       vm.arrAction = []
       for (let key in vm.votingItems) {
         vm.votingItems[key]['className'] = 'employee'
         vm.votingItems[key]['classPk'] = vm.employeeSelected['employeeId']
         if (String(vm.votingItems[key]['selected']) !== '0') {
-          vm.arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
+          if (vm.isDVC) {
+            vm.arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
+          } else {
+            vm.votingItems[key] = Object.assign(vm.votingItems[key], {itemCode: maDonVi})
+            vm.arrAction.push(vm.$store.dispatch('submitVotingProxy', vm.votingItems[key]))
+          }
         }
       }
       Promise.all(vm.arrAction).then(results => {

@@ -2,7 +2,7 @@
   <div>
     <v-layout justify-center>
       <v-flex xs12>
-        <v-card flat >
+        <v-card flat class="px-2">
           <h3 class="text-xs-center py-2" style="color:#065694">ĐÁNH GIÁ CÁN BỘ</h3>
           <v-container fluid grid-list-md>
             <v-layout row wrap>
@@ -63,6 +63,12 @@
               Không có danh sách cán bộ
             </v-alert>
           </div>
+          <v-flex xs12 sm12 class="text-xs-right mb-3">
+            <v-btn @click="goBack" color="primary">
+              <v-icon size="16">reply</v-icon>&nbsp;
+              Quay lại 
+            </v-btn>
+          </v-flex>
         </v-card>
       </v-flex>
     </v-layout>
@@ -206,20 +212,34 @@ export default {
       vm.$router.push({
         path: '/danh-sach-can-bo/' + item.employeeId,
         query: {
-          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+          itemCode: vm.itemCode
         }
       })
     },
     getVotingEmployee (item, key) {
       let vm = this
-      vm.$store.dispatch('loadVoting', {
-        className: 'employee',
-        classPk: item.employeeId
-      }).then(result => {
-        let votingItems = result
-        vm.getScoreVoting(votingItems, key)
-      }).catch(xhr => {
-      })
+      if (vm.isDVC) {
+        vm.$store.dispatch('loadVoting', {
+          className: 'employee',
+          classPk: item.employeeId
+        }).then(result => {
+          let votingItems = result
+          vm.getScoreVoting(votingItems, key)
+        }).catch(xhr => {
+        })
+      } else {
+        vm.$store.dispatch('loadVotingMotcua', {
+          className: 'employee',
+          classPk: item.employeeId,
+          itemCode: vm.itemCode
+        }).then(result => {
+          let votingItems = result
+          vm.getScoreVoting(votingItems, key)
+        }).catch(xhr => {
+        })
+      }
+      
     },
     getScoreVoting (votingItems, key) {
       let vm = this
