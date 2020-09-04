@@ -54,12 +54,10 @@ export default {
     }
   },
   created () {
-    // var vm = this
-    // vm.$nextTick(function () {
-    //   vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
-    //     vm.usersComment = result
-    //   })
-    // })
+    var vm = this
+    vm.$nextTick(function () {
+      vm.runComment()
+    })
   },
   mounted () {
     // var vm = this

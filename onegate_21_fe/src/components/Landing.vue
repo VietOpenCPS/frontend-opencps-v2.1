@@ -1642,7 +1642,6 @@ export default {
             // thuTuc['displayName'] = thuTuc['serviceName']
             return thuTuc
           })
-          // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
         }
         vm.listThuTuc = result.map(thuTuc => {
           thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
@@ -2137,6 +2136,8 @@ export default {
       let vm = this
       vm.selectMultiplePage = []
       vm.linhVucSelected = item
+      vm.listDichVu = []
+      vm.dichVuSelected = null
       if (item) {
         setTimeout(function () {
           let domain = {

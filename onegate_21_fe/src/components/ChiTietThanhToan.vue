@@ -195,10 +195,10 @@
                 </v-flex>
                 <!--  -->
                 <v-flex xs12 sm12 class="ml-3 mb-3">
-                  <v-btn color="primary" @click="tracuuhoadon()">
+                  <!-- <v-btn color="primary" @click="tracuuhoadon()">
                     <v-icon>search</v-icon> 
                     Tra cứu hóa đơn
-                  </v-btn>
+                  </v-btn> -->
                   <!-- <v-btn v-if="originality === 3" class="ml-3" color="primary" @click="printPay()"> -->
                   <v-btn class="ml-3" color="primary" @click="printPay()">
                     <v-icon>print</v-icon> &nbsp;

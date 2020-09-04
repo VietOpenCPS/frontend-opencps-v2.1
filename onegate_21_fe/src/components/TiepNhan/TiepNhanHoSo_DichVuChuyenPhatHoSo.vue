@@ -158,14 +158,14 @@ export default {
     resultWards: [],
     vnPostItems: [],
     postalServiceItems: [
-      {
-        itemName: 'VIETTEL POST',
-        itemCode: 'VTPOST'
-      },
       // {
-      //   itemName: 'VNPOST',
-      //   itemCode: 'VNPOST'
-      // }
+      //   itemName: 'VIETTEL POST',
+      //   itemCode: 'VTPOST'
+      // },
+      {
+        itemName: 'VNPOST',
+        itemCode: 'VNPOST'
+      }
     ],
     rules: {
       required: (value) => !!value || 'Trường dữ liệu bắt buộc',
