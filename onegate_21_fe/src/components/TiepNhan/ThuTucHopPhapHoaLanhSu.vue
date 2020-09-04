@@ -1642,10 +1642,10 @@ export default {
                     }
                     let formData = {
                         ho_ten_yeu_cau: vm.dossiers.delegateName,
-                        so_cmnd: vm.delegateIdNo,
-                        dien_thoai: vm.delegateTelNo,
-                        email: vm.delegateEmail,
-                        dia_chi: vm.delegateAddress,
+                        so_cmnd: vm.dossiers.delegateIdNo,
+                        dien_thoai: vm.dossiers.delegateTelNo,
+                        email: vm.dossiers.delegateEmail,
+                        dia_chi: vm.dossiers.delegateAddress,
                         de_nghi_chung_nhan: vm.de_nghi_chung_nhan ? true : false,
                         list_giay_to : vm.listGiayTo,
                         tong_so: vm.tongSoBan,
@@ -1654,6 +1654,7 @@ export default {
                         ma_muc_dich: vm.muc_dich.MA,
                         muc_dich: vm.muc_dich.TEN
                     }
+                    console.log('1111111111111',formData)
                     vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
                     vm.dossierFileArr[i]['eform'] = 'true'
                 }
@@ -1871,10 +1872,10 @@ export default {
                 
                         let formData = {
                             ho_ten_yeu_cau: vm.dossiers.delegateName,
-                            so_cmnd: vm.delegateIdNo,
-                            dien_thoai: vm.delegateTelNo,
-                            email: vm.delegateEmail,
-                            dia_chi: vm.delegateAddress,
+                            so_cmnd: vm.dossiers.delegateIdNo,
+                            dien_thoai: vm.dossiers.delegateTelNo,
+                            email: vm.dossiers.delegateEmail,
+                            dia_chi: vm.dossiers.delegateAddress,
                             de_nghi_chung_nhan: vm.de_nghi_chung_nhan ? true : false,
                             list_giay_to : arr,
                             tong_so: vm.tongSoBan,
@@ -1883,6 +1884,7 @@ export default {
                             ma_muc_dich: vm.muc_dich.MA,
                             muc_dich: vm.muc_dich.TEN
                         }
+                        console.log('1111111111111',formData)
                         vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
@@ -2116,10 +2118,10 @@ export default {
                     }
                     let formData = {
                         ho_ten_yeu_cau: vm.dossiers.delegateName,
-                        so_cmnd: vm.delegateIdNo,
-                        dien_thoai: vm.delegateTelNo,
-                        email: vm.delegateEmail,
-                        dia_chi: vm.delegateAddress,
+                        so_cmnd: vm.dossiers.delegateIdNo,
+                        dien_thoai: vm.dossiers.delegateTelNo,
+                        email: vm.dossiers.delegateEmail,
+                        dia_chi: vm.dossiers.delegateAddress,
                         de_nghi_chung_nhan: vm.de_nghi_chung_nhan ? true : false,
                         list_giay_to : arr,
                         tong_so: vm.tongSoBan,
@@ -2128,6 +2130,7 @@ export default {
                         ma_muc_dich: vm.muc_dich.MA,
                         muc_dich: vm.muc_dich.TEN
                     }
+                    console.log('1111111111111',formData)
                     vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
                     vm.dossierFileArr[i]['eform'] = 'true'
                 }

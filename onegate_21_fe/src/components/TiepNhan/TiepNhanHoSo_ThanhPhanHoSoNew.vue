@@ -673,6 +673,9 @@ export default {
             return item['fileMark'] !== 0
           })
         }
+        console.log('filter1', filter1)
+        console.log('partTypes', vm.partTypes)
+        console.log('dossierTemplate', dossierTemplate)
         console.log('dossierTemplateItemsFilter111', filterCheckInput)
         return filterCheckInput
       }
@@ -801,6 +804,7 @@ export default {
       Promise.all(arrTemp).then(values => {
         var dossierTemplates = values[0]['dossierParts']
         var dossierMarks = values[1]
+        console.log('dossierMarksdossierMarksdossierMarksdossierMarks',dossierMarks)
         var dossierFiles = values[2]
         var fileTemplates = []
         if (values[3].hasOwnProperty('serviceInfoId')) {
