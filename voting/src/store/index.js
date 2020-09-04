@@ -81,6 +81,28 @@ export const store = new Vuex.Store({
         })
       })
     },
+    loadImageEmployeeProxy ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/o/v1/opencps/users/avatar/org.opencps.usermgt.model.Employee/' + filter['employeeId'])
+          dataPost.append('serverCode', 'SERVER_' + filter.itemCode)
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+            let seriable = response.data
+            resolve(seriable)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
     loadImageEmployee ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result1) {

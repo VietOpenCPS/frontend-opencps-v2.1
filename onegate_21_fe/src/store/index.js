@@ -2791,7 +2791,6 @@ export const store = new Vuex.Store({
           }
           // test local
           axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, config).then(function (response) {
-          // axios.get('http://congtrinh0209:8080/api/stepconfigs/done/done_5', params, config).then(function (response) {
             let serializable = response.data.data
             let buttonConfig
             if (serializable[0].buttonConfig && serializable[0].buttonConfig.indexOf('{') >= 0) {

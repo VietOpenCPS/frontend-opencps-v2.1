@@ -494,11 +494,11 @@
         <!--  -->
         <v-tabs icons-and-text v-model="activeTab2">
           <v-tabs-slider color="primary"></v-tabs-slider>
-          <!-- <v-tab :key="1" href="#tabs-1b" v-if="originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done'">
+          <v-tab :key="1" href="#tabs-1b" v-if="originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done'">
             <v-btn flat class="px-0 py-0 mx-0 my-0">
               ĐÁNH GIÁ
             </v-btn>
-          </v-tab> -->
+          </v-tab>
           <v-tab :key="2" href="#tabs-2b" 
             v-if="(originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || originality === 3"
           >

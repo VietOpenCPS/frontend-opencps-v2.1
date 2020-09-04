@@ -273,7 +273,8 @@ export default {
     dossierNo: '',
     captchaValue: '',
     captchaCode: '',
-    arrAction: []
+    arrAction: [],
+    isDVC: false
   }),
   computed: {
     loading () {
@@ -464,8 +465,7 @@ export default {
       }
       Promise.all(vm.arrAction).then(results => {
         toastr.success('Gửi đánh giá thành công')
-        vm.dialogVerify = false
-        vm.getVotingEmployee()
+        vm.goBack()
       }).catch(xhr => {
         toastr.error('Gửi đánh giá thất bại')
       })
