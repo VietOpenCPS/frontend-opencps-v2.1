@@ -1635,7 +1635,7 @@ export default {
                             if(arr === '') {
                                 arr+=find.TEN
                             } else {
-                                arr+= ',' + find.TEN
+                                arr+= ', ' + find.TEN
                             }
                             
                         }
@@ -1864,7 +1864,7 @@ export default {
                                 if(arrNuocSD === '') {
                                     arrNuocSD+=find.TEN
                                 } else {
-                                    arrNuocSD+= ',' + find.TEN
+                                    arrNuocSD+= ', ' + find.TEN
                                 }
                                 
                             }
@@ -2111,7 +2111,7 @@ export default {
                                 if(arrNuocSD === '') {
                                     arrNuocSD+=find.TEN
                                 } else {
-                                    arrNuocSD+= ',' + find.TEN
+                                    arrNuocSD+= ', ' + find.TEN
                                 }
                                 
                             }

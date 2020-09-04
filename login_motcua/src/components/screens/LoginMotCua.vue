@@ -99,7 +99,14 @@
               <v-icon>how_to_reg</v-icon>&nbsp;
               Đăng nhập
             </v-btn>
-            <div class="d-inline-block ml-2">
+            <v-btn class="ml-2 my-0 white--text xacthuc-btn" color="#0b72ba"
+              v-if="showXacThucSso"
+              @click="redirectXacThucSso"
+            >
+              <v-icon>done_all</v-icon>&nbsp;
+              Xác thực SSO
+            </v-btn>
+            <div class="d-inline-block ml-2 remember-btn">
               <v-checkbox
                 class="mt-0"
                 color="primary"
@@ -151,6 +158,7 @@
 
 import Vue from 'vue'
 import $ from 'jquery'
+import axios from 'axios'
 import support from '../../store/support.json'
 export default {
   props: [],
@@ -164,7 +172,8 @@ export default {
     loading: false,
     valid: false,
     pinCode: '',
-    isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false
+    isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false,
+    showXacThucSso: false
   }),
   computed: {
   },
@@ -175,7 +184,7 @@ export default {
       $('body').addClass('body_login')
       let current = vm.$router.history.current
       let currentQuery = current.query
-      // vm.makeImageCap()
+      vm.checkShowXacThucSso()
     })
   },
   updated () {
@@ -235,6 +244,25 @@ export default {
     },
     goBack () {
       window.history.back()
+    },
+    redirectXacThucSso () {
+      let vm = this
+      window.location.href = vm.showXacThucSso
+    },
+    checkShowXacThucSso () {
+      let vm = this
+      let headers = {
+      }
+      axios({
+        method: 'GET',
+        url: '/o/v1/opencps/is-enabled-sso-login',
+        headers: headers
+      }).then(function (response) {
+        if (response.hasOwnProperty('data') && response.data) {
+          vm.showXacThucSso = response.data
+        }
+      }).catch(function (error) {
+      })
     }
   }
 }

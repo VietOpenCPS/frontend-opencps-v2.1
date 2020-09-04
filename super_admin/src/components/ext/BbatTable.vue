@@ -608,7 +608,7 @@
             }
         }).catch(function (error) {
         })
-        
+
         vm.problem = true
       },
       show (e) {
@@ -826,7 +826,7 @@
           let idEditor = 0
           let tempTableData = vm.dataSocket['tableData']
           idEditor = tempTableData[vm.currentIndex][0]
-                  let dataPost = new URLSearchParams()
+          let dataPost = new URLSearchParams()
           let textPost = {
             'type': 'admin',
             'cmd': 'delete',

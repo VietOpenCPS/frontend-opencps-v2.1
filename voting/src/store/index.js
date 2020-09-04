@@ -38,7 +38,6 @@ export const store = new Vuex.Store({
     },
     loadVoting ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
@@ -51,10 +50,55 @@ export const store = new Vuex.Store({
             } else {
               resolve([])
             }
-            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            // commit('setLoading', false)
+          })
+        })
+      })
+    },
+    loadVotingMotcua ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/votings/' + data.className + '/' + data.classPk)
+          dataPost.append('serverCode', 'SERVER_' + data.itemCode)
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data.data)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    loadImageEmployeeProxy ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/o/v1/opencps/users/avatar/org.opencps.usermgt.model.Employee/' + filter['employeeId'])
+          dataPost.append('serverCode', 'SERVER_' + filter.itemCode)
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+            let seriable = response.data
+            resolve(seriable)
+          }).catch(xhr => {
+            reject(xhr)
           })
         })
       })
@@ -261,6 +305,33 @@ export const store = new Vuex.Store({
           params.append('className', data.className)
           params.append('classPk', data.classPk)
           axios.post(state.endPointApi + '/postal/votings/' + data.votingId + '/results', params, config).then(result => {
+            resolve(result.data)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    submitVotingProxy ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let params = {
+            selected: data.selected,
+            className: data.className,
+            classPk: data.classPk
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
+          dataPost.append('data', JSON.stringify(params))
+          dataPost.append('serverCode', 'SERVER_' + data.itemCode)
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
             resolve(result.data)
           }).catch(xhr => {
             reject(xhr)

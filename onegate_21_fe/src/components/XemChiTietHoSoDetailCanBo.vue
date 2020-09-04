@@ -130,17 +130,17 @@
                         <span v-for="(item, index) in usersNextAction" :key="item.userId">
                           <b>{{item.userName}}</b><span v-if="index !== (usersNextAction.length - 1)">,</span>
                         </span>
-                        <!-- <span v-if="stepOverdueNextAction"> - </span>
+                        <span v-if="stepOverdueNextAction"> - </span>
                         <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
                           {{stepOverdueNextAction}}
-                        </span> -->
+                        </span>
                       </span>
                     </v-flex>
-                    <!-- <v-flex id="reAssign" v-if="thaoTacUyQuyen && showReasign && checkPemissionPhanCongLai(currentUser)" class="text-xs-right" style="width:100px">
+                    <v-flex id="reAssign" v-if="thaoTacUyQuyen && showReasign && checkPemissionPhanCongLai(currentUser)" class="text-xs-right" style="width:100px">
                       <v-btn @click="reAsign" class="mx-0 my-0 right" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" small color="primary" style="height:26px">
                         Ủy quyền
                       </v-btn>
-                    </v-flex> -->
+                    </v-flex>
                   </v-layout>
                 </div>
 
@@ -172,7 +172,7 @@
                   v-on:click.native="processPullBtnDetail(item, index)" 
                   :loading="loadingAction && index === btnIndex"
                   :disabled="loadingAction || item.enable === 2"
-                  v-if="item.enable > 0 || (item['autoEvent'] === 'special' && thongTinChiTietHoSo['permission'].indexOf('write') >= 0)"
+                  v-if="item.enable > 0 || (item['autoEvent'] === 'special' && thongTinChiTietHoSo && thongTinChiTietHoSo['permission'].indexOf('write') >= 0)"
                 >
                   {{item.actionName}}
                   <span slot="loader">Loading...</span>
@@ -213,7 +213,7 @@
                   <span slot="loader">Loading...</span>
                 </v-btn> -->
                 <!--  -->
-                <v-menu bottom offset-y v-if="showMenuActionKhac && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
+                <v-menu bottom offset-y v-if="showMenuActionKhac && thongTinChiTietHoSo && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
                   <v-btn slot="activator" class="on-hover-btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list>
                     <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" @click="btnActionEvent(item, index)" v-if="item.form !== 'UPDATE'">
@@ -494,11 +494,11 @@
         <!--  -->
         <v-tabs icons-and-text v-model="activeTab2">
           <v-tabs-slider color="primary"></v-tabs-slider>
-          <!-- <v-tab :key="1" href="#tabs-1b" v-if="originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done'">
+          <v-tab :key="1" href="#tabs-1b" v-if="originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done'">
             <v-btn flat class="px-0 py-0 mx-0 my-0">
               ĐÁNH GIÁ
             </v-btn>
-          </v-tab> -->
+          </v-tab>
           <v-tab :key="2" href="#tabs-2b" 
             v-if="(originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || originality === 3"
           >
@@ -748,7 +748,7 @@ import ChiTietThanhToan from './ChiTietThanhToan.vue'
 import ThucHienThanhToanDienTu from './form_xu_ly/ThucHienThanhToanDienTu.vue'
 import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
-import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQuaBQP.vue'
+import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
 import TaiLieuChungThuc from './TiepNhan/TaiLieuChungThuc.vue'
@@ -826,7 +826,7 @@ export default {
     reAsignUsers: [],
     showReasign: false,
     thaoTacUyQuyen: false,
-    thaoTacPhanCongLai: false,
+    thaoTacPhanCongLai: true,
     itemselect: '',
     dossierSyncs: [],
     stepModel: null,
@@ -1109,9 +1109,13 @@ export default {
     }
   },
   mounted () {
-    this.onResize()
-    window.addEventListener('resize', this.onResize, { passive: true })
+    let vm = this
+    vm.onResize()
+    window.addEventListener('resize', vm.onResize, { passive: true })
     $('#m-navigation').css('display', 'none')
+    if (vm.originality === 3) {
+      vm.runComment()
+    }
   },
   created () {
     let vm = this
@@ -1278,6 +1282,8 @@ export default {
             }
             
           })
+        } else {
+          vm.showMenuActionKhac = false
         }
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'done') {
           vm.activeTab2 = 'tabs-1b'
@@ -2564,57 +2570,117 @@ export default {
               }
             } else {
               // 1
-              vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-                vm.getDetailDossier()
-                if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
-                  vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
-                  })
-                }
-                if (filter['payment']) {
-                  vm.loadThanhToan()
-                }
-                vm.loadingAction = false
-                vm.dialogActionProcess = false
-                vm.loadingActionProcess = false
-                vm.alertObj = {
-                  icon: 'check_circle',
-                  color: 'success',
-                  message: 'Thực hiện thành công!'
-                }
-                vm.btnStateVisible = false
-                if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
-                  vm.rollbackable = result.rollbackable
-                }
-                if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
-                  vm.printDocument = true
-                }
-                if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
-                  vm.printInvoicefilePayment = true
-                  vm.printPay()
-                }
-                if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
-                  vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
-                }
-                vm.checkInput = 0
-                vm.$store.commit('setCheckInput', 0)
-                if (String(item.form) === 'ACTIONS') {
-                } else {
-                  vm.$router.push({
-                    path: vm.$router.history.current.path,
-                    query: {
-                      recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                      renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                      q: currentQuery['q']
+              if (String(filter.actionCode) === '1300') {
+                let confirmAction = confirm('Bạn có chắc chắn nộp hồ sơ này?')
+                if (confirmAction) {
+                  vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                    vm.getDetailDossier()
+                    if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
+                      vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+                      })
                     }
+                    if (filter['payment']) {
+                      vm.loadThanhToan()
+                    }
+                    vm.loadingAction = false
+                    vm.dialogActionProcess = false
+                    vm.loadingActionProcess = false
+                    vm.alertObj = {
+                      icon: 'check_circle',
+                      color: 'success',
+                      message: 'Thực hiện thành công!'
+                    }
+                    vm.btnStateVisible = false
+                    if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                      vm.rollbackable = result.rollbackable
+                    }
+                    if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                      vm.printDocument = true
+                    }
+                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                      vm.printInvoicefilePayment = true
+                      vm.printPay()
+                    }
+                    if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                      vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+                    }
+                    vm.checkInput = 0
+                    vm.$store.commit('setCheckInput', 0)
+                    if (String(item.form) === 'ACTIONS') {
+                    } else {
+                      vm.$router.push({
+                        path: vm.$router.history.current.path,
+                        query: {
+                          recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                          q: currentQuery['q']
+                        }
+                      })
+                    }
+                    $('html, body').animate({
+                      scrollTop: 0
+                    }, 500, 'linear')
+                  }).catch(function (reject) {
+                    vm.loadingAction = false
+                    vm.loadingActionProcess = false
                   })
+                } else {
+                  vm.loadingAction = false
+                  vm.loadingActionProcess = false
                 }
-                $('html, body').animate({
-                  scrollTop: 0
-                }, 500, 'linear')
-              }).catch(function (reject) {
-                vm.loadingAction = false
-                vm.loadingActionProcess = false
-              })
+              } else {
+                vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                  vm.getDetailDossier()
+                  if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
+                    vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+                    })
+                  }
+                  if (filter['payment']) {
+                    vm.loadThanhToan()
+                  }
+                  vm.loadingAction = false
+                  vm.dialogActionProcess = false
+                  vm.loadingActionProcess = false
+                  vm.alertObj = {
+                    icon: 'check_circle',
+                    color: 'success',
+                    message: 'Thực hiện thành công!'
+                  }
+                  vm.btnStateVisible = false
+                  if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                    vm.rollbackable = result.rollbackable
+                  }
+                  if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                    vm.printDocument = true
+                  }
+                  if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                    vm.printInvoicefilePayment = true
+                    vm.printPay()
+                  }
+                  if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                    vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+                  }
+                  vm.checkInput = 0
+                  vm.$store.commit('setCheckInput', 0)
+                  if (String(item.form) === 'ACTIONS') {
+                  } else {
+                    vm.$router.push({
+                      path: vm.$router.history.current.path,
+                      query: {
+                        recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                        renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                        q: currentQuery['q']
+                      }
+                    })
+                  }
+                  $('html, body').animate({
+                    scrollTop: 0
+                  }, 500, 'linear')
+                }).catch(function (reject) {
+                  vm.loadingAction = false
+                  vm.loadingActionProcess = false
+                })
+              }
               // 
             }
             
@@ -2746,6 +2812,9 @@ export default {
       let currentQuery = vm.$router.history.current.query
       vm.dossierId = vm.thongTinChiTietHoSo.dossierId
       vm.$store.dispatch('pullNextactions', filter).then(function (result) {
+        if (!result) {
+          return
+        }
         vm.btnDossierDynamics = result
         
         let btnEnable = vm.btnDossierDynamics.filter(e => e.enable === 1)
