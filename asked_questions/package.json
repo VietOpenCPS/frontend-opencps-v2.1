@@ -12,7 +12,7 @@
     "idempotent-babel-polyfill": "^7.0.0",
     "jquery": "^3.3.1",
     "mobile-device-detect": "^0.2.3",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.13.1",
     "sass-loader": "^7.1.0",
     "toastr": "^2.1.4",
     "vue": "^2.5.9",
