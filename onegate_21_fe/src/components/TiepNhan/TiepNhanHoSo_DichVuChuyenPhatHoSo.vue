@@ -314,14 +314,18 @@ export default {
         postalWardName: this.dichVuChuyenPhatHoSo.postalWardName ? this.dichVuChuyenPhatHoSo.postalWardName : '',
         postalTelNo: this.dichVuChuyenPhatHoSo.postalTelNo ? this.dichVuChuyenPhatHoSo.postalTelNo : ''
       }
-
       this.$store.commit('setDichVuChuyenPhatHoSo', dataChuyenPhat)
       console.log('dichVuChuyenPhatHoSo', this.dichVuChuyenPhatHoSo)
     },
     validDichVuChuyenPhat () {
       var vm = this
-      return vm.$refs.formDichVuChuyenPhatHoSo.validate()
-    }
+      if(vm.dichVuChuyenPhatHoSo.vnpostalStatus){
+        return vm.$refs.formDichVuChuyenPhatHoSo.validate()
+      } else {
+        return true
+      }
+      
+    } 
   }
 }
 </script>

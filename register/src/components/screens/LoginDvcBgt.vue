@@ -347,6 +347,8 @@ export default {
             }
           }
         })
+      } else {
+        toastr.error("Yêu cầu nhập đầy đủ thông tin tài khoản và mật khẩu.", { autoClose: 2000 });
       }
     },
     doMappingDvcqg () {
