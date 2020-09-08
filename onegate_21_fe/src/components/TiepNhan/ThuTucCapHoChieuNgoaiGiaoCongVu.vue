@@ -1315,6 +1315,7 @@ export default {
         dateDueDate: new Date().toISOString().substr(0, 10),
         dateDueDateFormated: '',
         birthdayFormated: '',
+        crurentHours: '',
         birthday: new Date().toISOString().substr(0, 10),
         eFormCode: '',
         tinhSelected: '',
@@ -1524,6 +1525,7 @@ export default {
             "dossierNote": '',
             "Doan_HCTN": '',
             "dossierFilePayment": '',
+            'durationCount': 4,
             "metaData": '{}'
         },
         bookingName: '',
@@ -1633,6 +1635,7 @@ export default {
             }
         ],
         payment: {},
+        auth: 'false',
         rules: {
             required: (v) => !!v || 'Thông tin này là bắt buộc',
             checkDatePast: (date)=> {
@@ -1716,7 +1719,7 @@ export default {
                 if(vm.formCode==='UPDATE'){
                     vm.getDetail()
                 } else {                   
-                    vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [], 'ma_to_khai': [], 'totalRecord': 0, 'delegateIdNo': '','delegateName': '','delegateTelNo': '','Doan_HCTN': ''})
+                    vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [], 'ma_to_khai': [], 'totalRecord': 0, 'delegateIdNo': '','delegateName': '','delegateTelNo': '','Doan_HCTN': '', 'durationCountMeta': 4})
                     vm.getThanhPhan()
                     vm.genDueDate()
                     if(vm.eFormCode){
@@ -1822,6 +1825,8 @@ export default {
             deep: true,
             handler:  (val, oldVal) => {
                 let arr = val.filter(e => e.recordCount) 
+                arr.push({"dossierPartNo":"TP01","fileMark":3,"partName":"Tờ khai  đề nghị cấp hộ chiếu ngoại giao, hộ chiếu công vụ và công hàm","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
+                arr.push({"dossierPartNo":"TP02","fileMark":3,"partName":"Văn bản hoặc quyết định cử hoặc cho phép cán bộ, công chức, viên chức, sỹ quan, quân nhân chuyên nghiệp ra nước ngoài","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
                 $('#dossierMarkArr_hidden').val(JSON.stringify(arr))
             }
         },
@@ -1867,7 +1872,7 @@ export default {
         dateDueDate (val) {
             this.dateDueDateFormated = this.formatDate(this.dateDueDate)
             const [year, month, day] = this.dateDueDate.split('-')
-            let date = new Date(this.dateDueDate)
+            let date = new Date(this.dateDueDate + this.crurentHours)
             // date.setFullYear(parseInt(year), parseInt(month), parseInt(day))
             this.dossiers.dueDate = date.getTime()
         },
@@ -1962,6 +1967,7 @@ export default {
                 vm.delegateDistrictCode = vm.dossiers.delegateDistrictCode
                 vm.delegateWardCode = vm.dossiers.delegateWardCode
                 vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
+                vm.crurentHours = vm.dossiers.dueDate.substring(10)
                 vm.viaPostal = vm.dossiers.viaPostal === 2 ?  true : false
                 vm.nuoc_di = metaData.Doan_HCTN.CacNuocDi_ma.split(',')
                 
@@ -2138,6 +2144,10 @@ export default {
                         metaData['ma_to_khai'].push(vm.eFormCode)
                         vm.dossiers['metaData'] = JSON.stringify(metaData)
                         vm.eFormCode = ''
+                        if(res.data.auth){
+                            vm.auth = res.data.auth
+                        }
+                        vm.viaPostal = res.data.viaPostal ? true : false
                         if(!vm.dossiers.delegateName){
                             if(res.data.delegateName) {
                                 vm.dossiers.delegateName = res.data.ho_ten
@@ -2842,17 +2852,30 @@ export default {
         },
         genDueDate () {
             let vm = this
+            // let config = {
+            //     url: '/o/rest/v2/dossiers/dueDate?service='+vm.serviceCode+'&agency='+vm.govAgencyCode+'&template='+vm.dossierTemplateNo+'&fromReceiveDate=',
+            //     headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+            // }
+            // axios.request(config).then(res => {
+            //     let tg = new Date(parseInt(res.data['dueDate']));
+                    
+            //     // let ngay = tg.getDate()+'/'+(tg.getMonth()+1)+'/'+tg.getFullYear()
+            //     // vm.dossiers['dueDate'] = ngay
+            //     vm.dateDueDate = tg.toISOString().substr(0, 10)
+            // }).catch(err => {}) 
             let config = {
-                url: '/o/rest/v2/dossiers/dueDate?service='+vm.serviceCode+'&agency='+vm.govAgencyCode+'&template='+vm.dossierTemplateNo+'&fromReceiveDate=',
+                url: '/o/rest/v2/dossiers/'+ 4 +'/calculate/duedate',
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
             }
             axios.request(config).then(res => {
-                let tg = new Date(parseInt(res.data['dueDate']));
-                    
-                // let ngay = tg.getDate()+'/'+(tg.getMonth()+1)+'/'+tg.getFullYear()
-                // vm.dossiers['dueDate'] = ngay
-                vm.dateDueDate = tg.toISOString().substr(0, 10)
-            }).catch(err => {}) 
+                vm.dossiers['durationCount'] = 4
+                let dateString =  res.data.substr(0, 10)
+                vm.crurentHours = res.data.substr(10)
+                vm.dateDueDate = vm.parseDate(dateString)
+                let metaData = JSON.parse(vm.dossiers['metaData'])
+                metaData['durationCountMeta'] = 4
+                vm.dossiers['metaData'] = JSON.stringify(metaData)
+            }).catch(err => {})  
         },
         getThongTinNhanThan () {
             let vm = this
@@ -3293,7 +3316,7 @@ export default {
              console.log('2')
             metaData['delegateTelNo']=vm.dossiers.delegateTelNo
             console.log('3')
-            if( vm.eFormCodeArr.length === 0 ) {
+            if( vm.auth === "false") {
                  console.log('4')
                 vm.dossiers['contactTelNo'] = vm.dossiers['delegateTelNo']
                  console.log('5')

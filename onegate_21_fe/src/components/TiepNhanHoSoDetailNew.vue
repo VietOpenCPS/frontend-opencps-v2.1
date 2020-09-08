@@ -1463,7 +1463,13 @@ export default {
         payment:  $('#payment_hidden').val(),
       }
       let dossiers = JSON.parse($('#dossiers_hidden').val())
-
+      let marks = JSON.parse($('#dossierMarkArr_hidden').val())
+      let dossiersMark = marks.map(function(el) {
+        let o = Object.assign({}, el)
+        o.dossierId = vm.id
+        o.partNo = o.dossierPartNo
+        return o;
+      })
       if (vm.data_form_template === 'formHPH') {
         if(vm.$refs.formTiepNhan.validate()){
           if (vm.formCode === 'NEW') {
@@ -1561,6 +1567,11 @@ export default {
               }).catch(reject => {
                 vm.loadingAction = false
               })
+              if(dossiersMark.length){
+                for(let i =0;i<dossiersMark.length;i++){
+                  vm.$store.dispatch('postDossierMark', dossiersMark[i])
+                }
+              }
             } else {
               vm.dialogXacNhanThaoTac = true
               vm.loadingAction = false
@@ -1663,6 +1674,11 @@ export default {
                 }).catch(reject => {
                   vm.loadingAction = false
                 })
+                if(dossiersMark.length){
+                  for(let i =0;i<dossiersMark.length;i++){
+                    vm.$store.dispatch('postDossierMark', dossiersMark[i])
+                  }
+                }
               }
             } else {
               vm.dialogXacNhanThaoTac = true
@@ -1692,6 +1708,13 @@ export default {
         payment:  $('#payment_hidden').val(),
       }
       let dossiers = JSON.parse($('#dossiers_hidden').val())
+      let marks = JSON.parse($('#dossierMarkArr_hidden').val())
+      let dossiersMark = marks.map(function(el) {
+        let o = Object.assign({}, el)
+        o.dossierId = vm.id
+        o.partNo = o.dossierPartNo
+        return o;
+      })
       if (vm.data_form_template === 'formHPH') {
         if(vm.$refs.formTiepNhan.validate()){
           if (vm.formCode === 'NEW') {
@@ -1785,6 +1808,11 @@ export default {
               }).catch(reject => {
                 vm.loadingAction = false
               })
+              if(dossiersMark.length){
+                for(let i =0;i<dossiersMark.length;i++){
+                  vm.$store.dispatch('postDossierMark', dossiersMark[i])
+                }
+              }
           }
         } else {
           toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
@@ -1882,6 +1910,11 @@ export default {
             }).catch(reject => {
               vm.loadingAction = false
             })
+              if(dossiersMark.length){
+                for(let i =0;i<dossiersMark.length;i++){
+                  vm.$store.dispatch('postDossierMark', dossiersMark[i])
+                }
+              }
            }
         } else {
           toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')

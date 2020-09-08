@@ -3291,7 +3291,7 @@ export default {
     },
     changeAdvFilterDataChips (item) {
       let vm = this
-      if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming') {
+      if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming' || item.key === 'overtime') {
         if (vm.top === item.key) {
           vm.top = ''
         } else {
