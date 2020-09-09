@@ -285,7 +285,7 @@
             <div id="formAlpacaNewTemplate" class="mb-5 pt-0" v-if="data_form_template !== 'formHPH' && data_form_template !== 'formCH'"></div>
             <v-form  ref="formTiepNhan" lazy-validation>
               <thu-tuc-cap-ho-chieu-ngoai-giao-cong-vu v-if="data_form_template === 'formCH'" :formCode="formCode" :id="id" @changeCheckCKCD="changeCheckCKCD"></thu-tuc-cap-ho-chieu-ngoai-giao-cong-vu>
-              <thu-tuc-hop-phap-hoa-lanh-su v-if="data_form_template === 'formHPH'"  :formCode="formCode" :id="id" @changeCheckCKCD="changeCheckCKCD"></thu-tuc-hop-phap-hoa-lanh-su>
+              <thu-tuc-hop-phap-hoa-lanh-su v-if="data_form_template === 'formHPH'"  :formCode="formCode" :id="id" @changeCheckCKCD="changeCheckCKCD" @changeCheckGiayTo="changeCheckGiayTo"></thu-tuc-hop-phap-hoa-lanh-su>
             </v-form>
           </v-card>
           <!--  -->
@@ -663,6 +663,7 @@ export default {
     isNotarization: false,
     dialogXacNhanThaoTac: false,
     checkCKCD: false,
+    checkGiayTo: false,
     templateName: '',
     formTemplate: '',
     data_form_template: '',
@@ -1473,109 +1474,120 @@ export default {
       if (vm.data_form_template === 'formHPH') {
         if(vm.$refs.formTiepNhan.validate()){
           if (vm.formCode === 'NEW') {
-            if(vm.checkCKCD) {
-              vm.loadingAction = true
-              vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
-                let metaData = dossiers.metaData
-                let dataMetaData = {
-                  id: result.dossierId,
-                  data: metaData
-                }
-                vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
-                  vm.loadingAction = false
-                  vm.$store.commit('setActivePrintBienNhan', result.dossierId)
-                  vm.goBack() 
-                }).catch(()=>{
-                  vm.loadingAction = false
-                })
-
-              }).catch(reject => {
-                vm.loadingAction = false
-              })
-            } else {
-              vm.dialogXacNhanThaoTac = true
-              vm.loadingAction = false
-            }
-          } else {
-            if(vm.checkCKCD) {
-              let dataPUTDossier = {
-                id: vm.id,
-                dossier: dossiers
-              }
-
-              vm.loadingAction = true
-              vm.$store.dispatch('putDossierNew', dataPUTDossier).then(function (result) {
-                let metaData = dossiers.metaData
-                let dataMetaData = {
-                  id: vm.id,
-                  data: metaData
-                }
-                vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
-                  console.log(result)
-                  let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
-                  dossierFile.forEach(async (e)=>{
-                    if(vm.data_form_template === 'formCH'){
-                      if(e.partNo === 'TP01' || e.partNo === 'TP02'){
-                        let dataPUTDossierFile = {
-                          id: vm.id,
-                          referenceUid: e.referenceUid,
-                          formData: e.formData
-                        }
-                        await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-
-                        }).catch(reject=>{
-                          
-                        })
-                      }
-                    }
-                    if(vm.data_form_template === 'formHPH'){
-                      if(e.partNo === 'TP01'){
-                        let dataPUTDossierFile = {
-                          id: vm.id,
-                          referenceUid: e.referenceUid,
-                          formData: e.formData
-                        }
-                        await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-
-                        }).catch(reject=>{
-                          
-                        })
-                      }
-                    }
-
-                  })
-                  let dataPayment = {
-                    dossierId: vm.id,
-                    payment: {}
+            if(vm.checkGiayTo){
+              if(vm.checkCKCD) {
+                vm.loadingAction = true
+                vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
+                  let metaData = dossiers.metaData
+                  let dataMetaData = {
+                    id: result.dossierId,
+                    data: metaData
                   }
-                  if($('#payment_hidden').val()){
-                    dataPayment['payment'] = JSON.parse($('#payment_hidden').val())
-                  }
-                  vm.$store.dispatch('putPayment', dataPayment).then(()=>{
+                  vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
                     vm.loadingAction = false
                     vm.$store.commit('setActivePrintBienNhan', result.dossierId)
-                    vm.goBack()
+                    vm.goBack() 
                   }).catch(()=>{
                     vm.loadingAction = false
                   })
-                }).catch(err=> {
+
+                }).catch(reject => {
                   vm.loadingAction = false
                 })
-    
-
-
-              }).catch(reject => {
+              } else {
+                vm.dialogXacNhanThaoTac = true
                 vm.loadingAction = false
-              })
-              if(dossiersMark.length){
-                for(let i =0;i<dossiersMark.length;i++){
-                  vm.$store.dispatch('postDossierMark', dossiersMark[i])
-                }
               }
             } else {
-              vm.dialogXacNhanThaoTac = true
               vm.loadingAction = false
+              toastr.error('Danh sách giấy tờ là bắt buộc')
             }
+          } else {
+            if(vm.checkGiayTo){
+              if(vm.checkCKCD) {
+                let dataPUTDossier = {
+                  id: vm.id,
+                  dossier: dossiers
+                }
+
+                vm.loadingAction = true
+                vm.$store.dispatch('putDossierNew', dataPUTDossier).then(function (result) {
+                  let metaData = dossiers.metaData
+                  let dataMetaData = {
+                    id: vm.id,
+                    data: metaData
+                  }
+                  vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
+                    console.log(result)
+                    let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+                    dossierFile.forEach(async (e)=>{
+                      if(vm.data_form_template === 'formCH'){
+                        if(e.partNo === 'TP01' || e.partNo === 'TP02'){
+                          let dataPUTDossierFile = {
+                            id: vm.id,
+                            referenceUid: e.referenceUid,
+                            formData: e.formData
+                          }
+                          await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+
+                          }).catch(reject=>{
+                            
+                          })
+                        }
+                      }
+                      if(vm.data_form_template === 'formHPH'){
+                        if(e.partNo === 'TP01'){
+                          let dataPUTDossierFile = {
+                            id: vm.id,
+                            referenceUid: e.referenceUid,
+                            formData: e.formData
+                          }
+                          await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+
+                          }).catch(reject=>{
+                            
+                          })
+                        }
+                      }
+
+                    })
+                    let dataPayment = {
+                      dossierId: vm.id,
+                      payment: {}
+                    }
+                    if($('#payment_hidden').val()){
+                      dataPayment['payment'] = JSON.parse($('#payment_hidden').val())
+                    }
+                    vm.$store.dispatch('putPayment', dataPayment).then(()=>{
+                      vm.loadingAction = false
+                      vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+                      vm.goBack()
+                    }).catch(()=>{
+                      vm.loadingAction = false
+                    })
+                  }).catch(err=> {
+                    vm.loadingAction = false
+                  })
+      
+
+
+                }).catch(reject => {
+                  vm.loadingAction = false
+                })
+                if(dossiersMark.length){
+                  for(let i =0;i<dossiersMark.length;i++){
+                    vm.$store.dispatch('postDossierMark', dossiersMark[i])
+                  }
+                }
+              } else {
+                vm.dialogXacNhanThaoTac = true
+                vm.loadingAction = false
+              }
+            } else {
+              vm.loadingAction = false
+              toastr.error('Danh sách giấy tờ là bắt buộc')
+            }
+
           }
         } else {
           toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
@@ -2131,8 +2143,10 @@ export default {
       window.history.back()
     },
     changeCheckCKCD(val){
-      console.log(val)
       this.checkCKCD = val
+    },
+    changeCheckGiayTo(val){
+      this.checkGiayTo = val
     },
     checkQuyetDinh(){
       try{

@@ -3326,7 +3326,7 @@ export default {
                  console.log('7')
                 vm.dossiers['applicantIdNo'] = vm.dossiers['delegateIdNo']
                  console.log('8')
-                vm.dossiers['applicantName'] = vm.dossiers['delegateName']
+                vm.dossiers['applicantName'] = vm.dossiers['bookingName']
                  console.log('9')
                 vm.dossiers['address'] = vm.dossiers['delegateAddress']
                  console.log('10')
@@ -3341,6 +3341,7 @@ export default {
                 vm.dossiers['contactEmail'] = vm.dossiers['delegateEmail']
                  console.log('15')
             }
+            vm.dossiers['applicantName'] = vm.dossiers['bookingName']
             vm.dossiers['metaData'] = JSON.stringify(metaData)
             console.log('16')
             $('#dossiers_hidden').val(JSON.stringify(vm.dossiers))

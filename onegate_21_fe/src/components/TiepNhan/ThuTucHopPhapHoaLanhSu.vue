@@ -1623,8 +1623,8 @@ export default {
                             vm.changeDeNghiChungNhan()
                         }
                         vm.viaPostal = res.data.viaPostal ? true : false
-                        if(res.data.muc_dich) {
-                            vm.muc_dich = vm.listMucDichSuDung.find(e=>e.TEN === res.data.muc_dich)
+                        if(res.data.ma_muc_dich) {
+                            vm.muc_dich = vm.listMucDichSuDung.find(e=>e.MA === res.data.ma_muc_dich)
                         }
                         if(res.data.ngay_cap_cmnd) {
                             vm.ngay_cap_cmnd = res.data.ngay_cap_cmnd
@@ -1700,8 +1700,8 @@ export default {
                         tong_so: vm.tongSoBan,
                         su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
                         su_dung_tai_nuoc: arr,
-                        ma_muc_dich: vm.muc_dich.MA,
-                        muc_dich: vm.muc_dich.TEN,
+                        ma_muc_dich: vm.muc_dich ? vm.muc_dich.MA : '',
+                        muc_dich: vm.muc_dich ? vm.muc_dich.TEN : '',
                         ngay_cap_cmnd: vm.ngay_cap_cmnd
                     }
                     console.log('1111111111111',formData)
@@ -1931,8 +1931,8 @@ export default {
                             tong_so: vm.tongSoBan,
                             su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
                             su_dung_tai_nuoc: arrNuocSD,
-                            ma_muc_dich: vm.muc_dich.MA,
-                            muc_dich: vm.muc_dich.TEN,
+                            ma_muc_dich: vm.muc_dich ? vm.muc_dich.MA : '',
+                            muc_dich: vm.muc_dich ? vm.muc_dich.TEN : '',
                             ngay_cap_cmnd: vm.ngay_cap_cmnd
 
                         }
@@ -2179,10 +2179,9 @@ export default {
                         tong_so: vm.tongSoBan,
                         su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
                         su_dung_tai_nuoc: arrNuocSD,
-                        ma_muc_dich: vm.muc_dich.MA,
-                        muc_dich: vm.muc_dich.TEN,
+                        ma_muc_dich: vm.muc_dich ? vm.muc_dich.MA : '',
+                        muc_dich: vm.muc_dich ? vm.muc_dich.TEN : '',
                         ngay_cap_cmnd: vm.ngay_cap_cmnd
-
                     }
                     console.log('1111111111111',formData)
                     vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
@@ -2459,13 +2458,19 @@ export default {
         },
         checkCKCD(){
             let vm = this
-            for (let i = 0; i< vm.listGiayTo.length ; i++){
-                if(!vm.listGiayTo[i]['kiem_tra']){
-                    vm.$emit('changeCheckCKCD', false)
-                    return
+            if(vm.listGiayTo.length) {
+                vm.$emit('changeCheckGiayTo', true)
+                for (let i = 0; i< vm.listGiayTo.length ; i++){
+                    if(!vm.listGiayTo[i]['kiem_tra']){
+                        vm.$emit('changeCheckCKCD', false)
+                        return
+                    }
                 }
+                vm.$emit('changeCheckCKCD', true)
+            } else {
+                vm.$emit('changeCheckGiayTo', false)
+                vm.$emit('changeCheckCKCD', false)
             }
-             vm.$emit('changeCheckCKCD', true)
         },
         changeNgayKy(){
             let vm = this
