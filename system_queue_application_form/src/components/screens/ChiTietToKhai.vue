@@ -293,6 +293,14 @@ export default {
           }).catch(function (reject) {
             vm.loadingForm = false
           })
+          let filter2 = {
+            serviceInfoId: currentQuery.service
+          }       
+          vm.$store.dispatch('getFileTemplateEform', filter2).then(response => {
+            if (response.data) {
+              vm.$store.commit('setFileTemplateSelected', response.data)
+            }
+          })
         } else {
           vm.goBack()
         }
