@@ -1335,7 +1335,7 @@ export default {
         vm.$store.commit('setApplicantId', query)
       }, 2000)
       console.log(query)
-      if (query.trim().length === 0 ) {
+      if (query.trim().length === 0) {
         vm.thongTinChuHoSo.applicantIdNo = ''
         console.log(vm.thongTinChuHoSo.applicantIdNo)
         return null
@@ -1361,7 +1361,11 @@ export default {
                   vm.thongTinChuHoSo.applicantIdNo = ''
                   return null
                 } else {
-                  vm.thongTinChuHoSo.applicantIdNo = query.trim()
+                  if(parseInt(query)<0){
+                    vm.thongTinChuHoSo.applicantIdNo = ''
+                  } else {
+                    vm.thongTinChuHoSo.applicantIdNo = query.trim()
+                  }
                 }
               } else {
                   if(query.trim().length > 100) {
@@ -1369,7 +1373,11 @@ export default {
                     vm.thongTinChuHoSo.applicantIdNo = ''
                     return null
                   } else {
-                    vm.thongTinChuHoSo.applicantIdNo = query.trim()
+                    if(parseInt(query)<0){
+                      vm.thongTinChuHoSo.applicantIdNo = ''
+                    } else {
+                      vm.thongTinChuHoSo.applicantIdNo = query.trim()
+                    }
                   }
               }
               resolve(items)
@@ -1406,7 +1414,11 @@ export default {
                   vm.thongTinNguoiNopHoSo.delegateIdNo = ''
                   return null
                 } else {
-                  vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
+                  if(parseInt(query)<0){
+                    vm.thongTinNguoiNopHoSo.delegateIdNo = ''
+                  } else {
+                    vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
+                  }
                 }
               } else {
                 if(query.trim().length > 100) {
@@ -1414,7 +1426,11 @@ export default {
                   vm.thongTinNguoiNopHoSo.delegateIdNo = ''
                   return null
                 } else {
-                  vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
+                  if(parseInt(query)<0){
+                    vm.thongTinNguoiNopHoSo.delegateIdNo = ''
+                  } else {
+                    vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
+                  }
                 }
               }
               resolve(items)
