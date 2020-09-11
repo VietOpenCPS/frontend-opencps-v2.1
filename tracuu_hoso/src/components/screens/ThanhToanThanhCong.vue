@@ -161,8 +161,9 @@ export default {
           secure_hash: query.hasOwnProperty('secure_hash') ? query.secure_hash : '',
           dossierId: query.hasOwnProperty('dossierId') ? query.dossierId : '',
         }
-        vm.$store.dispatch('checkkeypay',filterCheckEpay).then(resCheckEpay => {
-          if (responseCode === '00' && resCheckEpay && resCheckEpay.result) {
+        // vm.$store.dispatch('checkkeypay',filterCheckEpay).then(resCheckEpay => {
+          // if (responseCode === '00' && resCheckEpay && resCheckEpay.result) {
+          if (responseCode === '00') {
             vm.statusDeal = true
           } else {
             vm.statusDeal = false
@@ -224,9 +225,9 @@ export default {
               })
             }
           })
-        }).catch(()=>{
-          vm.statusDeal = false
-        })
+        // }).catch(()=>{
+        //   vm.statusDeal = false
+        // })
 
       }
     })
