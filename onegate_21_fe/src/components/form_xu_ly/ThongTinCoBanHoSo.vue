@@ -278,7 +278,7 @@
                   <span class="pl-0 text-bold "> {{metaData.state && metaData.state === 1 ? 'Đã chết' : 'Còn sống'}}</span>
                 </div>
                 <div class="xs12 sm12 pb-1">
-                  <span class="pr-2">Số năm được hưởng: </span>
+                  <span class="pr-2">Số tháng được hưởng: </span>
                   <span class="pl-0 text-bold "> {{metaData.yearPayment ? metaData.yearPayment : ''}}</span>
                 </div>
                 <div class="xs12 sm12 pb-1">

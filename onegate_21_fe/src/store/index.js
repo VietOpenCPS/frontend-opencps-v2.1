@@ -3776,6 +3776,61 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    getGovAgencysNew ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              serviceLevelRole: '3,4',
+              isEmployee: true
+            }
+          }
+          axios.get('/o/rest/v2/serviceinfos/statistics/ADMINISTRATIVE_REGION/agency', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getDomainsNew ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              agency: data.agency ? data.agency : '',
+              sort: 'siblingSearch',
+              serviceLevel: '3,4',
+            }
+          }
+          axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
     getAgencyLists ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {

@@ -37,7 +37,7 @@
     <!--  -->
     <div class="menu_header_list py-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <v-layout wrap v-if="originality !== 1 && trangThaiHoSoList">
-        <!-- <v-flex v-if="!trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && !hiddenFilterDomain" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+        <v-flex v-if="!trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && !hiddenFilterDomain" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
           <v-autocomplete
             placeholder="Chọn cơ quan"
             :items="agencyListXuLyThuTuc"
@@ -52,7 +52,7 @@
             clearable
           >
           </v-autocomplete>
-        </v-flex> -->
+        </v-flex>
         <v-flex v-if="!trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && !hiddenFilterDomain" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
           <v-autocomplete
             :items="listLinhVuc"
@@ -152,7 +152,7 @@
             <v-date-picker v-model="dateCv" locale="vi" :first-day-of-week="1" no-title @input="changeDate()"></v-date-picker>
           </v-menu>
         </v-flex>
-        <v-flex :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2' : 'xs12 sm4 pl-2 pr-2'">
+        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan')" :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2' : 'xs12 sm4 pl-2 pr-2'">
           <div style="position:relative" v-if="trangThaiHoSoList">
             <v-text-field
               v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
@@ -3458,7 +3458,7 @@ export default {
     },
     getGovAgency () {
       let vm = this
-      vm.$store.dispatch('getGovAgency').then(
+      vm.$store.dispatch('getGovAgencysNew').then(
         result => {
           vm.agencyListXuLyThuTuc = result ? result : []
         }
