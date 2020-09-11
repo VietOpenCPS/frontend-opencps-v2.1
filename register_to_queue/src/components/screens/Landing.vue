@@ -19,6 +19,46 @@
       </v-card>
     </v-dialog>
     <v-layout wrap v-if="!dialogLoadingCreate">
+      <v-flex xs12 md4>
+        <div class="timkiemtokhai">
+          <div class="row-header no__hidden_class">
+            <v-toolbar flat height="36" dark color="primary">
+              <v-toolbar-title class="white--text" style="font-size: 14px;">TÌM KIẾM TỜ KHAI</v-toolbar-title>
+            </v-toolbar>
+          </div>
+          <v-card flat class="">
+            <v-card-text class='px-2 py-3'>
+              <v-form ref="formSearch" v-model="validSearch" lazy-validation>
+                <v-flex xs12>
+                  <v-text-field v-model="eformNoSearch" box clearable @keyup.enter.prevent="submitSearchEform"
+                    :rules="[v => !!v || 'Mã tờ khai là bắt buộc']" required
+                  >
+                    <template slot="label"> 
+                      <span>Mã tờ khai</span> 
+                      <span class="red--text darken-3"> *</span>
+                    </template>
+                  </v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <v-text-field v-model="secretSearch" box clearable @keyup.enter.prevent="submitSearchEform"
+                    :rules="[v => !!v || 'Mã bí mật là bắt buộc']" required
+                  >
+                    <template slot="label"> 
+                      <span>Mã bí mật</span> 
+                      <span class="red--text darken-3"> *</span>
+                    </template>
+                  </v-text-field>
+                </v-flex>
+                <v-flex sm12 class="text-xs-right">
+                  <v-btn color="blue darken-3" :loading="loading" :disabled="loading" v-on:click.native="submitSearchEform" class="mx-0" dark>
+                    <v-icon>search</v-icon>&nbsp; Tìm kiếm
+                  </v-btn>
+                </v-flex>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </div>
+      </v-flex>
       <v-flex xs12 md8 class="px-2">
         <div class="dangkyxephang">
           <div class="row-header no__hidden_class">
@@ -149,46 +189,6 @@
                 </v-layout>
                 <!--  -->
 
-              </v-form>
-            </v-card-text>
-          </v-card>
-        </div>
-      </v-flex>
-      <v-flex xs12 md4>
-        <div class="timkiemtokhai">
-          <div class="row-header no__hidden_class">
-            <v-toolbar flat height="36" dark color="primary">
-              <v-toolbar-title class="white--text" style="font-size: 14px;">TÌM KIẾM TỜ KHAI</v-toolbar-title>
-            </v-toolbar>
-          </div>
-          <v-card flat class="">
-            <v-card-text class='px-2 py-3'>
-              <v-form ref="formSearch" v-model="validSearch" lazy-validation>
-                <v-flex xs12>
-                  <v-text-field v-model="eformNoSearch" box clearable @keyup.enter.prevent="submitSearchEform"
-                    :rules="[v => !!v || 'Mã tờ khai là bắt buộc']" required
-                  >
-                    <template slot="label"> 
-                      <span>Mã tờ khai</span> 
-                      <span class="red--text darken-3"> *</span>
-                    </template>
-                  </v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                  <v-text-field v-model="secretSearch" box clearable @keyup.enter.prevent="submitSearchEform"
-                    :rules="[v => !!v || 'Mã bí mật là bắt buộc']" required
-                  >
-                    <template slot="label"> 
-                      <span>Mã bí mật</span> 
-                      <span class="red--text darken-3"> *</span>
-                    </template>
-                  </v-text-field>
-                </v-flex>
-                <v-flex sm12 class="text-xs-right">
-                  <v-btn color="blue darken-3" :loading="loading" :disabled="loading" v-on:click.native="submitSearchEform" class="mx-0" dark>
-                    <v-icon>search</v-icon>&nbsp; Tìm kiếm
-                  </v-btn>
-                </v-flex>
               </v-form>
             </v-card-text>
           </v-card>
