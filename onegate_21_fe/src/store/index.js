@@ -3788,7 +3788,7 @@ export const store = new Vuex.Store({
               isEmployee: true
             }
           }
-          axios.get('/o/rest/v2/serviceinfos/statistics/ADMINISTRATIVE_REGION/agency', param).then(function (response) {
+          axios.get('/o/rest/v2/serviceinfos/statistics/agency', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
