@@ -477,6 +477,13 @@
                 $('#form_' + vm.formBuilder[key].fieldName)[0].__vue__.validate()
                 return valid
               }
+              if (vm.formBuilder[key].fieldType === 'textarea') {
+                if(vm.formBuilder[key].value.length > 5000){
+                    valid = false
+                    alert(vm.formBuilder[key]['fieldLabel'] + ' không được quá 5000 ký tự!')
+                    return valid
+                }
+              }
             }
           }
         }

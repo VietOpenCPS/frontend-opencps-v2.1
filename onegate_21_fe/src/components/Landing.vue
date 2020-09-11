@@ -37,6 +37,22 @@
     <!--  -->
     <div class="menu_header_list py-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <v-layout wrap v-if="originality !== 1 && trangThaiHoSoList">
+        <!-- <v-flex v-if="!trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && !hiddenFilterDomain" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+          <v-autocomplete
+            placeholder="Chọn cơ quan"
+            :items="agencyListXuLyThuTuc"
+            v-model="agencyXuLyThuTuc"
+            @change="changeAgencyXuLy"
+            item-text="itemName"
+            item-value="itemCode"
+            hide-details
+            hide-no-data
+            return-object
+            box
+            clearable
+          >
+          </v-autocomplete>
+        </v-flex> -->
         <v-flex v-if="!trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && !hiddenFilterDomain" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
           <v-autocomplete
             :items="listLinhVuc"
@@ -136,7 +152,6 @@
             <v-date-picker v-model="dateCv" locale="vi" :first-day-of-week="1" no-title @input="changeDate()"></v-date-picker>
           </v-menu>
         </v-flex>
-
         <v-flex :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2' : 'xs12 sm4 pl-2 pr-2'">
           <div style="position:relative" v-if="trangThaiHoSoList">
             <v-text-field
@@ -947,9 +962,12 @@ export default {
     xacthuc_BNG: false,
     doActionGroup: false,
     doActionGroupKhacThuTuc: false,
+    agencyListXuLyThuTuc: [],
+    agencyXuLyThuTuc: '',
     isAdminSuper: false,
     actionId: '',
     dossierIdSelected: '',
+    agencyCode: '',
     dossierCountingShow: false,
     dossierCounting: [],
     advSearchToolsSelected: [],
@@ -1214,7 +1232,7 @@ export default {
       } else {
         vm.hosoDatasPage = 1
       }
-
+      vm.getGovAgency()
       if (vm.activePrintBienNhan) {
         vm.itemAction = {
           title: 'In phiếu biên nhận',
@@ -1446,6 +1464,7 @@ export default {
         if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
           vm.processListCongVan(currentQuery)
         }
+        vm.getGovAgency()
         if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')) {
           vm.getDonViCongVan(currentQuery)
         }
@@ -3437,6 +3456,70 @@ export default {
       }
       return metaDataOut
     },
+    getGovAgency () {
+      let vm = this
+      vm.$store.dispatch('getGovAgency').then(
+        result => {
+          vm.agencyListXuLyThuTuc = result ? result : []
+        }
+      ).catch(()=>{})
+    },
+    changeAgencyXuLy (item) {
+      console.log('change changeAgencyXuLy', item)
+      let vm = this
+      vm.agencyListXuLyThuTuc = item
+      if (item) {
+        setTimeout(function () {
+          // let domain = {
+          //   domain: vm.linhVucSelected.domainCode,
+          //   searchGovAgencyCode: vm.govAgencyFilterMenuConfig,
+          //   groupServiceCode: vm.groupServiceFilterMenuConfig
+          // }
+          // vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
+          //   vm.listThuTucHanhChinh = result.map(thuTuc => {
+          //     thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+          //     // thuTuc['displayName'] = thuTuc['serviceName']
+          //     return thuTuc
+          //   })
+          //   // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
+          // }).catch(function (){})
+          vm.listThuTucHanhChinh = vm.listThuTuc
+        }, 100)
+      } else {
+        vm.listThuTucHanhChinh = vm.listThuTuc
+        // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
+      }
+      if (item !== null && item !== undefined) {
+        vm.govAgencyCode = vm.agencyListXuLyThuTuc['itemCode']
+      } else {
+        vm.govAgencyCode = ''
+      }
+      console.log('change Domain queryString', queryString)
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      newQuery['agency'] = ''
+      for (let key in newQuery) {
+        if (key === 'page') {
+          queryString += key + '=1&'
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && key !== 'step') {
+          queryString += key + '=' + newQuery[key] + '&'
+        }
+      }
+      if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
+        let stepQuery = newQuery.hasOwnProperty('step') ? newQuery['step'] : ''
+        queryString += 'step=' + stepQuery + '&'
+      }
+      queryString += 'agency=' + vm.govAgencyCode
+      console.log('change Agency queryString', queryString)
+      vm.$router.push({
+        path: current.path + queryString,
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
+    },
+      
   }
 }
 </script>

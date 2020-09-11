@@ -177,7 +177,7 @@
                       v-model="thongTinChuHoSo.contactTelNo"
                       @change="thongTinChuHoSo.contactTelNo=String(thongTinChuHoSo.contactTelNo).trim()"
                       append-icon="phone"
-                      :rules="requiredOptions['contactTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
+                      :rules="requiredOptions['contactTelNo'] ? [rules.telNo, rules.required, rules.varchar100] : [rules.telNo, rules.varchar100]"
                       :required="requiredOptions['contactTelNo']"
                       ></v-text-field>
                     </v-flex>
@@ -397,7 +397,7 @@
                         v-model="thongTinNguoiNopHoSo.delegateTelNo"
                         append-icon="phone"
                         @change="thongTinNguoiNopHoSo.delegateName=String(thongTinNguoiNopHoSo.delegateName).trim()"
-                        :rules="requiredOptions['delegateTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
+                        :rules="requiredOptions['delegateTelNo'] ? [rules.telNo, rules.required, rules.varchar100] : [rules.telNo, rules.varchar100]"
                         :required="requiredOptions['delegateTelNo']"
                         :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
