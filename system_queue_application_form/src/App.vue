@@ -55,7 +55,7 @@
         }
       ],
       serviceInfoList: [
-      ]
+      ],
     }),
     components: {
       GoTop
@@ -65,6 +65,8 @@
 
     created () {
       var vm = this
+      let isMobile = window.innerWidth < 1264
+      vm.$store.commit('setIsMobile', isMobile)
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query

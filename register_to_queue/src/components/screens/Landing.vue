@@ -177,8 +177,6 @@
                     <div><span class="red--text">Chú ý:</span></div>
                     <div class="pl-3" style="text-align: justify;">
                       - Họ tên của người nộp phải trùng với họ tên của đương sự (người được cấp trong giấy tờ hoặc người xin cấp hộ chiếu) <br>
-                      - Số thứ tự và thời gian xếp hàng sẽ được gửi qua tin nhắn SMS <br>
-                      - Người đăng ký chịu khoản phí nhắn tin SMS
                     </div>
                   </v-flex>
                   <v-flex sm12 class="text-xs-right px-2">

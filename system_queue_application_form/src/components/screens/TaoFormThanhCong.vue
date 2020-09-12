@@ -8,8 +8,8 @@
         outline
         class="my-0 px-2 py-2"
       >
-        - Tờ khai đã đăng ký xếp hàng.<br>
-        - Thời gian xếp hàng: {{timeBooking}} ngày {{checkinDate}}.<br>
+        - Tờ khai đã đăng ký lịch hẹn online.<br>
+        - Thời gian tiếp nhận hồ sơ: {{timeBooking}} ngày {{checkinDate}}.<br>
         - Qua thời gian xếp hàng trên nếu chưa đến làm thủ tục đề nghị đăng ký xếp hàng lại.
       </v-alert>
     </div>
@@ -67,6 +67,15 @@
               </p>
               <p>
                 -  Tờ khai này chỉ có giá trị hiệu lực trong vòng 10 ngày làm việc. Quá thời hạn trên nếu chưa nộp tờ khai đề nghị kê khai tờ khai mới.
+              </p>
+              <p>
+                -  Thủ tục cấp, gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ, xin công hàm thị thực quầy số 3.
+              </p>
+              <p>
+                -  Thủ tục hợp pháp hóa lãnh sự, chứng nhận lãnh sự quầy số 7.
+              </p>
+              <p v-if="timeBooking">
+                -  BPMC - Cục Lãnh sự xác nhận lịch hẹn nộp hồ sơ Quý khách vào {{' '+ timeBooking + ' ngày '+ checkinDate + ' '}} vui lòng đến trước giờ hẹn 10' và sắp xếp hồ sơ đúng, đủ theo quy định. Quá thời gian hẹn trả trên, Quý khách vui lòng đăng ký xếp hàng lại.
               </p>
             </div>
           </v-flex>
