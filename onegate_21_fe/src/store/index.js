@@ -3785,7 +3785,7 @@ export const store = new Vuex.Store({
             },
             params: {
               serviceLevelRole: '3,4',
-              isEmployee: true
+              isEmployee: data.isEmployee ? data.isEmployee : ''
             }
           }
           axios.get('/o/rest/v2/serviceinfos/statistics/agency', param).then(function (response) {

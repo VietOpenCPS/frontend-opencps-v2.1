@@ -948,7 +948,7 @@
         let data = {
           administration: administrationCode ? administrationCode : ''
         }
-        vm.$store.dispatch('getGovAgencysNew', data).then(
+        vm.$store.dispatch('getGovAgencys', data).then(
           res => {
             vm.govAgencyList = res
           }
@@ -971,7 +971,8 @@
       },
       getAgencysXuLyThuTuc () {
         let vm = this
-        vm.$store.dispatch('getGovAgencysNew').then(function(result) {
+        let filter={}
+        vm.$store.dispatch('getGovAgencysNew',filter).then(function(result) {
           vm.agencyListXuLyThuTuc = result ? result : []
         })
       },

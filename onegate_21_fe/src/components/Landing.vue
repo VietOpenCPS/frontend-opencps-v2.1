@@ -3458,7 +3458,10 @@ export default {
     },
     getGovAgency () {
       let vm = this
-      vm.$store.dispatch('getGovAgencysNew').then(
+      let filter={
+        isEmployee: true
+      }
+      vm.$store.dispatch('getGovAgencysNew',filter).then(
         result => {
           vm.agencyListXuLyThuTuc = result ? result : []
         }
@@ -3483,7 +3486,7 @@ export default {
           //   })
           //   // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
           // }).catch(function (){})
-          vm.listThuTucHanhChinh = vm.listThuTuc
+          vm.listThuTucHanhChinh = vm.listThuTuc.filter(e=>e.govAgencyCode === item.itemCode)
         }, 100)
       } else {
         vm.listThuTucHanhChinh = vm.listThuTuc
