@@ -12,7 +12,7 @@
             Giao dịch thanh toán thành công
           </v-alert>
           <v-alert v-else outline :value="true" type="error">
-            Giao dịch thực hiện thất bại. {{keypayStatusText}}
+            Giao dịch thực hiện thất bại.
           </v-alert>
         </div>
         <v-card class="mx-2">

@@ -284,7 +284,7 @@ export default {
           }
           vm.$store.dispatch('getServiceDetail', filter).then(function (result) {
             vm.$store.commit('setServiceinfoSelected', result)
-            
+            vm.$store.commit('setFileTemplateSelected', result.fileTemplates)
             let data = {
               serviceInfoId: currentQuery.service,
               fileTemplateNo: currentQuery.template
@@ -292,14 +292,6 @@ export default {
             vm.loadScriptTemplate(data)
           }).catch(function (reject) {
             vm.loadingForm = false
-          })
-          let filter2 = {
-            serviceInfoId: currentQuery.service
-          }       
-          vm.$store.dispatch('getFileTemplateEform', filter2).then(response => {
-            if (response.data) {
-              vm.$store.commit('setFileTemplateSelected', response.data)
-            }
           })
         } else {
           vm.goBack()
@@ -325,7 +317,7 @@ export default {
           }
           vm.$store.dispatch('getServiceDetail', filter).then(function (result) {
             vm.$store.commit('setServiceinfoSelected', result)
-            
+            vm.$store.commit('setFileTemplateSelected', result.fileTemplates)
             let data = {
               serviceInfoId: currentQuery.service,
               fileTemplateNo: currentQuery.template
