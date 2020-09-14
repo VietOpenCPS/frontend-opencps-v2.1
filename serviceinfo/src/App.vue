@@ -1,6 +1,6 @@
 <template>
   <v-app id="app_serviceinfo" :style="!isMobile ? 'border: 1px solid #dedede;max-width:1300px;margin:0 auto' : 'max-width:1300px;margin:0 auto'">
-    <v-navigation-drawer app clipped floating width="265" v-if="!isMobile">
+    <v-navigation-drawer app clipped floating width="265" v-if="!isMobile && !setAgency">
       <v-list class="py-0">
         <v-list-group
           v-for="(item, index) in menuServiceInfos"
@@ -94,7 +94,8 @@
           icon: 'select_all'
         }
       ],
-      hasCoQuanThucHien: false
+      hasCoQuanThucHien: false,
+      setAgency: false     /**fix 1 đơn vị */
     }),
     components: {
       GoTop
@@ -144,6 +145,9 @@
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
+        if (newQuery.hasOwnProperty('setAgency')) {
+          vm.setAgency = true
+        }
         if (vm.hasCoQuanThucHien) {
           vm.menuServiceInfos = [
             {
@@ -288,6 +292,9 @@
         let vm = this
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
+        if (currentQuery.hasOwnProperty('setAgency')) {
+          vm.setAgency = true
+        }
         if (currentParams.hasOwnProperty('index') && currentParams['index']) {
           vm.isDetail = true
         } else {

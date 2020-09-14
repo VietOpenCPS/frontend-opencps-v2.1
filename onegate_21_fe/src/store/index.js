@@ -3117,7 +3117,7 @@ export const store = new Vuex.Store({
             },
             responseType: 'blob',
             params: {
-              payload: filter.payload
+              payload: filter.payload ? filter.payload : ''
             }
           }
           axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/documents/preview/' + filter.document, param).then(function (response) {
@@ -3226,8 +3226,8 @@ export const store = new Vuex.Store({
           let formData = new URLSearchParams()
           // formData.append('serviceCode', filter.serviceCode)
           // formData.append('govAgencyCode', filter.govAgencyCode)
-          formData.append('dossiers', filter.dossiers)
-          formData.append('payload', filter.payload)
+          formData.append('dossiers', filter.dossiers ? filter.dossiers : '')
+          formData.append('payload', filter.payload ? filter.payload : '')
           axios.post(state.initData.getNextAction + '/preview/' + filter.document ,formData , param).then(function (response) {
             let serializable = response.data
             let file = window.URL.createObjectURL(serializable)

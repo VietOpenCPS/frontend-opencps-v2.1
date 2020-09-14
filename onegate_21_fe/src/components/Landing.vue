@@ -278,7 +278,7 @@
             <v-checkbox v-else
               :input-value="props.all"
               :indeterminate="props.indeterminate"
-              :disabled="!thuTucHanhChinhSelected && (!doActionGroup || !doActionGroupKhacThuTuc) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0' && (!doActionGroup || !doActionGroupKhacThuTuc)) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '' && (!doActionGroup || !doActionGroupKhacThuTuc))"
+              :disabled="(!doActionGroup && !doActionGroupKhacThuTuc) && (!thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === ''))"
               primary
               hide-details
               @click.native="toggleAll"
@@ -324,8 +324,8 @@
               v-if="getUser('Administrator') || getUser('Administrator_data')"
             ></v-checkbox>
             <v-checkbox v-else
-              :disabled="props.item['assigned'] === 0 && (!doActionGroup || !doActionGroupKhacThuTuc) || (!thuTucHanhChinhSelected && !doActionGroupKhacThuTuc) || 
-              (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0' && !doActionGroupKhacThuTuc) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '' && !doActionGroupKhacThuTuc)"
+              :disabled="(props.item['assigned'] === 0 && !doActionGroup && !doActionGroupKhacThuTuc) || (!thuTucHanhChinhSelected && !doActionGroup && !doActionGroupKhacThuTuc) || 
+              (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0' && !doActionGroup && !doActionGroupKhacThuTuc) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '' && !doActionGroup && !doActionGroupKhacThuTuc)"
               v-model="props.selected"
               @change="changeSelected"
               primary
@@ -1325,7 +1325,7 @@ export default {
                 }
               }
             }
-            console.log('btnDynamics_menu 1', vm.btnDynamics)
+            console.log('vm.doActionGroup updated', vm.doActionGroup)
             vm.$store.commit('setLoadingDynamicBtn', false)
           }).catch(function (){})
         }, 200)
@@ -1456,6 +1456,7 @@ export default {
           // vm.doLoadingDataHoSo()
         // }
       }
+      console.log('vm.doActionGroup watch', vm.doActionGroup)
     },
     activeLoadingDataHoSo (val) {
       var vm = this
@@ -2431,7 +2432,11 @@ export default {
         } else if (String(item.form) === 'PREVIEW') {
           vm.doPreview(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'ACTIONS') {
-          vm.doActions(dossierItem, item, index, isGroup)
+          if (!vm.thuTucHanhChinhSelected || vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
+            alert('Loại thủ tục bắt buộc phải chọn khi thực hiện thao tác này')
+          } else {
+            vm.doActions(dossierItem, item, index, isGroup)
+          }
         } else if (String(item.form) === 'DELETE') {
           vm.doDeleteDossier(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'ROLLBACK_01') {
@@ -2521,18 +2526,22 @@ export default {
     doPrint02 (dossierItem, item, index, isGroup) {
       let vm = this
       // console.log('vm.selectedDoAction', vm.selectedDoAction)
-      if ((vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') && (!vm.doActionGroup || !vm.doActionGroupKhacThuTuc)) {
-        alert('Loại thủ tục bắt buộc phải chọn')
+      if ((vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') && !vm.doActionGroup && !vm.doActionGroupKhacThuTuc) {
+        alert('Loại thủ tục bắt buộc phải chọn khi thực hiện thao tác này')
       } else {
         if (vm.selectedDoAction.length === 0) {
           alert('Chọn hồ sơ để thực hiện')
           return
         }
+        let dossierSelect = vm.selectedDoAction.map(dossier => {
+            dossier['submissionNote'] = ''
+            return dossier
+          })
         let filter = {
           document: item.document,
           // 'serviceCode': vm.thuTucHanhChinhSelected.serviceCode,
           // 'govAgencyCode': vm.thuTucHanhChinhSelected.govAgencyCode,
-          dossiers: JSON.stringify(vm.selectedDoAction)
+          dossiers: JSON.stringify(dossierSelect)
         }
         vm.dialogPDFLoading = true
         vm.dialogPDF = true

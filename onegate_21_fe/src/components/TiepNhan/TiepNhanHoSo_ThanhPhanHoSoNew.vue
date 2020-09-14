@@ -315,7 +315,7 @@
                 <span>Xem</span>
               </v-tooltip>
 
-              <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView">
+              <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView && !khoTaiLieuCongDan">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
                   <v-badge>
                     <v-icon size="24" color="#004b94">cloud_upload</v-icon>
@@ -324,7 +324,7 @@
                 <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ lên</span>
                 <span v-else>Tải giấy tờ lên (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
               </v-tooltip>
-              <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && !onlyView">
+              <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && !onlyView && !khoTaiLieuCongDan">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="showFilesApplicant(item.partNo)">
                   <v-badge>
                     <v-icon size="24" color="orange darken-3">folder</v-icon>
@@ -333,7 +333,8 @@
                 <span>Giấy tờ đã nộp</span>
               </v-tooltip>
 
-              <!-- <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView">
+              <!-- Sử dụng kho tài liệu công dân -->
+              <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView && khoTaiLieuCongDan">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
                   <v-badge>
                     <v-icon size="24" color="#004b94">cloud_upload</v-icon>
@@ -342,15 +343,15 @@
                 <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ từ máy</span>
                 <span v-else>Tải giấy tờ từ máy (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
               </v-tooltip>
-              <v-tooltip class="pl-1 pt-1" top v-if="!onlyView">
+              <v-tooltip class="pl-1 pt-1" top v-if="!onlyView && khoTaiLieuCongDan">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="showDocumentApplicant(item, index)">
                   <v-badge>
                     <v-icon size="20" color="orange darken-3">fas fa fa-folder-open</v-icon>
                   </v-badge>
                 </v-btn>
                 <span>Tải giấy tờ từ kho</span>
-              </v-tooltip> -->
-
+              </v-tooltip>
+              <!-- end -->
 
             </v-flex>
           </v-layout>
@@ -641,6 +642,7 @@ export default {
         }
       },
     },
+    khoTaiLieuCongDan: true
   }),
   created () {
     let vm = this
@@ -855,7 +857,7 @@ export default {
         vm.$store.commit('setDossierTemplateLienThong', vm.dossierTemplateLienThong)
         if (fileTemplateNoArr.length > 0) {
           vm.fileTemplateNoString = fileTemplateNoArr.toString()
-          if (vm.applicantId && !vm.onlyView) {
+          if (vm.applicantId && !vm.onlyView && !khoTaiLieuCongDan) {
             vm.getDossierFileApplicants(vm.applicantId, vm.fileTemplateNoString)
           }
         }
