@@ -686,6 +686,7 @@
                   v-model="applicantNameGuide"
                   :rules="[rules.required, rules.varchar500]"
                   required
+                  @change="applicantNameGuide=String(applicantNameGuide).trim()"
                 ></v-text-field>
                 <v-radio-group class="my-0" v-model="applicantTypeGuide" row style="position:absolute;right:0;top:0">
                   <v-radio label="Công dân" :value="true"></v-radio>
@@ -699,6 +700,7 @@
                   box
                   :rules="[rules.varchar500]"
                   v-model="applicantAddressGuide"
+                  @change="applicantAddressGuide=String(applicantAddressGuide).trim()"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -708,6 +710,7 @@
                   placeholder="Nhập thư điện tử"
                   v-model="applicantEmailGuide"
                   :rules="[rules.varchar100]"
+                  @change="applicantEmailGuide=String(applicantEmailGuide).trim()"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -717,6 +720,7 @@
                   placeholder="Nhập số điện thoại"
                   v-model="applicantTelNoGuide"
                   :rules="[rules.varchar100]"
+                  @change="applicantTelNoGuide=String(applicantTelNoGuide).trim()"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -762,6 +766,7 @@
                 v-model="applicantNoteGuide"
                 rows="3"
                 :rules="[rules.varchar5000]"
+                 @change="applicantNoteGuide=String(applicantNoteGuide).trim()"
                 ></v-textarea>
               </v-flex>
             </v-layout>
