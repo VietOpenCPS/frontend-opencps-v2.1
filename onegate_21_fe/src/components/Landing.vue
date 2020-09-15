@@ -68,7 +68,7 @@
             box
           ></v-autocomplete>
         </v-flex>
-        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan')" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan')" xs12 class="pl-2 pr-2 input-group--text-field-box" :class="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'sm3' :'sm4'">
           <v-autocomplete
             :items="listCongVan"
             v-model="congvanSelected"
@@ -84,7 +84,7 @@
             :autofocus="focusSelect === 1"
           ></v-autocomplete>
         </v-flex>
-        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')" xs12  class="pl-2 pr-2 input-group--text-field-box" :class="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'sm3' :'sm4'">
           <v-autocomplete
             :items="listDonviCongVan"
             v-model="donviguiSelected"
@@ -99,7 +99,7 @@
             box
           ></v-autocomplete>
         </v-flex>
-        <v-flex :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'">
+        <v-flex :class="(trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && (trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') || !hiddenFilterDomain)) || (!hiddenFilterDomain && !trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan')) ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'">
           <v-autocomplete
             :items="listThuTucHanhChinh"
             v-model="thuTucHanhChinhSelected"
@@ -115,7 +115,7 @@
             :autofocus="focusSelect === 2"
           ></v-autocomplete>
         </v-flex>
-        <v-flex :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'" v-if="trangThaiHoSoList">
+        <v-flex :class="(trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && (trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') || !hiddenFilterDomain)) || (!hiddenFilterDomain && !trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan'))  ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'" v-if="trangThaiHoSoList">
           <v-autocomplete
             v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
             :items="listDichVu"
@@ -152,7 +152,7 @@
             <v-date-picker v-model="dateCv" locale="vi" :first-day-of-week="1" no-title @input="changeDate()"></v-date-picker>
           </v-menu>
         </v-flex>
-        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan')" :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2' : 'xs12 sm4 pl-2 pr-2'">
+        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && !trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')" :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2' : 'xs12 sm4 pl-2 pr-2'">
           <div style="position:relative" v-if="trangThaiHoSoList">
             <v-text-field
               v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
@@ -2169,11 +2169,20 @@ export default {
             groupServiceCode: vm.groupServiceFilterMenuConfig
           }
           vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
-            vm.listThuTucHanhChinh = result.map(thuTuc => {
+            let data = result.map(thuTuc => {
               thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
               // thuTuc['displayName'] = thuTuc['serviceName']
               return thuTuc
             })
+
+            if(vm.agencyXuLyThuTuc  && vm.agencyXuLyThuTuc.hasOwnProperty('itemCode')){
+              vm.listThuTucHanhChinh = data.filter(e=>e.govAgencyCode === vm.agencyXuLyThuTuc.itemCode)
+            } else {
+              vm.listThuTucHanhChinh = data
+            }
+            console.log('111111111',data)
+            console.log('111111111',vm.listThuTucHanhChinh)
+             
             // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
           }).catch(function (){})
         }, 100)
@@ -3475,7 +3484,7 @@ export default {
     changeAgencyXuLy (item) {
       console.log('change changeAgencyXuLy', item)
       let vm = this
-      vm.agencyListXuLyThuTuc = item
+      vm.agencyXuLyThuTuc = item
       if (item) {
         setTimeout(function () {
           // let domain = {
@@ -3491,14 +3500,22 @@ export default {
           //   })
           //   // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
           // }).catch(function (){})
-          vm.listThuTucHanhChinh = vm.listThuTuc.filter(e=>e.govAgencyCode === item.itemCode)
+          console.log(vm.linhVucSelected && vm.linhVucSelected.hasOwnProperty('domainCode'))
+          if(vm.linhVucSelected && vm.linhVucSelected.hasOwnProperty('domainCode')){
+            vm.listThuTucHanhChinh = vm.listThuTuc.filter(e=>e.govAgencyCode === item.itemCode && e.domainCode === vm.linhVucSelected.domainCode)
+          } else {
+            vm.listThuTucHanhChinh = vm.listThuTuc.filter(e=>e.govAgencyCode === item.itemCode)
+          }
+          console.log('22222222',vm.listThuTuc)
+          console.log('22222222',vm.listThuTucHanhChinh)
+          
         }, 100)
       } else {
         vm.listThuTucHanhChinh = vm.listThuTuc
         // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
       }
       if (item !== null && item !== undefined) {
-        vm.govAgencyCode = vm.agencyListXuLyThuTuc['itemCode']
+        vm.govAgencyCode = vm.agencyXuLyThuTuc['itemCode']
       } else {
         vm.govAgencyCode = ''
       }
