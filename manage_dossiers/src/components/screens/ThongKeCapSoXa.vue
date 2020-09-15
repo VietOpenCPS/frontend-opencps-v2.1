@@ -5,15 +5,18 @@
         <div class="pa-2 v-sheet theme--light" style="height: 100%; border: 1px solid #dedede;">
           <div class="row-header" style="height: 38px; overflow: hidden;background: #fff">
             <div class="background-triangle-big1">THỐNG KÊ THEO NĂM</div>
-            <div style="width: 200px;">
-              <v-select
-                width="200px"
-                :items="yearList"
-                item-value="value"
-                item-text="name"
-                v-model="yearSelected"
-              ></v-select>
-            </div>
+            <v-layout wrap>
+              <v-flex class="text-right">
+                <v-select
+                  style="width: 150px; display:inline-block; margin: 0 10px;"
+                  :items="yearList"
+                  item-value="value"
+                  item-text="name"
+                  v-model="yearSelected"
+                  @change="getStatisticsYear"
+                ></v-select>
+              </v-flex>
+            </v-layout>
           </div>
           <v-layout wrap align-center style="margin-top: 25px;">
             <v-flex md6 xs12>
@@ -48,15 +51,18 @@
         <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
           <div class="row-header mb-1" style="height: 38px; overflow: hidden;background: #fff">
             <div class="background-triangle-big1">THỐNG KÊ THEO THÁNG</div>
-            <div style="width: 200px;">
-              <v-select
-                width="200px"
-                :items="yearList"
-                item-value="value"
-                item-text="name"
-                v-model="yearSelected"
-              ></v-select>
-            </div>
+            <v-layout wrap>
+              <v-flex class="text-right">
+                <v-select
+                  style="width: 150px; display:inline-block; margin: 0 10px;"
+                  :items="yearList"
+                  item-value="value"
+                  item-text="name"
+                  v-model="yearSelectedColumn"
+                  @change="getStatisticsMonth"
+                ></v-select>
+              </v-flex>
+            </v-layout>
           </div>
           <v-card-text class="px-0 py-0">
             <v-layout wrap class="custom-class">
@@ -70,7 +76,7 @@
       <v-flex xs12 class="pa-2">
         <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
           <div class="row-header" style="height: 38px; overflow: hidden;background: #fff">
-            <div class="background-triangle-big1" style="width: 228px;">BÁO CÁO TỔNG HỢP</div>
+            <div class="background-triangle-big1" style="width: auto;">THỐNG KÊ TỔNG HỢP</div>
             <v-layout wrap>
               <v-flex class="text-right">
                 <v-select
@@ -79,6 +85,7 @@
                   style="width: 120px; display:inline-block; margin: 0 10px;"
                   item-text="name"
                   item-value="value"
+                  @change="getStatisticsReport"
                 ></v-select>
                 <v-select
                   v-model="yearSelected2"
@@ -86,14 +93,15 @@
                   style="width: 120px; display:inline-block; margin: 0 10px;"
                   item-text="name"
                   item-value="value"
+                  @change="getStatisticsReport"
                 ></v-select>
               </v-flex>
             </v-layout>
           </div>
-          <v-layout wrap v-if="false">
-            <v-flex xs12 class="my-3 report__table" style="overflow: hidden;">
+          <v-layout wrap>
+            <v-flex xs12 class="my-2 report__table" style="overflow: hidden;">
               <v-flex xs12 class="text-center text-bold my-3">
-                BÁO CÁO TỔNG HỢP TÌNH HÌNH GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH <br/>
+                TỔNG HỢP TÌNH HÌNH GIẢI QUYẾT HỒ SƠ <br/>
                 <span v-if="String(monthSelected) !== '0'">Tháng {{monthSelected}}</span> Năm {{yearSelected2}}
               </v-flex>
               <table class="my-2" hide-default-footer>
@@ -103,132 +111,123 @@
                       <span>STT</span>
                     </th>
                     <th rowspan="3" class="text-center px-2">
-                      <span>Đơn vị</span>
+                      <span>Lĩnh vực</span>
                     </th>
-                    <th colspan="5" class="text-center px-2 py-1">
-                      <span>Nhận giải quyết</span>
+                    <th width="80" rowspan="3" class="text-center px-2 py-1">
+                      <span>Số đầu kỳ</span>
                     </th>
-                    <th colspan="7" class="text-center px-2">
-                      <span>Kết quả nhận giải quyết</span>
+                    <th width="80" rowspan="3" class="text-center px-2">
+                      <span>Kỳ trước chuyển qua</span>
                     </th>
-                    <th colspan="3" class="text-center px-2">
-                      <span>Đang giải quyết</span>
+                    <th width="80" rowspan="3" class="text-center px-2">
+                      <span>Tiếp nhận trong kỳ</span>
                     </th>
-                    <th rowspan="3" style="text-align: center;" width="60" class="px-2">
-                      <span>Tạm dừng bổ sung điều kiện</span>
+                    <th colspan="7" class="px-2">
+                      <span>Kết quả giải quyết trong kỳ</span>
                     </th>
-                    <th rowspan="3" style="text-align: center;" width="60" class="px-2">
-                      <span>Rút không giải quyết</span>
+                    <th width="80" rowspan="3" class="text-center px-2 py-1">
+                      <span>Tổng số trễ hạn</span>
                     </th>
-                    <th rowspan="3" style="text-align: center;" width="60" class="px-2">
-                      <span>Tỉ lệ sớm và đúng hạn</span>
+                    <th width="80" rowspan="3" class="text-center px-2">
+                      <span>Hồ sơ trả lại</span>
                     </th>
-                  </tr>
-                  <tr>
-                    <th rowspan="2" class="text-center px-2 py-2">
-                      <span>Tổng số</span>
-                    </th>
-                    <th rowspan="2" class="text-center px-2">
-                      <span>Tồn trước</span>
-                    </th>
-                    <th colspan="3" class="text-center px-2 py-1">
-                      <span>Nhận trong kì</span>
-                    </th>
-                    <th rowspan="2" class="text-center px-2 py-1">
-                      <span>Tổng số</span>
-                    </th>
-                    <th colspan="3" class="text-center px-2">
-                      <span>Tình hình thực hiện</span>
-                    </th>
-                    <th rowspan="2" class="text-center px-2">
-                      <span>Từ chối giải quyết</span>
-                    </th>
-                    <th colspan="2" class="text-center px-2">
-                      <span>Trả kết quả</span>
-                    </th>
-                    <th rowspan="2" class="text-center px-2">
-                      <span>Tổng số</span>
-                    </th>
-                    <th rowspan="2" class="text-center px-2">
-                      <span>Còn hạn</span>
-                    </th>
-                    <th rowspan="2" class="text-center px-2">
-                      <span>Quá hạn</span>
+                    <th width="80" rowspan="3" class="text-center px-2">
+                      <span>Hồ sơ rút</span>
                     </th>
                   </tr>
                   <tr>
-                    <th class="text-center px-2">
+                    <th colspan="4" class="text-center px-2 py-2">
+                      <span>Hồ sơ đã giải quyết xong</span>
+                    </th>
+                    <th colspan="3" class="text-center px-2 py-2">
+                      <span>Hồ sơ đang giải quyết</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th width="80" class="text-center px-2">
                       <span>Tổng số</span>
                     </th>
-                    <th class="text-center px-2">
-                      <span>Một cửa</span>
+                    <th width="60" class="text-center px-2">
+                      <span>Sớm hạn</span>
                     </th>
-                    <th class="text-center px-2">
-                      <span>Trực tuyến</span>
-                    </th>
-                    <th class="text-center px-2">
-                      <span>Trước hạn</span>
-                    </th>
-                    <th class="text-center px-2">
+                    <th width="60" class="text-center px-2">
                       <span>Đúng hạn</span>
                     </th>
-                    <th class="text-center px-2">
+                    <th width="60" class="text-center px-2">
+                      <span>Trễ hạn</span>
+                    </th>
+                    <th width="80" class="text-center px-2">
+                      <span>Tổng số</span>
+                    </th>
+                    <th width="60" class="text-center px-2">
+                      <span>Chưa đến hạn</span>
+                    </th>
+                    <th width="60" class="text-center px-2">
                       <span>Quá hạn</span>
-                    </th>
-                    <th class="text-center px-2">
-                      <span>Đã trả</span>
-                    </th>
-                    <th class="text-center px-2">
-                      <span>Chưa trả</span>
                     </th>
                   </tr>
                 </thead>
-
-                <tbody>
+                <tbody v-if="loadingTable">
+                  <content-placeholders class="my-2">
+                    <content-placeholders-text :lines="5" />
+                  </content-placeholders>
+                </tbody>
+                <tbody v-if="!loadingTable && danhSachThongKe.length > 0">
                   <tr class="note__column">
                     <td align="center" class="px-2">(1)</td>
                     <td align="center" class="px-2">(2)</td>
-                    <td align="center" class="px-2">(3)</td>
+                    <td align="center" class="px-2">(3 = 4 + 5)</td>
                     <td align="center" class="px-2">(4)</td>
                     <td align="center" class="px-2">(5)</td>
-                    <td align="center" class="px-2">(6)</td>
+                    <td align="center" class="px-2">(6 = 7 + 8 + 9)</td>
                     <td align="center" class="px-2">(7)</td>
                     <td align="center" class="px-2">(8)</td>
                     <td align="center" class="px-2">(9)</td>
-                    <td align="center" class="px-2">(10)</td>
+                    <td align="center" class="px-2">(10 = 11 + 12)</td>
                     <td align="center" class="px-2">(11)</td>
                     <td align="center" class="px-2">(12)</td>
-                    <td align="center" class="px-2">(13)</td>
+                    <td align="center" class="px-2">(13 = 9 + 12)</td>
                     <td align="center" class="px-2">(14)</td>
                     <td align="center" class="px-2">(15)</td>
-                    <td align="center" class="px-2">(16)</td>
-                    <td align="center" class="px-2">(17)</td>
-                    <td align="center" class="px-2">(18)</td>
-                    <td align="center" class="px-2">(19)</td>
-                    <td align="center" class="px-2">(20)</td>
                   </tr>
-                  <tr v-for="(item,index) in danhSachThongKeThang" :key="index">
+                  <tr v-for="(item,index) in danhSachThongKe" :key="index">
                     <td align="center"  class="px-2">{{index + 1}}</td>
-                    <td align="left"  class="px-2" style="padding: 8px 10px;">{{item.govAgencyName}}</td>
+                    <td align="left"  class="px-2" style="padding: 8px 10px;">{{item.domainName}}</td>
                     <td align="center"  class="px-2">{{item.processCount}}</td>
                     <td align="center"  class="px-2">{{item.remainingCount}}</td>
                     <td align="center" class="px-2">{{item.receivedCount}}</td>
-                    <td align="center" class="px-2">{{item.onegateCount}}</td>
-                    <td align="center" class="px-2">{{item.onlineCount}}</td>
                     <td align="center" class="px-2">{{item.releaseCount}}</td>
                     <td align="center" class="px-2">{{item.betimesCount}}</td>
                     <td align="center" class="px-2">{{item.ontimeCount}}</td>
                     <td align="center" class="px-2">{{item.overtimeCount}}</td>
-                    <td align="center" class="px-2">{{item.unresolvedCount}}</td>
-                    <td align="center" class="px-2">{{item.doneCount}}</td>
-                    <td align="center" class="px-2">{{item.releasingCount}}</td>
                     <td align="center" class="px-2">{{item.processingCount}}</td>
                     <td align="center" class="px-2">{{item.undueCount}}</td>
                     <td align="center" class="px-2">{{item.overdueCount}}</td>
-                    <td align="center" class="px-2">{{item.waitingCount}}</td>
+                    <td align="center" class="px-2">{{item.overtimeCount + item.overdueCount}}</td>
+                    <td align="center" class="px-2">{{item.deniedCount}}</td>
                     <td align="center" class="px-2">{{item.cancelledCount}}</td>
-                    <td align="center" class="px-2">{{item.ontimePercentage}}</td>
                   </tr>
+                </tbody>
+                <tbody v-if="!loadingTable && danhSachThongKe.length === 0">
+                  <tr class="note__column">
+                    <td align="center" class="px-2">(1)</td>
+                    <td align="center" class="px-2">(2)</td>
+                    <td align="center" class="px-2">(3 = 4 + 5)</td>
+                    <td align="center" class="px-2">(4)</td>
+                    <td align="center" class="px-2">(5)</td>
+                    <td align="center" class="px-2">(6 = 7 + 8 + 9)</td>
+                    <td align="center" class="px-2">(7)</td>
+                    <td align="center" class="px-2">(8)</td>
+                    <td align="center" class="px-2">(9)</td>
+                    <td align="center" class="px-2">(10 = 11 + 12)</td>
+                    <td align="center" class="px-2">(11)</td>
+                    <td align="center" class="px-2">(12)</td>
+                    <td align="center" class="px-2">(13 = 9 + 12)</td>
+                    <td align="center" class="px-2">(14)</td>
+                    <td align="center" class="px-2">(15)</td>
+                  </tr>
+                </tbody>
+                <tfoot>
                   <tr class="sum__column" style="font-weight: bold;">
                     <td align="center" colspan="2">Tổng số</td>
                     <td align="center" class="px-2">{{totalCounter['total_3']}}</td>
@@ -244,13 +243,8 @@
                     <td align="center" class="px-2">{{totalCounter['total_13']}}</td>
                     <td align="center" class="px-2">{{totalCounter['total_14']}}</td>
                     <td align="center" class="px-2">{{totalCounter['total_15']}}</td>
-                    <td align="center" class="px-2">{{totalCounter['total_16']}}</td>
-                    <td align="center" class="px-2">{{totalCounter['total_17']}}</td>
-                    <td align="center" class="px-2">{{totalCounter['total_18']}}</td>
-                    <td align="center" class="px-2">{{totalCounter['total_19']}}</td>
-                    <td align="center" class="px-2">{{totalCounter['total_20']}}</td>
                   </tr>
-                </tbody>
+                </tfoot>
               </table>
             </v-flex>
           </v-layout>
@@ -277,8 +271,10 @@ export default {
     donViXa: 'total',
     groupCode: "SBN",
     isLoading: false,
+    loadingTable: false,
     yearSelected: new Date().getFullYear(),
     yearSelected2: new Date().getFullYear(),
+    yearSelectedColumn: new Date().getFullYear(),
     monthSelected: new Date().getMonth() + 1,
     distGroupSelected: "",
     statisticalYear: [0, 0],
@@ -532,9 +528,10 @@ export default {
       waitingCount: 0,
       year: 2020
     },
-    danhSachThongKeThang: [],
+    danhSachThongKe: [],
     quanhuyenSelected: '',
-    labelPieChartConfig: ''
+    labelPieChartConfig: '',
+    totalCounter: {}
   }),
   computed: {
     yearList() {
@@ -554,6 +551,7 @@ export default {
     vm.$nextTick(() => {
       vm.getStatisticsYear()
       vm.getStatisticsMonth()
+      vm.getStatisticsReport()
     })
   },
   watch: {
@@ -561,7 +559,7 @@ export default {
   },
   methods: {
     getStatisticsYear() {
-      let vm = this;
+      let vm = this
       let config = {
         url: "/o/rest/statistics",
         headers: {
@@ -607,7 +605,7 @@ export default {
         params: {
           domain: "total",
           agency: "total",
-          year: vm.yearSelected2
+          year: vm.yearSelectedColumn
         }
       }
 
@@ -641,13 +639,96 @@ export default {
                   data: dataItem3
                 }
               ]
-            }, 200)
+            }, 300)
             
           }
         })
         .catch()
     },
-    
+    getStatisticsReport() {
+      let vm = this
+      vm.loadingTable = true
+      setTimeout (function () {
+        let config = {
+        url: "/o/rest/statistics",
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId(),
+          Accept: "application/json"
+        },
+        params: {
+          agency: "total",
+          year: vm.yearSelected2,
+          month: vm.monthSelected
+        }
+      }
+      vm.danhSachThongKe = []
+      axios
+        .request(config)
+        .then(function(response) {
+          vm.loadingTable = false
+          if (response.data.hasOwnProperty('data') && response.data.data) {
+            let dataTotal = response.data.data.filter(function (item) {
+              return item.domainCode === ''
+            })[0]
+            let dataRes = response.data.data.filter(function (item) {
+              return item.domainCode !== ''
+            })
+            let sortDomain = function (domain) {
+              function compare(a, b) {
+                if (a.domainName < b.domainName)
+                  return -1
+                if (a.domainName > b.domainName)
+                  return 1
+                return 0
+              }
+              return domain.sort(compare)
+            }
+            vm.danhSachThongKe = sortDomain(dataRes)
+            let total = {
+              'total_3': dataTotal.processCount,
+              'total_4': dataTotal.remainingCount,
+              'total_5': dataTotal.receivedCount,
+              'total_6': dataTotal.releaseCount,
+              'total_7': dataTotal.betimesCount,
+              'total_8': dataTotal.ontimeCount,
+              'total_9': dataTotal.overtimeCount,
+              'total_10': dataTotal.processingCount,
+              'total_11': dataTotal.undueCount,
+              'total_12': dataTotal.overdueCount,
+              'total_13': dataTotal.overtimeCount + dataTotal.overdueCount,
+              'total_14': dataTotal.deniedCount,
+              'total_15': dataTotal.cancelledCount
+            }
+            vm.totalCounter = total
+          } else {
+            vm.setTotalCounter()
+          }
+        })
+        .catch(function () {
+          vm.loadingTable = false
+          vm.setTotalCounter()
+        })
+      }, 200)
+    },
+    setTotalCounter () {
+      let vm = this
+      let total = {
+        'total_3': 0,
+        'total_4': 0,
+        'total_5': 0,
+        'total_6': 0,
+        'total_7': 0,
+        'total_8': 0,
+        'total_9': 0,
+        'total_10': 0,
+        'total_11': 0,
+        'total_12': 0,
+        'total_13': 0,
+        'total_14': 0,
+        'total_15': 0
+      }
+      vm.totalCounter = total
+    },
   }
 };
 </script>

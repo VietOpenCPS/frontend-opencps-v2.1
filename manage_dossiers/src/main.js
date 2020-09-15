@@ -4,8 +4,10 @@ import router from './router_dev'
 import vuetify from './plugins/vuetify';
 import VueApexCharts from 'vue-apexcharts'
 import axios from 'axios'
+import VueContentPlaceholders from 'vue-content-placeholders'
 Vue.use(VueApexCharts)
 Vue.component('apexchart', VueApexCharts)
+Vue.use(VueContentPlaceholders)
 Vue.config.productionTip = false
 
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : ''
