@@ -64,7 +64,7 @@
           <v-toolbar-title class="ml-0" style="font-size: 16px">Thông tin giấy phép</v-toolbar-title>
           <v-spacer></v-spacer>
         </v-toolbar> -->
-        <bbat-table-editor-component-simple ref="bbatFormSimple" :id="id" :datainput="detail"></bbat-table-editor-component-simple>
+        <!-- <bbat-table-editor-component-simple ref="bbatFormSimple" :id="id" :datainput="detail"></bbat-table-editor-component-simple> -->
       </v-navigation-drawer>
       
       <v-layout row wrap :class='{"fix_tool_bottom": offsetCheck > 300}'>

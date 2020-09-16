@@ -636,6 +636,7 @@ export default {
         }
         vm.$store.dispatch('getEformSecret', filter).then(function(result) {
           let bookingName = ''
+          let formHPH = false
           if (result && result.hasOwnProperty('eFormId')) {
             vm.detailEform = result
             let templateFile = vm.formTemplateList.filter(function (item) {
@@ -653,37 +654,76 @@ export default {
             // 
             try {
               let name = JSON.parse(result['eFormData'])
+              console.log(name)
+              if(name.hasOwnProperty('list_giay_to')){
+                formHPH = true
+              }
               bookingName = name !== 'undefined' && name !== undefined ? name['bookingName'] : ''
             } catch (e) {
               console.log('lỗi parse eFormData get bookingName')
             }
-            if (bookingName.toLowerCase() !== String(vm.applicantName).toLowerCase()) {
-              toastr.clear()
-              toastr.error('Họ tên người nộp không trùng với họ tên của đương sự (người được cấp trong giấy tờ hoặc người xin cấp hộ chiếu). Vui lòng kiểm tra lại.')
-            } else {
-              filterBooking.className = 'EFORM'
-              filterBooking.classPK = result.eFormId
-              filterBooking.serviceCode = result.serviceCode
-              filterBooking.bookingName = bookingName
-              filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
-              filterBooking.serverCode = vm.agencyTiepNhan.serverNo
-              // 
-              let filter = {
-                groupIdBooking: vm.agencyTiepNhan.value,
-                bookingDate: vm.applicantIdDateFormatted,
-                serverCode: vm.agencyTiepNhan.serverNo
-              }
-              vm.$store.dispatch('getCounterBookingProxy', filter).then(function (result) {
-                console.log('checkCounter', result)
-                if (result) {
-                  vm.isSlot = true
-                  vm.createBookingOnline(filterBooking)
-                } else {
-                  vm.isSlot = false
+            if(formHPH){
+              console.log(result['eFormData'])
+              console.log(vm.checkNguoiNop(result['eFormData']))
+              // if (bookingName.toLowerCase() !== String(vm.applicantName).toLowerCase()) {
+              if (vm.checkNguoiNop(result['eFormData'])) {
+                toastr.clear()
+                toastr.error('Họ tên người nộp không trùng với họ tên của đương sự (người được cấp trong giấy tờ hoặc người xin cấp hộ chiếu). Vui lòng kiểm tra lại.')
+              } else {
+                filterBooking.className = 'EFORM'
+                filterBooking.classPK = result.eFormId
+                filterBooking.serviceCode = result.serviceCode
+                filterBooking.bookingName = bookingName
+                filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
+                filterBooking.serverCode = vm.agencyTiepNhan.serverNo
+                // 
+                let filter = {
+                  groupIdBooking: vm.agencyTiepNhan.value,
+                  bookingDate: vm.applicantIdDateFormatted,
+                  serverCode: vm.agencyTiepNhan.serverNo
                 }
-              }).catch(reject => {
-                vm.isSlot = false
-              })
+                vm.$store.dispatch('getCounterBookingProxy', filter).then(function (result) {
+                  console.log('checkCounter', result)
+                  if (result) {
+                    vm.isSlot = true
+                    vm.createBookingOnline(filterBooking)
+                  } else {
+                    vm.isSlot = false
+                  }
+                }).catch(reject => {
+                  vm.isSlot = false
+                })
+              }
+            } else {
+              if (bookingName.toLowerCase() !== String(vm.applicantName).toLowerCase()) {
+              // if (vm.checkNguoiNop(result['eFormData'])) {
+                toastr.clear()
+                toastr.error('Họ tên người nộp không trùng với họ tên của đương sự (người được cấp trong giấy tờ hoặc người xin cấp hộ chiếu). Vui lòng kiểm tra lại.')
+              } else {
+                filterBooking.className = 'EFORM'
+                filterBooking.classPK = result.eFormId
+                filterBooking.serviceCode = result.serviceCode
+                filterBooking.bookingName = bookingName
+                filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
+                filterBooking.serverCode = vm.agencyTiepNhan.serverNo
+                // 
+                let filter = {
+                  groupIdBooking: vm.agencyTiepNhan.value,
+                  bookingDate: vm.applicantIdDateFormatted,
+                  serverCode: vm.agencyTiepNhan.serverNo
+                }
+                vm.$store.dispatch('getCounterBookingProxy', filter).then(function (result) {
+                  console.log('checkCounter', result)
+                  if (result) {
+                    vm.isSlot = true
+                    vm.createBookingOnline(filterBooking)
+                  } else {
+                    vm.isSlot = false
+                  }
+                }).catch(reject => {
+                  vm.isSlot = false
+                })
+              }
             }
           } else {
             toastr.clear()
@@ -875,6 +915,29 @@ export default {
     },
     goBack () {
       window.history.back()
+    },
+    checkNguoiNop (stringEform) {
+      let vm = this
+      let listGiayTo = []
+      let bookingName = ''
+      try {
+        let name = JSON.parse(stringEform)
+        listGiayTo = name !== 'undefined' && name !== undefined ? name['list_giay_to'] : []
+        bookingName = name !== 'undefined' && name !== undefined ? name['bookingName'] : ''
+      } catch (e) {
+        console.log('lỗi parse eFormData get bookingName')
+        return true
+      }
+      if(bookingName.toLowerCase() !== String(vm.applicantName).toLowerCase()){
+        return true
+      }
+      console.log(listGiayTo)
+      for (let i =0;i<listGiayTo.length;i++){
+        if(String(listGiayTo[i]['ten_nguoi_duoc_cap']).toLowerCase() === String(vm.applicantName).toLowerCase()){
+          return false
+        }
+      }
+      return true
     }
   }
 }
