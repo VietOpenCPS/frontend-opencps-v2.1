@@ -299,9 +299,9 @@ export default {
       })[0]['itemName']
     },
     changeViaPostal (event) {
-      console.log('changeViaPostal', event)
-      this.$store.commit('setViaPostal', event)
-      this.$emit('changeViapostal', event)
+      // console.log('changeViaPostal', event)
+      // this.$store.commit('setViaPostal', event)
+      // this.$emit('changeViapostal', event)
       let dataChuyenPhat = {
         vnpostalStatus: event,
         postalServiceCode: this.dichVuChuyenPhatHoSo.postalServiceCode ? this.dichVuChuyenPhatHoSo.postalServiceCode : '',
