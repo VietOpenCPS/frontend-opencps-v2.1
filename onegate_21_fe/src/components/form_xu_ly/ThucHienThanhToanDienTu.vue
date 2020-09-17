@@ -94,7 +94,7 @@
                 <v-avatar style="cursor: pointer">
                   <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
                 </v-avatar>
-                <span class="py-2" style="cursor: pointer">Thanh toán qua Cổng DVQG</span>
+                <span class="py-2" style="cursor: pointer">Thanh toán qua Cổng DVCQG</span>
               </v-chip>
 
               <v-chip v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('ppkpdvcqg')" color="orange" text-color="white"
@@ -104,7 +104,7 @@
                 <v-avatar style="cursor: pointer">
                   <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
                 </v-avatar>
-                <span class="py-2" style="cursor: pointer">Thanh toán qua Cổng DVQG</span>
+                <span class="py-2" style="cursor: pointer">Thanh toán qua Cổng DVCQG</span>
               </v-chip>
 
               <v-chip v-if="dataVietelPay" color="green" text-color="white" @click.native="showViettelPay" 

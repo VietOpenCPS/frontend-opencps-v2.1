@@ -191,21 +191,42 @@
                     <td align="center" class="px-2">(15)</td>
                   </tr>
                   <tr v-for="(item,index) in danhSachThongKe" :key="index">
-                    <td align="center"  class="px-2">{{index + 1}}</td>
-                    <td align="left"  class="px-2" style="padding: 8px 10px;">{{item.domainName}}</td>
-                    <td align="center"  class="px-2">{{item.processCount}}</td>
+                    <td align="center" class="px-2">{{index + 1}}</td>
+                    <td align="left" class="px-2" style="padding: 8px 10px;">{{item.domainName}}</td>
+                    <td align="center" class="px-2">{{item.processCount}}</td>
                     <td align="center"  class="px-2">{{item.remainingCount}}</td>
                     <td align="center" class="px-2">{{item.receivedCount}}</td>
                     <td align="center" class="px-2">{{item.releaseCount}}</td>
-                    <td align="center" class="px-2">{{item.betimesCount}}</td>
-                    <td align="center" class="px-2">{{item.ontimeCount}}</td>
-                    <td align="center" class="px-2">{{item.overtimeCount}}</td>
+                    <td align="center" class="px-2" :style="item.betimesCount ? 'cursor: pointer;text-decoration: underline' : ''"
+                      :title="item.betimesCount ? 'Xem danh sách hồ sơ' : ''" @click="item.betimesCount ? viewDossierList(item, 'betimesCount') : ''">
+                      {{item.betimesCount}}
+                    </td>
+                    <td align="center" class="px-2" :style="item.ontimeCount ? 'cursor: pointer;text-decoration: underline' : ''"
+                      :title="item.ontimeCount ? 'Xem danh sách hồ sơ' : ''" @click="item.ontimeCount ? viewDossierList(item, 'ontimeCount') : ''">
+                      {{item.ontimeCount}}
+                    </td>
+                    <td align="center" class="px-2" :style="item.overtimeCount ? 'cursor: pointer;text-decoration: underline' : ''"
+                      :title="item.overtimeCount ? 'Xem danh sách hồ sơ' : ''" @click="item.overtimeCount ? viewDossierList(item, 'overtimeCount') : ''">
+                      {{item.overtimeCount}}
+                    </td>
                     <td align="center" class="px-2">{{item.processingCount}}</td>
-                    <td align="center" class="px-2">{{item.undueCount}}</td>
-                    <td align="center" class="px-2">{{item.overdueCount}}</td>
+                    <td align="center" class="px-2" :style="item.undueCount ? 'cursor: pointer;text-decoration: underline' : ''"
+                      :title="item.undueCount ? 'Xem danh sách hồ sơ' : ''" @click="item.undueCount ? viewDossierList(item, 'undueCount') : ''">
+                      {{item.undueCount}}
+                    </td>
+                    <td align="center" class="px-2" :style="item.overdueCount ? 'cursor: pointer;text-decoration: underline' : ''"
+                      :title="item.overdueCount ? 'Xem danh sách hồ sơ' : ''" @click="item.overdueCount ? viewDossierList(item, 'overdueCount') : ''">
+                      {{item.overdueCount}}
+                    </td>
                     <td align="center" class="px-2">{{item.overtimeCount + item.overdueCount}}</td>
-                    <td align="center" class="px-2">{{item.deniedCount}}</td>
-                    <td align="center" class="px-2">{{item.cancelledCount}}</td>
+                    <td align="center" class="px-2" :style="item.unresolvedCount ? 'cursor: pointer;text-decoration: underline' : ''"
+                      :title="item.unresolvedCount ? 'Xem danh sách hồ sơ' : ''" @click="item.unresolvedCount ? viewDossierList(item, 'unresolvedCount') : ''">
+                      {{item.unresolvedCount}}
+                    </td>
+                    <td align="center" class="px-2" :style="item.cancelledCount ? 'cursor: pointer;text-decoration: underline' : ''"
+                      :title="item.cancelledCount ? 'Xem danh sách hồ sơ' : ''" @click="item.cancelledCount ? viewDossierList(item, 'cancelledCount') : ''">
+                      {{item.cancelledCount}}
+                    </td>
                   </tr>
                 </tbody>
                 <tbody v-if="!loadingTable && danhSachThongKe.length === 0">
@@ -251,15 +272,33 @@
         </div>
       </v-flex>
     </v-layout>
-
+    <!--  -->
+    <v-dialog v-model="dialog_dossier" fullscreen hide-overlay transition="dialog-bottom-transition">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title class="">Danh sách hồ sơ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-toolbar-items>
+            <v-btn icon dark @click="dialog_dossier = false">
+              <v-icon size="24">reply</v-icon>
+            </v-btn>
+          </v-toolbar-items>
+        </v-toolbar>
+        <v-card-text v-if="reRender">
+          <danh-sach-ho-so ref="danhsachhoso" :groupId="groupIdAgency" :apiGetDossier="apiGetDossier"></danh-sach-ho-so>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+import axios from "axios"
+import DanhSachHoSo from './DanhSachHoSo'
 import TinyPagination from './Pagination.vue'
 export default {
   components: {
+    'danh-sach-ho-so': DanhSachHoSo,
     'tiny-pagination': TinyPagination
   },
   data: () => ({
@@ -275,7 +314,7 @@ export default {
     yearSelected: new Date().getFullYear(),
     yearSelected2: new Date().getFullYear(),
     yearSelectedColumn: new Date().getFullYear(),
-    monthSelected: new Date().getMonth() + 1,
+    monthSelected: 0,
     distGroupSelected: "",
     statisticalYear: [0, 0],
     statisticalSBN: [0, 0, 0, 0, 0, 0],
@@ -489,7 +528,7 @@ export default {
       betimesCount: 1,
       cancelledCount: 0,
       companyId: 0,
-      deniedCount: 0,
+      unresolvedCount: 0,
       domainCode: "",
       domainName: "",
       doneCount: 0,
@@ -531,7 +570,12 @@ export default {
     danhSachThongKe: [],
     quanhuyenSelected: '',
     labelPieChartConfig: '',
-    totalCounter: {}
+    totalCounter: {},
+
+    dialog_dossier: false,
+    reRender: false,
+    apiGetDossier: '',
+    groupIdAgency: ''
   }),
   computed: {
     yearList() {
@@ -696,7 +740,7 @@ export default {
               'total_11': dataTotal.undueCount,
               'total_12': dataTotal.overdueCount,
               'total_13': dataTotal.overtimeCount + dataTotal.overdueCount,
-              'total_14': dataTotal.deniedCount,
+              'total_14': dataTotal.unresolvedCount,
               'total_15': dataTotal.cancelledCount
             }
             vm.totalCounter = total
@@ -709,6 +753,45 @@ export default {
           vm.setTotalCounter()
         })
       }, 200)
+    },
+    viewDossierList (itemRecord, statusCount) {
+      let vm = this
+      let fromDate = '1/' + vm.monthSelected + '/' + vm.yearSelected2
+      let toDate = '31/' + vm.monthSelected + '/' + vm.yearSelected2
+      if (vm.monthSelected === 0) {
+        fromDate = '1/1/' + vm.yearSelected2
+        toDate = '31/12/' + vm.yearSelected2
+      }
+      vm.reRender = false
+      if (statusCount === 'betimesCount') {
+        vm.apiGetDossier = '/o/rest/v2/dossiers?status=releasing,posting,done&time=betimes&fromReleaseDate=' + fromDate + '&toReleaseDate=' + toDate
+      }
+      if (statusCount === 'ontimeCount') {
+        vm.apiGetDossier = '/o/rest/v2/dossiers?status=releasing,posting,done&time=ontime&fromReleaseDate=' + fromDate + '&toReleaseDate=' + toDate
+      }
+      if (statusCount === 'overtimeCount') {
+        vm.apiGetDossier = '/o/rest/v2/dossiers?status=releasing,posting,done&time=overtime&fromReleaseDate=' + fromDate + '&toReleaseDate=' + toDate
+      }
+      if (statusCount === 'undueCount') {
+        vm.apiGetDossier = '/o/rest/v2/dossiers?status=processing,interoperating,planning&time=undue&fromReceiveDate=' + fromDate + '&toReceiveDate=' + toDate
+      }
+      if (statusCount === 'overdueCount') {
+        vm.apiGetDossier = '/o/rest/v2/dossiers?status=processing,interoperating,planning&time=overdue&fromReceiveDate=' + fromDate + '&toReceiveDate=' + toDate
+      }
+      if (statusCount === 'unresolvedCount') {
+        vm.apiGetDossier = '/o/rest/v2/dossiers?status=unresolved&fromReleaseDate=' + fromDate + '&toReleaseDate=' + toDate
+      }
+      if (statusCount === 'cancelledCount') {
+        vm.apiGetDossier = '/o/rest/v2/dossiers?status=cancelled&fromReleaseDate=' + fromDate + '&toReleaseDate=' + toDate
+      }
+      vm.apiGetDossier = vm.apiGetDossier + '&domain=' + itemRecord.domainCode
+      vm.groupIdAgency = window.themeDisplay.getScopeGroupId()
+      console.log('groupIdAgency-api', vm.groupIdAgency, vm.apiGetDossier)
+      vm.dialog_dossier = true
+      vm.reRender = true
+      setTimeout(function () {
+        vm.$refs.danhsachhoso.initData()
+      }, 100)
     },
     setTotalCounter () {
       let vm = this

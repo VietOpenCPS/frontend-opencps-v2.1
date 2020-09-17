@@ -2,7 +2,7 @@
   <div style="width: 1300px; margin: 0 auto">
     <div v-if="!loadingConfig">
       <thong-ke-trung-tam v-if="donViTrungTam"></thong-ke-trung-tam>
-      <thong-ke-quan-huyen v-if="donViHuyen" :govAgencyInfo="govAgencyHuyen"></thong-ke-quan-huyen>
+      <thong-ke-quan-huyen v-if="donViHuyen && !donViTrungTam" :govAgencyInfo="govAgencyHuyen"></thong-ke-quan-huyen>
       <thong-ke-so-xa v-if="!donViTrungTam && !donViHuyen"></thong-ke-so-xa>
     </div>
   </div>
@@ -29,6 +29,12 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      if (donViTrungTam) {
+        vm.donViTrungTam = true
+      }
+    } catch (error) {
+    }
     vm.getDynamicReports()
   },
   watch: {

@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div style="text-align: left;position: absolute;line-height: 46px">Tổng số <span class="text-bold primary--text">{{total}}</span> thủ tục. </div>
-    <div v-if="total > 0" class="vue-tiny-pagination pagination layout" style="justify-content: flex-end; -webkit-justify-content: flex-end;">
-      <div class="px-3 xs4 flex">
+    <div v-if="!isMobile" style="text-align: left;position: absolute;line-height: 46px">Tổng số <span class="text-bold primary--text">{{total}}</span> {{nameRecord}} </div>
+    <div v-if="total > 0" class="vue-tiny-pagination pagination layout" :style="!isMobile ? 'justify-content: flex-end; -webkit-justify-content: flex-end;' : ''">
+      <div :class="!isMobile ? 'px-3 xs4 flex' : 'pr-3 xs4 flex'">
         <v-select
           v-bind:items="totalPagesData"
           v-model="currentPage"
@@ -72,6 +72,10 @@ export default {
     showLimit: {
       type: Boolean,
       default: true
+    },
+    nameRecord: {
+      type: String,
+      default: 'bản ghi'
     }
   },
   data () {
@@ -86,7 +90,8 @@ export default {
           next: 'Next'
         }
       },
-      availableLanguages: ['en']
+      availableLanguages: ['en'],
+      isMobile: false
     }
   },
   created () {
@@ -130,7 +135,10 @@ export default {
       return {
         'c-not-allowed pagination__navigation--disabled': this.currentPage === this.totalPages
       }
-    }
+    },
+    // isMobile () {
+    //   return this.$store.getters.getIsMobile
+    // }
   },
   methods: {
     nextPage () {
