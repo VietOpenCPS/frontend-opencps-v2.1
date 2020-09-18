@@ -303,7 +303,7 @@ export default {
       // this.$store.commit('setViaPostal', event)
       // this.$emit('changeViapostal', event)
       let dataChuyenPhat = {
-        vnpostalStatus: event,
+        vnpostalStatus: event ? 1 : 0,
         postalServiceCode: this.dichVuChuyenPhatHoSo.postalServiceCode ? this.dichVuChuyenPhatHoSo.postalServiceCode : '',
         postalAddress: this.dichVuChuyenPhatHoSo.postalAddress ? this.dichVuChuyenPhatHoSo.postalAddress : '',
         postalCityCode: this.dichVuChuyenPhatHoSo.postalCityCode ? this.dichVuChuyenPhatHoSo.postalCityCode : '',
