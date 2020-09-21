@@ -44,7 +44,7 @@
             v-model="agencyXuLyThuTuc"
             @change="changeAgencyXuLy"
             item-text="itemName"
-            item-value="itemCode"
+            item-value="govAgencyCode"
             hide-details
             hide-no-data
             return-object
@@ -59,7 +59,7 @@
             v-model="linhVucSelected"
             label="Chọn lĩnh vực"
             item-text="displayName"
-            item-value="domainCode"
+            item-value="govAgencyCode"
             return-object
             hide-no-data
             :hide-selected="true"
@@ -1449,14 +1449,14 @@ export default {
           } else {
             if (vm.listLinhVuc.length === 1 && !vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
               vm.linhVucSelected = vm.listLinhVuc[0]
-              vm.domainCode = vm.linhVucSelected['domainCode']
+              vm.domainCode = vm.linhVucSelected['govAgencyCode']
             } else {
               vm.linhVucSelected = ''
               vm.domainCode = ''
             }
             for (let key in vm.listLinhVuc) {
               if (!vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
-                if (String(vm.listLinhVuc[key]['domainCode']) === String(currentQuery.domain)) {
+                if (String(vm.listLinhVuc[key]['govAgencyCode']) === String(currentQuery.domain)) {
                   vm.linhVucSelected = vm.listLinhVuc[key]
                   vm.domainCode = vm.linhVucSelected['domainCode']
                 }
@@ -1715,19 +1715,22 @@ export default {
     },
     processListDomain (currentQuery) {
       let vm = this
-      vm.$store.dispatch('getDomainLists').then(function (result) {
+        let data = {
+          agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
+        }
+      vm.$store.dispatch('getDomainsNew',data).then(function (result) {
         if (result.length > 0) {
           vm.listLinhVuc = result.map(domain => {
-            domain['displayName'] = domain['domainCode'] + ' - ' + domain['domainName']
+            domain['displayName'] = domain['govAgencyCode'] + ' - ' + domain['itemName']
             // domain['displayName'] = domain['domainName']
             return domain
           })
         }
         if (currentQuery.hasOwnProperty('domain') && String(currentQuery.domain) !== '') {
           for (let key in vm.listLinhVuc) {
-            if (String(vm.listLinhVuc[key]['domainCode']) === String(currentQuery.domain)) {
+            if (String(vm.listLinhVuc[key]['govAgencyCode']) === String(currentQuery.domain)) {
               vm.linhVucSelected = vm.listLinhVuc[key]
-              vm.domainCode = vm.linhVucSelected['domainCode']
+              vm.domainCode = vm.linhVucSelected['govAgencyCode']
             }
           }
           let domain = {
@@ -1747,7 +1750,7 @@ export default {
         } else if (vm.listLinhVuc.length === 1) {
           if (!vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
             vm.linhVucSelected = vm.listLinhVuc[0]
-            vm.domainCode = vm.linhVucSelected['domainCode']
+            vm.domainCode = vm.linhVucSelected['govAgencyCode']
           }
         } else {
           vm.linhVucSelected = null
@@ -2164,7 +2167,7 @@ export default {
       if (item) {
         setTimeout(function () {
           let domain = {
-            domain: vm.linhVucSelected.domainCode,
+            domain: vm.linhVucSelected.govAgencyCode,
             searchGovAgencyCode: vm.govAgencyFilterMenuConfig,
             groupServiceCode: vm.groupServiceFilterMenuConfig
           }
@@ -2191,7 +2194,7 @@ export default {
         // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
       }
       if (item !== null && item !== undefined) {
-        vm.domainCode = vm.linhVucSelected['domainCode']
+        vm.domainCode = vm.linhVucSelected['govAgencyCode']
       } else {
         vm.domainCode = ''
       }
@@ -3500,11 +3503,11 @@ export default {
           //   })
           //   // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
           // }).catch(function (){})
-          console.log(vm.linhVucSelected && vm.linhVucSelected.hasOwnProperty('domainCode'))
-          if(vm.linhVucSelected && vm.linhVucSelected.hasOwnProperty('domainCode')){
-            vm.listThuTucHanhChinh = vm.listThuTuc.filter(e=>e.govAgencyCode === item.itemCode && e.domainCode === vm.linhVucSelected.domainCode)
+          console.log(vm.linhVucSelected && vm.linhVucSelected.hasOwnProperty('govAgencyCode'))
+          if(vm.linhVucSelected && vm.linhVucSelected.hasOwnProperty('govAgencyCode')){
+            vm.listThuTucHanhChinh = vm.listThuTuc.filter(e=>e.govAgencyCode === item.govAgencyCode && e.domainCode === vm.linhVucSelected.govAgencyCode)
           } else {
-            vm.listThuTucHanhChinh = vm.listThuTuc.filter(e=>e.govAgencyCode === item.itemCode)
+            vm.listThuTucHanhChinh = vm.listThuTuc.filter(e=>e.govAgencyCode === item.govAgencyCode)
           }
           console.log('22222222',vm.listThuTuc)
           console.log('22222222',vm.listThuTucHanhChinh)
@@ -3515,7 +3518,7 @@ export default {
         // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
       }
       if (item !== null && item !== undefined) {
-        vm.govAgencyCode = vm.agencyXuLyThuTuc['itemCode']
+        vm.govAgencyCode = vm.agencyXuLyThuTuc['govAgencyCode']
       } else {
         vm.govAgencyCode = ''
       }

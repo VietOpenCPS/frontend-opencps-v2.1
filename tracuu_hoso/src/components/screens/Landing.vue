@@ -247,7 +247,7 @@ export default {
         sortable: false
       },
       {
-        text: 'Ngày nộp',
+        text: 'Ngày tiếp nhận',
         align: 'center',
         sortable: false
       },

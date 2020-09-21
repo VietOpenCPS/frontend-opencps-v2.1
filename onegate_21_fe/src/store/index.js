@@ -3784,14 +3784,14 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
-              serviceLevelRole: '3,4',
+              serviceLevel: '3,4',
               isEmployee: data.isEmployee ? data.isEmployee : ''
             }
           }
           axios.get('/o/rest/v2/serviceinfos/statistics/agency', param).then(function (response) {
             let serializable = response.data
-            if (serializable.data) {
-              let dataReturn = serializable.data
+            if (serializable.dataInput) {
+              let dataReturn = serializable.dataInput
               resolve(dataReturn)
             } else {
               resolve([])
@@ -3816,10 +3816,10 @@ export const store = new Vuex.Store({
               serviceLevel: '3,4',
             }
           }
-          axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+          axios.get('/o/rest/v2/serviceinfos/statistics/domains/serviceLevel', param).then(function (response) {
             let serializable = response.data
-            if (serializable.data) {
-              let dataReturn = serializable.data
+            if (serializable.dataInput) {
+              let dataReturn = serializable.dataInput
               resolve(dataReturn)
             } else {
               resolve([])
