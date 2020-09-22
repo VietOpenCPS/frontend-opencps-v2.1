@@ -99,7 +99,7 @@
                       v-model="domainFilter"
                       label="Chọn lĩnh vực"
                       item-text="itemName"
-                      item-value="govAgencyCode"
+                      item-value="domainCode"
                       :hide-selected="true"
                       @change="filterService"
                       box

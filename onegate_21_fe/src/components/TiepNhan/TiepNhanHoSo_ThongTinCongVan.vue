@@ -90,13 +90,13 @@
                     </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2">
-                      <content-placeholders class="mt-1" v-if="loading">
+                      <!-- <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Ngày hẹn trả lời<span  style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Ngày hẹn trả lời<span  style="color:red" v-if="!congVanDaGui">&nbsp;*</span>: </v-subheader> -->
                     </v-flex>
                     <v-flex xs12 sm4 class="mb-2">
-                      <content-placeholders class="mt-1" v-if="loading">
+                      <!-- <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-menu
@@ -126,7 +126,7 @@
                         <v-date-picker :min="getMindate()" ref="picker" locale="vi"
                         :first-day-of-week="1" v-model="dueDate" no-title @input="menuDueDate = false"></v-date-picker>
                       </v-menu>
-                      <p class="pt-2" v-else>{{duedateFormated}}</p>
+                      <p class="pt-2" v-else>{{duedateFormated}}</p> -->
                     </v-flex>
                     <!--  -->
                     <v-flex xs12 sm2 class="mb-2" v-if="formCodeInput !== 'NEW_GROUP_CV'">
