@@ -3,19 +3,17 @@
     <v-navigation-drawer app clipped floating width="0">
     </v-navigation-drawer>
     <v-content>
-      <Landing/>
+      <router-view></router-view>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import Landing from '../src/components/screens/Landing';
 
 export default {
   name: 'App',
 
   components: {
-    Landing,
   },
 
   data: () => ({

@@ -642,7 +642,7 @@ export default {
         }
       },
     },
-    khoTaiLieuCongDan: true
+    khoTaiLieuCongDan: false
   }),
   created () {
     let vm = this
@@ -971,7 +971,7 @@ export default {
             itemTemplate['fileCheck'] = fileMarkFind.fileCheck
             itemTemplate['recordCount'] = fileMarkFind.recordCount
             itemTemplate['fileMarkDefault'] = fileMarkFind.fileMark
-            itemTemplate['hasTemplate'] = String(fileMarkFind.fileMark) !== '0'
+            itemTemplate['hasTemplate'] = String(fileMarkFind.fileMark) !== '0' || itemTemplate.partType === 2
             if (itemTemplate['hasTemplate'] && !itemTemplate['recordCount']) {
               itemTemplate['recordCount'] = 1
             } else if (!itemTemplate['hasTemplate']) {
@@ -1000,6 +1000,7 @@ export default {
           })
         }
       }
+      console.log('mergeDossierTemplateVsDossierMark', dossierTemplates)
       return dossierTemplates
     },
     mergeDossierTemplateVsFileTemplates (dossierTemplates, fileTemplates) {
@@ -1022,6 +1023,7 @@ export default {
           })
         }
       }
+      console.log('mergeDossierTemplateVsFileTemplates', dossierTemplates)
       return dossierTemplates
     },
     showAlpacaJSFORM (item, isPending) {

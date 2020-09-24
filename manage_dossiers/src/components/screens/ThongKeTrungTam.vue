@@ -889,10 +889,10 @@ export default {
         vm.apiGetDossier = '/o/rest/v2/dossiers?status=releasing,posting,done&time=overtime&fromReleaseDate=' + fromDate + '&toReleaseDate=' + toDate
       }
       if (statusCount === 'undueCount') {
-        vm.apiGetDossier = '/o/rest/v2/dossiers?status=processing,interoperating,planning&time=undue&fromReceiveDate=' + fromDate + '&toReceiveDate=' + toDate
+        vm.apiGetDossier = '/o/rest/v2/dossiers?status=processing,interoperating,planning&time=undue&fromDueDate=' + fromDate + '&toDueDate=' + toDate
       }
       if (statusCount === 'overdueCount') {
-        vm.apiGetDossier = '/o/rest/v2/dossiers?status=processing,interoperating,planning&time=overdue&fromReceiveDate=' + fromDate + '&toReceiveDate=' + toDate
+        vm.apiGetDossier = '/o/rest/v2/dossiers?status=processing,interoperating,planning&time=overdue&fromDueDate=' + fromDate + '&toDueDate=' + toDate
       }
       if (statusCount === 'unresolvedCount') {
         vm.apiGetDossier = '/o/rest/v2/dossiers?status=unresolved&fromReleaseDate=' + fromDate + '&toReleaseDate=' + toDate

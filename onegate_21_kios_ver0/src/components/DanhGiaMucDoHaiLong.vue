@@ -22,7 +22,7 @@
                 <div class="input-custom">
                   <input id="secretKey" type="text" @focus="show" @keyup.enter="filterDossier" required="required" />
                   <span class="bar"></span>
-                  <label for="applicantIdNoKey">Mã bí mật</label>
+                  <label for="secretKey">Mã bí mật</label>
                 </div>
               </v-flex>
             </v-layout>
@@ -42,7 +42,7 @@
             </v-btn>
           </div>
         </v-layout>
-        <chi-tiet-danh-gia v-if="detailActive" :administration="govAgencySelected" :className='className'></chi-tiet-danh-gia>
+        <chi-tiet-danh-gia v-if="detailActive" :administration="govAgencySelected" :detailDossierMC="detailDossierMC" :className='className'></chi-tiet-danh-gia>
         <v-alert class="mt-5 mx-2" v-if="validateTracuu === false && !activeDetailDossier" :value="true" outline color="orange" icon="priority_high">
           Nhập thông tin đánh giá
         </v-alert>
@@ -73,7 +73,7 @@ import $ from 'jquery'
 import ChiTietHoSo from './ChiTietHoSo.vue'
 import TinyPagination from './pagination.vue'
 import VueTouchKeyBoard from './keyboard.vue'
-import ChiTietDanhGia from './ChiTietDanhGiaCLDV.vue'
+import ChiTietDanhGia from './ChiTietDanhGiaCLDVNew.vue'
 import toastr from 'toastr'
 
 export default {
@@ -132,6 +132,8 @@ export default {
     },
     govAgencySelected: '',
     detailActive: false,
+    isDvc: false,
+    detailDossierMC: ''
   }),
   computed: {
     filterDossierKey () {
@@ -146,6 +148,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.isDvc = isDvcConfig
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       var vm = this
       vm.$store.dispatch('agencies').then(function (result) {
@@ -169,6 +175,10 @@ export default {
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
+      try {
+        vm.isDvc = isDvcConfig
+      } catch (error) {
+      }
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
       $('#dossierNoKey').val(currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '')
@@ -255,33 +265,43 @@ export default {
       var filter = null
       filter = {
         dossierNo: currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '',
+        start: 0,
+        end: 1
       }
       vm.$store.dispatch('loadingDanhSachHoSo', filter).then(function (result) {
         if(result.data && result.data.length){
           let dossier = result.data[0]
+          if (filter.dossierNo !== dossier['dossierNo']) {
+            toastr.error('Mã hồ sơ không chính xác. Vui lòng kiểm tra lại')
+            return
+          }
           let filter2 = {
             password: currentQuery.hasOwnProperty('secret') ? currentQuery.secret : '',
-            dossierId: dossier.dossierId
+            dossierId: dossier.dossierId,
+            referenceUid: dossier.referenceUid,
+            isDvc: vm.isDvc,
+            serverCode: 'SERVER_' + dossier['govAgencyCode']
           }
           vm.$store.dispatch('getDossierDetailPass', filter2).then(function (res) {
+            if (String(dossier.hasPassword) !== String(filter2.password)) {
+              toastr.error('Mã bí mật không chính xác')
+              return
+            }
             if(res && res.data && res.data.dossierId){
               vm.govAgencySelected = res.data.dossierId
+              vm.detailDossierMC = res.data
               vm.detailActive = true
             } else {
               toastr.error('Mã bí mật không chính xác')
             }
-            // vm.$store.dispatch('loadVoting', filter3).then(function (res2) {
-  
-            // }).catch(function (reject) {
-            // })
           }).catch(function (reject) {
             toastr.error('Mã bí mật không chính xác')
           })
         } else {
-          toastr.error('Mã hồ sơ không hợp lệ. Không tìm thấy hồ sơ')
+          toastr.error('Mã hồ sơ không chính xác. Vui lòng kiểm tra lại')
         }
       }).catch(reject => {
-        toastr.error('Mã hồ sơ không hợp lệ. Không tìm thấy hồ sơ')
+        toastr.error('Mã hồ sơ không chính xác. Vui lòng kiểm tra lại')
       })
     },
     viewDetail (item) {

@@ -1,14 +1,14 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import NotFound from '../components/NotFound'
-import Landing from '../components/screens/Landing'
-import DetailForward from '../components/blacklist/DetailForward'
+import NotFound from '@/components/NotFound'
+import LandingBaocao from '@/components/screens/Landing'
+import DetailForward from '@/components/blacklist/DetailForward'
 const routes = [
   { path: '/', name: 'Landing', component: Landing, props: true },
   {
     path: '/danh-sach-ho-so/:index',
     name: 'Landing',
-    component: () => import('../components/blacklist/Landing'),
+    component: () => import(/* webpackChunkName: "Landing" */ '@/components/blacklist/Landing.vue'),
     props: true,
     meta: {
       requiresAuth: false
@@ -17,7 +17,7 @@ const routes = [
   {
     path: '/danh-sach-ho-so/:index/tiep-nhan-ho-so/:id/:formCode',
     name: 'TiepNhanHoSoDetail',
-    component: () => import( '../components/blacklist/TiepNhanHoSoDetail.vue'),
+    component: () => import(/* webpackChunkName: "TiepNhanHoSoDetail" */ '@/components/blacklist/TiepNhanHoSoDetail.vue'),
     props: true,
     meta: {
       requiresAuth: false
@@ -26,7 +26,7 @@ const routes = [
   {
     path: '/danh-sach-ho-so/:index/bo-sung-ho-so/:id',
     name: 'HoanThienBoSungHoSoDetail',
-    component: () => import( '../components/blacklist/HoanThienBoSungHoSoDetail.vue'),
+    component: () => import(/* webpackChunkName: "HoanThienBoSungHoSoDetail" */ '@/components/blacklist/HoanThienBoSungHoSoDetail.vue'),
     props: true,
     meta: {
       requiresAuth: false
@@ -39,6 +39,7 @@ const routes = [
 Vue.use(Router)
 
 const router = new Router({
+  // mode: 'history',
   routes
 })
 

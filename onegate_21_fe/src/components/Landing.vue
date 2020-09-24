@@ -104,7 +104,7 @@
             v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
             :items="listDichVu"
             v-model="dichVuSelected"
-            label="Chọn dịch vụ"
+            label="Chọn trường hợp"
             item-text="optionName"
             item-value="processOptionId"
             return-object
@@ -459,15 +459,15 @@
                 <v-autocomplete
                   :items="listDichVu"
                   v-model="dichVuSelected"
-                  label="Dịch vụ:"
-                  placeholder="Chọn dịch vụ"
+                  label="Trường hợp:"
+                  placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   hide-no-data
                   :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
-                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn']"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn']"
                   @change="changeDichVuConfigs"
                   required
                   box
@@ -647,19 +647,19 @@
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2 text-bold">Dịch vụ <span style="color:red">*</span>:</div>
+                <div class="my-2 text-bold">Trường hợp <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
-                  placeholder="Chọn dịch vụ"
+                  placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   hide-no-data
                   :hide-selected="true"
-                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>
@@ -803,19 +803,19 @@
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2 text-bold">Dịch vụ <span style="color:red">*</span>:</div>
+                <div class="my-2 text-bold">Trường hợp <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
-                  placeholder="Chọn dịch vụ"
+                  placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   hide-no-data
                   :hide-selected="true"
-                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>
@@ -2432,11 +2432,20 @@ export default {
         } else if (String(item.form) === 'PREVIEW') {
           vm.doPreview(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'ACTIONS') {
-          if (!vm.thuTucHanhChinhSelected || vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
-            alert('Loại thủ tục bắt buộc phải chọn khi thực hiện thao tác này')
+          if (!vm.doActionGroupKhacThuTuc) {
+            if (!vm.thuTucHanhChinhSelected || vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
+              alert('Loại thủ tục bắt buộc phải chọn khi thực hiện thao tác này')
+            } else {
+              vm.doActions(dossierItem, item, index, isGroup)
+            }
           } else {
-            vm.doActions(dossierItem, item, index, isGroup)
+            if ((!vm.thuTucHanhChinhSelected || vm.thuTucHanhChinhSelected === 'undefined') && (!vm.linhVucSelected || vm.linhVucSelected === 'undefined')) {
+              alert('Vui lòng chọn lĩnh vực hoặc thủ tục để thực hiện thao tác này')
+            } else {
+              vm.doActions(dossierItem, item, index, isGroup)
+            }
           }
+
         } else if (String(item.form) === 'DELETE') {
           vm.doDeleteDossier(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'ROLLBACK_01') {
@@ -3300,7 +3309,7 @@ export default {
     },
     changeAdvFilterDataChips (item) {
       let vm = this
-      if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming') {
+      if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming' || item.key === 'overtime') {
         if (vm.top === item.key) {
           vm.top = ''
         } else {

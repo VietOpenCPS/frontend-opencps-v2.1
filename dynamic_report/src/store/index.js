@@ -174,6 +174,17 @@ export const store = new Vuex.Store({
               })
               for (let key in dynamicReportsFilterSharing) {
                 let current = dynamicReportsFilterSharing[key]
+                console.log('keyDynamicReports', current['filterConfig'])
+                try {
+                  let checkfilterConfig = eval('( ' + current['filterConfig'] + ' )')
+                } catch (error) {
+                  alert("Lỗi cấu hình filterConfig mẫu: " + current['reportName'])
+                }
+                try {
+                  let checktableConfig = eval('( ' + current['tableConfig'] + ' )')
+                } catch (error) {
+                  alert("Lỗi cấu hình tableConfig mẫu: " + current['reportName'])
+                }
                 let typeCurrent = 'dossier'
                 if (current['reportCode'].startsWith('STATISTIC')) {
                   typeCurrent = 'thong_ke'
@@ -245,6 +256,16 @@ export const store = new Vuex.Store({
             })
             for (let key in dynamicReportsFilterSharing) {
               let current = dynamicReportsFilterSharing[key]
+              try {
+                let checkfilterConfig = eval('( ' + current['filterConfig'] + ' )')
+              } catch (error) {
+                alert("Lỗi cấu hình filterConfig mẫu: " + current['reportName'])
+              }
+              try {
+                let checktableConfig = eval('( ' + current['tableConfig'] + ' )')
+              } catch (error) {
+                alert("Lỗi cấu hình tableConfig mẫu: " + current['reportName'])
+              }
               let typeCurrent = 'dossier'
               if (current['reportCode'].startsWith('STATISTIC')) {
                 typeCurrent = 'thong_ke'
