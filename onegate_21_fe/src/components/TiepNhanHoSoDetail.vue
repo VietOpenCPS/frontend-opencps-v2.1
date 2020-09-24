@@ -1495,6 +1495,8 @@ export default {
             }
             tempData['vnpostalStatus'] = dichvuchuyenphathoso.vnpostalStatus
             tempData['vnpostalProfile'] = vnpostal
+            tempData['postalCityCode'] = dichvuchuyenphathoso.postalCityCode
+            tempData['postalDistrictCode'] = dichvuchuyenphathoso.postalDistrictCode
           }
           setTimeout(function () {
             vm.$store.dispatch('putDossier', tempData).then(function (result) {

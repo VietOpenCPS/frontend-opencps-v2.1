@@ -1110,7 +1110,9 @@ export default {
     window.addEventListener('resize', vm.onResize, { passive: true })
     $('#m-navigation').css('display', 'none')
     if (vm.originality === 3) {
-      vm.runComment()
+      setTimeout(()=>{
+        vm.runComment()
+      },200)
     }
   },
   created () {

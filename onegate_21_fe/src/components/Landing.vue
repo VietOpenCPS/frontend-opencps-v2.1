@@ -1840,25 +1840,78 @@ export default {
     },
     getDonViCongVan (currentQuery) {
       let vm = this
-      let filter = {
-        collectionCode: 'DON_VI_CONG_VAN',
-        level: '',
-        parent: ''
-      }
-      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
-        vm.listDonviCongVan = result.data
-        if (currentQuery.hasOwnProperty('donvigui') && String(currentQuery.donvigui) !== '') {
-          for (let key in vm.listDonviCongVan) {
-            if (String(vm.listDonviCongVan[key]['itemCode']) === String(currentQuery.donvigui)) {
-              vm.donviguiSelected = vm.listDonviCongVan[key]
-            }
-          }
-        } else {
-          vm.donviguiSelected = null
+      let referenceDonViGuiCongVan = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('referenceDonViGuiCongVan') ? vm.trangThaiHoSoList[vm.index]['tableConfig']['referenceDonViGuiCongVan'] : ''
+      let scope = ''
+      console.log('2222222222222', vm.employeeLoginInfomation)
+      if(referenceDonViGuiCongVan === '_firstscope'){
+        if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
+          scope = String(vm.employeeLoginInfomation.scope).split(',')[0]
         }
-      }).catch(function () {
-        vm.listDonviCongVan = []
-      })
+      } else if (referenceDonViGuiCongVan.includes('_group@')){
+        scope = referenceDonViGuiCongVan.slice(referenceDonViGuiCongVan.lastIndexOf('@') + 1, referenceDonViGuiCongVan.length)
+      } else {
+        scope = referenceDonViGuiCongVan
+      }
+      if(referenceDonViGuiCongVan.includes('_group@')){
+        let filterDictGroup = {
+          collectionCode: 'DON_VI_CONG_VAN',
+          groupCode: scope
+        }
+        vm.$store.dispatch('getGroupDictitem', filterDictGroup).then(res=>{
+          vm.listDonviCongVan = res
+          if (currentQuery.hasOwnProperty('donvigui') && String(currentQuery.donvigui) !== '') {
+            for (let key in vm.listDonviCongVan) {
+              if (String(vm.listDonviCongVan[key]['itemCode']) === String(currentQuery.donvigui)) {
+                vm.donviguiSelected = vm.listDonviCongVan[key]
+              }
+            }
+          } else {
+            vm.donviguiSelected = null
+          }
+        }).catch(()=>{
+          vm.listDonviCongVan = []
+        })
+      } else {
+        let filterDictItems = {
+          collectionCode: 'DON_VI_CONG_VAN',
+          level: '',
+          parent: scope
+        }
+        let filterDetailDictItems = {
+          collectionCode: 'DON_VI_CONG_VAN',
+          level: '',
+          itemCode: scope
+        }
+        const promise1 = vm.$store.dispatch('loadDictItems', filterDictItems)
+        const promise2 = vm.$store.dispatch('loadDetailDictItems', filterDetailDictItems)
+        Promise.all([promise1, promise2]).then(function(values) {
+          if(values[0]['data'] && values[1]){
+            let parent = values[1]['parentItem'] ? values[1]['parentItem']  : []
+            let parentArr = Array.isArray(parent) ? parent : [parent]
+            vm.listDonviCongVan = values[0]['data'].concat(parentArr)
+            
+          } else if (!values[0]['data'] && values[1]) {
+            let parent = values[1]['parentItem'] ? values[1]['parentItem']  : []
+            let parentArr = Array.isArray(parent) ? parent : [parent]
+            vm.listDonviCongVan = parentArr
+          } else if (values[0]['data'] && !values[1]) {
+            vm.listDonviCongVan = values[0]['data']
+          } else {
+            vm.listDonviCongVan = []
+          }
+          console.log('1111111111',vm.listDonviCongVan)
+          if (currentQuery.hasOwnProperty('donvigui') && String(currentQuery.donvigui) !== '') {
+            for (let key in vm.listDonviCongVan) {
+              if (String(vm.listDonviCongVan[key]['itemCode']) === String(currentQuery.donvigui)) {
+                vm.donviguiSelected = vm.listDonviCongVan[key]
+              }
+            }
+          } else {
+            vm.donviguiSelected = null
+          }
+        })
+      }
+
     },
     checkPemissionSpecialAction (form, currentUser, thongtinchitiet) {
       var vm = this

@@ -531,6 +531,7 @@ export default {
     },
     processAction () {
       var vm = this
+      var validCreateFiles = true
       var initData = vm.$store.getters.loadingInitData
       var actionUser = initData.user.userName ? initData.user.userName : ''
       vm.dossierProcess = vm.dossierSelected.filter(function (item) {
@@ -567,7 +568,12 @@ export default {
           }
         }
       }
+
       if (vm.showTaoTaiLieuKetQua) {
+        validCreateFiles = vm.$refs.tailieuketqua.validCreateFileTemplate()
+        if (!validCreateFiles) {
+          return
+        }
         let createFileAttach = vm.$refs.tailieuketqua.getCreateFileAttach()
         let arrFileAttach = []
         for (let key in createFileAttach) {
