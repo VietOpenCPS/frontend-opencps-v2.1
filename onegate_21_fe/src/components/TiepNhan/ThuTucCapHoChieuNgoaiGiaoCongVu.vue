@@ -56,7 +56,7 @@
                     <label>Điện thoại</label>
                     <v-text-field
                         v-model="dossiers.delegateTelNo"
-                        :rules="[rules.telNo]"
+                        :rules="[rules.varchar50]"
                         solo
                         @change="changeDossier()"
                     ></v-text-field>
@@ -1307,6 +1307,7 @@ export default {
         errorNgayCapCMT: false,
         dialogDanhSach: false,
         messengeCMT: '',
+        soNuocKhongDuocMien: 0,
         dateNgayKy: new Date().toISOString().substr(0, 10),
         dateNgayCapHCNG: new Date().toISOString().substr(0, 10),
         dateNgayCapHCCV: new Date().toISOString().substr(0, 10),
@@ -1493,6 +1494,7 @@ export default {
         govAgencyCode: $('#govAgencyCode_hidden').val(),
         dossierTemplateNo: "",
         originality: 3,
+        danhSachQGMienCongHam: [],
         selected: [],
         dossierFileCustom: [],
         dossierMarkArr: [],
@@ -1695,10 +1697,12 @@ export default {
                 }
             },
             varChar50: (val) => {
-                if(val){  
-                    return val.length > 50 ?  'Thông tin không được quá 50 ký tự' : true
-                }
-                else return true   
+                if(val){
+                val = String(val).trim()
+                return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+                } else {
+                return true
+                }    
             }
         }
     }),
@@ -1715,6 +1719,7 @@ export default {
             vm.getNuocDi()
             vm.getNoiSinhTrongNuoc()
             vm.getNoiSinhNuocNgoai()
+            vm.getBGMienCongHam()
             setTimeout(()=>{
                 if(vm.formCode==='UPDATE'){
                     vm.getDetail()
@@ -2385,6 +2390,13 @@ export default {
                     if(res.di_den){
                         vm.cong_ham_so_nuoc += res.di_den.length
                     }
+                    if(res.di_den_text){
+                        let arrNuocDi = res.di_den_text.split(', ')
+                        for(let i = 0;i<arrNuocDi.length;i++){
+                            let find =  vm.danhSachQGMienCongHam.find(e=>e.itemName !== arrNuocDi[i])
+                            vm.soNuocKhongDuocMien++
+                        } 
+                    }
                 }
                 vm.countPassport()
                 vm.genLePhi()
@@ -2735,7 +2747,12 @@ export default {
             let hc_gh = vm.ho_chieu_gia_han != '' ? parseInt(vm.ho_chieu_gia_han) : 0
             let hc_hong = vm.ho_chieu_hong != '' ? parseInt(vm.ho_chieu_hong) : 0
             let hc_mat = vm.ho_chieu_mat != '' ? parseInt(vm.ho_chieu_mat) : 0
-            let so_nuoc = vm.cong_ham_so_nuoc != '' ? parseInt(vm.cong_ham_so_nuoc) : 0
+            for(let i=0;i<vm.nuoc_di.length;i++){
+
+            }
+            // let so_nuoc = vm.cong_ham_so_nuoc != '' ? parseInt(vm.cong_ham_so_nuoc) : 0
+            soNuocKhongDuocMien
+            let so_nuoc = vm.soNuocKhongDuocMien
             let so_schengen = vm.cong_ham_schengen != '' ? parseInt(vm.cong_ham_schengen) : 0
             let so_nhap_canh = vm.cong_ham_nhap_canh != '' ? parseInt(vm.cong_ham_nhap_canh) : 0
             let so_qua_canh = vm.cong_ham_qua_canh != '' ? parseInt(vm.cong_ham_qua_canh) : 0
@@ -2836,9 +2853,6 @@ export default {
             };
             vm.dossiers['metaData'] = JSON.stringify(hs)
             
-        },
-        addPeriod (nStr){
-            return nStr.replace(/[^\d\.].+/, "").replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         },
         formatDate (date) {
             if (!date) return null
@@ -3197,8 +3211,7 @@ export default {
                 vm.$emit('changeCheckCKCD', true)
             } else {
                 vm.$emit('changeCheckCKCD', false)
-            }
-             
+            } 
         },
         fillCheckBox(){
             let vm = this
@@ -3346,6 +3359,25 @@ export default {
             console.log('16')
             $('#dossiers_hidden').val(JSON.stringify(vm.dossiers))
             console.log('17')
+        },
+        getBGMienCongHam(){
+            let vm = this
+            let headers = {
+                groupId: window.themeDisplay.getScopeGroupId(),
+                Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+            axios({
+                method: 'GET',
+                url: '/o/rest/v2/dictcollections/QG_MIENCONGHAM/dictitems',
+                headers: headers,
+            }).then(function (response) {
+                if(response.data.hasOwnProperty('data')){
+                    vm.danhSachQGMienCongHam =  response.data.data
+                } else {
+                    vm.danhSachQGMienCongHam = []
+                }
+            }).catch(function (error) {
+            })
         }
     }
 }

@@ -50,7 +50,7 @@
                 <label>Điện thoại</label>
                 <v-text-field
                     v-model="dossiers.delegateTelNo"
-                    :rules="[rules.telNo]"
+                    :rules="[rules.varchar50]"
                     solo
                     @change="changeDossier()"
                 ></v-text-field>
