@@ -642,7 +642,7 @@ export default {
         }
       },
     },
-    khoTaiLieuCongDan: false
+    khoTaiLieuCongDan: true
   }),
   created () {
     let vm = this
