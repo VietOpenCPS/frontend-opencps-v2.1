@@ -2,7 +2,7 @@
   <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3 vuejx__form">
     <v-layout row wrap>
       <v-flex xs12>
-        <div id="formDelivert" class="mb-5 pt-0"></div>
+        <div id="formDelivert" class="mb-5 pt-0" :style="{ 'pointer-events':  viewForm ? 'none' : 'auto'}"></div>
       </v-flex>
     </v-layout>
 
@@ -13,7 +13,7 @@
   import DatetimePicker from './DatetimePicker.vue'
 
   export default {
-    props: ['id', 'formid', 'datainput'],
+    props: ['id', 'formid', 'datainput', 'viewForm'],
     components: {
       DatetimePicker
     },

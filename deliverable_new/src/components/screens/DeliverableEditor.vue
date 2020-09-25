@@ -23,8 +23,8 @@
         </div>
       </div>
       <view-pdf ref="viewpdf" v-if="showComponent && String(id) !== '0' && !editDeliverable" :id="id" :datainput="detail"></view-pdf>
-      <bbat-table-editor-component v-if="showComponent && editDeliverable" ref="bbatForm" :id="id" :formid="formId" :datainput="detail['formData']"></bbat-table-editor-component>
-      <v-flex xs12 class="px-4" v-if="String(id) === '0' || (String(id) !== '0' && editDeliverable)">
+      <bbat-table-editor-component v-if="showComponent && editDeliverable" ref="bbatForm" :id="id" :formid="formId" :datainput="detail['formData']" :viewForm="viewForm"></bbat-table-editor-component>
+      <v-flex xs12 class="px-4" v-if="String(id) === '0' || (String(id) !== '0' && editDeliverable && !viewForm)">
         <div class="mb-2" style="font-size: 14px">
           Tài liệu đính kèm <span v-if="requiredAttachFile" style="color:red">(*) </span>:
           <a v-if="detail['fileAttachs'] && detail['fileAttachs'] !== '0'" :href="urlFileAttach" download
@@ -67,7 +67,7 @@
         <bbat-table-editor-component-simple ref="bbatFormSimple" :id="id" :datainput="detail"></bbat-table-editor-component-simple>
       </v-navigation-drawer>
       
-      <v-layout row wrap :class='{"fix_tool_bottom": offsetCheck > 300}'>
+      <v-layout row wrap :class='{"fix_tool_bottom": offsetCheck > 300}' v-if="!viewForm">
         <v-flex xs12 class="text-right pt-0 mt-4 ml-1 px-0 pr-3">
           <v-progress-linear v-if="loading" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
           <!-- <v-btn v-if="String(id) === '0'" color="teal darken-3" class="mr-0" dark  v-on:click.native="saveToData(-1)"
@@ -203,6 +203,7 @@
         showComponent: false,
         formId: '',
         editDeliverable: false,
+        viewForm: false,
         extensions: '.pdf',
         dialogPDF: false,
         dialogPDFLoading: false,
@@ -228,6 +229,8 @@
         }
         // 
         vm.editDeliverable = String(vm.id) === '0' || (currentQuery.hasOwnProperty('editForm') && currentQuery.editForm) ? true : false
+        vm.viewForm = currentQuery.hasOwnProperty('viewForm') && currentQuery.viewForm === 'true' ? true : false
+    
         vm.$store.dispatch('getDeliverableTypes').then(function (result) {
           setTimeout(() => {
             let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')

@@ -60,6 +60,10 @@ export default {
     //     vm.usersComment = result
     //   })
     // })
+    var vm = this
+    vm.$nextTick(function () {
+      vm.runComment()
+    })
   },
   mounted () {
     // var vm = this

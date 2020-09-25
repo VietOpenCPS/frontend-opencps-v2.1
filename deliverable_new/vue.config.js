@@ -1,5 +1,5 @@
 module.exports = {
-  productionSourceMap: false,
+  productionSourceMap: true,
   runtimeCompiler: true,
   chainWebpack: config => {
     config.module.rule('images').use('url-loader')

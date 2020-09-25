@@ -826,6 +826,19 @@
           let url = vm.urlRedirectDossier + '/' + item.dossierId
           window.open(url, "_blank")
         }
+        if(item.hasOwnProperty('dossierId') && item.dossierId && item.dossierId === '0') {
+          let current = vm.$router.history.current
+          let newQuery = current.query
+          let queryString = '?'
+          for (let key in newQuery) {
+            if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+              queryString += key + '=' + newQuery[key] + '&'
+            }
+          }
+          vm.$router.push({
+            path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString + 'editForm=true&viewForm=true'
+          })
+        }
         
       },
       editDeliverables (item, index) {

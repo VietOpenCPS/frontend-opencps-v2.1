@@ -1110,9 +1110,7 @@ export default {
     window.addEventListener('resize', vm.onResize, { passive: true })
     $('#m-navigation').css('display', 'none')
     if (vm.originality === 3) {
-      setTimeout(()=>{
-        vm.runComment()
-      },200)
+      vm.runComment()
     }
   },
   created () {
@@ -1157,6 +1155,9 @@ export default {
           vm.btnStateVisible = true
         }
         vm.$store.commit('setKysoSuccess', false)
+      }
+      if (vm.originality === 3) {
+        vm.runComment()
       }
     })
   },
