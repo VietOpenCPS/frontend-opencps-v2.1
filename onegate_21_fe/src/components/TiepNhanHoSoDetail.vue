@@ -1489,7 +1489,7 @@ export default {
               postalCityName: dichvuchuyenphathoso.postalCityName,
               postalDistrictCode: dichvuchuyenphathoso.postalDistrictCode,
               postalDistrictName: dichvuchuyenphathoso.postalDistrictName,
-              postalWardCode: dichvuchuyenphathoso.postalWardCode,
+              postalWardCode: "",
               postalWardName: dichvuchuyenphathoso.postalWardName,
               postalTelNo: dichvuchuyenphathoso.postalTelNo
             }

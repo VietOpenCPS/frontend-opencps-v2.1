@@ -649,7 +649,8 @@
         vm.donvicu = ''
         vm.trichyeu = ''
         vm.deliverableCode = ''
-        vm.filterDeliverable('keyword')
+        // vm.filterDeliverable('keyword')
+        vm.filterDeliverable()
       },
       index (val) {
         var vm = this
