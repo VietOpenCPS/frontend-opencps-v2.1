@@ -1500,7 +1500,7 @@ export default {
         } else {
           vm.selectedDoAction = []
         }
-        // console.log('selectedDoAction', vm.selectedDoAction)
+       console.log('selectedDoAction', vm.selectedDoAction)
         vm.$store.commit('setDossierSelectedDoAction', vm.selectedDoAction)
         
       },
