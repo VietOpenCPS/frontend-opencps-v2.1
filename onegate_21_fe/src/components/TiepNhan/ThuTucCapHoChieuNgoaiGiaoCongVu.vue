@@ -56,7 +56,7 @@
                     <label>Điện thoại</label>
                     <v-text-field
                         v-model="dossiers.delegateTelNo"
-                        :rules="[rules.varchar50]"
+                        :rules="[rules.varChar15]"
                         solo
                         @change="changeDossier()"
                     ></v-text-field>
@@ -889,6 +889,7 @@
                                         <v-text-field
                                             v-model="dien_thoai"
                                             solo
+                                            :rules="[rules.varChar15]"
                                         ></v-text-field>
                                     </v-flex>
                                     <v-flex xs12>
@@ -1701,6 +1702,14 @@ export default {
                 return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
                 } else {
                 return true
+                }    
+            },
+            varChar15: (val) => {
+                if(val){
+                    val = String(val).trim()
+                    return val.length <= 15 ? true : 'Không được nhập quá 15 ký tự'   
+                } else {
+                    return true
                 }    
             }
         }

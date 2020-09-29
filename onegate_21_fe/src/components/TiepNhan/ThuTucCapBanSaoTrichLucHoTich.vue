@@ -518,6 +518,8 @@ export default {
                     console.log('metaData',metaData)
                     vm.dossiers.delegateName = res.data.delegateName
                     vm.dossiers.delegateIdNo = res.data.delegateIdNo
+                    vm.dossiers.delegateTelNo = res.data.delegateTelNo
+                    vm.dossiers.delegateEmail = res.data.delegateEmail
                     vm.dossiers.delegateAddress = res.data.delegateAddress
                     vm.dossiers.applicantName = res.data.applicantName
                     vm.dossiers.applicantIdNo = res.data.applicantIdNo
@@ -652,6 +654,16 @@ export default {
                     if(!vm.dossiers.delegateIdNo){
                         if(res.data.giay_to_tuy_than_yeu_cau) {
                             vm.dossiers.delegateIdNo = res.data.giay_to_tuy_than_yeu_cau
+                        }
+                    }
+                    if(!vm.dossiers.delegateTelNo){
+                        if(res.data.delegateTelNo) {
+                            vm.dossiers.delegateTelNo = res.data.delegateTelNo
+                        }
+                    }
+                    if(!vm.dossiers.delegateEmail){
+                        if(res.data.delegateEmail) {
+                            vm.dossiers.delegateEmail = res.data.delegateEmail
                         }
                     }
                     if(!vm.dossiers.delegateAddress){
