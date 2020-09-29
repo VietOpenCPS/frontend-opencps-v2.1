@@ -463,7 +463,6 @@
 
 
                     >
-                   
                         <v-text-field
                             slot="activator"
                             v-model="dateDueDateFormated"
@@ -1830,7 +1829,7 @@ export default {
             deep: true,
             handler:  (val, oldVal) => {
                 let arr = val.filter(e => e.recordCount) 
-                arr.push({"dossierPartNo":"TP01","fileMark":3,"partName":"Tờ khai  đề nghị cấp hộ chiếu ngoại giao, hộ chiếu công vụ và công hàm","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
+                arr.push({"dossierPartNo":"TP01","fileMark":3,"partName":"Tờ khai đề nghị cấp hộ chiếu ngoại giao, hộ chiếu công vụ và công hàm","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
                 arr.push({"dossierPartNo":"TP02","fileMark":3,"partName":"Văn bản hoặc quyết định cử hoặc cho phép cán bộ, công chức, viên chức, sỹ quan, quân nhân chuyên nghiệp ra nước ngoài","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
                 $('#dossierMarkArr_hidden').val(JSON.stringify(arr))
             }
