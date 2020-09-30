@@ -26,7 +26,7 @@
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
                 <div class="mr-2" @click="item.hasForm ? loadAlpcaFormClick(item, index) : ''" style="min-width: 20px; display: flex;">
-                  <div v-if="originality === 3 && (formCodeInput === 'NEW' || formCodeInput === 'NEW_GROUP')" @click='$event.stopPropagation()' class="header__tphs check-template mr-2" style="width: 20px;margin-left: -15px;">
+                  <div v-if="render && originality === 3 && (formCodeInput === 'NEW' || formCodeInput === 'NEW_GROUP')" @click='$event.stopPropagation()' class="header__tphs check-template mr-2" style="width: 20px;margin-left: -15px;">
                     <v-checkbox class="my-0 py-0" v-model="item['hasTemplate']" @change="changeHasTemplate(index, item)"></v-checkbox>
                   </div>
                   <div v-if="originality === 3 && tempLienThong" @click='$event.stopPropagation()' class="header__tphs check-template mr-2" style="width: 20px;margin-left: -15px;">
@@ -419,12 +419,15 @@
         </v-card>
       </v-dialog>
     </v-card>
-    <!-- <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1 && !onlyView">
-      <span>Không chọn</span>
-      <span>Bản chính</span>
-      <span>Bản chụp</span>
-      <span>Công chứng</span>
-    </div> -->
+    <div class="absolute__btn pl-4" style="width: 200px; margin-top: 5px;" v-if="originality === 3 && !onlyView"> 
+      <v-checkbox
+        class="mt-0"
+        label="Chọn tất cả"
+        v-model="allFileMark"
+        :value="1"
+        @change="changeAllFileMark($event)"
+      ></v-checkbox>
+    </div>
     <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
       <v-card>
         <v-toolbar dark color="primary">
@@ -642,7 +645,9 @@ export default {
         }
       },
     },
-    khoTaiLieuCongDan: true
+    khoTaiLieuCongDan: false,
+    allFileMark: false,
+    render: true
   }),
   created () {
     let vm = this
@@ -1721,7 +1726,7 @@ export default {
       item['dossierId'] = vm.thongTinHoSo.dossierId
       setTimeout(function () {
         if (item['hasTemplate']) {
-          item.fileMark = item.fileMarkDefault
+          item.fileMark = item.fileMarkDefault ? item.fileMarkDefault : 3
           item.recordCount = 1
         } else {
           item.fileMark = 0
@@ -2121,6 +2126,26 @@ export default {
       vm.indexPart = index
       vm.$refs.khotailieu.initData()
       vm.dialog_documentApplicant = true
+    },
+    changeAllFileMark (event) {
+      let vm = this
+      if (vm.dossierTemplateItemsFilter) {
+        vm.render = false
+        vm.dossierTemplateItemsFilter.forEach(function (item, index) {
+          vm.dossierTemplateItemsFilter[index]['dossierId'] = vm.thongTinHoSo.dossierId
+          if (event) {
+            vm.dossierTemplateItemsFilter[index].fileMark = String(vm.dossierTemplateItemsFilter[index].fileMarkDefault) === '0' ? 3 : vm.dossierTemplateItemsFilter[index].fileMarkDefault
+            vm.dossierTemplateItemsFilter[index].recordCount = 1
+            vm.dossierTemplateItemsFilter[index].hasTemplate = true
+          } else {
+            vm.dossierTemplateItemsFilter[index].fileMark = 0
+            vm.dossierTemplateItemsFilter[index].recordCount = 0
+            vm.dossierTemplateItemsFilter[index].hasTemplate = false
+          }
+          vm.$store.dispatch('postDossierMark', vm.dossierTemplateItemsFilter[index])
+        })
+      }
+      vm.render = true
     }
   }
 }

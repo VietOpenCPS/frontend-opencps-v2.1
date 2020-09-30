@@ -399,6 +399,7 @@
       inputChangeSelect (item, index) {
         console.log('inputChangeSelect', item, index)
         let vm = this
+        vm.optionsGroup[index]['value'] = item
         if (vm.optionsGroup.length > (index + 1)) {
           vm.optionsGroup[index + 1]['value'] = ''
           vm.getDataSource(vm.optionsGroup[index + 1]['api'], index + 1, {parent: item})
@@ -464,6 +465,7 @@
           for (let key in vm.formBuilder) {
             if (vm.formBuilder[key].fieldType.indexOf('options_group') >= 0) {
               for (let key1 in vm.optionsGroup) {
+                console.log('itemGroup', vm.optionsGroup[key1])
                 if ((vm.optionsGroup[key1]['required'] === true || vm.optionsGroup[key1]['required'] === 'true') && !vm.optionsGroup[key1]['value']) {
                   valid = false
                   alert(vm.formBuilder[key]['fieldLabel'] + ' là bắt buộc!')

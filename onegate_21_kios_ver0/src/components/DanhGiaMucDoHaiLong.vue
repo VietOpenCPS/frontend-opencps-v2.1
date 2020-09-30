@@ -275,28 +275,33 @@ export default {
             toastr.error('Mã hồ sơ không chính xác. Vui lòng kiểm tra lại')
             return
           }
-          let filter2 = {
-            password: currentQuery.hasOwnProperty('secret') ? currentQuery.secret : '',
-            dossierId: dossier.dossierId,
-            referenceUid: dossier.referenceUid,
-            isDvc: vm.isDvc,
-            serverCode: 'SERVER_' + dossier['govAgencyCode']
+          if (dossier.dossierStatus === 'done' || (dossier.dossierStatus !== 'done' && dossier.dossierOverdue.indexOf('Quá') >=0)) {
+            let filter2 = {
+              password: currentQuery.hasOwnProperty('secret') ? currentQuery.secret : '',
+              dossierId: dossier.dossierId,
+              referenceUid: dossier.referenceUid,
+              isDvc: vm.isDvc,
+              serverCode: 'SERVER_' + dossier['govAgencyCode']
+            }
+            vm.$store.dispatch('getDossierDetailPass', filter2).then(function (res) {
+              if (String(dossier.hasPassword) !== String(filter2.password)) {
+                toastr.error('Mã bí mật không chính xác')
+                return
+              }
+              if(res && res.data && res.data.dossierId){
+                vm.govAgencySelected = res.data.dossierId
+                vm.detailDossierMC = res.data
+                vm.detailActive = true
+              } else {
+                toastr.error('Mã bí mật không chính xác')
+              }
+            }).catch(function (reject) {
+              toastr.error('Mã bí mật không chính xác')
+            })
+          } else {
+            toastr.error('Chỉ hồ sơ đã hoàn thành giải quyết hoặc quá hạn giải quyết mới được thực hiện đánh giá. Xin cảm ơn.')
           }
-          vm.$store.dispatch('getDossierDetailPass', filter2).then(function (res) {
-            if (String(dossier.hasPassword) !== String(filter2.password)) {
-              toastr.error('Mã bí mật không chính xác')
-              return
-            }
-            if(res && res.data && res.data.dossierId){
-              vm.govAgencySelected = res.data.dossierId
-              vm.detailDossierMC = res.data
-              vm.detailActive = true
-            } else {
-              toastr.error('Mã bí mật không chính xác')
-            }
-          }).catch(function (reject) {
-            toastr.error('Mã bí mật không chính xác')
-          })
+          
         } else {
           toastr.error('Mã hồ sơ không chính xác. Vui lòng kiểm tra lại')
         }

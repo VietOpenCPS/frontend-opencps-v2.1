@@ -36,7 +36,7 @@
                   <p>Hoàn thành</p>
                 </v-flex>
                 <v-flex md6 xs12 text-center>
-                  <span style="color:#1976d2;">{{statistics.processingCount}}</span>
+                  <span style="color:#1976d2;">{{thongKeHauGiang ? processingTotal : statistics.processingCount}}</span>
                   <p>Đang xử lý</p>
                 </v-flex>
                 <v-flex md6 xs12 text-center>
@@ -170,7 +170,7 @@
                       <p>Hoàn thành</p>
                     </v-flex>
                     <v-flex s12 text-center>
-                      <span style="color:#1976d2;">{{statisticTotalSBN.processingCount}}</span>
+                      <span style="color:#1976d2;">{{thongKeHauGiang ? processingSBN : statisticTotalSBN.processingCount}}</span>
                       <p>Đang xử lý</p>
                     </v-flex>
                   </v-layout>
@@ -228,7 +228,7 @@
                       <p>Hoàn thành</p>
                     </v-flex>
                     <v-flex s12 text-center>
-                      <span style="color:#1976d2;">{{statisticTotalQuanHuyen.processingCount}}</span>
+                      <span style="color:#1976d2;">{{thongKeHauGiang ? processingQuanHuyen : statisticTotalQuanHuyen.processingCount}}</span>
                       <p>Đang xử lý</p>
                     </v-flex>
                   </v-layout>
@@ -287,7 +287,7 @@
                         <p>Hoàn thành</p>
                       </v-flex>
                       <v-flex s12 text-center>
-                        <span style="color:#1976d2;">{{statisticTotalXaPhuong.processingCount}}</span>
+                        <span style="color:#1976d2;">{{thongKeHauGiang ? processingXaPhuong : statisticTotalXaPhuong.processingCount}}</span>
                         <p>Đang xử lý</p>
                       </v-flex>
                     </v-layout>
@@ -410,9 +410,9 @@
                     <th rowspan="3" style="text-align: center;" width="60" class="px-2">
                       <span>Tạm dừng bổ sung điều kiện</span>
                     </th>
-                    <th rowspan="3" style="text-align: center;" width="60" class="px-2">
+                    <!-- <th rowspan="3" style="text-align: center;" width="60" class="px-2">
                       <span>Rút không giải quyết</span>
-                    </th>
+                    </th> -->
                     <th rowspan="3" style="text-align: center;" width="60" class="px-2">
                       <span>Tỉ lệ sớm và đúng hạn</span>
                     </th>
@@ -498,7 +498,7 @@
                     <td align="center" class="px-2">(17)</td>
                     <td align="center" class="px-2">(18)</td>
                     <td align="center" class="px-2">(19)</td>
-                    <td align="center" class="px-2">(20)</td>
+                    <!-- <td align="center" class="px-2">(20)</td> -->
                   </tr>
                   <tr v-for="(item,index) in danhSachThongKeThang" :key="index">
                     <td align="center"  class="px-2">{{index + 1}}</td>
@@ -519,7 +519,7 @@
                     <td align="center" class="px-2">{{item.undueCount}}</td>
                     <td align="center" class="px-2">{{item.overdueCount}}</td>
                     <td align="center" class="px-2">{{item.waitingCount}}</td>
-                    <td align="center" class="px-2">{{item.cancelledCount}}</td>
+                    <!-- <td align="center" class="px-2">{{item.cancelledCount}}</td> -->
                     <td align="center" class="px-2">{{item.ontimePercentage}}</td>
                   </tr>
                   <tr class="sum__column" style="font-weight: bold;">
@@ -540,7 +540,7 @@
                     <td align="center" class="px-2">{{totalCounter['total_16']}}</td>
                     <td align="center" class="px-2">{{totalCounter['total_17']}}</td>
                     <td align="center" class="px-2">{{totalCounter['total_18']}}</td>
-                    <td align="center" class="px-2">{{totalCounter['total_19']}}</td>
+                    <!-- <td align="center" class="px-2">{{totalCounter['total_19']}}</td> -->
                     <td align="center" class="px-2">{{totalCounter['total_20']}}</td>
                   </tr>
                 </tbody>
@@ -694,7 +694,7 @@ export default {
       colors: ['#00E396','#FF4560']
     },
     chartOptionsYearHauGiang: {
-      labels: ["Đúng hạn", "Trễ hạn"],
+      labels: ["Hoàn thành đúng hạn", "Hoàn thành trễ hạn"],
       legend: {
         position: 'bottom'
       },
@@ -919,7 +919,11 @@ export default {
         class: 'text-xs-center'
       }
     ],
-    thongKeHauGiang: false
+    thongKeHauGiang: false,
+    processingTotal: 0,
+    processingSBN: 0,
+    processingQuanHuyen: 0,
+    processingXaPhuong: 0
   }),
   computed: {
     yearList() {
@@ -1144,16 +1148,17 @@ export default {
         .then(function(response) {
           if (response.data.data) {
             vm.statistics = response.data.data[0]
+            vm.processingTotal = vm.statistics.processingCount + vm.statistics.waitingCount
             vm.statisticalYear = [
               response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
               response.data.data[0].overtimeCount
             ]
-            if (vm.thongKeHauGiang) {
-              vm.statisticalYear = [
-                response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
-                response.data.data[0].overtimeCount + response.data.data[0].overdueCount
-              ]
-            }
+            // if (vm.thongKeHauGiang) {
+            //   vm.statisticalYear = [
+            //     response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
+            //     response.data.data[0].overtimeCount + response.data.data[0].overdueCount
+            //   ]
+            // }
           } else {
             vm.statisticalYear = [0, 0]
             vm.statistics = {
@@ -1222,9 +1227,10 @@ export default {
               
               if (vm.thongKeHauGiang) {
                 vm.statisticTotalSBN = response.data.data[0]
+                vm.processingSBN = vm.statisticTotalSBN.processingCount + vm.statisticTotalSBN.waitingCount
                 vm.statisticalSBN = [
                   response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
-                  response.data.data[0].overtimeCount + response.data.data[0].overdueCount
+                  response.data.data[0].overtimeCount
                 ]
               }
             } else {
@@ -1292,9 +1298,10 @@ export default {
               
               if (vm.thongKeHauGiang) {
                 vm.statisticTotalQuanHuyen = response.data.data[0]
+                vm.processingQuanHuyen = vm.statisticTotalQuanHuyen.processingCount + vm.statisticTotalQuanHuyen.waitingCount
                 vm.statisticalQUAN_HUYEN = [
                   response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
-                  response.data.data[0].overtimeCount + response.data.data[0].overdueCount
+                  response.data.data[0].overtimeCount
                 ]
               }
             } else {
@@ -1362,9 +1369,10 @@ export default {
               
               if (vm.thongKeHauGiang) {
                 vm.statisticTotalXaPhuong = response.data.data[0]
+                vm.processingXaPhuong = vm.statisticTotalXaPhuong.processingCount + vm.statisticTotalXaPhuong.waitingCount
                 vm.statisticalXA_PHUONG = [
                   response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
-                  response.data.data[0].overtimeCount + response.data.data[0].overdueCount
+                  response.data.data[0].overtimeCount
                 ]
               }
             } else {

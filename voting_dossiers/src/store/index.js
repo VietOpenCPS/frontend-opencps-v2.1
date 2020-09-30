@@ -46,7 +46,7 @@ export const store = new Vuex.Store({
                 groupId: state.initData.groupId
               }
             }
-            axios.get(state.endPoint + '/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
+            axios.get(state.endPointApi + '/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
               if (result.data) {
                 resolve(result.data.data)
               } else {
@@ -196,6 +196,36 @@ export const store = new Vuex.Store({
         })
       })
     },
+    submitVotingMC ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          // api đồng bộ sang một cửa
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            className: data.className,
+            classPk: data.classPk,
+            selected: data.selected,
+            votingCode: ''
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', data.serverCode)
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            resolve(result.data)
+          }).catch(xhr => {
+            toastr.clear()
+            toastr.error('Gửi đánh giá thất bại')
+            reject(xhr)
+          })
+        }).catch(function (){})
+      })
+    },
     loadingDataHoSo ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -242,8 +272,13 @@ export const store = new Vuex.Store({
           dataPost.append('data', JSON.stringify(textPost))
           dataPost.append('serverCode', filter.serverCode)
           axios.post('/o/rest/v2/proxy', dataPost, config).then(function (response) {
-            let serializable = response.data.data[0]
-            resolve(serializable)
+            if (response.data.hasOwnProperty('data')) {
+              let serializable = response.data.data[0]
+              resolve(serializable)
+            } else {
+              reject(response)
+            }
+            
           }).catch(xhr => {
             reject(xhr)
           })
@@ -261,7 +296,7 @@ export const store = new Vuex.Store({
             },
             params: {}
           }
-          axios.get(state.endPoint + '/dossiers/' + filter.dossierId, param).then(function (response) {
+          axios.get(state.endPointApi + '/dossiers/' + filter.dossierId, param).then(function (response) {
             resolve(response)
           }).catch(function (error) {
             console.log('error', error)

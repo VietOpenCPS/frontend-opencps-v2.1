@@ -88,9 +88,9 @@
         <td :colspan="!onlyView ? headers.length - 2 : headers.length - 1" class="text-xs-center" style="border-right: 1px solid #dedede;">
           <strong style="font-size: 1.25em;">TỔNG TIỀN</strong>
         </td>
-        <td class="px-2" :style="onlyView ? 'border-right: 1px solid #dedede' : ''">
+        <td :class="!onlyView ? 'px-2' : 'px-2 text-xs-center'" :style="onlyView ? 'border-right: 1px solid #dedede' : ''">
           <strong style="font-size: 1.25em;">{{fee | currency}}</strong>
-          <p class="d-inline-block right text-bold">vnđ</p>
+          <p v-if="!onlyView" class="d-inline-block right text-bold">vnđ</p>
         </td>
         <td v-if="!onlyView" style="border-right: 1px solid #dedede;">
         </td>

@@ -69,13 +69,13 @@
             <!-- epayment -->
             <p class="mb-0"><span class="red--text">* </span>&nbsp;Lựa chọn hình thức thanh toán:</p>
             <div class="text-xs-left mt-2 mb-3 ml-0">
-              <v-chip color="indigo" text-color="white" @click.native="showThanhToanChuyenKhoan" 
+              <!-- <v-chip color="indigo" text-color="white" @click.native="showThanhToanChuyenKhoan" 
                 :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 1 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')">
                 <v-avatar style="cursor: pointer">
                   <v-icon>account_balance</v-icon>
                 </v-avatar>
                 <span class="py-2" style="cursor: pointer">Thanh toán chuyển khoản</span>
-              </v-chip>
+              </v-chip> -->
               <v-chip v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && !getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('kpdvcqg')" color="orange" text-color="white"
                 @click.native="toKeyPay(getEPaymentProfile(paymentProfile.epaymentProfile).keypayUrl)"
                 :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 2 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
@@ -83,8 +83,8 @@
                 <v-avatar style="cursor: pointer">
                   <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
                 </v-avatar>
-                <span class="py-2" style="cursor: pointer">Thanh toán qua Keypay</span>
-                <!-- <span class="py-2" style="cursor: pointer">Thanh toán trực tuyến</span> -->
+                <!-- <span class="py-2" style="cursor: pointer">Thanh toán qua Keypay</span> -->
+                <span class="py-2" style="cursor: pointer">Thanh toán trực tuyến</span>
               </v-chip>
 
               <v-chip v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('kpdvcqg')" color="orange" text-color="white"
@@ -105,6 +105,15 @@
                   <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
                 </v-avatar>
                 <span class="py-2" style="cursor: pointer">Thanh toán qua Cổng DVCQG</span>
+              </v-chip>
+              <v-chip v-if="showPayGov" color="#3b5ab5" text-color="white"
+                @click.native="toPayGov()"
+              >
+                <v-avatar style="cursor: pointer">
+                  <img src="/documents/35417/431846/paygov_logo.png" alt="trevor" style="background: #fff">
+                  <!-- <img src="/o/opencps-store/js/cli/dvc/app/image/paygov_logo.png" alt="trevor" style="background: #fff"> -->
+                </v-avatar>
+                <span class="py-2" style="cursor: pointer">Thanh toán qua Cổng hỗ trợ thanh toán quốc gia</span>
               </v-chip>
 
               <v-chip v-if="dataVietelPay" color="green" text-color="white" @click.native="showViettelPay" 
@@ -279,7 +288,8 @@ export default {
     dialogPDFLoading: true,
     isBank: false,
     errorNotSelect: false,
-    methodSelect: 0
+    methodSelect: 0,
+    ipAddress:''
   }),
   directives: {money: VMoney},
   created () {
@@ -310,6 +320,15 @@ export default {
       if (vm.paymentProfile) {
         //
         if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && vm.paymentProfile.epaymentProfile) {
+          let paymentConfigInfo = vm.getEPaymentProfile(vm.paymentProfile.epaymentProfile)
+          if (paymentConfigInfo && paymentConfigInfo.hasOwnProperty('PAYGOV_CONFIG') && paymentConfigInfo['PAYGOV_CONFIG'] && paymentConfigInfo['PAYGOV_CONFIG']['isPaygov']) {
+            vm.showPayGov = true
+            $.getJSON('https://api.ipify.org?format=jsonp&callback=?', function(data) {
+              vm.ipAddress = data && data.hasOwnProperty('ip') ? data.ip : ''
+            })
+          } else {
+            vm.showPayGov = false
+          }
           try {
             let jsonQR = JSON.parse(vm.paymentProfile.epaymentProfile)
             vm.dataVietelPay = jsonQR.genQRCode
@@ -486,7 +505,18 @@ export default {
       vm.$store.dispatch('toKeypayDvcqg', filter).then(result => {
         window.open(result, '_self')
       })
-      
+    },
+    toPayGov () {
+      let vm = this
+      let filter = {
+        dossierId: vm.detailDossier.dossierId,
+        ipAddress: vm.ipAddress
+      }
+      vm.$store.dispatch('toPayGov', filter).then(result => {
+        if (result.hasOwnProperty('url')) {
+          window.open(result.url, '_self')
+        }
+      })
     },
     showViettelPay () {
       let vm = this

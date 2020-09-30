@@ -82,7 +82,7 @@
       <v-flex xs12 v-else>
         <div class="px-3">
           <v-alert outline color="warning" icon="priority_high" :value="true">
-            Chưa có câu hỏi khảo sát
+            Chưa có câu hỏi đánh giá
           </v-alert>
         </div>
       </v-flex>
@@ -104,7 +104,7 @@
                 required
               ></v-text-field>
             </v-flex>
-            <v-flex xs12>
+            <v-flex xs12 v-if="isDvc">
               <p>Mã bí mật <span style="color: red">(*)</span></p>
               <v-text-field
                 box
@@ -141,11 +141,11 @@
         </v-card-text>
         <v-card-actions class="mx-2">
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="submitForm">
+          <v-btn color="primary" @click="submitForm" :loading="btnLoading" :disabled="btnLoading">
             <v-icon>how_to_reg</v-icon>&nbsp;
               Xác nhận
           </v-btn>
-          <v-btn color="primary" @click="dialogVerify = false">
+          <v-btn color="primary" @click="dialogVerify = false" :loading="btnLoading" :disabled="btnLoading">
             <v-icon>clear</v-icon>&nbsp;
               Hủy
           </v-btn>
@@ -262,39 +262,56 @@ export default {
         dossierNo: vm.dossierNo
       }
       vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
-        if(result.data && result.data.length){
-          let dossier = result.data[0]
+        if(result && result.length){
+          let dossier = result[0]
           if (vm.isDvc) {
-            let filter2 = {
-              password: vm.applicantIdNo,
-              dossierId: dossier.dossierId
+            if (filter.dossierNo !== dossier['dossierNo']) {
+              toastr.error('Mã hồ sơ không chính xác. Vui lòng kiểm tra lại')
+              return
             }
-            vm.$store.dispatch('getDossierDetailPass', filter2).then(function (result) {
-              if (result.status && result.status.toString() === '203') {
+            if (dossier.dossierStatus === 'done' || (dossier.dossierStatus !== 'done' && dossier.dossierOverdue.indexOf('Quá') >=0)) {
+              let filter2 = {
+                password: vm.applicantIdNo,
+                dossierId: dossier.dossierId
+              }
+              vm.$store.dispatch('getDossierDetailPass', filter2).then(function (result) {
+                if (result.status && result.status.toString() === '203') {
+                  toastr.error('Mã bí mật không chính xác. Vui lòng kiểm tra lại.')
+                  return
+                } else {
+                  let filter3 = {
+                    dossierNo: dossier['dossierNo'],
+                    serverCode: 'SERVER_' + dossier['govAgencyCode']
+                  }
+                  vm.$store.dispatch('loadingDataHoSoFromDvcToMc', filter3).then(resultActions => {
+                    vm.detailDossierMC = resultActions
+                    vm.submitVoting()
+                  }).catch(function () {
+                    toastr.error('Mã hồ sơ không chính xác. Vui lòng kiểm tra lại')
+                  })
+                }
+              }).catch(function (reject) {
                 toastr.error('Mã bí mật không chính xác. Vui lòng kiểm tra lại.')
                 return
-              } else {
-                let filter3 = {
-                  dossierNo: dossier['dossierNo'],
-                  serverCode: 'SERVER_' + dossier['govAgencyCode']
-                }
-                vm.$store.dispatch('loadingDataHoSoFromMcToDvc', filter3).then(resultActions => {
-                  vm.detailDossierMC = resultActions
-                  vm.submitVoting()
-                })
-              }
-            }).catch(function (reject) {
-              toastr.error('Mã bí mật không chính xác. Vui lòng kiểm tra lại.')
-              return
-            })
+              })
+            } else {
+              toastr.error('Chỉ hồ sơ đã hoàn thành giải quyết hoặc quá hạn giải quyết mới được thực hiện đánh giá. Xin cảm ơn.')
+            }
+            
           } else {
             if (filter.dossierNo !== dossier['dossierNo']) {
               toastr.error('Mã hồ sơ không chính xác. Vui lòng kiểm tra lại')
               return
             }
-            vm.detailDossierMC = dossier
-            vm.submitVoting()
+            if (dossier.dossierStatus === 'done' || (dossier.dossierStatus !== 'done' && dossier.dossierOverdue.indexOf('Quá') >=0)) {
+              vm.detailDossierMC = dossier
+              vm.submitVoting()
+            } else {
+              toastr.error('Chỉ hồ sơ đã hoàn thành giải quyết hoặc quá hạn giải quyết mới được thực hiện đánh giá. Xin cảm ơn.')
+            }
           }
+          
+          
           
         } else {
           toastr.error('Mã hồ sơ không chính xác. Vui lòng kiểm tra lại')
@@ -304,6 +321,7 @@ export default {
       })
     },
     submitVoting () {
+      let vm = this
       let filter = {
         className: 'dossier',
         classPk: vm.detailDossierMC.dossierId,
@@ -330,16 +348,21 @@ export default {
       })
     },
     doVottingResultSubmit: function () {
-      var vm = this
-      vm.btnLoading = true
+      let vm = this
       let arrAction = []
       let valid = false
+      vm.btnLoading = true
       for (var key in vm.votingItemsResult) {
         vm.votingItemsResult[key]['className'] = 'dossier'
-        vm.votingItemsResult[key]['classPk'] = 0
+        vm.votingItemsResult[key]['classPk'] = vm.detailDossierMC.dossierId
+        vm.votingItemsResult[key]['serverCode'] = 'SERVER_' + vm.detailDossierMC['govAgencyCode']
         if (String(vm.votingItemsResult[key]['selected']) !== '0') {
           valid = true
-          arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItemsResult[key]))
+          if (vm.isDvc) {
+            arrAction.push(vm.$store.dispatch('submitVotingMC', vm.votingItemsResult[key]))
+          } else {
+            arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItemsResult[key]))
+          }
         }
       }
       if (valid) {

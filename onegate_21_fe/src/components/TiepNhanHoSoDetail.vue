@@ -166,14 +166,14 @@
             </v-expansion-panel>
           </div>
           <!--  -->
-          <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
+          <!-- <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
                 <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát hồ sơ</div>
                 <dich-vu-chuyen-phat-ho-so ref="dichvuchuyenphathoso" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-          </div>
+          </div> -->
           <!--  -->
           <div style="position: relative;" v-if="viaPortalDetail !== 0">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -888,7 +888,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: true,
+    notifyConfig: false,
     fromViaPostal: false,
     fromViaPostalConfig: false,
     smsNotify: true,
@@ -1332,17 +1332,17 @@ export default {
                   let actionList = result2.filter(function (item) {
                     return String(item.enable) === '1' && item.autoEvent !== 'listener'
                   })
+                  let exits = result2.filter(function (item) {
+                    return item.actionCode === 1300 || item.actionCode === '1300'
+                  })
+                  if (exits.length > 0 && vm.showGuiHoSoConfig) {
+                    vm.showGuiHoSo = true
+                    vm.actionDetailSendDossierDvc = exits[0]
+                  }
                   if (actionList.length > 1) {
                     vm.actionDetail = actionList.filter(function (item) {
                       return item.actionCode === 1100 || item.actionCode === '1100'
                     })[0]
-                    let exits = actionList.filter(function (item) {
-                      return item.actionCode === 1300 || item.actionCode === '1300'
-                    })
-                    if (exits.length > 0 && vm.showGuiHoSoConfig) {
-                      vm.showGuiHoSo = true
-                      vm.actionDetailSendDossierDvc = exits[0]
-                    }
                   } else {
                     vm.actionDetail = actionList[0]
                   }

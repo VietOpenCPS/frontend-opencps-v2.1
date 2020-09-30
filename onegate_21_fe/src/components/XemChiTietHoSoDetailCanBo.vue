@@ -1309,9 +1309,8 @@ export default {
         vm.$store.dispatch('getServiceInfo', {
           serviceInfoId: resultDossier.serviceCode
         }).then(function (res) {
-          if (resultDossier.serviceCode === 'TEST-CHUNG-THUC') {
+          if (res.hasOwnProperty('isNotarization') && String(res.isNotarization) === 'true') {
             vm.isNotarization = true
-
           } else {
             vm.isNotarization = false
             if (vm.$refs.thanhphanhoso) {
@@ -2477,7 +2476,12 @@ export default {
             })
           } else {
             // ký số với plugin cài đặt
-            if (result.signatureType === 'plugin') {
+            // check không sử dụng ký số trong quy trình có ký sô
+            let doNotSign = false
+            if (vm.showTaoTaiLieuKetQua && vm.typeEsign === 'plugin') {
+              doNotSign = vm.$refs.tailieuketqua.checkUseSign()
+            }
+            if (result.signatureType === 'plugin' && !doNotSign) {
               console.log('file ký số', vm.createFileSignedSync)
               let valid = true
               if (!vm.createFileSignedSync) {
@@ -2496,8 +2500,10 @@ export default {
                     valid = false
                     return
                   } else {
-                    fileEntries.push(files[index]['fileEntryId'])
-                    dossierFiles.push(files[index]['dossierFileId'])
+                    if (files[index]['fileSize']) {
+                      fileEntries.push(files[index]['fileEntryId'])
+                      dossierFiles.push(files[index]['dossierFileId'])
+                    }
                   }
                 }
                 console.log('fileEntries 12312', fileEntries, dossierFiles)
@@ -2645,8 +2651,10 @@ export default {
             toastr.error(files[index]['displayName'] + ' chưa được ký duyệt')
             return false
           } else {
-            fileEntries.push(files[index]['fileEntryId'])
-            dossierFiles.push(files[index]['dossierFileId'])
+            if (files[index]['fileSize']) {
+              fileEntries.push(files[index]['fileEntryId'])
+              dossierFiles.push(files[index]['dossierFileId'])
+            }
           }
         }
         console.log('fileEntries 12312', fileEntries, dossierFiles)

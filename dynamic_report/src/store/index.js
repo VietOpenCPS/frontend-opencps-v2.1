@@ -407,8 +407,9 @@ export const store = new Vuex.Store({
               .then(axios.spread((...args) => {
                 let myObject = []
                 for (let i = 0; i < args.length; i++) {
-                  if (args[i]['data']['total'] > 0) {
-                    myObject = myObject.concat(args[i]['data']['data'])
+                  let dataOutput = args[i]['data'].hasOwnProperty('total') ? args[i]['data']['data'] : args[i]['data']
+                  if (args[i]['data']['total'] > 0 || (!args[i]['data'].hasOwnProperty('total') && dataOutput)) {
+                    myObject = myObject.concat(dataOutput)
                   } else {
                     let itemNoData = [
                       {

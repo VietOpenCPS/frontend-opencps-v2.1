@@ -20,7 +20,9 @@
           <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
           <v-tab key="2" ripple class="mx-2"> Tiến trình thụ lý </v-tab>
           <v-tab key="3" ripple class="mx-2" v-if="paymentInfo"> Thanh toán trực tuyến</v-tab>
-          <v-tab key="4" ripple class="mx-2" @click="loadVoting()" v-if="dossierDetail['dossierStatus'] === 'done'"> Đánh giá chất lượng dịch vụ</v-tab>
+          <v-tab key="4" ripple class="mx-2" @click="loadVoting()" v-if="dossierDetail['dossierStatus'] === 'done' || (dossierDetail['dossierStatus'] !== 'done' && dossierDetail['dossierOverdue'].indexOf('Quá') >=0)">
+             Đánh giá hài lòng
+          </v-tab>
           <v-tab-item key="1">
             <v-card style="border: 1px solid #dedede;border-top: none;">
               <v-card-text class="px-0 py-0">

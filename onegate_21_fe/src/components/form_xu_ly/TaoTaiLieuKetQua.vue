@@ -44,7 +44,7 @@
                           <v-btn slot="activator" flat icon color="indigo" v-on:click.stop="signAction(itemFileView, index2)" class="my-0">
                             <v-icon size="18">fa fa-pencil-square-o</v-icon>
                           </v-btn>
-                          <span>Ký duyệt</span>
+                          <span>Ký duyệt tài liệu đính kèm</span>
                         </v-tooltip>
                       </div>
                     </div>
@@ -128,7 +128,7 @@
                     <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ lên</span>
                     <span v-else>Tải giấy tờ lên (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
                   </v-tooltip>
-                  <v-tooltip top v-if="esignType === 'plugin' && item['eForm']">
+                  <v-tooltip top v-if="esignType === 'plugin' && item['eForm'] && item['fileSize']">
                     <v-btn slot="activator" flat icon color="indigo" v-on:click.stop="signAction(item, index, item.partNo)" class="ml-2 my-0">
                       <v-icon size="22">fa fa-pencil-square-o</v-icon>
                     </v-btn>
@@ -143,6 +143,14 @@
                 </v-flex>
               </v-layout>
             </div>
+          </div>
+          <div class="mt-2" style="padding-left: 25px" v-if="esignType === 'plugin'">
+            <v-checkbox
+              class="mt-0"
+              v-model="doNotSign"
+            >
+              <template slot="label"><span class="black--text">Không sử dụng ký số</span></template>
+            </v-checkbox>
           </div>
         </v-card>
         <!-- <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1 && !onlyView">
@@ -297,7 +305,8 @@
       receiveMessage: '',
       active: true,
       loadingApacal: false,
-      thaoTacGop: false
+      thaoTacGop: false,
+      doNotSign: false
     }),
     computed: {
       loading () {
@@ -1390,6 +1399,10 @@
         } else {
           return false
         }
+      },
+      checkUseSign () {
+        let vm = this
+        return vm.doNotSign
       },
       createFileSigned (type) {
         let vm = this
