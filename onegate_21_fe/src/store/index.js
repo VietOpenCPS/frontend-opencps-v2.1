@@ -3679,6 +3679,24 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    getEmployee ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          axios.get('/o/rest/v2/employees/byGroupId', param).then(function (response) {
+            let serializable = response.data
+              resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      }).catch(function (){})
+    },
     getServiceOpionByProcess ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {

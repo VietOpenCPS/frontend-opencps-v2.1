@@ -952,7 +952,7 @@ import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import support from '../store/support.json'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import AdvSearch from './TimKiemNangCao'
-
+import axios from 'axios'
 export default {
   props: ['index'],
   components: {
@@ -1842,76 +1842,78 @@ export default {
       let vm = this
       let referenceDonViGuiCongVan = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('referenceDonViGuiCongVan') ? vm.trangThaiHoSoList[vm.index]['tableConfig']['referenceDonViGuiCongVan'] : ''
       let scope = ''
-      console.log('2222222222222', vm.employeeLoginInfomation)
-      if(referenceDonViGuiCongVan === '_firstscope'){
-        if (vm.employeeLoginInfomation.hasOwnProperty('scope') && vm.employeeLoginInfomation.scope) {
-          scope = String(vm.employeeLoginInfomation.scope).split(',')[0]
-        }
-      } else if (referenceDonViGuiCongVan.includes('_group@')){
-        scope = referenceDonViGuiCongVan.slice(referenceDonViGuiCongVan.lastIndexOf('@') + 1, referenceDonViGuiCongVan.length)
-      } else {
-        scope = referenceDonViGuiCongVan
-      }
-      if(referenceDonViGuiCongVan.includes('_group@')){
-        let filterDictGroup = {
-          collectionCode: 'DON_VI_CONG_VAN',
-          groupCode: scope
-        }
-        vm.$store.dispatch('getGroupDictitem', filterDictGroup).then(res=>{
-          vm.listDonviCongVan = res
-          if (currentQuery.hasOwnProperty('donvigui') && String(currentQuery.donvigui) !== '') {
-            for (let key in vm.listDonviCongVan) {
-              if (String(vm.listDonviCongVan[key]['itemCode']) === String(currentQuery.donvigui)) {
-                vm.donviguiSelected = vm.listDonviCongVan[key]
-              }
-            }
-          } else {
-            vm.donviguiSelected = null
+      vm.$store.dispatch('getEmployee').then(function(response1) {
+        let employeeLogin = response1
+        console.log('1111111111',response1)
+        console.log('2222222222222', vm.employeeLoginInfomation)
+        if(referenceDonViGuiCongVan === '_firstscope'){
+          if (employeeLogin.hasOwnProperty('scope') && employeeLogin.scope) {
+            scope = String(employeeLogin.scope).split(',')[0]
           }
-        }).catch(()=>{
-          vm.listDonviCongVan = []
-        })
-      } else {
-        let filterDictItems = {
-          collectionCode: 'DON_VI_CONG_VAN',
-          level: '',
-          parent: scope
+        } else if (referenceDonViGuiCongVan.includes('_group@')){
+          scope = referenceDonViGuiCongVan.slice(referenceDonViGuiCongVan.lastIndexOf('@') + 1, referenceDonViGuiCongVan.length)
+        } else {
+          scope = referenceDonViGuiCongVan
         }
-        let filterDetailDictItems = {
-          collectionCode: 'DON_VI_CONG_VAN',
-          level: '',
-          itemCode: scope
-        }
-        const promise1 = vm.$store.dispatch('loadDictItems', filterDictItems)
-        const promise2 = vm.$store.dispatch('loadDetailDictItems', filterDetailDictItems)
-        Promise.all([promise1, promise2]).then(function(values) {
-          if(values[0]['data'] && values[1]){
-            let parent = values[1]['parentItem'] ? values[1]['parentItem']  : []
-            let parentArr = Array.isArray(parent) ? parent : [parent]
-            vm.listDonviCongVan = values[0]['data'].concat(parentArr)
-            
-          } else if (!values[0]['data'] && values[1]) {
-            let parent = values[1]['parentItem'] ? values[1]['parentItem']  : []
-            let parentArr = Array.isArray(parent) ? parent : [parent]
-            vm.listDonviCongVan = parentArr
-          } else if (values[0]['data'] && !values[1]) {
-            vm.listDonviCongVan = values[0]['data']
-          } else {
+        if(referenceDonViGuiCongVan.includes('_group@')){
+          let filterDictGroup = {
+            collectionCode: 'DON_VI_CONG_VAN',
+            groupCode: scope
+          }
+          vm.$store.dispatch('getGroupDictitem', filterDictGroup).then(res=>{
+            vm.listDonviCongVan = res
+            if (currentQuery.hasOwnProperty('donvigui') && String(currentQuery.donvigui) !== '') {
+              for (let key in vm.listDonviCongVan) {
+                if (String(vm.listDonviCongVan[key]['itemCode']) === String(currentQuery.donvigui)) {
+                  vm.donviguiSelected = vm.listDonviCongVan[key]
+                }
+              }
+            } else {
+              vm.donviguiSelected = null
+            }
+          }).catch(()=>{
             vm.listDonviCongVan = []
+          })
+        } else {
+          let filterDictItems = {
+            collectionCode: 'DON_VI_CONG_VAN',
+            level: '',
+            parent: scope
           }
-          console.log('1111111111',vm.listDonviCongVan)
-          if (currentQuery.hasOwnProperty('donvigui') && String(currentQuery.donvigui) !== '') {
-            for (let key in vm.listDonviCongVan) {
-              if (String(vm.listDonviCongVan[key]['itemCode']) === String(currentQuery.donvigui)) {
-                vm.donviguiSelected = vm.listDonviCongVan[key]
-              }
+          let filterDetailDictItems = {
+            collectionCode: 'DON_VI_CONG_VAN',
+            level: '',
+            itemCode: scope
+          }
+          const promise1 = vm.$store.dispatch('loadDictItems', filterDictItems)
+          const promise2 = vm.$store.dispatch('loadDetailDictItems', filterDetailDictItems)
+          Promise.all([promise1, promise2]).then(function(values) {
+            if(values[0]['data'] && values[1]){
+              let parent = values[1]['parentItem'] ? values[1]['parentItem']  : []
+              let parentArr = Array.isArray(parent) ? parent : [parent]
+              vm.listDonviCongVan = values[0]['data'].concat(parentArr)
+              
+            } else if (!values[0]['data'] && values[1]) {
+              let parent = values[1]['parentItem'] ? values[1]['parentItem']  : []
+              let parentArr = Array.isArray(parent) ? parent : [parent]
+              vm.listDonviCongVan = parentArr
+            } else if (values[0]['data'] && !values[1]) {
+              vm.listDonviCongVan = values[0]['data']
+            } else {
+              vm.listDonviCongVan = []
             }
-          } else {
-            vm.donviguiSelected = null
-          }
-        })
-      }
-
+            if (currentQuery.hasOwnProperty('donvigui') && String(currentQuery.donvigui) !== '') {
+              for (let key in vm.listDonviCongVan) {
+                if (String(vm.listDonviCongVan[key]['itemCode']) === String(currentQuery.donvigui)) {
+                  vm.donviguiSelected = vm.listDonviCongVan[key]
+                }
+              }
+            } else {
+              vm.donviguiSelected = null
+            }
+          })
+        }
+      })
     },
     checkPemissionSpecialAction (form, currentUser, thongtinchitiet) {
       var vm = this
@@ -2238,8 +2240,6 @@ export default {
             } else {
               vm.listThuTucHanhChinh = data
             }
-            console.log('111111111',data)
-            console.log('111111111',vm.listThuTucHanhChinh)
              
             // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
           }).catch(function (){})
