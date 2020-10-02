@@ -723,21 +723,21 @@ export default {
     checkDelegateIdNo: false,
     checkApplicantId: false,
     requiredOptions: {
-      applicantIdNo: false,
+      applicantIdNo: true,
       applicantName: true,
       address: true,
       cityCode: true,
       districtCode: true,
       wardCode: true,
-      contactTelNo: false,
+      contactTelNo: true,
       contactEmail: false,
-      delegateIdNo: false,
-      delegateName: false,
-      delegateAddress: false,
-      delegateCityCode: false,
-      delegateDistrictCode: false,
-      delegateWardCode: false,
-      delegateTelNo: false,
+      delegateIdNo: true,
+      delegateName: true,
+      delegateAddress: true,
+      delegateCityCode: true,
+      delegateDistrictCode: true,
+      delegateWardCode: true,
+      delegateTelNo: true,
       delegateEmail: false
     },
     valid_thongtinchuhoso: false,
@@ -839,7 +839,7 @@ export default {
     functionTimeOut: null,
     dialog_applicantInfos: false,
     dialog_applicantList: false,
-    applicantConfig: true,
+    applicantConfig: false,
     titleEdit: 'Thông tin công dân, tổ chức, doanh nghiệp',
     applicantEdit: '',
     dialog_editApplicant: false,
@@ -916,7 +916,7 @@ export default {
     wardItems: [],
     valid: false,
     loadingTable: false,
-    hasOrganization: false
+    hasOrganization: true
   }),
   computed: {
     loading () {
@@ -950,7 +950,7 @@ export default {
   created () {
     let vm = this
     if (vm.formCode === "NEW") {
-      // vm.thongTinNguoiNopHoSo.sameUser = true
+      vm.thongTinNguoiNopHoSo.sameUser = true
     }
     if (vm.hasOrganization) {
       vm.labelSwitch = {
@@ -1158,10 +1158,10 @@ export default {
         vm.$store.getters.getDictItems(filter).then(function (result) {
           vm.citys = result.data
           // set default cityCode
-          // if (vm.formCode === "NEW" && !thongTinChuHoSoTemp['cityCode']) {
-          //   vm.thongTinChuHoSo['cityCode'] = 87
-          //   vm.thongTinChuHoSo['cityName'] = 'Tỉnh Đồng Tháp'
-          // }
+          if (vm.formCode === "NEW" && !thongTinChuHoSoTemp['cityCode']) {
+            vm.thongTinChuHoSo['cityCode'] = 87
+            vm.thongTinChuHoSo['cityName'] = 'Tỉnh Đồng Tháp'
+          }
           
         })
         setTimeout(function () {

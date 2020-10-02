@@ -4692,6 +4692,32 @@ export const store = new Vuex.Store({
         })
       })
     },
+    doActionPayGov({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json'
+          }
+        }
+        let dataPostdossier = new URLSearchParams()
+        dataPostdossier.append('amount', data.amount)
+        dataPostdossier.append('orderId', data.orderId)
+        dataPostdossier.append('orderInfo', data.orderInfo)
+        dataPostdossier.append('requestCode', data.requestCode)
+        dataPostdossier.append('transactionNo', data.transactionNo)
+        dataPostdossier.append('payDate', data.payDate)
+        dataPostdossier.append('errorCode', data.errorCode)
+        dataPostdossier.append('paygate', data.paygate)
+        dataPostdossier.append('type', data.type)
+        dataPostdossier.append('checksum', data.checksum)
+
+        axios.post('/o/pgi/paygov/dpnhankqthanhtoanhs', dataPostdossier, options).then(function (response) {
+          
+        }).catch(function (error) {
+        })
+      })
+    },
     getFieldPick ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {

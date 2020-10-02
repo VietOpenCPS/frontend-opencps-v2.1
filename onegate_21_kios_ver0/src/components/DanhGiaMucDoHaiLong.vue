@@ -8,44 +8,25 @@
         <h4 class="py-4 ml-2 text-xs-center">
           <span style="color:#065694;font-size: 1.2em !important;">ĐÁNH GIÁ MỨC ĐỘ HÀI LÒNG </span>
         </h4>
-        <v-layout wrap class="px-0 py-0">
-          <div style="width: calc(100% - 150px)">
-            <v-layout wrap>
-              <v-flex xs12 md6 class="px-2">
-                <div class="input-custom">
-                  <input id="dossierNoKey" type="text" @focus="show" @keyup.enter="filterDossier" required="required" />
-                  <span class="bar"></span>
-                  <label for="dossierNoKey">Mã hồ sơ</label>
-                </div>
-              </v-flex>
-              <v-flex xs12 md6 class="px-2">
-                <div class="input-custom">
-                  <input id="secretKey" type="text" @focus="show" @keyup.enter="filterDossier" required="required" />
-                  <span class="bar"></span>
-                  <label for="secretKey">Mã bí mật</label>
-                </div>
-              </v-flex>
-            </v-layout>
-          </div>
-          <div class="text-right" style="width: 150px;">
-            <v-btn color="primary"
-              :loading="loadingTable"
-              :disabled="loadingTable"
-              @click="filterDossier"
-              class="kios-btn my-0"
-              style="height: 50px !important"
-            >
-              <v-icon size="18">search</v-icon>
-              &nbsp;
-              Đánh giá
-              <span slot="loader">Loading...</span>
-            </v-btn>
-          </div>
-        </v-layout>
-        <chi-tiet-danh-gia v-if="detailActive" :administration="govAgencySelected" :detailDossierMC="detailDossierMC" :className='className'></chi-tiet-danh-gia>
-        <v-alert class="mt-5 mx-2" v-if="validateTracuu === false && !activeDetailDossier" :value="true" outline color="orange" icon="priority_high">
-          Nhập thông tin đánh giá
-        </v-alert>
+        <div>
+          <v-layout wrap>
+            <v-flex xs12 md6 class="px-2">
+              <div class="input-custom">
+                <input id="dossierNoKey" type="text" @focus="show" @keyup.enter="filterDossier" required="required" />
+                <span class="bar"></span>
+                <label for="dossierNoKey">Mã hồ sơ</label>
+              </div>
+            </v-flex>
+            <v-flex xs12 md6 class="px-2">
+              <div class="input-custom">
+                <input id="secretKey" type="text" @focus="show" @keyup.enter="filterDossier" required="required" />
+                <span class="bar"></span>
+                <label for="secretKey">Mã bí mật</label>
+              </div>
+            </v-flex>
+          </v-layout>
+        </div>
+        <chi-tiet-danh-gia :administration="govAgencySelected" :className='className'></chi-tiet-danh-gia>
         <!--  -->
         <div class="virtual-keyboard" v-if="visible">
           <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
@@ -131,7 +112,6 @@ export default {
       preventClickEvent: false
     },
     govAgencySelected: '',
-    detailActive: false,
     isDvc: false,
     detailDossierMC: ''
   }),
@@ -162,14 +142,13 @@ export default {
       let newQuery = current.query
       $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
       $('#secretKey').val(newQuery.hasOwnProperty('secret') ? newQuery.secret : '')
-      // $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
-      vm.hosoDatasPage = 1
-      if ($('#dossierNoKey').val() && $('#secretKey').val()) {
-        vm.validateTracuu = true
-        vm.doLoadingDataHoSo()
-      } else {
-        vm.validateTracuu = false
-      }
+      // vm.hosoDatasPage = 1
+      // if ($('#dossierNoKey').val() && $('#secretKey').val()) {
+      //   vm.validateTracuu = true
+      //   vm.doLoadingDataHoSo()
+      // } else {
+      //   vm.validateTracuu = false
+      // }
     })
   },
   watch: {
@@ -186,7 +165,6 @@ export default {
       // $('#applicantNameKey').val(currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : '')
       vm.hosoDatasPage = 1
       vm.govAgencySelected = ''
-      vm.detailActive = false
       if ($('#dossierNoKey').val() && $('#secretKey').val()) {
         vm.validateTracuu = true
         vm.doLoadingDataHoSo()
@@ -291,7 +269,6 @@ export default {
               if(res && res.data && res.data.dossierId){
                 vm.govAgencySelected = res.data.dossierId
                 vm.detailDossierMC = res.data
-                vm.detailActive = true
               } else {
                 toastr.error('Mã bí mật không chính xác')
               }

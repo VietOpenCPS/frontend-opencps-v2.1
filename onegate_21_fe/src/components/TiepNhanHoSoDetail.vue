@@ -166,14 +166,14 @@
             </v-expansion-panel>
           </div>
           <!--  -->
-          <!-- <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
+          <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
                 <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát hồ sơ</div>
                 <dich-vu-chuyen-phat-ho-so ref="dichvuchuyenphathoso" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-          </div> -->
+          </div>
           <!--  -->
           <div style="position: relative;" v-if="viaPortalDetail !== 0">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -888,7 +888,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: false,
+    notifyConfig: true,
     fromViaPostal: false,
     fromViaPostalConfig: false,
     smsNotify: true,
