@@ -1464,7 +1464,6 @@ export default {
     formVue () {
       let vm = this
       vm.loadingAction = true
-      console.log(vm.checkQuyetDinh())
       let dataCreate = {
         originality: vm.getOriginality(),
         serviceCode: $('#serviceCode_hidden').val(),
@@ -1750,21 +1749,21 @@ export default {
                 }
               vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
                 console.log(result)
-                let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
-                dossierFile.forEach(async (e)=>{
-                    if(e.partNo === 'TP01'){
-                      let dataPUTDossierFile = {
-                        id: vm.id,
-                        referenceUid: e.referenceUid,
-                        formData: e.formData
-                      }
-                      await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+                // let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+                // dossierFile.forEach(async (e)=>{
+                //     if(e.partNo === 'TP01'){
+                //       let dataPUTDossierFile = {
+                //         id: vm.id,
+                //         referenceUid: e.referenceUid,
+                //         formData: e.formData
+                //       }
+                //       await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
 
-                      }).catch(reject=>{
+                //       }).catch(reject=>{
                         
-                      })
-                    }
-                })
+                //       })
+                //     }
+                // })
                 let dataPayment = {
                   dossierId: vm.id,
                   payment: {}
@@ -1785,11 +1784,11 @@ export default {
             }).catch(reject => {
               vm.loadingAction = false
             })
-            if(dossiersMark.length){
-              for(let i =0;i<dossiersMark.length;i++){
-                vm.$store.dispatch('postDossierMark', dossiersMark[i])
-              }
-            }
+            // if(dossiersMark.length){
+            //   for(let i =0;i<dossiersMark.length;i++){
+            //     vm.$store.dispatch('postDossierMark', dossiersMark[i])
+            //   }
+            // }
           }
       }
     },

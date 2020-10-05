@@ -50,7 +50,7 @@
                 <label>Điện thoại</label>
                 <v-text-field
                     v-model="dossiers.delegateTelNo"
-                    :rules="[rules.varchar50]"
+                    :rules="[rules.varchar15]"
                     solo
                     @change="changeDossier()"
                 ></v-text-field>
@@ -837,6 +837,14 @@ export default {
                 return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
                 } else {
                 return true
+                }  
+            },
+            varchar15: (val) => {
+                if(val){
+                    val = String(val).trim()
+                    return val.length <= 15 ? true : 'Không được nhập quá 15 ký tự'   
+                } else {
+                    return true
                 }  
             },
             varchar100: (val) => {

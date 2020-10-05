@@ -2337,11 +2337,14 @@ export default {
                     tg['gia_dinh'] = vm.gia_dinh
                 }
                 if(vm.serviceCode === 'BNG-270820' || vm.serviceCode === 'BNG-270816'){
-                    if(tg['loai_ho_chieu'] === 'Công vụ'){
-                        tg['ho_chieu_cong_vu'] = true
-                    }
-                    if(tg['loai_ho_chieu'] === 'Ngoại giao'){
-                        tg['ho_chieu_ngoai_giao'] = true
+                    // if(tg['loai_ho_chieu'] === 'Công vụ'){
+                    //     tg['ho_chieu_cong_vu'] = true
+                    // }
+                    // if(tg['loai_ho_chieu'] === 'Ngoại giao'){
+                    //     tg['ho_chieu_ngoai_giao'] = true
+                    // }
+                    if(tg['loai_ho_chieu'] === 'Công vụ' || tg['loai_ho_chieu'] === 'Ngoại giao') {
+                        vm.ho_chieu_gia_han++
                     }
                 }
                 if(vm.serviceCode === 'BNG-270819'){
@@ -2759,7 +2762,6 @@ export default {
 
             }
             // let so_nuoc = vm.cong_ham_so_nuoc != '' ? parseInt(vm.cong_ham_so_nuoc) : 0
-            soNuocKhongDuocMien
             let so_nuoc = vm.soNuocKhongDuocMien
             let so_schengen = vm.cong_ham_schengen != '' ? parseInt(vm.cong_ham_schengen) : 0
             let so_nhap_canh = vm.cong_ham_nhap_canh != '' ? parseInt(vm.cong_ham_nhap_canh) : 0
@@ -2770,7 +2772,7 @@ export default {
                 giaLePhiMoi = 80000
             }
             let lp_moi = (hcng_moi + hccv_moi)*giaLePhiMoi;
-            let lp_gia_han = hc_gh * 100000;
+            let lp_gia_han = hc_gh * 80000;
             let lp_hong = (hc_hong + hc_mat) * 320000;
             let lp_schengen = so_schengen * 10000;
             let lp_nhap = so_nuoc * so_nhap_canh * 10000;

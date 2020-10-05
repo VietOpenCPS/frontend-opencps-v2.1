@@ -41,7 +41,7 @@
                     @change="changeDossier()"
                 ></v-text-field>
             </v-flex>
-            <v-flex xs12 class="px-2 ">
+            <v-flex xs12 sm6 class="px-2 ">
                 <label for="">Nơi cư chú</label>
                 <v-text-field
                     v-model="dossiers.delegateAddress"
@@ -49,7 +49,7 @@
                     @change="changeDossier()"
                 ></v-text-field>
             </v-flex>
-            <v-flex xs12  class="px-2 ">
+            <v-flex xs12  sm6 class="px-2 ">
                 <label>Giấy tờ tùy thân</label>
                 <v-text-field
                     v-model="dossiers.delegateIdNo"
@@ -57,7 +57,7 @@
                     @change="changeDossier()"
                 ></v-text-field>
             </v-flex>
-            <v-flex xs12 class="px-2 ">
+            <v-flex xs12 sm6 class="px-2 ">
                 <label>Quan hệ với người được cấp bản sao Trích lục hộ tịch</label>
                 <v-text-field
                     v-model="quan_he"
@@ -67,16 +67,42 @@
             </v-flex>
             <v-flex xs12 class="px-2 ">
                 <label>Đề nghị Cục Lãnh sự cấp bản sao trích lục</label>
-                <v-text-field
+                <!-- <v-text-field  
                     v-model="loai_viec_ho_tich"
                     solo
                     @change="changeDossier()"
-                ></v-text-field>
+                ></v-text-field> -->
+            </v-flex>
+            <v-flex xs12  class="px-2 my-2">
+                <v-data-table
+                    :headers="headerListTrichLuc"
+                    :items="list_trich_luc"
+                    hide-actions
+                    no-data-text="Không có thành phần hồ sơ nào"
+                    class="table_vuejs"
+                    style="border-left: 0.5px solid #dedede;"
+                >
+                    <template slot="items" slot-scope="props">
+                    <tr>
+                            <td>{{ props.item.ten_giay_to }}</td>
+                            <td>
+                                <v-text-field
+                                    solo
+                                    v-model="props.item.so_luong"
+                                    @change="changeListTrichLuc(props.item,props.index)"
+                                ></v-text-field>
+                            </td>
+                    </tr>
+                    </template>
+                </v-data-table>
+            </v-flex>
+            <v-flex xs12 class="px-2 my-2">
+                <strong>Tổng số bản: {{tongSoBan}}</strong>
             </v-flex>
             <v-flex xs12 class="px-2 ">
                 <strong>Cho người có tên dưới đây</strong>
             </v-flex>
-            <v-flex xs12 sm8 class="px-2 ">
+            <v-flex xs12 sm6 class="px-2 ">
                 <label>Họ, chữ đệm, tên</label>
                 <v-text-field
                     v-model="dossiers.applicantName"
@@ -84,7 +110,7 @@
                     @change="changeDossier()"
                 ></v-text-field>
             </v-flex>
-            <v-flex xs12 sm4 class="px-2 ">
+            <v-flex xs12 sm6 class="px-2 ">
                 <label>Giới tính</label>
                 <v-autocomplete
                     :items="listGioiTinh"
@@ -113,7 +139,7 @@
                     @change="changeDossier()"
                 ></v-text-field>
             </v-flex>
-            <v-flex xs12 class="px-2 ">
+            <v-flex xs12 sm6 class="px-2 ">
                 <label>Nơi cư trú</label>
                 <v-text-field
                     v-model="dossiers.address"
@@ -121,7 +147,7 @@
                     @change="changeDossier()"
                 ></v-text-field>
             </v-flex>
-            <v-flex xs12 class="px-2 ">
+            <v-flex xs12 sm6 class="px-2 ">
                 <label>Giấy tờ tùy thân</label>
                 <v-text-field
                     v-model="dossiers.applicantIdNo"
@@ -129,7 +155,7 @@
                     @change="changeDossier()"
                 ></v-text-field>
             </v-flex>
-            <v-flex xs12 class="px-2 ">
+            <v-flex xs12 sm6 class="px-2 ">
                 <label>Số định danh các nhân nếu có</label>
                 <v-text-field
                     v-model="so_dinh_danh"
@@ -137,7 +163,7 @@
                     @change="changeDossier()"
                 ></v-text-field>
             </v-flex>
-            <v-flex xs12 class="px-2 ">
+            <v-flex xs12 sm6 class="px-2 ">
                 <label>Đã đăng ký tại</label>
                 <v-text-field
                     v-model="noi_dang_ky"
@@ -145,7 +171,7 @@
                     @change="changeDossier()"
                 ></v-text-field>
             </v-flex>
-            <v-flex xs12 class="px-2 ">
+            <v-flex xs12 sm6 class="px-2 ">
                 <label>Ngày cấp</label><br>
                 <v-menu
                     ref="menu"
@@ -163,7 +189,6 @@
                         @change="changeNgayCap()"
                         @input="inputNgayCap()"
                         solo
-                      
                         required
                     ></v-text-field>
                     <v-date-picker v-model="dateNgayCap" no-title @input="menu = false" locale="vi"></v-date-picker>
@@ -208,7 +233,7 @@
                     style="border-left: 0.5px solid #dedede;"
                 >
                     <template slot="items" slot-scope="props">
-                    <tr v-if="(props.item.dossierPartNo != 'TP01' && props.item.dossierPartNo != 'TP02') && props.item.partType === 1">
+                    <tr v-if="(props.item.dossierPartNo != 'TP01-BNG-270814') && props.item.partType === 1">
                             <td>          
                                 <v-checkbox
                                     v-model="selected"
@@ -309,9 +334,24 @@ export default {
         menu: false,
         menu5: false,
         eFormCode: '',
+        tongSoBan: 0,
         eFormCodeArr: [],
         listGioiTinh: [{name: 'Nam', value: 'Nam'},{name: 'Nữ', value: 'Nữ'}],
         fileMarks: [{value: 1, name: 'Bản chụp'},{value: 2, name: 'Bản sao'},{value: 3, name: 'Bản gốc'},{value: 4, name: 'Bản dịch'}],
+        list_trich_luc: [
+            {
+                ten_giay_to: "Bản sao trích lục giấy khai sinh",
+                so_luong: 0
+            },
+            {
+                ten_giay_to: "Bản sao trích lục giấy khai tử",
+                so_luong: 0
+            },
+            {
+                ten_giay_to: "Bản sao trích lục giấy đăng ký kết hôn",
+                so_luong: 0
+            },
+        ],
         loai_viec_ho_tich: '',
         quan_he: '',
         gioi_tinh: '',
@@ -325,20 +365,23 @@ export default {
         quyen_so: '',
         viaPostal: false,
         dateNgayCap: new Date().toISOString().substr(0, 10),
+        headerListTrichLuc: [{text: 'Tên giấy tờ',align: 'center',sortable: false,},{text: 'Số lượng',align: 'center',sortable: false,}],
         headerThanhPhanHoSo: [{text: 'Chọn',align: 'center',sortable: false,},{text: 'Tên thành phần',align: 'center',sortable: false},{text: 'Loại',align: 'center',sortable: false},{text: 'Số lượng',align: 'center',sortable: false}],
         dossierMarkArr: [],
         dossierFileArr: [],
         dossierParts: [],
         selected: [],
+        dossierFileCustom: [],
         crurentHours: '',
         dateDueDateFormated: '',
         dateDueDate: '',
         dossierTemplateNo: '',
+        le_phi_format: 0,
         payment: {},
         dossiers: {
             address: "",
             applicantIdNo: "",
-            applicantIdType: "",
+            applicantIdType: "citizen",
             applicantName: "",
             applicantNote: "",
             cityCode: "",
@@ -359,7 +402,7 @@ export default {
             metaData: "",
             postalAddress: "",
             postalCityCode: "",
-            postalServiceCode: "",
+            postalServiceCode: "VNPOST",
             postalTelNo: "",
             sampleCount: 0,
             viaPostal:0,
@@ -446,7 +489,7 @@ export default {
                 if(vm.formCode==='UPDATE'){
                     vm.getDetail()
                 } else {                   
-                    vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [], 'ma_to_khai': [], 'totalRecord': 0, 'delegateIdNo': '','delegateName': '','delegateTelNo': '','Doan_HCTN': '', 'durationCountMeta': 4, "loai_viec_ho_tich": '',"quan_he": '',"gioi_tinh": '', "dan_toc": '',"quoc_tich": '',"so_dinh_danh": '',"noi_dang_ky": '',"ngay_cap": '',"loai_giay_to_da_cap": '',"so_giay_to": '',"quyen_so": '',})
+                    vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [], 'ma_to_khai': [], 'totalRecord': 0, 'delegateIdNo': '','delegateName': '','delegateTelNo': '','Doan_HCTN': '', 'durationCountMeta': 4, "loai_viec_ho_tich": '',"quan_he": '',"gioi_tinh": '', "dan_toc": '',"quoc_tich": '',"so_dinh_danh": '',"noi_dang_ky": '',"ngay_cap": '',"loai_giay_to_da_cap": '',"so_giay_to": '',"quyen_so": '',"list_trich_luc": vm.list_trich_luc})
                     vm.getThanhPhan()
                     vm.genDueDate()
                     if(vm.eFormCode){
@@ -485,10 +528,10 @@ export default {
         dossierMarkArr: {
             deep: true,
             handler:  (val, oldVal) => {
-                let arr = val.filter(e => e.recordCount) 
+                // let arr = val.filter(e => e.recordCount) 
                 // arr.push({"dossierPartNo":"TP01","fileMark":3,"partName":"Tờ khai  đề nghị cấp hộ chiếu ngoại giao, hộ chiếu công vụ và công hàm","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
                 // arr.push({"dossierPartNo":"TP02","fileMark":3,"partName":"Văn bản hoặc quyết định cử hoặc cho phép cán bộ, công chức, viên chức, sỹ quan, quân nhân chuyên nghiệp ra nước ngoài","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
-                $('#dossierMarkArr_hidden').val(JSON.stringify(arr))
+                $('#dossierMarkArr_hidden').val(JSON.stringify(val))
             }
         },
         payment: {
@@ -516,6 +559,13 @@ export default {
                     console.log('res.data.metaData',res.data.metaData)
                     let metaData =  JSON.parse(res.data.metaData)
                     console.log('metaData',metaData)
+                    if(metaData.dossierFileCustom)
+                    {   
+                        vm.dossierFileCustom = metaData.dossierFileCustom
+                    }
+                    vm.dossiers = res.data
+                    vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
+                    vm.crurentHours = vm.dossiers.dueDate.substring(10)
                     vm.dossiers.delegateName = res.data.delegateName
                     vm.dossiers.delegateIdNo = res.data.delegateIdNo
                     vm.dossiers.delegateTelNo = res.data.delegateTelNo
@@ -527,6 +577,8 @@ export default {
                     vm.dossiers.address = res.data.address
                     vm.loai_viec_ho_tich = metaData['loai_viec_ho_tich']
                     vm.quan_he = metaData['quan_he']
+                    vm.gioi_tinh = metaData['gioi_tinh']
+                    vm.dan_toc = metaData['dan_toc']
                     vm.quoc_tich = metaData['quoc_tich']
                     vm.so_dinh_danh = metaData['so_dinh_danh']
                     vm.noi_dang_ky = metaData['noi_dang_ky']
@@ -534,9 +586,11 @@ export default {
                     vm.loai_giay_to_da_cap = metaData['loai_giay_to_da_cap']
                     vm.so_giay_to = metaData['so_giay_to']
                     vm.quyen_so = metaData['quyen_so']
+                    vm.list_trich_luc = metaData['list_trich_luc']
                 }catch(err) {
 
                 }
+                vm.changeDossier()
                 vm.getThanhPhan()
                 vm.getDossierFile()
             }).catch(err => {})       
@@ -746,6 +800,9 @@ export default {
                             vm.quyen_so = res.data.quyen_so
                         }
                     }
+                    if(res.data.list_trich_luc) {
+                        vm.list_trich_luc =  res.data.list_trich_luc
+                    }
                     vm.changeDossier()            
                 }
                 else {
@@ -758,16 +815,16 @@ export default {
         genDueDate () {
             let vm = this
             let config = {
-                url: '/o/rest/v2/dossiers/'+ 4 +'/calculate/duedate',
+                url: '/o/rest/v2/dossiers/'+ 1 +'/calculate/duedate',
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
             }
             axios.request(config).then(res => {
-                vm.dossiers['durationCount'] = 4
+                vm.dossiers['durationCount'] = 1
                 let dateString =  res.data.substr(0, 10)
                 vm.crurentHours = res.data.substr(10)
                 vm.dateDueDate = vm.parseDate(dateString)
                 let metaData = JSON.parse(vm.dossiers['metaData'])
-                metaData['durationCountMeta'] = 4
+                metaData['durationCountMeta'] = 1
                 vm.dossiers['metaData'] = JSON.stringify(metaData)
             }).catch(err => {})  
         },
@@ -874,14 +931,19 @@ export default {
             let metaData = JSON.parse(vm.dossiers.metaData)
             metaData['loai_viec_ho_tich'] = vm.loai_viec_ho_tich
             metaData['quan_he'] = vm.quan_he
+            metaData['dan_toc'] = vm.dan_toc
             metaData['quoc_tich'] = vm.quoc_tich
             metaData['noi_dang_ky'] = vm.noi_dang_ky
+            metaData['gioi_tinh'] = vm.gioi_tinh
             metaData['ngay_cap'] = vm.ngay_cap
+            metaData['so_dinh_danh'] = vm.so_dinh_danh
             metaData['loai_giay_to_da_cap'] = vm.loai_giay_to_da_cap
             metaData['so_giay_to'] = vm.so_giay_to
             metaData['quyen_so'] = vm.quyen_so
+            metaData['list_trich_luc'] = vm.list_trich_luc
             vm.dossiers['metaData'] = JSON.stringify(metaData)
             $('#dossiers_hidden').val(JSON.stringify(vm.dossiers))
+            vm.genLePhi()
         },
         formatDate (date) {
             if (!date) return null
@@ -948,6 +1010,29 @@ export default {
             }else
                 vm[key] = gt
         },
+        changeListTrichLuc (item, index) {
+            let vm = this
+            let tg = {
+                ten_giay_to: item.ten_giay_to,
+                so_luong: item.so_luong
+            }
+            vm.$set(vm.list_trich_luc, index, tg) 
+            vm.changeDossier()
+        },
+        genLePhi () {
+            let vm = this
+            let tong = 0
+            console.log(vm.list_trich_luc)
+            for(let i=0;i<vm.list_trich_luc.length;i++){
+                console.log(parseInt(vm.list_trich_luc[i]['so_luong']))
+                tong += parseInt(vm.list_trich_luc[i]['so_luong']) ? parseInt(vm.list_trich_luc[i]['so_luong']) : 0
+                console.log(tong)
+            }
+            vm.tongSoBan = tong
+            let lePhi = tong*8000
+            vm.le_phi_format = lePhi.toString()
+            vm.payment = {"requestPayment":1,"paymentNote":"","advanceAmount":0,"feeAmount":vm.le_phi_format,"serviceAmount":0,"shipAmount":0}
+        }    
     }
 }
 </script>
