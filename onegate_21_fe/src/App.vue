@@ -183,96 +183,96 @@
       //     $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
       //   }
       // }
-      // axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
-      //   let userData = response.data
-      //   vm.$store.commit('setUserLogin', userData)
-      //   if (userData.hasOwnProperty('className') && userData.className === 'org.opencps.usermgt.model.Employee') {
-      //     let param = {
-      //       headers: {
-      //         groupId: window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : ''
-      //       }
-      //     }
-      //     axios.get('/o/rest/v2/employees/byGroupId', param).then(function(response1) {
-      //       let employeeLogin = response1.data
-      //       vm.$store.commit('setEmployeeLogin', employeeLogin)
-      //       console.log('setEmployeeLogin', vm.$store.getters.getEmployeeLogin)
-      //     })
-      //   }
-      // })
-      // .catch(function(error) {
-      // })
+      axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
+        let userData = response.data
+        vm.$store.commit('setUserLogin', userData)
+        if (userData.hasOwnProperty('className') && userData.className === 'org.opencps.usermgt.model.Employee') {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          axios.get('/o/rest/v2/employees/byGroupId', param).then(function(response1) {
+            let employeeLogin = response1.data
+            vm.$store.commit('setEmployeeLogin', employeeLogin)
+            console.log('setEmployeeLogin', vm.$store.getters.getEmployeeLogin)
+          })
+        }
+      })
+      .catch(function(error) {
+      })
       vm.$nextTick(function () {
         // 
         window.message = vm.callback_alpacal
         // 
         vm.loading = true
-        // vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
-        //   vm.loading = false
-        //   if (result) {
-        //     vm.trangThaiHoSoList = result
-        //     let currentParams = vm.$router.history.current.params
-        //     if (Array.isArray(vm.trangThaiHoSoList) && vm.trangThaiHoSoList.length > 0) {
-        //       if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
-        //         vm.trangThaiHoSoList[0]['active'] = true
-        //         vm.$router.push({
-        //           path: vm.pathLanding + '/0',
-        //           query: {
-        //             q: vm.trangThaiHoSoList[0]['queryParams']
-        //           }
-        //         })
-        //       } else {
-        //         vm.trangThaiHoSoList[currentParams.index]['active'] = true
-        //       }
-        //     }
-        //     vm.loadingCounter()
-        //     vm.loading = false
-        //   }
-        // })
-
-
-        axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
-          let userData = response.data
-          vm.$store.commit('setUserLogin', userData)
-          if (userData.hasOwnProperty('className') && userData.className === 'org.opencps.usermgt.model.Employee') {
-            let param = {
-              headers: {
-                groupId: window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : ''
+        vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
+          vm.loading = false
+          if (result) {
+            vm.trangThaiHoSoList = result
+            let currentParams = vm.$router.history.current.params
+            if (Array.isArray(vm.trangThaiHoSoList) && vm.trangThaiHoSoList.length > 0) {
+              if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
+                vm.trangThaiHoSoList[0]['active'] = true
+                vm.$router.push({
+                  path: vm.pathLanding + '/0',
+                  query: {
+                    q: vm.trangThaiHoSoList[0]['queryParams']
+                  }
+                })
+              } else {
+                vm.trangThaiHoSoList[currentParams.index]['active'] = true
               }
             }
-            axios.get('/o/rest/v2/employees/byGroupId', param).then(function(response1) {
-              let employeeLogin = response1.data
-              vm.$store.commit('setEmployeeLogin', employeeLogin)
-              console.log('setEmployeeLogin', vm.$store.getters.getEmployeeLogin)
-              vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
-                vm.loading = false
-                if (result) {
-                  vm.trangThaiHoSoList = result
-                  let currentParams = vm.$router.history.current.params
-                  if (Array.isArray(vm.trangThaiHoSoList) && vm.trangThaiHoSoList.length > 0) {
-                    if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
-                      vm.trangThaiHoSoList[0]['active'] = true
-                      vm.$router.push({
-                        path: vm.pathLanding + '/0',
-                        query: {
-                          q: vm.trangThaiHoSoList[0]['queryParams']
-                        }
-                      })
-                    } else {
-                      vm.trangThaiHoSoList[currentParams.index]['active'] = true
-                    }
-                  }
-                  vm.loadingCounter()
-                  vm.loading = false
-                }
-              })
-            }).catch(err=>{
-              vm.loading = true
-            })
+            vm.loadingCounter()
+            vm.loading = false
           }
         })
-        .catch(function(error) {
-          vm.loading = true
-        })
+
+
+        // axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
+        //   let userData = response.data
+        //   vm.$store.commit('setUserLogin', userData)
+        //   if (userData.hasOwnProperty('className') && userData.className === 'org.opencps.usermgt.model.Employee') {
+        //     let param = {
+        //       headers: {
+        //         groupId: window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : ''
+        //       }
+        //     }
+        //     axios.get('/o/rest/v2/employees/byGroupId', param).then(function(response1) {
+        //       let employeeLogin = response1.data
+        //       vm.$store.commit('setEmployeeLogin', employeeLogin)
+        //       console.log('setEmployeeLogin', vm.$store.getters.getEmployeeLogin)
+        //       vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
+        //         vm.loading = false
+        //         if (result) {
+        //           vm.trangThaiHoSoList = result
+        //           let currentParams = vm.$router.history.current.params
+        //           if (Array.isArray(vm.trangThaiHoSoList) && vm.trangThaiHoSoList.length > 0) {
+        //             if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
+        //               vm.trangThaiHoSoList[0]['active'] = true
+        //               vm.$router.push({
+        //                 path: vm.pathLanding + '/0',
+        //                 query: {
+        //                   q: vm.trangThaiHoSoList[0]['queryParams']
+        //                 }
+        //               })
+        //             } else {
+        //               vm.trangThaiHoSoList[currentParams.index]['active'] = true
+        //             }
+        //           }
+        //           vm.loadingCounter()
+        //           vm.loading = false
+        //         }
+        //       })
+        //     }).catch(err=>{
+        //       vm.loading = true
+        //     })
+        //   }
+        // })
+        // .catch(function(error) {
+        //   vm.loading = true
+        // })
         
         setInterval(function () {
           vm.loadingCounter()
