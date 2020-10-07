@@ -39,6 +39,22 @@
       <v-layout wrap v-if="originality !== 1 && trangThaiHoSoList">
         <v-flex v-if="!trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && !hiddenFilterDomain" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
           <v-autocomplete
+            placeholder="Chọn cơ quan"
+            :items="agencyListXuLyThuTuc"
+            v-model="agencyXuLyThuTuc"
+            @change="changeAgencyXuLy"
+            item-text="itemName"
+            item-value="govAgencyCode"
+            hide-details
+            hide-no-data
+            return-object
+            box
+            clearable
+          >
+          </v-autocomplete>
+        </v-flex>
+        <v-flex v-if="!trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && !hiddenFilterDomain" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+          <v-autocomplete
             :items="listLinhVuc"
             v-model="linhVucSelected"
             label="Chọn lĩnh vực"
@@ -52,7 +68,7 @@
             box
           ></v-autocomplete>
         </v-flex>
-        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan')" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan')" xs12 class="pl-2 pr-2 input-group--text-field-box" :class="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'sm3' :'sm4'">
           <v-autocomplete
             :items="listCongVan"
             v-model="congvanSelected"
@@ -68,7 +84,7 @@
             :autofocus="focusSelect === 1"
           ></v-autocomplete>
         </v-flex>
-        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')" xs12  class="pl-2 pr-2 input-group--text-field-box" :class="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'sm3' :'sm4'">
           <v-autocomplete
             :items="listDonviCongVan"
             v-model="donviguiSelected"
@@ -83,7 +99,7 @@
             box
           ></v-autocomplete>
         </v-flex>
-        <v-flex :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'">
+        <v-flex :class="(trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && (trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') || !hiddenFilterDomain)) || (!hiddenFilterDomain && !trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan')) ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'">
           <v-autocomplete
             :items="listThuTucHanhChinh"
             v-model="thuTucHanhChinhSelected"
@@ -99,7 +115,7 @@
             :autofocus="focusSelect === 2"
           ></v-autocomplete>
         </v-flex>
-        <v-flex :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'" v-if="trangThaiHoSoList">
+        <v-flex :class="(trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && (trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') || !hiddenFilterDomain)) || (!hiddenFilterDomain && !trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan'))  ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'" v-if="trangThaiHoSoList">
           <v-autocomplete
             v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
             :items="listDichVu"
@@ -136,8 +152,7 @@
             <v-date-picker v-model="dateCv" locale="vi" :first-day-of-week="1" no-title @input="changeDate()"></v-date-picker>
           </v-menu>
         </v-flex>
-
-        <v-flex :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2' : 'xs12 sm4 pl-2 pr-2'">
+        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && !trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')" :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2' : 'xs12 sm4 pl-2 pr-2'">
           <div style="position:relative" v-if="trangThaiHoSoList">
             <v-text-field
               v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
@@ -671,6 +686,7 @@
                   v-model="applicantNameGuide"
                   :rules="[rules.required, rules.varchar500]"
                   required
+                  @change="applicantNameGuide=String(applicantNameGuide).trim()"
                 ></v-text-field>
                 <v-radio-group class="my-0" v-model="applicantTypeGuide" row style="position:absolute;right:0;top:0">
                   <v-radio label="Công dân" :value="true"></v-radio>
@@ -684,6 +700,7 @@
                   box
                   :rules="[rules.varchar500]"
                   v-model="applicantAddressGuide"
+                  @change="applicantAddressGuide=String(applicantAddressGuide).trim()"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -693,6 +710,7 @@
                   placeholder="Nhập thư điện tử"
                   v-model="applicantEmailGuide"
                   :rules="[rules.varchar100]"
+                  @change="applicantEmailGuide=String(applicantEmailGuide).trim()"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -702,6 +720,7 @@
                   placeholder="Nhập số điện thoại"
                   v-model="applicantTelNoGuide"
                   :rules="[rules.varchar100]"
+                  @change="applicantTelNoGuide=String(applicantTelNoGuide).trim()"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -747,6 +766,7 @@
                 v-model="applicantNoteGuide"
                 rows="3"
                 :rules="[rules.varchar5000]"
+                 @change="applicantNoteGuide=String(applicantNoteGuide).trim()"
                 ></v-textarea>
               </v-flex>
             </v-layout>
@@ -932,7 +952,7 @@ import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import support from '../store/support.json'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import AdvSearch from './TimKiemNangCao'
-
+import axios from 'axios'
 export default {
   props: ['index'],
   components: {
@@ -947,9 +967,12 @@ export default {
     xacthuc_BNG: false,
     doActionGroup: false,
     doActionGroupKhacThuTuc: false,
+    agencyListXuLyThuTuc: [],
+    agencyXuLyThuTuc: '',
     isAdminSuper: false,
     actionId: '',
     dossierIdSelected: '',
+    agencyCode: '',
     dossierCountingShow: false,
     dossierCounting: [],
     advSearchToolsSelected: [],
@@ -1214,7 +1237,7 @@ export default {
       } else {
         vm.hosoDatasPage = 1
       }
-
+      vm.getGovAgency()
       if (vm.activePrintBienNhan) {
         vm.itemAction = {
           title: 'In phiếu biên nhận',
@@ -1421,6 +1444,7 @@ export default {
         }
         vm.$store.commit('setLoadingDynamicBtn', false)
         if (!vm.hiddenFilterDomain) {
+          vm.processListDomain(currentQuery)
           if (vm.listLinhVuc === null || vm.listLinhVuc === undefined || (vm.listLinhVuc !== null && vm.listLinhVuc !== undefined && vm.listLinhVuc.length === 0)) {
             vm.processListDomain(currentQuery)
           } else {
@@ -1433,7 +1457,7 @@ export default {
             }
             for (let key in vm.listLinhVuc) {
               if (!vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
-                if (String(vm.listLinhVuc[key]['domainCode']) === String(currentQuery.domain)) {
+                if (String(vm.listLinhVuc[key]['govAgencyCode']) === String(currentQuery.domain)) {
                   vm.linhVucSelected = vm.listLinhVuc[key]
                   vm.domainCode = vm.linhVucSelected['domainCode']
                 }
@@ -1446,6 +1470,7 @@ export default {
         if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
           vm.processListCongVan(currentQuery)
         }
+        vm.getGovAgency()
         if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')) {
           vm.getDonViCongVan(currentQuery)
         }
@@ -1456,6 +1481,7 @@ export default {
           // vm.doLoadingDataHoSo()
         // }
       }
+      vm.processListDomain(currentQuery)
     },
     activeLoadingDataHoSo (val) {
       var vm = this
@@ -1474,7 +1500,7 @@ export default {
         } else {
           vm.selectedDoAction = []
         }
-        // console.log('selectedDoAction', vm.selectedDoAction)
+       console.log('selectedDoAction', vm.selectedDoAction)
         vm.$store.commit('setDossierSelectedDoAction', vm.selectedDoAction)
         
       },
@@ -1691,10 +1717,13 @@ export default {
     },
     processListDomain (currentQuery) {
       let vm = this
-      vm.$store.dispatch('getDomainLists').then(function (result) {
+        let data = {
+          agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
+        }
+      vm.$store.dispatch('getDomainsNew',data).then(function (result) {
         if (result.length > 0) {
           vm.listLinhVuc = result.map(domain => {
-            domain['displayName'] = domain['domainCode'] + ' - ' + domain['domainName']
+            domain['displayName'] = domain['domainCode'] + ' - ' + domain['itemName']
             // domain['displayName'] = domain['domainName']
             return domain
           })
@@ -1811,24 +1840,79 @@ export default {
     },
     getDonViCongVan (currentQuery) {
       let vm = this
-      let filter = {
-        collectionCode: 'DON_VI_CONG_VAN',
-        level: '',
-        parent: ''
-      }
-      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
-        vm.listDonviCongVan = result.data
-        if (currentQuery.hasOwnProperty('donvigui') && String(currentQuery.donvigui) !== '') {
-          for (let key in vm.listDonviCongVan) {
-            if (String(vm.listDonviCongVan[key]['itemCode']) === String(currentQuery.donvigui)) {
-              vm.donviguiSelected = vm.listDonviCongVan[key]
-            }
+      let referenceDonViGuiCongVan = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('referenceDonViGuiCongVan') ? vm.trangThaiHoSoList[vm.index]['tableConfig']['referenceDonViGuiCongVan'] : ''
+      let scope = ''
+      vm.$store.dispatch('getEmployee').then(function(response1) {
+        let employeeLogin = response1
+        console.log('1111111111',response1)
+        console.log('2222222222222', vm.employeeLoginInfomation)
+        if(referenceDonViGuiCongVan === '_firstscope'){
+          if (employeeLogin.hasOwnProperty('scope') && employeeLogin.scope) {
+            scope = String(employeeLogin.scope).split(',')[0]
           }
+        } else if (referenceDonViGuiCongVan.includes('_group@')){
+          scope = referenceDonViGuiCongVan.slice(referenceDonViGuiCongVan.lastIndexOf('@') + 1, referenceDonViGuiCongVan.length)
         } else {
-          vm.donviguiSelected = null
+          scope = referenceDonViGuiCongVan
         }
-      }).catch(function () {
-        vm.listDonviCongVan = []
+        if(referenceDonViGuiCongVan.includes('_group@')){
+          let filterDictGroup = {
+            collectionCode: 'DON_VI_CONG_VAN',
+            groupCode: scope
+          }
+          vm.$store.dispatch('getGroupDictitem', filterDictGroup).then(res=>{
+            vm.listDonviCongVan = res
+            if (currentQuery.hasOwnProperty('donvigui') && String(currentQuery.donvigui) !== '') {
+              for (let key in vm.listDonviCongVan) {
+                if (String(vm.listDonviCongVan[key]['itemCode']) === String(currentQuery.donvigui)) {
+                  vm.donviguiSelected = vm.listDonviCongVan[key]
+                }
+              }
+            } else {
+              vm.donviguiSelected = null
+            }
+          }).catch(()=>{
+            vm.listDonviCongVan = []
+          })
+        } else {
+          let filterDictItems = {
+            collectionCode: 'DON_VI_CONG_VAN',
+            level: '',
+            parent: scope
+          }
+          let filterDetailDictItems = {
+            collectionCode: 'DON_VI_CONG_VAN',
+            level: '',
+            itemCode: scope
+          }
+          const promise1 = vm.$store.dispatch('loadDictItems', filterDictItems)
+          const promise2 = vm.$store.dispatch('loadDetailDictItems', filterDetailDictItems)
+          Promise.all([promise1, promise2]).then(function(values) {
+            if(values[0]['data'] && values[1]){
+              let parent = values[1]['parentItem'] ? values[1]['parentItem']  : []
+              let parentArr = Array.isArray(parent) ? parent : [parent]
+              vm.listDonviCongVan = values[0]['data'].concat(parentArr)
+              
+            } else if (!values[0]['data'] && values[1]) {
+              let parent = values[1]['parentItem'] ? values[1]['parentItem']  : []
+              let parentArr = Array.isArray(parent) ? parent : [parent]
+              vm.listDonviCongVan = parentArr
+            } else if (values[0]['data'] && !values[1]) {
+              vm.listDonviCongVan = values[0]['data']
+            } else {
+              vm.listDonviCongVan = []
+            }
+            if (currentQuery.hasOwnProperty('donvigui') && String(currentQuery.donvigui) !== '') {
+              for (let key in vm.listDonviCongVan) {
+                if (String(vm.listDonviCongVan[key]['itemCode']) === String(currentQuery.donvigui)) {
+                  vm.donviguiSelected = vm.listDonviCongVan[key]
+                }
+              }
+            } else {
+              vm.donviguiSelected = null
+            }
+          })
+        }
       })
     },
     checkPemissionSpecialAction (form, currentUser, thongtinchitiet) {
@@ -2145,11 +2229,18 @@ export default {
             groupServiceCode: vm.groupServiceFilterMenuConfig
           }
           vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
-            vm.listThuTucHanhChinh = result.map(thuTuc => {
+            let data = result.map(thuTuc => {
               thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
               // thuTuc['displayName'] = thuTuc['serviceName']
               return thuTuc
             })
+
+            if(vm.agencyXuLyThuTuc  && vm.agencyXuLyThuTuc.hasOwnProperty('itemCode')){
+              vm.listThuTucHanhChinh = data.filter(e=>e.govAgencyCode === vm.agencyXuLyThuTuc.itemCode)
+            } else {
+              vm.listThuTucHanhChinh = data
+            }
+             
             // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
           }).catch(function (){})
         }, 100)
@@ -2678,19 +2769,7 @@ export default {
       }
       if (isGroup) {
         vm.countSelected = 0
-        if (vm.selectedDoAction.length === 1) {
-          for (let key in vm.selectedDoAction) {
-            let actionDossierItem = vm.selectedDoAction[key]
-           vm.$router.push({
-              path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + actionDossierItem['dossierId'],
-              query: {
-                activeTab: 'tabs-1',
-                btnIndex: null
-              }
-            })
-            // vm.processAction(actionDossierItem, item, result, key, false)
-          }
-        } else if (vm.selectedDoAction.length > 1) {
+        if (vm.selectedDoAction.length > 0) {
           // console.log('run doActions Landing')
           vm.$store.dispatch('loadActionActive', item).then(function () {
             vm.$store.dispatch('loadDossierSelected', vm.selectedDoAction).then(function () {
@@ -3449,6 +3528,83 @@ export default {
       }
       return metaDataOut
     },
+    getGovAgency () {
+      let vm = this
+      let filter={
+        isEmployee: true
+      }
+      vm.$store.dispatch('getGovAgencysNew',filter).then(
+        result => {
+          vm.agencyListXuLyThuTuc = result ? result : []
+        }
+      ).catch(()=>{})
+    },
+    changeAgencyXuLy (item) {
+      console.log('change changeAgencyXuLy', item)
+      let vm = this
+      vm.agencyXuLyThuTuc = item
+      if (item) {
+        setTimeout(function () {
+          // let domain = {
+          //   domain: vm.linhVucSelected.domainCode,
+          //   searchGovAgencyCode: vm.govAgencyFilterMenuConfig,
+          //   groupServiceCode: vm.groupServiceFilterMenuConfig
+          // }
+          // vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
+          //   vm.listThuTucHanhChinh = result.map(thuTuc => {
+          //     thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+          //     // thuTuc['displayName'] = thuTuc['serviceName']
+          //     return thuTuc
+          //   })
+          //   // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
+          // }).catch(function (){})
+          console.log(vm.linhVucSelected && vm.linhVucSelected.hasOwnProperty('domainCode'))
+          if(vm.linhVucSelected && vm.linhVucSelected.hasOwnProperty('domainCode')){
+            vm.listThuTucHanhChinh = vm.listThuTuc.filter(e=>e.govAgencyCode === item.govAgencyCode && e.domainCode === vm.linhVucSelected.domainCode)
+          } else {
+            vm.listThuTucHanhChinh = vm.listThuTuc.filter(e=>e.govAgencyCode === item.govAgencyCode)
+          }
+          console.log('22222222',vm.listThuTuc)
+          console.log('22222222',vm.listThuTucHanhChinh)
+          
+        }, 100)
+      } else {
+        vm.listThuTucHanhChinh = vm.listThuTuc
+        // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
+      }
+      if (item !== null && item !== undefined) {
+        vm.govAgencyCode = vm.agencyXuLyThuTuc['govAgencyCode']
+      } else {
+        vm.govAgencyCode = ''
+      }
+      console.log('change Domain queryString', queryString)
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      newQuery['agency'] = ''
+      newQuery['domain'] = ''
+      vm.get
+      for (let key in newQuery) {
+        if (key === 'page') {
+          queryString += key + '=1&'
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && key !== 'step') {
+          queryString += key + '=' + newQuery[key] + '&'
+        }
+      }
+      if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
+        let stepQuery = newQuery.hasOwnProperty('step') ? newQuery['step'] : ''
+        queryString += 'step=' + stepQuery + '&'
+      }
+      queryString += 'agency=' + vm.govAgencyCode
+      console.log('change Agency queryString', queryString)
+      vm.$router.push({
+        path: current.path + queryString,
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
+    },
+      
   }
 }
 </script>

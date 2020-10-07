@@ -3484,7 +3484,8 @@ export const store = new Vuex.Store({
             end: filter.end ? filter.end : 10,
             keyword: filter.keyword ? filter.keyword.replace(/[!@#$%^&*(),?":{}|<>]/g, '') : '',
             level: filter.level ? filter.level : 0,
-            domain: filter.domain ? filter.domain : ''
+            domain: filter.domain ? filter.domain : '',
+            agency: filter.agency ? filter.agency : ''
           }
 
           if (filter.domain) {
@@ -3678,6 +3679,24 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    getEmployee ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          axios.get('/o/rest/v2/employees/byGroupId', param).then(function (response) {
+            let serializable = response.data
+              resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      }).catch(function (){})
+    },
     getServiceOpionByProcess ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -3764,6 +3783,61 @@ export const store = new Vuex.Store({
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getGovAgencysNew ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              serviceLevel: '3,4',
+              isEmployee: data.isEmployee ? data.isEmployee : ''
+            }
+          }
+          axios.get('/o/rest/v2/serviceinfos/statistics/agency', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.dataInput) {
+              let dataReturn = serializable.dataInput
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getDomainsNew ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              agency: data.agency ? data.agency : '',
+              sort: 'siblingSearch',
+              serviceLevel: '3,4',
+            }
+          }
+          axios.get('/o/rest/v2/serviceinfos/statistics/domains/serviceLevel', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.dataInput) {
+              let dataReturn = serializable.dataInput
               resolve(dataReturn)
             } else {
               resolve([])

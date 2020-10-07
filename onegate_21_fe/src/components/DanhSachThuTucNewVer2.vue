@@ -77,13 +77,14 @@
               <v-flex :style="!isMobile ? 'width:calc(100% - 220px)' : ''">
                 <v-layout wrap class="">
                   <v-flex v-if="hasFilterAgency" xs12 sm4 class="px-2">
+                    
                     <v-autocomplete
                       class="select-border"
                       :items="agencyListXuLyThuTuc"
                       v-model="agencyXuLyThuTuc"
                       label="Chọn đơn vị"
-                      item-text="domainName"
-                      item-value="domainCode"
+                      item-text="itemName"
+                      item-value="govAgencyCode"
                       :hide-selected="true"
                       @change="changeAgencyXuLy"
                       box
@@ -97,7 +98,7 @@
                       :items="domainList"
                       v-model="domainFilter"
                       label="Chọn lĩnh vực"
-                      item-text="domainName"
+                      item-text="itemName"
                       item-value="domainCode"
                       :hide-selected="true"
                       @change="filterService"
@@ -567,6 +568,7 @@
         let vm = this
         let current = vm.$router.history.current
         let newQuery = current.query
+        console.log('11111',vm.agencyXuLyThuTuc)
         setTimeout(function() {
           // if (vm.domainFilter || vm.serviceLastest) {
             // setTimeout (function () {
@@ -948,7 +950,7 @@
         let data = {
           administration: administrationCode ? administrationCode : ''
         }
-        vm.$store.dispatch('getAgencys', data).then(
+        vm.$store.dispatch('getGovAgencys', data).then(
           res => {
             vm.govAgencyList = res
           }
@@ -961,7 +963,7 @@
         let data = {
           agency: agencyCode ? agencyCode : ''
         }
-        vm.$store.dispatch('getDomains', data).then(
+        vm.$store.dispatch('getDomainsNew', data).then(
           res => {
             vm.domainList = res
           }
@@ -971,7 +973,9 @@
       },
       getAgencysXuLyThuTuc () {
         let vm = this
-        vm.$store.dispatch('getGovAgency').then(function(result) {
+        let filter={}
+        vm.$store.dispatch('getGovAgencysNew',filter).then(function(result) {
+          console.log(result)
           vm.agencyListXuLyThuTuc = result ? result : []
         })
       },

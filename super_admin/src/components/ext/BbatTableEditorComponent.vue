@@ -239,6 +239,10 @@
           :disabled="loadingPdf"
           v-if="(tableName === 'opencps_dossierpart' && data['EForm']) || tableName === 'opencps_documenttype'"
         >Xem trước bản in</v-btn>
+        <!-- <v-btn color="blue darken-3" class="mr-0" dark v-on:click.native="dialogJsonDataStr=true"
+          v-if="(tableName === 'opencps_dossierpart' && data['EForm']) || tableName === 'opencps_documenttype'"
+        >Xem trước bản in</v-btn> -->
+        
         <!--  -->
       </v-flex>
     </v-layout>
@@ -505,6 +509,34 @@
       </iframe>
     </div>
   </v-dialog>
+  <!--  -->
+  <v-dialog v-model="dialogJsonDataStr" persistent max-width="600px">
+      <v-card style="background: #fff;">
+        <div style="width: 100%;height: 45px; background-color: #115ebe; display: flex;justify-content: space-between; align-items: center;">
+          <span class="mx-2" style="font-size: 20px; font-weight: bold;color: #fff;"></span>
+          <v-btn color="#115ebe" fab small dark  @click="dialogJsonDataStr = false">
+              <v-icon>cancel</v-icon>
+          </v-btn>
+        </div>
+        <v-card-text>
+          <v-container grid-list-md>
+            <v-layout wrap>
+              <v-flex xs12>
+                <v-subheader class="px-0">JsonDataStr</v-subheader>
+                <codemirror v-model="formDataModel" :options="cmOptions"></codemirror>
+              </v-flex>
+              <v-flex xs12 class="text-xs-right">
+                <v-btn color="blue darken-3" class="mr-0" dark v-on:click.native="viewPdf(false)"
+                  :loading="loadingPdf"
+                  :disabled="loadingPdf"
+                  v-if="(tableName === 'opencps_dossierpart' && data['EForm']) || tableName === 'opencps_documenttype'"
+                >Bản in</v-btn>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+      </v-card>
+  </v-dialog>
 </div>
 </template>
 
@@ -534,6 +566,8 @@
         alertFail: false,
         alertSuccess: false,
         dialogChangeMail: false,
+        dialogJsonDataStr: false,
+        formDataModel: '',
         config: {},
         oldEmail: '',
         newEmail: '',
@@ -835,53 +869,58 @@
           dataPost.append('text', JSON.stringify(textPost))
           axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
             let dataObj = response.data
-            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-            if (dataObj.respone === 'detail') {
-              if (vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined && Array.isArray(vm.dataSocket['detail'])) {
-                if (vm.dataSocket['detail'].length === 0) {
-                  vm.data = {}
+            if(dataObj['status'] === 'NOK'){
+              toastr.error('Bản ghi này đã tồn tại')
+              vm.loading = false
+            } else {
+              vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+              vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+              if (dataObj.respone === 'detail') {
+                if (vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined && Array.isArray(vm.dataSocket['detail'])) {
+                  if (vm.dataSocket['detail'].length === 0) {
+                    vm.data = {}
+                  } else {
+                    vm.data = vm.dataSocket[dataObj.respone][0]
+                  }
+                  vm.processDataSourceVerify()
                 } else {
-                  vm.data = vm.dataSocket[dataObj.respone][0]
+                  vm.data = {}
                 }
-                vm.processDataSourceVerify()
-              } else {
+              } else if (dataObj.respone === 'loginUser') {
+                vm.$store.commit('setloginUser', dataObj['loginUser'])
+              } 
+              if (dataObj.respone === 'tableConfig' && vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
+                vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')
+                console.log('3',vm.detailForm)
+                console.log('load tableConfig')
+                vm.processDataSource()
+              }
+              vm.loading = false
+              if (dataObj['status'] === '200' && dataObj['cmd'] !== 'get' && dataObj['cmd'] !== 'cmd_ide') {
+                let current = vm.$router.history.current
+                let newQuery = current.query
+                let currentPath = current.path
+                let queryString = '?'
+                newQuery['state_change'] = '0'
+                newQuery['renew'] = ''
+                for (let key in newQuery) {
+                  if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+                    queryString += key + '=' + newQuery[key] + '&'
+                  }
+                }
+                queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                vm.$router.push({
+                  path: currentPath.substring(0, currentPath.indexOf('/editor/')) + queryString
+                })
+              } else if (dataObj['status'] === '200' && dataObj['cmd'] === 'cmd_ide') {
+                vm.snackbarsuccess = true
                 vm.data = {}
               }
-            } else if (dataObj.respone === 'loginUser') {
-              vm.$store.commit('setloginUser', dataObj['loginUser'])
-            } 
-            if (dataObj.respone === 'tableConfig' && vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
-              vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')
-              console.log('3',vm.detailForm)
-              console.log('load tableConfig')
-              vm.processDataSource()
-            }
-            vm.loading = false
-            if (dataObj['status'] === '200' && dataObj['cmd'] !== 'get' && dataObj['cmd'] !== 'cmd_ide') {
-              let current = vm.$router.history.current
-              let newQuery = current.query
-              let currentPath = current.path
-              let queryString = '?'
-              newQuery['state_change'] = '0'
-              newQuery['renew'] = ''
-              for (let key in newQuery) {
-                if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
-                  queryString += key + '=' + newQuery[key] + '&'
+              if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
+                vm.pullCounter = vm.pullCounter - 1
+                if (vm.pullCounter === 0) {
+                  vm.pullOk = true
                 }
-              }
-              queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
-              vm.$router.push({
-                path: currentPath.substring(0, currentPath.indexOf('/editor/')) + queryString
-              })
-            } else if (dataObj['status'] === '200' && dataObj['cmd'] === 'cmd_ide') {
-              vm.snackbarsuccess = true
-              vm.data = {}
-            }
-            if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
-              vm.pullCounter = vm.pullCounter - 1
-              if (vm.pullCounter === 0) {
-                vm.pullOk = true
               }
             }
           }).catch(function (error) {
@@ -1325,6 +1364,7 @@
         formData = {}
         /* eslint-disable */
         try {
+          
           formScript.data = eval('(' + vm.data.sampleData + ')')
           vm.viewFormInput = true
           vm.dialogEform = true
@@ -1348,7 +1388,6 @@
           }, 200)
           
         }
-        
       },
       viewPdf (t) {
         let vm = this
@@ -1375,9 +1414,9 @@
           },
           responseType: 'blob'
         }
-        if (!formData) {
-          formData = {}
-        }
+        // if (!formData) {
+        //   formData = JSON.parse(vm.formDataModel)
+        // }
         let formReport
         if (vm.tableName === 'opencps_dossierpart') {
           formReport = vm.data.formReport

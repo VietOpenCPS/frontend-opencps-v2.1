@@ -375,6 +375,20 @@
             vm.createFiles = vm.createFiles.map(obj =>{
               return obj = Object.assign(obj, {filesAttach: []})
             })
+            vm.$store.dispatch('loadDossierTemplates', vm.detailDossier).then(res=>{
+              let dossierTemplates = res['dossierParts']
+                if (dossierTemplates.length !== 0) {
+                vm.createFiles.forEach(template => {
+                  var itemFind = dossierTemplates.find(part => {
+                    return template.partNo === part.partNo
+                  })
+                  if (itemFind) {
+                    template['required'] = itemFind['required']
+                    template['partTip'] = itemFind['partTip']
+                  }
+                })
+              }
+            })
           }
         }
       })
@@ -747,7 +761,70 @@
         vm.progressUploadPart = data.partNo
         data['dossierId'] = vm.detailDossier.dossierId
         data['dossierTemplateNo'] = vm.detailDossier.dossierTemplateNo
-        if (!vm.thaoTacGop) {
+        // if (!vm.thaoTacGop) {
+        //   vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
+        //     vm.progressUploadPart = ''
+        //     vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
+        //       vm.dossierFilesItems = result
+        //       vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, vm.dossierFilesItems)
+        //       console.log('createFiles', vm.createFiles)
+        //       // 
+        //       vm.createFileSigned()
+        //       // 
+        //     })
+        //     // add hồ sơ cùng nhóm
+        //     console.log('vm.dossierIntoGroup', vm.dossierIntoGroup)
+        //     // Đính kèm giấy tờ hồ sơ cùng nhóm
+        //     // if (vm.dossierIntoGroup.length > 0) {
+        //     //   // vm.dialogSelectDosier = true
+        //     //   vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
+        //     //   vm.dialogConfirm = true
+        //     //   vm.filesAdd = result
+        //     // }
+        //   }).catch(function (xhr) {
+        //     vm.progressUploadPart = ''
+        //   })
+        // } else {
+        //   vm.progressUploadPart = ''
+        //   let files = $('input[id="file' + data.partNo + '"]')[0].files
+        //   let countFiles = files.length
+        //   if (files) {
+        //     for (let index = 0; index < countFiles; index++) {
+        //       let file = files[index]
+        //       let fileName = file['name']
+        //       if (file['name']) {
+        //         fileName = file['name'].replace(/\%/g, '')
+        //         fileName = fileName.replace(/\//g, '')
+        //         fileName = fileName.replace(/\\/g, '')
+        //       }
+        //       if (data.partType === 3) {
+        //         if (data['displayName']) {
+        //           fileName = data['displayName'].replace(/\%/g, '')
+        //           fileName = fileName.replace(/\//g, '')
+        //           fileName = fileName.replace(/\\/g, '')
+        //         }
+        //       }
+        //       let fileCreate = {
+        //         displayName: fileName,
+        //         fileType: file.type,
+        //         fileSize: file.size,
+        //         isSync: false,
+        //         file: file,
+        //         dossierPartNo: data.partNo,
+        //         dossierTemplateNo: data.dossierTemplateNo,
+        //         fileTemplateNo: data.templateFileNo,
+        //         formData: '',
+        //         referenceUid: '',
+        //         modifiedDate: vm.getCurentDateTime(),
+        //         createDate: (new Date()).getTime()
+        //       }
+        //       vm.dossierFilesItems.push(fileCreate)
+        //       console.log('dossierFilesItems', vm.dossierFilesItems)
+        //       vm.createFiles[indexItem]['filesAttach'].push(fileCreate)
+        //       console.log('createFilesAttachThaoTacGop', vm.createFiles)
+        //     }
+        //   }
+        // }
           vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
             vm.progressUploadPart = ''
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
@@ -770,48 +847,6 @@
           }).catch(function (xhr) {
             vm.progressUploadPart = ''
           })
-        } else {
-          vm.progressUploadPart = ''
-          let files = $('input[id="file' + data.partNo + '"]')[0].files
-          let countFiles = files.length
-          if (files) {
-            for (let index = 0; index < countFiles; index++) {
-              let file = files[index]
-              let fileName = file['name']
-              if (file['name']) {
-                fileName = file['name'].replace(/\%/g, '')
-                fileName = fileName.replace(/\//g, '')
-                fileName = fileName.replace(/\\/g, '')
-              }
-              if (data.partType === 3) {
-                if (data['displayName']) {
-                  fileName = data['displayName'].replace(/\%/g, '')
-                  fileName = fileName.replace(/\//g, '')
-                  fileName = fileName.replace(/\\/g, '')
-                }
-              }
-              let fileCreate = {
-                displayName: fileName,
-                fileType: file.type,
-                fileSize: file.size,
-                isSync: false,
-                file: file,
-                dossierPartNo: data.partNo,
-                dossierTemplateNo: data.dossierTemplateNo,
-                fileTemplateNo: data.templateFileNo,
-                formData: '',
-                referenceUid: '',
-                modifiedDate: vm.getCurentDateTime(),
-                createDate: (new Date()).getTime()
-              }
-              vm.dossierFilesItems.push(fileCreate)
-              console.log('dossierFilesItems', vm.dossierFilesItems)
-              vm.createFiles[indexItem]['filesAttach'].push(fileCreate)
-              console.log('createFilesAttachThaoTacGop', vm.createFiles)
-            }
-          }
-        }
-        
       },
       loadAlpcaForm (data) {
         var vm = this

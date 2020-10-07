@@ -14,7 +14,7 @@
                   v-model.lazy="noteYkien"
                   multi-line
                   :rows="4"
-                  :rules="user_note === 2 ? [() => noteYkien !== '' || 'Trường dữ liệu bắt buộc'] : []"
+                  :rules="user_note === 2 ? [() => noteYkien !== '' || 'Trường dữ liệu bắt buộc', rules.varchar5000] : [rules.varchar5000]"
                   box
                   label="Nhập ý kiến"
                 ></v-text-field>
@@ -40,7 +40,70 @@
     },
     data: () => ({
       noteYkien: '',
-      valid: false
+      valid: false,
+      rules: {
+        required: (value) => !!value || 'Thông tin bắt buộc',
+        cmndHoChieu: (value) => {
+          const pattern = /^(?![0-9]{4,12})[0-9a-zA-Z]{4,12}$/
+          return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 4-12 ký tự'
+        },
+        email: (value) => {
+          value = value.trim()
+          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
+        },
+        passWord: (value) => {
+          const pattern = /^(?![0-9]{6,})[0-9a-zA-Z]{6,}$/
+          return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 6 ký tự'
+        },
+        telNo: (value) => {
+          const pattern = /^([0-9]{0,})$/
+          if(typeof value === 'string'){
+            value = value.trim()
+          }
+          return pattern.test(value) || 'Gồm các ký tự 0-9'
+        },
+        varchar50: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+          } else {
+            return true
+          }  
+        },
+        varchar100: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+          } else {
+            return true
+          }
+        },
+        varchar255: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+          } else {
+            return true
+          }  
+        },
+        varchar500: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+          } else {
+            return true
+          }  
+        },
+        varchar5000: (val) => {
+          if(val){
+            val = String(val).trim()
+            return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+          } else {
+            return true
+          }
+        },
+      },
     }),
     methods: {
       initData (data) {

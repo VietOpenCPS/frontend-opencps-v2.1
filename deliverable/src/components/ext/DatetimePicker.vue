@@ -12,6 +12,7 @@
             slot="activator"
             box
             append-icon="event"
+            :mask="'##/##/####'"
             @blur="toDate = parseDate(toDateFormatted)"
             :rules="processRules(item.rules)"
             :value="formatDate(dataValue)"

@@ -512,7 +512,7 @@
             </v-btn>
           </v-tab>
           <v-tabs-items v-model="activeTab2" reverse-transition="fade-transition" transition="fade-transition">
-            <v-tab-item v-if="originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done'"
+            <!-- <v-tab-item v-if="originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done'"
             value="tabs-1b" :key="1" reverse-transition="fade-transition" transition="fade-transition">
               <div class="px-2 py-2">
                 <div v-if="votingItems && votingItems.length > 0">
@@ -523,11 +523,7 @@
                     <v-radio-group class="ml-3 mt-2" v-model="item.selected" column>
                       <v-radio class="ml-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" :disabled="originality === 3"></v-radio>
                     </v-radio-group>
-                    <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
-                      <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
-                        <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
-                      </v-flex>
-                    </v-layout> -->
+
                   </div>
                 </div>
                 
@@ -544,9 +540,9 @@
                   >Gửi đánh giá</v-btn>
                 </div>
               </div>
-            </v-tab-item>
+            </v-tab-item> -->
             <v-tab-item value="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition"
-              v-if="(originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || originality === 3"
+              v-if="(originality === 1 && (thongTinChiTietHoSo['dossierStatus'] !== 'new' || thongTinChiTietHoSo['dossierStatus'] !== 'done')) || originality === 3"
             >
               <div v-if="thongTinChiTietHoSo.online && !thongTinChiTietHoSo.originDossierNo">
                 <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -1109,9 +1105,13 @@ export default {
     }
   },
   mounted () {
-    this.onResize()
-    window.addEventListener('resize', this.onResize, { passive: true })
+    let vm = this
+    vm.onResize()
+    window.addEventListener('resize', vm.onResize, { passive: true })
     $('#m-navigation').css('display', 'none')
+    if (vm.originality === 3) {
+      vm.runComment()
+    }
   },
   created () {
     let vm = this
@@ -1155,6 +1155,9 @@ export default {
           vm.btnStateVisible = true
         }
         vm.$store.commit('setKysoSuccess', false)
+      }
+      if (vm.originality === 3) {
+        vm.runComment()
       }
     })
   },
@@ -1264,7 +1267,7 @@ export default {
         vm.getNextActions()
         vm.getPreAction()
         if (resultDossier['dossierSubStatus']) {
-          vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result => {
+           vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result => {
             vm.btnStepsDynamics = result
             if (vm.btnStepsDynamics.length > 0) {
               vm.btnStepsDynamics = vm.btnStepsDynamics.filter(function (item) {
@@ -1278,9 +1281,11 @@ export default {
             }
             
           })
+        } else {
+          vm.showMenuActionKhac = false
         }
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'done') {
-          vm.activeTab2 = 'tabs-1b'
+          vm.activeTab2 = 'tabs-2b'
           vm.loadVoting()
         }
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'new') {

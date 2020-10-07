@@ -11,6 +11,7 @@
               label="Mã số hồ sơ"
               v-model="dossierNoKey"
               box
+              @change="dossierNoKey=String(dossierNoKey).trim()"
               @keyup.enter="changeDataSearch"
             ></v-text-field>
           </v-flex>
@@ -19,6 +20,7 @@
               label="Số CMND/ hộ chiếu"
               v-model="applicantIdNo"
               box
+              @change="applicantIdNo=String(applicantIdNo).trim()"
               @keyup.enter="changeDataSearch"
             ></v-text-field>
           </v-flex>
@@ -245,7 +247,7 @@ export default {
         sortable: false
       },
       {
-        text: 'Ngày nộp',
+        text: 'Ngày tiếp nhận',
         align: 'center',
         sortable: false
       },
