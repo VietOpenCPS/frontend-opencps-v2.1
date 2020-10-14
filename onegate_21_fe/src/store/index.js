@@ -907,7 +907,7 @@ export const store = new Vuex.Store({
             formData.append('file', file, fileName)
             formData.append('dossierPartNo', data.partNo)
             formData.append('dossierTemplateNo', data.dossierTemplateNo)
-            formData.append('fileTemplateNo', data.fileTemplateNo)
+            formData.append('fileTemplateNo', data.fileTemplateNo ? data.fileTemplateNo : data.templateFileNo)
             formData.append('formData', '')
             formData.append('referenceUid', '')
             let fileUpload = {
@@ -2905,10 +2905,9 @@ export const store = new Vuex.Store({
                 groupId: state.initData.groupId
               },
               params: {
-                originDossierId: classPK
               }
             }
-            axios.get(state.initData.dossierApi, param).then(function (response) {
+            axios.get("/o/rest/v2/dossiers/inter/" + classPK, param).then(function (response) {
               let serializable = response.data
               if (serializable.data) {
                 resolve(serializable.data)
@@ -3122,6 +3121,9 @@ export const store = new Vuex.Store({
           }
           axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/documents/preview/' + filter.document, param).then(function (response) {
             let serializable = response.data
+            if (filter.hasOwnProperty('reportType')) {
+              saveAs(serializable, 'biennhan' + new Date().getTime() + '.doc')
+            }
             let file = window.URL.createObjectURL(serializable)
             resolve(file)
           }).catch(function (error) {
@@ -4428,14 +4430,15 @@ export const store = new Vuex.Store({
           dataPost.append('totalRecord', Number(filter.totalRecord))
           dataPost.append('totalPage', Number(filter.totalPage))
           dataPost.append('totalFee', filter.totalFee.toString().replace(/\./g, ''))
-          dataPost.append('totalCopy', 0),
-          dataPost.append('notarizationNo', (new Date()).getTime()),
-          dataPost.append('notarizationYear', (new Date()).getFullYear()),
-          dataPost.append('totalCopy', 0),
-          dataPost.append('notarizationDate', (new Date()).getTime()),
-          dataPost.append('signerName', ''),
-          dataPost.append('signerPosition', ''),
-          dataPost.append('statusCode', ''),
+          dataPost.append('totalCopy', 0)
+          dataPost.append('notarizationNo', 0)
+          dataPost.append('govAgencyCode', filter.govAgencyCode)
+          dataPost.append('serviceCode', filter.serviceCode)
+          dataPost.append('notarizationYear', (new Date()).getFullYear())
+          dataPost.append('notarizationDate', (new Date()).getTime())
+          dataPost.append('signerName', '')
+          dataPost.append('signerPosition', '')
+          dataPost.append('statusCode', '')
 
           axios.post('/o/rest/v2/notarizations', dataPost, param).then(function (response) {
             resolve(response.data)

@@ -40,7 +40,7 @@
                   <v-icon v-if="showConfig">reply</v-icon>
                   <v-icon v-else>settings</v-icon> &nbsp;
                   <span v-if="showConfig">Quay lại</span>
-                  <span v-else>Tuỳ chọn</span>
+                  <span v-else>Tùy chọn</span>
                 </v-btn>
               </v-flex>
             </v-layout>
@@ -610,6 +610,9 @@ export default {
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
             vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
           }
+          if (vm.itemsReports[vm.index]['reportCode'].indexOf('REGISTER') >= 0 || vm.itemsReports[vm.index]['reportCode'].indexOf('STATISTIC') >= 0) {
+            vm.customize = false
+          }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
             vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']
           }
@@ -745,6 +748,9 @@ export default {
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
         vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
       }
+      if (vm.itemsReports[vm.index]['reportCode'].indexOf('REGISTER') >= 0 || vm.itemsReports[vm.index]['reportCode'].indexOf('STATISTIC') >= 0) {
+        vm.customize = false
+      }
       // bug unsupported number: NaN
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
         vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']
@@ -874,6 +880,9 @@ export default {
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
             vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
+          }
+          if (vm.itemsReports[vm.index]['reportCode'].indexOf('REGISTER') >= 0 || vm.itemsReports[vm.index]['reportCode'].indexOf('STATISTIC') >= 0) {
+            vm.customize = false
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
             vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']

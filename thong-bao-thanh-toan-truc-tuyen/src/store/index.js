@@ -119,18 +119,31 @@ export const store = new Vuex.Store({
             'Accept': 'application/json'
           }
         }
-        let dataPostdossier = new URLSearchParams()
-        dataPostdossier.append('amount', data.amount)
-        dataPostdossier.append('orderId', data.orderId)
-        dataPostdossier.append('orderInfo', data.orderInfo)
-        dataPostdossier.append('requestCode', data.requestCode)
-        dataPostdossier.append('transactionNo', data.transactionNo)
-        dataPostdossier.append('payDate', data.payDate)
-        dataPostdossier.append('errorCode', data.errorCode)
-        dataPostdossier.append('paygate', data.paygate)
-        dataPostdossier.append('type', data.type)
-        dataPostdossier.append('checksum', data.checksum)
-
+        // let dataPostdossier = new URLSearchParams()
+        // dataPostdossier.append('amount', data.amount)
+        // dataPostdossier.append('orderId', data.orderId)
+        // dataPostdossier.append('orderInfo', data.orderInfo)
+        // dataPostdossier.append('requestCode', data.requestCode)
+        // dataPostdossier.append('transactionNo', data.transactionNo)
+        // dataPostdossier.append('payDate', data.payDate)
+        // dataPostdossier.append('errorCode', data.errorCode)
+        // dataPostdossier.append('paygate', data.paygate)
+        // dataPostdossier.append('type', data.type)
+        // dataPostdossier.append('checksum', data.checksum)
+        // dataPostdossier.append('activeCheckSum', true)
+        
+        let dataPostdossier = {
+          amount: data.amount,
+          orderId: data.orderId,
+          orderInfo: data.orderInfo,
+          requestCode: data.requestCode,
+          transactionNo: data.transactionNo,
+          payDate: data.payDate,
+          errorCode: data.errorCode,
+          paygate: data.paygate,
+          type: data.type,
+          checksum: data.checksum
+        }
         axios.post('/o/pgi/paygov/dpnhankqthanhtoanhs', dataPostdossier, options).then(function (response) {
           
         }).catch(function (error) {

@@ -361,7 +361,7 @@
                 </v-expansion-panel>
               </div>
               <div v-else>
-                <tai-lieu-chung-thuc ref="tailieuchungthuc" :dossierId="thongTinChiTietHoSo.dossierId" :onlyView="true"></tai-lieu-chung-thuc>
+                <tai-lieu-chung-thuc ref="tailieuchungthuc" :dossierInfo="thongTinChiTietHoSo" :onlyView="true"></tai-lieu-chung-thuc>
               </div>
             </v-tab-item>
             <v-tab-item value="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
@@ -578,7 +578,7 @@
                                 <div class="timeline-body">
                                   <span v-if="item.syncType === 2">Cán bộ trả lời</span>
                                   <span v-if="item.syncType === 2 && item.actionNote && item.actionNote !== 'null'">: </span>
-                                  <span v-if="item.actionNote && item.actionNote !== 'null'" style="color: #0b72ba">{{ item.actionNote }}</span>
+                                  <div v-if="item.actionNote && item.actionNote !== 'null'" style="color: #0b72ba">{{ item.actionNote }}</div>
                                 </div>
                               </div>
                             </li>
@@ -591,16 +591,20 @@
                           <!--  -->
                           <div style="position:relative">
                             <v-form v-model="validTraoDoi" ref="formTraoDoi" lazy-validation>
-                            <v-text-field class="pl-4 my-3"
-                            v-model="messageChat"
-                            label="Nhập trao đổi"
-                            @keyup.enter="postChat"
-                            :rules="[rules.varchar5000]"
-                            box
-                            ></v-text-field>
-                            
-                            <v-icon @click="postChat" color="blue" class="hover-pointer" style="position: absolute;right: 10px;bottom: 18px;font-size: 14px;">send</v-icon>
-                             </v-form>
+                              <v-textarea class="pl-4 my-0 mt-2"
+                              v-model="messageChat"
+                              label="Nhập trao đổi"
+                              :rules="[rules.varchar5000]"
+                              box
+                              clearable
+                              rows="3"
+                              ></v-textarea>
+                              <v-flex xs12 class="right">
+                                <v-btn small @click="postChat" color="primary" class="white--text mx-0 my-0">
+                                  <v-icon size="16">send</v-icon> &nbsp; Gửi
+                                </v-btn>
+                              </v-flex>
+                            </v-form>
                           </div>
                         </v-flex>
                       </v-card-text>
@@ -1264,7 +1268,9 @@ export default {
         }
         vm.loadDetailTempalte()
         vm.loadThanhToan()
-        vm.loadHoSoLienThong()
+        if (vm.originality === 3) {
+          vm.loadHoSoLienThong()
+        }
         vm.getNextActions()
         vm.getPreAction()
         if (resultDossier['dossierSubStatus']) {
@@ -2494,7 +2500,7 @@ export default {
                 let fileEntries = []
                 let dossierFiles = []
                 for (let index in files) {
-                  if (!files[index]['isSigned'] && files[index]['fileSize']) {
+                  if (!files[index]['isSigned'] && files[index]['fileSize'] && (!files[index]['eForm']) || (files[index]['eForm'] && files[index]['createFileDossierPartEform'])) {
                     toastr.clear()
                     toastr.error(files[index]['displayName'] + ' chưa được ký duyệt')
                     valid = false

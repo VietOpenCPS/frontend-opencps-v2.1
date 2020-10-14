@@ -4,12 +4,12 @@
       <ul class="tiny-pagination" :class="customClass">
         <li class="page-item" :class="classFirstPage" style="border: none !important;">
           <button @click.prevent="lastPage" :class="classFirstPage" class="pagination__navigation primary">
-            <i aria-hidden="true" class="material-icons icon">arrow_left</i>
+            <i aria-hidden="true" class="material-icons icon" style="line-height: 36px;">arrow_left</i>
           </button>
         </li>
         <li class="page-item ml-4" :class="classLastPage" style="margin-right: 0;border: none !important;">
           <button @click.prevent="nextPage" :class="classLastPage" class="pagination__navigation primary">
-            <i aria-hidden="true" class="material-icons icon">arrow_right</i>
+            <i aria-hidden="true" class="material-icons icon" style="line-height: 36px;">arrow_right</i>
           </button>
         </li>
       </ul>

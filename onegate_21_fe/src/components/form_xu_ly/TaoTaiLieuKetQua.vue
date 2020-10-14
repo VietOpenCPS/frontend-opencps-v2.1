@@ -40,12 +40,30 @@
                         <!-- <v-btn title="Đính kèm cho hồ sơ khác" v-if="itemFileView['dossierPartType'] === 7" icon ripple v-on:click.stop="attachOtherDossier(itemFileView)" class="mx-0 my-0">
                           <v-icon color="primary" size="13">fas fa fa-clone</v-icon>
                         </v-btn> -->
-                        <v-tooltip top v-if="esignType === 'plugin' && itemFileView.fileType.toLowerCase() === 'pdf'">
-                          <v-btn slot="activator" flat icon color="indigo" v-on:click.stop="signAction(itemFileView, index2)" class="my-0">
+                        <v-menu @click.native.stop right offset-y 
+                          transition="slide-x-transition" title="Ký số tài liệu đính kèm" 
+                          v-if="esignType === 'plugin' && itemFileView.fileType.toLowerCase() === 'pdf'">
+                          <v-btn slot="activator" flat icon color="indigo">
                             <v-icon size="18">fa fa-pencil-square-o</v-icon>
                           </v-btn>
-                          <span>Ký duyệt tài liệu đính kèm</span>
-                        </v-tooltip>
+                          <v-list>
+                            <v-list-tile>
+                              <v-list-tile-title @click.stop="signAction(itemFileView, index2, '', 'approved')">
+                                <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                              </v-list-tile-title>
+                            </v-list-tile>
+                            <v-list-tile>
+                              <v-list-tile-title @click.stop="signAction(itemFileView, index2, '', 'issued')">
+                                <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU
+                              </v-list-tile-title>
+                            </v-list-tile>
+                            <v-list-tile>
+                              <v-list-tile-title @click.stop="signAction(itemFileView, index2, '', 'income')">
+                                <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ VĂN BẢN
+                              </v-list-tile-title>
+                            </v-list-tile>
+                          </v-list>
+                        </v-menu>
                       </div>
                     </div>
                   </div>
@@ -128,12 +146,30 @@
                     <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ lên</span>
                     <span v-else>Tải giấy tờ lên (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
                   </v-tooltip>
-                  <v-tooltip top v-if="esignType === 'plugin' && item['eForm'] && item['fileSize']">
-                    <v-btn slot="activator" flat icon color="indigo" v-on:click.stop="signAction(item, index, item.partNo)" class="ml-2 my-0">
-                      <v-icon size="22">fa fa-pencil-square-o</v-icon>
+                  <v-menu @click.native.stop right offset-y
+                    transition="slide-x-transition" title="Ký số tài liệu" 
+                    v-if="esignType === 'plugin' && item['eForm'] && item['fileSize']">
+                    <v-btn slot="activator" flat icon color="indigo">
+                      <v-icon size="18">fa fa-pencil-square-o</v-icon>
                     </v-btn>
-                    <span>Ký duyệt</span>
-                  </v-tooltip>
+                    <v-list>
+                      <v-list-tile>
+                        <v-list-tile-title @click.stop="signAction(item, index, item.partNo, 'approved')">
+                          <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                        </v-list-tile-title>
+                      </v-list-tile>
+                      <v-list-tile>
+                        <v-list-tile-title @click.stop="signAction(item, index, item.partNo, 'issued')">
+                          <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU
+                        </v-list-tile-title>
+                      </v-list-tile>
+                      <v-list-tile>
+                        <v-list-tile-title @click.stop="signAction(item, index, item.partNo, 'income')">
+                          <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ VĂN BẢN
+                        </v-list-tile-title>
+                      </v-list-tile>
+                    </v-list>
+                  </v-menu>
                   <!-- <v-tooltip top>
                     <v-btn slot="activator" class="mx-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:20px;width:20px">
                       {{item.count}}
@@ -1135,7 +1171,7 @@
         vgca_show_config()
       },
       viewFileKySo (item, index) {},
-      signAction (item, index, partNo) {
+      signAction (item, index, partNo, typeSign) {
         let vm = this
         console.log('file ký duyệt', item)
         if (item['eForm'] && item['daKhai'] || !item['eForm']) {
@@ -1147,7 +1183,12 @@
                 dataSigned = JSON.parse(received_msg.FileServer)
               } catch (error) {
               }
-              console.log('dataSigned', dataSigned)
+              if (dataSigned) {
+                if (window.location.protocol === 'https:' && dataSigned.url.indexOf('http:') === 0) {
+                  dataSigned.url = dataSigned.url.replace('http', 'https')
+                }
+                dataSigned.url = dataSigned.url.replace(':80/', '/')
+              }
               toastr.clear()
               toastr.success('Tài liệu đã được ký duyệt')
               if (!partNo) {
@@ -1177,7 +1218,6 @@
                   }, 200)
                 }
                 // 
-                console.log('indexFile', vm.dossierFilesItems)
               }
               // lọc file gán với createFiles
               let createFileItems = []
@@ -1187,6 +1227,7 @@
                     return String(item.partNo) === String(vm.dossierFilesItems[i]['dossierPartNo'])
                   })
                   if (hasCreate && hasCreate.length > 0) {
+                    vm.dossierFilesItems[i] = Object.assign(vm.dossierFilesItems[i], {createFileDossierPartEform: hasCreate[0]['eForm']})
                     createFileItems.push(vm.dossierFilesItems[i])
                   }
                 }
@@ -1214,7 +1255,14 @@
           prms['FileName'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.detailDossier['dossierId'] + '/files/' + item['referenceUid'] + '/preview.pdf'
 
           let json_prms = JSON.stringify(prms)
-          vgca_sign_approved(json_prms, signFileCallBack)
+          if (typeSign === 'approved') {
+            vgca_sign_approved(json_prms, signFileCallBack)
+          } else if (typeSign === 'issued') {
+            vgca_sign_issued(json_prms, signFileCallBack)
+          } else {
+            vgca_sign_income(json_prms, signFileCallBack)
+          }
+          
         } else {
           toastr.clear()
           toastr.error('Chưa có tài liệu ký duyệt')

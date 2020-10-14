@@ -33,11 +33,11 @@
                 </v-flex>
                 <v-flex md6 xs12 text-center>
                   <span style="color:#1976d2;">{{statistics.releaseCount}}</span>
-                  <p>Hoàn thành</p>
+                  <p>Tổng số hoàn thành</p>
                 </v-flex>
                 <v-flex md6 xs12 text-center>
                   <span style="color:#1976d2;">{{thongKeHauGiang ? processingTotal : statistics.processingCount}}</span>
-                  <p>Đang xử lý</p>
+                  <p>Tổng số đang xử lý</p>
                 </v-flex>
                 <v-flex md6 xs12 text-center>
                   <span style="color:#1976d2;">{{statistics.overtimeCount}}</span>

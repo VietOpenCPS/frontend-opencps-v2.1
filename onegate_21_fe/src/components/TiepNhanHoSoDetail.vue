@@ -112,7 +112,7 @@
                   <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                   <span>Tài liệu chứng thực</span>
                 </div>
-                <tai-lieu-chung-thuc ref="tailieuchungthuc" :dossierId="thongTinChiTietHoSo.dossierId" :formCodeInput="formCode" :onlyView="false"></tai-lieu-chung-thuc>
+                <tai-lieu-chung-thuc ref="tailieuchungthuc" :dossierInfo="thongTinChiTietHoSo" :formCodeInput="formCode" :onlyView="false"></tai-lieu-chung-thuc>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>

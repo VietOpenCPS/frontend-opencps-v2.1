@@ -559,6 +559,16 @@
         </div>
         <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
+        <!-- <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-3" color="primary" @click="exportPrint01()"
+          :loading="loadingAction"
+          :disabled="loadingAction">
+            <v-icon>save</v-icon> &nbsp;
+            Xuất file word
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-card-actions> -->
       </v-card>
     </v-dialog>
     <v-dialog v-model="dialog_statusAction" scrollable persistent max-width="700px">
@@ -944,6 +954,7 @@ export default {
     'tim-kiem-nang-cao': AdvSearch
   },
   data: () => ({
+    dossierSelect: '',
     xacthuc_BNG: false,
     doActionGroup: false,
     doActionGroupKhacThuTuc: false,
@@ -1449,7 +1460,7 @@ export default {
         if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')) {
           vm.getDonViCongVan(currentQuery)
         }
-        if (vm.listThuTucHanhChinh === null || vm.listThuTucHanhChinh === undefined || (vm.listThuTucHanhChinh !== null && vm.listThuTucHanhChinh !== undefined && vm.listThuTucHanhChinh.length === 0)) {
+        if (vm.originality === 3  && (vm.listThuTucHanhChinh === null || vm.listThuTucHanhChinh === undefined || (vm.listThuTucHanhChinh !== null && vm.listThuTucHanhChinh !== undefined && vm.listThuTucHanhChinh.length === 0))) {
           vm.processListTTHC(currentQuery)
         } else {
           vm.doLoadingDataHoSo()
@@ -2520,6 +2531,7 @@ export default {
     },
     doPrint01 (dossierItem, item, index, isGroup) {
       let vm = this
+      vm.dossierSelect = dossierItem
       vm.dialogPDFLoading = true
       vm.dialogPDF = true
       let filter = {
@@ -2529,6 +2541,16 @@ export default {
       vm.$store.dispatch('doPrint01', filter).then(function (result) {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPDFPreview').src = result
+      }).catch(function (){})
+    },
+    exportPrint01 () {
+      let vm = this
+      let filter = {
+        dossierId: vm.dossierSelect.dossierId,
+        document: 'DOC_01',
+        reportType: 'doc'
+      }
+      vm.$store.dispatch('doPrint01', filter).then(function (result) {
       }).catch(function (){})
     },
     doPrint02 (dossierItem, item, index, isGroup) {

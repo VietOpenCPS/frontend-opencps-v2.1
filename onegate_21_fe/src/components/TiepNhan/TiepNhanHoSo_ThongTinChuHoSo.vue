@@ -1331,14 +1331,12 @@ export default {
       vm.functionTimeOut = setTimeout(function () {
         if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2') || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
           vm.checkApplicantInfos()
-          vm.thongTinChuHoSo.applicantIdNo = query.trim()
+          // vm.thongTinChuHoSo.applicantIdNo = query.trim()
         }
         vm.$store.commit('setApplicantId', query)
       }, 2000)
-      console.log(query)
-      if (query.trim().length === 0 ) {
+      if (query.trim().length === 0) {
         vm.thongTinChuHoSo.applicantIdNo = ''
-        console.log(vm.thongTinChuHoSo.applicantIdNo)
         return null
       }
       let url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
@@ -1357,21 +1355,7 @@ export default {
               let items = []
               if (response.data.hasOwnProperty('data')) {
                 items = response.data.data
-                if(query.trim().length > 100) {
-                  toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
-                  vm.thongTinChuHoSo.applicantIdNo = ''
-                  return null
-                } else {
-                  vm.thongTinChuHoSo.applicantIdNo = query.trim()
-                }
               } else {
-                  if(query.trim().length > 100) {
-                    toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
-                    vm.thongTinChuHoSo.applicantIdNo = ''
-                    return null
-                  } else {
-                    vm.thongTinChuHoSo.applicantIdNo = query.trim()
-                  }
               }
               resolve(items)
             })
@@ -1402,21 +1386,7 @@ export default {
               let items = []
               if (response.data.hasOwnProperty('data')) {
                 items = response.data.data
-                if(query.trim().length > 100) {
-                  toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
-                  vm.thongTinNguoiNopHoSo.delegateIdNo = ''
-                  return null
-                } else {
-                  vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
-                }
               } else {
-                if(query.trim().length > 100) {
-                  toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
-                  vm.thongTinNguoiNopHoSo.delegateIdNo = ''
-                  return null
-                } else {
-                  vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
-                }
               }
               resolve(items)
             })

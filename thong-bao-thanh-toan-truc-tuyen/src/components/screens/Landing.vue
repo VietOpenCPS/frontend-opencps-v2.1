@@ -149,12 +149,17 @@ export default {
       if (searchParams) {
         let query = vm.parse_query_string(searchParams)
         let responseCode = query.hasOwnProperty('response_code') ? query.response_code : ''
+        let responseCodePayGov = query.hasOwnProperty('errorCode') ? query.errorCode : ''
         let dossierId = query.hasOwnProperty('dossierId') ? query.dossierId : ''
         let referenceUidQuery = query.hasOwnProperty('referenceUid') ? query.referenceUid : ''
         let actionCode = query.hasOwnProperty('actionCode') ? query.actionCode : ''
         if (query.hasOwnProperty('paygate') && query.hasOwnProperty('orderId')) {
           // phần thông báo thanh toán qua Cổng PayGate
-          vm.statusDeal = true
+          if (responseCodePayGov === '00') {
+            vm.statusDeal = true
+          } else {
+            vm.statusDeal = false
+          }
           vm.payGate = true
           let dossierNo = query['orderId'].split('-')
           dossierNo.pop()
@@ -173,7 +178,9 @@ export default {
           })
           // chuyển bước hồ sơ khi thanh toán thành công
           let filterUpdate = query
-          vm.$store.dispatch('doActionPayGov', filterUpdate)
+          if (vm.statusDeal) {
+            vm.$store.dispatch('doActionPayGov', filterUpdate)
+          }
         } else {
           if (dossierId) {
             if (responseCode === '00') {
