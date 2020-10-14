@@ -2235,8 +2235,8 @@ export default {
               return thuTuc
             })
 
-            if(vm.agencyXuLyThuTuc  && vm.agencyXuLyThuTuc.hasOwnProperty('itemCode')){
-              vm.listThuTucHanhChinh = data.filter(e=>e.govAgencyCode === vm.agencyXuLyThuTuc.itemCode)
+            if(vm.agencyXuLyThuTuc  && vm.agencyXuLyThuTuc.hasOwnProperty('govAgencyCode')){
+              vm.listThuTucHanhChinh = data.filter(e=>e.govAgencyCode === vm.agencyXuLyThuTuc.govAgencyCode)
             } else {
               vm.listThuTucHanhChinh = data
             }
