@@ -1057,6 +1057,7 @@ export const store = new Vuex.Store({
           dataPostStep.append('stepInstruction', data.stepInstruction)
           dataPostStep.append('editable', data.editable)
           dataPostStep.append('checkInput', data.checkInput ? data.checkInput : '')
+          dataPostStep.append('roleAsStep', data.roleAsStep ? data.roleAsStep : '')
           if (data.type === 'add') {
             axios.post(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/steps', dataPostStep, options).then(function (response) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')

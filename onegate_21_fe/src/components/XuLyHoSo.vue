@@ -310,11 +310,13 @@ export default {
       return vm.$store.getters.dossierSelected
     },
     actionActive () {
-      console.log('actionActive-------', this.$store.getters.actionActive)
       return this.$store.getters.actionActive
     },
     activeGetCounter () {
       return this.$store.getters.activeGetCounter
+    },
+    menuConfigsToDo () {
+      return this.$store.getters.getMenuConfigsTodo
     }
   },
   created () {
@@ -550,6 +552,10 @@ export default {
                   actionCode: vm.actionExits[key].actionCode,
                   actionUser: actionUser
                 }
+                // if (vm.menuConfigsToDo[vm.index]['tableConfig'].hasOwnProperty('activeGroupActionService') && vm.menuConfigsToDo[vm.index]['tableConfig'].activeGroupActionService) {
+                //   filter.actionCode = vm.actionActive.action
+                // }
+                console.log('filterActionGroup1', filter)
                 vm.postAction(filter, vm.dossierSelected[key2], key2)
               }
             }
@@ -562,6 +568,7 @@ export default {
                 actionCode: vm.actionActive.action,
                 actionUser: actionUser
               }
+              console.log('filterActionGroup2', filter)
               vm.postAction(filter, vm.dossierSelected[key], key)
             }
           }

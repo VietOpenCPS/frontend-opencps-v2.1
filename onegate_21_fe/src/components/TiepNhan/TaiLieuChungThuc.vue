@@ -19,7 +19,7 @@
     >
       <v-progress-linear slot="progress" color="blue" indeterminate v-if="loading"></v-progress-linear>
       <template slot="items" slot-scope="props">
-        <td width="50" class="text-xs-center" :class="onlyView ? 'pt-1' : 'pt-3'"> {{props.index + 1}}</td>
+        <td :width="!onlyView ? 50 : 100" class="text-xs-center" :class="onlyView ? 'pt-1' : 'pt-3'"> {{!onlyView ? props.index + 1 : props.item.notarizationNo}}</td>
         <td class="text-xs-left py-1">
           <content-placeholders v-if="loading">
             <content-placeholders-text :lines="1" />
@@ -88,9 +88,9 @@
         <td :colspan="!onlyView ? headers.length - 2 : headers.length - 1" class="text-xs-center" style="border-right: 1px solid #dedede;">
           <strong style="font-size: 1.25em;">TỔNG TIỀN</strong>
         </td>
-        <td class="px-2" :style="onlyView ? 'border-right: 1px solid #dedede' : ''">
+        <td :class="!onlyView ? 'px-2' : 'px-2 text-xs-center'" :style="onlyView ? 'border-right: 1px solid #dedede' : ''">
           <strong style="font-size: 1.25em;">{{fee | currency}}</strong>
-          <p class="d-inline-block right text-bold">vnđ</p>
+          <p v-if="!onlyView" class="d-inline-block right text-bold">vnđ</p>
         </td>
         <td v-if="!onlyView" style="border-right: 1px solid #dedede;">
         </td>
@@ -109,7 +109,7 @@ toastr.options = {
 }
 export default {
   props: {
-    dossierId: {
+    dossierInfo: {
       type: String,
       default: () => ''
     },
@@ -174,10 +174,11 @@ export default {
     let vm = this
     if (vm.onlyView) {
       vm.headers.pop()
+      vm.headers[0]['text'] = 'Số chứng thực'
     }
     vm.loading = true
     let filter = {
-      dossierId: vm.dossierId
+      dossierId: vm.dossierInfo.dossierId
     }
     vm.$store.dispatch('getNotarization', filter).then(function (result) {
       vm.loading = false
@@ -239,7 +240,9 @@ export default {
         totalRecord: 1,
         totalPage: 1,
         totalFee: vm.feeTotal(1,1).toLocaleString('it-IT'),
-        dossierId: vm.dossierId
+        dossierId: vm.dossierInfo.dossierId,
+        serviceCode: vm.dossierInfo.serviceCode,
+        govAgencyCode: vm.dossierInfo.govAgencyCode
       }
       vm.loading = true
       vm.$store.dispatch('createNotarization', item).then(function (result) {

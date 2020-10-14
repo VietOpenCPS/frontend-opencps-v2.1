@@ -1,7 +1,15 @@
 <template>
   <v-app id="app_dynamic_report" :class="hiddenAside ? 'px-3' : ''">
-    <v-navigation-drawer app clipped floating width="300">
+    <v-navigation-drawer app clipped floating width="300" v-if="isSigned">
       <div class="drawer__filter">
+        <div class="px-2 pt-0">
+          <v-btn v-if="isAdmin" class="px-0 mt-0 ml-0" block color="primary" v-on:click.native="dialog_chotsolieu = true"
+            style="height:36px"
+          >
+            <v-icon size="22" color="white">sync</v-icon>&nbsp;
+            Chốt số liệu báo cáo
+          </v-btn>
+        </div>
         <v-list dense style="padding: 0;" class="report_list">
           <v-list-tile
             v-for="(item, indexItem) in itemsReports"
@@ -20,7 +28,7 @@
         </v-list>
       </div>
     </v-navigation-drawer>
-    <v-content :style="hiddenAside ? 'background: #ffffff' : ''">
+    <v-content :style="hiddenAside ? 'background: #ffffff' : ''" v-if="isSigned">
       <router-view></router-view>
     </v-content>
     <v-snackbar
@@ -97,11 +105,60 @@
         <span>Theo dõi tình hình đánh giá cán bộ</span>
       </v-tooltip>
     </div>
+    <!--  -->
+    <v-dialog v-model="dialog_chotsolieu" max-width="350" transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Thời gian chốt số liệu</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_chotsolieu = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-0 px-0">
+          <v-layout wrap class="pt-4 py-0 px-2">
+            <v-flex xs12 sm6 class="pr-2">
+              <v-autocomplete
+                :items="monthList"
+                v-model="month"
+                label="Tháng"
+                hide-no-data
+                :hide-selected="true"
+                box
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm6 class="pl-2">
+              <v-autocomplete
+                :items="yearList"
+                v-model="year"
+                label="Năm"
+                hide-no-data
+                :hide-selected="true"
+                box
+              ></v-autocomplete>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-2" color="primary" @click="chotSoLieuBaoCao()">
+            <v-icon>save</v-icon> &nbsp;
+            Xác nhận
+          </v-btn>
+          <v-btn class="" color="primary" @click="dialog_chotsolieu = false">
+            <v-icon>clear</v-icon> &nbsp;
+            Hủy
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
   import support from './store/support.json'
+  import axios from 'axios'
+  import toastr from 'toastr'
   export default {
     props: ['index'],
     data: () => ({
@@ -123,7 +180,14 @@
       ],
       userConfig: [],
       reportTypeFilter: '',
-      reportTypeMappingRole: ''
+      reportTypeMappingRole: '',
+      year: '',
+      month: '',
+      monthList: [1,2,3,4,5,6,7,8,9,10,11,12],
+      yearList: '',
+      dialog_chotsolieu: false,
+      isAdmin: false,
+      isSigned: window.themeDisplay.isSignedIn()
     }),
     computed: {
       itemsReports () {
@@ -207,6 +271,14 @@
     created () {
       var vm = this
       vm.$nextTick(function () {
+        vm.yearList = []
+        let currentYear = (new Date()).getFullYear()
+        vm.year = currentYear
+        vm.month = (new Date()).getMonth() + 1
+        for (let i = currentYear; i >= 2019; i--) {
+          vm.yearList.push(i)
+        }
+
         try {
           if (reportTypeFilter) {
             vm.reportTypeFilter = reportTypeFilter
@@ -291,7 +363,7 @@
         } else {
           doGetReport()
         }
-
+        vm.checkAdmin()
       })
     },
     methods: {
@@ -347,6 +419,39 @@
         let vm = this
         let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
         window.location.href = url + '/' + page
+      },
+      chotSoLieuBaoCao () {
+        let vm = this
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          },
+          params: {
+            reCalculate: 1,
+            year: vm.year,
+            month: vm.month
+          }
+        }
+        axios.get('/o/rest/statistics', param).then(function (response) {
+          toastr.success('Yêu cầu thực hiện thành công')
+          vm.dialog_chotsolieu = false
+        }).catch(function (error) {
+          toastr.error('Yêu cầu thực hiện không thành công')
+        })
+      },
+      checkAdmin () {
+        let vm = this
+        vm.isAdmin = false
+        vm.$store.dispatch('getRoleUser').then(function (roles) {
+          if (!roles) {
+            vm.isAdmin = false
+          }
+          let roleExits = roles.findIndex(item => item === 'Administrator' || item === 'Administrator_data' || item === 'CHOT_SO_LIEU_BAO_CAO')
+          if (roleExits >= 0) {
+            vm.isAdmin = true
+          }
+        })
       }
     }
   }

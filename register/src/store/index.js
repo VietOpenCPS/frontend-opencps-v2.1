@@ -233,7 +233,9 @@ export const store = new Vuex.Store({
             let dataError
             if (errorRes.response.data) {
               dataError = errorRes.response.data
-              if (dataError && dataError.description && dataError.description === 'DuplicateContactEmailException') {
+              if (dataError && dataError.description && dataError.description === 'RegisterDuplicate') {
+                toastr.error('Đăng ký thất bại. Thông tin sử dụng đăng ký đã tồn tại trên hệ thống. Vui lòng kiểm tra Email, Số CMND/Mã số thuế, Số điện thoại')
+              } else if (dataError && dataError.description && dataError.description === 'DuplicateContactEmailException') {
                 toastr.error('Đăng ký thất bại. Email sử dụng đã tồn tại trên hệ thống. Sử dụng Email khác để đăng ký')
               } else if (dataError && dataError.description && dataError.description === 'DuplicateApplicantIdException') {
                 toastr.error('Đăng ký thất bại. Số CMND/Mã số thuế đã tồn tại trên hệ thống. Sử dụng số CMND/mã số thuế khác để đăng ký')
@@ -299,7 +301,9 @@ export const store = new Vuex.Store({
             } else {
               if (errorRes.response.data) {
                 dataError = errorRes.response.data
-                if (dataError && dataError.description && dataError.description === 'DuplicateContactEmailException') {
+                if (dataError && dataError.description && dataError.description === 'RegisterDuplicate') {
+                  toastr.error('Đăng ký thất bại. Thông tin sử dụng đăng ký đã tồn tại trên hệ thống. Vui lòng kiểm tra Email, Số CMND/Mã số thuế, Số điện thoại')
+                } else if (dataError && dataError.description && dataError.description === 'DuplicateContactEmailException') {
                   toastr.error('Đăng ký thất bại. Email sử dụng đã tồn tại trên hệ thống. Sử dụng Email khác để đăng ký')
                 } else if (dataError && dataError.description && dataError.description === 'DuplicateApplicantIdException') {
                   toastr.error('Đăng ký thất bại. Số CMDN/Mã số thuế đã tồn tại trên hệ thống. Sử dụng số CMDN/mã số thuế khác để đăng ký')

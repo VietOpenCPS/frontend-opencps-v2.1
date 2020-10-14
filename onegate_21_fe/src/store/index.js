@@ -907,7 +907,7 @@ export const store = new Vuex.Store({
             formData.append('file', file, fileName)
             formData.append('dossierPartNo', data.partNo)
             formData.append('dossierTemplateNo', data.dossierTemplateNo)
-            formData.append('fileTemplateNo', data.fileTemplateNo)
+            formData.append('fileTemplateNo', data.fileTemplateNo ? data.fileTemplateNo : data.templateFileNo)
             formData.append('formData', '')
             formData.append('referenceUid', '')
             let fileUpload = {
@@ -2905,10 +2905,9 @@ export const store = new Vuex.Store({
                 groupId: state.initData.groupId
               },
               params: {
-                originDossierId: classPK
               }
             }
-            axios.get(state.initData.dossierApi, param).then(function (response) {
+            axios.get("/o/rest/v2/dossiers/inter/" + classPK, param).then(function (response) {
               let serializable = response.data
               if (serializable.data) {
                 resolve(serializable.data)
@@ -3117,11 +3116,14 @@ export const store = new Vuex.Store({
             },
             responseType: 'blob',
             params: {
-              payload: filter.payload
+              payload: filter.payload ? filter.payload : ''
             }
           }
           axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/documents/preview/' + filter.document, param).then(function (response) {
             let serializable = response.data
+            if (filter.hasOwnProperty('reportType')) {
+              saveAs(serializable, 'biennhan' + new Date().getTime() + '.doc')
+            }
             let file = window.URL.createObjectURL(serializable)
             resolve(file)
           }).catch(function (error) {
@@ -3226,8 +3228,8 @@ export const store = new Vuex.Store({
           let formData = new URLSearchParams()
           // formData.append('serviceCode', filter.serviceCode)
           // formData.append('govAgencyCode', filter.govAgencyCode)
-          formData.append('dossiers', filter.dossiers)
-          formData.append('payload', filter.payload)
+          formData.append('dossiers', filter.dossiers ? filter.dossiers : '')
+          formData.append('payload', filter.payload ? filter.payload : '')
           axios.post(state.initData.getNextAction + '/preview/' + filter.document ,formData , param).then(function (response) {
             let serializable = response.data
             let file = window.URL.createObjectURL(serializable)
@@ -4428,14 +4430,15 @@ export const store = new Vuex.Store({
           dataPost.append('totalRecord', Number(filter.totalRecord))
           dataPost.append('totalPage', Number(filter.totalPage))
           dataPost.append('totalFee', filter.totalFee.toString().replace(/\./g, ''))
-          dataPost.append('totalCopy', 0),
-          dataPost.append('notarizationNo', (new Date()).getTime()),
-          dataPost.append('notarizationYear', (new Date()).getFullYear()),
-          dataPost.append('totalCopy', 0),
-          dataPost.append('notarizationDate', (new Date()).getTime()),
-          dataPost.append('signerName', ''),
-          dataPost.append('signerPosition', ''),
-          dataPost.append('statusCode', ''),
+          dataPost.append('totalCopy', 0)
+          dataPost.append('notarizationNo', 0)
+          dataPost.append('govAgencyCode', filter.govAgencyCode)
+          dataPost.append('serviceCode', filter.serviceCode)
+          dataPost.append('notarizationYear', (new Date()).getFullYear())
+          dataPost.append('notarizationDate', (new Date()).getTime())
+          dataPost.append('signerName', '')
+          dataPost.append('signerPosition', '')
+          dataPost.append('statusCode', '')
 
           axios.post('/o/rest/v2/notarizations', dataPost, param).then(function (response) {
             resolve(response.data)
@@ -4666,6 +4669,55 @@ export const store = new Vuex.Store({
           }
         }).catch(xhr => {
           reject(xhr)
+        })
+      })
+    },
+    toPayGov ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              dossierId: filter.dossierId,
+              ipAddress: filter.ipAddress
+            }
+          }
+          let url = '/o/pgi/paygov/urlRedirect'
+          axios.get(url, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    doActionPayGov({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json'
+          }
+        }
+        let dataPostdossier = new URLSearchParams()
+        dataPostdossier.append('amount', data.amount)
+        dataPostdossier.append('orderId', data.orderId)
+        dataPostdossier.append('orderInfo', data.orderInfo)
+        dataPostdossier.append('requestCode', data.requestCode)
+        dataPostdossier.append('transactionNo', data.transactionNo)
+        dataPostdossier.append('payDate', data.payDate)
+        dataPostdossier.append('errorCode', data.errorCode)
+        dataPostdossier.append('paygate', data.paygate)
+        dataPostdossier.append('type', data.type)
+        dataPostdossier.append('checksum', data.checksum)
+
+        axios.post('/o/pgi/paygov/dpnhankqthanhtoanhs', dataPostdossier, options).then(function (response) {
+          
+        }).catch(function (error) {
         })
       })
     },

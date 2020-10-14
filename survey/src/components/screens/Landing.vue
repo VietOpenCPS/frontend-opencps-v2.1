@@ -70,7 +70,7 @@
               
             </v-flex>
             <v-flex xs12 sm12 :class="!isMobile ? 'text-xs-left mt-2' : 'text-xs-left mt-2 px-2'">
-              <v-btn class="white--text" @click="doVottingResultSubmit" color="#004C98" :loading="btnLoading" :disabled="btnLoading">
+              <v-btn class="white--text" @click="showFormVerify" color="#004C98" :loading="btnLoading" :disabled="btnLoading">
                 <v-icon>save</v-icon>&nbsp;
                 Gửi đánh giá
               </v-btn>
@@ -131,6 +131,73 @@
       <v-flex xs12 sm1>
       </v-flex>
     </v-layout>
+    <v-dialog v-model="dialogVerify" persistent max-width="500">
+      <v-card>
+        <v-card-title class="headline">
+          <div style="text-align: center;width: 100%;">Quý khách vui lòng nhập thông tin để gửi đánh giá</div>
+        </v-card-title>
+        <v-card-text class="py-2 px-2">
+          <v-form ref="formVerify" v-model="validVerify" lazy-validation class="px-2 pt-2">
+            <v-flex xs12>
+              <p>Mã hồ sơ <span style="color: red">(*)</span></p>
+              <v-text-field
+                box
+                placeholder="Nhập mã hồ sơ"
+                v-model="dossierNo"
+                :rules="[v => !!v || 'Mã hồ sơ là bắt buộc']"
+                required
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              <p>Số CMND/ mã số thuế <span style="color: red">(*)</span></p>
+              <v-text-field
+                box
+                placeholder="Nhập số CMND/ mã số thuế"
+                v-model="applicantIdNo"
+                :rules="[v => !!v || 'Số CMND/ mã số thuế là bắt buộc']"
+                required
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm12 class="">
+              <p>Mã bảo mật <span style="color: red">(*)</span></p>
+              <v-layout wrap>
+                <v-flex style="width: calc(100% - 200px)">
+                  <v-text-field
+                    box
+                    class="mr-2"
+                    clearable
+                    v-model="captchaValue"
+                    placeholder="Nhập mã bảo mật"
+                    :rules="[v => !!v || 'Mã bảo mật là bắt buộc']"
+                    required
+                  ></v-text-field>
+                </v-flex>
+                <v-flex style="width: 200px">
+                  <div id="captcha" class="d-inline-block text-xs-center" style="background: #d4d4d4;border-radius: 5px;"></div>
+                  <v-btn outline class="right mx-0 my-0 mt-2" flat v-on:click.native="createCaptcha">
+                    <v-icon color="primary" size="32">refresh</v-icon>
+                  </v-btn>
+                </v-flex>
+              </v-layout>
+              
+            </v-flex>
+          </v-form>
+        </v-card-text>
+        <v-card-actions class="mx-2">
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="submitForm">
+            <v-icon>how_to_reg</v-icon>&nbsp;
+              Xác nhận
+          </v-btn>
+          <v-btn color="primary" @click="dialogVerify = false">
+            <v-icon>clear</v-icon>&nbsp;
+              Hủy
+          </v-btn>
+          
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="dialog_voting_result" fullscreen hide-overlay transition="dialog-bottom-transition">
       <v-card>
         <v-toolbar dark color="primary">
@@ -254,7 +321,10 @@ export default {
     totalAnswer: 0,
     dialogMobile: false,
     captchaCode: '',
-    captchaValue: ''
+    captchaValue: '',
+    applicantIdNo: '',
+    dossierNo: '',
+    dialogVerify: false
   }),
   computed: {
     loading () {
@@ -294,20 +364,59 @@ export default {
         }
       })
     },
-    doVottingResultSubmit: function () {
-      var vm = this
-      if (vm.showCaptcha) {
+    showFormVerify () {
+      let vm = this
+      let valid = false
+      for (var key in vm.votingItems) {
+        if (String(vm.votingItems[key]['selected']) !== '0') {
+          valid = true
+        }
+      }
+      if (valid) {
+        vm.dialogVerify = true
+        vm.$refs.formVerify.resetValidation()
+        vm.createCaptcha()
+      } else {
+        toastr.error('Bạn chưa chọn đánh giá nào')
+      }
+    },
+    submitForm () {
+      let vm = this
+      if (vm.$refs.formVerify.validate()) {
         let valid = vm.validateCaptcha()
         if (!valid) {
           return
+        } else {
+          vm.checkDossierInfo()
         }
       } else {
-        vm.showCaptcha = true
         setTimeout (function () {
           vm.createCaptcha()
         }, 100)
         return
       }
+    },
+    checkDossierInfo () {
+      let vm = this
+      let filter = {
+        dossierNo: vm.dossierNo
+      }
+      vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
+        if (String(result.dossierNo) === String(vm.dossierNo)) {
+          if (String(result.applicantIdNo) === String(vm.applicantIdNo)) {
+            vm.doVottingResultSubmit()
+          } else {
+            toastr.error('Hồ sơ ' + vm.dossierNo + ' không phải hồ sơ quý khách đã đăng ký. Quý khách vui lòng kiểm tra lại.')
+          }
+        } else {
+          toastr.error('Hồ sơ ' + vm.dossierNo + ' không tồn tại. Quý khách vui lòng kiểm tra lại.')
+        }
+      }).catch(function () {
+        toastr.error('Hồ sơ ' + vm.dossierNo + ' không tồn tại. Quý khách vui lòng kiểm tra lại.')
+      })
+    },
+    doVottingResultSubmit: function () {
+      var vm = this
       vm.btnLoading = true
       let arrAction = []
       let valid = false
@@ -322,6 +431,7 @@ export default {
       if (valid) {
         Promise.all(arrAction).then(results => {
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          vm.dialogVerify = false
           vm.createCaptcha()
           vm.captchaValue = ''
           vm.btnLoading = false
@@ -379,12 +489,12 @@ export default {
         let result = {
           name: 'Điểm ' + indexAnswer,
           count: Number(votingItems['answersCount']),
-          percent: Number(((Number(votingItems['answers'][i]) / Number(votingItems['answersCount'])) * 100).toFixed(1))
+          percent: Number(((Number(votingItems['answers'][i]) / Number(votingItems['answersCount'])) * 100).toFixed(2))
         }
         votingPercent.push(result)
       }
       vm.votingItems[index]['answerPercent'] = votingPercent.reverse()
-      vm.votingItems[index]['averageScore'] = (Number(totalScore) / Number(votingItems['answersCount'])).toFixed(1)
+      vm.votingItems[index]['averageScore'] = (Number(totalScore) / Number(votingItems['answersCount'])).toFixed(2)
     },
     getPercentTotal (votingItems) {
       let vm = this
@@ -449,6 +559,28 @@ export default {
       canv.id = "captcha"
       canv.width = 150
       canv.height = 50
+      let ctx = canv.getContext("2d")
+      ctx.font = "32px Georgia"
+      ctx.strokeText(captcha.join(""), 0, 30)
+      vm.captchaCode = captcha.join("")
+      document.getElementById("captcha").appendChild(canv)
+    },
+    createCaptcha () {
+      let vm = this
+      document.getElementById('captcha').innerHTML = "";
+      let charsArray = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@!#&*"
+      let lengthOtp = 6
+      let captcha = []
+      for (var i = 0; i < lengthOtp; i++) {
+        var index = Math.floor(Math.random() * charsArray.length + 1)
+        if (captcha.indexOf(charsArray[index]) == -1)
+          captcha.push(charsArray[index])
+        else i--
+      }
+      let canv = document.createElement("canvas")
+      canv.id = "captcha"
+      canv.width = 140
+      canv.height = 42
       let ctx = canv.getContext("2d")
       ctx.font = "32px Georgia"
       ctx.strokeText(captcha.join(""), 0, 30)

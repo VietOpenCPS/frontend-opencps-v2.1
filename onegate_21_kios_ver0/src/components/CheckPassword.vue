@@ -5,11 +5,7 @@
         <div style="width: calc(100% - 150px)">
           <v-layout wrap class="text-xs-center">
             <v-flex xs12 class="pr-2">
-              <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-                <!-- <div class="input-group__input">
-                  <input id="passCheck" class="kios-input" data-layout="normal" @keyup.enter="submitPass" @focus="show" aria-label="Số hồ sơ" placeholder="Nhập mã tra cứu" type="text">
-                  <i v-if="visible" @click="clear('passCheck')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-                </div> -->
+              <div class="">
                 <div class="input-custom" style="width:100%">
                   <input id="passCheck" type="text" @keyup.enter="submitPass" @focus="show" required="required" />
                   <span class="bar"></span>

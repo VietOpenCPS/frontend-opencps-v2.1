@@ -7,71 +7,21 @@
       </v-chip>
     </div> -->
     <div class="wrap-scroll py-2" :class="!isMobile && votingItems.length > 2 ? 'wrap-scroll-votting' : ''">
-      <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" :class="visible ? 'overlayActive': ''">
-        <div class="text-bold">
+      <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" :class="visible ? 'overlayActive': ''" :style="daDanhGia ? 'pointer-events: none !important' : ''">
+        <div class="text-bold pl-3">
           {{index + 1}}.&nbsp; {{ item.subject }}
         </div>
         <v-radio-group class="ml-3 pt-2 mt-0" v-model="item.selected" row>
           <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1"></v-radio>
         </v-radio-group>
-        <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
-          <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
-            <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
-          </v-flex>
-        </v-layout> -->
       </div>
     </div>
     <div :class="visible ? 'validDanhGiaCLDV': ''">
-      <v-layout wrap :class="!isMobile ? 'mt-4' : 'mt-0'" v-if="!isSigned && votingItems.length > 0">
-        <v-flex xs12 sm6 :class="!isMobile ? 'pr-3' : 'pr-0'">
-          <v-layout wrap>
-            <div style="width:110px" class="text-bold">Mã hồ sơ <span style="color:red">*</span></div>
-            <div style="width:calc(100% - 110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
-              <div class="input-group__input">
-                <input id="dossierIdNoKey" style="width:calc(100% - 40px)" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập mã hồ sơ" type="text">
-                <i v-if="visible" @click="clear('dossierIdNoKey')" style="padding: 5px;" aria-hidden="true" class="py-0 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-              </div>
-              <div class="mt-1" v-if="!validPass1">
-                <div class="input-group__messages" style="color:red">Mã hồ sơ là bắt buộc!</div>
-              </div>
-            </div>
-          </v-layout>
-        </v-flex>
-        <!-- <v-flex xs12 sm6 :class="!isMobile ? 'pl-3' : 'pl-0 mt-2'">
-          <v-layout wrap>
-            <div style="width:110px" class="text-bold">Số CMND <span style="color:red">*</span></div>
-            <div style="width: calc(100% - 110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
-              <div class="input-group__input">
-                <input id="applicantIdNo" style="width:calc(100% - 40px)" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
-                <i v-if="visible" style="padding: 5px;" @click="clear('applicantIdNo')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-              </div>
-              <div class="mt-1" v-if="!validPass2">
-                <div class="input-group__messages" style="color:red">Số CMND là bắt buộc!</div>
-              </div>
-            </div>
-          </v-layout>
-        </v-flex> -->
-
-        <v-flex xs12 sm6 :class="!isMobile ? 'pl-3' : 'pl-0 mt-2'">
-          <v-layout wrap>
-            <div style="width:110px" class="text-bold">Mã bí mật<span style="color:red">*</span></div>
-            <div style="width: calc(100% - 110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
-              <div class="input-group__input">
-                <input id="applicantIdNo" style="width:calc(100% - 40px)" class="kios-input" data-layout="normal" @focus="show" aria-label="Mã bí mật" placeholder="Nhấn để nhập mã bí mật" type="text">
-                <i v-if="visible" style="padding: 5px;" @click="clear('applicantIdNo')" aria-hidden="true" class="py-0 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-              </div>
-              <div class="mt-1" v-if="!validPass2">
-                <div class="input-group__messages" style="color:red">Mã bí mật là bắt buộc!</div>
-              </div>
-            </div>
-          </v-layout>
-        </v-flex>
-      </v-layout>
       <div class="text-xs-center mt-4">
         <v-btn color="primary"
           :loading="loadingAction"
           :disabled="loadingAction"
-          @click="submitVoting"
+          @click="submitVotingDossier"
           class="kios-btn"
         >Gửi kết quả</v-btn>
       </div>
@@ -113,7 +63,10 @@ export default {
       useKbEvents: true,
       preventClickEvent: false
     },
-    detailDossierMC: ''
+    isDvc: false,
+    daDanhGia: false,
+    serverConfigVoting: "SERVER_SCT",
+    votingItemsResult: []
   }),
   computed: {
     isMobile () {
@@ -122,19 +75,26 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.isDvc = isDvcConfig
+    } catch (error) {
+    }
+    try {
+      vm.serverConfigVoting = serverConfigVoting
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       var vm = this
-      vm.isSigned = window.themeDisplay.isSignedIn()
-      // vm.isSigned = true
-      vm.validPass2 = true
+      // 
       let filter = {
+        className: 'dossier',
+        classPk: 0,
+        serverCode: vm.serverConfigVoting,
+        isDvc: vm.isDvc
       }
-      vm.$store.dispatch('loadVotingNew', filter).then(function (result) {
+      vm.$store.dispatch('loadVoting', filter).then(function (result) {
         vm.votingItems = result
-        console.log('votingItems', vm.votingItems)
-        vm.loading = false
       }).catch(function (reject) {
-        vm.loading = false
       })
     })
   },
@@ -142,83 +102,179 @@ export default {
     let vm = this
     vm.urlQR = window.location.href
   },
-  watch: {},
+  watch: {
+    '$route': function (newRoute, oldRoute) {
+      let vm = this
+      try {
+        vm.isDvc = isDvcConfig
+      } catch (error) {
+      }
+    }
+  },
   methods: {
     submitVoting () {
-      var vm = this
-
-      if ($('#applicantIdNo').val() === '') {
-        vm.validPass2 = false
-      } else {
-        vm.validPass2 = true
+      let vm = this
+      let filter = {
+        password: $('#applicantIdNo').val(),
+        dossierId: $('#dossierIdNoKey').val()
       }
-      if ($('#dossierIdNoKey').val() === '') {
-        vm.validPass1 = false
-      } else {
-        vm.validPass1 = true
-      }
-      if (vm.validPass1 && vm.validPass2) {
-        let filter = {
-          password: $('#applicantIdNo').val(),
-          dossierId: $('#dossierIdNoKey').val()
+      vm.$store.dispatch('getDossierDetailPass', filter).then(function (result) {
+        if (result.status && result.status.toString() === '203') {
+          toastr.error('Mã hồ sơ hoặc mã tra cứu không chính xác. Vui lòng thử lại.')
+        } else if (result.status && result.status.toString() === '200') {
+          vm.doResultVotingMC()
         }
-        vm.$store.dispatch('getDossierDetailPass', filter).then(function (result) {
-          if (result.status && result.status.toString() === '203') {
-            toastr.error('Mã hồ sơ hoặc mã tra cứu không chính xác. Vui lòng thử lại.')
-          } else if (result.status && result.status.toString() === '200') {
-            vm.doResultVotingMC()
-          }
-        }).catch(function (reject) {
-          vm.loading = false
-          toastr.error('Lỗi hệ thống')
-        })
-
-      }
+      }).catch(function (reject) {
+        vm.loading = false
+        toastr.error('Lỗi hệ thống')
+      })
 
     },
-    doResultVoting () {
+    submitVotingDossier () {
+      let vm = this
+      if ($('#dossierNoKey').val() && $('#secretKey').val()) {
+        vm.doLoadingDataHoSo()
+      } else {
+        toastr.clear()
+        toastr.error('Vui lòng nhập mã hồ sơ, mã bí mật để đánh giá')
+      }
+      
+    },
+    doLoadingDataHoSo () {
+      let vm = this
+      vm.dossierList = []
+      // vm.loadingTable = true
+      let currentQuery = router.history.current.query
+      let filter = null
+      filter = {
+        dossierNo: $('#dossierNoKey').val(),
+        start: 0,
+        end: 1
+      }
+      vm.$store.dispatch('loadingDanhSachHoSo', filter).then(function (result) {
+        if(result.data && result.data.length){
+          let dossier = result.data[0]
+          if (filter.dossierNo !== dossier['dossierNo']) {
+            toastr.error('Mã hồ sơ không chính xác. Vui lòng kiểm tra lại')
+            return
+          }
+          if (dossier.dossierStatus === 'done' || (dossier.dossierStatus !== 'done' && dossier.dossierOverdue.indexOf('Quá') >=0)) {
+            let filter2 = {
+              password: currentQuery.hasOwnProperty('secret') ? currentQuery.secret : '',
+              dossierId: dossier.dossierId,
+              referenceUid: dossier.referenceUid,
+              isDvc: vm.isDvc,
+              serverCode: 'SERVER_' + dossier['govAgencyCode']
+            }
+            vm.$store.dispatch('getDossierDetailPass', filter2).then(function (res) {
+              if (String(dossier.hasPassword) !== String(filter2.password)) {
+                toastr.error('Mã bí mật không chính xác')
+                return
+              }
+              if(res && res.data && res.data.dossierId){
+                vm.govAgencySelected = res.data.dossierId
+                vm.detailDossierMC = res.data
+                let valid = vm.votingItems.filter(function (item) {
+                  return item.selected == 0
+                })
+                if (valid && valid.length > 0) {
+                  toastr.error('Vui lòng thực hiện đánh giá tất cả các tiêu chí')
+                  return
+                }
+                vm.checkDaDanhGia()
+              } else {
+                toastr.error('Mã bí mật không chính xác')
+              }
+            }).catch(function (reject) {
+              toastr.error('Mã bí mật không chính xác')
+            })
+          } else {
+            toastr.error('Chỉ hồ sơ đã hoàn thành giải quyết hoặc quá hạn giải quyết mới được thực hiện đánh giá. Xin cảm ơn.')
+          }
+          
+        } else {
+          toastr.error('Mã hồ sơ không chính xác. Vui lòng kiểm tra lại')
+        }
+      }).catch(reject => {
+        toastr.error('Mã hồ sơ không chính xác. Vui lòng kiểm tra lại')
+      })
+    },
+    checkDaDanhGia () {
+      let vm = this
+      let filter = {
+        className: 'dossier',
+        classPk: vm.detailDossierMC.dossierId,
+        serverCode: 'SERVER_' + vm.detailDossierMC['govAgencyCode'],
+        isDvc: vm.isDvc
+      }
+      vm.$store.dispatch('loadVoting', filter).then(function (result) {
+        vm.loading = false
+        if (result && result.length > 0) {
+          let valid = result.filter(function (item) {
+            return item.answersCount
+          })
+          if (valid && valid.length > 0) {
+            vm.daDanhGia = true
+            toastr.success('Thông tin hồ sơ trên bạn đã thực hiện đánh giá')
+            return
+          } else {
+            for (let index in result) {
+              result[index].selected = vm.votingItems[index]['selected']
+            }
+            vm.votingItemsResult = result
+            if (!vm.isDvc) {
+              vm.doResultVotingDossier()
+            } else {
+              vm.doResultVotingMC()
+            }
+            
+          }
+        }
+        
+      }).catch(function (reject) {
+        vm.loading = false
+      })
+    },
+    doResultVotingDossier () {
       var vm = this
       let arrAction = []
-      if (vm.votingItems.length > 0) {
+      if (vm.votingItemsResult.length > 0) {
         vm.loadingAction = true
-        for (var index in vm.votingItems) {
-          vm.votingItems[index]['className'] = 'govagency'
-          vm.votingItems[index]['classPk'] = vm.administration
-          arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
+        for (var index in vm.votingItemsResult) {
+          vm.votingItemsResult[index]['className'] = 'dossier'
+          vm.votingItemsResult[index]['classPk'] = vm.detailDossierMC.dossierId
+          arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItemsResult[index]))
         }
         Promise.all(arrAction).then(results => {
           vm.loadingAction = false
           toastr.success('Đánh giá của bạn được gửi thành công')
-
-          $('#applicantIdNo').val('')
-          $('#dossierIdNoKey').val('')
-          let filter = {
-          }
-          vm.$store.dispatch('loadVotingNew', filter).then(function (result) {
-            vm.votingItems = result
-          }).catch(function (reject) {
+          vm.$router.push({
+            path: '/danh-gia-mdhl'
           })
         }).catch(xhr => {
           vm.loadingAction = false
+          toastr.error('Gửi đánh giá không thành công')
         })
       }
     },
     doResultVotingMC () {
       let vm = this
       let arrAction = []
-      if (vm.votingItems.length > 0) {
+      if (vm.votingItemsResult.length > 0) {
         vm.loadingAction = true
-        for (var index in vm.votingItems) {
-          vm.votingItems[index]['className'] = 'dossier'
-          vm.votingItems[index]['classPk'] = vm.detailDossierMC.dossierId
-          vm.votingItems[index]['serverCode'] = 'SERVER_' + vm.detailDossierMC['govAgencyCode']
-          arrAction.push(vm.$store.dispatch('submitVotingMC', vm.votingItems[index]))
+        for (var index in vm.votingItemsResult) {
+          vm.votingItemsResult[index]['className'] = 'dossier'
+          vm.votingItemsResult[index]['classPk'] = vm.detailDossierMC.dossierId
+          vm.votingItemsResult[index]['serverCode'] = 'SERVER_' + vm.detailDossierMC['govAgencyCode']
+          arrAction.push(vm.$store.dispatch('submitVotingMC', vm.votingItemsResult[index]))
         }
         Promise.all(arrAction).then(results => {
           vm.loadingAction = false
-          vm.loadVoting()
           toastr.clear()
           toastr.success('Đánh giá của bạn được gửi thành công')
+          vm.$router.push({
+            path: '/danh-gia-mdhl'
+          })
         }).catch(xhr => {
           vm.loadingAction = false
           toastr.clear()

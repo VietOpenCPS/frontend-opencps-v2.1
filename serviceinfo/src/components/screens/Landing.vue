@@ -4,7 +4,8 @@
     <div class="list-thu-tuc" v-if="!isMobile">
       <div class="row-header no__hidden_class">
         <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
-          <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
+          <span v-if="!setAgency">DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
+          <span v-else style="text-transform: uppercase;">THỦ TỤC HÀNH CHÍNH {{govAgencySelectedName}}</span>
         </div>
         <div class="layout row wrap header_tools row-blue">
           <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
@@ -30,7 +31,7 @@
         </div> 
       </div>
       <v-layout wrap class="white py-2">
-        <v-flex :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2">
+        <v-flex :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2" v-if="!setAgency">
           <v-autocomplete
             class="select-border"
             :items="govAgencyList"
@@ -44,7 +45,7 @@
             box
           ></v-autocomplete>
         </v-flex>
-        <v-flex v-if="hasCoQuanThucHien" :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2">
+        <v-flex v-if="hasCoQuanThucHien && !setAgency" :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2">
           <v-autocomplete
             class="select-border"
             :items="govAgencyListThucHien"
@@ -58,7 +59,7 @@
             box
           ></v-autocomplete>
         </v-flex>
-        <v-flex :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2">
+        <v-flex :class="setAgency ? 'xs12 sm6' : (hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4')" class="px-2">
           <v-autocomplete
             class="select-border"
             :items="domainListCurrent"
@@ -72,7 +73,7 @@
             box
           ></v-autocomplete>
         </v-flex>
-        <v-flex :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2">
+        <v-flex :class="setAgency ? 'xs12 sm6' : (hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4')" class="px-2">
           <v-autocomplete
             class="select-border"
             :items="levelList"
@@ -144,7 +145,7 @@
                   style="pointer-events: none;min-width: 110px;">Mức độ {{props.item.maxLevel}}</v-btn>
                 </div>
               </td>
-              <td class="text-xs-center" v-if="!userLoginInfomation || !userLoginInfomation.hasOwnProperty('className') || (userLoginInfomation && userLoginInfomation.hasOwnProperty('className') &&  userLoginInfomation.className !== 'org.opencps.usermgt.model.Employee')">
+              <td class="text-xs-center" v-if="!setAgency && (!userLoginInfomation || !userLoginInfomation.hasOwnProperty('className') || (userLoginInfomation && userLoginInfomation.hasOwnProperty('className') &&  userLoginInfomation.className !== 'org.opencps.usermgt.model.Employee'))">
                 <content-placeholders v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -235,7 +236,10 @@
     <!-- layout for mobile -->
     <div class="list-thu-tuc" v-else>
       <div class="row-header" style="background-color: #0054a6">
-        <div class="ml-2 py-2 text-bold white--text"> <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span> </div>
+        <div class="ml-2 py-2 text-bold white--text"> 
+          <span v-if="!setAgency">DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
+          <span v-else style="text-transform: uppercase;">THỦ TỤC HÀNH CHÍNH {{govAgencySelectedName}}</span>
+        </div>
         <div class="layout row wrap header_tools row-blue">
           <div class="flex text-right" style="margin-left: auto;">
             <v-btn flat class="my-0 mx-0 btn-border-left white--text" @click="goBack" active-class="temp_active">
@@ -254,9 +258,10 @@
             item-text="administrationName"
             item-value="administrationCode"
             :hide-selected="true"
-            clearable
+            :clearable="setAgency ? false : true"
             @change="changeAdministration"
             box
+            :style="setAgency ? 'pointer-events: none;' : ''"
           ></v-select>
         </v-flex>
         <v-flex xs12 sm6 md3 class="px-2 input-group--text-field-box">
@@ -672,6 +677,7 @@ export default {
     totalThuTuc: 0,
     thutucPage: 1,
     govAgencySelected: {},
+    govAgencySelectedName: '',
     govAgencyThucHienSelected: {},
     domainListCurrent: [],
     domainSelected: {},
@@ -731,7 +737,8 @@ export default {
     govAgencyTiepNhanSelected: '',
     selectGuide: false,
     onlyLoginDvcqg: false,
-    titleNopHoSo: ''
+    titleNopHoSo: '',
+    setAgency: false     /**fix 1 đơn vị */
   }),
   computed: {
     govAgencyList () {
@@ -807,6 +814,9 @@ export default {
       vm.makeImageCap()
       let current = vm.$router.history.current
       let currentQuery = current.query
+      if (currentQuery.hasOwnProperty('setAgency')) {
+        vm.setAgency = true
+      }
       if (vm.keyCodeDvcqg) {
         if (currentQuery.hasOwnProperty(vm.keyCodeDvcqg) && currentQuery[vm.keyCodeDvcqg]) {
           let url = window.location.href.split('?')[0] + '/' + currentQuery[vm.keyCodeDvcqg] + '?' + window.location.href.split('?')[1]
@@ -870,11 +880,7 @@ export default {
       // 
     })
   },
-  updated () {
-    let vm = this
-    vm.$nextTick(function () {
-    })
-  },
+  updated () {},
   mounted () {
     if (this.isMobile) {
       $('.input-search input').css('margin-top', '5px')
@@ -887,6 +893,9 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
+      if (currentQuery.hasOwnProperty('setAgency')) {
+        vm.setAgency = true
+      }
       vm.domainListCurrent = []
       if ((currentQuery.hasOwnProperty('agency') && currentQuery['agency']) || vm.index) {
         let filterDomain = {
@@ -900,6 +909,11 @@ export default {
       }
       vm.govAgencySelected = vm.govAgencyThucHienSelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
       vm.govAgencySelected = currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : '')
+      if (vm.setAgency && vm.govAgencySelected) {
+        vm.govAgencySelectedName = vm.govAgencyList.filter(function(item) {
+          return item.administrationCode === vm.govAgencySelected
+        })[0]['administrationName']
+      }
       vm.govAgencyThucHienSelected = currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
@@ -908,11 +922,21 @@ export default {
     },
     userLoginInfomation (val) {
       let vm = this
-      if (val.className === 'org.opencps.usermgt.model.Employee') {
+      if (val.className === 'org.opencps.usermgt.model.Employee' || vm.setAgency) {
         vm.headers = vm.headers.filter(function (item) {
           return !item.hasOwnProperty('type')
         })
       }
+    },
+    govAgencyList (val) {
+      let vm = this
+      vm.$nextTick(function () {
+        if (vm.setAgency && vm.govAgencySelected && vm.govAgencyList && vm.govAgencyList.length > 0) {
+          vm.govAgencySelectedName = vm.govAgencyList.filter(function(item) {
+            return item.administrationCode === vm.govAgencySelected
+          })[0]['administrationName']
+        }
+      })
     }
   },
   methods: {
@@ -923,6 +947,11 @@ export default {
       let currentQuery = current.query
       vm.govAgencySelected = vm.govAgencyThucHienSelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
       vm.govAgencySelected = currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : '')
+      if (vm.setAgency && vm.govAgencySelected && vm.govAgencyList && vm.govAgencyList.length > 0) {
+        vm.govAgencySelectedName = vm.govAgencyList.filter(function(item) {
+          return item.administrationCode === vm.govAgencySelected
+        })[0]['administrationName']
+      }
       vm.govAgencyThucHienSelected = currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
@@ -942,7 +971,7 @@ export default {
           vm.domainListCurrent = result
         })
       }
-      if (vm.userLoginInfomation && vm.userLoginInfomation.className === 'org.opencps.usermgt.model.Employee') {
+      if (vm.userLoginInfomation && vm.userLoginInfomation.className === 'org.opencps.usermgt.model.Employee' || vm.setAgency) {
         vm.headers = vm.headers.filter(function (item) {
           return !item.hasOwnProperty('type')
         })
@@ -1338,15 +1367,17 @@ export default {
     },
     viewDetail (item) {
       let vm = this
+      let urlRedirect = vm.pathRouter + item.serviceInfoId
       if (item.serviceCodeDVCQG) {
-        vm.$router.push({
-          path: vm.pathRouter + item.serviceInfoId + '?code=' + item.serviceCodeDVCQG
-        })
-      } else {
-        vm.$router.push({
-          path: vm.pathRouter + item.serviceInfoId
-        })
+        urlRedirect = urlRedirect + '?code=' + item.serviceCodeDVCQG
       }
+      if (vm.setAgency) {
+        urlRedirect = vm.pathRouter + item.serviceInfoId + '?setAgency'
+      }
+      
+      vm.$router.push({
+        path: urlRedirect
+      })
     },
     createDossier (item, serviceInfoItem) {
       let vm = this

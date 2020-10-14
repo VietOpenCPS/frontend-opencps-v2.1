@@ -299,6 +299,16 @@ export default {
             })
           }
         })
+        
+        // let pAuth = Liferay.authToken
+        // $.post("?p_p_id=com_liferay_login_web_portlet_LoginPortlet&p_p_lifecycle=1&p_p_state=maximized&p_p_mode=view&_com_liferay_login_web_portlet_LoginPortlet_javax.portlet.action=%2Flogin%2Flogin&_com_liferay_login_web_portlet_LoginPortlet_mvcRenderCommandName=%2Flogin%2Flogin&p_auth=" + pAuth,
+        // {
+        //   "_com_liferay_login_web_portlet_LoginPortlet_login": vm.npmreactlogin_login,
+        //   "_com_liferay_login_web_portlet_LoginPortlet_password": vm.npmreactlogin_password
+        // },
+        // function(data, status){
+        //   window.location.href = window.location.origin
+        // })
       }
     },
     doLogOut () {

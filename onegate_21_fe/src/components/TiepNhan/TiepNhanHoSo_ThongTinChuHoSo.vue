@@ -723,21 +723,21 @@ export default {
     checkDelegateIdNo: false,
     checkApplicantId: false,
     requiredOptions: {
-      applicantIdNo: false,
+      applicantIdNo: true,
       applicantName: true,
       address: true,
       cityCode: true,
       districtCode: true,
       wardCode: true,
-      contactTelNo: false,
+      contactTelNo: true,
       contactEmail: false,
-      delegateIdNo: false,
-      delegateName: false,
-      delegateAddress: false,
-      delegateCityCode: false,
-      delegateDistrictCode: false,
-      delegateWardCode: false,
-      delegateTelNo: false,
+      delegateIdNo: true,
+      delegateName: true,
+      delegateAddress: true,
+      delegateCityCode: true,
+      delegateDistrictCode: true,
+      delegateWardCode: true,
+      delegateTelNo: true,
       delegateEmail: false
     },
     valid_thongtinchuhoso: false,
@@ -839,7 +839,7 @@ export default {
     functionTimeOut: null,
     dialog_applicantInfos: false,
     dialog_applicantList: false,
-    applicantConfig: true,
+    applicantConfig: false,
     titleEdit: 'Thông tin công dân, tổ chức, doanh nghiệp',
     applicantEdit: '',
     dialog_editApplicant: false,
@@ -916,7 +916,7 @@ export default {
     wardItems: [],
     valid: false,
     loadingTable: false,
-    hasOrganization: false
+    hasOrganization: true
   }),
   computed: {
     loading () {
@@ -950,7 +950,7 @@ export default {
   created () {
     let vm = this
     if (vm.formCode === "NEW") {
-      // vm.thongTinNguoiNopHoSo.sameUser = true
+      vm.thongTinNguoiNopHoSo.sameUser = true
     }
     if (vm.hasOrganization) {
       vm.labelSwitch = {
@@ -1110,6 +1110,7 @@ export default {
   methods: {
     initData (data) {
       var vm = this
+      console.log('data_init_chuhoso', data)
       vm.$store.commit('setApplicantId', data.applicantIdNo)
       let tempData = {
         delegateName: data.delegateName,
@@ -1157,10 +1158,10 @@ export default {
         vm.$store.getters.getDictItems(filter).then(function (result) {
           vm.citys = result.data
           // set default cityCode
-          // if (vm.formCode === "NEW") {
-          //   vm.thongTinChuHoSo['cityCode'] = 87
-          //   vm.thongTinChuHoSo['cityName'] = 'Tỉnh Đồng Tháp'
-          // }
+          if (vm.formCode === "NEW" && !thongTinChuHoSoTemp['cityCode']) {
+            vm.thongTinChuHoSo['cityCode'] = 87
+            vm.thongTinChuHoSo['cityName'] = 'Tỉnh Đồng Tháp'
+          }
           
         })
         setTimeout(function () {
@@ -1330,14 +1331,12 @@ export default {
       vm.functionTimeOut = setTimeout(function () {
         if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2') || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
           vm.checkApplicantInfos()
-          vm.thongTinChuHoSo.applicantIdNo = query.trim()
+          // vm.thongTinChuHoSo.applicantIdNo = query.trim()
         }
         vm.$store.commit('setApplicantId', query)
       }, 2000)
-      console.log(query)
-      if (query.trim().length === 0 ) {
+      if (query.trim().length === 0) {
         vm.thongTinChuHoSo.applicantIdNo = ''
-        console.log(vm.thongTinChuHoSo.applicantIdNo)
         return null
       }
       let url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
@@ -1356,21 +1355,7 @@ export default {
               let items = []
               if (response.data.hasOwnProperty('data')) {
                 items = response.data.data
-                if(query.trim().length > 100) {
-                  toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
-                  vm.thongTinChuHoSo.applicantIdNo = ''
-                  return null
-                } else {
-                  vm.thongTinChuHoSo.applicantIdNo = query.trim()
-                }
               } else {
-                  if(query.trim().length > 100) {
-                    toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
-                    vm.thongTinChuHoSo.applicantIdNo = ''
-                    return null
-                  } else {
-                    vm.thongTinChuHoSo.applicantIdNo = query.trim()
-                  }
               }
               resolve(items)
             })
@@ -1401,21 +1386,7 @@ export default {
               let items = []
               if (response.data.hasOwnProperty('data')) {
                 items = response.data.data
-                if(query.trim().length > 100) {
-                  toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
-                  vm.thongTinNguoiNopHoSo.delegateIdNo = ''
-                  return null
-                } else {
-                  vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
-                }
               } else {
-                if(query.trim().length > 100) {
-                  toastr.error(vm.labelSwitch[vm.thongTinChuHoSo.userType].cmtnd  + ' phải ít hơn 100 kí tự')
-                  vm.thongTinNguoiNopHoSo.delegateIdNo = ''
-                  return null
-                } else {
-                  vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
-                }
               }
               resolve(items)
             })

@@ -523,25 +523,9 @@ export default {
         state: ''
       }
       axios.post('/o/rest/v2/dvcqgsso/logout', data, param).then(function (response) {
-        let paramLogout = {
-          headers: {
-            Token: window.Liferay ? window.Liferay.authToken : '',
-          }
-        }
-        axios.get('/c/portal/logout', paramLogout).then(function (response) {
-          window.location.href = urlRedirect
-        }).catch(function (error) {
-        })
+        window.location.href = "/c/portal/logout"
       }).catch(function (error) {
-        let paramLogout = {
-          headers: {
-            Token: window.Liferay ? window.Liferay.authToken : '',
-          }
-        }
-        axios.get('/c/portal/logout', paramLogout).then(function (response) {
-          window.location.href = urlRedirect
-        }).catch(function (error) {
-        })
+        window.location.href = "/c/portal/logout"
       })
     },
     goToDangKyPage() {

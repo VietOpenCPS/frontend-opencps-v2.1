@@ -70,16 +70,6 @@
           return {}
         }
       },
-      dataSocket: {
-        // getter
-        get: function() {
-          return this.$store.getters.dataSocket
-        },
-        // setter
-        set: function(newValue) {
-          this.$store.commit('setdataSocket', newValue)
-        }
-      },
       pullCounterOrg () {
         return this.$store.getters.pullCounter
       },
@@ -112,7 +102,7 @@
       let vm = this
       vm.$nextTick(function () {
         vm.$store.dispatch('getContentFile', vm.formid).then(function (result) {
-          console.log('formScript --->', result)
+          // console.log('formScript --->', result)
           vm.formTempalate = result
           window.$('#formDelivert').empty()
           let formScript, formData
@@ -122,6 +112,7 @@
           } else {
             formScript = {}
           }
+          // console.log('form-Data', vm.datainput)
           if (String(vm.id) !== '0' && vm.datainput) {
             formData = eval('(' + vm.datainput + ')')
           } else {

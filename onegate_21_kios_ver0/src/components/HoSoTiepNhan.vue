@@ -23,7 +23,7 @@
                     class="kios-btn"
                     style="top: -5px;
                     position: absolute;
-                    right: -4px;
+                    right: -7px;
                     height: 48px !important;
                     border-bottom-left-radius: 0px;"
                   >
@@ -127,7 +127,7 @@ export default {
     agencies: [],
     totalPages: 0,
     pagination: {
-      rowsPerPage: 5,
+      rowsPerPage: 7,
       page: 1
     },
     headerTable: [

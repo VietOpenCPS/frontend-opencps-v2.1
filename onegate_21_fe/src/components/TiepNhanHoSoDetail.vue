@@ -112,7 +112,7 @@
                   <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                   <span>Tài liệu chứng thực</span>
                 </div>
-                <tai-lieu-chung-thuc ref="tailieuchungthuc" :dossierId="thongTinChiTietHoSo.dossierId" :formCodeInput="formCode" :onlyView="false"></tai-lieu-chung-thuc>
+                <tai-lieu-chung-thuc ref="tailieuchungthuc" :dossierInfo="thongTinChiTietHoSo" :formCodeInput="formCode" :onlyView="false"></tai-lieu-chung-thuc>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
@@ -166,14 +166,14 @@
             </v-expansion-panel>
           </div>
           <!--  -->
-          <!-- <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
+          <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
                 <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát hồ sơ</div>
                 <dich-vu-chuyen-phat-ho-so ref="dichvuchuyenphathoso" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-          </div> -->
+          </div>
           <!--  -->
           <div style="position: relative;" v-if="viaPortalDetail !== 0">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -386,7 +386,18 @@
               :disabled="loadingAction"
             >
               <v-icon size="20">save</v-icon> &nbsp;
-              Lưu nháp
+              <span v-if="!showGuiHoSo">Lưu</span>
+              <span v-else>Lưu nháp</span>
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-tab>
+          <v-tab href="#tab-4" @click="luuHoSo('send')" v-if="originality === 1 && showGuiHoSo" class="px-0 py-0"> 
+            <v-btn flat class=""
+              :loading="loadingAction"
+              :disabled="loadingAction"
+            >
+              <v-icon size="20">save</v-icon> &nbsp;
+              Gửi hồ sơ
               <span slot="loader">Loading...</span>
             </v-btn>
           </v-tab>
@@ -877,7 +888,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: false,
+    notifyConfig: true,
     fromViaPostal: false,
     fromViaPostalConfig: false,
     smsNotify: true,
@@ -917,6 +928,7 @@ export default {
     tiltleDialog: '',
     requiredConfigData: false,
     templateDescription : '',
+    actionDetailSendDossierDvc: '',
     actionDetail: '',
     mauCongVan: '',
     tphsCV: '',
@@ -1047,7 +1059,9 @@ export default {
         }
       },
     },
-    applicantIdRequired :true
+    applicantIdRequired :true,
+    showGuiHoSoConfig: false,
+    showGuiHoSo: false
   }),
   computed: {
     loading () {
@@ -1077,6 +1091,10 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      vm.showGuiHoSoConfig = showGuiHoSoConfig
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       let currentQuery = vm.$router.history.current.query
       if (currentQuery.hasOwnProperty('formActionGroup') && currentQuery.formActionGroup) {
@@ -1314,6 +1332,13 @@ export default {
                   let actionList = result2.filter(function (item) {
                     return String(item.enable) === '1' && item.autoEvent !== 'listener'
                   })
+                  let exits = result2.filter(function (item) {
+                    return item.actionCode === 1300 || item.actionCode === '1300'
+                  })
+                  if (exits.length > 0 && vm.showGuiHoSoConfig) {
+                    vm.showGuiHoSo = true
+                    vm.actionDetailSendDossierDvc = exits[0]
+                  }
                   if (actionList.length > 1) {
                     vm.actionDetail = actionList.filter(function (item) {
                       return item.actionCode === 1100 || item.actionCode === '1100'
@@ -1430,7 +1455,7 @@ export default {
         }
       })
     },
-    luuHoSo () {
+    luuHoSo (type) {
       var vm = this
       // console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
@@ -1497,15 +1522,20 @@ export default {
             tempData['vnpostalProfile'] = vnpostal
           }
           setTimeout(function () {
+            vm.loadingAction = true
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               if (vm.formCode === 'UPDATE') {
+                vm.loadingAction = false
                 window.history.back()
                 // vm.goBack()
               } else {
                 var initData = vm.$store.getters.loadingInitData
                 let actionUser = initData.user.userName ? initData.user.userName : ''
                 let actionCodeRequest = vm.actionDetail.actionCode
+                if (type && type === 'send') {
+                  actionCodeRequest = vm.actionDetailSendDossierDvc.actionCode
+                }
                 let dataPostAction = {
                   dossierId: vm.dossierId,
                   actionCode: actionCodeRequest,
@@ -1518,19 +1548,39 @@ export default {
                   createDossiers: '',
                   dueDate: tempData.dueDate
                 }
-                vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-                  // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-                  let currentQuery = vm.$router.history.current.query
-                  vm.$router.push({
-                    path: '/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId,
-                    query: {
-                      activeTab: 'tabs-1'
-                    }
+                if (type && type === 'send') {
+                  let x = confirm('Bạn có chắc chắn gửi hồ sơ này?')
+                  if (x) {
+                    vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+                      vm.loadingAction = false
+                      vm.$router.push({
+                        path: '/danh-sach-ho-so/' + vm.index,
+                        query: {
+                          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                          q: vm.menuConfigsToDo[vm.index]['queryParams']
+                        }
+                      })
+                      vm.tiepNhanState = false
+                    })
+                  } else {
+                    vm.loadingAction = false
+                  }
+                } else {
+                  vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+                    vm.loadingAction = false
+                    let currentQuery = vm.$router.history.current.query
+                    vm.$router.push({
+                      path: '/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId,
+                      query: {
+                        activeTab: 'tabs-1'
+                      }
+                    })
+                    vm.tiepNhanState = false
                   })
-                  vm.tiepNhanState = false
-                })
+                }
               }
             }).catch(function (xhr) {
+              vm.loadingAction = false
               toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
@@ -1552,8 +1602,9 @@ export default {
       let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
       let validThongtinchuhoso = vm.$refs.thongtinchuhoso ? vm.$refs.thongtinchuhoso.showValid() : {validForm: true, validApplicant: true}
       let thongtinchuhosocongvan = vm.$refs.thongtinchuhosocongvan ? vm.$refs.thongtinchuhosocongvan.getThongTinChuHoSo() : {validation: true}
-      
-      if (validThongtinchuhoso['validForm'] && thongtinchuhosocongvan['validation'] && vm.$refs.formTenHoSo.validate() && validThanhPhanHoSo['validForm']) {
+      let validFormTenHoSo = vm.$refs.formTenHoSo ? vm.$refs.formTenHoSo.validate() : true
+
+      if (validThongtinchuhoso['validForm'] && thongtinchuhosocongvan['validation'] && validFormTenHoSo && validThanhPhanHoSo['validForm']) {
         let passValid = false
         if (!validThongtinchuhoso['validApplicant']) {
           let x = confirm(validThongtinchuhoso['message'] + ' Bạn có muốn tiếp tục?')
