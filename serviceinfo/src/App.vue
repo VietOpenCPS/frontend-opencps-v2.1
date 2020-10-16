@@ -297,6 +297,13 @@
         }
         if (currentParams.hasOwnProperty('index') && currentParams['index']) {
           vm.isDetail = true
+          try {
+            if (govTracking_log) {
+              govTracking_log()
+            }
+          } catch (error) {
+            
+          }
         } else {
           vm.isDetail = false
         }

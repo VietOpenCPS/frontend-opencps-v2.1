@@ -1995,8 +1995,19 @@ export const store = new Vuex.Store({
         let url = state.initData.dossierApi + '/' + data.dossierId + '/actions'
         axios.post(url, dataPostActionDossier, options).then(function (response) {
           resolve(response.data)
-          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           commit('setLoading', false)
+          if (data.hasOwnProperty('originality') && data.originality == 1 && data.actionCode == 1300) {
+            let dataCustom
+            if (data.hasOwnProperty('thongtinhoso')) {
+              let createDate = String(data.thongtinhoso.createDate).split(" ")[0].replace(/\//g, "")
+              dataCustom = data.thongtinhoso.dossierId + ';' + createDate + ';' + data.thongtinhoso.applicantName + ';' + data.thongtinhoso.applicantIdNo
+            }
+            let filterTracking = {
+              serviceCode: data.hasOwnProperty('thongtinhoso') ? data.thongtinhoso.serviceCode : '',
+              customData: dataCustom ? dataCustom : ''
+            }
+            store.dispatch('trackingBTTT', filterTracking)
+          }
           store.dispatch('getActiveGetCounter', !state.activeGetCounter)
         }).catch(function (xhr) {
           reject(xhr)
@@ -2999,6 +3010,18 @@ export const store = new Vuex.Store({
             store.dispatch('getActiveGetCounter', !state.activeGetCounter)
             let serializable = response.data
             resolve(serializable)
+            if (filter.hasOwnProperty('originality') && filter.originality == 1 && filter.actionCode == 1300) {
+              let dataCustom
+              if (filter.hasOwnProperty('thongtinhoso')) {
+                let createDate = String(filter.thongtinhoso.createDate).split(" ")[0].replace(/\//g, "")
+                dataCustom = filter.thongtinhoso.dossierId + ';' + createDate + ';' + filter.thongtinhoso.applicantName + ';' + filter.thongtinhoso.applicantIdNo
+              }
+              let filterTracking = {
+                serviceCode: filter.hasOwnProperty('thongtinhoso') ? filter.thongtinhoso.serviceCode : '',
+                customData: dataCustom ? dataCustom : ''
+              }
+              store.dispatch('trackingBTTT', filterTracking)
+            }
           }).catch(function (error) {
             console.log(error)
             toastr.clear()
@@ -4869,6 +4892,32 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getHashStringFile ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        let url = '/o/rest/v2/'
+        axios.get(url, param).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
+    trackingBTTT ({commit, state}, filter) {
+      console.log('trackDVC', filter.serviceCode, filter.customData)
+      try {
+        if (_govaq) {
+          _govaq.push(['trackDVC', filter.serviceCode, '1', filter.customData])
+        }
+      } catch (error) { 
+      }
+    }
     // ----End---------
   },
   mutations: {

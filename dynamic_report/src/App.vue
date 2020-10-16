@@ -141,11 +141,17 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn class="mr-2" color="primary" @click="chotSoLieuBaoCao()">
+          <v-btn class="mr-2" color="primary" @click="chotSoLieuBaoCao()"
+            :loading="loadingChotSoLieu"
+            :disabled="loadingChotSoLieu"
+          >
             <v-icon>save</v-icon> &nbsp;
             Xác nhận
           </v-btn>
-          <v-btn class="" color="primary" @click="dialog_chotsolieu = false">
+          <v-btn class="" color="primary" @click="dialog_chotsolieu = false"
+            :loading="loadingChotSoLieu"
+            :disabled="loadingChotSoLieu"
+          >
             <v-icon>clear</v-icon> &nbsp;
             Hủy
           </v-btn>
@@ -162,6 +168,7 @@
   export default {
     props: ['index'],
     data: () => ({
+      loadingChotSoLieu: false,
       hiddenAside: false,
       dialog: false,
       drawer: null,
@@ -433,10 +440,13 @@
             month: vm.month
           }
         }
+        vm.loadingChotSoLieu = true
         axios.get('/o/rest/statistics', param).then(function (response) {
           toastr.success('Yêu cầu thực hiện thành công')
+          vm.loadingChotSoLieu = false
           vm.dialog_chotsolieu = false
         }).catch(function (error) {
+          vm.loadingChotSoLieu = false
           toastr.error('Yêu cầu thực hiện không thành công')
         })
       },

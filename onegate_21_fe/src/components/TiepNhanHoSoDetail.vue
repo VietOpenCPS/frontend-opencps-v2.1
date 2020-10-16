@@ -1537,6 +1537,8 @@ export default {
                   actionCodeRequest = vm.actionDetailSendDossierDvc.actionCode
                 }
                 let dataPostAction = {
+                  originality: vm.originality,
+                  thongtinhoso: vm.thongTinChiTietHoSo,
                   dossierId: vm.dossierId,
                   actionCode: actionCodeRequest,
                   actionNote: '',
