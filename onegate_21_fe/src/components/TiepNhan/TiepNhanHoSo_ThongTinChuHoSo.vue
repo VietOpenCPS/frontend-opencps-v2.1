@@ -21,7 +21,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span v-if="requiredOptions['applicantIdNo'] || originality === 1" style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span v-if="requiredOptions['applicantIdNo'] || (originality === 1 && requiredOptions['applicantIdNo'])" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2 style="position:relative">
                       <v-text-field
@@ -723,14 +723,14 @@ export default {
     checkDelegateIdNo: false,
     checkApplicantId: false,
     requiredOptions: {
-      applicantIdNo: true,
+      applicantIdNo: false,
       applicantName: true,
       address: true,
-      cityCode: true,
-      districtCode: true,
-      wardCode: true,
+      cityCode: false,
+      districtCode: false,
+      wardCode: false,
       contactTelNo: true,
-      contactEmail: false,
+      contactEmail: true,
       delegateIdNo: true,
       delegateName: true,
       delegateAddress: true,

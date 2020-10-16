@@ -1281,7 +1281,9 @@ export default {
               vm.hiddenFilterDomain = vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain
             }
             // 
-            vm.processListTTHC(currentQuery)
+            if (vm.originality === 3) {
+              vm.processListTTHC(currentQuery)
+            }
             if (!vm.hiddenFilterDomain) {
               vm.processListDomain(currentQuery)
             }

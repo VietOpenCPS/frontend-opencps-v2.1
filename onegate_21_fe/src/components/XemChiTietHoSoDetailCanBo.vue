@@ -168,70 +168,70 @@
               </div>
               <!-- Action button -->
               <div class="px-4 py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
-                <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" :class='{"deactive__btn": String(btnIndex) === String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
-                  v-on:click.native="processPullBtnDetail(item, index)" 
-                  :loading="loadingAction && index === btnIndex"
-                  :disabled="loadingAction || item.enable === 2"
-                  v-if="item.enable > 0 || (item['autoEvent'] === 'special' && thongTinChiTietHoSo && thongTinChiTietHoSo['permission'].indexOf('write') >= 0)"
-                >
-                  {{item.actionName}}
-                  <span slot="loader">Loading...</span>
-                </v-btn>
-                <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" v-for="(item, index) in btnPlugins" v-bind:key="index" 
-                  v-on:click.native="processPullBtnplugin(item, index)"
-                  :loading="loadingPlugin"
-                  :disabled="loadingPlugin"
-                >
-                  {{item.pluginName}} 
-                  <span slot="loader">Loading...</span>
-                </v-btn>
-                <!--  -->
-                <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" v-if="thaoTacPhanCongLai && detailPreAction && Number(detailPreAction['allowAssignUser']) > 2"
-                  v-on:click.native="phanCongLai" 
-                  :loading="loadingAction"
-                  :disabled="loadingAction"
-                >
-                  Phân công lại
-                  <span slot="loader">Loading...</span>
-                </v-btn>
-                <!--  -->
-                <v-btn v-for="(item, index) in btnStepsDynamics" :key="index" color="primary" class="ml-0 mr-2 on-hover-btn" v-if="item.form === 'UPDATE'"
-                  @click="btnActionEvent(item, index)"
-                  :loading="loadingAction"
-                  :disabled="loadingAction"
-                >
-                  {{ item.title }}
-                </v-btn>
-                <!-- Thao tác thu hồi hồ sơ -->
-                <!-- <v-btn color="primary" class="ml-0 mr-2" v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId)
-                && thongTinChiTietHoSo['dossierStatus'] !== 'new' && originality === 3"
-                  v-on:click.native="rollBack()"
-                  :loading="loadingAction"
-                  :disabled="loadingAction"
-                >
-                  Quay lại bước trước
-                  <span slot="loader">Loading...</span>
-                </v-btn> -->
-                <!--  -->
-                <v-menu bottom offset-y v-if="showMenuActionKhac && thongTinChiTietHoSo && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
-                  <v-btn slot="activator" class="on-hover-btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                  <v-list>
-                    <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" @click="btnActionEvent(item, index)" v-if="item.form !== 'UPDATE'">
-                      <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-                    </v-list-tile>
-                    <!-- <v-list-tile v-for="(item, index) in btnDossierDynamics" :key="index" 
-                      @click="processPullBtnDetail(item, index)" 
-                      v-if="checkPemissionSpecialAction(null, currentUser, thongTinChiTietHoSo)"
-                      >
-                      <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
-                    </v-list-tile> -->
-                  </v-list>
-                </v-menu>
+                <v-progress-linear :indeterminate="true" v-if="loadingNextAction"></v-progress-linear>
+                <div v-else>
+                  <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" :class='{"deactive__btn": String(btnIndex) === String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
+                    v-on:click.native="processPullBtnDetail(item, index)" 
+                    :loading="loadingAction && index === btnIndex"
+                    :disabled="loadingAction || item.enable === 2"
+                    v-if="item.enable > 0 || (item['autoEvent'] === 'special' && thongTinChiTietHoSo && thongTinChiTietHoSo['permission'].indexOf('write') >= 0)"
+                  >
+                    {{item.actionName}}
+                    <span slot="loader">Loading...</span>
+                  </v-btn>
+                  <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" v-for="(item, index) in btnPlugins" v-bind:key="index" 
+                    v-on:click.native="processPullBtnplugin(item, index)"
+                    :loading="loadingPlugin"
+                    :disabled="loadingPlugin"
+                  >
+                    {{item.pluginName}} 
+                    <span slot="loader">Loading...</span>
+                  </v-btn>
+                  <!--  -->
+                  <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" v-if="thaoTacPhanCongLai && detailPreAction && Number(detailPreAction['allowAssignUser']) > 2"
+                    v-on:click.native="phanCongLai" 
+                    :loading="loadingAction"
+                    :disabled="loadingAction"
+                  >
+                    Phân công lại
+                    <span slot="loader">Loading...</span>
+                  </v-btn>
+                  <!--  -->
+                  <v-btn v-for="(item, index) in btnStepsDynamics" :key="index" color="primary" class="ml-0 mr-2 on-hover-btn" v-if="item.form === 'UPDATE'"
+                    @click="btnActionEvent(item, index)"
+                    :loading="loadingAction"
+                    :disabled="loadingAction"
+                  >
+                    {{ item.title }}
+                  </v-btn>
+                  <!-- Thao tác thu hồi hồ sơ -->
+                  <!-- <v-btn color="primary" class="ml-0 mr-2" v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId)
+                  && thongTinChiTietHoSo['dossierStatus'] !== 'new' && originality === 3"
+                    v-on:click.native="rollBack()"
+                    :loading="loadingAction"
+                    :disabled="loadingAction"
+                  >
+                    Quay lại bước trước
+                    <span slot="loader">Loading...</span>
+                  </v-btn> -->
+                  <!--  -->
+                  <v-menu bottom offset-y v-if="showMenuActionKhac && thongTinChiTietHoSo && thongTinChiTietHoSo.hasOwnProperty('permission') && thongTinChiTietHoSo['permission'].indexOf('write') >= 0"
+                    style="display: inline-block;position:relative !important">
+                    <v-btn slot="activator" class="on-hover-btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                    <v-list>
+                      <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" @click="btnActionEvent(item, index)" v-if="item.form !== 'UPDATE'">
+                        <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                      </v-list-tile>
+                      <!-- <v-list-tile v-for="(item, index) in btnDossierDynamics" :key="index" 
+                        @click="processPullBtnDetail(item, index)" 
+                        v-if="checkPemissionSpecialAction(null, currentUser, thongTinChiTietHoSo)"
+                        >
+                        <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
+                      </v-list-tile> -->
+                    </v-list>
+                  </v-menu>
+                </div>
               </div>
-              <content-placeholders v-if="loadingAction">
-                <content-placeholders-img />
-                <content-placeholders-heading />
-              </content-placeholders>
               <!--  -->
               <div class="px-4 pt-2" v-if="btnStateVisible && thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(thongTinChiTietHoSo.dossierSyncState) === '1'">
                 <v-progress-circular
@@ -803,6 +803,7 @@ export default {
     btnDossierDynamics: [],
     btnStepsDynamics: [],
     loadingAction: false,
+    loadingNextAction: false,
     indexAction: -1,
     indexActionStep: -1,
     dossierId: '',
@@ -814,8 +815,7 @@ export default {
     listHistoryProcessing: [],
     dossierTemplatesTN: [],
     dossierTemplatesKQ: [],
-    thongTinChiTietHoSo: {
-    },
+    thongTinChiTietHoSo: {},
     dialogPDF: false,
     dialogPDFLoading: false,
     loadingAlpacajsForm: false,
@@ -2052,6 +2052,8 @@ export default {
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
       let filter = {
+        originality: vm.originality,
+        thongtinhoso: dossierItem,
         dossierId: dossierItem.dossierId,
         actionCode: result.actionCode,
         actionUser: actionUser
@@ -2763,7 +2765,9 @@ export default {
       }
       let currentQuery = vm.$router.history.current.query
       vm.dossierId = vm.thongTinChiTietHoSo.dossierId
+      vm.loadingNextAction = true
       vm.$store.dispatch('pullNextactions', filter).then(function (result) {
+        vm.loadingNextAction = false
         if (!result) {
           return
         }
@@ -2816,6 +2820,8 @@ export default {
         }
         // lấy danh sách user reAsign
         vm.loadUserReAsign()
+      }).catch(function () {
+        vm.loadingNextAction = false
       })
       vm.$store.dispatch('loadPlugins', {
         dossierId: vm.thongTinChiTietHoSo.dossierId

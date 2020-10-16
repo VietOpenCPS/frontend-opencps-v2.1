@@ -514,7 +514,7 @@
             <v-flex xs12 sm6 class="text-xs-center" style="cursor: pointer">
               <v-hover>
                 <div slot-scope="{ hover }" style="position: relative;">
-                  <img class="mb-2" src="/o/opencps-store/js/cli/dvc/app/image/logo-viettel-ca.png" alt="trevor" style="background: #fff;">
+                  <img class="mb-2" src="/o/opencps-store/js/cli/dvc/app/image/logo-viettel-ca.png" alt="trevor" style="background: #fff;"><br>
                   <span class="text-bold" style="color: #3a877e">KÝ SỐ VIETTEL CA</span>
                   <v-expand-transition>
                     <div
@@ -526,17 +526,17 @@
                       justify-content: center;
                       position: absolute;
                       width: 100%;"
+                      @click="getHashStringFile"
                     >
                     </div>
                   </v-expand-transition>
                 </div>
               </v-hover>
-              
             </v-flex>
             <v-flex xs12 sm6 class="text-xs-center" style="cursor: pointer">
               <v-hover>
                 <div slot-scope="{ hover }" style="position: relative;height: 100%;">
-                  <img class="mb-2" src="/o/opencps-store/js/cli/dvc/app/image/logo-kyso-bancoyeu.png" alt="trevor" style="background: #fff;">
+                  <img class="mb-2" src="/o/opencps-store/js/cli/dvc/app/image/logo-kyso-bancoyeu.png" alt="trevor" style="background: #fff;"><br>
                   <span class="text-bold" style="color: #0071bd;" v-if="!hover">KÝ SỐ BAN CƠ YẾU CHÍNH PHỦ</span>
                   <v-expand-transition>
                     <div
@@ -1339,7 +1339,6 @@ export default {
     },
     changeApplicantNote () {
       let vm = this
-      console.log('applicantNoteEdit', vm.applicantNoteDossier)
       vm.$store.commit('setApplicantNote', vm.applicantNoteDossier)
     },
     pickFile (item) {
@@ -2325,6 +2324,22 @@ export default {
           vm.loadingFile = false
         })
       }, 100)
+    },
+    getHashStringFile (itemFile) {
+      let vm = this
+      vm.$store.dispatch('getHashStringFile', itemFile).then(res => {
+        console.log('hashString', res)
+        if (res) {
+          // HashOpt: loai ma hash (0: SHA-1; 1:MD5; 2:SHA256)
+          let fileSignReturn = signHash(res, 0) /** chuỗi hash đã có chữ ký */
+
+        } else {
+          toastr.error('Tải tài liệu ký số lên không thành công')
+        }
+        
+      }).catch(reject => {
+        toastr.error('Tải tài liệu ký số lên không thành công')
+      })
     }
   }
 }

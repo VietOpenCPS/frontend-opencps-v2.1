@@ -1160,6 +1160,7 @@ export default {
             //   ]
             // }
           } else {
+            vm.processingTotal = 0
             vm.statisticalYear = [0, 0]
             vm.statistics = {
               receivedCount: 0,

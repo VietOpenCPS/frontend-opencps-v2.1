@@ -69,14 +69,25 @@
             <!-- epayment -->
             <p class="mb-0"><span class="red--text">* </span>&nbsp;Lựa chọn hình thức thanh toán:</p>
             <div class="text-xs-left mt-2 mb-3 ml-0">
-              <v-chip color="indigo" text-color="white"  @click.native="showThanhToanChuyenKhoan"
+              <v-chip class="mb-2" color="indigo" text-color="white"  @click.native="showThanhToanChuyenKhoan"
                 :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 1 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')">
                 <v-avatar :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">
-                  <v-icon>account_balance</v-icon>
+                  <v-icon size=20 style="color: #fff !important">payment</v-icon>
                 </v-avatar>
                 <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán chuyển khoản</span>
               </v-chip>
-              <v-chip v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && !getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('kpdvcqg')" color="orange" text-color="white"
+
+              <v-chip class="mb-2" v-if="showPayGov" color="#3b5ab5" text-color="white"
+                :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 5 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
+                @click.native="toPayGov()"
+              >
+                <v-avatar :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'" >
+                  <img src="/o/opencps-store/js/cli/dvc/app/image/paygov_logo.png?t=983123" alt="trevor" style="background: #fff">
+                </v-avatar>
+                <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán qua Cổng hỗ trợ thanh toán quốc gia</span>
+              </v-chip>
+
+              <v-chip class="mb-2" v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && !getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('kpdvcqg')" color="orange" text-color="white"
                 :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 2 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
                 @click.native="toKeyPay(getEPaymentProfile(paymentProfile.epaymentProfile).keypayUrl)"
               >
@@ -87,7 +98,7 @@
                 <!-- <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán trực tuyến</span> -->
               </v-chip>
 
-              <v-chip v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('kpdvcqg')" color="orange" text-color="white"
+              <v-chip class="mb-2" v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('kpdvcqg')" color="orange" text-color="white"
                 :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 3 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
                 @click.native="toKeyPayDvcqg('kpdvcqg')"
               >
@@ -97,7 +108,7 @@
                 <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán qua Cổng DVCQG</span>
               </v-chip>
 
-              <v-chip v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('ppkpdvcqg')" color="orange" text-color="white"
+              <v-chip class="mb-2" v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('ppkpdvcqg')" color="orange" text-color="white"
                 :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 4 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
                  @click.native="toKeyPayDvcqg('ppkpdvcqg')"
               >
@@ -106,17 +117,10 @@
                 </v-avatar>
                 <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán qua Cổng DVCQG</span>
               </v-chip>
-              <v-chip v-if="showPayGov" color="#3b5ab5" text-color="white"
-                :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 5 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
-                @click.native="toPayGov()"
+              
+              <v-chip class="mb-2" v-if="dataVietelPay" color="green" text-color="white" @click.native="showViettelPay"
+                :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 6 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
               >
-                <v-avatar :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'" >
-                  <img src="/o/opencps-store/js/cli/dvc/app/image/paygov_logo.png?t=983123" alt="trevor" style="background: #fff">
-                </v-avatar>
-                <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán qua Cổng hỗ trợ thanh toán quốc gia</span>
-              </v-chip>
-
-              <v-chip v-if="dataVietelPay" color="green" text-color="white" @click.native="showViettelPay">
                 <v-avatar :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">
                   <img src="/o/opencps-store/js/cli/dvc/app/image/logo-viettelpay.svg"  style="background: #fff">
                 </v-avatar>
@@ -320,7 +324,7 @@ export default {
         //
         if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && vm.paymentProfile.epaymentProfile) {
           let paymentConfigInfo = vm.getEPaymentProfile(vm.paymentProfile.epaymentProfile)
-          if (paymentConfigInfo && paymentConfigInfo.hasOwnProperty('PAYGOV_CONFIG') && paymentConfigInfo['PAYGOV_CONFIG'] && paymentConfigInfo['PAYGOV_CONFIG']['isPaygov']) {
+          if (paymentConfigInfo && paymentConfigInfo.hasOwnProperty('isPaygov') && paymentConfigInfo['isPaygov']) {
             vm.showPayGov = true
             $.getJSON('https://api.ipify.org?format=jsonp&callback=?', function(data) {
               vm.ipAddress = data && data.hasOwnProperty('ip') ? data.ip : ''
@@ -518,6 +522,7 @@ export default {
       let vm = this
       vm.loadingPay = true
       vm.methodSelect = 5
+      vm.isBank = false
       let filter = {
         dossierId: vm.detailDossier.dossierId,
         ipAddress: vm.ipAddress
@@ -534,7 +539,7 @@ export default {
     showViettelPay () {
       let vm = this
       vm.isBank = false
-      vm.methodSelect = 3
+      vm.methodSelect = 6
       vm.$store.commit('setVisibleDoAction', false)
       vm.dialogQrViettelPay = true
     },
