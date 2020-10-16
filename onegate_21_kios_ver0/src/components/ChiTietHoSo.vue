@@ -20,7 +20,7 @@
       </v-expansion-panel> -->
       <v-layout class="wrap">
         <v-flex class="pr-2 pb-2">
-          <span class="text-bold">{{dossierDetail.serviceName}}</span>
+          <span class="text-bold">Tên hồ sơ: {{dossierDetail.dossierName}}</span>
         </v-flex>
       </v-layout>
       <div class="mt-2">
@@ -38,49 +38,20 @@
           <v-tab-item key="1" class="wrap-scroll wrap-scroll-dossier">
             <v-card >
               <v-card-text class="px-0 py-0">
-                <!-- <v-expansion-panel expand  class="expansion-pl ext__form">
-                  <v-expansion-panel-content v-bind:value="true">
-                    <div slot="header" class="text-bold">
-                      <div class="background-triangle-small"> I.</div>
-                      Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
-                    </div>
-                    <div v-for="(item, index) in tailieuNop" :key="index" style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;border-top: 1px solid rgb(221, 221, 221)">
-                      <div class="mr-2" style="min-width: 18px; display: flex; min-height: 38px;">
-                        <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
-                        <div class="header__tphs">
-                          {{item.partName}} <span v-if="item.required" style="color: red">&nbsp; (*) </span>
-                          &nbsp;&nbsp;
-                        </div>
-                      </div>
-                    </div>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel expand  class="expansion-pl ext__form">
-                  <v-expansion-panel-content v-bind:value="true">
-                    <div slot="header" class="text-bold">
-                      <div class="background-triangle-small"> II.</div>
-                      Kết quả xử lý
-                    </div>
-                    <div v-for="(item, index) in tailieuKeyQua" :key="index" style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;border-top: 1px solid rgb(221, 221, 221)">
-                      <div class="mr-2" style="min-width: 18px; display: flex; min-height: 38px;">
-                        <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
-                        <div class="header__tphs">
-                          {{item.partName}} <span v-if="item.required" style="color: red">&nbsp; (*) </span>
-                          &nbsp;&nbsp;
-                        </div>
-                      </div>
-                    </div>
-                  </v-expansion-panel-content>
-                </v-expansion-panel> -->
+                
                 <v-layout wrap class="px-2 py-2">
                   <v-flex xs12 sm4 class="pr-3">
                     <div class="xs12 sm12 pb-1">
                       <span class="pr-2">Mã hồ sơ: </span>
                       <span class="pl-0 text-bold ">  {{dossierDetail.dossierNo}} </span>
                     </div>
+                    <div class="xs12 sm12 pb-1">
+                      <span class="pr-2">Hình thức nộp: </span>
+                      <span class="pl-0 text-bold ">  {{dossierDetail.online ? 'Nộp trực tuyến' : 'Nộp trực tiếp'}} </span>
+                    </div>
                     <!--  -->
                     <div class="xs12 sm12 pb-1">
-                      <span class="pr-2">Cơ quan: </span>
+                      <span class="pr-2">Đơn vị tiếp nhận: </span>
                       <span class="pl-0 text-bold ">  {{dossierDetail.govAgencyName}} </span>
                     </div>
                     <!--  -->
@@ -91,6 +62,10 @@
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm4>
+                    <div class="xs12 sm12 pb-1">
+                      <span class="pr-2">Chủ hồ sơ: </span>
+                      <span class="pl-0 text-bold "> {{dossierDetail.applicantName}}</span>
+                    </div>
                     <div class="xs12 sm12 pb-1" v-if="dossierDetail.online">
                       <span class="pr-2">Ngày gửi: </span>
                       <span class="pl-0 text-bold" v-if="dossierDetail.online"> {{dossierDetail.submitDate}} </span>
@@ -101,9 +76,13 @@
                       <span class="pl-0 text-bold "> {{dossierDetail.receiveDate}}</span>
                     </div>
                     <!--  -->
-                    <div class="xs12 sm12 pb-1">
+                    <div class="xs12 sm12 pb-1" v-if="dossierDetail.dueDate">
                       <span class="pr-2">Ngày hẹn trả: </span>
                       <span class="pl-0 text-bold "> {{dossierDetail.dueDate}}</span>
+                    </div>
+                    <div class="xs12 sm12 pb-1" v-if="dossierDetail.finishDate">
+                      <span class="pr-2">Ngày hoàn thành: </span>
+                      <span class="pl-0 text-bold "> {{dossierDetail.finishDate}}</span>
                     </div>
                   </v-flex>
                   <!--  -->
@@ -147,12 +126,12 @@
                       <td class="text-xs-left">{{props.item.sequenceName}}</td>
                       <td class="text-xs-left">{{props.item.durationCount}} ngày</td>
                       <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
-                      <td class="text-xs-left">
+                      <td class="text-xs-left" v-if="!configDongThap">
                         <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
                           {{itemUser.userName}} <br>
                         </div>
                       </td>
-                      <td class="text-xs-left">
+                      <td class="text-xs-left" v-if="!configDongThap">
                         <div v-for="(itemAction, index) in props.item.actions" :key="index">
                           {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
                         </div>
@@ -170,29 +149,25 @@
             <v-card>
               <v-card-text class="px-0 py-0">
                 <div class="px-2 py-2">
-                  <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" >
-                    <div class="text-bold">
+                  <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" :style="daDanhGia ? 'pointer-events: none !important' : ''">
+                    <div class="text-bold pl-3">
                       {{index + 1}}.&nbsp; {{ item.subject }}
                     </div>
-                    <v-radio-group class="ml-3 pt-2" v-model="item.selected" row>
+                    <v-radio-group class="ml-3 pt-2 mt-0" v-model="item.selected" row>
                       <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1"></v-radio>
                     </v-radio-group>
-                    <v-layout wrap class="ml-3" style="margin-top:-10px">
-                      <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
-                        <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
-                      </v-flex>
-                    </v-layout>
+                    
                   </div>
                   <div v-if="votingItems.length === 0" class="mx-3">
                     <v-alert outline color="warning" icon="priority_high" :value="true">
                       Không có đánh giá
                     </v-alert>
                   </div>
-                  <div class="ml-3" v-if="votingItems.length > 0">
+                  <div class="ml-3" v-if="votingItems.length > 0 && !daDanhGia">
                     <v-btn color="primary"
                       :loading="loadingVoting"
                       :disabled="loadingVoting"
-                      @click="submitVoting"
+                      @click="submitVotingDossier"
                     >Gửi đánh giá</v-btn>
                   </div>
                 </div>
@@ -225,6 +200,7 @@
 <script>
   import router from '@/router'
   import Vue from 'vue/dist/vue.min.js'
+  import toastr from 'toastr'
   export default {
     props: ['index'],
     components: {},
@@ -232,6 +208,7 @@
       loading: false,
       loadingAction: false,
       dossierDetail: {},
+      dossierDetailMc: '',
       listHistoryProcessing: [],
       dossierActions: [],
       tailieuNop: [],
@@ -273,29 +250,59 @@
         align: 'center',
         sortable: false,
         class: 'ketqua_column'
-      }]
+      }],
+      configDongThap: true,
+      isDvc: false,
+      daDanhGia: false
     }),
     computed: {},
     created () {
       let vm = this
+      try {
+        vm.isDvc = isDvcConfig
+      } catch (error) {
+      }
       vm.$nextTick(function () {
-        var vm = this
+        try {
+          vm.configDongThap = configDongThap
+        } catch (error) {
+        }
+        if (vm.configDongThap) {
+          vm.headers = vm.headers.slice(0, 5)
+        }
         vm.dossierDetail = this.$store.getters.getDetailDossier
-        if (vm.dossierDetail.submissionNote) {
-          let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
-          let resultTemp = submissionNote ? submissionNote.data : ''
-          if (resultTemp) {
-            for (var i = 0; i < resultTemp.length; i++) {
-              if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
-                if (!Array.isArray(resultTemp[i]['actions'])) {
-                  let arrActionsTemp = []
-                  arrActionsTemp.push(resultTemp[i]['actions'])
-                  resultTemp[i]['actions'] = arrActionsTemp
+        if (vm.isDvc) {
+          if (vm.dossierDetail.submissionNote) {
+            let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
+            let resultTemp = submissionNote ? submissionNote.data : ''
+            if (resultTemp) {
+              for (var i = 0; i < resultTemp.length; i++) {
+                if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                  if (!Array.isArray(resultTemp[i]['actions'])) {
+                    let arrActionsTemp = []
+                    arrActionsTemp.push(resultTemp[i]['actions'])
+                    resultTemp[i]['actions'] = arrActionsTemp
+                  }
                 }
               }
+              vm.dossierActions = resultTemp
             }
-            vm.dossierActions = resultTemp
           }
+        } else {
+          vm.loadDossierActionsPublicDvc()
+        }
+        
+        if (vm.dossierDetail.referenceUid) {
+          let filter2 = {
+            dossierId: vm.dossierDetail.dossierId,
+            referenceUid: vm.dossierDetail.referenceUid,
+            isDvc: vm.isDvc,
+            serverCode: 'SERVER_' + vm.dossierDetail['govAgencyCode']
+          }
+          vm.$store.dispatch('getDossierDetailAllCase', filter2).then(function (res) {
+            vm.dossierDetailMc = res
+          }).catch(function (reject) {
+          })
         }
       })
     },
@@ -324,6 +331,32 @@
             }
           })
         }
+      },
+      loadDossierActionsPublicDvc () {
+        var vm = this
+        let filter = {
+          dossierNo: vm.dossierDetail.dossierNo,
+          serverCode: 'SERVER_DVC'
+        }
+        vm.$store.dispatch('loadingDataHoSoFromMcToDvc', filter).then(resultActions => {
+          if (resultActions.submissionNote) {
+            let submissionNote = resultActions.submissionNote ? JSON.parse(resultActions.submissionNote) : ''
+            let resultTemp = submissionNote ? submissionNote.data : ''
+            if (resultTemp) {
+              for (var i = 0; i < resultTemp.length; i++) {
+                if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                  if (!Array.isArray(resultTemp[i]['actions'])) {
+                    let arrActionsTemp = []
+                    arrActionsTemp.push(resultTemp[i]['actions'])
+                    resultTemp[i]['actions'] = arrActionsTemp
+                  }
+                }
+              }
+              vm.dossierActions = resultTemp
+            }
+          }
+        })
+        
       },
       loadLogs () {
         var vm = this
@@ -354,13 +387,35 @@
       },
       loadVoting () {
         let vm = this
+        if (!vm.isDvc) {
+          vm.dossierDetailMc = vm.dossierDetail
+        }
         let filter = {
           className: 'dossier',
-          classPK: vm.dossierDetail.dossierId
+          classPk: vm.dossierDetailMc.dossierId,
+          serverCode: 'SERVER_' + vm.dossierDetailMc['govAgencyCode'],
+          isDvc: vm.isDvc
         }
         vm.$store.dispatch('loadVoting', filter).then(function (result) {
+          let valid = result.filter(function (item) {
+            return item.answersCount
+          })
+          if (valid && valid.length > 0) {
+            vm.daDanhGia = true
+            toastr.success('Thông tin hồ sơ trên bạn đã thực hiện đánh giá')
+          }
+          // 
+          for (let index in result) {
+            let selectedAns = 0
+            for (let index2 in result[index]['answers']) {
+              if (result[index]['answers'][index2] !== 0) {
+                selectedAns = Number(index2) + 1
+                result[index].selected = selectedAns
+                break
+              }
+            }
+          }
           vm.votingItems = result
-          console.log('votingItems', vm.votingItems)
         }).catch(function (reject) {
         })
       },
@@ -379,6 +434,57 @@
             vm.loadVoting()
           }).catch(xhr => {
             vm.loadingVoting = false
+          })
+        }
+      },
+      submitVotingDossier () {
+        let vm = this
+        if (!vm.isDvc) {
+          vm.doResultVotingDossier()
+        } else {
+          vm.doResultVotingMC()
+        }
+      },
+      doResultVotingDossier () {
+        var vm = this
+        let arrAction = []
+        if (vm.votingItems.length > 0) {
+          vm.loadingVoting = true
+          for (var index in vm.votingItems) {
+            vm.votingItems[index]['className'] = 'dossier'
+            vm.votingItems[index]['classPk'] = vm.dossierDetailMc.dossierId
+            arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
+          }
+          Promise.all(arrAction).then(results => {
+            vm.loadingVoting = false
+            toastr.success('Đánh giá của bạn được gửi thành công')
+            vm.loadVoting()
+          }).catch(xhr => {
+            vm.loadingVoting = false
+            toastr.error('Gửi đánh giá không thành công')
+          })
+        }
+      },
+      doResultVotingMC () {
+        let vm = this
+        let arrAction = []
+        if (vm.votingItems.length > 0) {
+          vm.loadingAction = true
+          for (var index in vm.votingItems) {
+            vm.votingItems[index]['className'] = 'dossier'
+            vm.votingItems[index]['classPk'] = vm.dossierDetailMc.dossierId
+            vm.votingItems[index]['serverCode'] = 'SERVER_' + vm.dossierDetailMc['govAgencyCode']
+            arrAction.push(vm.$store.dispatch('submitVotingMC', vm.votingItems[index]))
+          }
+          Promise.all(arrAction).then(results => {
+            vm.loadingAction = false
+            toastr.clear()
+            toastr.success('Đánh giá của bạn được gửi thành công')
+            vm.loadVoting()
+          }).catch(xhr => {
+            vm.loadingAction = false
+            toastr.clear()
+            toastr.error('Gửi đánh giá không thành công')
           })
         }
       },

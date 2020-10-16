@@ -113,7 +113,7 @@
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 <span>Tài liệu chứng thực</span>
               </div>
-              <tai-lieu-chung-thuc ref="tailieuchungthuc" :dossierId="thongTinChiTietHoSo.dossierId" :formCodeInput="formCode" :onlyView="false"></tai-lieu-chung-thuc>
+              <tai-lieu-chung-thuc ref="tailieuchungthuc" :dossierInfo="thongTinChiTietHoSo" :formCodeInput="formCode" :onlyView="false"></tai-lieu-chung-thuc>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
@@ -817,7 +817,10 @@ export default {
     },
     menuConfigsToDo () {
       return this.$store.getters.getMenuConfigsTodo
-    }
+    },
+    userLoginInfomation () {
+      return this.$store.getters.getUserLogin
+    },
   },
   created () {
     var vm = this
@@ -995,6 +998,25 @@ export default {
               }
             }
             vm.thongTinChiTietHoSo = result
+            console.log('chitiethoso', result)
+            if (vm.originality === 1 && result.hasOwnProperty('cityCode') && !result.cityCode) {
+              result.cityCode = vm.userLoginInfomation['applicantCityCode']
+              result.cityName = vm.userLoginInfomation['applicantCityName']
+              result.districtCode = vm.userLoginInfomation['applicantDistrictCode']
+              result.districtName = vm.userLoginInfomation['applicantDistrictName']
+              result.wardCode = vm.userLoginInfomation['applicantWardCode']
+              result.wardName = vm.userLoginInfomation['applicantWardName']
+              result.address = vm.userLoginInfomation['applicantAddress']
+
+              result.delegateCityCode = vm.userLoginInfomation['applicantCityCode']
+              result.delegateCityName = vm.userLoginInfomation['applicantCityName']
+              result.delegateDistrictCode = vm.userLoginInfomation['applicantDistrictCode']
+              result.delegateDistrictName = vm.userLoginInfomation['applicantDistrictName']
+              result.delegateWardCode = vm.userLoginInfomation['applicantWardCode']
+              result.delegateWardName = vm.userLoginInfomation['applicantWardName']
+              result.delegateAddress = vm.userLoginInfomation['applicantAddress']
+              console.log('chitiethoso3123', result)
+            }
             vm.$refs.thongtinchuhoso.initData(result)
             vm.viaPortalDetail = result.viaPostal
             if (result.viaPostal > 0) {

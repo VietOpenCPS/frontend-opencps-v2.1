@@ -747,7 +747,9 @@
           vm.$store.dispatch('getServiceRecently', params).then(function (result) {
             vm.loading = false
             vm.serviceLastestTotal = result.total
-            vm.serviceInfoLastestList = result.data
+            vm.serviceInfoLastestList = result.data.filter(function (item) {
+              return item.maxLevel !== 2
+            })
           }).catch (function () {
             vm.loading = false
             vm.serviceInfoLastestList = []
@@ -1087,7 +1089,7 @@
         try {
           console.log('trackDVC serviceCode', serviceCode)
           if (_govaq) {
-            _govaq.push(['trackDVC', serviceCode, '1', ''])
+            _govaq.push(['trackDVC', serviceCode, '-1', ''])
           }
         } catch (error) { 
         }

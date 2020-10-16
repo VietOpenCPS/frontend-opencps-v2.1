@@ -50,32 +50,6 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
-    // loadInitResource ({commit, state}) {
-    //   if (state.initData == null) {
-    //     return new Promise((resolve, reject) => {
-    //       let param = {}
-    //       let orginURL = window.location.href
-    //       let coma = window.location.href.lastIndexOf('#/')
-    //       if (coma > 0) {
-    //         orginURL = window.location.href.substr(0, coma)
-    //       }
-    //       /* test local */
-    //       orginURL = 'http://127.0.0.1:8081/api/initdata'
-    //       axios.get(orginURL + support.renderURLInit, param).then(function (response) {
-    //         let serializable = response.data
-    //         commit('setInitData', serializable)
-    //         resolve(serializable)
-    //       }).catch(function (error) {
-    //         console.log(error)
-    //         reject(error)
-    //       })
-    //     })
-    //   } else {
-    //     return new Promise((resolve, reject) => {
-    //       resolve(state.initData)
-    //     })
-    //   }
-    // },
     loadingDataHoSo ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -100,6 +74,33 @@ export const store = new Vuex.Store({
         })
       })
     },
+    loadingDataHoSoFromMcToDvc ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            start: 0,
+            end: 1,
+            dossierNo: filter.dossierNo ? filter.dossierNo : ''
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/dossiers')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', filter.serverCode)
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (response) {
+            let serializable = response.data.data[0]
+            resolve(serializable)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
     loadingDanhSachHoSo ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -109,6 +110,8 @@ export const store = new Vuex.Store({
             },
             params: {
               dossierNo: filter.dossierNo ? filter.dossierNo : '',
+              start: filter.start,
+              end: filter.end
             }
           }
           axios.get(state.endPoint + '/dossiers', param).then(function (response) {
@@ -373,26 +376,83 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDossierDetailAllCase ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          if (!filter.isDvc) {
+            let param = {
+              headers: {
+                groupId: state.initData.groupId
+              }
+            }
+            axios.get(state.endPoint + '/dossiers/' + filter.dossierId, param).then(function (response) {
+              let serializable = response.data
+              resolve(serializable)
+            }).catch(function (error) {
+              console.log(error)
+              reject(error)
+            })
+          } else {
+            let config = {
+              headers: {
+                'groupId': window.themeDisplay.getScopeGroupId()
+              }
+            }
+            let textPost = {
+            }
+            let dataPost = new URLSearchParams()
+            dataPost.append('method', 'GET')
+            dataPost.append('url', '/dossiers/' + filter.referenceUid)
+            dataPost.append('data', JSON.stringify(textPost))
+            dataPost.append('serverCode', filter.serverCode)
+            axios.post('/o/rest/v2/proxy', dataPost, config).then(function (response) {
+              let serializable = response.data
+              resolve(serializable)
+            }).catch(xhr => {
+              reject(xhr)
+            })
+          }
+          
+        })
+      })
+    },
     getDossierDetailPass ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId,
-              secretCode: filter.password
-            },
-            params: {}
+          if (!filter.isDvc) {
+            let param = {
+              headers: {
+                groupId: state.initData.groupId,
+                secretCode: filter.password
+              },
+              params: {}
+            }
+            axios.get(state.endPoint + '/dossiers/' + filter.dossierId, param).then(function (response) {
+              resolve(response)
+            }).catch(function (error) {
+              console.log('error', error)
+              reject(error)
+            })
+          } else {
+            let config = {
+              headers: {
+                'groupId': window.themeDisplay.getScopeGroupId()
+              }
+            }
+            let textPost = {
+              secretKey: filter.password
+            }
+            let dataPost = new URLSearchParams()
+            dataPost.append('method', 'GET')
+            dataPost.append('url', '/dossiers/' + filter.referenceUid)
+            dataPost.append('data', JSON.stringify(textPost))
+            dataPost.append('serverCode', filter.serverCode)
+            axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+              resolve(result)
+            }).catch(xhr => {
+              reject(xhr)
+            })
           }
-          console.log('getDossierDetailPass')
-          axios.get(state.endPoint + '/dossiers/' + filter.dossierId, param).then(function (response) {
-            let serializable = response.data
-            console.log('responsegetDossierDetailPass')
-            console.log('response', response)
-            resolve(response)
-          }).catch(function (error) {
-            console.log('error', error)
-            reject(error)
-          })
         })
       })
     },
@@ -482,25 +542,47 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId
+          if (!data.isDvc) {
+            let param = {
+              headers: {
+                groupId: state.initData.groupId
+              }
             }
+            axios.get(state.endPoint + '/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
+              if (result.data) {
+                resolve(result.data.data)
+              } else {
+                resolve([])
+              }
+              commit('setLoading', false)
+            }).catch(xhr => {
+              reject(xhr)
+              commit('setLoading', false)
+            })
+          } else {
+            let config = {
+              headers: {
+                'groupId': window.themeDisplay.getScopeGroupId()
+              }
+            }
+            let textPost = {
+            }
+            let dataPost = new URLSearchParams()
+            dataPost.append('method', 'GET')
+            dataPost.append('url', '/postal/votings/' + data.className + '/' + data.classPk)
+            dataPost.append('data', JSON.stringify(textPost))
+            dataPost.append('serverCode', data.serverCode)
+            axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+              if (result.data) {
+                resolve(result.data.data)
+              } else {
+                resolve([])
+              }
+            }).catch(xhr => {
+              reject(xhr)
+            })
           }
-          // test local
-          axios.get(state.endPoint + '/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
-          // axios.get('http://127.0.0.1:8081/api/votings/12/' + data.classPK, param).then(result => {
-            console.log('loadVoting',result)
-            if (result.data) {
-              resolve(result.data.data)
-            } else {
-              resolve([])
-            }
-            commit('setLoading', false)
-          }).catch(xhr => {
-            reject(xhr)
-            commit('setLoading', false)
-          })
+          
         })
       })
     },

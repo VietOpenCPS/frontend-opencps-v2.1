@@ -37,8 +37,8 @@
             <a href="javascript:;" @click="goPage('danhgia')">
               <p class="icon pl-1 pr-2 pt-3"><img src="/o/opencps-store/js/kios_ver0/img/icon-evaluation.png"></p>
               <p class="ml-2 my-0">
-                <span class="text-bold">Khảo sát</span><br>
-                <span>Khảo sát mức độ hài lòng</span>
+                <span class="text-bold">Đánh giá</span><br>
+                <span>Đánh giá mức độ hài lòng</span>
               </p>
             </a>
           </div>

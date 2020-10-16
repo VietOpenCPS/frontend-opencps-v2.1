@@ -20,7 +20,9 @@
           <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
           <v-tab key="2" ripple class="mx-2"> Tiến trình thụ lý </v-tab>
           <v-tab key="3" ripple class="mx-2" v-if="paymentInfo"> Thanh toán trực tuyến</v-tab>
-          <v-tab key="4" ripple class="mx-2" @click="loadVoting()" v-if="dossierDetail['dossierStatus'] === 'done'"> Đánh giá chất lượng dịch vụ</v-tab>
+          <v-tab key="4" ripple class="mx-2" @click="loadVoting()" v-if="dossierDetail['dossierStatus'] === 'done'">
+             Đánh giá hài lòng
+          </v-tab>
           <v-tab-item key="1">
             <v-card style="border: 1px solid #dedede;border-top: none;">
               <v-card-text class="px-0 py-0">
@@ -50,7 +52,36 @@
                     </div>
                   </v-flex>
                   <!--  -->
-                  <v-flex xs12 sm4>
+                  <v-flex xs12 sm4 v-if="configDongThap">
+                    <div class="xs12 sm12 pb-1">
+                      <span class="pr-2">Chủ hồ sơ: </span>
+                      <span class="pl-0 text-bold"> {{dossierDetail.applicantName}} </span>
+                    </div>
+                    <div class="xs12 sm12 pb-1" v-if="isMobile">
+                      <span class="pr-2">{{dossierDetail.applicantIdType === 'citizen' ? 'Số CMND/ căn cước' : 'Mã số thuế'}} : </span>
+                      <span class="pl-0 text-bold ">  {{dossierDetail.applicantIdNo}} </span>
+                    </div>
+                    <!--  -->
+                    <div class="xs12 sm12 pb-1" v-if="dossierDetail.online">
+                      <span class="pr-2">Ngày gửi: </span>
+                      <span class="pl-0 text-bold" v-if="dossierDetail.online"> {{dossierDetail.submitDate}} </span>
+                    </div>
+                    <!--  -->
+                    <div class="xs12 sm12 pb-1">
+                      <span class="pr-2">Ngày tiếp nhận: </span>
+                      <span class="pl-0 text-bold "> {{dossierDetail.receiveDate}}</span>
+                    </div>
+                    <!--  -->
+                    <div class="xs12 sm12 pb-1" v-if="dossierDetail.dueDate">
+                      <span class="pr-2">Ngày hẹn trả: </span>
+                      <span class="pl-0 text-bold "> {{dossierDetail.dueDate}}</span>
+                    </div>
+                    <div class="xs12 sm12 pb-1" v-if="dossierDetail.finishDate">
+                      <span class="pr-2">Ngày hoàn thành: </span>
+                      <span class="pl-0 text-bold "> {{dossierDetail.finishDate}}</span>
+                    </div>
+                  </v-flex>
+                  <v-flex xs12 sm4 v-if="!configDongThap">
                     <div class="xs12 sm12 pb-1">
                       <span class="pr-2">Chủ hồ sơ: </span>
                       <span class="pl-0 text-bold"> {{dossierDetail.applicantName}} </span>
@@ -71,7 +102,7 @@
                     </div>
                   </v-flex>
                   <!--  -->
-                  <v-flex xs12 sm4>
+                  <v-flex xs12 sm4 v-if="!configDongThap">
                     <div class="xs12 sm12 pb-1" v-if="dossierDetail.online">
                       <span class="pr-2">Ngày gửi: </span>
                       <span class="pl-0 text-bold" v-if="dossierDetail.online"> {{dossierDetail.submitDate}} </span>
@@ -128,12 +159,12 @@
                       <td class="text-xs-left">{{props.item.sequenceName}}</td>
                       <td class="text-xs-left">{{props.item.durationCount}} ngày</td>
                       <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
-                      <td class="text-xs-left">
+                      <td class="text-xs-left" v-if="!configDongThap">
                         <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
                           {{itemUser.userName}} <br>
                         </div>
                       </td>
-                      <td class="text-xs-left">
+                      <td class="text-xs-left" v-if="!configDongThap">
                         <div v-for="(itemAction, index) in props.item.actions" :key="index">
                           {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
                         </div>
@@ -163,7 +194,7 @@
                       <td class="text-xs-left">{{props.item.sequenceName}}</td>
                       <td class="text-xs-left">{{props.item.sequenceRole}}</td>
                       <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
-                      <td class="text-xs-left">
+                      <td class="text-xs-left" v-if="!configDongThap">
                         <div v-for="(itemAction, index) in props.item.actions" :key="index">
                           {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
                         </div>
@@ -242,7 +273,7 @@
                     <div class="text-bold">
                       {{index + 1}}.&nbsp; {{ item.subject }}
                     </div>
-                    <v-radio-group :class="!isMobile ? 'ml-3 pt-2' : 'ml-0 mb-2 mt-2 pt-0'" v-model="item.selected" row>
+                    <v-radio-group :class="!isMobile ? 'ml-3 pt-2 mt-0' : 'ml-0 mb-2 mt-2 pt-0'" v-model="item.selected" row>
                       <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" ></v-radio>
                     </v-radio-group>
                     <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
@@ -256,7 +287,7 @@
                       Không có đánh giá
                     </v-alert>
                   </div>
-                  <div class="ml-3" v-if="votingItems.length > 0">
+                  <div class="ml-3 mt-2" v-if="votingItems.length > 0">
                     <v-btn color="primary"
                       :loading="loadingVoting"
                       :disabled="loadingVoting"
@@ -360,7 +391,8 @@
       ],
       isMobile: false,
       two_system: true,
-      paymentInfo: false
+      paymentInfo: false,
+      configDongThap: false
     }),
     computed: {
       secretCode () {
@@ -382,6 +414,14 @@
     },
     created () {
       let vm = this
+      try {
+        vm.configDongThap = configDongThap
+      } catch (error) {
+      }
+      if (vm.configDongThap) {
+        vm.headers = vm.headers.slice(0, 5)
+        vm.headersMobile = vm.headersMobile.slice(0, 4)
+      }
       vm.$nextTick(function () {
         vm.onResize()
         window.addEventListener('resize', vm.onResize, { passive: true })

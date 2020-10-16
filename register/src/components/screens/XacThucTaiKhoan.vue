@@ -248,6 +248,10 @@ export default {
     },
     goToDangNhap() {
       let vm = this;
+      let filter = {
+        npmreactlogin_login: vm.userName,
+        npmreactlogin_password: vm.passWord
+      }
       let configs = {
         headers: {
           'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),

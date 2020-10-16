@@ -33,11 +33,11 @@
                 </v-flex>
                 <v-flex md6 xs12 text-center>
                   <span style="color:#1976d2;">{{statistics.releaseCount}}</span>
-                  <p>Hoàn thành</p>
+                  <p>Tổng số hoàn thành</p>
                 </v-flex>
                 <v-flex md6 xs12 text-center>
-                  <span style="color:#1976d2;">{{statistics.processingCount}}</span>
-                  <p>Đang xử lý</p>
+                  <span style="color:#1976d2;">{{thongKeHauGiang ? processingTotal : statistics.processingCount}}</span>
+                  <p>Tổng số đang xử lý</p>
                 </v-flex>
                 <v-flex md6 xs12 text-center>
                   <span style="color:#1976d2;">{{statistics.overtimeCount}}</span>
@@ -136,18 +136,47 @@
                       hide-no-data
                       :hide-selected="true"
                       @change="getStatisticsYearSBN"
-                      clearable
                     ></v-autocomplete>
                   </div>
                 </v-flex>
               </div>
               <apexchart
+                v-if="!thongKeHauGiang"
                 type="pie"
                 width=400 height=220
                 :options="chartOptionsSoQuanXa"
                 :series="statisticalSBN"
                 class="pieChartAgency"
               ></apexchart>
+              <!-- Hậu Giang -->
+              <v-layout wrap align-center v-else class="pieChartHauGiang">
+                <v-flex md7 xs12>
+                  <apexchart
+                    type="pie"
+                    width=350 height=220
+                    :options="chartOptionsSoQuanXa"
+                    :series="statisticalSBN"
+                    class=""
+                  ></apexchart>
+                </v-flex>
+                <v-flex md5 xs12>
+                  <v-layout wrap class="run-down">
+                    <v-flex xs12 text-center>
+                      <span style="color:#1976d2;">{{statisticTotalSBN.receivedCount}}</span>
+                      <p>Tổng số đã tiếp nhận</p>
+                    </v-flex>
+                    <v-flex xs12 text-center>
+                      <span style="color:#1976d2;">{{statisticTotalSBN.releaseCount}}</span>
+                      <p>Hoàn thành</p>
+                    </v-flex>
+                    <v-flex s12 text-center>
+                      <span style="color:#1976d2;">{{thongKeHauGiang ? processingSBN : statisticTotalSBN.processingCount}}</span>
+                      <p>Đang xử lý</p>
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
+              </v-layout>
+              <!--  -->
             </div>
           </v-flex>
           <v-flex md4 xs12 class="pt-2 pr-2 pb-2 pl-0">
@@ -165,18 +194,47 @@
                       hide-no-data
                       :hide-selected="true"
                       @change="getStatisticsYearQUAN_HUYEN"
-                      clearable
                     ></v-autocomplete>
                   </div>
                 </v-flex>
               </div>
               <apexchart
+                v-if="!thongKeHauGiang"
                 type="pie"
                 width=400 height=220
                 :options="chartOptionsSoQuanXa"
                 :series="statisticalQUAN_HUYEN"
                 class="pieChartAgency"
               ></apexchart>
+              <!-- Hậu Giang -->
+              <v-layout wrap align-center v-else class="pieChartHauGiang">
+                <v-flex md7 xs12>
+                  <apexchart
+                    type="pie"
+                    width=350 height=220
+                    :options="chartOptionsSoQuanXa"
+                    :series="statisticalQUAN_HUYEN"
+                    class=""
+                  ></apexchart>
+                </v-flex>
+                <v-flex md5 xs12>
+                  <v-layout wrap class="run-down">
+                    <v-flex xs12 text-center>
+                      <span style="color:#1976d2;">{{statisticTotalQuanHuyen.receivedCount}}</span>
+                      <p>Tổng số đã tiếp nhận</p>
+                    </v-flex>
+                    <v-flex xs12 text-center>
+                      <span style="color:#1976d2;">{{statisticTotalQuanHuyen.releaseCount}}</span>
+                      <p>Hoàn thành</p>
+                    </v-flex>
+                    <v-flex s12 text-center>
+                      <span style="color:#1976d2;">{{thongKeHauGiang ? processingQuanHuyen : statisticTotalQuanHuyen.processingCount}}</span>
+                      <p>Đang xử lý</p>
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
+              </v-layout>
+              <!--  -->
             </div>
           </v-flex>
           <v-flex md4 xs12 class="pt-2 pr-2 pb-2 pl-0">
@@ -194,19 +252,48 @@
                       hide-no-data
                       :hide-selected="true"
                       @change="getStatisticsYearXA_PHUONG"
-                      clearable
                     ></v-autocomplete>
                   </div>
                 </v-flex>
               </div>
               <div style="width: 100%;">
                 <apexchart
+                  v-if="!thongKeHauGiang"
                   type="pie"
                   width=400 height=220
                   :options="chartOptionsSoQuanXa"
                   :series="statisticalXA_PHUONG"
                   class="pieChartAgency"
                 ></apexchart>
+                <!-- Hậu Giang -->
+                <v-layout wrap align-center v-else class="pieChartHauGiang">
+                  <v-flex md7 xs12>
+                    <apexchart
+                      type="pie"
+                      width=350 height=220
+                      :options="chartOptionsSoQuanXa"
+                      :series="statisticalXA_PHUONG"
+                      class=""
+                    ></apexchart>
+                  </v-flex>
+                  <v-flex md5 xs12>
+                    <v-layout wrap class="run-down">
+                      <v-flex xs12 text-center>
+                        <span style="color:#1976d2;">{{statisticTotalXaPhuong.receivedCount}}</span>
+                        <p>Tổng số đã tiếp nhận</p>
+                      </v-flex>
+                      <v-flex xs12 text-center>
+                        <span style="color:#1976d2;">{{statisticTotalXaPhuong.releaseCount}}</span>
+                        <p>Hoàn thành</p>
+                      </v-flex>
+                      <v-flex s12 text-center>
+                        <span style="color:#1976d2;">{{thongKeHauGiang ? processingXaPhuong : statisticTotalXaPhuong.processingCount}}</span>
+                        <p>Đang xử lý</p>
+                      </v-flex>
+                    </v-layout>
+                  </v-flex>
+                </v-layout>
+                <!--  -->
               </div>
             </div>
           </v-flex>
@@ -323,9 +410,9 @@
                     <th rowspan="3" style="text-align: center;" width="60" class="px-2">
                       <span>Tạm dừng bổ sung điều kiện</span>
                     </th>
-                    <th rowspan="3" style="text-align: center;" width="60" class="px-2">
+                    <!-- <th rowspan="3" style="text-align: center;" width="60" class="px-2">
                       <span>Rút không giải quyết</span>
-                    </th>
+                    </th> -->
                     <th rowspan="3" style="text-align: center;" width="60" class="px-2">
                       <span>Tỉ lệ sớm và đúng hạn</span>
                     </th>
@@ -411,7 +498,7 @@
                     <td align="center" class="px-2">(17)</td>
                     <td align="center" class="px-2">(18)</td>
                     <td align="center" class="px-2">(19)</td>
-                    <td align="center" class="px-2">(20)</td>
+                    <!-- <td align="center" class="px-2">(20)</td> -->
                   </tr>
                   <tr v-for="(item,index) in danhSachThongKeThang" :key="index">
                     <td align="center"  class="px-2">{{index + 1}}</td>
@@ -432,7 +519,7 @@
                     <td align="center" class="px-2">{{item.undueCount}}</td>
                     <td align="center" class="px-2">{{item.overdueCount}}</td>
                     <td align="center" class="px-2">{{item.waitingCount}}</td>
-                    <td align="center" class="px-2">{{item.cancelledCount}}</td>
+                    <!-- <td align="center" class="px-2">{{item.cancelledCount}}</td> -->
                     <td align="center" class="px-2">{{item.ontimePercentage}}</td>
                   </tr>
                   <tr class="sum__column" style="font-weight: bold;">
@@ -453,7 +540,7 @@
                     <td align="center" class="px-2">{{totalCounter['total_16']}}</td>
                     <td align="center" class="px-2">{{totalCounter['total_17']}}</td>
                     <td align="center" class="px-2">{{totalCounter['total_18']}}</td>
-                    <td align="center" class="px-2">{{totalCounter['total_19']}}</td>
+                    <!-- <td align="center" class="px-2">{{totalCounter['total_19']}}</td> -->
                     <td align="center" class="px-2">{{totalCounter['total_20']}}</td>
                   </tr>
                 </tbody>
@@ -546,11 +633,11 @@ export default {
   },
   data: () => ({
     listDonViSBN: [],
-    donViSBN: '',
+    donViSBN: 'total',
     listDonViHuyen: [],
-    donViHuyen: '',
+    donViHuyen: 'total',
     listDonViXa: [],
-    donViXa: '',
+    donViXa: 'total',
     levelList: [
       {level: 2, count: "0", levelName: 2},
       {level: 3, count: "0", levelName: 3},
@@ -565,9 +652,9 @@ export default {
     distGroupSelected: "",
     isTable: false,
     statisticalYear: [0, 0],
-    statisticalSBN: [0, 0, 0, 0, 0, 0],
-    statisticalQUAN_HUYEN: [0, 0, 0, 0, 0, 0],
-    statisticalXA_PHUONG: [0, 0, 0, 0, 0, 0],
+    statisticalSBN: [],
+    statisticalQUAN_HUYEN: [],
+    statisticalXA_PHUONG: [],
     statisticalMonth: [
       {
         name: "Hồ sơ nộp trực tiếp",
@@ -579,6 +666,34 @@ export default {
       }
     ],
     chartOptionsYear: {
+      labels: ["Hoàn thành sớm và đúng hạn", "Hoàn thành trễ hạn"],
+      legend: {
+        position: 'bottom'
+      },
+      states: {
+        normal: {
+          filter: {
+            type: 'none',
+            value: 0,
+          }
+        },
+        hover: {
+          filter: {
+            type: 'none',
+            value: 0,
+          }
+        },
+        active: {
+          allowMultipleDataPointsSelection: false,
+          filter: {
+            type: 'none',
+            value: 0,
+          }
+        },
+      },
+      colors: ['#00E396','#FF4560']
+    },
+    chartOptionsYearHauGiang: {
       labels: ["Hoàn thành đúng hạn", "Hoàn thành trễ hạn"],
       legend: {
         position: 'bottom'
@@ -765,6 +880,9 @@ export default {
       waitingCount: 0,
       year: 2020
     },
+    statisticTotalSBN: '',
+    statisticTotalQuanHuyen: '',
+    statisticTotalXaPhuong: '',
     danhSachThongKeThang: [],
     quanhuyenSelected: '',
     totalCounter: {},
@@ -801,6 +919,11 @@ export default {
         class: 'text-xs-center'
       }
     ],
+    thongKeHauGiang: false,
+    processingTotal: 0,
+    processingSBN: 0,
+    processingQuanHuyen: 0,
+    processingXaPhuong: 0
   }),
   computed: {
     yearList() {
@@ -817,7 +940,15 @@ export default {
   },
   created() {
     let vm = this
-    // 
+    //
+    try {
+      vm.thongKeHauGiang = thongKeHauGiang ? thongKeHauGiang : false
+    } catch (error) {
+      vm.thongKeHauGiang = false
+    }
+    if (vm.thongKeHauGiang) {
+      vm.chartOptionsYear = vm.chartOptionsYearHauGiang
+    }
     try {
       vm.labelPieChartConfig = labelPieChartConfig ? labelPieChartConfig : ''
     } catch (error) {
@@ -882,10 +1013,14 @@ export default {
   methods: {
     changeLevel (levelSelect) {
       let vm = this
-      vm.thutucPage = 1
-      vm.levelFilter = levelSelect
-      vm.doLoadingThuTuc()
-      vm.dialogServiceInfo = true
+      // vm.thutucPage = 1
+      // vm.levelFilter = levelSelect
+      // vm.doLoadingThuTuc()
+      // vm.dialogServiceInfo = true
+
+      let pathName = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
+      let url = pathName + '/thu-tuc-hanh-chinh#/thu-tuc-hanh-chinh/?page=1&level=' + levelSelect
+      window.open(url, "_blank")
     },
     doLoadingThuTuc () {
       let vm = this
@@ -969,14 +1104,15 @@ export default {
       axios
         .request(config)
         .then(function(response) {
+          let totalScore = [{itemName: 'Tất cả đơn vị', itemCode: 'total'}]
           if (response.data.data) {
             if (key === 'SBN') {
-              vm.listDonViSBN = response.data.data
+              vm.listDonViSBN = totalScore.concat(response.data.data)
             } else if (key === 'QUAN_HUYEN') {
-              vm.listDoiTuong = response.data.hasOwnProperty('data') ? response.data.data : []
-              vm.listDonViHuyen = response.data.hasOwnProperty('data') ? response.data.data : []
+              vm.listDoiTuong = response.data.hasOwnProperty('data') ? totalScore.concat(response.data.data) : []
+              vm.listDonViHuyen = response.data.hasOwnProperty('data') ? totalScore.concat(response.data.data) : []
             } else {
-              vm.listDonViXa = response.data.hasOwnProperty('data') ? response.data.data : []
+              vm.listDonViXa = response.data.hasOwnProperty('data') ? totalScore.concat(response.data.data) : []
             }
           } else {
             if (key === 'SBN') {
@@ -1012,11 +1148,19 @@ export default {
         .then(function(response) {
           if (response.data.data) {
             vm.statistics = response.data.data[0]
+            vm.processingTotal = vm.statistics.processingCount + vm.statistics.waitingCount
             vm.statisticalYear = [
               response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
               response.data.data[0].overtimeCount
-            ];
+            ]
+            // if (vm.thongKeHauGiang) {
+            //   vm.statisticalYear = [
+            //     response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
+            //     response.data.data[0].overtimeCount + response.data.data[0].overdueCount
+            //   ]
+            // }
           } else {
+            vm.processingTotal = 0
             vm.statisticalYear = [0, 0]
             vm.statistics = {
               receivedCount: 0,
@@ -1047,31 +1191,51 @@ export default {
         }
       };
       setTimeout(function () {
-        if (vm.donViSBN) {
+        if (vm.donViSBN && vm.donViSBN !== 'total') {
           config.params = {
             year: vm.yearSelected,
             month: 0,
             domain: "total",
             agency: vm.donViSBN,
           }
+        } else {
+          config.params = {
+            year: vm.yearSelected,
+            month: 0,
+            domain: "total",
+            agency: "total",
+            groupCode: "SBN"
+          }
         }
         axios
           .request(config)
           .then(function(response) {
             if (response.data.data) {
-              if (vm.labelPieChartConfig) {
-                vm.statisticalSBN = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
-              } else {
+              if (!vm.thongKeHauGiang) {
+                if (vm.labelPieChartConfig) {
+                  vm.statisticalSBN = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
+                } else {
+                  vm.statisticalSBN = [
+                    response.data.data[0].undueCount,
+                    response.data.data[0].overdueCount,
+                    response.data.data[0].ontimeCount,
+                    response.data.data[0].overtimeCount,
+                    response.data.data[0].cancelledCount,
+                    response.data.data[0].waitingCount
+                  ]
+                }
+              }
+              
+              if (vm.thongKeHauGiang) {
+                vm.statisticTotalSBN = response.data.data[0]
+                vm.processingSBN = vm.statisticTotalSBN.processingCount + vm.statisticTotalSBN.waitingCount
                 vm.statisticalSBN = [
-                  response.data.data[0].undueCount,
-                  response.data.data[0].overdueCount,
-                  response.data.data[0].ontimeCount,
-                  response.data.data[0].overtimeCount,
-                  response.data.data[0].cancelledCount,
-                  response.data.data[0].waitingCount
-                ];
+                  response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
+                  response.data.data[0].overtimeCount
+                ]
               }
             } else {
+              vm.statisticTotalSBN = vm.statistics
               vm.statisticalSBN = vm.labelPieChartConfig ? vm.labelPieChartConfig.map(x => 0) : [0, 0, 0, 0, 0, 0]
             }
           })
@@ -1098,31 +1262,51 @@ export default {
         }
       };
       setTimeout(function () {
-        if (vm.donViHuyen) {
+        if (vm.donViHuyen && vm.donViHuyen !== 'total') {
           config.params = {
             year: vm.yearSelected,
             month: 0,
             domain: "total",
             agency: vm.donViHuyen
           }
+        } else {
+          config.params = {
+            year: vm.yearSelected,
+            month: 0,
+            domain: "total",
+            agency: "total",
+            groupCode: "QUAN_HUYEN"
+          }
         }
         axios
           .request(config)
           .then(function(response) {
             if (response.data.data) {
-              if (vm.labelPieChartConfig) {
-                vm.statisticalQUAN_HUYEN = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
-              } else {
+              if (!vm.thongKeHauGiang) {
+                if (vm.labelPieChartConfig) {
+                  vm.statisticalQUAN_HUYEN = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
+                } else {
+                  vm.statisticalQUAN_HUYEN = [
+                    response.data.data[0].undueCount,
+                    response.data.data[0].overdueCount,
+                    response.data.data[0].ontimeCount,
+                    response.data.data[0].overtimeCount,
+                    response.data.data[0].cancelledCount,
+                    response.data.data[0].waitingCount
+                  ]
+                }
+              }
+              
+              if (vm.thongKeHauGiang) {
+                vm.statisticTotalQuanHuyen = response.data.data[0]
+                vm.processingQuanHuyen = vm.statisticTotalQuanHuyen.processingCount + vm.statisticTotalQuanHuyen.waitingCount
                 vm.statisticalQUAN_HUYEN = [
-                  response.data.data[0].undueCount,
-                  response.data.data[0].overdueCount,
-                  response.data.data[0].ontimeCount,
-                  response.data.data[0].overtimeCount,
-                  response.data.data[0].cancelledCount,
-                  response.data.data[0].waitingCount
-                ];
+                  response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
+                  response.data.data[0].overtimeCount
+                ]
               }
             } else {
+              vm.statisticTotalQuanHuyen = vm.statistics
               vm.statisticalQUAN_HUYEN = vm.labelPieChartConfig ? vm.labelPieChartConfig.map(x => 0) : [0, 0, 0, 0, 0, 0];
             }
           })
@@ -1149,31 +1333,51 @@ export default {
         }
       };
       setTimeout (function () {
-        if (vm.donViXa) {
+        if (vm.donViXa && vm.donViXa !== 'total') {
           config.params = {
             domain: "total",
             agency: vm.donViXa,
             year: vm.yearSelected,
             month: 0
           }
+        } else {
+          config.params = {
+            domain: "total",
+            agency: "total",
+            year: vm.yearSelected,
+            month: 0,
+            groupCode: "XA_PHUONG"
+          }
         }
         axios
           .request(config)
           .then(function(response) {
             if (response.data.data) {
-              if (vm.labelPieChartConfig) {
-                vm.statisticalXA_PHUONG = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
-              } else {
+              if (!vm.thongKeHauGiang) {
+                if (vm.labelPieChartConfig) {
+                  vm.statisticalXA_PHUONG = vm.labelPieChartConfig.map(x => response.data.data[0][x['value']])
+                } else {
+                  vm.statisticalXA_PHUONG = [
+                    response.data.data[0].undueCount,
+                    response.data.data[0].overdueCount,
+                    response.data.data[0].ontimeCount,
+                    response.data.data[0].overtimeCount,
+                    response.data.data[0].cancelledCount,
+                    response.data.data[0].waitingCount
+                  ];
+                }
+              }
+              
+              if (vm.thongKeHauGiang) {
+                vm.statisticTotalXaPhuong = response.data.data[0]
+                vm.processingXaPhuong = vm.statisticTotalXaPhuong.processingCount + vm.statisticTotalXaPhuong.waitingCount
                 vm.statisticalXA_PHUONG = [
-                  response.data.data[0].undueCount,
-                  response.data.data[0].overdueCount,
-                  response.data.data[0].ontimeCount,
-                  response.data.data[0].overtimeCount,
-                  response.data.data[0].cancelledCount,
-                  response.data.data[0].waitingCount
-                ];
+                  response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
+                  response.data.data[0].overtimeCount
+                ]
               }
             } else {
+              vm.statisticTotalXaPhuong = vm.statistics
               vm.statisticalXA_PHUONG = vm.labelPieChartConfig ? vm.labelPieChartConfig.map(x => 0) : [0, 0, 0, 0, 0, 0];
             }
           })
@@ -1315,8 +1519,25 @@ export default {
                 value: 0,
               }
             },
+          },
+          legend: {
+            fontFamily: 'Roboto, Arial, sans-serif',
+            formatter: function(seriesName, opts) {
+              return '<span style="color:' + opts.w.globals.colors[opts.seriesIndex]+ '">' +
+              opts.w.globals.series[opts.seriesIndex] + '</span>&nbsp;' + seriesName
+            }
+          },
+          dataLabels: {
+            enabled: true,
+            formatter: function(val) {
+              if (Number(val) > 3) {return val.toFixed(1) + '%'}
+              return ''
+            }
           }
         }
+      }
+      if (vm.thongKeHauGiang) {
+        vm.chartOptionsSoQuanXa = vm.chartOptionsYearHauGiang
       }
     }
   }

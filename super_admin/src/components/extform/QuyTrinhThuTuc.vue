@@ -528,6 +528,17 @@
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm12>
+                    <v-text-field
+                      label="RoleAsStep"
+                      v-model="currentStep.roleAsStep"
+                      box
+                      :rules="[rules.varchar500, rules.syntaxError]"
+                      :maxlength="500"
+                      :counter="500"
+                    ></v-text-field>
+                  </v-flex>
+                  <!--  -->
+                  <v-flex xs12 sm12>
                     <v-layout wrap>
                       <v-flex xs12 sm3 class="pl-0">
                         <v-autocomplete
@@ -1214,7 +1225,8 @@
           customProcessUrl: '',
           sequenceNo: '',
           editable: false,
-          checkInput: ''
+          checkInput: '',
+          roleAsStep: ''
         },
         validAddStep: false,
         // PROCESS ACTION DATA
@@ -1695,7 +1707,8 @@
             customProcessUrl: '',
             sequenceNo: '',
             editable: false,
-            checkInput: ''
+            checkInput: '',
+            roleAsStep: ''
           }
           vm.stepRoleList = []
           if (Number(currentQuery.stepCode) > 0) {

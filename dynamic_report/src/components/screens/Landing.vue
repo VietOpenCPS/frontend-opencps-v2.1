@@ -36,12 +36,12 @@
                   class="btn__chot"
                   @change="doChotSoLieu($event, button)"
                 ></v-select>
-                <!-- <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
+                <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
                   <v-icon v-if="showConfig">reply</v-icon>
                   <v-icon v-else>settings</v-icon> &nbsp;
                   <span v-if="showConfig">Quay lại</span>
-                  <span v-else>Tuỳ chọn</span>
-                </v-btn> -->
+                  <span v-else>Tùy chọn</span>
+                </v-btn>
               </v-flex>
             </v-layout>
           </div>
@@ -525,6 +525,7 @@ export default {
     dataRowRenderHtmlTable: [],
     headerRenderHtmlTable: [],
     widthRenderHtmlTable: [],
+    statisticVotingDossiers: false
   }),
   computed: {
     itemsReports () {
@@ -608,6 +609,9 @@ export default {
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
             vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
+          }
+          if (vm.itemsReports[vm.index]['reportCode'].indexOf('REGISTER') >= 0 || vm.itemsReports[vm.index]['reportCode'].indexOf('STATISTIC') >= 0) {
+            vm.customize = false
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
             vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']
@@ -744,6 +748,9 @@ export default {
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
         vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
       }
+      if (vm.itemsReports[vm.index]['reportCode'].indexOf('REGISTER') >= 0 || vm.itemsReports[vm.index]['reportCode'].indexOf('STATISTIC') >= 0) {
+        vm.customize = false
+      }
       // bug unsupported number: NaN
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
         vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']
@@ -874,6 +881,9 @@ export default {
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
             vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
           }
+          if (vm.itemsReports[vm.index]['reportCode'].indexOf('REGISTER') >= 0 || vm.itemsReports[vm.index]['reportCode'].indexOf('STATISTIC') >= 0) {
+            vm.customize = false
+          }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
             vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']
           }
@@ -961,7 +971,15 @@ export default {
     //       return item.key === val
     //     })[0]
     //   }
-    // }
+    // },
+    api (val) {
+      let vm = this
+      if (val.indexOf('isGetVotingData') !== -1) {
+        vm.statisticVotingDossiers = true
+      } else {
+        vm.statisticVotingDossiers = false
+      }
+    }
   },
   methods: {
     doCreatePDF () {
@@ -1188,9 +1206,21 @@ export default {
           dataRaw.reverse()
           console.log('dossierRaw 47', dataRaw)
           let dataRowTotal = []
+          let dataRowAverageTotal = [] /**Row tính trung bình cộng */
           let totalText = 'Tổng cộng'
+          let totalAverageText = 'Trung bình'
+          if (vm.statisticVotingDossiers) {
+            totalAverageText = 'Điểm trung bình các chỉ số'
+          }
           dataRowTotal.push({
             text: totalText, 
+            colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? 2 : 1,
+            bold: true,
+            alignment: 'center',
+            style: 'tdStyle'
+          })
+          dataRowAverageTotal.push({
+            text: totalAverageText, 
             colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? 2 : 1,
             bold: true,
             alignment: 'center',
@@ -1203,6 +1233,11 @@ export default {
                 alignment: 'center',
                 style: 'tdStyle'
               })
+              dataRowAverageTotal.push({
+                text: '', 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
             }  else {
               if (vm.itemsReportsConfig[keyMapping].hasOwnProperty('type') && vm.itemsReportsConfig[keyMapping].type === 'currency') {
                 dataRowTotal.push({
@@ -1211,8 +1246,19 @@ export default {
                   style: 'tdStyle',
                   type: 'currency'
                 })
+                dataRowAverageTotal.push({
+                  text: 0, 
+                  alignment: 'center',
+                  style: 'tdStyle',
+                  type: 'currency'
+                })
               } else {
                 dataRowTotal.push({
+                  text: 0, 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+                dataRowAverageTotal.push({
                   text: 0, 
                   alignment: 'center',
                   style: 'tdStyle'
@@ -1234,36 +1280,12 @@ export default {
                   csvGroup.push('')
                 }
                 dataToExportCSV.push(csvGroup)
-                // if (vm.doExportExcel) {
-                //   console.log('case1')
-                //   dataReportTotal += '[ '
-                //   dataReportTotal += JSON.stringify({
-                //     text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
-                //     bold: true,
-                //     style: 'tdStyle'
-                //   }) + ','
-                //   for (let csvIndexXXX = 0; csvIndexXXX < colLeng - 1; csvIndexXXX ++) {
-                //     dataReportTotal += JSON.stringify({
-                //       text: '',
-                //       bold: true,
-                //       style: 'tdStyle'
-                //     }) + ','
-                //   }
-                //   dataReportTotal += JSON.stringify({
-                //     text: '',
-                //     bold: true,
-                //     style: 'tdStyle'
-                //   })
-                //   dataReportTotal += ' ],'
-                // } else {
-                  console.log('case2')
-                  dataReportTotal += JSON.stringify([{
-                    colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? colLeng + 1 : colLeng,
-                    text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
-                    bold: true,
-                    style: 'tdStyle'
-                  }]) + ','
-                // }
+                dataReportTotal += JSON.stringify([{
+                  colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? colLeng + 1 : colLeng,
+                  text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
+                  bold: true,
+                  style: 'tdStyle'
+                }]) + ','
               }
             }
             
@@ -1272,6 +1294,7 @@ export default {
             let indexStt = 1
             let dataRow = []
             for (let keyDossier in dossiersArray) {
+              indexCountTotal += 1
               dataRow = []
               let dataToExportCSVItem = []
               let dossierObj = dossiersArray[keyDossier]
@@ -1322,6 +1345,7 @@ export default {
                     if (vm.itemsReportsConfig[keyVal]['value'] === 'note') {
                       dataRowTotal[indexRow]['text'] = ''
                     }
+                    dataRowAverageTotal[indexRow]['text'] = dataRowTotal[indexRow]['text']
                   }
                   
                   // 
@@ -1333,7 +1357,7 @@ export default {
               indexNotShowGroup = indexNotShowGroup + 1
               dataToExportCSV.push(dataToExportCSVItem)
               // 
-              indexCountTotal += 1
+              
             }
           }
           dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
@@ -1342,12 +1366,22 @@ export default {
           console.log('itemsReportsConfig', vm.itemsReportsConfig)
           console.log('dataRowTotal 777===', dataRowTotal)
           console.log('percentTotal 555', dataRowTotal[dataRowTotal.length - 1]['text'], indexCountTotal, Math.round(dataRowTotal[dataRowTotal.length - 1]['text']/indexCountTotal))
-
+          let totalScoreVoting = 0
+          for (let indexTotalAverage in dataRowAverageTotal) {
+            if (!isNaN(dataRowAverageTotal[indexTotalAverage]['text']) && dataRowAverageTotal[indexTotalAverage]['text']) {
+              totalScoreVoting += dataRowAverageTotal[indexTotalAverage]['text']
+              let average = dataRowAverageTotal[indexTotalAverage]['text']/indexCountTotal
+              dataRowAverageTotal[indexTotalAverage]['text'] = String(average).indexOf('.') > 0 ? average.toFixed(1) : average
+            }
+          }
           if (vm.reportType.startsWith('REPORT_STATISTIC')) {
             if (vm.itemsReportsConfig[dataRowTotal.length - 2]['value'] === 'ontimePercentage') {
               dataRowTotal[dataRowTotal.length - 1]['text'] = Math.round(dataRowTotal[dataRowTotal.length - 1]['text']/indexCountTotal)
             }
             vm.dataReportXX += ',' + JSON.stringify(dataRowTotal)
+          }
+          if (vm.statisticVotingDossiers) {
+            vm.dataReportXX += ',' + JSON.stringify(dataRowAverageTotal)
           }
           console.log('dataReportXX11ZZ', vm.dataReportXX)
           
@@ -1365,6 +1399,9 @@ export default {
             }
           }
           vm.showCSVDownload = true
+          if (vm.statisticVotingDossiers) {
+            docDString = docDString.replace(/\[\$totalScoreVoting\$\]/g, totalScoreVoting)
+          }
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           vm.dataExportExcel = docDString
