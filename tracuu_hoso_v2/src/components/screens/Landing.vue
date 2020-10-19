@@ -7,10 +7,10 @@
       </v-flex>
       <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>
-          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Mã hồ sơ:</div>
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 160px;">Mã hồ sơ:</div>
           <v-text-field
             class="search-input-appbar input-search d-inline-block"
-            style="width: calc(100% - 130px);"
+            style="width: calc(100% - 160px);"
             v-model="dossierNoKey"
             single-lines
             hide-details
@@ -24,10 +24,10 @@
       </v-flex>
       <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>
-          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">CMND/Hộ chiếu/MST:</div>
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 160px;">CMND/Hộ chiếu/MST:</div>
           <v-text-field
             class="search-input-appbar input-search d-inline-block"
-            style="width: calc(100% - 130px);"
+            style="width: calc(100% - 160px);"
             single-lines
             v-model="applicantIdNo"
             hide-details
@@ -41,10 +41,10 @@
       </v-flex>
       <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>
-          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Lĩnh vực:</div>
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 160px;">Lĩnh vực:</div>
           <v-autocomplete
             class="select-search d-inline-block"
-            style="width: calc(100% - 130px);"
+            style="width: calc(100% - 160px);"
             v-model="domain"
             :items="domainListCurrent"
             item-text="domainName"
@@ -61,10 +61,10 @@
       </v-flex>
       <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>
-          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Thủ tục:</div>
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 160px;">Thủ tục:</div>
           <v-autocomplete
             class="select-search d-inline-block"
-            style="width: calc(100% - 130px);"
+            style="width: calc(100% - 160px);"
             item-text="domainName"
             item-value="domainCode"
             hide-details
@@ -79,10 +79,10 @@
       </v-flex>
       <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>
-          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Trạng thái:</div>
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 160px;">Trạng thái:</div>
           <v-autocomplete
             class="select-search d-inline-block"
-            style="width: calc(100% - 130px);"
+            style="width: calc(100% - 160px);"
             item-text="text"
             item-value="value"
             v-model="status"
@@ -99,10 +99,10 @@
       </v-flex>
       <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>
-          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Phương thức nộp:</div>
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 160px;">Phương thức nộp:</div>
           <v-autocomplete
             class="select-search d-inline-block"
-            style="width: calc(100% - 130px);"
+            style="width: calc(100% - 160px);"
             :items="onlines"
             v-model="online"
             item-text="text"
@@ -119,22 +119,24 @@
       </v-flex>
       <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>
-          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Mã xác nhận:</div>
-          <div style="width: calc(100% - 130px);display: inline-block;">
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 160px;">Mã xác nhận:</div>
+          <div style="width: calc(100% - 160px);display: inline-block;">
             <div style="display:flex; align-items: center;justify-content: center;">
-              <v-text-field
-                v-model="captchaValue"
-                class="search-input-appbar input-search d-inline-block"
-                style="width: 75%"
-                single-lines
-                hide-details
-                solo
-                flat
-                height="32"
-                min-height="32"
-                clearable
-              ></v-text-field>
-              <div style="width: 25%">
+              <div style="width: calc(100% - 130px);">
+                <v-text-field
+                  v-model="captchaValue"
+                  class="search-input-appbar input-search d-inline-block"
+                  single-lines
+                  hide-details
+                  style="width: 100%;"
+                  solo
+                  flat
+                  height="32"
+                  min-height="32"
+                  clearable
+                ></v-text-field>
+              </div>
+              <div style="width: 130px">
                 <div id="captcha" class="d-inline-block text-xs-center" style="background: #fff;border-radius: 5px;"></div>
                 <v-btn class="right  mx-0 my-0" title="refresh" flat icon v-on:click.native="createCaptcha" style="display: inline-block;">
                   <v-icon color="primary" size="32">refresh</v-icon>
@@ -606,7 +608,7 @@ export default {
       canv.width = 90
       canv.height = 30
       let ctx = canv.getContext("2d")
-      ctx.font = "20px Georgia"
+      ctx.font = "18px Georgia"
       ctx.strokeText(captcha.join(""), 0, 30)
       vm.captchaCode = captcha.join("")
       document.getElementById("captcha").appendChild(canv)
