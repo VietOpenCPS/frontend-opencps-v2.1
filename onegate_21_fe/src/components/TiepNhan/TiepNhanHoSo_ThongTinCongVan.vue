@@ -543,6 +543,7 @@ export default {
     initData (data) {
       let vm = this
       vm.thongTinCongVan = data
+      console.log('thongTinCongVan', vm.thongTinCongVan)
       try {
         let metadata = JSON.parse(vm.thongTinCongVan.metaData)
         vm.metaDataDossier = metadata
@@ -845,6 +846,7 @@ export default {
       vm.$store.dispatch('loadDictItems', filter).then(function (result) {
         vm.govAgencySubmitList = result.data
         if (vm.govAgencySubmitList.length === 1 && vm.formCodeInput === 'NEW_GROUP_CV_DI') {
+          console.log('111111', vm.govAgencySubmitList)
           vm.donvi_gui_nhan = vm.govAgencySubmitList[0]['itemCode']
         }
       })
@@ -864,6 +866,7 @@ export default {
           vm.govAgencySubmitList = Array.isArray(parent) ? parent : [parent]
         }
         if (vm.govAgencySubmitList.length === 1 && vm.formCodeInput === 'NEW_GROUP_CV_DI') {
+          console.log('2222', vm.govAgencySubmitList)
           vm.donvi_gui_nhan = vm.govAgencySubmitList[0]['itemCode']
         }
       })
@@ -877,6 +880,7 @@ export default {
       vm.$store.dispatch('getGroupDictitem', filter).then(function (result) {
         vm.govAgencySubmitList = Array.isArray(result) ? result : [result]
         if (vm.govAgencySubmitList.length === 1 && vm.formCodeInput === 'NEW_GROUP_CV_DI') {
+          console.log('3333', vm.govAgencySubmitList)
           vm.donvi_gui_nhan = vm.govAgencySubmitList[0]['itemCode']
         }
       })

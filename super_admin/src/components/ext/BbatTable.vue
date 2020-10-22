@@ -536,6 +536,17 @@
                   'start': vm.page * 10 - 10,
                   'end': vm.page * 10
                 }
+              } else if (vm.tableName === 'opencps_userlogin') {
+                textPost = {
+                  'type': 'admin',
+                  'cmd': 'get',
+                  'code': vm.$router.history.current.params.tableName,
+                  'respone': 'tableData',
+                  'filter': vm.columnsDataFilter,
+                  'sort': vm.order ? 'createDate_desc' : 'createDate_asc',
+                  'start': vm.page * 10 - 10,
+                  'end': vm.page * 10
+                }
               } else {
                 textPost = {
                   'type': 'admin',
