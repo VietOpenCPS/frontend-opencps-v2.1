@@ -723,14 +723,14 @@ export default {
     checkDelegateIdNo: false,
     checkApplicantId: false,
     requiredOptions: {
-      applicantIdNo: false,
+      applicantIdNo: true,
       applicantName: true,
       address: true,
-      cityCode: false,
-      districtCode: false,
-      wardCode: false,
+      cityCode: true,
+      districtCode: true,
+      wardCode: true,
       contactTelNo: true,
-      contactEmail: true,
+      contactEmail: false,
       delegateIdNo: true,
       delegateName: true,
       delegateAddress: true,
@@ -916,7 +916,7 @@ export default {
     wardItems: [],
     valid: false,
     loadingTable: false,
-    hasOrganization: true
+    hasOrganization: false
   }),
   computed: {
     loading () {
@@ -1158,10 +1158,10 @@ export default {
         vm.$store.getters.getDictItems(filter).then(function (result) {
           vm.citys = result.data
           // set default cityCode
-          if (vm.formCode === "NEW" && !thongTinChuHoSoTemp['cityCode']) {
-            vm.thongTinChuHoSo['cityCode'] = 87
-            vm.thongTinChuHoSo['cityName'] = 'Tỉnh Đồng Tháp'
-          }
+          // if (vm.formCode === "NEW" && !thongTinChuHoSoTemp['cityCode']) {
+          //   vm.thongTinChuHoSo['cityCode'] = 87
+          //   vm.thongTinChuHoSo['cityName'] = 'Tỉnh Đồng Tháp'
+          // }
           
         })
         setTimeout(function () {
