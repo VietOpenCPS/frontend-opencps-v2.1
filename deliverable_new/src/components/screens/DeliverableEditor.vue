@@ -49,23 +49,15 @@
         </v-btn>
         
       </v-flex>
-      <v-navigation-drawer
+      <!-- <v-navigation-drawer
         v-model="drawer"
         absolute
         hide-overlay
         right
         temporary
       >
-        <!-- <v-toolbar height="40" color="primary" dark flat class="mb-2">
-          <v-btn icon @click.stop="drawer = !drawer">
-            <v-icon size="22">chevron_right</v-icon>
-          </v-btn>
-
-          <v-toolbar-title class="ml-0" style="font-size: 16px">Thông tin giấy phép</v-toolbar-title>
-          <v-spacer></v-spacer>
-        </v-toolbar> -->
         <bbat-table-editor-component-simple ref="bbatFormSimple" :id="id" :datainput="detail"></bbat-table-editor-component-simple>
-      </v-navigation-drawer>
+      </v-navigation-drawer> -->
       
       <v-layout row wrap :class='{"fix_tool_bottom": offsetCheck > 300}' v-if="!viewForm">
         <v-flex xs12 class="text-right pt-0 mt-4 ml-1 px-0 pr-3">

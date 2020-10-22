@@ -356,11 +356,12 @@
           </v-btn>
         </v-tab>
         
-        <v-tab href="#tab-2" @click="putGroupDossier('saveSend')" v-if="activeAddGroup && formCode === 'NEW_GROUP_CV_DI' && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui" class="px-0 py-0"> 
+        <v-tab href="#tab-2" v-if="activeAddGroup && formCode === 'NEW_GROUP_CV_DI' && metaDataGroupDossier.hasOwnProperty('congvandagui') && !metaDataGroupDossier.congvandagui" class="px-0 py-0"> 
           <v-btn flat class="" 
             :loading="loadingAction"
             :disabled="loadingAction || dossiersCounterIntoGroupFilter === 0"
             :style="dossiersCounterIntoGroupFilter === 0 ? 'pointer-events: none;' : ''"
+            @click="putGroupDossier('saveSend')" 
           >
             <v-icon size="20">save</v-icon>  &nbsp;
             <span>Lưu và gửi công văn</span>

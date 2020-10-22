@@ -13,7 +13,10 @@
           <div class="background-triangle-big"> <span>CHI TIẾT HỒ SƠ</span> </div>
           <div class="layout row wrap header_tools row-blue">
             <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinChiTietHoSo.serviceName">
-              {{thongTinChiTietHoSo.serviceName}}
+                <v-tooltip top>
+                  <span  slot="activator">{{thongTinChiTietHoSo.serviceName}}</span>
+                  <span>{{thongTinChiTietHoSo.serviceName}}</span>
+                </v-tooltip>
             </div>
             <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
               <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">

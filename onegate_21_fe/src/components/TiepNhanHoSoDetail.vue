@@ -413,10 +413,11 @@
               <span slot="loader">Loading...</span>
             </v-btn>
           </v-tab>
-          <v-tab v-if="formCode === 'NEW_GROUP_CV_DI'" href="#tab-2" @click="tiepNhanCongVan('add', 'saveSend')" class="px-0 py-0"> 
+          <v-tab v-if="formCode === 'NEW_GROUP_CV_DI'" href="#tab-2" class="px-0 py-0"> 
             <v-btn flat class="" 
               :loading="loadingAction"
               :disabled="loadingAction || dossiersCounterIntoGroupFilter === 0"
+              @click="tiepNhanCongVan('add', 'saveSend')"
             >
               <v-icon size="20">save</v-icon>  &nbsp;
               <span>Lưu và gửi công văn</span>
