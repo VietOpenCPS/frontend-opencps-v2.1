@@ -1,16 +1,16 @@
 <template>
-  <div style="background: #eeeeee;">
-    <v-layout wrap>
-      <v-flex xs12 class="text-xs-center my-4">
-        <p class="display-1 font-weight-bold">Tra cứu hồ sơ</p>
-        <p class="headline">Vui lòng nhập mã hồ sơ hoặc CMND/Hộ chiếu/MST để tra cứu hồ sơ</p>
+  <div style="margin-top: 15px;">
+    <v-layout wrap class="px-3" style="background: #dde4eb;">
+      <v-flex xs12 class="text-xs-center mt-2 mb-3" style="font-size: 22px;">
+        <p class="font-weight-bold">Tra cứu hồ sơ</p>
+        <p class="">Vui lòng nhập mã hồ sơ hoặc CMND/Hộ chiếu/MST để tra cứu hồ sơ</p>
       </v-flex>
       <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>
-          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Mã hồ sơ:</div>
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Mã hồ sơ:</div>
           <v-text-field
             class="search-input-appbar input-search d-inline-block"
-            style="width: calc(100% - 130px);"
+            style="width: calc(100% - 150px);"
             v-model="dossierNoKey"
             single-lines
             hide-details
@@ -24,10 +24,10 @@
       </v-flex>
       <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>
-          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">CMND/Hộ chiếu/MST:</div>
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">CMND/Hộ chiếu/MST:</div>
           <v-text-field
             class="search-input-appbar input-search d-inline-block"
-            style="width: calc(100% - 130px);"
+            style="width: calc(100% - 150px);"
             single-lines
             v-model="applicantIdNo"
             hide-details
@@ -41,10 +41,10 @@
       </v-flex>
       <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>
-          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Lĩnh vực:</div>
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Lĩnh vực:</div>
           <v-autocomplete
             class="select-search d-inline-block"
-            style="width: calc(100% - 130px);"
+            style="width: calc(100% - 150px);"
             v-model="domain"
             :items="domainListCurrent"
             item-text="domainName"
@@ -56,17 +56,20 @@
             height="32"
             min-height="32"
             clearable
+            @change="changeDomain"
           ></v-autocomplete>
         </div>
       </v-flex>
       <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>
-          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Thủ tục:</div>
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Thủ tục:</div>
           <v-autocomplete
             class="select-search d-inline-block"
-            style="width: calc(100% - 130px);"
-            item-text="domainName"
-            item-value="domainCode"
+            style="width: calc(100% - 150px);"
+            v-model="service"
+            :items="serviceList"
+            item-text="serviceName"
+            item-value="serviceCode"
             hide-details
             hide-no-data
             solo
@@ -79,10 +82,10 @@
       </v-flex>
       <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>
-          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Trạng thái:</div>
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Trạng thái:</div>
           <v-autocomplete
             class="select-search d-inline-block"
-            style="width: calc(100% - 130px);"
+            style="width: calc(100% - 150px);"
             item-text="text"
             item-value="value"
             v-model="status"
@@ -99,10 +102,10 @@
       </v-flex>
       <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>
-          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Phương thức nộp:</div>
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Phương thức nộp:</div>
           <v-autocomplete
             class="select-search d-inline-block"
-            style="width: calc(100% - 130px);"
+            style="width: calc(100% - 150px);"
             :items="onlines"
             v-model="online"
             item-text="text"
@@ -117,15 +120,15 @@
           ></v-autocomplete>
         </div>
       </v-flex>
-      <v-flex class="mb-2 px-2 xs12 md6"> 
+      <!-- <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>
-          <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Mã xác nhận:</div>
-          <div style="width: calc(100% - 130px);display: inline-block;">
+          <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Mã xác nhận <span style="color: red">(*)</span> :</div>
+          <div style="width: calc(100% - 150px);display: inline-block;">
             <div style="display:flex; align-items: center;justify-content: center;">
               <v-text-field
                 v-model="captchaValue"
                 class="search-input-appbar input-search d-inline-block"
-                style="width: 75%"
+                style="width: calc(100% - 130px);"
                 single-lines
                 hide-details
                 solo
@@ -134,30 +137,32 @@
                 min-height="32"
                 clearable
               ></v-text-field>
-              <div style="width: 25%">
-                <div id="captcha" class="d-inline-block text-xs-center" style="background: #fff;border-radius: 5px;"></div>
-                <v-btn class="right  mx-0 my-0" title="refresh" flat icon v-on:click.native="createCaptcha" style="display: inline-block;">
+              <div style="width: 130px" class="layout wrap">
+                <div id="captcha" class="d-inline-block text-xs-center" style="background: #fff;height: 32px;margin-top: 3px;border-left: 1px solid #dedede;"></div>
+                <v-btn class="right  mx-0 px-0" title="refresh" flat icon v-on:click.native="createCaptcha" style="display: inline-block; margin-top: 3px;">
                   <v-icon color="primary" size="32">refresh</v-icon>
                 </v-btn>
               </div>
             </div>
           </div>
         </div>
-      </v-flex>
-      <v-flex xs12 class="text-xs-center">
+      </v-flex> -->
+      <v-flex xs12 class="text-xs-center mb-2">
         <v-btn color="primary" @click="changeStatus">
+          <v-icon>search</v-icon>&nbsp;
           Tìm kiếm
         </v-btn>
       </v-flex>
     </v-layout>
-    <v-layout wrap>
+    <v-layout wrap v-if="!detail">
       <v-flex xs12>
         <v-data-table
           :headers="headers"
           :items="dossierList"
           hide-actions
-          class="table-landing table-bordered mt-3 mx-2"
+          class="table-landing table-bordered mt-3 mx-0"
           style="border-left: 1px solid #dedede;"
+          no-data-text="Không có hồ sơ nào"
         >
           <template slot="items" slot-scope="props">
             <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;" @click="viewDetail(props.item)">
@@ -183,16 +188,15 @@
                 </content-placeholders>
                 <div v-else>
                   <p>{{props.item.dossierNo}}</p>
-                  <p v-if="props.item.online" style="color: blue;">Hồ sơ nộp trực tuyến</p>
-                  <p v-if="!props.item.online" style="color: green;">Hồ sơ nộp trực tiếp</p>
                 </div>
               </td>
-              <td class="text-xs-left py-2" style="min-width: 150px;">
+              <td class="text-xs-left py-2" :style="isMobile ? 'min-width: 110px' : 'min-width: 135px'">
                 <content-placeholders v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
-                  <span>{{props.item.dossierName}}</span>
+                  <p v-if="props.item.online" style="color: blue;">Hồ sơ nộp trực tuyến</p>
+                  <p v-if="!props.item.online" style="color: green;">Hồ sơ nộp trực tiếp</p>
                 </div>
               </td>
               <td class="text-xs-left py-2" :style="isMobile ? 'min-width: 100px' : 'min-width: 135px'">
@@ -236,6 +240,50 @@
         </div>
       </v-flex>
     </v-layout>
+    <v-card flat class="" v-else>
+      <chi-tiet-ho-so :detail="dossierDetail"></chi-tiet-ho-so>
+    </v-card>
+    <v-dialog v-model="dialogCheckPass" max-width="450">
+      <v-card class="px-0">
+        <v-card-title color="primary" class="headline">XÁC THỰC TRA CỨU THÔNG TIN HỒ SƠ</v-card-title>
+        <v-divider class="my-0"></v-divider>
+        <v-card-text class="pt-4">
+          <v-form ref="form" v-model="valid" lazy-validation class="">
+            <v-flex xs12 class="">
+              <v-text-field
+                box
+                label="Mã tra cứu"
+                v-model="secretKey"
+                height="42"
+                :rules="[v => !!v || 'Mã tra cứu là bắt buộc']"
+                required
+                @keyup.enter="submitPass"
+                autofocus
+              ></v-text-field>
+            </v-flex>
+            <div class="flex primary--text mb-3">Mã tra cứu là dãy số gồm 4 ký tự được in trên giấy tiếp nhận hồ sơ và hẹn trả kết quả, mail thông báo tiếp nhận hồ sơ.</div>
+            <v-flex xs12 class="text-xs-left text-xs-center mt-2">
+              <v-btn class="ml-0 mr-1 my-0 white--text" color="#0b72ba"
+                :loading="loading"
+                :disabled="loading"
+                @click="submitPass"
+              >
+                <v-icon>search</v-icon>&nbsp;
+                Tra cứu
+              </v-btn>
+              <v-btn class="ml-1 my-0 white--text" color="#0b72ba"
+                :loading="loading"
+                :disabled="loading"
+                @click="dialogCheckPass = false"
+              >
+                <v-icon>reply</v-icon>&nbsp;
+                Quay lại
+              </v-btn>
+            </v-flex>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -260,6 +308,8 @@ export default {
   },
   data: () => ({
     methodSelected: '',
+    serviceList: [],
+    service: '',
     domain: '',
     domainListCurrent: [],
     dossierList: [],
@@ -281,7 +331,7 @@ export default {
         sortable: false
       },
       {
-        text: 'Thủ tục',
+        text: 'Tên hồ sơ',
         align: 'center',
         sortable: false
       },
@@ -292,11 +342,6 @@ export default {
       },
       {
         text: 'Phương thức nộp',
-        align: 'center',
-        sortable: false
-      },
-      {
-        text: 'Tên hồ sơ',
         align: 'center',
         sortable: false
       },
@@ -354,6 +399,7 @@ export default {
     vm.$nextTick(function () {
       vm.createCaptcha()
       vm.getDomain()
+      vm.getService()
     })
   },
   updated () {
@@ -386,6 +432,22 @@ export default {
         vm.domainListCurrent = result
       })
     },
+    getService () {
+      let vm = this
+      let filter = {
+        domain: vm.domain
+      }
+      vm.$store.dispatch('getService', filter).then(function (result) {
+        vm.service = ''
+        vm.serviceList = result
+      })
+    },
+    changeDomain () {
+      let vm = this
+      setTimeout(function () {
+        vm.getService()
+      }, 200)
+    },
     doSearchDossier () {
       let vm = this
       vm.detail = false
@@ -398,6 +460,7 @@ export default {
       vm.status = newQuery.hasOwnProperty('status') && newQuery.status !== 'null' ? newQuery.status : ''
       vm.online = newQuery.hasOwnProperty('online') && newQuery.online !== 'null' ? newQuery.online : ''
       vm.domain = newQuery.hasOwnProperty('domain') && newQuery.domain !== 'null' ? newQuery.domain : ''
+      vm.service = newQuery.hasOwnProperty('service') && newQuery.service !== 'null' ? newQuery.service : ''
       vm.dossierPage = newQuery.hasOwnProperty('page') ? Number(newQuery.page) : 1
       let filter = {
         page: vm.dossierPage,
@@ -405,7 +468,8 @@ export default {
         applicantIdNo: vm.applicantIdNo,
         status: vm.status,
         online: vm.online,
-        domain: vm.domain
+        domain: vm.domain,
+        service: vm.service
       }
       if (vm.dossierNoKey || vm.applicantIdNo) {
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
@@ -422,7 +486,7 @@ export default {
     changeDataSearch () {
       let vm = this
       if (vm.dossierNoKey || vm.applicantIdNo) {
-        if(vm.validateCaptcha()){
+        // if(vm.validateCaptcha()){
           setTimeout(function () {
             vm.dossierPage = 1
             let current = vm.$router.history.current
@@ -430,6 +494,7 @@ export default {
             let queryString = '?'
             newQuery['page'] = vm.dossierPage
             newQuery['domain'] = vm.domain
+            newQuery['service'] = vm.service
             newQuery['dossierNo'] = vm.dossierNoKey
             newQuery['applicantIdNo'] = vm.applicantIdNo
             newQuery['status'] = vm.status
@@ -447,7 +512,7 @@ export default {
               }
             })
           }, 100)
-        }
+        // }
       } else {
         toastr.error('Vui lòng nhập mã hồ sơ hoặc số CMND/ hộ chiếu để tra cứu')
       }
@@ -539,56 +604,6 @@ export default {
     goBack () {
       window.history.back()
     },
-    thanhToanTrucTuyen () {
-      let vm = this
-      let paymentProfile = {
-        "paymentMerchantCode": "UBNDHG",
-        "paymentHashAlgorithm": "SHA-256",
-        "paymentServiceCode": "720",
-        "paymentVersion": "1.0",
-        "paymentCommand": "pay",
-        "paymentCurrencyCode": "704",
-        "paymentCurrentLocale": "vn",
-        "paymentCountryCode": "+84",
-        "paymentInternalBank": "all_card",
-        "paymentMerchantSecureKey": "ubnd@keypay@haugiang",
-        "paymentResultUrl": "http://119.17.200.66:8074/o/rest/v2/dossiers/keypay",
-        "paymentKeypayDomain": "http://online.keypay.vn/process",
-            "bankAccountInfo": {
-              "default": "3511.0.1004872.00000"
-            },
-        "paymentReturnUrl":"http://119.17.200.66:8074/web/cong-dich-vu-cong-tinh-hau-giang/dich-vu-cong/#/thanh-toan-thanh-cong?paymentPortal=KEYPAY&actionCode=6200"
-      }
-      let filter = {
-        payment_domain: 'online.keypay.vn',
-        params: {
-          merchant_code: paymentProfile.paymentMerchantCode,
-          name: 'Ten Khach Hang',
-          phone: '0987654321',
-          email: 'kh@email.com.vn',
-          address: 'Đống Đa, Hà Nội',
-          merchant_trans_id: '123',
-          good_code: 'GC_232134034',
-          net_cost: '100000',
-          ship_fee: '3000',
-          Tax: '3000',
-          return_url: paymentProfile.paymentReturnUrl,
-          Version: '1.0',
-          Command: paymentProfile.paymentCommand,
-          current_locale: paymentProfile.paymentCurrentLocale,
-          currency_code: paymentProfile.paymentCurrencyCode,
-          service_code: paymentProfile.paymentServiceCode,
-          country_code: paymentProfile.paymentCountryCode,
-          xml_description: 'Nap tien mobile',
-          secure_hash: 'd13eac5a49adff8bdcd757ea8a527eab'
-        }
-      }
-      vm.$store.dispatch('createBillCode', filter).then(function (result) {
-
-      }).catch(function (reject) {
-
-      })
-    },
     createCaptcha () {
       let vm = this
       document.getElementById('captcha').innerHTML = "";
@@ -604,7 +619,7 @@ export default {
       let canv = document.createElement("canvas")
       canv.id = "captcha"
       canv.width = 90
-      canv.height = 30
+      canv.height = 32
       let ctx = canv.getContext("2d")
       ctx.font = "20px Georgia"
       ctx.strokeText(captcha.join(""), 0, 30)
@@ -616,7 +631,7 @@ export default {
       if (vm.captchaValue == vm.captchaCode) {
         return true
       } else {
-        toastr.error('Mã captcha không đúng. Vui lòng thử lại.')
+        toastr.error('Mã xác nhận không đúng. Vui lòng thử lại.')
         vm.createCaptcha()
         return false
       }

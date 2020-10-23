@@ -1,6 +1,6 @@
 <template>
   <v-app id="app_deliverable">
-    <v-navigation-drawer app clipped floating width="240">
+    <v-navigation-drawer app clipped floating width="316">
       <v-list dense>
         <v-list-tile
           v-for="(item, indexItem) in items"

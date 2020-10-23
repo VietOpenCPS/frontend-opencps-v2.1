@@ -2063,7 +2063,7 @@ export const store = new Vuex.Store({
           let field = window.$('div[id="formAlpaca' + data.dossierPartNo + id + '"]').alpaca('get').childrenByPropertyId
           if (field) {
             for (let prop in field) {
-              if (field[prop].isRequired() && field[prop].getValue() === '') {
+              if (field[prop].isRequired() && String(field[prop].getValue()).replace(/ /g, '') === '') {
                 toastr.clear()
                 toastr.error(field[prop].options.title ? field[prop].options.title + ' là trường dữ liệu bắt buộc' : field[prop].options['name'] + ' là trường dữ liệu bắt buộc')
                 reject('valid')
@@ -2077,11 +2077,11 @@ export const store = new Vuex.Store({
           axios.put(url, dataPutAlpacaForm, options).then(function (response) {
             resolve(response.data)
           }).catch(function (xhr) {
-            reject(data)
+            reject(xhr)
           })
         } catch (e) {
           console.log(e)
-          reject(data)
+          reject(xhr)
         }
       })
     },

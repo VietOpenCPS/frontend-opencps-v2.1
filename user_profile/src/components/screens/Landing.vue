@@ -992,7 +992,7 @@
             })
           }
           if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
-            vm.user['employeeBirthDate'] = vm.parseDateInput(vm.user['employeeBirthDate'])
+            vm.user['employeeBirthDate'] = vm.parseDateInput(vm.user['employeeBirthdate'])
           }
           // 
           if (vm.user['applicantProfile'] && vm.user['applicantProfile']['NoiDangKyKhaiSinhCityCode']) {
@@ -1060,6 +1060,7 @@
               }
             }
           }
+          console.log('user_info', vm.user)
         })
       })
     },
@@ -1279,7 +1280,7 @@
       parseDateInput (dateInput) {
         if (dateInput) {
           let date = ''
-          if (isNaN(dateInput)) {
+          if (isNaN(Number(dateInput))) {
             date = new Date(dateInput)
           } else {
             date = new Date(Number(dateInput))
