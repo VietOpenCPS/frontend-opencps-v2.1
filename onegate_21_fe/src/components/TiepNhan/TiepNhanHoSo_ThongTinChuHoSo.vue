@@ -177,7 +177,7 @@
                       v-model="thongTinChuHoSo.contactTelNo"
                       @change="thongTinChuHoSo.contactTelNo=String(thongTinChuHoSo.contactTelNo).trim()"
                       append-icon="phone"
-                      :rules="requiredOptions['contactTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
+                      :rules="requiredOptions['contactTelNo'] ? [rules.telNo, rules.required, rules.varchar100] : [rules.telNo, rules.varchar100]"
                       :required="requiredOptions['contactTelNo']"
                       ></v-text-field>
                     </v-flex>
@@ -397,7 +397,7 @@
                         v-model="thongTinNguoiNopHoSo.delegateTelNo"
                         append-icon="phone"
                         @change="thongTinNguoiNopHoSo.delegateName=String(thongTinNguoiNopHoSo.delegateName).trim()"
-                        :rules="requiredOptions['delegateTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
+                        :rules="requiredOptions['delegateTelNo'] ? [rules.telNo, rules.required, rules.varchar100] : [rules.telNo, rules.varchar100]"
                         :required="requiredOptions['delegateTelNo']"
                         :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
@@ -1335,7 +1335,7 @@ export default {
         vm.$store.commit('setApplicantId', query)
       }, 2000)
       console.log(query)
-      if (query.trim().length === 0 ) {
+      if (query.trim().length === 0) {
         vm.thongTinChuHoSo.applicantIdNo = ''
         console.log(vm.thongTinChuHoSo.applicantIdNo)
         return null
@@ -1361,7 +1361,11 @@ export default {
                   vm.thongTinChuHoSo.applicantIdNo = ''
                   return null
                 } else {
-                  vm.thongTinChuHoSo.applicantIdNo = query.trim()
+                  if(parseInt(query)<0){
+                    vm.thongTinChuHoSo.applicantIdNo = ''
+                  } else {
+                    vm.thongTinChuHoSo.applicantIdNo = query.trim()
+                  }
                 }
               } else {
                   if(query.trim().length > 100) {
@@ -1369,7 +1373,11 @@ export default {
                     vm.thongTinChuHoSo.applicantIdNo = ''
                     return null
                   } else {
-                    vm.thongTinChuHoSo.applicantIdNo = query.trim()
+                    if(parseInt(query)<0){
+                      vm.thongTinChuHoSo.applicantIdNo = ''
+                    } else {
+                      vm.thongTinChuHoSo.applicantIdNo = query.trim()
+                    }
                   }
               }
               resolve(items)
@@ -1406,7 +1414,11 @@ export default {
                   vm.thongTinNguoiNopHoSo.delegateIdNo = ''
                   return null
                 } else {
-                  vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
+                  if(parseInt(query)<0){
+                    vm.thongTinNguoiNopHoSo.delegateIdNo = ''
+                  } else {
+                    vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
+                  }
                 }
               } else {
                 if(query.trim().length > 100) {
@@ -1414,7 +1426,11 @@ export default {
                   vm.thongTinNguoiNopHoSo.delegateIdNo = ''
                   return null
                 } else {
-                  vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
+                  if(parseInt(query)<0){
+                    vm.thongTinNguoiNopHoSo.delegateIdNo = ''
+                  } else {
+                    vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
+                  }
                 }
               }
               resolve(items)

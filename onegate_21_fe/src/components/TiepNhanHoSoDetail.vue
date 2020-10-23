@@ -413,10 +413,11 @@
               <span slot="loader">Loading...</span>
             </v-btn>
           </v-tab>
-          <v-tab v-if="formCode === 'NEW_GROUP_CV_DI'" href="#tab-2" @click="tiepNhanCongVan('add', 'saveSend')" class="px-0 py-0"> 
+          <v-tab v-if="formCode === 'NEW_GROUP_CV_DI'" href="#tab-2" class="px-0 py-0"> 
             <v-btn flat class="" 
               :loading="loadingAction"
               :disabled="loadingAction || dossiersCounterIntoGroupFilter === 0"
+              @click="tiepNhanCongVan('add', 'saveSend')"
             >
               <v-icon size="20">save</v-icon>  &nbsp;
               <span>Lưu và gửi công văn</span>
@@ -1302,6 +1303,10 @@ export default {
         } else {
           vm.formTemplate = 'version_1.0'
           vm.$store.dispatch('getDetailDossier', data).then(result => {
+            // lấy thông tin createFile công văn
+            if (vm.formCode === 'NEW_GROUP_CV_DI') {
+              vm.getDetailActionCongVan()
+            }
             vm.dossierId = result.dossierId
             vm.briefNote = result.serviceName ? result.serviceName : ''
             if (vm.formCode === 'UPDATE') {
@@ -1319,7 +1324,7 @@ export default {
                       return item.actionCode === 1100 || item.actionCode === '1100'
                     })[0]
                   } else {
-                    vm.actionDetail = actionList[0]
+                    vm.actionDetail = actionList && actionList.length === 1 ? actionList[0] : result2[0]
                   }
                   vm.$store.dispatch('processPullBtnDetail', {
                     dossierId: result.dossierId,
@@ -1365,13 +1370,12 @@ export default {
               }
             }
             vm.thongTinChiTietHoSo = result
-            if (!vm.mauCongVan) {
+            if (!vm.mauCongVan && vm.$refs.thongtinchuhoso) {
               vm.$refs.thongtinchuhoso.initData(result)
             }
-            if (vm.formCode === 'UPDATE' && vm.mauCongVan) {
+            if (vm.formCode === 'UPDATE' && vm.mauCongVan && vm.$refs.thongtinchuhosocongvan) {
               vm.$refs.thongtinchuhosocongvan.initData(result)
             }
-            
             vm.viaPortalDetail = result.viaPostal
             if (result.viaPostal > 0) {
               let vnpostalProfile = {
@@ -1420,10 +1424,7 @@ export default {
                 }
               }
             })
-            // lấy thông tin createFile công văn
-            if (vm.formCode === 'NEW_GROUP_CV_DI') {
-              vm.getDetailActionCongVan()
-            }
+            
             
           }).catch(reject => {
           })
@@ -1489,12 +1490,14 @@ export default {
               postalCityName: dichvuchuyenphathoso.postalCityName,
               postalDistrictCode: dichvuchuyenphathoso.postalDistrictCode,
               postalDistrictName: dichvuchuyenphathoso.postalDistrictName,
-              postalWardCode: dichvuchuyenphathoso.postalWardCode,
+              postalWardCode: "",
               postalWardName: dichvuchuyenphathoso.postalWardName,
               postalTelNo: dichvuchuyenphathoso.postalTelNo
             }
             tempData['vnpostalStatus'] = dichvuchuyenphathoso.vnpostalStatus
             tempData['vnpostalProfile'] = vnpostal
+            tempData['postalCityCode'] = dichvuchuyenphathoso.postalCityCode
+            tempData['postalDistrictCode'] = dichvuchuyenphathoso.postalDistrictCode
           }
           setTimeout(function () {
             vm.$store.dispatch('putDossier', tempData).then(function (result) {

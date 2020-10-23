@@ -299,11 +299,11 @@ export default {
       })[0]['itemName']
     },
     changeViaPostal (event) {
-      console.log('changeViaPostal', event)
-      this.$store.commit('setViaPostal', event)
-      this.$emit('changeViapostal', event)
+      // console.log('changeViaPostal', event)
+      // this.$store.commit('setViaPostal', event)
+      // this.$emit('changeViapostal', event)
       let dataChuyenPhat = {
-        vnpostalStatus: event,
+        vnpostalStatus: event ? 1 : 0,
         postalServiceCode: this.dichVuChuyenPhatHoSo.postalServiceCode ? this.dichVuChuyenPhatHoSo.postalServiceCode : '',
         postalAddress: this.dichVuChuyenPhatHoSo.postalAddress ? this.dichVuChuyenPhatHoSo.postalAddress : '',
         postalCityCode: this.dichVuChuyenPhatHoSo.postalCityCode ? this.dichVuChuyenPhatHoSo.postalCityCode : '',
@@ -314,14 +314,18 @@ export default {
         postalWardName: this.dichVuChuyenPhatHoSo.postalWardName ? this.dichVuChuyenPhatHoSo.postalWardName : '',
         postalTelNo: this.dichVuChuyenPhatHoSo.postalTelNo ? this.dichVuChuyenPhatHoSo.postalTelNo : ''
       }
-
       this.$store.commit('setDichVuChuyenPhatHoSo', dataChuyenPhat)
       console.log('dichVuChuyenPhatHoSo', this.dichVuChuyenPhatHoSo)
     },
     validDichVuChuyenPhat () {
       var vm = this
-      return vm.$refs.formDichVuChuyenPhatHoSo.validate()
-    }
+      if(vm.dichVuChuyenPhatHoSo.vnpostalStatus){
+        return vm.$refs.formDichVuChuyenPhatHoSo.validate()
+      } else {
+        return true
+      }
+      
+    } 
   }
 }
 </script>

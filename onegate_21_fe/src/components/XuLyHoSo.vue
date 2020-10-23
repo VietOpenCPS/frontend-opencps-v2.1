@@ -531,6 +531,7 @@ export default {
     },
     processAction () {
       var vm = this
+      var validCreateFiles = true
       var initData = vm.$store.getters.loadingInitData
       var actionUser = initData.user.userName ? initData.user.userName : ''
       vm.dossierProcess = vm.dossierSelected.filter(function (item) {
@@ -567,7 +568,12 @@ export default {
           }
         }
       }
+
       if (vm.showTaoTaiLieuKetQua) {
+        validCreateFiles = vm.$refs.tailieuketqua.validCreateFileTemplate()
+        if (!validCreateFiles) {
+          return
+        }
         let createFileAttach = vm.$refs.tailieuketqua.getCreateFileAttach()
         let arrFileAttach = []
         for (let key in createFileAttach) {
@@ -592,9 +598,9 @@ export default {
       }
     },
     postAction (filter, dossier, index) {
-      var vm = this
-      var validPhanCong = true
-      var validYKien = true
+      let vm = this
+      let validPhanCong = true
+      let validYKien = true
       if (vm.showPhanCongNguoiThucHien) {
         filter['toUsers'] = vm.assign_items
         let result = vm.$refs.phancong.doExport()
@@ -605,7 +611,7 @@ export default {
           validPhanCong = false
         }
       }
-      var paymentsOut = null
+      let paymentsOut = null
       if (vm.payments) {
         if (vm.showThuPhi) {
           paymentsOut = {
@@ -628,9 +634,9 @@ export default {
       if (vm.showFormBoSungThongTinNgan) {
         filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
       }
-      if (vm.showKyPheDuyetTaiLieu) {
-        let result = vm.$refs.kypheduyettailieu.doExport()
-      }
+      // if (vm.showKyPheDuyetTaiLieu) {
+      //   let result = vm.$refs.kypheduyettailieu.doExport()
+      // }
       if (vm.showEditDate) {
         let date = vm.$refs.ngayhentra.getDateInput()
         console.log('dueDateEdit', date)

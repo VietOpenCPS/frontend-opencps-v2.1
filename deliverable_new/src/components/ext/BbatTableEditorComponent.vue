@@ -2,7 +2,7 @@
   <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3 vuejx__form">
     <v-layout row wrap>
       <v-flex xs12>
-        <div id="formDelivert" class="mb-5 pt-0"></div>
+        <div id="formDelivert" class="mb-5 pt-0" :style="{ 'pointer-events':  viewForm ? 'none' : 'auto'}"></div>
       </v-flex>
     </v-layout>
 
@@ -13,7 +13,7 @@
   import DatetimePicker from './DatetimePicker.vue'
 
   export default {
-    props: ['id', 'formid', 'datainput'],
+    props: ['id', 'formid', 'datainput', 'viewForm'],
     components: {
       DatetimePicker
     },
@@ -102,7 +102,7 @@
       let vm = this
       vm.$nextTick(function () {
         vm.$store.dispatch('getContentFile', vm.formid).then(function (result) {
-          // console.log('formScript --->', result)
+          console.log('formScript --->', result)
           vm.formTempalate = result
           window.$('#formDelivert').empty()
           let formScript, formData
@@ -112,7 +112,7 @@
           } else {
             formScript = {}
           }
-          // console.log('form-Data', vm.datainput)
+          console.log('form-Data', vm.datainput)
           if (String(vm.id) !== '0' && vm.datainput) {
             formData = eval('(' + vm.datainput + ')')
           } else {
