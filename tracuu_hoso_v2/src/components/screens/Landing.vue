@@ -368,7 +368,7 @@ export default {
       {text: 'Đang xử lý', value: 'processing'},
       {text: 'Yêu cầu bổ sung giấy tờ', value: 'waiting'},
       {text: 'Từ chối xử lý', value: 'denied'},
-      {text: 'Đã xử lý xong', value: 'releasing'},
+      {text: 'Chờ trả kết quả', value: 'releasing'},
       {text: 'Đã trả kết quả', value: 'done'}
     ],
     onlines: [
@@ -397,7 +397,7 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
-      vm.createCaptcha()
+      // vm.createCaptcha()
       vm.getDomain()
       vm.getService()
     })

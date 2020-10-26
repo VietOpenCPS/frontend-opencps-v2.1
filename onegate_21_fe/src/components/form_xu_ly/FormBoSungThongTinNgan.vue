@@ -464,14 +464,14 @@
           for (let key in vm.formBuilder) {
             if (vm.formBuilder[key].fieldType.indexOf('options_group') >= 0) {
               for (let key1 in vm.optionsGroup) {
-                if ((vm.optionsGroup[key1]['required'] === true || vm.optionsGroup[key1]['required'] === 'true') && !vm.optionsGroup[key1]['value']) {
+                if ((vm.optionsGroup[key1]['required'] === true || vm.optionsGroup[key1]['required'] === 'true') && (!vm.optionsGroup[key1]['value'] || !String(vm.optionsGroup[key1]['value']).replace(/ /g, ''))) {
                   valid = false
                   alert(vm.formBuilder[key]['fieldLabel'] + ' là bắt buộc!')
                   return valid
                 }
               }
             } else {
-              if ((vm.formBuilder[key]['required'] === true || vm.formBuilder[key]['required'] === 'true') && !vm.formBuilder[key]['value']) {
+              if ((vm.formBuilder[key]['required'] === true || vm.formBuilder[key]['required'] === 'true') && (!vm.formBuilder[key]['value'] || !String(vm.formBuilder[key]['value']).replace(/ /g, ''))) {
                 valid = false
                 alert(vm.formBuilder[key]['fieldLabel'] + ' là bắt buộc!')
                 $('#form_' + vm.formBuilder[key].fieldName)[0].__vue__.validate()

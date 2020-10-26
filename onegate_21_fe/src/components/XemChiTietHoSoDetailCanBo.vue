@@ -216,7 +216,7 @@
                   <span slot="loader">Loading...</span>
                 </v-btn> -->
                 <!--  -->
-                <v-menu bottom offset-y v-if="showMenuActionKhac && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
+                <v-menu bottom offset-y v-if="showMenuActionKhac && thongTinChiTietHoSo && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
                   <v-btn slot="activator" class="on-hover-btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list>
                     <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" @click="btnActionEvent(item, index)" v-if="item.form !== 'UPDATE'">

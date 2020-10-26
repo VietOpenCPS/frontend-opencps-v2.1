@@ -1481,7 +1481,7 @@ export default {
           tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
           tempData['originality'] = vm.originality
           tempData['dossierName'] = vm.briefNote
-          // console.log('data put dossier -->', tempData)
+          
           if (dichvuchuyenphathoso) {
             let vnpostal = {
               postalServiceName: dichvuchuyenphathoso.postalServiceCode,
@@ -1490,16 +1490,13 @@ export default {
               postalCityName: dichvuchuyenphathoso.postalCityName,
               postalDistrictCode: dichvuchuyenphathoso.postalDistrictCode,
               postalDistrictName: dichvuchuyenphathoso.postalDistrictName,
-              postalWardCode: "",
-              postalWardName: dichvuchuyenphathoso.postalWardName,
               postalTelNo: dichvuchuyenphathoso.postalTelNo
             }
             tempData['vnpostalStatus'] = dichvuchuyenphathoso.vnpostalStatus
             tempData['vnpostalProfile'] = vnpostal
-            tempData['postalCityCode'] = dichvuchuyenphathoso.postalCityCode
-            tempData['postalDistrictCode'] = dichvuchuyenphathoso.postalDistrictCode
           }
           setTimeout(function () {
+            console.log('data put dossier -->', tempData)
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               if (vm.formCode === 'UPDATE') {

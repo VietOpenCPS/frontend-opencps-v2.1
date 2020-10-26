@@ -14,7 +14,7 @@
                   v-model.lazy="noteYkien"
                   multi-line
                   :rows="4"
-                  :rules="user_note === 2 ? [() => noteYkien !== '' || 'Trường dữ liệu bắt buộc', rules.varchar5000] : [rules.varchar5000]"
+                  :rules="user_note === 2 ? [() => String(noteYkien).replace(/ /g, '') !== '' || 'Trường dữ liệu bắt buộc', rules.varchar5000] : [rules.varchar5000]"
                   box
                   label="Nhập ý kiến"
                 ></v-text-field>

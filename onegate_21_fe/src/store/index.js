@@ -117,7 +117,9 @@ export const store = new Vuex.Store({
       postalServiceCode: '',
       postalAddress: '',
       postalCityCode: '',
+      postalCityName: '',
       postalDistrictCode: '',
+      postalDistrictName: '',
       postalWardCode: '',
       postalTelNo: ''
     },
@@ -554,7 +556,8 @@ export const store = new Vuex.Store({
     loadDictItems ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          let groupIdSet = data.collectionCode === 'VNPOST_CITY_CODE' ? 0 : state.initData.groupId
+          let collectionVTPost = data.collectionCode === 'VIETTELPOST_PROVINCE' || data.collectionCode === 'VIETTELPOST_DISTRICT' || data.collectionCode === 'VIETTELPOST_WARD'
+          let groupIdSet = data.collectionCode === 'VNPOST_CITY_CODE' || collectionVTPost ? 0 : state.initData.groupId
           let param = {
             headers: {
               groupId: groupIdSet
@@ -580,7 +583,7 @@ export const store = new Vuex.Store({
     loadDetailDictItems ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          let groupIdSet = data.collectionCode === 'VNPOST_CITY_CODE' ? 0 : state.initData.groupId
+          let groupIdSet = data.collectionCode === 'VNPOST_CITY_CODE' || data.collectionCode === 'VIETTELPOST_PROVINCE' ? 0 : state.initData.groupId
           let param = {
             headers: {
               groupId: groupIdSet
@@ -1735,7 +1738,12 @@ export const store = new Vuex.Store({
           dataPutdossier.append('postalCityCode', data.postalCityCode ? data.postalCityCode : '')
           dataPutdossier.append('postalDistrictCode', data.postalDistrictCode ? data.postalDistrictCode : '')
           dataPutdossier.append('postalTelNo', data.postalTelNo ? data.postalTelNo : '')
-
+          if (data.hasOwnProperty('postalCityName') && data.postalCityName) {
+            dataPutdossier.append('postalCityName', data.postalCityName ? data.postalCityName : '')
+          }
+          if (data.hasOwnProperty('postalDistrictName') && data.postalDistrictName) {
+            dataPutdossier.append('postalDistrictName', data.postalDistrictName ? data.postalDistrictName : '')
+          }
           if (data.hasOwnProperty('vnpostalStatus')) {
             dataPutdossier.append('vnpostalStatus', data.vnpostalStatus)
           }
@@ -2170,7 +2178,7 @@ export const store = new Vuex.Store({
           let field = window.$('div[id="formAlpaca' + data.partNo + id + '"]').alpaca('get').childrenByPropertyId
           if (field) {
             for (let prop in field) {
-              if (field[prop].isRequired() && field[prop].getValue() === '') {
+              if (field[prop].isRequired() && (field[prop].getValue() === '' || String(field[prop].getValue()).replace(/ /g, '') === '')) {
                 toastr.clear()
                 toastr.error(field[prop].options.title ? field[prop].options.title + ' là trường dữ liệu bắt buộc' : field[prop].options['name'] + ' là trường dữ liệu bắt buộc')
                 reject('valid')
@@ -4999,7 +5007,9 @@ export const store = new Vuex.Store({
         postalServiceCode: payload.postalServiceCode ? payload.postalServiceCode : '',
         postalAddress: payload.postalAddress ? payload.postalAddress : '',
         postalCityCode: payload.postalCityCode ? payload.postalCityCode : '',
+        postalCityName: payload.postalCityName ? payload.postalCityName : '',
         postalDistrictCode: payload.postalDistrictCode ? payload.postalDistrictCode : '',
+        postalDistrictName: payload.postalDistrictName ? payload.postalDistrictName : '',
         postalWardCode: payload.postalWardCode ? payload.postalWardCode : '',
         postalTelNo: payload.postalTelNo ? payload.postalTelNo : ''
       }

@@ -118,6 +118,9 @@
         vm.index = params['index']
         console.log('newRoute', newRoute)
         console.log('currentQuery', currentQuery)
+        if (newRoute.path === '/' && newRoute.hash === '') {
+          window.history.back()
+        }
       }
     },
     methods: {

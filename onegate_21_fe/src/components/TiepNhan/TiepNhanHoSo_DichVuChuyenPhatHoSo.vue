@@ -225,7 +225,7 @@ export default {
   mounted () {
     let vm = this
     let filter = {
-      collectionCode: 'VNPOST_CITY_CODE',
+      collectionCode: 'VIETTELPOST_PROVINCE',
       level: 0,
       parent: 0
     }
@@ -235,7 +235,7 @@ export default {
     })
     if (data.postalCityCode) {
       let filter1 = {
-        collectionCode: 'VNPOST_CITY_CODE',
+        collectionCode: 'VIETTELPOST_DISTRICT',
         level: 1,
         parent: data.postalCityCode
       }
@@ -265,7 +265,7 @@ export default {
       vm.resultDistricts = []
       vm.resultWards = []
       let filter = {
-        collectionCode: 'VNPOST_CITY_CODE',
+        collectionCode: 'VIETTELPOST_DISTRICT',
         level: 1,
         parent: data
       }

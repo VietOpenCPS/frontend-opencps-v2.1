@@ -436,6 +436,10 @@ export const store = new Vuex.Store({
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
+              dataReturn = dataReturn.map(thuTuc => {
+              thuTuc['domainName'] = thuTuc['domainCode'] + ' - ' + thuTuc['domainName']
+                return thuTuc
+              })
               resolve(dataReturn)
             } else {
               resolve([])
@@ -461,6 +465,10 @@ export const store = new Vuex.Store({
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
+              dataReturn = dataReturn.map(thuTuc => {
+                thuTuc['serviceName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+                return thuTuc
+              })
               resolve(dataReturn)
             } else {
               resolve([])
