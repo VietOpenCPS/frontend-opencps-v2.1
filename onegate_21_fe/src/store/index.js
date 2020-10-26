@@ -1805,6 +1805,25 @@ export const store = new Vuex.Store({
         })
       })
     },
+    putSampleCountDossier ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            groupId: state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': ''
+          }
+        }
+        let dataPutdossier = new URLSearchParams()
+        dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : '')
+        axios.put(state.initData.postDossierApi + '/' + data.dossierId + '/updateDossier', dataPutdossier, options).then(function (response) {
+          resolve(response.data)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
     importDossier ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         commit('setLoading', false)

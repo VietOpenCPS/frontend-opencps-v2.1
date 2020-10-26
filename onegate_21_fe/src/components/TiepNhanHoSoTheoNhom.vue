@@ -1168,6 +1168,13 @@ export default {
         vm.dossiersIntoGroupRenderTemp = []
         vm.totalFee = 0
       }
+      if (vm.dossiersCounterIntoGroupFilter && String(vm.dossiersCounterIntoGroupFilter) !== String(vm.thongTinNhomHoSo.sampleCount)) {
+        let putSample = {
+          dossierId: vm.id,
+          sampleCount: vm.dossiersCounterIntoGroupFilter
+        }
+        vm.$store.dispatch('putSampleCountDossier', putSample)
+      }
       
     },
     thongTinNhomHoSo (val) {

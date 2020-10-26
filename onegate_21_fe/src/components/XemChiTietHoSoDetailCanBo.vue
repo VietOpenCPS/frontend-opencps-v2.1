@@ -809,8 +809,7 @@ export default {
     listHistoryProcessing: [],
     dossierTemplatesTN: [],
     dossierTemplatesKQ: [],
-    thongTinChiTietHoSo: {
-    },
+    thongTinChiTietHoSo: '',
     dialogPDF: false,
     dialogPDFLoading: false,
     loadingAlpacajsForm: false,
