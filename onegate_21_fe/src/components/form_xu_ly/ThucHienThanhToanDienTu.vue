@@ -69,13 +69,13 @@
             <!-- epayment -->
             <p class="mb-0"><span class="red--text">* </span>&nbsp;Lựa chọn hình thức thanh toán:</p>
             <div class="text-xs-left mt-2 mb-3 ml-0">
-              <v-chip class="mb-2" color="indigo" text-color="white"  @click.native="showThanhToanChuyenKhoan"
+              <!-- <v-chip class="mb-2" color="indigo" text-color="white"  @click.native="showThanhToanChuyenKhoan"
                 :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 1 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')">
                 <v-avatar :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">
                   <v-icon size=20 style="color: #fff !important">payment</v-icon>
                 </v-avatar>
                 <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán chuyển khoản</span>
-              </v-chip>
+              </v-chip> -->
 
               <v-chip class="mb-2" v-if="showPayGov" color="#3b5ab5" text-color="white"
                 :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 5 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
@@ -94,8 +94,8 @@
                 <v-avatar :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'" >
                   <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
                 </v-avatar>
-                <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán qua Keypay</span>
-                <!-- <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán trực tuyến</span> -->
+                <!-- <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán qua Keypay</span> -->
+                <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán trực tuyến</span>
               </v-chip>
 
               <v-chip class="mb-2" v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('kpdvcqg')" color="orange" text-color="white"

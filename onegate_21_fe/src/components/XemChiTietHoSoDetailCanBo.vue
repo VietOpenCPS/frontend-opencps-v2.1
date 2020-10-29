@@ -70,6 +70,17 @@
           </div>
           <iframe v-show="!dialogPDFLoading" id="dialogPDFPreviewXl" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
           </iframe>
+          <v-card-actions v-if="itemAction && (itemAction.form === 'PRINT_01' || itemAction.form === 'PRINT_02')">
+            <v-spacer></v-spacer>
+            <v-btn class="mr-3" color="primary" @click="exportDoc()">
+              <v-icon size=16>fas fa fa-file-word-o</v-icon> &nbsp;
+              Tải xuống file word
+            </v-btn>
+            <v-btn class="mr-3" color="primary">
+              <v-icon size=16>fa fa-file-pdf-o</v-icon> &nbsp;
+              <a :href="srcDownloadIframe" download> Tải xuống file pdf</a>
+            </v-btn>
+          </v-card-actions>
         </v-card>
       </v-dialog>
       <thong-tin-co-ban-ho-so v-if="reRender" ref="thong-tin-co-ban-ho-so" :detailDossier="thongTinChiTietHoSo" :mauCongVan="mauCongVan"></thong-tin-co-ban-ho-so>
@@ -1016,6 +1027,8 @@ export default {
     mauCongVan: '',
     reRender: true,
     activeReload: false,
+    srcDownloadIframe: '',
+    itemAction: '',
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -1902,10 +1915,34 @@ export default {
         dossierId: dossierItem.dossierId,
         document: item.document
       }
+      vm.srcDownloadIframe = ''
       vm.$store.dispatch('doPrint01', filter).then(function (result) {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPDFPreviewXl').src = result
+        vm.srcDownloadIframe = result
       })
+    },
+    exportDoc () {
+      let vm = this
+      console.log('itemAction', vm.itemAction)
+      if (vm.itemAction.form === 'PRINT_01') {
+        let filter = {
+          dossierId: vm.thongTinChiTietHoSo.dossierId,
+          document: vm.itemAction.document,
+          reportType: 'word'
+        }
+        vm.$store.dispatch('doPrint01', filter).then(function (result) {
+        }).catch(function (){})
+      } else if (vm.itemAction.form === 'PRINT_02') {
+        let filter2 = {
+          document: vm.itemAction.document,
+          dossiers: JSON.stringify(vm.selected),
+          reportType: 'word'
+        }
+        vm.$store.dispatch('doPrint02', filter2).then(function (result) {
+        }).catch(function (){})
+      }
+      
     },
     doPreview (dossierItem, item, index) {
       let vm = this
@@ -2687,9 +2724,11 @@ export default {
         }
         vm.dialogPDFLoading = true
         vm.dialogPDF = true
+        vm.srcDownloadIframe = ''
         vm.$store.dispatch('doPrint02', filter).then(function (result) {
           vm.dialogPDFLoading = false
           document.getElementById('dialogPDFPreviewXl').src = result
+          vm.srcDownloadIframe = result
         })
       }
     },

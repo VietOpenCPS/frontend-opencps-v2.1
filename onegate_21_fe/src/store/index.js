@@ -3139,13 +3139,14 @@ export const store = new Vuex.Store({
             },
             responseType: 'blob',
             params: {
-              payload: filter.payload ? filter.payload : ''
+              payload: filter.payload ? filter.payload : '',
+              reportType: filter.hasOwnProperty('reportType') && filter.reportType ? filter.reportType : ''
             }
           }
           axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/documents/preview/' + filter.document, param).then(function (response) {
             let serializable = response.data
-            if (filter.hasOwnProperty('reportType')) {
-              saveAs(serializable, 'biennhan' + new Date().getTime() + '.doc')
+            if (filter.hasOwnProperty('reportType') && filter.reportType) {
+              saveAs(serializable, filter.dossierId + '-' + filter.document + new Date().getTime() + '.docx')
             }
             let file = window.URL.createObjectURL(serializable)
             resolve(file)
@@ -3249,13 +3250,18 @@ export const store = new Vuex.Store({
             responseType: 'blob'
           }
           let formData = new URLSearchParams()
-          // formData.append('serviceCode', filter.serviceCode)
-          // formData.append('govAgencyCode', filter.govAgencyCode)
           formData.append('dossiers', filter.dossiers ? filter.dossiers : '')
           formData.append('payload', filter.payload ? filter.payload : '')
+          if (filter.hasOwnProperty('reportType') && filter.reportType) {
+            formData.append('reportType', filter.reportType)
+          }
+          
           axios.post(state.initData.getNextAction + '/preview/' + filter.document ,formData , param).then(function (response) {
             let serializable = response.data
             let file = window.URL.createObjectURL(serializable)
+            if (filter.hasOwnProperty('reportType') && filter.reportType) {
+              saveAs(serializable, filter.document + new Date().getTime() + '.docx')
+            }
             resolve(file)
           }).catch(function (error) {
             console.log(error)

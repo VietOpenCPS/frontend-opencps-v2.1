@@ -67,7 +67,7 @@
         </v-flex> -->
 
         <v-container align-center row wrap class="px-5" style="font-size:1.25em">
-          <v-flex xs12 style="border: 1px solid #0072bc">
+          <v-flex xs12 style="border: 1px solid #0072bc;border-top-left-radius: 7px;border-top-right-radius: 7px;">
             <v-layout row wrap>
               <v-flex xs12 sm12 class="py-3">
                 <v-layout wrap class="px-2">
@@ -107,7 +107,7 @@
               </v-flex>
             </v-layout>
           </v-flex>
-          <v-flex xs12 class="py-3 px-2 pl-5" v-if="!isMobile" style="border: 1px solid #0072bc; border-top: 0">
+          <v-flex xs12 class="py-3 px-2 pl-5" v-if="!isMobile" style="border: 1px solid #0072bc; border-top: 0;border-bottom-left-radius: 7px; border-bottom-right-radius: 7px;">
             <div v-for="(item, index) in votingItems" :key="index" class="mb-2">
               <div class="text-bold primary--text">* {{ item.subject }}</div>
               <div class="ml-3">
@@ -228,11 +228,11 @@
         </v-card-text>
         <v-card-actions class="mx-2">
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="submitForm">
+          <v-btn color="primary" @click="submitForm" :disabled="btnLoading">
             <v-icon>how_to_reg</v-icon>&nbsp;
               Xác nhận
           </v-btn>
-          <v-btn color="primary" @click="dialogVerify = false">
+          <v-btn color="primary" @click="dialogVerify = false" :disabled="btnLoading">
             <v-icon>clear</v-icon>&nbsp;
               Hủy
           </v-btn>
@@ -463,10 +463,13 @@ export default {
           }
         }
       }
+      vm.btnLoading = true
       Promise.all(vm.arrAction).then(results => {
+        vm.btnLoading = false
         toastr.success('Gửi đánh giá thành công')
         vm.goBack()
       }).catch(xhr => {
+        vm.btnLoading = false
         toastr.error('Gửi đánh giá thất bại')
       })
     },
