@@ -1000,6 +1000,7 @@ export default {
     formActionGroup: '',
     hasTaoQuyetDinh: false,
     mauGiayPhep: 'KQGP',
+    configValidateGp: '',
     mappingValidateGP: '',
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
@@ -1576,7 +1577,7 @@ export default {
           let dossierTemplates = thanhphanhoso
           let listAction = []
           let listDossierMark = []
-          if (dossierFiles) {
+          if (dossierFiles && vm.formCode !== 'UPDATE') {
             dossierFiles.forEach(function (value, index) {
               if (value.eForm) {
                 value['dossierId'] = vm.dossierId
@@ -1596,7 +1597,11 @@ export default {
           tempData['dossierName'] = vm.briefNote
           tempData['originality'] = vm.originality
           tempData['fromViaPostal'] = vm.fromViaPostal ? 1 : 0
-
+          let hasMappingCheckGp
+          try {
+            hasMappingCheckGp = vm.configValidateGp ? JSON.parse(vm.configValidateGp.configs) : ''
+          } catch (error) {
+          }
           let doAction = function () {
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
               vm.loadingAction = false
@@ -1695,16 +1700,16 @@ export default {
             doAction()
           } else {
             //
-            if (vm.mappingValidateGP) {
+            if (hasMappingCheckGp && hasMappingCheckGp.hasOwnProperty('mapping')) {
               for (let key in vm.mappingValidateGP) {
-                vm.mappingValidateGP[key] = thongtinchuhosocongvan[vm.mappingValidateGP[key]]
+                vm.mappingValidateGP[key] = thongtinchuhosocongvan[hasMappingCheckGp['mapping'][key]]
               }
-            } 
+            }
             let filterCheck = {
               formDataKey: vm.mappingValidateGP ? vm.mappingValidateGP : '',
               deliverableType: vm.mauGiayPhep
             }
-            if (filterCheck.formDataKey === '') {
+            if (!hasMappingCheckGp || !hasMappingCheckGp.hasOwnProperty('mapping')) {
               doAction()
             } else {
               vm.$store.dispatch('checkDaCapPhep', filterCheck).then(function (result) {
@@ -1715,7 +1720,7 @@ export default {
                   userExits = true
                 }
                 if (userExits) {
-                  let x = confirm('Đối tượng đã cấp phép. Bạn có muốn tiếp tục?')
+                  let x = confirm('Đối tượng đã cấp phép tại hồ sơ số ' + thongTinCapPhep[0]['deliverableCode'] + '. Bạn có muốn tiếp tục?')
                   if (x) {
                     doAction()
                   } else {
@@ -2411,9 +2416,9 @@ export default {
       }
       vm.$store.dispatch('getServerConfig', filter).then(function (result) {
         let configs = JSON.parse(result.configs)
+        vm.configValidateGp = result
         vm.mauGiayPhep = configs.deliverableType
         vm.mappingValidateGP = configs.mapping
-        console.log('mauGiayPhep', vm.mauGiayPhep, vm.mappingValidateGP)
       }).catch(function (reject) {
       })
     },

@@ -1,9 +1,9 @@
 <template>
   <div style="margin-top: 15px;">
     <v-layout wrap class="px-3" style="background: #dde4eb;">
-      <v-flex xs12 class="text-xs-center mt-2 mb-3" style="font-size: 22px;">
-        <p class="font-weight-bold">Tra cứu hồ sơ</p>
-        <p class="">Vui lòng nhập mã hồ sơ hoặc CMND/Hộ chiếu/MST để tra cứu hồ sơ</p>
+      <v-flex xs12 class="text-xs-center mt-2 mb-3">
+        <p class="font-weight-bold" style="font-size: 24px;">Tra cứu hồ sơ</p>
+        <p class="" style="font-size: 20px;">Vui lòng nhập mã hồ sơ hoặc CMND/Hộ chiếu/MST để tra cứu hồ sơ</p>
       </v-flex>
       <v-flex class="mb-2 px-2 xs12 md6"> 
         <div>

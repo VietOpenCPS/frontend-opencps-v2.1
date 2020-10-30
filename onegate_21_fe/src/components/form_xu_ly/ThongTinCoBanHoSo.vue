@@ -11,7 +11,7 @@
                   <span class="pr-2">Chủ hồ sơ: </span>
                   <v-tooltip top>
                     <span  class="text-bold ">{{thongTinChiTietHoSo.applicantName}}</span>
-                    <span  slot="activator" class="pl-0 text-bold"> {{thongTinChiTietHoSo.applicantName.length > 100 ? thongTinChiTietHoSo.applicantName.substr(0, 100) + '...' : thongTinChiTietHoSo.applicantName}}</span>
+                    <span  slot="activator" class="pl-0 text-bold"> {{thongTinChiTietHoSo && thongTinChiTietHoSo.applicantName.length > 100 ? thongTinChiTietHoSo.applicantName.substr(0, 100) + '...' : thongTinChiTietHoSo.applicantName}}</span>
                   </v-tooltip>
                 </div>
                 <div class="xs12 sm12 pb-1">
@@ -22,7 +22,8 @@
                 <div class="xs12 sm12 pb-1 overHidden">
                   <span class="pr-2">Địa chỉ: </span>
                   <v-tooltip top>
-                    <span slot="activator" class="text-bold ">{{ String(thongTinChiTietHoSo.address).replace(/\./g, "").length < 100 ?  String(thongTinChiTietHoSo.address).replace(/\./g, "") : String(thongTinChiTietHoSo.address).replace(/\./g, "").substr(100) + '...'}} {{thongTinChiTietHoSo.wardName}}
+                    <span slot="activator" class="text-bold ">
+                      {{ thongTinChiTietHoSo && String(thongTinChiTietHoSo.address).replace(/\./g, "").length < 100 ?  String(thongTinChiTietHoSo.address).replace(/\./g, "") : String(thongTinChiTietHoSo.address).replace(/\./g, "").substr(100) + '...'}} {{thongTinChiTietHoSo.wardName}}
                       <span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span>
                     </span>
                     <span class="pl-0"> {{String(thongTinChiTietHoSo.address).replace(/\./g, "")}} {{thongTinChiTietHoSo.wardName}}<span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span></span>
@@ -395,7 +396,7 @@
     },
     components: {},
     data: () => ({
-      thongTinChiTietHoSo: {},
+      thongTinChiTietHoSo: '',
       metaData: '',
       groupDossierNo: '',
       groupDossierName: '',

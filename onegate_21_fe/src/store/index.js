@@ -2106,8 +2106,7 @@ export const store = new Vuex.Store({
           }).catch(function (xhr) {
             reject(xhr)
           })
-        } catch (e) {
-          console.log(e)
+        } catch (xhr) {
           reject(xhr)
         }
       })
