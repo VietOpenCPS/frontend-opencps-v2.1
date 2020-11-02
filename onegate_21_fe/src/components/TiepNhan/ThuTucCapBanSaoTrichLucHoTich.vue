@@ -42,7 +42,7 @@
                 ></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 class="px-2 ">
-                <label for="">Nơi cư chú</label>
+                <label for="">Nơi cư trú</label>
                 <v-text-field
                     v-model="dossiers.delegateAddress"
                     solo

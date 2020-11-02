@@ -2783,31 +2783,22 @@ export default {
             let le_phi = lp_moi + lp_gia_han + lp_hong + lp_schengen + lp_nhap + lp_qua;
             
             let file_payment2 = new Array();
-            if(lp_moi > 0)
-                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 160000, 'thanh_tien': lp_moi};
-            // if((hcng_moi <= 0 || hccv_moi <=0) && lp_gia_han <=0 && lp_hong <=0 && lp_cong_ham <=0 )
-            // {
-            //     file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'}; 
-            //     file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'};   
+            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 160000, 'thanh_tien': lp_moi};
+            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_gia_han};
+            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 320000, 'thanh_tien': lp_hong};
+            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp công hàm đề nghị cấp thị thực', 'partName': 'Công hàm', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_cong_ham, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_cong_ham};
+
+            // if(lp_moi > 0)
+            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 160000, 'thanh_tien': lp_moi};
+            // if(lp_gia_han > 0)
+            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_gia_han};
+            
+            // if(lp_hong > 0)
+            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 320000, 'thanh_tien': lp_hong};
+                  
+            // if (lp_cong_ham > 0 ){
+            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp công hàm đề nghị cấp thị thực', 'partName': 'Công hàm', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_cong_ham, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_cong_ham};
             // }
-            if(lp_gia_han > 0)
-                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_gia_han};
-            
-            if(lp_hong > 0)
-                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 320000, 'thanh_tien': lp_hong};
-            
-            // if(lp_schengen > 0)
-            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': vm.dossiers.dossierName + ' (Số công hàm)', 'partName': 'Schengen', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_schengen, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_schengen};
-            
-            // if(lp_nhap > 0)
-            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': vm.dossiers.dossierName + ' (Số công hàm)', 'partName': 'Nhập cảnh '+so_nuoc +' quốc gia', 'fileMark': '-1', 'fileMarkName': '', 'so_nuoc': so_nuoc, 'recordCount': so_nhap_canh, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_nhap};
-            
-            // if(lp_qua > 0)
-            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': vm.dossiers.dossierName + ' (Số công hàm)', 'partName': 'Quá cảnh '+so_nuoc +' quốc gia', 'fileMark': '-1', 'fileMarkName': '', 'so_nuoc': so_nuoc, 'recordCount': so_qua_canh, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_qua};
-            
-            if (lp_cong_ham > 0 ){
-                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp công hàm đề nghị cấp thị thực', 'partName': '', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_cong_ham, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_cong_ham};
-            }
             if(file_payment2.length === 2)
             {
                 file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'}; 
