@@ -339,7 +339,7 @@
             :loading="loadingAction"
             :disabled="loadingAction"
           >
-            <v-icon size="20">save</v-icon>  &nbsp;
+            <v-icon size="20" class="my-0">save</v-icon>  &nbsp;
             <span>Cập nhật</span>
             <span slot="loader">Loading...</span>
           </v-btn>
@@ -350,7 +350,7 @@
             :loading="loadingAction"
             :disabled="loadingAction"
           >
-            <v-icon size="20">save</v-icon>  &nbsp;
+            <v-icon size="20" class="my-0">save</v-icon>  &nbsp;
             <span>Lưu công văn</span>
             <span slot="loader">Loading...</span>
           </v-btn>
@@ -363,7 +363,7 @@
             :style="dossiersCounterIntoGroupFilter === 0 ? 'pointer-events: none;' : ''"
             @click="putGroupDossier('saveSend')" 
           >
-            <v-icon size="20">save</v-icon>  &nbsp;
+            <v-icon size="20" class="my-0">save</v-icon>  &nbsp;
             <span>Lưu và gửi công văn</span>
             <span slot="loader">Loading...</span>
           </v-btn>
@@ -374,7 +374,7 @@
             :loading="loadingAction"
             :disabled="loadingAction"
           >
-            <v-icon size="20">save</v-icon>  &nbsp;
+            <v-icon size="20" class="my-0">save</v-icon>  &nbsp;
             <span>Tiếp nhận hồ sơ</span>
             <span slot="loader">Loading...</span>
           </v-btn>
@@ -384,7 +384,7 @@
             :loading="loadingAction"
             :disabled="loadingAction"
           >
-            <v-icon size="20">save</v-icon>  &nbsp;
+            <v-icon size="20" class="my-0">save</v-icon>  &nbsp;
             <span>Tiếp nhận hồ sơ</span>
             <span slot="loader">Loading...</span>
           </v-btn>
@@ -407,7 +407,7 @@
             :disabled="loadingAction"
             @click="printCongVan"
           >
-            <v-icon size="20">printer</v-icon> &nbsp;
+            <v-icon size="20" class="my-0">printer</v-icon> &nbsp;
             <span style="margin-left: -30px;">In công văn</span>
             <span slot="loader">Loading...</span>
           </v-btn>
@@ -417,7 +417,7 @@
             :loading="loadingAction"
             :disabled="loadingAction"
           >
-            <v-icon size="20">clear</v-icon>  &nbsp;
+            <v-icon size="20" class="my-0">clear</v-icon>  &nbsp;
             <span>Xóa công văn</span>
             <span slot="loader">Loading...</span>
           </v-btn>
@@ -427,7 +427,7 @@
             :loading="loadingAction"
             :disabled="loadingAction"
           >
-            <v-icon size="18">reply</v-icon> &nbsp;
+            <v-icon size="18" class="my-0">reply</v-icon> &nbsp;
             Quay lại
             <span slot="loader">Loading...</span>
           </v-btn>
@@ -987,8 +987,10 @@ export default {
     congvanguiden: false,
     mauCongVan: false,
     activeDeleteCongVan: false,
+    serverGiayPhep: '',
     mauGiayPhep: 'KQGP',
     mappingValidateGP: '',
+    configValidateGp: '',
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -1167,6 +1169,13 @@ export default {
       } else {
         vm.dossiersIntoGroupRenderTemp = []
         vm.totalFee = 0
+      }
+      if (vm.dossiersCounterIntoGroupFilter && String(vm.dossiersCounterIntoGroupFilter) !== String(vm.thongTinNhomHoSo.sampleCount)) {
+        let putSample = {
+          dossierId: vm.id,
+          sampleCount: vm.dossiersCounterIntoGroupFilter
+        }
+        vm.$store.dispatch('putSampleCountDossier', putSample)
       }
       
     },
@@ -1610,9 +1619,9 @@ export default {
                     vm.payments = resAction.payment
                   }
                   // 
-                  let mauGP = vm.getSearchParams(resAction['preCondition'], 'validateDeliverable')
-                  if (mauGP) {
-                    vm.getThongTinValidateGp(mauGP)
+                  vm.serverGiayPhep = vm.getSearchParams(resAction['preCondition'], 'validateDeliverable')
+                  if (vm.serverGiayPhep) {
+                    vm.getThongTinValidateGp(vm.serverGiayPhep)
                   }
                 })
               } else {
@@ -2016,7 +2025,11 @@ export default {
           tempData['sampleCount'] = vm.currentDossierIntoGroup.sampleCount
           tempData['originality'] = vm.originality
           tempData['userType'] = '1'
-          console.log('putDossierIntoCongVan', tempData)
+          let hasMappingCheckGp
+          try {
+            hasMappingCheckGp = vm.configValidateGp ? JSON.parse(vm.configValidateGp.configs) : ''
+          } catch (error) {
+          }
           let doAction = function () {
             // ham put hồ sơ công văn
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
@@ -2077,16 +2090,16 @@ export default {
             // 
           }
           //
-          if (vm.mappingValidateGP) {
+          if (hasMappingCheckGp && hasMappingCheckGp.hasOwnProperty('mapping')) {
             for (let key in vm.mappingValidateGP) {
-              vm.mappingValidateGP[key] = thongtinchuhosocongvan[vm.mappingValidateGP[key]]
+              vm.mappingValidateGP[key] = thongtinchuhosocongvan[hasMappingCheckGp['mapping'][key]]
             }
-          } 
+          }
           let filterCheck = {
             formDataKey: vm.mappingValidateGP ? vm.mappingValidateGP : '',
             deliverableType: vm.mauGiayPhep
           }
-          if (filterCheck.formDataKey === '') {
+          if (!hasMappingCheckGp || !hasMappingCheckGp.hasOwnProperty('mapping')) {
             doAction()
           } else {
             vm.$store.dispatch('checkDaCapPhep', filterCheck).then(function (result) {
@@ -2097,7 +2110,7 @@ export default {
                 userExits = true
               }
               if (userExits) {
-                let x = confirm('Đối tượng đã cấp phép. Bạn có muốn tiếp tục?')
+                let x = confirm('Đối tượng đã cấp phép tại hồ sơ số ' + thongTinCapPhep[0]['deliverableCode'] + '. Bạn có muốn tiếp tục?')
                 if (x) {
                   doAction()
                 } else {
@@ -2111,9 +2124,7 @@ export default {
               doAction()
             })
           }
-          
           // 
-          
         } else {
           vm.loadingAction = false
           toastr.clear()
@@ -2575,9 +2586,9 @@ export default {
       }
       vm.$store.dispatch('getServerConfig', filter).then(function (result) {
         let configs = JSON.parse(result.configs)
+        vm.configValidateGp = result
         vm.mauGiayPhep = configs.deliverableType
         vm.mappingValidateGP = configs.mapping
-        console.log('mauGiayPhep', vm.mauGiayPhep, vm.mappingValidateGP)
       }).catch(function (reject) {
       })
     },

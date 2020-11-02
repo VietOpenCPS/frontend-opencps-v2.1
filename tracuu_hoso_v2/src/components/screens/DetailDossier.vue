@@ -4,7 +4,7 @@
       <content-placeholders-text :lines="10" />
     </content-placeholders>
     <div v-else>
-      <v-layout class="wrap">
+      <v-layout class="wrap px-2 py-2">
         <v-flex :class="isMobile ? 'pb-2 pl-2' : 'pb-2'">
           <h3 style="color:#0054a6" v-if="!isMobile"><span class="text-bold">Tên hồ sơ: </span>{{dossierDetail.dossierName ? dossierDetail.dossierName : dossierDetail.serviceName}}</h3>
           <h3 style="color:#0054a6" v-else><span class="text-bold">Thủ tục hành chính: </span>{{dossierDetail.serviceName}}</h3>

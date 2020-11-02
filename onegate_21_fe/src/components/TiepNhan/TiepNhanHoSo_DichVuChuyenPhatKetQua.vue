@@ -242,9 +242,6 @@ export default {
   },
   created () {
     let vm = this
-    vm.$store.dispatch('getVNPOSTcode').then(result => {
-      vm.vnPostItems = result
-    })
     if (this.postalServiceItems.length > 0) {
       this.dichVuChuyenPhatKetQua.postalServiceCode = this.postalServiceItems[0].itemCode
     }
@@ -273,20 +270,24 @@ export default {
     }
   },
   mounted () {
-    var vm = this
-    var filter = {
-      collectionCode: 'VNPOST_CITY_CODE',
+    let vm = this
+    let filter = {
+      collectionCode: 'VIETTELPOST_PROVINCE',
       level: 0,
       parent: 0
     }
-    var data = vm.dichVuChuyenPhatKetQua
+    let data = vm.dichVuChuyenPhatKetQua
     vm.$store.getters.getDictItems(filter).then(function (result) {
       vm.citys = result.data
     })
+
     if (data.postalCityCode) {
-      filter.parent = data.postalCityCode
-      filter.level = 1
-      vm.$store.getters.getDictItems(filter).then(function (result) {
+      let filter2 = {
+        collectionCode: 'VIETTELPOST_DISTRICT',
+        level: 1,
+        parent: data.postalCityCode
+      }
+      vm.$store.getters.getDictItems(filter2).then(function (result) {
         vm.resultDistricts = result.data
       })
     }
@@ -352,14 +353,20 @@ export default {
     onChangeResultCity (data) {
       var vm = this
       let filter = {
-        collectionCode: 'VNPOST_CITY_CODE',
+        collectionCode: 'VIETTELPOST_DISTRICT',
         level: 1,
         parent: data
       }
-      console.log('onChangeResultCity', data)
+      
       vm.$store.getters.getDictItems(filter).then(function (result) {
         vm.resultDistricts = result.data
       })
+      setTimeout(function () {
+        vm.dichVuChuyenPhatKetQua.postalCityName = vm.citys.filter(function(item) {
+          return item.itemCode === data
+        })[0]['itemName']
+      }, 100)
+      console.log('dichVuChuyenPhatKetQua', vm.dichVuChuyenPhatKetQua)
     },
     onChangeResultDistrict (data) {
       var vm = this
@@ -372,9 +379,12 @@ export default {
       // vm.$store.getters.getDictItems(filter).then(function (result) {
       //   vm.resultWards = result.data
       // })
-      vm.dichVuChuyenPhatHoSo.postalDistrictName = vm.resultDistricts.filter(function(item) {
-        return item.itemCode === data
-      })[0]['itemName']
+      setTimeout(function () {
+        vm.dichVuChuyenPhatKetQua.postalDistrictName = vm.resultDistricts.filter(function(item) {
+          return item.itemCode === data
+        })[0]['itemName']
+      }, 100)
+      console.log('dichVuChuyenPhatKetQua', vm.dichVuChuyenPhatKetQua)
     },
     changeViaPostal (event) {
       console.log('changeViaPostal', event)
@@ -385,7 +395,9 @@ export default {
         postalServiceCode: this.dichVuChuyenPhatKetQua.postalServiceCode ? this.dichVuChuyenPhatKetQua.postalServiceCode : '',
         postalAddress: this.dichVuChuyenPhatKetQua.postalAddress ? this.dichVuChuyenPhatKetQua.postalAddress : '',
         postalCityCode: this.dichVuChuyenPhatKetQua.postalCityCode ? this.dichVuChuyenPhatKetQua.postalCityCode : '',
+        postalCityName: this.dichVuChuyenPhatKetQua.postalCityName ? this.dichVuChuyenPhatKetQua.postalCityName : '',
         postalDistrictCode: this.dichVuChuyenPhatKetQua.postalDistrictCode ? this.dichVuChuyenPhatKetQua.postalDistrictCode : '',
+        postalDistrictName: this.dichVuChuyenPhatKetQua.postalDistrictName ? this.dichVuChuyenPhatKetQua.postalDistrictName : '',
         postalWardCode: this.dichVuChuyenPhatKetQua.postalWardCode ? this.dichVuChuyenPhatKetQua.postalWardCode : '',
         postalTelNo: this.dichVuChuyenPhatKetQua.postalTelNo ? this.dichVuChuyenPhatKetQua.postalTelNo : ''
       }

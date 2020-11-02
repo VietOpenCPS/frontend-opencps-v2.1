@@ -424,7 +424,7 @@
             let field = window.$('#formDelivert').alpaca('get').childrenByPropertyId
             if (field) {
               for (let prop in field) {
-                if (field[prop].isRequired() && field[prop].getValue() === '') {
+                if (field[prop].isRequired() && (field[prop].getValue() === '' || String(field[prop].getValue()).replace(/ /g, '') === '')) {
                   toastr.clear()
                   toastr.error(field[prop].options.title ? field[prop].options.title + ' là trường dữ liệu bắt buộc' : field[prop].options['name'] + ' là trường dữ liệu bắt buộc')
                   return

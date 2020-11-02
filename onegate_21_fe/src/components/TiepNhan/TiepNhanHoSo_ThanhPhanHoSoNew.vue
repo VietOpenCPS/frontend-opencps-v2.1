@@ -1401,7 +1401,7 @@ export default {
                   var fileViewsTemp = vm.dossierFilesItems.filter(file => {
                     return file.dossierPartNo === item.partNo
                   })
-                  if (fileViewsTemp) {
+                  if (fileViewsTemp && fileViewsTemp.length > 0) {
                     vm.dossierTemplateItemsFilter[index]['passRequired'] = true
                   } else {
                     vm.dossierTemplateItemsFilter[index]['passRequired'] = false
@@ -1925,7 +1925,7 @@ export default {
     validDossierTemplate () {
       var vm = this
       if (vm.dossierTemplateItemsFilter.length > 0) {
-        for (var i = 0; i < vm.dossierTemplateItemsFilter.length; i++) {
+        for (let i = 0; i < vm.dossierTemplateItemsFilter.length; i++) {
           if (vm.dossierTemplateItemsFilter[i]['required'] && !vm.dossierTemplateItemsFilter[i]['passRequired'] && vm.partTypes.includes(vm.dossierTemplateItemsFilter[i].partType)) {
             let message = 'Chú ý :' + vm.dossierTemplateItemsFilter[i].partName + ' là thành phần bắt buộc!'
             toastr.clear()

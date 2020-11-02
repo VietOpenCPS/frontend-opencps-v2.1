@@ -71,7 +71,8 @@ export const store = new Vuex.Store({
               applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : '',
               status: filter.status ? filter.status : '',
               online: filter.online ? filter.online : '',
-              domain: filter.domain ? filter.domain : ''
+              domain: filter.domain ? filter.domain : '',
+              service: filter.service ? filter.service : ''
             }
           }
           axios.get(state.endPointApi + '/dossiers', param).then(function (response) {
@@ -435,6 +436,39 @@ export const store = new Vuex.Store({
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
+              dataReturn = dataReturn.map(thuTuc => {
+              thuTuc['domainName'] = thuTuc['domainCode'] + ' - ' + thuTuc['domainName']
+                return thuTuc
+              })
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
+        })
+      })
+    },
+    getService ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+              domain: data.domain ? data.domain : ''
+            }
+          }
+          axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              dataReturn = dataReturn.map(thuTuc => {
+                thuTuc['serviceName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+                return thuTuc
+              })
               resolve(dataReturn)
             } else {
               resolve([])

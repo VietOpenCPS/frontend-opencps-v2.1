@@ -1000,6 +1000,7 @@ export default {
     formActionGroup: '',
     hasTaoQuyetDinh: false,
     mauGiayPhep: 'KQGP',
+    configValidateGp: '',
     mappingValidateGP: '',
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
@@ -1481,7 +1482,7 @@ export default {
           tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
           tempData['originality'] = vm.originality
           tempData['dossierName'] = vm.briefNote
-          // console.log('data put dossier -->', tempData)
+          
           if (dichvuchuyenphathoso) {
             let vnpostal = {
               postalServiceName: dichvuchuyenphathoso.postalServiceCode,
@@ -1490,16 +1491,13 @@ export default {
               postalCityName: dichvuchuyenphathoso.postalCityName,
               postalDistrictCode: dichvuchuyenphathoso.postalDistrictCode,
               postalDistrictName: dichvuchuyenphathoso.postalDistrictName,
-              postalWardCode: "",
-              postalWardName: dichvuchuyenphathoso.postalWardName,
               postalTelNo: dichvuchuyenphathoso.postalTelNo
             }
             tempData['vnpostalStatus'] = dichvuchuyenphathoso.vnpostalStatus
             tempData['vnpostalProfile'] = vnpostal
-            tempData['postalCityCode'] = dichvuchuyenphathoso.postalCityCode
-            tempData['postalDistrictCode'] = dichvuchuyenphathoso.postalDistrictCode
           }
           setTimeout(function () {
+            console.log('data put dossier -->', tempData)
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               if (vm.formCode === 'UPDATE') {
@@ -1579,7 +1577,7 @@ export default {
           let dossierTemplates = thanhphanhoso
           let listAction = []
           let listDossierMark = []
-          if (dossierFiles) {
+          if (dossierFiles && vm.formCode !== 'UPDATE') {
             dossierFiles.forEach(function (value, index) {
               if (value.eForm) {
                 value['dossierId'] = vm.dossierId
@@ -1599,7 +1597,11 @@ export default {
           tempData['dossierName'] = vm.briefNote
           tempData['originality'] = vm.originality
           tempData['fromViaPostal'] = vm.fromViaPostal ? 1 : 0
-
+          let hasMappingCheckGp
+          try {
+            hasMappingCheckGp = vm.configValidateGp ? JSON.parse(vm.configValidateGp.configs) : ''
+          } catch (error) {
+          }
           let doAction = function () {
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
               vm.loadingAction = false
@@ -1698,16 +1700,16 @@ export default {
             doAction()
           } else {
             //
-            if (vm.mappingValidateGP) {
+            if (hasMappingCheckGp && hasMappingCheckGp.hasOwnProperty('mapping')) {
               for (let key in vm.mappingValidateGP) {
-                vm.mappingValidateGP[key] = thongtinchuhosocongvan[vm.mappingValidateGP[key]]
+                vm.mappingValidateGP[key] = thongtinchuhosocongvan[hasMappingCheckGp['mapping'][key]]
               }
-            } 
+            }
             let filterCheck = {
               formDataKey: vm.mappingValidateGP ? vm.mappingValidateGP : '',
               deliverableType: vm.mauGiayPhep
             }
-            if (filterCheck.formDataKey === '') {
+            if (!hasMappingCheckGp || !hasMappingCheckGp.hasOwnProperty('mapping')) {
               doAction()
             } else {
               vm.$store.dispatch('checkDaCapPhep', filterCheck).then(function (result) {
@@ -1718,7 +1720,7 @@ export default {
                   userExits = true
                 }
                 if (userExits) {
-                  let x = confirm('Đối tượng đã cấp phép. Bạn có muốn tiếp tục?')
+                  let x = confirm('Đối tượng đã cấp phép tại hồ sơ số ' + thongTinCapPhep[0]['deliverableCode'] + '. Bạn có muốn tiếp tục?')
                   if (x) {
                     doAction()
                   } else {
@@ -2414,9 +2416,9 @@ export default {
       }
       vm.$store.dispatch('getServerConfig', filter).then(function (result) {
         let configs = JSON.parse(result.configs)
+        vm.configValidateGp = result
         vm.mauGiayPhep = configs.deliverableType
         vm.mappingValidateGP = configs.mapping
-        console.log('mauGiayPhep', vm.mauGiayPhep, vm.mappingValidateGP)
       }).catch(function (reject) {
       })
     },

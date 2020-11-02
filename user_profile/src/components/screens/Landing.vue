@@ -420,36 +420,11 @@
                 </v-menu>
               </v-flex>
               <v-flex xs12 sm4>
-                <v-text-field v-model="user['employeeNo']" box>
-                  <template slot="label">Contact code <span class="red--text darken-3">*</span></template>
+                <v-text-field v-model="user['employeeNo']" box disabled>
+                  <template slot="label">Mã nhân sự <span class="red--text darken-3">*</span></template>
                 </v-text-field>
               </v-flex>
-              <v-flex xs12 sm4>
-                <v-text-field label="Địa điểm ký số" value="Hà Nội" box></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm4>
-                <v-text-field label="Chức danh ký số" v-model="user['title']" box></v-text-field>
-              </v-flex>
-              <!--  -->
-              <v-flex xs12 class="px-0" v-if="serverProtocolFilter.length > 0">
-                <v-layout wrap>
-                  <v-flex xs12 sm4 v-for="(item, index) in serverProtocolFilter" :key="index">
-                    <v-autocomplete :label="item['serverName']" :items="item['optionsData']" v-model="item['serverNo']" item-text="TEN" item-value="MA" :hide-selected="true" box>
-                    </v-autocomplete>
-                  </v-flex>
-                </v-layout>
-              </v-flex>
-              <!--  -->
-              <v-flex xs12 sm6>
-                <p class="mb-2 px-1">File ảnh ký số</p>
-                <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="itemEsign" :type="'image'"></attached-file-avatar>
-              </v-flex>
-              <v-flex xs12 sm6>
-                <p class="mb-2 px-1">File chứng thư gốc</p>
-                <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="itemEsignCert" :type="'document'"></attached-file-avatar>
-              </v-flex>
-
-              <v-flex sm12 class="text-xs-right">
+              <v-flex xs12 class="text-xs-right">
                 <v-btn color="blue darken-3" :loading="loading" :disabled="loading" v-on:click.native="submitUserProfile" class="mx-0" dark>
                   <v-icon>done</v-icon>&nbsp; Cập nhật thông tin
                 </v-btn>
@@ -992,7 +967,7 @@
             })
           }
           if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
-            vm.user['employeeBirthDate'] = vm.parseDateInput(vm.user['employeeBirthDate'])
+            vm.user['employeeBirthDate'] = vm.parseDateInput(vm.user['employeeBirthdate'])
           }
           // 
           if (vm.user['applicantProfile'] && vm.user['applicantProfile']['NoiDangKyKhaiSinhCityCode']) {
@@ -1060,6 +1035,7 @@
               }
             }
           }
+          console.log('user_info', vm.user)
         })
       })
     },
@@ -1279,7 +1255,7 @@
       parseDateInput (dateInput) {
         if (dateInput) {
           let date = ''
-          if (isNaN(dateInput)) {
+          if (isNaN(Number(dateInput))) {
             date = new Date(dateInput)
           } else {
             date = new Date(Number(dateInput))
