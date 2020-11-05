@@ -57,7 +57,8 @@
                 >
                   <div style="position:relative">
                     <i class="text-bold">Ngày {{answerList[0].createDate}}</i>
-                    <div class="ml-2 mt-2" v-html="String(answerList[0].content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
+                    <!-- <div class="ml-2 mt-2" v-html="String(answerList[0].content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div> -->
+                    <div class="ml-2 mt-2" v-html="answerList[0].content"></div>
                     <div v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:10px;top:0">
                       <v-tooltip top>
                         <v-btn slot="activator" icon ripple @click="editAnswer(answerList[0])" style="margin-top:-3px!important">
@@ -90,7 +91,8 @@
                 >
                   <div style="position:relative">
                     <span class="text-bold">Câu trả lời {{ indexAnswer + 1}} </span> <i>(Ngày {{itemAnswer.createDate}})</i>
-                    <div class="ml-2 mt-2" v-html="String(itemAnswer.content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
+                    <!-- <div class="ml-2 mt-2" v-html="String(itemAnswer.content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div> -->
+                    <div class="ml-2 mt-2" v-html="itemAnswer.content"></div>
                     <div v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:10px;top:0">
                       <v-tooltip top >
                         <v-btn slot="activator" icon ripple @click="editAnswer(itemAnswer)" style="margin-top:-3px!important">
