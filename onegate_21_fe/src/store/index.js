@@ -4923,7 +4923,30 @@ export const store = new Vuex.Store({
         }
       } catch (error) { 
       }
-    }
+    },
+    phiChuyenPhat ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let dataPost = {
+          senderProvince: data.senderProvince,
+          senderDistrict: data.senderDistrict,
+          receiverProvince: data.receiverProvince,
+          receiverDistrict: data.receiverDistrict,
+          weight: data.weight
+        }
+        let url = '/o/rest/v2/postal/vnpostprice'
+        axios.post(url, dataPost, options).then(function (response) {
+          resolve(response.data)
+        }).catch(function () {
+          reject()
+        })
+      })
+    },
     // ----End---------
   },
   mutations: {

@@ -96,14 +96,13 @@
                 </content-placeholders>
                 <v-subheader v-else class="pl-0">SĐT người gửi<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm4>
+              <v-flex xs12 sm10>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <v-text-field
                   v-else
                   v-model="dichVuChuyenPhatHoSo.postalTelNo"
-                  append-icon="phone"
                   :rules="[rules.telNo, rules.required]"
                   required
                 ></v-text-field>
@@ -127,6 +126,36 @@
                   @change="onChangeResultWard"
                 ></v-autocomplete>
               </v-flex> -->
+              <v-flex xs12 sm2 v-if="showTinhPhi">
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0">Khối lượng: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm4 v-if="showTinhPhi">
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-text-field
+                  v-else
+                  v-model="weight"
+                  @input="getFee"
+                  suffix="(gam)"
+                  type="number"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm2 v-if="showTinhPhi">
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0" style="padding-top: 7px;">Phí vận chuyển tạm tính: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm4 v-if="showTinhPhi" style="padding-top: 10px;">
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <span :style="loadingFee ? 'color:black;opacity:0.5' : 'color:red;font-weight: bold;'">{{feeVnPost}} VNĐ</span>
+              </v-flex>
             </v-layout>
           </v-form>
         </v-slide-y-transition>
@@ -150,8 +179,13 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   data: () => ({
+    loadingFee: false,
+    showTinhPhi: true,
+    weight: '',
+    feeVnPost: '',
     valid_dichvuchuyenphat: false,
     citys: [],
     resultDistricts: [],
@@ -177,7 +211,8 @@ export default {
         const pattern = /^([0-9]{0,})$/
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       }
-    }
+    },
+    functionTimeOutGetFee: ''
   }),
   computed: {
     loading () {
@@ -272,10 +307,14 @@ export default {
       console.log('onChangeResultCity', data)
       vm.$store.getters.getDictItems(filter).then(function (result) {
         vm.resultDistricts = result.data
+        vm.dichVuChuyenPhatHoSo.postalDistrictCode = ''
       })
       vm.dichVuChuyenPhatHoSo.postalCityName = vm.citys.filter(function(item) {
         return item.itemCode === data
       })[0]['itemName']
+      if (vm.showTinhPhi) {
+        vm.getFee()
+      }
     },
     onChangeResultDistrict (data) {
       let vm = this
@@ -291,6 +330,9 @@ export default {
       vm.dichVuChuyenPhatHoSo.postalDistrictName = vm.resultDistricts.filter(function(item) {
         return item.itemCode === data
       })[0]['itemName']
+      if (vm.showTinhPhi) {
+        vm.getFee()
+      }
     },
     onChangeResultWard (data) {
       let vm = this
@@ -321,7 +363,51 @@ export default {
     validDichVuChuyenPhat () {
       var vm = this
       return vm.$refs.formDichVuChuyenPhatHoSo.validate()
-    }
+    },
+    getFee () {
+      let vm = this
+      if (vm.functionTimeOutGetFee) {
+        clearTimeout(vm.functionTimeOutGetFee)
+      }
+      vm.functionTimeOutGetFee = setTimeout(function () {
+        if (vm.dichVuChuyenPhatHoSo.postalCityCode && vm.dichVuChuyenPhatHoSo.postalDistrictCode) {
+          vm.loadingFee = true
+          let url = '/o/rest/v2/postal/vnpostprice'
+          let typeMethod = 'POST'
+          let headers = {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+          let dataUpdate = new URLSearchParams()
+          dataUpdate.append("senderProvince", vm.dichVuChuyenPhatHoSo.postalCityCode)
+          dataUpdate.append("senderDistrict", vm.dichVuChuyenPhatHoSo.postalDistrictCode)
+          dataUpdate.append("receiverProvince", "")
+          dataUpdate.append("receiverDistrict", "")
+          dataUpdate.append("weight", vm.weight)
+          let paramGet = {}
+          axios({
+            method: typeMethod,
+            url: url,
+            headers: headers,
+            params: paramGet,
+            data: dataUpdate
+          }).then(function (response) {
+            vm.loadingFee = false
+            vm.feeVnPost = response.data ? vm.currency(response.data) : ''
+          }).catch(function (error) {
+          })
+        } else {
+          vm.feeVnPost = ''
+        }
+        
+      }, 1000)
+    },
+    currency (value) {
+      if (value) {
+        let moneyCur = (value / 1).toFixed(0).replace('.', ',')
+        return moneyCur.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+      }
+      return ''
+    },
   }
 }
 </script>
