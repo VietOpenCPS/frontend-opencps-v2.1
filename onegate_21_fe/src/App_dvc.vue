@@ -419,8 +419,8 @@
         if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
           vm.dialogVerifycation = true
         } else {
-          vm.$router.push('/add-dvc/0')
-          // vm.$router.push('/linh-vuc-thu-tuc')
+          // vm.$router.push('/add-dvc/0')
+          vm.$router.push('/linh-vuc-thu-tuc')
         }
       },
       onResize () {

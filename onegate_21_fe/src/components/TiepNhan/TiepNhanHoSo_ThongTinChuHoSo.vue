@@ -723,21 +723,21 @@ export default {
     checkDelegateIdNo: false,
     checkApplicantId: false,
     requiredOptions: {
-      applicantIdNo: true,
-      applicantName: true,
-      address: true,
-      cityCode: true,
-      districtCode: true,
-      wardCode: true,
-      contactTelNo: true,
+      applicantIdNo: false,
+      applicantName: false,
+      address: false,
+      cityCode: false,
+      districtCode: false,
+      wardCode: false,
+      contactTelNo: false,
       contactEmail: false,
-      delegateIdNo: true,
-      delegateName: true,
-      delegateAddress: true,
-      delegateCityCode: true,
-      delegateDistrictCode: true,
-      delegateWardCode: true,
-      delegateTelNo: true,
+      delegateIdNo: false,
+      delegateName: false,
+      delegateAddress: false,
+      delegateCityCode: false,
+      delegateDistrictCode: false,
+      delegateWardCode: false,
+      delegateTelNo: false,
       delegateEmail: false
     },
     valid_thongtinchuhoso: false,
@@ -950,7 +950,7 @@ export default {
   created () {
     let vm = this
     if (vm.formCode === "NEW") {
-      vm.thongTinNguoiNopHoSo.sameUser = true
+      // vm.thongTinNguoiNopHoSo.sameUser = true
     }
     if (vm.hasOrganization) {
       vm.labelSwitch = {
