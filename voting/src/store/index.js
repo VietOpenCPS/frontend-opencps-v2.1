@@ -46,7 +46,7 @@ export const store = new Vuex.Store({
           }
           axios.get(state.endPointApi + '/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
             if (result.data) {
-              resolve(result.data.data)
+              resolve(result.data)
             } else {
               resolve([])
             }
@@ -71,7 +71,7 @@ export const store = new Vuex.Store({
           dataPost.append('serverCode', 'SERVER_' + data.itemCode)
           axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
             if (result.data) {
-              resolve(result.data.data)
+              resolve(result.data)
             } else {
               resolve([])
             }

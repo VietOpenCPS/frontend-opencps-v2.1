@@ -225,8 +225,9 @@ export default {
           className: 'employee',
           classPk: item.employeeId
         }).then(result => {
-          let votingItems = result
-          vm.getScoreVoting(votingItems, key)
+          let votingItems = result.data
+          let votingCount = result.hasOwnProperty('votingCount') ? result.votingCount : 0
+          vm.getScoreVoting(votingItems, key, votingCount)
         }).catch(xhr => {
         })
       } else {
@@ -235,14 +236,15 @@ export default {
           classPk: item.employeeId,
           itemCode: vm.itemCode
         }).then(result => {
-          let votingItems = result
-          vm.getScoreVoting(votingItems, key)
+          let votingItems = result.data
+          let votingCount = result.hasOwnProperty('votingCount') ? result.votingCount : 0
+          vm.getScoreVoting(votingItems, key, votingCount)
         }).catch(xhr => {
         })
       }
       
     },
-    getScoreVoting (votingItems, key) {
+    getScoreVoting (votingItems, key, votingCount) {
       let vm = this
       if (votingItems && votingItems.length > 0) {
         let totalVoting = 0
@@ -257,8 +259,9 @@ export default {
         }
         if (totalVoting > 0) {
           vm.employeeItems[key]['score'] = Number(((totalScore * 5) / (totalVoting * lengthAnswer)).toFixed(1))
-          vm.employeeItems[key]['totalVoting'] = Number(totalVoting)
+          // vm.employeeItems[key]['totalVoting'] = Number(totalVoting)
         }
+        vm.employeeItems[key]['totalVoting'] = votingCount
       }
     },
     changePage () {

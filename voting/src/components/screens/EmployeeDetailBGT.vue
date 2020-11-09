@@ -369,8 +369,9 @@ export default {
           className: 'employee',
           classPk: vm.id
         }).then(result => {
-          vm.votingItems = result
+          vm.votingItems = result.data
           vm.getScoreVoting(vm.votingItems)
+          vm.employeeSelected['totalVoting'] = Number(result.votingCount)
         }).catch(xhr => {
         })
       } else {
@@ -379,8 +380,9 @@ export default {
           classPk: vm.id,
           itemCode: maDonVi
         }).then(result => {
-          vm.votingItems = result
+          vm.votingItems = result.data
           vm.getScoreVoting(vm.votingItems)
+          vm.employeeSelected['totalVoting'] = Number(result.votingCount)
         }).catch(xhr => {
         })
       }
@@ -401,7 +403,7 @@ export default {
         }
         if (totalVoting > 0) {
           vm.employeeSelected['score'] = Number(((totalScore * 5) / (totalVoting * lengthAnswer)).toFixed(1))
-          vm.employeeSelected['totalVoting'] = Number(totalVoting)
+          // vm.employeeSelected['totalVoting'] = Number(totalVoting)
         }
       }
     },
