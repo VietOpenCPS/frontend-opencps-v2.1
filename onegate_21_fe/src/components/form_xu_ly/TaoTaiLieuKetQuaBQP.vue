@@ -650,7 +650,7 @@
             // }
             // vm.$store.commit('setCreateFileSigned', createFileSigned)
           }).catch(reject => {
-            // vm.loadingApacal = false
+            vm.loadingApacal = false
             // toastr.clear()
             // toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })

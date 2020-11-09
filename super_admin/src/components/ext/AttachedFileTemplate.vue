@@ -429,10 +429,10 @@ import TiepNhanHoSoDetailVue from '../../../../dynamic_report_admin/src/componen
           vm.fileTemplateFilter = vm.fileTemplateData.filter(function (item) {
             return vm.convertString(String(item['templateName'])).indexOf(keySearch) >= 0
           })
-          // console.log('fileTemplateFilter', vm.fileTemplateKey, vm.fileTemplateFilter)
+          console.log('fileTemplateFilter', vm.fileTemplateKey, vm.fileTemplateFilter)
         } else {
           vm.fileTemplateFilter = vm.fileTemplateData
-          // console.log('fileTemplateFilter', vm.fileTemplateKey, vm.fileTemplateFilter)
+          console.log('fileTemplateFilter', vm.fileTemplateKey, vm.fileTemplateFilter)
         }
       },
       convertString(str) {

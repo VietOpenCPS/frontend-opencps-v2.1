@@ -293,7 +293,7 @@
             <v-checkbox v-else
               :input-value="props.all"
               :indeterminate="props.indeterminate"
-              :disabled="!thuTucHanhChinhSelected && (!doActionGroup || !doActionGroupKhacThuTuc) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0' && (!doActionGroup || !doActionGroupKhacThuTuc)) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '' && (!doActionGroup || !doActionGroupKhacThuTuc))"
+              :disabled="(!thuTucHanhChinhSelected && (!doActionGroup && !doActionGroupKhacThuTuc)) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0' && (!doActionGroup && !doActionGroupKhacThuTuc)) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '' && (!doActionGroup && !doActionGroupKhacThuTuc))"
               primary
               hide-details
               @click.native="toggleAll"
@@ -339,8 +339,8 @@
               v-if="getUser('Administrator') || getUser('Administrator_data')"
             ></v-checkbox>
             <v-checkbox v-else
-              :disabled="props.item['assigned'] === 0 && (!doActionGroup || !doActionGroupKhacThuTuc) || (!thuTucHanhChinhSelected && !doActionGroupKhacThuTuc) || 
-              (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0' && !doActionGroupKhacThuTuc) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '' && !doActionGroupKhacThuTuc)"
+              :disabled="(props.item['assigned'] === 0 && (!doActionGroup && !doActionGroupKhacThuTuc)) || (!thuTucHanhChinhSelected && (!doActionGroup && !doActionGroupKhacThuTuc)) || 
+              (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0' && (!doActionGroup && !doActionGroupKhacThuTuc)) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '' && (!doActionGroup && !doActionGroupKhacThuTuc))"
               v-model="props.selected"
               @change="changeSelected"
               primary
@@ -1500,7 +1500,7 @@ export default {
         } else {
           vm.selectedDoAction = []
         }
-       console.log('selectedDoAction', vm.selectedDoAction)
+        console.log('selectedDoAction', vm.selectedDoAction)
         vm.$store.commit('setDossierSelectedDoAction', vm.selectedDoAction)
         
       },
