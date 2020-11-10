@@ -591,11 +591,15 @@ export const store = new Vuex.Store({
             params: {
             }
           }
-          axios.get(state.initData.regionApi + '/' + data.collectionCode + '/dictitems/' + data.itemCode, param).then(function (response) {
-            resolve(response.data)
-          }, error => {
-            reject(error)
-          })
+          if (data.hasOwnProperty('itemCode') && data.itemCode) {
+            axios.get(state.initData.regionApi + '/' + data.collectionCode + '/dictitems/' + data.itemCode, param).then(function (response) {
+              resolve(response.data)
+            }, error => {
+              reject(error)
+            })
+          } else {
+            reject('')
+          }
         }).catch(function (){})
       })
     },

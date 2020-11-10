@@ -1080,7 +1080,7 @@ export default {
         }
       } else {
         if (typeof(Storage) !== 'undefined') {
-          localStorage.setItem('hscv_' + vm.id, dossiers.toString())
+          localStorage.setItem('hscv_' + vm.id, JSON.stringify(dossiers))
         } else {
         }
       }
@@ -1103,6 +1103,13 @@ export default {
       vm.requiredCVDenGroupId = vm.formActionGroup.hasOwnProperty('requiredCVDenGroupId') ? vm.formActionGroup.requiredCVDenGroupId : ''
       vm.requiredCVDenGovCode = vm.formActionGroup.hasOwnProperty('requiredCVDenGovCode') ? vm.formActionGroup.requiredCVDenGovCode : ''
       vm.hasTaoQuyetDinh = vm.formActionGroup.hasOwnProperty('taoQuyetDinh') ? vm.formActionGroup.taoQuyetDinh : false
+      if (typeof(Storage) !== 'undefined') {
+        for (let i =0; i < localStorage.length; i++) {
+          if (localStorage.key(i).indexOf('hscv_') == 0 && localStorage.key(i) !== 'hscv_' + vm.id) {
+            localStorage.removeItem(localStorage.key(i))
+          }
+        }
+      }
     })
   },
   beforeDestroy () {
@@ -1761,7 +1768,9 @@ export default {
     tiepNhanCongVan (type, isDraf) {
       let vm = this
       try {
-        localStorage.removeItem('hscv_' + vm.id)
+        if (typeof(Storage) !== 'undefined') {
+          localStorage.removeItem('hscv_' + vm.id)
+        }
       } catch (error) {
       }
       let thongtincongvan = this.$refs.thongtincongvan.getThongTinCongVan()
