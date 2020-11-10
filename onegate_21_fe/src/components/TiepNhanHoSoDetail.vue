@@ -1071,7 +1071,20 @@ export default {
       return this.$store.getters.getMenuConfigsTodo
     },
     dossiersIntoGroupRender () {
-      return this.$store.getters.dossierSelectedDoAction
+      let vm = this
+      let dossiers = vm.$store.getters.dossierSelectedDoAction
+      if (!dossiers || dossiers.length === 0) {
+        try {
+          dossiers = JSON.parse(localStorage.getItem('hscv_' + vm.id))
+        } catch (error) {
+        }
+      } else {
+        if (typeof(Storage) !== 'undefined') {
+          localStorage.setItem('hscv_' + vm.id, dossiers.toString())
+        } else {
+        }
+      }
+      return dossiers
     },
     // formActionGroup () {
     //   return this.$store.getters.formActionGroup
@@ -1747,6 +1760,10 @@ export default {
     },
     tiepNhanCongVan (type, isDraf) {
       let vm = this
+      try {
+        localStorage.removeItem('hscv_' + vm.id)
+      } catch (error) {
+      }
       let thongtincongvan = this.$refs.thongtincongvan.getThongTinCongVan()
       let tempData = thongtincongvan
       tempData.dueDate = vm.dateTimeView(thongtincongvan.dueDate)

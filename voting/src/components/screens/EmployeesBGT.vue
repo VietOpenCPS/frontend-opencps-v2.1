@@ -2,7 +2,7 @@
   <div>
     <v-layout justify-center>
       <v-flex xs12>
-        <v-card flat >
+        <v-card flat class="px-2">
           <h3 class="text-xs-center py-2" style="color:#065694">ĐÁNH GIÁ CÁN BỘ</h3>
           <v-container fluid grid-list-md>
             <v-layout row wrap>
@@ -17,7 +17,7 @@
                     <v-layout wrap>
                       <v-flex xs4 style="text-align: center!important;">
                         <div v-if="employee['imgSrc']" class="mt-1" :style="'background-image: url(' + employee['imgSrc'] + ');'" style="max-width: 100px;height: 150px;margin: 0 auto;background-position: center;background-size: cover;"></div>
-                        <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="max-width: 100px;height: 150px;object-fit: contain;background: #ddd;opacity:0.6"/>
+                        <img v-else src="/o/opencps-store/js/cli/voting/app/img/contacts-icon.png" style="max-width: 100px;height: 150px;object-fit: contain;background: #ddd;opacity:0.6"/>
                       </v-flex>
                       <v-flex xs8 style="word-wrap: break-word;">
                         <div class="primary--text">{{employee.jobPosTitle}}</div>
@@ -63,6 +63,12 @@
               Không có danh sách cán bộ
             </v-alert>
           </div>
+          <v-flex xs12 sm12 class="text-xs-right mb-3">
+            <v-btn @click="goBack" color="primary">
+              <v-icon size="16">reply</v-icon>&nbsp;
+              Quay lại 
+            </v-btn>
+          </v-flex>
         </v-card>
       </v-flex>
     </v-layout>
@@ -186,9 +192,10 @@ export default {
     getAvatar (item, key) {
       let vm = this
       let filter = {
-        employeeId: item.employeeId
+        employeeId: item.employeeId,
+        itemCode: vm.itemCode
       }
-      vm.$store.dispatch('loadImageEmployee', filter).then(function (data) {
+      vm.$store.dispatch('loadImageEmployeeProxy', filter).then(function (data) {
         if (data !== '' && data !== null) {
           let portalURL = ''
           if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
@@ -206,22 +213,38 @@ export default {
       vm.$router.push({
         path: '/danh-sach-can-bo/' + item.employeeId,
         query: {
-          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+          itemCode: vm.itemCode
         }
       })
     },
     getVotingEmployee (item, key) {
       let vm = this
-      vm.$store.dispatch('loadVoting', {
-        className: 'employee',
-        classPk: item.employeeId
-      }).then(result => {
-        let votingItems = result
-        vm.getScoreVoting(votingItems, key)
-      }).catch(xhr => {
-      })
+      if (vm.isDVC) {
+        vm.$store.dispatch('loadVoting', {
+          className: 'employee',
+          classPk: item.employeeId
+        }).then(result => {
+          let votingItems = result.data
+          let votingCount = result.hasOwnProperty('votingCount') ? result.votingCount : 0
+          vm.getScoreVoting(votingItems, key, votingCount)
+        }).catch(xhr => {
+        })
+      } else {
+        vm.$store.dispatch('loadVotingMotcua', {
+          className: 'employee',
+          classPk: item.employeeId,
+          itemCode: vm.itemCode
+        }).then(result => {
+          let votingItems = result.data
+          let votingCount = result.hasOwnProperty('votingCount') ? result.votingCount : 0
+          vm.getScoreVoting(votingItems, key, votingCount)
+        }).catch(xhr => {
+        })
+      }
+      
     },
-    getScoreVoting (votingItems, key) {
+    getScoreVoting (votingItems, key, votingCount) {
       let vm = this
       if (votingItems && votingItems.length > 0) {
         let totalVoting = 0
@@ -236,8 +259,9 @@ export default {
         }
         if (totalVoting > 0) {
           vm.employeeItems[key]['score'] = Number(((totalScore * 5) / (totalVoting * lengthAnswer)).toFixed(1))
-          vm.employeeItems[key]['totalVoting'] = Number(totalVoting)
+          // vm.employeeItems[key]['totalVoting'] = Number(totalVoting)
         }
+        vm.employeeItems[key]['totalVoting'] = votingCount
       }
     },
     changePage () {

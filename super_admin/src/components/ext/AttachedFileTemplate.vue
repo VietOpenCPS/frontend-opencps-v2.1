@@ -423,7 +423,7 @@ import TiepNhanHoSoDetailVue from '../../../../dynamic_report_admin/src/componen
         }
       },
       filterFileTemplate () {
-        let vm = TiepNhanHoSoDetailVue
+        let vm = this
         if (vm.fileTemplateKey) {
           let keySearch = vm.convertString(vm.fileTemplateKey)
           vm.fileTemplateFilter = vm.fileTemplateData.filter(function (item) {

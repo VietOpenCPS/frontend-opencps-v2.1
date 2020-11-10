@@ -67,7 +67,7 @@
         </v-flex> -->
 
         <v-container align-center row wrap class="px-5" style="font-size:1.25em">
-          <v-flex xs12 style="border: 1px solid #0072bc">
+          <v-flex xs12 style="border: 1px solid #0072bc;border-top-left-radius: 7px;border-top-right-radius: 7px;">
             <v-layout row wrap>
               <v-flex xs12 sm12 class="py-3">
                 <v-layout wrap class="px-2">
@@ -107,7 +107,7 @@
               </v-flex>
             </v-layout>
           </v-flex>
-          <v-flex xs12 class="py-3 px-2 pl-5" v-if="!isMobile" style="border: 1px solid #0072bc; border-top: 0">
+          <v-flex xs12 class="py-3 px-2 pl-5" v-if="!isMobile" style="border: 1px solid #0072bc; border-top: 0;border-bottom-left-radius: 7px; border-bottom-right-radius: 7px;">
             <div v-for="(item, index) in votingItems" :key="index" class="mb-2">
               <div class="text-bold primary--text">* {{ item.subject }}</div>
               <div class="ml-3">
@@ -228,11 +228,11 @@
         </v-card-text>
         <v-card-actions class="mx-2">
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="submitForm">
+          <v-btn color="primary" @click="submitForm" :disabled="btnLoading">
             <v-icon>how_to_reg</v-icon>&nbsp;
               Xác nhận
           </v-btn>
-          <v-btn color="primary" @click="dialogVerify = false">
+          <v-btn color="primary" @click="dialogVerify = false" :disabled="btnLoading">
             <v-icon>clear</v-icon>&nbsp;
               Hủy
           </v-btn>
@@ -273,7 +273,8 @@ export default {
     dossierNo: '',
     captchaValue: '',
     captchaCode: '',
-    arrAction: []
+    arrAction: [],
+    isDVC: false
   }),
   computed: {
     loading () {
@@ -294,6 +295,12 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      if (isDVC) {
+        vm.isDVC = isDVC
+      }
+    } catch (error) {
+    }
     let currentQuery = vm.$router.history.current.query
     vm.$nextTick(function () {
       vm.getVotingEmployee()
@@ -304,10 +311,10 @@ export default {
   methods: {
     showFormVerify () {
       let vm = this
-      let valid = false
+      let valid = true
       for (var key in vm.votingItems) {
-        if (String(vm.votingItems[key]['selected']) !== '0') {
-          valid = true
+        if (String(vm.votingItems[key]['selected']) === '0') {
+          valid = false
         }
       }
       if (valid) {
@@ -315,7 +322,7 @@ export default {
         vm.$refs.formVerify.resetValidation()
         vm.createCaptcha()
       } else {
-        toastr.error('Bạn chưa chọn đánh giá nào')
+        toastr.error('Vui lòng chọn tất cả tiêu chí để đánh giá')
       }
     },
     submitForm () {
@@ -355,14 +362,31 @@ export default {
     },
     getVotingEmployee () {
       let vm = this
-      vm.$store.dispatch('loadVoting', {
-        className: 'employee',
-        classPk: vm.id
-      }).then(result => {
-        vm.votingItems = result
-        vm.getScoreVoting(vm.votingItems)
-      }).catch(xhr => {
-      })
+      let currentQuery = vm.$router.history.current.query
+      let maDonVi = currentQuery.hasOwnProperty('itemCode') ? currentQuery.itemCode : ''
+      if (vm.isDVC) {
+        vm.$store.dispatch('loadVoting', {
+          className: 'employee',
+          classPk: vm.id
+        }).then(result => {
+          vm.votingItems = result.data
+          vm.getScoreVoting(vm.votingItems)
+          vm.employeeSelected['totalVoting'] = result.votingCount ? Number(result.votingCount) : 0
+        }).catch(xhr => {
+        })
+      } else {
+        vm.$store.dispatch('loadVotingMotcua', {
+          className: 'employee',
+          classPk: vm.id,
+          itemCode: maDonVi
+        }).then(result => {
+          vm.votingItems = result.data
+          vm.getScoreVoting(vm.votingItems)
+          vm.employeeSelected['totalVoting'] = result.votingCount ? Number(result.votingCount) : 0
+        }).catch(xhr => {
+        })
+      }
+      
     },
     getScoreVoting (votingItems) {
       let vm = this
@@ -379,7 +403,7 @@ export default {
         }
         if (totalVoting > 0) {
           vm.employeeSelected['score'] = Number(((totalScore * 5) / (totalVoting * lengthAnswer)).toFixed(1))
-          vm.employeeSelected['totalVoting'] = Number(totalVoting)
+          // vm.employeeSelected['totalVoting'] = Number(totalVoting)
         }
       }
     },
@@ -426,19 +450,28 @@ export default {
     },
     doVottingResultSubmit () {
       let vm = this
+      let currentQuery = vm.$router.history.current.query
+      let maDonVi = currentQuery.hasOwnProperty('itemCode') ? currentQuery.itemCode : ''
       vm.arrAction = []
       for (let key in vm.votingItems) {
         vm.votingItems[key]['className'] = 'employee'
         vm.votingItems[key]['classPk'] = vm.employeeSelected['employeeId']
         if (String(vm.votingItems[key]['selected']) !== '0') {
-          vm.arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
+          if (vm.isDVC) {
+            vm.arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
+          } else {
+            vm.votingItems[key] = Object.assign(vm.votingItems[key], {itemCode: maDonVi})
+            vm.arrAction.push(vm.$store.dispatch('submitVotingProxy', vm.votingItems[key]))
+          }
         }
       }
+      vm.btnLoading = true
       Promise.all(vm.arrAction).then(results => {
+        vm.btnLoading = false
         toastr.success('Gửi đánh giá thành công')
-        vm.dialogVerify = false
-        vm.getVotingEmployee()
+        vm.goBack()
       }).catch(xhr => {
+        vm.btnLoading = false
         toastr.error('Gửi đánh giá thất bại')
       })
     },
