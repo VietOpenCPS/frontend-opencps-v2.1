@@ -161,7 +161,7 @@
                     height="32"
                     min-height="32"
                     clearable
-                    @keyup.enter="filterDeliverable"
+                    @keyup.enter="filterAdvance"
                   ></v-text-field>
                   <v-textarea
                     v-if="item['fieldType'] === 'textarea'"
@@ -174,7 +174,7 @@
                     flat
                     rows="3"
                     clearable
-                    @keyup.enter="filterDeliverable"
+                    @keyup.enter="filterAdvance"
                   ></v-textarea>
                   <v-autocomplete
                     v-if="item['fieldType'] === 'select'"
@@ -243,7 +243,7 @@
             </v-layout>
             
             <v-flex class="xs12 mx-2">
-              <v-btn class="mx-0 mb-0" color="primary" dark @click.native="filterDeliverable">
+              <v-btn class="mx-0 mb-0" color="primary" dark @click.native="filterAdvance">
                 <v-icon size="18">search</v-icon> &nbsp; Tìm kiếm
               </v-btn>
             </v-flex>
@@ -649,7 +649,8 @@
         vm.donvicu = ''
         vm.trichyeu = ''
         vm.deliverableCode = ''
-        vm.filterDeliverable('keyword')
+        // vm.filterDeliverable('keyword')
+        vm.filterDeliverable()
       },
       index (val) {
         var vm = this
@@ -825,6 +826,19 @@
         if (item.hasOwnProperty('dossierId') && item.dossierId && item.dossierId !== '0' && vm.urlRedirectDossier) {
           let url = vm.urlRedirectDossier + '/' + item.dossierId
           window.open(url, "_blank")
+        }
+        if(item.hasOwnProperty('dossierId') && item.dossierId && item.dossierId === '0') {
+          let current = vm.$router.history.current
+          let newQuery = current.query
+          let queryString = '?'
+          for (let key in newQuery) {
+            if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+              queryString += key + '=' + newQuery[key] + '&'
+            }
+          }
+          vm.$router.push({
+            path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString + 'editForm=true&viewForm=true'
+          })
         }
         
       },
@@ -1026,7 +1040,7 @@
         let filter = {
           typeSearch: type_search ? type_search : '',
           type: vm.items[vm.index]['typeCode'],
-          page: newQuery.hasOwnProperty('page') ? newQuery['page'] : 1,
+          page: newQuery.hasOwnProperty('page') && newQuery['page'] ? newQuery['page'] : 1,
           keyword: newQuery.hasOwnProperty('keyword') ? newQuery['keyword'] : vm.deliverableKey,
           formDataKey: JSON.stringify(searchParams)
         }
@@ -1042,6 +1056,24 @@
           vm.hosoDatasTotal = 0
           vm.hosoDatas = []
           console.log(reject)
+        })
+      },
+      filterAdvance () {
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = ''
+        newQuery['keyword'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        // console.log('queryString=====', queryString)
+        queryString += 'page=1&keyword=' + vm.deliverableKey
+        vm.$router.push({
+          path: current.path + queryString + '&renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
         })
       },
       doImportData () {

@@ -2916,9 +2916,11 @@ export const store = new Vuex.Store({
                 groupId: state.initData.groupId
               },
               params: {
+                originDossierId: classPK
               }
             }
-            axios.get("/o/rest/v2/dossiers/inter/" + classPK, param).then(function (response) {
+            // axios.get("/o/rest/v2/dossiers/inter/" + classPK, param).then(function (response) {
+            axios.get("/o/rest/v2/dossiers", param).then(function (response) {
               let serializable = response.data
               if (serializable.data) {
                 resolve(serializable.data)
@@ -3139,13 +3141,14 @@ export const store = new Vuex.Store({
             },
             responseType: 'blob',
             params: {
-              payload: filter.payload ? filter.payload : ''
+              payload: filter.payload ? filter.payload : '',
+              reportType: filter.hasOwnProperty('reportType') && filter.reportType ? filter.reportType : ''
             }
           }
           axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/documents/preview/' + filter.document, param).then(function (response) {
             let serializable = response.data
-            if (filter.hasOwnProperty('reportType')) {
-              saveAs(serializable, 'biennhan' + new Date().getTime() + '.doc')
+            if (filter.hasOwnProperty('reportType') && filter.reportType) {
+              saveAs(serializable, filter.dossierId + '-' + filter.document + new Date().getTime() + '.docx')
             }
             let file = window.URL.createObjectURL(serializable)
             resolve(file)
@@ -3249,13 +3252,18 @@ export const store = new Vuex.Store({
             responseType: 'blob'
           }
           let formData = new URLSearchParams()
-          // formData.append('serviceCode', filter.serviceCode)
-          // formData.append('govAgencyCode', filter.govAgencyCode)
           formData.append('dossiers', filter.dossiers ? filter.dossiers : '')
           formData.append('payload', filter.payload ? filter.payload : '')
+          if (filter.hasOwnProperty('reportType') && filter.reportType) {
+            formData.append('reportType', filter.reportType)
+          }
+          
           axios.post(state.initData.getNextAction + '/preview/' + filter.document ,formData , param).then(function (response) {
             let serializable = response.data
             let file = window.URL.createObjectURL(serializable)
+            if (filter.hasOwnProperty('reportType') && filter.reportType) {
+              saveAs(serializable, filter.document + new Date().getTime() + '.docx')
+            }
             resolve(file)
           }).catch(function (error) {
             console.log(error)
@@ -4917,7 +4925,30 @@ export const store = new Vuex.Store({
         }
       } catch (error) { 
       }
-    }
+    },
+    phiChuyenPhat ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let dataPost = {
+          senderProvince: data.senderProvince,
+          senderDistrict: data.senderDistrict,
+          receiverProvince: data.receiverProvince,
+          receiverDistrict: data.receiverDistrict,
+          weight: data.weight
+        }
+        let url = '/o/rest/v2/postal/vnpostprice'
+        axios.post(url, dataPost, options).then(function (response) {
+          resolve(response.data)
+        }).catch(function () {
+          reject()
+        })
+      })
+    },
     // ----End---------
   },
   mutations: {
