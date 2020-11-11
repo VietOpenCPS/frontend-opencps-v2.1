@@ -1,5 +1,5 @@
 {
-  "name": "system_queue_application_form",
+  "name": "register_to_queue",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,7 +13,7 @@
     "babel-plugin-transform-remove-console": "^6.9.4",
     "file-saver": "^2.0.0-rc.4",
     "idempotent-babel-polyfill": "^7.0.0",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.1",
     "json-mapper-json": "^1.3.0",
     "json2csv": "^3.0.0",
     "jstoxml": "^1.4.4",

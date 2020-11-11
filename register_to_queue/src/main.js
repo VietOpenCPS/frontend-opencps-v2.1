@@ -52,5 +52,5 @@ new Vue({
     })
   },
   render: function (h) { return h(App) }
-}).$mount('#app_application_form')
+}).$mount('#app_register_to_queue')
 
