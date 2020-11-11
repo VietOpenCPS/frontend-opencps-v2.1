@@ -22,7 +22,7 @@
               @keyup.enter="changeDataSearch"
             ></v-text-field>
           </v-flex>
-          <v-flex xs12 class="my-3">
+          <!-- <v-flex xs12 class="my-3">
             <v-autocomplete
               :items="statusList"
               v-model="status"
@@ -33,7 +33,7 @@
               @change="changeStatus"
               clearable
             ></v-autocomplete>
-          </v-flex>
+          </v-flex> -->
           <v-flex xs12 class="mb-1">
             <div><span style="color: red">(*) </span> Nhập mã hồ sơ hoặc số CMND/ hộ chiếu để thực hiện tra cứu hồ sơ.</div>
           </v-flex>

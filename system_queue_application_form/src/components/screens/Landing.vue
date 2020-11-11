@@ -19,7 +19,73 @@
       </v-card>
     </v-dialog>
     <v-layout wrap v-if="!dialogLoadingCreate">
-      <v-flex xs12 md8>
+      <v-flex xs12 v-if="isMobile">
+        <div class="row-header no__hidden_class">
+          <!-- <div class="">
+            <span>DANH SÁCH MẪU TỜ KHAI TRỰC TUYẾN</span>
+          </div> -->
+          <v-toolbar flat height="36" dark color="primary">
+            <v-toolbar-title class="white--text" style="font-size: 14px;">DANH SÁCH MẪU TỜ KHAI TRỰC TUYẾN</v-toolbar-title>
+          </v-toolbar>
+          <!-- <div class="layout row wrap header_tools row-blue">
+            <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
+              <v-text-field
+                v-model="eformNoSearch"
+                placeholder="Tìm kiếm tờ khai đã tạo"
+                solo
+                chips
+                multiple
+                deletable-chips
+                item-value="eFormNo"
+                item-text="eFormName"
+                @keyup.enter="searchEform"
+                content-class="adv__search__select"
+                return-object
+                autofocus
+              ></v-text-field>
+            </div>
+            <div class="flex text-right" style="margin-left: auto;max-width: 100px;height:37px">
+              <v-btn color="primary" class="my-0 mx-0 white--text" v-on:click.native="searchEform" style="height:100%">
+                <v-icon size="16">search</v-icon> &nbsp;
+                Tìm kiếm
+              </v-btn>
+            </div>
+          </div>  -->
+        </div>
+        <v-card flat class="">
+          <v-card-text class='grey lighten-3 px-0 py-0'>
+            <v-expansion-panel class="expand__select__domain" v-model="panelServiceList" expand>
+              <v-expansion-panel-content v-for='(item, index) in serviceInfoList' :key='index' :value="true">
+                <!-- <div class="text-bold" slot='header' style="margin-left: 14px;color:#615d5d">
+                    <v-icon class="pr-2" color="#615d5d">navigate_next</v-icon> 
+                    <span style="position: absolute;margin-top: 1px;">{{item.serviceCode}}  - {{item.serviceName}} </span>
+                </div> -->
+                <v-card>
+                  <div class="pl-2" v-for='(itemTemplate, index2) in item.templateList' :key='index2'>
+                    <v-layout row wrap>
+                      <v-flex xs9 sm10 class="pt-1 primary--text text-bold" @click="selectTemplate(index, itemTemplate, item)" style="cursor: pointer">
+                        <span>{{index + 1}}.</span> &nbsp;
+                        <span>{{itemTemplate.templateName}}</span>
+                      </v-flex>
+
+                      <v-flex xs3 sm2 class="text-xs-center">
+                        <v-menu left offset-x>
+                          <v-btn color="primary" class="mx-0 my-0 mt-1 white--text" slot="activator" small 
+                            @click="selectTemplate(index, itemTemplate, item)"
+                          >
+                            Chọn
+                          </v-btn>
+                        </v-menu>
+                      </v-flex>
+                    </v-layout>
+                  </div>
+                </v-card>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-card-text>
+        </v-card>
+      </v-flex>
+      <v-flex xs12 md8 v-if="!isMobile">
         <div class="row-header no__hidden_class">
           <!-- <div class="">
             <span>DANH SÁCH MẪU TỜ KHAI TRỰC TUYẾN</span>
@@ -85,7 +151,7 @@
           </v-card-text>
         </v-card>
       </v-flex>
-      <v-flex xs12 md4 class="pl-2">
+      <v-flex xs12 md4 v-if="!isMobile" class="pl-2">
         <div class="dangkyxephang">
           <div class="row-header no__hidden_class">
             <v-toolbar flat height="36" dark color="primary">
@@ -203,8 +269,6 @@
                   <div><span class="red--text">Chú ý:</span></div>
                   <div class="pl-3" style="text-align: justify;">
                     - Họ tên của người nộp phải trùng với họ tên của đương sự (người được cấp trong giấy tờ hoặc người xin cấp hộ chiếu) <br>
-                    - Số thứ tự và thời gian xếp hàng sẽ được gửi qua tin nhắn SMS <br>
-                    - Người đăng ký chịu khoản phí nhắn tin SMS
                   </div>
                 </v-flex>
                 <v-flex sm12 class="text-xs-right">
@@ -378,6 +442,9 @@ export default {
     },
     fileTemplateSelected () {
       return this.$store.getters.getFileTemplateSelected
+    },
+    isMobile () {
+      return this.$store.getters.getIsMobile
     }
   },
   created () {
@@ -569,6 +636,7 @@ export default {
         }
         vm.$store.dispatch('getEformSecret', filter).then(function(result) {
           let bookingName = ''
+          let formHPH = false
           if (result && result.hasOwnProperty('eFormId')) {
             vm.detailEform = result
             let templateFile = vm.formTemplateList.filter(function (item) {
@@ -586,37 +654,76 @@ export default {
             // 
             try {
               let name = JSON.parse(result['eFormData'])
+              console.log(name)
+              if(name.hasOwnProperty('list_giay_to')){
+                formHPH = true
+              }
               bookingName = name !== 'undefined' && name !== undefined ? name['bookingName'] : ''
             } catch (e) {
               console.log('lỗi parse eFormData get bookingName')
             }
-            if (bookingName.toLowerCase() !== String(vm.applicantName).toLowerCase()) {
-              toastr.clear()
-              toastr.error('Họ tên người nộp không trùng với họ tên của đương sự (người được cấp trong giấy tờ hoặc người xin cấp hộ chiếu). Vui lòng kiểm tra lại.')
-            } else {
-              filterBooking.className = 'EFORM'
-              filterBooking.classPK = result.eFormId
-              filterBooking.serviceCode = result.serviceCode
-              filterBooking.bookingName = bookingName
-              filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
-              filterBooking.serverCode = vm.agencyTiepNhan.serverNo
-              // 
-              let filter = {
-                groupIdBooking: vm.agencyTiepNhan.value,
-                bookingDate: vm.applicantIdDateFormatted,
-                serverCode: vm.agencyTiepNhan.serverNo
-              }
-              vm.$store.dispatch('getCounterBookingProxy', filter).then(function (result) {
-                console.log('checkCounter', result)
-                if (result) {
-                  vm.isSlot = true
-                  vm.createBookingOnline(filterBooking)
-                } else {
-                  vm.isSlot = false
+            if(formHPH){
+              console.log(result['eFormData'])
+              console.log(vm.checkNguoiNop(result['eFormData']))
+              // if (bookingName.toLowerCase() !== String(vm.applicantName).toLowerCase()) {
+              if (vm.checkNguoiNop(result['eFormData'])) {
+                toastr.clear()
+                toastr.error('Họ tên người nộp không trùng với họ tên của đương sự (người được cấp trong giấy tờ hoặc người xin cấp hộ chiếu). Vui lòng kiểm tra lại.')
+              } else {
+                filterBooking.className = 'EFORM'
+                filterBooking.classPK = result.eFormId
+                filterBooking.serviceCode = result.serviceCode
+                filterBooking.bookingName = bookingName
+                filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
+                filterBooking.serverCode = vm.agencyTiepNhan.serverNo
+                // 
+                let filter = {
+                  groupIdBooking: vm.agencyTiepNhan.value,
+                  bookingDate: vm.applicantIdDateFormatted,
+                  serverCode: vm.agencyTiepNhan.serverNo
                 }
-              }).catch(reject => {
-                vm.isSlot = false
-              })
+                vm.$store.dispatch('getCounterBookingProxy', filter).then(function (result) {
+                  console.log('checkCounter', result)
+                  if (result) {
+                    vm.isSlot = true
+                    vm.createBookingOnline(filterBooking)
+                  } else {
+                    vm.isSlot = false
+                  }
+                }).catch(reject => {
+                  vm.isSlot = false
+                })
+              }
+            } else {
+              if (bookingName.toLowerCase() !== String(vm.applicantName).toLowerCase()) {
+              // if (vm.checkNguoiNop(result['eFormData'])) {
+                toastr.clear()
+                toastr.error('Họ tên người nộp không trùng với họ tên của đương sự (người được cấp trong giấy tờ hoặc người xin cấp hộ chiếu). Vui lòng kiểm tra lại.')
+              } else {
+                filterBooking.className = 'EFORM'
+                filterBooking.classPK = result.eFormId
+                filterBooking.serviceCode = result.serviceCode
+                filterBooking.bookingName = bookingName
+                filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
+                filterBooking.serverCode = vm.agencyTiepNhan.serverNo
+                // 
+                let filter = {
+                  groupIdBooking: vm.agencyTiepNhan.value,
+                  bookingDate: vm.applicantIdDateFormatted,
+                  serverCode: vm.agencyTiepNhan.serverNo
+                }
+                vm.$store.dispatch('getCounterBookingProxy', filter).then(function (result) {
+                  console.log('checkCounter', result)
+                  if (result) {
+                    vm.isSlot = true
+                    vm.createBookingOnline(filterBooking)
+                  } else {
+                    vm.isSlot = false
+                  }
+                }).catch(reject => {
+                  vm.isSlot = false
+                })
+              }
             }
           } else {
             toastr.clear()
@@ -808,6 +915,29 @@ export default {
     },
     goBack () {
       window.history.back()
+    },
+    checkNguoiNop (stringEform) {
+      let vm = this
+      let listGiayTo = []
+      let bookingName = ''
+      try {
+        let name = JSON.parse(stringEform)
+        listGiayTo = name !== 'undefined' && name !== undefined ? name['list_giay_to'] : []
+        bookingName = name !== 'undefined' && name !== undefined ? name['bookingName'] : ''
+      } catch (e) {
+        console.log('lỗi parse eFormData get bookingName')
+        return true
+      }
+      if(bookingName.toLowerCase() !== String(vm.applicantName).toLowerCase()){
+        return true
+      }
+      console.log(listGiayTo)
+      for (let i =0;i<listGiayTo.length;i++){
+        if(String(listGiayTo[i]['ten_nguoi_duoc_cap']).toLowerCase() === String(vm.applicantName).toLowerCase()){
+          return false
+        }
+      }
+      return true
     }
   }
 }

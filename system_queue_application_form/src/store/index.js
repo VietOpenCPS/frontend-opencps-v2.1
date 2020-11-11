@@ -713,7 +713,10 @@ export const store = new Vuex.Store({
     },
     setServerNo (state, payload) {
       state.serverNo = payload
-    }
+    },
+    setIsMobile (state, payload) {
+      state.isMobile = payload
+    },
   },
   getters: {
     loading (state) {
@@ -739,6 +742,9 @@ export const store = new Vuex.Store({
     },
     getServerNo (state, payload) {
       return state.serverNo
-    }
+    },
+    getIsMobile (state) {
+      return state.isMobile
+    },
   }
 })

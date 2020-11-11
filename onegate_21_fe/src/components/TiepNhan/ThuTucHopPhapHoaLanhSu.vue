@@ -50,7 +50,7 @@
                 <label>Điện thoại</label>
                 <v-text-field
                     v-model="dossiers.delegateTelNo"
-                    :rules="[rules.telNo]"
+                    :rules="[rules.varchar15]"
                     solo
                     @change="changeDossier()"
                 ></v-text-field>
@@ -223,6 +223,7 @@
                 <v-checkbox
                     v-model="de_nghi_chung_nhan"
                     label="Đề nghị chứng nhận giấy tờ đã được xuất trình tại Bộ Ngoại giao"
+                    @change="changeDeNghiChungNhan()"
                 >
                 </v-checkbox>  
             </v-flex>
@@ -838,6 +839,14 @@ export default {
                 return true
                 }  
             },
+            varchar15: (val) => {
+                if(val){
+                    val = String(val).trim()
+                    return val.length <= 15 ? true : 'Không được nhập quá 15 ký tự'   
+                } else {
+                    return true
+                }  
+            },
             varchar100: (val) => {
                 if(val){
                 val = String(val).trim()
@@ -974,6 +983,8 @@ export default {
         },
         payment: {},
         tongSoBanTG: 0,
+        auth: 'false',
+        ngay_cap_cmnd: '',
     }),
     created () {
         let vm = this
@@ -984,7 +995,7 @@ export default {
             if(vm.formCode==='UPDATE'){
                 vm.getDetail()
             } else {
-                vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [],  'totalRecord': 0, })
+                vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [],  'totalRecord': 0, 'ma_to_khai':[], 'durationCountMeta': 2, })
                 vm.getThanhPhan()
                 // vm.genDueDate()
                 if(vm.eFormCode){
@@ -1033,6 +1044,7 @@ export default {
             deep: true,
             handler:  (val, oldVal) => {
                 let arr = val.filter(e => e.recordCount) 
+                arr.push({"dossierPartNo":"TP01","fileMark":3,"partName":"Tờ khai hợp pháp hoá lãnh sự, chứng nhận lãnh sự","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
                 $('#dossierMarkArr_hidden').val(JSON.stringify(arr))
             }
         },
@@ -1146,7 +1158,7 @@ export default {
         dateDueDate (val) {
             this.dateDueDateFormated = this.formatDate(this.dateDueDate) 
             const [year, month, day] = this.dateDueDate.split('-')
-            let date = new Date(this.dateDueDate)
+            let date = new Date(this.dateDueDate + this.crurentHours)
             // date.setFullYear(parseInt(year), parseInt(month) , parseInt(day))
             this.dossiers.dueDate = date.getTime()
             //this.dossiers.dueDate = this.dateDueDateFormated
@@ -1169,17 +1181,47 @@ export default {
         // } 
     },
     methods: {
+        changeDeNghiChungNhan(){
+            let vm = this
+            if(vm.de_nghi_chung_nhan){
+                let temp = {
+                        dossierPartNo: 'TP03',
+                        fileMark: 3,
+                        partName: 'Giấy tờ, tài liệu đề nghị chứng nhận lãnh sự',
+                        partType: 1,
+                        fileCheck: 0,
+                        fileComment: '',
+                        recordCount: 1
+                }
+                let check = true
+                for(let i = 0 ; i<vm.dossierMarkArr.length;i++){
+                    if(vm.dossierMarkArr[i]['dossierPartNo'] === 'TP03'){
+                        vm.$set(vm.dossierMarkArr, i, temp)
+                        check = false
+                    }
+                }
+                if(check){
+                    vm.dossierMarkArr.push(temp)
+                }
+            } else {
+                 vm.dossierMarkArr = vm.dossierMarkArr.filter(e=>e.dossierPartNo !== 'TP03')
+            }
+        },
         computeDate () {
             let vm = this 
             if(parseInt(vm.tongSoBan) >= 10){
                 let config = {
-                    url: '/o/rest/v2/dossiers/'+ 5 +'/calculate/duedate',
+                    url: '/o/rest/v2/dossiers/'+ 6 +'/calculate/duedate',
                     headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
                 }
                 axios.request(config).then(res => {
-                    vm.dossiers['durationCount'] = 5
+                    vm.dossiers['durationCount'] = 6
                     let dateString =  res.data.substr(0, 10)
+                    vm.crurentHours = res.data.substr(10)
                     vm.dateDueDate = vm.parseDate(dateString)
+                    let metaData = JSON.parse(vm.dossiers['metaData'])
+                    metaData['durationCountMeta'] = 6
+                    vm.dossiers['metaData'] = JSON.stringify(metaData)
                 }).catch(err => {})    
             }
             if(parseInt(vm.tongSoBan) < 10){
@@ -1190,7 +1232,11 @@ export default {
                 axios.request(config).then(res => {
                     vm.dossiers['durationCount'] = 2
                     let dateString =  res.data.substr(0, 10)
+                    vm.crurentHours = res.data.substr(10)
                     vm.dateDueDate = vm.parseDate(dateString)
+                    let metaData = JSON.parse(vm.dossiers['metaData'])
+                    metaData['durationCountMeta'] = 2
+                    vm.dossiers['metaData'] = JSON.stringify(metaData)
                 }).catch(err => {})
             }
              vm.tongSoBanTG = parseInt(vm.tongSoBan) 
@@ -1242,6 +1288,7 @@ export default {
                             vm.listGiayTo = formData.list_giay_to
                             vm.checkCKCD()
                             vm.de_nghi_chung_nhan = formData.de_nghi_chung_nhan
+                            vm.changeDeNghiChungNhan()
                             vm.su_dung_tai_nuoc_ma = formData.su_dung_tai_nuoc_ma
                             vm.muc_dich = {
                                 MA: formData.ma_muc_dich,
@@ -1491,6 +1538,14 @@ export default {
                 if(Object.keys(res.data).length !== 0 && res.data.constructor === Object){
                     if(Array.isArray(res.data.list_giay_to) && res.data.list_giay_to.length){
                         vm.eFormCodeArr.push(vm.eFormCode)
+                        let metaData = JSON.parse(vm.dossiers['metaData'])
+                        metaData['ma_to_khai'].push(vm.eFormCode)
+                        vm.dossiers['metaData'] = JSON.stringify(metaData)
+                        vm.eFormCode = ''
+                        if(res.data.auth) {
+                            vm.auth = res.data.auth
+                        }
+                        
                         // if(res.data.bookingName) {
                         //     vm.dossiers.delegateName = res.data.bookingName
                         //     vm.dossiers.applicantName = res.data.bookingName
@@ -1573,10 +1628,16 @@ export default {
                         }
                         if(res.data.de_nghi_chung_nhan) {
                             vm.de_nghi_chung_nhan = res.data.de_nghi_chung_nhan
+                            vm.changeDeNghiChungNhan()
                         }
-                        if(res.data.muc_dich) {
-                            vm.muc_dich = vm.listMucDichSuDung.find(e=>e.TEN === res.data.muc_dich)
+                        vm.viaPostal = res.data.viaPostal ? true : false
+                        if(res.data.ma_muc_dich) {
+                            vm.muc_dich = vm.listMucDichSuDung.find(e=>e.MA === res.data.ma_muc_dich)
                         }
+                        if(res.data.ngay_cap_cmnd) {
+                            vm.ngay_cap_cmnd = res.data.ngay_cap_cmnd
+                        }
+                        
                         if(res.data.list_giay_to) {
                             vm.fillTableGiayTo(res.data.list_giay_to)
                         }
@@ -1631,25 +1692,27 @@ export default {
                             if(arr === '') {
                                 arr+=find.TEN
                             } else {
-                                arr+= ',' + find.TEN
+                                arr+= ', ' + find.TEN
                             }
                             
                         }
                     }
                     let formData = {
                         ho_ten_yeu_cau: vm.dossiers.delegateName,
-                        so_cmnd: vm.delegateIdNo,
-                        dien_thoai: vm.delegateTelNo,
-                        email: vm.delegateEmail,
-                        dia_chi: vm.delegateAddress,
+                        so_cmnd: vm.dossiers.delegateIdNo,
+                        dien_thoai: vm.dossiers.delegateTelNo,
+                        email: vm.dossiers.delegateEmail,
+                        dia_chi: vm.dossiers.delegateAddress,
                         de_nghi_chung_nhan: vm.de_nghi_chung_nhan ? true : false,
                         list_giay_to : vm.listGiayTo,
                         tong_so: vm.tongSoBan,
                         su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
                         su_dung_tai_nuoc: arr,
-                        ma_muc_dich: vm.muc_dich.MA,
-                        muc_dich: vm.muc_dich.TEN
+                        ma_muc_dich: vm.muc_dich ? vm.muc_dich.MA : '',
+                        muc_dich: vm.muc_dich ? vm.muc_dich.TEN : '',
+                        ngay_cap_cmnd: vm.ngay_cap_cmnd
                     }
+                    console.log('1111111111111',formData)
                     vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
                     vm.dossierFileArr[i]['eform'] = 'true'
                 }
@@ -1859,7 +1922,7 @@ export default {
                                 if(arrNuocSD === '') {
                                     arrNuocSD+=find.TEN
                                 } else {
-                                    arrNuocSD+= ',' + find.TEN
+                                    arrNuocSD+= ', ' + find.TEN
                                 }
                                 
                             }
@@ -1867,18 +1930,21 @@ export default {
                 
                         let formData = {
                             ho_ten_yeu_cau: vm.dossiers.delegateName,
-                            so_cmnd: vm.delegateIdNo,
-                            dien_thoai: vm.delegateTelNo,
-                            email: vm.delegateEmail,
-                            dia_chi: vm.delegateAddress,
+                            so_cmnd: vm.dossiers.delegateIdNo,
+                            dien_thoai: vm.dossiers.delegateTelNo,
+                            email: vm.dossiers.delegateEmail,
+                            dia_chi: vm.dossiers.delegateAddress,
                             de_nghi_chung_nhan: vm.de_nghi_chung_nhan ? true : false,
                             list_giay_to : arr,
                             tong_so: vm.tongSoBan,
                             su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
                             su_dung_tai_nuoc: arrNuocSD,
-                            ma_muc_dich: vm.muc_dich.MA,
-                            muc_dich: vm.muc_dich.TEN
+                            ma_muc_dich: vm.muc_dich ? vm.muc_dich.MA : '',
+                            muc_dich: vm.muc_dich ? vm.muc_dich.TEN : '',
+                            ngay_cap_cmnd: vm.ngay_cap_cmnd
+
                         }
+                        console.log('1111111111111',formData)
                         vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
@@ -2105,25 +2171,27 @@ export default {
                                 if(arrNuocSD === '') {
                                     arrNuocSD+=find.TEN
                                 } else {
-                                    arrNuocSD+= ',' + find.TEN
+                                    arrNuocSD+= ', ' + find.TEN
                                 }
                                 
                             }
                     }
                     let formData = {
                         ho_ten_yeu_cau: vm.dossiers.delegateName,
-                        so_cmnd: vm.delegateIdNo,
-                        dien_thoai: vm.delegateTelNo,
-                        email: vm.delegateEmail,
-                        dia_chi: vm.delegateAddress,
+                        so_cmnd: vm.dossiers.delegateIdNo,
+                        dien_thoai: vm.dossiers.delegateTelNo,
+                        email: vm.dossiers.delegateEmail,
+                        dia_chi: vm.dossiers.delegateAddress,
                         de_nghi_chung_nhan: vm.de_nghi_chung_nhan ? true : false,
                         list_giay_to : arr,
                         tong_so: vm.tongSoBan,
                         su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
                         su_dung_tai_nuoc: arrNuocSD,
-                        ma_muc_dich: vm.muc_dich.MA,
-                        muc_dich: vm.muc_dich.TEN
+                        ma_muc_dich: vm.muc_dich ? vm.muc_dich.MA : '',
+                        muc_dich: vm.muc_dich ? vm.muc_dich.TEN : '',
+                        ngay_cap_cmnd: vm.ngay_cap_cmnd
                     }
+                    console.log('1111111111111',formData)
                     vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
                     vm.dossierFileArr[i]['eform'] = 'true'
                 }
@@ -2398,13 +2466,19 @@ export default {
         },
         checkCKCD(){
             let vm = this
-            for (let i = 0; i< vm.listGiayTo.length ; i++){
-                if(!vm.listGiayTo[i]['kiem_tra']){
-                    vm.$emit('changeCheckCKCD', false)
-                    return
+            if(vm.listGiayTo.length) {
+                vm.$emit('changeCheckGiayTo', true)
+                for (let i = 0; i< vm.listGiayTo.length ; i++){
+                    if(!vm.listGiayTo[i]['kiem_tra']){
+                        vm.$emit('changeCheckCKCD', false)
+                        return
+                    }
                 }
+                vm.$emit('changeCheckCKCD', true)
+            } else {
+                vm.$emit('changeCheckGiayTo', false)
+                vm.$emit('changeCheckCKCD', false)
             }
-             vm.$emit('changeCheckCKCD', true)
         },
         changeNgayKy(){
             let vm = this
@@ -2463,7 +2537,7 @@ export default {
             //  console.log('2')
             // metaData['delegateTelNo']=vm.dossiers.delegateTelNo
             console.log('3')
-            if( vm.eFormCodeArr.length === 0 ) {
+            if( vm.auth === 'false') {
                  console.log('4')
                 vm.dossiers['contactTelNo'] = vm.dossiers['delegateTelNo']
                  console.log('5')

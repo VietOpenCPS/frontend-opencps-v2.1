@@ -12,6 +12,7 @@
               v-model="status"
               item-text="itemName"
               item-value="itemCode"
+              @change="changeStatus()"
               hide-details
               hide-no-data
               solo
@@ -28,7 +29,7 @@
             <v-autocomplete
               class="select-search d-inline-block"
               style="width: calc(100% - 130px);"
-              :items="substatusItems"
+              :items="substatusItemsTemp"
               v-model="substatus"
               item-text="itemName"
               item-value="itemCode"
@@ -565,6 +566,7 @@ export default {
     agency: '',
     domainItems: [],
     domain: '',
+    substatusItemsTemp: [],
     topItems: [
       {
         'value': 'overdue',
@@ -577,6 +579,10 @@ export default {
       {
         'value': 'coming',
         'text': 'Sắp đến hạn'
+      },
+      {
+        'value': 'overtime',
+        'text': 'Hoàn thành trễ hạn'
       }
     ],
     top: '',
@@ -605,6 +611,17 @@ export default {
     }
   },
   methods: {
+    changeStatus () {
+      let vm = this
+      setTimeout(()=>{
+        if(vm.status){
+          vm.substatusItemsTemp = vm.substatusItems.filter(e=> e.itemCode.includes(vm.status))
+        } else {
+          vm.substatusItemsTemp = vm.substatusItems
+        }
+        
+      },100)
+    },
     setShow(show) {
       let vm = this
       vm.advSearchShow = show
@@ -634,6 +651,7 @@ export default {
           } else {
             vm.substatusItems = result
           }
+          vm.substatusItemsTemp = vm.substatusItems
           
         }).catch(function (){})
       }

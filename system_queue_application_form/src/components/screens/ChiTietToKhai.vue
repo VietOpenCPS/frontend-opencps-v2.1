@@ -284,7 +284,7 @@ export default {
           }
           vm.$store.dispatch('getServiceDetail', filter).then(function (result) {
             vm.$store.commit('setServiceinfoSelected', result)
-            
+            vm.$store.commit('setFileTemplateSelected', result.fileTemplates)
             let data = {
               serviceInfoId: currentQuery.service,
               fileTemplateNo: currentQuery.template
@@ -317,7 +317,7 @@ export default {
           }
           vm.$store.dispatch('getServiceDetail', filter).then(function (result) {
             vm.$store.commit('setServiceinfoSelected', result)
-            
+            vm.$store.commit('setFileTemplateSelected', result.fileTemplates)
             let data = {
               serviceInfoId: currentQuery.service,
               fileTemplateNo: currentQuery.template

@@ -56,7 +56,7 @@
                     <label>Điện thoại</label>
                     <v-text-field
                         v-model="dossiers.delegateTelNo"
-                        :rules="[rules.telNo]"
+                        :rules="[rules.varChar15]"
                         solo
                         @change="changeDossier()"
                     ></v-text-field>
@@ -463,7 +463,6 @@
 
 
                     >
-                   
                         <v-text-field
                             slot="activator"
                             v-model="dateDueDateFormated"
@@ -890,6 +889,7 @@
                                         <v-text-field
                                             v-model="dien_thoai"
                                             solo
+                                            :rules="[rules.varChar15]"
                                         ></v-text-field>
                                     </v-flex>
                                     <v-flex xs12>
@@ -1307,6 +1307,7 @@ export default {
         errorNgayCapCMT: false,
         dialogDanhSach: false,
         messengeCMT: '',
+        soNuocKhongDuocMien: 0,
         dateNgayKy: new Date().toISOString().substr(0, 10),
         dateNgayCapHCNG: new Date().toISOString().substr(0, 10),
         dateNgayCapHCCV: new Date().toISOString().substr(0, 10),
@@ -1315,6 +1316,7 @@ export default {
         dateDueDate: new Date().toISOString().substr(0, 10),
         dateDueDateFormated: '',
         birthdayFormated: '',
+        crurentHours: '',
         birthday: new Date().toISOString().substr(0, 10),
         eFormCode: '',
         tinhSelected: '',
@@ -1492,6 +1494,7 @@ export default {
         govAgencyCode: $('#govAgencyCode_hidden').val(),
         dossierTemplateNo: "",
         originality: 3,
+        danhSachQGMienCongHam: [],
         selected: [],
         dossierFileCustom: [],
         dossierMarkArr: [],
@@ -1524,6 +1527,7 @@ export default {
             "dossierNote": '',
             "Doan_HCTN": '',
             "dossierFilePayment": '',
+            'durationCount': 4,
             "metaData": '{}'
         },
         bookingName: '',
@@ -1633,6 +1637,7 @@ export default {
             }
         ],
         payment: {},
+        auth: 'false',
         rules: {
             required: (v) => !!v || 'Thông tin này là bắt buộc',
             checkDatePast: (date)=> {
@@ -1692,10 +1697,20 @@ export default {
                 }
             },
             varChar50: (val) => {
-                if(val){  
-                    return val.length > 50 ?  'Thông tin không được quá 50 ký tự' : true
-                }
-                else return true   
+                if(val){
+                val = String(val).trim()
+                return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+                } else {
+                return true
+                }    
+            },
+            varChar15: (val) => {
+                if(val){
+                    val = String(val).trim()
+                    return val.length <= 15 ? true : 'Không được nhập quá 15 ký tự'   
+                } else {
+                    return true
+                }    
             }
         }
     }),
@@ -1712,11 +1727,12 @@ export default {
             vm.getNuocDi()
             vm.getNoiSinhTrongNuoc()
             vm.getNoiSinhNuocNgoai()
+            vm.getBGMienCongHam()
             setTimeout(()=>{
                 if(vm.formCode==='UPDATE'){
                     vm.getDetail()
                 } else {                   
-                    vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [], 'ma_to_khai': [], 'totalRecord': 0, 'delegateIdNo': '','delegateName': '','delegateTelNo': '','Doan_HCTN': ''})
+                    vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [], 'ma_to_khai': [], 'totalRecord': 0, 'delegateIdNo': '','delegateName': '','delegateTelNo': '','Doan_HCTN': '', 'durationCountMeta': 4})
                     vm.getThanhPhan()
                     vm.genDueDate()
                     if(vm.eFormCode){
@@ -1822,6 +1838,8 @@ export default {
             deep: true,
             handler:  (val, oldVal) => {
                 let arr = val.filter(e => e.recordCount) 
+                arr.push({"dossierPartNo":"TP01","fileMark":3,"partName":"Tờ khai đề nghị cấp hộ chiếu ngoại giao, hộ chiếu công vụ và công hàm","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
+                arr.push({"dossierPartNo":"TP02","fileMark":3,"partName":"Văn bản hoặc quyết định cử hoặc cho phép cán bộ, công chức, viên chức, sỹ quan, quân nhân chuyên nghiệp ra nước ngoài","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
                 $('#dossierMarkArr_hidden').val(JSON.stringify(arr))
             }
         },
@@ -1867,7 +1885,7 @@ export default {
         dateDueDate (val) {
             this.dateDueDateFormated = this.formatDate(this.dateDueDate)
             const [year, month, day] = this.dateDueDate.split('-')
-            let date = new Date(this.dateDueDate)
+            let date = new Date(this.dateDueDate + this.crurentHours)
             // date.setFullYear(parseInt(year), parseInt(month), parseInt(day))
             this.dossiers.dueDate = date.getTime()
         },
@@ -1962,6 +1980,7 @@ export default {
                 vm.delegateDistrictCode = vm.dossiers.delegateDistrictCode
                 vm.delegateWardCode = vm.dossiers.delegateWardCode
                 vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
+                vm.crurentHours = vm.dossiers.dueDate.substring(10)
                 vm.viaPostal = vm.dossiers.viaPostal === 2 ?  true : false
                 vm.nuoc_di = metaData.Doan_HCTN.CacNuocDi_ma.split(',')
                 
@@ -2138,6 +2157,10 @@ export default {
                         metaData['ma_to_khai'].push(vm.eFormCode)
                         vm.dossiers['metaData'] = JSON.stringify(metaData)
                         vm.eFormCode = ''
+                        if(res.data.auth){
+                            vm.auth = res.data.auth
+                        }
+                        vm.viaPostal = res.data.viaPostal ? true : false
                         if(!vm.dossiers.delegateName){
                             if(res.data.delegateName) {
                                 vm.dossiers.delegateName = res.data.ho_ten
@@ -2314,11 +2337,14 @@ export default {
                     tg['gia_dinh'] = vm.gia_dinh
                 }
                 if(vm.serviceCode === 'BNG-270820' || vm.serviceCode === 'BNG-270816'){
-                    if(tg['loai_ho_chieu'] === 'Công vụ'){
-                        tg['ho_chieu_cong_vu'] = true
-                    }
-                    if(tg['loai_ho_chieu'] === 'Ngoại giao'){
-                        tg['ho_chieu_ngoai_giao'] = true
+                    // if(tg['loai_ho_chieu'] === 'Công vụ'){
+                    //     tg['ho_chieu_cong_vu'] = true
+                    // }
+                    // if(tg['loai_ho_chieu'] === 'Ngoại giao'){
+                    //     tg['ho_chieu_ngoai_giao'] = true
+                    // }
+                    if(tg['loai_ho_chieu'] === 'Công vụ' || tg['loai_ho_chieu'] === 'Ngoại giao') {
+                        vm.ho_chieu_gia_han++
                     }
                 }
                 if(vm.serviceCode === 'BNG-270819'){
@@ -2374,6 +2400,13 @@ export default {
                 if(res.nhap_canh || res.qua_canh || res.schengen){
                     if(res.di_den){
                         vm.cong_ham_so_nuoc += res.di_den.length
+                    }
+                    if(res.di_den_text){
+                        let arrNuocDi = res.di_den_text.split(', ')
+                        for(let i = 0;i<arrNuocDi.length;i++){
+                            let find =  vm.danhSachQGMienCongHam.find(e=>e.itemName !== arrNuocDi[i])
+                            vm.soNuocKhongDuocMien++
+                        } 
                     }
                 }
                 vm.countPassport()
@@ -2725,7 +2758,11 @@ export default {
             let hc_gh = vm.ho_chieu_gia_han != '' ? parseInt(vm.ho_chieu_gia_han) : 0
             let hc_hong = vm.ho_chieu_hong != '' ? parseInt(vm.ho_chieu_hong) : 0
             let hc_mat = vm.ho_chieu_mat != '' ? parseInt(vm.ho_chieu_mat) : 0
-            let so_nuoc = vm.cong_ham_so_nuoc != '' ? parseInt(vm.cong_ham_so_nuoc) : 0
+            for(let i=0;i<vm.nuoc_di.length;i++){
+
+            }
+            // let so_nuoc = vm.cong_ham_so_nuoc != '' ? parseInt(vm.cong_ham_so_nuoc) : 0
+            let so_nuoc = vm.soNuocKhongDuocMien
             let so_schengen = vm.cong_ham_schengen != '' ? parseInt(vm.cong_ham_schengen) : 0
             let so_nhap_canh = vm.cong_ham_nhap_canh != '' ? parseInt(vm.cong_ham_nhap_canh) : 0
             let so_qua_canh = vm.cong_ham_qua_canh != '' ? parseInt(vm.cong_ham_qua_canh) : 0
@@ -2735,7 +2772,7 @@ export default {
                 giaLePhiMoi = 80000
             }
             let lp_moi = (hcng_moi + hccv_moi)*giaLePhiMoi;
-            let lp_gia_han = hc_gh * 100000;
+            let lp_gia_han = hc_gh * 80000;
             let lp_hong = (hc_hong + hc_mat) * 320000;
             let lp_schengen = so_schengen * 10000;
             let lp_nhap = so_nuoc * so_nhap_canh * 10000;
@@ -2746,31 +2783,22 @@ export default {
             let le_phi = lp_moi + lp_gia_han + lp_hong + lp_schengen + lp_nhap + lp_qua;
             
             let file_payment2 = new Array();
-            if(lp_moi > 0)
-                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 160000, 'thanh_tien': lp_moi};
-            // if((hcng_moi <= 0 || hccv_moi <=0) && lp_gia_han <=0 && lp_hong <=0 && lp_cong_ham <=0 )
-            // {
-            //     file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'}; 
-            //     file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'};   
+            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 160000, 'thanh_tien': lp_moi};
+            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_gia_han};
+            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 320000, 'thanh_tien': lp_hong};
+            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp công hàm đề nghị cấp thị thực', 'partName': 'Công hàm', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_cong_ham, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_cong_ham};
+
+            // if(lp_moi > 0)
+            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 160000, 'thanh_tien': lp_moi};
+            // if(lp_gia_han > 0)
+            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_gia_han};
+            
+            // if(lp_hong > 0)
+            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 320000, 'thanh_tien': lp_hong};
+                  
+            // if (lp_cong_ham > 0 ){
+            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp công hàm đề nghị cấp thị thực', 'partName': 'Công hàm', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_cong_ham, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_cong_ham};
             // }
-            if(lp_gia_han > 0)
-                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_gia_han};
-            
-            if(lp_hong > 0)
-                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 320000, 'thanh_tien': lp_hong};
-            
-            // if(lp_schengen > 0)
-            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': vm.dossiers.dossierName + ' (Số công hàm)', 'partName': 'Schengen', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_schengen, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_schengen};
-            
-            // if(lp_nhap > 0)
-            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': vm.dossiers.dossierName + ' (Số công hàm)', 'partName': 'Nhập cảnh '+so_nuoc +' quốc gia', 'fileMark': '-1', 'fileMarkName': '', 'so_nuoc': so_nuoc, 'recordCount': so_nhap_canh, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_nhap};
-            
-            // if(lp_qua > 0)
-            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': vm.dossiers.dossierName + ' (Số công hàm)', 'partName': 'Quá cảnh '+so_nuoc +' quốc gia', 'fileMark': '-1', 'fileMarkName': '', 'so_nuoc': so_nuoc, 'recordCount': so_qua_canh, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_qua};
-            
-            if (lp_cong_ham > 0 ){
-                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp công hàm đề nghị cấp thị thực', 'partName': '', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_cong_ham, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_cong_ham};
-            }
             if(file_payment2.length === 2)
             {
                 file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'}; 
@@ -2827,9 +2855,6 @@ export default {
             vm.dossiers['metaData'] = JSON.stringify(hs)
             
         },
-        addPeriod (nStr){
-            return nStr.replace(/[^\d\.].+/, "").replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        },
         formatDate (date) {
             if (!date) return null
             const [year, month, day] = date.split('-')
@@ -2842,17 +2867,30 @@ export default {
         },
         genDueDate () {
             let vm = this
+            // let config = {
+            //     url: '/o/rest/v2/dossiers/dueDate?service='+vm.serviceCode+'&agency='+vm.govAgencyCode+'&template='+vm.dossierTemplateNo+'&fromReceiveDate=',
+            //     headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+            // }
+            // axios.request(config).then(res => {
+            //     let tg = new Date(parseInt(res.data['dueDate']));
+                    
+            //     // let ngay = tg.getDate()+'/'+(tg.getMonth()+1)+'/'+tg.getFullYear()
+            //     // vm.dossiers['dueDate'] = ngay
+            //     vm.dateDueDate = tg.toISOString().substr(0, 10)
+            // }).catch(err => {}) 
             let config = {
-                url: '/o/rest/v2/dossiers/dueDate?service='+vm.serviceCode+'&agency='+vm.govAgencyCode+'&template='+vm.dossierTemplateNo+'&fromReceiveDate=',
+                url: '/o/rest/v2/dossiers/'+ 4 +'/calculate/duedate',
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
             }
             axios.request(config).then(res => {
-                let tg = new Date(parseInt(res.data['dueDate']));
-                    
-                // let ngay = tg.getDate()+'/'+(tg.getMonth()+1)+'/'+tg.getFullYear()
-                // vm.dossiers['dueDate'] = ngay
-                vm.dateDueDate = tg.toISOString().substr(0, 10)
-            }).catch(err => {}) 
+                vm.dossiers['durationCount'] = 4
+                let dateString =  res.data.substr(0, 10)
+                vm.crurentHours = res.data.substr(10)
+                vm.dateDueDate = vm.parseDate(dateString)
+                let metaData = JSON.parse(vm.dossiers['metaData'])
+                metaData['durationCountMeta'] = 4
+                vm.dossiers['metaData'] = JSON.stringify(metaData)
+            }).catch(err => {})  
         },
         getThongTinNhanThan () {
             let vm = this
@@ -3174,8 +3212,7 @@ export default {
                 vm.$emit('changeCheckCKCD', true)
             } else {
                 vm.$emit('changeCheckCKCD', false)
-            }
-             
+            } 
         },
         fillCheckBox(){
             let vm = this
@@ -3293,7 +3330,7 @@ export default {
              console.log('2')
             metaData['delegateTelNo']=vm.dossiers.delegateTelNo
             console.log('3')
-            if( vm.eFormCodeArr.length === 0 ) {
+            if( vm.auth === "false") {
                  console.log('4')
                 vm.dossiers['contactTelNo'] = vm.dossiers['delegateTelNo']
                  console.log('5')
@@ -3303,7 +3340,7 @@ export default {
                  console.log('7')
                 vm.dossiers['applicantIdNo'] = vm.dossiers['delegateIdNo']
                  console.log('8')
-                vm.dossiers['applicantName'] = vm.dossiers['delegateName']
+                vm.dossiers['applicantName'] = vm.dossiers['bookingName']
                  console.log('9')
                 vm.dossiers['address'] = vm.dossiers['delegateAddress']
                  console.log('10')
@@ -3318,10 +3355,30 @@ export default {
                 vm.dossiers['contactEmail'] = vm.dossiers['delegateEmail']
                  console.log('15')
             }
+            vm.dossiers['applicantName'] = vm.dossiers['bookingName']
             vm.dossiers['metaData'] = JSON.stringify(metaData)
             console.log('16')
             $('#dossiers_hidden').val(JSON.stringify(vm.dossiers))
             console.log('17')
+        },
+        getBGMienCongHam(){
+            let vm = this
+            let headers = {
+                groupId: window.themeDisplay.getScopeGroupId(),
+                Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+            axios({
+                method: 'GET',
+                url: '/o/rest/v2/dictcollections/QG_MIENCONGHAM/dictitems',
+                headers: headers,
+            }).then(function (response) {
+                if(response.data.hasOwnProperty('data')){
+                    vm.danhSachQGMienCongHam =  response.data.data
+                } else {
+                    vm.danhSachQGMienCongHam = []
+                }
+            }).catch(function (error) {
+            })
         }
     }
 }

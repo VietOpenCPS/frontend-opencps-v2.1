@@ -314,6 +314,7 @@
     },
     data: () => ({
       loading: false,
+      xacthuc_BNG: false,
       loadingAction: false,
       dossierDetail: {},
       dossierDetailMotcua: '',
@@ -448,6 +449,12 @@
             vm.dossierActions = resultTemp
           }
         }
+        try {
+          if (xacthuc_BNG) {
+            vm.xacthuc_BNG = true
+          }
+        } catch (error) {
+        }
       })
     },
     watch: {},
@@ -558,9 +565,16 @@
 
         vm.$store.dispatch('loadDossierPayments', filter).then(function (result) {
           console.log(result)
-          if (result && result.paymentStatus && String(result.paymentStatus) === '2') {
-            vm.paymentInfo = result
+          if(vm.xacthuc_BNG){
+            if (result && result.paymentStatus && (String(result.paymentStatus) === '2' || String(result.paymentStatus) === '1')) {
+              vm.paymentInfo = result
+            }
+          } else {
+            if (result && result.paymentStatus && String(result.paymentStatus) === '2') {
+              vm.paymentInfo = result
+            }
           }
+
         })
       },
       currency (value) {

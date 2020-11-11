@@ -56,9 +56,10 @@
         right
         temporary
       >
+
         <bbat-table-editor-component-simple ref="bbatFormSimple" :id="id" :datainput="detail"></bbat-table-editor-component-simple>
       </v-navigation-drawer> -->
-      
+
       <v-layout row wrap :class='{"fix_tool_bottom": offsetCheck > 300}' v-if="!viewForm">
         <v-flex xs12 class="text-right pt-0 mt-4 ml-1 px-0 pr-3">
           <v-progress-linear v-if="loading" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
