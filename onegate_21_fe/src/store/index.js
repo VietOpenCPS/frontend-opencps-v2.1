@@ -2804,7 +2804,7 @@ export const store = new Vuex.Store({
           axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, config).then(function (response) {
             let serializable = response.data.data
             let buttonConfig
-            if (serializable[0].buttonConfig && serializable[0].buttonConfig.indexOf('{') >= 0) {
+            if (serializable && serializable[0].buttonConfig && serializable[0].buttonConfig.indexOf('{') >= 0) {
               buttonConfig = JSON.parse(serializable[0].buttonConfig)['buttons'] ? JSON.parse(serializable[0].buttonConfig)['buttons'] : []
             } else {
               buttonConfig = []
