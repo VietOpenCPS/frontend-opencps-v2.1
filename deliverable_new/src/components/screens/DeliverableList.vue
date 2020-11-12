@@ -1026,7 +1026,7 @@
             if (type_search === 'keyword') {
               searchParams = Object.assign({}, tableConfig.paramUrl)
             } else {
-              searchParams = Object.assign(searchParams, tableConfig.paramUrl)
+              searchParams = Object.assign(tableConfig.paramUrl, searchParams)
             }
           } else {
             if (type_search === 'keyword') {
