@@ -34,9 +34,21 @@
             </div>
             <div
               class="my-2 px-2 py-2"
-              style="border:1px solid #dedede;border-radius:3px"
+              style="border:1px solid #dedede;border-radius:3px; position:relative"
             >
               <div v-html="String(questionDetail.content.split('&&')[0]).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
+              <div v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:10px;top:0">
+                <v-tooltip top >
+                  <v-btn slot="activator" icon ripple @click="editQuestion(questionDetail)" style="margin-top:-3px!important">
+                    <v-icon color="primary">edit</v-icon>
+                  </v-btn>
+                  <span>Sửa</span>
+                </v-tooltip>
+                <v-checkbox class="mt-1" style="display: inline-block" @click.stop="changePublicQuestion(questionDetail)"
+                  label="Công khai"
+                  v-model="questionDetail['publish']"
+                ></v-checkbox>
+              </div>
             </div>
           </div>
           <div v-if="loadingAnswer">
@@ -129,12 +141,12 @@
             </div>
             <div class="px-2 pt-3">
               <v-flex xs12 sm12 style="margin:0 auto">
-                <!-- <vue-editor v-model="contentAnswer" :editorToolbar="customToolbar"></vue-editor> -->
-                <v-textarea
+                <vue-editor v-model="contentAnswer" :editorToolbar="customToolbar"></vue-editor>
+                <!-- <v-textarea
                   box
                   rows="5"
                   v-model="contentAnswer"
-                ></v-textarea>
+                ></v-textarea> -->
               </v-flex>
               <div v-if="!activeEdit">
                 <v-checkbox class="mt-0"
@@ -176,6 +188,42 @@
       </v-card>
       
     </v-layout>
+    <v-dialog v-model="dialog_updateQuestion" scrollable persistent max-width="1000px">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Cập nhật nội dung câu hỏi</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_updateQuestion = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-form ref="form" v-model="validForm" lazy-validation>
+            <v-layout wrap class="px-2 mt-2 pb-3">
+              <v-flex xs12>
+                <div class="mb-1">Nội dung câu hỏi <span style="color:red">(*)</span></div>
+                <v-textarea
+                  box
+                  row="5"
+                  placeholder="Nhập nội dung câu hỏi"
+                  v-model="contentQuestion"
+                  :rules="[rules.required]"
+                  required
+                ></v-textarea>
+              </v-flex>
+              <v-flex xs12>
+                <v-btn color="primary"
+                  @click="submitPutQuestion"
+                >
+                  <v-icon>save</v-icon> &nbsp;
+                  Cập nhật
+                </v-btn>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -198,6 +246,8 @@ export default {
     VueEditor
   },
   data: () => ({
+    contentQuestion: '',
+    validForm: false,
     answerList: [],
     answersDefault: [],
     answerSelected: '',
@@ -214,6 +264,7 @@ export default {
     questionSelected: '',
     openQuestion: '',
     publishAnswer: true,
+    dialog_updateQuestion: false,
     rules: {
       required: (value) => !!value || 'Trường dữ liệu bắt buộc',
       email: (value) => {
@@ -291,6 +342,11 @@ export default {
     }
   },
   methods: {
+    editQuestion () {
+      let vm = this
+      vm.dialog_updateQuestion = true
+      vm.contentQuestion = vm.questionDetail.content
+    },
     getAnswers () {
       let vm = this
       let current = vm.$router.history.current
@@ -448,6 +504,52 @@ export default {
       }).catch(function (reject) {
         console.log(reject)
       })
+    },
+    changePublicQuestion (item) {
+      let vm = this
+      let filter = {
+        questionId: item['questionId'],
+        publish: item['publish'] === 1 ? 0 : 1,
+        content: item['content'],
+        email: item['email'],
+        fullname: item['fullname'],
+        govAgencyCode: item['govAgencyCode'],
+        govAgencyName: item['govAgencyName'],
+        domainCode: item['domainCode'],
+        domainName: item['domainName'],
+        questionType: item['questionType']
+      }
+      vm.$store.dispatch('putQuestion', filter).then(function (result) {
+        toastr.success('Cập nhật thành công')
+        vm.questionDetail.publish = result.data.publish
+      }).catch(function (reject) {
+        console.log(reject)
+      })
+    },
+    submitPutQuestion () {
+      let vm = this
+      if (vm.$refs.form.validate()) {
+        let filter = {
+          questionId: vm.questionDetail['questionId'],
+          publish: vm.questionDetail['publish'] === 1 ? 0 : 1,
+          content: vm.contentQuestion,
+          email: vm.questionDetail['email'],
+          fullname: vm.questionDetail['fullname'],
+          govAgencyCode: vm.questionDetail['govAgencyCode'],
+          govAgencyName: vm.questionDetail['govAgencyName'],
+          domainCode: vm.questionDetail['domainCode'],
+          domainName: vm.questionDetail['domainName'],
+          questionType: vm.questionDetail['questionType']
+        }
+        vm.$store.dispatch('putQuestion', filter).then(function (result) {
+          toastr.success('Cập nhật thành công')
+          vm.dialog_updateQuestion = false
+          vm.questionDetail.content = result.data.content
+        }).catch(function (reject) {
+          toastr.success('Cập nhật thất bại')
+        })
+      }
+      
     },
     changePublicAnswer (item, index) {
       let vm = this
