@@ -700,35 +700,40 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get(state.initData.dossierTemplatesApi + '/' + data.dossierTemplateNo, param).then(function (response) {
-            let serializable = response.data
-            let jsonParse = function (string) {
-              try {
-                JSON.parse(string)
-                return JSON.parse(string)
-              } catch (e) {
-                let partTip = {
-                  tip: string,
-                  maxSize: 30,
-                  extensions: state.fileTypeAllowDefault
+          if (data.dossierTemplateNo) {
+            axios.get(state.initData.dossierTemplatesApi + '/' + data.dossierTemplateNo, param).then(function (response) {
+              let serializable = response.data
+              let jsonParse = function (string) {
+                try {
+                  JSON.parse(string)
+                  return JSON.parse(string)
+                } catch (e) {
+                  let partTip = {
+                    tip: string,
+                    maxSize: 30,
+                    extensions: state.fileTypeAllowDefault
+                  }
+                  return partTip
                 }
-                return partTip
               }
-            }
-            if (serializable && serializable['dossierParts']) {
-              for (let key in serializable['dossierParts']) {
-                serializable['dossierParts'][key].hasTemplate = false
-                serializable['dossierParts'][key].hasTemplateLienThong = false
-                serializable['dossierParts'][key].fileMarkDefault = ''
-                serializable['dossierParts'][key].recordCountDefault = ''
-                let partTip = serializable['dossierParts'][key]['partTip']
-                serializable['dossierParts'][key]['partTip'] = jsonParse(partTip)
+              if (serializable && serializable['dossierParts']) {
+                for (let key in serializable['dossierParts']) {
+                  serializable['dossierParts'][key].hasTemplate = false
+                  serializable['dossierParts'][key].hasTemplateLienThong = false
+                  serializable['dossierParts'][key].fileMarkDefault = ''
+                  serializable['dossierParts'][key].recordCountDefault = ''
+                  let partTip = serializable['dossierParts'][key]['partTip']
+                  serializable['dossierParts'][key]['partTip'] = jsonParse(partTip)
+                }
               }
-            }
-            resolve(serializable)
-          }, error => {
-            reject(error)
-          })
+              resolve(serializable)
+            }, error => {
+              reject(error)
+            })
+          } else {
+            reject('')
+          }
+          
         }).catch(function (){})
       })
     },
