@@ -62,15 +62,14 @@
             </div>
             <v-card flat v-if="answerList.length === 1">
               <v-card-text class="px-3 py-1">
-                <!-- <div class="ml-2 mt-1 mb-3" v-html="answerList[0] ? answerList[0].content : ''"></div> -->
                 <div
                   class="my-2 px-2 py-2"
                   style="border:1px solid #dedede;border-radius:3px"
                 >
                   <div style="position:relative">
                     <i class="text-bold">Ngày {{answerList[0].createDate}}</i>
-                    <!-- <div class="ml-2 mt-2" v-html="String(answerList[0].content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div> -->
-                    <div class="ml-2 mt-2" v-html="answerList[0].content"></div>
+                    <div class="ml-2 mt-2" v-html="String(answerList[0].content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
+                    <!-- <div class="ml-2 mt-2" v-html="answerList[0].content"></div> -->
                     <div v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:10px;top:0">
                       <v-tooltip top>
                         <v-btn slot="activator" icon ripple @click="editAnswer(answerList[0])" style="margin-top:-3px!important">
@@ -103,8 +102,8 @@
                 >
                   <div style="position:relative">
                     <span class="text-bold">Câu trả lời {{ indexAnswer + 1}} </span> <i>(Ngày {{itemAnswer.createDate}})</i>
-                    <!-- <div class="ml-2 mt-2" v-html="String(itemAnswer.content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div> -->
-                    <div class="ml-2 mt-2" v-html="itemAnswer.content"></div>
+                    <div class="ml-2 mt-2" v-html="String(itemAnswer.content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
+                    <!-- <div class="ml-2 mt-2" v-html="itemAnswer.content"></div> -->
                     <div v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:10px;top:0">
                       <v-tooltip top >
                         <v-btn slot="activator" icon ripple @click="editAnswer(itemAnswer)" style="margin-top:-3px!important">
