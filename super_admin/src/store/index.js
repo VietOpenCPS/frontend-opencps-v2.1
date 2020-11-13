@@ -65,6 +65,12 @@ export const store = new Vuex.Store({
             text: 'Dịch vụ công'
           },
           {
+            icon: 'filter_5',
+            link: '/table/opencps_certnumbers/certnumbers',
+            code: 'certnumbers',
+            text: 'Tham số hệ thống'
+          },
+          {
             icon: 'filter_6',
             link: '/table/opencps_voting/votings',
             code: 'votings',
