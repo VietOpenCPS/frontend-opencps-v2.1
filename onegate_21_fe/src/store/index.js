@@ -4954,6 +4954,37 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getThongTinToKhai ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            eFormNo: filter.eFormNo
+          }
+        }
+        axios.get('/o/rest/v2/serverconfigs/SERVER_EFORM_DVC/protocols/API_CONNECT', options).then(function (response) {
+          resolve(response.data)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
+    getFileToKhai ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/eforms/saveeforms/SERVER_DVC/' + filter.eFormId + '/' + filter.secret, config).then(function (response) {
+          resolve(response.data)
+        }).catch(xhr => {
+          reject('')
+        })
+      })
+    },
     // ----End---------
   },
   mutations: {

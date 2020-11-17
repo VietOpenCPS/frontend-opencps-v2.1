@@ -2229,8 +2229,30 @@ export default {
                     }
                 }).catch(err => {
                     vm.eFormCode = ''
-                     toastr.error('Mã tờ khai không tìm thấy') 
+                    toastr.error('Mã tờ khai không tìm thấy') 
                 }) 
+                // 
+                let filterGetDetailEform = {
+                  eFormNo: vm.eFormCode
+                }
+                vm.$store.dispatch('getThongTinToKhai', filterGetDetailEform).then(function (response) {
+                  console.log('eformInfomation', response)
+                  if (response && response.hasOwnProperty('eFormId') && response.hasOwnProperty('secret')) {
+                      let filterGetFileEform = {
+                          eFormId: response.eFormId,
+                          secret: response.secret
+                      }
+                      vm.$store.dispatch('getFileToKhai', filterGetFileEform).then(function (responseFile) {
+                          console.log('fileEntryId', responseFile)
+                          let partNoEform = response.fileTemplateNo.split('_')[0]
+                          let fileEform = [{fileEntryId: responseFile ? responseFile : 0, partNo: partNoEform, eform: false, displayName: 'Tờ khai - ' +  response.eFormNo}]
+                          console.log('dossierFileArr', vm.dossierFileArr)
+                          vm.dossierFileArr = vm.dossierFileArr.concat(fileEform)
+                          console.log('dossierFileArr123', vm.dossierFileArr)
+                      }).catch(function (reject) {
+                      })
+                  }
+                }).catch({})
             }
         },
         fillDataEform (res) {
@@ -2258,7 +2280,7 @@ export default {
                 if (!vanban) {
                     vm.listVanBan.push(tg)
                     for (let i =0; i< vm.dossierFileArr.length; i++){
-                        if(vm.dossierFileArr[i]['partNo'] === 'TP02'){
+                        if(vm.dossierFileArr[i]['partNo'] === 'TP02' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                             vm.dossierFileArr[i]['formData'] = JSON.stringify({'van_ban': vm.listVanBan})
                             vm.dossierFileArr[i]['eform'] = 'true'
                         }
@@ -2379,7 +2401,7 @@ export default {
                 
                 // Day  formData vao dossierFileArr 
                 for (let i =0; i< vm.dossierFileArr.length; i++){
-                    if(vm.dossierFileArr[i]['partNo'] === 'TP01'){
+                    if(vm.dossierFileArr[i]['partNo'] === 'TP01'  && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                         vm.dossierFileArr[i]['formData'] = JSON.stringify({'thanh_vien_doan': vm.listThanhVien})
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
@@ -2511,7 +2533,7 @@ export default {
                 vm.genSelectCQCQ()
                 
                 for (let i =0; i< vm.dossierFileArr.length; i++){
-                    if(vm.dossierFileArr[i]['partNo'] === 'TP02'){
+                    if(vm.dossierFileArr[i]['partNo'] === 'TP02' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                         vm.dossierFileArr[i]['formData'] = JSON.stringify({'van_ban': vm.listVanBan})
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
@@ -2596,7 +2618,7 @@ export default {
                 }
                 vm.so_nguoi = vm.listThanhVien.length
                 for (let i=0; i<vm.dossierFileArr.length; i++){
-                    if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                    if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                         vm.dossierFileArr[i]['formData'] = JSON.stringify({'thanh_vien_doan': vm.listThanhVien })
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
@@ -2720,7 +2742,7 @@ export default {
             let vm = this
             vm.listThanhVien.splice(index,1)
             for (let i =0; i< vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] === 'TP01'){
+                if(vm.dossierFileArr[i]['partNo'] === 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                     vm.dossierFileArr[i]['formData'] = JSON.stringify({'thanh_vien_doan': vm.listThanhVien})
                     vm.dossierFileArr[i]['eform'] = 'true'
                 }
@@ -2740,11 +2762,16 @@ export default {
             if(!vm.checkThanhVien(index)){
                 vm.listVanBan.splice(index,1)
                 for (let i =0; i< vm.dossierFileArr.length; i++){
-                    if(vm.dossierFileArr[i]['partNo'] === 'TP02'){
+                    if(vm.dossierFileArr[i]['partNo'] === 'TP02' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                         vm.dossierFileArr[i]['formData'] = JSON.stringify({'van_ban': vm.listVanBan})
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
                 }
+                // 
+                vm.dossierFileArr = vm.dossierFileArr.filter(function (item) {
+                    return !item.hasOwnProperty('fileEntryId')
+                })
+                // 
                 $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
                 this.genSelectCQCQ()
             } else {
