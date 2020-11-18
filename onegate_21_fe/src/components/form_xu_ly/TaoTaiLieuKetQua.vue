@@ -543,7 +543,7 @@
 
             let token = localStorage.getItem('jwt_token')
 
-            let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+            let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?referenceUid=' +  referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) + '&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
             console.log('urlEmbed', urlEmbed)
             setTimeout(function () {
               document.getElementById('formAlpaca' + item.partNo + vm.id + 'embed').src = ''

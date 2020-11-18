@@ -1165,7 +1165,7 @@ export default {
           let deliverableType = item.deliverableType ? item.deliverableType : ''
           let token = localStorage.getItem('jwt_token')
 
-          let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+          let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?referenceUid=' + referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) +'&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
           setTimeout(function () {
             console.log('urlEmbed123123123', urlEmbed)
             document.getElementById('formAlpaca' + item.partNo + vm.id).src = ''
