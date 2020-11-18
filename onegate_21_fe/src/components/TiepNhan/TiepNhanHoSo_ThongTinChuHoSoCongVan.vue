@@ -581,7 +581,7 @@ export default {
     hasOrganization: false,
     sameUser: false,
     years: [],
-    months: [1,2,3,4,5,6,7,8,9,10,11,12],
+    months: ['01','02','03','04','05','06','07','08','09','10','11','12'],
     days: [],
     money: {
       decimal: '',
@@ -622,11 +622,11 @@ export default {
     birthDateDay (val) {
       let vm = this
       if(parseInt(val)=== 31) {
-        vm.months = [1,3,5,7,8,10,12]
+        vm.months = ['01','03','05','07','08','10','12']
       } else if(parseInt(val)=== 30) {
-        vm.months = [4,6,9,11]
+        vm.months = ['04','06','09','11']
       } else {
-        vm.months = [1,2,3,4,5,6,7,8,9,10,11,12]
+        vm.months = ['01','02','03','04','05','06','07','08','09','10','11','12']
       }
     },
     birthDateMonth (val) {
@@ -641,7 +641,7 @@ export default {
         case 12:
           vm.days = []
           for(let i = 1 ; i<=31;i++){
-            vm.days.push(i)
+            vm.days.push(i <= 9 ? '0' + i : '' + i)
           }
           break;
         case 4:
@@ -650,13 +650,13 @@ export default {
         case 11:
           vm.days = []
           for(let i = 1 ; i<=30;i++){
-            vm.days.push(i)
+            vm.days.push(i <= 9 ? '0' + i : '' + i)
           } 
           break;
         case 2:
           vm.days = []
           for(let i = 1 ; i<=29;i++){
-            vm.days.push(i)
+            vm.days.push(i <= 9 ? '0' + i : '' + i)
           } 
           break;
       }
@@ -693,7 +693,7 @@ export default {
         vm.years = []
         let currentYear = (new Date()).getFullYear()
         for (let i = 1; i <= 31; i++) {
-          vm.days.push(i)
+          vm.days.push(i <= 9 ? '0' + i : '' + i)
         }
         for (let i = currentYear; i >= 1900; i--) {
           vm.years.push(i)
