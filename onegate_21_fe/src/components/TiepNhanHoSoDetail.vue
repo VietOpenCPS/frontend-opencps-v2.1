@@ -1418,14 +1418,23 @@ export default {
                 result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
 
                 vnpostalProfile['vnpostalStatus'] = result.vnpostalStatus
-                vnpostalProfile['postalAddress'] = result.address
-                vnpostalProfile['postalCityCode'] = result.cityCode
-                vnpostalProfile['postalCityName'] = result.cityName
-                vnpostalProfile['postalDistrictCode'] = result.districtCode
-                vnpostalProfile['postalDistrictName'] = result.districtName
-                vnpostalProfile['postalWardCode'] = result.wardCode
-                vnpostalProfile['postalWardName'] = result.wardName
-                vnpostalProfile['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
+                if (result.hasOwnProperty('vnpostalProfile') && result.vnpostalProfile) {
+                  try {
+                    let data = JSON.parse(result.vnpostalProfile)
+                    if (data) {
+                      vnpostalProfile['postalAddress'] = data.postalAddress
+                      vnpostalProfile['postalCityCode'] = data.postalCityCode
+                      vnpostalProfile['postalCityName'] = data.postalCityName
+                      vnpostalProfile['postalDistrictCode'] = data.postalDistrictCode
+                      vnpostalProfile['postalDistrictName'] = data.postalDistrictName
+                      vnpostalProfile['postalWardCode'] = data.postalWardCode
+                      vnpostalProfile['postalWardName'] = data.postalWardName
+                      vnpostalProfile['postalTelNo'] = data.postalTelNo ? data.postalTelNo : vm.thongTinChuHoSo['contactTelNo']
+                    }
+                  } catch (error) {
+                  }
+                }
+                
               }
               vm.$store.commit('setDichVuChuyenPhatKetQua', result)
               vm.$store.commit('setDichVuChuyenPhatHoSo', vnpostalProfile)
