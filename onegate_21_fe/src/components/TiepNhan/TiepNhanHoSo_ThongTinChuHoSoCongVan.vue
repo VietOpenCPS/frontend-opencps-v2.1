@@ -544,7 +544,7 @@ export default {
         }  
       },
       varchar100: (val) => {
-        if(val){
+        if (val) {
           val = String(val).trim()
           return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
         } else {
@@ -552,7 +552,7 @@ export default {
         }  
       },
       varchar255: (val) => {
-        if(val){
+        if (val) {
           val = String(val).trim()
           return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
         } else {
@@ -565,7 +565,7 @@ export default {
           return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
         } else {
           return true
-        }  
+        }
       },
       varchar5000: (val) => {
         if(val){
