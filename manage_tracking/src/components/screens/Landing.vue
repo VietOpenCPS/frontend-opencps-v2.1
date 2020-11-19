@@ -43,17 +43,102 @@
               </div>
               <v-card-text class="px-0 py-0">
                 <v-layout wrap class="custom-class" style="height: 250px">
-                  <v-flex xs6 class="px-2" style="padding-top: 35px;">
+                  <v-flex xs6 class="px-2" style="">
                     <div class="text-xs-center" style="color: #1d9488">
-                      <div style="font-size: 48px; font-weight: 900; margin: 10px 20px 20px;">
+                      <div style="font-size: 48px; font-weight: 900; margin: 0px 20px;">
                         <span><label style="margin-bottom: 0px;">198</label></span>
                       </div>
                       <span>
                         <b>198 </b> lượt truy cập và <b>368 </b> hành động <br> trong <b>3 </b> phút gần đây 
                       </span>
                     </div>
+                    <div class="mt-3">
+                      <table class="dataTable" cellspacing="0" style="background: #17c6b4; border-radius: 3px;color: #fff;">
+                        <thead>
+                          <tr>
+                            <th id="label" class="sortable label first py-2" style="cursor: auto;border-bottom: 1px dotted #fff;border-right: 1px dotted #fff;">
+                              <div>Thời gian</div>
+                            </th>
+                            <th class="sortable py-2" style="cursor: auto;border-bottom: 1px dotted #fff;border-right: 1px dotted #fff;">
+                              <div>Truy cập</div>
+                            </th>
+                            <th class="sortable py-2" style="cursor: auto;border-bottom: 1px dotted #fff;">
+                              <div>Hành động</div>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="">
+                            <td class="label column pl-2 py-2 text-bold" style="border-bottom: 1px dotted #fff;border-right: 1px dotted #fff;">24 giờ qua</td>
+                            <td class="column text-xs-center text-bold" style="border-bottom: 1px dotted #fff;border-right: 1px dotted #fff;">7</td>
+                            <td class="column text-xs-center text-bold" style="border-bottom: 1px dotted #fff;">61</td>
+                          </tr>
+                          <tr class="">
+                            <td class="label column pl-2 py-2 text-bold" style="border-right: 1px dotted #fff;">30 phút qua</td>
+                            <td class="column text-xs-center text-bold" style="border-right: 1px dotted #fff;">1</td>
+                            <td class="column text-xs-center text-bold">0</td>
+                          </tr>
+                        </tbody>
+                    </table>
+                    </div>
                   </v-flex>
-                  <v-flex xs6></v-flex>
+                  <v-flex xs6 style="position: relative;">
+                    <div class="px-2" style="
+                        height: 20px;
+                    ">
+                      <i class="" style="
+                          position: absolute;
+                          top: 5px;
+                          font-weight: bold;
+                          right: 10px;
+                          color: #1d9488;
+                      ">Truy cập 24 giờ qua</i>
+                    </div>
+                    <div id="contentListVisitor" style="max-height: 245px;overflow: hidden auto;">
+                      <v-list three-line>
+                        <v-list-tile
+                          v-for="item in visitorList"
+                          :key="item.idVisit"
+                          avatar
+                          @click=""
+                        >
+                          <v-list-tile-content class="pl-2">
+                            <v-list-tile-title>
+                              Thứ {{ (new Date (item.serverDatePretty)).getDay() + 1 }}, 
+                              {{ (new Date (item.serverDatePretty)).getDate()}}/{{ (new Date (item.serverDatePretty)).getMonth() + 1}}/{{ (new Date (item.serverDatePretty)).getFullYear()}}
+                              - {{item.serverTimePretty}} <i>(ip: {{item.visitIp}})</i>
+                            </v-list-tile-title>
+                            <v-list-tile-sub-title>
+                              <span class="visitorDetails" style="margin-right: 10px">
+                                <v-tooltip bottom>
+                                  <img style="width: 16px;" slot="activator" :src="'http://thongke.fds.vn/' + item.browserIcon">
+                                  <span>{{ item.browser }}</span>
+                                </v-tooltip>
+                              </span>
+                              <span class="visitorDetails" style="margin-right: 10px">
+                                <v-tooltip bottom>
+                                  <img style="width: 16px;" slot="activator" :src="'http://thongke.fds.vn/' + item.operatingSystemIcon">
+                                  <span>{{ item.operatingSystem }}</span>
+                                </v-tooltip>
+                              </span>
+                              <span class="visitorDetails" style="margin-right: 10px">
+                                <v-tooltip bottom>
+                                  <img style="width: 16px;" slot="activator" :src="'http://thongke.fds.vn/' + item.deviceTypeIcon">
+                                  <span>{{ item.deviceType }}</span>
+                                </v-tooltip>
+                              </span>
+                              <span class="visitorDetails">
+                                <v-tooltip bottom>
+                                  <i slot="activator" class="fa fa-address-card-o" style="color: #1867c0;font-size: 14px;"></i>
+                                  <span>Chi tiết truy cập</span>
+                                </v-tooltip>
+                              </span>
+                            </v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                      </v-list>
+                    </div>
+                  </v-flex>
                 </v-layout>
                 
               </v-card-text>
@@ -149,6 +234,207 @@ export default {
   data: () => ({
     loading: false,
     dialog_visitor: false,
+    visitorList: [
+    {
+        "idSite": "1",
+        "idVisit": "25",
+        "visitIp": "101.96.0.0",
+        "visitorId": "9add0157f78b306d",
+        "fingerprint": "30c2bd98dea86f14",
+        "actionDetails": [
+        ],
+        "goalConversions": 0,
+        "siteCurrency": "USD",
+        "siteCurrencySymbol": "$",
+        "serverDate": "2020-11-19",
+        "visitServerHour": "5",
+        "lastActionTimestamp": 1605762514,
+        "lastActionDateTime": "2020-11-19 05:08:34",
+        "siteName": "DVC-HG-QA",
+        "serverTimestamp": 1605762514,
+        "firstActionTimestamp": 1605759800,
+        "serverTimePretty": "12:08:34",
+        "serverDatePretty": "Thursday, November 19, 2020",
+        "serverDatePrettyFirstAction": "Thursday, November 19, 2020",
+        "serverTimePrettyFirstAction": "11:23:20",
+        "userId": null,
+        "visitorType": "returning",
+        "visitorTypeIcon": "plugins/Live/images/returningVisitor.png",
+        "visitConverted": "0",
+        "visitConvertedIcon": null,
+        "visitCount": "11",
+        "visitEcommerceStatus": "none",
+        "visitEcommerceStatusIcon": null,
+        "daysSinceFirstVisit": "2",
+        "daysSinceLastEcommerceOrder": "0",
+        "visitDuration": "2715",
+        "visitDurationPretty": "45 min 15s",
+        "searches": "0",
+        "actions": "13",
+        "interactions": "13",
+        "referrerType": "direct",
+        "referrerTypeName": "Direct Entry",
+        "referrerName": "",
+        "referrerKeyword": "",
+        "referrerKeywordPosition": null,
+        "referrerUrl": null,
+        "referrerSearchEngineUrl": null,
+        "referrerSearchEngineIcon": null,
+        "referrerSocialNetworkUrl": null,
+        "referrerSocialNetworkIcon": null,
+        "languageCode": "en-us",
+        "language": "Language code en-us",
+        "deviceType": "Desktop",
+        "deviceTypeIcon": "plugins/Morpheus/icons/dist/devices/desktop.png",
+        "deviceBrand": "Unknown",
+        "deviceModel": "Generic Desktop",
+        "operatingSystem": "Windows 10",
+        "operatingSystemName": "Windows",
+        "operatingSystemIcon": "plugins/Morpheus/icons/dist/os/WIN.png",
+        "operatingSystemCode": "WIN",
+        "operatingSystemVersion": "10",
+        "browserFamily": "Blink",
+        "browserFamilyDescription": "Blink (Chrome, Opera)",
+        "browser": "Chrome 86.0",
+        "browserName": "Chrome",
+        "browserIcon": "plugins/Morpheus/icons/dist/browsers/CH.png",
+        "browserCode": "CH",
+        "browserVersion": "86.0",
+        "totalEcommerceRevenue": "0.00",
+        "totalEcommerceConversions": "0",
+        "totalEcommerceItems": "0",
+        "totalAbandonedCartsRevenue": "0.00",
+        "totalAbandonedCarts": "0",
+        "totalAbandonedCartsItems": "0",
+        "events": "0",
+        "continent": "North America",
+        "continentCode": "amn",
+        "country": "United States",
+        "countryCode": "us",
+        "countryFlag": "plugins/Morpheus/icons/dist/flags/us.png",
+        "region": null,
+        "regionCode": null,
+        "city": null,
+        "location": "United States",
+        "latitude": null,
+        "longitude": null,
+        "visitLocalTime": "11:23:18",
+        "visitLocalHour": "11",
+        "daysSinceLastVisit": "0",
+        "customVariables": [],
+        "resolution": "1536x864",
+        "plugins": "cookie, pdf",
+        "pluginsIcons": [
+            {
+                "pluginIcon": "plugins/Morpheus/icons/dist/plugins/cookie.png",
+                "pluginName": "cookie"
+            },
+            {
+                "pluginIcon": "plugins/Morpheus/icons/dist/plugins/pdf.png",
+                "pluginName": "pdf"
+            }
+        ]
+    },
+    {
+        "idSite": "1",
+        "idVisit": "26",
+        "visitIp": "101.96.0.0",
+        "visitorId": "fcc82f19c12b1a7d",
+        "fingerprint": "f7ad8c54cab9fe6a",
+        "actionDetails": [
+        ],
+        "goalConversions": 0,
+        "siteCurrency": "USD",
+        "siteCurrencySymbol": "$",
+        "serverDate": "2020-11-19",
+        "visitServerHour": "5",
+        "lastActionTimestamp": 1605762012,
+        "lastActionDateTime": "2020-11-19 05:00:12",
+        "siteName": "DVC-HG-QA",
+        "serverTimestamp": 1605762012,
+        "firstActionTimestamp": 1605760199,
+        "serverTimePretty": "12:00:12",
+        "serverDatePretty": "Thursday, November 19, 2020",
+        "serverDatePrettyFirstAction": "Thursday, November 19, 2020",
+        "serverTimePrettyFirstAction": "11:29:59",
+        "userId": null,
+        "visitorType": "returning",
+        "visitorTypeIcon": "plugins/Live/images/returningVisitor.png",
+        "visitConverted": "0",
+        "visitConvertedIcon": null,
+        "visitCount": "7",
+        "visitEcommerceStatus": "none",
+        "visitEcommerceStatusIcon": null,
+        "daysSinceFirstVisit": "2",
+        "daysSinceLastEcommerceOrder": "0",
+        "visitDuration": "1814",
+        "visitDurationPretty": "30 min 14s",
+        "searches": "0",
+        "actions": "9",
+        "interactions": "9",
+        "referrerType": "direct",
+        "referrerTypeName": "Direct Entry",
+        "referrerName": "",
+        "referrerKeyword": "",
+        "referrerKeywordPosition": null,
+        "referrerUrl": "http://hanoi.fds.vn:8074/c/portal/logout",
+        "referrerSearchEngineUrl": null,
+        "referrerSearchEngineIcon": null,
+        "referrerSocialNetworkUrl": null,
+        "referrerSocialNetworkIcon": null,
+        "languageCode": "en-us",
+        "language": "Language code en-us",
+        "deviceType": "Desktop",
+        "deviceTypeIcon": "plugins/Morpheus/icons/dist/devices/desktop.png",
+        "deviceBrand": "Unknown",
+        "deviceModel": "Generic Desktop",
+        "operatingSystem": "Windows 10",
+        "operatingSystemName": "Windows",
+        "operatingSystemIcon": "plugins/Morpheus/icons/dist/os/WIN.png",
+        "operatingSystemCode": "WIN",
+        "operatingSystemVersion": "10",
+        "browserFamily": "Blink",
+        "browserFamilyDescription": "Blink (Chrome, Opera)",
+        "browser": "Chrome 86.0",
+        "browserName": "Chrome",
+        "browserIcon": "plugins/Morpheus/icons/dist/browsers/CH.png",
+        "browserCode": "CH",
+        "browserVersion": "86.0",
+        "totalEcommerceRevenue": "0.00",
+        "totalEcommerceConversions": "0",
+        "totalEcommerceItems": "0",
+        "totalAbandonedCartsRevenue": "0.00",
+        "totalAbandonedCarts": "0",
+        "totalAbandonedCartsItems": "0",
+        "events": "0",
+        "continent": "North America",
+        "continentCode": "amn",
+        "country": "United States",
+        "countryCode": "us",
+        "countryFlag": "plugins/Morpheus/icons/dist/flags/us.png",
+        "region": null,
+        "regionCode": null,
+        "city": null,
+        "location": "United States",
+        "latitude": null,
+        "longitude": null,
+        "visitLocalTime": "11:29:57",
+        "visitLocalHour": "11",
+        "daysSinceLastVisit": "1",
+        "customVariables": [],
+        "resolution": "1536x864",
+        "plugins": "cookie, pdf",
+        "pluginsIcons": [
+            {
+                "pluginIcon": "plugins/Morpheus/icons/dist/plugins/cookie.png",
+                "pluginName": "cookie"
+            },
+            {
+                "pluginIcon": "plugins/Morpheus/icons/dist/plugins/pdf.png",
+                "pluginName": "pdf"
+            }
+        ]
+    }],
     seriesLineType: [
       {data: [20, 31, 31, 39, 56, 61, 85, 195, 163, 190, 205, 252, 299, 353, 415]}
     ],
