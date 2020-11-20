@@ -112,25 +112,25 @@
                               <span class="visitorDetails" style="margin-right: 10px">
                                 <v-tooltip bottom>
                                   <img style="width: 16px;" slot="activator" :src="'http://thongke.fds.vn/' + item.browserIcon">
-                                  <span>{{ item.browser }}</span>
+                                  <span>Trình duyệt: {{ item.browser }}</span>
                                 </v-tooltip>
                               </span>
                               <span class="visitorDetails" style="margin-right: 10px">
                                 <v-tooltip bottom>
                                   <img style="width: 16px;" slot="activator" :src="'http://thongke.fds.vn/' + item.operatingSystemIcon">
-                                  <span>{{ item.operatingSystem }}</span>
+                                  <span>Hệ điều hành: {{ item.operatingSystem }}</span>
                                 </v-tooltip>
                               </span>
                               <span class="visitorDetails" style="margin-right: 10px">
                                 <v-tooltip bottom>
                                   <img style="width: 16px;" slot="activator" :src="'http://thongke.fds.vn/' + item.deviceTypeIcon">
-                                  <span>{{ item.deviceType }}</span>
+                                  <span>Thiết bị: {{ item.deviceType }}</span>
                                 </v-tooltip>
                               </span>
                               <span class="visitorDetails">
                                 <v-tooltip bottom>
                                   <i slot="activator" class="fa fa-address-card-o" style="color: #1867c0;font-size: 14px;"></i>
-                                  <span>Chi tiết truy cập</span>
+                                  <span>Chi tiết</span>
                                 </v-tooltip>
                               </span>
                             </v-list-tile-sub-title>
@@ -154,7 +154,7 @@
             background: #17c6b4;
             line-height: 42px;
             color: #fff;border-top-left-radius: 7px;border-top-right-radius: 7px;">
-            <div class="">TRUY CẬP THEO THỜI GIAN</div>
+            <div class="">LƯỢT TRUY CẬP THEO NGÀY</div>
           </div>
           <v-card-text class="px-0 py-0">
             <v-layout wrap class="custom-class">
@@ -165,7 +165,7 @@
           </v-card-text>
         </div>
       </v-flex>
-      <v-flex xs12 md6 class="pa-2">
+      <v-flex xs12 md3 class="pa-2">
         <div class="v-sheet theme--light" style="border-radius: 7px;">
           <div class="pl-3" style="height: 42px;
             font-size: 14px;
@@ -178,7 +178,26 @@
           <v-card-text class="px-0 py-0">
             <v-layout wrap class="custom-class">
               <v-flex xs12>
-                
+                <apexchart type="donut" :options="chartBrowserOptions" :series="browserSeries"></apexchart>
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+        </div>
+      </v-flex>
+      <v-flex xs12 md3 class="pa-2">
+        <div class="v-sheet theme--light" style="border-radius: 7px;">
+          <div class="pl-3" style="height: 42px;
+            font-size: 14px;
+            font-weight: 500;
+            background: #17c6b4;
+            line-height: 42px;
+            color: #fff;border-top-left-radius: 7px;border-top-right-radius: 7px;">
+            <div class="">THIẾT BỊ TRUY CẬP</div>
+          </div>
+          <v-card-text class="px-0 py-0">
+            <v-layout wrap class="custom-class">
+              <v-flex xs12>
+                <apexchart type="donut" :options="chartDeviceOptions" :series="deviceSeries"></apexchart>
               </v-flex>
             </v-layout>
           </v-card-text>
@@ -192,7 +211,7 @@
             background: #17c6b4;
             line-height: 42px;
             color: #fff;border-top-left-radius: 7px;border-top-right-radius: 7px;">
-            <div class="">THIẾT BỊ TRUY CẬP</div>
+            <div class="">TRANG TRUY CẬP GẦN ĐÂY</div>
           </div>
           <v-card-text class="px-0 py-0">
             <v-layout wrap class="custom-class">
@@ -472,6 +491,48 @@ export default {
       xaxis: {
         type: "datetime"
       }
+    },
+    browserSeries: [44, 55, 41, 17, 15],
+    chartBrowserOptions: {
+      chart: {
+        type: 'donut',
+      },
+      legend: {
+        position: 'bottom'
+      },
+      labels: ['Chrome', 'Firefox', 'CocCoc', 'Safari'],
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          chart: {
+            width: 200
+          },
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }]
+    },
+    deviceSeries: [44, 55, 41, 17, 15],
+    chartDeviceOptions: {
+      chart: {
+        type: 'donut',
+      },
+      labels: ['Desktop', 'Smartphone', 'Tablet', 'Pha'],
+      legend: {
+        position: 'bottom'
+      },
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          chart: {
+            width: 200
+          },
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }]
     },
   }),
   computed: {

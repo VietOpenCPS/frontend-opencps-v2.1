@@ -372,6 +372,28 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getSso ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              state: filter.state,
+              redirectURL: filter.redirectURL
+            }
+          }
+          axios.get('/o/rest/v2/dvcqgsso/authUrlMic', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     mappingDvcqg ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
