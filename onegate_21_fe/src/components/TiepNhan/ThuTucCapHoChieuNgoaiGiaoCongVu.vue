@@ -2243,12 +2243,9 @@ export default {
                           secret: response.secret
                       }
                       vm.$store.dispatch('getFileToKhai', filterGetFileEform).then(function (responseFile) {
-                          console.log('fileEntryId', responseFile)
                           let partNoEform = response.fileTemplateNo.split('_')[0]
                           let fileEform = [{fileEntryId: responseFile ? responseFile : 0, partNo: partNoEform, eform: false, displayName: 'Tờ khai - ' +  response.eFormNo}]
-                          console.log('dossierFileArr', vm.dossierFileArr)
                           vm.dossierFileArr = vm.dossierFileArr.concat(fileEform)
-                          console.log('dossierFileArr123', vm.dossierFileArr)
                       }).catch(function (reject) {
                       })
                   }

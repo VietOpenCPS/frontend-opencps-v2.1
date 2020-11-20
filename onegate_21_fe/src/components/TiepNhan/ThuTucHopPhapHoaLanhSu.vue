@@ -1072,7 +1072,7 @@ export default {
         de_nghi_chung_nhan(val){
             let vm = this
             for (let i=0; i<vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                     try{
                         let formData = JSON.parse(vm.dossierFileArr[i]['formData'])
                         formData['de_nghi_chung_nhan'] = val ? true : false
@@ -1092,7 +1092,7 @@ export default {
         su_dung_tai_nuoc_ma (val) {
             let vm = this
             for (let i=0; i<vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                     try{
                         let formData = JSON.parse(vm.dossierFileArr[i]['formData'])
                         formData['su_dung_tai_nuoc_ma'] = val
@@ -1137,7 +1137,7 @@ export default {
         muc_dich (val) {
             let vm = this
             for (let i=0; i<vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                     try{
                         let formData = JSON.parse(vm.dossierFileArr[i]['formData'])
                         formData['ma_muc_dich'] = val.MA
@@ -1671,7 +1671,7 @@ export default {
                         vm.$store.dispatch('getFileToKhai', filterGetFileEform).then(function (responseFile) {
                             console.log('fileEntryId', responseFile)
                             let partNoEform = response.fileTemplateNo.split('_')[0]
-                            let fileEform = [{fileEntryId: responseFile ? responseFile : 0, partNo: partNoEform, eform: false}]
+                            let fileEform = [{fileEntryId: responseFile ? responseFile : 0, partNo: partNoEform, eform: false, displayName: 'Tờ khai - ' +  response.eFormNo}]
                             vm.dossierFileArr = vm.dossierFileArr.concat(fileEform)
                         }).catch(function (reject) {
                         })
@@ -1713,7 +1713,7 @@ export default {
             // 
             vm.computeDate()
             for (let i=0; i<vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                     let arr = ''
                     for(let i = 0; i<vm.su_dung_tai_nuoc_ma.length; i++) {
                         let find = vm.listQuocGia.find(e=>e.MA === vm.su_dung_tai_nuoc_ma[i])
@@ -1936,7 +1936,7 @@ export default {
                 vm.computeDate()
                 // 
                 for (let i=0; i<vm.dossierFileArr.length; i++){
-                    if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                    if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                         let arr = []
                         vm.listGiayTo.forEach(e=>{
                             let obj = Object.assign({}, e)
@@ -2185,7 +2185,7 @@ export default {
             vm.computeDate()
             // 
             for (let i=0; i<vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                     let arr = []
                     vm.listGiayTo.forEach(e=>{
                         let obj = Object.assign({}, e)

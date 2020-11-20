@@ -12,7 +12,7 @@
                 </div>
                 <div class="white--text">
                   <h6 class="mb-2" style="font-size: 14px;font-weight: 500;">LƯỢT TRUY CẬP</h6>
-                  <h4 class=""><label style="margin-bottom: 0px;font-size: 26px">11.146</label></h4>
+                  <h4 class=""><label style="margin-bottom: 0px;font-size: 26px">{{visitTotal}}</label></h4>
                 </div>
               </div>
             </div>
@@ -26,7 +26,7 @@
                 </div>
                 <div class="white--text">
                   <h6 class="mb-2" style="font-size: 14px;font-weight: 500;">NGƯỜI DÙNG</h6>
-                  <h4 class=""><label style="margin-bottom: 0px;font-size: 26px">5.146</label></h4>
+                  <h4 class=""><label style="margin-bottom: 0px;font-size: 26px">{{visitorTotal}}</label></h4>
                 </div>
               </div>
             </div>
@@ -46,10 +46,10 @@
                   <v-flex xs6 class="px-2" style="">
                     <div class="text-xs-center" style="color: #1d9488">
                       <div style="font-size: 48px; font-weight: 900; margin: 0px 20px;">
-                        <span><label style="margin-bottom: 0px;">198</label></span>
+                        <span><label style="margin-bottom: 0px;">{{liveStatistic.visits ? liveStatistic.visits : 0}}</label></span>
                       </div>
                       <span>
-                        <b>198 </b> lượt truy cập và <b>368 </b> hành động <br> trong <b>3 </b> phút gần đây 
+                        <b>{{liveStatistic.visits ? liveStatistic.visits : 0}} </b> lượt truy cập và <b>{{liveStatistic.actions ? liveStatistic.actions : 0}} </b> hành động <br> trong <b>3 </b> phút gần đây 
                       </span>
                     </div>
                     <div class="mt-3">
@@ -70,13 +70,13 @@
                         <tbody>
                           <tr class="">
                             <td class="label column pl-2 py-2 text-bold" style="border-bottom: 1px dotted #fff;border-right: 1px dotted #fff;">24 giờ qua</td>
-                            <td class="column text-xs-center text-bold" style="border-bottom: 1px dotted #fff;border-right: 1px dotted #fff;">7</td>
-                            <td class="column text-xs-center text-bold" style="border-bottom: 1px dotted #fff;">61</td>
+                            <td class="column text-xs-center text-bold" style="border-bottom: 1px dotted #fff;border-right: 1px dotted #fff;">{{liveStatistic24.visits ? liveStatistic24.visits : 0}}</td>
+                            <td class="column text-xs-center text-bold" style="border-bottom: 1px dotted #fff;">{{liveStatistic24.actions ? liveStatistic24.actions : 0}}</td>
                           </tr>
                           <tr class="">
                             <td class="label column pl-2 py-2 text-bold" style="border-right: 1px dotted #fff;">30 phút qua</td>
-                            <td class="column text-xs-center text-bold" style="border-right: 1px dotted #fff;">1</td>
-                            <td class="column text-xs-center text-bold">0</td>
+                            <td class="column text-xs-center text-bold" style="border-right: 1px dotted #fff;">{{liveStatistic30.visits ? liveStatistic30.visits : 0}}</td>
+                            <td class="column text-xs-center text-bold">{{liveStatistic30.actions ? liveStatistic30.actions : 0}}</td>
                           </tr>
                         </tbody>
                     </table>
@@ -94,7 +94,7 @@
                           color: #1d9488;
                       ">Truy cập 24 giờ qua</i>
                     </div>
-                    <div id="contentListVisitor" style="max-height: 245px;overflow: hidden auto;">
+                    <div id="contentListVisitor" class="mt-1" style="max-height: 215px;overflow: hidden auto;">
                       <v-list three-line>
                         <v-list-tile
                           v-for="item in visitorList"
@@ -178,7 +178,7 @@
           <v-card-text class="px-0 py-0">
             <v-layout wrap class="custom-class">
               <v-flex xs12>
-                <apexchart type="donut" :options="chartBrowserOptions" :series="browserSeries"></apexchart>
+                <apexchart width=310 type="donut" :options="chartBrowserOptions" :series="browserSeries"></apexchart>
               </v-flex>
             </v-layout>
           </v-card-text>
@@ -197,7 +197,7 @@
           <v-card-text class="px-0 py-0">
             <v-layout wrap class="custom-class">
               <v-flex xs12>
-                <apexchart type="donut" :options="chartDeviceOptions" :series="deviceSeries"></apexchart>
+                <apexchart type="donut" width=310 :options="chartDeviceOptions" :series="deviceSeries"></apexchart>
               </v-flex>
             </v-layout>
           </v-card-text>
@@ -251,289 +251,25 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    host: "http://thongke.fds.vn",
+    idSite: '1',
+    token_auth: 'b0a9a426253ca32c552492ab1e41bbee',
+    visitTotal: 0,
+    visitorTotal: 0,
+    liveStatistic: '',
+    liveStatistic30: '',
+    liveStatistic24: '',
+    fromDate: ' 2020-11-01',
+    toDate: '2020-11-30',
     loading: false,
     dialog_visitor: false,
-    visitorList: [
-    {
-        "idSite": "1",
-        "idVisit": "25",
-        "visitIp": "101.96.0.0",
-        "visitorId": "9add0157f78b306d",
-        "fingerprint": "30c2bd98dea86f14",
-        "actionDetails": [
-        ],
-        "goalConversions": 0,
-        "siteCurrency": "USD",
-        "siteCurrencySymbol": "$",
-        "serverDate": "2020-11-19",
-        "visitServerHour": "5",
-        "lastActionTimestamp": 1605762514,
-        "lastActionDateTime": "2020-11-19 05:08:34",
-        "siteName": "DVC-HG-QA",
-        "serverTimestamp": 1605762514,
-        "firstActionTimestamp": 1605759800,
-        "serverTimePretty": "12:08:34",
-        "serverDatePretty": "Thursday, November 19, 2020",
-        "serverDatePrettyFirstAction": "Thursday, November 19, 2020",
-        "serverTimePrettyFirstAction": "11:23:20",
-        "userId": null,
-        "visitorType": "returning",
-        "visitorTypeIcon": "plugins/Live/images/returningVisitor.png",
-        "visitConverted": "0",
-        "visitConvertedIcon": null,
-        "visitCount": "11",
-        "visitEcommerceStatus": "none",
-        "visitEcommerceStatusIcon": null,
-        "daysSinceFirstVisit": "2",
-        "daysSinceLastEcommerceOrder": "0",
-        "visitDuration": "2715",
-        "visitDurationPretty": "45 min 15s",
-        "searches": "0",
-        "actions": "13",
-        "interactions": "13",
-        "referrerType": "direct",
-        "referrerTypeName": "Direct Entry",
-        "referrerName": "",
-        "referrerKeyword": "",
-        "referrerKeywordPosition": null,
-        "referrerUrl": null,
-        "referrerSearchEngineUrl": null,
-        "referrerSearchEngineIcon": null,
-        "referrerSocialNetworkUrl": null,
-        "referrerSocialNetworkIcon": null,
-        "languageCode": "en-us",
-        "language": "Language code en-us",
-        "deviceType": "Desktop",
-        "deviceTypeIcon": "plugins/Morpheus/icons/dist/devices/desktop.png",
-        "deviceBrand": "Unknown",
-        "deviceModel": "Generic Desktop",
-        "operatingSystem": "Windows 10",
-        "operatingSystemName": "Windows",
-        "operatingSystemIcon": "plugins/Morpheus/icons/dist/os/WIN.png",
-        "operatingSystemCode": "WIN",
-        "operatingSystemVersion": "10",
-        "browserFamily": "Blink",
-        "browserFamilyDescription": "Blink (Chrome, Opera)",
-        "browser": "Chrome 86.0",
-        "browserName": "Chrome",
-        "browserIcon": "plugins/Morpheus/icons/dist/browsers/CH.png",
-        "browserCode": "CH",
-        "browserVersion": "86.0",
-        "totalEcommerceRevenue": "0.00",
-        "totalEcommerceConversions": "0",
-        "totalEcommerceItems": "0",
-        "totalAbandonedCartsRevenue": "0.00",
-        "totalAbandonedCarts": "0",
-        "totalAbandonedCartsItems": "0",
-        "events": "0",
-        "continent": "North America",
-        "continentCode": "amn",
-        "country": "United States",
-        "countryCode": "us",
-        "countryFlag": "plugins/Morpheus/icons/dist/flags/us.png",
-        "region": null,
-        "regionCode": null,
-        "city": null,
-        "location": "United States",
-        "latitude": null,
-        "longitude": null,
-        "visitLocalTime": "11:23:18",
-        "visitLocalHour": "11",
-        "daysSinceLastVisit": "0",
-        "customVariables": [],
-        "resolution": "1536x864",
-        "plugins": "cookie, pdf",
-        "pluginsIcons": [
-            {
-                "pluginIcon": "plugins/Morpheus/icons/dist/plugins/cookie.png",
-                "pluginName": "cookie"
-            },
-            {
-                "pluginIcon": "plugins/Morpheus/icons/dist/plugins/pdf.png",
-                "pluginName": "pdf"
-            }
-        ]
-    },
-    {
-        "idSite": "1",
-        "idVisit": "26",
-        "visitIp": "101.96.0.0",
-        "visitorId": "fcc82f19c12b1a7d",
-        "fingerprint": "f7ad8c54cab9fe6a",
-        "actionDetails": [
-        ],
-        "goalConversions": 0,
-        "siteCurrency": "USD",
-        "siteCurrencySymbol": "$",
-        "serverDate": "2020-11-19",
-        "visitServerHour": "5",
-        "lastActionTimestamp": 1605762012,
-        "lastActionDateTime": "2020-11-19 05:00:12",
-        "siteName": "DVC-HG-QA",
-        "serverTimestamp": 1605762012,
-        "firstActionTimestamp": 1605760199,
-        "serverTimePretty": "12:00:12",
-        "serverDatePretty": "Thursday, November 19, 2020",
-        "serverDatePrettyFirstAction": "Thursday, November 19, 2020",
-        "serverTimePrettyFirstAction": "11:29:59",
-        "userId": null,
-        "visitorType": "returning",
-        "visitorTypeIcon": "plugins/Live/images/returningVisitor.png",
-        "visitConverted": "0",
-        "visitConvertedIcon": null,
-        "visitCount": "7",
-        "visitEcommerceStatus": "none",
-        "visitEcommerceStatusIcon": null,
-        "daysSinceFirstVisit": "2",
-        "daysSinceLastEcommerceOrder": "0",
-        "visitDuration": "1814",
-        "visitDurationPretty": "30 min 14s",
-        "searches": "0",
-        "actions": "9",
-        "interactions": "9",
-        "referrerType": "direct",
-        "referrerTypeName": "Direct Entry",
-        "referrerName": "",
-        "referrerKeyword": "",
-        "referrerKeywordPosition": null,
-        "referrerUrl": "http://hanoi.fds.vn:8074/c/portal/logout",
-        "referrerSearchEngineUrl": null,
-        "referrerSearchEngineIcon": null,
-        "referrerSocialNetworkUrl": null,
-        "referrerSocialNetworkIcon": null,
-        "languageCode": "en-us",
-        "language": "Language code en-us",
-        "deviceType": "Desktop",
-        "deviceTypeIcon": "plugins/Morpheus/icons/dist/devices/desktop.png",
-        "deviceBrand": "Unknown",
-        "deviceModel": "Generic Desktop",
-        "operatingSystem": "Windows 10",
-        "operatingSystemName": "Windows",
-        "operatingSystemIcon": "plugins/Morpheus/icons/dist/os/WIN.png",
-        "operatingSystemCode": "WIN",
-        "operatingSystemVersion": "10",
-        "browserFamily": "Blink",
-        "browserFamilyDescription": "Blink (Chrome, Opera)",
-        "browser": "Chrome 86.0",
-        "browserName": "Chrome",
-        "browserIcon": "plugins/Morpheus/icons/dist/browsers/CH.png",
-        "browserCode": "CH",
-        "browserVersion": "86.0",
-        "totalEcommerceRevenue": "0.00",
-        "totalEcommerceConversions": "0",
-        "totalEcommerceItems": "0",
-        "totalAbandonedCartsRevenue": "0.00",
-        "totalAbandonedCarts": "0",
-        "totalAbandonedCartsItems": "0",
-        "events": "0",
-        "continent": "North America",
-        "continentCode": "amn",
-        "country": "United States",
-        "countryCode": "us",
-        "countryFlag": "plugins/Morpheus/icons/dist/flags/us.png",
-        "region": null,
-        "regionCode": null,
-        "city": null,
-        "location": "United States",
-        "latitude": null,
-        "longitude": null,
-        "visitLocalTime": "11:29:57",
-        "visitLocalHour": "11",
-        "daysSinceLastVisit": "1",
-        "customVariables": [],
-        "resolution": "1536x864",
-        "plugins": "cookie, pdf",
-        "pluginsIcons": [
-            {
-                "pluginIcon": "plugins/Morpheus/icons/dist/plugins/cookie.png",
-                "pluginName": "cookie"
-            },
-            {
-                "pluginIcon": "plugins/Morpheus/icons/dist/plugins/pdf.png",
-                "pluginName": "pdf"
-            }
-        ]
-    }],
-    seriesLineType: [
-      {data: [20, 31, 31, 39, 56, 61, 85, 195, 163, 190, 205, 252, 299, 353, 415]}
-    ],
-    chartOptionsLineType: {
-      chart: {
-        height: 350,
-        type: "line",
-        group: "detail",
-        id: "areachart-1",
-        toolbar: {
-          show: false
-        }
-      },
-      dataLabels: {
-        enabled: false
-      },
-      stroke: {
-        curve: "smooth"
-      },
-      grid: {
-        padding: {
-          right: 30,
-          left: 20
-        }
-      },
-
-      labels: ["14 Mar 2020", "15 Mar 2020", "16 Mar 2020", "17 Mar 2020", "18 Mar 2020", "19 Mar 2020", "20 Mar 2020", "21 Mar 2020",
-      "22 Mar 2020",
-      "23 Mar 2020",
-      "24 Mar 2020",
-      "25 Mar 2020",
-      "26 Mar 2020",
-      "27 Mar 2020",
-      "28 Mar 2020"],
-      xaxis: {
-        type: "datetime"
-      }
-    },
-    browserSeries: [44, 55, 41, 17, 15],
-    chartBrowserOptions: {
-      chart: {
-        type: 'donut',
-      },
-      legend: {
-        position: 'bottom'
-      },
-      labels: ['Chrome', 'Firefox', 'CocCoc', 'Safari'],
-      responsive: [{
-        breakpoint: 480,
-        options: {
-          chart: {
-            width: 200
-          },
-          legend: {
-            position: 'bottom'
-          }
-        }
-      }]
-    },
-    deviceSeries: [44, 55, 41, 17, 15],
-    chartDeviceOptions: {
-      chart: {
-        type: 'donut',
-      },
-      labels: ['Desktop', 'Smartphone', 'Tablet', 'Pha'],
-      legend: {
-        position: 'bottom'
-      },
-      responsive: [{
-        breakpoint: 480,
-        options: {
-          chart: {
-            width: 200
-          },
-          legend: {
-            position: 'bottom'
-          }
-        }
-      }]
-    },
+    visitorList: [],
+    seriesLineType: [],
+    chartOptionsLineType: '',
+    browserSeries: [],
+    chartBrowserOptions: '',
+    deviceSeries: [],
+    chartDeviceOptions: ''
   }),
   computed: {
     
@@ -541,48 +277,296 @@ export default {
   created() {
     let vm = this
     vm.$nextTick(() => {
-
+      vm.getStatisticTotal()
+      vm.getStatisticVisitorTotal()
+      vm.getLiveStatistic('liveStatistic', 3)
+      vm.getLiveStatistic('liveStatistic30', 30)
+      vm.getLiveStatistic('liveStatistic24', 1440)
+      vm.getDetailLiveStatistic24(1440)
+      vm.getGraphStatistic()
+      vm.getBrowserStatistic()
+      vm.getOsStatistic()
     })
   },
   watch: {
     
   },
   methods: {
-    getStatisticsYear() {
+    getStatisticTotal() {
       let vm = this
       let config = {
-        url: "/o/rest/statistics",
+        url: vm.host,
         headers: {
-          groupId: window.themeDisplay.getScopeGroupId(),
-          Accept: "application/json"
         },
         params: {
-          year: vm.yearSelected,
-          month: 0,
-          domain: 'total',
-          agency: 'total'
+          idSite: vm.idSite,
+          token_auth: vm.token_auth,
+          module: 'API',
+          method: 'VisitsSummary.getVisits',
+          format: 'JSON',
+          date: vm.fromDate + ',' + vm.toDate,
+          period: 'range'
         }
       };
       axios
         .request(config)
         .then(function(response) {
-          if (response.data.data) {
-            vm.statistics = response.data.data[0]
-            vm.statisticalYear = [
-              response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
-              response.data.data[0].overtimeCount
-            ];
-          } else {
-            vm.statisticalYear = [0, 0]
-            vm.statistics = {
-              receivedCount: 0,
-              releaseCount: 0,
-              processingCount: 0,
-              overtimeCount: 0
+          if (response.data) {
+            vm.visitTotal = response.data.value
+          }          
+        })
+        .catch();
+    },
+    getStatisticVisitorTotal() {
+      let vm = this
+      let config = {
+        url: vm.host,
+        headers: {
+        },
+        params: {
+          idSite: vm.idSite,
+          token_auth: vm.token_auth,
+          module: 'API',
+          method: 'VisitsSummary.getUniqueVisitors',
+          format: 'JSON',
+          date: vm.fromDate + ',' + vm.toDate,
+          period: 'day'
+        }
+      };
+      vm.visitorTotal = 0
+      axios
+        .request(config)
+        .then(function(response) {
+          if (response.data) {
+            let dataResult = response.data
+            for (let key in dataResult) {
+              vm.visitorTotal += dataResult[key]
             }
+          }          
+        })
+        .catch();
+    },
+    getLiveStatistic(type, minutes) {
+      let vm = this
+      let config = {
+        url: vm.host,
+        headers: {
+        },
+        params: {
+          idSite: vm.idSite,
+          token_auth: vm.token_auth,
+          module: 'API',
+          method: 'Live.getCounters',
+          lastMinutes: minutes,
+          format: 'JSON',
+          force_api_session: '1'
+        }
+      };
+      axios
+        .request(config)
+        .then(function(response) {
+          if (type === 'liveStatistic') {
+            vm.liveStatistic = response.data[0]
+          } else if (type === 'liveStatistic30') {
+            vm.liveStatistic30 = response.data[0]
+          } else if (type === 'liveStatistic24') {
+            vm.liveStatistic24 = response.data[0]
+          }
+          
+        })
+        .catch();
+    },
+    getDetailLiveStatistic24(minutes) {
+      let vm = this
+      let config = {
+        url: vm.host,
+        headers: {
+        },
+        params: {
+          idSite: vm.idSite,
+          token_auth: vm.token_auth,
+          module: 'API',
+          method: 'Live.getLastVisitsDetails',
+          lastMinutes: minutes,
+          format: 'JSON'
+        }
+      };
+      axios
+        .request(config)
+        .then(function(response) {
+          vm.visitorList = response.data        
+        })
+        .catch();
+    },
+    getGraphStatistic() {
+      let vm = this
+      let config = {
+        url: vm.host,
+        headers: {
+        },
+        params: {
+          idSite: vm.idSite,
+          token_auth: vm.token_auth,
+          module: 'API',
+          method: 'VisitsSummary.getVisits',
+          format: 'JSON',
+          date: vm.fromDate + ',' + vm.toDate,
+          period: 'day'
+        }
+      };
+      axios
+        .request(config)
+        .then(function(response) {
+          vm.seriesLineType = []
+          let dataResult = response.data
+          let seriesVisit = []
+          let labelsVisit = []
+          for (let key in dataResult) {
+            labelsVisit.push(vm.parsedate(key))
+            seriesVisit.push(dataResult[key])
+          }
+          vm.chartOptionsLineType = {
+            chart: {
+              height: 350,
+              type: "line",
+              group: "detail",
+              id: "areachart-1",
+              toolbar: {
+                show: false
+              }
+            },
+            dataLabels: {
+              enabled: false
+            },
+            stroke: {
+              curve: "smooth"
+            },
+            grid: {
+              padding: {
+                right: 30,
+                left: 20
+              }
+            },
+
+            labels: labelsVisit
+          }
+          vm.seriesLineType = [
+            {name: 'Truy cập', data: seriesVisit}
+          ]
+        })
+        .catch();
+    },
+    getBrowserStatistic () {
+      let vm = this
+      let config = {
+        url: vm.host,
+        headers: {
+        },
+        params: {
+          idSite: vm.idSite,
+          token_auth: vm.token_auth,
+          module: 'API',
+          method: 'DevicesDetection.getBrowsers',
+          format: 'JSON',
+          date: vm.fromDate + ',' + vm.toDate,
+          period: 'range'
+        }
+      };
+      axios
+        .request(config)
+        .then(function(response) {
+          vm.browserSeries = []
+          let dataBrowser = response.data
+          let labelsBrowser = []
+          let seriesBrowser = []
+          if (dataBrowser.length > 0) {
+            for (var i = 0; i < dataBrowser.length; i++) {
+              labelsBrowser.push(dataBrowser[i]['label'])
+              seriesBrowser.push(dataBrowser[i]['nb_visits'])
+            }
+            vm.chartBrowserOptions = {
+              chart: {
+                type: 'donut'
+              },
+              legend: {
+                position: 'bottom',
+                height: 60
+              },
+              labels: labelsBrowser,
+              responsive: [{
+                breakpoint: 480,
+                options: {
+                  chart: {
+                    width: 200
+                  },
+                  legend: {
+                    position: 'bottom'
+                  }
+                }
+              }]
+            },
+            vm.browserSeries = seriesBrowser
           }
         })
         .catch();
+    },
+    getOsStatistic () {
+      let vm = this
+      let config = {
+        url: vm.host,
+        headers: {
+        },
+        params: {
+          idSite: vm.idSite,
+          token_auth: vm.token_auth,
+          module: 'API',
+          method: 'DevicesDetection.getOsFamilies',
+          format: 'JSON',
+          date: vm.fromDate + ',' + vm.toDate,
+          period: 'range'
+        }
+      };
+      axios
+        .request(config)
+        .then(function(response) {
+          vm.deviceSeries = []
+          let dataBrowser = response.data
+          let labelsDevice = []
+          let seriesDevice = []
+          if (dataBrowser.length > 0) {
+            for (var i = 0; i < dataBrowser.length; i++) {
+              labelsDevice.push(dataBrowser[i]['label'])
+              seriesDevice.push(dataBrowser[i]['nb_visits'])
+            }
+            vm.chartDeviceOptions = {
+              chart: {
+                type: 'donut'
+              },
+              legend: {
+                position: 'bottom',
+                height: 60
+              },
+              labels: labelsDevice,
+              responsive: [{
+                breakpoint: 480,
+                options: {
+                  chart: {
+                    width: 200
+                  },
+                  legend: {
+                    position: 'bottom'
+                  }
+                }
+              }]
+            },
+            vm.deviceSeries = seriesDevice
+          }
+        })
+        .catch();
+    },
+    parsedate (date) {
+      const [year, month, day] = date.split('-')
+      return `${day}-${month}-${year}`
     }
   }
 };

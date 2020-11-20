@@ -13,8 +13,8 @@ Vue.config.productionTip = false
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : ''
 
 axios.defaults.withCredentials = true
-axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
-axios.defaults.headers.common['groupId'] = groupId
+// axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
+// axios.defaults.headers.common['groupId'] = groupId
 
 new Vue({
   router,
