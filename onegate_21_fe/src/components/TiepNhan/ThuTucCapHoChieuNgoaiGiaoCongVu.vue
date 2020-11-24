@@ -1831,7 +1831,10 @@ export default {
         dossierFileArr: {
             deep: true,
             handler:  (val, oldVal) => {
-                $('#dossierFileArr_hidden').val(JSON.stringify(val))
+                let dataOut = val.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
             }
         },
         dossierMarkArr: {
@@ -2282,7 +2285,10 @@ export default {
                             vm.dossierFileArr[i]['eform'] = 'true'
                         }
                     }
-                    $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+                    let dataOut = vm.dossierFileArr.filter(function (item) {
+                        return item.formData || (!item.formData && item.fileEntryId)
+                    })
+                    $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
                     vm.genSelectCQCQ()
                 }
             }
@@ -2403,7 +2409,10 @@ export default {
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
                 }
-                $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+                let dataOut = vm.dossierFileArr.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
 
                 // 
                 vm.cong_ham_so_nguoi = vm.listThanhVien.filter(e => e.cong_ham).length
@@ -2535,7 +2544,10 @@ export default {
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
                 }
-                $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+                let dataOut = vm.dossierFileArr.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
                 vm.dialogThemVanBan = false
             } else {
                 toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
@@ -2620,7 +2632,10 @@ export default {
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
                 }
-                $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+                let dataOut = vm.dossierFileArr.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
                 vm.cong_ham_so_nguoi = vm.listThanhVien.filter(e => e.cong_ham).length
 
                 vm.countPassport()
@@ -2745,7 +2760,10 @@ export default {
                 }
             }
             vm.so_nguoi = vm.listThanhVien.length
-            $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+            let dataOut = vm.dossierFileArr.filter(function (item) {
+                return item.formData || (!item.formData && item.fileEntryId)
+            })
+            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
         },
         checkThanhVien (index) {
             let vm = this
@@ -2769,7 +2787,10 @@ export default {
                     return !item.hasOwnProperty('fileEntryId')
                 })
                 // 
-                $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+                let dataOut = vm.dossierFileArr.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
                 this.genSelectCQCQ()
             } else {
                 toastr.error('Văn bản quyết định đã được sử dụng. Phải xóa thành viên sử dụng văn bản quyết định ' + vm.listVanBan[index].vb_so_hieu_van_ban + ' - ' + vm.listVanBan[index].vb_ngay_ky + ' - ' + vm.listVanBan[index].vb_co_quan_chu_quan)

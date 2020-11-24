@@ -1037,7 +1037,10 @@ export default {
         dossierFileArr: {
             deep: true,
             handler:  (val, oldVal) => {
-                $('#dossierFileArr_hidden').val(JSON.stringify(val))
+                let dataOut = val.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
             }
         },
         dossierMarkArr: {
@@ -1087,7 +1090,10 @@ export default {
                     // vm.dossierFileArr[i]['eform'] = 'true'
                 }
             }
-            $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))  
+            let dataOut = vm.dossierFileArr.filter(function (item) {
+                return item.formData || (!item.formData && item.fileEntryId)
+            })
+            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))  
         },
         su_dung_tai_nuoc_ma (val) {
             let vm = this
@@ -1132,7 +1138,10 @@ export default {
                     }
                 }
             }
-            $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))             
+            let dataOut = vm.dossierFileArr.filter(function (item) {
+                return item.formData || (!item.formData && item.fileEntryId)
+            })
+            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))             
         },
         muc_dich (val) {
             let vm = this
@@ -1153,7 +1162,10 @@ export default {
                     }
                 }
             }
-            $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))            
+            let dataOut = vm.dossierFileArr.filter(function (item) {
+                return item.formData || (!item.formData && item.fileEntryId)
+            })
+            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))            
         },
         dateDueDate (val) {
             this.dateDueDateFormated = this.formatDate(this.dateDueDate) 
@@ -1746,7 +1758,10 @@ export default {
                     vm.dossierFileArr[i]['eform'] = 'true'
                 }
             }
-            $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+            let dataOut = vm.dossierFileArr.filter(function (item) {
+                return item.formData || (!item.formData && item.fileEntryId)
+            })
+            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
 
             // Gen le phi
             vm.genLePhi()
@@ -1978,8 +1993,10 @@ export default {
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
                 }
-                
-                $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+                let dataOut = vm.dossierFileArr.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
 
                 // Gen le phi
                 vm.genLePhi()
@@ -2225,7 +2242,10 @@ export default {
                     vm.dossierFileArr[i]['eform'] = 'true'
                 }
             }
-            $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+            let dataOut = vm.dossierFileArr.filter(function (item) {
+                return item.formData || (!item.formData && item.fileEntryId)
+            })
+            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
 
             // Gen le phi
             vm.genLePhi()
