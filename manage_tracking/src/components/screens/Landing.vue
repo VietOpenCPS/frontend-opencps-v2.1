@@ -170,7 +170,7 @@
                           font-weight: bold;
                           right: 10px;
                           color: #1d9488;
-                      ">Truy cập hôm nay</i>
+                      ">Truy cập gần đây</i>
                     </div>
                     <div id="contentListVisitor" class="mt-1" style="max-height: 215px;overflow: hidden auto;">
                       <v-list three-line>
@@ -182,26 +182,26 @@
                         >
                           <v-list-tile-content class="pl-2">
                             <v-list-tile-title>
-                              Thứ {{ (new Date (item.serverDatePretty)).getDay() + 1 }}, 
-                              {{ (new Date (item.serverDatePretty)).getDate()}}/{{ (new Date (item.serverDatePretty)).getMonth() + 1}}/{{ (new Date (item.serverDatePretty)).getFullYear()}}
+                              Thứ {{ (new Date (item.serverTimestamp*1000)).getDay() + 1 }}, 
+                              {{ (new Date (item.serverTimestamp*1000)).getDate()}}/{{ (new Date (item.serverTimestamp*1000)).getMonth() + 1}}/{{ (new Date (item.serverTimestamp*1000)).getFullYear()}}
                               - {{item.serverTimePretty}} <i>(ip: {{item.visitIp}})</i>
                             </v-list-tile-title>
                             <v-list-tile-sub-title>
                               <span class="visitorDetails" style="margin-right: 10px">
                                 <v-tooltip bottom>
-                                  <img style="width: 16px;" slot="activator" :src="'http://thongke.fds.vn/' + item.browserIcon">
+                                  <img style="width: 16px;" slot="activator" :src="host + '/' + item.browserIcon">
                                   <span>Trình duyệt: {{ item.browser }}</span>
                                 </v-tooltip>
                               </span>
                               <span class="visitorDetails" style="margin-right: 10px">
                                 <v-tooltip bottom>
-                                  <img style="width: 16px;" slot="activator" :src="'http://thongke.fds.vn/' + item.operatingSystemIcon">
+                                  <img style="width: 16px;" slot="activator" :src="host + '/' + item.operatingSystemIcon">
                                   <span>Hệ điều hành: {{ item.operatingSystem }}</span>
                                 </v-tooltip>
                               </span>
                               <span class="visitorDetails" style="margin-right: 10px">
                                 <v-tooltip bottom>
-                                  <img style="width: 16px;" slot="activator" :src="'http://thongke.fds.vn/' + item.deviceTypeIcon">
+                                  <img style="width: 16px;" slot="activator" :src="host + '/' + item.deviceTypeIcon">
                                   <span>Thiết bị: {{ item.deviceType }}</span>
                                 </v-tooltip>
                               </span>
@@ -255,7 +255,7 @@
           </div>
           <v-card-text class="px-0 py-0">
             <v-layout wrap class="custom-class">
-              <v-flex xs12>
+              <v-flex xs12 v-if="!reRender">
                 <apexchart width=310 type="donut" :options="chartBrowserOptions" :series="browserSeries"></apexchart>
               </v-flex>
             </v-layout>
@@ -274,7 +274,7 @@
           </div>
           <v-card-text class="px-0 py-0">
             <v-layout wrap class="custom-class">
-              <v-flex xs12>
+              <v-flex xs12 v-if="!reRender">
                 <apexchart type="donut" width=310 :options="chartDeviceOptions" :series="deviceSeries"></apexchart>
               </v-flex>
             </v-layout>
@@ -383,6 +383,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    reRender: false,
     loading: false,
     counterGetdata: 0,
     siteDvc: false,
@@ -491,6 +492,9 @@ export default {
         vm.getGraphStatisticLineTime()
         vm.getBrowserStatistic()
         vm.getOsStatistic()
+        if (vm.site.hasOwnProperty('siteMotCua') && vm.site.siteMotCua) {
+          vm.getEmloyeeOnline()
+        }
       }
     },
     resetData () {
@@ -582,12 +586,10 @@ export default {
     },
     changeSite () {
       let vm = this
+      vm.reRender = true
       setTimeout(function () {
         vm.idSite = vm.site['siteId']
         vm.getDataTracking()
-        if (vm.site.hasOwnProperty('siteMotCua') && vm.site.siteMotCua) {
-          vm.getEmloyeeOnline()
-        }
       }, 100)
     },
     getStatisticTotal() {
@@ -662,8 +664,7 @@ export default {
           module: 'API',
           method: 'Live.getCounters',
           lastMinutes: minutes,
-          format: 'JSON',
-          force_api_session: '1'
+          format: 'JSON'
         }
       };
       axios
@@ -845,6 +846,7 @@ export default {
       axios
         .request(config)
         .then(function(response) {
+          vm.reRender = false
           vm.browserSeries = []
           let dataBrowser = response.data
           let labelsBrowser = []
@@ -878,7 +880,9 @@ export default {
             vm.browserSeries = seriesBrowser
           }
         })
-        .catch();
+        .catch(function () {
+          vm.reRender = false
+        });
     },
     getOsStatistic () {
       let vm = this

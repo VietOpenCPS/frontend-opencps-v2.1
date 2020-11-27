@@ -699,7 +699,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: false,
+    notifyConfig: true,
     smsNotify: true,
     emailNotify: true,
     dialog_printGuide: false,

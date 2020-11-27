@@ -104,7 +104,7 @@
             v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
             :items="listDichVu"
             v-model="dichVuSelected"
-            label="Chọn dịch vụ"
+            label="Chọn trường hợp"
             item-text="optionName"
             item-value="processOptionId"
             return-object
@@ -460,7 +460,7 @@
                   :items="listDichVu"
                   v-model="dichVuSelected"
                   label="Dịch vụ:"
-                  placeholder="Chọn dịch vụ"
+                  placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
@@ -668,7 +668,7 @@
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
-                  placeholder="Chọn dịch vụ"
+                  placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
@@ -824,7 +824,7 @@
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
-                  placeholder="Chọn dịch vụ"
+                  placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object

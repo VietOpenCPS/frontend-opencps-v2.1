@@ -331,6 +331,67 @@
                 </table>
         </div>
         <!--  -->
+        <v-layout wrap v-if="reportType.startsWith('DANH_GIA_CAN_BO')">
+          <v-flex xs12 class="report__table" style="overflow:auto;max-height: 1000px" v-if="!showErrorData && dataTableVottingList.length > 0">
+            <table class="my-2" hide-default-footer>
+              <thead>
+                <tr>
+                  <th rowspan="2" class="text-center px-2">
+                    <span>STT</span>
+                  </th>
+                  <th rowspan="2" class="text-center px-2">
+                    <span>Tên đơn vị</span>
+                  </th>
+                  <th width="80" rowspan="3" class="text-center px-2 py-1">
+                    <span>Số lượt đánh giá</span>
+                  </th>
+                  <th v-for="(item, index) in dataTableVottingList[0]['employees'][0]['voting']" v-bind:key="index" :colspan="dataTableVottingList[0]['employees'][0]['voting'][index]['answers'].length">
+                    <span>{{item.question}}</span>
+                  </th>
+                </tr>
+
+                <tr>
+                  <th v-for="(item, index) in listAnswers" v-bind:key="index" width="" class="text-center px-2">
+                    <span>{{item}}</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody v-if="loadingTable">
+                <content-placeholders class="my-2">
+                  <content-placeholders-text :lines="5" />
+                </content-placeholders>
+              </tbody>
+              <tbody v-if="!loadingTable && dataTableVottingList.length > 0">
+                <tr v-for="(item,index) in dataTableRender" :key="index">
+                  <td align="center" :class="item.hasOwnProperty('group') ? 'px-2 text-bold' : 'px-2'">{{item.hasOwnProperty('group') ? item.group : item.child}}</td>
+                  <td align="left" :class="item.hasOwnProperty('group') ? 'px-2 text-bold' : 'px-2'" style="padding: 8px 10px;"
+                    :colspan="item.hasOwnProperty('group') ? columnLength - 1 : ''"
+                  >
+                    {{item.name}}
+                  </td>
+                  <td align="center" class="px-2" v-if="!item.hasOwnProperty('group')">{{item.total}}</td>
+                  <!-- <td align="center"  class="px-2" v-for="(item1,index1) in (columnLength - 3)" :key="index1"
+                    v-if="item.hasOwnProperty('group')"
+                  >
+                    
+                  </td> -->
+                  <td align="center"  class="px-2" v-for="(item1,index1) in item['data']" :key="index1"
+                    v-if="!item.hasOwnProperty('group')"
+                  >
+                    {{item1}}
+                  </td>
+                  
+                </tr>
+              </tbody>
+            </table>
+          </v-flex>
+          <div class="mx-3 my-4" v-if="showErrorData">
+            <v-alert :value="true" outline color="info" icon="info">
+              Không có dữ liệu báo cáo.
+            </v-alert>
+          </div>
+        </v-layout>
+        <!--  -->
         <div class="mx-3 my-4" v-if="showErrorData">
           <v-alert :value="true" outline color="info" icon="info">
             Không có dữ liệu báo cáo.
@@ -408,6 +469,57 @@ export default {
   },
   data: () => ({
     showHTML: false,
+    columnLength: 0,
+    listAnswers: [],
+    dataTableRender: [],
+    dataTableVottingList: [
+      {
+        "jobpos": "SLDTBXH",
+        "name": "Sở LĐTBXH",
+        "employees":[
+          {
+            "userId": 100,
+            "name": "Đỗ Mỹ Linh",
+            "totalVote": 87,
+            "voting":[
+              {
+                "question": "Câu hỏi 1",
+                "answers": ["Rất hài lòng", "Hài lòng", "Không hài lòng"],
+                "score": [80, 5, 2]
+              },
+              {
+                "question": "Câu hỏi 2",
+                "answers": ["Rất hài lòng", "Hài lòng", "Không hài lòng"],
+                "score": [11, 7, 12]
+              } 
+            ]
+          }  
+        ]
+      },
+      {
+        "jobpos": "STC",
+        "name": "Sở Tài chính",
+        "employees":[
+          {
+            "userId": 100,
+            "name": "Trần Trọng Nghĩa",
+            "totalVote": 87,
+            "voting":[
+              {
+                "question": "Câu hỏi 1",
+                "answers": ["Rất hài lòng", "Hài lòng", "Không hài lòng"],
+                "score": [80, 5, 2]
+              },
+              {
+                "question": "Câu hỏi 2",
+                "answers": ["Rất hài lòng", "Hài lòng", "Không hài lòng"],
+                "score": [11, 7, 12]
+              } 
+            ]
+          }  
+        ]
+      }  
+    ],
     hiddenAside: false,
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
     doExportExcel: false,
@@ -997,10 +1109,94 @@ export default {
       }
       if (vm.reportType.startsWith('STATISTIC')) {
         vm.doPrintReportFix()
+      } else if (vm.reportType.startsWith('DANH_GIA_CAN_BO')) {
+        vm.doDynamicVoting()
       } else {
         vm.doDynamicReport()
       }
       vm.isCallData = true
+    },
+    doDynamicVoting () {
+      let vm = this
+      vm.agencyLists = []
+      vm.api = ''
+      vm.proxyApi = ''
+      
+      if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
+      } else {
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      }
+
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+        vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
+      let filter = {
+        document: vm.reportType,
+        data: vm.data,
+        api: vm.api,
+        proxyApi: vm.proxyApi
+      }
+      let check =  true
+      for (let key in vm.filterGroup) {
+        if (key === vm.groupIdListSelected) {
+          filter['govAgency'] = vm.filterGroup[key]
+          filter['agencyLists'] = vm.groupIdList.find(item => item.key === key).value
+          check = false
+          break
+        }
+      }
+      
+      if(check) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
+      }
+      let sumKey = vm.itemsReports[vm.index]['filterConfig']['sumKey']
+      let selection = vm.itemsReports[vm.index]['filterConfig']['selection']
+      let merge = vm.itemsReports[vm.index]['filterConfig']['merge']
+      let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
+      let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
+      console.log('FILTER', filter)
+      // tạo header
+      let answers = []
+      let arr = vm.dataTableVottingList[0]['employees'][0]['voting']
+      for (let i = 0; i < arr.length; i++) {
+        for (let j = 0; j < arr[i]['answers'].length; j++) {
+          answers.push(arr[i]['answers'][j])
+        }
+      }
+      vm.listAnswers = answers
+      vm.columnLength = vm.listAnswers.length + 3
+      // Tạo body
+      let dataRawVoting = []
+      let lengData = vm.dataTableVottingList.length
+      let dataEmp = vm.dataTableVottingList
+      for (let i = 0; i < lengData; i++) {
+        dataRawVoting.push({
+          group: i + 1,
+          name: dataEmp[i]['name'],
+          data: []
+        })
+        let lengthEmployee = dataEmp[i]['employees'].length
+        for (let j = 0; j < lengthEmployee; j++) {
+          let lengthVoting = dataEmp[i]['employees'][j]['voting'].length
+          let dataScore = []
+          for (let k = 0; k < lengthVoting; k++) {
+            dataScore = dataScore.concat(dataEmp[i]['employees'][j]['voting'][k]['score'])
+          }
+          dataRawVoting.push(
+            {
+              child: (i + 1) + '.' + (j + 1),
+              name: dataEmp[i]['employees'][j]['name'],
+              total: dataEmp[i]['employees'][j]['totalVote'],
+              data: dataScore
+            }
+          )
+        }
+      }
+      vm.dataTableRender = dataRawVoting
+      console.log('dataRawVoting', vm.dataTableRender)
     },
     doDynamicReport () {
       let vm = this

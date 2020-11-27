@@ -2331,19 +2331,25 @@ export default {
     },
     getHashStringFile (itemFile) {
       let vm = this
-      vm.$store.dispatch('getHashStringFile', itemFile).then(res => {
-        console.log('hashString', res)
-        if (res) {
-          // HashOpt: loai ma hash (0: SHA-1; 1:MD5; 2:SHA256)
-          let fileSignReturn = signHash(res, 0) /** chuỗi hash đã có chữ ký */
-
-        } else {
-          toastr.error('Tải tài liệu ký số lên không thành công')
-        }
+      if (VtPluginSocket) {
+        VtPluginSocket.initPlugin()
+      }
+      
+      let fileSignReturn = VtPluginSocket.signHash('477523be98c8f474f87e879af8c2e07482d7e207', 0)
+      console.log('fileSignReturn', fileSignReturn)
+      
+      // vm.$store.dispatch('getHashStringFile', itemFile).then(res => {
+      //   console.log('hashString', res)
+      //   if (res) {
+      //     // HashOpt: loai ma hash (0: SHA-1; 1:MD5; 2:SHA256)
+      //     let fileSignReturn = signHash(res, 0) /** chuỗi hash đã có chữ ký */
+      //   } else {
+      //     toastr.error('Tải tài liệu ký số lên không thành công')
+      //   }
         
-      }).catch(reject => {
-        toastr.error('Tải tài liệu ký số lên không thành công')
-      })
+      // }).catch(reject => {
+      //   toastr.error('Tải tài liệu ký số lên không thành công')
+      // })
     }
   }
 }
