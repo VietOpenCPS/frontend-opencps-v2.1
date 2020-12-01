@@ -543,7 +543,7 @@
 
             let token = localStorage.getItem('jwt_token')
 
-            let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?referenceUid=' +  referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) + '&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+            let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '___' + deliverableType + '?referenceUid=' +  referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) + '&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
             console.log('urlEmbed', urlEmbed)
             setTimeout(function () {
               document.getElementById('formAlpaca' + item.partNo + vm.id + 'embed').src = ''
@@ -607,7 +607,8 @@
 
               let token = localStorage.getItem('jwt_token')
 
-              let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+              // let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+              let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '___' + deliverableType + '?referenceUid=' +  referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) + '&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
               console.log('urlEmbed', urlEmbed)
               setTimeout(function () {
                 document.getElementById('formAlpaca' + item.partNo + vm.id + 'embed').src = urlEmbed
@@ -729,8 +730,7 @@
       },
       saveAlpacaFormCallBack (data) {
         let vm = this
-        let dataOutPut = data.data ? data.data : ''
-        // console.log('data_output eform', dataOutPut)
+        let dataOutPut = data.data ? JSON.parse(data.data) : ''
         if (dataOutPut.hasOwnProperty('tp') && dataOutPut.tp) {
           let fileFind = vm.dossierFilesItems.find(itemFile => {
             return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm && itemFile.fileSize!==0
@@ -755,8 +755,8 @@
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
           } else {
+            console.log('item post 3123123', dataOutPut, vm.detailDossier)
             dataOutPut['dossierId'] = vm.detailDossier.dossierId
-            console.log('item post', dataOutPut)
             vm.$store.dispatch('postEformCallBack', dataOutPut).then(resPostEform => {
               let index = vm.createFiles.findIndex(item => item.partNo === dataOutPut.tp)
               setTimeout(function () {
@@ -778,6 +778,8 @@
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
           }
+        } else {
+          console.log('ăn cứt', dataOutPut.tp)
         }
       },
       pickFile (item) {
@@ -973,8 +975,8 @@
 
           let token = localStorage.getItem('jwt_token')
 
-          let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
-
+          // let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+          let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '___' + deliverableType + '?referenceUid=' +  referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) + '&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
           setTimeout(function () {
             document.getElementById('formAlpaca' + item.partNo + vm.id + 'embed').src = urlEmbed
           }, 500)

@@ -932,6 +932,50 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getReportVotingEmployee ({state}, dataReq) {
+      return new Promise((resolve, reject) => {
+        let data = JSON.stringify(dataReq.jobposList)
+        let config = {
+          method: 'post',
+          url: '/o/rest/v2/votings/employee/statistic',
+          headers: { 
+            'groupId': state.groupId,
+            'Content-Type': 'application/json'
+          },
+          data : data
+        };
+
+        axios(config)
+        .then(function (response) {
+          resolve(response.data)
+        })
+        .catch(function (error) {
+          reject(error)
+        })
+      })
+    },
+    exportVotingEmployee ({state}, dataReq) {
+      return new Promise((resolve, reject) => {
+        let data = JSON.stringify(dataReq.jobposList)
+        let config = {
+          method: 'post',
+          url: '/o/rest/v2/votings/employee/export',
+          headers: { 
+            'groupId': state.groupId,
+            'Content-Type': 'application/json'
+          },
+          data : data
+        };
+
+        axios(config)
+        .then(function (response) {
+          resolve(response.data)
+        })
+        .catch(function (error) {
+          reject(error)
+        })
+      })
+    },
   },
   mutations: {
     setInitData (state, payload) {

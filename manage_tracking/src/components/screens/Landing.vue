@@ -308,7 +308,7 @@
             background: #17c6b4;
             line-height: 42px;
             color: #fff;border-top-left-radius: 7px;border-top-right-radius: 7px;">
-            <div class="">CÁN BỘ ĐANG TRUY CẬP</div>
+            <div class="">CÁN BỘ ĐANG XỬ LÝ HỒ SƠ</div>
           </div>
           <v-card-text class="px-0 py-0">
             <v-data-table
@@ -343,7 +343,7 @@
                 </tr>
               </template>
             </v-data-table>
-            <div class="my-2">
+            <div class="my-2 px-2">
               <div class="text-xs-right layout wrap" style="position: relative;">
                 <div class="flex pagging-table"> 
                   <tiny-pagination :total="totalEmployeeSearch" :page="employeePage" :numberPerPage="numberPerPage" nameRecord="cán bộ" custom-class="custom-tiny-class" 

@@ -147,6 +147,7 @@
   // import { isMobile } from 'mobile-device-detect'
   export default {
     data: () => ({
+      showListLinhVuc: false,
       isCallBack: true,
       trangThaiHoSoList: [],
       loading: true,
@@ -199,6 +200,10 @@
       let isMobile = window.innerWidth < 1264
       vm.$store.commit('setIsMobile', isMobile)
       //
+      try {
+        vm.showListLinhVuc = chonDanhSachLinhVuc //config fragment DVC
+      } catch (error) {
+      }
       try {
         vm.verificationApplicantCreateDossier = hasVerificationCreateDossier
       } catch (error) {
@@ -419,8 +424,11 @@
         if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
           vm.dialogVerifycation = true
         } else {
-          vm.$router.push('/add-dvc/0')
-          // vm.$router.push('/linh-vuc-thu-tuc')
+          if (vm.showListLinhVuc) {
+            vm.$router.push('/linh-vuc-thu-tuc')
+          } else {
+            vm.$router.push('/add-dvc/0')
+          }
         }
       },
       onResize () {

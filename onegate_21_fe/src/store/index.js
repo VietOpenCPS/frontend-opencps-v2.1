@@ -710,7 +710,7 @@ export const store = new Vuex.Store({
                 } catch (e) {
                   let partTip = {
                     tip: string,
-                    maxSize: 30,
+                    maxSize: 100,
                     extensions: state.fileTypeAllowDefault
                   }
                   return partTip
@@ -754,7 +754,7 @@ export const store = new Vuex.Store({
               } catch (e) {
                 let partTip = {
                   tip: string,
-                  maxSize: 30,
+                  maxSize: 100,
                   extensions: state.fileTypeAllowDefault
                 }
                 return partTip
@@ -2921,11 +2921,11 @@ export const store = new Vuex.Store({
                 groupId: state.initData.groupId
               },
               params: {
-                // originDossierId: classPK
+                originDossierId: classPK
               }
             }
-            axios.get("/o/rest/v2/dossiers/inter/" + classPK, param).then(function (response) {
-            // axios.get("/o/rest/v2/dossiers", param).then(function (response) {
+            // axios.get("/o/rest/v2/dossiers/inter/" + classPK, param).then(function (response) {
+            axios.get("/o/rest/v2/dossiers", param).then(function (response) {
               let serializable = response.data
               if (serializable.data) {
                 resolve(serializable.data)

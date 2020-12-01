@@ -336,22 +336,22 @@
             <table class="my-2" hide-default-footer>
               <thead>
                 <tr>
-                  <th rowspan="2" class="text-center px-2">
+                  <th rowspan="2" class="text-center px-2 py-1">
                     <span>STT</span>
                   </th>
-                  <th rowspan="2" class="text-center px-2">
+                  <th rowspan="2" class="text-center px-2 py-1">
                     <span>Tên đơn vị</span>
                   </th>
                   <th width="80" rowspan="3" class="text-center px-2 py-1">
                     <span>Số lượt đánh giá</span>
                   </th>
-                  <th v-for="(item, index) in dataTableVottingList[0]['employees'][0]['voting']" v-bind:key="index" :colspan="dataTableVottingList[0]['employees'][0]['voting'][index]['answers'].length">
+                  <th class="py-1" v-for="(item, index) in dataTableVottingList[0]['employees'][0]['voting']" v-bind:key="index" :colspan="dataTableVottingList[0]['employees'][0]['voting'][index]['selected'].length">
                     <span>{{item.question}}</span>
                   </th>
                 </tr>
 
                 <tr>
-                  <th v-for="(item, index) in listAnswers" v-bind:key="index" width="" class="text-center px-2">
+                  <th v-for="(item, index) in listAnswers" v-bind:key="index" width="" class="text-center px-2 py-1">
                     <span>{{item}}</span>
                   </th>
                 </tr>
@@ -363,19 +363,19 @@
               </tbody>
               <tbody v-if="!loadingTable && dataTableVottingList.length > 0">
                 <tr v-for="(item,index) in dataTableRender" :key="index">
-                  <td align="center" :class="item.hasOwnProperty('group') ? 'px-2 text-bold' : 'px-2'">{{item.hasOwnProperty('group') ? item.group : item.child}}</td>
-                  <td align="left" :class="item.hasOwnProperty('group') ? 'px-2 text-bold' : 'px-2'" style="padding: 8px 10px;"
+                  <td align="center" :class="item.hasOwnProperty('group') ? 'px-2 text-bold py-1' : 'px-2 py-1'">{{item.hasOwnProperty('group') ? item.group : item.child}}</td>
+                  <td align="left" :class="item.hasOwnProperty('group') ? 'px-2 text-bold py-1' : 'px-2 py-1'" style="padding: 8px 10px;"
                     :colspan="item.hasOwnProperty('group') ? columnLength - 1 : ''"
                   >
                     {{item.name}}
                   </td>
-                  <td align="center" class="px-2" v-if="!item.hasOwnProperty('group')">{{item.total}}</td>
+                  <td align="center" class="px-2 py-1" v-if="!item.hasOwnProperty('group')">{{item.total}}</td>
                   <!-- <td align="center"  class="px-2" v-for="(item1,index1) in (columnLength - 3)" :key="index1"
                     v-if="item.hasOwnProperty('group')"
                   >
                     
                   </td> -->
-                  <td align="center"  class="px-2" v-for="(item1,index1) in item['data']" :key="index1"
+                  <td align="center"  class="px-2 py-1" v-for="(item1,index1) in item['data']" :key="index1"
                     v-if="!item.hasOwnProperty('group')"
                   >
                     {{item1}}
@@ -472,54 +472,7 @@ export default {
     columnLength: 0,
     listAnswers: [],
     dataTableRender: [],
-    dataTableVottingList: [
-      {
-        "jobpos": "SLDTBXH",
-        "name": "Sở LĐTBXH",
-        "employees":[
-          {
-            "userId": 100,
-            "name": "Đỗ Mỹ Linh",
-            "totalVote": 87,
-            "voting":[
-              {
-                "question": "Câu hỏi 1",
-                "answers": ["Rất hài lòng", "Hài lòng", "Không hài lòng"],
-                "score": [80, 5, 2]
-              },
-              {
-                "question": "Câu hỏi 2",
-                "answers": ["Rất hài lòng", "Hài lòng", "Không hài lòng"],
-                "score": [11, 7, 12]
-              } 
-            ]
-          }  
-        ]
-      },
-      {
-        "jobpos": "STC",
-        "name": "Sở Tài chính",
-        "employees":[
-          {
-            "userId": 100,
-            "name": "Trần Trọng Nghĩa",
-            "totalVote": 87,
-            "voting":[
-              {
-                "question": "Câu hỏi 1",
-                "answers": ["Rất hài lòng", "Hài lòng", "Không hài lòng"],
-                "score": [80, 5, 2]
-              },
-              {
-                "question": "Câu hỏi 2",
-                "answers": ["Rất hài lòng", "Hài lòng", "Không hài lòng"],
-                "score": [11, 7, 12]
-              } 
-            ]
-          }  
-        ]
-      }  
-    ],
+    dataTableVottingList: [],
     hiddenAside: false,
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
     doExportExcel: false,
@@ -1158,45 +1111,123 @@ export default {
       let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
       let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
       console.log('FILTER', filter)
-      // tạo header
-      let answers = []
-      let arr = vm.dataTableVottingList[0]['employees'][0]['voting']
-      for (let i = 0; i < arr.length; i++) {
-        for (let j = 0; j < arr[i]['answers'].length; j++) {
-          answers.push(arr[i]['answers'][j])
+      let jobposListEmp = []
+      if (vm.govAgency) {
+        let selected = vm.agencyLists.filter(function (item) {
+          return item.value === vm.govAgency
+        })[0]
+        jobposListEmp = [{jobposCode: selected.value, groupId: selected.code}]
+      } else {
+        let lengData = vm.agencyLists.length
+        for (let i = 1; i < lengData; i++) {
+          let item = {jobposCode: vm.agencyLists[i].value, groupId: vm.agencyLists[i].code}
+          jobposListEmp.push(item)
         }
       }
-      vm.listAnswers = answers
-      vm.columnLength = vm.listAnswers.length + 3
-      // Tạo body
-      let dataRawVoting = []
-      let lengData = vm.dataTableVottingList.length
-      let dataEmp = vm.dataTableVottingList
-      for (let i = 0; i < lengData; i++) {
-        dataRawVoting.push({
-          group: i + 1,
-          name: dataEmp[i]['name'],
-          data: []
-        })
-        let lengthEmployee = dataEmp[i]['employees'].length
-        for (let j = 0; j < lengthEmployee; j++) {
-          let lengthVoting = dataEmp[i]['employees'][j]['voting'].length
-          let dataScore = []
-          for (let k = 0; k < lengthVoting; k++) {
-            dataScore = dataScore.concat(dataEmp[i]['employees'][j]['voting'][k]['score'])
-          }
-          dataRawVoting.push(
-            {
-              child: (i + 1) + '.' + (j + 1),
-              name: dataEmp[i]['employees'][j]['name'],
-              total: dataEmp[i]['employees'][j]['totalVote'],
-              data: dataScore
+      let filterGetEmployee = {
+        jobposList: jobposListEmp
+      }
+      //
+      if (vm.doExportExcel) {
+        vm.$store.dispatch('exportVotingEmployee', filterGetEmployee).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.dataTableVottingList = result.data
+            // tạo header
+            let answers = []
+            let arr = vm.dataTableVottingList[0]['employees'][0]['voting']
+            for (let i = 0; i < arr.length; i++) {
+              for (let j = 0; j < arr[i]['choices'].length; j++) {
+                answers.push(arr[i]['choices'][j])
+              }
             }
-          )
-        }
+            vm.listAnswers = answers
+            vm.columnLength = vm.listAnswers.length + 3
+            // Tạo body
+            let dataRawVoting = []
+            let lengData = vm.dataTableVottingList.length
+            let dataEmp = vm.dataTableVottingList
+            for (let i = 0; i < lengData; i++) {
+              dataRawVoting.push({
+                group: i + 1,
+                name: dataEmp[i]['jobposName'],
+                data: []
+              })
+              let lengthEmployee = dataEmp[i]['employees'].length
+              for (let j = 0; j < lengthEmployee; j++) {
+                let lengthVoting = dataEmp[i]['employees'][j]['voting'].length
+                let dataScore = []
+                for (let k = 0; k < lengthVoting; k++) {
+                  dataScore = dataScore.concat(dataEmp[i]['employees'][j]['voting'][k]['selected'])
+                }
+                dataRawVoting.push(
+                  {
+                    child: (i + 1) + '.' + (j + 1),
+                    name: dataEmp[i]['employees'][j]['name'],
+                    total: dataEmp[i]['employees'][j]['totalVote'],
+                    data: dataScore
+                  }
+                )
+              }
+            }
+            vm.dataTableRender = dataRawVoting
+            console.log('dataRawVoting', vm.dataTableRender)
+          } else {
+            vm.dataTableVottingList = []
+          }
+        }).catch(function () {
+          vm.dataTableVottingList = []
+        })
+      } else {
+        vm.$store.dispatch('getReportVotingEmployee', filterGetEmployee).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.dataTableVottingList = result.data
+            // tạo header
+            let answers = []
+            let arr = vm.dataTableVottingList[0]['employees'][0]['voting']
+            for (let i = 0; i < arr.length; i++) {
+              for (let j = 0; j < arr[i]['choices'].length; j++) {
+                answers.push(arr[i]['choices'][j])
+              }
+            }
+            vm.listAnswers = answers
+            vm.columnLength = vm.listAnswers.length + 3
+            // Tạo body
+            let dataRawVoting = []
+            let lengData = vm.dataTableVottingList.length
+            let dataEmp = vm.dataTableVottingList
+            for (let i = 0; i < lengData; i++) {
+              dataRawVoting.push({
+                group: i + 1,
+                name: dataEmp[i]['jobposName'],
+                data: []
+              })
+              let lengthEmployee = dataEmp[i]['employees'].length
+              for (let j = 0; j < lengthEmployee; j++) {
+                let lengthVoting = dataEmp[i]['employees'][j]['voting'].length
+                let dataScore = []
+                for (let k = 0; k < lengthVoting; k++) {
+                  dataScore = dataScore.concat(dataEmp[i]['employees'][j]['voting'][k]['selected'])
+                }
+                dataRawVoting.push(
+                  {
+                    child: (i + 1) + '.' + (j + 1),
+                    name: dataEmp[i]['employees'][j]['name'],
+                    total: dataEmp[i]['employees'][j]['totalVote'],
+                    data: dataScore
+                  }
+                )
+              }
+            }
+            vm.dataTableRender = dataRawVoting
+            console.log('dataRawVoting', vm.dataTableRender)
+          } else {
+            vm.dataTableVottingList = []
+          }
+        }).catch(function () {
+          vm.dataTableVottingList = []
+        })
       }
-      vm.dataTableRender = dataRawVoting
-      console.log('dataRawVoting', vm.dataTableRender)
+      
     },
     doDynamicReport () {
       let vm = this
