@@ -87,7 +87,7 @@
                     <div class="mb-2">Email: {{employeeSelected.email}}</div>
                     <!--  -->
                     <div :style="isMobile ? '' : 'position:absolute;top:0;right:0'">
-                      <star-rating read-only :rating="employeeSelected['score']" :increment="0.1" :max-rating="5" :show-rating="false" :star-size="30" :title="employeeSelected['score'] + '/5*'"></star-rating>
+                      <!-- <star-rating read-only :rating="employeeSelected['score']" :increment="0.1" :max-rating="5" :show-rating="false" :star-size="30" :title="employeeSelected['score'] + '/5*'"></star-rating> -->
                       <div class="text-bold primary--text pl-2">{{employeeSelected['totalVoting']}} lượt đánh giá</div>
                     </div>
                     <!--  -->
@@ -274,7 +274,8 @@ export default {
     captchaValue: '',
     captchaCode: '',
     arrAction: [],
-    isDVC: false
+    isDVC: false,
+    currentSite: false
   }),
   computed: {
     loading () {
@@ -299,6 +300,10 @@ export default {
       if (isDVC) {
         vm.isDVC = isDVC
       }
+    } catch (error) {
+    }
+    try {
+      vm.currentSite = currentSite
     } catch (error) {
     }
     let currentQuery = vm.$router.history.current.query
@@ -371,20 +376,34 @@ export default {
         }).then(result => {
           vm.votingItems = result.data
           vm.getScoreVoting(vm.votingItems)
-          vm.employeeSelected['totalVoting'] = Number(result.votingCount)
+          vm.employeeSelected['totalVoting'] = result.hasOwnProperty('votingCount') ? Number(result.votingCount) : 0
         }).catch(xhr => {
         })
       } else {
-        vm.$store.dispatch('loadVotingMotcua', {
-          className: 'employee',
-          classPk: vm.id,
-          itemCode: maDonVi
-        }).then(result => {
-          vm.votingItems = result.data
-          vm.getScoreVoting(vm.votingItems)
-          vm.employeeSelected['totalVoting'] = Number(result.votingCount)
-        }).catch(xhr => {
-        })
+        if (vm.currentSite) {
+          vm.$store.dispatch('loadVoting', {
+            className: 'employee',
+            classPk: vm.id,
+            itemCode: maDonVi
+          }).then(result => {
+            vm.votingItems = result.data
+            vm.getScoreVoting(vm.votingItems)
+            vm.employeeSelected['totalVoting'] = result.hasOwnProperty('votingCount') ? Number(result.votingCount) : 0
+          }).catch(xhr => {
+          })
+        } else {
+          vm.$store.dispatch('loadVotingMotcua', {
+            className: 'employee',
+            classPk: vm.id,
+            itemCode: maDonVi
+          }).then(result => {
+            vm.votingItems = result.data
+            vm.getScoreVoting(vm.votingItems)
+            vm.employeeSelected['totalVoting'] = result.hasOwnProperty('votingCount') ? Number(result.votingCount) : 0
+          }).catch(xhr => {
+          })
+        }
+        
       }
       
     },
@@ -460,8 +479,13 @@ export default {
           if (vm.isDVC) {
             vm.arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
           } else {
-            vm.votingItems[key] = Object.assign(vm.votingItems[key], {itemCode: maDonVi})
-            vm.arrAction.push(vm.$store.dispatch('submitVotingProxy', vm.votingItems[key]))
+            if (vm.currentSite) {
+              vm.arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
+            } else {
+              vm.votingItems[key] = Object.assign(vm.votingItems[key], {itemCode: maDonVi})
+              vm.arrAction.push(vm.$store.dispatch('submitVotingProxy', vm.votingItems[key]))
+            }
+            
           }
         }
       }

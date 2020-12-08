@@ -6,6 +6,64 @@
           <span>QUẢN LÝ THÔNG TIN CÔNG DÂN, CƠ QUAN TỔ CHỨC, DOANH NGHIỆP</span>
         </div>
       </div>
+      <div id="content-pdf-sss">
+        <div class="toolbar">
+          <button class="cursor" type="button" title="Cursor" data-tooltype="cursor">➚</button>
+
+          <div class="spacer"></div>
+
+          <button class="rectangle" type="button" title="Rectangle" data-tooltype="area">&nbsp;</button>
+          <button class="highlight" type="button" title="Highlight" data-tooltype="highlight">&nbsp;</button>
+          <button class="strikeout" type="button" title="Strikeout" data-tooltype="strikeout">&nbsp;</button>
+
+          <div class="spacer"></div>
+
+          <button class="text" type="button" title="Text Tool" data-tooltype="text"></button>
+          <select class="text-size"></select>
+          <div class="text-color"></div>
+
+          <div class="spacer"></div>
+
+          <button class="pen" type="button" title="Pen Tool" data-tooltype="draw">✎</button>
+          <select class="pen-size"></select>
+          <div class="pen-color"></div>
+
+          <div class="spacer"></div>
+
+          <button class="comment" type="button" title="Comment" data-tooltype="point">🗨</button>
+
+          <div class="spacer"></div>
+
+          <select class="scale">
+            <option value=".5">50%</option>
+            <option value="1">100%</option>
+            <option value="1.33">133%</option>
+            <option value="1.5">150%</option>
+            <option value="2">200%</option>
+          </select>
+
+          <a href="javascript://" class="rotate-ccw" title="Rotate Counter Clockwise">⟲</a>
+          <a href="javascript://" class="rotate-cw" title="Rotate Clockwise">⟳</a>
+
+          <div class="spacer"></div>
+
+          <a href="javascript://" class="clear" title="Clear">×</a>
+        </div>
+        <div id="content-wrapper">
+          <div id="viewer" class="pdfViewer"></div>
+        </div>
+        <div id="comment-wrapper">
+          <h4>Comments</h4>
+          <div class="comment-list">
+            <div class="comment-list-container">
+              <div class="comment-list-item">No comments</div>
+            </div>
+            <form class="comment-list-form" style="display:none;">
+              <input type="text" placeholder="Add a Comment"/>
+            </form>
+          </div>
+        </div>
+      </div>
       <v-card-text class="px-0 pt-0">
         <v-layout wrap class="">
           <v-flex xs12 class="pr-2 mt-3">
@@ -13,7 +71,7 @@
             <v-radio-group class="pt-0 d-inline-block ml-3 mt-0" v-model="typeSearch" row @change="changeTypeSearch">
               <v-radio label="Công dân" :value="'citizen'"></v-radio>
               <v-radio label="Doanh nghiệp" :value="'business'"></v-radio>
-              <v-radio label="Cơ quan, tổ chức" :value="'organization'"></v-radio>
+              <!-- <v-radio label="Cơ quan, tổ chức" :value="'organization'"></v-radio> -->
               <v-radio label="Tất cả" :value="''" ></v-radio>
             </v-radio-group>
           </v-flex>
@@ -45,6 +103,11 @@
               ></v-text-field>
           </v-flex>
         </v-layout>
+        <div style="text-align: right">
+          <v-btn color="blue darken-3" dark @click="addApplicant">
+            <v-icon size="16">add</v-icon>&nbsp;Thêm mới
+          </v-btn>
+        </div>
         <v-data-table
           :headers="applicantListHeader"
           :items="applicantLists"
@@ -54,7 +117,7 @@
         >
           <template slot="items" slot-scope="props">
             <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
-              <td class="text-xs-center" style="width:50px;height:36px">
+              <td class="text-xs-center" style="width:50px;height:36px" @click="showEditApplicant(props.item)">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -62,7 +125,7 @@
                   <span>{{ applicantPage * numberPerPage - numberPerPage + props.index + 1 }}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px">
+              <td class="text-xs-left" style="height:36px" @click="showEditApplicant(props.item)">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -70,7 +133,7 @@
                   <span>{{props.item.applicantName}}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px">
+              <td class="text-xs-left" style="height:36px" @click="showEditApplicant(props.item)">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -78,7 +141,7 @@
                   <span>{{props.item.applicantIdType === 'citizen' ? 'Công dân' : (props.item.applicantIdType === 'business' ? 'Doanh nghiệp' : 'Cơ quan, tổ chức')}}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px">
+              <td class="text-xs-left" style="height:36px" @click="showEditApplicant(props.item)">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -86,7 +149,7 @@
                   <span>{{props.item.applicantIdNo}}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px;min-width:200px">
+              <td class="text-xs-left" style="height:36px;min-width:200px" @click="showEditApplicant(props.item)">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -104,13 +167,18 @@
                   </v-btn>
                   <span>Sửa thông tin</span>
                 </v-tooltip>
-                
-                <v-tooltip top v-if="!loadingTable" class="ml-2">
+                <v-tooltip top v-if="!loadingTable">
+                  <v-btn @click="deleteApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
+                    <v-icon>delete</v-icon>
+                  </v-btn>
+                  <span>Xóa</span>
+                </v-tooltip>
+                <!-- <v-tooltip top v-if="!loadingTable" class="ml-2">
                   <v-btn @click="documentManage(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon>fas fa fa-folder-open</v-icon>
                   </v-btn>
                   <span>Quản lý tài liệu</span>
-                </v-tooltip>
+                </v-tooltip> -->
               </td>
             </tr>
           </template>
@@ -134,7 +202,7 @@
     <v-dialog v-model="dialog_editApplicant" scrollable persistent max-width="900px">
       <v-card>
         <v-toolbar dark color="primary">
-          <v-toolbar-title>{{titleEdit}}</v-toolbar-title>
+          <v-toolbar-title>{{typeUpdateApplicant === 'update' ? titleEdit : 'Thêm mới công dân, tổ chức, doanh nghiệp'}}</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="dialog_editApplicant = false">
             <v-icon>close</v-icon>
@@ -143,7 +211,7 @@
         <v-card-text class="py-1">
           <v-form ref="form" v-model="valid" lazy-validation class="py-3 px-0 grid-list">
             <v-layout row wrap class="px-0 py-3">
-              <v-flex xs12 sm12>
+              <v-flex xs12 sm6>
                 <v-text-field v-model="applicantEdit['applicantName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required>
                   <template slot="label"> 
                     <span v-if="applicantEdit['applicantIdType'] === 'business'">Tên doanh nghiệp</span>
@@ -154,9 +222,16 @@
                 </v-text-field>
               </v-flex>
               <v-flex xs12 sm6>
+                <v-autocomplete 
+                  :items="applicantTypeLists" label="Loại thông tin người dùng" 
+                  v-model="applicantEdit['applicantIdType']" 
+                  item-text="text" item-value="value" 
+                  :hide-selected="true" box>
+                </v-autocomplete>
+              </v-flex>
+              <v-flex xs12 sm6>
                 <v-text-field v-model="applicantEdit['applicantIdNo']" box 
-                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required 
-                  disabled style="pointer-events: none"
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required
                 >
                   <template slot="label"> 
                     <span v-if="applicantEdit['applicantIdType'] === 'business'">Mã số thuế</span>
@@ -194,7 +269,7 @@
                 <v-text-field label="Số điện thoại" v-model="applicantEdit['contactTelNo']" box></v-text-field>
               </v-flex>
               <v-flex xs12 sm6>
-                <v-text-field label="Thư điện tử" v-model="applicantEdit['contactEmail']" box disabled></v-text-field>
+                <v-text-field label="Thư điện tử" v-model="applicantEdit['contactEmail']" box ></v-text-field>
               </v-flex>
               <v-flex xs12 sm12>
                 <v-text-field label="Địa chỉ" v-model="applicantEdit['address']" box clearable></v-text-field>
@@ -213,13 +288,19 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn class="mr-2" color="primary" @click.native="exitDialogEditApplicant">
+          <v-btn class="mr-2" color="primary" @click.native="exitDialogEditApplicant"
+            :loading="loading"
+            :disabled="loading"
+          >
             <v-icon>clear</v-icon> &nbsp;
             Thoát
           </v-btn>
-          <v-btn class="mr-3" color="primary" @click.native="updateApplicant">
+          <v-btn class="mr-3" color="primary" @click.native="updateApplicant"
+            :loading="loading"
+            :disabled="loading"
+          >
             <v-icon>save</v-icon> &nbsp;
-            Cập nhật
+            {{typeUpdateApplicant === 'update' ? 'Cập nhật' : 'Thêm mới'}}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -235,6 +316,28 @@ import toastr from 'toastr'
 import axios from 'axios'
 import support from '../../store/support.json'
 import TinyPagination from './Pagination.vue'
+import __pdfjs from 'pdfjs-dist/build/pdf';
+import PDFJSAnnotate from 'pdfjs-annotate';
+import MyStoreAdapter from './myStoreAdapter';
+
+const { UI } = PDFJSAnnotate;
+const VIEWER = document.getElementById('viewer');
+const RENDER_OPTIONS = {
+  documentId: 'MyPDF.pdf',
+  pdfDocument: null,
+  scale: 1,
+  rotate: 0
+};
+
+PDFJS.workerSrc = 'pdf.worker.js';
+PDFJSAnnotate.setStoreAdapter(MyStoreAdapter);
+
+PDFJS.getDocument(RENDER_OPTIONS.documentId).then((pdf) => {
+  RENDER_OPTIONS.pdfDocument = pdf;
+  VIEWER.appendChild(UI.createPage(1));
+  UI.renderPage(1, RENDER_OPTIONS);
+});
+
 Vue.use(toastr)
 export default {
   props: [],
@@ -242,6 +345,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    typeUpdateApplicant: 'update',
     keySearch: '',
     idNoSearch: '',
     typeSearch: '',
@@ -278,8 +382,12 @@ export default {
       }
     ],
     applicantLists: '',
+    applicantTypeLists: [
+      {text: 'Công dân', value: 'citizen'},
+      {text: 'Doanh nghiệp', value: 'business'}
+    ],
     loadingTable: false,
-    numberPerPage: 10,
+    numberPerPage: 30,
     applicantPage: 1,
     totalApplicantSearch: 0,
     menuBirthDate: false,
@@ -343,66 +451,24 @@ export default {
     },
   },
   methods: {
-    // getApplicantList () {
-    //   let vm = this
-    //   let url = '/o/rest/v2/applicants'
-    //   vm.loadingTable = true
-    //   return new Promise(resolve => {
-    //     vm.$store.dispatch('loadInitResource').then(result => {
-    //       let param = {
-    //         headers: {
-    //         },
-    //         params: {
-    //           start: vm.applicantPage * vm.numberPerPage - vm.numberPerPage,
-    //           end: vm.applicantPage * vm.numberPerPage,
-    //           type: vm.typeSearch,
-    //           applicantName: vm.keySearch,
-    //           idNo: vm.idNoSearch
-    //         }
-    //       }
-    //       axios.get(url, param).then(response => {
-    //         let items = []
-    //         if (response.data.hasOwnProperty('data')) {
-    //           items = response.data.data
-    //         } else {
-    //         }
-    //         let dataOut = {
-    //           data: items,
-    //           total: response.data['total']
-    //         }
-    //         vm.loadingTable = false
-    //         resolve(dataOut)
-    //       }).catch(function () {
-    //         vm.loadingTable = false
-    //       })
-    //     })
-    //   })
-    // },
-
     getApplicantList () {
       let vm = this
+      let url = '/o/rest/v2/applicants'
       vm.loadingTable = true
       return new Promise(resolve => {
         vm.$store.dispatch('loadInitResource').then(result => {
           let param = {
             headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            },
+            params: {
+              start: vm.applicantPage * vm.numberPerPage - vm.numberPerPage,
+              end: vm.applicantPage * vm.numberPerPage,
+              type: vm.typeSearch,
+              applicantName: vm.keySearch,
+              idNo: vm.idNoSearch
             }
           }
-          let filter = {
-            start: vm.applicantPage * vm.numberPerPage - vm.numberPerPage,
-            end: vm.applicantPage * vm.numberPerPage,
-            type: vm.typeSearch,
-            applicantName: vm.keySearch,
-            idNo: vm.idNoSearch
-          }
-
-          let dataPost = new URLSearchParams()
-          dataPost.append('method', 'GET')
-          dataPost.append('url', '/applicants')
-          dataPost.append('data', JSON.stringify(filter))
-
-          axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
+          axios.get(url, param).then(response => {
             let items = []
             if (response.data.hasOwnProperty('data')) {
               items = response.data.data
@@ -420,8 +486,82 @@ export default {
         })
       })
     },
+
+    // getApplicantList () {
+    //   let vm = this
+    //   vm.loadingTable = true
+    //   return new Promise(resolve => {
+    //     vm.$store.dispatch('loadInitResource').then(result => {
+    //       let param = {
+    //         headers: {
+    //           groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+    //         }
+    //       }
+    //       let filter = {
+    //         start: vm.applicantPage * vm.numberPerPage - vm.numberPerPage,
+    //         end: vm.applicantPage * vm.numberPerPage,
+    //         type: vm.typeSearch,
+    //         applicantName: vm.keySearch,
+    //         idNo: vm.idNoSearch
+    //       }
+
+    //       let dataPost = new URLSearchParams()
+    //       dataPost.append('method', 'GET')
+    //       dataPost.append('url', '/applicants')
+    //       dataPost.append('data', JSON.stringify(filter))
+
+    //       axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
+    //         let items = []
+    //         if (response.data.hasOwnProperty('data')) {
+    //           items = response.data.data
+    //         } else {
+    //         }
+    //         let dataOut = {
+    //           data: items,
+    //           total: response.data['total']
+    //         }
+    //         vm.loadingTable = false
+    //         resolve(dataOut)
+    //       }).catch(function () {
+    //         vm.loadingTable = false
+    //       })
+    //     })
+    //   })
+    // },
+    addApplicant () {
+      let vm = this
+      vm.typeUpdateApplicant = 'create'
+      vm.applicantEdit = {
+        address: "",
+        applicantIdNo: "",
+        applicantIdType: "citizen",
+        applicantName: "",
+        contactEmail: "",
+        contactTelNo: "",
+        cityCode: "",
+        cityName: "",
+        districtCode: "",
+        districtName: "",
+        wardCode: "",
+        wardName: ""
+      }
+      if (vm.cityItems.length === 0) {
+        let filterCity = {
+          collectionCode: 'ADMINISTRATIVE_REGION',
+          level: 0,
+          parent: 0,
+          commit: ''
+        }
+        vm.$store.dispatch('loadDictItems', filterCity).then(function (result) {
+          vm.cityItems = result.data
+        })
+      }
+      vm.dialog_editApplicant = true
+      vm.$refs.form.resetValidation()
+    },
     showEditApplicant (item) {
       let vm = this
+      vm.typeUpdateApplicant = 'update'
       vm.applicantEdit = item
       if (vm.cityItems.length === 0) {
         let filterCity = {
@@ -459,6 +599,25 @@ export default {
       }
       vm.dialog_editApplicant = true
       vm.$refs.form.resetValidation()
+    },
+    deleteApplicant (item) {
+      let vm = this
+      let x = confirm('Bạn có chắc chắn xóa công dân, doanh nghiệp này?')
+      if (x) {
+        vm.$store.dispatch('deleteUser', item).then(function () {
+          toastr.clear()
+          toastr.success('Yêu cầu thực hiện thành công')
+          vm.getApplicantList().then(function(result) {
+            vm.totalApplicantSearch = result['total']
+            vm.applicantLists = result['data']
+          }).catch(function () {
+          })
+        }).catch(function () {
+          toastr.clear()
+          toastr.error('Yêu cầu thực hiện thất bại')
+        })
+      }
+      
     },
     documentManage (item) {
       let vm = this
@@ -522,14 +681,34 @@ export default {
       if (vm.$refs.form.validate()) {
         vm.loading = true
         // console.log('user put data', vm.applicantEdit)
-        vm.$store.dispatch('putUser', vm.applicantEdit).then(function () {
-          toastr.clear()
-          toastr.success('Yêu cầu thực hiện thành công')
-          vm.dialog_editApplicant = false
-        }).catch(function () {
-          toastr.clear()
-          toastr.error('Yêu cầu thực hiện thất bại')
-        })
+        if (vm.typeUpdateApplicant === 'update') {
+          vm.$store.dispatch('putUser', vm.applicantEdit).then(function () {
+            vm.loading = false
+            toastr.clear()
+            toastr.success('Yêu cầu thực hiện thành công')
+            vm.dialog_editApplicant = false
+          }).catch(function () {
+            vm.loading = false
+            toastr.clear()
+            toastr.error('Yêu cầu thực hiện thất bại')
+          })
+        } else {
+          vm.$store.dispatch('addUser', vm.applicantEdit).then(function () {
+            vm.loading = false
+            toastr.clear()
+            toastr.success('Yêu cầu thực hiện thành công')
+            vm.dialog_editApplicant = false
+            vm.getApplicantList().then(function(result) {
+              vm.totalApplicantSearch = result['total']
+              vm.applicantLists = result['data']
+            }).catch(function () {
+            })
+          }).catch(function () {
+            vm.loading = false
+            toastr.clear()
+            toastr.error('Yêu cầu thực hiện thất bại')
+          })
+        }
       }
     },
     exitDialogEditApplicant () {

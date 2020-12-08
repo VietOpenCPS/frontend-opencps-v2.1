@@ -387,6 +387,7 @@ export default {
     loading: false,
     counterGetdata: 0,
     siteDvc: false,
+    currentSite: false,
     siteItems: [],
     site: '',
     host: '',
@@ -457,6 +458,11 @@ export default {
       try {
         vm.siteDvc = siteDvc /**config fragment*/
       } catch (error) {
+      }
+      try {
+        vm.currentSite = currentSite
+      } catch (error) {
+        
       }
       vm.getServerConfig()
     })
@@ -531,7 +537,7 @@ export default {
           Token: window.Liferay ? window.Liferay.authToken : ''
         }
       }
-      if (vm.siteDvc) {
+      if (vm.siteDvc || vm.currentSite) {
         let url = '/o/rest/v2/serverconfigs/SERVER_TRACKING_OPENCPS'
         axios.get(url, param).then(function (response) {
           let serializable = response.data

@@ -959,17 +959,30 @@ export const store = new Vuex.Store({
         let data = JSON.stringify(dataReq.jobposList)
         let config = {
           method: 'post',
-          url: '/o/rest/v2/votings/employee/export',
+          url: '/o/rest/v2/votings/employee/statistic/export',
           headers: { 
             'groupId': state.groupId,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/octet-stream'
           },
-          data : data
+          data : data,
+          responseType: 'blob'
         };
 
         axios(config)
         .then(function (response) {
-          resolve(response.data)
+          var fileNames = response.headers['content-disposition']
+          var fileName = fileNames.split('filename=')[1]
+          fileName = fileName.split('"').join('')
+          var a = document.createElement('a')
+          document.body.appendChild(a)
+          a.style = 'display: none'
+          var urlFile = window.URL.createObjectURL(response.data)
+          a.href = urlFile
+          a.download = fileName
+          a.click()
+          
+          window.URL.revokeObjectURL(urlFile)
+          resolve('success')
         })
         .catch(function (error) {
           reject(error)

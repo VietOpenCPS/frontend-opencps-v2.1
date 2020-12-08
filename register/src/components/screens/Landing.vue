@@ -252,6 +252,27 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog scrollable v-model="dialogApplicantType" persistent max-width="450">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Đối tượng đăng ký</v-toolbar-title>
+        </v-toolbar>
+        <v-card-text >
+          <v-flex class="text-xs-center">
+            <v-btn class="mr-2" color="primary" @click.native="chosseType('1')"
+            >
+              <v-icon>how_to_reg</v-icon>&nbsp;
+              Công dân
+            </v-btn>
+            <v-btn class="ml-3" color="primary" @click.native="chosseType('2')"
+            >
+              <v-icon style="color: #fff">account_balance</v-icon>&nbsp;
+              Doanh nghiệp
+            </v-btn>
+          </v-flex>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -274,6 +295,7 @@ export default {
     'captcha': Captcha
   },
   data: () => ({
+    dialogApplicantType: false,
     date: null,
     dialogPending: false,
     dialogRules: false,
@@ -398,6 +420,9 @@ export default {
       vm.getDieuKhoan()
       // mappping user dvcqg
       console.log('currentQuery', currentQuery)
+      if (currentQuery.hasOwnProperty('applycantType') && currentQuery['applycantType']) {
+        vm.dialogApplicantType = true
+      }
       if (currentQuery.hasOwnProperty('name') && currentQuery['name']) {
         console.log('currentQuery 2', currentQuery['type'], currentQuery['name'], currentQuery['tel'])
         vm.applicantType = currentQuery.hasOwnProperty('type') ? (String(currentQuery['type']) === '1' ? '1' : '2') : '1'
@@ -447,6 +472,11 @@ export default {
     }
   },
   methods: {
+    chosseType(type) {
+      let vm = this
+      vm.applicantType = type
+      vm.dialogApplicantType = false
+    },
     submitAddUser () {
       let vm = this
       let currentQuery = vm.$router.history.current.query

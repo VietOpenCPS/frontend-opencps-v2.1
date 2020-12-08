@@ -72,7 +72,7 @@
                           :placeholder="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : (originality === 1 ? 'Nhập nội dung yêu cầu giải quyết' : 'Nhập tên hồ sơ')"
                         ></v-textarea>
                       </v-form>
-                      <div v-if="templateDescription">(*) &nbsp; {{templateDescription}}</div>
+                      <div v-if="templateDescription || fixDescription"><span style="color: red">(*)</span> &nbsp; {{templateDescription ? templateDescription : fixDescription}}</div>
                     </v-card-text>
                   </v-card>
                 </div>
@@ -117,7 +117,7 @@
             </v-expansion-panel>
           </div>
           <!--  -->
-          <div style="position: relative;border-top:1px solid #ddd" v-if="originality !== 1 && notifyConfig">
+          <div style="position: relative;border-top:1px solid #ddd" v-if="notifyConfig">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
                 <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Hình thức gửi thông báo giải quyết hồ sơ</div>
@@ -167,7 +167,6 @@
           </div>
           <!--  -->
           <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
-          <!-- <div style="position: relative;" v-if="originality === 1"> -->
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
                 <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát hồ sơ</div>
@@ -853,6 +852,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    fixDescription: 'Đối với thủ tục thông báo khuyến mãi, đề nghị nhập vào ô này tên doanh nghiệp, tên chương trình khuyến mãi, thời gian thực hiện, tổng giá trị hoàng hoá dịch vụ',
     valid_tenHoSo: false,
     // add new template
     isNotarization: false,
@@ -889,7 +889,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: false,
+    notifyConfig: true,
     fromViaPostal: false,
     fromViaPostalConfig: false,
     smsNotify: true,

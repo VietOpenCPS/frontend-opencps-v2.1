@@ -385,11 +385,6 @@
               </tbody>
             </table>
           </v-flex>
-          <div class="mx-3 my-4" v-if="showErrorData">
-            <v-alert :value="true" outline color="info" icon="info">
-              Không có dữ liệu báo cáo.
-            </v-alert>
-          </div>
         </v-layout>
         <!--  -->
         <div class="mx-3 my-4" v-if="showErrorData">
@@ -1071,6 +1066,8 @@ export default {
     },
     doDynamicVoting () {
       let vm = this
+      vm.showErrorData = false
+      vm.isShowLoading = true
       vm.agencyLists = []
       vm.api = ''
       vm.proxyApi = ''
@@ -1129,57 +1126,15 @@ export default {
       }
       //
       if (vm.doExportExcel) {
-        vm.$store.dispatch('exportVotingEmployee', filterGetEmployee).then(function (result) {
-          if (result.hasOwnProperty('data')) {
-            vm.dataTableVottingList = result.data
-            // tạo header
-            let answers = []
-            let arr = vm.dataTableVottingList[0]['employees'][0]['voting']
-            for (let i = 0; i < arr.length; i++) {
-              for (let j = 0; j < arr[i]['choices'].length; j++) {
-                answers.push(arr[i]['choices'][j])
-              }
-            }
-            vm.listAnswers = answers
-            vm.columnLength = vm.listAnswers.length + 3
-            // Tạo body
-            let dataRawVoting = []
-            let lengData = vm.dataTableVottingList.length
-            let dataEmp = vm.dataTableVottingList
-            for (let i = 0; i < lengData; i++) {
-              dataRawVoting.push({
-                group: i + 1,
-                name: dataEmp[i]['jobposName'],
-                data: []
-              })
-              let lengthEmployee = dataEmp[i]['employees'].length
-              for (let j = 0; j < lengthEmployee; j++) {
-                let lengthVoting = dataEmp[i]['employees'][j]['voting'].length
-                let dataScore = []
-                for (let k = 0; k < lengthVoting; k++) {
-                  dataScore = dataScore.concat(dataEmp[i]['employees'][j]['voting'][k]['selected'])
-                }
-                dataRawVoting.push(
-                  {
-                    child: (i + 1) + '.' + (j + 1),
-                    name: dataEmp[i]['employees'][j]['name'],
-                    total: dataEmp[i]['employees'][j]['totalVote'],
-                    data: dataScore
-                  }
-                )
-              }
-            }
-            vm.dataTableRender = dataRawVoting
-            console.log('dataRawVoting', vm.dataTableRender)
-          } else {
-            vm.dataTableVottingList = []
-          }
+        vm.$store.dispatch('exportVotingEmployee', filterGetEmployee).then(function (response) {
+          vm.isShowLoading = false
         }).catch(function () {
-          vm.dataTableVottingList = []
+          vm.isShowLoading = false
         })
       } else {
         vm.$store.dispatch('getReportVotingEmployee', filterGetEmployee).then(function (result) {
-          if (result.hasOwnProperty('data')) {
+          vm.isShowLoading = false
+          if (result.hasOwnProperty('data') && result.data) {
             vm.dataTableVottingList = result.data
             // tạo header
             let answers = []
@@ -1222,9 +1177,12 @@ export default {
             console.log('dataRawVoting', vm.dataTableRender)
           } else {
             vm.dataTableVottingList = []
+            vm.showErrorData = true
           }
         }).catch(function () {
+          vm.isShowLoading = false
           vm.dataTableVottingList = []
+          vm.showErrorData = true
         })
       }
       
