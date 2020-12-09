@@ -35,7 +35,7 @@ export default {
   data: () => ({
     govAgencys: [],
     btnLoading: false,
-    donViDanhGia: [],
+    donViDanhGia: '',
     isDVC: false
   }),
   computed: {

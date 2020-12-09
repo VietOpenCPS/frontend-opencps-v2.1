@@ -4985,6 +4985,23 @@ export const store = new Vuex.Store({
         })
       })
     },
+    saveEditor({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'application/json'
+          }
+        }
+        let dataPost = filter.annotation
+        let url = '/o/rest/v2/dossiers/' + filter.dossierFileId + '/tracePdf'
+        axios.post(url, dataPost, options).then(function (response) {
+          resolve(response.data)
+        }).catch(function () {
+          reject()
+        })
+      })
+    }
     // ----End---------
   },
   mutations: {

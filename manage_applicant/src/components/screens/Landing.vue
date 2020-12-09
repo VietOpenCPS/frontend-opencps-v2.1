@@ -6,64 +6,7 @@
           <span>QUẢN LÝ THÔNG TIN CÔNG DÂN, CƠ QUAN TỔ CHỨC, DOANH NGHIỆP</span>
         </div>
       </div>
-      <div id="content-pdf-sss">
-        <div class="toolbar">
-          <button class="cursor" type="button" title="Cursor" data-tooltype="cursor">➚</button>
-
-          <div class="spacer"></div>
-
-          <button class="rectangle" type="button" title="Rectangle" data-tooltype="area">&nbsp;</button>
-          <button class="highlight" type="button" title="Highlight" data-tooltype="highlight">&nbsp;</button>
-          <button class="strikeout" type="button" title="Strikeout" data-tooltype="strikeout">&nbsp;</button>
-
-          <div class="spacer"></div>
-
-          <button class="text" type="button" title="Text Tool" data-tooltype="text"></button>
-          <select class="text-size"></select>
-          <div class="text-color"></div>
-
-          <div class="spacer"></div>
-
-          <button class="pen" type="button" title="Pen Tool" data-tooltype="draw">✎</button>
-          <select class="pen-size"></select>
-          <div class="pen-color"></div>
-
-          <div class="spacer"></div>
-
-          <button class="comment" type="button" title="Comment" data-tooltype="point">🗨</button>
-
-          <div class="spacer"></div>
-
-          <select class="scale">
-            <option value=".5">50%</option>
-            <option value="1">100%</option>
-            <option value="1.33">133%</option>
-            <option value="1.5">150%</option>
-            <option value="2">200%</option>
-          </select>
-
-          <a href="javascript://" class="rotate-ccw" title="Rotate Counter Clockwise">⟲</a>
-          <a href="javascript://" class="rotate-cw" title="Rotate Clockwise">⟳</a>
-
-          <div class="spacer"></div>
-
-          <a href="javascript://" class="clear" title="Clear">×</a>
-        </div>
-        <div id="content-wrapper">
-          <div id="viewer" class="pdfViewer"></div>
-        </div>
-        <div id="comment-wrapper">
-          <h4>Comments</h4>
-          <div class="comment-list">
-            <div class="comment-list-container">
-              <div class="comment-list-item">No comments</div>
-            </div>
-            <form class="comment-list-form" style="display:none;">
-              <input type="text" placeholder="Add a Comment"/>
-            </form>
-          </div>
-        </div>
-      </div>
+      
       <v-card-text class="px-0 pt-0">
         <v-layout wrap class="">
           <v-flex xs12 class="pr-2 mt-3">
@@ -316,28 +259,6 @@ import toastr from 'toastr'
 import axios from 'axios'
 import support from '../../store/support.json'
 import TinyPagination from './Pagination.vue'
-import __pdfjs from 'pdfjs-dist/build/pdf';
-import PDFJSAnnotate from 'pdfjs-annotate';
-import MyStoreAdapter from './myStoreAdapter';
-
-const { UI } = PDFJSAnnotate;
-const VIEWER = document.getElementById('viewer');
-const RENDER_OPTIONS = {
-  documentId: 'MyPDF.pdf',
-  pdfDocument: null,
-  scale: 1,
-  rotate: 0
-};
-
-PDFJS.workerSrc = 'pdf.worker.js';
-PDFJSAnnotate.setStoreAdapter(MyStoreAdapter);
-
-PDFJS.getDocument(RENDER_OPTIONS.documentId).then((pdf) => {
-  RENDER_OPTIONS.pdfDocument = pdf;
-  VIEWER.appendChild(UI.createPage(1));
-  UI.renderPage(1, RENDER_OPTIONS);
-});
-
 Vue.use(toastr)
 export default {
   props: [],
