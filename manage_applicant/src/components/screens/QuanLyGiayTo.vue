@@ -334,6 +334,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    isDvc: false,
     applicantInfos: '',
     nameTitle: '',
     creditTitle: '',
@@ -414,6 +415,10 @@ export default {
   created () {
     let vm = this
     vm.$nextTick(function () {
+      try {
+        vm.isDvc = isDvc
+      } catch (error) {
+      }
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
       let applicant = vm.$store.getters.getApplicantInfos
@@ -478,19 +483,36 @@ export default {
         applicantDataType: ''
       }
       vm.loadingTable = true
-      vm.$store.dispatch('getApplicantDocument', filter).then(function (result) {
-        if (result.hasOwnProperty('data')) {
-          vm.documentApplicantList = result.data
-        } else {
+      if (vm.isDvc) {
+        vm.$store.dispatch('getApplicantDocumentFromDvc', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.documentApplicantList = result.data
+          } else {
+            vm.documentApplicantList = []
+          }
+          vm.totalDocument = result['total']
+          vm.loadingTable = false
+        }).catch(function () {
+          vm.loadingTable = false
           vm.documentApplicantList = []
-        }
-        vm.totalDocument = result['total']
-        vm.loadingTable = false
-      }).catch(function () {
-        vm.loadingTable = false
-        vm.documentApplicantList = []
-        vm.totalDocument = 0
-      })
+          vm.totalDocument = 0
+        })
+      } else {
+        vm.$store.dispatch('getApplicantDocument', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.documentApplicantList = result.data
+          } else {
+            vm.documentApplicantList = []
+          }
+          vm.totalDocument = result['total']
+          vm.loadingTable = false
+        }).catch(function () {
+          vm.loadingTable = false
+          vm.documentApplicantList = []
+          vm.totalDocument = 0
+        })
+      }
+      
     },
     uploadFile () {
       let vm = this
@@ -522,14 +544,26 @@ export default {
       let filter = {
         status: 1
       }
-      vm.$store.dispatch('getFileItems', filter).then(function (result) {
-        if (result.hasOwnProperty('data')) {
-          vm.fileTemplateList = result.data
-        } else {
-          vm.fileTemplateList = []
-        }
-      }).catch(function () {
-      })
+      if (vm.isDvc) {
+        vm.$store.dispatch('getFileItemsFromDvc', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.fileTemplateList = result.data
+          } else {
+            vm.fileTemplateList = []
+          }
+        }).catch(function () {
+        })
+      } else {
+        vm.$store.dispatch('getFileItems', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.fileTemplateList = result.data
+          } else {
+            vm.fileTemplateList = []
+          }
+        }).catch(function () {
+        })
+      }
+      
     },
     showCreatedocument () {
       let vm = this
@@ -567,21 +601,39 @@ export default {
               'Content-Type': 'application/x-www-form-urlencoded'
             }
           }
-          let dataPost = new FormData()
-          dataPost.append('method', 'POST')
-          dataPost.append('url', '/applicantdatas')
-          dataPost.append('data', JSON.stringify(filter))
-          dataPost.append('file', vm.fileUpdate)
+          if (vm.isDvc) {
+            let dataPost = new FormData()
+            dataPost.append('method', 'POST')
+            dataPost.append('url', '/applicantdatas')
+            dataPost.append('data', JSON.stringify(filter))
+            dataPost.append('file', vm.fileUpdate)
+            
+            axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
+              vm.loadingAction = false
+              toastr.success('Thêm mới tài liệu thành công')
+              vm.dialog_createDocument = false
+              vm.getApplicantDocument()
+            }).catch(xhr => {
+              vm.loadingAction = false
+              toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
+            })
+          } else {
+            let dataCreateFile = new URLSearchParams()
+            let url = '/o/rest/v2/applicantdatas'
+            dataCreateFile.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
+            dataCreateFile.append('status', vm.statusCreate)
+            dataCreateFile.append('fileNo', vm.fileNo)
+            dataCreateFile.append('fileName', vm.fileName)
+            dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
+            dataCreateFile.append('file', vm.fileUpdate)
+            
+            axios.post(url, dataCreateFile, param).then(result1 => {
+              resolve(result1)
+            }).catch(xhr => {
+              reject(xhr)
+            })
+          }
           
-          axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
-            vm.loadingAction = false
-            toastr.success('Thêm mới tài liệu thành công')
-            vm.dialog_createDocument = false
-            vm.getApplicantDocument()
-          }).catch(xhr => {
-            vm.loadingAction = false
-            toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
-          })
         } else {
           toastr.clear()
           toastr.error('Vui lòng đính kèm tài liệu')

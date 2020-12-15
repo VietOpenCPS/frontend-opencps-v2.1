@@ -72,7 +72,12 @@
                           :placeholder="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : (originality === 1 ? 'Nhập nội dung yêu cầu giải quyết' : 'Nhập tên hồ sơ')"
                         ></v-textarea>
                       </v-form>
-                      <div v-if="templateDescription || fixDescription"><span style="color: red">(*)</span> &nbsp; {{templateDescription ? templateDescription : fixDescription}}</div>
+                      
+                      <div v-if="fixDescriptionDt && templateDescription"><span style="color: red">(*)</span> &nbsp; {{templateDescription}}</div>
+                      <div v-else><span style="color: red">(*)</span> &nbsp; 
+                        Đối với thủ tục thông báo khuyến mãi, đề nghị nhập vào ô này tên doanh nghiệp, tên chương trình khuyến mãi, thời gian thực hiện, tổng giá trị hàng hoá dịch vụ 
+                        <span style="color: red">dùng để khuyến mãi</span>
+                      </div>
                     </v-card-text>
                   </v-card>
                 </div>
@@ -852,7 +857,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
-    fixDescription: 'Đối với thủ tục thông báo khuyến mãi, đề nghị nhập vào ô này tên doanh nghiệp, tên chương trình khuyến mãi, thời gian thực hiện, tổng giá trị hoàng hoá dịch vụ',
+    fixDescriptionDt: false,
     valid_tenHoSo: false,
     // add new template
     isNotarization: false,
@@ -1094,6 +1099,10 @@ export default {
     var vm = this
     try {
       vm.showGuiHoSoConfig = showGuiHoSoConfig
+    } catch (error) {
+    }
+    try {
+      vm.fixDescriptionDt = fixDescriptionDt
     } catch (error) {
     }
     vm.$nextTick(function () {

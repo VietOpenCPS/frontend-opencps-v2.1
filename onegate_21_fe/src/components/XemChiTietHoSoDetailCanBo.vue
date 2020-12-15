@@ -322,6 +322,15 @@
             </v-tab-item>
             <v-tab-item value="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
               <div v-if="!isNotarization">
+                <v-btn color="primary" v-if="hasDownloadAllFile" @click.native="downloadAllFile()"
+                  :loading="loadingDownload"
+                  :disabled="loadingDownload"
+                  style="position: absolute;right: 50px;"
+                >
+                  <v-icon>save_alt</v-icon> &nbsp;
+                  Tải giấy tờ đính kèm
+                  <span slot="loader">Loading...</span>
+                </v-btn>
                 <v-expansion-panel :value="[true]" expand class="expansion-pl ext__form">
                   <v-expansion-panel-content :key="1">
                     <div slot="header" class="text-bold">
@@ -829,6 +838,8 @@ export default {
     thongTinChiTietHoSo: {},
     dialogPDF: false,
     dialogPDFLoading: false,
+    loadingDownload: false,
+    hasDownloadAllFile: true,
     loadingAlpacajsForm: false,
     nextActions: [],
     createFiles: [],
@@ -3342,6 +3353,18 @@ export default {
           })
         }
       }
+    },
+    downloadAllFile () {
+      let vm = this
+      vm.loadingDownload = true
+      let filter = {
+        dossierId: vm.thongTinChiTietHoSo.dossierId
+      }
+      vm.$store.dispatch('downLoadAllFile', filter).then(function (result) {
+        vm.loadingDownload = false
+      }).catch(function () {
+        vm.loadingDownload = false
+      })
     },
     changeStateViewResult (data) {
       // console.log('state view result', data)

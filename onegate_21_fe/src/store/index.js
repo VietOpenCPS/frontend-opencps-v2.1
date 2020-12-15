@@ -1617,7 +1617,6 @@ export const store = new Vuex.Store({
             url: '/o/rest/v2/dossiers',
             method: 'get',
             params: {
-              dossierNo: filter.dossierNo,
               order:true,
               start:0,
               end:15
@@ -1625,6 +1624,15 @@ export const store = new Vuex.Store({
             headers: {
               groupId: state.initData.groupId
             }
+          }
+          if (filter.hasOwnProperty('dossierNo')) {
+            config.params = Object.assign(config.params, {dossierNo: filter.dossierNo})
+          }
+          if (filter.hasOwnProperty('applicantIdNo')) {
+            config.params = Object.assign(config.params, {applicantIdNo: filter.applicantIdNo})
+          }
+          if (filter.hasOwnProperty('status')) {
+            config.params = Object.assign(config.params, {status: filter.status})
           }
           axios.request(config).then(function (response) {
             let serializable = response.data
@@ -4913,8 +4921,51 @@ export const store = new Vuex.Store({
             Token: window.Liferay ? window.Liferay.authToken : ''
           }
         }
-        let url = '/o/rest/v2/'
-        axios.get(url, param).then(function (response) {
+        let dataPost = new URLSearchParams()
+        dataPost.append('certChainBase64', filter.certChain)
+        let url = '/o/rest/v2/signature/' + filter.dossierId + '/hashFilePDF/' + filter.referenceUid
+        axios.post(url, dataPost, param).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
+    insertSignatureVtCa ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('fileName', filter.fileName)
+        dataPost.append('fileName', filter.fileEntryId)
+        dataPost.append('signatureBase64', filter.signatureBase64)
+        let url = '/o/rest/v2/signature/insertSignature'
+        axios.post(url, dataPost, param).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
+    updateSignatureVtCa ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('fileEntryIdStr', filter.fileEntryIdStr)
+        dataPost.append('dossierFileStr', filter.dossierFileStr)
+        let url = '/o/rest/v2/defaultsignature/vtca/updateFile'
+        axios.put(url, dataPost, param).then(function (response) {
           let serializable = response.data
           resolve(serializable)
         }).catch(function (error) {
@@ -4999,6 +5050,20 @@ export const store = new Vuex.Store({
           resolve(response.data)
         }).catch(function () {
           reject()
+        })
+      })
+    },
+    downLoadAllFile ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/dossiers/' + filter.dossierId + '/downloadAllFile', config).then(function (response) {
+          resolve(response)
+        }).catch(xhr => {
+          reject('')
         })
       })
     }

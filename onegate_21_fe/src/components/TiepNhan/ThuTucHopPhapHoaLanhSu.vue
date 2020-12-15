@@ -580,7 +580,7 @@
                                             <div v-if="!loadingImage" style="width: 100%; height: 190px;display:flex;">
                                                 <div v-for="(item, index) in listChuKy" :key="index">
                                                     <img :src="'data:image/png;base64,' +  item.strChuKy" alt="" style=" height: 140px;" @click="phongTo(item.strChuKy)">
-                                                    <!-- <img :src="item.strChuKy" alt="" style=" height: 140px;" @click="phongTo(item.strChuKy)"> -->
+                                                    
                                                     <v-checkbox
                                                         v-model="chonChuKy"
                                                         primary
@@ -2112,6 +2112,34 @@ export default {
             vm.kiem_tra =item.kiem_tra,
             vm.conDau = item.anh_con_dau
             vm.chuKy = item.anh_chu_ky
+            // 
+            if (vm.ma_chu_ky) {
+                let config = {
+                    url: '/o/rest/v2/serverconfigs/LAY_ANH_CHU_KY_CLS/protocols/API_CONNECT?ma_chu_ky=' + vm.ma_chu_ky,
+                    headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                }
+                vm.loadingImage = true
+                axios.request(config).then(res => {
+                    vm.chuKy = res.data
+                    vm.loadingImage = false
+                }).catch(function() {
+                    vm.loadingImage = false
+                })
+            }
+            if (vm.ma_con_dau) {
+                let config = {
+                    url: '/o/rest/v2/serverconfigs/LAY_ANH_CON_DAU_CLS/protocols/API_CONNECT?ma_con_dau=' + vm.ma_con_dau,
+                    headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                }
+                vm.loadingImage = true
+                axios.request(config).then(res => {
+                    vm.conDau = res.data
+                    vm.loadingImage = false
+                }).catch(function() {
+                    vm.loadingImage = false
+                })
+            }
+            // 
             if(item.ten_giay_to && item.ma_ten_giay_to){
                 vm.giay_to = {
                     TEN: item.ten_giay_to,
@@ -2137,8 +2165,6 @@ export default {
                 vm.loai_cong_viec = ''
             }
 
-            // vm.conDau = ''
-            // vm.chuKy = ''
             vm.dialogGiayTo = true
         },
         openDialogCopyGiayTo (index, item) {

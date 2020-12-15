@@ -827,7 +827,7 @@ export default {
     khoTaiLieuCongDan: false,
     allFileMark: false,
     render: true,
-    showKySo: false,
+    showKySo: true,
     dialogSignDigital: false,
     fileKySo: '',
     indexFileSelect: '',
@@ -2415,27 +2415,66 @@ export default {
         })
       }, 100)
     },
-    getHashStringFile (itemFile) {
+    getHashStringFile () {
       let vm = this
       if (VtPluginSocket) {
         VtPluginSocket.initPlugin()
       }
+      async function getCertRunSign() {
+        VtPluginSocket.getCert()
+      }
+      getCertRunSign().then(function () {
+        vm.fileKySo['certChain'] = certChainUserVtCa
+        vm.fileKySo['dossierId'] = vm.thongTinHoSo.dossierId
+        vm.$store.dispatch('getHashStringFile', vm.fileKySo).then(res => {
+          let base64HashFile, fileName, fileEntryId
+          try {
+            base64HashFile = res.base64Hash
+            fileName = res.fileName
+            fileEntryId = res.fileEntryId
+          } catch (error) {
+          }
+          console.log('base64HashFile', res)
+          if (base64HashFile) {
+            // HashOpt: loai ma hash (0: SHA-1; 1:MD5; 2:SHA256)
+            async function signHashVtCa() {
+              VtPluginSocket.signHash(base64HashFile, 0) /** chuỗi hash đã có chữ ký */
+            }
+            signHashVtCa().then(function () {
+              let fileSignReturn = signatureBase64VtCa
+              console.log('fileSignReturn', fileSignReturn)
+              let dataInsertSignature = {
+                fileName: fileName,
+                fileEntryId: fileEntryId,
+                signatureBase64: fileSignReturn
+              }
+              vm.$store.dispatch('insertSignatureVtCa', dataInsertSignature).then(res => {
+                console.log('resInsertSignatureVtCa', res)
+
+                let dataUpdateFile = {
+                  fileEntryIdStr: res['fileEntryIdStr'] ? res['fileEntryIdStr'] : '',
+                  dossierFileStr: res['signedFileName'] ? res['signedFileName'] : ''
+                }
+                vm.$store.dispatch('updateSignatureVtCa', dataUpdateFile).then(res => {
+                  toastr.success('Thực hiện ký số thành công')
+                  vm.dialogSignDigital = false
+                  vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+                    vm.dossierFilesItems = resFiles
+                  }).catch(reject => {
+                  })
+                })
+              })
+            })
+            
+          } else {
+            toastr.error('Tải tài liệu ký số lên không thành công')
+          }
+          
+        }).catch(reject => {
+          toastr.error('Tải tài liệu ký số lên không thành công')
+        })
+      })
       
-      let fileSignReturn = VtPluginSocket.signHash('477523be98c8f474f87e879af8c2e07482d7e207', 0)
-      console.log('fileSignReturn', fileSignReturn)
-      
-      // vm.$store.dispatch('getHashStringFile', itemFile).then(res => {
-      //   console.log('hashString', res)
-      //   if (res) {
-      //     // HashOpt: loai ma hash (0: SHA-1; 1:MD5; 2:SHA256)
-      //     let fileSignReturn = signHash(res, 0) /** chuỗi hash đã có chữ ký */
-      //   } else {
-      //     toastr.error('Tải tài liệu ký số lên không thành công')
-      //   }
-        
-      // }).catch(reject => {
-      //   toastr.error('Tải tài liệu ký số lên không thành công')
-      // })
     },
     showEditorPdf (file) {
       let vm = this

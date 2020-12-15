@@ -41,6 +41,7 @@
                         :onInputChange="onInputChange"
                         :class="loadingVerify ? 'input-group--disabled' : ''"
                         :style="loadingVerify ? 'color:#00000061' : ''"
+                        @change="changeSuggess"
                         >
                         <div slot="item" slot-scope="props" class="single-item">
                           <v-list-tile-content>
@@ -916,7 +917,7 @@ export default {
     wardItems: [],
     valid: false,
     loadingTable: false,
-    hasOrganization: true
+    hasOrganization: false
   }),
   computed: {
     loading () {
@@ -1108,6 +1109,9 @@ export default {
     },
   },
   methods: {
+    changeSuggess (val) {
+      console.log('changeSuggestion', val)
+    },
     initData (data) {
       var vm = this
       console.log('data_init_chuhoso', data)
@@ -1513,35 +1517,50 @@ export default {
     checkApplicantInfos () {
       let vm = this
       
-      if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2' && vm.thongTinChuHoSo.applicantIdNo) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
-        let filter = {
-          applicantIdNo: vm.thongTinChuHoSo.applicantIdNo,
-          applicantName: vm.thongTinChuHoSo.applicantName
-        }
-        // vm.loadingVerify = true
-        vm.$store.dispatch('checkApplicantInfos', filter).then(result => {
-          // vm.loadingVerify = false
-          if (result && result.hasOwnProperty('error') && result.error === true) {
-            vm.bussinessExits = false
-            vm.validBussinessInfos = false
-            // vm.$store.commit('setApplicantBussinessExit', false)
-            vm.messageCheckApplicant = result.message
-            // toastr.error(result.message + ' Vui lòng kiểm tra lại mã số thuế')
-          } else if (result && result.hasOwnProperty('warning') && result.warning === true) {
-            vm.bussinessExits = true
-            vm.validBussinessInfos = false
-            // vm.$store.commit('setApplicantBussinessExit', false)
-            vm.messageCheckApplicant = result.message
-            // toastr.error(result.message + ' Vui lòng đối chiếu thông tin doanh nghiệp')
-          } else if (result && !result.hasOwnProperty('error') && !result.hasOwnProperty('warning')) {
-            vm.bussinessExits = true
-            vm.validBussinessInfos = true
-            // vm.$store.commit('setApplicantBussinessExit', filter['applicantIdNo'])
-          }
-        }).catch(function () {
-          vm.loadingVerify = false
-        })
-      }
+      // if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2' && vm.thongTinChuHoSo.applicantIdNo) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+      //   let filter = {
+      //     applicantIdNo: vm.thongTinChuHoSo.applicantIdNo,
+      //     applicantName: vm.thongTinChuHoSo.applicantName
+      //   }
+      //   vm.$store.dispatch('checkApplicantInfos', filter).then(result => {
+      //     // vm.loadingVerify = false
+      //     if (result && result.hasOwnProperty('error') && result.error === true) {
+      //       vm.bussinessExits = false
+      //       vm.validBussinessInfos = false
+      //       // vm.$store.commit('setApplicantBussinessExit', false)
+      //       vm.messageCheckApplicant = result.message
+      //       // toastr.error(result.message + ' Vui lòng kiểm tra lại mã số thuế')
+      //     } else if (result && result.hasOwnProperty('warning') && result.warning === true) {
+      //       vm.bussinessExits = true
+      //       vm.validBussinessInfos = false
+      //       // vm.$store.commit('setApplicantBussinessExit', false)
+      //       vm.messageCheckApplicant = result.message
+      //       // toastr.error(result.message + ' Vui lòng đối chiếu thông tin doanh nghiệp')
+      //     } else if (result && !result.hasOwnProperty('error') && !result.hasOwnProperty('warning')) {
+      //       vm.bussinessExits = true
+      //       vm.validBussinessInfos = true
+      //       // vm.$store.commit('setApplicantBussinessExit', filter['applicantIdNo'])
+      //     }
+      //   }).catch(function () {
+      //     vm.loadingVerify = false
+      //   })
+      // }
+
+      // check cảnh báo đang xử lý hồ sơ cùng mã chủ hồ sơ
+      // if (vm.originality === 3 && vm.thongTinChuHoSo.applicantIdNo) {
+      //   let filter = {
+      //     applicantIdNo: vm.thongTinChuHoSo.applicantIdNo,
+      //     status: 'processing'
+      //   }
+      //   vm.$store.dispatch('getDossiers', filter).then(result => {
+      //     if (result.length > 0) {
+      //       let dossierSameApplicant = result.map(select => {
+      //         return select.dossierNo
+      //       }).join(',')
+      //       console.log('dossierSameApplicant', dossierSameApplicant)
+      //     }
+      //   })
+      // }
     },
     getApplicantInfos () {
       let vm = this

@@ -124,6 +124,7 @@
             item-text="name"
             :clearable="item['clearable']"
             :multiple="item.hasOwnProperty('multiple') && item.multiple"
+            @change="item.hasOwnProperty('parent') ? changeMapping(item) : ''"
           >
             <!-- <template slot="selection" slot-scope="props" >
               <v-chip v-if="props.index === 0">
@@ -143,6 +144,7 @@
             item-value="value"
             item-text="name"
             :clearable="item['clearable']"
+            @change="item.hasOwnProperty('parent') ? changeMapping(item) : ''"
           >
           </v-autocomplete>
         </v-flex>
@@ -510,7 +512,7 @@ export default {
     nameReport: '',
     showConfig: false,
     filters: [],
-    data: {},
+    data: '',
     customize: false,
     groupBy: [],
     groupByVal: '',
@@ -744,12 +746,14 @@ export default {
             }
             if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
               vm.filters[key]['groupId'] = vm.govAgency
-              vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
-                vm.filters[key]['source'] = result
-                if (vm.filters[key]['appendItem']) {
-                  vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
-                }
-              }).catch(function(){})
+              if (!vm.filters[key]['source'] || vm.filters[key]['source'].length === 0) {
+                vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+                  vm.filters[key]['source'] = result
+                  if (vm.filters[key]['appendItem']) {
+                    vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
+                  }
+                }).catch(function(){})
+              }
             }
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
@@ -889,12 +893,15 @@ export default {
         }
         if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
           vm.filters[key]['groupId'] = vm.govAgency
-          vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
-            vm.filters[key]['source'] = result
-            if (vm.filters[key]['appendItem']) {
-              vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
-            }
-          }).catch(function(){})
+          if (!vm.filters[key]['source'] || vm.filters[key]['source'].length === 0) {
+            vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+              vm.filters[key]['source'] = result
+              if (vm.filters[key]['appendItem']) {
+                vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
+              }
+            }).catch(function(){})
+          }
+          
         }
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
@@ -2377,6 +2384,34 @@ export default {
       }
 
       vm.showHTML = true
+    },
+    changeMapping (item) {
+      let vm = this
+      setTimeout(function () {
+        if (item.hasOwnProperty('parent')) {
+          vm.data[item.parent] = ''
+          let indexChildren = ''
+          for (let key in vm.filters) {
+            if (vm.filters[key]['key'] === item.parent) {
+              indexChildren = key
+              break
+            }
+          }
+          console.log('indexChildren', indexChildren)
+          if (indexChildren) {
+            console.log('filters', vm.filters)
+            console.log('data', vm.data)
+            vm.filters[indexChildren]['api'] = vm.filters[indexChildren]['api'].split('?')[0]
+            vm.filters[indexChildren]['api'] += '?' + item['key'] + '=' + vm.data[item['key']].toString()
+            vm.$store.dispatch('loadDataSource', vm.filters[indexChildren]).then(function(result) {
+              vm.filters[indexChildren]['source'] = result
+              if (vm.filters[indexChildren]['appendItem']) {
+                vm.filters[indexChildren]['source'] = vm.filters[indexChildren]['appendItem'].concat(result)
+              }
+            }).catch(function(){})
+          }
+        }
+      }, 100)
     }
   }
 }

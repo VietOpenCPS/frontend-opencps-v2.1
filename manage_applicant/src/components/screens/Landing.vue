@@ -14,7 +14,7 @@
             <v-radio-group class="pt-0 d-inline-block ml-3 mt-0" v-model="typeSearch" row @change="changeTypeSearch">
               <v-radio label="Công dân" :value="'citizen'"></v-radio>
               <v-radio label="Doanh nghiệp" :value="'business'"></v-radio>
-              <!-- <v-radio label="Cơ quan, tổ chức" :value="'organization'"></v-radio> -->
+              <v-radio label="Cơ quan, tổ chức" :value="'organization'"></v-radio>
               <v-radio label="Tất cả" :value="''" ></v-radio>
             </v-radio-group>
           </v-flex>
@@ -46,11 +46,11 @@
               ></v-text-field>
           </v-flex>
         </v-layout>
-        <div style="text-align: right">
+        <!-- <div style="text-align: right">
           <v-btn color="blue darken-3" dark @click="addApplicant">
             <v-icon size="16">add</v-icon>&nbsp;Thêm mới
           </v-btn>
-        </div>
+        </div> -->
         <v-data-table
           :headers="applicantListHeader"
           :items="applicantLists"
@@ -110,18 +110,18 @@
                   </v-btn>
                   <span>Sửa thông tin</span>
                 </v-tooltip>
-                <v-tooltip top v-if="!loadingTable">
+                <!-- <v-tooltip top v-if="!loadingTable">
                   <v-btn @click="deleteApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon>delete</v-icon>
                   </v-btn>
                   <span>Xóa</span>
-                </v-tooltip>
-                <!-- <v-tooltip top v-if="!loadingTable" class="ml-2">
+                </v-tooltip> -->
+                <v-tooltip top v-if="!loadingTable" class="ml-2">
                   <v-btn @click="documentManage(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon>fas fa fa-folder-open</v-icon>
                   </v-btn>
                   <span>Quản lý tài liệu</span>
-                </v-tooltip> -->
+                </v-tooltip>
               </td>
             </tr>
           </template>
@@ -305,7 +305,8 @@ export default {
     applicantLists: '',
     applicantTypeLists: [
       {text: 'Công dân', value: 'citizen'},
-      {text: 'Doanh nghiệp', value: 'business'}
+      {text: 'Doanh nghiệp', value: 'business'},
+      {text: 'Cơ quan, tổ chức', value: 'organization'}
     ],
     loadingTable: false,
     numberPerPage: 30,
