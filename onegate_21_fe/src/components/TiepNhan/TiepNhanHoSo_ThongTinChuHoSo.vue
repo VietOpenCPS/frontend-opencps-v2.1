@@ -17,6 +17,15 @@
                 </v-tooltip>
                 <v-card-text class="pt-3">
                   <v-layout wrap>
+                    <v-flex xs12 class="mb-3 text-xs-center" v-if="validateSameApplicantIdNo && sameApplicantIdNo">
+                      <div>
+                        <span class="mr-2"><v-icon color="warning">error_outline</v-icon></span>
+                        <span style="">Chủ hồ sơ CMND/ Hộ chiếu/ Mã số thuế </span>
+                        <span class="text-bold">{{thongTinChuHoSo.applicantIdNo}}</span>
+                        <span> đang được tiếp nhận, giải quyết tại hồ sơ số: </span>
+                        <span style="color: red">{{sameApplicantIdNo}}</span>
+                      </div>
+                    </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
@@ -721,24 +730,26 @@ export default {
   },
   props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode', 'applicantIdRequired'],
   data: () => ({
+    validateSameApplicantIdNo: false,
+    sameApplicantIdNo: '',
     checkDelegateIdNo: false,
     checkApplicantId: false,
     requiredOptions: {
-      applicantIdNo: true,
-      applicantName: true,
-      address: true,
-      cityCode: true,
-      districtCode: true,
-      wardCode: true,
-      contactTelNo: true,
+      applicantIdNo: false,
+      applicantName: false,
+      address: false,
+      cityCode: false,
+      districtCode: false,
+      wardCode: false,
+      contactTelNo: false,
       contactEmail: false,
-      delegateIdNo: true,
-      delegateName: true,
-      delegateAddress: true,
-      delegateCityCode: true,
-      delegateDistrictCode: true,
-      delegateWardCode: true,
-      delegateTelNo: true,
+      delegateIdNo: false,
+      delegateName: false,
+      delegateAddress: false,
+      delegateCityCode: false,
+      delegateDistrictCode: false,
+      delegateWardCode: false,
+      delegateTelNo: false,
       delegateEmail: false
     },
     valid_thongtinchuhoso: false,
@@ -951,7 +962,7 @@ export default {
   created () {
     let vm = this
     if (vm.formCode === "NEW") {
-      vm.thongTinNguoiNopHoSo.sameUser = true
+      // vm.thongTinNguoiNopHoSo.sameUser = true
     }
     if (vm.hasOrganization) {
       vm.labelSwitch = {
@@ -1162,10 +1173,10 @@ export default {
         vm.$store.getters.getDictItems(filter).then(function (result) {
           vm.citys = result.data
           // set default cityCode
-          if (vm.formCode === "NEW" && !thongTinChuHoSoTemp['cityCode']) {
-            vm.thongTinChuHoSo['cityCode'] = 87
-            vm.thongTinChuHoSo['cityName'] = 'Tỉnh Đồng Tháp'
-          }
+          // if (vm.formCode === "NEW" && !thongTinChuHoSoTemp['cityCode']) {
+          //   vm.thongTinChuHoSo['cityCode'] = 87
+          //   vm.thongTinChuHoSo['cityName'] = 'Tỉnh Đồng Tháp'
+          // }
           
         })
         setTimeout(function () {
@@ -1333,7 +1344,7 @@ export default {
         clearTimeout(vm.functionTimeOut)
       }
       vm.functionTimeOut = setTimeout(function () {
-        if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2') || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+        if (vm.originality === 3) {
           vm.checkApplicantInfos()
           // vm.thongTinChuHoSo.applicantIdNo = query.trim()
         }
@@ -1420,7 +1431,7 @@ export default {
       setTimeout(function () {
         vm.$store.commit('setApplicantId', vm.thongTinChuHoSo['applicantIdNo'])
         vm.checkApplicantInfos()
-      }, 2100)
+      }, 2000)
       
       function changeCity (data) {
         return new Promise((resolve, reject) => {
@@ -1508,7 +1519,7 @@ export default {
         clearTimeout(vm.functionTimeOut)
       }
       vm.functionTimeOut = setTimeout(function () {
-        if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2') || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+        if (vm.originality === 3) {
           vm.checkApplicantInfos()
         }
         vm.$store.commit('setApplicantId', vm.thongTinChuHoSo.applicantIdNo)
@@ -1547,20 +1558,25 @@ export default {
       // }
 
       // check cảnh báo đang xử lý hồ sơ cùng mã chủ hồ sơ
-      // if (vm.originality === 3 && vm.thongTinChuHoSo.applicantIdNo) {
-      //   let filter = {
-      //     applicantIdNo: vm.thongTinChuHoSo.applicantIdNo,
-      //     status: 'processing'
-      //   }
-      //   vm.$store.dispatch('getDossiers', filter).then(result => {
-      //     if (result.length > 0) {
-      //       let dossierSameApplicant = result.map(select => {
-      //         return select.dossierNo
-      //       }).join(',')
-      //       console.log('dossierSameApplicant', dossierSameApplicant)
-      //     }
-      //   })
-      // }
+      if (vm.validateSameApplicantIdNo && vm.originality === 3 && vm.thongTinChuHoSo.applicantIdNo) {
+        let filter = {
+          applicantIdNo: vm.thongTinChuHoSo.applicantIdNo,
+          status: 'new,waiting,processing'
+        }
+        vm.$store.dispatch('getDossiers', filter).then(result => {
+          let dossierMapping = result.filter(function(item) {
+            return item.applicantIdNo == vm.thongTinChuHoSo.applicantIdNo
+          })
+          if (dossierMapping.length > 0) {
+            let dossierSameApplicant = dossierMapping.map(select => {
+              return select.dossierNo
+            }).join(',')
+            vm.sameApplicantIdNo = dossierSameApplicant
+          } else {
+            vm.sameApplicantIdNo = ''
+          }
+        })
+      }
     },
     getApplicantInfos () {
       let vm = this

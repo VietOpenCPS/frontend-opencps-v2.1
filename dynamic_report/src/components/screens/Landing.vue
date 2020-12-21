@@ -344,9 +344,9 @@
                   <th rowspan="2" class="text-center px-2 py-1">
                     <span>Tên đơn vị</span>
                   </th>
-                  <th width="80" rowspan="3" class="text-center px-2 py-1">
+                  <!-- <th width="80" rowspan="3" class="text-center px-2 py-1">
                     <span>Số lượt đánh giá</span>
-                  </th>
+                  </th> -->
                   <th class="py-1" v-for="(item, index) in dataTableVottingList[0]['employees'][0]['voting']" v-bind:key="index" :colspan="dataTableVottingList[0]['employees'][0]['voting'][index]['selected'].length">
                     <span>{{item.question}}</span>
                   </th>
@@ -371,7 +371,7 @@
                   >
                     {{item.name}}
                   </td>
-                  <td align="center" class="px-2 py-1" v-if="!item.hasOwnProperty('group')">{{item.total}}</td>
+                  <!-- <td align="center" class="px-2 py-1" v-if="!item.hasOwnProperty('group')">{{item.total}}</td> -->
                   <!-- <td align="center"  class="px-2" v-for="(item1,index1) in (columnLength - 3)" :key="index1"
                     v-if="item.hasOwnProperty('group')"
                   >
@@ -1152,7 +1152,7 @@ export default {
               }
             }
             vm.listAnswers = answers
-            vm.columnLength = vm.listAnswers.length + 3
+            vm.columnLength = vm.listAnswers.length + 2
             // Tạo body
             let dataRawVoting = []
             let lengData = vm.dataTableVottingList.length

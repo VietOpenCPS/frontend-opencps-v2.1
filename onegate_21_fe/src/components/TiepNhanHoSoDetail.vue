@@ -66,18 +66,18 @@
                       <v-form v-model="valid_tenHoSo" ref="formTenHoSo" lazy-validation>
                         <v-textarea
                           v-model="briefNote"
-                          :rows="2"
+                          :rows="3"
                           box
                           :rules="originality === 1 ? '' : [rules.varchar5000]"
                           :placeholder="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : (originality === 1 ? 'Nhập nội dung yêu cầu giải quyết' : 'Nhập tên hồ sơ')"
                         ></v-textarea>
                       </v-form>
-                      
-                      <div v-if="fixDescriptionDt && templateDescription"><span style="color: red">(*)</span> &nbsp; {{templateDescription}}</div>
-                      <div v-else><span style="color: red">(*)</span> &nbsp; 
+                      <div v-if="fixDescriptionDt && templateDescription"><span style="color: red">(*)</span> &nbsp; 
                         Đối với thủ tục thông báo khuyến mãi, đề nghị nhập vào ô này tên doanh nghiệp, tên chương trình khuyến mãi, thời gian thực hiện, tổng giá trị hàng hoá dịch vụ 
                         <span style="color: red">dùng để khuyến mãi</span>
                       </div>
+                      <div v-else><span v-if="templateDescription" style="color: red">(*)</span> &nbsp; {{templateDescription}}</div>
+                      
                     </v-card-text>
                   </v-card>
                 </div>
@@ -894,7 +894,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: true,
+    notifyConfig: false,
     fromViaPostal: false,
     fromViaPostalConfig: false,
     smsNotify: true,

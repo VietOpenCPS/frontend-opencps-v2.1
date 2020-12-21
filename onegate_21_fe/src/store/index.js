@@ -4599,7 +4599,7 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
-    getApplicantDocument ({commit, state}, filter) {
+    getApplicantDocumentProxy ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -4644,7 +4644,47 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
-    getFileItems ({commit, state}, filter) {
+    getApplicantDocument ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+              start: filter.start ? filter.start : 0,
+              end: filter.end ? filter.end : 15,
+              applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : '',
+              fileTemplateNo: filter.fileTemplateNo ? filter.fileTemplateNo : '',
+              status: filter.status,
+              keyword: filter.keywordSearch ? filter.keywordSearch : '',
+              applicantDataType: filter.applicantDataType ? filter.applicantDataType : '',
+              fileNo: filter.fileNoSearch
+            }
+          }
+
+          axios.get('/o/rest/v2/applicantdatas', param).then(function (response) {
+            if (response['data'].hasOwnProperty('data')) {
+              if (Array.isArray(response['data']['data'])) {
+                resolve(response.data)
+              } else {
+                resolve(
+                  {
+                    data: [response['data']['data']],
+                    total: response['data']['total']
+                  }
+                )
+              }
+            } else {
+              reject(response)
+            }
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getFileItemsProxy ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -4669,7 +4709,27 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
-    getFileAttach ({commit, state}, filter) {
+    getFileItems ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+              status: filter.status ? filter.status : ''
+            }
+          }
+
+          axios.get('/o/rest/v2/fileitems', param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getFileAttachProxy ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
@@ -4684,6 +4744,23 @@ export const store = new Vuex.Store({
         dataPost.append('data', '')
         
         axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
+          let url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
+    getFileAttach ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          },
+          responseType: 'blob'
+        }
+        
+        axios.get('/o/rest/v2/applicantdatas/' + filter.applicantDataId + '/preview', param).then(response => {
           let url = window.URL.createObjectURL(response.data)
           resolve(url)
         }).catch(xhr => {
@@ -4942,9 +5019,28 @@ export const store = new Vuex.Store({
         }
         let dataPost = new URLSearchParams()
         dataPost.append('fileName', filter.fileName)
-        dataPost.append('fileName', filter.fileEntryId)
+        dataPost.append('fileEntryId', filter.fileEntryId)
         dataPost.append('signatureBase64', filter.signatureBase64)
         let url = '/o/rest/v2/signature/insertSignature'
+        axios.post(url, dataPost, param).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
+    uploadSignatureVtCa ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('uploadfile', filter.signedFileName)
+        let url = '/o/rest/v2/defaultsignature/vtca/fileupload'
         axios.post(url, dataPost, param).then(function (response) {
           let serializable = response.data
           resolve(serializable)
@@ -4963,7 +5059,7 @@ export const store = new Vuex.Store({
         }
         let dataPost = new URLSearchParams()
         dataPost.append('fileEntryIdStr', filter.fileEntryIdStr)
-        dataPost.append('dossierFileStr', filter.dossierFileStr)
+        dataPost.append('dossierFileIdStr', filter.dossierFileIdStr)
         let url = '/o/rest/v2/defaultsignature/vtca/updateFile'
         axios.put(url, dataPost, param).then(function (response) {
           let serializable = response.data
@@ -5055,15 +5151,44 @@ export const store = new Vuex.Store({
     },
     downLoadAllFile ({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
+        // let config = {
+        //   headers: {
+        //     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+        //   }
+        // }
+        // axios.get('/o/rest/v2/dossiers/' + filter.dossierId + '/downloadAllFile', config).then(function (response) {
+        //   resolve(response)
+        // }).catch(xhr => {
+        //   reject('')
+        // })
         let config = {
-          headers: {
-            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
-          }
-        }
-        axios.get('/o/rest/v2/dossiers/' + filter.dossierId + '/downloadAllFile', config).then(function (response) {
-          resolve(response)
-        }).catch(xhr => {
-          reject('')
+          method: 'get',
+          url: '/o/rest/v2/dossiers/' + filter.dossierId + '/downloadAllFile',
+          headers: { 
+            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            'Content-Type': 'application/octet-stream'
+          },
+          responseType: 'blob'
+        };
+
+        axios(config)
+        .then(function (response) {
+          var fileNames = response.headers['content-disposition']
+          var fileName = fileNames.split('filename=')[1]
+          fileName = fileName.split('"').join('')
+          var a = document.createElement('a')
+          document.body.appendChild(a)
+          a.style = 'display: none'
+          var urlFile = window.URL.createObjectURL(response.data)
+          a.href = urlFile
+          a.download = fileName
+          a.click()
+          
+          window.URL.revokeObjectURL(urlFile)
+          resolve('success')
+        })
+        .catch(function (error) {
+          reject(error)
         })
       })
     }

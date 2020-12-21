@@ -698,7 +698,7 @@
       dialog_loginDVCQG: false,
       tempDVCQG: '',
       profileConfig: '',
-      activeChangePass: true,
+      activeChangePass: false,
       zaloOaId: '',
       zaloOaid_token_access: '',
       userAppZaloUid: '',

@@ -231,7 +231,7 @@ export default {
   data: () => ({
     functionTimeOutGetFee: '',
     loadingFee: false,
-    showTinhPhi: false,
+    showTinhPhi: true,
     weight: '',
     feeVnPost: '',
     valid_dichvuchuyenphat: false,

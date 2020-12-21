@@ -618,7 +618,7 @@ export default {
               toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
             })
           } else {
-            let dataCreateFile = new URLSearchParams()
+            let dataCreateFile = new FormData()
             let url = '/o/rest/v2/applicantdatas'
             dataCreateFile.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
             dataCreateFile.append('status', vm.statusCreate)
@@ -628,9 +628,13 @@ export default {
             dataCreateFile.append('file', vm.fileUpdate)
             
             axios.post(url, dataCreateFile, param).then(result1 => {
-              resolve(result1)
+              vm.loadingAction = false
+              toastr.success('Thêm mới tài liệu thành công')
+              vm.dialog_createDocument = false
+              vm.getApplicantDocument()
             }).catch(xhr => {
-              reject(xhr)
+              vm.loadingAction = false
+              toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
             })
           }
           
@@ -667,23 +671,49 @@ export default {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }
-        let dataPost = new FormData()
-        dataPost.append('method', 'PUT')
-        dataPost.append('url', '/applicantdatas/' + vm.documentSelect.applicantDataId)
-        dataPost.append('data', JSON.stringify(filter))
-        if (vm.updateFile) {
-          dataPost.append('file', vm.fileUpdate)
-        }
+        if (vm.isDvc) {
+          let dataPost = new FormData()
+          dataPost.append('method', 'PUT')
+          dataPost.append('url', '/applicantdatas/' + vm.documentSelect.applicantDataId)
+          dataPost.append('data', JSON.stringify(filter))
+          if (vm.updateFile) {
+            dataPost.append('file', vm.fileUpdate)
+          } else {
+            dataPost.append('file', '')
+          }
 
-        axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
-          vm.loadingAction = false
-          toastr.success('Cập nhật tài liệu thành công')
-          vm.dialog_createDocument = false
-          vm.getApplicantDocument()
-        }).catch(xhr => {
-          vm.loadingAction = false
-          toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
-        })
+          axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
+            vm.loadingAction = false
+            toastr.success('Cập nhật tài liệu thành công')
+            vm.dialog_createDocument = false
+            vm.getApplicantDocument()
+          }).catch(xhr => {
+            vm.loadingAction = false
+            toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
+          })
+        } else {
+          let dataPost = new FormData()
+          let url = '/o/rest/v2/applicantdatas/' + vm.documentSelect.applicantDataId
+          dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
+          dataPost.append('status', vm.statusCreate)
+          dataPost.append('fileNo', vm.fileNo)
+          dataPost.append('fileName', vm.fileName)
+          dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
+          if (vm.updateFile) {
+            dataPost.append('file', vm.fileUpdate)
+          } else {
+            dataPost.append('file', '')
+          } 
+          axios.put(url, dataPost, param).then(result1 => {
+            vm.loadingAction = false
+            toastr.success('Cập nhật tài liệu thành công')
+            vm.dialog_createDocument = false
+            vm.getApplicantDocument()
+          }).catch(xhr => {
+            vm.loadingAction = false
+            toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
+          })
+        }
         
       }
     },
@@ -785,13 +815,23 @@ export default {
       let filter = {
         applicantDataId: item.applicantDataId
       }
-      vm.$store.dispatch('getFileAttach', filter).then(function (result) {
-        vm.srcDownload = result
-        setTimeout(function () {
-          document.getElementById('downloadFile').click()
-        }, 100)
-      }).catch(function () {
-      })
+      if (vm.isDvc) {
+        vm.$store.dispatch('getFileAttachProxy', filter).then(function (result) {
+          vm.srcDownload = result
+          setTimeout(function () {
+            document.getElementById('downloadFile').click()
+          }, 100)
+        }).catch(function () {
+        })
+      } else {
+        vm.$store.dispatch('getFileAttach', filter).then(function (result) {
+          vm.srcDownload = result
+          setTimeout(function () {
+            document.getElementById('downloadFile').click()
+          }, 100)
+        }).catch(function () {
+        })
+      }
     },
     viewDocument (item) {
       let vm = this
@@ -800,21 +840,40 @@ export default {
       let filter = {
         applicantDataId: item.applicantDataId
       }
-      vm.$store.dispatch('getFileAttach', filter).then(function (result) {
-        let fileType = item.fileExtension.toLowerCase()
-        if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
-          fileType === 'tif' || fileType === 'tiff'
-        ) {
-          vm.dialogPDF = true
-          document.getElementById('dialogPDFPreview').src = result
-        } else {
-          vm.srcDownload = result
-          setTimeout(function () {
-            document.getElementById('downloadFile').click()
-          }, 100)
-        }
-      }).catch(function () {
-      })
+      if (vm.isDvc) {
+        vm.$store.dispatch('getFileAttachProxy', filter).then(function (result) {
+          let fileType = item.fileExtension.toLowerCase()
+          if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+            fileType === 'tif' || fileType === 'tiff'
+          ) {
+            vm.dialogPDF = true
+            document.getElementById('dialogPDFPreview').src = result
+          } else {
+            vm.srcDownload = result
+            setTimeout(function () {
+              document.getElementById('downloadFile').click()
+            }, 100)
+          }
+        }).catch(function () {
+        })
+      } else {
+        vm.$store.dispatch('getFileAttach', filter).then(function (result) {
+          let fileType = item.fileExtension.toLowerCase()
+          if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+            fileType === 'tif' || fileType === 'tiff'
+          ) {
+            vm.dialogPDF = true
+            document.getElementById('dialogPDFPreview').src = result
+          } else {
+            vm.srcDownload = result
+            setTimeout(function () {
+              document.getElementById('downloadFile').click()
+            }, 100)
+          }
+        }).catch(function () {
+        })
+        
+      }
     },
     getApplicantType (item) {
       let vm = this

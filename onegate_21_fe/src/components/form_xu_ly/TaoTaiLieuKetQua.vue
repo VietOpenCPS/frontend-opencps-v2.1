@@ -19,7 +19,7 @@
                         {{item.partName}} <span v-if="item.required" style="color: red"> (*)</span>
                         &nbsp;&nbsp;
 
-                        <span v-if="item.hasForm" style="color:#004b94">(Bản khai trực tuyến)</span>
+                        <span v-if="item.hasForm || item.eForm" style="color:#004b94">(Giấy tờ nhập trực tuyến)</span>
                         &nbsp;&nbsp;
 
                       </div>
@@ -137,14 +137,14 @@
                   indeterminate
                   v-if="progressUploadPart + id === item.partNo + id"
                   ></v-progress-circular>
-                  <!-- <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id & item.eForm">
-                    <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item)">
+                  <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id && item.eForm">
+                    <v-btn slot="activator" icon class="mx-0 my-0" @click="loadAlpcaFormClick(item)">
                       <v-badge>
                         <v-icon size="24" color="#004b94">edit</v-icon>
                       </v-badge>
                     </v-btn>
-                    <span>Khai trực tuyến</span>
-                  </v-tooltip> -->
+                    <span>Giấy tờ nhập trực tuyến</span>
+                  </v-tooltip>
                   <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id">
                     <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
                       <v-badge>

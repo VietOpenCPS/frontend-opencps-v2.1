@@ -331,33 +331,62 @@ export default {
         applicantDataType: ''
       }
       vm.loadingTable = true
-      vm.$store.dispatch('getApplicantDocument', filter).then(function (result) {
-        if (result.hasOwnProperty('data')) {
-          vm.documentApplicantList = result.data
-        } else {
+      if (vm.originality === 1) {
+        vm.$store.dispatch('getApplicantDocumentProxy', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.documentApplicantList = result.data
+          } else {
+            vm.documentApplicantList = []
+          }
+          vm.totalDocument = result['total']
+          vm.loadingTable = false
+        }).catch(function () {
+          vm.loadingTable = false
           vm.documentApplicantList = []
-        }
-        vm.totalDocument = result['total']
-        vm.loadingTable = false
-      }).catch(function () {
-        vm.loadingTable = false
-        vm.documentApplicantList = []
-        vm.totalDocument = 0
-      })
+          vm.totalDocument = 0
+        })
+      } else {
+        vm.$store.dispatch('getApplicantDocument', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.documentApplicantList = result.data
+          } else {
+            vm.documentApplicantList = []
+          }
+          vm.totalDocument = result['total']
+          vm.loadingTable = false
+        }).catch(function () {
+          vm.loadingTable = false
+          vm.documentApplicantList = []
+          vm.totalDocument = 0
+        })
+      }
+      
     },
     getFileItems () {
       let vm = this
       let filter = {
         status: 1
       }
-      vm.$store.dispatch('getFileItems', filter).then(function (result) {
-        if (result.hasOwnProperty('data')) {
-          vm.fileTemplateList = result.data
-        } else {
-          vm.fileTemplateList = []
-        }
-      }).catch(function () {
-      })
+      if (vm.originality === 1) {
+        vm.$store.dispatch('getFileItemsProxy', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.fileTemplateList = result.data
+          } else {
+            vm.fileTemplateList = []
+          }
+        }).catch(function () {
+        })
+      } else {
+        vm.$store.dispatch('getFileItems', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.fileTemplateList = result.data
+          } else {
+            vm.fileTemplateList = []
+          }
+        }).catch(function () {
+        })
+      }
+      
     },
     showCreatedocument () {
       let vm = this
@@ -485,21 +514,39 @@ export default {
       let filter = {
         applicantDataId: item.applicantDataId
       }
-      vm.$store.dispatch('getFileAttach', filter).then(function (result) {
-        let fileType = item.fileExtension.toLowerCase()
-        if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
-          fileType === 'tif' || fileType === 'tiff'
-        ) {
-          vm.dialogPDF = true
-          document.getElementById('dialogPDFPreview').src = result
-        } else {
-          vm.srcDownload = result
-          setTimeout(function () {
-            document.getElementById('downloadFile').click()
-          }, 100)
-        }
-      }).catch(function () {
-      })
+      if (vm.originality === 1) {
+        vm.$store.dispatch('getFileAttachProxy', filter).then(function (result) {
+          let fileType = item.fileExtension.toLowerCase()
+          if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+            fileType === 'tif' || fileType === 'tiff'
+          ) {
+            vm.dialogPDF = true
+            document.getElementById('dialogPDFPreview').src = result
+          } else {
+            vm.srcDownload = result
+            setTimeout(function () {
+              document.getElementById('downloadFile').click()
+            }, 100)
+          }
+        }).catch(function () {
+        })
+      } else {
+        vm.$store.dispatch('getFileAttach', filter).then(function (result) {
+          let fileType = item.fileExtension.toLowerCase()
+          if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+            fileType === 'tif' || fileType === 'tiff'
+          ) {
+            vm.dialogPDF = true
+            document.getElementById('dialogPDFPreview').src = result
+          } else {
+            vm.srcDownload = result
+            setTimeout(function () {
+              document.getElementById('downloadFile').click()
+            }, 100)
+          }
+        }).catch(function () {
+        })
+      }
     },
     getApplicantType (item) {
       let vm = this

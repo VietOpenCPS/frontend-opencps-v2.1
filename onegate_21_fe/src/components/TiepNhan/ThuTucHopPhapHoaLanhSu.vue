@@ -1493,6 +1493,9 @@ export default {
                         }
                         axios.request(config).then(res => {
                             vm.listNguoiKy = res.data.data
+                            if (vm.listNguoiKy && vm.listNguoiKy.length === 1) {
+                                vm.getChuKyConDau(vm.listNguoiKy[0])
+                            }
                             vm.listConDau = []
                             vm.listChuKy = []
                             vm.chonChuKy = []
@@ -1528,6 +1531,9 @@ export default {
                             vm.chonConDau = []
                             vm.chuKySelected = ''
                             vm.conDauSelected = ''
+                            if (vm.listNguoiKy && vm.listNguoiKy.length === 1) {
+                                vm.getChuKyConDau(vm.listNguoiKy[0])
+                            }
                         }).catch(err => {}) 
                 }
             } else {
@@ -1903,6 +1909,7 @@ export default {
             this.chonConDau = []
             this.chuKySelected = ''
             this.conDauSelected = ''
+            this.getDSNguoiKy()
         },
         updateGiayTo () {
             let vm = this
@@ -1926,8 +1933,8 @@ export default {
                   ma_con_dau: vm.ma_con_dau,
                   ma_chu_ky: vm.ma_chu_ky,
                   kiem_tra: true,
-                  anh_con_dau: vm.conDau,
-                  anh_chu_ky: vm.chuKy,
+                  anh_con_dau: '',
+                  anh_chu_ky: '',
                     
                 }  
                 if(vm.update_giayto === 'add') {
@@ -2092,26 +2099,26 @@ export default {
         openDialogUpdateGiayTo (index, item) {
             let vm = this
             vm.update_giayto = index
-            vm.ten_giay_to = item.ten_giay_to,
-            vm.ma_ten_giay_to = item.ma_ten_giay_to,
-            vm.ma_loai_giay_to =  item.ma_loai_giay_to,
-            vm.loai_giay_to = item.loai_giay_to,
-            vm.so_ban = item.so_ban,
-            vm.loai_cong_viec = item.loai_cong_viec,
-            vm.so_hieu_giay_to = item.so_hieu_giay_to,
-            vm.ten_nguoi_duoc_cap = item.ten_nguoi_duoc_cap,
-            vm.co_quan_cap = item.co_quan_cap,
-            vm.ma_co_quan_cap = item.ma_co_quan_cap,
-            vm.nguoi_ky = item.nguoi_ky,
-            vm.ma_nguoi_ky = item.ma_nguoi_ky,
-            vm.chuc_danh_ky = item.chuc_danh_ky,
-            vm.ma_chuc_vu = item.ma_chuc_vu,
-            vm.ngay_ky = item.ngay_ky,
-            vm.ma_con_dau = item.ma_con_dau,
-            vm.ma_chu_ky = item.ma_chu_ky,
-            vm.kiem_tra =item.kiem_tra,
-            vm.conDau = item.anh_con_dau
-            vm.chuKy = item.anh_chu_ky
+            vm.ten_giay_to = item.ten_giay_to
+            vm.ma_ten_giay_to = item.ma_ten_giay_to
+            vm.ma_loai_giay_to =  item.ma_loai_giay_to
+            vm.loai_giay_to = item.loai_giay_to
+            vm.so_ban = item.so_ban
+            vm.loai_cong_viec = item.loai_cong_viec
+            vm.so_hieu_giay_to = item.so_hieu_giay_to
+            vm.ten_nguoi_duoc_cap = item.ten_nguoi_duoc_cap
+            vm.co_quan_cap = item.co_quan_cap
+            vm.ma_co_quan_cap = item.ma_co_quan_cap
+            vm.nguoi_ky = item.nguoi_ky
+            vm.ma_nguoi_ky = item.ma_nguoi_ky
+            vm.chuc_danh_ky = item.chuc_danh_ky
+            vm.ma_chuc_vu = item.ma_chuc_vu
+            vm.ngay_ky = item.ngay_ky
+            vm.ma_con_dau = item.ma_con_dau
+            vm.ma_chu_ky = item.ma_chu_ky
+            vm.kiem_tra = item.kiem_tra
+            // vm.conDau = item.anh_con_dau
+            // vm.chuKy = item.anh_chu_ky
             // 
             if (vm.ma_chu_ky) {
                 let config = {
@@ -2120,7 +2127,9 @@ export default {
                 }
                 vm.loadingImage = true
                 axios.request(config).then(res => {
-                    vm.chuKy = res.data
+                    if (res.data.hasOwnProperty('CK_IMAGE_FILE')) {
+                        vm.chuKy = vm.hexToBase64(res.data['CK_IMAGE_FILE'])
+                    }
                     vm.loadingImage = false
                 }).catch(function() {
                     vm.loadingImage = false
@@ -2133,7 +2142,9 @@ export default {
                 }
                 vm.loadingImage = true
                 axios.request(config).then(res => {
-                    vm.conDau = res.data
+                    if (res.data.hasOwnProperty('CD_IMAGE_FILE')) {
+                        vm.conDau = vm.hexToBase64(res.data['CD_IMAGE_FILE'])
+                    }
                     vm.loadingImage = false
                 }).catch(function() {
                     vm.loadingImage = false
@@ -2159,7 +2170,7 @@ export default {
             if(item.loai_cong_viec){
                 vm.loai_cong_viec = {
                     text: item.loai_cong_viec,
-                    value:  item.loai_cong_viec
+                    value: item.loai_cong_viec
                 }
             } else {
                 vm.loai_cong_viec = ''
@@ -2213,8 +2224,41 @@ export default {
                 vm.loai_cong_viec = ''
             }
             vm.dialogGiayTo = true
-            vm.conDau = item.anh_con_dau
-            vm.chuKy = item.anh_chu_ky
+            // vm.conDau = item.anh_con_dau
+            // vm.chuKy = item.anh_chu_ky
+
+            // 
+            if (vm.ma_chu_ky) {
+                let config = {
+                    url: '/o/rest/v2/serverconfigs/LAY_ANH_CHU_KY_CLS/protocols/API_CONNECT?ma_chu_ky=' + vm.ma_chu_ky,
+                    headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                }
+                vm.loadingImage = true
+                axios.request(config).then(res => {
+                    if (res.data.hasOwnProperty('CK_IMAGE_FILE')) {
+                        vm.chuKy = vm.hexToBase64(res.data['CK_IMAGE_FILE'])
+                    }
+                    vm.loadingImage = false
+                }).catch(function() {
+                    vm.loadingImage = false
+                })
+            }
+            if (vm.ma_con_dau) {
+                let config = {
+                    url: '/o/rest/v2/serverconfigs/LAY_ANH_CON_DAU_CLS/protocols/API_CONNECT?ma_con_dau=' + vm.ma_con_dau,
+                    headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                }
+                vm.loadingImage = true
+                axios.request(config).then(res => {
+                    if (res.data.hasOwnProperty('CD_IMAGE_FILE')) {
+                        vm.conDau = vm.hexToBase64(res.data['CD_IMAGE_FILE'])
+                    }
+                    vm.loadingImage = false
+                }).catch(function() {
+                    vm.loadingImage = false
+                })
+            }
+            //
         },
         deleteGiayTo(index) {
             let vm = this

@@ -827,7 +827,7 @@ export default {
     khoTaiLieuCongDan: false,
     allFileMark: false,
     render: true,
-    showKySo: true,
+    showKySo: false,
     dialogSignDigital: false,
     fileKySo: '',
     indexFileSelect: '',
@@ -2160,17 +2160,17 @@ export default {
       })
     },
     getDossierFileApplicants (applicantIdNo, fileTemplateNo) {
-      var vm = this
-      let filter = {
-        dossierId: vm.thongTinHoSo.dossierId,
-        applicantIdNo: applicantIdNo,
-        fileTemplateNo: fileTemplateNo
-      }
-      vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
-        vm.dossierFilesApplicant = result
-      }).catch(reject => {
-        console.log('error')
-      })
+      // var vm = this
+      // let filter = {
+      //   dossierId: vm.thongTinHoSo.dossierId,
+      //   applicantIdNo: applicantIdNo,
+      //   fileTemplateNo: fileTemplateNo
+      // }
+      // vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
+      //   vm.dossierFilesApplicant = result
+      // }).catch(reject => {
+      //   console.log('error')
+      // })
     },
     showFilesApplicant (partNo) {
       let vm = this
@@ -2323,8 +2323,10 @@ export default {
       let vm = this
       vm.dossierPartAttach = part
       vm.indexPart = index
-      vm.$refs.khotailieu.initData()
       vm.dialog_documentApplicant = true
+      setTimeout(function () {
+        vm.$refs.khotailieu.initData()
+      }, 200)
     },
     changeAllFileMark (event) {
       let vm = this
@@ -2449,20 +2451,35 @@ export default {
                 signatureBase64: fileSignReturn
               }
               vm.$store.dispatch('insertSignatureVtCa', dataInsertSignature).then(res => {
-                console.log('resInsertSignatureVtCa', res)
-
-                let dataUpdateFile = {
-                  fileEntryIdStr: res['fileEntryIdStr'] ? res['fileEntryIdStr'] : '',
-                  dossierFileStr: res['signedFileName'] ? res['signedFileName'] : ''
+                let dataUploadFile = {
+                  signedFileName: res['signedFileName'] ? res['signedFileName'] : ''
                 }
-                vm.$store.dispatch('updateSignatureVtCa', dataUpdateFile).then(res => {
-                  toastr.success('Thực hiện ký số thành công')
-                  vm.dialogSignDigital = false
-                  vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
-                    vm.dossierFilesItems = resFiles
-                  }).catch(reject => {
+                
+                vm.$store.dispatch('uploadSignatureVtCa', dataUploadFile).then(res => {
+                  let dataSigned
+                  try {
+                    dataSigned = JSON.parse(res.FileServer)
+                  } catch (error) {
+                  }
+                  let dataUpdateFile = {
+                    fileEntryIdStr: dataSigned ? dataSigned['fileEntryId'] : '',
+                    dossierFileIdStr: vm.fileKySo.dossierFileId
+                  }
+                  vm.$store.dispatch('updateSignatureVtCa', dataUpdateFile).then(res => {
+                    toastr.success('Thực hiện ký số thành công')
+                    vm.dialogSignDigital = false
+                    vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+                      vm.dossierFilesItems = resFiles
+                    }).catch(reject => {
+                    })
+                  }).catch(function() {
+                    toastr.error('Lỗi trong quá trình cập nhật tài liệu ký số')
                   })
+                }).catch(function() {
+                  toastr.error('Lỗi trong quá trình cập nhật tài liệu ký số')
                 })
+              }).catch(function() {
+                toastr.error('Lỗi trong quá trình cập nhật tài liệu ký số')
               })
             })
             

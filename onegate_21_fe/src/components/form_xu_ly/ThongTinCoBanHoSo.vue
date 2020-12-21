@@ -15,7 +15,7 @@
                   </v-tooltip>
                 </div>
                 <div class="xs12 sm12 pb-1">
-                  <span class="pr-2">Số CMND/ căn cước: </span>
+                  <span class="pr-2">{{thongTinChiTietHoSo.applicantIdType === 'citizen' ? 'Số CMND/ căn cước' : 'Mã số thuế'}}: </span>
                   <span class="pl-0 text-bold"> {{thongTinChiTietHoSo.applicantIdNo}}</span>
                 </div>
                 <!--  -->

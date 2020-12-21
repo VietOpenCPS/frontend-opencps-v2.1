@@ -184,7 +184,7 @@ export default {
   props: ['detailDossier'],
   data: () => ({
     loadingFee: false,
-    showTinhPhi: false,
+    showTinhPhi: true,
     weight: '',
     feeVnPost: '',
     valid_dichvuchuyenphat: false,

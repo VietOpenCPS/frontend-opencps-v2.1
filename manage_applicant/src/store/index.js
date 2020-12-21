@@ -309,7 +309,7 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
-    getFileAttach ({commit, state}, filter) {
+    getFileAttachProxy ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
@@ -324,6 +324,22 @@ export const store = new Vuex.Store({
         dataPost.append('data', '')
         
         axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
+          let url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
+    getFileAttach ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          },
+          responseType: 'blob'
+        }
+        axios.get('/o/rest/v2/applicantdatas/' + filter.applicantDataId + '/preview', param).then(response => {
           let url = window.URL.createObjectURL(response.data)
           resolve(url)
         }).catch(xhr => {

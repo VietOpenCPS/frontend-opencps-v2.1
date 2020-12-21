@@ -322,10 +322,10 @@
             </v-tab-item>
             <v-tab-item value="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
               <div v-if="!isNotarization">
-                <v-btn color="primary" v-if="hasDownloadAllFile" @click.native="downloadAllFile()"
+                <v-btn color="primary" v-if="hasDownloadAllFile" @click.stop="downloadAllFile()"
                   :loading="loadingDownload"
                   :disabled="loadingDownload"
-                  style="position: absolute;right: 50px;"
+                  style="position: absolute;right: 50px;z-index: 5;"
                 >
                   <v-icon>save_alt</v-icon> &nbsp;
                   Tải giấy tờ đính kèm
@@ -839,7 +839,6 @@ export default {
     dialogPDF: false,
     dialogPDFLoading: false,
     loadingDownload: false,
-    hasDownloadAllFile: true,
     loadingAlpacajsForm: false,
     nextActions: [],
     createFiles: [],
@@ -1040,6 +1039,7 @@ export default {
     activeReload: false,
     srcDownloadIframe: '',
     itemAction: '',
+    hasDownloadAllFile: false,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -2546,15 +2546,16 @@ export default {
                 vm.loadingAction = false
                 vm.loadingActionProcess = false
               } else {
+                let fileChuaKy = []
                 let files = vm.createFileSignedSync.createFiles
-                let fileEntries = []
+                var fileEntries = []
                 let dossierFiles = []
                 for (let index in files) {
-                  if (!files[index]['isSigned'] && files[index]['fileSize'] && (!files[index]['eForm']) || (files[index]['eForm'] && files[index]['createFileDossierPartEform'])) {
-                    toastr.clear()
-                    toastr.error(files[index]['displayName'] + ' chưa được ký duyệt')
-                    valid = false
-                    return
+                  if (
+                    (!files[index]['isSigned'] && files[index]['fileSize'] && files[index]['fileType'].toLocaleLowerCase() === 'pdf' && !files[index]['eForm']) || 
+                    (!files[index]['isSigned'] && files[index]['eForm'] && files[index]['fileSize'] && files[index]['createFileDossierPartEform'])
+                  ) {
+                    fileChuaKy.push(files[index]['displayName'])
                   } else {
                     if (files[index]['fileSize']) {
                       fileEntries.push(files[index]['fileEntryId'])
@@ -2562,73 +2563,82 @@ export default {
                     }
                   }
                 }
-                console.log('fileEntries 12312', fileEntries, dossierFiles)
-                if (!valid) {
-                  return
-                }
-                let filterUpdateFile = {
-                  dossierId: vm.thongTinChiTietHoSo['dossierId'],
-                  fileEntries: fileEntries.toString(),
-                  dossierFiles: dossierFiles.toString()
-                }
-                vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
-                  // 1
-                  vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-                    vm.getDetailDossier()
-                    if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
-                      vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
-                      })
-                    }
-                    if (filter['payment']) {
-                      vm.loadThanhToan()
-                    }
-                    vm.loadingAction = false
-                    vm.dialogActionProcess = false
-                    vm.loadingActionProcess = false
-                    vm.alertObj = {
-                      icon: 'check_circle',
-                      color: 'success',
-                      message: 'Thực hiện thành công!'
-                    }
-                    vm.btnStateVisible = false
-                    if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
-                      vm.rollbackable = result.rollbackable
-                    }
-                    if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
-                      vm.printDocument = true
-                    }
-                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
-                      vm.printInvoicefilePayment = true
-                      vm.printPay()
-                    }
-                    if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
-                      vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
-                    }
-                    vm.checkInput = 0
-                    vm.$store.commit('setCheckInput', 0)
-                    if (String(item.form) === 'ACTIONS') {
-                    } else {
-                      vm.$router.push({
-                        path: vm.$router.history.current.path,
-                        query: {
-                          recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                          q: currentQuery['q']
-                        }
-                      })
-                    }
-                    $('html, body').animate({
-                      scrollTop: 0
-                    }, 500, 'linear')
-                  }).catch(function (reject) {
+                let doActionKySo = function () {
+                  console.log('fileEntries 12312', fileEntries, dossierFiles)
+                  let filterUpdateFile = {
+                    dossierId: vm.thongTinChiTietHoSo['dossierId'],
+                    fileEntries: fileEntries.toString(),
+                    dossierFiles: dossierFiles.toString()
+                  }
+                  vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
+                    // 1
+                    vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                      vm.getDetailDossier()
+                      if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
+                        vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+                        })
+                      }
+                      if (filter['payment']) {
+                        vm.loadThanhToan()
+                      }
+                      vm.loadingAction = false
+                      vm.dialogActionProcess = false
+                      vm.loadingActionProcess = false
+                      vm.alertObj = {
+                        icon: 'check_circle',
+                        color: 'success',
+                        message: 'Thực hiện thành công!'
+                      }
+                      vm.btnStateVisible = false
+                      if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                        vm.rollbackable = result.rollbackable
+                      }
+                      if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                        vm.printDocument = true
+                      }
+                      if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                        vm.printInvoicefilePayment = true
+                        vm.printPay()
+                      }
+                      if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                        vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+                      }
+                      vm.checkInput = 0
+                      vm.$store.commit('setCheckInput', 0)
+                      if (String(item.form) === 'ACTIONS') {
+                      } else {
+                        vm.$router.push({
+                          path: vm.$router.history.current.path,
+                          query: {
+                            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                            q: currentQuery['q']
+                          }
+                        })
+                      }
+                      $('html, body').animate({
+                        scrollTop: 0
+                      }, 500, 'linear')
+                    }).catch(function (reject) {
+                      vm.loadingAction = false
+                      vm.loadingActionProcess = false
+                    })
+                  }).catch(function () {
+                    toastr.error('Cập nhật kết quả xử lý thất bại')
                     vm.loadingAction = false
                     vm.loadingActionProcess = false
                   })
-                }).catch(function () {
-                  toastr.error('Cập nhật kết quả xử lý thất bại')
-                  vm.loadingAction = false
-                  vm.loadingActionProcess = false
-                })
+                }
+                if (fileChuaKy.length > 0) {
+                  let x = confirm('Tài liệu "' + fileChuaKy.toString() + '" chưa được ký duyệt, bạn có muốn tiếp tục?')
+                  if (x) {
+                    doActionKySo()
+                  } else {
+                    vm.loadingActionProcess = false
+                  }
+                } else {
+                  doActionKySo()
+                }
               }
             } else {
               vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
