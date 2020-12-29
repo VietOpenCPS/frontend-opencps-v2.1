@@ -932,19 +932,38 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getReportVotingEmployee ({state}, dataReq) {
+    getReportVotingEmployee ({state}, filter) {
       return new Promise((resolve, reject) => {
-        let data = JSON.stringify(dataReq.jobposList)
+        let data = JSON.stringify(filter.jobposList)
         let config = {
           method: 'post',
           url: '/o/rest/v2/votings/employee/statistic',
-          headers: { 
+          headers: {
             'groupId': state.groupId,
             'Content-Type': 'application/json'
           },
-          data : data
+          data : data,
+          params: {}
         };
-
+        for (let key in filter['data']) {
+          let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
+          if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
+            let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+            if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+              config.params[key] = dateStr
+            } else {
+              if (String(key).indexOf('DateExtend') > 0) {
+                let keySearch = String(key).replace('Extend', '')
+                let dateCurrent = new Date()
+                dateCurrent.setDate(dateCurrent.getDate() + Number(filter['data'][key]))
+                config.params['from' + keySearch] = new Date(dateCurrent).toLocaleDateString('vi-VN')
+                config.params['to' + keySearch] = new Date(dateCurrent).toLocaleDateString('vi-VN')
+              } else {
+                config.params[key] = currentVal
+              }
+            }
+          }
+        }
         axios(config)
         .then(function (response) {
           resolve(response.data)
@@ -954,9 +973,9 @@ export const store = new Vuex.Store({
         })
       })
     },
-    exportVotingEmployee ({state}, dataReq) {
+    exportVotingEmployee ({state}, filter) {
       return new Promise((resolve, reject) => {
-        let data = JSON.stringify(dataReq.jobposList)
+        let data = JSON.stringify(filter.jobposList)
         let config = {
           method: 'post',
           url: '/o/rest/v2/votings/employee/statistic/export',
@@ -965,9 +984,29 @@ export const store = new Vuex.Store({
             'Content-Type': 'application/octet-stream'
           },
           data : data,
-          responseType: 'blob'
+          responseType: 'blob',
+          params: {}
         };
-
+        console.log('filterEmployee', filter)
+        for (let key in filter['data']) {
+          let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
+          if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
+            let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+            if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+              config.params[key] = dateStr
+            } else {
+              if (String(key).indexOf('DateExtend') > 0) {
+                let keySearch = String(key).replace('Extend', '')
+                let dateCurrent = new Date()
+                dateCurrent.setDate(dateCurrent.getDate() + Number(filter['data'][key]))
+                config.params['from' + keySearch] = new Date(dateCurrent).toLocaleDateString('vi-VN')
+                config.params['to' + keySearch] = new Date(dateCurrent).toLocaleDateString('vi-VN')
+              } else {
+                config.params[key] = currentVal
+              }
+            }
+          }
+        }
         axios(config)
         .then(function (response) {
           var fileNames = response.headers['content-disposition']

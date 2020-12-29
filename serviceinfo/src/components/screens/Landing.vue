@@ -577,9 +577,21 @@
         <v-card-text>
           <v-form ref="formSelect" v-model="validFormSelectGov" lazy-validation>
             <v-autocomplete
+              v-if="luaChonXaPhuong"
               class="mt-3"
-              placeholder="Chọn cơ quan"
-              :items="govAgencyListTiepNhan"
+              placeholder="Quận, huyện, thị xã"
+              :items="danhSachQuanHuyen"
+              v-model="quanHuyen"
+              item-text="itemName"
+              item-value="itemCode"
+              clearable
+              return-object
+              @change="changeQuanHuyen"
+            ></v-autocomplete>
+            <v-autocomplete
+              class="mt-3"
+              :placeholder="luaChonXaPhuong === true ? 'Xã, phường, thị trấn' : 'Chọn cơ quan'"
+              :items="govAgencyListTiepNhanFilters"
               v-model="govAgencyTiepNhanSelected"
               item-text="govAgencyName"
               item-value="govAgencyCode"
@@ -733,12 +745,16 @@ export default {
     j_captcha_response: '',
     chapchablob: '',
     validFormSelectGov: false,
+    danhSachQuanHuyen: [],
+    quanHuyen: '',
     govAgencyListTiepNhan: [],
     govAgencyTiepNhanSelected: '',
+    govAgencyListTiepNhanFilters: [],
     selectGuide: false,
     onlyLoginDvcqg: false,
     titleNopHoSo: '',
-    setAgency: false     /**fix 1 đơn vị */
+    setAgency: false,     /**fix 1 đơn vị */
+    luaChonXaPhuong: false
   }),
   computed: {
     govAgencyList () {
@@ -1444,7 +1460,40 @@ export default {
       vm.govAgencyTiepNhanSelected = ''
       vm.selectGuide = guide ? true : false
       vm.govAgencyListTiepNhan = vm.serviceConfigs(govList)
+      vm.govAgencyListTiepNhanFilters = vm.govAgencyListTiepNhan
+      if (vm.serviceInfoSelected.administrationCode === 'CAP_XA') {
+        vm.luaChonXaPhuong = true
+        let filterSearch = {
+          collection: 'QUAN_HUYEN'
+        }
+        vm.$store.dispatch('getDict', filterSearch).then(function (result) {
+          vm.danhSachQuanHuyen = result
+        })
+      } else {
+        vm.luaChonXaPhuong = false
+      }
       vm.dialog_selectAgency = true
+    },
+    changeQuanHuyen () {
+      let vm = this
+      setTimeout(function () {
+        if (vm.quanHuyen) {
+          let filterSearch = {
+            parent: vm.quanHuyen.itemCode
+          }
+          vm.$store.dispatch('getDictFromParent', filterSearch).then(function (result) {
+            let donViXa = result
+            vm.govAgencyListTiepNhanFilters = vm.govAgencyListTiepNhan.filter(function(item) {
+              return donViXa.filter(function(item1) {
+                return item1.itemCode === item.govAgencyCode
+              }).length > 0
+            })
+          })
+        } else {
+          vm.govAgencyListTiepNhanFilters = vm.govAgencyListTiepNhan
+        }
+        
+      }, 50)
     },
     submitSelectGov () {
       let vm = this

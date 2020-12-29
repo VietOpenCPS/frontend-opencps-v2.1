@@ -465,8 +465,11 @@ export const store = new Vuex.Store({
             },
             params: {
               state: filter.state,
-              redirectURL: filter.redirectURL
+              redirectURL: filter.redirectURL,
             }
+          }
+          if (filter.provider) {
+            param.params = Object.assign(param.params, {provider: filter.provider})
           }
           axios.get('/o/rest/v2/dvcqgsso/authurl', param).then(function (response) {
             let serializable = response.data

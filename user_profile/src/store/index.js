@@ -464,17 +464,45 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: window.themeDisplay.getScopeGroupId()
-            },
-            params: {
-              status: filter.status ? filter.status : ''
             }
           }
-          axios.get('/o/rest/v2/fileitems', param).then(function (response) {
+          let params = {
+            status: filter.status ? filter.status : ''
+          }
+          let dataPost = new URLSearchParams()
+          let textPost = params
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/fileitems')
+          dataPost.append('data', JSON.stringify(textPost))
+
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
             resolve(response.data)
           }, error => {
             reject(error)
           })
         }).catch(function (){})
+      })
+    },
+    getFileAttachProxy ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          },
+          responseType: 'blob'
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/applicantdatas/' + filter.applicantDataId + '/preview')
+        dataPost.append('dataType', 'binary')
+        dataPost.append('data', '')
+        
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
+          let url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
       })
     },
     getFileAttach ({commit, state}, filter) {

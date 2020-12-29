@@ -391,7 +391,7 @@ export default {
           alert('Không có biên lai')
         }
         
-      } else if (vm.payments['paymentMethod'] === 'PayPlatDVCQG') {
+      } else if (vm.payments['paymentMethod'] === 'PayPlatDVCQG' || vm.payments['paymentMethod'] === 'Paygov') {
         // let param = {
         //   headers: {
         //     groupId: window.themeDisplay.getScopeGroupId()

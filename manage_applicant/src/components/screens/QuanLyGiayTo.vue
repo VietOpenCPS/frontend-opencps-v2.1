@@ -142,12 +142,20 @@
                   <span>{{props.item.hasOwnProperty('fileNo') ? props.item.fileNo : ''}}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px; min-width:200px">
+              <td class="text-xs-left" style="height:36px;min-width:120px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
-                  <span>{{props.item.hasOwnProperty('dossierNo') ? props.item.dossierNo : ''}}</span>
+                  <span>{{props.item.hasOwnProperty('fileExtension') ? props.item.fileExtension : ''}}</span>
+                </div>
+              </td>
+              <td class="text-xs-left" style="height:36px; min-width:150px">
+                <content-placeholders v-if="loadingTable">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.hasOwnProperty('createDate') ? props.item.createDate : ''}}</span>
                 </div>
               </td>
               <td class="text-xs-center" style="height:36px;width:135px">
@@ -381,7 +389,12 @@ export default {
         sortable: false
       },
       {
-        text: 'Hồ sơ gốc',
+        text: 'Định dạng',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Ngày tạo',
         align: 'center',
         sortable: false
       },
@@ -589,7 +602,7 @@ export default {
           vm.loadingAction = true
           let filter = {
             fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
-            status: vm.statusCreate,
+            status: vm.statusCreate ? vm.statusCreate : 0,
             fileNo: vm.fileNo,
             fileName: vm.fileName,
             applicantIdNo: vm.applicantInfos.applicantIdNo,
@@ -612,16 +625,17 @@ export default {
               vm.loadingAction = false
               toastr.success('Thêm mới tài liệu thành công')
               vm.dialog_createDocument = false
-              vm.getApplicantDocument()
+              setTimeout(function () {
+                vm.getApplicantDocument()
+              }, 200)
             }).catch(xhr => {
-              vm.loadingAction = false
               toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
             })
           } else {
             let dataCreateFile = new FormData()
             let url = '/o/rest/v2/applicantdatas'
             dataCreateFile.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-            dataCreateFile.append('status', vm.statusCreate)
+            dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 0)
             dataCreateFile.append('fileNo', vm.fileNo)
             dataCreateFile.append('fileName', vm.fileName)
             dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
@@ -631,7 +645,9 @@ export default {
               vm.loadingAction = false
               toastr.success('Thêm mới tài liệu thành công')
               vm.dialog_createDocument = false
-              vm.getApplicantDocument()
+              setTimeout(function () {
+                vm.getApplicantDocument()
+              }, 200)
             }).catch(xhr => {
               vm.loadingAction = false
               toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
@@ -659,7 +675,7 @@ export default {
         vm.loadingAction = true
         let filter = {
           fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
-          status: vm.statusCreate,
+          status: vm.statusCreate ? vm.statusCreate : 0,
           fileNo: vm.fileNo,
           fileName: vm.fileName,
           applicantIdNo: vm.applicantInfos.applicantIdNo
@@ -686,16 +702,17 @@ export default {
             vm.loadingAction = false
             toastr.success('Cập nhật tài liệu thành công')
             vm.dialog_createDocument = false
-            vm.getApplicantDocument()
+            setTimeout(function () {
+              vm.getApplicantDocument()
+            }, 200)
           }).catch(xhr => {
-            vm.loadingAction = false
             toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
           })
         } else {
           let dataPost = new FormData()
           let url = '/o/rest/v2/applicantdatas/' + vm.documentSelect.applicantDataId
           dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-          dataPost.append('status', vm.statusCreate)
+          dataPost.append('status', vm.statusCreate ? vm.statusCreate : 0)
           dataPost.append('fileNo', vm.fileNo)
           dataPost.append('fileName', vm.fileName)
           dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
@@ -708,9 +725,10 @@ export default {
             vm.loadingAction = false
             toastr.success('Cập nhật tài liệu thành công')
             vm.dialog_createDocument = false
-            vm.getApplicantDocument()
+            setTimeout(function () {
+              vm.getApplicantDocument()
+            }, 200)
           }).catch(xhr => {
-            vm.loadingAction = false
             toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
           })
         }

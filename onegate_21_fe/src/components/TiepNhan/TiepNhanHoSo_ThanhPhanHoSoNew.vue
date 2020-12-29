@@ -824,7 +824,7 @@ export default {
         }
       },
     },
-    khoTaiLieuCongDan: false,
+    khoTaiLieuCongDan: true,
     allFileMark: false,
     render: true,
     showKySo: false,
@@ -2261,6 +2261,7 @@ export default {
         filePath: data.filePath,
         fileName: data.fileName,
         fileType: data.fileExtension,
+        fileEntryId: data.fileEntryId,
         // fileName: String(data.fileName).replace(/\s/g, '')
       }
       console.log('data storage', filter)

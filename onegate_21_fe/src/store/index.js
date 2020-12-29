@@ -805,7 +805,8 @@ export const store = new Vuex.Store({
         dataPost.append('uri', filter.filePath ? filter.filePath : '')
         dataPost.append('displayName', filter.fileName ? filter.fileName : '')
         dataPost.append('fileType', filter.fileType ? filter.fileType : '')
-        
+        dataPost.append('fileEntryId', filter.fileEntryId ? filter.fileEntryId : '')
+
         axios.post(state.initData.dossierApi + '/' + filter.dossierId + '/files/applicantdata', dataPost, param).then(function (response) {
           resolve(response)
         }).catch(function (xhr) {
@@ -912,7 +913,7 @@ export const store = new Vuex.Store({
             formData.append('file', file, fileName)
             formData.append('dossierPartNo', data.partNo)
             formData.append('dossierTemplateNo', data.dossierTemplateNo)
-            formData.append('fileTemplateNo', data.fileTemplateNo ? data.fileTemplateNo : data.templateFileNo)
+            formData.append('fileTemplateNo', data.fileTemplateNo ? data.fileTemplateNo : (data.templateFileNo ? data.templateFileNo : ''))
             formData.append('formData', '')
             formData.append('referenceUid', '')
             let fileUpload = {
@@ -5151,16 +5152,6 @@ export const store = new Vuex.Store({
     },
     downLoadAllFile ({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
-        // let config = {
-        //   headers: {
-        //     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
-        //   }
-        // }
-        // axios.get('/o/rest/v2/dossiers/' + filter.dossierId + '/downloadAllFile', config).then(function (response) {
-        //   resolve(response)
-        // }).catch(xhr => {
-        //   reject('')
-        // })
         let config = {
           method: 'get',
           url: '/o/rest/v2/dossiers/' + filter.dossierId + '/downloadAllFile',
@@ -5191,7 +5182,35 @@ export const store = new Vuex.Store({
           reject(error)
         })
       })
-    }
+    },
+    checkLgsp() {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/applicants/checkenterprisedvcqg', config).then(function (response) {
+          resolve(response.data)
+        }).catch(xhr => {
+          reject('')
+        })
+      })
+    },
+    searchLgsp({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/applicants/enterprisedvcqg/' + filter.applicantIdNo, config).then(function (response) {
+          resolve(response.data)
+        }).catch(xhr => {
+          reject('')
+        })
+      })
+    },
     // ----End---------
   },
   mutations: {

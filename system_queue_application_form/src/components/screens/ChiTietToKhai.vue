@@ -178,6 +178,38 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialogSelectGovagency" persistent max-width="580">
+      <v-toolbar flat dark color="primary">
+        <v-toolbar-title>Chọn nơi nộp tờ khai</v-toolbar-title>
+        <v-spacer></v-spacer>
+      </v-toolbar>
+      <v-card-text class="px-0 py-0">
+        <v-layout row wrap>
+          <v-flex xs12 sm12>
+            <v-list class="px-3 py-3">
+              <v-list-tile
+                v-for="(item, index) in agencyItems"
+                :key="index"
+                avatar
+                @click="selectAgency(item)"
+                :class="index == 0 ? 'mb-3' : ''"
+              >
+                <v-list-tile-avatar>
+                  <v-icon :class="index == 0 ? 'blue white--text' : 'amber white--text'">account_balance</v-icon>
+                </v-list-tile-avatar>
+
+                <v-list-tile-content class="ml-2">
+                  <v-list-tile-title style="font-size: 14px !important">{{ String(item.name).toUpperCase() }}</v-list-tile-title>
+                </v-list-tile-content>
+
+              </v-list-tile>
+            </v-list>
+          </v-flex>
+        </v-layout>
+        
+      </v-card-text>
+    </v-dialog>
   </div>
 </template>
 
@@ -217,6 +249,11 @@ export default {
     dataMapping: '',
     mapping: false,
     dialogLoadingCreate: false,
+    dialogSelectGovagency: false,
+    agencyItems: [
+      {name: 'Cục lãnh sự - 40 Trần Phú, Ba Đình, Hà Nội', value: '124302', code: 'CLS', serverNo: 'SERVER_CLS'}
+    ],
+    agencySelected: ''
   }),
   computed: {
     serviceinfoSelected () {
@@ -297,6 +334,16 @@ export default {
           vm.goBack()
         }
         
+      }
+      try {
+        vm.agencyItems = agencyItems /**config fragment*/
+      } catch (error) {
+      }
+      if (currentQuery.hasOwnProperty('agency') && currentQuery.agency) {
+        vm.agencySelected = currentQuery.agency
+        vm.dialogSelectGovagency = false
+      } else {
+        vm.dialogSelectGovagency = true
       }
     })
   },
@@ -432,6 +479,7 @@ export default {
         }
         let dataCreateEform = new URLSearchParams()
         dataCreateEform.append('eFormData', JSON.stringify(formData))
+        dataCreateEform.append('govAgencyCode', vm.agencySelected)
         dataCreateEform.append('serviceInfoId', vm.serviceinfoSelected.serviceInfoId)
         dataCreateEform.append('fileTemplateNo', fileTemplateNoParam ? fileTemplateNoParam : vm.fileTemplateSelected.fileTemplateNo)
         dataCreateEform.append('email', '')
@@ -584,6 +632,11 @@ export default {
       vm.$store.dispatch('mappingDvcqg', filter).then(function (result) {
       }).catch(function () {
       })
+    },
+    selectAgency (item) {
+      let vm = this
+      vm.agencySelected = item.code
+      vm.dialogSelectGovagency = false
     },
     goBack () {
       let vm = this

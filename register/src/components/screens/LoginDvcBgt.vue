@@ -188,7 +188,8 @@ export default {
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
       }
-    }
+    },
+    ssoCs: false
   }),
   computed: {
     loadingLogin () {
@@ -216,6 +217,10 @@ export default {
       try {
         vm.conectDvcqg = ssoConfig ? ssoConfig['active'] : false
         vm.captcha = hasCaptcha ? hasCaptcha : false
+      } catch (error) {
+      }
+      try {
+        vm.ssoCs = ssoCsConfig
       } catch (error) {
       }
       // 
@@ -282,7 +287,8 @@ export default {
       let vm = this
       let filter = {
         state: '',
-        redirectURL: window.location.href.split("?")[0]
+        redirectURL: window.location.href.split("?")[0],
+        provider: vm.ssoCs ? 'SSOCS' : ''
       }
       vm.$store.dispatch('getVNConect', filter).then(function (result) {
         if (result) {

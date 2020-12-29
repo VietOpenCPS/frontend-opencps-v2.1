@@ -1129,7 +1129,8 @@ export default {
         }
       }
       let filterGetEmployee = {
-        jobposList: jobposListEmp
+        jobposList: jobposListEmp,
+        data: vm.data
       }
       //
       if (vm.doExportExcel) {
@@ -1723,7 +1724,7 @@ export default {
       let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
       let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
       
-      // console.log('getAgencyReportLists2', filter)
+      console.log('getAgencyReportLists2', filter)
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         // console.log('result',result)
         if (result !== null) {
@@ -1813,7 +1814,7 @@ export default {
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('notSumkey')) {
             resultDataTotal = resultData
           }
-         console.log('resultDataTotal666', resultDataTotal)
+        //  console.log('resultDataTotal666', resultDataTotal)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -1902,7 +1903,7 @@ export default {
                     dataText = Math.round(eval(currentConfig['calculator']))
                   }
                 } else {
-                  console.log('resultData[key]', resultData[key], currentConfig['value'] )
+                  // console.log('resultData[key]', resultData[key], currentConfig['value'] )
                   if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                     if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
                       dataText =  ' - ' + resultData[key][currentConfig['subValue']] + ' '
@@ -2027,7 +2028,7 @@ export default {
           }
           vm.showCSVDownload = true
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
-          console.log('docDString,dataExportExcelStatistic', docDString)
+          // console.log('docDString,dataExportExcelStatistic', docDString)
           vm.dataExportExcel = docDString
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)

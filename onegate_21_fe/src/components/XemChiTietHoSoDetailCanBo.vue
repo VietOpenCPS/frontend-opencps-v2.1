@@ -2532,12 +2532,12 @@ export default {
             })
           } else {
             // ký số với plugin cài đặt
-            // check không sử dụng ký số trong quy trình có ký sô
+            // check không sử dụng ký số trong quy trình có ký số
             let doNotSign = false
             if (vm.showTaoTaiLieuKetQua && vm.typeEsign === 'plugin') {
               doNotSign = vm.$refs.tailieuketqua.checkUseSign()
             }
-            if (result.signatureType === 'plugin' && !doNotSign) {
+            if (result.signatureType === 'plugin' && !doNotSign && vm.showTaoTaiLieuKetQua) {
               console.log('file ký số', vm.createFileSignedSync)
               let valid = true
               if (!vm.createFileSignedSync) {

@@ -55,7 +55,7 @@
               box
             ></v-autocomplete>
           </v-flex>
-          <v-flex xs12 sm4 class="" v-if="originality === 1">
+          <v-flex xs12 sm4 class="pr-2" v-if="originality === 1">
             <v-text-field
               label="Tìm theo mã tài liệu"
               v-model="fileNoSearch"
@@ -117,12 +117,20 @@
                   <span>{{props.item.hasOwnProperty('fileNo') ? props.item.fileNo : ''}}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px; min-width:200px">
+              <td class="text-xs-left" style="height:36px;min-width:120px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
-                  <span>{{props.item.hasOwnProperty('dossierNo') ? props.item.dossierNo : ''}}</span>
+                  <span>{{props.item.hasOwnProperty('fileExtension') ? props.item.fileExtension : ''}}</span>
+                </div>
+              </td>
+              <td class="text-xs-left" style="height:36px; min-width:150px">
+                <content-placeholders v-if="loadingTable">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.hasOwnProperty('createDate') ? props.item.createDate : ''}}</span>
                 </div>
               </td>
               <td class="text-xs-center" style="height:36px;width:135px">
@@ -251,7 +259,12 @@ export default {
         sortable: false
       },
       {
-        text: 'Hồ sơ gốc',
+        text: 'Định dạng',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Ngày tạo',
         align: 'center',
         sortable: false
       },

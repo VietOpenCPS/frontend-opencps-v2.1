@@ -107,12 +107,20 @@
                   <span>{{props.item.hasOwnProperty('fileNo') ? props.item.fileNo : ''}}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px; min-width:200px">
+              <td class="text-xs-left" style="height:36px;min-width:120px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
-                  <span>{{props.item.hasOwnProperty('dossierNo') ? props.item.dossierNo : ''}}</span>
+                  <span>{{props.item.hasOwnProperty('fileExtension') ? props.item.fileExtension : ''}}</span>
+                </div>
+              </td>
+              <td class="text-xs-left" style="height:36px; min-width:150px">
+                <content-placeholders v-if="loadingTable">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.hasOwnProperty('createDate') ? props.item.createDate : ''}}</span>
                 </div>
               </td>
               <td class="text-xs-center" style="height:36px;width:135px">
@@ -333,7 +341,12 @@ export default {
         sortable: false
       },
       {
-        text: 'Hồ sơ gốc',
+        text: 'Định dạng',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Ngày tạo',
         align: 'center',
         sortable: false
       },
@@ -391,7 +404,12 @@ export default {
     },
     getApplicantDocument () {
       let vm = this
-      let filter = {
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId()
+        }
+      }
+      let params = {
         start: vm.documentPage * vm.numberPerPage - vm.numberPerPage,
         end: vm.documentPage * vm.numberPerPage,
         applicantIdNo: vm.index,
@@ -401,16 +419,25 @@ export default {
         fileNoSearch: vm.fileNoSearch,
         applicantDataType: ''
       }
+      let dataPost = new URLSearchParams()
+      let textPost = params
+      dataPost.append('method', 'GET')
+      dataPost.append('url', '/applicantdatas')
+      dataPost.append('data', JSON.stringify(textPost))
       vm.loadingTable = true
-      vm.$store.dispatch('getApplicantDocument', filter).then(function (result) {
-        if (result.hasOwnProperty('data')) {
-          vm.documentApplicantList = result.data
+      axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) { 
+        if (response['data'].hasOwnProperty('data')) {
+          if (Array.isArray(response['data']['data'])) {
+            vm.documentApplicantList = response.data.data
+          } else {
+            vm.documentApplicantList = [response['data']['data']]
+          }
         } else {
           vm.documentApplicantList = []
         }
-        vm.totalDocument = result['total']
+        vm.totalDocument = response['total']
         vm.loadingTable = false
-      }).catch(function () {
+      }, error => {
         vm.loadingTable = false
         vm.documentApplicantList = []
         vm.totalDocument = 0
@@ -477,6 +504,13 @@ export default {
       if (vm.$refs.form.validate()) {
         if (vm.fileNameView) {
           vm.loadingAction = true
+          let filter = {
+            fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
+            status: 0,
+            fileNo: vm.fileNo,
+            fileName: vm.fileName,
+            applicantIdNo: vm.index,
+          }
           let param = {
             headers: {
               groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
@@ -485,14 +519,12 @@ export default {
             }
           }
           let dataPost = new FormData()
-          dataPost.append('status', 0)
-          dataPost.append('applicantIdNo', vm.index)
-          dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-          dataPost.append('fileNo', vm.fileNo)
-          dataPost.append('fileName', vm.fileName)
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/applicantdatas')
+          dataPost.append('data', JSON.stringify(filter))
           dataPost.append('file', vm.fileUpdate)
           
-          axios.post('/o/rest/v2/applicantdatas', dataPost, param).then(response => {
+          axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
             vm.loadingAction = false
             toastr.success('Thêm mới tài liệu thành công')
             vm.dialog_createDocument = false
@@ -523,7 +555,8 @@ export default {
         let filter = {
           fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
           fileNo: vm.fileNo,
-          fileName: vm.fileName
+          fileName: vm.fileName,
+          applicantIdNo: vm.applicantInfos.applicantIdNo
         }
         let param = {
           headers: {
@@ -533,14 +566,16 @@ export default {
           }
         }
         let dataPost = new FormData()
-        dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-        dataPost.append('fileNo', vm.fileNo)
-        dataPost.append('fileName', vm.fileName)
+        dataPost.append('method', 'PUT')
+        dataPost.append('url', '/applicantdatas/' + vm.documentSelect.applicantDataId)
+        dataPost.append('data', JSON.stringify(filter))
         if (vm.updateFile) {
           dataPost.append('file', vm.fileUpdate)
+        } else {
+          dataPost.append('file', '')
         }
 
-        axios.post('/o/rest/v2/applicantdatas/' + vm.documentSelect.applicantDataId, dataPost, param).then(response => {
+        axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
           vm.loadingAction = false
           toastr.success('Cập nhật tài liệu thành công')
           vm.dialog_createDocument = false
@@ -549,7 +584,6 @@ export default {
           vm.loadingAction = false
           toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
         })
-        
       }
     },
     getDocumentTypeIcon (type) {
@@ -650,7 +684,7 @@ export default {
       let filter = {
         applicantDataId: item.applicantDataId
       }
-      vm.$store.dispatch('getFileAttach', filter).then(function (result) {
+      vm.$store.dispatch('getFileAttachProxy', filter).then(function (result) {
         vm.srcDownload = result
         setTimeout(function () {
           document.getElementById('downloadFile').click()
@@ -665,7 +699,7 @@ export default {
       let filter = {
         applicantDataId: item.applicantDataId
       }
-      vm.$store.dispatch('getFileAttach', filter).then(function (result) {
+      vm.$store.dispatch('getFileAttachProxy', filter).then(function (result) {
         let fileType = item.fileExtension.toLowerCase()
         if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
           fileType === 'tif' || fileType === 'tiff'
