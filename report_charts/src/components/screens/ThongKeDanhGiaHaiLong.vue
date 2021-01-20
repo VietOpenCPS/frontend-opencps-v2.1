@@ -5,7 +5,7 @@
             <v-flex xs12 sm3>
                 <v-layout row wrap style="background-color: #ffff;border-top: 1px solid #004b94;" class="pa-2">
                     <v-flex xs12 text-center>
-                        <span style="color: #004b94; font-weight: 600;">Đánh giá hài lòng của người sử dụng đối với dịch vụ công trực tuyến mức độ 3 và 4</span>
+                        <span style="color: #004b94; font-weight: 600;">Đánh giá hài lòng của người dùng về việc thực hiện thủ tục hành chính</span>
                     </v-flex>
                     <v-flex xs12 class="my-2">
                         <v-autocomplete
@@ -50,7 +50,8 @@
                 <v-layout row wrap  style="background-color: #ffff;">
                     <v-flex class="xs12" style="
                         background-color: #004b94 !important;
-                        height: 36px;
+                        height: auto;
+                        min-height: 36px;
                         padding: 9px 15px;
                         font-weight: 600;
                         color: white;">

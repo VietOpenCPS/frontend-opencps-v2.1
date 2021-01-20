@@ -2,12 +2,15 @@
   <div>
     <v-layout row wrap class="mx-2 py-2" id="contentFaq">
       <v-flex xs12 :class="(!getUser('Administrator') && !getUser('Administrator_data') && !getUser('tra_loi_hoi_dap')) ? 'sm7' : ''" class="pr-3">
-        <h3 v-if="!getUser('Administrator') && !getUser('Administrator_data') && !getUser('tra_loi_hoi_dap')" class="text-bold mb-3" style="color:#034687">
-          NHỮNG CÂU HỎI THƯỜNG GẶP
-        </h3>
-        <h3 v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')" class="text-bold mb-3 text-xs-center" style="color:#034687">
-          DANH SÁCH CÂU HỎI
-        </h3>
+        <div v-if="!phanAnhKienNghi">
+          <h3 v-if="!getUser('Administrator') && !getUser('Administrator_data') && !getUser('tra_loi_hoi_dap')" class="text-bold mb-3" style="color:#034687">
+            NHỮNG CÂU HỎI THƯỜNG GẶP
+          </h3>
+          <h3 v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')" class="text-bold mb-3 text-xs-center" style="color:#034687">
+            DANH SÁCH CÂU HỎI
+          </h3>
+        </div>
+        
         <content-placeholders v-if="loading" class="mt-3">
           <content-placeholders-text :lines="10" />
         </content-placeholders>
@@ -18,7 +21,7 @@
                 class="select-border"
                 :items="agencyList"
                 v-model="agencyFilterSelected"
-                placeholder="Cơ quan tiếp nhận câu hỏi"
+                :placeholder="'Cơ quan tiếp nhận ' + titleData"
                 item-text="itemName"
                 item-value="itemCode"
                 return-object
@@ -43,7 +46,7 @@
                 @change="changeLvtt"
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 sm6 class="selectLvds pl-0">
+            <!-- <v-flex xs12 sm6 class="selectLvds pl-0">
               <v-autocomplete
                 class="select-border"
                 :items="lvdsList"
@@ -57,11 +60,11 @@
                 clearable
                 @change="changeLvds"
               ></v-autocomplete>
-            </v-flex>
+            </v-flex> -->
             <v-flex xs12 :class="agencyCodeSiteExits ? 'sm6 pl-2' : 'sm12 pl-0'">
               <v-text-field
                 box
-                placeholder="Nội dung câu hỏi"
+                :placeholder="'Nội dung ' + titleData"
                 v-model="keyword"
                 @keyup.enter="filterKeyword"
                 @click:append="filterKeyword"
@@ -124,18 +127,18 @@
                       >
                         <div>
                           <div style="position:relative">
-                            <div class="" v-html="String(itemAnswer.content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
+                            <div class="" v-html="itemAnswer.content"></div>
                             <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')" style="display:inline-block;position:absolute;right:18px;top:-15px">
                               <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
                                 <v-icon>settings</v-icon>
                               </v-btn>
                               <v-list>
-                                <v-list-tile>
+                                <!-- <v-list-tile>
                                   <v-list-tile-title v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')" @click.stop="changePublicAnswer(itemAnswer, indexAnswer)">
                                     <v-icon color="primary" size="16px">{{ itemAnswer.publish === 1 ? 'visibility_off' : 'visibility' }}</v-icon>&nbsp;
                                     {{ itemAnswer.publish === 1 ? 'Bỏ công khai' : 'Công khai' }}
                                   </v-list-tile-title>
-                                </v-list-tile>
+                                </v-list-tile> -->
                                 <v-list-tile>
                                   <v-list-tile-title @click.stop="editAnswer(itemAnswer, indexAnswer, itemQuestion, indexQuestion)">
                                     <v-icon color="primary" size="16px">edit</v-icon>&nbsp;
@@ -154,7 +157,7 @@
                   </v-card>
                   <div class="px-3 py-2" v-else>
                     <v-alert outline color="warning" icon="priority_high" :value="true">
-                      Chưa có câu trả lời nào
+                      Không có {{titleData}} nào
                     </v-alert>
                   </div>
                 </div>
@@ -177,8 +180,11 @@
       <v-flex xs12 sm5 v-if="!getUser('Administrator') && !getUser('Administrator_data') && !getUser('tra_loi_hoi_dap')">
         <v-card flat style="border: 1px solid #ddd;border-top: 0">
           <v-flex xs12 style="border-top: 1.5px solid #0053a4;">
-            <div class="head-title">
+            <div class="head-title" v-if="!phanAnhKienNghi">
               ĐẶT CÂU HỎI
+            </div>
+            <div class="head-title" v-else>
+              GỬI KIẾN NGHỊ
             </div>
           </v-flex>
           <v-form ref="form" v-model="valid" lazy-validation>
@@ -189,7 +195,7 @@
                   class="select-border"
                   :items="agencyList"
                   v-model="agencySelected"
-                  placeholder="Chọn cơ quan tiếp nhận câu hỏi"
+                  :placeholder="'Chọn cơ quan tiếp nhận ' + titleData"
                   item-text="itemName"
                   item-value="itemCode"
                   return-object
@@ -245,11 +251,11 @@
                 ></v-text-field>
               </v-flex> -->
               <v-flex xs12>
-                <div class="mb-1">Nội dung câu hỏi <span style="color:red">(*)</span></div>
+                <div class="mb-1">Nội dung {{titleData}}<span style="color:red">(*)</span></div>
                 <v-textarea
                   box
                   row="5"
-                  placeholder="Nhập nội dung câu hỏi"
+                  :placeholder="'Nhập nội dung ' + titleData"
                   v-model="content"
                   :rules="[rules.required]"
                   required
@@ -264,7 +270,7 @@
                   :disabled="loading"
                   @click="submitAddQuestion"
                 >
-                  Gửi câu hỏi
+                  Gửi {{titleData}}
                 </v-btn>
               </v-flex>
             </v-layout>
@@ -404,6 +410,8 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    phanAnhKienNghi: false,
+    titleData: 'câu hỏi',
     agencyList: [],
     lvdsList: [],
     lvttList: [],
@@ -501,6 +509,13 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      vm.phanAnhKienNghi = phanAnhKienNghiPage
+      if (vm.phanAnhKienNghi) {
+        vm.titleData = 'kiến nghị'
+      }
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       var vm = this
       console.log('run1 run1 run1')
@@ -632,7 +647,7 @@ export default {
             publish: 0,
             j_captcha_response: vm.$refs.captcha.j_captcha_response,
             agencyCode: vm.agencySelected ? vm.agencySelected['itemCode'] : '',
-            questionType: ''
+            questionType: vm.phanAnhKienNghi ? 'PAKN' : 'FAQ'
           }
           vm.$store.dispatch('addQuestion', filter).then(function (result) {
             toastr.success('Hệ thống đã tiếp nhận câu hỏi của bạn')

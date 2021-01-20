@@ -128,7 +128,7 @@
         <v-card class="px-0">
           <v-card-title color="primary" class="headline">Yêu cầu xác minh tài khoản</v-card-title>
           <v-divider class="my-0"></v-divider>
-          <v-card-text>Tài khoản chỉ được phép nộp tối đa 3 hồ sơ trực tuyến khi chưa được xác minh. <br>
+          <v-card-text>Tài khoản chỉ được phép nộp tối đa {{userLoginInfomation['maxCounterVerifiCreateDossier']}} hồ sơ trực tuyến khi chưa được xác minh. <br>
             Để tiếp tục nộp hồ sơ trực tuyến vui lòng mang chứng minh thư nhân dân/ thẻ căn cước đến Bộ phận tiếp nhận và trả kết quả để được xác minh.
           </v-card-text>
           <v-card-actions>
@@ -211,7 +211,25 @@
       // 
       axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
         let userData = response.data
-        vm.$store.commit('setUserLogin', userData)
+        if (vm.verificationApplicantCreateDossier && userData) {
+          let filter = {
+            serverNo: 'COUNTER_VERIFY_CREATEDOSSIER'
+          }
+          vm.$store.dispatch('getServerConfig', filter).then(function (result) {
+            if (result.hasOwnProperty('configs')) {
+              try {
+                userData = Object.assign(userData, {maxCounterVerifiCreateDossier: JSON.parse(result.configs)['counter']})
+              } catch (error) {
+              }
+            }
+            vm.$store.commit('setUserLogin', userData)
+          }).catch(function(){
+            vm.$store.commit('setUserLogin', userData)
+          })
+        } else {
+          vm.$store.commit('setUserLogin', userData)
+        }
+        
       })
       .catch(function(error) {
       })
@@ -421,15 +439,70 @@
       },
       doAddDVC () {
         let vm = this
-        if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
-          vm.dialogVerifycation = true
+        if (vm.verificationApplicantCreateDossier) {
+          axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
+            let userData = response.data
+            if (vm.verificationApplicantCreateDossier && userData) {
+              let filter = {
+                serverNo: 'COUNTER_VERIFY_CREATEDOSSIER'
+              }
+              vm.$store.dispatch('getServerConfig', filter).then(function (result) {
+                if (result.hasOwnProperty('configs')) {
+                  try {
+                    userData = Object.assign(userData, {maxCounterVerifiCreateDossier: JSON.parse(result.configs)['counter']})
+                  } catch (error) {
+                  }
+                }
+                vm.$store.commit('setUserLogin', userData)
+                if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
+                  vm.dialogVerifycation = true
+                } else {
+                  if (vm.showListLinhVuc) {
+                    vm.$router.push('/linh-vuc-thu-tuc')
+                  } else {
+                    vm.$router.push('/add-dvc/0')
+                  }
+                }
+              }).catch(function(){
+                vm.$store.commit('setUserLogin', userData)
+                if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
+                  vm.dialogVerifycation = true
+                } else {
+                  if (vm.showListLinhVuc) {
+                    vm.$router.push('/linh-vuc-thu-tuc')
+                  } else {
+                    vm.$router.push('/add-dvc/0')
+                  }
+                }
+              })
+            } else {
+              vm.$store.commit('setUserLogin', userData)
+              if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
+                vm.dialogVerifycation = true
+              } else {
+                if (vm.showListLinhVuc) {
+                  vm.$router.push('/linh-vuc-thu-tuc')
+                } else {
+                  vm.$router.push('/add-dvc/0')
+                }
+              }
+            }
+            
+          })
+          .catch(function(error) {
+          })
         } else {
-          if (vm.showListLinhVuc) {
-            vm.$router.push('/linh-vuc-thu-tuc')
+          if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
+            vm.dialogVerifycation = true
           } else {
-            vm.$router.push('/add-dvc/0')
+            if (vm.showListLinhVuc) {
+              vm.$router.push('/linh-vuc-thu-tuc')
+            } else {
+              vm.$router.push('/add-dvc/0')
+            }
           }
         }
+        
       },
       onResize () {
         let vm = this

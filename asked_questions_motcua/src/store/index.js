@@ -19,7 +19,7 @@ export const store = new Vuex.Store({
     indexQuestion: 0,
     questionListDefault: [
     ],
-    questionList: [],
+    questionList: '',
     questionDetail: '',
     lvdsFilter: '',
     lvttFilter: '',
@@ -143,7 +143,7 @@ export const store = new Vuex.Store({
               keyword: filter.keyword ? filter.keyword : '',
               publish: filter.publish,
               answered: filter.answered,
-              questionType: 'FAQ',
+              questionType: filter.questionType ? filter.questionType : 'FAQ',
               subDomainCode: filter.subDomainCode ? filter.subDomainCode : ''
             }
           } else {
@@ -154,7 +154,7 @@ export const store = new Vuex.Store({
               govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
               domainCode: filter.domainCode ? filter.domainCode : '',
               keyword: filter.keyword ? filter.keyword : '',
-              questionType: 'FAQ',
+              questionType: filter.questionType ? filter.questionType : 'FAQ',
               subDomainCode: filter.subDomainCode ? filter.subDomainCode : ''
             }
           }
@@ -227,7 +227,7 @@ export const store = new Vuex.Store({
               govAgencyCode: filter['agencyCode'] ? filter['agencyCode'] : '',
               publish: filter['publish'] ? filter['publish'] : '',
               answered: filter['answered'] ? filter['answered'] : '',
-              questionType: 'FAQ'
+              questionType: filter.questionType ? filter.questionType : 'FAQ'
             }
             let dataPost = new URLSearchParams()
             let textPost = params
@@ -427,7 +427,12 @@ export const store = new Vuex.Store({
           dataPost.append('data', '')
           axios.post('/o/rest/v2/faq/proxy', dataPost, param).then(response => {
             if (response.data && response.data['data']) {
-              resolve(response.data['data'])
+              let resultData = response.data['data']
+              if (Array.isArray(resultData)) {
+                resolve(resultData)
+              } else {
+                resolve([resultData])
+              }
             } else {
               resolve([])
             }

@@ -1197,6 +1197,8 @@ export default {
     },
     doDynamicReport () {
       let vm = this
+      console.log('getAgencyReportLists2', vm.itemsReports)
+      console.log('itemsReports', vm.itemsReports[vm.index])
       vm.isRender = false
       vm.docDefinition = {}
       let docDString = {}
@@ -1725,6 +1727,7 @@ export default {
       let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
       
       console.log('getAgencyReportLists2', filter)
+      console.log('itemsReports', vm.itemsReports[vm.index])
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         // console.log('result',result)
         if (result !== null) {

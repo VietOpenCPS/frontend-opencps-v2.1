@@ -118,7 +118,7 @@ export const store = new Vuex.Store({
                 answered: filter.answered,
                 domainCode: filter.domainCode ? filter.domainCode : '',
                 subDomainCode: filter.subDomainCode ? filter.subDomainCode : '',
-                questionType: filter.questionType ? filter.questionType : ''
+                questionType: filter.hasOwnProperty('questionType') ? filter.questionType : ''
               }
             }
           } else {
@@ -250,6 +250,37 @@ export const store = new Vuex.Store({
           dataAdd.append('subDomainName', filter.subDomainName ? filter.subDomainName : '')
           dataAdd.append('j_captcha_response', filter.j_captcha_response ? filter.j_captcha_response : '')
           dataAdd.append('questionType', filter.questionType ? filter.questionType : '')
+          axios.post(url, dataAdd, param).then(response => {
+            if (response['status'] !== undefined && response['status'] === 203) {
+              toastr.clear()
+              toastr.error('Mã captcha không chính xác')
+              reject('captcha')
+            } else {
+              resolve(response.data)
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    adminAddQuestion ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+          var url = state.endPointApi + '/faq/questions'
+          var dataAdd = new URLSearchParams()
+          dataAdd.append('content', filter.content ? filter.content : '')
+          dataAdd.append('publish', filter.publish ? filter.publish : '')
+          dataAdd.append('govAgencyCode', filter.agencyCode ? filter.agencyCode : '')
+          dataAdd.append('questionType', filter.questionType ? filter.questionType : '')
+          dataAdd.append('j_captcha_response', filter.j_captcha_response ? filter.j_captcha_response : '')
           axios.post(url, dataAdd, param).then(response => {
             if (response['status'] !== undefined && response['status'] === 203) {
               toastr.clear()
@@ -406,7 +437,12 @@ export const store = new Vuex.Store({
           let url = state.serverConfig ? state.serverConfig['url'] : state.endPointApi
           axios.get(url + '/faq/questions/' + filter.questionId + '/answers', param).then(function (response) {
             if (response.data && response.data['data']) {
-              resolve(response.data['data'])
+              let resultData = response.data['data']
+              if (Array.isArray(resultData)) {
+                resolve(resultData)
+              } else {
+                resolve([resultData])
+              }
             } else {
               resolve([])
             }

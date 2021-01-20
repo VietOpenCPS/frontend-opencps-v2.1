@@ -378,11 +378,11 @@
       <v-dialog v-model="dialogVerifycation" max-width="350">
         <v-card class="px-0">
           <v-card-title color="primary" class="headline">Yêu cầu xác minh tài khoản</v-card-title>
-          <v-divider></v-divider>
-          <v-card-text>Tài khoản chỉ được phép nộp tối đa 3 hồ sơ trực tuyến khi chưa được xác minh. Để tiếp tục nộp hồ sơ trực tuyến vui lòng mang chứng minh thư nhân dân/ thẻ căn cước đến Bộ phận tiếp nhận và trả kết quả để được xác minh.</v-card-text>
+          <v-divider class="my-0"></v-divider>
+          <v-card-text>Tài khoản chỉ được phép nộp tối đa {{userLoginInfomation['maxCounterVerifiCreateDossier']}} hồ sơ trực tuyến khi chưa được xác minh. Để tiếp tục nộp hồ sơ trực tuyến vui lòng mang chứng minh thư nhân dân/ thẻ căn cước đến Bộ phận tiếp nhận và trả kết quả để được xác minh.</v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="green darken-1" flat @click="dialog = false">Đóng</v-btn>
+            <v-btn color="green darken-1" flat @click="dialogVerifycation = false">Đóng</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -445,6 +445,7 @@
 </template>
 
 <script>
+  import axios from 'axios'
   import Captcha from './Captcha.vue'
   import toastr from 'toastr'
   import TinyPagination from './pagging/opencps_pagination.vue'
@@ -552,9 +553,37 @@
         let params = {
           service: vm.serviceCode
         }
-        vm.$store.dispatch('getServiceConfigs', params).then( res => {
-          vm.pullServiceOptions(res.data[0])
-        })
+        if (vm.verificationApplicantCreateDossier) {
+          axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
+            let userData = response.data
+            if (vm.verificationApplicantCreateDossier && userData) {
+              let filter = {
+                serverNo: 'COUNTER_VERIFY_CREATEDOSSIER'
+              }
+              vm.$store.dispatch('getServerConfig', filter).then(function (result) {
+                if (result.hasOwnProperty('configs')) {
+                  try {
+                    userData = Object.assign(userData, {maxCounterVerifiCreateDossier: JSON.parse(result.configs)['counter']})
+                  } catch (error) {
+                  }
+                }
+                vm.$store.commit('setUserLogin', userData)
+                vm.$store.dispatch('getServiceConfigs', params).then( res => {
+                  vm.pullServiceOptions(res.data[0])
+                })
+              }).catch(function(){
+                vm.$store.commit('setUserLogin', userData)
+                vm.$store.dispatch('getServiceConfigs', params).then( res => {
+                  vm.pullServiceOptions(res.data[0])
+                })
+              })
+            }
+          })
+        } else {
+          vm.$store.dispatch('getServiceConfigs', params).then( res => {
+            vm.pullServiceOptions(res.data[0])
+          })
+        }
       }
       vm.getServiceAdminisTration()
       vm.getLevers()
@@ -760,7 +789,6 @@
       },
       pullServiceOptions (item, serviceInfo) {
         var vm = this
-
         if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
           vm.hasVerify = true
           setTimeout(function () {

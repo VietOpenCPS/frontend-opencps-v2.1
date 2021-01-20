@@ -824,7 +824,7 @@ export default {
         }
       },
     },
-    khoTaiLieuCongDan: true,
+    khoTaiLieuCongDan: false,
     allFileMark: false,
     render: true,
     showKySo: false,
@@ -1986,7 +1986,7 @@ export default {
         return 'calc(100% - 140px)'
       } else {
         let divPx = 0
-        if (vm.originality !== 1 && item.partType === 1 && !vm.thongTinHoSo.online && vm.checkInput !== 1) {
+        if (vm.originality !== 1 && (item.partType === 1 || item.partType === 3) && !vm.thongTinHoSo.online && vm.checkInput !== 1) {
           if (!vm.onlyView) {
             divPx += 240
           } else {

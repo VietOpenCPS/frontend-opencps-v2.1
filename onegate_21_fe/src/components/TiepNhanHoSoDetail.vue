@@ -72,7 +72,7 @@
                           :placeholder="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : (originality === 1 ? 'Nhập nội dung yêu cầu giải quyết' : 'Nhập tên hồ sơ')"
                         ></v-textarea>
                       </v-form>
-                      <div v-if="fixDescriptionDt && templateDescription"><span style="color: red">(*)</span> &nbsp; 
+                      <div v-if="fixDescriptionDt"><span style="color: red">(*)</span> &nbsp; 
                         Đối với thủ tục thông báo khuyến mãi, đề nghị nhập vào ô này tên doanh nghiệp, tên chương trình khuyến mãi, thời gian thực hiện, tổng giá trị hàng hoá dịch vụ 
                         <span style="color: red">dùng để khuyến mãi</span>
                       </div>
@@ -894,7 +894,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: false,
+    notifyConfig: true,
     fromViaPostal: false,
     fromViaPostalConfig: false,
     smsNotify: true,

@@ -2,15 +2,23 @@
     <div>
       <div class="row-header no__hidden_class">
         <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
-          <span>DANH SÁCH HỒ SƠ DỊCH VỤ HÀNH CHÍNH CÔNG</span>
+          <span v-if="!boNganh">DANH SÁCH HỒ SƠ DỊCH VỤ HÀNH CHÍNH CÔNG</span>
+          <span v-if="boNganh">TRA CỨU THÔNG TIN HỒ SƠ</span>
+        </div>
+        <div class="layout row wrap header_tools row-blue">
+          <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+            <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
+              <v-icon size="16">reply</v-icon> &nbsp; Quay lại 
+            </v-btn>
+          </div>
         </div>
       </div>
       <v-form ref="form" v-model="validFormSearch" lazy-validation>
         <v-layout wrap>
-          <div class="adv_search my-2 px-2" style="background: #eeeeee">
-            <div class="searchAdvanced-content pb-3">
+          <div class="adv_search my-2 px-2" :style="!boNganh ? 'background: #eeeeee' : 'background: #eeeeee;width: 100%'">
+            <div :class="!boNganh ? 'searchAdvanced-content pb-3' : 'searchAdvanced-content py-3'">
               <v-layout wrap>
-                <v-flex xs12 class="px-2">
+                <v-flex xs12 class="px-2" v-if="!boNganh">
                   <v-layout wrap align-center>
                     <v-flex class="text-bold" style="font-weight:450;width: 200px;">Cấp đơn vị thực hiện:</v-flex>
                     <v-flex style="width: calc(100% - 200px);">    
@@ -59,9 +67,9 @@
                     ></v-autocomplete>
                   </div>
                 </v-flex> -->
-                <v-flex class="mb-2 px-2 xs12">
+                <v-flex class="mb-2 px-2 xs12" v-if="!boNganh">
                   <div>
-                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Đơn vị thực hiện <span style="color: red" > (*)</span>:</div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Đơn vị <span style="color: red" > (*)</span>:</div>
                     <v-autocomplete
                       placeholder="Chọn đơn vị thực hiện"
                       class="select-search d-inline-block"
@@ -125,7 +133,7 @@
                     ></v-autocomplete>
                   </div>
                 </v-flex>
-                <v-flex xs12 sm6 class="mb-2 px-2">
+                <v-flex :class="!boNganh ? 'mb-2 px-2 xs12 sm6' : 'mb-2 px-2 xs12'">
                   <div>
                     <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Mã hồ sơ :</div>
                     <v-text-field
@@ -143,7 +151,7 @@
                     ></v-text-field>
                   </div>
                 </v-flex>
-                <v-flex xs12 sm6 class="mb-2 px-2">
+                <v-flex xs12 sm6 class="mb-2 px-2" v-if="!boNganh">
                   <div>
                     <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Trạng thái hồ sơ :</div>
                     <v-autocomplete
@@ -184,6 +192,7 @@
         hide-actions
         class="table-landing table-bordered mt-3"
         style="border-left: 1px solid #dedede"
+        no-data-text="Không có hồ sơ"
       >
         <template slot="items" slot-scope="props">
           <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;" @click="viewDetailDossier(props.item)">
@@ -376,7 +385,7 @@
                 <v-card>
                   <v-card-text class="py-0 mt-2">
                     <v-data-table :headers="headersTienTrinh" :items="dossierActions" class="table-landing table-bordered"
-                    hide-actions no-data-text="Không có dữ liệu"
+                    hide-actions no-data-text="Không có thông tin tiến trình xử lý"
                     >
                       <template slot="headerCell" slot-scope="props">
                         <v-tooltip bottom>
@@ -475,6 +484,7 @@
       dialogDetailDossier: false,
       dossierActions: [],
       quanhuyenSelected: '',
+      boNganh: false,
       dossierListHeader: [
         {
           text: 'STT',
@@ -572,7 +582,17 @@
       let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
-      vm.getServiceAdminisTration()
+      try {
+        vm.boNganh = boNganh
+      } catch (error) {
+      }
+      if (!vm.boNganh) {
+        vm.getServiceAdminisTration()
+      } else {
+        vm.getDomains()
+        vm.getServiceInfo()
+      }
+      
     },
     watch: {
       capCoQuanThucHien (val) {
@@ -759,21 +779,18 @@
       },
       getDossiers () {
         let vm = this
-        if (vm.dossierNoKey) {
-          vm.statusFilter = ''
+        vm.loadingTable = true
+        let params = {
+          groupId: vm.groupIdDonVi ? vm.groupIdDonVi : '',
+          start:  vm.dossierPage * vm.limitRecord - vm.limitRecord,
+          end: vm.dossierPage * vm.limitRecord,
+          agency: vm.govAgencyFilter ? vm.govAgencyFilter : '',
+          domain: vm.domainFilter ? vm.domainFilter : '',
+          service: vm.serviceFilter ? vm.serviceFilter : '',
+          dossierNo: vm.dossierNoKey,
+          status: vm.statusFilter
         }
-        if (vm.$refs.form.validate()) {
-          vm.loadingTable = true
-          let params = {
-            groupId: vm.groupIdDonVi,
-            start:  vm.dossierPage * vm.limitRecord - vm.limitRecord,
-            end: vm.dossierPage * vm.limitRecord,
-            agency: vm.govAgencyFilter ? vm.govAgencyFilter : '',
-            domain: vm.domainFilter ? vm.domainFilter : '',
-            service: vm.serviceFilter ? vm.serviceFilter : '',
-            dossierNo: vm.dossierNoKey,
-            status: vm.statusFilter
-          }
+        if (!vm.boNganh) {
           vm.$store.dispatch('getDossiers', params).then(res => {
             vm.loadingTable = false
             vm.totalDossierSearch = res.total
@@ -789,7 +806,20 @@
             vm.totalDossierSearch = 0
           })
         } else {
-          toastr.error('Vui lòng chọn đơn vị để tìm kiếm')
+          vm.$store.dispatch('getDossiersFromDvc', params).then(res => {
+            vm.loadingTable = false
+            vm.totalDossierSearch = res.total
+            if (res.data) {
+              vm.dossierList = res.data
+            } else {
+              vm.dossierList = []
+              vm.totalDossierSearch = 0
+            }
+          }).catch(() => {
+            vm.loadingTable = false
+            vm.dossierList = []
+            vm.totalDossierSearch = 0
+          })
         }
       },
       getDetailDossier (data) {
@@ -800,11 +830,45 @@
           },
           params: {}
         }
-        let url = '/o/rest/v2/dossiers/' + data.dossierId
-        axios.get(url, config).then(function (response) {
-          vm.thongTinChiTietHoSo = response.data
-          vm.loadDossierActions(vm.thongTinChiTietHoSo)
-        })
+        if (!boNganh) {
+          let url = '/o/rest/v2/dossiers/' + data.dossierId
+          axios.get(url, config).then(function (response) {
+            vm.thongTinChiTietHoSo = response.data
+            vm.loadDossierActions(vm.thongTinChiTietHoSo)
+          })
+        } else {
+          let dataPost = new URLSearchParams()
+          let textPost = {}
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/dossiers/' + data.dossierId)
+          dataPost.append('data', JSON.stringify(textPost))
+
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (response) {
+            vm.thongTinChiTietHoSo = response.data
+            if (!vm.boNganh) {
+              vm.loadDossierActions(vm.thongTinChiTietHoSo)
+            } else {
+              try {
+                let resultTemp = JSON.parse(vm.thongTinChiTietHoSo['submissionNote'])['data']
+                for (let i = 0; i < resultTemp.length; i++) {
+                  if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                    if (!Array.isArray(resultTemp[i]['actions'])) {
+                      let arrActionsTemp = []
+                      arrActionsTemp.push(resultTemp[i]['actions'])
+                      resultTemp[i]['actions'] = arrActionsTemp
+                    }
+                  }
+                }
+                vm.dossierActions = resultTemp
+              } catch (error) {
+                vm.dossierActions = []
+              }
+            }
+          }, error => {
+            reject(error)
+          })
+        }
+        
       },
       loadDossierActions (data) {
         let vm = this
@@ -834,6 +898,7 @@
           
         }).catch(function (xhr) {
         })
+
       },
       changePage (config) {
         let vm = this
@@ -865,6 +930,9 @@
           durationText = durationCount + ' giờ'
         }
         return durationText
+      },
+      goBack () {
+        window.history.back()
       },
     },
     filters: {

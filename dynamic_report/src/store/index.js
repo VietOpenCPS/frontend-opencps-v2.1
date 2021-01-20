@@ -172,6 +172,15 @@ export const store = new Vuex.Store({
               let dynamicReportsFilterSharing = serializable['getDynamicReports'].filter(function (item) {
                 return String(item.sharing) !== '9'
               })
+              try {
+                // TH chỉ lấy các mẫu theo cấu hình từng site
+                if (reportTypeScope) {
+                  dynamicReportsFilterSharing = dynamicReportsFilterSharing.filter(function (item) {
+                    return item.userConfig && JSON.parse(item.userConfig).hasOwnProperty('reportTypeScope') && JSON.parse(item.userConfig)['reportTypeScope'] === reportTypeScope
+                  })
+                }
+              } catch (error) {
+              }
               for (let key in dynamicReportsFilterSharing) {
                 let current = dynamicReportsFilterSharing[key]
                 console.log('keyDynamicReports', current['filterConfig'])
@@ -228,8 +237,17 @@ export const store = new Vuex.Store({
               itemsReportsData = itemsReportsData.filter(function (item) {
                 return String(item.sharing) !== '9'
               })
+              try {
+                // TH chỉ lấy các mẫu theo cấu hình từng site
+                if (reportTypeScope) {
+                  console.log('reportTypeScope123', itemsReportsData)
+                  itemsReportsData = itemsReportsData.filter(function (item) {
+                    return item.userConfig && item.userConfig.hasOwnProperty('reportTypeScope') && item.userConfig['reportTypeScope'] === reportTypeScope
+                  })
+                }
+              } catch (error) {
+              }
               state.itemsReports = itemsReportsData
-              console.log('state.itemsReports', state.itemsReports)
               resolve(itemsReportsData)
             }).catch(function (error) {
               state.itemsReports = []
@@ -254,6 +272,15 @@ export const store = new Vuex.Store({
             let dynamicReportsFilterSharing = serializable['getDynamicReports'].filter(function (item) {
               return String(item.sharing) !== '9'
             })
+            try {
+              // TH chỉ lấy các mẫu theo cấu hình từng site
+              if (reportTypeScope) {
+                dynamicReportsFilterSharing = dynamicReportsFilterSharing.filter(function (item) {
+                  return item.userConfig && JSON.parse(item.userConfig).hasOwnProperty('reportTypeScope') && JSON.parse(item.userConfig)['reportTypeScope'] === reportTypeScope
+                })
+              }
+            } catch (error) {
+            }
             for (let key in dynamicReportsFilterSharing) {
               let current = dynamicReportsFilterSharing[key]
               try {
@@ -309,8 +336,16 @@ export const store = new Vuex.Store({
             itemsReportsData = itemsReportsData.filter(function (item) {
               return String(item.sharing) !== '9'
             })
+            try {
+              // TH chỉ lấy các mẫu theo cấu hình từng site
+              if (reportTypeScope) {
+                itemsReportsData = itemsReportsData.filter(function (item) {
+                  return item.userConfig && item.userConfig.hasOwnProperty('reportTypeScope') && item.userConfig['reportTypeScope'] === reportTypeScope
+                })
+              }
+            } catch (error) {
+            }
             state.itemsReports = itemsReportsData
-            console.log('state.itemsReports', state.itemsReports)
             resolve(itemsReportsData)
           }).catch(function (error) {
             state.itemsReports = []

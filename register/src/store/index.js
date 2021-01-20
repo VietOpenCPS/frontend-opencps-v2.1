@@ -90,16 +90,10 @@ export const store = new Vuex.Store({
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }
-        // test local
-        var url = '/o/rest/v2/applicants/ngsp/verify'
-        // var url = 'http://127.0.0.1:8081/api/applicants/ngsp/verify'
-        var dataCheck = new URLSearchParams()
-        dataCheck.append('applicantIdNo', filter.applicantIdNo ? filter.applicantIdNo : '')
-        dataCheck.append('applicantName', filter.applicantName ? filter.applicantName : '')
-        axios.post(url, dataCheck, param).then(result1 => {
-          resolve(result1.data)
+        axios.get('/o/rest/v2/applicants/enterprisedvcqg/' + filter.applicantIdNo, param).then(function (response) {
+          resolve(response.data)
         }).catch(xhr => {
-          reject(xhr)
+          reject('')
         })
       })
     },

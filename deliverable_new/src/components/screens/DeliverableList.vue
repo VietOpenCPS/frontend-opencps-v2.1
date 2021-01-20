@@ -373,14 +373,14 @@
             </v-tooltip> -->
 
             <v-tooltip top v-if="!loadingTable">
-              <v-btn :disabled="props.item['dossierId'] === '0' ? false : true" slot="activator" flat icon class="mx-0 my-0" v-if="!loadingTable" v-on:click.native="editDeliverables(props.item)">
+              <v-btn :disabled="props.item['dossierId'] === '0' && props.item['moderator'] ? false : true" slot="activator" flat icon class="mx-0 my-0" v-if="!loadingTable" v-on:click.native="editDeliverables(props.item)">
                 <v-icon>edit</v-icon>
               </v-btn>
               <span>Sửa&nbsp;{{String(loaiDuLieu).toLowerCase()}}</span>
             </v-tooltip>
 
             <v-tooltip top v-if="!loadingTable">
-              <v-btn slot="activator" flat icon class="mx-0 my-0" v-if="props.item['dossierId'] === '0' && !loadingTable" v-on:click.native="deleteDeliverable(props.item)">
+              <v-btn slot="activator" :disabled="props.item['moderator'] ? false : true" flat icon class="mx-0 my-0" v-if="props.item['dossierId'] === '0' && !loadingTable" v-on:click.native="deleteDeliverable(props.item)">
                 <v-icon>delete</v-icon>
               </v-btn>
               <span>Xóa&nbsp;{{String(loaiDuLieu).toLowerCase()}}</span>
@@ -844,17 +844,20 @@
       },
       editDeliverables (item, index) {
         let vm = this
-        let current = vm.$router.history.current
-        let newQuery = current.query
-        let queryString = '?'
-        for (let key in newQuery) {
-          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
-            queryString += key + '=' + newQuery[key] + '&'
+        if (item['moderator']) {
+          let current = vm.$router.history.current
+          let newQuery = current.query
+          let queryString = '?'
+          for (let key in newQuery) {
+            if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+              queryString += key + '=' + newQuery[key] + '&'
+            }
           }
+          vm.$router.push({
+            path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString + 'editForm=true'
+          })
         }
-        vm.$router.push({
-          path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString + 'editForm=true'
-        })
+        
       },
       showPDFG (item) {
         let vm = this
@@ -1090,7 +1093,7 @@
           bodyFormData.append('deliverableTypeCode', vm.items[vm.index]['typeCode'])
           axios({
             method: 'post',
-            url: '/o/rest/v2/deliverables/import/files-v3',
+            url: '/o/rest/v2/deliverables/import/file/v3',
             data: bodyFormData,
             config: { headers: {
                 'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
@@ -1112,48 +1115,50 @@
       },
       deleteDeliverable (item) {
         let vm = this
-        let x = confirm('Bạn có muốn thực hiện thao tác này?')
-        if(x){
-          let param = {
-            headers: {
-              groupId: window.themeDisplay.getScopeGroupId()
-            }
-          }
-          axios.delete('/o/rest/v2/deliverables/' + item.deliverableId, param).then(function () {
-            toastr.success('Thực hiện thành công')
-            vm.loadingTable = true
-            let currentQuery = vm.$router.history.current.query
-            let queryString = ''
-            for (let key in currentQuery) {
-              if (currentQuery[key] !== '' && currentQuery[key] !== 'undefined' && currentQuery[key] !== undefined) {
-                queryString += key + '=' + currentQuery[key] + '&'
+        if (item['moderator']) {
+          let x = confirm('Bạn có muốn thực hiện thao tác này?')
+          if(x){
+            let param = {
+              headers: {
+                groupId: window.themeDisplay.getScopeGroupId()
               }
             }
-            queryString += '1=1'
-            let filter = {
-              type: vm.items[vm.index]['typeCode'],
-              page: vm.hosoDatasPage,
-              q: queryString,
-            }
-            try {
-              let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
-              if (tableConfig.hasOwnProperty('paramUrl') && tableConfig.paramUrl) {
-                filter = Object.assign(filter, {formDataKey: JSON.stringify(tableConfig.paramUrl)})
+            axios.delete('/o/rest/v2/deliverables/' + item.deliverableId, param).then(function () {
+              toastr.success('Thực hiện thành công')
+              vm.loadingTable = true
+              let currentQuery = vm.$router.history.current.query
+              let queryString = ''
+              for (let key in currentQuery) {
+                if (currentQuery[key] !== '' && currentQuery[key] !== 'undefined' && currentQuery[key] !== undefined) {
+                  queryString += key + '=' + currentQuery[key] + '&'
+                }
               }
-            } catch (error) {
-            }
-            vm.$store.dispatch('getDeliverables', filter).then(function (result) {
-              vm.hosoDatasTotal = result['total']
-              vm.hosoDatas = result['data']
-              vm.loadingTable = false
-            }).catch(function (reject) {
-              vm.loadingTable = false
+              queryString += '1=1'
+              let filter = {
+                type: vm.items[vm.index]['typeCode'],
+                page: vm.hosoDatasPage,
+                q: queryString,
+              }
+              try {
+                let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
+                if (tableConfig.hasOwnProperty('paramUrl') && tableConfig.paramUrl) {
+                  filter = Object.assign(filter, {formDataKey: JSON.stringify(tableConfig.paramUrl)})
+                }
+              } catch (error) {
+              }
+              vm.$store.dispatch('getDeliverables', filter).then(function (result) {
+                vm.hosoDatasTotal = result['total']
+                vm.hosoDatas = result['data']
+                vm.loadingTable = false
+              }).catch(function (reject) {
+                vm.loadingTable = false
+              })
+            }).catch(function (xhr) {
+              toastr.success('Thực hiện thất bại')
             })
-          }).catch(function (xhr) {
-            toastr.success('Thực hiện thất bại')
-          })
+          }
         }
-
+        
       },
       getState (item) {
         let currentDate = (new Date()).getTime()

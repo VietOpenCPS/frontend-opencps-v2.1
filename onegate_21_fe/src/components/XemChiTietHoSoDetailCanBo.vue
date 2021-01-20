@@ -1031,7 +1031,7 @@ export default {
     titleDialogPdf: 'Tài liệu đính kèm',
     viewScript: false,
     loadingForm: false,
-    hasPreviewSync: false,
+    hasPreviewSync: true,
     isNotarization: false,
     sequencyDossierImport: false,
     mauCongVan: '',

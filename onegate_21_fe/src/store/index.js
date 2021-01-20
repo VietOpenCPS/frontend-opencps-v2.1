@@ -5211,6 +5211,24 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getServerConfig ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        let url = '/o/rest/v2/serverconfigs/' + filter.serverNo
+        axios.get(url, param).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          console.log(error)
+          reject(error)
+        })
+      })
+    },
     // ----End---------
   },
   mutations: {

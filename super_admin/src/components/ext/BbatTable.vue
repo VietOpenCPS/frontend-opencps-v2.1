@@ -454,6 +454,7 @@
         })
       },
       getData () {
+        // lấy dữ liệu bảng DB render table
         let vm = this
         vm.showCopy = false
         vm.exportExcel = false

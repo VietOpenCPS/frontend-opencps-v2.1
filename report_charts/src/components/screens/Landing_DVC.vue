@@ -1003,7 +1003,9 @@ export default {
           vm.chartView = (currentQuerys.chartView === 'true')
         }
         if (currentQuerys.hasOwnProperty('system')) {
-          vm.systemReport = currentQuerys.system
+          vm.systemReport = currentQuerys.system || currentQuerys.system == '0' ? currentQuerys.system : 'total'
+        } else {
+          vm.systemReport = 'total'
         }
         vm.doStaticsReport()
         if (vm.isOnegate) {
@@ -1146,7 +1148,9 @@ export default {
         }
       }
       if (currentQuerys.hasOwnProperty('system')) {
-        vm.systemReport = currentQuerys.system
+        vm.systemReport = currentQuerys.system || currentQuerys.system == '0' ? currentQuerys.system : 'total'
+      } else {
+        vm.systemReport = 'total'
       }
       vm.doStaticsReport()
     },

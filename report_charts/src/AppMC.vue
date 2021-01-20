@@ -25,12 +25,18 @@
             <v-list-tile @click="goTo('thong-ke#/danh-gia-hai-long')">
               <v-list-tile-title >Đánh giá DVC mức độ 3, 4</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile @click="goTo('chi-so-danh-gia')">
+            <v-list-tile @click="goTo('thong-ke#/chi-so-danh-gia')">
               <v-list-tile-title @click="goTo('thong-ke#/chi-so-danh-gia')">Chỉ số đánh giá giải quyết TTHC</v-list-tile-title>
             </v-list-tile>
           </v-list>
         </v-menu>
-        <v-menu left offset-x open-on-hover>
+        <v-tooltip left>
+          <v-btn slot="activator" flat icon color="orange" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('tra-cuu-ho-so')">
+            <v-icon size="20">search</v-icon>
+          </v-btn>
+          <span>Tra cứu thông tin hồ sơ</span>
+        </v-tooltip>
+        <!-- <v-menu left offset-x open-on-hover>
           <v-btn slot="activator" flat icon color="orange" class="mx-0 my-0" style="width: 32px;height:32px">
             <v-icon size="20">perm_identity</v-icon>
           </v-btn>
@@ -43,7 +49,7 @@
               <v-list-tile-title>Tình hình xử lý hồ sơ của cán bộ</v-list-tile-title>
             </v-list-tile>
           </v-list>
-        </v-menu>
+        </v-menu> -->
       </div>
     </v-content>
   </v-app>

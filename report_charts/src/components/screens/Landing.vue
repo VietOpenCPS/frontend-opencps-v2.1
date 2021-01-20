@@ -357,24 +357,6 @@ export default {
     agencyLists: [],
     agencyListsMonth: [],
     group: '',
-    years: [
-      {
-        'value': '2020',
-        'name': 'Năm 2020'
-      },
-      {
-        'value': '2019',
-        'name': 'Năm 2019'
-      },
-      {
-        'value': '2018',
-        'name': 'Năm 2018'
-      },
-      {
-        'value': '2017',
-        'name': 'Năm 2017'
-      }
-    ],
     year: (new Date()).getFullYear() + '',
     months: [
       {
@@ -508,6 +490,14 @@ export default {
     seriesDonut: [0, 0, 0]
   }),
   computed: {
+    years() {
+      let arr = [];
+      let year = new Date().getFullYear();
+      for (let i = 0; i <= 3; i++) {
+        arr.push({ name: "Năm " + (year - i), value: year - i });
+      }
+      return arr;
+    },
     loadingMenuConfigToDo () {
       return this.$store.getters.loadingMenuConfigToDo
     },
@@ -533,7 +523,9 @@ export default {
         vm.reportGovName = ''
         vm.govAgencyCode = ''
         if (currentQuerys.hasOwnProperty('year')) {
-          vm.year = currentQuerys.year
+          vm.year = Number(currentQuerys.year)
+        } else {
+          vm.year = (new Date()).getFullYear()
         }
         if (currentQuerys.hasOwnProperty('month')) {
           vm.month = currentQuerys.month
@@ -603,9 +595,9 @@ export default {
       vm.govAgencyCode = ''
       console.log('currentQuerys', currentQuerys)
       if (currentQuerys.hasOwnProperty('year')) {
-        vm.year = currentQuerys.year + ''
+        vm.year = Number(currentQuerys.year)
       } else {
-        vm.year = (new Date()).getFullYear() + ''
+        vm.year = (new Date()).getFullYear()
       }
       if (currentQuerys.hasOwnProperty('month')) {
         vm.month = currentQuerys.month + ''

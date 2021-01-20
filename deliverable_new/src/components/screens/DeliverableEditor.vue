@@ -42,7 +42,7 @@
         
         <input type="file" id="documentFileAttach" @input="onUploadSingleFile($event, 0)" style="display:none">
         <input type="file" id="documentFileAttachSub" @input="onUploadSingleFile($event, 1)" style="display:none">
-        <v-btn small color="primary" class="mx-0 mt-2" dark @click.native="uploadFile">
+        <v-btn small color="primary" class="mx-0 mt-2" dark @click.native="uploadFile" v-if="detail['moderator'] || String(id) === '0'">
           <v-icon>fas fa fa-upload</v-icon> &nbsp; &nbsp;
           <span v-if="String(id) !== '0' && editDeliverable && detail['fileAttachs'] && detail['fileAttachs'] !== '0'">Cập nhật tài liệu đính kèm</span>
           <span v-else>Chọn tài liệu tải lên</span>
@@ -172,6 +172,10 @@
   import { detach } from '@syncfusion/ej2-base'
 
   Vue.use(UploaderPlugin)
+
+  toastr.options = {
+    'closeButton': true
+  }
   export default {
     props: ['index', 'id'],
     components: {
@@ -221,9 +225,8 @@
           vm.$store.commit('setUserPermission', vm.items[vm.index]['moderator'])
         }
         // 
-        vm.editDeliverable = String(vm.id) === '0' || (currentQuery.hasOwnProperty('editForm') && currentQuery.editForm) ? true : false
+        vm.editDeliverable = String(vm.id) === '0' || (currentQuery.hasOwnProperty('editForm') && currentQuery.editForm && vm.detail['moderator']) ? true : false
         vm.viewForm = currentQuery.hasOwnProperty('viewForm') && currentQuery.viewForm === 'true' ? true : false
-    
         vm.$store.dispatch('getDeliverableTypes').then(function (result) {
           setTimeout(() => {
             let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
@@ -254,6 +257,7 @@
             vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
               if (String(vm.id) !== '0') {
                 vm.detail = result
+                vm.editDeliverable = String(vm.id) === '0' || (currentQuery.hasOwnProperty('editForm') && currentQuery.editForm && vm.detail['moderator']) ? true : false
                 // test multiple fileAttachs
                 // vm.detail['fileAttachs'] = '1300487,1289275'
                 // 
@@ -428,6 +432,10 @@
                 if (field[prop].isRequired() && (field[prop].getValue() === '' || String(field[prop].getValue()).replace(/ /g, '') === '')) {
                   toastr.clear()
                   toastr.error(field[prop].options.title ? field[prop].options.title + ' là trường dữ liệu bắt buộc' : field[prop].options['name'] + ' là trường dữ liệu bắt buộc')
+                  $('html, body').animate({
+                    scrollTop: $("#" + field[prop].options['id']).offset().top
+                  }, 500);
+
                   return
                 }
               }
