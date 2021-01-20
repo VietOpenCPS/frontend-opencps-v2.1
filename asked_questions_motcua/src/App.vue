@@ -9,7 +9,7 @@
           Thêm mới câu hỏi
         </v-btn>
       </div> -->
-      <v-list class="pt-0" v-if="!phanAnhKienNghi">
+      <v-list class="pt-0" v-if="!phanAnhKienNghi && !gopY">
         <v-list-tile :style="activeTab === 0 ? 'border-left: 7px solid #00aeef' : ''">
           <v-list-tile-content class="pl-2" @click="filterQuestion(0, 'all')">
             <v-list-tile-title>Tất cả câu hỏi</v-list-tile-title>
@@ -66,7 +66,7 @@
         <v-divider class="my-0"></v-divider>
       </v-list>
       <!--  -->
-      <v-list class="pt-0" v-else>
+      <v-list class="pt-0" v-if="phanAnhKienNghi">
         <v-list-tile :style="activeTab === 0 ? 'border-left: 7px solid #00aeef' : ''">
           <v-list-tile-content class="pl-2" @click="filterQuestion(0, 'questionType=PAKN')">
             <v-list-tile-title>Tổng số kiến nghị</v-list-tile-title>
@@ -114,6 +114,36 @@
         </v-list-tile>
         <v-divider class="my-0"></v-divider>
       </v-list>
+      <!--  -->
+      <v-list class="pt-0" v-if="gopY">
+        <v-list-tile :style="activeTab === 0 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(0, 'questionType=GOPY')">
+            <v-list-tile-title>Tổng số góp ý</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalQuestionCounter}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
+
+        <v-list-tile :style="activeTab === 1 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(1, 'questionType=GOPY&answered=true')">
+            <v-list-tile-title>Góp ý đã được trả lời</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalAnswered}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 2 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(2, 'questionType=GOPY&answered=false')">
+            <v-list-tile-title>Góp ý chưa được trả lời</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalNotAnswer}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
     </v-navigation-drawer>
     <v-content :style="(!getUser('Administrator') && !getUser('Administrator_data') && !getUser('tra_loi_hoi_dap')) ? 'width: 100%;max-width: 1300px;margin: 0 auto' : ''">
       <router-view></router-view>
@@ -133,6 +163,7 @@
       totalFAQ: 0,
       agencyList: [],
       phanAnhKienNghi: false,
+      gopY: false,
       titleData: 'câu hỏi',
     }),
     computed: {
@@ -170,6 +201,13 @@
         vm.phanAnhKienNghi = phanAnhKienNghiPage
         if (vm.phanAnhKienNghi) {
           vm.titleData = 'kiến nghị'
+        }
+      } catch (error) {
+      }
+      try {
+        vm.gopY = gopY
+        if (vm.gopY) {
+          vm.titleData = 'góp ý'
         }
       } catch (error) {
       }
@@ -221,6 +259,9 @@
         if (vm.phanAnhKienNghi) {
           filter.questionType = "PAKN"
         }
+        if (vm.gopY) {
+          filter.questionType = "GOPY"
+        }
         vm.$store.commit('setLoading', true)
         console.log('getQuestion 111', filter)
         vm.$store.dispatch('getQuestions', filter).then(function (result) {
@@ -248,6 +289,9 @@
           answered: '',
           questionType: vm.phanAnhKienNghi ? 'PAKN' : ''
         }
+        if (vm.gopY) {
+          filter.questionType = 'GOPY'
+        }
         // vm.$store.commit('setLoading', true)
         try {
           if (agencyCodeSite) {
@@ -264,6 +308,9 @@
             publish: 1,
             answered: '',
             questionType: vm.phanAnhKienNghi ? 'PAKN' : ''
+          }
+          if (vm.gopY) {
+            filter1.questionType = 'GOPY'
           }
           try {
             if (agencyCodeSite) {
@@ -286,6 +333,9 @@
             answered: true,
             questionType: vm.phanAnhKienNghi ? 'PAKN' : ''
           }
+          if (vm.gopY) {
+            filter2.questionType = 'GOPY'
+          }
           try {
             if (agencyCodeSite) {
               filter2.agencyCode = agencyCodeSite
@@ -305,6 +355,9 @@
             agencyCode: '',
             publish: '',
             questionType: vm.phanAnhKienNghi ? 'PAKN' : 'FAQ'
+          }
+          if (vm.gopY) {
+            filter3.questionType = 'GOPY'
           }
           vm.$store.dispatch('getQuestionsCounter', filter3).then(function (result2) {
             vm.totalFAQ = result2['total']
