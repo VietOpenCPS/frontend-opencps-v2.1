@@ -200,7 +200,7 @@
               GỬI KIẾN NGHỊ
             </div>
           </v-flex>
-          <v-form ref="form" v-model="valid" lazy-validation>
+          <v-form ref="form1" v-model="valid" lazy-validation>
             <v-layout wrap class="px-2 mt-2 pb-3">
               <v-flex xs12>
                 <div class="mb-1">Cơ quan tiếp nhận <span style="color:red"></span></div>
@@ -478,7 +478,7 @@
         </v-card>
       </v-list>
     </v-navigation-drawer>
-    <v-dialog v-model="dialog_addQuestion" scrollable persistent max-width="1000px">
+    <v-dialog v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" v-model="dialog_addQuestion" scrollable persistent max-width="1000px">
       <v-card>
         <v-toolbar flat dark color="primary">
           <v-toolbar-title>Thêm mới câu hỏi</v-toolbar-title>
@@ -510,7 +510,7 @@
                   box
                   row="5"
                   placeholder="Nhập nội dung câu hỏi"
-                  v-model="content"
+                  v-model="contentAddQuestion"
                   :rules="[rules.required]"
                   required
                 ></v-textarea>
@@ -589,6 +589,7 @@ export default {
     keyword: '',
     answerList: [],
     content: '',
+    contentAddQuestion: '',
     contentAnswer: '',
     loadingAnswer: false,
     config: {},
@@ -854,7 +855,7 @@ export default {
         toastr.error('Mã captcha không chính xác')
         return
       } else if (vm.content) {
-        if (vm.$refs.form.validate()) {
+        if (vm.$refs.form1.validate()) {
           let filter = {
             content: vm.content,
             fullname: vm.fullName,
@@ -899,7 +900,7 @@ export default {
       }
       if (vm.$refs.form.validate()) {
         let filter = {
-          content: vm.content,
+          content: vm.contentAddQuestion,
           publish: 1,
           agencyCode: vm.agencySelected ? vm.agencySelected['itemCode'] : '',
           j_captcha_response: vm.$refs.captcha_admin_add.j_captcha_response,

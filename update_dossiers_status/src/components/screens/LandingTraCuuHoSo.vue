@@ -729,7 +729,9 @@
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
-        vm.getDossiers()
+        vm.fromReceiveDateFormatted= vm.currentDateFormat(new Date((new Date()).getFullYear(), (new Date()).getMonth(), 1).toLocaleDateString('vi-VN'))
+        vm.toReceiveDateFormatted = vm.currentDateFormat()
+        // vm.getDossiers()
         vm.getServiceInfo()
       })
     },
@@ -926,7 +928,7 @@
               vm.totalDossierSearch = vm.dossierList.length
               vm.pagination = {
                 rowsPerPage: vm.limitRecord,
-                page: 1          
+                page: 1
               }
             }).catch(function() {
               vm.loadingActionUpdate = false
@@ -945,6 +947,10 @@
           vm.serviceInfoList = []
         })  
       },
+      currentDateFormat (date) {
+        let date1 = date ? new Date(date) : new Date()
+        return `${date1.getDate().toString().padStart(2, '0')}/${(date1.getMonth() + 1).toString().padStart(2, '0')}/${date1.getFullYear()}`
+      }
     },
     filters: {
       dateTimeView (arg) {

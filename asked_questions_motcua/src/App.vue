@@ -1,14 +1,14 @@
 <template>
   <v-app id="app_asked_questions" style="background: #fff !important">
-    <v-navigation-drawer app clipped floating width="255" v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')">
-      <!-- <div class="">
+    <v-navigation-drawer app clipped floating width="255" v-if="gopY || getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')">
+      <div class="" v-if="gopY">
         <v-btn class="px-0 my-0 ml-0" block color="primary" v-on:click.native="addQuestion"
           style="height:36px"
         >
           <v-icon size="22" color="white">add</v-icon>&nbsp;
-          Thêm mới câu hỏi
+          Gửi góp ý
         </v-btn>
-      </div> -->
+      </div>
       <v-list class="pt-0" v-if="!phanAnhKienNghi && !gopY">
         <v-list-tile :style="activeTab === 0 ? 'border-left: 7px solid #00aeef' : ''">
           <v-list-tile-content class="pl-2" @click="filterQuestion(0, 'all')">
@@ -145,13 +145,14 @@
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-    <v-content :style="(!getUser('Administrator') && !getUser('Administrator_data') && !getUser('tra_loi_hoi_dap')) ? 'width: 100%;max-width: 1300px;margin: 0 auto' : ''">
+    <v-content :style="(!gopY && !getUser('Administrator') && !getUser('Administrator_data') && !getUser('tra_loi_hoi_dap')) ? 'width: 100%;max-width: 1300px;margin: 0 auto' : ''">
       <router-view></router-view>
     </v-content>
   </v-app>
 </template>
 
 <script>
+  import axios from 'axios'
   export default {
     data: () => ({
       activeTab: 0,
@@ -164,7 +165,9 @@
       agencyList: [],
       phanAnhKienNghi: false,
       gopY: false,
+      admin_gopy: false,
       titleData: 'câu hỏi',
+      agencyCurrent: ''
     }),
     computed: {
       loading () {
@@ -211,11 +214,24 @@
         }
       } catch (error) {
       }
+      try {
+        vm.admin_gopy = admin_gopy
+      } catch (error) {
+      }
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
-        vm.getQuestionList()
-        vm.getCounter()
+        if (vm.gopY && !vm.admin_gopy) {
+          if (vm.agencyCurrent) {
+            vm.getQuestionList()
+            vm.getCounter()
+          } else {
+            vm.getAgencyConfigs()
+          }
+        } else {
+          vm.getQuestionList()
+          vm.getCounter()
+        }
       })
     },
     watch: {
@@ -242,7 +258,7 @@
         let current = vm.$router.history.current
         let query = current.query
         let filter = {
-          agencyCode: vm.agencyFilterSelected['itemCode'] ? vm.agencyFilterSelected['itemCode'] : '',
+          agencyCode: vm.agencyFilterSelected && vm.agencyFilterSelected['itemCode'] ? vm.agencyFilterSelected['itemCode'] : '',
           domainCode: vm.lvttFilterSelected ? vm.lvttFilterSelected['domainCode'] : '',
           keyword: vm.keyword ? vm.keyword : '',
           publish: query.hasOwnProperty('publish') ? query['publish'] : '',
@@ -262,8 +278,13 @@
         if (vm.gopY) {
           filter.questionType = "GOPY"
         }
+        if (vm.gopY && !vm.admin_gopy) {
+          filter.agencyCode = vm.agencyCurrent['code']
+        }
+        if (vm.admin_gopy) {
+          filter.agencyCode = vm.agencyFilterSelected ? vm.agencyFilterSelected['code'] : ''
+        }
         vm.$store.commit('setLoading', true)
-        console.log('getQuestion 111', filter)
         vm.$store.dispatch('getQuestions', filter).then(function (result) {
           vm.$store.commit('setLoading', false)
           let questionList = []
@@ -299,6 +320,9 @@
           }
         } catch (error) {
         }
+        if (vm.gopY && !vm.admin_gopy) {
+          filter.agencyCode = vm.agencyCurrent['code']
+        }
         vm.$store.dispatch('getQuestionsCounter', filter).then(function (result) {
           vm.$store.commit('setLoading', false)
           vm.totalQuestionCounter = result['total']
@@ -318,7 +342,9 @@
             }
           } catch (error) {
           }
-          console.log('filterCounter 1', filter1)
+          if (vm.gopY && !vm.admin_gopy) {
+            filter1.agencyCode = vm.agencyCurrent['code']
+          }
           vm.$store.dispatch('getQuestionsCounter', filter1).then(function (result1) {
             vm.totalPublished = result1['total']
             vm.totalNotPublish = Number(vm.totalQuestionCounter) - Number(vm.totalPublished)
@@ -342,6 +368,9 @@
             }
           } catch (error) {
           }
+          if (vm.gopY && !vm.admin_gopy) {
+            filter2.agencyCode = vm.agencyCurrent['code']
+          }
           console.log('filterCounter 2', filter2)
           vm.$store.dispatch('getQuestionsCounter', filter2).then(function (result2) {
             vm.totalAnswered = result2['total']
@@ -358,6 +387,9 @@
           }
           if (vm.gopY) {
             filter3.questionType = 'GOPY'
+          }
+          if (vm.gopY && !vm.admin_gopy) {
+            filter3.agencyCode = vm.agencyCurrent['code']
           }
           vm.$store.dispatch('getQuestionsCounter', filter3).then(function (result2) {
             vm.totalFAQ = result2['total']
@@ -397,6 +429,40 @@
             }
           })
         }
+      },
+      getAgencyConfigs () {
+        let vm = this
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        
+        let dataGet = {}
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('serverCode', 'SERVER_DVC')
+        dataPost.append('url', '/serverconfigs/GROUP_ID_SITE_MOTCUA')
+        dataPost.append('data', JSON.stringify(dataGet))
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+          let serializable = response.data
+          let configs = JSON.parse(serializable.configs)
+          let agency = configs['groupIds']
+          try {
+            vm.agencyCurrent = agency.filter(function (item) {
+              return item.value == window.themeDisplay.getScopeGroupId()
+            })[0]
+            if (vm.agencyCurrent) {
+              vm.getQuestionList()
+              vm.getCounter()
+            }
+          } catch (error) {
+          }
+          
+        }).catch(function (xhr) {
+        })
+
       },
       getUser (roleItem) {
         let vm = this

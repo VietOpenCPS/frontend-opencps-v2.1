@@ -866,7 +866,6 @@
             })
           }
         } else {
-          console.log('ăn cứt', dataOutPut.tp)
         }
       },
       pickFile (item) {

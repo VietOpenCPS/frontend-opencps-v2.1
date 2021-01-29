@@ -2,11 +2,11 @@
   <div class="form-chitiet">
     <div class="run-down mt-3" v-if="String(index) === '0' && !isMobile">
       <div class="box-title">Tình hình xử lý các năm</div>
-      <div class="in-time">
+      <!-- <div class="in-time">
         <span>{{itemTotalAllYear['ontimePercentage'] ? Math.round(itemTotalAllYear['ontimePercentage']) : 0}} %</span>
         Sớm và đúng hạn
-      </div>
-      <div class="fake-line"></div>
+      </div> -->
+      <!-- <div class="fake-line"></div> -->
       <div class="total-solved">
         <span>{{itemTotalAllYear['processCount']}}</span>
         Tổng giải quyết
@@ -570,12 +570,21 @@
         </v-card-text>
       </v-card>
     </div>
+    <!-- import statistic -->
+    <input type="file" style="display: none" id="fileStatisticTemplate"  @change="onUploadStatisticTemplate($event)">
+    <v-btn color="primary" flat="flat" @click.native="uploadFile">
+      <v-icon>save</v-icon>&nbsp;
+      Import statistic
+    </v-btn>
+    <!--  -->
   </div>
 </template>
 
 <script>
 
 import $ from 'jquery'
+import readXlsxFile from 'read-excel-file'
+import convertToJson from "read-excel-file/schema"
 export default {
   props: ['index', 'id'],
   components: {
@@ -590,7 +599,7 @@ export default {
       {level: 4, count: "0", levelName: 4}
     ],
     totalTTHC: 0,
-    chartView: true,
+    chartView: false,
     currentMonth: ((new Date()).getMonth() + 1) < 10 ? '0' + ((new Date()).getMonth() + 1) : ((new Date()).getMonth() + 1),
     currentDay: (new Date()).getDate() < 10 ? '0' + (new Date()).getDate() : (new Date()).getDate(),
     agencyGroups: [],
@@ -1166,6 +1175,7 @@ export default {
     itemTotal (val) {
       // data report_1
       let vm = this
+      console.log('itemTotal', val)
       if (val) {
         vm.seriesDonut[0] = val['processingCount'] /**Đang xử lý còn hạn */
         vm.seriesDonut[1] = val['waitingCount'] /**Đang xử lý quá hạn */
@@ -1563,6 +1573,7 @@ export default {
       })
     },
     doProcessReport1 (data) {
+      console.log("dataReportLine", data)
       let vm = this
       let datasetsCustom = []
       let labelsCustomMonth = {}
@@ -1649,7 +1660,7 @@ export default {
       let waitingCountData = []
       let releaseCountData = []
       let currentQuerys = vm.$router.history.current.query
-      // console.log('dataReport2', data)
+      console.log('dataReport2', data)
       // data report_2
       for (let key in data) {
         if (String(data[key].govAgencyName) === '' && String(data[key].domainName) === '') {
@@ -1896,6 +1907,45 @@ export default {
           }
         }
       }
+    },
+    uploadFile () {
+      let vm = this
+      document.getElementById('fileStatisticTemplate').value = ''
+      document.getElementById('fileStatisticTemplate').click()
+    },
+    onUploadStatisticTemplate () {
+      let vm = this
+      let map1 = {
+        'year': {prop: 'year'},
+        'month': {prop: 'month'},
+        'domainCode': {prop: 'domainCode'},
+        'domainName': {prop: 'domainName'},
+        'receivedCount': {prop: 'receivedCount'},
+        'ontimeCount': {prop: 'ontimeCount'},
+        'overtimeCount': {prop: 'overtimeCount'},
+        'onlineCount': {prop: 'onlineCount'},
+        'releaseCount': {prop: 'releaseCount'}
+      }
+      let inputFile = document.getElementById('fileStatisticTemplate')
+      readXlsxFile(inputFile.files[0], {sheet: 1}).then((rows) => {
+        let dataJson = convertToJson(rows, map1)
+        console.log("sheet1", dataJson.rows)
+      })
+      let map2 = {
+        'year': {prop: 'year'},
+        'month': {prop: 'month'},
+        'govAgencyCode': {prop: 'govAgencyCode'},
+        'govAgencyName': {prop: 'govAgencyName'},
+        'receivedCount': {prop: 'receivedCount'},
+        'ontimeCount': {prop: 'ontimeCount'},
+        'overtimeCount': {prop: 'overtimeCount'},
+        'onlineCount': {prop: 'onlineCount'},
+        'releaseCount': {prop: 'releaseCount'}
+      }
+      readXlsxFile(inputFile.files[0], {sheet: 2}).then((rows) => {
+        let dataJson = convertToJson(rows, map2)
+        console.log("sheet2", dataJson.rows)
+      })
     },
     hashCode (str) {
       var hash = 0

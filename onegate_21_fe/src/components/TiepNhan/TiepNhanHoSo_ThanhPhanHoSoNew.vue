@@ -1348,18 +1348,21 @@ export default {
     },
     saveAlpacaFormCallBack (data) {
       let vm = this
-      let dataOutPut = data.data ? data.data : ''
-      console.log('data_output new_eform_2', dataOutPut)
+      console.log('dataTBTV', data)
+      let dataOutPut = data.data ? JSON.parse(data.data) : ''
+      // console.log('data_output new_eform_2', dataOutPut, dataOutPut.tp)
       if (dataOutPut.hasOwnProperty('tp') && dataOutPut.tp) {
         let fileFind = vm.dossierFilesItems.find(itemFile => {
           // return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm && itemFile.fileSize!==0
           return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm
         })
+        console.log('fileFind', vm.dossierFilesItems, fileFind)
         if (fileFind) {
+          console.log('item put 5555', fileFind)
           fileFind['dossierId'] = vm.thongTinHoSo.dossierId
           fileFind['id'] = vm.id
           vm.loadingApacal = true
-          console.log('item put', fileFind)
+          
           vm.$store.dispatch('putAlpacaFormCallBack', fileFind).then(resData => {
             let index = vm.dossierTemplateItemsFilter.findIndex(item => item.partNo === dataOutPut.tp);
             vm.dossierTemplateItemsFilter[index]['passRequired'] = true
@@ -1385,7 +1388,7 @@ export default {
           dataOutPut['dossierId'] = vm.thongTinHoSo.dossierId
           dataOutPut['id'] = vm.id
           vm.loadingApacal = true
-          console.log('item post', dataOutPut)
+          
           vm.$store.dispatch('postEformCallBack', dataOutPut).then(resPostEform => {
             let index = vm.dossierTemplateItemsFilter.findIndex(item => item.partNo === dataOutPut.tp)
             setTimeout(function () {
@@ -1493,6 +1496,7 @@ export default {
       let vm = this
       window.removeEventListener('message', vm.receiveMessage)
       window.addEventListener('message', vm.receiveMessage)
+      console.log("message123123", window.message)
       //
       if (vm.currentFormView === 'formAlpaca' + data.partNo + vm.id) {
         vm.currentFormView = ''

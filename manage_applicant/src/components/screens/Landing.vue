@@ -110,12 +110,12 @@
                   </v-btn>
                   <span>Sửa thông tin</span>
                 </v-tooltip>
-                <!-- <v-tooltip top v-if="!loadingTable">
+                <v-tooltip top v-if="!loadingTable && (getUser('Administrator') || getUser('Administrator_data')) && props.item['verification'] == 1">
                   <v-btn @click="deleteApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon>delete</v-icon>
                   </v-btn>
                   <span>Xóa</span>
-                </v-tooltip> -->
+                </v-tooltip>
                 <v-tooltip top v-if="!loadingTable" class="ml-2">
                   <v-btn @click="documentManage(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon>fas fa fa-folder-open</v-icon>
@@ -226,6 +226,11 @@
               <v-flex xs12 sm4>
                 <v-autocomplete label="Xã/phường" :items="wardItems" v-model="applicantEdit['wardCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeWardEditApplicant($event)"></v-autocomplete>
               </v-flex>
+              <v-flex xs12 v-if="hasVerification && typeUpdateApplicant === 'update'">
+                <v-checkbox
+                  class="mt-2" color="primary" @change="changeVerification" v-model="verificationApplicant" :label="verificationApplicant ? 'Hủy xác thực' : 'Xác thực'"
+                ></v-checkbox>
+              </v-flex>
             </v-layout>
           </v-form>
         </v-card-text>
@@ -266,6 +271,8 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    hasVerification: false,
+    verificationApplicant: false,
     typeUpdateApplicant: 'update',
     keySearch: '',
     idNoSearch: '',
@@ -321,20 +328,28 @@ export default {
     cityItems: [],
     districtItems: [],
     wardItems: [],
+    rolesUser: []
   }),
   computed: {
     
   },
   created () {
     let vm = this
+    try {
+      vm.hasVerification = hasVerification
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
-      vm.getApplicantList().then(function(result) {
-        vm.totalApplicantSearch = result['total']
-        vm.applicantLists = result['data']
-      }).catch(function () {
+      vm.getRoleUser().then(function () {
+        vm.getApplicantList().then(function(result) {
+          vm.totalApplicantSearch = result['total']
+          vm.applicantLists = result['data']
+        }).catch(function () {
+        })
       })
+      
     })
   },
   updated () {
@@ -485,6 +500,7 @@ export default {
       let vm = this
       vm.typeUpdateApplicant = 'update'
       vm.applicantEdit = item
+      vm.verificationApplicant = vm.applicantEdit['verification'] === 0 ? true : false
       if (vm.cityItems.length === 0) {
         let filterCity = {
           collectionCode: 'ADMINISTRATIVE_REGION',
@@ -703,6 +719,60 @@ export default {
       vm.applicantEdit['wardName'] = vm.wardItems.filter(function (item) {
         return item['itemCode'] === data
       })[0]['itemName']
+    },
+    changeVerification () {
+      let vm = this
+      setTimeout(function () {
+        let filter = {
+          applicantId: vm.applicantEdit['applicantId'],
+          verification: vm.verificationApplicant ? 0 : 1
+        }
+        vm.$store.dispatch('putVerification', filter).then(function (result) {
+          toastr.clear()
+          toastr.success('Yêu cầu thực hiện thành công')
+        }).catch(function () {
+          toastr.clear()
+          toastr.error('Yêu cầu thực hiện thất bại')
+        })
+      }, 100)
+    },
+    getRoleUser () {
+      let vm = this
+      return new Promise(resolve => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/users/login', param).then(function (response) {
+          let serializable = response.data
+          if (serializable && serializable.length > 0) {
+            let roles = []
+            for (let key in serializable) {
+              if (serializable[key]['role']) {
+                roles.push(serializable[key]['role'])
+              }
+            }
+            console.log('roles', roles)
+            vm.rolesUser = roles
+          } else {
+            vm.rolesUser = []
+          }
+          resolve(vm.rolesUser)
+        }).catch(function (error) {
+          resolve()
+        })
+      })
+      
+    },
+    getUser (roleItem) {
+      let vm = this
+      let roles = vm.rolesUser
+      if (!roles) {
+        return false
+      }
+      let roleExits = roles.findIndex(item => item === roleItem)
+      return (roleExits >= 0)
     },
     parseDate(date) {
       if (!date) return null

@@ -526,6 +526,27 @@
               } else {
                 vm.depen = false
               }
+              // 
+              if (vm.tableName === 'opencps_dictitem' && query.hasOwnProperty('dictCollectionId') && query.dictCollectionId) {
+                let objectConfig = vm.dataSocket['tableConfig']
+                let columns = eval('( ' + objectConfig.columns + ' )')
+                for (var key in columns) {
+                  if (columns[key]['key'] === 'dictCollectionId') {
+                    columns[key]['value_filter'] = query.dictCollectionId
+                    if (vm.columnsDataFilter.length > 0) {
+                      for (var key in vm.columnsDataFilter) {
+                        if (vm.columnsDataFilter[key]['key'] === 'dictCollectionId') {
+                          vm.columnsDataFilter[key]['value_filter'] = query.dictCollectionId
+                        }
+                      }
+                    } else {
+                      vm.columnsDataFilter.push(columns[key])
+                    }
+                  }
+                }
+                console.log('columnsDataFilter9988', vm.columnsDataFilter)
+              }
+              // 
               if(vm.tableName === 'opencps_applicant'){
                 textPost = {
                   'type': 'admin',
@@ -548,7 +569,7 @@
                   'start': vm.page * 10 - 10,
                   'end': vm.page * 10
                 }
-              }else {
+              } else {
                 textPost = {
                   'type': 'admin',
                   'cmd': 'get',
@@ -559,7 +580,6 @@
                   'end': vm.page * 10
                 }               
               }
-
               dataPost = new URLSearchParams();
               dataPost.append('text', JSON.stringify(textPost))
               axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {

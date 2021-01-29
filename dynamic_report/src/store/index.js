@@ -126,7 +126,7 @@ export const store = new Vuex.Store({
         for (let key in filter['data']) {
           let currentVal = filter['data'][key]
           if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
-            let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+            let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
             if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
               param.params[key] = dateStr
             } else {
@@ -369,7 +369,7 @@ export const store = new Vuex.Store({
           for (let key in filter['data']) {
             let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
-              let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+              let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
               if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
                 param.params[key] = dateStr
               } else {
@@ -983,7 +983,7 @@ export const store = new Vuex.Store({
         for (let key in filter['data']) {
           let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
           if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
-            let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+            let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
             if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
               config.params[key] = dateStr
             } else {
@@ -1026,7 +1026,7 @@ export const store = new Vuex.Store({
         for (let key in filter['data']) {
           let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
           if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
-            let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+            let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
             if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
               config.params[key] = dateStr
             } else {

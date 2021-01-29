@@ -109,6 +109,7 @@
             :data-value="data[item.key]"
             :data-all="data"
             @change="reloadPickerChange(item.key)">
+            
           </datetime-picker>
           <v-text-field 
             v-if="item['type'] === 'text'"
@@ -157,7 +158,10 @@
               <v-icon>print</v-icon> &nbsp; In báo cáo
             </v-btn>
             <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
-              <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
+              <v-icon size="16px">fas fa fa-file-excel-o</v-icon> &nbsp; Tải xuống Excel
+            </v-btn>
+            <v-btn v-if="!itemsReports[index]['filterConfig']['showTable'] && exportWordReport" dark color="blue darken-3" class="my-0" v-on:click.native="doCreateReport(true, 'word')">
+              <v-icon size="16px">fas fa fa-file-word-o</v-icon> &nbsp; Tải xuống Word
             </v-btn>
             <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
               <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
@@ -179,7 +183,10 @@
             <v-icon>print</v-icon> &nbsp; In báo cáo
           </v-btn>
           <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
-            <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
+            <v-icon size="16px">fas fa fa-file-excel-o</v-icon> &nbsp; Tải xuống Excel
+          </v-btn>
+          <v-btn v-if="!itemsReports[index]['filterConfig']['showTable'] && exportWordReport" dark color="blue darken-3" class="my-0" v-on:click.native="doCreateReport(true, 'word')">
+            <v-icon size="16px">fas fa fa-file-word-o</v-icon> &nbsp; Tải xuống Word
           </v-btn>
           <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
             <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
@@ -473,6 +480,8 @@ export default {
     hiddenAside: false,
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
     doExportExcel: false,
+    doExportWord: false,
+    exportWordReport: false,
     showGuilds: false,
     showPicker: true,
     showErrorData: false,
@@ -631,6 +640,10 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       console.log('run new ver_23')
+      try {
+        vm.exportWordReport = exportWordReport
+      } catch (error) {
+      }
       let query = vm.$router.history.current.query
       let param = {
         headers: {
@@ -1216,7 +1229,7 @@ export default {
         let find = vm.filters[key]['key']
         let currentVal = vm.data[vm.filters[key]['key']]
         if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
-          let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+          let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
           if (dateStr !== 'Invalid Date'&& String(currentVal).length === 13) {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), dateStr)
           } else {
@@ -1600,7 +1613,6 @@ export default {
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           vm.dataExportExcel = docDString
-          console.log('docDString1234123, dataExportExcelReport', docDString)
           vm.docDefinition = JSON.parse(docDString)
           // console.log('vm.docDefinition', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
@@ -1620,10 +1632,19 @@ export default {
             pdfDocGenerator.getBlob((blob) => {
               vm.pdfBlob = window.URL.createObjectURL(blob)
               vm.isShowLoading = false
-              if (vm.doExportExcel) {
+              if (vm.doExportExcel && !vm.doExportWord) {
                 vm.$store.dispatch('getExcelReportFromServer', {
                   data: docDString,
                   fileName: 'baocaothongke' + '.xls'
+                })
+              }
+              if (vm.doExportWord) {
+                let docDStringJson = JSON.parse(docDString)
+                let docDStringWord = Object.assign(docDStringJson, {reportType: "docx"})
+                console.log('docDString55552343', docDStringWord)
+                vm.$store.dispatch('getExcelReportFromServer', {
+                  data: JSON.stringify(docDStringWord),
+                  fileName: 'baocaothongke' + '.docx'
                 })
               }
             })
@@ -1658,7 +1679,7 @@ export default {
         let find = vm.filters[key]['key']
         let currentVal = vm.data[vm.filters[key]['key']]
         if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
-          let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+          let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
           if (dateStr !== 'Invalid Date'&& String(currentVal).length === 13) {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), dateStr)
           } else {
@@ -2055,10 +2076,18 @@ export default {
             pdfDocGenerator.getBlob((blob) => {
               vm.pdfBlob = window.URL.createObjectURL(blob)
               vm.isShowLoading = false
-              if (vm.doExportExcel) {
+              if (vm.doExportExcel && !vm.doExportWord) {
                 vm.$store.dispatch('getExcelReportFromServer', {
                   data: docDString,
                   fileName: new Date().getTime() + '.xls'
+                })
+              }
+              if (vm.doExportWord) {
+                let docDStringJson = JSON.parse(docDString)
+                let docDStringWord = Object.assign(docDStringJson, {reportType: "docx"})
+                vm.$store.dispatch('getExcelReportFromServer', {
+                  data: JSON.stringify(docDStringWord),
+                  fileName: 'baocaothongke' + '.docx'
                 })
               }
             })
@@ -2070,12 +2099,13 @@ export default {
         }
       })
     },
-    doCreateReport(isExportExcel) {
+    doCreateReport(isExportExcel, isExportWord) {
       let vm = this
       vm.showHTML = false
       vm.showGuilds = false
       if (vm.$refs.form.validate()) {
         vm.doExportExcel = isExportExcel
+        vm.doExportWord = isExportWord && isExportWord === 'word' ? true : false
         vm.showConfig = false
         vm.doCreatePDF()
       }
@@ -2114,9 +2144,11 @@ export default {
     },
     reloadPickerChange (key) {
       let vm = this
+      console.log('keyDate2', key, vm.data[key])
       vm.showPicker = false
       setTimeout(() => {
         vm.data[key] = new Date(vm.data[key]).toLocaleDateString('vi-VN')
+        console.log('DATE91232', vm.data[key])
         vm.showPicker = true
       }, 200)
     },

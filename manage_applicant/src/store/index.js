@@ -164,6 +164,23 @@ export const store = new Vuex.Store({
     //     })
     //   })
     // },
+    putVerification ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let dataPutUser = new URLSearchParams()
+        let url = ''
+        url = '/o/rest/v2/applicants/' + filter['applicantId'] + '/verify/' + filter['verification']
+        axios.put(url, dataPutUser, param).then(result1 => {
+          resolve(result1)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
     getApplicantInfos ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {

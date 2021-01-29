@@ -128,7 +128,7 @@
               class="search-input-appbar input-search"
               v-model="dateCvFormatted"
               append-icon="event"
-              @blur="dateCv = parseDate(dateCvFormatted)"
+              @change="dateCv = parseDate(dateCvFormatted)"
               box
               clearable
             >

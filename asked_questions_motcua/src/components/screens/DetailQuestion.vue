@@ -19,8 +19,11 @@
             class="mx-3 mb-2 px-2 py-2"
             style="border:1px solid #0072bc;border-radius:3px;color:#0072bc"
           >
-            <p>
+            <p v-if="!gopY">
               Người hỏi: <span class="text-bold">{{questionDetail.fullname}}</span><i> ({{questionDetail.email}})</i>
+            </p>
+            <p v-else>
+              Người gửi: <span class="text-bold">{{questionDetail.fullname}}</span><i> ({{questionDetail.govAgencyName}})</i>
             </p>
             <p>
               Ngày gửi: <span class="text-bold">{{questionDetail.createDate}}</span>
@@ -28,7 +31,8 @@
           </div>
           <div class="mx-3 mt-3">
             <div class="py-1" v-if="!phanAnhKienNghi">
-              <span class="primary--text text-bold">NỘI DUNG CÂU HỎI: </span>
+              <span v-if="!gopY" class="primary--text text-bold">NỘI DUNG CÂU HỎI: </span>
+              <span v-else class="primary--text text-bold">NỘI DUNG GÓP Ý: <i v-if="questionDetail['domainName']">(Lĩnh vực: {{questionDetail['domainName']}})</i></span>
             </div>
             <div class="py-1" v-else>
               <span class="primary--text text-bold">NỘI DUNG KIẾN NGHỊ: </span>
@@ -193,6 +197,7 @@ export default {
   },
   data: () => ({
     phanAnhKienNghi: false,
+    gopY: false,
     titleData: 'câu hỏi',
     answerList: [],
     answersDefault: [],
@@ -273,6 +278,13 @@ export default {
       vm.phanAnhKienNghi = phanAnhKienNghiPage
       if (vm.phanAnhKienNghi) {
         vm.titleData = 'kiến nghị'
+      }
+    } catch (error) {
+    }
+    try {
+      vm.gopY = gopY
+      if (vm.gopY) {
+        vm.titleData = 'góp ý'
       }
     } catch (error) {
     }

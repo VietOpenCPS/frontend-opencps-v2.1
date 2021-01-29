@@ -115,6 +115,31 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getLvttListProxy ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        let dataPost = new URLSearchParams()
+        let textPost = {
+          agency: filter['agency'] ? filter['agency'] : '',
+          sort: 'siblingSearch'
+        }
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/serviceinfos/statistics/domains')
+        dataPost.append('data', JSON.stringify(textPost))
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function () {
+        })
+      })
+    },
     getQuestions ({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -259,23 +284,47 @@ export const store = new Vuex.Store({
               'Content-Type': 'application/x-www-form-urlencoded'
             }
           }
-          var url = state.endPointApi + '/faq/questions'
-          var dataAdd = new URLSearchParams()
-          dataAdd.append('content', filter.content ? filter.content : '')
-          dataAdd.append('fullname', filter.fullname ? filter.fullname : '')
-          dataAdd.append('email', filter.email ? filter.email : '')
-          dataAdd.append('publish', filter.publish ? filter.publish : '')
-          dataAdd.append('govAgencyCode', filter.agencyCode ? filter.agencyCode : '')
-          dataAdd.append('j_captcha_response', filter.j_captcha_response ? filter.j_captcha_response : '')
-          dataAdd.append('questionType', filter.questionType ? filter.questionType : '')
-          axios.post(url, dataAdd, param).then(response => {
-            if (response['status'] !== undefined && response['status'] === 203) {
-              toastr.clear()
-              toastr.error('Nhập sai mã Captcha')
-              reject(xhr)
-            } else {
-              resolve(response.data)
-            }
+          // var url = state.endPointApi + '/faq/questions'
+          // var dataAdd = new URLSearchParams()
+          // dataAdd.append('content', filter.content ? filter.content : '')
+          // dataAdd.append('fullname', filter.fullname ? filter.fullname : '')
+          // dataAdd.append('email', filter.email ? filter.email : '')
+          // dataAdd.append('publish', filter.publish ? filter.publish : '')
+          // dataAdd.append('govAgencyCode', filter.agencyCode ? filter.agencyCode : '')
+          // dataAdd.append('govAgencyName', filter.agencyName ? filter.agencyName : '')
+          // dataAdd.append('domainCode', filter.domainCode ? filter.domainCode : '')
+          // dataAdd.append('domainName', filter.domainName ? filter.domainName : '')
+          // dataAdd.append('j_captcha_response', filter.j_captcha_response ? filter.j_captcha_response : '')
+          // dataAdd.append('questionType', filter.questionType ? filter.questionType : '')
+          // axios.post(url, dataAdd, param).then(response => {
+          //   if (response['status'] !== undefined && response['status'] === 203) {
+          //     toastr.clear()
+          //     toastr.error('Nhập sai mã Captcha')
+          //     reject(xhr)
+          //   } else {
+          //     resolve(response.data)
+          //   }
+          // }).catch(xhr => {
+          //   reject(xhr)
+          // })
+          // 
+          let dataPost = new URLSearchParams()
+          let urlPost = '/faq/questions'
+          let dataAdd = {
+            questionType: filter.questionType ? filter.questionType : '',
+            content: filter.content ? filter.content : '',
+            fullname: filter.fullname ? filter.fullname : '',
+            publish: 1,
+            govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
+            govAgencyName: filter.agencyName ? filter.agencyName : '',
+            domainCode: filter.domainCode ? filter.domainCode : '',
+            domainName: filter.domainName ? filter.domainName : ''
+          }
+          dataPost.append('method', 'POST')
+          dataPost.append('url', urlPost)
+          dataPost.append('data', JSON.stringify(dataAdd))
+          axios.post('/o/rest/v2/faq/proxy', dataPost, param).then(response => {
+            resolve(response.data)
           }).catch(xhr => {
             reject(xhr)
           })

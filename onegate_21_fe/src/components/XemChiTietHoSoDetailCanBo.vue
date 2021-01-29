@@ -850,7 +850,7 @@ export default {
     dossierImportActions: [],
     reAsignUsers: [],
     showReasign: false,
-    thaoTacUyQuyen: false,
+    thaoTacUyQuyen: true,
     thaoTacPhanCongLai: true,
     itemselect: '',
     dossierSyncs: [],
