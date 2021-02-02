@@ -164,21 +164,21 @@
       <!-- filter navigation -->
       <v-layout wrap class="mt-4 ml-0" :class="String(index) !== '0' ? 'mb-4' : ''">
         <v-flex xs12 >
-          <div v-if="!isMobile" class="d-inline-block px-2" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
+          <div v-if="!isMobile && year != 2020" class="d-inline-block px-2" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
             <v-btn @click="toNativeViewType(true)" :flat="chartView ? false : true" depressed small color="#0054a6"
              class="mr-2" :class="chartView ? 'white--text' : ''" style="height: 24px;">Đơn vị</v-btn>
             <v-btn @click="toNativeViewType(false)" :flat="chartView ? true : false" depressed small color="#0054a6" 
             :class="chartView ? '' : 'white--text'" style="height: 24px;">Lĩnh vực</v-btn>
           </div>
 
-          <div v-if="!isMobile" class="ml-3 d-inline-block" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
+          <div v-if="!isMobile && year != 2020" class="ml-3 d-inline-block" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
             <v-btn @click="changeSystem('total')" :flat="systemReport !== 'total' ? true : false" :class="systemReport === 'total' ? 'white--text' : ''" small color="#0054a6" depressed class="mr-2" style="height: 24px;">Tất cả các hệ thống</v-btn>
             <v-btn @click="changeSystem('0')" :flat="systemReport !== '0' ? true : false" :class="systemReport === '0' ? 'white--text' : ''" small depressed color="#0054a6" class="mr-2" title="Dịch vụ công và một cửa điện tử" style="height: 24px;">DVC-MCĐT</v-btn>
             <v-btn @click="changeSystem('1')" :flat="systemReport !== '1' ? true : false" :class="systemReport === '1' ? 'white--text' : ''" small depressed color="#0054a6" class="mr-2" style="height: 24px;">NSW</v-btn>
             <v-btn @click="changeSystem('2')" :flat="systemReport !== '2' ? true : false" :class="systemReport === '2' ? 'white--text' : ''" small depressed color="#0054a6" class="" style="height: 24px;">Phần mềm nghiệp vụ</v-btn>
           </div>
 
-          <div class="d-inline-block" v-if="isMobile" class="ml-0" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
+          <div class="d-inline-block" v-if="isMobile && year != 2020" class="ml-0" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
             <v-btn @click="changeSystem('total')" :flat="systemReport !== 'total' ? true : false" :class="systemReport === 'total' ? 'white--text' : ''" small color="#0054a6" depressed class="mx-1 px-1" style="height: 24px;">Tất cả các hệ thống</v-btn>
             <v-btn @click="changeSystem('0')" :flat="systemReport !== '0' ? true : false" :class="systemReport === '0' ? 'white--text' : ''" small depressed color="#0054a6" class="mx-0 px-1" title="Dịch vụ công và một cửa điện tử" style="height: 24px;">DVC-MCĐT</v-btn>
             <v-btn @click="changeSystem('1')" :flat="systemReport !== '1' ? true : false" :class="systemReport === '1' ? 'white--text' : ''" small depressed color="#0054a6" class="mx-0 px-1" style="height: 24px;">NSW</v-btn>
@@ -583,6 +583,7 @@
 <script>
 
 import $ from 'jquery'
+import axios from 'axios'
 import readXlsxFile from 'read-excel-file'
 import convertToJson from "read-excel-file/schema"
 export default {
@@ -590,6 +591,8 @@ export default {
   components: {
   },
   data: () => ({
+    dataImportExcel: '',
+    serverImportId: '',
     systemReport: '',
     itemTotalAllYear: {},
     itemTotal: {},
@@ -948,6 +951,7 @@ export default {
     var vm = this
     $('html').addClass('report')
     vm.$nextTick(function () {
+      vm.getServerConfig()
       let currentYear = (new Date()).getFullYear()
       vm.years = []
       try {
@@ -1054,9 +1058,14 @@ export default {
         if (vm.isOnegate) {
           vm.$store.dispatch('getReportTotalMC', vm.year).then(function (result) {
             let agencyListsTotal = result
+            // số liệu thống kê 2020 theo số liệu import từ excel 
+            if (vm.year == 2020) {
+              agencyListsTotal = vm.dataImportExcel
+            }
+            // 
             for (let key in agencyListsTotal) {
               let currentData = agencyListsTotal[key]
-              if (currentData.domainName === '' && currentData.domainName === '') {
+              if (!currentData.domainName) {
                 vm.itemTotal = currentData
                 vm.showTableTotal = true
                 break
@@ -1069,9 +1078,14 @@ export default {
         } else {
           vm.$store.dispatch('getReportTotal', vm.year).then(function (result) {
             let agencyListsTotal = result
+            // số liệu thống kê 2020 theo số liệu import từ excel 
+            if (vm.year == 2020) {
+              agencyListsTotal = vm.dataImportExcel
+            }
+            // 
             for (let key in agencyListsTotal) {
               let currentData = agencyListsTotal[key]
-              if (currentData.domainName === '' && currentData.domainName === '') {
+              if (!currentData.domainName) {
                 vm.itemTotal = currentData
                 vm.showTableTotal = true
                 break
@@ -1085,9 +1099,14 @@ export default {
         if (vm.isOnegate) {
           vm.$store.dispatch('getReportTotalMC', '0').then(function (result) {
             let agencyListsTotal = result
+            // số liệu thống kê 2020 theo số liệu import từ excel 
+            if (vm.year == 2020) {
+              agencyListsTotal = vm.dataImportExcel
+            }
+            // 
             for (let key in agencyListsTotal) {
               let currentData = agencyListsTotal[key]
-              if (currentData.domainName === '' && currentData.govAgencyName === '') {
+              if (!currentData.domainName && !currentData.govAgencyName) {
                 vm.itemTotalAllYear = currentData
                 console.log('itemTotalAllYear', vm.itemTotalAllYear)
                 vm.showTableTotal = true
@@ -1101,9 +1120,14 @@ export default {
         } else {
           vm.$store.dispatch('getReportTotal', '0').then(function (result) {
             let agencyListsTotal = result
+            // số liệu thống kê 2020 theo số liệu import từ excel 
+            if (vm.year == 2020) {
+              agencyListsTotal = vm.dataImportExcel
+            }
+            // 
             for (let key in agencyListsTotal) {
               let currentData = agencyListsTotal[key]
-              if (currentData.domainName === '' && currentData.govAgencyName === '') {
+              if (!currentData.domainName && !currentData.govAgencyName) {
                 vm.itemTotalAllYear = currentData
                 console.log('itemTotalAllYear', vm.itemTotalAllYear)
                 vm.showTableTotal = true
@@ -1354,6 +1378,10 @@ export default {
             vm.noReportData = false
             vm.agencyLists = result
           }
+          // số liệu thống kê 2020 theo số liệu import từ excel 
+          if (vm.year == 2020) {
+            vm.agencyLists = vm.dataImportExcel
+          }
           // console.log('agencyLists', vm.agencyLists)
           if (!vm.noReportData) {
             vm.doProcessReport2(vm.agencyLists)
@@ -1396,6 +1424,10 @@ export default {
           } else {
             vm.noReportData = false
             vm.agencyLists = result
+          }
+          // số liệu thống kê 2020 theo số liệu import từ excel 
+          if (vm.year == 2020) {
+            vm.agencyLists = vm.dataImportExcel
           }
           // console.log('agencyLists', vm.agencyLists)
           if (!vm.noReportData) {
@@ -1503,7 +1535,7 @@ export default {
           let agencyListsTotal = result
           for (let key in agencyListsTotal) {
             let currentData = agencyListsTotal[key]
-            if (currentData.domainName === '' && currentData.domainName === '') {
+            if (!currentData.domainName) {
               vm.itemTotal = currentData
               vm.showTableTotal = true
               break
@@ -1663,7 +1695,7 @@ export default {
       console.log('dataReport2', data)
       // data report_2
       for (let key in data) {
-        if (String(data[key].govAgencyName) === '' && String(data[key].domainName) === '') {
+        if (!data[key].govAgencyName && !data[key].domainName) {
         } else {
           // if (data[key].month > 0) {
             // if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== undefined && currentQuerys['govAgencyCode'] !== '' && String(data[key].domainName) !== '') {
@@ -1672,9 +1704,17 @@ export default {
             } else {
               labelsCustomMonth[data[key].govAgencyName] = data[key].processingCount + data[key].waitingCount + data[key].releaseCount
             }
-            processingCountData.push(data[key].processingCount)
-            waitingCountData.push(data[key].waitingCount)
-            releaseCountData.push(data[key].releaseCount)
+            if (vm.year == 2020) {
+              if (data[key]['month'] == vm.month) {
+                processingCountData.push(data[key].processingCount)
+                waitingCountData.push(data[key].waitingCount)
+                releaseCountData.push(data[key].releaseCount)
+              }
+            } else {
+              processingCountData.push(data[key].processingCount)
+              waitingCountData.push(data[key].waitingCount)
+              releaseCountData.push(data[key].releaseCount)
+            }
           // }
         }
       }
@@ -1921,31 +1961,139 @@ export default {
         'domainCode': {prop: 'domainCode'},
         'domainName': {prop: 'domainName'},
         'receivedCount': {prop: 'receivedCount'},
+        'processingCount': {prop: 'processingCount'},
+        'releaseCount': {prop: 'releaseCount'},
+        'waitingCount': {prop: 'waitingCount'},
+        'onegateCount': {prop: 'onegateCount'},
+        'onlineCount': {prop: 'onlineCount'},
+        'betimesCount': {prop: 'betimesCount'},
         'ontimeCount': {prop: 'ontimeCount'},
         'overtimeCount': {prop: 'overtimeCount'},
-        'onlineCount': {prop: 'onlineCount'},
-        'releaseCount': {prop: 'releaseCount'}
+        'ontimePercentage': {prop: 'ontimePercentage'},
+        'system': {prop: 'system'}
       }
-      let inputFile = document.getElementById('fileStatisticTemplate')
-      readXlsxFile(inputFile.files[0], {sheet: 1}).then((rows) => {
-        let dataJson = convertToJson(rows, map1)
-        console.log("sheet1", dataJson.rows)
-      })
       let map2 = {
         'year': {prop: 'year'},
         'month': {prop: 'month'},
         'govAgencyCode': {prop: 'govAgencyCode'},
         'govAgencyName': {prop: 'govAgencyName'},
         'receivedCount': {prop: 'receivedCount'},
+        'processingCount': {prop: 'processingCount'},
+        'releaseCount': {prop: 'releaseCount'},
+        'waitingCount': {prop: 'waitingCount'},
+        'onegateCount': {prop: 'onegateCount'},
+        'onlineCount': {prop: 'onlineCount'},
+        'betimesCount': {prop: 'betimesCount'},
         'ontimeCount': {prop: 'ontimeCount'},
         'overtimeCount': {prop: 'overtimeCount'},
-        'onlineCount': {prop: 'onlineCount'},
-        'releaseCount': {prop: 'releaseCount'}
+        'ontimePercentage': {prop: 'ontimePercentage'},
+        'system': {prop: 'system'}
       }
+      let inputFile = document.getElementById('fileStatisticTemplate')
+      // DVC-MCDT
+      readXlsxFile(inputFile.files[0], {sheet: 1}).then((rows) => {
+        let dataJson = convertToJson(rows, map1)
+        let dataOut = dataJson.rows.map(item => {
+          item['govAgencyCode'] = ''
+          item['govAgencyName'] = ''
+          return item
+        })
+        dataOut.shift()
+        console.log("sheet1-dvc-mcdt-domain", dataOut)
+      })
       readXlsxFile(inputFile.files[0], {sheet: 2}).then((rows) => {
         let dataJson = convertToJson(rows, map2)
-        console.log("sheet2", dataJson.rows)
+        let dataOut = dataJson.rows.map(item => {
+          item['domainCode'] = ''
+          item['domainName'] = ''
+          return item
+        })
+        dataOut.shift()
+        console.log("sheet2-dvc-mcdt-govAgency", dataOut)
       })
+      // NSW
+      readXlsxFile(inputFile.files[0], {sheet: 3}).then((rows) => {
+        let dataJson = convertToJson(rows, map1)
+        let dataOut = dataJson.rows.map(item => {
+          item['govAgencyCode'] = ''
+          item['govAgencyName'] = ''
+          return item
+        })
+        dataOut.shift()
+        console.log("sheet3-nsw-domain", dataOut)
+      })
+      readXlsxFile(inputFile.files[0], {sheet: 4}).then((rows) => {
+        let dataJson = convertToJson(rows, map2)
+        let dataOut = dataJson.rows.map(item => {
+          item['domainCode'] = ''
+          item['domainName'] = ''
+          return item
+        })
+        dataOut.shift()
+        console.log("sheet4-nsw-govAgeny", dataOut)
+      })
+      // Tất cả hệ thống
+      readXlsxFile(inputFile.files[0], {sheet: 5}).then((rows) => {
+        let dataJson = convertToJson(rows, map1)
+        let dataOut = dataJson.rows.map(item => {
+          item['govAgencyCode'] = ''
+          item['govAgencyName'] = ''
+          item['system'] = ''
+          return item
+        })
+        dataOut.shift()
+        console.log("sheet5-all-domain", dataOut)
+        vm.putServerConfig(JSON.stringify(dataOut))
+      })
+      readXlsxFile(inputFile.files[0], {sheet: 6}).then((rows) => {
+        let dataJson = convertToJson(rows, map2)
+        let dataOut = dataJson.rows.map(item => {
+          item['domainCode'] = ''
+          item['domainName'] = ''
+          item['system'] = ''
+          return item
+        })
+        dataOut.shift()
+        console.log("sheet6-all-govAgency", dataOut)
+      })
+    },
+    getServerConfig () {
+      let vm = this
+      let param = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+          Token: window.Liferay ? window.Liferay.authToken : ''
+        }
+      }
+
+      let url = '/o/rest/v2/serverconfigs/SERVER_REPORT_IMPORT'
+      axios.get(url, param).then(function (response) {
+        let serializable = response.data
+        vm.serverImportId = serializable.serverConfigId
+        let stringConfigs = serializable.configs.replace(/&#34;/g, '"')
+        let configs = JSON.parse(stringConfigs)
+        vm.dataImportExcel = configs
+        console.log('dataImportExcel', vm.dataImportExcel)
+      }).catch(function (error) {
+      })
+    },
+    putServerConfig (valueConfigs) {
+      let vm = this
+      let param = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+          Token: window.Liferay ? window.Liferay.authToken : '',
+          Authorization: "BASIC " + window.btoa("test@liferay.com:Dvc@2020#")
+        }
+      }
+
+      let url = '/o/rest/v2/serverconfigs/' + vm.serverImportId + '/configs'
+      let dataPutConfig = new URLSearchParams()
+      dataPutConfig.append('value', valueConfigs)
+      axios.put(url, dataPutConfig, param).then(function (response) {
+      }).catch(function (error) {
+      })
+      
     },
     hashCode (str) {
       var hash = 0

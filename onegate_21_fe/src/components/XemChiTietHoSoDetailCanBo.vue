@@ -116,6 +116,11 @@
               TIẾN TRÌNH XỬ LÝ
             </v-btn>
           </v-tab>
+          <v-tab :key="6" href="#tabs-6" v-if="originality !== 1 && viTriLuuTru && docLuuTru.length > 0">
+            <v-btn flat class="px-0 py-0 mx-0 my-0">
+              VỊ TRÍ LƯU TRỮ
+            </v-btn>
+          </v-tab>
           <!-- <v-tab :key="7" href="#tabs-7" @click="loadMermaidgraph()" v-if="originality !== 1">
             <v-btn flat class="px-0 py-0 mx-0 my-0">
               THEO DÕI HỒ SƠ
@@ -509,6 +514,16 @@
                 <div id="mermaid_dossier" class="mermaid" style="padding: 15px;min-height: 350px;"></div>
               </div>
             </v-tab-item>
+            <v-tab-item v-if="originality !== 1 && viTriLuuTru" value="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
+              <v-card>
+                <v-card-text>
+                  <v-flex xs12 class="">
+                    <iframe id="viTriLuuTru" src="" type="application/pdf" width="100%" height="400px" style="overflow: auto;max-height: 400px;" frameborder="0">
+                    </iframe>
+                  </v-flex>
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
           </v-tabs-items>
         </v-tabs>
         <!--  -->
@@ -809,6 +824,8 @@ export default {
     'phan-cong-lai': PhanCongLai
   },
   data: () => ({
+    viTriLuuTru: false,
+    docLuuTru: [],
     validTraoDoi: false,
     isMobile: false,
     inputTypes: [1, 3, 6],
@@ -1147,6 +1164,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.viTriLuuTru = viTriLuuTru
+    } catch (error) {
+    }
     window.toastr = toastr
     vm.$nextTick(function () {
       $('#m-navigation').css('display', 'none')
@@ -1348,7 +1369,9 @@ export default {
             }
           }
         })
-        
+        if (vm.viTriLuuTru) {
+          vm.loadDocumentLuuTru()
+        }
       })
     },
     loadDetailTempalte () {
@@ -3033,6 +3056,9 @@ export default {
         } else {
           vm.documents.push(resultDocuments)
         }
+        vm.documents = vm.documents.filter(function(item) {
+          return item.documentType !== 'DOC_LUU_TRU'
+        })
       })
     },
     loadThanhToan () {
@@ -3420,6 +3446,27 @@ export default {
       } else {
         return false
       }
+    },
+    loadDocumentLuuTru () {
+      let vm = this
+      vm.$store.dispatch('loadDossierDocuments', vm.thongTinChiTietHoSo).then(resultDocuments => {
+        vm.docLuuTru = []
+        if (Array.isArray(resultDocuments)) {
+          vm.docLuuTru = resultDocuments
+        } else {
+          vm.docLuuTru.push(resultDocuments)
+        }
+        vm.docLuuTru = vm.docLuuTru.filter(function(item) {
+          return item.documentType === 'DOC_LUU_TRU'
+        })
+        if (vm.docLuuTru.length > 0) {
+          let fileDoc = vm.docLuuTru[0]
+          fileDoc['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+          vm.$store.dispatch('viewDocument', fileDoc).then(result => {
+            document.getElementById('viTriLuuTru').src = result
+          })
+        }
+      })
     }
   },
   filters: {
