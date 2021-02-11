@@ -9,7 +9,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "apexcharts": "^2.2.1",
+    "apexcharts": "^3.24.0",
     "bootstrap": "^4.1.1",
     "jquery": "^3.3.1",
     "vue-apexcharts": "^1.2.6",
