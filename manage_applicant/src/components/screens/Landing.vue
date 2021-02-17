@@ -147,7 +147,7 @@
         <v-toolbar dark color="primary">
           <v-toolbar-title>{{typeUpdateApplicant === 'update' ? titleEdit : 'Thêm mới công dân, tổ chức, doanh nghiệp'}}</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn icon dark @click.native="dialog_editApplicant = false">
+          <v-btn icon dark @click.native="exitDialogEditApplicant">
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
@@ -625,6 +625,11 @@ export default {
             toastr.clear()
             toastr.success('Yêu cầu thực hiện thành công')
             vm.dialog_editApplicant = false
+            vm.getApplicantList().then(function(result) {
+              vm.totalApplicantSearch = result['total']
+              vm.applicantLists = result['data']
+            }).catch(function () {
+            })
           }).catch(function () {
             vm.loading = false
             toastr.clear()

@@ -10,6 +10,50 @@
           <div class="adv_search my-2 px-2" style="background: #eeeeee">
             <div class="searchAdvanced-content py-3">
               <v-layout wrap>
+                <v-flex xs12 class="mb-3 px-2" v-if="siteTrungTam">
+                  <div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Đơn vị:</div>
+                    <v-autocomplete
+                      placeholder="Chọn đơn vị"
+                      class="select-search d-inline-block"
+                      style="width: calc(100% - 130px)"
+                      :items="agencyList"
+                      v-model="agencyFilter"
+                      item-text="text"
+                      item-value="value"
+                      hide-details
+                      hide-no-data
+                      solo
+                      flat
+                      height="32"
+                      min-height="32"
+                      clearable
+                      return-object
+                      @change="changeAgency"
+                    ></v-autocomplete>
+                  </div>
+                </v-flex>
+                <v-flex xs12 class="mb-3 px-2" v-if="!siteTrungTam">
+                  <div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Thủ tục:</div>
+                    <v-autocomplete
+                      placeholder="Chọn thủ tục"
+                      class="select-search d-inline-block"
+                      style="width: calc(100% - 130px)"
+                      :items="serviceInfoList"
+                      v-model="serviceFilter"
+                      item-text="serviceName"
+                      item-value="serviceCode"
+                      hide-details
+                      hide-no-data
+                      solo
+                      flat
+                      height="32"
+                      min-height="32"
+                      clearable
+                    ></v-autocomplete>
+                  </div>
+                </v-flex>
                 <v-flex xs12 sm6 class="mb-3 px-2">
                   <div class="layout wrap">
                     <div class="d-inline-block text-bold pt-1" style="font-weight:450;width: 130px;">Ngày tiếp nhận:</div>
@@ -143,27 +187,7 @@
 
                   </div>
                 </v-flex>
-                <v-flex xs12 class="mb-3 px-2">
-                  <div>
-                    <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Thủ tục:</div>
-                    <v-autocomplete
-                      placeholder="Chọn thủ tục"
-                      class="select-search d-inline-block"
-                      style="width: calc(100% - 130px)"
-                      :items="serviceInfoList"
-                      v-model="serviceFilter"
-                      item-text="serviceName"
-                      item-value="serviceCode"
-                      hide-details
-                      hide-no-data
-                      solo
-                      flat
-                      height="32"
-                      min-height="32"
-                      clearable
-                    ></v-autocomplete>
-                  </div>
-                </v-flex>
+                
                 <v-flex xs12 sm6 class="mb-2 px-2">
                   <div>
                     <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Mã hồ sơ :</div>
@@ -581,6 +605,9 @@
   }
   export default {
     data: () => ({
+      siteTrungTam: false,
+      agencyList: [],
+      agencyFilter: '',
       loadingTable: false,
       loadingActionUpdate: false,
       pagination: {
@@ -726,13 +753,20 @@
     },
     created () {
       let vm = this
+      try {
+        vm.siteTrungTam = siteTrungTam
+      } catch (error) {
+      }
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
         vm.fromReceiveDateFormatted= vm.currentDateFormat(new Date((new Date()).getFullYear(), (new Date()).getMonth(), 1).toLocaleDateString('vi-VN'))
         vm.toReceiveDateFormatted = vm.currentDateFormat()
         // vm.getDossiers()
-        vm.getServiceInfo()
+        vm.getAgencyConfigs()
+        if (!vm.siteTrungTam) {
+          vm.getServiceInfo()
+        }
       })
     },
     methods: {
@@ -937,20 +971,57 @@
           }
         }
       },
+      changeAgency () {
+        let vm = this
+        setTimeout(function () {
+          vm.groupIdDonVi = vm.agencyFilter['value']
+          if (!vm.siteTrungTam) {
+            vm.getServiceInfo()
+          }
+        }, 200)
+      },
       getServiceInfo () {
         let vm = this
         let data = {}
         vm.serviceInfoList = []
+        if (vm.siteTrungTam && vm.agencyFilter) {
+          data['groupId'] = vm.agencyFilter['value']
+        }
         vm.$store.dispatch('getServiceInfo', data).then(function(res) {
           vm.serviceInfoList = res
         }).catch(()=>{
           vm.serviceInfoList = []
-        })  
+        })        
       },
       currentDateFormat (date) {
         let date1 = date ? new Date(date) : new Date()
         return `${date1.getDate().toString().padStart(2, '0')}/${(date1.getMonth() + 1).toString().padStart(2, '0')}/${date1.getFullYear()}`
-      }
+      },
+      getAgencyConfigs () {
+        let vm = this
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        
+        let dataGet = {}
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('serverCode', 'SERVER_DVC')
+        dataPost.append('url', '/serverconfigs/GROUP_ID_SITE_MOTCUA')
+        dataPost.append('data', JSON.stringify(dataGet))
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+          let serializable = response.data
+          let configs = JSON.parse(serializable.configs)
+          let agency = configs['groupIds']
+          vm.agencyList = agency
+          vm.agencyFilter = vm.agencyList[0]
+          vm.getServiceInfo()
+        }).catch(function (xhr) {
+        })
+      },
     },
     filters: {
       dateTimeView (arg) {

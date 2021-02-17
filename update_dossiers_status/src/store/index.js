@@ -108,7 +108,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject)=>{
         let config = {
           headers: {
-            'groupId': window.themeDisplay.getScopeGroupId()
+            'groupId': data.hasOwnProperty('groupId') ? data.groupId : window.themeDisplay.getScopeGroupId()
           }
         }
         axios.get('/o/rest/v2/onegate/serviceconfigs/processes', config).then(function (response) {

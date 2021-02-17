@@ -926,6 +926,10 @@
       var vm = this
       window.callback_dvcqg = vm.callback_dvcqg
       try {
+        vm.activeChangePass = activeChangePass
+      } catch (error) {
+      }
+      try {
         vm.hasSSo = ssoConect
         if (rulesConfig) {
           vm.rules = Object.assign({}, vm.rules, rulesConfig)

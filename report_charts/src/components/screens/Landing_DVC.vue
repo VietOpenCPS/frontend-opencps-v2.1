@@ -164,21 +164,21 @@
       <!-- filter navigation -->
       <v-layout wrap class="mt-4 ml-0" :class="String(index) !== '0' ? 'mb-4' : ''">
         <v-flex xs12 >
-          <div v-if="!isMobile && year != 2020" class="d-inline-block px-2" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
+          <div v-if="!isMobile && year != 2019 && year != 2020" class="d-inline-block px-2" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
             <v-btn @click="toNativeViewType(true)" :flat="chartView ? false : true" depressed small color="#0054a6"
              class="mr-2" :class="chartView ? 'white--text' : ''" style="height: 24px;">Đơn vị</v-btn>
             <v-btn @click="toNativeViewType(false)" :flat="chartView ? true : false" depressed small color="#0054a6" 
             :class="chartView ? '' : 'white--text'" style="height: 24px;">Lĩnh vực</v-btn>
           </div>
 
-          <div v-if="!isMobile && year != 2020" class="ml-3 d-inline-block" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
+          <div v-if="!isMobile && year != 2019 && year != 2020" class="ml-3 d-inline-block" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
             <v-btn @click="changeSystem('total')" :flat="systemReport !== 'total' ? true : false" :class="systemReport === 'total' ? 'white--text' : ''" small color="#0054a6" depressed class="mr-2" style="height: 24px;">Tất cả các hệ thống</v-btn>
             <v-btn @click="changeSystem('0')" :flat="systemReport !== '0' ? true : false" :class="systemReport === '0' ? 'white--text' : ''" small depressed color="#0054a6" class="mr-2" title="Dịch vụ công và một cửa điện tử" style="height: 24px;">DVC-MCĐT</v-btn>
             <v-btn @click="changeSystem('1')" :flat="systemReport !== '1' ? true : false" :class="systemReport === '1' ? 'white--text' : ''" small depressed color="#0054a6" class="mr-2" style="height: 24px;">NSW</v-btn>
             <v-btn @click="changeSystem('2')" :flat="systemReport !== '2' ? true : false" :class="systemReport === '2' ? 'white--text' : ''" small depressed color="#0054a6" class="" style="height: 24px;">Phần mềm nghiệp vụ</v-btn>
           </div>
 
-          <div class="d-inline-block" v-if="isMobile && year != 2020" class="ml-0" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
+          <div class="d-inline-block ml-0" v-if="isMobile && year != 2019 && year != 2020" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
             <v-btn @click="changeSystem('total')" :flat="systemReport !== 'total' ? true : false" :class="systemReport === 'total' ? 'white--text' : ''" small color="#0054a6" depressed class="mx-1 px-1" style="height: 24px;">Tất cả các hệ thống</v-btn>
             <v-btn @click="changeSystem('0')" :flat="systemReport !== '0' ? true : false" :class="systemReport === '0' ? 'white--text' : ''" small depressed color="#0054a6" class="mx-0 px-1" title="Dịch vụ công và một cửa điện tử" style="height: 24px;">DVC-MCĐT</v-btn>
             <v-btn @click="changeSystem('1')" :flat="systemReport !== '1' ? true : false" :class="systemReport === '1' ? 'white--text' : ''" small depressed color="#0054a6" class="mx-0 px-1" style="height: 24px;">NSW</v-btn>
@@ -572,8 +572,8 @@
     </div>
     <!-- import statistic -->
     <input type="file" style="display: none" id="fileStatisticTemplate"  @change="onUploadStatisticTemplate($event)">
-    <v-btn color="primary" flat="flat" @click.native="uploadFile">
-      <v-icon>save</v-icon>&nbsp;
+    <v-btn v-if="isAdmin" color="primary" @click.native="uploadFile" class="right my-3">
+      <v-icon>import_export</v-icon>&nbsp;
       Import statistic
     </v-btn>
     <!--  -->
@@ -584,6 +584,7 @@
 
 import $ from 'jquery'
 import axios from 'axios'
+import toastr from 'toastr'
 import readXlsxFile from 'read-excel-file'
 import convertToJson from "read-excel-file/schema"
 export default {
@@ -591,6 +592,7 @@ export default {
   components: {
   },
   data: () => ({
+    isAdmin: false,
     dataImportExcel: '',
     serverImportId: '',
     systemReport: '',
@@ -952,6 +954,7 @@ export default {
     $('html').addClass('report')
     vm.$nextTick(function () {
       vm.getServerConfig()
+      vm.getRoleUser()
       let currentYear = (new Date()).getFullYear()
       vm.years = []
       try {
@@ -1074,6 +1077,15 @@ export default {
             if (vm.itemTotal === '') {
               vm.showTableTotal = false
             }
+            // FIX SỐ LIỆU 2019
+            if (vm.year == 2019) {
+              vm.itemTotal = {
+                processingCount: 0,
+                waitingCount: 0,
+                releaseCount: 623872,
+                ontimePercentage: 98
+              }
+            }
           })
         } else {
           vm.$store.dispatch('getReportTotal', vm.year).then(function (result) {
@@ -1094,21 +1106,24 @@ export default {
             if (vm.itemTotal === '') {
               vm.showTableTotal = false
             }
+            // FIX SỐ LIỆU 2019
+            if (vm.year == 2019) {
+              vm.itemTotal = {
+                processingCount: 0,
+                waitingCount: 0,
+                releaseCount: 623872,
+                ontimePercentage: 98
+              }
+            }
           })
         }
         if (vm.isOnegate) {
           vm.$store.dispatch('getReportTotalMC', '0').then(function (result) {
             let agencyListsTotal = result
-            // số liệu thống kê 2020 theo số liệu import từ excel 
-            if (vm.year == 2020) {
-              agencyListsTotal = vm.dataImportExcel
-            }
-            // 
             for (let key in agencyListsTotal) {
               let currentData = agencyListsTotal[key]
               if (!currentData.domainName && !currentData.govAgencyName) {
                 vm.itemTotalAllYear = currentData
-                console.log('itemTotalAllYear', vm.itemTotalAllYear)
                 vm.showTableTotal = true
                 break
               }
@@ -1116,20 +1131,36 @@ export default {
             if (vm.itemTotal === '') {
               vm.showTableTotal = false
             }
+            // ghép số liệu các năm 2019+2020+2021
+            vm.$store.dispatch('getReportTotal', 2021).then(function (result) {
+              let total2021 = ''
+              let agencyListsTotal = result
+              for (let key in agencyListsTotal) {
+                let currentData = agencyListsTotal[key]
+                if (!currentData.domainName && !currentData.govAgencyName) {
+                  total2021 = currentData
+                  break
+                }
+              }
+              let total2020 = vm.dataImportExcel.filter(function (item) {
+                return item.month == 0 && !item.domainCode
+              })[0]
+              vm.itemTotalAllYear = {
+                processCount: 623827 + (total2020['processingCount'] + total2020['releaseCount'] + total2020['waitingCount']) + total2021['processCount'],
+                processingCount: total2020['processingCount'] + total2021['processingCount'],
+                releaseCount: 623827 + total2020['releaseCount'] + total2021['releaseCount'],
+                cancelledCount: total2021['cancelledCount']
+              }
+            })
+            // end
           })
         } else {
           vm.$store.dispatch('getReportTotal', '0').then(function (result) {
             let agencyListsTotal = result
-            // số liệu thống kê 2020 theo số liệu import từ excel 
-            if (vm.year == 2020) {
-              agencyListsTotal = vm.dataImportExcel
-            }
-            // 
             for (let key in agencyListsTotal) {
               let currentData = agencyListsTotal[key]
               if (!currentData.domainName && !currentData.govAgencyName) {
                 vm.itemTotalAllYear = currentData
-                console.log('itemTotalAllYear', vm.itemTotalAllYear)
                 vm.showTableTotal = true
                 break
               }
@@ -1137,9 +1168,30 @@ export default {
             if (vm.itemTotal === '') {
               vm.showTableTotal = false
             }
+            // ghép số liệu các năm 2019+2020+2021
+            vm.$store.dispatch('getReportTotal', 2021).then(function (result) {
+              let total2021 = ''
+              let agencyListsTotal = result
+              for (let key in agencyListsTotal) {
+                let currentData = agencyListsTotal[key]
+                if (!currentData.domainName && !currentData.govAgencyName) {
+                  total2021 = currentData
+                  break
+                }
+              }
+              let total2020 = vm.dataImportExcel.filter(function (item) {
+                return item.month == 0 && !item.domainCode
+              })[0]
+              vm.itemTotalAllYear = {
+                processCount: 623827 + (total2020['processingCount'] + total2020['releaseCount'] + total2020['waitingCount']) + total2021['processCount'],
+                processingCount: total2020['processingCount'] + total2021['processingCount'],
+                releaseCount: 623827 + total2020['releaseCount'] + total2021['releaseCount'],
+                cancelledCount: total2021['cancelledCount']
+              }
+            })
+            // end
           })
         }
-        
       }
     })
   },
@@ -1201,9 +1253,9 @@ export default {
       let vm = this
       console.log('itemTotal', val)
       if (val) {
-        vm.seriesDonut[0] = val['processingCount'] /**Đang xử lý còn hạn */
-        vm.seriesDonut[1] = val['waitingCount'] /**Đang xử lý quá hạn */
-        vm.seriesDonut[2] = val['releaseCount'] /**Đang bổ sung điều kiện */
+        vm.seriesDonut[0] = val['processingCount'] 
+        vm.seriesDonut[1] = val['waitingCount'] 
+        vm.seriesDonut[2] = val['releaseCount'] 
         vm.chartDonutOptions.plotOptions = {
           pie: {
             donut: {
@@ -1498,6 +1550,11 @@ export default {
                 vm.noReportDataLine = false
                 dataReport1 = result
               }
+              // số liệu thống kê 2020 theo số liệu import từ excel 
+              if (vm.year == 2020) {
+                dataReport1 = vm.dataImportExcel
+              }
+              // 
               if (!vm.noReportDataLine) {
                 vm.doProcessReport1(dataReport1)
               }
@@ -1512,6 +1569,11 @@ export default {
                 vm.noReportDataLine = false
                 dataReport1 = result
               }
+              // số liệu thống kê 2020 theo số liệu import từ excel 
+              if (vm.year == 2020) {
+                dataReport1 = vm.dataImportExcel
+              }
+              // 
               if (!vm.noReportDataLine) {
                 vm.doProcessReport1(dataReport1)
               }
@@ -1533,6 +1595,11 @@ export default {
       if (vm.isOnegate) {
         vm.$store.dispatch('getReportTotalMC', vm.year).then(function (result) {
           let agencyListsTotal = result
+          // số liệu thống kê 2020 theo số liệu import từ excel 
+          if (vm.year == 2020) {
+            agencyListsTotal = vm.dataImportExcel
+          }
+          // 
           for (let key in agencyListsTotal) {
             let currentData = agencyListsTotal[key]
             if (!currentData.domainName) {
@@ -1544,13 +1611,27 @@ export default {
           if (vm.itemTotal === '') {
             vm.showTableTotal = false
           }
+          // FIX SỐ LIỆU 2019
+          if (vm.year == 2019) {
+            vm.itemTotal = {
+              processingCount: 0,
+              waitingCount: 0,
+              releaseCount: 623872,
+              ontimePercentage: 100
+            }
+          }
         })
       } else {
         vm.$store.dispatch('getReportTotal', vm.year).then(function (result) {
           let agencyListsTotal = result
+          // số liệu thống kê 2020 theo số liệu import từ excel 
+          if (vm.year == 2020) {
+            agencyListsTotal = vm.dataImportExcel
+          }
+          // 
           for (let key in agencyListsTotal) {
             let currentData = agencyListsTotal[key]
-            if (currentData.domainName === '' && currentData.domainName === '') {
+            if (!currentData.domainName) {
               vm.itemTotal = currentData
               vm.showTableTotal = true
               break
@@ -1558,6 +1639,15 @@ export default {
           }
           if (vm.itemTotal === '') {
             vm.showTableTotal = false
+          }
+          // FIX SỐ LIỆU 2019
+          if (vm.year == 2019) {
+            vm.itemTotal = {
+              processingCount: 0,
+              waitingCount: 0,
+              releaseCount: 623872,
+              ontimePercentage: 100
+            }
           }
         })
       }
@@ -1612,7 +1702,15 @@ export default {
       let monthData = {}
       // console.log('dataReport line month', data)
       // Bind data report NĂM
-      for (let i = 1; i <= 12; i++) {
+      let monthMax = 12
+      let currentYear = (new Date()).getFullYear()
+      let currentMonth = (new Date()).getMonth() + 1
+      if (Number(vm.year) < currentYear) {
+        monthMax = 12
+      } else {
+        monthMax = currentMonth
+      }
+      for (let i = 1; i <= monthMax; i++) {
         labelsCustomMonth['' + i] = 'T ' + i
       }
       for (let key in data) {
@@ -1682,7 +1780,7 @@ export default {
         vm.chartOptions.colors.push(datasetsCustom[key]['borderColor'])
       }
       vm.reloadLine = false
-      // console.log('vm.seriesChart', vm.seriesChart)
+      console.log('vm.seriesChart', vm.seriesChart)
     },
     doProcessReport2 (data) {
       let vm = this
@@ -1907,15 +2005,35 @@ export default {
       let labelAgency = []
       // Bind data report THÁNG
       for (let key in data) {
-        if (String(data[key].govAgencyName) === '' && String(data[key].domainName) === '') {
+        if (!data[key].govAgencyName && !data[key].domainName) {
         } else {
-          if (String(data[key].govAgencyName) === '' && String(data[key].domainName) !== '') {
-            labelDomain.push(data[key].domainName)
+          if (!data[key].govAgencyName && String(data[key].domainName) !== '') {
+            if (vm.year == 2020) {
+              if (data[key]['month'] == vm.month) {
+                labelDomain.push(data[key].domainName)
+              }
+            } else {
+              labelDomain.push(data[key].domainName)
+            }
           } else {
-            labelAgency.push(data[key].govAgencyName)
+            if (vm.year == 2020) {
+              if (data[key]['month'] == vm.month) {
+                labelAgency.push(data[key].govAgencyName)
+              }
+            } else {
+              labelAgency.push(data[key].govAgencyName)
+            }
           }
-          onlineCountData.push(data[key].onlineCount)
-          onegateCountData.push(data[key].onegateCount)
+          // năm 2020 lấy số liệu từ file excel import
+          if (vm.year == 2020) {
+            if (data[key]['month'] == vm.month) {
+              onlineCountData.push(data[key].onlineCount)
+              onegateCountData.push(data[key].onegateCount)
+            }
+          } else {
+            onlineCountData.push(data[key].onlineCount)
+            onegateCountData.push(data[key].onegateCount)
+          }
         }
       }
       // data report_3
@@ -2073,7 +2191,6 @@ export default {
         let stringConfigs = serializable.configs.replace(/&#34;/g, '"')
         let configs = JSON.parse(stringConfigs)
         vm.dataImportExcel = configs
-        console.log('dataImportExcel', vm.dataImportExcel)
       }).catch(function (error) {
       })
     },
@@ -2082,8 +2199,7 @@ export default {
       let param = {
         headers: {
           groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-          Token: window.Liferay ? window.Liferay.authToken : '',
-          Authorization: "BASIC " + window.btoa("test@liferay.com:Dvc@2020#")
+          Token: window.Liferay ? window.Liferay.authToken : ''
         }
       }
 
@@ -2091,9 +2207,43 @@ export default {
       let dataPutConfig = new URLSearchParams()
       dataPutConfig.append('value', valueConfigs)
       axios.put(url, dataPutConfig, param).then(function (response) {
+        toastr.clear()
+        toastr.success('Import số liệu thành công')
+        setTimeout(function() {
+          window.location.reload()
+        }, 300)
       }).catch(function (error) {
+        toastr.clear()
+        toastr.error('Import số liệu thất bại')
       })
-      
+    },
+    getRoleUser () {
+      let vm = this
+      vm.isAdmin = false
+      let param = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+        }
+      }
+      axios.get('/o/rest/v2/users/login', param).then(function (response) {
+        let serializable = response.data
+        if (serializable && serializable.length > 0) {
+          let roles = []
+          for (let key in serializable) {
+            if (serializable[key]['role']) {
+              roles.push(serializable[key]['role'])
+            }
+          }
+          let roleExits = roles.findIndex(item => item === 'Administrator' || item === 'Administrator_data')
+          if (roleExits >= 0) {
+            vm.isAdmin = true
+          }
+        } else {
+          vm.isAdmin = false
+        }
+      }).catch(function (error) {
+        vm.isAdmin = false
+      })
     },
     hashCode (str) {
       var hash = 0

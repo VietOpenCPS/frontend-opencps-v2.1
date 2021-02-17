@@ -308,7 +308,8 @@
           agencyCode: '',
           publish: '',
           answered: '',
-          questionType: vm.phanAnhKienNghi ? 'PAKN' : ''
+          questionType: vm.phanAnhKienNghi ? 'PAKN' : '',
+          gopY: vm.gopY
         }
         if (vm.gopY) {
           filter.questionType = 'GOPY'
@@ -331,7 +332,8 @@
             agencyCode: '',
             publish: 1,
             answered: '',
-            questionType: vm.phanAnhKienNghi ? 'PAKN' : ''
+            questionType: vm.phanAnhKienNghi ? 'PAKN' : '',
+            gopY: vm.gopY
           }
           if (vm.gopY) {
             filter1.questionType = 'GOPY'
@@ -357,7 +359,8 @@
             agencyCode: '',
             publish: '',
             answered: true,
-            questionType: vm.phanAnhKienNghi ? 'PAKN' : ''
+            questionType: vm.phanAnhKienNghi ? 'PAKN' : '',
+            gopY: vm.gopY
           }
           if (vm.gopY) {
             filter2.questionType = 'GOPY'

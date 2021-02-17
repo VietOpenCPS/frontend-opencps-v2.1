@@ -245,7 +245,7 @@ export const store = new Vuex.Store({
             }
           }
           let params
-          if (admin) {
+          if (admin || (filter.hasOwnProperty('gopY') && filter.gopY)) {
             params = {
               start: 0,
               end: 1,
