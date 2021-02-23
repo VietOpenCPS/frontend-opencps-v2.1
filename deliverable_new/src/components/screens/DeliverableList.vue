@@ -362,7 +362,8 @@
               <v-btn :disabled="props.item['fileAttachs'] && String(props.item['fileAttachs']) !== '0' ? false : true" slot="activator" flat icon class="mx-0 my-0" v-on:click.native="showPDFG(props.item)">
                 <v-icon>attach_file</v-icon>
               </v-btn>
-              <span>Xem &nbsp;{{String(loaiDuLieu).toLowerCase()}}</span>
+              <!-- <span>Xem &nbsp;{{String(loaiDuLieu).toLowerCase()}}</span> -->
+              <span>Tài liệu đính kèm</span>
             </v-tooltip>
             
             <!-- <v-tooltip top v-if="!loadingTable">
@@ -836,9 +837,16 @@
               queryString += key + '=' + newQuery[key] + '&'
             }
           }
-          vm.$router.push({
-            path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString + 'editForm=true&viewForm=true'
-          })
+          if (!newQuery.hasOwnProperty('viewForm')) {
+            vm.$router.push({
+              path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString + 'viewForm=true'
+            })
+          } else {
+            vm.$router.push({
+              path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString
+            })
+          }
+          
         }
         
       },

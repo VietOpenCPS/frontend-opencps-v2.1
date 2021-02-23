@@ -167,6 +167,34 @@ export default {
         // chuyển bước hồ sơ khi thanh toán thành công
         let filterUpdate = query
         vm.$store.dispatch('doActionPayGov', filterUpdate)
+      } else if (query.hasOwnProperty('command') && query.hasOwnProperty('version') && query.command === 'PAY' && query.version === '3.0') {
+        if (query.hasOwnProperty('status') && query.status == '0') {
+          vm.statusDeal = true
+        }
+        let searchParams = window.location.href.split("?")
+        if (searchParams[1]) {
+          let dataKeyPay = decodeURIComponent(String(vm.getSearchParams(searchParams[1], "bill_info")))
+          let dossierNo = JSON.parse(dataKeyPay)['MaHoSo']
+          let filter = {
+            dossierNo: dossierNo
+          }
+          vm.$store.dispatch('getDossiers', filter).then(resultDossier => {
+            let detail = resultDossier[0]
+            vm.dossierDetail['serviceName'] = detail.dossierName
+            vm.dossierDetail['dossierNo'] = detail.dossierNo
+            vm.dossierDetail['govAgencyName'] = detail.govAgencyName
+            let filterPayment = {
+              dossierId: resultDossier[0].referenceUid
+            }
+            vm.$store.dispatch('loadDossierPayments', filterPayment).then(result => {
+              vm.dossierDetail['paymentFee'] = vm.getEPaymentProfile(result.epaymentProfile).paymentFee
+              vm.dossierDetail['paymentPortal'] = result.paymentMethod
+              vm.dossierDetail['paymentAmount'] = result.paymentAmount
+              vm.dossierDetail['transId'] = query.transaction_id
+            }).catch(reject => {
+            })
+          })
+        }
       } else {
         if (dossierId) {
           if (responseCode === '00') {
@@ -244,7 +272,19 @@ export default {
       } else {
         return ''
       }
-    }
+    },
+    getSearchParams (prams, key) {
+      let value = ""
+      let headers = prams.split("&")
+      headers.forEach(function (header) {
+        header = header.split("=");
+        let keyHeader = header[0];
+        if (keyHeader === key) {
+          value = header[1]
+        }
+      });
+      return value
+    },
   }
 }
 </script>

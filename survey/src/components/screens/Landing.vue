@@ -103,36 +103,9 @@
             <v-card-text class="px-2 py-1 pr-0">
               <div class="text-xs-center white--text text-bold">Kết quả đánh giá các chỉ số</div>
               <div class="text-xs-center white--text" v-if="!ksBgt">Năm {{(new Date()).getFullYear()}}</div>
-              <div v-if="ksBgt" class="text-xs-center white--text">(Do người làm thủ tục đánh giá)</div>
-              <div v-if="ksBgt">
-                <v-flex xs12 v-for="(item, index) in votingItems" :key="index" class="white--text mt-2"
-                 v-if="index === 0 || index === 1 || index === 2 || index === 3 || index === 6">
-                  <v-layout row justify-center>
-                    <v-flex xs7 class="text-xs-center">
-                      <span>Chỉ số {{index + 1}}: </span>
-                      <span style="color:#6dcff6">{{item.answersCount ? item.averageScore + ' / 2 điểm' : 'Chưa có đánh giá'}}</span>
-                    </v-flex>
-                  </v-layout>
-                </v-flex>
-              </div>
-              <div v-else>
-                <v-flex xs12 v-for="(item, index) in votingItems" :key="index" class="white--text mt-2">
-                  <v-layout row justify-center>
-                    <v-flex xs7 class="text-xs-center">
-                      <span>Chỉ số {{index + 1}}: </span>
-                      <span style="color:#6dcff6">{{item.answersCount ? item.averageScore + ' / 2 điểm' : 'Chưa có đánh giá'}}</span>
-                    </v-flex>
-                  </v-layout>
-                </v-flex>
-              </div>
-            </v-card-text>
-          </v-card>
-          <v-card v-if="ksBgt" color="#0072bc" flat :class="isMobile ? 'px-2 py-2 mt-4' : 'px-2 py-2 mt-2'" style="border-radius: 7px;">
-            <v-card-text class="px-2 py-1 pr-0">
-              <div class="text-xs-center white--text text-bold">Kết quả đánh giá các chỉ số</div>
-              <div class="text-xs-center white--text">(Do cơ quan quản lý đánh giá)</div>
               <div class="text-xs-center mt-2">
                 <v-autocomplete
+                  v-if="ksBgt"
                   class="select-search d-inline-block"
                   :items="agencyList"
                   v-model="agency"
@@ -148,27 +121,32 @@
                   return-object
                 ></v-autocomplete>
               </div>
-              <div>
-                <div class="text-xs-center pt-4" v-if="loadingChangeAgency" style="height: 100px">
-                  <v-progress-circular
-                    indeterminate
-                    color="white"
-                  ></v-progress-circular>
-                </div>
-                <div v-else>
-                  <v-flex xs12 v-for="(item, index) in votingItems" :key="index" class="white--text mt-2"
-                  v-if="index === 4 || index === 5 || index === 7 || index === 8">
-                    <v-layout row justify-center>
-                      <v-flex xs7 class="text-xs-center">
-                        <span>Chỉ số {{index + 1}}: </span>
-                        <span style="color:#6dcff6">2 / 2 điểm</span>
-                      </v-flex>
-                    </v-layout>
-                  </v-flex>
-                </div>
+              <div class="text-xs-center pt-4" v-if="loadingChangeAgency" style="height: 100px">
+                <v-progress-circular
+                  indeterminate
+                  color="white"
+                ></v-progress-circular>
+              </div>
+              <div v-else>
+                <v-flex xs12 v-for="(item, index) in votingItems" :key="index" class="white--text mt-2">
+                  <v-layout row justify-center v-if="!ksBgt">
+                    <v-flex xs7 class="text-xs-center">
+                      <span>Chỉ số {{index + 1}}: </span>
+                      <span style="color:#6dcff6">{{item.answersCount ? item.averageScore + ' / 2 điểm' : 'Chưa có đánh giá'}}</span>
+                    </v-flex>
+                  </v-layout>
+                  <v-layout row justify-center v-else>
+                    <v-flex xs7 class="text-xs-center">
+                      <span>Chỉ số {{index + 1}}: </span>
+                      <span v-if="index === 4 || index === 5 || index === 7 || index === 8" style="color:#6dcff6">2 / 2 điểm</span>
+                      <span v-else style="color:#6dcff6">{{item.answersCount ? item.averageScore + ' / 2 điểm' : 'Chưa có đánh giá'}}</span>
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
               </div>
             </v-card-text>
           </v-card>
+          
           <!-- Thống kê chi tiết các chỉ số. Sử dụng sau -->
           <!-- <v-card v-for="(item, index) in votingItems" :key="index" color="#0072bc" flat class="px-2 py-2 mt-4" style="border-radius: 7px;">
             <v-card-text class="px-2 py-1 pr-0">

@@ -4838,7 +4838,6 @@ export const store = new Vuex.Store({
         dataPostdossier.append('checksum', data.checksum)
 
         axios.post('/o/pgi/paygov/dpnhankqthanhtoanhs', dataPostdossier, options).then(function (response) {
-          
         }).catch(function (error) {
         })
       })
@@ -4962,7 +4961,7 @@ export const store = new Vuex.Store({
           let dataPostEform = new FormData()
           dataPostEform.append('dossierIds', data.dossierIds)
           dataPostEform.append('file', data.file)
-          let url = state.initData.dossierApi + '/eforms/' + data.dossierPartNo
+          let url = state.initData.dossierApi + '/files/' + data.dossierPartNo
           axios.post(url, dataPostEform, options).then(function (response) {
             resolve(response.data)
           }).catch(function (xhr) {

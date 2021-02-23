@@ -22,8 +22,8 @@
           </div> -->
         </div>
       </div>
-      <view-pdf ref="viewpdf" v-if="showComponent && String(id) !== '0' && !editDeliverable" :id="id" :datainput="detail"></view-pdf>
-      <bbat-table-editor-component v-if="showComponent && editDeliverable" ref="bbatForm" :id="id" :formid="formId" :datainput="detail['formData']" :viewForm="viewForm"></bbat-table-editor-component>
+      <view-pdf ref="viewpdf" v-if="showComponent && String(id) !== '0' && viewForm" :id="id" :datainput="detail"></view-pdf>
+      <bbat-table-editor-component v-if="showComponent && editDeliverable && !viewForm" ref="bbatForm" :id="id" :formid="formId" :datainput="detail['formData']" :viewForm="viewForm"></bbat-table-editor-component>
       <v-flex xs12 class="px-4" v-if="String(id) === '0' || (String(id) !== '0' && editDeliverable && !viewForm)">
         <div class="mb-2" style="font-size: 14px">
           Tài liệu đính kèm <span v-if="requiredAttachFile" style="color:red">(*) </span>:
@@ -60,7 +60,7 @@
         <bbat-table-editor-component-simple ref="bbatFormSimple" :id="id" :datainput="detail"></bbat-table-editor-component-simple>
       </v-navigation-drawer> -->
 
-      <v-layout row wrap :class='{"fix_tool_bottom": offsetCheck > 300}' v-if="!viewForm">
+      <v-layout row wrap :class='{"fix_tool_bottom": offsetCheck > 300}'>
         <v-flex xs12 class="text-right pt-0 mt-4 ml-1 px-0 pr-3">
           <v-progress-linear v-if="loading" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
           <!-- <v-btn v-if="String(id) === '0'" color="teal darken-3" class="mr-0" dark  v-on:click.native="saveToData(-1)"
@@ -76,14 +76,14 @@
             <span v-if="String(id) === '0'">Tạo&nbsp;{{String(loaiDuLieu).toLowerCase()}}</span>
             <span v-else>Cập nhật</span>
           </v-btn>
-          <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && !editDeliverable && String(id) !== '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="uploadFileDeliverable"
+          <!-- <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && !editDeliverable && String(id) !== '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="uploadFileDeliverable"
             :loading="loading"
             :disabled="loading"
           >
           <v-icon>cloud_upload</v-icon> &nbsp;
           Tải&nbsp;{{String(loaiDuLieu).toLowerCase()}}&nbsp;từ máy tính
-          </v-btn>
-          <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && !editDeliverable && detail.dossierId === '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverableAction()"
+          </v-btn> -->
+          <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && viewForm && detail.dossierId === '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverableAction()"
             :loading="loading"
             :disabled="loading"
           >
@@ -97,7 +97,7 @@
           <v-icon>visibility</v-icon> &nbsp;
             Tài liệu đính kèm
           </v-btn> -->
-          <v-btn v-if="String(id) !== '0' && editDeliverable && detail['fileAttachs'] && detail['fileAttachs'] !== '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverable = false"
+          <v-btn v-if="String(id) !== '0' && editDeliverable && detail['fileEntryId'] && detail['fileEntryId'] !== '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="viewPdf()"
             :loading="loading"
             :disabled="loading"
           >
@@ -258,6 +258,10 @@
               if (String(vm.id) !== '0') {
                 vm.detail = result
                 vm.editDeliverable = String(vm.id) === '0' || (currentQuery.hasOwnProperty('editForm') && currentQuery.editForm && vm.detail['moderator']) ? true : false
+                if (!vm.detail['fileEntryId'] || String(vm.detail['fileEntryId']) === '0') {
+                  vm.editDeliverable = true
+                  vm.viewForm = false
+                }
                 // test multiple fileAttachs
                 // vm.detail['fileAttachs'] = '1300487,1289275'
                 // 
@@ -533,6 +537,7 @@
       editDeliverableAction() {
         let vm = this
         vm.editDeliverable = true
+        vm.viewForm = false
         setTimeout(function(){
           if (String(vm.id) === '0' || (String(vm.id) !== '0' && vm.editDeliverable)) {
             vm.indexFile = 0
@@ -540,6 +545,11 @@
             vm.fileNameAttach = ''
           }
         }, 100)
+      },
+      viewPdf () {
+        let vm = this
+        vm.editDeliverable = false
+        vm.viewForm = true
       },
       changePage(page) {
         let vm = this

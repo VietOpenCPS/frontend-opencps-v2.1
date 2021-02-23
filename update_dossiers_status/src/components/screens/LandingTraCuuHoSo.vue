@@ -27,9 +27,30 @@
                       flat
                       height="32"
                       min-height="32"
-                      clearable
                       return-object
                       @change="changeAgency"
+                    ></v-autocomplete>
+                  </div>
+                </v-flex>
+                <v-flex xs12 class="mb-3 px-2" v-if="agencyFilter && agencyFilter.hasOwnProperty('parent')">
+                  <div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Đơn vị xã, phường:</div>
+                    <v-autocomplete
+                      placeholder="Chọn đơn vị"
+                      class="select-search d-inline-block"
+                      style="width: calc(100% - 130px)"
+                      :items="agencyListXa"
+                      v-model="agencyFilterXa"
+                      item-text="itemName"
+                      item-value="itemCode"
+                      hide-details
+                      hide-no-data
+                      solo
+                      flat
+                      height="32"
+                      min-height="32"
+                      return-object
+                      clearable
                     ></v-autocomplete>
                   </div>
                 </v-flex>
@@ -227,7 +248,7 @@
               </v-layout>
               
               <v-flex class="xs12 mx-2">
-                <v-btn :loading="loadingTable" :style="loadingTable ? 'pointer-events: none' : ''" class="mx-0 mb-0" color="primary" dark @click.native="getDossiers">
+                <v-btn :loading="loadingTable" :style="loadingTable ? 'pointer-events: none' : ''" class="mx-0 mb-0" color="primary" dark @click.native="submitSearch">
                   <v-icon size="18">search</v-icon> &nbsp; Tìm kiếm
                 </v-btn>
               </v-flex>
@@ -254,7 +275,6 @@
         :items="dossierList"
         v-model="dossierSelected"
         hide-actions
-        :pagination.sync="pagination"
         select-all
         item-key="dossierId"
         class="table-landing table-bordered mt-3"
@@ -311,7 +331,7 @@
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
               <div v-else>
-                <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
+                <span>{{dossierPage * limitRecord - limitRecord + props.index + 1}}</span>
               </div>
             </td>
             <td class="text-xs-left" style="height:36px">
@@ -320,6 +340,14 @@
               </content-placeholders>
               <div v-else>
                 <span>{{props.item.dossierNo}}</span>
+              </div>
+            </td>
+            <td class="text-xs-left" style="height:36px">
+              <content-placeholders v-if="loadingTable">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{props.item.govAgencyName}}</span>
               </div>
             </td>
             <td class="text-xs-left" style="height:36px">
@@ -369,7 +397,7 @@
       <div class="my-2">
         <div class="text-xs-right layout wrap" style="position: relative;">
           <div class="flex pagging-table"> 
-            <tiny-pagination :total="totalDossierSearch" :page="pagination.page" :numberPerPage="limitRecord" nameRecord="hồ sơ" custom-class="custom-tiny-class" 
+            <tiny-pagination :total="totalDossierSearch" :page="dossierPage" :numberPerPage="limitRecord" nameRecord="hồ sơ" custom-class="custom-tiny-class" 
               @tiny:change-page="changePage" ></tiny-pagination> 
           </div>
         </div>
@@ -606,14 +634,12 @@
   export default {
     data: () => ({
       siteTrungTam: false,
+      agencyListXa: [],
+      agencyFilterXa: '',
       agencyList: [],
       agencyFilter: '',
       loadingTable: false,
       loadingActionUpdate: false,
-      pagination: {
-        rowsPerPage: 20,
-        page: 1
-      },
       listDonVi: [],
       domainList: [],
       serviceInfoList: [],
@@ -666,6 +692,11 @@
         },
         {
           text: 'Mã hồ sơ',
+          align: 'center',
+          sortable: false
+        },
+        {
+          text: 'Đơn vị giải quyết',
           align: 'center',
           sortable: false
         },
@@ -741,6 +772,8 @@
     },
     computed: {
     },
+    watch: {
+    },
     beforeDestroy () {
 
     },
@@ -760,8 +793,8 @@
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
-        vm.fromReceiveDateFormatted= vm.currentDateFormat(new Date((new Date()).getFullYear(), (new Date()).getMonth(), 1).toLocaleDateString('vi-VN'))
-        vm.toReceiveDateFormatted = vm.currentDateFormat()
+        // vm.fromReceiveDateFormatted= vm.currentDateFormat(new Date((new Date()).getFullYear(), (new Date()).getMonth(), 1).toLocaleDateString('vi-VN'))
+        // vm.toReceiveDateFormatted = vm.currentDateFormat()
         // vm.getDossiers()
         vm.getAgencyConfigs()
         if (!vm.siteTrungTam) {
@@ -772,13 +805,9 @@
     methods: {
       getDossiers () {
         let vm = this
-        vm.pagination = {
-          rowsPerPage: 20,
-          page: 1          
-        }
-        vm.limitRecord = vm.pagination.rowsPerPage
         vm.dossierSelected = []
         vm.loadingTable = true
+        vm.numberPerPage = vm.limitRecord
         let params = {
           groupId: vm.groupIdDonVi,
           dossierNo: vm.dossierNoKey,
@@ -787,7 +816,10 @@
           toReceiveDate: vm.toReceiveDateFormatted ? vm.toReceiveDateFormatted : '',
           fromReleaseDate: vm.fromReleaseDateFormatted ? vm.fromReleaseDateFormatted : '',
           toReleaseDate: vm.toReleaseDateFormatted ? vm.toReleaseDateFormatted : '',
-          service: vm.serviceFilter ? vm.serviceFilter : ''
+          service: vm.serviceFilter ? vm.serviceFilter : '',
+          start: vm.dossierPage * vm.numberPerPage - vm.numberPerPage,
+          end: vm.dossierPage * vm.numberPerPage,
+          agency: vm.agencyFilterXa ? vm.agencyFilterXa['itemCode'] : ''
         }
         vm.$store.dispatch('getDossiers', params).then(res => {
           vm.loadingTable = false
@@ -804,6 +836,11 @@
           vm.totalDossierSearch = 0
         })
 
+      },
+      submitSearch () {
+        let vm = this
+        vm.dossierPage = 1
+        vm.getDossiers()
       },
       getDetailDossier (data) {
         let vm = this
@@ -850,12 +887,9 @@
       },
       changePage (config) {
         let vm = this
-        vm.limitRecord = config.numberPerPage ? config.numberPerPage : 20
-        vm.pagination = {
-          page: config.page,
-          rowsPerPage: vm.limitRecord
-        }
-        console.log('vm.paginantion', config, vm.pagination)
+        vm.dossierPage = config.page
+        vm.limitRecord = config.numberPerPage
+        vm.getDossiers()
       },
       viewDetailDossier (data) {
         let vm = this
@@ -955,15 +989,7 @@
                 vm.dialogUpdateDossier = false
                 toastr.success('Cập nhật hồ sơ thành công')
               }, 200)
-              vm.dossierList = vm.dossierList.filter(function(item) {
-                return !dossierIdsSelectArr.includes(String(item.dossierId))
-              })
-              vm.dossierSelected = []
-              vm.totalDossierSearch = vm.dossierList.length
-              vm.pagination = {
-                rowsPerPage: vm.limitRecord,
-                page: 1
-              }
+              vm.getDossiers()
             }).catch(function() {
               vm.loadingActionUpdate = false
               toastr.error('Cập nhật không thành công')
@@ -977,6 +1003,14 @@
           vm.groupIdDonVi = vm.agencyFilter['value']
           if (!vm.siteTrungTam) {
             vm.getServiceInfo()
+          }
+          if (vm.agencyFilter.hasOwnProperty('parent')) {
+            vm.agencyListXa = []
+            vm.agencyFilterXa = ''
+            vm.getDonViXa()
+          } else {
+            vm.agencyListXa = []
+            vm.agencyFilterXa = ''
           }
         }, 200)
       },
@@ -1018,10 +1052,24 @@
           let agency = configs['groupIds']
           vm.agencyList = agency
           vm.agencyFilter = vm.agencyList[0]
+          vm.groupIdDonVi = vm.agencyFilter['value']
           vm.getServiceInfo()
         }).catch(function (xhr) {
         })
       },
+      getDonViXa () {
+        let vm = this
+        let filter = {
+          parent: vm.agencyFilter['parent']
+        }
+        vm.$store.dispatch('getAgencysFromParent', filter).then(
+          res => {
+            vm.agencyListXa = res
+          }
+        ).catch(()=>{
+          vm.agencyListXa = []
+        }) 
+      }
     },
     filters: {
       dateTimeView (arg) {

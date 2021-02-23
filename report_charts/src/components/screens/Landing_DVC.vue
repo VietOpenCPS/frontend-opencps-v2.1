@@ -25,13 +25,13 @@
       </div>
     </div>
     <div class="group-mobile pb-2" v-if="String(index) === '0' && isMobile">
-      <div class="run-down-mobile mt-0">
+      <!-- <div class="run-down-mobile mt-0">
         <div class="box-title">Tình hình xử lý các năm</div>
         <div class="in-time flex text-xs-center">
           <span>{{itemTotalAllYear['ontimePercentage'] ? Math.round(itemTotalAllYear['ontimePercentage']) : 0}} %</span>
           Sớm và đúng hạn
         </div>
-      </div>
+      </div> -->
       <!--  -->
       <v-layout wrap class="run-down-mobile">
         <v-flex xs6>
