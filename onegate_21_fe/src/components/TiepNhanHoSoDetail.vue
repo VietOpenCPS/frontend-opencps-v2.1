@@ -66,13 +66,18 @@
                       <v-form v-model="valid_tenHoSo" ref="formTenHoSo" lazy-validation>
                         <v-textarea
                           v-model="briefNote"
-                          :rows="2"
+                          :rows="3"
                           box
                           :rules="originality === 1 ? '' : [rules.varchar5000]"
                           :placeholder="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : (originality === 1 ? 'Nhập nội dung yêu cầu giải quyết' : 'Nhập tên hồ sơ')"
                         ></v-textarea>
                       </v-form>
-                      <div v-if="templateDescription">(*) &nbsp; {{templateDescription}}</div>
+                      <div v-if="fixDescriptionDt"><span style="color: red">(*)</span> &nbsp; 
+                        Đối với thủ tục thông báo khuyến mãi, đề nghị nhập vào ô này tên doanh nghiệp, tên chương trình khuyến mãi, thời gian thực hiện, tổng giá trị hàng hoá dịch vụ 
+                        <span style="color: red">dùng để khuyến mãi</span>
+                      </div>
+                      <div v-else><span v-if="templateDescription" style="color: red">(*)</span> &nbsp; {{templateDescription}}</div>
+                      
                     </v-card-text>
                   </v-card>
                 </div>
@@ -117,7 +122,7 @@
             </v-expansion-panel>
           </div>
           <!--  -->
-          <div style="position: relative;border-top:1px solid #ddd" v-if="originality !== 1 && notifyConfig">
+          <div style="position: relative;border-top:1px solid #ddd" v-if="notifyConfig">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
                 <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Hình thức gửi thông báo giải quyết hồ sơ</div>
@@ -167,11 +172,10 @@
           </div>
           <!--  -->
           <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
-          <!-- <div style="position: relative;" v-if="originality === 1"> -->
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
                 <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát hồ sơ</div>
-                <dich-vu-chuyen-phat-ho-so ref="dichvuchuyenphathoso" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ho-so>
+                <dich-vu-chuyen-phat-ho-so ref="dichvuchuyenphathoso" @changeViapostal="changeViapostal" :detailDossier="thongTinChiTietHoSo"></dich-vu-chuyen-phat-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
@@ -180,7 +184,7 @@
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
                 <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát kết quả</div>
-                <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
+                <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal" :detailDossier="thongTinChiTietHoSo"></dich-vu-chuyen-phat-ket-qua>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
@@ -853,6 +857,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    fixDescriptionDt: false,
     valid_tenHoSo: false,
     // add new template
     isNotarization: false,
@@ -1094,6 +1099,10 @@ export default {
     var vm = this
     try {
       vm.showGuiHoSoConfig = showGuiHoSoConfig
+    } catch (error) {
+    }
+    try {
+      vm.fixDescriptionDt = fixDescriptionDt
     } catch (error) {
     }
     vm.$nextTick(function () {

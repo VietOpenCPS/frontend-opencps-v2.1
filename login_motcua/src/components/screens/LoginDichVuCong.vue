@@ -105,7 +105,7 @@
               <v-icon>how_to_reg</v-icon>&nbsp;
               Đăng nhập
             </v-btn>
-            <v-btn @click="goBack" color="primary">
+            <v-btn @click="goBack" color="primary" class="btt-go-back">
               <v-icon>reply</v-icon>&nbsp;
               Quay lại
             </v-btn>
@@ -115,6 +115,14 @@
               @click="loginDVCQG"
             >
               Đăng nhập qua Cổng DVC Quốc gia
+            </v-btn>
+            <v-btn v-if="hasSSO" class="px-2 my-0" color="#913938"
+              :loading="loading"
+              :disabled="loading"
+              @click="loginSso"
+            >
+              <v-icon>admin_panel_settings</v-icon>&nbsp;
+              Đăng nhập SSO
             </v-btn>
           </v-flex>
         </v-form>
@@ -173,6 +181,7 @@ export default {
   props: [],
   components: {},
   data: () => ({
+    hasSSO: false,
     npmreactlogin_login: '',
     npmreactlogin_password: '',
     captcha: false,
@@ -203,7 +212,12 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
-      var vm = this
+      try {
+        if (configSsoBtt) {
+          vm.hasSSO = true
+        }
+      } catch (error) {
+      }
       $('body').addClass('body_login')
       let current = vm.$router.history.current
       let currentQuery = current.query
@@ -261,6 +275,25 @@ export default {
   watch: {
   },
   methods: {
+    loginSso () {
+      let vm = this
+      vm.loading = true
+      let filter = {
+        state: '',
+        redirectURL: window.location.href.split("?")[0]
+      }
+      vm.$store.dispatch('getSso', filter).then(function (result) {
+        vm.loading = false
+        if (result) {
+          window.location.href = result
+        } else {
+          alert('Chức năng đang cập nhật')
+        }
+      }).catch(function () {
+        vm.loading = false
+        alert('Chức năng đang cập nhật')
+      })
+    },
     makeImageCap () {
       var vm = this
       vm.chapchablob = ''

@@ -342,6 +342,7 @@ export const store = new Vuex.Store({
           dataCreateBooking.append('className', filter.className)
           dataCreateBooking.append('classPK', filter.classPK)
           dataCreateBooking.append('codeNumber', filter.codeNumber)
+          dataCreateBooking.append('govAgencyCode', filter.govAgencyCode)
           dataCreateBooking.append('serviceCode', filter.serviceCode)
           dataCreateBooking.append('state', filter.state)
           dataCreateBooking.append('gateNumber', '')
@@ -381,6 +382,7 @@ export const store = new Vuex.Store({
         let dataCreate = {
           className: filter['className'],
           classPK: filter['classPK'],
+          govAgencyCode: filter['govAgencyCode'],
           codeNumber: filter['codeNumber'],
           serviceCode: filter['serviceCode'],
           state: filter['state'],

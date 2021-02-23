@@ -9,26 +9,12 @@
         class="my-0 px-2 py-2"
       >
         - Tờ khai đã đăng ký lịch hẹn online.<br>
+        - Nơi tiếp nhận hồ sơ: {{agencyTiepNhan ? agencyTiepNhan['name'] : ''}}.<br>
         - Thời gian tiếp nhận hồ sơ: {{timeBooking}} ngày {{checkinDate}}.<br>
         - Qua thời gian xếp hàng trên nếu chưa đến làm thủ tục đề nghị đăng ký xếp hàng lại.
       </v-alert>
     </div>
-    <!-- <div class="row-header no__hidden_class">
-      <div class="background-triangle-big">
-        <span v-if="String(index) !== '0'">THÔNG TIN TỜ KHAI</span>
-        <span v-else>TẠO TỜ KHAI THÀNH CÔNG</span>
-      </div>
-      <div class="layout row wrap header_tools row-blue">
-        <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-        </div>
-        <div class="flex text-right" style="margin-left: auto;max-width: 150px;height:37px">
-          <v-btn color="primary" class="my-0 mx-0 white--text" v-on:click.native="goBack" style="height:100%">
-            <v-icon size="16">reply</v-icon> &nbsp;
-            Quay lại
-          </v-btn>
-        </div>
-      </div> 
-    </div> -->
+    
     <v-container align-center row wrap class="px-0 pt-0">
       <v-flex xs12 style="border: 1px solid #0072bc; border-radius: 3px">
         <v-layout row wrap>
@@ -40,6 +26,8 @@
               <p class="mb-2 text-bold">Tên tờ khai: <span class="ml-2 primary--text">{{fileTemplateSelected.templateName}}</span></p>
               <p class="mb-2 text-bold">Mã tờ khai: <span class="ml-2 primary--text">{{eformDetail.eFormNo }}</span></p>
               <p class="mb-2 text-bold">Mã bí mật tra cứu tờ khai: <span class="ml-2 primary--text">{{eformDetail.secret}}</span></p>
+              <p class="mb-2 text-bold" v-if="agencyTiepNhan">Nơi nộp tờ khai: <span class="ml-2 primary--text">{{agencyTiepNhan ? agencyTiepNhan['name'] : ''}}</span></p>
+              
               <span class="mr-2"><v-icon color="warning">warning</v-icon></span>
               <span class="warning--text" style="font-size: 1.2em">Vui lòng ghi lại Mã tờ khai, Mã bí mật để tra cứu, in lại tờ khai khi cần thiết!</span>
               <div class="mt-3">
@@ -60,23 +48,38 @@
                   Tải xuống
                 </v-btn>
               </div>
-              <p class="mt-4">
-                -  Để hoàn tất thủ tục, đề nghị mang Tờ khai này cùng các giấy tờ theo quy định đến Cục Lãnh sự 
-                hoặc Sở Ngoại vụ Thành phố Hồ Chí Minh hoặc Ngoại vụ địa phương hoặc 
-                Cơ quan đại diện để xin chứng nhận/ hợp pháp hóa lãnh sự.
-              </p>
-              <p>
-                -  Tờ khai này chỉ có giá trị hiệu lực trong vòng 10 ngày làm việc. Quá thời hạn trên nếu chưa nộp tờ khai đề nghị kê khai tờ khai mới.
-              </p>
-              <p>
-                -  Thủ tục cấp, gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ, xin công hàm thị thực quầy số 3.
-              </p>
-              <p>
-                -  Thủ tục hợp pháp hóa lãnh sự, chứng nhận lãnh sự quầy số 7.
-              </p>
-              <p v-if="timeBooking">
-                -  BPMC - Cục Lãnh sự xác nhận lịch hẹn nộp hồ sơ Quý khách vào {{' '+ timeBooking + ' ngày '+ checkinDate + ' '}} vui lòng đến trước giờ hẹn 10' và sắp xếp hồ sơ đúng, đủ theo quy định. Quá thời gian hẹn trả trên, Quý khách vui lòng đăng ký xếp hàng lại.
-              </p>
+              <div v-if="!agencyTiepNhan || (agencyTiepNhan && agencyTiepNhan['code'] === 'CLS')">
+                <p class="mt-4">
+                  -  Để hoàn tất thủ tục, đề nghị mang Tờ khai này cùng các giấy tờ theo quy định đến Cục Lãnh sự 
+                  hoặc Sở Ngoại vụ Thành phố Hồ Chí Minh hoặc Ngoại vụ địa phương hoặc 
+                  Cơ quan đại diện để xin chứng nhận/ hợp pháp hóa lãnh sự.
+                </p>
+                <p>
+                  -  Tờ khai này chỉ có giá trị hiệu lực trong vòng 10 ngày làm việc. Quá thời hạn trên nếu chưa nộp tờ khai đề nghị kê khai tờ khai mới.
+                </p>
+                <p>
+                  -  Thủ tục cấp, gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ, xin công hàm thị thực quầy số 3.
+                </p>
+                <p>
+                  -  Thủ tục hợp pháp hóa lãnh sự, chứng nhận lãnh sự quầy số 7.
+                </p>
+                <p v-if="timeBooking">
+                  -  Bộ phận một cửa - Cục Lãnh sự xác nhận lịch hẹn nộp hồ sơ Quý khách vào {{' '+ timeBooking + ' ngày '+ checkinDate + ' '}} vui lòng đến trước giờ hẹn 10' và sắp xếp hồ sơ đúng, đủ theo quy định. Quá thời gian hẹn trả trên, Quý khách vui lòng đăng ký xếp hàng lại.
+                </p>
+              </div>
+              <div v-else>
+                <p class="mt-4">
+                  -  Để hoàn tất thủ tục, đề nghị mang Tờ khai này cùng các giấy tờ theo quy định đến Cục Lãnh sự 
+                  hoặc Sở Ngoại vụ Thành phố Hồ Chí Minh hoặc Ngoại vụ địa phương hoặc 
+                  Cơ quan đại diện để xin chứng nhận/ hợp pháp hóa lãnh sự.
+                </p>
+                <p>
+                  -  Tờ khai này chỉ có giá trị hiệu lực trong vòng 10 ngày làm việc. Quá thời hạn trên nếu chưa nộp tờ khai đề nghị kê khai tờ khai mới.
+                </p>
+                <p v-if="timeBooking">
+                  -  Bộ phận một cửa - Sở ngoại vụ Tp. Hồ Chí Minh xác nhận lịch hẹn nộp hồ sơ Quý khách vào {{' '+ timeBooking + ' ngày '+ checkinDate + ' '}} vui lòng đến trước giờ hẹn 10' và sắp xếp hồ sơ đúng, đủ theo quy định. Quá thời gian hẹn trả trên, Quý khách vui lòng đăng ký xếp hàng lại.
+                </p>
+              </div>
             </div>
           </v-flex>
           <v-flex xs12 class="text-xs-right mt-3 mb-2">
@@ -152,7 +155,11 @@ export default {
     dialogPDF: false,
     dialogPDFLoading: false,
     timeBooking: '',
-    checkinDate: ''
+    checkinDate: '',
+    agencyItems: [
+      {name: 'Cục lãnh sự - 40 Trần Phú, Ba Đình, Hà Nội', value: '124302', code: 'CLS', serverNo: 'SERVER_CLS'}
+    ],
+    agencyTiepNhan: ''
   }),
   computed: {
     serviceinfoSelected () {
@@ -171,6 +178,10 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
+      try {
+        vm.agencyItems = agencyItems /**config fragment*/
+      } catch (error) {
+      }
       let current = vm.$router.history.current
       let currentQuery = current.query
       if (!vm.eformDetail.secret && !vm.eformDetail.eFormNo) {
@@ -179,6 +190,13 @@ export default {
       if (String(vm.index) === '1') {
         vm.getDetailBooking()
       }
+      try {
+        vm.agencyTiepNhan = vm.agencyItems.filter(function (item) {
+          return item.code === vm.eformDetail.govAgencyCode
+        })[0]
+      } catch (error) {
+      }
+      
     })
   },
   updated () {

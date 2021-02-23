@@ -19,7 +19,7 @@
                         <div v-if="employee['imgSrc']" class="mt-1" :style="'background-image: url(' + employee['imgSrc'] + ');'" style="max-width: 100px;height: 150px;margin: 0 auto;background-position: center;background-size: cover;"></div>
                         <img v-else src="/o/opencps-store/js/cli/voting/app/img/contacts-icon.png" style="max-width: 100px;height: 150px;object-fit: contain;background: #ddd;opacity:0.6"/>
                       </v-flex>
-                      <v-flex xs8 style="word-wrap: break-word;">
+                      <v-flex xs8 class="px-2" style="word-wrap: break-word;">
                         <div class="primary--text">{{employee.jobPosTitle}}</div>
                         <div class="text-bold primary--text mb-2">{{employee.fullName}}</div>
                         <div>{{employee.workingUnitName}}</div>
@@ -29,14 +29,14 @@
                   </v-card-text>
                   <v-divider light class="my-0"></v-divider>
                   <div class="py-2">
-                    <v-layout wrap class="px-3">
+                    <!-- <v-layout wrap class="px-3">
                       <v-flex class="pt-2" style='max-width:100px'>
                         <span class="text-bold">Đánh giá:</span>
                       </v-flex>
                       <v-flex>
                         <star-rating read-only :rating="employee['score'] ? employee['score'] : 0" :increment="0.1" :max-rating="5" :show-rating="false" :star-size="30"></star-rating>
                       </v-flex>
-                    </v-layout>
+                    </v-layout> -->
                     <v-layout wrap class="px-3">
                       <v-flex style='max-width:100px'>
                         <span class="text-bold">Kết quả:</span>
@@ -110,7 +110,8 @@ export default {
     totalEmployee: 0,
     employeePage: 1,
     numberPerPage: 12,
-    isDVC: false
+    isDVC: false,
+    currentSite: false
   }),
   computed: {
     loading () {
@@ -123,6 +124,10 @@ export default {
       if (isDVC) {
         vm.isDVC = isDVC
       }
+    } catch (error) {
+    }
+    try {
+      vm.currentSite = currentSite
     } catch (error) {
     }
     let currentQuery = vm.$router.history.current.query
@@ -170,22 +175,42 @@ export default {
           vm.thutucPage = 1
         })
       } else {
-        vm.$store.dispatch('loadEmployeesProxy', filter).then(result => {
-          vm.totalEmployee = result[0]
-          vm.employeeItems = sortEmployee(result[1])
-          vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
+        if (vm.currentSite) {
+          vm.$store.dispatch('loadEmployees', filter).then(result => {
+            vm.totalEmployee = result[0]
+            vm.employeeItems = sortEmployee(result[1])
+            vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
 
-          vm.employeeItems = vm.employeeItems.slice(filter.start, filter.end)
-          if (vm.employeeItems && vm.employeeItems.length > 0) {
-            for (let key in vm.employeeItems) {
-              vm.getAvatar(vm.employeeItems[key], key)
-              vm.getVotingEmployee(vm.employeeItems[key], key)
+            vm.employeeItems = vm.employeeItems.slice(filter.start, filter.end)
+            if (vm.employeeItems && vm.employeeItems.length > 0) {
+              for (let key in vm.employeeItems) {
+                // vm.getAvatar(vm.employeeItems[key], key)
+                vm.getVotingEmployee(vm.employeeItems[key], key)
+              }
             }
-          }
-        }).catch(xhr => {
-          vm.totalThuTuc = 0
-          vm.thutucPage = 1
-        })
+          }).catch(xhr => {
+            vm.totalThuTuc = 0
+            vm.thutucPage = 1
+          })
+        } else {
+          vm.$store.dispatch('loadEmployeesProxy', filter).then(result => {
+            vm.totalEmployee = result[0]
+            vm.employeeItems = sortEmployee(result[1])
+            vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
+
+            vm.employeeItems = vm.employeeItems.slice(filter.start, filter.end)
+            if (vm.employeeItems && vm.employeeItems.length > 0) {
+              for (let key in vm.employeeItems) {
+                // vm.getAvatar(vm.employeeItems[key], key)
+                vm.getVotingEmployee(vm.employeeItems[key], key)
+              }
+            }
+          }).catch(xhr => {
+            vm.totalThuTuc = 0
+            vm.thutucPage = 1
+          })
+        }
+        
       }
       
     },
@@ -195,17 +220,32 @@ export default {
         employeeId: item.employeeId,
         itemCode: vm.itemCode
       }
-      vm.$store.dispatch('loadImageEmployeeProxy', filter).then(function (data) {
-        if (data !== '' && data !== null) {
-          let portalURL = ''
-          if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
-            portalURL = window.themeDisplay.getPortalURL()
+      if (vm.isDVC) {
+        vm.$store.dispatch('loadImageEmployee', filter).then(function (data) {
+          if (data !== '' && data !== null) {
+            let portalURL = ''
+            if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+              portalURL = window.themeDisplay.getPortalURL()
+            }
+            vm.employeeItems[key]['imgSrc'] = portalURL + data
           }
-          vm.employeeItems[key]['imgSrc'] = portalURL + data
-        }
-      }).catch(function (data) {
-        vm.employeeItems[key]['imgSrc'] = ''
-      })
+        }).catch(function (data) {
+          vm.employeeItems[key]['imgSrc'] = ''
+        })
+      } else {
+        vm.$store.dispatch('loadImageEmployeeProxy', filter).then(function (data) {
+          if (data !== '' && data !== null) {
+            let portalURL = ''
+            if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+              portalURL = window.themeDisplay.getPortalURL()
+            }
+            vm.employeeItems[key]['imgSrc'] = portalURL + data
+          }
+        }).catch(function (data) {
+          vm.employeeItems[key]['imgSrc'] = ''
+        })
+      }
+      
     },
     viewDetailEmployee (item) {
       var vm = this
@@ -231,16 +271,30 @@ export default {
         }).catch(xhr => {
         })
       } else {
-        vm.$store.dispatch('loadVotingMotcua', {
-          className: 'employee',
-          classPk: item.employeeId,
-          itemCode: vm.itemCode
-        }).then(result => {
-          let votingItems = result.data
-          let votingCount = result.hasOwnProperty('votingCount') ? result.votingCount : 0
-          vm.getScoreVoting(votingItems, key, votingCount)
-        }).catch(xhr => {
-        })
+        if (vm.currentSite) {
+          vm.$store.dispatch('loadVoting', {
+            className: 'employee',
+            classPk: item.employeeId,
+            itemCode: vm.itemCode
+          }).then(result => {
+            let votingItems = result.data
+            let votingCount = result.hasOwnProperty('votingCount') ? result.votingCount : 0
+            vm.getScoreVoting(votingItems, key, votingCount)
+          }).catch(xhr => {
+          })
+        } else {
+          vm.$store.dispatch('loadVotingMotcua', {
+            className: 'employee',
+            classPk: item.employeeId,
+            itemCode: vm.itemCode
+          }).then(result => {
+            let votingItems = result.data
+            let votingCount = result.hasOwnProperty('votingCount') ? result.votingCount : 0
+            vm.getScoreVoting(votingItems, key, votingCount)
+          }).catch(xhr => {
+          })
+        }
+        
       }
       
     },

@@ -15,8 +15,23 @@
                   </v-btn>
                   <span>Đối chiếu thông tin doanh nghiệp</span>
                 </v-tooltip>
-                <v-card-text class="pt-3">
+                <v-card-text :class="originality === 3 && thongTinChuHoSo.userType === '2' && traCuuLgsp ? 'pt-0' : 'pt-3'">
+                  <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '2' && traCuuLgsp">
+                    <v-btn class="mx-0" color="primary" @click.stop="showDialogSearchLgsp()">
+                      <v-icon>fas fa fa-search-plus</v-icon> &nbsp;
+                      Tra cứu CSDL Quốc Gia
+                    </v-btn>
+                  </v-flex>
                   <v-layout wrap>
+                    <v-flex xs12 class="mb-3 text-xs-center" v-if="validateSameApplicantIdNo && sameApplicantIdNo">
+                      <div>
+                        <span class="mr-2"><v-icon color="warning">error_outline</v-icon></span>
+                        <span style="">Chủ hồ sơ CMND/ Hộ chiếu/ Mã số thuế </span>
+                        <span class="text-bold">{{thongTinChuHoSo.applicantIdNo}}</span>
+                        <span> đang được tiếp nhận, giải quyết tại hồ sơ số: </span>
+                        <span style="color: red">{{sameApplicantIdNo}}</span>
+                      </div>
+                    </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
@@ -41,6 +56,7 @@
                         :onInputChange="onInputChange"
                         :class="loadingVerify ? 'input-group--disabled' : ''"
                         :style="loadingVerify ? 'color:#00000061' : ''"
+                        @change="changeSuggess"
                         >
                         <div slot="item" slot-scope="props" class="single-item">
                           <v-list-tile-content>
@@ -701,6 +717,92 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- tra cứu LGSP -->
+    <v-dialog v-model="dialog_searchLgsp" scrollable persistent max-width="700px">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Tra cứu CSDL Quốc Gia về thông tin doanh nghiệp</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_searchLgsp = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-1">
+          <v-form ref="formLgsp" v-model="valid" class="py-3 px-0 grid-list">
+            <v-layout row wrap class="px-0 py-0">
+              <v-flex xs12>
+                <v-text-field label="Mã số thuế doanh nghiệp" v-model="applicantIdNoLgsp"
+                 box clearable :rules="[rules.required]"></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="text-right">
+                <v-btn color="primary"
+                  @click="searchLgsp"
+                  :loading="loadingSearchLgsp"
+                  :disabled="loadingSearchLgsp"
+                  class="mx-0 my-0"
+                >
+                  <v-icon size="20">search</v-icon>
+                  &nbsp;
+                  Tra cứu
+                  <span slot="loader">Loading...</span>
+                </v-btn>
+              </v-flex>
+              
+            </v-layout>
+          </v-form>
+          <div>
+            <table class="datatable table" style="border-top: 1px solid #dedede;" v-if="applicantLgspInfomation">
+              <tbody>
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Tên doanh nghiệp</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.NAME}}</span></td>
+                </tr>
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Mã số thuế</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.ENTERPRISE_GDT_CODE}}</span></td>
+                </tr>
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Người đại diện</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.FULL_NAME}}</span></td>
+                </tr>
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Địa chỉ</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.AddressFullText}}</span></td>
+                </tr>
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Ngày thành lập</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.FOUNDING_DATE}}</span></td>
+                </tr>
+                <tr>
+                  <td class="pt-2"><span class="text-bold">Loại hình doanh nghiệp</span></td>
+                  <td class="pt-2"><span v-html="applicantLgspInfomation.ENTERPRISE_TYPE_NAME"></span></td>
+                </tr>
+                <tr>
+                  <td class="pt-2"><span class="text-bold">Tình trạng hoạt động</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.ENTERPRISE_STATUS_NAME}}</span></td>
+                </tr>
+                
+              </tbody>
+            </table>
+            <v-flex xs12 class="text-right my-2" v-if="applicantLgspInfomation">
+              <v-btn color="primary"
+                @click="addApplicantLgsp"
+                class="mx-0 my-0"
+              >
+                <v-icon size="20">save_alt</v-icon>
+                &nbsp;
+                Lấy thông tin
+              </v-btn>
+            </v-flex>
+            <div v-if="applicantLgspInfomation === false" class="mx-1 flex mb-3">
+              <v-alert outline color="warning" icon="priority_high" :value="true">
+                Không có thông tin doanh nghiệp
+              </v-alert>
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -720,6 +822,8 @@ export default {
   },
   props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode', 'applicantIdRequired'],
   data: () => ({
+    validateSameApplicantIdNo: false,
+    sameApplicantIdNo: '',
     checkDelegateIdNo: false,
     checkApplicantId: false,
     requiredOptions: {
@@ -916,7 +1020,12 @@ export default {
     wardItems: [],
     valid: false,
     loadingTable: false,
-    hasOrganization: false
+    hasOrganization: false,
+    traCuuLgsp: false,
+    dialog_searchLgsp: false,
+    loadingSearchLgsp: false,
+    applicantIdNoLgsp: '',
+    applicantLgspInfomation: ''
   }),
   computed: {
     loading () {
@@ -949,6 +1058,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.validateSameApplicantIdNo = checkTrungChuHoSo
+    } catch (error) {
+    }
     if (vm.formCode === "NEW") {
       // vm.thongTinNguoiNopHoSo.sameUser = true
     }
@@ -968,9 +1081,20 @@ export default {
         }
       }
     }
+    try {
+      if (requiredOptionConfig) {
+        vm.requiredOptions = Object.assign(vm.requiredOptions, requiredOptionConfig)
+      }
+    } catch (error) {
+    }
     if (vm.requiredConfig && vm.requiredConfig['applicant']) {
       vm.requiredOptions = Object.assign(vm.requiredOptions, vm.requiredConfig['applicant'])
     }
+    vm.$store.dispatch('checkLgsp').then(result => {
+      vm.traCuuLgsp = result && result.hasOwnProperty('enabled') && result.enabled ? true : false
+    }).catch(xhr => {
+      vm.traCuuLgsp = false
+    })
   },
   watch: {
     thongTinChuHoSo: {
@@ -1108,6 +1232,9 @@ export default {
     },
   },
   methods: {
+    changeSuggess (val) {
+      console.log('changeSuggestion', val)
+    },
     initData (data) {
       var vm = this
       console.log('data_init_chuhoso', data)
@@ -1329,7 +1456,7 @@ export default {
         clearTimeout(vm.functionTimeOut)
       }
       vm.functionTimeOut = setTimeout(function () {
-        if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2') || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+        if (vm.originality === 3) {
           vm.checkApplicantInfos()
           // vm.thongTinChuHoSo.applicantIdNo = query.trim()
         }
@@ -1416,7 +1543,7 @@ export default {
       setTimeout(function () {
         vm.$store.commit('setApplicantId', vm.thongTinChuHoSo['applicantIdNo'])
         vm.checkApplicantInfos()
-      }, 2100)
+      }, 2000)
       
       function changeCity (data) {
         return new Promise((resolve, reject) => {
@@ -1504,7 +1631,7 @@ export default {
         clearTimeout(vm.functionTimeOut)
       }
       vm.functionTimeOut = setTimeout(function () {
-        if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2') || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+        if (vm.originality === 3) {
           vm.checkApplicantInfos()
         }
         vm.$store.commit('setApplicantId', vm.thongTinChuHoSo.applicantIdNo)
@@ -1513,33 +1640,53 @@ export default {
     checkApplicantInfos () {
       let vm = this
       
-      if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2' && vm.thongTinChuHoSo.applicantIdNo) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+      // if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2' && vm.thongTinChuHoSo.applicantIdNo) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+      //   let filter = {
+      //     applicantIdNo: vm.thongTinChuHoSo.applicantIdNo,
+      //     applicantName: vm.thongTinChuHoSo.applicantName
+      //   }
+      //   vm.$store.dispatch('checkApplicantInfos', filter).then(result => {
+      //     // vm.loadingVerify = false
+      //     if (result && result.hasOwnProperty('error') && result.error === true) {
+      //       vm.bussinessExits = false
+      //       vm.validBussinessInfos = false
+      //       // vm.$store.commit('setApplicantBussinessExit', false)
+      //       vm.messageCheckApplicant = result.message
+      //       // toastr.error(result.message + ' Vui lòng kiểm tra lại mã số thuế')
+      //     } else if (result && result.hasOwnProperty('warning') && result.warning === true) {
+      //       vm.bussinessExits = true
+      //       vm.validBussinessInfos = false
+      //       // vm.$store.commit('setApplicantBussinessExit', false)
+      //       vm.messageCheckApplicant = result.message
+      //       // toastr.error(result.message + ' Vui lòng đối chiếu thông tin doanh nghiệp')
+      //     } else if (result && !result.hasOwnProperty('error') && !result.hasOwnProperty('warning')) {
+      //       vm.bussinessExits = true
+      //       vm.validBussinessInfos = true
+      //       // vm.$store.commit('setApplicantBussinessExit', filter['applicantIdNo'])
+      //     }
+      //   }).catch(function () {
+      //     vm.loadingVerify = false
+      //   })
+      // }
+
+      // check cảnh báo đang xử lý hồ sơ cùng mã chủ hồ sơ
+      if (vm.validateSameApplicantIdNo && vm.originality === 3 && vm.thongTinChuHoSo.applicantIdNo) {
         let filter = {
           applicantIdNo: vm.thongTinChuHoSo.applicantIdNo,
-          applicantName: vm.thongTinChuHoSo.applicantName
+          status: 'new,waiting,processing'
         }
-        // vm.loadingVerify = true
-        vm.$store.dispatch('checkApplicantInfos', filter).then(result => {
-          // vm.loadingVerify = false
-          if (result && result.hasOwnProperty('error') && result.error === true) {
-            vm.bussinessExits = false
-            vm.validBussinessInfos = false
-            // vm.$store.commit('setApplicantBussinessExit', false)
-            vm.messageCheckApplicant = result.message
-            // toastr.error(result.message + ' Vui lòng kiểm tra lại mã số thuế')
-          } else if (result && result.hasOwnProperty('warning') && result.warning === true) {
-            vm.bussinessExits = true
-            vm.validBussinessInfos = false
-            // vm.$store.commit('setApplicantBussinessExit', false)
-            vm.messageCheckApplicant = result.message
-            // toastr.error(result.message + ' Vui lòng đối chiếu thông tin doanh nghiệp')
-          } else if (result && !result.hasOwnProperty('error') && !result.hasOwnProperty('warning')) {
-            vm.bussinessExits = true
-            vm.validBussinessInfos = true
-            // vm.$store.commit('setApplicantBussinessExit', filter['applicantIdNo'])
+        vm.$store.dispatch('getDossiers', filter).then(result => {
+          let dossierMapping = result.filter(function(item) {
+            return item.applicantIdNo == vm.thongTinChuHoSo.applicantIdNo
+          })
+          if (dossierMapping.length > 0) {
+            let dossierSameApplicant = dossierMapping.map(select => {
+              return select.dossierNo
+            }).join(',')
+            vm.sameApplicantIdNo = dossierSameApplicant
+          } else {
+            vm.sameApplicantIdNo = ''
           }
-        }).catch(function () {
-          vm.loadingVerify = false
         })
       }
     },
@@ -1818,6 +1965,37 @@ export default {
       vm.thongTinChuHoSo['address'] = ''
       vm.thongTinChuHoSo['applicantName'] = ''
 
+    },
+    showDialogSearchLgsp () {
+      let vm = this
+      vm.applicantIdNoLgsp = vm.thongTinChuHoSo['applicantIdNo']
+      vm.applicantLgspInfomation = ''
+      vm.dialog_searchLgsp = true
+      if (vm.applicantIdNoLgsp.trim()) {
+        vm.searchLgsp()
+      }
+    },
+    searchLgsp () {
+      let vm = this
+      let filter = {
+        applicantIdNo: vm.applicantIdNoLgsp.trim()
+      }
+      if (vm.applicantIdNoLgsp.trim()) {
+        vm.$store.dispatch('searchLgsp', filter).then(result => {
+          vm.applicantLgspInfomation = result
+        }).catch(xhr => {
+          vm.applicantLgspInfomation = false
+        })
+      } else {
+        vm.applicantLgspInfomation = false
+      }
+    },
+    addApplicantLgsp () {
+      let vm = this
+      vm.thongTinChuHoSo['applicantIdNo'] = vm.applicantLgspInfomation.ENTERPRISE_GDT_CODE
+      vm.thongTinChuHoSo['applicantName'] = vm.applicantLgspInfomation.NAME
+      vm.thongTinChuHoSo['address'] = vm.applicantLgspInfomation.AddressFullText
+      vm.dialog_searchLgsp = false
     }
   }
 }

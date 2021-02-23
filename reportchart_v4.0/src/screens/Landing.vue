@@ -32,7 +32,7 @@
                   <p>Tổng số đã tiếp nhận</p>
                 </v-flex>
                 <v-flex md6 xs12 text-center>
-                  <span style="color:#1976d2;">{{statistics.releaseCount}}</span>
+                  <span style="color:#1976d2;">{{thongKeHauGiang ? statistics.releaseInAPeriodCount : statistics.releaseCount}}</span>
                   <p>Tổng số hoàn thành</p>
                 </v-flex>
                 <v-flex md6 xs12 text-center>
@@ -166,7 +166,7 @@
                       <p>Tổng số đã tiếp nhận</p>
                     </v-flex>
                     <v-flex xs12 text-center>
-                      <span style="color:#1976d2;">{{statisticTotalSBN.releaseCount}}</span>
+                      <span style="color:#1976d2;">{{thongKeHauGiang ? statisticTotalSBN.releaseInAPeriodCount : statisticTotalSBN.releaseCount}}</span>
                       <p>Hoàn thành</p>
                     </v-flex>
                     <v-flex s12 text-center>
@@ -224,7 +224,7 @@
                       <p>Tổng số đã tiếp nhận</p>
                     </v-flex>
                     <v-flex xs12 text-center>
-                      <span style="color:#1976d2;">{{statisticTotalQuanHuyen.releaseCount}}</span>
+                      <span style="color:#1976d2;">{{thongKeHauGiang ? statisticTotalQuanHuyen.releaseInAPeriodCount : statisticTotalQuanHuyen.releaseCount}}</span>
                       <p>Hoàn thành</p>
                     </v-flex>
                     <v-flex s12 text-center>
@@ -283,7 +283,7 @@
                         <p>Tổng số đã tiếp nhận</p>
                       </v-flex>
                       <v-flex xs12 text-center>
-                        <span style="color:#1976d2;">{{statisticTotalXaPhuong.releaseCount}}</span>
+                        <span style="color:#1976d2;">{{thongKeHauGiang ? statisticTotalXaPhuong.releaseInAPeriodCount : statisticTotalXaPhuong.releaseCount}}</span>
                         <p>Hoàn thành</p>
                       </v-flex>
                       <v-flex s12 text-center>
@@ -1149,6 +1149,10 @@ export default {
           if (response.data.data) {
             vm.statistics = response.data.data[0]
             vm.processingTotal = vm.statistics.processingCount + vm.statistics.waitingCount
+            // số liệu hoàn thành, đang xử lý chỉ lấy hồ sơ trong năm hiện tại
+            if (vm.thongKeHauGiang) {
+              vm.processingTotal = vm.statistics.processingInAPeriodCount
+            }
             vm.statisticalYear = [
               response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
               response.data.data[0].overtimeCount
@@ -1229,6 +1233,9 @@ export default {
               if (vm.thongKeHauGiang) {
                 vm.statisticTotalSBN = response.data.data[0]
                 vm.processingSBN = vm.statisticTotalSBN.processingCount + vm.statisticTotalSBN.waitingCount
+                if (vm.thongKeHauGiang) {
+                  vm.processingSBN = vm.statisticTotalSBN.processingInAPeriodCount
+                }
                 vm.statisticalSBN = [
                   response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
                   response.data.data[0].overtimeCount
@@ -1300,6 +1307,9 @@ export default {
               if (vm.thongKeHauGiang) {
                 vm.statisticTotalQuanHuyen = response.data.data[0]
                 vm.processingQuanHuyen = vm.statisticTotalQuanHuyen.processingCount + vm.statisticTotalQuanHuyen.waitingCount
+                if (vm.thongKeHauGiang) {
+                  vm.processingQuanHuyen = vm.statisticTotalQuanHuyen.processingInAPeriodCount
+                }
                 vm.statisticalQUAN_HUYEN = [
                   response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
                   response.data.data[0].overtimeCount
@@ -1371,6 +1381,9 @@ export default {
               if (vm.thongKeHauGiang) {
                 vm.statisticTotalXaPhuong = response.data.data[0]
                 vm.processingXaPhuong = vm.statisticTotalXaPhuong.processingCount + vm.statisticTotalXaPhuong.waitingCount
+                if (vm.thongKeHauGiang) {
+                  vm.processingXaPhuong = vm.statisticTotalXaPhuong.processingInAPeriodCount
+                }
                 vm.statisticalXA_PHUONG = [
                   response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
                   response.data.data[0].overtimeCount

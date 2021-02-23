@@ -6,9 +6,13 @@
           <v-icon>add</v-icon>&nbsp;
           Thêm câu trả lời
         </v-btn> -->
-        <v-flex xs12 sm12 class="text-xs-center" style="margin-bottom: 20px;">
+        <v-flex v-if="phanAnhKienNghi" xs12 sm12 class="text-xs-center" style="margin-bottom: 20px;">
           <h3 v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" class="text-xs-center mt-2" style="color:#065694">QUẢN LÝ CÂU HỎI</h3>
           <h3 v-else class="text-xs-center mt-2" style="color:#065694">HỎI ĐÁP THÔNG TIN</h3>
+        </v-flex>
+        <v-flex v-else xs12 sm12 class="text-xs-center" style="margin-bottom: 20px;">
+          <h3 v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" class="text-xs-center mt-2" style="color:#065694">QUẢN LÝ PHẢN ÁNH KIẾN NGHỊ</h3>
+          <h3 v-else class="text-xs-center mt-2" style="color:#065694">PHẢN ÁNH KIẾN NGHỊ</h3>
         </v-flex>
         <v-flex xs12 sm12>
           <div
@@ -29,8 +33,11 @@
             </p>
           </div>
           <div class="mx-3 mt-3">
-            <div class="py-1">
+            <div class="py-1" v-if="!phanAnhKienNghi">
               <span class="primary--text text-bold">NỘI DUNG CÂU HỎI: </span>
+            </div>
+            <div class="py-1" v-else>
+              <span class="primary--text text-bold">NỘI DUNG KIẾN NGHỊ: </span>
             </div>
             <div
               class="my-2 px-2 py-2"
@@ -196,6 +203,8 @@ export default {
     VueEditor
   },
   data: () => ({
+    phanAnhKienNghi: false,
+    titleData: 'câu hỏi',
     answerList: [],
     answersDefault: [],
     answerSelected: '',
@@ -271,6 +280,13 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      vm.phanAnhKienNghi = phanAnhKienNghiPage
+      if (vm.phanAnhKienNghi) {
+        vm.titleData = 'kiến nghị'
+      }
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       var vm = this
       vm.getAnswers()
@@ -335,7 +351,7 @@ export default {
             j_captcha_response: vm.$refs.captcha.j_captcha_response
           }
           vm.$store.dispatch('addQuestion', filter).then(function (result) {
-            toastr.success('Thêm câu hỏi thành công')
+            toastr.success('Thêm ' + vm.titleData + ' thành công')
             vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
             vm.$store.commit('setActiveAddQuestion', false)
           }).catch(function (reject) {
@@ -360,7 +376,7 @@ export default {
     submitAddAnswer () {
       let vm = this
       let validateSyntax = true
-      if (String(vm.contentAnswer).indexOf('<img') >= 0 || String(vm.contentAnswer).indexOf('<script') >= 0) {
+      if (String(vm.contentAnswer).indexOf('<img') >= 0 || String(vm.contentAnswer).indexOf('<script') >= 0 || String(vm.contentAnswer).indexOf('</') >= 0) {
         validateSyntax = false
         alert('Nội dung câu trả lời không hợp lệ!')
         return
@@ -407,13 +423,13 @@ export default {
     },
     deleteQuestion (item) {
       let vm = this
-      let x = confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')
+      let x = confirm('Bạn có chắc chắn muốn xóa ' + vm.titleData + ' này?')
       if (x) {
         let filter = {
           questionId: item['questionId']
         }
         vm.$store.dispatch('deleteQuestion', filter).then(function (result) {
-          toastr.success('Xóa câu hỏi thành công')
+          toastr.success('Xóa ' + vm.titleData + ' thành công')
           vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
         }).catch(function (reject) {
           console.log(reject)

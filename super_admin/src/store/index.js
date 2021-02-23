@@ -151,6 +151,14 @@ export const store = new Vuex.Store({
       {
         icon: 'keyboard_arrow_up',
         'icon-alt': 'keyboard_arrow_down',
+        text: 'Dữ liệu danh mục',
+        model: false,
+        children: [
+        ]
+      },
+      {
+        icon: 'keyboard_arrow_up',
+        'icon-alt': 'keyboard_arrow_down',
         text: 'Cấu hình',
         model: false,
         children: [
@@ -2306,6 +2314,26 @@ export const store = new Vuex.Store({
           })
         }
       }
+      let options = {
+        headers: {
+          'groupId': window.themeDisplay.getScopeGroupId(),
+          'Token': window.Liferay !== undefined ? window.Liferay.authToken : ''
+        }
+      }
+      axios.get('/o/v1/opencps/jexcel/backend.datamgt.service/org.opencps.datamgt.model.DictCollection/org.opencps.datamgt.service.DictCollectionLocalServiceUtil/dictCollectionId/collectionName',options).then(function (response) {
+        let listDanhMucDuLieu = response.data
+        if (listDanhMucDuLieu) {
+          for (let key in listDanhMucDuLieu) {
+            listTableMenu[3].children.push({
+              icon: 'arrow_right',
+              link: '/table/opencps_dictitem?dictCollectionId=' + listDanhMucDuLieu[key]['id'],
+              code: listDanhMucDuLieu[key]['id'],
+              text: listDanhMucDuLieu[key]['name']
+            })
+          }
+        }
+      }).catch(function (error) {
+      })
       state.listTableMenu = listTableMenu
     },
     setInitData (state, payload) {

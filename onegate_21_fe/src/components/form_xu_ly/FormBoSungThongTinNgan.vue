@@ -1,6 +1,6 @@
 <template>
   <div style="width:100%">
-    <v-expansion-panel :value="panel" expand  v-if="type !== 'dieuchinhdulieu' && formBuilder.length > 0" class="expansion-pl ext__form">
+    <v-expansion-panel :value="panel" expand  v-if="type !== 'dieuchinhdulieu' && formBuilder.length > 0 && !pending" class="expansion-pl ext__form">
       <v-expansion-panel-content v-for="(item, index) in formBuilder" v-bind:key="index">
         <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
         {{item.fieldLabel}} <span v-if="item.required === true || item.required === 'true'" style="color:red"> *</span>
@@ -38,7 +38,7 @@
                     :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
                     :required="(item.required === true || item.required === 'true') ? true : false"
                   ></v-text-field>
-                  <v-autocomplete v-if="item.fieldType.indexOf('select') >= 0"
+                  <v-autocomplete v-if="validDatasourceSelect(item.fieldType) && JSON.parse(item.fieldType)['select'] && !JSON.parse(item.fieldType)['api']"
                     class="select-border"
                     :items="validDatasourceSelect(item.fieldType) ? JSON.parse(item.fieldType)['select'] : []"
                     :value="item.value"
@@ -47,6 +47,20 @@
                     :placeholder="item.placeholder"
                     item-text="text"
                     item-value="value"
+                    hide-no-data
+                    :hide-selected="true"
+                    @change="inputChangeValue($event, index)"
+                    box
+                  ></v-autocomplete>
+                  <v-autocomplete v-if="validDatasourceSelect(item.fieldType) && JSON.parse(item.fieldType)['select'] && JSON.parse(item.fieldType)['api']"
+                    class="select-border"
+                    :items="validDatasourceSelect(item.fieldType) ? JSON.parse(item.fieldType)['dataSource'] : []"
+                    :value="item.value"
+                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                    :required="(item.required === true || item.required === 'true') ? true : false"
+                    :placeholder="item.placeholder"
+                    :item-text="JSON.parse(item.fieldType)['textMapping']"
+                    :item-value="JSON.parse(item.fieldType)['valueMapping']"
                     hide-no-data
                     :hide-selected="true"
                     @change="inputChangeValue($event, index)"
@@ -107,7 +121,7 @@
         </v-card>
       </v-expansion-panel-content>
     </v-expansion-panel>
-    <div v-if="type === 'dieuchinhdulieu'" class="ext__form px-3">
+    <div v-if="type === 'dieuchinhdulieu' && !pending" class="ext__form px-3">
       <div v-if="formBuilder.length > 0" class="mb-2" hide-actions v-for="(item, index) in formBuilder" v-bind:key="index">
         <div class="py-1" style="border-bottom:1px solid #8a898942">
           <!-- <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div> -->
@@ -246,6 +260,7 @@
       }
     },
     data: () => ({
+      pending: false,
       optionsGroup: [],
       itemId: null,
       fieldNameID: '',
@@ -353,6 +368,29 @@
                   vm.formBuilder[key]['value'] = ''
                 } else if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && !isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
                   vm.formBuilder[key]['value'] = new Date(vm.formBuilder[key]['value'])
+                } else if (vm.formBuilder[key]['fieldType'].indexOf('select') >= 0 && JSON.parse(vm.formBuilder[key]['fieldType'])['select'] && JSON.parse(vm.formBuilder[key]['fieldType'])['api']) {
+                  let api = JSON.parse(vm.formBuilder[key]['fieldType'])['api']
+                  let dataSourceSelect = []
+                  let param = {
+                    headers: {
+                      groupId: window.themeDisplay.getScopeGroupId()
+                    },
+                    params: {}
+                  }
+                  axios.get(api, param).then(function (response) {
+                    vm.pending = true
+                    if (response.data && response.data['data']) {
+                      dataSourceSelect = response.data['data']
+                    } else {
+                      dataSourceSelect = response.data
+                    }
+                    let fieldTypeObj = JSON.parse(vm.formBuilder[key]['fieldType'])
+                    fieldTypeObj['dataSource'] = dataSourceSelect
+                    vm.formBuilder[key]['fieldType'] = JSON.stringify(fieldTypeObj)
+                    vm.pending = false
+                  }).catch(function (xhr) {
+                  })
+                  
                 } else if (vm.formBuilder[key]['fieldType'].indexOf('options_group') >= 0) {
                   vm.optionsGroup = JSON.parse(vm.formBuilder[key]['fieldType'])['options_group']
                   for (let key1 in vm.optionsGroup) {

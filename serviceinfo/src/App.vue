@@ -15,19 +15,90 @@
               {{countAllService}}
             </span>
           </v-list-tile>
-          <v-list-tile v-for="(item1, index1) in item['children']" :key="index1">
-            <v-list-tile-action>
+          <v-list-tile v-for="(item1, index1) in item['children']" :key="index1" :class="thuTucTinh && (item1['administrationCode'] === 'CAP_HUYEN' || item1['administrationCode'] === 'CAP_XA') ? 'thuTucTinh' : ''">
+            
+            <v-list-tile-action v-if="!thuTucTinh || (thuTucTinh && item1['administrationCode'] !== 'CAP_HUYEN' && item1['administrationCode'] !== 'CAP_XA')">
               <v-icon color="#00aeef" 
                 v-if="String(currentAgency) === String(item1[item.mappingCode]) || String(currentAgencyTh) === String(item1[item.mappingCode]) || String(currentDomain) === String(item1[item.mappingCode])
                 || String(currentLevel) === String(item1[item.mappingCode]) || String(currentMethod) === String(item1[item.mappingCode])"
               >play_arrow</v-icon>
             </v-list-tile-action>
-            <v-list-tile-content @click="filterAction(index, item1)">
+            <v-list-tile-content v-if="!thuTucTinh || (thuTucTinh && item1['administrationCode'] !== 'CAP_HUYEN' && item1['administrationCode'] !== 'CAP_XA')" @click="filterAction(index, item1)">
               <v-list-tile-title v-text="item1[item.mappingName]" style="width: calc(100% - 45px)" :title="item1[item.mappingName]"></v-list-tile-title>
               <span class="status__counter" style="color:#0b72ba">
                 {{item1[item.mappingCount]}}
               </span>
             </v-list-tile-content>
+            <!-- render list domain / cấp huyện, cấp xã -->
+            <v-list class="py-0" v-if="thuTucTinh">
+              <v-list-group
+                :prepend-icon="play_arrow"
+                v-if="thuTucTinh && item1['administrationCode'] === 'CAP_HUYEN'"
+                @click="filterAction(index, item1)"
+              >
+                <v-list-tile slot="activator">
+                  <v-list-tile-action>
+                    <v-icon color="#00aeef" 
+                      v-if="String(currentAgency) === String(item1[item.mappingCode]) || String(currentAgencyTh) === String(item1[item.mappingCode]) || String(currentDomain) === String(item1[item.mappingCode])
+                      || String(currentLevel) === String(item1[item.mappingCode]) || String(currentMethod) === String(item1[item.mappingCode])"
+                    >play_arrow</v-icon>
+                  </v-list-tile-action>
+                  <v-list-tile-content>
+                    <v-list-tile-title>{{item1[item.mappingName]}}</v-list-tile-title>
+                    <span class="status__counter" style="color:#0b72ba">
+                      {{item1[item.mappingCount]}}
+                    </span>
+                  </v-list-tile-content>
+                  
+                </v-list-tile>
+                <v-list-tile v-for="(item2, index2) in domainCapHuyen" :key="index2">
+                  
+                  <v-list-tile-action>
+                    <v-icon color="#00aeef" size="10px">fiber_manual_record</v-icon>
+                  </v-list-tile-action>
+                  <v-list-tile-content @click.stop="filterAction(99, item1, item2)">
+                    <v-list-tile-title v-text="item2.domainName" :title="item2.domainName"></v-list-tile-title>
+                    <!-- <span class="status__counter" style="color:#0b72ba">
+                      {{item1[item.mappingCount]}}
+                    </span> -->
+                  </v-list-tile-content>
+                </v-list-tile>
+              </v-list-group>
+              <v-list-group
+                :prepend-icon="play_arrow"
+                v-if="thuTucTinh && item1['administrationCode'] === 'CAP_XA'"
+                @click="filterAction(index, item1)"
+              >
+                <v-list-tile slot="activator" >
+                  <v-list-tile-action>
+                    <v-icon color="#00aeef" 
+                      v-if="String(currentAgency) === String(item1[item.mappingCode]) || String(currentAgencyTh) === String(item1[item.mappingCode]) || String(currentDomain) === String(item1[item.mappingCode])
+                      || String(currentLevel) === String(item1[item.mappingCode]) || String(currentMethod) === String(item1[item.mappingCode])"
+                    >play_arrow</v-icon>
+                  </v-list-tile-action>
+                  <v-list-tile-content>
+                    <v-list-tile-title>{{item1[item.mappingName]}}</v-list-tile-title>
+                    <span class="status__counter" style="color:#0b72ba">
+                      {{item1[item.mappingCount]}}
+                    </span>
+                  </v-list-tile-content>
+                  
+                </v-list-tile>
+                <v-list-tile v-for="(item2, index2) in domainCapXa" :key="index2">
+                  
+                  <v-list-tile-action>
+                    <v-icon color="#00aeef" size="10px">fiber_manual_record</v-icon>
+                  </v-list-tile-action>
+                  <v-list-tile-content @click.stop="filterAction(99, item1, item2)">
+                    <v-list-tile-title v-text="item2.domainName" :title="item2.domainName"></v-list-tile-title>
+                    <!-- <span class="status__counter" style="color:#0b72ba">
+                      {{item1[item.mappingCount]}}
+                    </span> -->
+                  </v-list-tile-content>
+                </v-list-tile>
+              </v-list-group>
+            </v-list>
+            <!--  -->
           </v-list-tile>
         </v-list-group>
       </v-list>
@@ -95,7 +166,10 @@
         }
       ],
       hasCoQuanThucHien: false,
-      setAgency: false     /**fix 1 đơn vị */
+      setAgency: false,     /**fix 1 đơn vị */
+      domainCapHuyen: [],
+      domainCapXa: [],
+      thuTucTinh: false
     }),
     components: {
       GoTop
@@ -141,6 +215,10 @@
         vm.hasCoQuanThucHien = hasCoQuanThucHien
       } catch (error) {
         vm.hasCoQuanThucHien = false
+      }
+      try {
+        vm.thuTucTinh = thuTucTinh
+      } catch (error) {
       }
       vm.$nextTick(function () {
         let current = vm.$router.history.current
@@ -264,6 +342,32 @@
           vm.$store.commit('setDomainList', result)
           vm.currentDomain = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
         })
+        // 
+        if (vm.thuTucTinh) {
+          let sortCode = function (serviceList) {
+            function compare(a, b) {
+              if (a.domainName < b.domainName)
+                return -1
+              if (a.domainName > b.domainName)
+                return 1
+              return 0
+            }
+            return serviceList.sort(compare)
+          }
+          let filterDomain = {
+            agencyCode: 'CAP_HUYEN'
+          }
+          vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+            vm.domainCapHuyen = sortCode(result)
+          })
+          let filterDomain2 = {
+            agencyCode: 'CAP_XA'
+          }
+          vm.$store.dispatch('getDomain', filterDomain2).then(function (result) {
+            vm.domainCapXa = sortCode(result)
+          })
+        }
+        // 
         vm.$store.dispatch('getLevelList').then(function (result) {
           if (vm.hasCoQuanThucHien) {
             vm.menuServiceInfos[3].children = result
@@ -337,8 +441,9 @@
         let isMobile = window.innerWidth < 1024
         vm.$store.commit('setIsMobile', isMobile)
       },
-      filterAction (index, item1) {
+      filterAction (index, item1, item2) {
         let vm = this
+        console.log('filterAction', index, item1)
         if (!vm.hasCoQuanThucHien) {
           if (index === 0) {
             vm.filterAgency(item1)
@@ -350,6 +455,8 @@
             vm.filterMethod(item1)
           } else if (index === 5) {
             vm.filterAll()
+          } else if (index === 99) {
+            vm.filterAgencyAndDomain(item1, item2)
           }
         } else {
           if (index === 0) {
@@ -364,6 +471,8 @@
             vm.filterMethod(item1)
           } else if (index === 5) {
             vm.filterAll()
+          } else if (index === 99) {
+            vm.filterAgencyAndDomain(item1, item2)
           }
         }
       },
@@ -500,6 +609,30 @@
         newQuery['agencyth'] = ''
         newQuery['level'] = ''
         newQuery['all'] = true
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        vm.$router.push({
+          path: vm.pathRouter + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      },
+      filterAgencyAndDomain (item, item2) {
+        var vm = this
+        vm.currentAgency = item.administrationCode
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = 1
+        newQuery['agency'] = item.administrationCode
+        newQuery['agencyth'] = ''
+        newQuery['domain'] = item2.domainCode
+        newQuery['level'] = ''
+        newQuery['all'] = false
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'

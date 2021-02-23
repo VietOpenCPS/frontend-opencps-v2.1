@@ -142,12 +142,20 @@
                   <span>{{props.item.hasOwnProperty('fileNo') ? props.item.fileNo : ''}}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px; min-width:200px">
+              <td class="text-xs-left" style="height:36px;min-width:120px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
-                  <span>{{props.item.hasOwnProperty('dossierNo') ? props.item.dossierNo : ''}}</span>
+                  <span>{{props.item.hasOwnProperty('fileExtension') ? props.item.fileExtension : ''}}</span>
+                </div>
+              </td>
+              <td class="text-xs-left" style="height:36px; min-width:150px">
+                <content-placeholders v-if="loadingTable">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.hasOwnProperty('createDate') ? props.item.createDate : ''}}</span>
                 </div>
               </td>
               <td class="text-xs-center" style="height:36px;width:135px">
@@ -334,6 +342,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    isDvc: false,
     applicantInfos: '',
     nameTitle: '',
     creditTitle: '',
@@ -380,7 +389,12 @@ export default {
         sortable: false
       },
       {
-        text: 'Hồ sơ gốc',
+        text: 'Định dạng',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Ngày tạo',
         align: 'center',
         sortable: false
       },
@@ -414,6 +428,10 @@ export default {
   created () {
     let vm = this
     vm.$nextTick(function () {
+      try {
+        vm.isDvc = isDvc
+      } catch (error) {
+      }
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
       let applicant = vm.$store.getters.getApplicantInfos
@@ -478,19 +496,36 @@ export default {
         applicantDataType: ''
       }
       vm.loadingTable = true
-      vm.$store.dispatch('getApplicantDocument', filter).then(function (result) {
-        if (result.hasOwnProperty('data')) {
-          vm.documentApplicantList = result.data
-        } else {
+      if (vm.isDvc) {
+        vm.$store.dispatch('getApplicantDocumentFromDvc', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.documentApplicantList = result.data
+          } else {
+            vm.documentApplicantList = []
+          }
+          vm.totalDocument = result['total']
+          vm.loadingTable = false
+        }).catch(function () {
+          vm.loadingTable = false
           vm.documentApplicantList = []
-        }
-        vm.totalDocument = result['total']
-        vm.loadingTable = false
-      }).catch(function () {
-        vm.loadingTable = false
-        vm.documentApplicantList = []
-        vm.totalDocument = 0
-      })
+          vm.totalDocument = 0
+        })
+      } else {
+        vm.$store.dispatch('getApplicantDocument', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.documentApplicantList = result.data
+          } else {
+            vm.documentApplicantList = []
+          }
+          vm.totalDocument = result['total']
+          vm.loadingTable = false
+        }).catch(function () {
+          vm.loadingTable = false
+          vm.documentApplicantList = []
+          vm.totalDocument = 0
+        })
+      }
+      
     },
     uploadFile () {
       let vm = this
@@ -522,14 +557,26 @@ export default {
       let filter = {
         status: 1
       }
-      vm.$store.dispatch('getFileItems', filter).then(function (result) {
-        if (result.hasOwnProperty('data')) {
-          vm.fileTemplateList = result.data
-        } else {
-          vm.fileTemplateList = []
-        }
-      }).catch(function () {
-      })
+      if (vm.isDvc) {
+        vm.$store.dispatch('getFileItemsFromDvc', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.fileTemplateList = result.data
+          } else {
+            vm.fileTemplateList = []
+          }
+        }).catch(function () {
+        })
+      } else {
+        vm.$store.dispatch('getFileItems', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.fileTemplateList = result.data
+          } else {
+            vm.fileTemplateList = []
+          }
+        }).catch(function () {
+        })
+      }
+      
     },
     showCreatedocument () {
       let vm = this
@@ -555,7 +602,7 @@ export default {
           vm.loadingAction = true
           let filter = {
             fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
-            status: vm.statusCreate,
+            status: vm.statusCreate ? vm.statusCreate : 0,
             fileNo: vm.fileNo,
             fileName: vm.fileName,
             applicantIdNo: vm.applicantInfos.applicantIdNo,
@@ -567,21 +614,46 @@ export default {
               'Content-Type': 'application/x-www-form-urlencoded'
             }
           }
-          let dataPost = new FormData()
-          dataPost.append('method', 'POST')
-          dataPost.append('url', '/applicantdatas')
-          dataPost.append('data', JSON.stringify(filter))
-          dataPost.append('file', vm.fileUpdate)
+          if (vm.isDvc) {
+            let dataPost = new FormData()
+            dataPost.append('method', 'POST')
+            dataPost.append('url', '/applicantdatas')
+            dataPost.append('data', JSON.stringify(filter))
+            dataPost.append('file', vm.fileUpdate)
+            
+            axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
+              vm.loadingAction = false
+              toastr.success('Thêm mới tài liệu thành công')
+              vm.dialog_createDocument = false
+              setTimeout(function () {
+                vm.getApplicantDocument()
+              }, 200)
+            }).catch(xhr => {
+              toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
+            })
+          } else {
+            let dataCreateFile = new FormData()
+            let url = '/o/rest/v2/applicantdatas'
+            dataCreateFile.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
+            dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 0)
+            dataCreateFile.append('fileNo', vm.fileNo)
+            dataCreateFile.append('fileName', vm.fileName)
+            dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
+            dataCreateFile.append('file', vm.fileUpdate)
+            
+            axios.post(url, dataCreateFile, param).then(result1 => {
+              vm.loadingAction = false
+              toastr.success('Thêm mới tài liệu thành công')
+              vm.dialog_createDocument = false
+              setTimeout(function () {
+                vm.getApplicantDocument()
+              }, 200)
+            }).catch(xhr => {
+              vm.loadingAction = false
+              toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
+            })
+          }
           
-          axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
-            vm.loadingAction = false
-            toastr.success('Thêm mới tài liệu thành công')
-            vm.dialog_createDocument = false
-            vm.getApplicantDocument()
-          }).catch(xhr => {
-            vm.loadingAction = false
-            toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
-          })
         } else {
           toastr.clear()
           toastr.error('Vui lòng đính kèm tài liệu')
@@ -603,7 +675,7 @@ export default {
         vm.loadingAction = true
         let filter = {
           fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
-          status: vm.statusCreate,
+          status: vm.statusCreate ? vm.statusCreate : 0,
           fileNo: vm.fileNo,
           fileName: vm.fileName,
           applicantIdNo: vm.applicantInfos.applicantIdNo
@@ -615,23 +687,51 @@ export default {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }
-        let dataPost = new FormData()
-        dataPost.append('method', 'PUT')
-        dataPost.append('url', '/applicantdatas/' + vm.documentSelect.applicantDataId)
-        dataPost.append('data', JSON.stringify(filter))
-        if (vm.updateFile) {
-          dataPost.append('file', vm.fileUpdate)
-        }
+        if (vm.isDvc) {
+          let dataPost = new FormData()
+          dataPost.append('method', 'PUT')
+          dataPost.append('url', '/applicantdatas/' + vm.documentSelect.applicantDataId)
+          dataPost.append('data', JSON.stringify(filter))
+          if (vm.updateFile) {
+            dataPost.append('file', vm.fileUpdate)
+          } else {
+            dataPost.append('file', '')
+          }
 
-        axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
-          vm.loadingAction = false
-          toastr.success('Cập nhật tài liệu thành công')
-          vm.dialog_createDocument = false
-          vm.getApplicantDocument()
-        }).catch(xhr => {
-          vm.loadingAction = false
-          toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
-        })
+          axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
+            vm.loadingAction = false
+            toastr.success('Cập nhật tài liệu thành công')
+            vm.dialog_createDocument = false
+            setTimeout(function () {
+              vm.getApplicantDocument()
+            }, 200)
+          }).catch(xhr => {
+            toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
+          })
+        } else {
+          let dataPost = new FormData()
+          let url = '/o/rest/v2/applicantdatas/' + vm.documentSelect.applicantDataId
+          dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
+          dataPost.append('status', vm.statusCreate ? vm.statusCreate : 0)
+          dataPost.append('fileNo', vm.fileNo)
+          dataPost.append('fileName', vm.fileName)
+          dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
+          if (vm.updateFile) {
+            dataPost.append('file', vm.fileUpdate)
+          } else {
+            dataPost.append('file', '')
+          } 
+          axios.put(url, dataPost, param).then(result1 => {
+            vm.loadingAction = false
+            toastr.success('Cập nhật tài liệu thành công')
+            vm.dialog_createDocument = false
+            setTimeout(function () {
+              vm.getApplicantDocument()
+            }, 200)
+          }).catch(xhr => {
+            toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
+          })
+        }
         
       }
     },
@@ -733,13 +833,23 @@ export default {
       let filter = {
         applicantDataId: item.applicantDataId
       }
-      vm.$store.dispatch('getFileAttach', filter).then(function (result) {
-        vm.srcDownload = result
-        setTimeout(function () {
-          document.getElementById('downloadFile').click()
-        }, 100)
-      }).catch(function () {
-      })
+      if (vm.isDvc) {
+        vm.$store.dispatch('getFileAttachProxy', filter).then(function (result) {
+          vm.srcDownload = result
+          setTimeout(function () {
+            document.getElementById('downloadFile').click()
+          }, 100)
+        }).catch(function () {
+        })
+      } else {
+        vm.$store.dispatch('getFileAttach', filter).then(function (result) {
+          vm.srcDownload = result
+          setTimeout(function () {
+            document.getElementById('downloadFile').click()
+          }, 100)
+        }).catch(function () {
+        })
+      }
     },
     viewDocument (item) {
       let vm = this
@@ -748,21 +858,40 @@ export default {
       let filter = {
         applicantDataId: item.applicantDataId
       }
-      vm.$store.dispatch('getFileAttach', filter).then(function (result) {
-        let fileType = item.fileExtension.toLowerCase()
-        if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
-          fileType === 'tif' || fileType === 'tiff'
-        ) {
-          vm.dialogPDF = true
-          document.getElementById('dialogPDFPreview').src = result
-        } else {
-          vm.srcDownload = result
-          setTimeout(function () {
-            document.getElementById('downloadFile').click()
-          }, 100)
-        }
-      }).catch(function () {
-      })
+      if (vm.isDvc) {
+        vm.$store.dispatch('getFileAttachProxy', filter).then(function (result) {
+          let fileType = item.fileExtension.toLowerCase()
+          if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+            fileType === 'tif' || fileType === 'tiff'
+          ) {
+            vm.dialogPDF = true
+            document.getElementById('dialogPDFPreview').src = result
+          } else {
+            vm.srcDownload = result
+            setTimeout(function () {
+              document.getElementById('downloadFile').click()
+            }, 100)
+          }
+        }).catch(function () {
+        })
+      } else {
+        vm.$store.dispatch('getFileAttach', filter).then(function (result) {
+          let fileType = item.fileExtension.toLowerCase()
+          if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+            fileType === 'tif' || fileType === 'tiff'
+          ) {
+            vm.dialogPDF = true
+            document.getElementById('dialogPDFPreview').src = result
+          } else {
+            vm.srcDownload = result
+            setTimeout(function () {
+              document.getElementById('downloadFile').click()
+            }, 100)
+          }
+        }).catch(function () {
+        })
+        
+      }
     },
     getApplicantType (item) {
       let vm = this

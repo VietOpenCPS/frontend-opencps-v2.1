@@ -580,7 +580,7 @@
                                             <div v-if="!loadingImage" style="width: 100%; height: 190px;display:flex;">
                                                 <div v-for="(item, index) in listChuKy" :key="index">
                                                     <img :src="'data:image/png;base64,' +  item.strChuKy" alt="" style=" height: 140px;" @click="phongTo(item.strChuKy)">
-                                                    <!-- <img :src="item.strChuKy" alt="" style=" height: 140px;" @click="phongTo(item.strChuKy)"> -->
+                                                    
                                                     <v-checkbox
                                                         v-model="chonChuKy"
                                                         primary
@@ -1037,7 +1037,10 @@ export default {
         dossierFileArr: {
             deep: true,
             handler:  (val, oldVal) => {
-                $('#dossierFileArr_hidden').val(JSON.stringify(val))
+                let dataOut = val.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
             }
         },
         dossierMarkArr: {
@@ -1072,7 +1075,7 @@ export default {
         de_nghi_chung_nhan(val){
             let vm = this
             for (let i=0; i<vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                     try{
                         let formData = JSON.parse(vm.dossierFileArr[i]['formData'])
                         formData['de_nghi_chung_nhan'] = val ? true : false
@@ -1087,12 +1090,15 @@ export default {
                     // vm.dossierFileArr[i]['eform'] = 'true'
                 }
             }
-            $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))  
+            let dataOut = vm.dossierFileArr.filter(function (item) {
+                return item.formData || (!item.formData && item.fileEntryId)
+            })
+            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))  
         },
         su_dung_tai_nuoc_ma (val) {
             let vm = this
             for (let i=0; i<vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                     try{
                         let formData = JSON.parse(vm.dossierFileArr[i]['formData'])
                         formData['su_dung_tai_nuoc_ma'] = val
@@ -1132,12 +1138,15 @@ export default {
                     }
                 }
             }
-            $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))             
+            let dataOut = vm.dossierFileArr.filter(function (item) {
+                return item.formData || (!item.formData && item.fileEntryId)
+            })
+            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))             
         },
         muc_dich (val) {
             let vm = this
             for (let i=0; i<vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                     try{
                         let formData = JSON.parse(vm.dossierFileArr[i]['formData'])
                         formData['ma_muc_dich'] = val.MA
@@ -1153,7 +1162,10 @@ export default {
                     }
                 }
             }
-            $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))            
+            let dataOut = vm.dossierFileArr.filter(function (item) {
+                return item.formData || (!item.formData && item.fileEntryId)
+            })
+            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))            
         },
         dateDueDate (val) {
             this.dateDueDateFormated = this.formatDate(this.dateDueDate) 
@@ -1252,6 +1264,9 @@ export default {
                 if(metaData.dossierFileCustom)
                 {   
                     vm.dossierFileCustom = metaData.dossierFileCustom
+                }
+                if(metaData.ma_to_khai){
+                    vm.eFormCodeArr = metaData.ma_to_khai
                 }
                 vm.dossiers = res.data
                 vm.dossiers['bookingName'] = res.data['applicantName']
@@ -1478,6 +1493,9 @@ export default {
                         }
                         axios.request(config).then(res => {
                             vm.listNguoiKy = res.data.data
+                            if (vm.listNguoiKy && vm.listNguoiKy.length === 1) {
+                                vm.getChuKyConDau(vm.listNguoiKy[0])
+                            }
                             vm.listConDau = []
                             vm.listChuKy = []
                             vm.chonChuKy = []
@@ -1513,6 +1531,9 @@ export default {
                             vm.chonConDau = []
                             vm.chuKySelected = ''
                             vm.conDauSelected = ''
+                            if (vm.listNguoiKy && vm.listNguoiKy.length === 1) {
+                                vm.getChuKyConDau(vm.listNguoiKy[0])
+                            }
                         }).catch(err => {}) 
                 }
             } else {
@@ -1529,127 +1550,153 @@ export default {
         },
         getDataEform() {
             let vm = this
-            let config = {
-                url: '/o/rest/v2/serverconfigs/SERVER_EFORM_DATA_DVC/protocols/API_CONNECT?eFormNo=' + vm.eFormCode,
-                headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
-            }
-            vm.eFormCodeArr = []
-            axios.request(config).then(res => {
-                if(Object.keys(res.data).length !== 0 && res.data.constructor === Object){
-                    if(Array.isArray(res.data.list_giay_to) && res.data.list_giay_to.length){
-                        vm.eFormCodeArr.push(vm.eFormCode)
-                        let metaData = JSON.parse(vm.dossiers['metaData'])
-                        metaData['ma_to_khai'].push(vm.eFormCode)
-                        vm.dossiers['metaData'] = JSON.stringify(metaData)
-                        vm.eFormCode = ''
-                        if(res.data.auth) {
-                            vm.auth = res.data.auth
-                        }
-                        
-                        // if(res.data.bookingName) {
-                        //     vm.dossiers.delegateName = res.data.bookingName
-                        //     vm.dossiers.applicantName = res.data.bookingName
-                        // }
-                        // if(res.data.so_cmnd) {
-                        // vm.dossiers.delegateIdNo = res.data.so_cmnd
-                        // }
-                        // if(res.data.dien_thoai) {
-                        //     vm.dossiers.delegateTelNo = res.data.dien_thoai
-                        // }
-                        // if(res.data.email) {
-                        //     vm.dossiers.delegateEmail = res.data.email
-                        // }
-                        // if(res.data.dia_chi) {
-                        //     vm.dossiers.delegateAddress = res.data.dia_chi.length < 100 ? res.data.dia_chi : ''
-                        //     vm.dossiers.address = res.data.dia_chi.length < 100 ? res.data.dia_chi : ''
-                        // }
-                       if(!vm.dossiers.delegateName){
-                            if(res.data.delegateName) {
-                                vm.dossiers.delegateName = res.data.delegateName
+            let checkEformCode = vm.eFormCodeArr.find(e => e === vm.eFormCode)
+            if(checkEformCode){
+                vm.eFormCode = ''
+                toastr.error('Không hợp lệ. Mã tờ khai đã được lấy dữ liệu')
+            } else {
+                let config = {
+                    url: '/o/rest/v2/serverconfigs/SERVER_EFORM_DATA_DVC/protocols/API_CONNECT?eFormNo=' + vm.eFormCode,
+                    headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                }
+                axios.request(config).then(res => {
+                    if(Object.keys(res.data).length !== 0 && res.data.constructor === Object){
+                        if(Array.isArray(res.data.list_giay_to) && res.data.list_giay_to.length){
+                            vm.eFormCodeArr.push(vm.eFormCode)
+                            let metaData = JSON.parse(vm.dossiers['metaData'])
+                            metaData['ma_to_khai'].push(vm.eFormCode)
+                            vm.dossiers['metaData'] = JSON.stringify(metaData)
+                            vm.eFormCode = ''
+                            if(res.data.auth) {
+                                vm.auth = res.data.auth
                             }
-                        }
-                        if(!vm.dossiers.delegateIdNo){
-                            if(res.data.delegateIdNo) {
-                                 vm.dossiers.delegateIdNo = res.data.delegateIdNo
+                            
+                            // if(res.data.bookingName) {
+                            //     vm.dossiers.delegateName = res.data.bookingName
+                            //     vm.dossiers.applicantName = res.data.bookingName
+                            // }
+                            // if(res.data.so_cmnd) {
+                            // vm.dossiers.delegateIdNo = res.data.so_cmnd
+                            // }
+                            // if(res.data.dien_thoai) {
+                            //     vm.dossiers.delegateTelNo = res.data.dien_thoai
+                            // }
+                            // if(res.data.email) {
+                            //     vm.dossiers.delegateEmail = res.data.email
+                            // }
+                            // if(res.data.dia_chi) {
+                            //     vm.dossiers.delegateAddress = res.data.dia_chi.length < 100 ? res.data.dia_chi : ''
+                            //     vm.dossiers.address = res.data.dia_chi.length < 100 ? res.data.dia_chi : ''
+                            // }
+                        if(!vm.dossiers.delegateName){
+                                if(res.data.delegateName) {
+                                    vm.dossiers.delegateName = res.data.delegateName
+                                }
                             }
-                        }
-                        if(!vm.dossiers.delegateTelNo){
-                            if(res.data.delegateTelNo) {
-                                vm.dossiers.delegateTelNo = res.data.delegateTelNo
+                            if(!vm.dossiers.delegateIdNo){
+                                if(res.data.delegateIdNo) {
+                                    vm.dossiers.delegateIdNo = res.data.delegateIdNo
+                                }
                             }
-                        }
-                        if(!vm.dossiers.delegateAddress){
-                            if(res.data.delegateAddress ){
-                                vm.dossiers.delegateAddress = res.data.delegateAddress.length < 100 ? res.data.delegateAddress : ''
-                            } 
-                        }
-                        if(!vm.dossiers.delegateEmail){
-                            if(res.data.delegateEmail ){
-                                vm.dossiers.delegateEmail = res.data.delegateEmail
-                            } 
-                        }
-                        if(!vm.dossiers.applicantName){
-                            if(res.data.delegateName) {
-                                vm.dossiers.applicantName = res.data.delegateName
+                            if(!vm.dossiers.delegateTelNo){
+                                if(res.data.delegateTelNo) {
+                                    vm.dossiers.delegateTelNo = res.data.delegateTelNo
+                                }
                             }
-                        }
-                        if(!vm.dossiers.applicantIdNo){
-                            if(res.data.applicantIdNo) {
-                                vm.dossiers.applicantIdNo = res.data.applicantIdNo
+                            if(!vm.dossiers.delegateAddress){
+                                if(res.data.delegateAddress ){
+                                    vm.dossiers.delegateAddress = res.data.delegateAddress.length < 100 ? res.data.delegateAddress : ''
+                                } 
                             }
-                        }
-                        if(!vm.dossiers.contactTelNo){
-                            if(res.data.contactTelNo) {
-                                vm.dossiers.contactTelNo = res.data.contactTelNo
+                            if(!vm.dossiers.delegateEmail){
+                                if(res.data.delegateEmail ){
+                                    vm.dossiers.delegateEmail = res.data.delegateEmail
+                                } 
                             }
-                        }
-                        if(!vm.dossiers.contactEmail){
-                            if(res.data.contactEmail) {
-                                vm.dossiers.contactEmail = res.data.contactEmail
+                            if(!vm.dossiers.applicantName){
+                                if(res.data.delegateName) {
+                                    vm.dossiers.applicantName = res.data.delegateName
+                                }
                             }
-                        }
-                        if(!vm.dossiers.contactName){
-                            if(res.data.delegateName) {
-                                vm.dossiers.contactName = res.data.delegateName
+                            if(!vm.dossiers.applicantIdNo){
+                                if(res.data.applicantIdNo) {
+                                    vm.dossiers.applicantIdNo = res.data.applicantIdNo
+                                }
                             }
+                            if(!vm.dossiers.contactTelNo){
+                                if(res.data.contactTelNo) {
+                                    vm.dossiers.contactTelNo = res.data.contactTelNo
+                                }
+                            }
+                            if(!vm.dossiers.contactEmail){
+                                if(res.data.contactEmail) {
+                                    vm.dossiers.contactEmail = res.data.contactEmail
+                                }
+                            }
+                            if(!vm.dossiers.contactName){
+                                if(res.data.delegateName) {
+                                    vm.dossiers.contactName = res.data.delegateName
+                                }
+                            }
+                            if(!vm.dossiers.address){
+                                if(res.data.address ){
+                                    vm.dossiers.address = res.data.address.length < 100 ? res.data.address : ''
+                                } 
+                            }
+                            if(!vm.dossiers.bookingName){
+                                if(res.data.delegateName ){
+                                    vm.dossiers.bookingName = res.data.delegateName
+                                } 
+                            }
+                            if(res.data.su_dung_tai_nuoc_ma) {
+                                vm.su_dung_tai_nuoc_ma = res.data.su_dung_tai_nuoc_ma
+                            }
+                            if(res.data.de_nghi_chung_nhan) {
+                                vm.de_nghi_chung_nhan = res.data.de_nghi_chung_nhan
+                                vm.changeDeNghiChungNhan()
+                            }
+                            vm.viaPostal = res.data.viaPostal ? true : false
+                            if(res.data.ma_muc_dich) {
+                                vm.muc_dich = vm.listMucDichSuDung.find(e=>e.MA === res.data.ma_muc_dich)
+                            }
+                            if(res.data.ngay_cap_cmnd) {
+                                vm.ngay_cap_cmnd = res.data.ngay_cap_cmnd
+                            }
+                            
+                            if(res.data.list_giay_to) {
+                                vm.fillTableGiayTo(res.data.list_giay_to)
+                            }
+                            vm.changeDossier()
                         }
-                        if(!vm.dossiers.address){
-                            if(res.data.address ){
-                                vm.dossiers.address = res.data.address.length < 100 ? res.data.address : ''
-                            } 
-                        }
-                        if(!vm.dossiers.bookingName){
-                            if(res.data.delegateName ){
-                                vm.dossiers.bookingName = res.data.delegateName
-                            } 
-                        }
-                        if(res.data.su_dung_tai_nuoc_ma) {
-                            vm.su_dung_tai_nuoc_ma = res.data.su_dung_tai_nuoc_ma
-                        }
-                        if(res.data.de_nghi_chung_nhan) {
-                            vm.de_nghi_chung_nhan = res.data.de_nghi_chung_nhan
-                            vm.changeDeNghiChungNhan()
-                        }
-                        vm.viaPostal = res.data.viaPostal ? true : false
-                        if(res.data.ma_muc_dich) {
-                            vm.muc_dich = vm.listMucDichSuDung.find(e=>e.MA === res.data.ma_muc_dich)
-                        }
-                        if(res.data.ngay_cap_cmnd) {
-                            vm.ngay_cap_cmnd = res.data.ngay_cap_cmnd
-                        }
-                        
-                        if(res.data.list_giay_to) {
-                            vm.fillTableGiayTo(res.data.list_giay_to)
-                        }
-                        vm.changeDossier()
                     }
+                    else {
+                        toastr.error('Mã tờ khai không hợp lệ')  
+                    }
+                }).catch(err => {
+                    toastr.error('Mã tờ khai không tìm thấy') 
+                })
+                // 
+                let filterGetDetailEform = {
+                    eFormNo: vm.eFormCode
                 }
-                else {
-                    toastr.error('Mã tờ khai không hợp lệ')  
-                }
-            }).catch(err => {
-                 toastr.error('Mã tờ khai không tìm thấy') 
-            }) 
+                vm.$store.dispatch('getThongTinToKhai', filterGetDetailEform).then(function (response) {
+                    console.log('eformInfomation', response)
+                    if (response && response.hasOwnProperty('eFormId') && response.hasOwnProperty('secret')) {
+                        let filterGetFileEform = {
+                            eFormId: response.eFormId,
+                            secret: response.secret
+                        }
+                        vm.$store.dispatch('getFileToKhai', filterGetFileEform).then(function (responseFile) {
+                            console.log('fileEntryId', responseFile)
+                            let partNoEform = response.fileTemplateNo.split('_')[0]
+                            let fileEform = [{fileEntryId: responseFile ? responseFile : 0, partNo: partNoEform, eform: false, displayName: 'Tờ khai - ' +  response.eFormNo}]
+                            vm.dossierFileArr = vm.dossierFileArr.concat(fileEform)
+                        }).catch(function (reject) {
+                        })
+                    }
+                }).catch({})
+            }
+            
         },
         fillTableGiayTo (data) {
             let vm = this
@@ -1684,7 +1731,7 @@ export default {
             // 
             vm.computeDate()
             for (let i=0; i<vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                     let arr = ''
                     for(let i = 0; i<vm.su_dung_tai_nuoc_ma.length; i++) {
                         let find = vm.listQuocGia.find(e=>e.MA === vm.su_dung_tai_nuoc_ma[i])
@@ -1717,7 +1764,10 @@ export default {
                     vm.dossierFileArr[i]['eform'] = 'true'
                 }
             }
-            $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+            let dataOut = vm.dossierFileArr.filter(function (item) {
+                return item.formData || (!item.formData && item.fileEntryId)
+            })
+            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
 
             // Gen le phi
             vm.genLePhi()
@@ -1859,6 +1909,7 @@ export default {
             this.chonConDau = []
             this.chuKySelected = ''
             this.conDauSelected = ''
+            this.getDSNguoiKy()
         },
         updateGiayTo () {
             let vm = this
@@ -1882,8 +1933,8 @@ export default {
                   ma_con_dau: vm.ma_con_dau,
                   ma_chu_ky: vm.ma_chu_ky,
                   kiem_tra: true,
-                  anh_con_dau: vm.conDau,
-                  anh_chu_ky: vm.chuKy,
+                  anh_con_dau: '',
+                  anh_chu_ky: '',
                     
                 }  
                 if(vm.update_giayto === 'add') {
@@ -1907,7 +1958,7 @@ export default {
                 vm.computeDate()
                 // 
                 for (let i=0; i<vm.dossierFileArr.length; i++){
-                    if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                    if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                         let arr = []
                         vm.listGiayTo.forEach(e=>{
                             let obj = Object.assign({}, e)
@@ -1949,8 +2000,10 @@ export default {
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
                 }
-                
-                $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+                let dataOut = vm.dossierFileArr.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
 
                 // Gen le phi
                 vm.genLePhi()
@@ -2046,26 +2099,58 @@ export default {
         openDialogUpdateGiayTo (index, item) {
             let vm = this
             vm.update_giayto = index
-            vm.ten_giay_to = item.ten_giay_to,
-            vm.ma_ten_giay_to = item.ma_ten_giay_to,
-            vm.ma_loai_giay_to =  item.ma_loai_giay_to,
-            vm.loai_giay_to = item.loai_giay_to,
-            vm.so_ban = item.so_ban,
-            vm.loai_cong_viec = item.loai_cong_viec,
-            vm.so_hieu_giay_to = item.so_hieu_giay_to,
-            vm.ten_nguoi_duoc_cap = item.ten_nguoi_duoc_cap,
-            vm.co_quan_cap = item.co_quan_cap,
-            vm.ma_co_quan_cap = item.ma_co_quan_cap,
-            vm.nguoi_ky = item.nguoi_ky,
-            vm.ma_nguoi_ky = item.ma_nguoi_ky,
-            vm.chuc_danh_ky = item.chuc_danh_ky,
-            vm.ma_chuc_vu = item.ma_chuc_vu,
-            vm.ngay_ky = item.ngay_ky,
-            vm.ma_con_dau = item.ma_con_dau,
-            vm.ma_chu_ky = item.ma_chu_ky,
-            vm.kiem_tra =item.kiem_tra,
-            vm.conDau = item.anh_con_dau
-            vm.chuKy = item.anh_chu_ky
+            vm.ten_giay_to = item.ten_giay_to
+            vm.ma_ten_giay_to = item.ma_ten_giay_to
+            vm.ma_loai_giay_to =  item.ma_loai_giay_to
+            vm.loai_giay_to = item.loai_giay_to
+            vm.so_ban = item.so_ban
+            vm.loai_cong_viec = item.loai_cong_viec
+            vm.so_hieu_giay_to = item.so_hieu_giay_to
+            vm.ten_nguoi_duoc_cap = item.ten_nguoi_duoc_cap
+            vm.co_quan_cap = item.co_quan_cap
+            vm.ma_co_quan_cap = item.ma_co_quan_cap
+            vm.nguoi_ky = item.nguoi_ky
+            vm.ma_nguoi_ky = item.ma_nguoi_ky
+            vm.chuc_danh_ky = item.chuc_danh_ky
+            vm.ma_chuc_vu = item.ma_chuc_vu
+            vm.ngay_ky = item.ngay_ky
+            vm.ma_con_dau = item.ma_con_dau
+            vm.ma_chu_ky = item.ma_chu_ky
+            vm.kiem_tra = item.kiem_tra
+            // vm.conDau = item.anh_con_dau
+            // vm.chuKy = item.anh_chu_ky
+            // 
+            if (vm.ma_chu_ky) {
+                let config = {
+                    url: '/o/rest/v2/serverconfigs/LAY_ANH_CHU_KY_CLS/protocols/API_CONNECT?ma_chu_ky=' + vm.ma_chu_ky,
+                    headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                }
+                vm.loadingImage = true
+                axios.request(config).then(res => {
+                    if (res.data.hasOwnProperty('CK_IMAGE_FILE')) {
+                        vm.chuKy = vm.hexToBase64(res.data['CK_IMAGE_FILE'])
+                    }
+                    vm.loadingImage = false
+                }).catch(function() {
+                    vm.loadingImage = false
+                })
+            }
+            if (vm.ma_con_dau) {
+                let config = {
+                    url: '/o/rest/v2/serverconfigs/LAY_ANH_CON_DAU_CLS/protocols/API_CONNECT?ma_con_dau=' + vm.ma_con_dau,
+                    headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                }
+                vm.loadingImage = true
+                axios.request(config).then(res => {
+                    if (res.data.hasOwnProperty('CD_IMAGE_FILE')) {
+                        vm.conDau = vm.hexToBase64(res.data['CD_IMAGE_FILE'])
+                    }
+                    vm.loadingImage = false
+                }).catch(function() {
+                    vm.loadingImage = false
+                })
+            }
+            // 
             if(item.ten_giay_to && item.ma_ten_giay_to){
                 vm.giay_to = {
                     TEN: item.ten_giay_to,
@@ -2085,14 +2170,12 @@ export default {
             if(item.loai_cong_viec){
                 vm.loai_cong_viec = {
                     text: item.loai_cong_viec,
-                    value:  item.loai_cong_viec
+                    value: item.loai_cong_viec
                 }
             } else {
                 vm.loai_cong_viec = ''
             }
 
-            // vm.conDau = ''
-            // vm.chuKy = ''
             vm.dialogGiayTo = true
         },
         openDialogCopyGiayTo (index, item) {
@@ -2141,8 +2224,41 @@ export default {
                 vm.loai_cong_viec = ''
             }
             vm.dialogGiayTo = true
-            vm.conDau = item.anh_con_dau
-            vm.chuKy = item.anh_chu_ky
+            // vm.conDau = item.anh_con_dau
+            // vm.chuKy = item.anh_chu_ky
+
+            // 
+            if (vm.ma_chu_ky) {
+                let config = {
+                    url: '/o/rest/v2/serverconfigs/LAY_ANH_CHU_KY_CLS/protocols/API_CONNECT?ma_chu_ky=' + vm.ma_chu_ky,
+                    headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                }
+                vm.loadingImage = true
+                axios.request(config).then(res => {
+                    if (res.data.hasOwnProperty('CK_IMAGE_FILE')) {
+                        vm.chuKy = vm.hexToBase64(res.data['CK_IMAGE_FILE'])
+                    }
+                    vm.loadingImage = false
+                }).catch(function() {
+                    vm.loadingImage = false
+                })
+            }
+            if (vm.ma_con_dau) {
+                let config = {
+                    url: '/o/rest/v2/serverconfigs/LAY_ANH_CON_DAU_CLS/protocols/API_CONNECT?ma_con_dau=' + vm.ma_con_dau,
+                    headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                }
+                vm.loadingImage = true
+                axios.request(config).then(res => {
+                    if (res.data.hasOwnProperty('CD_IMAGE_FILE')) {
+                        vm.conDau = vm.hexToBase64(res.data['CD_IMAGE_FILE'])
+                    }
+                    vm.loadingImage = false
+                }).catch(function() {
+                    vm.loadingImage = false
+                })
+            }
+            //
         },
         deleteGiayTo(index) {
             let vm = this
@@ -2156,7 +2272,7 @@ export default {
             vm.computeDate()
             // 
             for (let i=0; i<vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                     let arr = []
                     vm.listGiayTo.forEach(e=>{
                         let obj = Object.assign({}, e)
@@ -2196,7 +2312,10 @@ export default {
                     vm.dossierFileArr[i]['eform'] = 'true'
                 }
             }
-            $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+            let dataOut = vm.dossierFileArr.filter(function (item) {
+                return item.formData || (!item.formData && item.fileEntryId)
+            })
+            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
 
             // Gen le phi
             vm.genLePhi()

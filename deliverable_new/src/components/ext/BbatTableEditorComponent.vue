@@ -102,7 +102,6 @@
       let vm = this
       vm.$nextTick(function () {
         vm.$store.dispatch('getContentFile', vm.formid).then(function (result) {
-          console.log('formScript --->', result)
           vm.formTempalate = result
           window.$('#formDelivert').empty()
           let formScript, formData

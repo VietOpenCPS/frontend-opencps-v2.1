@@ -116,6 +116,11 @@
               TIẾN TRÌNH XỬ LÝ
             </v-btn>
           </v-tab>
+          <v-tab :key="6" href="#tabs-6" v-if="originality !== 1 && viTriLuuTru && docLuuTru.length > 0">
+            <v-btn flat class="px-0 py-0 mx-0 my-0">
+              VỊ TRÍ LƯU TRỮ
+            </v-btn>
+          </v-tab>
           <!-- <v-tab :key="7" href="#tabs-7" @click="loadMermaidgraph()" v-if="originality !== 1">
             <v-btn flat class="px-0 py-0 mx-0 my-0">
               THEO DÕI HỒ SƠ
@@ -322,6 +327,15 @@
             </v-tab-item>
             <v-tab-item value="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
               <div v-if="!isNotarization">
+                <v-btn color="primary" v-if="hasDownloadAllFile" @click.stop="downloadAllFile()"
+                  :loading="loadingDownload"
+                  :disabled="loadingDownload"
+                  style="position: absolute;right: 50px;z-index: 5;"
+                >
+                  <v-icon>save_alt</v-icon> &nbsp;
+                  Tải giấy tờ đính kèm
+                  <span slot="loader">Loading...</span>
+                </v-btn>
                 <v-expansion-panel :value="[true]" expand class="expansion-pl ext__form">
                   <v-expansion-panel-content :key="1">
                     <div slot="header" class="text-bold">
@@ -499,6 +513,16 @@
                 </content-placeholders>
                 <div id="mermaid_dossier" class="mermaid" style="padding: 15px;min-height: 350px;"></div>
               </div>
+            </v-tab-item>
+            <v-tab-item v-if="originality !== 1 && viTriLuuTru" value="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
+              <v-card>
+                <v-card-text>
+                  <v-flex xs12 class="">
+                    <iframe id="viTriLuuTru" src="" type="application/pdf" width="100%" height="400px" style="overflow: auto;max-height: 400px;" frameborder="0">
+                    </iframe>
+                  </v-flex>
+                </v-card-text>
+              </v-card>
             </v-tab-item>
           </v-tabs-items>
         </v-tabs>
@@ -800,6 +824,8 @@ export default {
     'phan-cong-lai': PhanCongLai
   },
   data: () => ({
+    viTriLuuTru: false,
+    docLuuTru: [],
     validTraoDoi: false,
     isMobile: false,
     inputTypes: [1, 3, 6],
@@ -829,6 +855,7 @@ export default {
     thongTinChiTietHoSo: {},
     dialogPDF: false,
     dialogPDFLoading: false,
+    loadingDownload: false,
     loadingAlpacajsForm: false,
     nextActions: [],
     createFiles: [],
@@ -1029,6 +1056,7 @@ export default {
     activeReload: false,
     srcDownloadIframe: '',
     itemAction: '',
+    hasDownloadAllFile: false,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -1136,6 +1164,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.viTriLuuTru = viTriLuuTru
+    } catch (error) {
+    }
     window.toastr = toastr
     vm.$nextTick(function () {
       $('#m-navigation').css('display', 'none')
@@ -1337,7 +1369,9 @@ export default {
             }
           }
         })
-        
+        if (vm.viTriLuuTru) {
+          vm.loadDocumentLuuTru()
+        }
       })
     },
     loadDetailTempalte () {
@@ -2521,12 +2555,12 @@ export default {
             })
           } else {
             // ký số với plugin cài đặt
-            // check không sử dụng ký số trong quy trình có ký sô
+            // check không sử dụng ký số trong quy trình có ký số
             let doNotSign = false
             if (vm.showTaoTaiLieuKetQua && vm.typeEsign === 'plugin') {
               doNotSign = vm.$refs.tailieuketqua.checkUseSign()
             }
-            if (result.signatureType === 'plugin' && !doNotSign) {
+            if (result.signatureType === 'plugin' && !doNotSign && vm.showTaoTaiLieuKetQua) {
               console.log('file ký số', vm.createFileSignedSync)
               let valid = true
               if (!vm.createFileSignedSync) {
@@ -2535,15 +2569,16 @@ export default {
                 vm.loadingAction = false
                 vm.loadingActionProcess = false
               } else {
+                let fileChuaKy = []
                 let files = vm.createFileSignedSync.createFiles
-                let fileEntries = []
+                var fileEntries = []
                 let dossierFiles = []
                 for (let index in files) {
-                  if (!files[index]['isSigned'] && files[index]['fileSize'] && (!files[index]['eForm']) || (files[index]['eForm'] && files[index]['createFileDossierPartEform'])) {
-                    toastr.clear()
-                    toastr.error(files[index]['displayName'] + ' chưa được ký duyệt')
-                    valid = false
-                    return
+                  if (
+                    (!files[index]['isSigned'] && files[index]['fileSize'] && files[index]['fileType'].toLocaleLowerCase() === 'pdf' && !files[index]['eForm']) || 
+                    (!files[index]['isSigned'] && files[index]['eForm'] && files[index]['fileSize'] && files[index]['createFileDossierPartEform'])
+                  ) {
+                    fileChuaKy.push(files[index]['displayName'])
                   } else {
                     if (files[index]['fileSize']) {
                       fileEntries.push(files[index]['fileEntryId'])
@@ -2551,73 +2586,82 @@ export default {
                     }
                   }
                 }
-                console.log('fileEntries 12312', fileEntries, dossierFiles)
-                if (!valid) {
-                  return
-                }
-                let filterUpdateFile = {
-                  dossierId: vm.thongTinChiTietHoSo['dossierId'],
-                  fileEntries: fileEntries.toString(),
-                  dossierFiles: dossierFiles.toString()
-                }
-                vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
-                  // 1
-                  vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-                    vm.getDetailDossier()
-                    if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
-                      vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
-                      })
-                    }
-                    if (filter['payment']) {
-                      vm.loadThanhToan()
-                    }
-                    vm.loadingAction = false
-                    vm.dialogActionProcess = false
-                    vm.loadingActionProcess = false
-                    vm.alertObj = {
-                      icon: 'check_circle',
-                      color: 'success',
-                      message: 'Thực hiện thành công!'
-                    }
-                    vm.btnStateVisible = false
-                    if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
-                      vm.rollbackable = result.rollbackable
-                    }
-                    if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
-                      vm.printDocument = true
-                    }
-                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
-                      vm.printInvoicefilePayment = true
-                      vm.printPay()
-                    }
-                    if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
-                      vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
-                    }
-                    vm.checkInput = 0
-                    vm.$store.commit('setCheckInput', 0)
-                    if (String(item.form) === 'ACTIONS') {
-                    } else {
-                      vm.$router.push({
-                        path: vm.$router.history.current.path,
-                        query: {
-                          recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                          q: currentQuery['q']
-                        }
-                      })
-                    }
-                    $('html, body').animate({
-                      scrollTop: 0
-                    }, 500, 'linear')
-                  }).catch(function (reject) {
+                let doActionKySo = function () {
+                  console.log('fileEntries 12312', fileEntries, dossierFiles)
+                  let filterUpdateFile = {
+                    dossierId: vm.thongTinChiTietHoSo['dossierId'],
+                    fileEntries: fileEntries.toString(),
+                    dossierFiles: dossierFiles.toString()
+                  }
+                  vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
+                    // 1
+                    vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                      vm.getDetailDossier()
+                      if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
+                        vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+                        })
+                      }
+                      if (filter['payment']) {
+                        vm.loadThanhToan()
+                      }
+                      vm.loadingAction = false
+                      vm.dialogActionProcess = false
+                      vm.loadingActionProcess = false
+                      vm.alertObj = {
+                        icon: 'check_circle',
+                        color: 'success',
+                        message: 'Thực hiện thành công!'
+                      }
+                      vm.btnStateVisible = false
+                      if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                        vm.rollbackable = result.rollbackable
+                      }
+                      if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                        vm.printDocument = true
+                      }
+                      if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                        vm.printInvoicefilePayment = true
+                        vm.printPay()
+                      }
+                      if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                        vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+                      }
+                      vm.checkInput = 0
+                      vm.$store.commit('setCheckInput', 0)
+                      if (String(item.form) === 'ACTIONS') {
+                      } else {
+                        vm.$router.push({
+                          path: vm.$router.history.current.path,
+                          query: {
+                            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                            q: currentQuery['q']
+                          }
+                        })
+                      }
+                      $('html, body').animate({
+                        scrollTop: 0
+                      }, 500, 'linear')
+                    }).catch(function (reject) {
+                      vm.loadingAction = false
+                      vm.loadingActionProcess = false
+                    })
+                  }).catch(function () {
+                    toastr.error('Cập nhật kết quả xử lý thất bại')
                     vm.loadingAction = false
                     vm.loadingActionProcess = false
                   })
-                }).catch(function () {
-                  toastr.error('Cập nhật kết quả xử lý thất bại')
-                  vm.loadingAction = false
-                  vm.loadingActionProcess = false
-                })
+                }
+                if (fileChuaKy.length > 0) {
+                  let x = confirm('Tài liệu "' + fileChuaKy.toString() + '" chưa được ký duyệt, bạn có muốn tiếp tục?')
+                  if (x) {
+                    doActionKySo()
+                  } else {
+                    vm.loadingActionProcess = false
+                  }
+                } else {
+                  doActionKySo()
+                }
               }
             } else {
               vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
@@ -3012,6 +3056,9 @@ export default {
         } else {
           vm.documents.push(resultDocuments)
         }
+        vm.documents = vm.documents.filter(function(item) {
+          return item.documentType !== 'DOC_LUU_TRU'
+        })
       })
     },
     loadThanhToan () {
@@ -3343,6 +3390,18 @@ export default {
         }
       }
     },
+    downloadAllFile () {
+      let vm = this
+      vm.loadingDownload = true
+      let filter = {
+        dossierId: vm.thongTinChiTietHoSo.dossierId
+      }
+      vm.$store.dispatch('downLoadAllFile', filter).then(function (result) {
+        vm.loadingDownload = false
+      }).catch(function () {
+        vm.loadingDownload = false
+      })
+    },
     changeStateViewResult (data) {
       // console.log('state view result', data)
       var vm = this
@@ -3387,6 +3446,27 @@ export default {
       } else {
         return false
       }
+    },
+    loadDocumentLuuTru () {
+      let vm = this
+      vm.$store.dispatch('loadDossierDocuments', vm.thongTinChiTietHoSo).then(resultDocuments => {
+        vm.docLuuTru = []
+        if (Array.isArray(resultDocuments)) {
+          vm.docLuuTru = resultDocuments
+        } else {
+          vm.docLuuTru.push(resultDocuments)
+        }
+        vm.docLuuTru = vm.docLuuTru.filter(function(item) {
+          return item.documentType === 'DOC_LUU_TRU'
+        })
+        if (vm.docLuuTru.length > 0) {
+          let fileDoc = vm.docLuuTru[0]
+          fileDoc['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+          vm.$store.dispatch('viewDocument', fileDoc).then(result => {
+            document.getElementById('viTriLuuTru').src = result
+          })
+        }
+      })
     }
   },
   filters: {

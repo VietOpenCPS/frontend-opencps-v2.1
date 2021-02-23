@@ -177,10 +177,10 @@ export default {
             }
           })
           // chuyển bước hồ sơ khi thanh toán thành công
-          let filterUpdate = query
-          if (vm.statusDeal) {
-            vm.$store.dispatch('doActionPayGov', filterUpdate)
-          }
+          // let filterUpdate = query
+          // if (vm.statusDeal) {
+          //   vm.$store.dispatch('doActionPayGov', filterUpdate)
+          // }
         } else {
           if (dossierId) {
             if (responseCode === '00') {

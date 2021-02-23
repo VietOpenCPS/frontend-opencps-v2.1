@@ -181,6 +181,7 @@
 <script>
 import axios from 'axios'
 export default {
+  props: ['detailDossier'],
   data: () => ({
     loadingFee: false,
     showTinhPhi: true,
@@ -378,6 +379,7 @@ export default {
             groupId: window.themeDisplay.getScopeGroupId()
           }
           let dataUpdate = new URLSearchParams()
+          dataUpdate.append("GovAgencyCode", vm.detailDossier.govAgencyCode)
           dataUpdate.append("senderProvince", vm.dichVuChuyenPhatHoSo.postalCityCode)
           dataUpdate.append("senderDistrict", vm.dichVuChuyenPhatHoSo.postalDistrictCode)
           dataUpdate.append("receiverProvince", "")

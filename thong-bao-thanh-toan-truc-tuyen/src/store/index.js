@@ -138,6 +138,7 @@ export const store = new Vuex.Store({
           orderInfo: data.orderInfo,
           requestCode: data.requestCode,
           transactionNo: data.transactionNo,
+          transactionCode: data.transactionCode,
           payDate: data.payDate,
           errorCode: data.errorCode,
           paygate: data.paygate,

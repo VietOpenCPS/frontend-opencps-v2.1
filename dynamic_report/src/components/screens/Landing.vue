@@ -109,6 +109,7 @@
             :data-value="data[item.key]"
             :data-all="data"
             @change="reloadPickerChange(item.key)">
+            
           </datetime-picker>
           <v-text-field 
             v-if="item['type'] === 'text'"
@@ -124,6 +125,7 @@
             item-text="name"
             :clearable="item['clearable']"
             :multiple="item.hasOwnProperty('multiple') && item.multiple"
+            @change="item.hasOwnProperty('parent') ? changeMapping(item) : ''"
           >
             <!-- <template slot="selection" slot-scope="props" >
               <v-chip v-if="props.index === 0">
@@ -143,6 +145,7 @@
             item-value="value"
             item-text="name"
             :clearable="item['clearable']"
+            @change="item.hasOwnProperty('parent') ? changeMapping(item) : ''"
           >
           </v-autocomplete>
         </v-flex>
@@ -155,7 +158,10 @@
               <v-icon>print</v-icon> &nbsp; In báo cáo
             </v-btn>
             <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
-              <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
+              <v-icon size="16px">fas fa fa-file-excel-o</v-icon> &nbsp; Tải xuống Excel
+            </v-btn>
+            <v-btn v-if="!itemsReports[index]['filterConfig']['showTable'] && exportWordReport" dark color="blue darken-3" class="my-0" v-on:click.native="doCreateReport(true, 'word')">
+              <v-icon size="16px">fas fa fa-file-word-o</v-icon> &nbsp; Tải xuống Word
             </v-btn>
             <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
               <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
@@ -177,7 +183,10 @@
             <v-icon>print</v-icon> &nbsp; In báo cáo
           </v-btn>
           <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
-            <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
+            <v-icon size="16px">fas fa fa-file-excel-o</v-icon> &nbsp; Tải xuống Excel
+          </v-btn>
+          <v-btn v-if="!itemsReports[index]['filterConfig']['showTable'] && exportWordReport" dark color="blue darken-3" class="my-0" v-on:click.native="doCreateReport(true, 'word')">
+            <v-icon size="16px">fas fa fa-file-word-o</v-icon> &nbsp; Tải xuống Word
           </v-btn>
           <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
             <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
@@ -331,6 +340,62 @@
                 </table>
         </div>
         <!--  -->
+        <v-layout wrap v-if="reportType.startsWith('DANH_GIA_CAN_BO')">
+          <v-flex xs12 class="report__table" style="overflow:auto;max-height: 1000px" v-if="!showErrorData && dataTableVottingList.length > 0">
+            <table class="my-2" hide-default-footer>
+              <thead>
+                <tr>
+                  <th rowspan="2" class="text-center px-2 py-1">
+                    <span>STT</span>
+                  </th>
+                  <th rowspan="2" class="text-center px-2 py-1">
+                    <span>Tên đơn vị</span>
+                  </th>
+                  <!-- <th width="80" rowspan="3" class="text-center px-2 py-1">
+                    <span>Số lượt đánh giá</span>
+                  </th> -->
+                  <th class="py-1" v-for="(item, index) in dataTableVottingList[0]['employees'][0]['voting']" v-bind:key="index" :colspan="dataTableVottingList[0]['employees'][0]['voting'][index]['selected'].length">
+                    <span>{{item.question}}</span>
+                  </th>
+                </tr>
+
+                <tr>
+                  <th v-for="(item, index) in listAnswers" v-bind:key="index" width="" class="text-center px-2 py-1">
+                    <span>{{item}}</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody v-if="loadingTable">
+                <content-placeholders class="my-2">
+                  <content-placeholders-text :lines="5" />
+                </content-placeholders>
+              </tbody>
+              <tbody v-if="!loadingTable && dataTableVottingList.length > 0">
+                <tr v-for="(item,index) in dataTableRender" :key="index">
+                  <td align="center" :class="item.hasOwnProperty('group') ? 'px-2 text-bold py-1' : 'px-2 py-1'">{{item.hasOwnProperty('group') ? item.group : item.child}}</td>
+                  <td align="left" :class="item.hasOwnProperty('group') ? 'px-2 text-bold py-1' : 'px-2 py-1'" style="padding: 8px 10px;"
+                    :colspan="item.hasOwnProperty('group') ? columnLength - 1 : ''"
+                  >
+                    {{item.name}}
+                  </td>
+                  <!-- <td align="center" class="px-2 py-1" v-if="!item.hasOwnProperty('group')">{{item.total}}</td> -->
+                  <!-- <td align="center"  class="px-2" v-for="(item1,index1) in (columnLength - 3)" :key="index1"
+                    v-if="item.hasOwnProperty('group')"
+                  >
+                    
+                  </td> -->
+                  <td align="center"  class="px-2 py-1" v-for="(item1,index1) in item['data']" :key="index1"
+                    v-if="!item.hasOwnProperty('group')"
+                  >
+                    {{item1}}
+                  </td>
+                  
+                </tr>
+              </tbody>
+            </table>
+          </v-flex>
+        </v-layout>
+        <!--  -->
         <div class="mx-3 my-4" v-if="showErrorData">
           <v-alert :value="true" outline color="info" icon="info">
             Không có dữ liệu báo cáo.
@@ -408,9 +473,15 @@ export default {
   },
   data: () => ({
     showHTML: false,
+    columnLength: 0,
+    listAnswers: [],
+    dataTableRender: [],
+    dataTableVottingList: [],
     hiddenAside: false,
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
     doExportExcel: false,
+    doExportWord: false,
+    exportWordReport: false,
     showGuilds: false,
     showPicker: true,
     showErrorData: false,
@@ -450,7 +521,7 @@ export default {
     nameReport: '',
     showConfig: false,
     filters: [],
-    data: {},
+    data: '',
     customize: false,
     groupBy: [],
     groupByVal: '',
@@ -569,6 +640,10 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       console.log('run new ver_23')
+      try {
+        vm.exportWordReport = exportWordReport
+      } catch (error) {
+      }
       let query = vm.$router.history.current.query
       let param = {
         headers: {
@@ -684,12 +759,14 @@ export default {
             }
             if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
               vm.filters[key]['groupId'] = vm.govAgency
-              vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
-                vm.filters[key]['source'] = result
-                if (vm.filters[key]['appendItem']) {
-                  vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
-                }
-              }).catch(function(){})
+              if (!vm.filters[key]['source'] || vm.filters[key]['source'].length === 0) {
+                vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+                  vm.filters[key]['source'] = result
+                  if (vm.filters[key]['appendItem']) {
+                    vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
+                  }
+                }).catch(function(){})
+              }
             }
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
@@ -829,12 +906,15 @@ export default {
         }
         if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
           vm.filters[key]['groupId'] = vm.govAgency
-          vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
-            vm.filters[key]['source'] = result
-            if (vm.filters[key]['appendItem']) {
-              vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
-            }
-          }).catch(function(){})
+          if (!vm.filters[key]['source'] || vm.filters[key]['source'].length === 0) {
+            vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+              vm.filters[key]['source'] = result
+              if (vm.filters[key]['appendItem']) {
+                vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
+              }
+            }).catch(function(){})
+          }
+          
         }
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
@@ -997,13 +1077,141 @@ export default {
       }
       if (vm.reportType.startsWith('STATISTIC')) {
         vm.doPrintReportFix()
+      } else if (vm.reportType.startsWith('DANH_GIA_CAN_BO')) {
+        vm.doDynamicVoting()
       } else {
         vm.doDynamicReport()
       }
       vm.isCallData = true
     },
+    doDynamicVoting () {
+      let vm = this
+      vm.showErrorData = false
+      vm.isShowLoading = true
+      vm.agencyLists = []
+      vm.api = ''
+      vm.proxyApi = ''
+      
+      if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
+      } else {
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      }
+
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+        vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
+      let filter = {
+        document: vm.reportType,
+        data: vm.data,
+        api: vm.api,
+        proxyApi: vm.proxyApi
+      }
+      let check =  true
+      for (let key in vm.filterGroup) {
+        if (key === vm.groupIdListSelected) {
+          filter['govAgency'] = vm.filterGroup[key]
+          filter['agencyLists'] = vm.groupIdList.find(item => item.key === key).value
+          check = false
+          break
+        }
+      }
+      
+      if(check) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
+      }
+      let sumKey = vm.itemsReports[vm.index]['filterConfig']['sumKey']
+      let selection = vm.itemsReports[vm.index]['filterConfig']['selection']
+      let merge = vm.itemsReports[vm.index]['filterConfig']['merge']
+      let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
+      let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
+      console.log('FILTER', filter)
+      let jobposListEmp = []
+      if (vm.govAgency) {
+        let selected = vm.agencyLists.filter(function (item) {
+          return item.value === vm.govAgency
+        })[0]
+        jobposListEmp = [{jobposCode: selected.value, groupId: selected.code}]
+      } else {
+        let lengData = vm.agencyLists.length
+        for (let i = 1; i < lengData; i++) {
+          let item = {jobposCode: vm.agencyLists[i].value, groupId: vm.agencyLists[i].code}
+          jobposListEmp.push(item)
+        }
+      }
+      let filterGetEmployee = {
+        jobposList: jobposListEmp,
+        data: vm.data
+      }
+      //
+      if (vm.doExportExcel) {
+        vm.$store.dispatch('exportVotingEmployee', filterGetEmployee).then(function (response) {
+          vm.isShowLoading = false
+        }).catch(function () {
+          vm.isShowLoading = false
+        })
+      } else {
+        vm.$store.dispatch('getReportVotingEmployee', filterGetEmployee).then(function (result) {
+          vm.isShowLoading = false
+          if (result.hasOwnProperty('data') && result.data) {
+            vm.dataTableVottingList = result.data
+            // tạo header
+            let answers = []
+            let arr = vm.dataTableVottingList[0]['employees'][0]['voting']
+            for (let i = 0; i < arr.length; i++) {
+              for (let j = 0; j < arr[i]['choices'].length; j++) {
+                answers.push(arr[i]['choices'][j])
+              }
+            }
+            vm.listAnswers = answers
+            vm.columnLength = vm.listAnswers.length + 2
+            // Tạo body
+            let dataRawVoting = []
+            let lengData = vm.dataTableVottingList.length
+            let dataEmp = vm.dataTableVottingList
+            for (let i = 0; i < lengData; i++) {
+              dataRawVoting.push({
+                group: i + 1,
+                name: dataEmp[i]['jobposName'],
+                data: []
+              })
+              let lengthEmployee = dataEmp[i]['employees'].length
+              for (let j = 0; j < lengthEmployee; j++) {
+                let lengthVoting = dataEmp[i]['employees'][j]['voting'].length
+                let dataScore = []
+                for (let k = 0; k < lengthVoting; k++) {
+                  dataScore = dataScore.concat(dataEmp[i]['employees'][j]['voting'][k]['selected'])
+                }
+                dataRawVoting.push(
+                  {
+                    child: (i + 1) + '.' + (j + 1),
+                    name: dataEmp[i]['employees'][j]['name'],
+                    total: dataEmp[i]['employees'][j]['totalVote'],
+                    data: dataScore
+                  }
+                )
+              }
+            }
+            vm.dataTableRender = dataRawVoting
+            console.log('dataRawVoting', vm.dataTableRender)
+          } else {
+            vm.dataTableVottingList = []
+            vm.showErrorData = true
+          }
+        }).catch(function () {
+          vm.isShowLoading = false
+          vm.dataTableVottingList = []
+          vm.showErrorData = true
+        })
+      }
+      
+    },
     doDynamicReport () {
       let vm = this
+      console.log('getAgencyReportLists2', vm.itemsReports)
+      console.log('itemsReports', vm.itemsReports[vm.index])
       vm.isRender = false
       vm.docDefinition = {}
       let docDString = {}
@@ -1021,7 +1229,7 @@ export default {
         let find = vm.filters[key]['key']
         let currentVal = vm.data[vm.filters[key]['key']]
         if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
-          let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+          let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
           if (dateStr !== 'Invalid Date'&& String(currentVal).length === 13) {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), dateStr)
           } else {
@@ -1405,7 +1613,6 @@ export default {
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           vm.dataExportExcel = docDString
-          console.log('docDString1234123, dataExportExcelReport', docDString)
           vm.docDefinition = JSON.parse(docDString)
           // console.log('vm.docDefinition', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
@@ -1425,10 +1632,19 @@ export default {
             pdfDocGenerator.getBlob((blob) => {
               vm.pdfBlob = window.URL.createObjectURL(blob)
               vm.isShowLoading = false
-              if (vm.doExportExcel) {
+              if (vm.doExportExcel && !vm.doExportWord) {
                 vm.$store.dispatch('getExcelReportFromServer', {
                   data: docDString,
                   fileName: 'baocaothongke' + '.xls'
+                })
+              }
+              if (vm.doExportWord) {
+                let docDStringJson = JSON.parse(docDString)
+                let docDStringWord = Object.assign(docDStringJson, {reportType: "docx"})
+                console.log('docDString55552343', docDStringWord)
+                vm.$store.dispatch('getExcelReportFromServer', {
+                  data: JSON.stringify(docDStringWord),
+                  fileName: 'baocaothongke' + '.docx'
                 })
               }
             })
@@ -1463,7 +1679,7 @@ export default {
         let find = vm.filters[key]['key']
         let currentVal = vm.data[vm.filters[key]['key']]
         if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
-          let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+          let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
           if (dateStr !== 'Invalid Date'&& String(currentVal).length === 13) {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), dateStr)
           } else {
@@ -1531,7 +1747,8 @@ export default {
       let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
       let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
       
-      // console.log('getAgencyReportLists2', filter)
+      console.log('getAgencyReportLists2', filter)
+      console.log('itemsReports', vm.itemsReports[vm.index])
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         // console.log('result',result)
         if (result !== null) {
@@ -1621,7 +1838,7 @@ export default {
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('notSumkey')) {
             resultDataTotal = resultData
           }
-         console.log('resultDataTotal666', resultDataTotal)
+        //  console.log('resultDataTotal666', resultDataTotal)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -1710,7 +1927,7 @@ export default {
                     dataText = Math.round(eval(currentConfig['calculator']))
                   }
                 } else {
-                  console.log('resultData[key]', resultData[key], currentConfig['value'] )
+                  // console.log('resultData[key]', resultData[key], currentConfig['value'] )
                   if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                     if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
                       dataText =  ' - ' + resultData[key][currentConfig['subValue']] + ' '
@@ -1835,7 +2052,7 @@ export default {
           }
           vm.showCSVDownload = true
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
-          console.log('docDString,dataExportExcelStatistic', docDString)
+          // console.log('docDString,dataExportExcelStatistic', docDString)
           vm.dataExportExcel = docDString
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
@@ -1859,10 +2076,18 @@ export default {
             pdfDocGenerator.getBlob((blob) => {
               vm.pdfBlob = window.URL.createObjectURL(blob)
               vm.isShowLoading = false
-              if (vm.doExportExcel) {
+              if (vm.doExportExcel && !vm.doExportWord) {
                 vm.$store.dispatch('getExcelReportFromServer', {
                   data: docDString,
                   fileName: new Date().getTime() + '.xls'
+                })
+              }
+              if (vm.doExportWord) {
+                let docDStringJson = JSON.parse(docDString)
+                let docDStringWord = Object.assign(docDStringJson, {reportType: "docx"})
+                vm.$store.dispatch('getExcelReportFromServer', {
+                  data: JSON.stringify(docDStringWord),
+                  fileName: 'baocaothongke' + '.docx'
                 })
               }
             })
@@ -1874,12 +2099,13 @@ export default {
         }
       })
     },
-    doCreateReport(isExportExcel) {
+    doCreateReport(isExportExcel, isExportWord) {
       let vm = this
       vm.showHTML = false
       vm.showGuilds = false
       if (vm.$refs.form.validate()) {
         vm.doExportExcel = isExportExcel
+        vm.doExportWord = isExportWord && isExportWord === 'word' ? true : false
         vm.showConfig = false
         vm.doCreatePDF()
       }
@@ -1918,9 +2144,11 @@ export default {
     },
     reloadPickerChange (key) {
       let vm = this
+      console.log('keyDate2', key, vm.data[key])
       vm.showPicker = false
       setTimeout(() => {
         vm.data[key] = new Date(vm.data[key]).toLocaleDateString('vi-VN')
+        console.log('DATE91232', vm.data[key])
         vm.showPicker = true
       }, 200)
     },
@@ -2192,6 +2420,34 @@ export default {
       }
 
       vm.showHTML = true
+    },
+    changeMapping (item) {
+      let vm = this
+      setTimeout(function () {
+        if (item.hasOwnProperty('parent')) {
+          vm.data[item.parent] = ''
+          let indexChildren = ''
+          for (let key in vm.filters) {
+            if (vm.filters[key]['key'] === item.parent) {
+              indexChildren = key
+              break
+            }
+          }
+          console.log('indexChildren', indexChildren)
+          if (indexChildren) {
+            console.log('filters', vm.filters)
+            console.log('data', vm.data)
+            vm.filters[indexChildren]['api'] = vm.filters[indexChildren]['api'].split('?')[0]
+            vm.filters[indexChildren]['api'] += '?' + item['key'] + '=' + vm.data[item['key']].toString()
+            vm.$store.dispatch('loadDataSource', vm.filters[indexChildren]).then(function(result) {
+              vm.filters[indexChildren]['source'] = result
+              if (vm.filters[indexChildren]['appendItem']) {
+                vm.filters[indexChildren]['source'] = vm.filters[indexChildren]['appendItem'].concat(result)
+              }
+            }).catch(function(){})
+          }
+        }
+      }, 100)
     }
   }
 }

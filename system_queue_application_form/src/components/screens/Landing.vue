@@ -164,6 +164,7 @@
                 <v-flex xs12>
                   <v-text-field v-model="eformNoBooking" box clearable
                     :rules="[v => !!v || 'Mã tờ khai là bắt buộc']" required
+                    @blur="getInfoEform"
                   >
                     <template slot="label"> 
                       <span>Mã tờ khai</span> 
@@ -174,6 +175,7 @@
                 <v-flex xs12>
                   <v-text-field v-model="secretBooking" box clearable
                     :rules="[v => !!v || 'Mã bí mật là bắt buộc']" required
+                    @blur="getInfoEform"
                   >
                     <template slot="label"> 
                       <span>Mã bí mật</span> 
@@ -362,6 +364,41 @@
         </v-card>
       </v-form>
     </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialogSelectGovagency" persistent max-width="580">
+      <v-toolbar flat dark color="primary">
+        <v-toolbar-title>Chọn nơi nộp tờ khai</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon dark @click.native="dialogSelectGovagency = false">
+          <v-icon>close</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <v-card-text class="px-0 py-0">
+        <v-layout row wrap>
+          <v-flex xs12 sm12>
+            <v-list class="px-3 py-3">
+              <v-list-tile
+                v-for="(item, index) in agencyItems"
+                :key="index"
+                avatar
+                @click="selectAgency(item)"
+                :class="index == 0 ? 'mb-3' : ''"
+              >
+                <v-list-tile-avatar>
+                  <v-icon :class="index == 0 ? 'blue white--text' : 'amber white--text'">account_balance</v-icon>
+                </v-list-tile-avatar>
+
+                <v-list-tile-content class="ml-2">
+                  <v-list-tile-title style="font-size: 14px !important">{{ String(item.name).toUpperCase() }}</v-list-tile-title>
+                </v-list-tile-content>
+
+              </v-list-tile>
+            </v-list>
+          </v-flex>
+        </v-layout>
+        
+      </v-card-text>
+    </v-dialog>
   </div>
 </template>
 
@@ -384,6 +421,7 @@ export default {
     'captcha': Captcha
   },
   data: () => ({
+    dialogSelectGovagency: false,
     dialogLoadingCreate: false,
     isSlot: true,
     groupDvc: '',
@@ -556,12 +594,7 @@ export default {
       vm.$store.commit('setServiceinfoSelected', serviceInfo)
       let templateFile = Object.assign({}, template, {serviceInfoId: serviceInfo.serviceInfoId})
       vm.$store.commit('setFileTemplateSelected', templateFile)
-      vm.$router.push({
-        path: '/thong-tin-to-khai',
-        query: {
-          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-        }
-      })
+      vm.dialogSelectGovagency = true
     },
     searchEform () {
       let vm = this
@@ -676,6 +709,7 @@ export default {
                 filterBooking.bookingName = bookingName
                 filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
                 filterBooking.serverCode = vm.agencyTiepNhan.serverNo
+                filterBooking.govAgencyCode = vm.agencyTiepNhan.code
                 // 
                 let filter = {
                   groupIdBooking: vm.agencyTiepNhan.value,
@@ -706,6 +740,7 @@ export default {
                 filterBooking.bookingName = bookingName
                 filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
                 filterBooking.serverCode = vm.agencyTiepNhan.serverNo
+                filterBooking.govAgencyCode = vm.agencyTiepNhan.code
                 // 
                 let filter = {
                   groupIdBooking: vm.agencyTiepNhan.value,
@@ -938,6 +973,43 @@ export default {
         }
       }
       return true
+    },
+    getInfoEform () {
+      let vm = this
+      if (String(vm.eformNoBooking).trim() && String(vm.secretBooking).trim() ) {
+        let filter = {
+          eFormNo: String(vm.eformNoBooking).trim(),
+          secret: vm.secretBooking
+        }
+        vm.$store.dispatch('getEformSecret', filter).then(function(result) {
+          if (result && result.hasOwnProperty('govAgencyCode')) {
+            try {
+              vm.agencyTiepNhan = vm.agencyItems.filter(function (item) {
+                return item.code === result.govAgencyCode
+              })[0]
+            } catch (error) {
+            }
+            vm.getBookingConfigs()
+            if (vm.applicantIdDateFormatted) {
+              vm.getCounterBooking()
+            }
+            setTimeout(function () {
+              vm.$store.commit('setServerNo', vm.agencyTiepNhan.serverNo)
+            }, 200)
+          }
+        })
+      }
+    },
+    selectAgency (item) {
+      let vm = this
+      vm.$router.push({
+        path: '/thong-tin-to-khai',
+        query: {
+          agency: item.code,
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
+      vm.dialogSelectGovagency = false
     }
   }
 }

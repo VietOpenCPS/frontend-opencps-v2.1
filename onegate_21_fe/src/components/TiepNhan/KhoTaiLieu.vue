@@ -55,7 +55,7 @@
               box
             ></v-autocomplete>
           </v-flex>
-          <v-flex xs12 sm4 class="" v-if="originality === 1">
+          <v-flex xs12 sm4 class="pr-2" v-if="originality === 1">
             <v-text-field
               label="Tìm theo mã tài liệu"
               v-model="fileNoSearch"
@@ -117,12 +117,20 @@
                   <span>{{props.item.hasOwnProperty('fileNo') ? props.item.fileNo : ''}}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px; min-width:200px">
+              <td class="text-xs-left" style="height:36px;min-width:120px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
-                  <span>{{props.item.hasOwnProperty('dossierNo') ? props.item.dossierNo : ''}}</span>
+                  <span>{{props.item.hasOwnProperty('fileExtension') ? props.item.fileExtension : ''}}</span>
+                </div>
+              </td>
+              <td class="text-xs-left" style="height:36px; min-width:150px">
+                <content-placeholders v-if="loadingTable">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.hasOwnProperty('createDate') ? props.item.createDate : ''}}</span>
                 </div>
               </td>
               <td class="text-xs-center" style="height:36px;width:135px">
@@ -251,7 +259,12 @@ export default {
         sortable: false
       },
       {
-        text: 'Hồ sơ gốc',
+        text: 'Định dạng',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Ngày tạo',
         align: 'center',
         sortable: false
       },
@@ -331,33 +344,62 @@ export default {
         applicantDataType: ''
       }
       vm.loadingTable = true
-      vm.$store.dispatch('getApplicantDocument', filter).then(function (result) {
-        if (result.hasOwnProperty('data')) {
-          vm.documentApplicantList = result.data
-        } else {
+      if (vm.originality === 1) {
+        vm.$store.dispatch('getApplicantDocumentProxy', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.documentApplicantList = result.data
+          } else {
+            vm.documentApplicantList = []
+          }
+          vm.totalDocument = result['total']
+          vm.loadingTable = false
+        }).catch(function () {
+          vm.loadingTable = false
           vm.documentApplicantList = []
-        }
-        vm.totalDocument = result['total']
-        vm.loadingTable = false
-      }).catch(function () {
-        vm.loadingTable = false
-        vm.documentApplicantList = []
-        vm.totalDocument = 0
-      })
+          vm.totalDocument = 0
+        })
+      } else {
+        vm.$store.dispatch('getApplicantDocument', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.documentApplicantList = result.data
+          } else {
+            vm.documentApplicantList = []
+          }
+          vm.totalDocument = result['total']
+          vm.loadingTable = false
+        }).catch(function () {
+          vm.loadingTable = false
+          vm.documentApplicantList = []
+          vm.totalDocument = 0
+        })
+      }
+      
     },
     getFileItems () {
       let vm = this
       let filter = {
         status: 1
       }
-      vm.$store.dispatch('getFileItems', filter).then(function (result) {
-        if (result.hasOwnProperty('data')) {
-          vm.fileTemplateList = result.data
-        } else {
-          vm.fileTemplateList = []
-        }
-      }).catch(function () {
-      })
+      if (vm.originality === 1) {
+        vm.$store.dispatch('getFileItemsProxy', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.fileTemplateList = result.data
+          } else {
+            vm.fileTemplateList = []
+          }
+        }).catch(function () {
+        })
+      } else {
+        vm.$store.dispatch('getFileItems', filter).then(function (result) {
+          if (result.hasOwnProperty('data')) {
+            vm.fileTemplateList = result.data
+          } else {
+            vm.fileTemplateList = []
+          }
+        }).catch(function () {
+        })
+      }
+      
     },
     showCreatedocument () {
       let vm = this
@@ -485,21 +527,39 @@ export default {
       let filter = {
         applicantDataId: item.applicantDataId
       }
-      vm.$store.dispatch('getFileAttach', filter).then(function (result) {
-        let fileType = item.fileExtension.toLowerCase()
-        if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
-          fileType === 'tif' || fileType === 'tiff'
-        ) {
-          vm.dialogPDF = true
-          document.getElementById('dialogPDFPreview').src = result
-        } else {
-          vm.srcDownload = result
-          setTimeout(function () {
-            document.getElementById('downloadFile').click()
-          }, 100)
-        }
-      }).catch(function () {
-      })
+      if (vm.originality === 1) {
+        vm.$store.dispatch('getFileAttachProxy', filter).then(function (result) {
+          let fileType = item.fileExtension.toLowerCase()
+          if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+            fileType === 'tif' || fileType === 'tiff'
+          ) {
+            vm.dialogPDF = true
+            document.getElementById('dialogPDFPreview').src = result
+          } else {
+            vm.srcDownload = result
+            setTimeout(function () {
+              document.getElementById('downloadFile').click()
+            }, 100)
+          }
+        }).catch(function () {
+        })
+      } else {
+        vm.$store.dispatch('getFileAttach', filter).then(function (result) {
+          let fileType = item.fileExtension.toLowerCase()
+          if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+            fileType === 'tif' || fileType === 'tiff'
+          ) {
+            vm.dialogPDF = true
+            document.getElementById('dialogPDFPreview').src = result
+          } else {
+            vm.srcDownload = result
+            setTimeout(function () {
+              document.getElementById('downloadFile').click()
+            }, 100)
+          }
+        }).catch(function () {
+        })
+      }
     },
     getApplicantType (item) {
       let vm = this

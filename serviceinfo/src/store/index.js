@@ -376,7 +376,57 @@ export const store = new Vuex.Store({
           })
         })
       })
-    }
+    },
+    getDict ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              parent: filter.parent ? filter.parent : ''
+            }
+          }
+          axios.get('/o/rest/v2/dictcollections/REPORT_GROUP/dictgroups/' + filter.collection + '/dictitems', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.hasOwnProperty('data')) {
+              resolve(serializable.data)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getDictFromParent ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              parent: filter.parent ? filter.parent : ''
+            }
+          }
+          axios.get('/o/rest/v2/dictcollections/REPORT_GROUP/dictitems', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.hasOwnProperty('data')) {
+              resolve(serializable.data)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
   },
   mutations: {
     setLoading (state, payload) {

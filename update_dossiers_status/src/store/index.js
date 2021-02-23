@@ -50,7 +50,10 @@ export const store = new Vuex.Store({
             toReceiveDate: filter.toReceiveDate ? filter.toReceiveDate : '',
             fromReleaseDate: filter.fromReleaseDate ? filter.fromReleaseDate : '',
             toReleaseDate: filter.toReleaseDate ? filter.toReleaseDate : '',
-            service: filter.service ? filter.service : ''
+            service: filter.service ? filter.service : '',
+            agency: filter.agency ? filter.agency : '',
+            start: filter.start,
+            end: filter.end
           },
           headers: {
             groupId: filter.groupId ? filter.groupId : window.themeDisplay.getScopeGroupId()
@@ -108,7 +111,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject)=>{
         let config = {
           headers: {
-            'groupId': window.themeDisplay.getScopeGroupId()
+            'groupId': data.hasOwnProperty('groupId') ? data.groupId : window.themeDisplay.getScopeGroupId()
           }
         }
         axios.get('/o/rest/v2/onegate/serviceconfigs/processes', config).then(function (response) {
@@ -172,6 +175,31 @@ export const store = new Vuex.Store({
           reject(xhr)
         })
       })
+    },
+    getAgencysFromParent ({commit,state}, data) {
+      return new Promise((resolve, reject)=>{
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+            }
+          }
+          if (data.parent) {
+            param.params = {
+              parent: data.parent
+            }
+          }
+          axios.get('/o/rest/v2/dictcollections/REPORT_GROUP/dictitems', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable.data)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        }).catch(function (){})     
+      })     
     },
     setSubmissionNote({commit, state}, data) {
       commit('setSubmissionNote', data)

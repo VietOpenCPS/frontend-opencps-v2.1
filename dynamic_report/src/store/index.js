@@ -126,7 +126,7 @@ export const store = new Vuex.Store({
         for (let key in filter['data']) {
           let currentVal = filter['data'][key]
           if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
-            let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+            let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
             if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
               param.params[key] = dateStr
             } else {
@@ -172,6 +172,15 @@ export const store = new Vuex.Store({
               let dynamicReportsFilterSharing = serializable['getDynamicReports'].filter(function (item) {
                 return String(item.sharing) !== '9'
               })
+              try {
+                // TH chỉ lấy các mẫu theo cấu hình từng site
+                if (reportTypeScope) {
+                  dynamicReportsFilterSharing = dynamicReportsFilterSharing.filter(function (item) {
+                    return item.userConfig && JSON.parse(item.userConfig).hasOwnProperty('reportTypeScope') && JSON.parse(item.userConfig)['reportTypeScope'] === reportTypeScope
+                  })
+                }
+              } catch (error) {
+              }
               for (let key in dynamicReportsFilterSharing) {
                 let current = dynamicReportsFilterSharing[key]
                 console.log('keyDynamicReports', current['filterConfig'])
@@ -228,8 +237,17 @@ export const store = new Vuex.Store({
               itemsReportsData = itemsReportsData.filter(function (item) {
                 return String(item.sharing) !== '9'
               })
+              try {
+                // TH chỉ lấy các mẫu theo cấu hình từng site
+                if (reportTypeScope) {
+                  console.log('reportTypeScope123', itemsReportsData)
+                  itemsReportsData = itemsReportsData.filter(function (item) {
+                    return item.userConfig && item.userConfig.hasOwnProperty('reportTypeScope') && item.userConfig['reportTypeScope'] === reportTypeScope
+                  })
+                }
+              } catch (error) {
+              }
               state.itemsReports = itemsReportsData
-              console.log('state.itemsReports', state.itemsReports)
               resolve(itemsReportsData)
             }).catch(function (error) {
               state.itemsReports = []
@@ -254,6 +272,15 @@ export const store = new Vuex.Store({
             let dynamicReportsFilterSharing = serializable['getDynamicReports'].filter(function (item) {
               return String(item.sharing) !== '9'
             })
+            try {
+              // TH chỉ lấy các mẫu theo cấu hình từng site
+              if (reportTypeScope) {
+                dynamicReportsFilterSharing = dynamicReportsFilterSharing.filter(function (item) {
+                  return item.userConfig && JSON.parse(item.userConfig).hasOwnProperty('reportTypeScope') && JSON.parse(item.userConfig)['reportTypeScope'] === reportTypeScope
+                })
+              }
+            } catch (error) {
+            }
             for (let key in dynamicReportsFilterSharing) {
               let current = dynamicReportsFilterSharing[key]
               try {
@@ -309,8 +336,16 @@ export const store = new Vuex.Store({
             itemsReportsData = itemsReportsData.filter(function (item) {
               return String(item.sharing) !== '9'
             })
+            try {
+              // TH chỉ lấy các mẫu theo cấu hình từng site
+              if (reportTypeScope) {
+                itemsReportsData = itemsReportsData.filter(function (item) {
+                  return item.userConfig && item.userConfig.hasOwnProperty('reportTypeScope') && item.userConfig['reportTypeScope'] === reportTypeScope
+                })
+              }
+            } catch (error) {
+            }
             state.itemsReports = itemsReportsData
-            console.log('state.itemsReports', state.itemsReports)
             resolve(itemsReportsData)
           }).catch(function (error) {
             state.itemsReports = []
@@ -334,7 +369,7 @@ export const store = new Vuex.Store({
           for (let key in filter['data']) {
             let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
-              let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+              let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
               if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
                 param.params[key] = dateStr
               } else {
@@ -929,6 +964,102 @@ export const store = new Vuex.Store({
         }).catch(function (error) {
           console.log(error)
           reject('default')
+        })
+      })
+    },
+    getReportVotingEmployee ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        let data = JSON.stringify(filter.jobposList)
+        let config = {
+          method: 'post',
+          url: '/o/rest/v2/votings/employee/statistic',
+          headers: {
+            'groupId': state.groupId,
+            'Content-Type': 'application/json'
+          },
+          data : data,
+          params: {}
+        };
+        for (let key in filter['data']) {
+          let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
+          if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
+            let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
+            if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+              config.params[key] = dateStr
+            } else {
+              if (String(key).indexOf('DateExtend') > 0) {
+                let keySearch = String(key).replace('Extend', '')
+                let dateCurrent = new Date()
+                dateCurrent.setDate(dateCurrent.getDate() + Number(filter['data'][key]))
+                config.params['from' + keySearch] = new Date(dateCurrent).toLocaleDateString('vi-VN')
+                config.params['to' + keySearch] = new Date(dateCurrent).toLocaleDateString('vi-VN')
+              } else {
+                config.params[key] = currentVal
+              }
+            }
+          }
+        }
+        axios(config)
+        .then(function (response) {
+          resolve(response.data)
+        })
+        .catch(function (error) {
+          reject(error)
+        })
+      })
+    },
+    exportVotingEmployee ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        let data = JSON.stringify(filter.jobposList)
+        let config = {
+          method: 'post',
+          url: '/o/rest/v2/votings/employee/statistic/export',
+          headers: { 
+            'groupId': state.groupId,
+            'Content-Type': 'application/octet-stream'
+          },
+          data : data,
+          responseType: 'blob',
+          params: {}
+        };
+        console.log('filterEmployee', filter)
+        for (let key in filter['data']) {
+          let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
+          if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
+            let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
+            if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+              config.params[key] = dateStr
+            } else {
+              if (String(key).indexOf('DateExtend') > 0) {
+                let keySearch = String(key).replace('Extend', '')
+                let dateCurrent = new Date()
+                dateCurrent.setDate(dateCurrent.getDate() + Number(filter['data'][key]))
+                config.params['from' + keySearch] = new Date(dateCurrent).toLocaleDateString('vi-VN')
+                config.params['to' + keySearch] = new Date(dateCurrent).toLocaleDateString('vi-VN')
+              } else {
+                config.params[key] = currentVal
+              }
+            }
+          }
+        }
+        axios(config)
+        .then(function (response) {
+          var fileNames = response.headers['content-disposition']
+          var fileName = fileNames.split('filename=')[1]
+          fileName = fileName.split('"').join('')
+          var a = document.createElement('a')
+          document.body.appendChild(a)
+          a.style = 'display: none'
+          var urlFile = window.URL.createObjectURL(response.data)
+          a.href = urlFile
+          a.download = fileName
+          a.click()
+          
+          window.URL.revokeObjectURL(urlFile)
+          resolve('success')
+        })
+        .catch(function (error) {
+          reject(error)
         })
       })
     },

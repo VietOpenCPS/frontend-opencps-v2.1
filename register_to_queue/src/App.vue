@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app_application_form" style="max-width:1300px;margin:0 auto">
+  <v-app id="app_register_to_queue" style="max-width:1300px;margin:0 auto">
     <v-navigation-drawer app clipped floating width="310" v-if="false">
     </v-navigation-drawer>
     <v-content>

@@ -112,6 +112,7 @@
                     <v-btn icon ripple v-on:click.stop="downloadSingleFile(itemFileView)" class="mx-0 my-0">
                       <v-icon size="14" color="primary">fas fa fa-download</v-icon>
                     </v-btn>
+
                     <v-btn class="my-0" title="Ký số điện tử" v-if="originality === 1 && showKySo && itemFileView.fileType.toLowerCase() === 'pdf'" flat icon color="indigo"
                       @click.stop="showSelectDigitalSign(itemFileView, index)"
                     >
@@ -133,6 +134,14 @@
                     <v-btn icon ripple v-on:click.stop="downloadSingleFile(itemFileView)" class="mx-0 my-0">
                       <v-icon size="14" color="primary">fas fa fa-download</v-icon>
                     </v-btn>
+                    <!--  -->
+                    <v-tooltip top v-if="originality === 3 && activePdfEditor && itemFileView['fileType'].toLocaleLowerCase() === 'pdf'">
+                      <v-btn slot="activator" icon ripple v-on:click.stop="showEditorPdf(itemFileView)" class="mx-0 my-0">
+                        <v-icon size="14" color="primary">chat</v-icon>
+                      </v-btn>
+                      <span>Ghi chú trên giấy tờ</span>
+                    </v-tooltip>
+                    <!--  -->
                     <v-btn title="Ký số điện tử" class="my-0" v-if="originality === 1 && showKySo && itemFileView.fileType.toLowerCase() === 'pdf'" flat icon color="indigo"
                       @click.stop="showSelectDigitalSign(itemFileView, index)"
                     >
@@ -568,6 +577,76 @@
       </v-card>
     </v-dialog>
     <!--  -->
+    <v-dialog v-model="dialog_editor_pdf" fullscreen hide-overlay scrollable transition="dialog-bottom-transition">
+      <v-card v-if="activePdfEditor && showViewerPdfEditor">
+        <v-card-text>
+          <div id="content-pdf-editor">
+            <div class="toolbar">
+              <button class="cursor" type="button" data-tooltype="cursor">➚</button>
+
+              <div class="spacer"></div>
+
+              <button class="rectangle" type="button"  data-tooltype="area" style="margin-right: 8px">&nbsp;</button>
+              <button class="highlight" type="button" data-tooltype="highlight" style="margin-right: 8px">&nbsp;</button>
+              <button class="strikeout" type="button" data-tooltype="strikeout">&nbsp;</button>
+
+              <div class="spacer"></div>
+
+              <button class="text" type="button" data-tooltype="text" style="font-weight: bold;"></button>
+              <select class="text-size mx-2"></select>
+              <div class="text-color"></div>
+
+              <div class="spacer"></div>
+
+              <button class="pen" type="button" data-tooltype="draw">✎</button>
+              <select class="pen-size mx-2"></select>
+              <div class="pen-color"></div>
+
+              <div class="spacer"></div>
+
+              <button style="display: none" class="comment" type="button" data-tooltype="point">🗨</button>
+
+              <div style="display: none" class="spacer"></div>
+
+              <select class="scale mx-2">
+                <option value=".5">50%</option>
+                <option value="1">100%</option>
+                <option value="1.33">133%</option>
+                <option value="1.5">150%</option>
+                <option value="2">200%</option>
+              </select>
+
+              <a href="javascript://" class="rotate-ccw mx-2">⟲</a>
+              <a href="javascript://" class="rotate-cw mx-2">⟳</a>
+
+              <div class="spacer"></div>
+
+              <a href="javascript://" style="display: none" class="clear" title="Clear">×</a>
+              <v-btn v-if="!onlyView" color="primary" class="mx-2" @click="saveEditor" style="color: #0167d3!important;margin-top: -4px; height: 26px;">
+                <v-icon>save</v-icon>&nbsp; Lưu &nbsp;
+              </v-btn>
+              <v-btn style="background-color: transparent !important;border-color: transparent !important;" class="right" icon @click="closeEditorPdf">
+                <v-icon>close</v-icon>
+              </v-btn>
+            </div>
+            <div id="content-wrapper" style="right: 0;">
+              <div id="viewer" class="pdfViewer" style="background-color: #eee;"></div>
+            </div>
+            <div id="comment-wrapper" style="display: none">
+              <h4>Comments</h4>
+              <div class="comment-list">
+                <div class="comment-list-container">
+                  <div class="comment-list-item">No comments</div>
+                </div>
+                <form class="comment-list-form" style="display:none;">
+                  <input type="text" placeholder="Add a Comment"/>
+                </form>
+              </div>
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -610,6 +689,9 @@ export default {
     'kho-tai-lieu': KhoTaiLieu,
   },
   data: () => ({
+    activePdfEditor: false,
+    showViewerPdfEditor: false,
+    dialog_editor_pdf: false,
     valid_ghichu: false,
     dossierTemplateItems: [],
     dossierMarksItems: [],
@@ -748,7 +830,8 @@ export default {
     showKySo: false,
     dialogSignDigital: false,
     fileKySo: '',
-    indexFileSelect: ''
+    indexFileSelect: '',
+    fileEditor: ''
   }),
   created () {
     let vm = this
@@ -757,6 +840,10 @@ export default {
     }
     try {
       vm.showKySo = showKySoDvc
+    } catch (error) {
+    }
+    try {
+      vm.activePdfEditor = activePdfEditor
     } catch (error) {
     }
   },
@@ -1165,9 +1252,8 @@ export default {
           let deliverableType = item.deliverableType ? item.deliverableType : ''
           let token = localStorage.getItem('jwt_token')
 
-          let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+          let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?referenceUid=' + referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) +'&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
           setTimeout(function () {
-            console.log('urlEmbed123123123', urlEmbed)
             document.getElementById('formAlpaca' + item.partNo + vm.id).src = ''
             setTimeout(function () {
               document.getElementById('formAlpaca' + item.partNo + vm.id).src = urlEmbed
@@ -1262,18 +1348,21 @@ export default {
     },
     saveAlpacaFormCallBack (data) {
       let vm = this
-      let dataOutPut = data.data ? data.data : ''
-      console.log('data_output new_eform_2', dataOutPut)
+      console.log('dataTBTV', data)
+      let dataOutPut = data.data ? JSON.parse(data.data) : ''
+      // console.log('data_output new_eform_2', dataOutPut, dataOutPut.tp)
       if (dataOutPut.hasOwnProperty('tp') && dataOutPut.tp) {
         let fileFind = vm.dossierFilesItems.find(itemFile => {
           // return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm && itemFile.fileSize!==0
           return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm
         })
+        console.log('fileFind', vm.dossierFilesItems, fileFind)
         if (fileFind) {
+          console.log('item put 5555', fileFind)
           fileFind['dossierId'] = vm.thongTinHoSo.dossierId
           fileFind['id'] = vm.id
           vm.loadingApacal = true
-          console.log('item put', fileFind)
+          
           vm.$store.dispatch('putAlpacaFormCallBack', fileFind).then(resData => {
             let index = vm.dossierTemplateItemsFilter.findIndex(item => item.partNo === dataOutPut.tp);
             vm.dossierTemplateItemsFilter[index]['passRequired'] = true
@@ -1299,7 +1388,7 @@ export default {
           dataOutPut['dossierId'] = vm.thongTinHoSo.dossierId
           dataOutPut['id'] = vm.id
           vm.loadingApacal = true
-          console.log('item post', dataOutPut)
+          
           vm.$store.dispatch('postEformCallBack', dataOutPut).then(resPostEform => {
             let index = vm.dossierTemplateItemsFilter.findIndex(item => item.partNo === dataOutPut.tp)
             setTimeout(function () {
@@ -1407,6 +1496,7 @@ export default {
       let vm = this
       window.removeEventListener('message', vm.receiveMessage)
       window.addEventListener('message', vm.receiveMessage)
+      console.log("message123123", window.message)
       //
       if (vm.currentFormView === 'formAlpaca' + data.partNo + vm.id) {
         vm.currentFormView = ''
@@ -1479,8 +1569,8 @@ export default {
 
         let token = localStorage.getItem('jwt_token')
 
-        let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
-        // console.log('urlEmbed', urlEmbed)
+        // let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+        let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?referenceUid=' + referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) +'&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
         setTimeout(function () {
           document.getElementById('formAlpaca' + item.partNo + vm.id).src = urlEmbed
         }, 300)
@@ -1900,7 +1990,7 @@ export default {
         return 'calc(100% - 140px)'
       } else {
         let divPx = 0
-        if (vm.originality !== 1 && item.partType === 1 && !vm.thongTinHoSo.online && vm.checkInput !== 1) {
+        if (vm.originality !== 1 && (item.partType === 1 || item.partType === 3) && !vm.thongTinHoSo.online && vm.checkInput !== 1) {
           if (!vm.onlyView) {
             divPx += 240
           } else {
@@ -2074,17 +2164,17 @@ export default {
       })
     },
     getDossierFileApplicants (applicantIdNo, fileTemplateNo) {
-      var vm = this
-      let filter = {
-        dossierId: vm.thongTinHoSo.dossierId,
-        applicantIdNo: applicantIdNo,
-        fileTemplateNo: fileTemplateNo
-      }
-      vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
-        vm.dossierFilesApplicant = result
-      }).catch(reject => {
-        console.log('error')
-      })
+      // var vm = this
+      // let filter = {
+      //   dossierId: vm.thongTinHoSo.dossierId,
+      //   applicantIdNo: applicantIdNo,
+      //   fileTemplateNo: fileTemplateNo
+      // }
+      // vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
+      //   vm.dossierFilesApplicant = result
+      // }).catch(reject => {
+      //   console.log('error')
+      // })
     },
     showFilesApplicant (partNo) {
       let vm = this
@@ -2175,6 +2265,7 @@ export default {
         filePath: data.filePath,
         fileName: data.fileName,
         fileType: data.fileExtension,
+        fileEntryId: data.fileEntryId,
         // fileName: String(data.fileName).replace(/\s/g, '')
       }
       console.log('data storage', filter)
@@ -2237,8 +2328,10 @@ export default {
       let vm = this
       vm.dossierPartAttach = part
       vm.indexPart = index
-      vm.$refs.khotailieu.initData()
       vm.dialog_documentApplicant = true
+      setTimeout(function () {
+        vm.$refs.khotailieu.initData()
+      }, 200)
     },
     changeAllFileMark (event) {
       let vm = this
@@ -2329,21 +2422,181 @@ export default {
         })
       }, 100)
     },
-    getHashStringFile (itemFile) {
+    getHashStringFile () {
       let vm = this
-      vm.$store.dispatch('getHashStringFile', itemFile).then(res => {
-        console.log('hashString', res)
-        if (res) {
-          // HashOpt: loai ma hash (0: SHA-1; 1:MD5; 2:SHA256)
-          let fileSignReturn = signHash(res, 0) /** chuỗi hash đã có chữ ký */
-
-        } else {
+      if (VtPluginSocket) {
+        VtPluginSocket.initPlugin()
+      }
+      async function getCertRunSign() {
+        VtPluginSocket.getCert()
+      }
+      getCertRunSign().then(function () {
+        vm.fileKySo['certChain'] = certChainUserVtCa
+        vm.fileKySo['dossierId'] = vm.thongTinHoSo.dossierId
+        vm.$store.dispatch('getHashStringFile', vm.fileKySo).then(res => {
+          let base64HashFile, fileName, fileEntryId
+          try {
+            base64HashFile = res.base64Hash
+            fileName = res.fileName
+            fileEntryId = res.fileEntryId
+          } catch (error) {
+          }
+          console.log('base64HashFile', res)
+          if (base64HashFile) {
+            // HashOpt: loai ma hash (0: SHA-1; 1:MD5; 2:SHA256)
+            async function signHashVtCa() {
+              VtPluginSocket.signHash(base64HashFile, 0) /** chuỗi hash đã có chữ ký */
+            }
+            signHashVtCa().then(function () {
+              let fileSignReturn = signatureBase64VtCa
+              console.log('fileSignReturn', fileSignReturn)
+              let dataInsertSignature = {
+                fileName: fileName,
+                fileEntryId: fileEntryId,
+                signatureBase64: fileSignReturn
+              }
+              vm.$store.dispatch('insertSignatureVtCa', dataInsertSignature).then(res => {
+                let dataUploadFile = {
+                  signedFileName: res['signedFileName'] ? res['signedFileName'] : ''
+                }
+                
+                vm.$store.dispatch('uploadSignatureVtCa', dataUploadFile).then(res => {
+                  let dataSigned
+                  try {
+                    dataSigned = JSON.parse(res.FileServer)
+                  } catch (error) {
+                  }
+                  let dataUpdateFile = {
+                    fileEntryIdStr: dataSigned ? dataSigned['fileEntryId'] : '',
+                    dossierFileIdStr: vm.fileKySo.dossierFileId
+                  }
+                  vm.$store.dispatch('updateSignatureVtCa', dataUpdateFile).then(res => {
+                    toastr.success('Thực hiện ký số thành công')
+                    vm.dialogSignDigital = false
+                    vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+                      vm.dossierFilesItems = resFiles
+                    }).catch(reject => {
+                    })
+                  }).catch(function() {
+                    toastr.error('Lỗi trong quá trình cập nhật tài liệu ký số')
+                  })
+                }).catch(function() {
+                  toastr.error('Lỗi trong quá trình cập nhật tài liệu ký số')
+                })
+              }).catch(function() {
+                toastr.error('Lỗi trong quá trình cập nhật tài liệu ký số')
+              })
+            })
+            
+          } else {
+            toastr.error('Tải tài liệu ký số lên không thành công')
+          }
+          
+        }).catch(reject => {
           toastr.error('Tải tài liệu ký số lên không thành công')
-        }
-        
-      }).catch(reject => {
-        toastr.error('Tải tài liệu ký số lên không thành công')
+        })
       })
+      
+    },
+    showEditorPdf (file) {
+      let vm = this
+      vm.showViewerPdfEditor = true
+      $(".toolbar .text-color").html("")
+      $(".toolbar .pen-color").html("")
+      if (typeof(Storage) !== "undefined") {
+        for(let key in localStorage) {
+          if (key.indexOf('/preview.pdf/') > 0) {
+            localStorage.removeItem(key)
+          }
+        }
+      } else {
+      }
+      vm.fileEditor = file
+      let urlPreview = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.thongTinHoSo['dossierId'] + '/files/' + file['referenceUid'] + '/preview.pdf'
+      let defaultEditor = {}
+      defaultEditor[urlPreview + '/text/size'] = '14'
+      defaultEditor[urlPreview + '/text/color'] = '#EF4437'
+      defaultEditor[urlPreview + '/pen/size'] = '1'
+      defaultEditor[urlPreview + '/pen/color'] = '#EF4437'
+      defaultEditor[urlPreview + '/tooltype'] = 'text'
+      defaultEditor[urlPreview + '/scale'] = '1.33'
+      defaultEditor[urlPreview + '/rotate'] = '0'
+      if (vm.fileEditor['signInfo']) {
+        defaultEditor[urlPreview + '/annotations'] = vm.fileEditor['signInfo']
+      }
+      
+      if (typeof(Storage) !== "undefined") {
+        for(let key in defaultEditor) {
+          localStorage.setItem(key, defaultEditor[key])
+        }
+      } else {
+      }
+      vm.dialog_editor_pdf = true
+      
+      setTimeout(function () {
+        initPdf(urlPreview)
+      }, 200)
+    },
+    saveEditor() {
+      let vm = this
+      console.log('fileEditor', vm.fileEditor)
+      let x = confirm('Bạn có chắc chắn lưu các ghi chú cho giấy tờ này?')
+      if (x) {
+        let urlPreview = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.thongTinHoSo['dossierId'] + '/files/' + vm.fileEditor['referenceUid'] + '/preview.pdf'
+        if (typeof(Storage) !== "undefined") {
+          let anotations = localStorage.getItem(urlPreview + '/annotations')
+          // call save annotation sau khi update anotation -> get lại dossierFile + close dialog
+          let filter = {
+            dossierFileId: vm.fileEditor.dossierFileId,
+            annotation: anotations
+          }
+          vm.$store.dispatch('saveEditor', filter).then(function (result) {
+            vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+              vm.dossierFilesItems = resFiles
+            }).catch(reject => {
+            })
+            vm.dialog_editor_pdf = false
+            vm.showViewerPdfEditor = false
+          }).catch(function () {
+            toastr.error('Lưu ghi chú thất bại')
+          })          
+        } else {
+        }
+      }
+    },
+    closeEditorPdf() {
+      let vm = this
+      if (!vm.onlyView) {
+        let x = confirm('Bạn có muốn lưu các ghi chú cho giấy tờ này?')
+        if (x) {
+          let urlPreview = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.thongTinHoSo['dossierId'] + '/files/' + vm.fileEditor['referenceUid'] + '/preview.pdf'
+          if (typeof(Storage) !== "undefined") {
+            let anotations = localStorage.getItem(urlPreview + '/annotations')
+            // call save annotation sau khi update anotation -> get lại dossierFile + close dialog
+            let filter = {
+              dossierFileId: vm.fileEditor.dossierFileId,
+              annotation: anotations
+            }
+            vm.$store.dispatch('saveEditor', filter).then(function (result) {
+              vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+                vm.dossierFilesItems = resFiles
+              }).catch(reject => {
+              })
+              vm.dialog_editor_pdf = false
+              vm.showViewerPdfEditor = false
+            }).catch(function () {
+              toastr.error('Lưu ghi chú thất bại')
+            })
+          }
+        } else {
+          vm.dialog_editor_pdf = false
+          vm.showViewerPdfEditor = false
+        }
+      } else {
+        vm.dialog_editor_pdf = false
+        vm.showViewerPdfEditor = false
+      }
+      
     }
   }
 }

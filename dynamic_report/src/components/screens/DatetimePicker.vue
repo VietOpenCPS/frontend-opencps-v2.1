@@ -11,8 +11,8 @@
         <v-text-field
             slot="activator"
             append-icon="event"
-            @blur="toDate = parseDate(toDateFormatted)"
-            :value="formatDate(rawDate)"
+            @change="toDate = parseDate(toDateFormatted)"
+            v-model="toDateFormatted"
             :rules="[rules.required]"
         >
             <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
@@ -49,10 +49,10 @@
         vm.$nextTick(function () {
             // console.log('input data: ', vm.dataValue)
             vm.rawDate = vm.parseDate(vm.dataValue)
+            vm.toDateFormatted = vm.dataValue
             if (vm.item.hasOwnProperty('before')) {
                 let dataMax = vm.dataAll[vm.item['before']]
                 let dataMaxConvert = vm.parseDate(dataMax)
-                // console.log('dataMax: ', dataMaxConvert)
                 vm.maxDate = dataMaxConvert
             } else {
                 vm.maxDate = null
@@ -71,7 +71,8 @@
         toDate (val) {
             let vm = this
             vm.toDateFormatted = vm.formatDate(val)
-            vm.rawDate = vm.parseDate(vm.toDateFormatted)
+            // vm.rawDate = vm.parseDate(vm.toDateFormatted)
+            console.log('toDateFormatted', vm.toDateFormatted, vm.rawDate)
             vm.$emit('input', new Date(val).getTime())
             vm.$emit('change', new Date(val).getTime())
             // vm.$parent.reloadPicker()

@@ -19,7 +19,7 @@
                         {{item.partName}} <span v-if="item.required" style="color: red"> (*)</span>
                         &nbsp;&nbsp;
 
-                        <span v-if="item.hasForm" style="color:#004b94">(Bản khai trực tuyến)</span>
+                        <span v-if="item.hasForm || item.eForm" style="color:#004b94">(Giấy tờ nhập trực tuyến)</span>
                         &nbsp;&nbsp;
 
                       </div>
@@ -34,6 +34,14 @@
                           {{itemFileView.displayName}} - 
                           <i>{{itemFileView.modifiedDate}}</i>
                         </span>
+                        <!--  -->
+                        <v-tooltip top v-if="originality === 3 && activePdfEditor && itemFileView['fileType'].toLocaleLowerCase() === 'pdf'">
+                          <v-btn slot="activator" icon ripple v-on:click.stop="showEditorPdf(itemFileView)" class="mx-0 my-0">
+                            <v-icon size="14" color="primary">chat</v-icon>
+                          </v-btn>
+                          <span>Ghi chú trên giấy tờ</span>
+                        </v-tooltip>
+                        <!--  -->
                         <v-btn title="Xóa" icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index2, index)" class="mx-0 my-0">
                           <v-icon style="color: red">delete_outline</v-icon>
                         </v-btn>
@@ -129,14 +137,14 @@
                   indeterminate
                   v-if="progressUploadPart + id === item.partNo + id"
                   ></v-progress-circular>
-                  <!-- <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id & item.eForm">
-                    <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item)">
+                  <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id && item.eForm">
+                    <v-btn slot="activator" icon class="mx-0 my-0" @click="loadAlpcaFormClick(item)">
                       <v-badge>
                         <v-icon size="24" color="#004b94">edit</v-icon>
                       </v-badge>
                     </v-btn>
-                    <span>Khai trực tuyến</span>
-                  </v-tooltip> -->
+                    <span>Giấy tờ nhập trực tuyến</span>
+                  </v-tooltip>
                   <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id">
                     <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
                       <v-badge>
@@ -272,6 +280,77 @@
       </v-card>
     </v-dialog>
     <!--  -->
+    <!--  -->
+    <v-dialog v-model="dialog_editor_pdf" fullscreen hide-overlay scrollable transition="dialog-bottom-transition">
+      <v-card v-if="activePdfEditor && showViewerPdfEditor">
+        <v-card-text>
+          <div id="content-pdf-editor">
+            <div class="toolbar">
+              <button class="cursor" type="button" data-tooltype="cursor">➚</button>
+
+              <div class="spacer"></div>
+
+              <button class="rectangle" type="button"  data-tooltype="area" style="margin-right: 8px">&nbsp;</button>
+              <button class="highlight" type="button" data-tooltype="highlight" style="margin-right: 8px">&nbsp;</button>
+              <button class="strikeout" type="button" data-tooltype="strikeout">&nbsp;</button>
+
+              <div class="spacer"></div>
+
+              <button class="text" type="button" data-tooltype="text" style="font-weight: bold;"></button>
+              <select class="text-size mx-2"></select>
+              <div class="text-color"></div>
+
+              <div class="spacer"></div>
+
+              <button class="pen" type="button" data-tooltype="draw">✎</button>
+              <select class="pen-size mx-2"></select>
+              <div class="pen-color"></div>
+
+              <div class="spacer"></div>
+
+              <button style="display: none" class="comment" type="button" data-tooltype="point">🗨</button>
+
+              <div style="display: none" class="spacer"></div>
+
+              <select class="scale mx-2">
+                <option value=".5">50%</option>
+                <option value="1">100%</option>
+                <option value="1.33">133%</option>
+                <option value="1.5">150%</option>
+                <option value="2">200%</option>
+              </select>
+
+              <a href="javascript://" class="rotate-ccw mx-2">⟲</a>
+              <a href="javascript://" class="rotate-cw mx-2">⟳</a>
+
+              <div class="spacer"></div>
+
+              <a href="javascript://" style="display: none" class="clear" title="Clear">×</a>
+              <v-btn v-if="!onlyView" color="primary" class="mx-2" @click="saveEditor" style="color: #0167d3!important;margin-top: -4px; height: 26px;">
+                <v-icon>save</v-icon>&nbsp; Lưu &nbsp;
+              </v-btn>
+              <v-btn style="background-color: transparent !important;border-color: transparent !important;" class="right" icon @click="closeEditorPdf">
+                <v-icon>close</v-icon>
+              </v-btn>
+            </div>
+            <div id="content-wrapper" style="right: 0;">
+              <div id="viewer" class="pdfViewer" style="background-color: #eee;"></div>
+            </div>
+            <div id="comment-wrapper" style="display: none">
+              <h4>Comments</h4>
+              <div class="comment-list">
+                <div class="comment-list-container">
+                  <div class="comment-list-item">No comments</div>
+                </div>
+                <form class="comment-list-form" style="display:none;">
+                  <input type="text" placeholder="Add a Comment"/>
+                </form>
+              </div>
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
 
   </div>
 </template>
@@ -307,6 +386,9 @@
       'ho-so-nhom': HoSoTrongNhom
     },
     data: () => ({
+      dialog_editor_pdf: false,
+      activePdfEditor: false,
+      showViewerPdfEditor: false,
       dialogConfirm: false,
       labelConfirm: '',
       dossierTemplateItems: [],
@@ -342,7 +424,8 @@
       active: true,
       loadingApacal: false,
       thaoTacGop: false,
-      doNotSign: false
+      doNotSign: false,
+      fileEditor: ''
     }),
     computed: {
       loading () {
@@ -367,6 +450,10 @@
     },
     created () {
       let vm = this
+      try {
+        vm.activePdfEditor = activePdfEditor
+      } catch (error) {
+      }
       let currentQuery = vm.$router.history.current.query
       if (currentQuery.hasOwnProperty('dossiers')) {
         vm.thaoTacGop = true
@@ -543,7 +630,7 @@
 
             let token = localStorage.getItem('jwt_token')
 
-            let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+            let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '___' + deliverableType + '?referenceUid=' +  referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) + '&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
             console.log('urlEmbed', urlEmbed)
             setTimeout(function () {
               document.getElementById('formAlpaca' + item.partNo + vm.id + 'embed').src = ''
@@ -607,7 +694,8 @@
 
               let token = localStorage.getItem('jwt_token')
 
-              let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+              // let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+              let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '___' + deliverableType + '?referenceUid=' +  referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) + '&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
               console.log('urlEmbed', urlEmbed)
               setTimeout(function () {
                 document.getElementById('formAlpaca' + item.partNo + vm.id + 'embed').src = urlEmbed
@@ -729,8 +817,7 @@
       },
       saveAlpacaFormCallBack (data) {
         let vm = this
-        let dataOutPut = data.data ? data.data : ''
-        // console.log('data_output eform', dataOutPut)
+        let dataOutPut = data.data ? JSON.parse(data.data) : ''
         if (dataOutPut.hasOwnProperty('tp') && dataOutPut.tp) {
           let fileFind = vm.dossierFilesItems.find(itemFile => {
             return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm && itemFile.fileSize!==0
@@ -755,8 +842,8 @@
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
           } else {
+            console.log('item post 3123123', dataOutPut, vm.detailDossier)
             dataOutPut['dossierId'] = vm.detailDossier.dossierId
-            console.log('item post', dataOutPut)
             vm.$store.dispatch('postEformCallBack', dataOutPut).then(resPostEform => {
               let index = vm.createFiles.findIndex(item => item.partNo === dataOutPut.tp)
               setTimeout(function () {
@@ -778,6 +865,7 @@
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
           }
+        } else {
         }
       },
       pickFile (item) {
@@ -973,8 +1061,8 @@
 
           let token = localStorage.getItem('jwt_token')
 
-          let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
-
+          // let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+          let urlEmbed = eformScript.eformEmbed + '/' + item.templateFileNo + '___' + deliverableType + '?referenceUid=' +  referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) + '&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
           setTimeout(function () {
             document.getElementById('formAlpaca' + item.partNo + vm.id + 'embed').src = urlEmbed
           }, 500)
@@ -1580,6 +1668,104 @@
             color: 'primary',
             size: 14
           }
+        }
+      },
+      showEditorPdf (file) {
+        let vm = this
+        vm.showViewerPdfEditor = true
+        $(".toolbar .text-color").html("")
+        $(".toolbar .pen-color").html("")
+        if (typeof(Storage) !== "undefined") {
+          for(let key in localStorage) {
+            if (key.indexOf('/preview.pdf/') > 0) {
+              localStorage.removeItem(key)
+            }
+          }
+        } else {
+        }
+        vm.fileEditor = file
+        let urlPreview = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.detailDossier['dossierId'] + '/files/' + file['referenceUid'] + '/preview.pdf'
+        let defaultEditor = {}
+        defaultEditor[urlPreview + '/text/size'] = '14'
+        defaultEditor[urlPreview + '/text/color'] = '#EF4437'
+        defaultEditor[urlPreview + '/pen/size'] = '1'
+        defaultEditor[urlPreview + '/pen/color'] = '#EF4437'
+        defaultEditor[urlPreview + '/tooltype'] = 'text'
+        defaultEditor[urlPreview + '/scale'] = '1.33'
+        defaultEditor[urlPreview + '/rotate'] = '0'
+        if (vm.fileEditor['signInfo']) {
+          defaultEditor[urlPreview + '/annotations'] = vm.fileEditor['signInfo']
+        }
+        
+        if (typeof(Storage) !== "undefined") {
+          for(let key in defaultEditor) {
+            localStorage.setItem(key, defaultEditor[key])
+          }
+        } else {
+        }
+        vm.dialog_editor_pdf = true
+        setTimeout(function () {
+          initPdf(urlPreview)
+        }, 200)
+      },
+      saveEditor() {
+        let vm = this
+        console.log('fileEditor', vm.fileEditor)
+        let x = confirm('Bạn có chắc chắn lưu các ghi chú cho giấy tờ này?')
+        if (x) {
+          let urlPreview = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.detailDossier['dossierId'] + '/files/' + vm.fileEditor['referenceUid'] + '/preview.pdf'
+          if (typeof(Storage) !== "undefined") {
+            let anotations = localStorage.getItem(urlPreview + '/annotations')
+            // call save annotation sau khi update anotation -> get lại dossierFile + close dialog
+            let filter = {
+              dossierFileId: vm.fileEditor.dossierFileId,
+              annotation: anotations
+            }
+            vm.$store.dispatch('saveEditor', filter).then(function (result) {
+              vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
+                vm.dossierFilesItems = resFiles
+              }).catch(reject => {
+              })
+              vm.dialog_editor_pdf = false
+              vm.showViewerPdfEditor = false
+            }).catch(function () {
+              toastr.error('Lưu ghi chú thất bại')
+            })          
+          } else {
+          }
+        }
+      },
+      closeEditorPdf() {
+        let vm = this
+        if (!vm.onlyView) {
+          let x = confirm('Bạn có muốn lưu các ghi chú cho giấy tờ này?')
+          if (x) {
+            let urlPreview = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.thongTinHoSo['dossierId'] + '/files/' + vm.fileEditor['referenceUid'] + '/preview.pdf'
+            if (typeof(Storage) !== "undefined") {
+              let anotations = localStorage.getItem(urlPreview + '/annotations')
+              // call save annotation sau khi update anotation -> get lại dossierFile + close dialog
+              let filter = {
+                dossierFileId: vm.fileEditor.dossierFileId,
+                annotation: anotations
+              }
+              vm.$store.dispatch('saveEditor', filter).then(function (result) {
+                vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+                  vm.dossierFilesItems = resFiles
+                }).catch(reject => {
+                })
+                vm.dialog_editor_pdf = false
+                vm.showViewerPdfEditor = false
+              }).catch(function () {
+                toastr.error('Lưu ghi chú thất bại')
+              })
+            }
+          } else {
+            vm.dialog_editor_pdf = false
+            vm.showViewerPdfEditor = false
+          }
+        } else {
+          vm.dialog_editor_pdf = false
+          vm.showViewerPdfEditor = false
         }
       }
     }

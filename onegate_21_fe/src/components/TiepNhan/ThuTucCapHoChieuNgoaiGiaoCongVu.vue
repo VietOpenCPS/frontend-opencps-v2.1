@@ -1831,7 +1831,10 @@ export default {
         dossierFileArr: {
             deep: true,
             handler:  (val, oldVal) => {
-                $('#dossierFileArr_hidden').val(JSON.stringify(val))
+                let dataOut = val.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
             }
         },
         dossierMarkArr: {
@@ -2229,8 +2232,27 @@ export default {
                     }
                 }).catch(err => {
                     vm.eFormCode = ''
-                     toastr.error('Mã tờ khai không tìm thấy') 
+                    toastr.error('Mã tờ khai không tìm thấy') 
                 }) 
+                // 
+                let filterGetDetailEform = {
+                  eFormNo: vm.eFormCode
+                }
+                vm.$store.dispatch('getThongTinToKhai', filterGetDetailEform).then(function (response) {
+                  console.log('eformInfomation', response)
+                  if (response && response.hasOwnProperty('eFormId') && response.hasOwnProperty('secret')) {
+                      let filterGetFileEform = {
+                          eFormId: response.eFormId,
+                          secret: response.secret
+                      }
+                      vm.$store.dispatch('getFileToKhai', filterGetFileEform).then(function (responseFile) {
+                          let partNoEform = response.fileTemplateNo.split('_')[0]
+                          let fileEform = [{fileEntryId: responseFile ? responseFile : 0, partNo: partNoEform, eform: false, displayName: 'Tờ khai - ' +  response.eFormNo}]
+                          vm.dossierFileArr = vm.dossierFileArr.concat(fileEform)
+                      }).catch(function (reject) {
+                      })
+                  }
+                }).catch({})
             }
         },
         fillDataEform (res) {
@@ -2258,12 +2280,15 @@ export default {
                 if (!vanban) {
                     vm.listVanBan.push(tg)
                     for (let i =0; i< vm.dossierFileArr.length; i++){
-                        if(vm.dossierFileArr[i]['partNo'] === 'TP02'){
+                        if(vm.dossierFileArr[i]['partNo'] === 'TP02' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                             vm.dossierFileArr[i]['formData'] = JSON.stringify({'van_ban': vm.listVanBan})
                             vm.dossierFileArr[i]['eform'] = 'true'
                         }
                     }
-                    $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+                    let dataOut = vm.dossierFileArr.filter(function (item) {
+                        return item.formData || (!item.formData && item.fileEntryId)
+                    })
+                    $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
                     vm.genSelectCQCQ()
                 }
             }
@@ -2379,12 +2404,15 @@ export default {
                 
                 // Day  formData vao dossierFileArr 
                 for (let i =0; i< vm.dossierFileArr.length; i++){
-                    if(vm.dossierFileArr[i]['partNo'] === 'TP01'){
+                    if(vm.dossierFileArr[i]['partNo'] === 'TP01'  && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                         vm.dossierFileArr[i]['formData'] = JSON.stringify({'thanh_vien_doan': vm.listThanhVien})
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
                 }
-                $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+                let dataOut = vm.dossierFileArr.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
 
                 // 
                 vm.cong_ham_so_nguoi = vm.listThanhVien.filter(e => e.cong_ham).length
@@ -2511,12 +2539,15 @@ export default {
                 vm.genSelectCQCQ()
                 
                 for (let i =0; i< vm.dossierFileArr.length; i++){
-                    if(vm.dossierFileArr[i]['partNo'] === 'TP02'){
+                    if(vm.dossierFileArr[i]['partNo'] === 'TP02' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                         vm.dossierFileArr[i]['formData'] = JSON.stringify({'van_ban': vm.listVanBan})
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
                 }
-                $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+                let dataOut = vm.dossierFileArr.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
                 vm.dialogThemVanBan = false
             } else {
                 toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
@@ -2596,12 +2627,15 @@ export default {
                 }
                 vm.so_nguoi = vm.listThanhVien.length
                 for (let i=0; i<vm.dossierFileArr.length; i++){
-                    if(vm.dossierFileArr[i]['partNo'] == 'TP01'){
+                    if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                         vm.dossierFileArr[i]['formData'] = JSON.stringify({'thanh_vien_doan': vm.listThanhVien })
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
                 }
-                $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+                let dataOut = vm.dossierFileArr.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
                 vm.cong_ham_so_nguoi = vm.listThanhVien.filter(e => e.cong_ham).length
 
                 vm.countPassport()
@@ -2720,13 +2754,16 @@ export default {
             let vm = this
             vm.listThanhVien.splice(index,1)
             for (let i =0; i< vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] === 'TP01'){
+                if(vm.dossierFileArr[i]['partNo'] === 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                     vm.dossierFileArr[i]['formData'] = JSON.stringify({'thanh_vien_doan': vm.listThanhVien})
                     vm.dossierFileArr[i]['eform'] = 'true'
                 }
             }
             vm.so_nguoi = vm.listThanhVien.length
-            $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+            let dataOut = vm.dossierFileArr.filter(function (item) {
+                return item.formData || (!item.formData && item.fileEntryId)
+            })
+            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
         },
         checkThanhVien (index) {
             let vm = this
@@ -2740,12 +2777,20 @@ export default {
             if(!vm.checkThanhVien(index)){
                 vm.listVanBan.splice(index,1)
                 for (let i =0; i< vm.dossierFileArr.length; i++){
-                    if(vm.dossierFileArr[i]['partNo'] === 'TP02'){
+                    if(vm.dossierFileArr[i]['partNo'] === 'TP02' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
                         vm.dossierFileArr[i]['formData'] = JSON.stringify({'van_ban': vm.listVanBan})
                         vm.dossierFileArr[i]['eform'] = 'true'
                     }
                 }
-                $('#dossierFileArr_hidden').val(JSON.stringify(vm.dossierFileArr))
+                // 
+                vm.dossierFileArr = vm.dossierFileArr.filter(function (item) {
+                    return !item.hasOwnProperty('fileEntryId')
+                })
+                // 
+                let dataOut = vm.dossierFileArr.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
                 this.genSelectCQCQ()
             } else {
                 toastr.error('Văn bản quyết định đã được sử dụng. Phải xóa thành viên sử dụng văn bản quyết định ' + vm.listVanBan[index].vb_so_hieu_van_ban + ' - ' + vm.listVanBan[index].vb_ngay_ky + ' - ' + vm.listVanBan[index].vb_co_quan_chu_quan)
@@ -2784,7 +2829,7 @@ export default {
             
             let file_payment2 = new Array();
             file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 160000, 'thanh_tien': lp_moi};
-            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_gia_han};
+            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 80000, 'thanh_tien': lp_gia_han};
             file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 320000, 'thanh_tien': lp_hong};
             file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp công hàm đề nghị cấp thị thực', 'partName': 'Công hàm', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_cong_ham, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_cong_ham};
 

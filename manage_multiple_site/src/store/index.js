@@ -200,6 +200,40 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDossiersFromDvc ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let params = {
+          agency: filter.agency,
+          domain: filter.domain,
+          service: filter.service,
+          dossierNo: filter.dossierNo,
+          order: true,
+          start: filter.start,
+          end: filter.end
+        }
+        let dataPost = new URLSearchParams()
+        let textPost = params
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/dossiers')
+        dataPost.append('data', JSON.stringify(textPost))
+
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+          let serializable = response.data
+          if (serializable) {
+            resolve(serializable)
+          } else {
+            resolve({total: 0})
+          }
+        }, error => {
+          reject(error)
+        })
+      })
+    },
     getDetailDossier ({ commit, state }, data) {
       store.dispatch('loadInitResource').then(function (result) {
         let param = {

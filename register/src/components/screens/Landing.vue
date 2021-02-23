@@ -24,16 +24,9 @@
                 <v-radio label="Công dân" :value="'1'" class="mr-2"></v-radio>
                 <v-radio label="Tổ chức, doanh nghiệp" :value="'2'" class="mr-2"></v-radio>
               </v-radio-group>
-              <v-flex xs12>
-                <div style="position:relative">
+              <v-flex xs12 v-if="applicantType === '1'">
+                <div>
                   <span>{{applicantType === '1' ? 'Họ và tên ' : (applicantType === '2' ? 'Tên tổ chức, doanh nghiệp ' : 'Tên cơ quan, tổ chức ')}}</span> <span style="color:red">(*)</span>
-                  <v-tooltip left v-if="applicantType === '2' && bussinessExits" style="position:absolute;top:-5px;right:-3px">
-                    <v-btn slot="activator" class="my-0" fab icon small dark color="primary" @click.native="getApplicantInfos()" style="width:26px!important;height:26px!important"
-                    >
-                      <v-icon dark>account_balance</v-icon>
-                    </v-btn>
-                    <span>Đối chiếu thông tin doanh nghiệp</span>
-                  </v-tooltip>
                 </div>
                 <v-text-field
                   :placeholder="applicantType === '1' ? 'Họ và tên ' : (applicantType === '2' ? 'Tên tổ chức, doanh nghiệp ' : 'Tên cơ quan, tổ chức ')"
@@ -41,21 +34,51 @@
                   box
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
-                  @input="changeApplicantInfos"
-                  :disabled="loadingVerify"
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12>
-                <div><span>{{applicantType === '1' ? 'Số CMND/ Hộ chiếu ' : (applicantType === '2' ? 'Mã số thuế ' : 'Mã cơ quan, tổ chức ')}}</span> <span style="color:red">(*)</span></div>
+              <v-flex xs12 style="position: relative;">
+                <div><span>{{applicantType === '1' ? 'Số CMND/ Hộ chiếu ' : (applicantType === '2' ? 'Mã số ĐKKD, mã số thuế ' : 'Mã cơ quan, tổ chức ')}}</span> <span style="color:red">(*)</span></div>
                 <v-text-field
-                  :placeholder="applicantType === '1' ? 'Số CMND/ Hộ chiếu ' : (applicantType === '2' ? 'Mã số thuế ' : 'Mã cơ quan, tổ chức ')"
+                  :placeholder="applicantType === '1' ? 'Số CMND/ Hộ chiếu ' : (applicantType === '2' ? 'Mã số ĐKKD, mã số thuế ' : 'Mã cơ quan, tổ chức ')"
                   v-model="applicantIdNo"
                   box
                   :rules="applicantType === '1' ? [rules.required, rules.credit] : (applicantType === '2' ? [rules.required, rules.taxCode] : [rules.required])"
                   required
                   @input="changeApplicantInfos"
-                  :disabled="loadingVerify"
                 ></v-text-field>
+                <div style="display: inline-block;position:absolute;top:25px;right:-3px" v-if="applicantType === '2' && bussinessExits">
+                  <v-tooltip left>
+                    <v-btn slot="activator" class="my-0" fab icon small dark color="primary" @click.native="showApplicantInfos()" style="width:26px!important;height:26px!important"
+                    >
+                      <v-icon dark>account_balance</v-icon>
+                    </v-btn>
+                    <span>Thông tin doanh nghiệp</span>
+                  </v-tooltip>
+                </div>
+              </v-flex>
+              <v-flex xs12 v-if="applicantType === '2'">
+                <div v-if="!validBussinessInfos && hasCheckBussiness" class="mb-2">
+                  <v-chip color="red" outline text-color="red" class="mx-0" style="width: 100%">
+                    <v-avatar>
+                      <v-icon size=18>warning</v-icon>
+                    </v-avatar>
+                    <span v-if="!bussinessExits">{{'Mã số ĐKKD, mã số thuế ' + applicantIdNo + ' không chính xác'}}</span>
+                    <span v-if="bussinessExits && !bussinessStatus">{{'Doanh nghiệp mã số thuế ' + applicantIdNo + ' không còn hoạt động'}}</span>
+                  </v-chip>
+                </div>
+                <div>
+                  <span>{{applicantType === '1' ? 'Họ và tên ' : (applicantType === '2' ? 'Tên tổ chức, doanh nghiệp ' : 'Tên cơ quan, tổ chức ')}}</span> <span style="color:red">(*)</span>
+                </div>
+                <v-textarea
+                  :placeholder="applicantType === '1' ? 'Họ và tên ' : (applicantType === '2' ? 'Tên tổ chức, doanh nghiệp ' : 'Tên cơ quan, tổ chức ')"
+                  v-model="applicantName"
+                  box
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  required
+                  :disabled="loadingVerify"
+                  rows="2"
+                  class="text-area-custom"
+                ></v-textarea>
               </v-flex>
               <v-flex xs12>
                 <div>Ngày cấp <span style="color:red">(*)</span></div>
@@ -101,7 +124,7 @@
                 <v-text-field
                   placeholder="Số điện thoại"
                   v-model="contactTelNo"
-                  :rules="requiredOption['contactTelNo'] ? [rules.required, rules.telNo] : [rules.telNo]"
+                  :rules="requiredOption['contactTelNo'] ? [rules.required, rules.telNo] : (contactTelNo ? [rules.telNo]: [])"
                   box
                   browser-autocomplete="off"
                 ></v-text-field>
@@ -227,19 +250,19 @@
               <div class="my-2"><span class="text-bold">Tên tổ chức, doanh nghiệp: </span> <span>{{applicantInfos.applicantName}}</span></div>
             </v-flex>
             <v-flex xs12 class="px-2">
-              <div class="my-2"><span class="text-bold">Mã số thuế: </span> <span>{{applicantInfos.applicantIdNo}}</span></div>
+              <div class="mb-2"><span class="text-bold">Mã số ĐKKD, mã số thuế: </span> <span>{{applicantInfos.applicantIdNo}}</span></div>
             </v-flex>
             <v-flex xs12 class="px-2">
-              <div class="my-2"><span class="text-bold">Loại hình doanh nghiệp: </span> <span>{{applicantInfos.companyType}}</span></div>
+              <div class="mb-2"><span class="text-bold">Ngày thành lập: </span> <span>{{applicantInfos.applicantDate}}</span></div>
             </v-flex>
             <v-flex xs12 class="px-2">
-              <div class="my-2"><span class="text-bold">Địa chỉ:</span> <span>{{applicantInfos.address}}</span></div>
+              <div class="mb-2"><span class="text-bold">Loại hình doanh nghiệp: </span> <span>{{applicantInfos.companyType}}</span></div>
             </v-flex>
             <v-flex xs12 class="px-2">
-              <div class="my-2"><span class="text-bold">Người đại diện: </span> <span>{{applicantInfos.representatives}}</span></div>
+              <div class="mb-2"><span class="text-bold">Địa chỉ:</span> <span>{{applicantInfos.address}}</span></div>
             </v-flex>
             <v-flex xs12 class="px-2">
-              <div class="my-2"><span class="text-bold">Tình trạng: </span> <span>{{applicantInfos.companyStatus}}</span></div>
+              <div class="mb-2"><span class="text-bold">Tình trạng: </span> <span>{{applicantInfos.companyStatus}}</span></div>
             </v-flex>
           </v-layout>
         </v-card-text>
@@ -250,6 +273,27 @@
             Thoát
           </v-btn>
         </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog scrollable v-model="dialogApplicantType" persistent max-width="450">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Đối tượng đăng ký</v-toolbar-title>
+        </v-toolbar>
+        <v-card-text >
+          <v-flex class="text-xs-center">
+            <v-btn class="mr-2" color="primary" @click.native="chosseType('1')"
+            >
+              <v-icon>how_to_reg</v-icon>&nbsp;
+              Công dân
+            </v-btn>
+            <v-btn class="ml-3" color="primary" @click.native="chosseType('2')"
+            >
+              <v-icon style="color: #fff">account_balance</v-icon>&nbsp;
+              Doanh nghiệp
+            </v-btn>
+          </v-flex>
+        </v-card-text>
       </v-card>
     </v-dialog>
   </div>
@@ -274,6 +318,7 @@ export default {
     'captcha': Captcha
   },
   data: () => ({
+    dialogApplicantType: false,
     date: null,
     dialogPending: false,
     dialogRules: false,
@@ -282,6 +327,7 @@ export default {
     applicantInfos: {
       applicantName: '',
       applicantIdNo: '',
+      applicantDate: '',
       companyType: '',
       companyStatus: '',
       address: '',
@@ -303,7 +349,10 @@ export default {
     rePassWord: '',
     agreeRules: false,
     functionTimeOut: null,
+    hasCheckBussiness: false,
     bussinessExits: false,
+    bussinessStatus: false,
+    bussinessInfomation: '',
     validBussinessInfos: true,
     messageCheckApplicant: '',
     ruleContent: '',
@@ -341,10 +390,10 @@ export default {
       taxCode: (value) => {
         if (value.length === 10) {
           const pattern = /^(([0-9]{10,10}))$/
-          return pattern.test(value) || 'Mã số thuế gồm 10 hoặc 13 ký tự 0-9'
+          return pattern.test(value) || 'Mã số ĐKKD, mã số thuế gồm 10 hoặc 13 ký tự 0-9'
         } else {
           const pattern = /^(([0-9]{13,13}))$/
-          return pattern.test(value) || 'Mã số thuế gồm 10 hoặc 13 ký tự 0-9'
+          return pattern.test(value) || 'Mã số ĐKKD, mã số thuế gồm 10 hoặc 13 ký tự 0-9'
         }
       },
       credit: (value) => {
@@ -393,11 +442,18 @@ export default {
         }
       } catch (error) {
       }
+      try {
+        vm.hasCheckBussiness = hasCheckBussiness
+      } catch (error) {
+      }
       let current = vm.$router.history.current
       let currentQuery = current.query
       vm.getDieuKhoan()
       // mappping user dvcqg
       console.log('currentQuery', currentQuery)
+      if (currentQuery.hasOwnProperty('applycantType') && currentQuery['applycantType']) {
+        vm.dialogApplicantType = true
+      }
       if (currentQuery.hasOwnProperty('name') && currentQuery['name']) {
         console.log('currentQuery 2', currentQuery['type'], currentQuery['name'], currentQuery['tel'])
         vm.applicantType = currentQuery.hasOwnProperty('type') ? (String(currentQuery['type']) === '1' ? '1' : '2') : '1'
@@ -447,6 +503,11 @@ export default {
     }
   },
   methods: {
+    chosseType(type) {
+      let vm = this
+      vm.applicantType = type
+      vm.dialogApplicantType = false
+    },
     submitAddUser () {
       let vm = this
       let currentQuery = vm.$router.history.current.query
@@ -465,12 +526,16 @@ export default {
       }
       console.log('dataForm', dataForm)
       if (vm.$refs.form.validate() && vm.agreeRules) {
-        let passValid = false
-        if (!vm.validBussinessInfos) {
-          let x = confirm(vm.messageCheckApplicant + ' Bạn có muốn tiếp tục?')
-          if (x) {
-            passValid = true
+        let passValid = true
+        if (vm.applicantType === '2' && vm.hasCheckBussiness && (!vm.bussinessExits || !vm.bussinessStatus || 
+          (vm.bussinessExits && vm.bussinessStatus && vm.applicantName.toLocaleLowerCase().trim() !== vm.bussinessInfomation['NAME'].toLocaleLowerCase().trim()))
+        ) {
+          passValid = false
+          if (vm.applicantName.toLocaleLowerCase().trim() !== vm.bussinessInfomation['NAME'].toLocaleLowerCase().trim()) {
+            vm.messageCheckApplicant = 'Vui lòng nhập tên tổ chức, doanh nghiệp đúng với tên đăng ký kinh doanh'
           }
+          toastr.error(vm.messageCheckApplicant)
+          return
         } else { passValid = true }
         if (passValid) {
           vm.loading = true
@@ -504,75 +569,93 @@ export default {
           }
 
         }
+      } else {
+        toastr.error('Vui lòng điền đầy đủ thông tin đăng ký')
       }
     },
     changeApplicantType () {
-      var vm = this
+      let vm = this
       // console.log(vm.applicantType)
-      if (vm.applicantType === '2') {
-        vm.validBussinessInfos = true
-      }
-      vm.changeApplicantInfos()
+      setTimeout(function () {
+        if (vm.applicantType === '2') {
+          vm.validBussinessInfos = true
+        } else {
+          vm.validBussinessInfos = false
+          vm.bussinessExits = false
+          vm.bussinessStatus = false
+        }
+        vm.applicantIdNo = ''
+        vm.applicantName = ''
+        vm.applicantIdNoDate = ''
+        vm.contactTelNo = ''
+        vm.contactEmail = ''
+        vm.passWord = ''
+        vm.rePassWord = ''
+        vm.applicantIdDateFormatted = null
+        vm.$refs.form.resetValidation()
+      }, 50)
     },
     changeApplicantInfos () {
       let vm = this
-      if (vm.applicantType === '2') {
+      if (vm.applicantType === '2' && vm.hasCheckBussiness) {
         if (vm.functionTimeOut) {
           clearTimeout(vm.functionTimeOut)
         }
         vm.functionTimeOut = setTimeout(function () {
-          if (vm.applicantIdNo.length === 10 || vm.applicantIdNo.length === 13) {
+          if (vm.applicantIdNo.length >= 10) {
             vm.checkApplicantInfos()
+          } else {
+            vm.validBussinessInfos = true
           }
-        }, 2000)
+        }, 1000)
       }
     },
     checkApplicantInfos () {
       let vm = this
       if (vm.applicantType === '2') {
         let filter = {
-          applicantIdNo: vm.applicantIdNo,
-          applicantName: vm.applicantName
+          applicantIdNo: vm.applicantIdNo
         }
         // vm.loadingVerify = true
         vm.$store.dispatch('checkApplicantInfos', filter).then(result => {
           // vm.loadingVerify = false
-          if (result && result.hasOwnProperty('error') && result.error === true) {
-            vm.validBussinessInfos = false
-            vm.bussinessExits = false
-            // vm.$store.commit('setApplicantBussinessExit', false)
-            // toastr.error(result.message + ' Vui lòng kiểm tra lại mã số thuế')
-            vm.messageCheckApplicant = result.message
-          } else if (result && result.hasOwnProperty('warning') && result.warning === true) {
-            vm.validBussinessInfos = false
-            vm.bussinessExits = true
-            // vm.$store.commit('setApplicantBussinessExit', false)
-            // toastr.error(result.message + ' Vui lòng đối chiếu thông tin doanh nghiệp')
-            vm.messageCheckApplicant = result.message
-          } else if (result && !result.hasOwnProperty('error') && !result.hasOwnProperty('warning')) {
+          if (result && result.hasOwnProperty('ENTERPRISE_GDT_CODE') && result.ENTERPRISE_GDT_CODE) {
+            vm.bussinessInfomation = result
             vm.validBussinessInfos = true
             vm.bussinessExits = true
-            // vm.$store.commit('setApplicantBussinessExit', filter['applicantIdNo'])
+            vm.applicantName = result.NAME
+            vm.applicantIdDateFormatted = result.FOUNDING_DATE
+            if (result.hasOwnProperty('ENTERPRISE_STATUS_ID') && result.ENTERPRISE_STATUS_ID === 'ACT') {
+              vm.bussinessStatus = true
+            } else {
+              vm.bussinessStatus = false
+              vm.validBussinessInfos = false
+              vm.messageCheckApplicant = 'Doanh nghiệp mã số thuế ' + vm.applicantIdNo + ' không còn hoạt động. Vui lòng kiểm tra lại'
+            }
+          } else {
+            vm.validBussinessInfos = false
+            vm.bussinessExits = false
+            vm.applicantName = ''
+            vm.applicantIdDateFormatted = null
+            vm.messageCheckApplicant = 'Mã số ĐKKD, mã số thuế ' + vm.applicantIdNo + ' không chính xác. Vui lòng kiểm tra lại'
           }
         }).catch(function () {
-          vm.loadingVerify = false
+          vm.validBussinessInfos = false
+          vm.bussinessExits = false
+          vm.bussinessStatus = false
+          vm.applicantName = ''
         })
       }
     },
-    getApplicantInfos () {
+    showApplicantInfos () {
       let vm = this
-      let filter = {
-        applicantIdNo: vm.applicantIdNo
-      }
-      vm.$store.dispatch('getApplicantInfos', filter).then(result => {
-        vm.applicantInfos['applicantName'] = result['MainInformation']['NAME']
-        vm.applicantInfos['applicantIdNo'] = result['MainInformation']['ENTERPRISE_GDT_CODE']
-        vm.applicantInfos['address'] = result['HOAdress']['AddressFullText']
-        vm.applicantInfos['representatives'] = result['Representatives']['FULL_NAME'] ? result['Representatives']['FULL_NAME'] : result['Representatives'][0]['FULL_NAME']
-        vm.applicantInfos['companyType'] = result['MainInformation']['ENTERPRISE_TYPE_NAME']
-        vm.applicantInfos['companyStatus'] = result['MainInformation']['ENTERPRISE_STATUS_NAME']
-        vm.dialog_applicantInfos = true
-      })
+      vm.applicantInfos['applicantName'] = vm.bussinessInfomation['NAME']
+      vm.applicantInfos['applicantIdNo'] = vm.bussinessInfomation['ENTERPRISE_GDT_CODE']
+      vm.applicantInfos['applicantDate'] = vm.bussinessInfomation['FOUNDING_DATE']
+      vm.applicantInfos['address'] = vm.bussinessInfomation['AddressFullText']
+      vm.applicantInfos['companyType'] = vm.bussinessInfomation['ENTERPRISE_TYPE_NAME']
+      vm.applicantInfos['companyStatus'] = vm.bussinessInfomation['ENTERPRISE_STATUS_NAME']
+      vm.dialog_applicantInfos = true
     },
     getDieuKhoan () {
       let vm = this

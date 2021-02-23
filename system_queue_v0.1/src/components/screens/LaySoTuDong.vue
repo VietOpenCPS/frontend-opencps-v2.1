@@ -219,6 +219,7 @@ export default {
                   filterBooking.className = 'EFORM'
                   filterBooking.classPK = result.eFormId
                   filterBooking.serviceCode = result.serviceCode
+                  filterBooking.govAgencyCode = result.hasOwnProperty('govAgencyCode') ? result.govAgencyCode : ''
                   filterBooking.bookingName = bookingName
                   filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
                   vm.createBooking(filterBooking)

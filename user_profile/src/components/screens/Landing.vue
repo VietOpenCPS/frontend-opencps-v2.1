@@ -448,7 +448,17 @@
                 <p class="mb-2 px-1">File chứng thư gốc</p>
                 <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="itemEsignCert" :type="'document'"></attached-file-avatar>
               </v-flex>
-
+              <v-flex xs12 class="px-2" v-if="notifyConfig">
+                <v-checkbox
+                  class="mt-2 d-inline-block" color="primary" v-model="sendSms" label="Gửi tin nhắn" @change="changeConfigNotify"
+                ></v-checkbox>
+                <v-checkbox
+                  class="mt-2 mx-3 d-inline-block" color="primary" v-model="sendMail" label="Gửi thư điện tử" @change="changeConfigNotify"
+                ></v-checkbox>
+                <v-checkbox
+                  class="mt-2 d-inline-block" color="primary" v-model="sendNotify" label="sendNotifycation" @change="changeConfigNotify"
+                ></v-checkbox>
+              </v-flex>
               <v-flex sm12 class="text-xs-right">
                 <v-btn color="blue darken-3" :loading="loading" :disabled="loading" v-on:click.native="submitUserProfile" class="mx-0" dark>
                   <v-icon>done</v-icon>&nbsp; Cập nhật thông tin
@@ -688,6 +698,10 @@
     },
     data: () => ({
       hasDocumentStorage: false,
+      notifyConfig: false,
+      sendSms: false,
+      sendMail: false,
+      sendNotify: false,
       xacthuc_credit: false,
       indentifyNoFFileUrl: '',
       indentifyNoFileUrl: '',
@@ -698,7 +712,7 @@
       dialog_loginDVCQG: false,
       tempDVCQG: '',
       profileConfig: '',
-      activeChangePass: false,
+      activeChangePass: true,
       zaloOaId: '',
       zaloOaid_token_access: '',
       userAppZaloUid: '',
@@ -912,6 +926,10 @@
       var vm = this
       window.callback_dvcqg = vm.callback_dvcqg
       try {
+        vm.activeChangePass = activeChangePass
+      } catch (error) {
+      }
+      try {
         vm.hasSSo = ssoConect
         if (rulesConfig) {
           vm.rules = Object.assign({}, vm.rules, rulesConfig)
@@ -928,6 +946,10 @@
         if (documentStorageConfig) {
           vm.hasDocumentStorage = true
         }
+      } catch (error) {
+      }
+      try {
+        vm.notifyConfig = notifyConfig
       } catch (error) {
       }
       vm.$nextTick(function() {
@@ -1058,6 +1080,19 @@
                 vm.dataMapping = dataObj
                 vm.doMappingDvcqg()
               }
+            }
+          }
+          // 
+          if (vm.notifyConfig) {
+            try {
+              let storageConfig = localStorage.getItem("notifyConfig" + vm.user['userId'])
+              if (storageConfig) {
+                let configs = JSON.parse(storageConfig)
+                vm.sendSms = configs.sendSms
+                vm.sendMail = configs.sendMail
+                vm.sendNotify = configs.sendNotify
+              }
+            } catch (error) {
             }
           }
         })
@@ -1507,6 +1542,20 @@
         vm.$router.push({
           path: '/kho-tai-lieu/' + vm.user['applicantIdNo']
         })
+      },
+      changeConfigNotify () {
+        let vm = this
+        if (vm.notifyConfig) {
+          setTimeout(function () {
+            let config = {
+              sendSms: vm.sendSms,
+              sendMail: vm.sendMail,
+              sendNotify: vm.sendNotify
+            }
+            localStorage.setItem("notifyConfig" + vm.user['userId'], JSON.stringify(config))
+            toastr.success('Cập nhật thành công')
+          }, 100)
+        }
       }
     }
   }

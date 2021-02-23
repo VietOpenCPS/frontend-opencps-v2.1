@@ -1,18 +1,27 @@
 <template>
   <v-app id="app_asked_questions" style="background: #fff !important">
     <v-navigation-drawer app clipped floating width="255" v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')">
-      <!-- <div class="">
+      <div class="" v-if="adminCreateQuestion">
         <v-btn class="px-0 my-0 ml-0" block color="primary" v-on:click.native="addQuestion"
           style="height:36px"
         >
           <v-icon size="22" color="white">add</v-icon>&nbsp;
           Thêm mới câu hỏi
         </v-btn>
-      </div> -->
-      <v-list class="pt-0">
+      </div>
+      <v-list class="pt-0" v-if="!phanAnhKienNghi">
         <v-list-tile :style="activeTab === 0 ? 'border-left: 7px solid #00aeef' : ''">
           <v-list-tile-content class="pl-2" @click="filterQuestion(0, 'all')">
             <v-list-tile-title>Tất cả câu hỏi</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalQuestionCounter}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 6 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(6, 'questionType=')">
+            <v-list-tile-title>Câu hỏi thường gặp</v-list-tile-title>
             <span class="status__counter" style="color:#0b72ba!important">
               {{totalQuestionCounter}}
             </span>
@@ -65,6 +74,55 @@
         </v-list-tile>
         <v-divider class="my-0"></v-divider>
       </v-list>
+      <!--  -->
+      <v-list class="pt-0" v-else>
+        <v-list-tile :style="activeTab === 0 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(0, 'questionType=PAKN')">
+            <v-list-tile-title>Tất cả kiến nghị</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalQuestionCounter}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
+
+        <v-list-tile :style="activeTab === 1 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(1, 'questionType=PAKN&answered=true')">
+            <v-list-tile-title>Kiến nghị đã trả lời</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalAnswered}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 2 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(2, 'questionType=PAKN&answered=false')">
+            <v-list-tile-title>Kiến nghị chưa trả lời</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalNotAnswer}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 3 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(3, 'questionType=PAKN&publish=1')">
+            <v-list-tile-title>Kiến nghị công khai</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalPublished}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 4 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(4, 'questionType=PAKN&publish=0')">
+            <v-list-tile-title>Kiến nghị không công khai</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalNotPublish}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
+      </v-list>
     </v-navigation-drawer>
     <v-content :style="(!getUser('Administrator') && !getUser('Administrator_data') && !getUser('Administrator_Employee')) ? 'width: 100%;max-width: 1300px;margin: 0 auto' : ''">
       <router-view></router-view>
@@ -82,7 +140,10 @@
       totalPublished: 0,
       totalNotPublish: 0,
       totalFAQ: 0,
-      agencyList: []
+      agencyList: [],
+      phanAnhKienNghi: false,
+      titleData: 'câu hỏi',
+      adminCreateQuestion: false
     }),
     computed: {
       loading () {
@@ -121,6 +182,17 @@
     },
     created () {
       var vm = this
+      try {
+        vm.phanAnhKienNghi = phanAnhKienNghiPage
+        if (vm.phanAnhKienNghi) {
+          vm.titleData = 'kiến nghị'
+        }
+      } catch (error) {
+      }
+      try {
+        vm.adminCreateQuestion = adminCreateQuestion
+      } catch (error) {
+      }
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
@@ -172,6 +244,9 @@
           answered: query.hasOwnProperty('answered') ? query['answered'] : '',
           questionType: vm.typeFilterSelected ? vm.typeFilterSelected : (query.hasOwnProperty('questionType') ? query['questionType'] : '')
         }
+        if (vm.phanAnhKienNghi) {
+          filter.questionType = 'PAKN'
+        }
         try {
           if (agencyCodeSite) {
             filter.agencyCode = agencyCodeSite
@@ -201,7 +276,8 @@
         let filter = {
           agencyCode: '',
           publish: '',
-          answered: ''
+          answered: '',
+          questionType: vm.phanAnhKienNghi ? 'PAKN' : ''
         }
         // vm.$store.commit('setLoading', true)
         try {
@@ -218,7 +294,8 @@
           let filter1 = {
             agencyCode: '',
             publish: 1,
-            answered: ''
+            answered: '',
+            questionType: vm.phanAnhKienNghi ? 'PAKN' : ''
           }
           try {
             if (agencyCodeSite) {
@@ -239,7 +316,8 @@
           let filter2 = {
             agencyCode: '',
             publish: '',
-            answered: true
+            answered: true,
+            questionType: vm.phanAnhKienNghi ? 'PAKN' : ''
           }
           try {
             if (agencyCodeSite) {
@@ -259,7 +337,7 @@
           let filter3 = {
             agencyCode: '',
             publish: '',
-            questionType: 'FAQ'
+            questionType: vm.phanAnhKienNghi ? 'PAKN' : 'FAQ'
           }
           vm.$store.dispatch('getQuestionsCounter', filter3).then(function (result2) {
             vm.totalFAQ = result2['total']

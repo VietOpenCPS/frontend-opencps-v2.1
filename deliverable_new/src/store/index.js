@@ -306,10 +306,10 @@ export const store = new Vuex.Store({
           }
         }
         axios.get('/o/v1/opencps/deliverable/' + id + '/detail', options).then(function (response) {
-          if (response.data) {
-            response.data.govAgenciesItems = []
-            response.data.applicantIdNoItems = []
-            resolve(response.data)
+          if (response.data.data) {
+            response.data.data.govAgenciesItems = []
+            response.data.data.applicantIdNoItems = []
+            resolve(response.data.data)
           } else {
             resolve({})
           }

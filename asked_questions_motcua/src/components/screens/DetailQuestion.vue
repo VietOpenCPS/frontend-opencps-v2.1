@@ -6,25 +6,36 @@
           <v-icon>add</v-icon>&nbsp;
           Thêm câu trả lời
         </v-btn> -->
-        <v-flex xs12 sm12 class="text-xs-center" style="margin-bottom: 20px;">
+        <v-flex v-if="!phanAnhKienNghi" xs12 sm12 class="text-xs-center" style="margin-bottom: 20px;">
           <h3 v-if="getUser('Administrator') || getUser('Administrator_data')" class="text-xs-center mt-2" style="color:#065694">QUẢN LÝ CÂU HỎI</h3>
           <h3 v-else class="text-xs-center mt-2" style="color:#065694">HỎI ĐÁP THÔNG TIN</h3>
+        </v-flex>
+        <v-flex v-else xs12 sm12 class="text-xs-center" style="margin-bottom: 20px;">
+          <h3 v-if="getUser('Administrator') || getUser('Administrator_data')" class="text-xs-center mt-2" style="color:#065694">QUẢN LÝ PHẢN ÁNH KIẾN NGHỊ</h3>
+          <h3 v-else class="text-xs-center mt-2" style="color:#065694">PHẢN ÁNH KIẾN NGHỊ</h3>
         </v-flex>
         <v-flex xs12 sm12>
           <div
             class="mx-3 mb-2 px-2 py-2"
             style="border:1px solid #0072bc;border-radius:3px;color:#0072bc"
           >
-            <p>
+            <p v-if="!gopY">
               Người hỏi: <span class="text-bold">{{questionDetail.fullname}}</span><i> ({{questionDetail.email}})</i>
+            </p>
+            <p v-else>
+              Người gửi: <span class="text-bold">{{questionDetail.fullname}}</span><i> ({{questionDetail.govAgencyName}})</i>
             </p>
             <p>
               Ngày gửi: <span class="text-bold">{{questionDetail.createDate}}</span>
             </p>
           </div>
           <div class="mx-3 mt-3">
-            <div class="py-1">
-              <span class="primary--text text-bold">NỘI DUNG CÂU HỎI: </span>
+            <div class="py-1" v-if="!phanAnhKienNghi">
+              <span v-if="!gopY" class="primary--text text-bold">NỘI DUNG CÂU HỎI: </span>
+              <span v-else class="primary--text text-bold">NỘI DUNG GÓP Ý: <i v-if="questionDetail['domainName']">(Lĩnh vực: {{questionDetail['domainName']}})</i></span>
+            </div>
+            <div class="py-1" v-else>
+              <span class="primary--text text-bold">NỘI DUNG KIẾN NGHỊ: </span>
             </div>
             <div
               class="my-2 px-2 py-2"
@@ -51,7 +62,7 @@
                 >
                   <div style="position:relative">
                     <i class="text-bold">Ngày {{answerList[0].createDate}}</i>
-                    <div class="ml-2 mt-2" v-html="String(answerList[0].content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
+                    <div class="ml-2 mt-2" v-html="answerList[0].content"></div>
                     <div v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')" style="display:inline-block;position:absolute;right:10px;top:0">
                       <v-tooltip top>
                         <v-btn slot="activator" icon ripple @click="editAnswer(answerList[0])" style="margin-top:-3px!important">
@@ -65,10 +76,10 @@
                         </v-btn>
                         <span>Xóa</span>
                       </v-tooltip>
-                      <v-checkbox v-if="getUser('Administrator') || getUser('Administrator_data')" class="mt-1" style="display: inline-block" @click.stop="changePublicAnswer(answerList[0], 0)"
+                      <!-- <v-checkbox v-if="getUser('Administrator') || getUser('Administrator_data')" class="mt-1" style="display: inline-block" @click.stop="changePublicAnswer(answerList[0], 0)"
                         label="Công khai"
                         v-model="answerList[0]['publish']"
-                      ></v-checkbox>
+                      ></v-checkbox> -->
                     </div>
                   </div>
                 </div>
@@ -84,7 +95,7 @@
                 >
                   <div style="position:relative">
                     <span class="text-bold">Câu trả lời {{ indexAnswer + 1}} </span> <i>(Ngày {{itemAnswer.createDate}})</i>
-                    <div class="ml-2 mt-2" v-html="String(itemAnswer.content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
+                    <div class="ml-2 mt-2" v-html="itemAnswer.content"></div>
                     <div v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')" style="display:inline-block;position:absolute;right:10px;top:0">
                       <v-tooltip top >
                         <v-btn slot="activator" icon ripple @click="editAnswer(itemAnswer)" style="margin-top:-3px!important">
@@ -98,10 +109,10 @@
                         </v-btn>
                         <span>Xóa</span>
                       </v-tooltip>
-                      <v-checkbox v-if="getUser('Administrator') || getUser('Administrator_data')" class="mt-1" style="display: inline-block" @click.stop="changePublicAnswer(itemAnswer, indexAnswer)"
+                      <!-- <v-checkbox v-if="getUser('Administrator') || getUser('Administrator_data')" class="mt-1" style="display: inline-block" @click.stop="changePublicAnswer(itemAnswer, indexAnswer)"
                         label="Công khai"
                         v-model="itemAnswer['publish']"
-                      ></v-checkbox>
+                      ></v-checkbox> -->
                     </div>
                   </div>
                 </div>
@@ -123,12 +134,12 @@
               <v-flex xs12 sm12 style="margin:0 auto">
                 <vue-editor v-model="contentAnswer" :editorToolbar="customToolbar"></vue-editor>
               </v-flex>
-              <div v-if="!activeEdit">
+              <!-- <div v-if="!activeEdit">
                 <v-checkbox class="mt-0"
                   label="Công khai"
                   v-model="publishAnswer"
                 ></v-checkbox>
-              </div>
+              </div> -->
               <div class="text-xs-center my-3">
                 <!-- Thêm mới -->
                 <v-btn v-if="!activeEdit" color="primary"
@@ -185,6 +196,9 @@ export default {
     VueEditor
   },
   data: () => ({
+    phanAnhKienNghi: false,
+    gopY: false,
+    titleData: 'câu hỏi',
     answerList: [],
     answersDefault: [],
     answerSelected: '',
@@ -260,6 +274,20 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      vm.phanAnhKienNghi = phanAnhKienNghiPage
+      if (vm.phanAnhKienNghi) {
+        vm.titleData = 'kiến nghị'
+      }
+    } catch (error) {
+    }
+    try {
+      vm.gopY = gopY
+      if (vm.gopY) {
+        vm.titleData = 'góp ý'
+      }
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       var vm = this
       vm.getAnswers()
@@ -358,7 +386,7 @@ export default {
         let filter = {
           questionId: vm.index,
           content: vm.contentAnswer,
-          publish: vm.publishAnswer ? 1 : 0
+          publish: 1
         }
         vm.$store.dispatch('addAnswer', filter).then(function (result) {
           toastr.success('Thêm câu trả lời thành công')
@@ -377,7 +405,7 @@ export default {
           questionId: vm.answerSelected.questionId,
           answerId: vm.answerSelected.answerId,
           content: vm.contentAnswer,
-          publish: vm.answerSelected.publish ? 1 : 0
+          publish: 1
         }
         vm.$store.dispatch('putAnswer', filter).then(function (result) {
           toastr.success('Cập nhật câu trả lời thành công')

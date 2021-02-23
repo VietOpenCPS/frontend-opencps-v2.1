@@ -681,7 +681,6 @@
         if (vm.tableConfig !== null && vm.tableConfig !== undefined) {
           if (vm.tableConfig['detailColumns'] !== '') {
             vm.detailForm = eval('( ' + vm.tableConfig['detailColumns'] + ' )')
-            console.log('1',vm.detailForm)
           } else {
             let videoElement = document.getElementById('editor-video-preloader')
             if (videoElement !== null && videoElement !== undefined) {
@@ -689,7 +688,6 @@
             }
           }
           if (vm.detailData !== null && vm.detailData !== undefined && Array.isArray(vm.detailData) && vm.detailData.length > 0) {
-             console.log(vm.tableName.split('_')[vm.tableName.split('_').length])
             if(vm.$router.history.current.query.idCopy){
               let data = {}
               for (let i=0; i< vm.detailForm.length; i++) {
@@ -1026,6 +1024,8 @@
       },
       processDataSource () {
         let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
         for (let key in vm.detailForm) {
           if (vm.detailForm[key].hasOwnProperty('datasource_api') && vm.detailForm[key].hasOwnProperty('datasource_key')) {
             vm.pullOk = false
@@ -1083,6 +1083,10 @@
               })
               
             }
+          }
+          // 
+          if (vm.tableName === 'opencps_dictitem' && vm.detailForm[key]['model'] === 'dictCollectionId' && newQuery.hasOwnProperty('dictCollectionId') && newQuery['dictCollectionId']) {
+            vm.data[vm.detailForm[key]['model']] = Number(newQuery.dictCollectionId)
           }
         }
       },
