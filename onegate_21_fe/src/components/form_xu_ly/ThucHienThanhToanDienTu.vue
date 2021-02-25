@@ -69,7 +69,7 @@
             <!-- epayment -->
             <p class="mb-0"><span class="red--text">* </span>&nbsp;Lựa chọn hình thức thanh toán:</p>
             <div class="text-xs-left mt-2 mb-3 ml-0">
-              <v-chip class="mb-2" color="indigo" text-color="white"  @click.native="showThanhToanChuyenKhoan"
+              <v-chip v-if="thanhToanChuyenKhoan" class="mb-2" color="indigo" text-color="white"  @click.native="showThanhToanChuyenKhoan"
                 :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 1 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')">
                 <v-avatar :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">
                   <v-icon size=20 style="color: #fff !important">payment</v-icon>
@@ -293,11 +293,16 @@ export default {
     errorNotSelect: false,
     methodSelect: 0,
     ipAddress:'',
-    loadingPay: false
+    loadingPay: false,
+    thanhToanChuyenKhoan: true
   }),
   directives: {money: VMoney},
   created () {
     var vm = this
+    try {
+      vm.thanhToanChuyenKhoan = thanhToanChuyenKhoan
+    } catch (error) {
+    }
     if (vm.detailDossier.hasOwnProperty('dossierId')) {
       let filter = vm.detailDossier
       vm.$store.dispatch('getPaymentFiles', filter).then(result => {

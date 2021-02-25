@@ -459,7 +459,7 @@
                 <v-autocomplete
                   :items="listDichVu"
                   v-model="dichVuSelected"
-                  label="Dịch vụ:"
+                  label="Trường hợp:"
                   placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
@@ -467,7 +467,7 @@
                   hide-no-data
                   :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
-                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn']"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn']"
                   @change="changeDichVuConfigs"
                   required
                   box
@@ -662,7 +662,7 @@
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2 text-bold">Dịch vụ <span style="color:red">*</span>:</div>
+                <div class="my-2 text-bold">Trường hợp <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
@@ -674,7 +674,7 @@
                   return-object
                   hide-no-data
                   :hide-selected="true"
-                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>
@@ -818,7 +818,7 @@
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2 text-bold">Dịch vụ <span style="color:red">*</span>:</div>
+                <div class="my-2 text-bold">Trường hợp <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
@@ -830,7 +830,7 @@
                   return-object
                   hide-no-data
                   :hide-selected="true"
-                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>

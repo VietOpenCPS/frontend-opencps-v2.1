@@ -839,6 +839,10 @@ export default {
       vm.saveAlpacaFormCallBack(event)
     }
     try {
+      vm.khoTaiLieuCongDan = khoTaiLieuCongDan
+    } catch (error) {
+    }
+    try {
       vm.showKySo = showKySoDvc
     } catch (error) {
     }
