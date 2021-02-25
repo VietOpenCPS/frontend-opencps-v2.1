@@ -827,21 +827,21 @@ export default {
     checkDelegateIdNo: false,
     checkApplicantId: false,
     requiredOptions: {
-      applicantIdNo: false,
-      applicantName: false,
-      address: false,
-      cityCode: false,
-      districtCode: false,
-      wardCode: false,
-      contactTelNo: false,
+      applicantIdNo: true,
+      applicantName: true,
+      address: true,
+      cityCode: true,
+      districtCode: true,
+      wardCode: true,
+      contactTelNo: true,
       contactEmail: false,
-      delegateIdNo: false,
-      delegateName: false,
-      delegateAddress: false,
-      delegateCityCode: false,
-      delegateDistrictCode: false,
-      delegateWardCode: false,
-      delegateTelNo: false,
+      delegateIdNo: true,
+      delegateName: true,
+      delegateAddress: true,
+      delegateCityCode: true,
+      delegateDistrictCode: true,
+      delegateWardCode: true,
+      delegateTelNo: true,
       delegateEmail: false
     },
     valid_thongtinchuhoso: false,
@@ -1025,7 +1025,8 @@ export default {
     dialog_searchLgsp: false,
     loadingSearchLgsp: false,
     applicantIdNoLgsp: '',
-    applicantLgspInfomation: ''
+    applicantLgspInfomation: '',
+    defaultCityCode: false
   }),
   computed: {
     loading () {
@@ -1062,8 +1063,23 @@ export default {
       vm.validateSameApplicantIdNo = checkTrungChuHoSo
     } catch (error) {
     }
+    try {
+      vm.defaultCityCode = defaultCityCode
+    } catch (error) {
+    }
+    try {
+      vm.applicantConfig = applicantConfig
+    } catch (error) {
+    }
+    try {
+      vm.hasOrganization = hasOrganization
+    } catch (error) {
+    }
     if (vm.formCode === "NEW") {
-      // vm.thongTinNguoiNopHoSo.sameUser = true
+      try {
+        vm.thongTinNguoiNopHoSo.sameUser = applicantSameDelegate
+      } catch (error) {
+      }
     }
     if (vm.hasOrganization) {
       vm.labelSwitch = {
@@ -1285,10 +1301,10 @@ export default {
         vm.$store.getters.getDictItems(filter).then(function (result) {
           vm.citys = result.data
           // set default cityCode
-          // if (vm.formCode === "NEW" && !thongTinChuHoSoTemp['cityCode']) {
-          //   vm.thongTinChuHoSo['cityCode'] = 87
-          //   vm.thongTinChuHoSo['cityName'] = 'Tỉnh Đồng Tháp'
-          // }
+          if (vm.formCode === "NEW" && !thongTinChuHoSoTemp['cityCode'] && vm.defaultCityCode) {
+            vm.thongTinChuHoSo['cityCode'] = vm.defaultCityCode ? vm.defaultCityCode : ''
+            vm.thongTinChuHoSo['cityName'] = defaultCityName ? defaultCityName : ''
+          }
           
         })
         setTimeout(function () {

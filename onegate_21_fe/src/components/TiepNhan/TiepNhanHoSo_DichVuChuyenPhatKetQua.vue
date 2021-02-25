@@ -278,6 +278,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.showTinhPhi = showTinhPhi
+    } catch (error) {
+    }
     vm.$store.dispatch('getVNPOSTcode').then(result => {
       vm.vnPostItems = result
     })

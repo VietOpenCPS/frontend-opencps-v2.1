@@ -1165,6 +1165,14 @@ export default {
   created () {
     let vm = this
     try {
+      vm.hasPreviewSync = hasPreviewSync
+    } catch (error) {
+    }
+    try {
+      vm.hasDownloadAllFile = hasDownloadAllFile
+    } catch (error) {
+    }
+    try {
       vm.viTriLuuTru = viTriLuuTru
     } catch (error) {
     }

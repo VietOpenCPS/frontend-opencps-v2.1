@@ -228,11 +228,15 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.showTinhPhi = showTinhPhi
+    } catch (error) {
+    }
     // vm.$store.dispatch('getVNPOSTcode').then(result => {
     //   vm.vnPostItems = result
     // })
-    if (this.postalServiceItems.length > 0) {
-      this.dichVuChuyenPhatHoSo.postalServiceCode = this.postalServiceItems[0].itemCode
+    if (vm.postalServiceItems.length > 0) {
+      vm.dichVuChuyenPhatHoSo.postalServiceCode = vm.postalServiceItems[0].itemCode
     }
   },
   watch: {

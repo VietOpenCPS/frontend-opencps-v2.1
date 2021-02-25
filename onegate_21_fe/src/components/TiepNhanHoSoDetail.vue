@@ -1105,6 +1105,10 @@ export default {
       vm.fixDescriptionDt = fixDescriptionDt
     } catch (error) {
     }
+    try {
+      vm.notifyConfig = notifyConfig
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       let currentQuery = vm.$router.history.current.query
       if (currentQuery.hasOwnProperty('formActionGroup') && currentQuery.formActionGroup) {
