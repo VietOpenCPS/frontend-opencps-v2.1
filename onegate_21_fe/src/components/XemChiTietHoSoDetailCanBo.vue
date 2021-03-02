@@ -2570,8 +2570,15 @@ export default {
             }
             if (result.signatureType === 'plugin' && !doNotSign && vm.showTaoTaiLieuKetQua) {
               console.log('file ký số', vm.createFileSignedSync)
+              let hasIsSigned = false
+              try {
+                hasIsSigned = vm.createFileSignedSync['createFiles'].filter(function(item) {
+                  return item.isSigned
+                })
+              } catch (error) {
+              }
               let valid = true
-              if (!vm.createFileSignedSync) {
+              if (!vm.createFileSignedSync || !hasIsSigned || hasIsSigned.length === 0) {
                 toastr.clear()
                 toastr.error('Chưa có tài liệu nào được ký duyệt')
                 vm.loadingAction = false
@@ -2588,7 +2595,7 @@ export default {
                   ) {
                     fileChuaKy.push(files[index]['displayName'])
                   } else {
-                    if (files[index]['fileSize']) {
+                    if (files[index]['fileSize'] && files[index]['isSigned']) {
                       fileEntries.push(files[index]['fileEntryId'])
                       dossierFiles.push(files[index]['dossierFileId'])
                     }

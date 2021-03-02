@@ -76,12 +76,12 @@
               v-model="active"
             >
               <v-tabs-slider color="primary"></v-tabs-slider>
-              <v-tab key="1" ripple class="mr-2"> Thông tin chung </v-tab>
-              <v-tab key="2" ripple class="mr-2"> Trình tự thực hiện</v-tab>
-              <v-tab key="3" ripple class="mr-2"> Thành phần hồ sơ </v-tab>
-              <v-tab key="4" ripple class="mr-2"> Yêu cầu điều kiện </v-tab>
+              <v-tab :key="1" ripple class="mr-2"> Thông tin chung </v-tab>
+              <v-tab :key="2" ripple class="mr-2"> Trình tự thực hiện</v-tab>
+              <v-tab :key="3" ripple class="mr-2"> Thành phần hồ sơ </v-tab>
+              <v-tab :key="4" ripple class="mr-2"> Yêu cầu điều kiện </v-tab>
               <!--  -->
-              <v-tab-item key="1" transition="fade-transition" reverse-transition="fade-transition">
+              <v-tab-item :key="1" transition="fade-transition" reverse-transition="fade-transition">
                 <v-card>
                   <v-card-text class="px-0 py-0">
                     <div class="table-detail-domain table-bordered">
@@ -141,14 +141,14 @@
                   </v-card-text>
                 </v-card>
               </v-tab-item>
-              <v-tab-item key="2" transition="fade-transition" reverse-transition="fade-transition">
+              <v-tab-item :key="2" transition="fade-transition" reverse-transition="fade-transition">
                 <v-card>
                   <v-card-text>
                     <div v-html="serviceDetail.processText"></div>
                   </v-card-text>
                 </v-card>
               </v-tab-item>
-              <v-tab-item key="3" transition="fade-transition" reverse-transition="fade-transition">
+              <v-tab-item :key="3" transition="fade-transition" reverse-transition="fade-transition">
                 <v-card>
                   <v-card-text>
                     <div v-html="serviceDetail.dossierText" class="mb-2"></div>
@@ -165,7 +165,7 @@
                   </v-card-text>                 
                 </v-card>
               </v-tab-item>
-              <v-tab-item key="4" transition="fade-transition" reverse-transition="fade-transition">
+              <v-tab-item :key="4" transition="fade-transition" reverse-transition="fade-transition">
                 <v-card>
                   <v-card-text>
                     <div v-html="serviceDetail.conditionText"></div>
@@ -179,7 +179,12 @@
       <v-dialog scrollable v-model="dialogGuide" persistent max-width="600">
         <v-card>
           <v-card-title class="headline">Hướng dẫn nộp hồ sơ</v-card-title>
-          <v-card-text v-if="serviceConfigDetail" style="max-height: 400px" v-html="serviceConfigDetail.serviceInstruction"></v-card-text>
+          <v-card-text v-if="serviceConfigDetail" style="max-height: 400px">
+            <div  v-html="serviceConfigDetail.serviceInstruction"></div>
+            <p class="mt-1">
+              <a href="javascript:;" @click="viewTphs" style="color: #001fff;text-decoration: underline;font-style: italic;">Thành phần hồ sơ</a>
+            </p>
+          </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="green darken-1" flat="flat" @click.native="dialogGuide = false">
@@ -369,7 +374,12 @@
       <v-dialog scrollable v-model="dialogGuide" persistent max-width="600">
         <v-card>
           <v-card-title class="headline">Hướng dẫn nộp hồ sơ</v-card-title>
-          <v-card-text v-if="serviceConfigDetail" style="max-height: 400px" v-html="serviceConfigDetail.serviceInstruction"></v-card-text>
+          <v-card-text v-if="serviceConfigDetail" style="max-height: 400px">
+            <div  v-html="serviceConfigDetail.serviceInstruction"></div>
+            <p class="mt-1">
+              <a href="javascript:;" @click="viewTphs" style="color: #001fff;text-decoration: underline;font-style: italic;">Thành phần hồ sơ</a>
+            </p>
+          </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="green darken-1" flat="flat" @click.native="dialogGuide = false">
@@ -503,7 +513,7 @@
                   Đồng ý
                 </v-btn>
 
-                <v-btn @click="dialogLoginDvcqg = false" color="primary">
+                <v-btn class="white--text" @click="dialogLoginDvcqg = false" color="primary">
                   <v-icon>reply</v-icon>&nbsp;
                   Thoát
                 </v-btn>
@@ -560,7 +570,7 @@
             ></v-autocomplete>
           </v-form>
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="mx-2">
           <v-spacer></v-spacer>
           <v-btn color="primary" @click="submitSelectGov">
             <v-icon size="20">save</v-icon>&nbsp; Đồng ý
@@ -717,6 +727,9 @@ export default {
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
+      if (query.hasOwnProperty('active')) {
+        vm.active = Number(query.active)
+      }
       if (query.hasOwnProperty('setAgency')) {
         vm.setAgency = true
       }
@@ -752,6 +765,20 @@ export default {
       }
       vm.$store.dispatch('getServiceDetail', filter).then(function (result) {
         vm.serviceDetail = result
+        if (!query.hasOwnProperty('notCreate') && (query.hasOwnProperty('code') && query.code) || (query.hasOwnProperty('MaTTHCDP') && query.MaTTHCDP)) {
+          if (window.themeDisplay.isSignedIn()) {
+            let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+            if (Array.isArray(vm.serviceDetail['serviceConfigs']) && vm.serviceDetail['serviceConfigs'].length === 1) {
+              let url = redirectURL + '/dich-vu-cong#/add-dvc/' + vm.serviceDetail['serviceConfigs'][0]['serviceConfigId']
+              window.open(url, '_self')
+            } else if (!Array.isArray(vm.serviceDetail['serviceConfigs'])) {
+              let url = redirectURL + '/dich-vu-cong#/add-dvc/' + vm.serviceDetail['serviceConfigs']['serviceConfigId']
+              window.open(url, '_self')
+            } else {
+              vm.showSelectGov(vm.serviceDetail['serviceConfigs'])
+            }
+          }
+        }
         if (query.hasOwnProperty('code') && query.code) {
           vm.serviceDetail.serviceCodeDVCQG = query.code
         }
@@ -919,6 +946,11 @@ export default {
       vm.serviceConfigDetail = item
       vm.dialogGuide = true
       // vm.trackingBTTT(vm.serviceDetail.serviceCode)
+    },
+    viewTphs () {
+      let vm = this
+      vm.active = 2
+      vm.dialogGuide = false
     },
     downloadFileTemplate (item) {
       var vm = this

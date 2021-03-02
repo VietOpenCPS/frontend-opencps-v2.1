@@ -488,6 +488,7 @@
         newQuery['domain'] = ''
         newQuery['level'] = ''
         newQuery['all'] = false
+        newQuery['MaTTHCDP'] = null
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -512,6 +513,7 @@
         newQuery['domain'] = ''
         newQuery['level'] = ''
         newQuery['all'] = false
+        newQuery['MaTTHCDP'] = null
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -536,6 +538,7 @@
         newQuery['agencyth'] = ''
         newQuery['level'] = ''
         newQuery['all'] = false
+        newQuery['MaTTHCDP'] = null
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -560,6 +563,7 @@
         newQuery['agencyth'] = ''
         newQuery['all'] = false
         newQuery['level'] = item.level
+        newQuery['MaTTHCDP'] = null
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -584,6 +588,7 @@
         newQuery['agencyth'] = ''
         newQuery['all'] = false
         newQuery['level'] = item.level
+        newQuery['MaTTHCDP'] = null
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -609,6 +614,7 @@
         newQuery['agencyth'] = ''
         newQuery['level'] = ''
         newQuery['all'] = true
+        newQuery['MaTTHCDP'] = null
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -633,6 +639,7 @@
         newQuery['domain'] = item2.domainCode
         newQuery['level'] = ''
         newQuery['all'] = false
+        newQuery['MaTTHCDP'] = null
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'

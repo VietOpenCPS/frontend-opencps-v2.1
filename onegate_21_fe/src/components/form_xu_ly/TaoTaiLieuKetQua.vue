@@ -24,7 +24,7 @@
 
                       </div>
                     </div>
-                    <div v-for="(itemFileView, index2) in dossierFilesItems" :key="index2 + 'cr'" v-if="item.partNo + id === itemFileView.dossierPartNo + id && !itemFileView.eForm">
+                    <div v-for="(itemFileView, index2) in dossierFilesItems" :key="index2 + 'cr'" v-if="item.partNo + id === itemFileView.dossierPartNo + id && itemFileView.fileSize">
                       <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 25px; font-size: 12px;">
                         <span v-on:click.stop="viewFile2(itemFileView, index2)" class="ml-3" style="cursor: pointer;">
                           <v-icon class="mr-1" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
@@ -154,9 +154,9 @@
                     <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ lên</span>
                     <span v-else>Tải giấy tờ lên (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
                   </v-tooltip>
-                  <v-menu @click.native.stop right offset-y
+                  <!-- <v-menu @click.native.stop right offset-y
                     transition="slide-x-transition" title="Ký số tài liệu" 
-                    v-if="esignType === 'plugin' && item['eForm'] && item['fileSize']">
+                    v-if="esignType === 'plugin' && item['eForm'] && item['daKhai']">
                     <v-btn slot="activator" flat icon color="indigo">
                       <v-icon size="18">fa fa-pencil-square-o</v-icon>
                     </v-btn>
@@ -177,13 +177,7 @@
                         </v-list-tile-title>
                       </v-list-tile>
                     </v-list>
-                  </v-menu>
-                  <!-- <v-tooltip top>
-                    <v-btn slot="activator" class="mx-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:20px;width:20px">
-                      {{item.count}}
-                    </v-btn>
-                    <span>Xem</span>
-                  </v-tooltip> -->
+                  </v-menu> -->
                 </v-flex>
               </v-layout>
             </div>
@@ -746,33 +740,27 @@
         if (fileFind) {
           fileFind['dossierId'] = vm.detailDossier.dossierId
           fileFind['id'] = vm.id
+          vm.loadingApacal = true
           vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
-            toastr.clear()
-            toastr.success('Yêu cầu của bạn thực hiện thành công')
-            vm.createFiles[index].daKhai = true
-            // Đính kèm giấy tờ hồ sơ cùng nhóm
-            // if (vm.dossierIntoGroup.length > 0) {
-            //   vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
-            //   vm.dialogConfirm = true
-            //   vm.filesAdd = [resData]
-            // }
-            vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
-              vm.dossierFilesItems = resFiles
-              // 
-              vm.createFileSigned('update')
-              // 
-            }).catch(reject => {
-            })
-            // 
-            // vm.createFiles[index]['isSigned'] = false
-            // vm.createFiles[index]['fileEntryId'] = ''
-            // vm.createFiles[index]['pdfSigned'] = ''
-            // let createFileSigned = {
-            //   dossierId: vm.detailDossier['dossierId'],
-            //   createFiles: vm.createFiles
-            // }
-            // vm.$store.commit('setCreateFileSigned', createFileSigned)
+            setTimeout(function () {
+              vm.loadingApacal = false
+              toastr.clear()
+              toastr.success('Yêu cầu của bạn thực hiện thành công')
+              vm.createFiles[index].daKhai = true
+              // Đính kèm giấy tờ hồ sơ cùng nhóm
+              // if (vm.dossierIntoGroup.length > 0) {
+              //   vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
+              //   vm.dialogConfirm = true
+              //   vm.filesAdd = [resData]
+              // }
+              vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
+                vm.dossierFilesItems = resFiles
+                vm.createFileSigned('update')
+              }).catch(reject => {
+              })
+            }, 3000)
           }).catch(reject => {
+            vm.loadingApacal = false
             console.log('run saveForm')
             toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
@@ -780,6 +768,7 @@
         } else {
           item['dossierId'] = vm.detailDossier.dossierId
           item['id'] = vm.id
+          vm.loadingApacal = true
           vm.$store.dispatch('postEform', item).then(resPostEform => {
             // Đính kèm giấy tờ hồ sơ cùng nhóm
             // if (vm.dossierIntoGroup.length > 0) {
@@ -788,28 +777,20 @@
             //   vm.filesAdd = [resData]
             // }
             setTimeout(function () {
+              vm.loadingApacal = false
               toastr.success('Yêu cầu của bạn thực hiện thành công')
               vm.createFiles[index].daKhai = true
+              vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
+                vm.dossierFilesItems = resFiles
+                // 
+                vm.createFileSigned('update')
+                // 
+              }).catch(reject => {
+              })
             }, 3000)
-            vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
-              vm.dossierFilesItems = resFiles
-              // 
-              vm.createFileSigned('update')
-              // 
-            }).catch(reject => {
-              toastr.clear()
-              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
-            })
-            // 
-            // vm.createFiles[index]['isSigned'] = false
-            // vm.createFiles[index]['fileEntryId'] = ''
-            // vm.createFiles[index]['pdfSigned'] = ''
-            // let createFileSigned = {
-            //   dossierId: vm.detailDossier['dossierId'],
-            //   createFiles: vm.createFiles
-            // }
-            // vm.$store.commit('setCreateFileSigned', createFileSigned)
+            
           }).catch(reject => {
+            vm.loadingApacal = false
             toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
@@ -1262,99 +1243,94 @@
       signAction (item, index, partNo, typeSign) {
         let vm = this
         console.log('file ký duyệt', item)
-        if (item['eForm'] && item['daKhai'] || !item['eForm']) {
-          let signFileCallBack = function (rv) {
-            let received_msg = JSON.parse(rv)
-            if (received_msg.Status === 0) {
-              let dataSigned
-              try {
-                dataSigned = JSON.parse(received_msg.FileServer)
-              } catch (error) {
+        let signFileCallBack = function (rv) {
+          let received_msg = JSON.parse(rv)
+          if (received_msg.Status === 0) {
+            let dataSigned
+            try {
+              dataSigned = JSON.parse(received_msg.FileServer)
+            } catch (error) {
+            }
+            if (dataSigned) {
+              if (window.location.protocol === 'https:' && dataSigned.url.indexOf('http:') === 0) {
+                dataSigned.url = dataSigned.url.replace('http', 'https')
               }
-              if (dataSigned) {
-                if (window.location.protocol === 'https:' && dataSigned.url.indexOf('http:') === 0) {
-                  dataSigned.url = dataSigned.url.replace('http', 'https')
-                }
-                dataSigned.url = dataSigned.url.replace(':80/', '/')
-              }
-              toastr.clear()
-              toastr.success('Tài liệu đã được ký duyệt')
-              if (!partNo) {
-                vm.dossierFilesItems[index].isSigned = true
-                vm.dossierFilesItems[index].pdfSigned = dataSigned ? dataSigned.url : ''
-                vm.dossierFilesItems[index].fileEntryId = dataSigned ? dataSigned.fileEntryId : ''
-              } else {
-                let indexFile = ''
-                for (let i = 0; i < vm.dossierFilesItems.length; i++) {
-                  if (vm.dossierFilesItems[i]['dossierPartNo'] === partNo && vm.dossierFilesItems[i]['eForm']) {
-                    indexFile = i
-                    break
-                  }
-                }
-                vm.dossierFilesItems[indexFile].isSigned = true
-                vm.dossierFilesItems[indexFile].pdfSigned = dataSigned ? dataSigned.url : ''
-                vm.dossierFilesItems[indexFile].fileEntryId = dataSigned ? dataSigned.fileEntryId : ''
-                // 
-                if (vm.createFiles[index]['editForm']) {
-                  vm.createFiles[index]['editForm'] = false
-                  setTimeout(function () {
-                    document.getElementById('displayPDF' + partNo + vm.id).src = dataSigned.url
-                  }, 200)
-                } else {
-                  setTimeout(function () {
-                    document.getElementById('displayPDF' + partNo + vm.id).src = dataSigned.url
-                  }, 200)
-                }
-                // 
-              }
-              // lọc file gán với createFiles
-              let createFileItems = []
-              if (vm.dossierFilesItems.length > 0) {
-                for (let i = 0; i < vm.dossierFilesItems.length; i++) {
-                  let hasCreate = vm.createFiles.filter(function (item) {
-                    return String(item.partNo) === String(vm.dossierFilesItems[i]['dossierPartNo'])
-                  })
-                  if (hasCreate && hasCreate.length > 0) {
-                    vm.dossierFilesItems[i] = Object.assign(vm.dossierFilesItems[i], {createFileDossierPartEform: hasCreate[0]['eForm']})
-                    createFileItems.push(vm.dossierFilesItems[i])
-                  }
-                }
-              }
-              
-              // 
-              let createFileSigned = {
-                dossierId: vm.detailDossier['dossierId'],
-                createFiles: createFileItems
-              }
-              vm.$store.commit('setCreateFileSigned', createFileSigned)
+              dataSigned.url = dataSigned.url.replace(':80/', '/')
+            }
+            toastr.clear()
+            toastr.success('Tài liệu đã được ký duyệt')
+            if (!partNo) {
+              vm.dossierFilesItems[index].isSigned = true
+              vm.dossierFilesItems[index].pdfSigned = dataSigned ? dataSigned.url : ''
+              vm.dossierFilesItems[index].fileEntryId = dataSigned ? dataSigned.fileEntryId : ''
             } else {
-              if (received_msg.Message) {
-                toastr.clear()
-                toastr.error(received_msg.Message)
+              let indexFile = ''
+              for (let i = 0; i < vm.dossierFilesItems.length; i++) {
+                if (vm.dossierFilesItems[i]['dossierPartNo'] === partNo && vm.dossierFilesItems[i]['eForm']) {
+                  indexFile = i
+                  break
+                }
+              }
+              vm.dossierFilesItems[indexFile].isSigned = true
+              vm.dossierFilesItems[indexFile].pdfSigned = dataSigned ? dataSigned.url : ''
+              vm.dossierFilesItems[indexFile].fileEntryId = dataSigned ? dataSigned.fileEntryId : ''
+              // 
+              if (vm.createFiles[index]['editForm']) {
+                vm.createFiles[index]['editForm'] = false
+                setTimeout(function () {
+                  document.getElementById('displayPDF' + partNo + vm.id).src = dataSigned.url
+                }, 200)
               } else {
-                toastr.clear()
-                toastr.error('Ký duyệt không thành công')
+                setTimeout(function () {
+                  document.getElementById('displayPDF' + partNo + vm.id).src = dataSigned.url
+                }, 200)
+              }
+              // 
+            }
+            // lọc file gán với createFiles
+            let createFileItems = []
+            if (vm.dossierFilesItems.length > 0) {
+              for (let i = 0; i < vm.dossierFilesItems.length; i++) {
+                let hasCreate = vm.createFiles.filter(function (item) {
+                  return String(item.partNo) === String(vm.dossierFilesItems[i]['dossierPartNo'])
+                })
+                if (hasCreate && hasCreate.length > 0) {
+                  vm.dossierFilesItems[i] = Object.assign(vm.dossierFilesItems[i], {createFileDossierPartEform: hasCreate[0]['eForm']})
+                  createFileItems.push(vm.dossierFilesItems[i])
+                }
               }
             }
-          }
-          let prms = {}
-          prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/vgca/fileupload'
-          prms['SessionId'] = ''
-          prms['FileName'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.detailDossier['dossierId'] + '/files/' + item['referenceUid'] + '/preview.pdf'
-
-          let json_prms = JSON.stringify(prms)
-          if (typeSign === 'approved') {
-            vgca_sign_approved(json_prms, signFileCallBack)
-          } else if (typeSign === 'issued') {
-            vgca_sign_issued(json_prms, signFileCallBack)
+            
+            // 
+            let createFileSigned = {
+              dossierId: vm.detailDossier['dossierId'],
+              createFiles: createFileItems
+            }
+            vm.$store.commit('setCreateFileSigned', createFileSigned)
           } else {
-            vgca_sign_income(json_prms, signFileCallBack)
+            if (received_msg.Message) {
+              toastr.clear()
+              toastr.error(received_msg.Message)
+            } else {
+              toastr.clear()
+              toastr.error('Ký duyệt không thành công')
+            }
           }
-          
-        } else {
-          toastr.clear()
-          toastr.error('Chưa có tài liệu ký duyệt')
         }
+        let prms = {}
+        prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/vgca/fileupload'
+        prms['SessionId'] = ''
+        prms['FileName'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.detailDossier['dossierId'] + '/files/' + item['referenceUid'] + '/preview.pdf'
+
+        let json_prms = JSON.stringify(prms)
+        if (typeSign === 'approved') {
+          vgca_sign_approved(json_prms, signFileCallBack)
+        } else if (typeSign === 'issued') {
+          vgca_sign_issued(json_prms, signFileCallBack)
+        } else {
+          vgca_sign_income(json_prms, signFileCallBack)
+        }
+          
       },
       deleteSingleFile (item, index, indexPart) {
         var vm = this
