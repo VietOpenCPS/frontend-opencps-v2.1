@@ -160,7 +160,7 @@
                     <v-list v-if="props.item.serviceConfigs">
                       <v-list-tile v-for="(item2, index) in serviceConfigs(props.item.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
                         <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2, props.item)" >{{item2.govAgencyName}}</v-list-tile-title>
-                        <v-list-tile-title v-else @click="viewGuide(item2, props.item.serviceCode)">{{item2.govAgencyName}}</v-list-tile-title>
+                        <v-list-tile-title v-else @click="viewGuide(item2, props.item.serviceCode, props.item)">{{item2.govAgencyName}}</v-list-tile-title>
                       </v-list-tile>
                     </v-list>
                   </v-menu>
@@ -191,7 +191,7 @@
                   <v-btn small color="primary" class="my-1" style="min-width: 110px;"
                     v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 
                       && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) <= 2 && !formToKhai"
-                    @click="viewGuide(serviceConfigs(props.item.serviceConfigs)[0], props.item.serviceCode)"
+                    @click="viewGuide(serviceConfigs(props.item.serviceConfigs)[0], props.item.serviceCode, props.item)"
                   >
                     Hướng dẫn
                   </v-btn>
@@ -223,7 +223,12 @@
       <v-dialog scrollable v-model="dialogGuide" persistent max-width="600">
         <v-card>
           <v-card-title class="headline">Hướng dẫn nộp hồ sơ</v-card-title>
-          <v-card-text v-if="serviceDetail" style="max-height: 400px" v-html="serviceDetail.serviceInstruction"></v-card-text>
+          <v-card-text v-if="serviceDetail" style="max-height: 400px">
+            <div  v-html="serviceDetail.serviceInstruction"></div>
+            <p class="mt-1">
+              <a href="javascript:;" @click="viewTphs" style="color: #001fff;text-decoration: underline;font-style: italic;">Thành phần hồ sơ</a>
+            </p>
+          </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="green darken-1" flat="flat" @click.native="dialogGuide = false">
@@ -343,7 +348,7 @@
                         <v-list v-if="item.serviceConfigs">
                           <v-list-tile v-for="(item2, index) in serviceConfigs(item.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
                             <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2, item)" >{{item2.govAgencyName}}</v-list-tile-title>
-                            <v-list-tile-title v-else @click="viewGuide(item2, item.serviceCode)">{{item2.govAgencyName}}</v-list-tile-title>
+                            <v-list-tile-title v-else @click="viewGuide(item2, item.serviceCode, item)">{{item2.govAgencyName}}</v-list-tile-title>
                           </v-list-tile>
                         </v-list>
                       </v-menu>
@@ -370,7 +375,7 @@
                       </v-btn>
                       <v-btn class="mx-0 my-0" small color="primary" 
                         v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length === 1 && Number(serviceConfigs(item.serviceConfigs)[0]['serviceLevel']) <= 2"
-                        @click="viewGuide(serviceConfigs(item.serviceConfigs)[0], item.serviceCode)"
+                        @click="viewGuide(serviceConfigs(item.serviceConfigs)[0], item.serviceCode, item)"
                       >
                         Xem hướng dẫn
                       </v-btn>
@@ -391,7 +396,12 @@
       <v-dialog scrollable v-model="dialogGuide" persistent max-width="600">
         <v-card>
           <v-card-title class="headline">Hướng dẫn nộp hồ sơ</v-card-title>
-          <v-card-text v-if="serviceDetail" style="max-height: 400px" v-html="serviceDetail.serviceInstruction"></v-card-text>
+          <v-card-text v-if="serviceDetail" style="max-height: 400px">
+            <div  v-html="serviceDetail.serviceInstruction"></div>
+            <p class="mt-1">
+              <a href="javascript:;" @click="viewTphs" style="color: #001fff;text-decoration: underline;font-style: italic;">Thành phần hồ sơ</a>
+            </p>
+          </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="green darken-1" flat="flat" @click.native="dialogGuide = false">
@@ -1381,19 +1391,29 @@ export default {
         path: current.path + queryString
       })
     },
-    viewDetail (item) {
+    viewDetail (item, activeTab) {
       let vm = this
       let urlRedirect = vm.pathRouter + item.serviceInfoId
       if (item.serviceCodeDVCQG) {
-        urlRedirect = urlRedirect + '?code=' + item.serviceCodeDVCQG
+        urlRedirect = urlRedirect + '?code=' + item.serviceCodeDVCQG + '&notCreate=true'
       }
       if (vm.setAgency) {
-        urlRedirect = vm.pathRouter + item.serviceInfoId + '?setAgency'
+        urlRedirect = vm.pathRouter + item.serviceInfoId + '?setAgency=true&notCreate=true'
       }
-      
+      if (activeTab) {
+        if (item.serviceCodeDVCQG || vm.setAgency) {
+          urlRedirect = urlRedirect + '&active=' + activeTab
+        } else {
+          urlRedirect = urlRedirect + '?active=' + activeTab
+        }
+      }
       vm.$router.push({
         path: urlRedirect
       })
+    },
+    viewTphs () {
+      let vm = this
+      vm.viewDetail(vm.serviceInfoSelected, 2)
     },
     createDossier (item, serviceInfoItem) {
       let vm = this
@@ -1448,11 +1468,14 @@ export default {
       let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
       window.open(url, '_self')
     },
-    viewGuide (item, serviceCode) {
+    viewGuide (item, serviceCode, serviceInfo) {
       let vm = this
       vm.serviceDetail = item
       vm.dialogGuide = true
       vm.trackingBTTT(serviceCode)
+      if (serviceInfo) {
+        vm.serviceInfoSelected = serviceInfo
+      }
     },
     showSelectGov (serviceInfo, govList, guide) {
       let vm = this

@@ -3191,7 +3191,7 @@ export const store = new Vuex.Store({
           axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/documents/print', param).then(function (response) {
             let serializable = response.data
             if (response['status'] !== undefined && response['status'] !== 200) {
-              reject('pending')
+              resolve('pending')
             } else {
               if (serializable['size']) {
                 let file = window.URL.createObjectURL(serializable)

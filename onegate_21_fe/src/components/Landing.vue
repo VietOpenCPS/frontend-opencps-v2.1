@@ -2618,11 +2618,11 @@ export default {
       let callServer = function() {
         setTimeout(function () {
           vm.$store.dispatch('doPrint03', filter).then(function (result) {
-            if (result === 'pending' && counter <= 10) {
+            if (result === 'pending' && counter <= 15) {
               counter += 1
               callServer()
             } else {
-              if (counter > 10) {
+              if (counter > 15) {
                 vm.dialogPDFLoading = false
               } else {
                 vm.dialogPDFLoading = false
