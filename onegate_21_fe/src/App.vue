@@ -1,7 +1,7 @@
 <template>
-  <v-app class="onegate__fe">
+  <v-app class="onegate__fe" style="border: 1px solid #dedede;">
     <v-navigation-drawer app clipped floating width="240"
-      :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !viewMobile"
+      :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !isMobile"
     >
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="7" />
@@ -11,7 +11,7 @@
           v-for="(item, index) in trangThaiHoSoList"
           v-model="item.active"
           :key="index"
-          prepend-icon="description"
+          :prepend-icon="item['icon'] ? item['icon'] : 'description'"
           :append-icon="item.hasOwnProperty('items') ? '' : ''"
           no-action
           ref="listGroupCustom"
@@ -48,9 +48,9 @@
         </v-list-group>
       </v-list>
     </v-navigation-drawer>
-    <div v-if="trangThaiHoSoList.length !== 0 && viewMobile">
-      <div class="row-header mb-2 py-2" style="background-color: #070f52">
-        <div class="ml-2 text-bold white--text"> <span>QUẢN LÝ HỒ SƠ</span> </div>
+    <div v-if="trangThaiHoSoList.length !== 0 && isMobile" id="m-navigation">
+      <div class="row-header mb-0 py-2" style="background-color: #070f52">
+        <div class="ml-2 white--text"> <span>QUẢN LÝ HỒ SƠ</span> </div>
       </div>
       <div style="max-height:200px;overflow:hidden;overflow-y:scroll">
         <content-placeholders class="mt-3" v-if="loading">
@@ -61,7 +61,7 @@
             v-for="(item, index) in trangThaiHoSoList"
             v-model="item.active"
             :key="index"
-            prepend-icon="description"
+            :prepend-icon="item['icon'] ? item['icon'] : 'description'"
             :append-icon="item.hasOwnProperty('items') ? '' : ''"
             no-action
             ref="listGroupCustom"
@@ -100,17 +100,42 @@
       </div>
     </div>
     <v-content>
-      <router-view></router-view>
-      <v-alert class="mx-3" v-if="!loading && trangThaiHoSoList.length === 0" outline color="warning" icon="priority_high" :value="true">
+      <router-view v-if="isSigned"></router-view>
+      <v-alert class="mx-3" v-if="!loading && trangThaiHoSoList.length === 0 && isSigned" outline color="warning" icon="priority_high" :value="true">
         Bạn không có quyền thao tác!
       </v-alert>
+      <v-layout class="mt-4" wrap style="max-width:500px;margin: 0 auto" v-if="!isSigned">
+        <v-flex xs12>
+          <v-card flat class="px-2 py-3" style="border: 1px solid #dddddd;">
+            <v-flex xs12 class="primary--text text-bold text-xs-center">
+              VUI LÒNG ĐĂNG NHẬP ĐỂ SỬ DỤNG
+            </v-flex>
+            <v-flex xs12 class="mt-3 text-xs-center">
+              <v-btn
+                @click="doLogin"
+                color="primary"
+                class="mr-2"
+              >
+                <v-icon>input</v-icon>&nbsp;
+                Đăng nhập
+              </v-btn>
+              <v-btn @click="goBack" color="primary">
+                <v-icon>reply</v-icon>&nbsp;
+                Quay lại
+              </v-btn>
+            </v-flex>
+          </v-card>
+        </v-flex>
+      </v-layout>
     </v-content>
     <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
   </v-app>
 </template>
 
 <script>
-  import { isMobile } from 'mobile-device-detect'
+  // import { isMobile } from 'mobile-device-detect'
+  import axios from 'axios'
+  import $ from 'jquery'
   export default {
     data: () => ({
       isCallBack: true,
@@ -118,8 +143,21 @@
       loading: true,
       currentStep: '0',
       counterData: [],
-      detailState: 0
+      detailState: 0,
+      isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false
     }),
+    beforeDestroy () {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', this.onResize, { passive: true })
+      }
+    },
+    mounted () {
+      this.onResize()
+      window.addEventListener('resize', this.onResize, { passive: true })
+      if (this.isMobile) {
+        $('section#content').css('padding-left', '0px')
+      }
+    },
     computed: {
       currentIndex () {
         return this.$store.getters.index
@@ -127,16 +165,46 @@
       activeGetCounter () {
         return this.$store.getters.activeGetCounter
       },
-      viewMobile () {
-        return isMobile
-      },
       pathLanding () {
-        return isMobile ? '/m/danh-sach-ho-so' : '/danh-sach-ho-so'
+        return '/danh-sach-ho-so'
+      },
+      isMobile () {
+        return this.$store.getters.getIsMobile
       }
     },
     created () {
-      var vm = this
+      let vm = this
+      let isMobile = window.innerWidth < 1264
+      vm.$store.commit('setIsMobile', isMobile)
+      // if (window.location.href.includes('/m/') && vm.isMobile) {
+      //   $('head meta[name=viewport]').remove()
+      // } else {
+      //   if ($('head meta[name=viewport]').length === 0) {
+      //     $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
+      //   }
+      // }
+      axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
+        let userData = response.data
+        vm.$store.commit('setUserLogin', userData)
+        if (userData.hasOwnProperty('className') && userData.className === 'org.opencps.usermgt.model.Employee') {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          // axios.get('/o/rest/v2/employees/byGroupId', param).then(function(response1) {
+          //   let employeeLogin = response1.data
+          //   vm.$store.commit('setEmployeeLogin', employeeLogin)
+          //   console.log('setEmployeeLogin', vm.$store.getters.getEmployeeLogin)
+          // })
+        }
+      })
+      .catch(function(error) {
+      })
       vm.$nextTick(function () {
+        // 
+        window.message = vm.callback_alpacal
+        // 
         vm.loading = true
         vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
           vm.loading = false
@@ -146,7 +214,7 @@
             if (Array.isArray(vm.trangThaiHoSoList) && vm.trangThaiHoSoList.length > 0) {
               if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
                 vm.trangThaiHoSoList[0]['active'] = true
-               vm.$router.push({
+                vm.$router.push({
                   path: vm.pathLanding + '/0',
                   query: {
                     q: vm.trangThaiHoSoList[0]['queryParams']
@@ -160,10 +228,14 @@
             vm.loading = false
           }
         })
+        // 
+        setInterval(function () {
+          vm.loadingCounter()
+        }, 5*60*1000)
       })
     },
     updated () {
-      var vm = this
+      let vm = this
       vm.$nextTick(function () {
         let currentParams = vm.$router.history.current.params
         if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
@@ -180,6 +252,15 @@
     watch: {
       '$route': function (newRoute, oldRoute) {
         let vm = this
+        let isMobile = window.innerWidth < 1264
+        vm.$store.commit('setIsMobile', isMobile)
+        // if (window.location.href.includes('/m/') && vm.isMobile) {
+        //   $('head meta[name=viewport]').remove()
+        // } else {
+        //   if ($('head meta[name=viewport]').length === 0) {
+        //     $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
+        //   }
+        // }
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
         if (currentQuery.hasOwnProperty('step')) {
@@ -198,7 +279,7 @@
         }
       },
       activeGetCounter (val) {
-        var vm = this
+        let vm = this
         setTimeout(function () {
           vm.loadingCounter()
         }, 300)
@@ -207,8 +288,18 @@
     methods: {
       toTableIndexing (item, index) {
         let vm = this
+        try {
+          if (vm.isMobile && $('#table-dossier')) {
+            $('html, body').animate(
+              {
+                scrollTop: $('#table-dossier').offset().top,
+              }, 200,'linear'
+            )
+          }
+        } catch (error) {
+        }
         this.$store.commit('setIndex', index)
-       vm.$router.push({
+        vm.$router.push({
           path: vm.pathLanding + '/' + index,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -218,10 +309,21 @@
       },
       filterSteps (item) {
         let vm = this
+        try {
+          if (vm.isMobile && $('#table-dossier')) {
+            $('html, body').animate(
+              {
+                scrollTop: $('#table-dossier').offset().top,
+              }, 200,'linear'
+            )
+          }
+        } catch (error) {
+        }
+        
         let currentQuery = vm.$router.history.current.query
         let currentParams = vm.$router.history.current.params
-        console.log('currentParams', currentParams)
-        console.log('currentQuery', currentQuery)
+        // console.log('currentParams', currentParams)
+        // console.log('currentQuery', currentQuery)
         let queryString = vm.trangThaiHoSoList[currentParams.index].queryParams
         console.log('queryString++++++1111111+++++', queryString)
         /* test Local */
@@ -233,18 +335,8 @@
           }
         }
         vm.currentStep = String(item.stepCode)
-        // if (vm.currentStep) {
-        //   let urls = queryString.split("?")
-        //   if (urls !== null && urls.length !== 0) {
-        //     for (var i = 0; i < urls.length; i++) {
-        //       if (urls[i].indexOf('step') > 0) {
-        //         urls.splice(i, 1)
-        //       }
-        //     }
-        //   }
-        // }
-        console.log('queryString++++++++22222222+++', queryString)
-       vm.$router.push({
+        // console.log('queryString++++++++22222222+++', queryString)
+        vm.$router.push({
           path: vm.pathLanding + '/' + currentParams.index,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -278,15 +370,27 @@
               vm.trangThaiHoSoList[key]['counter'] = parentCount
             } else {
               if (vm.trangThaiHoSoList[key].queryParams.indexOf('step') >= 0) {
-                let stepParent = vm.trangThaiHoSoList[key].queryParams.split('step=')
-                let countParent = 0
-                for (let countKey in vm.counterData) {
-                  if (String(vm.counterData[countKey].stepCode) === String(stepParent[1])) {
-                    let countParent = vm.counterData[countKey].totalCount
-                    break
+                if (vm.trangThaiHoSoList[key]['menuType'] === 2) {
+                  let filter = {
+                    queryParams: vm.trangThaiHoSoList[key].queryParams
                   }
+                  vm.$store.dispatch('loadingCounterNotStep', filter).then(function (result) {
+                    vm.trangThaiHoSoList[key]['counter'] = result.total
+                  }).catch(function () {
+                    vm.trangThaiHoSoList[key]['counter'] = 0
+                  })
+                } else {
+                  let stepParent = vm.trangThaiHoSoList[key].queryParams.split('step=')
+                  let countParent = 0
+                  for (let countKey in vm.counterData) {
+                    if (String(vm.counterData[countKey].stepCode) === String(stepParent[1])) {
+                      countParent = vm.counterData[countKey].totalCount
+                      break
+                    }
+                  }
+                  vm.trangThaiHoSoList[key]['counter'] = countParent
                 }
-                vm.trangThaiHoSoList[key]['counter'] = countParent
+                
               } else {
                 let filter = {
                   queryParams: vm.trangThaiHoSoList[key].queryParams
@@ -301,7 +405,21 @@
           }
           vm.loading = false
         })
-      }
+      },
+      doLogin () {
+        window.location.href = window.themeDisplay.getPortalURL()
+      },
+      goBack () {
+        window.history.back()
+      },
+      callback_alpacal (data) {
+        console.log('data_export_eform', data)
+      },
+      onResize () {
+        let vm = this
+        let isMobile = window.innerWidth < 1264
+        vm.$store.commit('setIsMobile', isMobile)
+      },
     }
   }
 </script>

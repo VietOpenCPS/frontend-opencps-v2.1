@@ -7,6 +7,13 @@ import axios from 'axios'
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 Vue.config.productionTip = true
 
+// new Vue({
+//   render: function (h) { 
+//     return h(App) }
+// }).$mount('#app_login')
+
 new Vue({
-  render: function (h) { return h(App) }
-}).$mount('#app_login')
+  el: '#app_login',
+  components: { App },
+  template: '<App/>'
+})

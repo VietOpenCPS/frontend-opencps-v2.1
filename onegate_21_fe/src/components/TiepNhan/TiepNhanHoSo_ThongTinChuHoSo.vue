@@ -3,35 +3,50 @@
     <v-form v-model="valid_thongtinchuhoso" ref="formChuHoSo" lazy-validation>
       <div>
         <div style="position: relative;">
-          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+          <v-expansion-panel :value="[true]" expand  class="expansion-pl" v-if="!showApplicant">
             <v-expansion-panel-content>
               <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div> Thông tin chủ hồ sơ</div>
               <v-card>
-                <v-tooltip left v-if="(!thongTinChuHoSo.userType || (originality === 1 && thongTinChuHoSo.applicantIdType === 'business')) && bussinessExits"
+                <v-tooltip left v-if="(thongTinChuHoSo.userType === '2' || (originality === 1 && thongTinChuHoSo.applicantIdType === 'business')) && bussinessExits"
                 style="position:absolute;right:5px;z-index:101"
                 >
-                  <v-btn slot="activator" class="my-0 mt-1" fab icon small dark color="primary" @click.native="getApplicantInfos()" style="width:32px!important;height:32px!important"
-                  >
+                  <v-btn slot="activator" class="my-0 mt-1" fab icon small dark color="primary" @click.native="getApplicantInfos()" style="width:32px!important;height:32px!important">
                     <v-icon dark>account_balance</v-icon>
                   </v-btn>
                   <span>Đối chiếu thông tin doanh nghiệp</span>
                 </v-tooltip>
-                <v-card-text class="pt-3">
+                <v-card-text :class="originality === 3 && thongTinChuHoSo.userType === '2' && traCuuLgsp ? 'pt-0' : 'pt-3'">
+                  <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '2' && traCuuLgsp">
+                    <v-btn class="mx-0" color="primary" @click.stop="showDialogSearchLgsp()">
+                      <v-icon>fas fa fa-search-plus</v-icon> &nbsp;
+                      Tra cứu CSDL Quốc Gia
+                    </v-btn>
+                  </v-flex>
                   <v-layout wrap>
+                    <v-flex xs12 class="mb-3 text-xs-center" v-if="validateSameApplicantIdNo && sameApplicantIdNo">
+                      <div>
+                        <span class="mr-2"><v-icon color="warning">error_outline</v-icon></span>
+                        <span style="">Chủ hồ sơ CMND/ Hộ chiếu/ Mã số thuế </span>
+                        <span class="text-bold">{{thongTinChuHoSo.applicantIdNo}}</span>
+                        <span> đang được tiếp nhận, giải quyết tại hồ sơ số: </span>
+                        <span style="color: red">{{sameApplicantIdNo}}</span>
+                      </div>
+                    </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0"> <!-- {{thongTinChuHoSo.userType}} --> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span v-if="requiredOptions['applicantIdNo'] || (originality === 1 && requiredOptions['applicantIdNo'])" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm2>
+                    <v-flex xs12 sm2 style="position:relative">
                       <v-text-field
                         v-if="originality === 1 || originality === '1'"
                         v-model="thongTinChuHoSo.applicantIdNo"
-                        :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                        required
                         @input="changeApplicantInfos"
                         :disabled="loadingVerify"
+                        :rules="[rules.required, rules.varchar100]"
+                        required
+                        @change="thongTinChuHoSo.applicantIdNo=String(thongTinChuHoSo.applicantIdNo).trim()"
                       ></v-text-field>
                       <suggestions
                         v-if="originality === 3 || originality === '3'"
@@ -41,6 +56,7 @@
                         :onInputChange="onInputChange"
                         :class="loadingVerify ? 'input-group--disabled' : ''"
                         :style="loadingVerify ? 'color:#00000061' : ''"
+                        @change="changeSuggess"
                         >
                         <div slot="item" slot-scope="props" class="single-item">
                           <v-list-tile-content>
@@ -49,12 +65,19 @@
                           </v-list-tile-content>
                         </div>
                       </suggestions>
+                      <span style="color:#ff5252;font-size: 12px;" v-if="(originality === 3 || originality === '3') && !applicantIdRequired && !thongTinChuHoSo.applicantIdNo">Thông tin bắt buộc</span>
+                      <v-tooltip top v-if="(originality === 3 || originality === '3') && applicantConfig">
+                        <v-btn @click="showDialogApplicantList('ChuHoSo')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
+                          <v-icon size="14">fas fa fa-address-card</v-icon>
+                        </v-btn>
+                        <span>Danh sách công dân, tổ chức, doanh nghiệp</span>
+                      </v-tooltip>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].nguoi_nop }}<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].nguoi_nop }}<span v-if="requiredOptions['applicantName']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm6>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -64,35 +87,36 @@
                         v-else
                         v-model="thongTinChuHoSo.applicantName"
                         @input="changeApplicantInfos"
-                        :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                        required
+                        @change="thongTinChuHoSo.applicantName=String(thongTinChuHoSo.applicantName).trim()"
                         :disabled="loadingVerify"
+                        :rules="requiredOptions['applicantName'] ? [rules.required,rules.varchar500] : ''"
+                        :required="requiredOptions['applicantName']"
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Địa chỉ <span v-if="originality === 1" style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Địa chỉ <span v-if="requiredOptions['address']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm10>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-text-field
+                      <v-textarea
                       v-else
                       v-model="thongTinChuHoSo.address"
-                      multi-line
                       rows="2"
-                      :rules="originality === 1 ? [v => !!v || 'Trường dữ liệu bắt buộc'] : ''"
-                      required
-                      ></v-text-field>
+                      @change="thongTinChuHoSo.address=String(thongTinChuHoSo.address).trim()"
+                      :rules="requiredOptions['address'] ? [rules.required,rules.varchar500] : ''"
+                      :required="requiredOptions['address']"
+                      ></v-textarea>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Tỉnh/Thành phố<span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
+                      <v-subheader v-else class="pl-0">Tỉnh/Thành phố <span v-if="requiredOptions['cityCode']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -104,16 +128,17 @@
                       item-text="itemName"
                       item-value="itemCode"
                       v-model="thongTinChuHoSo.cityCode"
+                      hide-no-data
                       @change="onChangeCity"
-                      :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                      required
+                      :rules="requiredOptions['cityCode'] ? [rules.required] : ''"
+                      :required="requiredOptions['cityCode']"
                       ></v-autocomplete>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Quận/Huyện <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
+                      <v-subheader v-else class="pl-0">Quận/Huyện <span v-if="requiredOptions['districtCode']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -126,15 +151,16 @@
                       item-value="itemCode"
                       v-model="thongTinChuHoSo.districtCode"
                       @change="onChangeDistrict"
-                      :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                      required
+                      :rules="requiredOptions['districtCode'] ? [rules.required] : ''"
+                      :required="requiredOptions['districtCode']"
+                      hide-no-data
                       ></v-autocomplete>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Xã/Phường <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
+                      <v-subheader v-else class="pl-0">Xã/Phường <span v-if="requiredOptions['wardCode']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -147,15 +173,16 @@
                       item-value="itemCode"
                       v-model="thongTinChuHoSo.wardCode"
                       @change="onChangeWard"
-                      :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                      required
+                      :rules="requiredOptions['wardCode'] ? [rules.required] : ''"
+                      :required="requiredOptions['wardCode']"
+                      hide-no-data
                       ></v-autocomplete>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Số điện thoại <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Số điện thoại <span v-if="requiredOptions['contactTelNo']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -164,16 +191,17 @@
                       <v-text-field
                       v-else
                       v-model="thongTinChuHoSo.contactTelNo"
+                      @change="thongTinChuHoSo.contactTelNo=String(thongTinChuHoSo.contactTelNo).trim()"
                       append-icon="phone"
-                      :rules="[rules.telNo, rules.required]"
-                      required
+                      :rules="requiredOptions['contactTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
+                      :required="requiredOptions['contactTelNo']"
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Địa chỉ E-mail <span v-if="originality === 1" style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Địa chỉ email <span v-if="requiredOptions['contactEmail']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm6>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -182,8 +210,9 @@
                       <v-text-field
                       v-else
                       v-model="thongTinChuHoSo.contactEmail"
-                      :rules="originality === 1 ? [rules.email, rules.required] : (thongTinChuHoSo.contactEmail && originality !== 1 ? [rules.email] : '')"
-                      required
+                       @change="thongTinChuHoSo.contactEmail=String(thongTinChuHoSo.contactEmail).trim()"
+                      :rules="requiredOptions['contactEmail'] ? [rules.email, rules.required, rules.varchar100] : (thongTinChuHoSo.contactEmail ? [rules.email, rules.varchar100] : '')"
+                      :required="requiredOptions['contactEmail']"
                       ></v-text-field>
                     </v-flex>
                   </v-layout>
@@ -191,16 +220,30 @@
               </v-card>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <div class="absolute__btn" style="width: 350px;" v-if="originality !== 1">
+          <div class="absolute__btn" :style="hasOrganization ? 'width: 420px;' : 'width: 350px;'" v-if="originality !== 1">
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-radio-group class="mt-2" v-else v-model="thongTinChuHoSo.userType" row @change="checkApplicantInfos">
-              <v-radio label="Công dân" :value="true"></v-radio>
-              <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
+            <v-radio-group class="mt-2" v-if="!loading && !hasOrganization" v-model="thongTinChuHoSo.userType" row @change="checkUserType">
+              <v-radio label="Công dân" :value="'1'"></v-radio>
+              <v-radio label="Tổ chức, doanh nghiệp" :value="'2'"></v-radio>
             </v-radio-group>
+            <v-radio-group class="mt-2" v-if="!loading && hasOrganization" v-model="thongTinChuHoSo.userType" row @change="checkUserType">
+              <v-radio label="Công dân" :value="'1'"></v-radio>
+              <v-radio label="Doanh nghiệp" :value="'2'"></v-radio>
+              <v-radio label="Cơ quan, tổ chức" :value="'3'"></v-radio>
+            </v-radio-group>
+            <!-- <v-radio-group class="mt-2" v-if="!loading && !hasOrganization" v-model="thongTinChuHoSo.userType" row @change="checkApplicantInfos">
+              <v-radio label="Công dân" :value="'1'"></v-radio>
+              <v-radio label="Tổ chức, doanh nghiệp" :value="'2'"></v-radio>
+            </v-radio-group>
+            <v-radio-group class="mt-2" v-if="!loading && hasOrganization" v-model="thongTinChuHoSo.userType" row @change="checkApplicantInfos">
+              <v-radio label="Công dân" :value="'1'"></v-radio>
+              <v-radio label="Doanh nghiệp" :value="'2'"></v-radio>
+              <v-radio label="Cơ quan, tổ chức" :value="'3'"></v-radio>
+            </v-radio-group> -->
           </div>
-          <div style="position: relative;" v-if="originality !== 1">
+          <div style="position: relative;" v-if="originality !== 1  && !showDelegate">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content>
                 <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div> Thông tin người nộp hồ sơ</div>
@@ -211,17 +254,19 @@
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">CMND/Hộ chiếu <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                        <v-subheader v-else class="pl-0">CMND/Hộ chiếu <span v-if="requiredOptions['delegateIdNo']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
-                      <v-flex xs12 sm2>
+                      <v-flex xs12 sm2 style="position:relative">
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
                         <v-text-field
-                        v-if="originality === 1 || originality === '1'"
-                        v-model="thongTinNguoiNopHoSo.delegateIdNo"
-                        :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                        required
+                          v-if="originality === 1 || originality === '1'"
+                          v-model="thongTinNguoiNopHoSo.delegateIdNo"
+                          :rules="[rules.required, rules.varchar100]"
+                          required
+                          @change="thongTinNguoiNopHoSo.delegateIdNo=String(thongTinNguoiNopHoSo.delegateIdNo).trim()"
+                          :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
                         <!--  -->
                         <suggestions
@@ -229,7 +274,8 @@
                           v-model="thongTinNguoiNopHoSo.delegateIdNo"
                           :options="searchOptions"
                           :onItemSelected="onSearchItemSelected1"
-                          :onInputChange="onInputChange1">
+                          :onInputChange="onInputChange1"
+                          :style="thongTinNguoiNopHoSo.sameUser ? 'pointer-events: none;opacity: 0.7' : ''">
                           <div slot="item" slot-scope="props" class="single-item">
                             <v-list-tile-content>
                               <v-list-tile-title v-html="props.item.applicantName"></v-list-tile-title>
@@ -237,12 +283,19 @@
                             </v-list-tile-content>
                           </div>
                         </suggestions>
+                        <span style="color:#ff5252;font-size: 12px" v-if="(originality === 3 || originality === '3') && !applicantIdRequired && !thongTinNguoiNopHoSo.delegateIdNo">Thông tin bắt buộc</span>
+                        <v-tooltip top v-if="(originality === 3 || originality === '3') && applicantConfig">
+                          <v-btn @click="showDialogApplicantList('NguoiNop')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
+                            <v-icon size="14">fas fa fa-address-card</v-icon>
+                          </v-btn>
+                          <span>Danh sách công dân, tổ chức, doanh nghiệp</span>
+                        </v-tooltip>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Họ và tên <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                        <v-subheader v-else class="pl-0">Họ và tên <span v-if="requiredOptions['delegateName']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm6>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -251,32 +304,37 @@
                         <v-text-field
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateName"
-                        :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                        required
+                        :rules="requiredOptions['delegateName'] ? [rules.required, rules.varchar500] : ''"
+                        :required="requiredOptions['delegateName']"
+                        @change="thongTinNguoiNopHoSo.delegateName=String(thongTinNguoiNopHoSo.delegateName).trim()"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Địa chỉ: </v-subheader>
+                        <v-subheader v-else class="pl-0">Địa chỉ <span v-if="requiredOptions['delegateAddress']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm10>
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-text-field
+                        <v-textarea
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateAddress"
-                        multi-line
                         rows="2"
-                        ></v-text-field>
+                        @change="thongTinNguoiNopHoSo.delegateAddress=String(thongTinNguoiNopHoSo.delegateAddress).trim()"
+                        :rules="requiredOptions['delegateAddress'] ? [rules.required, rules.varchar500] : ''"
+                        :required="requiredOptions['delegateAddress']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
+                        ></v-textarea>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Tỉnh/Thành phố <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
+                        <v-subheader v-else class="pl-0">Tỉnh/Thành phố <span v-if="requiredOptions['delegateCityCode']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -289,15 +347,17 @@
                         item-value="itemCode"
                         @change="onChangeDelegateCity"
                         v-model="thongTinNguoiNopHoSo.delegateCityCode"
-                        :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                        required
+                        :rules="requiredOptions['delegateCityCode'] ? [rules.required] : ''"
+                        :required="requiredOptions['delegateCityCode']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
+                        hide-no-data
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Quận/Huyện <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
+                        <v-subheader v-else class="pl-0">Quận/Huyện <span v-if="requiredOptions['delegateDistrictCode']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -310,15 +370,17 @@
                         item-value="itemCode"
                         @change="onChangeDelegateDistrict"
                         v-model="thongTinNguoiNopHoSo.delegateDistrictCode"
-                        :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                        required
+                        :rules="requiredOptions['delegateDistrictCode'] ? [rules.required] : ''"
+                        :required="requiredOptions['delegateDistrictCode']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
+                        hide-no-data
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Xã/Phường <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
+                        <v-subheader v-else class="pl-0">Xã/Phường <span v-if="requiredOptions['delegateWardCode']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -330,15 +392,17 @@
                         item-text="itemName"
                         item-value="itemCode"
                         v-model="thongTinNguoiNopHoSo.delegateWardCode"
-                        :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                        required
+                        :rules="requiredOptions['delegateWardCode'] ? [rules.required] : ''"
+                        :required="requiredOptions['delegateWardCode']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
+                        hide-no-data
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Số điện thoại: </v-subheader>
+                        <v-subheader v-else class="pl-0">Số điện thoại <span v-if="requiredOptions['delegateTelNo']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -347,15 +411,18 @@
                         <v-text-field
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateTelNo"
-                        :rules="[rules.telNo]"
                         append-icon="phone"
+                        @change="thongTinNguoiNopHoSo.delegateName=String(thongTinNguoiNopHoSo.delegateName).trim()"
+                        :rules="requiredOptions['delegateTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
+                        :required="requiredOptions['delegateTelNo']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Email: </v-subheader>
+                        <v-subheader v-else class="pl-0">Địa chỉ email <span v-if="requiredOptions['delegateEmail']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm6>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -364,7 +431,10 @@
                         <v-text-field
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateEmail"
-                        :rules="thongTinNguoiNopHoSo.delegateEmail ? [rules.email] : ''"
+                        @change="thongTinNguoiNopHoSo.delegateEmail=String(thongTinNguoiNopHoSo.delegateEmail).trim()"
+                        :rules="requiredOptions['delegateEmail'] ? [rules.email, rules.required] : (thongTinNguoiNopHoSo.delegateEmail ? [rules.email] : '')"
+                        :required="requiredOptions['delegateEmail']"
+                        :disabled="thongTinNguoiNopHoSo.sameUser"
                         ></v-text-field>
                       </v-flex>
                     </v-layout>
@@ -372,13 +442,13 @@
                 </v-card>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <div class="absolute__btn" style="width: 200px;margin-top: 4px;">
+            <div class="absolute__btn" style="width: 200px;margin-top: 4px;" v-if="!showApplicant">
               <content-placeholders class="mt-1" v-if="loading">
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
               <v-checkbox class="mt-1"
               v-else
-              label="Giống chủ hồ sơ"
+              label="Là chủ hồ sơ"
               v-model="thongTinNguoiNopHoSo.sameUser"
               ></v-checkbox>
             </div>
@@ -426,6 +496,313 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialog_applicantList" scrollable persistent max-width="1200px">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Danh sách công dân, tổ chức, doanh nghiệp</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_applicantList = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-1">
+          <v-layout wrap class="mt-3">
+            <v-flex xs12 sm7 class="pr-2 input-group--text-field-box">
+              <v-text-field
+                  label="Tìm kiếm theo tên người dùng"
+                  v-model="keySearch"
+                  @keyup.enter="searchKeyword"
+                  append-icon="search"
+                  box
+                  clear-icon="clear"
+                  clearable
+                  @click:clear="clearKeySearch"
+                  @click:append="searchKeyword"
+                ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm5 class="pl-2 pr-2">
+              <div style="position:relative">
+                <v-radio-group class="mt-1" v-model="typeSearch" row @change="changeTypeSearch">
+                  <v-radio label="Tất cả" :value="''" ></v-radio>
+                  <v-radio label="Công dân" :value="'citizen'"></v-radio>
+                  <v-radio label="Doanh nghiệp" :value="'business'"></v-radio>
+                  <v-radio label="Cơ quan, tổ chức" :value="'organization'"></v-radio>
+                </v-radio-group>
+              </div>
+            </v-flex>
+          </v-layout>
+          <v-data-table
+            :headers="applicantListHeader"
+            :items="applicantLists"
+            hide-actions
+            class="table-landing table-bordered"
+            style="border-left: 1px solid #dedede"
+          >
+            <template slot="items" slot-scope="props">
+              <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
+                <td class="text-xs-center" style="width:50px;height:36px">
+                  <content-placeholders v-if="loadingTable">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{ applicantPage * numberPerPage - numberPerPage + props.index + 1 }}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left" style="height:36px">
+                  <content-placeholders v-if="loadingTable">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{props.item.applicantName}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left" style="height:36px">
+                  <content-placeholders v-if="loadingTable">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{props.item.applicantIdType === 'citizen' ? 'Công dân' : (props.item.applicantIdType === 'business' ? 'Doanh nghiệp' : 'Cơ quan, tổ chức')}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left" style="height:36px">
+                  <content-placeholders v-if="loadingTable">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{props.item.applicantIdNo}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left" style="height:36px;min-width:200px">
+                  <content-placeholders v-if="loadingTable">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{fullAddress(props.item['address'], props.item['cityName'], props.item['districtName'], props.item['wardName'])}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-center" style="height:36px;width: 100px">
+                  <content-placeholders v-if="loadingTable">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <v-tooltip top v-if="!loadingTable">
+                    <v-btn @click="showEditApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
+                      <v-icon>edit</v-icon>
+                    </v-btn>
+                    <span>Sửa thông tin</span>
+                  </v-tooltip>
+                  
+                  <v-tooltip top v-if="!loadingTable">
+                    <v-btn @click="bindInfoApplicant(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
+                      <v-icon>beenhere</v-icon>
+                    </v-btn>
+                    <span>Sử dụng</span>
+                  </v-tooltip>
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
+          <!--  -->
+          <div class="my-2" v-if="totalApplicantSearch > numberPerPage">
+            <div class="text-xs-right layout wrap" style="position: relative;">
+              <div class="flex pagging-table px-2"> 
+                <tiny-pagination :total="totalApplicantSearch" :page="applicantPage" :numberPerPage="numberPerPage" nameRecord="người dùng" custom-class="custom-tiny-class" 
+                  @tiny:change-page="changePage" ></tiny-pagination> 
+              </div>
+            </div>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-4" color="primary" @click.native="dialog_applicantList = false">
+            <v-icon>clear</v-icon> &nbsp;
+            Thoát
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialog_editApplicant" scrollable persistent max-width="700px">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>{{titleEdit}}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_editApplicant = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-1">
+          <v-form ref="form" v-model="valid" lazy-validation class="py-3 px-0 grid-list">
+            <v-layout row wrap class="px-0 py-3">
+              <v-flex xs12 sm12>
+                <v-text-field v-model="applicantEdit['applicantName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required  @change="applicantEdit['applicantName']=String(applicantEdit['applicantName']).trim()">
+                  <template slot="label"> 
+                    <span v-if="applicantEdit['applicantIdType'] === 'business'">Tên doanh nghiệp</span>
+                    <span v-if="applicantEdit['applicantIdType'] === 'citizen'">Họ tên</span> 
+                    <span v-if="applicantEdit['applicantIdType'] === 'organization'">Tên cơ quan, tổ chức</span> 
+                    <span class="red--text darken-3"> *</span>
+                  </template>
+                </v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6>
+                <v-text-field v-model="applicantEdit['applicantIdNo']" box 
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required 
+                  disabled style="pointer-events: none"
+                  @change="applicantEdit['applicantIdNo']=applicantEdit['applicantIdNo'].trim()"
+                >
+                  <template slot="label"> 
+                    <span v-if="applicantEdit['applicantIdType'] === 'business'">Mã số thuế</span>
+                    <span v-if="applicantEdit['applicantIdType'] === 'citizen'">Số CMND/ Căn cước</span> 
+                    <span v-if="applicantEdit['applicantIdType'] === 'organization'">Mã cơ quan, tổ chức</span> 
+                    <span class="red--text darken-3"> *</span>
+                  </template>
+                </v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6>
+                <v-menu
+                  ref="menuBirthDate"
+                  :close-on-content-click="false"
+                  v-model="menuBirthDate"
+                  :nudge-right="40"
+                  lazy
+                  transition="fade-transition"
+                  offset-y
+                  full-width
+                  max-width="290px"
+                  min-width="290px"
+                >
+                  <v-text-field
+                    slot="activator"
+                    box append-icon="event"
+                    v-model="applicantEdit['applicantIdDate']"
+                    label="Ngày cấp"
+                    @change="applicantEdit['applicantIdDate']=String(applicantEdit['applicantIdDate']).trim()"
+                    @blur="ngayCap = parseDate(applicantEdit['applicantIdDate'])"
+                  ></v-text-field>
+                  <v-date-picker ref="picker" min="1950-01-01" :max="getMaxdate()" :first-day-of-week="1" locale="vi"
+                  v-model="ngayCap" no-title @input="changeBirthDate"></v-date-picker>
+                </v-menu>
+              </v-flex>
+              <v-flex xs12 sm6>
+                <v-text-field label="Số điện thoại" v-model="applicantEdit['contactTelNo']" box @change="applicantEdit['contactTelNo']=String(applicantEdit['contactTelNo']).trim()"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6>
+                <v-text-field label="Thư điện tử" v-model="applicantEdit['contactEmail']" box disabled @change="applicantEdit['contactEmail']=String(applicantEdit['contactEmail']).trim()"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm12>
+                <v-text-field label="Địa chỉ" v-model="applicantEdit['address']" box clearable @change="applicantEdit['address']=String(applicantEdit['address']).trim()"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-autocomplete :items="cityItems" hide-no-data label="Tỉnh/thành phố" v-model="applicantEdit['cityCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeCityEditApplicant($event)"></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-autocomplete :items="districtItems" hide-no-data label="Quận/huyện" v-model="applicantEdit['districtCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeDistrictEditApplicant($event)"></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-autocomplete label="Xã/phường" hide-no-data :items="wardItems" v-model="applicantEdit['wardCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeWardEditApplicant($event)"></v-autocomplete>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-2" color="primary" @click.native="exitDialogEditApplicant">
+            <v-icon>clear</v-icon> &nbsp;
+            Thoát
+          </v-btn>
+          <v-btn class="mr-3" color="primary" @click.native="updateApplicant">
+            <v-icon>save</v-icon> &nbsp;
+            Cập nhật
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- tra cứu LGSP -->
+    <v-dialog v-model="dialog_searchLgsp" scrollable persistent max-width="700px">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Tra cứu CSDL Quốc Gia về thông tin doanh nghiệp</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_searchLgsp = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-1">
+          <v-form ref="formLgsp" v-model="valid" class="py-3 px-0 grid-list">
+            <v-layout row wrap class="px-0 py-0">
+              <v-flex xs12>
+                <v-text-field label="Mã số thuế doanh nghiệp" v-model="applicantIdNoLgsp"
+                 box clearable :rules="[rules.required]"></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="text-right">
+                <v-btn color="primary"
+                  @click="searchLgsp"
+                  :loading="loadingSearchLgsp"
+                  :disabled="loadingSearchLgsp"
+                  class="mx-0 my-0"
+                >
+                  <v-icon size="20">search</v-icon>
+                  &nbsp;
+                  Tra cứu
+                  <span slot="loader">Loading...</span>
+                </v-btn>
+              </v-flex>
+              
+            </v-layout>
+          </v-form>
+          <div>
+            <table class="datatable table" style="border-top: 1px solid #dedede;" v-if="applicantLgspInfomation">
+              <tbody>
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Tên doanh nghiệp</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.NAME}}</span></td>
+                </tr>
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Mã số thuế</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.ENTERPRISE_GDT_CODE}}</span></td>
+                </tr>
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Người đại diện</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.FULL_NAME}}</span></td>
+                </tr>
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Địa chỉ</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.AddressFullText}}</span></td>
+                </tr>
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Ngày thành lập</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.FOUNDING_DATE}}</span></td>
+                </tr>
+                <tr>
+                  <td class="pt-2"><span class="text-bold">Loại hình doanh nghiệp</span></td>
+                  <td class="pt-2"><span v-html="applicantLgspInfomation.ENTERPRISE_TYPE_NAME"></span></td>
+                </tr>
+                <tr>
+                  <td class="pt-2"><span class="text-bold">Tình trạng hoạt động</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.ENTERPRISE_STATUS_NAME}}</span></td>
+                </tr>
+                
+              </tbody>
+            </table>
+            <v-flex xs12 class="text-right my-2" v-if="applicantLgspInfomation">
+              <v-btn color="primary"
+                @click="addApplicantLgsp"
+                class="mx-0 my-0"
+              >
+                <v-icon size="20">save_alt</v-icon>
+                &nbsp;
+                Lấy thông tin
+              </v-btn>
+            </v-flex>
+            <div v-if="applicantLgspInfomation === false" class="mx-1 flex mb-3">
+              <v-alert outline color="warning" icon="priority_high" :value="true">
+                Không có thông tin doanh nghiệp
+              </v-alert>
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -433,15 +810,40 @@
 import axios from 'axios'
 import Suggestions from 'v-suggestions'
 import toastr from 'toastr'
+import TinyPagination from '../../components/pagging/opencps_pagination'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
 }
 export default {
   components: {
-    'suggestions': Suggestions
+    'suggestions': Suggestions,
+    'tiny-pagination': TinyPagination
   },
+  props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode', 'applicantIdRequired'],
   data: () => ({
+    validateSameApplicantIdNo: false,
+    sameApplicantIdNo: '',
+    checkDelegateIdNo: false,
+    checkApplicantId: false,
+    requiredOptions: {
+      applicantIdNo: true,
+      applicantName: true,
+      address: true,
+      cityCode: true,
+      districtCode: true,
+      wardCode: true,
+      contactTelNo: true,
+      contactEmail: false,
+      delegateIdNo: true,
+      delegateName: true,
+      delegateAddress: true,
+      delegateCityCode: true,
+      delegateDistrictCode: true,
+      delegateWardCode: true,
+      delegateTelNo: true,
+      delegateEmail: false
+    },
     valid_thongtinchuhoso: false,
     loadingVerify: false,
     citys: [],
@@ -452,18 +854,51 @@ export default {
     applicantItems: [],
     applicantItems2: [],
     applicantIdNo: '',
+    applicantLists: [],
+    applicantListHeader: [
+      {
+        text: 'STT',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Tên công dân, tổ chức, doanh nghiệp',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Loại thông tin người dùng',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Số CMND/ căn cước, mã tổ chức, doanh nghiệp',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Địa chỉ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Thao tác',
+        align: 'center',
+        sortable: false
+      }
+    ],
     labelSwitch: {
-      'true': {
+      '1': {
         cmtnd: 'CMND/ Hộ chiếu',
         nguoi_nop: 'Họ và tên'
       },
-      'false': {
+      '2': {
         cmtnd: 'Mã số thuế',
         nguoi_nop: 'Tên tổ chức, doanh nghiệp'
       }
     },
     thongTinChuHoSo: {
-      userType: true,
+      userType: '1',
       cityCode: '',
       districtCode: '',
       wardCode: '',
@@ -494,6 +929,9 @@ export default {
       address: '',
       representatives: ''
     },
+    numberPerPage: 10,
+    applicantPage: 1,
+    totalApplicantSearch: 0,
     bussinessExits: false,
     validBussinessInfos: true,
     messageCheckApplicant: '',
@@ -504,9 +942,19 @@ export default {
     searchOptions: {},
     functionTimeOut: null,
     dialog_applicantInfos: false,
+    dialog_applicantList: false,
+    applicantConfig: false,
+    titleEdit: 'Thông tin công dân, tổ chức, doanh nghiệp',
+    applicantEdit: '',
+    dialog_editApplicant: false,
     rules: {
-      required: (value) => !!value || 'Trường dữ liệu bắt buộc',
+      required: (value) => !!value || 'Thông tin bắt buộc',
+      cmndHoChieu: (value) => {
+        const pattern = /^(?![0-9]{4,12})[0-9a-zA-Z]{4,12}$/
+        return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 4-12 ký tự'
+      },
       email: (value) => {
+        value = value.trim()
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
       },
@@ -516,13 +964,76 @@ export default {
       },
       telNo: (value) => {
         const pattern = /^([0-9]{0,})$/
+        if(typeof value === 'string'){
+          value = value.trim()
+        }
         return pattern.test(value) || 'Gồm các ký tự 0-9'
-      }
-    }
+      },
+      varchar50: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar100: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+        } else {
+          return true
+        }
+      },
+      varchar255: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar500: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar5000: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+        } else {
+          return true
+        }
+      },
+    },
+    typeSearch: '',
+    keySearch: '',
+    menuBirthDate: false,
+    ngayCap: null,
+    toDateFormatted: null,
+    cityItems: [],
+    districtItems: [],
+    wardItems: [],
+    valid: false,
+    loadingTable: false,
+    hasOrganization: false,
+    traCuuLgsp: false,
+    dialog_searchLgsp: false,
+    loadingSearchLgsp: false,
+    applicantIdNoLgsp: '',
+    applicantLgspInfomation: '',
+    defaultCityCode: false
   }),
   computed: {
     loading () {
       return this.$store.getters.loading
+    },
+    forGroupDossier () {
+      return this.$store.getters.getForGroupDossier
     },
     originality () {
       var vm = this
@@ -547,11 +1058,69 @@ export default {
     }
   },
   created () {
+    let vm = this
+    try {
+      vm.validateSameApplicantIdNo = checkTrungChuHoSo
+    } catch (error) {
+    }
+    try {
+      vm.defaultCityCode = defaultCityCode
+    } catch (error) {
+    }
+    try {
+      vm.applicantConfig = applicantConfig
+    } catch (error) {
+    }
+    try {
+      vm.hasOrganization = hasOrganization
+    } catch (error) {
+    }
+    if (vm.formCode === "NEW") {
+      try {
+        vm.thongTinNguoiNopHoSo.sameUser = applicantSameDelegate
+      } catch (error) {
+      }
+    }
+    if (vm.hasOrganization) {
+      vm.labelSwitch = {
+        '1': {
+          cmtnd: 'CMND/ Hộ chiếu',
+          nguoi_nop: 'Họ và tên'
+        },
+        '2': {
+          cmtnd: 'Mã số thuế',
+          nguoi_nop: 'Tên doanh nghiệp'
+        },
+        '3': {
+          cmtnd: 'Mã cơ quan, tổ chức',
+          nguoi_nop: 'Tên cơ quan, tổ chức'
+        }
+      }
+    }
+    try {
+      if (requiredOptionConfig) {
+        vm.requiredOptions = Object.assign(vm.requiredOptions, requiredOptionConfig)
+      }
+    } catch (error) {
+    }
+    if (vm.requiredConfig && vm.requiredConfig['applicant']) {
+      vm.requiredOptions = Object.assign(vm.requiredOptions, vm.requiredConfig['applicant'])
+    }
+    vm.$store.dispatch('checkLgsp').then(result => {
+      vm.traCuuLgsp = result && result.hasOwnProperty('enabled') && result.enabled ? true : false
+    }).catch(xhr => {
+      vm.traCuuLgsp = false
+    })
   },
   watch: {
     thongTinChuHoSo: {
       handler: function (value) {
         let vm = this
+        value['applicantIdNo'] = String(value['applicantIdNo']).trim()
+        if(!value.applicantIdNo) {
+          vm.checkApplicantId = true
+        }
+        vm.$store.commit('setThongTinChuHoSo', value)
         let tempData = {
           delegateName: value.applicantName,
           delegateCityCode: value.cityCode,
@@ -562,11 +1131,7 @@ export default {
           delegateTelNo: value.contactTelNo,
           delegateIdNo: value.applicantIdNo
         }
-        // if (!vm.thongTinChuHoSo.userType) {
-        //   vm.thongTinNguoiNopHoSo.sameUser = false
-        // } else {
-        //   vm.thongTinNguoiNopHoSo.sameUser = true
-        // }
+
         if (vm.thongTinNguoiNopHoSo.sameUser) {
           if (value.cityCode && value.cityCode !== vm.thongTinNguoiNopHoSo['delegateCityCode']) {
             vm.onChangeDelegateCity(value.cityCode)
@@ -576,6 +1141,47 @@ export default {
           }
           vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
         }
+        // set requiredOptions
+        // if (value.userType === '2') {
+        //   vm.requiredOptions = {
+        //     applicantIdNo: false,
+        //     applicantName: true,
+        //     address: true,
+        //     cityCode: true,
+        //     districtCode: true,
+        //     wardCode: true,
+        //     contactTelNo: true,
+        //     contactEmail: false,
+        //     delegateIdNo: false,
+        //     delegateName: false,
+        //     delegateAddress: false,
+        //     delegateCityCode: false,
+        //     delegateDistrictCode: false,
+        //     delegateWardCode: false,
+        //     delegateTelNo: false,
+        //     delegateEmail: false
+        //   }
+        // } else {
+        //   vm.requiredOptions = {
+        //     applicantIdNo: true,
+        //     applicantName: true,
+        //     address: true,
+        //     cityCode: true,
+        //     districtCode: true,
+        //     wardCode: true,
+        //     contactTelNo: true,
+        //     contactEmail: false,
+        //     delegateIdNo: false,
+        //     delegateName: false,
+        //     delegateAddress: false,
+        //     delegateCityCode: false,
+        //     delegateDistrictCode: false,
+        //     delegateWardCode: false,
+        //     delegateTelNo: false,
+        //     delegateEmail: false
+        //   }
+        // }
+        // end
       },
       deep: true
     },
@@ -583,6 +1189,10 @@ export default {
       handler: function (value) {
         var vm = this
         let dataChuHoSo = vm.thongTinChuHoSo
+        value['delegateIdNo'] = String(value['delegateIdNo']).trim()
+        if(!value.delegateIdNo) {
+          vm.checkDelegateIdNo = true
+        }
         if (value.sameUser) {
           let dataNguoiNopHoSo = {
             delegateName: dataChuHoSo.applicantName,
@@ -615,11 +1225,35 @@ export default {
     },
     search2 (val) {
       val && this.querySelections2(val)
-    }
+    },
+    typeSearch (val) {
+      let vm = this
+      if (val === '') {
+        vm.applicantListHeader[1].text = 'Tên công dân, tổ chức, doanh nghiệp'
+        vm.applicantListHeader[3].text = 'Số CMND/ căn cước, mã số thuế doanh nghiệp'
+      } else if (val === 'citizen') {
+        vm.applicantListHeader[1].text = 'Tên công dân'
+        vm.applicantListHeader[3].text = 'Số CMND/ căn cước'
+      } else if (val === 'business') {
+        vm.applicantListHeader[1].text = 'Tên doanh nghiệp'
+        vm.applicantListHeader[3].text = 'Mã số thuế doanh nghiệp'
+      } else {
+        vm.applicantListHeader[1].text = 'Tên cơ quan, tổ chức'
+        vm.applicantListHeader[3].text = 'Mã cơ quan, tổ chức'
+      }
+    },
+    ngayCap(val) {
+      this.toDateFormatted = this.formatDate(val)
+      this.applicantEdit['applicantIdDate'] = this.toDateFormatted
+    },
   },
   methods: {
+    changeSuggess (val) {
+      console.log('changeSuggestion', val)
+    },
     initData (data) {
       var vm = this
+      console.log('data_init_chuhoso', data)
       vm.$store.commit('setApplicantId', data.applicantIdNo)
       let tempData = {
         delegateName: data.delegateName,
@@ -633,9 +1267,11 @@ export default {
       }
       let thongTinNguoiNopHoSoTemp = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
       vm.thongTinNguoiNopHoSo = thongTinNguoiNopHoSoTemp
-      let userTypeCondition = true
+      let userTypeCondition = '1'
       if (data.applicantIdType === 'business') {
-        userTypeCondition = false
+        userTypeCondition = '2'
+      } else if (data.applicantIdType === 'organization') {
+        userTypeCondition = '3'
       }
       let tempDataChuHs = {
         userType: userTypeCondition,
@@ -664,6 +1300,12 @@ export default {
         }
         vm.$store.getters.getDictItems(filter).then(function (result) {
           vm.citys = result.data
+          // set default cityCode
+          if (vm.formCode === "NEW" && !thongTinChuHoSoTemp['cityCode'] && vm.defaultCityCode) {
+            vm.thongTinChuHoSo['cityCode'] = vm.defaultCityCode ? vm.defaultCityCode : ''
+            vm.thongTinChuHoSo['cityName'] = defaultCityName ? defaultCityName : ''
+          }
+          
         })
         setTimeout(function () {
           if (data.cityCode) {
@@ -675,7 +1317,6 @@ export default {
               vm.districts = resultDistricts.data
             })
           }
-          console.log('districtCode-----------', data.districtCode)
           if (data.districtCode) {
             vm.$store.getters.getDictItems({
               collectionCode: 'ADMINISTRATIVE_REGION',
@@ -705,38 +1346,50 @@ export default {
           }
         }, 200)
       })
+      vm.$refs.formChuHoSo.resetValidation()
     },
-    onChangeCity (data) {
+    onChangeCity (data, editDelegate) {
       var vm = this
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
         level: 1,
         parent: data
       }
-      vm.thongTinChuHoSo.districtCode = ''
-      vm.thongTinChuHoSo.wardCode = ''
-      vm.$store.commit('setCityVal', data)
+      if (!editDelegate) {
+        vm.thongTinChuHoSo.districtCode = ''
+        vm.thongTinChuHoSo.wardCode = ''
+        vm.$store.commit('setCityVal', data)
+      }
       vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.districts = result.data
-        vm.wards = []
-        if (vm.thongTinNguoiNopHoSo.sameUser) {
-          vm.delegateDistricts = result.data
+        if (!editDelegate) {
+          vm.districts = result.data
           vm.wards = []
+        }
+
+        if (editDelegate || vm.thongTinNguoiNopHoSo.sameUser || (!vm.thongTinNguoiNopHoSo.sameUser && vm.showApplicant && !vm.showDelegate)) {
+          vm.delegateDistricts = result.data
+          vm.delegateWards = []
         }
       })
     },
-    onChangeDistrict (data) {
+    onChangeDistrict (data, editDelegate) {
       var vm = this
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
         level: 1,
         parent: data
       }
-      vm.thongTinChuHoSo.wardCode = ''
-      vm.$store.commit('setDistrictVal', data)
+      if (!editDelegate) {
+        vm.thongTinChuHoSo.wardCode = ''
+        vm.$store.commit('setDistrictVal', data)
+      }
+      
       vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.wards = result.data
-        if (vm.thongTinNguoiNopHoSo.sameUser) {
+        if (!editDelegate) {
+          vm.wards = result.data
+        }
+        
+        if (editDelegate || vm.thongTinNguoiNopHoSo.sameUser || (!vm.thongTinNguoiNopHoSo.sameUser && vm.showApplicant && !vm.showDelegate)) {
           vm.delegateWards = result.data
         }
       })
@@ -782,10 +1435,18 @@ export default {
     },
     showValid () {
       var vm = this
+      let applicantIdRequired = true
+      if (vm.requiredOptions['applicantIdNo'] && !vm.thongTinChuHoSo.applicantIdNo) {
+        applicantIdRequired = false
+      }
+      if (vm.originality !== 1  && !vm.showDelegate && vm.requiredOptions['delegateIdNo'] && !vm.thongTinNguoiNopHoSo.delegateIdNo) {
+        applicantIdRequired = false
+      }
       let result = {
-        validForm: vm.$refs.formChuHoSo.validate(),
+        validForm: vm.$refs.formChuHoSo.validate() && applicantIdRequired,
         message: vm.messageCheckApplicant,
-        validApplicant: vm.validBussinessInfos
+        validApplicant: vm.validBussinessInfos,
+        applicantIdRequired: applicantIdRequired
       }
       return result
     },
@@ -806,73 +1467,88 @@ export default {
     },
     onInputChange (query) {
       let vm = this
+      vm.thongTinChuHoSo.applicantIdNo = query.trim()
       if (vm.functionTimeOut) {
         clearTimeout(vm.functionTimeOut)
       }
       vm.functionTimeOut = setTimeout(function () {
-        if ((vm.originality === 3 && !vm.thongTinChuHoSo.userType) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+        if (vm.originality === 3) {
           vm.checkApplicantInfos()
+          // vm.thongTinChuHoSo.applicantIdNo = query.trim()
         }
         vm.$store.commit('setApplicantId', query)
       }, 2000)
       if (query.trim().length === 0) {
+        vm.thongTinChuHoSo.applicantIdNo = ''
         return null
       }
-      const url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
-      // test local
-      // const url = 'http://127.0.0.1:8081/api/applicants'
-      return new Promise(resolve => {
-        vm.$store.dispatch('loadInitResource').then(result => {
-          let param = {
-            headers: {
+      let url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
+
+      // if (vm.functionTimeOutApplicant) {
+      //   clearTimeout(vm.functionTimeOutApplicant)
+      // }
+      // vm.functionTimeOutApplicant = setTimeout(function () {
+        return new Promise(resolve => {
+          vm.$store.dispatch('loadInitResource').then(result => {
+            let param = {
+              headers: {
+              }
             }
-          }
-          axios.get(url, param).then(response => {
-            let items = []
-            if (response.data.hasOwnProperty('data')) {
-              items = response.data.data
-            } else {
-            }
-            resolve(items)
+            axios.get(url, param).then(response => {
+              let items = []
+              if (response.data.hasOwnProperty('data')) {
+                items = response.data.data
+              } else {
+              }
+              resolve(items)
+            })
           })
         })
-      })
+      // }, 1000)
     },
     onInputChange1 (query) {
       let vm = this
+      vm.thongTinNguoiNopHoSo.delegateIdNo = query.trim()
       if (query.trim().length === 0) {
+        vm.thongTinNguoiNopHoSo.delegateIdNo = ''
         return null
       }
-      const url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
-      // test local
-      // const url = 'http://127.0.0.1:8081/api/applicants'
-      return new Promise(resolve => {
-        vm.$store.dispatch('loadInitResource').then(result => {
-          let param = {
-            headers: {
+      let url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
+
+      // if (vm.functionTimeOutApplicant) {
+      //   clearTimeout(vm.functionTimeOutApplicant)
+      // }
+      // vm.functionTimeOutApplicant = setTimeout(function () {
+        return new Promise(resolve => {
+          vm.$store.dispatch('loadInitResource').then(result => {
+            let param = {
+              headers: {
+              }
             }
-          }
-          axios.get(url, param).then(response => {
-            let items = []
-            if (response.data.hasOwnProperty('data')) {
-              items = response.data.data
-            } else {
-            }
-            resolve(items)
+            axios.get(url, param).then(response => {
+              let items = []
+              if (response.data.hasOwnProperty('data')) {
+                items = response.data.data
+              } else {
+              }
+              resolve(items)
+            })
           })
         })
-      })
+      // }, 1000)
     },
     onSearchItemSelected (item) {
       var vm = this
       vm.selectedSearchItem = item
-      console.log('selectedSearchItem', vm.selectedSearchItem)
-      // if (item['applicantIdType'] === 'business') {
-      //   vm.thongTinChuHoSo.userType = false
-      //   vm.thongTinNguoiNopHoSo.sameUser = false
-      // } else {
-      //   vm.thongTinChuHoSo.userType = true
-      // }
+      // console.log('selectedSearchItem', vm.selectedSearchItem)
+      if (item['applicantIdType'] === 'business') {
+        vm.thongTinChuHoSo.userType = '2'
+        // vm.thongTinNguoiNopHoSo.sameUser = false
+      } else if (item['applicantIdType'] === 'citizen') {
+        vm.thongTinChuHoSo.userType = '1'
+      } else {
+        vm.thongTinChuHoSo.userType = '3'
+      }
       vm.thongTinChuHoSo['applicantIdNo'] = item.applicantIdNo.toString()
       //
       vm.thongTinChuHoSo['applicantName'] = item['applicantName'] ? item['applicantName'] : ''
@@ -880,8 +1556,11 @@ export default {
       vm.thongTinChuHoSo['contactTelNo'] = item['contactTelNo'] ? item['contactTelNo'] : ''
       vm.thongTinChuHoSo['contactEmail'] = item['contactEmail'] ? item['contactEmail'] : ''
       vm.thongTinChuHoSo.cityCode = item['cityCode'] ? item['cityCode'] : ''
-      vm.$store.commit('setApplicantId', vm.thongTinChuHoSo['applicantIdNo'])
-      vm.checkApplicantInfos()
+      setTimeout(function () {
+        vm.$store.commit('setApplicantId', vm.thongTinChuHoSo['applicantIdNo'])
+        vm.checkApplicantInfos()
+      }, 2000)
+      
       function changeCity (data) {
         return new Promise((resolve, reject) => {
           setTimeout(
@@ -928,7 +1607,7 @@ export default {
         return new Promise((resolve, reject) => {
           setTimeout(
             () => {
-              vm.onChangeCity(data)
+              vm.onChangeCity(data, 'true')
               resolve()
             }, Math.floor(Math.random() * 100) + 1
           )
@@ -938,16 +1617,17 @@ export default {
         return new Promise((resolve, reject) => {
           setTimeout(
             () => {
-              vm.onChangeDistrict(data)
+              vm.onChangeDistrict(data, 'true')
               resolve()
             }, Math.floor(Math.random() * 100) + 1
           )
         })
       }
-      if (vm.thongTinNguoiNopHoSo['delegateCityCode'] !== null && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== '0') {
+      console.log('thongTinNguoiNopHoSo', vm.thongTinNguoiNopHoSo)
+      if (vm.thongTinNguoiNopHoSo['delegateCityCode'] && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== '0') {
         changeCity(vm.thongTinNguoiNopHoSo['delegateCityCode']).then(function () {
           vm.thongTinNguoiNopHoSo['delegateDistrictCode'] = item['districtCode'] ? item['districtCode'] : ''
-          if (vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== null && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== '0') {
+          if (vm.thongTinNguoiNopHoSo['delegateDistrictCode'] && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== '0') {
             changeDistrict(vm.thongTinNguoiNopHoSo['delegateDistrictCode']).then(function () {
               vm.thongTinNguoiNopHoSo['delegateWardCode'] = item['wardCode'] ? item['wardCode'] : ''
             })
@@ -967,7 +1647,7 @@ export default {
         clearTimeout(vm.functionTimeOut)
       }
       vm.functionTimeOut = setTimeout(function () {
-        if ((vm.originality === 3 && !vm.thongTinChuHoSo.userType) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+        if (vm.originality === 3) {
           vm.checkApplicantInfos()
         }
         vm.$store.commit('setApplicantId', vm.thongTinChuHoSo.applicantIdNo)
@@ -975,33 +1655,54 @@ export default {
     },
     checkApplicantInfos () {
       let vm = this
-      if ((vm.originality === 3 && !vm.thongTinChuHoSo.userType && vm.thongTinChuHoSo.applicantIdNo) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+      
+      // if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2' && vm.thongTinChuHoSo.applicantIdNo) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+      //   let filter = {
+      //     applicantIdNo: vm.thongTinChuHoSo.applicantIdNo,
+      //     applicantName: vm.thongTinChuHoSo.applicantName
+      //   }
+      //   vm.$store.dispatch('checkApplicantInfos', filter).then(result => {
+      //     // vm.loadingVerify = false
+      //     if (result && result.hasOwnProperty('error') && result.error === true) {
+      //       vm.bussinessExits = false
+      //       vm.validBussinessInfos = false
+      //       // vm.$store.commit('setApplicantBussinessExit', false)
+      //       vm.messageCheckApplicant = result.message
+      //       // toastr.error(result.message + ' Vui lòng kiểm tra lại mã số thuế')
+      //     } else if (result && result.hasOwnProperty('warning') && result.warning === true) {
+      //       vm.bussinessExits = true
+      //       vm.validBussinessInfos = false
+      //       // vm.$store.commit('setApplicantBussinessExit', false)
+      //       vm.messageCheckApplicant = result.message
+      //       // toastr.error(result.message + ' Vui lòng đối chiếu thông tin doanh nghiệp')
+      //     } else if (result && !result.hasOwnProperty('error') && !result.hasOwnProperty('warning')) {
+      //       vm.bussinessExits = true
+      //       vm.validBussinessInfos = true
+      //       // vm.$store.commit('setApplicantBussinessExit', filter['applicantIdNo'])
+      //     }
+      //   }).catch(function () {
+      //     vm.loadingVerify = false
+      //   })
+      // }
+
+      // check cảnh báo đang xử lý hồ sơ cùng mã chủ hồ sơ
+      if (vm.validateSameApplicantIdNo && vm.originality === 3 && vm.thongTinChuHoSo.applicantIdNo) {
         let filter = {
           applicantIdNo: vm.thongTinChuHoSo.applicantIdNo,
-          applicantName: vm.thongTinChuHoSo.applicantName
+          status: 'new,waiting,processing'
         }
-        // vm.loadingVerify = true
-        vm.$store.dispatch('checkApplicantInfos', filter).then(result => {
-          // vm.loadingVerify = false
-          if (result && result.hasOwnProperty('error') && result.error === true) {
-            vm.bussinessExits = false
-            vm.validBussinessInfos = false
-            // vm.$store.commit('setApplicantBussinessExit', false)
-            vm.messageCheckApplicant = result.message
-            // toastr.error(result.message + ' Vui lòng kiểm tra lại mã số thuế')
-          } else if (result && result.hasOwnProperty('warning') && result.warning === true) {
-            vm.bussinessExits = true
-            vm.validBussinessInfos = false
-            // vm.$store.commit('setApplicantBussinessExit', false)
-            vm.messageCheckApplicant = result.message
-            // toastr.error(result.message + ' Vui lòng đối chiếu thông tin doanh nghiệp')
-          } else if (result && !result.hasOwnProperty('error') && !result.hasOwnProperty('warning')) {
-            vm.bussinessExits = true
-            vm.validBussinessInfos = true
-            // vm.$store.commit('setApplicantBussinessExit', filter['applicantIdNo'])
+        vm.$store.dispatch('getDossiers', filter).then(result => {
+          let dossierMapping = result.filter(function(item) {
+            return item.applicantIdNo == vm.thongTinChuHoSo.applicantIdNo
+          })
+          if (dossierMapping.length > 0) {
+            let dossierSameApplicant = dossierMapping.map(select => {
+              return select.dossierNo
+            }).join(',')
+            vm.sameApplicantIdNo = dossierSameApplicant
+          } else {
+            vm.sameApplicantIdNo = ''
           }
-        }).catch(function () {
-          vm.loadingVerify = false
         })
       }
     },
@@ -1019,6 +1720,298 @@ export default {
         vm.applicantInfos['companyStatus'] = result['MainInformation']['ENTERPRISE_STATUS_NAME']
         vm.dialog_applicantInfos = true
       })
+    },
+    getApplicantList () {
+      let vm = this
+      let url = '/o/rest/v2/applicants'
+      vm.loadingTable = true
+      return new Promise(resolve => {
+        vm.$store.dispatch('loadInitResource').then(result => {
+          let param = {
+            headers: {
+            },
+            params: {
+              start: vm.applicantPage * vm.numberPerPage - vm.numberPerPage,
+              end: vm.applicantPage * vm.numberPerPage,
+              type: vm.typeSearch,
+              applicantName: vm.keySearch
+            }
+          }
+          axios.get(url, param).then(response => {
+            let items = []
+            if (response.data.hasOwnProperty('data')) {
+              items = response.data.data
+            } else {
+            }
+            let dataOut = {
+              data: items,
+              total: response.data['total']
+            }
+            vm.loadingTable = false
+            resolve(dataOut)
+          }).catch(function () {
+            vm.loadingTable = false
+          })
+        })
+      })
+    },
+    showDialogApplicantList (type) {
+      let vm = this
+      vm.typeApplicantBind = type
+      vm.applicantPage = 1
+      vm.getApplicantList().then(function(result) {
+        vm.totalApplicantSearch = result['total']
+        vm.applicantLists = result['data']
+        vm.dialog_applicantList = true
+      }).catch(function () {
+        toastr.error('Không lấy được danh sách công dân, tổ chức, doanh nghiệp')
+      })
+    },
+    searchKeyword () {
+      let vm = this
+      setTimeout(function () {
+        if (String(vm.keySearch).length >= 3) {
+          vm.applicantPage = 1
+          vm.getApplicantList().then(function(result) {
+            vm.totalApplicantSearch = result['total']
+            vm.applicantLists = result['data']
+          }).catch(function () {
+          })
+        }
+      }, 200)
+    },
+    clearKeySearch () {
+      let vm = this
+      vm.keySearch = ''
+      setTimeout(function () {
+        vm.applicantPage = 1
+        vm.getApplicantList().then(function(result) {
+          vm.totalApplicantSearch = result['total']
+          vm.applicantLists = result['data']
+        }).catch(function () {
+        })
+      }, 200)
+    },
+    changeTypeSearch () {
+      let vm = this
+      setTimeout(function () {
+        vm.applicantPage = 1
+        vm.getApplicantList().then(function(result) {
+          vm.totalApplicantSearch = result['total']
+          vm.applicantLists = result['data']
+        }).catch(function () {
+        })
+      }, 200)
+    },
+    changePage (config) {
+      let vm = this
+      vm.applicantPage = config.page
+      vm.getApplicantList().then(function(result) {
+        vm.totalApplicantSearch = result['total']
+        vm.applicantLists = result['data']
+      }).catch(function () {
+      })
+    },
+    bindInfoApplicant (item) {
+      let vm = this
+      if (vm.typeApplicantBind === 'ChuHoSo') {
+        vm.onSearchItemSelected(item)
+      } else if (vm.typeApplicantBind === 'NguoiNop') {
+        vm.onSearchItemSelected1(item)
+      }
+      vm.dialog_applicantList = false
+    },
+    showEditApplicant (item) {
+      let vm = this
+      vm.applicantEdit = item
+      if (vm.cityItems.length === 0) {
+        let filterCity = {
+          collectionCode: 'ADMINISTRATIVE_REGION',
+          level: 0,
+          parent: 0,
+          commit: ''
+        }
+        vm.$store.dispatch('loadDictItems', filterCity).then(function (result) {
+          vm.cityItems = result.data
+        })
+      }
+      if (vm.applicantEdit['cityCode']) {
+        vm.$store.dispatch('loadDictItems', {
+          collectionCode: 'ADMINISTRATIVE_REGION',
+          level: 1,
+          parent: vm.applicantEdit['cityCode']
+        }).then(function (resultDistricts) {
+          vm.districtItems = resultDistricts.data
+        })
+      }
+      if (vm.applicantEdit['districtCode']) {
+        vm.$store.dispatch('loadDictItems', {
+          collectionCode: 'ADMINISTRATIVE_REGION',
+          level: 1,
+          parent: vm.applicantEdit['districtCode']
+        }).then(function (resultWards) {
+          vm.wardItems = resultWards.data
+        })
+      }
+      if (vm.applicantEdit['applicantIdType'] === 'citizen') {
+        vm.titleEdit = "Thông tin công dân"
+      } else if (vm.applicantEdit['applicantIdType'] === 'business') {
+        vm.titleEdit = "Thông tin tổ chức, doanh nghiệp"
+      }
+      vm.dialog_editApplicant = true
+      vm.$refs.form.resetValidation()
+    },
+    changeBirthDate () {
+      let vm = this
+      vm.menuBirthDate = false
+      vm.applicantEdit['applicantIdDate'] = vm.formatDate(vm.ngayCap)
+    },
+    formatDate(date) {
+      if (!date) return null
+      const [year, month, day] = date.split('-')
+      return `${day}/${month}/${year}`
+    },
+    getMaxdate () {
+      let date = new Date()
+      return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+    },
+    parseDateInput (dateInput) {
+      if (dateInput) {
+        let date = ''
+        if (isNaN(dateInput)) {
+          date = new Date(dateInput)
+        } else {
+          date = new Date(Number(dateInput))
+        }
+        let dateFormated = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+        return dateFormated
+      }
+    },
+    parseDate(date) {
+      if (!date) return null
+      const [day, month, year] = date.split('/')
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+    },
+    onChangeCityEditApplicant (data) {
+      let vm = this
+      vm.applicantEdit['cityName'] = vm.cityItems.filter(function (item) {
+        return item['itemCode'] === data
+      })[0]['itemName']
+      let filter = {
+        collectionCode: 'ADMINISTRATIVE_REGION',
+        level: 1,
+        parent: data
+      }
+      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
+        vm.districtItems = result.data
+        vm.wardItems = []
+      })
+    },
+    onChangeDistrictEditApplicant (data) {
+      let vm = this
+      vm.applicantEdit['districtName'] = vm.districtItems.filter(function (item) {
+        return item['itemCode'] === data
+      })[0]['itemName']
+      let filter = {
+        collectionCode: 'ADMINISTRATIVE_REGION',
+        level: 1,
+        parent: data
+      }
+      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
+        vm.wardItems = result.data
+      })
+    },
+    onChangeWardEditApplicant (data) {
+      let vm = this
+      vm.applicantEdit['wardName'] = vm.wardItems.filter(function (item) {
+        return item['itemCode'] === data
+      })[0]['itemName']
+    },
+    updateApplicant () {
+      let vm = this
+      if (vm.$refs.form.validate()) {
+        vm.loading = true
+        // console.log('user put data', vm.applicantEdit)
+        vm.$store.dispatch('putUser', vm.applicantEdit).then(function () {
+          toastr.clear()
+          toastr.success('Yêu cầu thực hiện thành công')
+          vm.dialog_editApplicant = false
+        }).catch(function () {
+          toastr.clear()
+          toastr.error('Yêu cầu thực hiện thất bại')
+        })
+      }
+    },
+    exitDialogEditApplicant () {
+      let vm = this
+      vm.dialog_editApplicant = false
+      vm.getApplicantList().then(function(result) {
+        vm.totalApplicantSearch = result['total']
+        vm.applicantLists = result['data']
+      }).catch(function () {
+        toastr.error('Không lấy được danh sách công dân, tổ chức, doanh nghiệp')
+      })
+    },
+    fullAddress (address, city, district, ward) {
+      let fullAddress = ''
+      if (address) {
+        fullAddress += (address + ', ')
+      }
+      if (ward) {
+        fullAddress += (ward + ' - ')
+      }
+      if (district) {
+        fullAddress += (district + ' - ')
+      }
+      if (city) {
+        fullAddress += city
+      }
+      return fullAddress
+    },
+    checkUserType () {
+      let vm = this
+      vm.thongTinChuHoSo['cityCode'] = ''
+      vm.thongTinChuHoSo['districtCode'] = ''
+      vm.thongTinChuHoSo['wardCode'] = ''
+      vm.thongTinChuHoSo['applicantIdNo'] = ''
+      vm.thongTinChuHoSo['applicantIdType'] = ''
+      vm.thongTinChuHoSo['contactEmail'] = ''
+      vm.thongTinChuHoSo['contactTelNo'] = ''
+      vm.thongTinChuHoSo['contactName'] = ''
+      vm.thongTinChuHoSo['address'] = ''
+      vm.thongTinChuHoSo['applicantName'] = ''
+
+    },
+    showDialogSearchLgsp () {
+      let vm = this
+      vm.applicantIdNoLgsp = vm.thongTinChuHoSo['applicantIdNo']
+      vm.applicantLgspInfomation = ''
+      vm.dialog_searchLgsp = true
+      if (vm.applicantIdNoLgsp.trim()) {
+        vm.searchLgsp()
+      }
+    },
+    searchLgsp () {
+      let vm = this
+      let filter = {
+        applicantIdNo: vm.applicantIdNoLgsp.trim()
+      }
+      if (vm.applicantIdNoLgsp.trim()) {
+        vm.$store.dispatch('searchLgsp', filter).then(result => {
+          vm.applicantLgspInfomation = result
+        }).catch(xhr => {
+          vm.applicantLgspInfomation = false
+        })
+      } else {
+        vm.applicantLgspInfomation = false
+      }
+    },
+    addApplicantLgsp () {
+      let vm = this
+      vm.thongTinChuHoSo['applicantIdNo'] = vm.applicantLgspInfomation.ENTERPRISE_GDT_CODE
+      vm.thongTinChuHoSo['applicantName'] = vm.applicantLgspInfomation.NAME
+      vm.thongTinChuHoSo['address'] = vm.applicantLgspInfomation.AddressFullText
+      vm.dialog_searchLgsp = false
     }
   }
 }

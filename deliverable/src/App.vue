@@ -13,7 +13,7 @@
           </v-list-tile-action>
 
           <v-list-tile-content>
-            <v-list-tile-title>{{ item.typeName }}</v-list-tile-title>
+            <v-list-tile-title :title="item.typeName">{{ item.typeName }}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -78,6 +78,13 @@
       drawer: null,
       dataSocket: {}
     }),
+    created () {
+      let vm = this
+      vm.$nextTick(function () {
+        let params = vm.$router.history.current.params
+        vm.index = params['index']
+      })
+    },
     computed: {
       items () {
         return this.$store.getters.getDeliverableTypes
@@ -101,6 +108,16 @@
         set: function(newValue) {
           this.$store.commit('setsnackbarsocket', newValue)
         }
+      }
+    },
+    watch: {
+      '$route': function (newRoute, oldRoute) {
+        let vm = this
+        let currentQuery = newRoute.query
+        let params = newRoute.params
+        vm.index = params['index']
+        console.log('newRoute', newRoute)
+        console.log('currentQuery', currentQuery)
       }
     },
     methods: {

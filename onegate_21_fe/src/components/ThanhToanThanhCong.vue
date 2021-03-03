@@ -40,24 +40,20 @@
                       <td><span>{{dossierDetail.govAgencyName}}</span></td>
                     </tr>
                     <tr>
-                      <td><span class="text-bold">Tên phí, lệ phí</span></td>
-                      <td><span>{{dossierDetail.paymentFee}}</span></td>
-                    </tr>
-                    <tr>
-                      <td><span class="text-bold">Tổng tiền</span></td>
+                      <td><span class="text-bold">Số tiền thanh toán</span></td>
                       <td><span>{{currency(dossierDetail.paymentAmount)}} VNĐ</span></td>
                     </tr>
-                    <tr v-if="statusDeal">
+                    <tr v-if="statusDeal && !payGate">
                       <td><span class="text-bold">Mã giao dịch trực tuyến</span></td>
                       <td><span>{{dossierDetail.transId}}</span></td>
                     </tr>
-                    <tr v-if="statusDeal">
-                      <td><span class="text-bold">Mã đơn hàng</span></td>
+                    <tr v-if="statusDeal && !payGate">
+                      <td><span class="text-bold">Mã hóa đơn</span></td>
                       <td><span>{{dossierDetail.goodCode}}</span></td>
                     </tr>
                     <tr v-if="statusDeal">
                       <td><span class="text-bold">Cổng thanh toán</span></td>
-                      <td><span>{{dossierDetail.paymentPortal}}</span></td>
+                      <td><span>{{String(dossierDetail.paymentPortal).toUpperCase()}}</span></td>
                     </tr>
                   </tbody>
                 </table>
@@ -81,6 +77,7 @@ export default {
     loadingAction: false,
     statusDeal: false,
     keypayStatusText: '',
+    payGate: false,
     dossierDetail: {
       serviceName: '',
       dossierNo: '',
@@ -149,53 +146,105 @@ export default {
       let dossierId = query.hasOwnProperty('dossierId') ? query.dossierId : ''
       let referenceUidQuery = query.hasOwnProperty('referenceUid') ? query.referenceUid : ''
       let actionCode = query.hasOwnProperty('actionCode') ? query.actionCode : ''
-      if (dossierId) {
-        if (responseCode === '00') {
-          vm.statusDeal = true
-        } else {
-          vm.statusDeal = false
-          vm.keypayStatusText = vm.keypayStatusCode['responseCode'] ? vm.keypayStatusCode['responseCode'] : ''
+      if (query.hasOwnProperty('paygate') && query.hasOwnProperty('orderId')) {
+        // phần thông báo thanh toán qua Cổng PayGate
+        vm.statusDeal = true
+        vm.payGate = true
+        let dossierNo = query['orderId'].split('-')
+        dossierNo.pop()
+        let filter = {
+          dossierNo: dossierNo.join('-')
         }
-        vm.$store.dispatch('getDetailDossier', dossierId).then(resultDossier => {
-          vm.dossierDetail['serviceName'] = resultDossier.serviceName
-          vm.dossierDetail['dossierNo'] = resultDossier.dossierNo
-          vm.dossierDetail['govAgencyName'] = resultDossier.govAgencyName
-          vm.dossierDetail['transId'] = query.transId
-          vm.dossierDetail['goodCode'] = query.goodCode
-          vm.dossierDetail['paymentPortal'] = query.paymentPortal
-          vm.dossierDetail['paymentAmount'] = query.net_cost
+        vm.$store.dispatch('getDossiers', filter).then(resultDossier => {
+          if (resultDossier && resultDossier.length > 0) {
+            vm.dossierDetail['serviceName'] = resultDossier[0].dossierName
+            vm.dossierDetail['dossierNo'] = resultDossier[0].dossierNo
+            vm.dossierDetail['govAgencyName'] = resultDossier[0].govAgencyName
+            vm.dossierDetail['paymentPortal'] = query.hasOwnProperty('paygate') ? query.paygate : ''
+            vm.dossierDetail['paymentAmount'] = query.hasOwnProperty('amount') ? query.amount : ''
+          }
+        })
+        // chuyển bước hồ sơ khi thanh toán thành công
+        let filterUpdate = query
+        vm.$store.dispatch('doActionPayGov', filterUpdate)
+      } else if (query.hasOwnProperty('command') && query.hasOwnProperty('version') && query.command === 'PAY' && query.version === '3.0') {
+        if (query.hasOwnProperty('status') && query.status == '0') {
+          vm.statusDeal = true
+        }
+        let searchParams = window.location.href.split("?")
+        if (searchParams[1]) {
+          let dataKeyPay = decodeURIComponent(String(vm.getSearchParams(searchParams[1], "bill_info")))
+          let dossierNo = JSON.parse(dataKeyPay)['MaHoSo']
           let filter = {
-            dossierId: resultDossier.dossierId,
-            referenceUid: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery
+            dossierNo: dossierNo
           }
-          let filterPayment = {
-            dossierId: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery
+          vm.$store.dispatch('getDossiers', filter).then(resultDossier => {
+            let detail = resultDossier[0]
+            vm.dossierDetail['serviceName'] = detail.dossierName
+            vm.dossierDetail['dossierNo'] = detail.dossierNo
+            vm.dossierDetail['govAgencyName'] = detail.govAgencyName
+            let filterPayment = {
+              dossierId: resultDossier[0].referenceUid
+            }
+            vm.$store.dispatch('loadDossierPayments', filterPayment).then(result => {
+              vm.dossierDetail['paymentFee'] = vm.getEPaymentProfile(result.epaymentProfile).paymentFee
+              vm.dossierDetail['paymentPortal'] = result.paymentMethod
+              vm.dossierDetail['paymentAmount'] = result.paymentAmount
+              vm.dossierDetail['transId'] = query.transaction_id
+            }).catch(reject => {
+            })
+          })
+        }
+      } else {
+        if (dossierId) {
+          if (responseCode === '00') {
+            vm.statusDeal = true
+          } else {
+            vm.statusDeal = false
+            vm.keypayStatusText = vm.keypayStatusCode['responseCode'] ? vm.keypayStatusCode['responseCode'] : ''
           }
-          if (vm.statusDeal === true) {
-            vm.$store.dispatch('putPayments', filter).then(result => {
+          vm.$store.dispatch('getDetailDossier', referenceUidQuery).then(resultDossier => {
+            vm.dossierDetail['serviceName'] = resultDossier.serviceName
+            vm.dossierDetail['dossierNo'] = resultDossier.dossierNo
+            vm.dossierDetail['govAgencyName'] = resultDossier.govAgencyName
+            vm.dossierDetail['transId'] = query.transId
+            vm.dossierDetail['goodCode'] = query.goodCode
+            vm.dossierDetail['paymentPortal'] = query.paymentPortal
+            vm.dossierDetail['paymentAmount'] = query.net_cost
+            let filter = {
+              dossierId: resultDossier.dossierId,
+              referenceUid: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery
+            }
+            let filterPayment = {
+              dossierId: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery
+            }
+            if (vm.statusDeal === true) {
+              vm.$store.dispatch('putPayments', filter).then(result => {
+                vm.$store.dispatch('loadDossierPayments', filterPayment).then(result => {
+                  vm.dossierDetail['paymentFee'] = vm.getEPaymentProfile(result.epaymentProfile).paymentFee
+                }).catch(reject => {
+                })
+                if (actionCode) {
+                  let fiter2 = {
+                    dossierId: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery,
+                    actionCode: actionCode
+                  }
+                  vm.$store.dispatch('processDossierRouter', fiter2).then(function (result) {
+                  }).catch(function () {
+                  })
+                }
+              }).catch(reject => {
+              })
+            } else {
               vm.$store.dispatch('loadDossierPayments', filterPayment).then(result => {
                 vm.dossierDetail['paymentFee'] = vm.getEPaymentProfile(result.epaymentProfile).paymentFee
               }).catch(reject => {
               })
-              if (actionCode) {
-                let fiter2 = {
-                  dossierId: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery,
-                  actionCode: actionCode
-                }
-                vm.$store.dispatch('processDossierRouter', fiter2).then(function (result) {
-                }).catch(function () {
-                })
-              }
-            }).catch(reject => {
-            })
-          } else {
-            vm.$store.dispatch('loadDossierPayments', filterPayment).then(result => {
-              vm.dossierDetail['paymentFee'] = vm.getEPaymentProfile(result.epaymentProfile).paymentFee
-            }).catch(reject => {
-            })
-          }
-        })
+            }
+          })
+        }
       }
+      
     })
   },
   watch: {},
@@ -223,7 +272,19 @@ export default {
       } else {
         return ''
       }
-    }
+    },
+    getSearchParams (prams, key) {
+      let value = ""
+      let headers = prams.split("&")
+      headers.forEach(function (header) {
+        header = header.split("=");
+        let keyHeader = header[0];
+        if (keyHeader === key) {
+          value = header[1]
+        }
+      });
+      return value
+    },
   }
 }
 </script>

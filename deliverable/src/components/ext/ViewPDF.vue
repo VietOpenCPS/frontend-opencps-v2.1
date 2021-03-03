@@ -22,16 +22,16 @@
       vm.$nextTick(function () {
         setTimeout(() => {
           vm.data = vm.datainput
-          vm.pullPDF()
+          vm.pullPDF(vm.data['fileEntryId'])
         }, 100)
       })
     },
     methods: {
-      pullPDF () {
+      pullPDF (fileEntryId) {
         let vm = this
         vm.dialogPDFLoading = true
-        console.log('pullPDF', vm.data['fileEntryId'])
-        vm.$store.dispatch('viewPDF', vm.data['fileEntryId']).then(function (result) {
+        console.log('pullPDF', fileEntryId)
+        vm.$store.dispatch('viewPDF', fileEntryId).then(function (result) {
           vm.dialogPDFLoading = false
           document.getElementById('pdfViewerComponent').src = result
         })

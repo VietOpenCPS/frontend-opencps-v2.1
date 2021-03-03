@@ -1,195 +1,43 @@
 <template>
   <div>
-    <div class="row-header no__hidden_class">
+    <div class="row-header no__hidden_class" v-if="trangThaiHoSoList">
       <div v-if="trangThaiHoSoList !== null" class="background-triangle-big"> <span>{{trangThaiHoSoList[index]['title']}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
-        <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-          <v-combobox
-            v-model="advSearchItems"
-            placeholder="Tìm kiếm theo tên hồ sơ, tên thủ tục ..."
+        <div v-if="!isMobile" class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
+          <v-text-field
+            v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
+            v-model="keyword"
+            placeholder="Tìm kiếm theo tên hồ sơ, mã hồ sơ, tên thủ tục, chủ hồ sơ ..."
             solo
-            chips
-            multiple
-            deletable-chips
-            item-value="value"
-            item-text="text"
-            @input="keywordEventChange"
-            content-class="adv__search__select"
-            return-object
-          ></v-combobox>
-          <v-fade-transition>
-            <div v-if="menusss"
-            class="adv__search_container"
-            >
-              <v-layout wrap v-for="(item, indexTool) in advSearchTools" v-bind:key="indexTool" v-if="item.display">
-                <v-flex xs12 sm5>
-                  <v-select
-                    :items="advSearchTools"
-                    v-model="item.value"
-                    label="Chọn điều kiện lọc"
-                    single-line
-                    item-value="value"
-                    item-text="text"
-                    disabled
-                  ></v-select>
-                </v-flex>
-                <v-flex xs12 sm1 class="text-center">
-                  <v-btn icon class="my-0 mx-0">
-                    <v-icon size="16">drag_handle</v-icon>
-                  </v-btn>
-                </v-flex>
-                <v-flex xs2 sm2 class="pr-2" v-if="item.spec === 'year_month_day'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.years"
-                    v-model="itemFilterSupport.year"
-                    label="Chọn năm"
-                    single-line
-                    item-value="value"
-                    item-text="name"
-                    hide-selected
-                    @change="changeAdvFilterData($event, 'year', item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <!-- <v-flex xs1 sm1 class="text-center" v-if="item.spec === 'year_month_day'">
-                  <v-btn icon class="my-0 mx-0">
-                    <v-icon size="16">remove</v-icon>
-                  </v-btn>
-                </v-flex> -->
-                <v-flex xs2 sm2 class="pr-2" v-if="item.spec === 'year_month_day'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.months"
-                    v-model="itemFilterSupport.month"
-                    label="Chọn tháng"
-                    single-line
-                    item-value="value"
-                    item-text="name"
-                    @change="changeAdvFilterData($event, 'month', item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <!-- <v-flex xs1 sm1 class="text-center" v-if="item.spec === 'year_month_day'">
-                  <v-btn icon class="my-0 mx-0">
-                    <v-icon size="16">remove</v-icon>
-                  </v-btn>
-                </v-flex> -->
-                <v-flex xs2 sm2 v-if="item.spec === 'year_month_day'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.days"
-                    v-model="itemFilterSupport.day"
-                    label="Chọn ngày"
-                    single-line
-                    item-value="value"
-                    item-text="name"
-                    @change="changeAdvFilterData($event, 'day', item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'top'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.tops"
-                    v-model="itemFilterSupport.top"
-                    :label="item.text + ':'"
-                    single-line
-                    item-value="value"
-                    item-text="name"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'status'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.statusLists"
-                    v-model="itemFilterSupport.status"
-                    :label="item.text + ':'"
-                    single-line
-                    item-value="itemCode"
-                    item-text="itemName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'substatus'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.substatusLists"
-                    v-model="itemFilterSupport.substatus"
-                    :label="item.text + ':'"
-                    single-line
-                    item-value="itemCode"
-                    item-text="itemName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'agency'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.agencyLists"
-                    v-model="itemFilterSupport.agency"
-                    :label="item.text + ':'"
-                    single-line
-                    item-value="administrationCode"
-                    item-text="administrationName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'service'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.serviceLists"
-                    v-model="itemFilterSupport.service"
-                    :label="item.text + ':'"
-                    single-line
-                    item-value="serviceCode"
-                    item-text="serviceName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'domain'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.domainLists"
-                    v-model="itemFilterSupport.domain"
-                    :label="item.text + ':'"
-                    single-line
-                    item-value="domainCode"
-                    item-text="domainName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'register'">
-                  <v-text-field 
-                    v-model="itemFilterSupport.register" 
-                    :placeholder="item.text">
-                  </v-text-field>
-                </v-flex>
-              </v-layout>
-              <v-layout wrap>
-                <v-flex xs12 sm10 class="no__selected__items">
-                  <v-autocomplete
-                    :items="advSearchTools"
-                    v-model="advSearchToolsSelected"
-                    label="Chọn điều kiện lọc"
-                    single-line
-                    item-value="text"
-                    item-text="text"
-                    return-object
-                    @change="selectedAdvFilter"
-                    hide-selected
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs12 sm2 class="text-right">
-                  <v-btn color="primary" class="mx-0 my-0 mt-1" v-on:click.native="menusss = false">
-                    <v-icon class="mr-2">clear</v-icon>
-                    Quay lại
-                  </v-btn>
-                </v-flex>
-              </v-layout>
-            </div>
-          </v-fade-transition>
+            @change="keyword=String(keyword).trim()"
+            @keyup.enter="keywordEventChange"
+          ></v-text-field>
         </div>
         <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
-          <v-btn icon class="my-0 mx-2" v-on:click.native="showAdvFilter">
-            <v-icon size="16">filter_list</v-icon>
-          </v-btn>
+          <v-tooltip top>
+            <v-btn v-if="advSearchShow || getCountAdvSearch() === 0" slot="activator" icon class="my-0 mx-0 mr-2 px-0" v-on:click.native="showAdvFilter">
+              <v-icon size="20">fas fa fa-filter</v-icon>
+            </v-btn>
+
+            <v-badge color="primary" v-if="!advSearchShow && getCountAdvSearch() >= 1" left slot="activator">
+              <template slot='badge'>
+                <span style="font-size: 12px;">{{getCountAdvSearch()}}</span>
+              </template>
+              <v-btn icon class="my-0 mr-2 px-0" v-on:click.native="showAdvFilter" style="margin-left: -7px">
+                <v-icon size="20">fas fa fa-filter</v-icon>
+              </v-btn>
+            </v-badge>
+            <span>Tìm kiếm nâng cao</span>
+          </v-tooltip>
         </div>
       </div> 
     </div>
-    <v-layout wrap class="menu_header_list pt-3 pb-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
-      <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
-      <v-layout wrap v-if="originality !== 1">
-        <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+    <!-- Tìm kiếm nâng cao -->
+    <tim-kiem-nang-cao :menuInfo="trangThaiHoSoList[index]" ref="advSearch" v-if="advSearchShow"></tim-kiem-nang-cao>
+    <!--  -->
+    <div class="menu_header_list py-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
+      <v-layout wrap v-if="originality !== 1 && trangThaiHoSoList">
+        <v-flex v-if="!trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && !hiddenFilterDomain" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
           <v-autocomplete
             :items="listLinhVuc"
             v-model="linhVucSelected"
@@ -197,13 +45,45 @@
             item-text="displayName"
             item-value="domainCode"
             return-object
+            hide-no-data
             :hide-selected="true"
             @change="changeDomain"
+            :clearable="Array.isArray(listLinhVuc) && listLinhVuc.length > 1"
+            box
+          ></v-autocomplete>
+        </v-flex>
+        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan')" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+          <v-autocomplete
+            :items="listCongVan"
+            v-model="congvanSelected"
+            label="Chọn công văn"
+            item-text="displayName"
+            item-value="dossierId"
+            return-object
+            hide-no-data
+            :hide-selected="true"
+            @change="changeCongVan"
+            clearable
+            box
+            :autofocus="focusSelect === 1"
+          ></v-autocomplete>
+        </v-flex>
+        <v-flex v-if="trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+          <v-autocomplete
+            :items="listDonviCongVan"
+            v-model="donviguiSelected"
+            label="Chọn đơn vị gửi công văn"
+            item-text="itemName"
+            item-value="itemCode"
+            return-object
+            hide-no-data
+            :hide-selected="true"
+            @change="changeDonViGuiCongVan"
             clearable
             box
           ></v-autocomplete>
         </v-flex>
-        <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+        <v-flex :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'">
           <v-autocomplete
             :items="listThuTucHanhChinh"
             v-model="thuTucHanhChinhSelected"
@@ -211,30 +91,68 @@
             item-text="displayName"
             item-value="serviceConfigId"
             return-object
+            hide-no-data
             :hide-selected="true"
             @change="changeServiceConfigs"
             clearable
             box
+            :autofocus="focusSelect === 2"
           ></v-autocomplete>
         </v-flex>
-        <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+        <v-flex :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2 input-group--text-field-box' : 'xs12 sm4 pl-2 pr-2 input-group--text-field-box'" v-if="trangThaiHoSoList">
           <v-autocomplete
+            v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
             :items="listDichVu"
             v-model="dichVuSelected"
-            label="Chọn dịch vụ"
+            label="Chọn trường hợp"
             item-text="optionName"
             item-value="processOptionId"
             return-object
+            hide-no-data
             :hide-selected="true"
             @change="changeDichVuConfigs"
             box
           ></v-autocomplete>
-        </v-flex>
-        <v-flex xs12 sm3 class="pl-2 pr-2">
-          <div style="position:relative">
+          <v-menu
+            v-else
+            ref="menuDateCV"
+            v-model="menuDateCV"
+            :close-on-content-click="true"
+            transition="scale-transition"
+            offset-y
+            full-width
+          >
             <v-text-field
-              label="Nhập mã hồ sơ"
+              label="Chọn ngày công văn"
+              slot="activator"
+              class="search-input-appbar input-search"
+              v-model="dateCvFormatted"
+              append-icon="event"
+              @change="dateCv = parseDate(dateCvFormatted)"
+              box
+              clearable
+            >
+            </v-text-field>
+            <v-date-picker v-model="dateCv" locale="vi" :first-day-of-week="1" no-title @input="changeDate()"></v-date-picker>
+          </v-menu>
+        </v-flex>
+
+        <v-flex :class="!hiddenFilterDomain || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') || trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan') ? 'xs12 sm3 pl-2 pr-2' : 'xs12 sm4 pl-2 pr-2'">
+          <div style="position:relative" v-if="trangThaiHoSoList">
+            <v-text-field
+              v-if="trangThaiHoSoList[index]['id'].indexOf('CV_DI') !== 0 && trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0"
+              label="Nhập mã hồ sơ đầy đủ"
               v-model="dossierNoKey"
+              @keyup.enter="changeDossierNoKey"
+              append-icon="search"
+              box
+              @change="dossierNoKey=String(dossierNoKey).trim()"
+              @click:append="changeDossierNoKey"
+            ></v-text-field>
+            <v-text-field
+              v-else
+              label="Nhập số công văn đầy đủ"
+              v-model="documentNo"
               @keyup.enter="changeDossierNoKey"
               append-icon="search"
               box
@@ -244,15 +162,18 @@
           </div>
         </v-flex>
       </v-layout>
-      <div class="py-1 px-1" style="background: #f6f6f6;border-top: 1px solid lightgrey;"
-        v-if="dossierCounting !== null && dossierCounting !== undefined && dossierCounting.length > 0 && dossierCountingShow">
-        <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index" @click="changeAdvFilterDataChips(item)">
+      <div class="py-1 px-1" style="background: #ffffff;border-top: 1px solid lightgrey;"
+        v-if="dossierCounting !== null && dossierCounting !== undefined && dossierCounting.length > 0 && dossierCountingShow"
+      >
+        <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index"
+         @click="changeAdvFilterDataChips(item)" :color="item.key === status || item.key === top ? 'orange' : ''"
+        >
           <v-avatar v-if="item.key === 'deleted'" style="background-color: #da0e0e;border-color: #da0e0e;color: #fff;"><v-icon size="16">delete</v-icon></v-avatar>
           <v-avatar v-else style="background-color: #0b72ba;border-color: #0b72ba;color: #fff;">{{item.count}}</v-avatar>
-          {{item.title}}
+          <span :style="item.key === status || item.key === top ? 'color: #fff' : ''">{{item.title}}</span>
         </v-chip>
       </div>
-    </v-layout>
+    </div>
     <v-layout wrap v-if="loadingDynamicBtn">
       <v-flex xs12 sm6>
       </v-flex>
@@ -304,7 +225,7 @@
 
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'DELETE'}, 0, true)" 
-        v-if="getUser('Administrator') && currentQueryState['status'] !== 'deleted'"
+        v-if="getUser('Administrator')"
       >
         DELETE
       </v-btn>
@@ -314,10 +235,14 @@
       >
         Khôi phục hồ sơ
       </v-btn>
-
+      <!-- <v-btn color="red" dark
+        v-on:click.native="btnActionEvent(null, {form: 'IMPORT'}, 0, true)"
+      >
+        Import hồ sơ
+      </v-btn> -->
       <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
         v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
-        v-if="String(item.form).indexOf('VIEW') < 0 && menuType !== 3"
+        v-if="(String(item.form).indexOf('VIEW') < 0 && menuType !== 3 && !hideGroupAction) || (String(item.form).indexOf('VIEW') < 0 && menuType !== 3 && hideGroupAction && String(item.form) !== 'ACTIONS') "
         :loading="loadingAction && indexBTN === indexAction"
         :disabled="loadingAction && indexBTN === indexAction"
       >
@@ -325,8 +250,9 @@
         <span slot="loader">Loading...</span>
       </v-btn>
     </div>
-    
+    <!--  -->
     <v-data-table
+        id="table-dossier"
         :headers="headers"
         :items="hosoDatas"
         :total-items="hosoDatasTotal"
@@ -340,7 +266,7 @@
       <!--  -->
       <template slot="headers" slot-scope="props">
         <tr>
-          <th class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
+          <th width="32px" class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
             <v-checkbox
               :input-value="props.all"
               :indeterminate="props.indeterminate"
@@ -352,29 +278,43 @@
             <v-checkbox v-else
               :input-value="props.all"
               :indeterminate="props.indeterminate"
-              :disabled="!thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
+              :disabled="(!doActionGroup && !doActionGroupKhacThuTuc) && (!thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === ''))"
               primary
               hide-details
               @click.native="toggleAll"
             ></v-checkbox>
           </th>
-          <th
+          <th v-if="!isMobile"
             v-for="header in props.headers"
             :key="header.text"
             :class="header['class'] ? header['class'] : ''"
             :width="header['width'] ? header['width'] + 'px' : ''"
+            @click="String(header['sortable']) === 'true' ? sortAction(header['value']) : ''"
+            :style="header['sortable'] ? 'cursor: pointer' : ''"
           >
             <v-tooltip bottom>
               <span slot="activator">{{ header.text }}</span>
               <span>{{ header.text }}</span>
-            </v-tooltip>
+            </v-tooltip> 
+            <v-icon v-if="header['sortable'] && header['value'] === sortValue" size="16" class="ml-2" :style="header['sortable'] && orderSort==='false' ? 'transform: rotate(180deg)' : ''">arrow_downward</v-icon>
+            <v-icon v-if="header['sortable'] && header['value'] !== sortValue" size="16" class="ml-2" style="opacity: 0.5">arrow_downward</v-icon>
           </th>
+          <!--  -->
+          <th width="30px" v-if="isMobile">
+            <span>STT</span>
+          </th>
+          <th v-if="isMobile">
+            <span>Tên thủ tục</span>
+          </th>
+          <!--  -->
+          <th width="30px" v-if="isMobile"></th>
+          <!--  -->
         </tr>
       </template>
       <!--  -->
       <template slot="items" slot-scope="props">
         <tr>
-          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
+          <td width="32px" class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
             <v-checkbox
               v-model="props.selected"
               @change="changeSelected"
@@ -384,7 +324,8 @@
               v-if="getUser('Administrator') || getUser('Administrator_data')"
             ></v-checkbox>
             <v-checkbox v-else
-              :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
+              :disabled="(props.item['assigned'] === 0 && !doActionGroup && !doActionGroupKhacThuTuc) || (!thuTucHanhChinhSelected && !doActionGroup && !doActionGroupKhacThuTuc) || 
+              (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0' && !doActionGroup && !doActionGroupKhacThuTuc) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '' && !doActionGroup && !doActionGroupKhacThuTuc)"
               v-model="props.selected"
               @change="changeSelected"
               primary
@@ -397,24 +338,39 @@
               <content-placeholders-text :lines="1" />
             </content-placeholders>
             <span v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
-              {{ hosoDatasPage * 15 - 15 + props.index + 1 }}
+              {{ hosoDatasPage * limitRecord - limitRecord + props.index + 1 }}
             </span>
           </td>
-
+          <!-- desktop -->
           <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item.dossierId"
             :class="itemHeader['class_column']"
-            v-if="itemHeader.hasOwnProperty('value')"
+            v-if="!isMobile && itemHeader.hasOwnProperty('value')"
           >
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
+            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;word-break: break-word;" :class="{'no_acction__event': !props.item['permission']}">
               <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item" :layout_view="itemHeader.layout_view"></template-rendering>
               <span v-else>
                 {{ props.item[itemHeader.value] }}
               </span>
             </div>
           </td>
+          <!-- mobile -->
+          <td class="px-1 py-0" v-if="isMobile">
+            <content-placeholders v-if="loadingTable">
+              <content-placeholders-text :lines="1" />
+            </content-placeholders>
+            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;word-break: break-word;" :class="{'no_acction__event': !props.item['permission']}">
+              <span class="primary--text" v-if="props.item.dossierNo"> {{ props.item.dossierNo }} - </span><span class="primary--text"> {{ props.item.online ? 'Hồ sơ trực tuyến' : 'Hồ sơ một cửa' }}</span><br>
+              <span class="primary--text text-bold"> {{ props.item.serviceName }} </span><br>
+              <span class="text-bold">Chủ hồ sơ: </span> <span>{{ props.item.applicantName }}</span><br>
+              <span class="text-bold">Tiếp nhận: </span> <span>{{ props.item.receiveDate }}</span><br>
+              <span class="text-bold">Hẹn trả: </span> <span>{{ props.item.dueDate }}</span><br>
+              <span v-if="props.item.dossierOverdue" :class="props.item.dossierOverdue.indexOf('Quá hạn') >= 0 ? 'red--text' : 'green--text'">{{ props.item.dossierOverdue }}</span>
+            </div>
+          </td>
+          <!--  -->
           <td class="text-xs-center px-0 py-0" v-if="!hideAction">
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
@@ -423,7 +379,7 @@
               v-if="!loadingTable && ((btnDynamics !== null || btnDynamics !== undefined || btnDynamics !== 'undefined') || 
                 (btnDossierDynamics !== null || btnDossierDynamics !== undefined || btnDossierDynamics !== 'undefined'))">
               <v-btn class="mx-0 my-0" slot="activator" icon @click="processPullBtnDynamics(props.item)">
-                <v-icon>more_vert</v-icon>
+                <v-icon>filter_list</v-icon>
               </v-btn>
               <v-list>
                 <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->
@@ -442,10 +398,16 @@
                   <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
                 </v-list-tile>
                 <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId"
-                  v-if="String(props.item['permission']).indexOf('write') !== -1 && String(item.form) !== 'NEW' && menuType !== 3"
+                  v-if="String(props.item['permission']).indexOf('write') !== -1 && String(item.form) !== 'NEW' && menuType !== 3
+                    && (!item.hasOwnProperty('roleCode') || item.hasOwnProperty('roleCode') && getUser(item.roleCode))
+                  "
                   @click="btnActionEvent(props.item, item, index, false)"
                 >
                   <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile v-if="(trangThaiHoSoList[index]['id'].indexOf('CV_DI') === 0 || trangThaiHoSoList[index]['id'].indexOf('CV_DEN') !== 0) &&
+                props.item.metaData && getMetaData(props.item).hasOwnProperty('congvandagui') && !getMetaData(props.item)['congvandagui']" @click="deleteCongVan(props.item, props.index)">
+                  Xóa công văn
                 </v-list-tile>
                 <v-list-tile @click="viewDetail(props.item, props.index)" :disabled="!props.item['permission']">
                   Xem chi tiết
@@ -457,14 +419,16 @@
       </template>
     </v-data-table>
     <div class="text-xs-right layout wrap" style="position: relative;">
-      <div class="flex pagging-table px-2"> 
-        <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" custom-class="custom-tiny-class" 
-          @tiny:change-page="paggingData" ></tiny-pagination> 
+      <div class="flex pagging-table px-2" :class="isMobile ? 'mt-2' : ''"> 
+        <!-- <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" :numberPerPage="limitRecord" :showLimit="showLimit ? showLimit : false" custom-class="custom-tiny-class" 
+          :limits="limits" @tiny:change-page="paggingData" ></tiny-pagination>  -->
+        <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" :numberPerPage="limitRecord" :showLimit="true" custom-class="custom-tiny-class" 
+          :limits="limits" @tiny:change-page="paggingData" ></tiny-pagination> 
       </div>
     </div>
-    <v-dialog v-model="dialogAction" max-width="400" transition="fade-transition" persistent>
+    <v-dialog v-model="dialogAction" max-width="700" transition="fade-transition" persistent>
       <v-card>
-        <v-form ref="form" v-model="valid" lazy-validation>
+        <v-form ref="form1" v-model="valid" lazy-validation>
           <v-toolbar dark color="primary">
             <v-toolbar-title>{{itemAction.title}}{{itemAction.tiltle}}</v-toolbar-title>
             <v-spacer></v-spacer>
@@ -476,12 +440,16 @@
             <v-layout wrap>
               <v-flex xs12 class="px-2 pb-3">
                 <v-autocomplete
+                  label="Thủ tục:"
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelected"
-                  placeholder="chọn thủ tục hành chính"
-                  item-text="serviceName"
+                  :rules="[v => !!v || 'Thủ tục hành chính bắt buộc phải chọn']"
+                  required
+                  placeholder="Chọn thủ tục hành chính"
+                  item-text="displayName"
                   item-value="serviceConfigId"
                   return-object
+                  hide-no-data
                   :hide-selected="true"
                   @change ="changeServiceConfigs"
                   box
@@ -491,14 +459,15 @@
                 <v-autocomplete
                   :items="listDichVu"
                   v-model="dichVuSelected"
-                  label="Dịch vụ:"
-                  placeholder="chọn dịch vụ"
+                  label="Trường hợp:"
+                  placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
+                  hide-no-data
                   :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
-                  :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn']"
                   @change="changeDichVuConfigs"
                   required
                   box
@@ -506,13 +475,13 @@
               </v-flex>
             </v-layout>
           </v-card-text>
-          <v-card-actions>
+          <v-card-actions class="mx-3">
             <v-spacer></v-spacer>
             <v-btn color="red darken-3" flat="flat" @click.native="dialogAction = false"
               :loading="loadingAction"
               :disabled="loadingAction"
             >
-              <v-icon>undo</v-icon>&nbsp;
+              <v-icon>reply</v-icon>&nbsp;
               Quay lại
               <span slot="loader">Loading...</span>
             </v-btn>
@@ -540,14 +509,7 @@
           </v-toolbar>
           <v-card-text class="py-0 px-0">
             <v-layout wrap>
-              <thong-tin-co-ban-ho-so v-if="dialogActionProcess" :detailDossier="thongtinhoso"></thong-tin-co-ban-ho-so>
-              <!-- showFormBoSungThongTinNgan: {{showFormBoSungThongTinNgan}} <br/> -->
               <phan-cong v-if="dialogActionProcess && showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong>
-              <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
-              <!-- showKyPheDuyetTaiLieu: {{showKyPheDuyetTaiLieu}} <br/> -->
-              <tra-ket-qua v-if="dialogActionProcess && showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
-              <thu-phi v-if="dialogActionProcess && showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
-              <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <y-kien-can-bo ref="ykiencanbo" v-if="dialogActionProcess && showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
             </v-layout>
           </v-card-text>
@@ -565,7 +527,7 @@
               :loading="loadingActionProcess"
               :disabled="loadingActionProcess"
             >
-            <v-icon>undo</v-icon>&nbsp;
+            <v-icon>reply</v-icon>&nbsp;
             Quay lại
             <span slot="loader">Loading...</span>
             </v-btn>
@@ -573,7 +535,7 @@
         </v-form>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition">
+    <v-dialog v-model="dialogPDF" max-width="1000" transition="fade-transition">
       <v-card>
         <v-toolbar flat dark color="primary">
           <v-toolbar-title>{{itemAction.title}}{{itemAction.tiltle}}</v-toolbar-title>
@@ -597,6 +559,21 @@
         </div>
         <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
+        <v-card-actions v-if="itemAction.form === 'PRINT_01' || itemAction.form === 'PRINT_02'">
+          <v-spacer></v-spacer>
+          <v-btn class="mr-3" color="primary" @click="exportDoc()"
+          :loading="loadingAction"
+          :disabled="loadingAction">
+            <v-icon size=16>fas fa fa-file-word-o</v-icon> &nbsp;
+            Tải xuống file word
+            <span slot="loader">Loading...</span>
+          </v-btn>
+          <v-btn class="mr-3" color="primary">
+            <v-icon size=16>fa fa-file-pdf-o</v-icon> &nbsp;
+            <a :href="srcDownloadIframe" download> Tải xuống file pdf</a>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
     <v-dialog v-model="dialog_statusAction" scrollable persistent max-width="700px">
@@ -653,6 +630,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- Form phiếu hướng dẫn -->
     <v-dialog v-model="dialog_printGuide" scrollable persistent max-width="700px">
       <v-card>
         <v-toolbar flat dark color="primary">
@@ -665,17 +643,18 @@
         <v-card-text>
           <v-form ref="formGuide" v-model="validGuide" lazy-validation>
             <v-layout wrap class="py-1 align-center row-list-style">
-              <v-flex xs12 class="px-2 pb-3">
-                <div class="my-2">Thủ tục hành chính:</div>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Thủ tục hành chính <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelectedGuide"
                   placeholder="Chọn thủ tục hành chính"
-                  item-text="serviceName"
+                  item-text="displayName"
                   item-value="serviceConfigId"
                   return-object
+                  hide-no-data
                   :hide-selected="true"
                   @change="changeServiceConfigsGuide"
                   :rules="[v => !!v || 'Thủ tục bắt buộc phải chọn.']"
@@ -683,53 +662,107 @@
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2">Dịch vụ:</div>
+                <div class="my-2 text-bold">Trường hợp <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
-                  placeholder="Chọn dịch vụ"
+                  placeholder="Chọn trường hợp"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
+                  hide-no-data
                   :hide-selected="true"
-                  :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
               </v-flex>
-              <v-flex xs12 class="px-2">
-                <div class="my-2">Tên người làm thủ tục:</div>
+              <v-flex xs12 class="px-2" style="position:relative">
+                <div class="my-2 text-bold">Tên người làm thủ tục <span style="color:red">*</span>:</div>
                 <v-text-field
                   placeholder="Nhập tên người làm thủ tục"
                   box
                   v-model="applicantNameGuide"
-                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  :rules="[rules.required, rules.varchar500]"
                   required
                 ></v-text-field>
+                <v-radio-group class="my-0" v-model="applicantTypeGuide" row style="position:absolute;right:0;top:0">
+                  <v-radio label="Công dân" :value="true"></v-radio>
+                  <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
+                </v-radio-group>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2">Địa chỉ:</div>
+                <div class="my-2 text-bold">Địa chỉ:</div>
                 <v-text-field
                   placeholder="Nhập địa chỉ"
                   box
+                  :rules="[rules.varchar500]"
                   v-model="applicantAddressGuide"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2">Thư điện tử:</div>
+                <div class="my-2 text-bold">Thư điện tử:</div>
                 <v-text-field
                   box
                   placeholder="Nhập thư điện tử"
                   v-model="applicantEmailGuide"
+                  :rules="[rules.varchar100]"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2">Số điện thoại:</div>
+                <div class="my-2 text-bold">Số điện thoại:</div>
                 <v-text-field
                   box
+                  placeholder="Nhập số điện thoại"
                   v-model="applicantTelNoGuide"
+                  :rules="[rules.varchar100]"
                 ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Thông tin thành phần hồ sơ:</div>
+                <v-data-table
+                  :headers="headersTphsGuide"
+                  :items="tphsGuide"
+                  hide-actions
+                  class="table-landing table-bordered"
+                  style="border-left: 1px solid #dedede"
+                >
+                  <template slot="items" slot-scope="props">
+                    <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
+                      <td class="text-xs-center" style="width:50px">
+                        <div>
+                          <span>{{props.index + 1}}</span><br>
+                        </div>
+                      </td>
+                      <td class="text-xs-left">
+                        <div>
+                          <span>{{props.item.partName}}</span>
+                        </div>
+                      </td>
+                      <td class="text-xs-center" style="width: 50px">
+                        <div>
+                          <v-checkbox
+                            v-model="props.item.fileMark"
+                            primary
+                            hide-details
+                            color="primary"
+                            style="display: inline-block;width: 25px"
+                          ></v-checkbox>
+                        </div>
+                      </td>
+                    </tr>
+                  </template>
+                </v-data-table>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Ghi chú:</div>
+                <v-textarea class="py-0"
+                box
+                v-model="applicantNoteGuide"
+                rows="3"
+                :rules="[rules.varchar5000]"
+                ></v-textarea>
               </v-flex>
             </v-layout>
           </v-form>
@@ -753,6 +786,126 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- Form phiếu từ chối -->
+    <v-dialog v-model="dialog_denied" scrollable persistent max-width="700px">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Thông tin phiếu từ chối tiếp nhận</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_denied = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-form ref="formDenied" v-model="validDenied" lazy-validation>
+            <v-layout wrap class="py-1 align-center row-list-style">
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Thủ tục hành chính <span style="color:red">*</span>:</div>
+                <v-autocomplete
+                  box
+                  class="input-group--text-field-box"
+                  :items="listThuTucHanhChinh"
+                  v-model="thuTucHanhChinhSelectedGuide"
+                  placeholder="Chọn thủ tục hành chính"
+                  item-text="displayName"
+                  item-value="serviceConfigId"
+                  return-object
+                  hide-no-data
+                  :hide-selected="true"
+                  @change="changeServiceConfigsGuide"
+                  :rules="[v => !!v || 'Thủ tục bắt buộc phải chọn.']"
+                  required
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Trường hợp <span style="color:red">*</span>:</div>
+                <v-autocomplete
+                  box
+                  class="input-group--text-field-box"
+                  :items="listDichVuGuide"
+                  v-model="dichVuSelectedGuide"
+                  placeholder="Chọn trường hợp"
+                  item-text="optionName"
+                  item-value="processOptionId"
+                  return-object
+                  hide-no-data
+                  :hide-selected="true"
+                  :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
+                  required
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 class="px-2" style="position:relative">
+                <div class="my-2 text-bold">Tên người làm thủ tục <span style="color:red">*</span>:</div>
+                <v-text-field
+                  placeholder="Nhập tên người làm thủ tục"
+                  box
+                  v-model="applicantNameGuide"
+                  :rules="[rules.required, rules.varchar500]"
+                  required
+                ></v-text-field>
+                <v-radio-group class="my-0" v-model="applicantTypeGuide" row style="position:absolute;right:0;top:0">
+                  <v-radio label="Công dân" :value="true"></v-radio>
+                  <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
+                </v-radio-group>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Địa chỉ:</div>
+                <v-text-field
+                  placeholder="Nhập địa chỉ"
+                  box
+                  v-model="applicantAddressGuide"
+                  :rules="[rules.varchar500]"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Thư điện tử:</div>
+                <v-text-field
+                  box
+                  placeholder="Nhập thư điện tử"
+                  v-model="applicantEmailGuide"
+                  :rules="[rules.varchar100]"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Số điện thoại:</div>
+                <v-text-field
+                  box
+                  v-model="applicantTelNoGuide"
+                  :rules="[rules.varchar100]"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Lý do từ chối tiếp nhận:</div>
+                <v-textarea class="py-0"
+                box
+                v-model="applicantNoteGuide"
+                rows="3"
+                :rules="[rules.varchar5000]"
+                ></v-textarea>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-3" color="primary" @click="doDenied('doc')"
+          :loading="loadingAction"
+          :disabled="loadingAction">
+            <v-icon>save</v-icon> &nbsp;
+            Lưu phiếu từ chối
+            <span slot="loader">Loading...</span>
+          </v-btn>
+          <v-btn class="mr-3" color="primary" @click="doDenied('pdf')"
+          :loading="loadingAction"
+          :disabled="loadingAction">
+            <v-icon>print</v-icon> &nbsp;
+            In phiếu từ chối
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- Form điều chỉnh hồ sơ -->
     <v-dialog v-model="dialog_extraForm" scrollable persistent max-width="700px">
       <v-card>
         <v-toolbar flat dark color="primary">
@@ -784,32 +937,32 @@
 </template>
 
 <script>
-import Vue from 'vue'
+// import Vue from 'vue'
+import toastr from 'toastr'
+import $ from 'jquery'
 import TemplateRendering from './pagging/template_rendering.vue'
-import TinyPagination from './pagging/hanghai_pagination.vue'
-import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
+import TinyPagination from './pagging/opencps_pagination.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
-import TraKetQua from './form_xu_ly/TraKetQua.vue'
-import XacNhanThuPhi from './form_xu_ly/XacNhanThuPhi.vue'
-import ThuPhi from './form_xu_ly/FeeDetail.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import support from '../store/support.json'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
+import AdvSearch from './TimKiemNangCao'
 
 export default {
   props: ['index'],
   components: {
     'tiny-pagination': TinyPagination,
-    'thong-tin-co-ban-ho-so': ThongTinCoBanHoSo,
     'phan-cong': PhanCong,
-    'tra-ket-qua': TraKetQua,
-    'xac-nhan-thu-phi': XacNhanThuPhi,
-    'thu-phi': ThuPhi,
     'y-kien-can-bo': YkienCanBoThucHien,
     'template-rendering': TemplateRendering,
-    'form-bo-sung-thong-tin': FormBoSungThongTinNgan
+    'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
+    'tim-kiem-nang-cao': AdvSearch
   },
   data: () => ({
+    dossierSelect: '',
+    xacthuc_BNG: false,
+    doActionGroup: false,
+    doActionGroupKhacThuTuc: false,
     isAdminSuper: false,
     actionId: '',
     dossierIdSelected: '',
@@ -820,121 +973,6 @@ export default {
     advSearchItems: [],
     advObjectSearch: {},
     menusss: false,
-    itemFilterSupport: {
-      years: [
-        {
-          'value': '',
-          'name': 'Lọc theo năm'
-        },
-        {
-          'value': '2017',
-          'name': 'năm 2017'
-        },
-        {
-          'value': '2018',
-          'name': 'năm 2018'
-        },
-        {
-          'value': '2019',
-          'name': 'năm 2019'
-        }
-      ],
-      year: '',
-      months: [
-        {
-          'value': '',
-          'name': 'Lọc theo tháng'
-        },
-        {
-          'value': '1',
-          'name': 'tháng 1'
-        },
-        {
-          'value': '2',
-          'name': 'tháng 2'
-        },
-        {
-          'value': '3',
-          'name': 'tháng 3'
-        },
-        {
-          'value': '4',
-          'name': 'tháng 4'
-        },
-        {
-          'value': '5',
-          'name': 'tháng 5'
-        },
-        {
-          'value': '6',
-          'name': 'tháng 6'
-        },
-        {
-          'value': '7',
-          'name': 'tháng 7'
-        },
-        {
-          'value': '8',
-          'name': 'tháng 8'
-        },
-        {
-          'value': '9',
-          'name': 'tháng 9'
-        },
-        {
-          'value': '10',
-          'name': 'tháng 10'
-        },
-        {
-          'value': '11',
-          'name': 'tháng 11'
-        },
-        {
-          'value': '12',
-          'name': 'tháng 12'
-        }
-      ],
-      month: '',
-      days: [],
-      day: '',
-      tops: [
-        {
-          'value': '',
-          'name': 'toàn bộ'
-        },
-        {
-          'value': 'overdue',
-          'name': 'hồ sơ đang quá hạn cần giải quyết'
-        },
-        {
-          'value': 'delay',
-          'name': 'chậm hạn trả'
-        },
-        {
-          'value': 'coming',
-          'name': 'sắp đến hạn'
-        }
-      ],
-      top: '',
-      statusLists: [],
-      status: '',
-      substatusLists: [
-        {
-          'itemCode': '',
-          'itemName': 'toàn bộ'
-        }
-      ],
-      substatus: '',
-      agencyLists: [],
-      agency: '',
-      serviceLists: [],
-      service: '',
-      domainLists: [],
-      domain: '',
-      keyword: '',
-      register: ''
-    },
-    itemFilterKey: ['year', 'month', 'day', 'top', 'status', 'substatus', 'agency', 'service', 'domain', 'keyword', 'register'],
     menuType: 0,
     type_assign: '',
     assign_items: [],
@@ -948,19 +986,17 @@ export default {
     statusFailed: 0,
     dialog_statusAction: false,
     dialog_printGuide: false,
+    dialog_denied: false,
     dialog_extraForm: false,
     validGuide: false,
+    validDenied: false,
     applicantNameGuide: '',
     applicantEmailGuide: '',
     applicantTelNoGuide: '',
+    applicantNoteGuide: '',
     applicantAddressGuide: '',
-    dossierSelected: [
-      {
-        dossierNo: '18ACE289',
-        serviceName: 'Đăng ký, cấp Giấy chứng nhận quyền sử dụng đất, quyền sở hữu nhà ở và tài sản khác gắn liền với đất lần đầu đối với tài sản gắn liền với đất mà chủ sở hữu không đồng thời là người sử dụng đất',
-        statusAction: false
-      }
-    ],
+    reasonNote: '',
+    dossierSelected: [],
     /** */
     buttonConfigItem: {},
     /* ý kiến cán bộ */
@@ -968,7 +1004,7 @@ export default {
     /** */
     thongtinhoso: {},
     dossierId: 0,
-    valid: true,
+    valid: false,
     isCallBack: true,
     trangThaiHoSoList: null,
     listDichVu: [],
@@ -979,9 +1015,11 @@ export default {
     loading: true,
     headers: [],
     hideAction: false,
+    hideGroupAction: false,
     hosoDatas: [],
     hosoDatasTotal: 0,
     hosoDatasPage: 1,
+    limitRecord: 15,
     hosoTotalPage: 0,
     selectedDoAction: [],
     selectMultiplePage: [],
@@ -990,6 +1028,11 @@ export default {
     listThuTuc: [],
     thuTucHanhChinhSelected: null,
     thuTucHanhChinhSelectedGuide: null,
+    docTypePrint: '',
+    listCongVan: [],
+    congvanSelected: null,
+    listDonviCongVan: [],
+    donviguiSelected: null,
     listLinhVuc: [],
     linhVucSelected: null,
     listDichVuGuide: [],
@@ -1000,6 +1043,9 @@ export default {
     serviceCode: '',
     templateNo: '',
     dossierNoKey: '',
+    documentNo: '',
+    dateCvFormatted: '',
+    menuDateCV: false,
     dialogAction: false,
     loadingAction: false,
     dialogActionProcess: false,
@@ -1029,7 +1075,105 @@ export default {
     filterForm: null,
     checkSelectAll: false,
     titleLanding: '',
-    currentQueryState: ''
+    currentQueryState: '',
+    tphsGuide: [],
+    headersTphsGuide: [
+      {
+        text: 'TT',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Tên thành phần',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Đã có',
+        align: 'center',
+        sortable: false
+      }
+    ],
+    applicantTypeGuide: true,
+    limits: [],
+    showLimit: false,
+    advSearchShow: false,
+    filterKeyAdvSearch: ['status','substatus','top','agency','domain','register','fromReceiveDate','toReceiveDate',
+      'fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate','documentNo','dateCv'
+    ],
+    status: '',
+    top: '',
+    orderSort: '',
+    sortValue: '',
+    govAgencyFilterMenuConfig: '',
+    groupServiceFilterMenuConfig: '',
+    disableSearchAgency: false,
+    hiddenFilterDomain: false,
+    focusSelect: 0,
+    srcDownloadIframe: '',
+    rules: {
+      required: (value) => !!value || 'Thông tin bắt buộc',
+      cmndHoChieu: (value) => {
+        const pattern = /^(?![0-9]{4,12})[0-9a-zA-Z]{4,12}$/
+        return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 4-12 ký tự'
+      },
+      email: (value) => {
+        value = value.trim()
+        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
+      },
+      passWord: (value) => {
+        const pattern = /^(?![0-9]{6,})[0-9a-zA-Z]{6,}$/
+        return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 6 ký tự'
+      },
+      telNo: (value) => {
+        const pattern = /^([0-9]{0,})$/
+        if(typeof value === 'string'){
+          value = value.trim()
+        }
+        return pattern.test(value) || 'Gồm các ký tự 0-9'
+      },
+      varchar50: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar100: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 100 ? true : 'Không được nhập quá 100 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar255: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar500: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+        } else {
+          return true
+        }  
+      },
+      varchar5000: (val) => {
+        if(val){
+          val = String(val).trim()
+          return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+        } else {
+          return true
+        }
+      },
+    }
   }),
   computed: {
     loadingDynamicBtn () {
@@ -1047,33 +1191,73 @@ export default {
     },
     activeLoadingDataHoSo () {
       return this.$store.getters.activeLoadingDataHoSo
-    }
+    },
+    activePrintBienNhan () {
+      return this.$store.getters.getActivePrintBienNhan
+    },
+    itemsFilterAdv () {
+      return this.$store.getters.getItemsFilterAdv
+    },
+    // advSearchShow () {
+    //   return this.$store.getters.advSearchShow
+    // },
+    isMobile () {
+      return this.$store.getters.getIsMobile
+    },
+    userLoginInfomation () {
+      return this.$store.getters.getUserLogin
+    },
+    employeeLoginInfomation () {
+      return this.$store.getters.getEmployeeLogin
+    },
   },
   created () {
-    var vm = this
+    let vm = this
     vm.selectMultiplePage = []
     vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
-    vm.itemFilterSupport['days'] = [{'value': '', 'name': 'Lọc theo ngày'}]
-    for (let i = 1; i <= 31; i++) {
-      let item = {'value': i, 'name': 'Ngày ' + i}
-      vm.itemFilterSupport.days.push(item)
-    }
     vm.$nextTick(function () {
       let query = vm.$router.history.current.query
       let currentQuery = vm.$router.history.current.query
+      if (vm.isMobile) {
+        $('#m-navigation').css('display', 'block')
+      }
+      
       vm.currentQueryState = query
+      vm.keyword = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+      vm.status = currentQuery.hasOwnProperty('status') ? currentQuery.status : ''
+      vm.top = currentQuery.hasOwnProperty('top') ? currentQuery.top : ''
       if (query.hasOwnProperty('page') && query['page'] !== '1') {
         vm.hosoDatasPage = parseInt(query['page'])
       } else {
         vm.hosoDatasPage = 1
       }
-      // <--- set State advSearch
-      vm.setStateAdvSearch(currentQuery)
-      // ---->
+
+      if (vm.activePrintBienNhan) {
+        vm.itemAction = {
+          title: 'In phiếu biên nhận',
+          form: 'PRINT_03'
+        }
+        $(window).scrollTop(0)
+        setTimeout(function () {
+          let dossier = {
+            dossierId: vm.activePrintBienNhan
+          }
+          vm.doPrint03(dossier)
+          vm.$store.commit('setActivePrintBienNhan', '')
+        }, 500)
+      }
+      try {
+        if (xacthuc_BNG) {
+          vm.xacthuc_BNG = true
+          vm.getFieldPick()
+        }
+      } catch (error) {
+      }
     })
   },
   updated () {
     var vm = this
+    console.log('run updated')
     vm.$nextTick(function () {
       let currentParams = vm.$router.history.current.params
       let currentQuery = vm.$router.history.current.query
@@ -1087,14 +1271,43 @@ export default {
             vm.trangThaiHoSoList = result
             vm.menuType = parseInt(vm.trangThaiHoSoList[vm.index]['menuType'])
             vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
-            vm.processListTTHC(currentQuery)
-            vm.processListDomain(currentQuery)
+            vm.doActionGroup = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('activeGroupAction') && vm.trangThaiHoSoList[vm.index]['tableConfig'].activeGroupAction
+            vm.doActionGroupKhacThuTuc = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('activeGroupActionService') && vm.trangThaiHoSoList[vm.index]['tableConfig'].activeGroupActionService
+            // 
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchGovAgencyCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode) {
+              vm.govAgencyFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode
+            }
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('groupServiceCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode) {
+              vm.groupServiceFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode
+            }
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('disableSearchAgency') && vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency) {
+              vm.disableSearchAgency = vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency
+            }
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hiddenFilterDomain') && vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain) {
+              vm.hiddenFilterDomain = vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain
+            }
+            // 
+            if (vm.originality === 3) {
+              vm.processListTTHC(currentQuery)
+            }
+            if (!vm.hiddenFilterDomain) {
+              vm.processListDomain(currentQuery)
+            }
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
+              vm.processListCongVan(currentQuery)
+            }
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')) {
+              vm.getDonViCongVan(currentQuery)
+            }
             // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
             if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('headers')) {
               vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
             }
             if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideAction')) {
               vm.hideAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideAction']
+            }
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideGroupAction')) {
+              vm.hideGroupAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideGroupAction']
             }
             if (vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== null && vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['buttonConfig'].hasOwnProperty('buttons')) {
               vm.btnDynamics = vm.trangThaiHoSoList[vm.index]['buttonConfig']['buttons']
@@ -1131,18 +1344,45 @@ export default {
                 }
               }
             }
+            console.log('vm.doActionGroup updated', vm.doActionGroup)
             vm.$store.commit('setLoadingDynamicBtn', false)
-          })
+          }).catch(function (){})
         }, 200)
       }
     })
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
+      console.log('run watched')
       let vm = this
+      vm.dossierNoKey = ''
+      vm.linhVucSelected = ''
+      vm.domainCode = ''
       let currentQuery = newRoute.query
       let currentQueryOld = oldRoute.query
       vm.currentQueryState = currentQuery
+      vm.doActionGroup = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('activeGroupAction') && vm.trangThaiHoSoList[vm.index]['tableConfig'].activeGroupAction
+      vm.doActionGroupKhacThuTuc = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('activeGroupActionService') && vm.trangThaiHoSoList[vm.index]['tableConfig'].activeGroupActionService
+      vm.keyword = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+      vm.status = currentQuery.hasOwnProperty('status') ? currentQuery.status : ''
+      vm.top = currentQuery.hasOwnProperty('top') ? currentQuery.top : ''
+      vm.orderSort = currentQuery.hasOwnProperty('order') ? currentQuery.order : ''
+      vm.sortValue = currentQuery.hasOwnProperty('sort') ? currentQuery.sort : ''
+      vm.documentNo = currentQuery.hasOwnProperty('documentNo') ? currentQuery.documentNo : ''
+      vm.dateCv = currentQuery.hasOwnProperty('dateCv') ? vm.parseDate(currentQuery.dateCv) : ''
+      vm.dateCvFormatted = vm.formatDate(vm.dateCv)
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchGovAgencyCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode) {
+        vm.govAgencyFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('groupServiceCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode) {
+        vm.groupServiceFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('disableSearchAgency') && vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency) {
+        vm.disableSearchAgency = vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hiddenFilterDomain') && vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain) {
+        vm.hiddenFilterDomain = vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain
+      }
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
         vm.$store.commit('setLoadingDynamicBtn', true)
@@ -1152,6 +1392,9 @@ export default {
         vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
         if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideAction')) {
           vm.hideAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideAction']
+        }
+        if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideGroupAction')) {
+          vm.hideGroupAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideGroupAction']
         }
         if (vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== null && vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['buttonConfig'].hasOwnProperty('buttons')) {
           vm.btnDynamics = vm.trangThaiHoSoList[vm.index]['buttonConfig']['buttons']
@@ -1185,7 +1428,6 @@ export default {
               break
             }
           }
-          // console.log('btnDynamics', vm.btnDynamics)
         }
         if (currentQuery.hasOwnProperty('page')) {
           vm.hosoDatasPage = parseInt(currentQuery.page)
@@ -1197,25 +1439,42 @@ export default {
           vm.selectMultiplePage = []
         }
         vm.$store.commit('setLoadingDynamicBtn', false)
-        if (vm.listLinhVuc === null || vm.listLinhVuc === undefined || (vm.listLinhVuc !== null && vm.listLinhVuc !== undefined && vm.listLinhVuc.length === 0)) {
-          vm.processListDomain(currentQuery)
-        } else {
-          for (let key in vm.listLinhVuc) {
-            if (String(vm.listLinhVuc[key]['domainCode']) === String(currentQuery.domain)) {
-              vm.linhVucSelected = vm.listLinhVuc[key]
+        if (!vm.hiddenFilterDomain) {
+          if (vm.listLinhVuc === null || vm.listLinhVuc === undefined || (vm.listLinhVuc !== null && vm.listLinhVuc !== undefined && vm.listLinhVuc.length === 0)) {
+            vm.processListDomain(currentQuery)
+          } else {
+            if (vm.listLinhVuc.length === 1 && !vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
+              vm.linhVucSelected = vm.listLinhVuc[0]
               vm.domainCode = vm.linhVucSelected['domainCode']
+            } else {
+              vm.linhVucSelected = ''
+              vm.domainCode = ''
+            }
+            for (let key in vm.listLinhVuc) {
+              if (!vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
+                if (String(vm.listLinhVuc[key]['domainCode']) === String(currentQuery.domain)) {
+                  vm.linhVucSelected = vm.listLinhVuc[key]
+                  vm.domainCode = vm.linhVucSelected['domainCode']
+                }
+                console.log('linhVucSelected watch', vm.linhVucSelected)
+              }
             }
           }
         }
-        if (vm.listThuTucHanhChinh === null || vm.listThuTucHanhChinh === undefined || (vm.listThuTucHanhChinh !== null && vm.listThuTucHanhChinh !== undefined && vm.listThuTucHanhChinh.length === 0)) {
+        
+        if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
+          vm.processListCongVan(currentQuery)
+        }
+        if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchDonViGuiCongVan')) {
+          vm.getDonViCongVan(currentQuery)
+        }
+        if (vm.originality === 3  && (vm.listThuTucHanhChinh === null || vm.listThuTucHanhChinh === undefined || (vm.listThuTucHanhChinh !== null && vm.listThuTucHanhChinh !== undefined && vm.listThuTucHanhChinh.length === 0))) {
           vm.processListTTHC(currentQuery)
         } else {
           vm.doLoadingDataHoSo()
         }
-        // <--- set State advSearch
-        vm.setStateAdvSearch(currentQuery)
-        // ---->
       }
+      console.log('vm.doActionGroup watch', vm.doActionGroup)
     },
     activeLoadingDataHoSo (val) {
       var vm = this
@@ -1235,8 +1494,91 @@ export default {
           vm.selectedDoAction = []
         }
         // console.log('selectedDoAction', vm.selectedDoAction)
+        vm.$store.commit('setDossierSelectedDoAction', vm.selectedDoAction)
+        
       },
       deep: true
+    },
+
+    dichVuSelectedGuide (val) {
+      let vm = this
+      if (val) {
+        vm.templateNoGuide = val['templateNo']
+        val.dossierTemplateNo = val['templateNo']
+        // console.log('val_dichVuSelectedGuide', val)
+        vm.$store.dispatch('loadDossierTemplates', val).then(function (result) {
+          for (let key in result['dossierParts']) {
+            result['dossierParts'][key].fileMark = true
+          }
+          vm.tphsGuide = result['dossierParts'].filter(function (item) {
+            return item['partType'] === 1
+          })
+        }).catch(function (){})
+      }
+    },
+    trangThaiHoSoList (val) {
+      let vm = this
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('pagination') && vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination']) {
+        vm.limits = vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination'].filter(function (item) {
+          return Number(item) <= 100
+        })
+        if (vm.limits.length > 0) {
+          vm.limitRecord = vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination'][0]
+          vm.showLimit = true
+        } else {
+          vm.showLimit = false
+          vm.limitRecord = 15
+        }
+      } else {
+        vm.showLimit = false
+        vm.limitRecord = 15
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchGovAgencyCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode) {
+        vm.govAgencyFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('groupServiceCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode) {
+        vm.groupServiceFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('disableSearchAgency') && vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency) {
+        vm.disableSearchAgency = vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hiddenFilterDomain') && vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain) {
+        vm.hiddenFilterDomain = vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain
+      }
+      console.log('govAgencyFilterMenuConfig', vm.govAgencyFilterMenuConfig, vm.groupServiceFilterMenuConfig)
+    },
+    index (val) {
+      let vm = this
+      console.log('indexMenu', vm.index)
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('pagination') && vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination']) {
+        vm.limits = vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination'].filter(function (item) {
+          return Number(item) <= 100
+        })
+        if (vm.limits.length > 0) {
+          vm.limitRecord = vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination'][0]
+          vm.showLimit = true
+        } else {
+          vm.showLimit = false
+          vm.limitRecord = 15
+        }
+      } else {
+        vm.showLimit = false
+        vm.limitRecord = 15
+      }
+
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchGovAgencyCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode) {
+        vm.govAgencyFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].searchGovAgencyCode
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('groupServiceCode') && vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode) {
+        vm.groupServiceFilterMenuConfig = vm.trangThaiHoSoList[vm.index]['tableConfig'].groupServiceCode
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('disableSearchAgency') && vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency) {
+        vm.disableSearchAgency = vm.trangThaiHoSoList[vm.index]['tableConfig'].disableSearchAgency
+      }
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hiddenFilterDomain') && vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain) {
+        vm.hiddenFilterDomain = vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain
+      }
+      console.log('govAgencyFilterMenuConfig333', vm.govAgencyFilterMenuConfig, vm.groupServiceFilterMenuConfig)
     }
   },
   methods: {
@@ -1247,7 +1589,7 @@ export default {
         vm.isAdminSuper = true
       }
       */
-      if (vm.getUser('Administrator')) {
+      if (vm.getUser('Administrator') || vm.doActionGroup || vm.doActionGroupKhacThuTuc) {
         if (vm.selected.length) {
           vm.selected = []
         } else {
@@ -1283,102 +1625,6 @@ export default {
       vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected'] = vm.selected
       // console.log('selected item', vm.selectMultiplePage)
     },
-    setStateAdvSearch (currentQuery) {
-      // <--------- set State advSearch
-      let vm = this
-      if (currentQuery.hasOwnProperty('adv_renew')) {
-        vm.advSearchItems = []
-        for (let key1 in vm.itemFilterKey) {
-          for (let key in currentQuery) {
-            if (vm.itemFilterKey[key1] === key && currentQuery[key]) {
-              vm.itemFilterSupport[vm.itemFilterKey[key1]] = currentQuery[key]
-              break
-            } else {
-              vm.itemFilterSupport[vm.itemFilterKey[key1]] = ''
-            }
-          }
-        }
-        for (let key in vm.itemFilterKey) {
-          let spec = vm.itemFilterKey[key]
-          let current = vm.advSearchTools.find(function (item) {
-            return item.spec === spec
-          })
-          if (vm.itemFilterSupport[spec]) {
-            if (spec === 'keyword') {
-              vm.advSearchItems.push({
-                spec: spec,
-                value: spec + ':' + vm.itemFilterSupport[spec],
-                text: spec + ':' + vm.itemFilterSupport[spec],
-                index: -1
-              })
-            } else if (spec === 'year') {
-              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month_day' })
-              if (searchDate) {
-                searchDate['value'] = 'year_month_day' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport['day']
-                searchDate['text'] = 'year_month_day' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport['day']
-                searchDate['index'] = 0
-              } else {
-                vm.advSearchItems.push({
-                  spec: 'year_month_day',
-                  value: 'year_month_day' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport['day'],
-                  text: 'year_month_day' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport['day'],
-                  index: 0
-                })
-              }
-            } else if (spec === 'month') {
-              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month_day' })
-              if (searchDate) {
-                searchDate['value'] = 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['day']
-                searchDate['text'] = 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['day']
-                searchDate['index'] = 0
-              } else {
-                vm.advSearchItems.push({
-                  spec: 'year_month_day',
-                  value: 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['day'],
-                  text: 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['day'],
-                  index: 0
-                })
-              }
-            } else if (spec === 'day') {
-              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month_day' })
-              if (searchDate) {
-                searchDate['value'] = 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport[spec]
-                searchDate['text'] = 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport[spec]
-                searchDate['index'] = 0
-              } else {
-                vm.advSearchItems.push({
-                  spec: 'year_month_day',
-                  value: 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport[spec],
-                  text: 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport[spec],
-                  index: 0
-                })
-              }
-            } else {
-              vm.advSearchItems.push({
-                spec: spec,
-                value: spec + ':' + vm.itemFilterSupport[spec],
-                text: spec + ':' + vm.itemFilterSupport[spec],
-                index: current['index']
-              })
-            }
-          }
-        }
-      } else {
-        vm.advSearchItems = []
-      }
-      for (let keyTool in vm.advSearchTools) {
-        vm.advSearchTools[keyTool].display = false
-        vm.advSearchTools[keyTool].disabled = false
-        let current = vm.advSearchItems.find(function (item) {
-          return item.spec === vm.advSearchTools[keyTool].spec
-        })
-        if (current) {
-          vm.advSearchTools[keyTool].display = true
-          vm.advSearchTools[keyTool].disabled = true
-        }
-      }
-      // ------->
-    },
     resend () {
       var vm = this
       vm.doActions(null, vm.buttonConfigItem, null, true)
@@ -1404,15 +1650,21 @@ export default {
     },
     processListTTHC (currentQuery) {
       let vm = this
-      vm.$store.dispatch('loadListThuTucHanhChinh').then(function (result) {
+      let filterGetService = {
+        searchGovAgencyCode: vm.govAgencyFilterMenuConfig,
+        groupServiceCode: vm.groupServiceFilterMenuConfig
+      }
+      vm.$store.dispatch('loadListThuTucHanhChinh', filterGetService).then(function (result) {
         if (!currentQuery.hasOwnProperty('domain') || (currentQuery.hasOwnProperty('domain') && String(currentQuery.domain) === '')) {
           vm.listThuTucHanhChinh = result.map(thuTuc => {
-            thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+            thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+            // thuTuc['displayName'] = thuTuc['serviceName']
             return thuTuc
           })
         }
         vm.listThuTuc = result.map(thuTuc => {
-          thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+          thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+          // thuTuc['displayName'] = thuTuc['serviceName']
           return thuTuc
         })
         if (currentQuery.hasOwnProperty('service_config') && String(currentQuery.service_config) !== '0') {
@@ -1441,6 +1693,7 @@ export default {
               break
             }
           }
+          console.log('thuTucHanhChinhSelected---999', vm.thuTucHanhChinhSelected, vm.dichVuSelected)
         } else {
           vm.thuTucHanhChinhSelected = null
           vm.dichVuSelected = null
@@ -1448,6 +1701,9 @@ export default {
           vm.serviceCode = ''
           vm.templateNo = ''
         }
+        console.log('thuTucHanhChinhSelected---7777', vm.thuTucHanhChinhSelected, vm.dichVuSelected)
+        vm.doLoadingDataHoSo()
+      }).catch(function (){
         vm.doLoadingDataHoSo()
       })
     },
@@ -1457,6 +1713,7 @@ export default {
         if (result.length > 0) {
           vm.listLinhVuc = result.map(domain => {
             domain['displayName'] = domain['domainCode'] + ' - ' + domain['domainName']
+            // domain['displayName'] = domain['domainName']
             return domain
           })
         }
@@ -1468,18 +1725,128 @@ export default {
             }
           }
           let domain = {
-            domain: vm.linhVucSelected.domainCode
+            domain: vm.linhVucSelected.domainCode,
+            searchGovAgencyCode: vm.govAgencyFilterMenuConfig,
+            groupServiceCode: vm.groupServiceFilterMenuConfig
           }
           vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
             vm.listThuTucHanhChinh = result.map(thuTuc => {
-              thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+              thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+              // thuTuc['displayName'] = thuTuc['serviceName']
               return thuTuc
             })
-          })
+            // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
+            console.log('listThuTucHanhChinh2', vm.listThuTucHanhChinh)
+          }).catch(function (){})
+        } else if (vm.listLinhVuc.length === 1) {
+          if (!vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
+            vm.linhVucSelected = vm.listLinhVuc[0]
+            vm.domainCode = vm.linhVucSelected['domainCode']
+          }
         } else {
           vm.linhVucSelected = null
         }
-        // vm.doLoadingDataHoSo()
+        vm.doLoadingDataHoSo()
+      }).catch(function (){})
+    },
+    processListCongVan (currentQuery) {
+      let vm = this
+      console.log('currentQuery9999999 -- processListCongVan', currentQuery)
+      let getAllUrlParams = function(arr) {
+        let obj = {}
+        for (var i = 0; i < arr.length; i++) {
+          let a = arr[i].split('=')
+          let paramName = a[0]
+          let paramValue = typeof (a[1]) === 'undefined' ? true : a[1]
+          paramName = paramName.toLowerCase()
+          if (typeof paramValue === 'string') paramValue = paramValue.toLowerCase()
+          if (paramName.match(/\[(\d+)?\]$/)) {
+            var key = paramName.replace(/\[(\d+)?\]/, '')
+            if (!obj[key]) obj[key] = []
+            if (paramName.match(/\[\d+\]$/)) {
+              var index = /\[(\d+)\]/.exec(paramName)[1]
+              obj[key][index] = paramValue
+            } else {
+              obj[key].push(paramValue)
+            }
+          } else {
+            if (!obj[paramName]) {
+              obj[paramName] = paramValue
+            } else if (obj[paramName] && typeof obj[paramName] === 'string'){
+              obj[paramName] = [obj[paramName]]
+              obj[paramName].push(paramValue)
+            } else {
+              obj[paramName].push(paramValue)
+            }
+          }
+        }
+        return obj
+      }
+      let filter = {
+        paramSearch: vm.trangThaiHoSoList[vm.index]['queryParams'] ? getAllUrlParams(vm.trangThaiHoSoList[vm.index]['queryParams'].split('?')[1].split('&')) : {}
+      }
+      let agencyDonViNhan = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVanTheoDonViNhan') ? vm.trangThaiHoSoList[vm.index]['tableConfig']['searchCongVanTheoDonViNhan'] : ''
+      filter.paramSearch = Object.assign(filter.paramSearch, {searchCongVanTheoDonViNhan: agencyDonViNhan})
+      vm.$store.dispatch('getListCongVan', filter).then(function (result) {
+        if (result.length > 0) {
+          vm.listCongVan = result.map(cv => {
+            cv['displayName'] = cv['documentNo'] + ' - ' + cv['documentDate'].split(' ')[0] + ' - ' + cv['govAgencyName']
+            return cv
+          })
+        }
+        if (currentQuery.hasOwnProperty('groupDossierId') && String(currentQuery.groupDossierId) !== '') {
+          for (let key in vm.listCongVan) {
+            if (String(vm.listCongVan[key]['dossierId']) === String(currentQuery.groupDossierId)) {
+              vm.congvanSelected = vm.listCongVan[key]
+              // test ----
+              let thutuccongvan = vm.congvanSelected ? vm.congvanSelected.serviceCode : ''
+              if (thutuccongvan) {
+                let chonthutuc = vm.listThuTucHanhChinh.filter(function (item) {
+                  return item.serviceCode == thutuccongvan
+                })
+                if (chonthutuc && chonthutuc.length > 0) {
+                  vm.thuTucHanhChinhSelected = chonthutuc[0]
+                  if (vm.thuTucHanhChinhSelected !== null && vm.thuTucHanhChinhSelected !== 'null' && vm.thuTucHanhChinhSelected !== undefined && vm.thuTucHanhChinhSelected.hasOwnProperty('options')) {
+                    vm.listDichVu = vm.thuTucHanhChinhSelected.options
+                  } else {
+                    vm.listDichVu = []
+                  }
+                  if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
+                    vm.dichVuSelected = vm.listDichVu[0]
+                    vm.templateNo = vm.dichVuSelected.templateNo
+                  } else {
+                    vm.dichVuSelected = null
+                  }
+                }
+              }
+              // end test -------
+            }
+          }
+        } else {
+          vm.congvanSelected = null
+        }
+      }).catch(function (){})
+    },
+    getDonViCongVan (currentQuery) {
+      let vm = this
+      let filter = {
+        collectionCode: 'DON_VI_CONG_VAN',
+        level: '',
+        parent: ''
+      }
+      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
+        vm.listDonviCongVan = result.data
+        if (currentQuery.hasOwnProperty('donvigui') && String(currentQuery.donvigui) !== '') {
+          for (let key in vm.listDonviCongVan) {
+            if (String(vm.listDonviCongVan[key]['itemCode']) === String(currentQuery.donvigui)) {
+              vm.donviguiSelected = vm.listDonviCongVan[key]
+            }
+          }
+        } else {
+          vm.donviguiSelected = null
+        }
+      }).catch(function () {
+        vm.listDonviCongVan = []
       })
     },
     checkPemissionSpecialAction (form, currentUser, thongtinchitiet) {
@@ -1515,6 +1882,7 @@ export default {
     },
     paggingData (config) {
       let vm = this
+      vm.limitRecord = config.numberPerPage ? config.numberPerPage : 15
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
@@ -1530,16 +1898,41 @@ export default {
         path: current.path + queryString
       })
     },
+    sortAction (val) {
+      let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      newQuery['sort'] = val
+      newQuery['order'] = newQuery.hasOwnProperty('order') && newQuery['order'] === 'true' ? 'false' : 'true'
+      for (let key in newQuery) {
+        if (key === 'page') {
+          queryString += key + '=1&'
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== 'null' && newQuery[key] !== null && key !== 'step') {
+          queryString += key + '=' + newQuery[key] + '&'
+        }
+      }
+      if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
+        let stepQuery = newQuery.hasOwnProperty('step') ? newQuery['step'] : ''
+        queryString += 'step=' + stepQuery + '&'
+      }
+      vm.$router.push({
+        path: current.path + queryString,
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
+    },
     doLoadingDataHoSo () {
       let vm = this
       vm.selected = []
       let currentQuery =vm.$router.history.current.query
-      console.log('currentQuery======', currentQuery)
+      vm.orderSort = currentQuery.hasOwnProperty('order') ? currentQuery.order : ''
+      vm.sortValue = currentQuery.hasOwnProperty('sort') ? currentQuery.sort : ''
       if (currentQuery.hasOwnProperty('q')) {
         let querySet
-        if (currentQuery.q.indexOf('step') > 0) {
+        if (currentQuery.q.indexOf('step') > 0 || currentQuery.q.indexOf('originality') > 0) {
           querySet = currentQuery.q
-          // console.log('querySet------', querySet)
         } else {
           querySet = currentQuery['step'] ? currentQuery.q + '&step=' + currentQuery['step'] : currentQuery.q
         }
@@ -1550,6 +1943,7 @@ export default {
             /*  test local */
             // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
+            numberPerPage: vm.limitRecord,
             order: currentQuery.hasOwnProperty('order') ? currentQuery.order : '',
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
@@ -1564,7 +1958,24 @@ export default {
             keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
-            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
+            dossierNo: vm.dossierNoKey ? String(vm.dossierNoKey).trim() : '',
+            follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : '',
+            originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : '',
+            viapostal: currentQuery.hasOwnProperty('viapostal') ? currentQuery.viapostal : '',
+
+            fromReceiveDate: currentQuery.hasOwnProperty('fromReceiveDate') ? currentQuery.fromReceiveDate : '',
+            toReceiveDate: currentQuery.hasOwnProperty('toReceiveDate') ? currentQuery.toReceiveDate : '',
+            fromDueDate: currentQuery.hasOwnProperty('fromDueDate') ? currentQuery.fromDueDate : '',
+            toDueDate: currentQuery.hasOwnProperty('toDueDate') ? currentQuery.toDueDate : '',
+            fromReleaseDate: currentQuery.hasOwnProperty('fromReleaseDate') ? currentQuery.fromReleaseDate : '',
+            toReleaseDate: currentQuery.hasOwnProperty('toReleaseDate') ? currentQuery.toReleaseDate : '',
+            fromFinishDate: currentQuery.hasOwnProperty('fromFinishDate') ? currentQuery.fromFinishDate : '',
+            toFinishDate: currentQuery.hasOwnProperty('toFinishDate') ? currentQuery.toFinishDate : '',
+            dateCv: currentQuery.hasOwnProperty('dateCv') ? currentQuery.dateCv : vm.dateCvFormatted,
+            documentNo: currentQuery.hasOwnProperty('documentNo') ? currentQuery.documentNo : vm.documentNo,
+            donvigui: currentQuery.hasOwnProperty('donvigui') ? currentQuery.donvigui : '',
+            donvinhan: currentQuery.hasOwnProperty('donvinhan') ? currentQuery.donvinhan : '',
+            sort: vm.sortValue
           }
         } else {
           let originalityDossierDeleted = currentQuery.hasOwnProperty('status') && currentQuery['status'] === 'deleted' ? -1 : ''
@@ -1573,6 +1984,7 @@ export default {
             /*  test local */
             // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
+            numberPerPage: vm.limitRecord,
             order: currentQuery.hasOwnProperty('order') ? currentQuery.order : '',
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
@@ -1588,13 +2000,40 @@ export default {
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : originalityDossierDeleted,
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
-            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
+            dossierNo: vm.dossierNoKey ? String(vm.dossierNoKey).trim() : '',
+            follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : '',
+            viapostal: currentQuery.hasOwnProperty('viapostal') ? currentQuery.viapostal : '',
+
+            fromReceiveDate: currentQuery.hasOwnProperty('fromReceiveDate') ? currentQuery.fromReceiveDate : '',
+            toReceiveDate: currentQuery.hasOwnProperty('toReceiveDate') ? currentQuery.toReceiveDate : '',
+            fromDueDate: currentQuery.hasOwnProperty('fromDueDate') ? currentQuery.fromDueDate : '',
+            toDueDate: currentQuery.hasOwnProperty('toDueDate') ? currentQuery.toDueDate : '',
+            fromReleaseDate: currentQuery.hasOwnProperty('fromReleaseDate') ? currentQuery.fromReleaseDate : '',
+            toReleaseDate: currentQuery.hasOwnProperty('toReleaseDate') ? currentQuery.toReleaseDate : '',
+            fromFinishDate: currentQuery.hasOwnProperty('fromFinishDate') ? currentQuery.fromFinishDate : '',
+            toFinishDate: currentQuery.hasOwnProperty('toFinishDate') ? currentQuery.toFinishDate : '',
+            dateCv: currentQuery.hasOwnProperty('dateCv') ? currentQuery.dateCv : vm.dateCvFormatted,
+            documentNo: currentQuery.hasOwnProperty('documentNo') ? currentQuery.documentNo : vm.documentNo,
+            donvigui: currentQuery.hasOwnProperty('donvigui') ? currentQuery.donvigui : '',
+            donvinhan: currentQuery.hasOwnProperty('donvinhan') ? currentQuery.donvinhan : '',
+            sort: vm.sortValue
           }
         }
+        if (vm.groupServiceFilterMenuConfig || vm.disableSearchAgency) {
+          filter.agency = ''
+        }
+        if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('searchCongVan')) {
+          let group = {
+            groupDossierId: currentQuery.hasOwnProperty('groupDossierId') ? currentQuery.groupDossierId : (vm.congvanSelected ? vm.congvanSelected.dossierId : '')
+          }
+          filter = Object.assign(filter, group)
+        }
+        // console.log('filter doLoadingData', filter)
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
-          vm.hosoTotalPage = Math.ceil(vm.hosoDatasTotal / 15)
+          vm.limits = [15 , 30, 50, 100 ]
+          vm.hosoTotalPage = Math.ceil(vm.hosoDatasTotal / vm.limitRecord)
           /*
           if (window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139') {
             vm.isAdminSuper = true
@@ -1608,7 +2047,7 @@ export default {
               }
               vm.selectMultiplePage.push(item)
             }
-            console.log('selectMultiplePage', vm.selectMultiplePage)
+            // console.log('selectMultiplePage', vm.selectMultiplePage)
           }
           vm.selected = vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected']
         }).catch(reject => {
@@ -1618,9 +2057,23 @@ export default {
       }
       if (vm.menuType === 3 || String(vm.menuType) === '3') {
         setTimeout(() => {
+          vm.dossierCounting = []
           vm.$store.dispatch('loadingDossierCounting').then(function (result) {
             if (result !== null && result !== undefined) {
-              vm.dossierCounting = result
+              
+              if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('advanceSearchCounting')) {
+                let status = vm.trangThaiHoSoList[vm.index]['tableConfig']['advanceSearchCounting'].split(',')
+                result.forEach(element => {
+                  if (status.filter(function(item) {
+                    return item === element['key']
+                  }).length > 0) {
+                    vm.dossierCounting.push(element)
+                  }
+                })
+              } else {
+                vm.dossierCounting = result
+              }
+              
               // add search dossierDeleted
               if (vm.getUser('Administrator_data')) {
                 let dossierDelete = {key: 'deleted', title: 'Hồ sơ đã xóa', count: 0}
@@ -1630,7 +2083,7 @@ export default {
               vm.dossierCounting = []
             }
             vm.dossierCountingShow = true
-          })
+          }).catch(function (){})
         }, 200)
       } else {
         vm.dossierCountingShow = false
@@ -1663,7 +2116,8 @@ export default {
         }
       }
       if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
-        queryString += 'step=' + newQuery['step'] + '&'
+        let stepQuery = newQuery.hasOwnProperty('step') ? newQuery['step'] : ''
+        queryString += 'step=' + stepQuery + '&'
       }
       if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
         queryString += 'service_config=' + item.serviceConfigId
@@ -1681,45 +2135,55 @@ export default {
     },
     changeServiceConfigsGuide (item) {
       let vm = this
-      if (item !== null && item !== 'null' && item !== undefined && item.hasOwnProperty('options')) {
-        vm.listDichVuGuide = item.options
-      } else {
-        vm.listDichVuGuide = []
-      }
-      if (vm.listDichVuGuide !== null && vm.listDichVuGuide !== undefined && vm.listDichVuGuide !== 'undefined' && vm.listDichVuGuide.length > 0) {
-        vm.dichVuSelectedGuide = vm.listDichVuGuide[0]
-        vm.templateNoGuide = vm.dichVuSelectedGuide.templateNo
-      } else {
-        vm.dichVuSelectedGuide = null
-      }
+      vm.listDichVuGuide = []
+      setTimeout (function () {
+        if (item !== null && item !== 'null' && item !== undefined && item.hasOwnProperty('options')) {
+          vm.listDichVuGuide = item.options
+        } else {
+          vm.listDichVuGuide = []
+        }
+        if (vm.listDichVuGuide !== null && vm.listDichVuGuide !== undefined && vm.listDichVuGuide !== 'undefined' && vm.listDichVuGuide.length > 0) {
+          vm.dichVuSelectedGuide = vm.listDichVuGuide[0]
+          vm.templateNoGuide = vm.dichVuSelectedGuide.templateNo
+        } else {
+          vm.dichVuSelectedGuide = null
+        }
+      }, 300)
     },
     changeDomain (item) {
-      // console.log('change Domain')
+      console.log('change Domain', item)
       let vm = this
       vm.selectMultiplePage = []
       vm.linhVucSelected = item
+      vm.listDichVu = []
+      vm.dichVuSelected = null
       if (item) {
         setTimeout(function () {
           let domain = {
-            domain: vm.linhVucSelected.domainCode
+            domain: vm.linhVucSelected.domainCode,
+            searchGovAgencyCode: vm.govAgencyFilterMenuConfig,
+            groupServiceCode: vm.groupServiceFilterMenuConfig
           }
           vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
             vm.listThuTucHanhChinh = result.map(thuTuc => {
-              thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+              thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+              // thuTuc['displayName'] = thuTuc['serviceName']
               return thuTuc
             })
-          })
-          // vm.listThuTucHanhChinh = vm.listThuTuc.filter(function (itemThuTuc) {
-          //   return (itemThuTuc.serviceCode.split(itemThuTuc.serviceCode.match(/\d+/g)[0])[0] === item.domainCode)
-          // })
+            // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
+          }).catch(function (){})
         }, 100)
       } else {
         vm.listThuTucHanhChinh = vm.listThuTuc
+        // vm.listThuTucHanhChinh = vm.filterServiceConfig(vm.listThuTucHanhChinh)
       }
       if (item !== null && item !== undefined) {
         vm.domainCode = vm.linhVucSelected['domainCode']
       } else {
         vm.domainCode = ''
+      }
+      if(vm.xacthuc_BNG){
+        vm.postFieldPick('domain',vm.linhVucSelected)
       }
       let current = vm.$router.history.current
       let newQuery = current.query
@@ -1733,9 +2197,102 @@ export default {
         }
       }
       if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
-        queryString += 'step=' + newQuery['step'] + '&'
+        let stepQuery = newQuery.hasOwnProperty('step') ? newQuery['step'] : ''
+        queryString += 'step=' + stepQuery + '&'
       }
       queryString += 'domain=' + vm.domainCode
+      // console.log('change Domain queryString', queryString)
+      vm.$router.push({
+        path: current.path + queryString,
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
+    },
+    changeCongVan (item) {
+      let vm = this
+      console.log('congvanSelected', item)
+      vm.selectMultiplePage = []
+      vm.congvanSelected = item
+      // test -----
+      let thutuccongvan = item ? item.serviceCode : ''
+      if (thutuccongvan) {
+        let chonthutuc = vm.listThuTucHanhChinh.filter(function (item) {
+          return item.serviceCode == thutuccongvan
+        })
+        if (chonthutuc && chonthutuc.length > 0) {
+          vm.thuTucHanhChinhSelected = chonthutuc[0]
+          if (vm.thuTucHanhChinhSelected !== null && vm.thuTucHanhChinhSelected !== 'null' && vm.thuTucHanhChinhSelected !== undefined && vm.thuTucHanhChinhSelected.hasOwnProperty('options')) {
+            vm.listDichVu = vm.thuTucHanhChinhSelected.options
+          } else {
+            vm.listDichVu = []
+          }
+          if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
+            vm.dichVuSelected = vm.listDichVu[0]
+            vm.templateNo = vm.dichVuSelected.templateNo
+          } else {
+            vm.dichVuSelected = null
+          }
+        }
+      }
+      // end test -------
+      let groupIdQuery = vm.congvanSelected ? vm.congvanSelected.dossierId : ''
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      newQuery['groupDossierId'] = ''
+      newQuery['service_config'] = ''
+      newQuery['template_no'] = ''
+      for (let key in newQuery) {
+        if (key === 'page') {
+          queryString += key + '=1&'
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && key !== 'step') {
+          queryString += key + '=' + newQuery[key] + '&'
+        }
+      }
+      if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
+        let stepQuery = newQuery.hasOwnProperty('step') ? newQuery['step'] : ''
+        queryString += 'step=' + stepQuery + '&'
+      }
+      queryString += 'groupDossierId=' + groupIdQuery
+      if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
+        queryString += '&service_config=' + vm.thuTucHanhChinhSelected.serviceConfigId
+        queryString += '&template_no=' + vm.dichVuSelected.templateNo
+        vm.govAgencyCode = vm.thuTucHanhChinhSelected.govAgencyCode
+        vm.serviceCode = vm.thuTucHanhChinhSelected.serviceCode
+      } else {
+        vm.templateNo = ''
+        vm.govAgencyCode = ''
+        vm.serviceCode = ''
+      }
+      vm.$router.push({
+        path: current.path + queryString,
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
+    },
+    changeDonViGuiCongVan (item) {
+      let vm = this
+      vm.selectMultiplePage = []
+      vm.donviguiSelected = item
+      let donvigui = vm.donviguiSelected ? vm.donviguiSelected.itemCode : ''
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      newQuery['donvigui'] = ''
+      for (let key in newQuery) {
+        if (key === 'page') {
+          queryString += key + '=1&'
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && key !== 'step') {
+          queryString += key + '=' + newQuery[key] + '&'
+        }
+      }
+      if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
+        let stepQuery = newQuery.hasOwnProperty('step') ? newQuery['step'] : ''
+        queryString += 'step=' + stepQuery + '&'
+      }
+      queryString += 'donvigui=' + donvigui
       // console.log('change Domain queryString', queryString)
       vm.$router.push({
         path: current.path + queryString,
@@ -1749,13 +2306,7 @@ export default {
       vm.selectMultiplePage = []
       // console.log('run log ...')
       setTimeout(function () {
-        if (vm.dossierNoKey) {
-          if (vm.dossierNoKey.length > 3 || vm.dossierNoKey === '') {
-            vm.doLoadingDataHoSo()
-          }
-        } else {
-          vm.doLoadingDataHoSo()
-        }
+        vm.doLoadingDataHoSo()
       }, 200)
     },
     clearDossierNoKey () {
@@ -1784,157 +2335,275 @@ export default {
     },
     btnActionEvent (dossierItem, item, index, isGroup) {
       let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
       // set info buttonConfig
       vm.buttonConfigItem = {}
       vm.buttonConfigItem = item
       //
       vm.itemAction = item
-      // console.log('itemAction++++++++++++', item)
       vm.indexAction = index
-      if (String(item.form) === 'NEW') {
-        let isOpenDialog = true
-        if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
-          isOpenDialog = false
-        }
-        if (isOpenDialog) {
-          // vm.thuTucHanhChinhSelected = null
-          vm.dialogAction = true
+      if (item.hasOwnProperty('requiredCVDen') && (!vm.congvanSelected || !vm.thuTucHanhChinhSelected)) {
+        if (!vm.congvanSelected && !vm.thuTucHanhChinhSelected) {
+          alert('Vui lòng chọn công văn và thủ tục để thực hiện')
+          vm.focusSelect = 1
+        } else if (!vm.congvanSelected && vm.thuTucHanhChinhSelected) {
+          alert('Vui lòng chọn công văn để thực hiện')
+          vm.focusSelect = 1
         } else {
-          vm.doCreateDossier()
+          alert('Vui lòng chọn thủ tục để thực hiện')
+          vm.focusSelect = 2
         }
-        // console.log('isOpenDialog++++++++', isOpenDialog)
-      } else if (String(item.form) === 'UPDATE') {
-       vm.$router.push({
-          path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
-          query: vm.$router.history.current.query
-        })
-      } else if (String(item.form) === 'ADD') {
-       vm.$router.push({
-          path: '/danh-sach-ho-so/' + vm.index + '/bo-sung-ho-so/' + dossierItem.dossierId,
-          query: vm.$router.history.current.query
-        })
-      } else if (String(item.form) === 'COPY') {
-        vm.doCopy(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'CANCEL') {
-        vm.doCancel(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'PRINT_01') {
-        // Xem trước phiếu của một hồ sơ
-        vm.doPrint01(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'PRINT_02') {
-        // Xem trước phiếu gộp của nhiều hồ sơ
-        vm.doPrint02(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'PRINT_03') {
-        // In văn bản mới nhất đã phê duyệt
-        vm.doPrint03(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'GUIDING') {
-        vm.dialog_printGuide = true
-        // vm.doGuiding(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'PREVIEW') {
-        vm.doPreview(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'ACTIONS') {
-        vm.doActions(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'DELETE') {
-        vm.doDeleteDossier(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'ROLLBACK_01') {
-        let result = {
-          actionCode: 9000
+        
+      } else {
+        if (String(item.form) === 'NEW' || String(item.form) === 'NEW_GROUP' || String(item.form) === 'NEW_GROUP_CV' || String(item.form) === 'NEW_GROUP_CV_DI') {
+          let isOpenDialog = true
+          if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
+            isOpenDialog = false
+          }
+          if (String(item.form) === 'NEW_GROUP_CV_DI') {
+            isOpenDialog = false
+          }
+          if (isOpenDialog) {
+            vm.dialogAction = true
+          } else {
+            if(String(item.form) === 'NEW_GROUP_CV_DI') {
+              if(vm.serviceCode && vm.templateNo) {
+                if (item.hasOwnProperty('requiredCVDen')) {
+                  item = Object.assign(item, {requiredCVDenGovCode: vm.congvanSelected.govAgencyCode, requiredCVDenGroupId: vm.congvanSelected.dossierId})
+                }
+                vm.$store.commit('setFormActionGroup', item)
+                vm.doCreateDossier() 
+              } else {
+                toastr.error('Chưa chọn thủ tục hành chính')
+              }
+            } else {
+              if (item.hasOwnProperty('requiredCVDen')) {
+                item = Object.assign(item, {requiredCVDenGovCode: vm.congvanSelected.govAgencyCode, requiredCVDenGroupId: vm.congvanSelected.dossierId})
+              }
+              vm.$store.commit('setFormActionGroup', item)
+              vm.doCreateDossier()
+            }
+          }
+        } else if (String(item.form) === 'UPDATE') {
+          if(dossierItem.serviceCode === 'BNG-270817' || dossierItem.serviceCode === 'BNG-270821' || dossierItem.serviceCode === 'BNG-270820' || dossierItem.serviceCode === 'BNG-270816' || dossierItem.serviceCode === 'BNG-270819' || dossierItem.serviceCode === 'BNG-270815'){
+            vm.$router.history.current.query['template_no'] = dossierItem.dossierTemplateNo
+            vm.$router.history.current.query['serviceCode'] = dossierItem.serviceCode
+          }
+          // 
+          vm.$router.history.current.query['template_no'] = dossierItem.dossierTemplateNo
+          vm.$router.history.current.query['serviceCode'] = dossierItem.serviceCode
+          // 
+          vm.$router.push({
+              path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
+              query: vm.$router.history.current.query
+            })
+        } else if (String(item.form) === 'ADD') {
+          vm.$router.push({
+            path: '/danh-sach-ho-so/' + vm.index + '/bo-sung-ho-so/' + dossierItem.dossierId,
+            query: vm.$router.history.current.query
+          })
+        } else if (String(item.form) === 'IMPORT') {
+          if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined) {
+            vm.doImportDossier()
+          } else {
+            alert('Chọn thủ tục để thực hiện')
+          }
+        } else if (String(item.form) === 'COPY') {
+          vm.doCopy(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'CANCEL') {
+          vm.doCancel(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'PRINT_01') {
+          // Xem trước phiếu của một hồ sơ
+          vm.doPrint01(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'PRINT_02') {
+          // Xem trước phiếu gộp của nhiều hồ sơ
+          vm.doPrint02(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'PRINT_03') {
+          // In văn bản mới nhất đã phê duyệt
+          vm.doPrint03(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'GUIDING') {
+          vm.thuTucHanhChinhSelectedGuide = ''
+          vm.dichVuSelectedGuide = ''
+          vm.tphsGuide = []
+          if (vm.thuTucHanhChinhSelected) {
+            vm.thuTucHanhChinhSelectedGuide = vm.thuTucHanhChinhSelected
+            vm.listDichVuGuide = vm.thuTucHanhChinhSelectedGuide.hasOwnProperty('options') ? vm.thuTucHanhChinhSelectedGuide['options'] : ''
+            vm.dichVuSelectedGuide = vm.dichVuSelected ? vm.dichVuSelected : ''
+            vm.templateNoGuide = vm.dichVuSelectedGuide ? vm.dichVuSelectedGuide.templateNo : ''
+          }
+          vm.docTypePrint = item.document
+          vm.dialog_printGuide = true
+          vm.$refs.formGuide.reset()
+        } else if (String(item.form) === 'DENIED') {
+          vm.docTypePrint = item.document
+          vm.thuTucHanhChinhSelectedGuide = ''
+          vm.dichVuSelectedGuide = ''
+          if (vm.thuTucHanhChinhSelected) {
+            vm.thuTucHanhChinhSelectedGuide = vm.thuTucHanhChinhSelected
+            vm.listDichVuGuide = vm.thuTucHanhChinhSelectedGuide.hasOwnProperty('options') ? vm.thuTucHanhChinhSelectedGuide['options'] : ''
+            vm.dichVuSelectedGuide = vm.dichVuSelected ? vm.dichVuSelected : ''
+            vm.templateNoGuide = vm.dichVuSelectedGuide ? vm.dichVuSelectedGuide.templateNo : ''
+          }
+          vm.dialog_denied = true
+          vm.$refs.formDenied.reset()
+        } else if (String(item.form) === 'PREVIEW') {
+          vm.doPreview(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'ACTIONS') {
+          if (!vm.doActionGroupKhacThuTuc) {
+            if (!vm.thuTucHanhChinhSelected || vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
+              alert('Loại thủ tục bắt buộc phải chọn khi thực hiện thao tác này')
+            } else {
+              vm.doActions(dossierItem, item, index, isGroup)
+            }
+          } else {
+            if ((!vm.thuTucHanhChinhSelected || vm.thuTucHanhChinhSelected === 'undefined') && (!vm.linhVucSelected || vm.linhVucSelected === 'undefined')) {
+              alert('Vui lòng chọn lĩnh vực hoặc thủ tục để thực hiện thao tác này')
+            } else {
+              vm.doActions(dossierItem, item, index, isGroup)
+            }
+          }
+
+        } else if (String(item.form) === 'DELETE') {
+          vm.doDeleteDossier(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'ROLLBACK_01') {
+          let result = {
+            actionCode: 9000
+          }
+          vm.processAction(dossierItem, item, result, index, true)
+        } else if (String(item.form) === 'ROLLBACK_02') {
+          let result = {
+            actionCode: 9000
+          }
+          vm.processAction(dossierItem, item, result, index, true)
+        } else if (String(item.form) === 'OVERDUE') {
+          let result = {
+            actionCode: 8500,
+            dossierId: dossierItem.dossierId,
+            overdue: dossierItem['extendDate']
+          }
+          vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8500)
+        } else if (String(item.form) === 'PREOVERDUE') {
+          let result = {
+            actionCode: 8501,
+            dossierId: dossierItem.dossierId,
+            preoverdue: dossierItem['extendDate']
+          }
+          vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8501)
+        } else if (String(item.form) === 'BETIMES') {
+          let result = {
+            actionCode: 8400,
+            dossierId: dossierItem.dossierId,
+            betimes: dossierItem['extendDate']
+          }
+          vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8400)
+        } else if (String(item.form) === 'CHANGE_DATA_DOSSIER') {
+          vm.doChangeDossier(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'UNDO_DOSSIER') {
+          vm.doUndoDossier(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'RESTORE_DOSSIER') {
+          vm.doRestoreDossier(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'GOTO_DONE') {
+          if (!dossierItem) {
+            alert('Chọn hồ sơ để thực hiện')
+            return
+          }
+          let result = {
+            stepCode: 400,
+            stepName: 'hoàn thành'
+          }
+          vm.gotoStep(dossierItem, result)
+        } else if (String(item.form) === 'GOTO_CANCEL') {
+          if (!dossierItem) {
+            alert('Chọn hồ sơ để thực hiện')
+            return
+          }
+          let result = {
+            stepCode: 410,
+            stepName: 'rút'
+          }
+          vm.gotoStep(dossierItem, result)
+        } else if (String(item.form) === 'GOTO_DENY') {
+          if (!dossierItem) {
+            alert('Chọn hồ sơ để thực hiện')
+            return
+          }
+          let result = {
+            stepCode: 420,
+            stepName: 'từ chối'
+          }
+          vm.gotoStep(dossierItem, result)
         }
-        vm.processAction(dossierItem, item, result, index, true)
-      } else if (String(item.form) === 'ROLLBACK_02') {
-        let result = {
-          actionCode: 9000
-        }
-        vm.processAction(dossierItem, item, result, index, true)
-      } else if (String(item.form) === 'OVERDUE') {
-        let result = {
-          actionCode: 8500,
-          dossierId: dossierItem.dossierId,
-          overdue: dossierItem['extendDate']
-        }
-        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8500)
-      } else if (String(item.form) === 'PREOVERDUE') {
-        let result = {
-          actionCode: 8501,
-          dossierId: dossierItem.dossierId,
-          preoverdue: dossierItem['extendDate']
-        }
-        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8501)
-      } else if (String(item.form) === 'BETIMES') {
-        let result = {
-          actionCode: 8400,
-          dossierId: dossierItem.dossierId,
-          betimes: dossierItem['extendDate']
-        }
-        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8400)
-      } else if (String(item.form) === 'CHANGE_DATA_DOSSIER') {
-        vm.doChangeDossier(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'UNDO_DOSSIER') {
-        vm.doUndoDossier(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'RESTORE_DOSSIER') {
-        vm.doRestoreDossier(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'GOTO_DONE') {
-        if (!dossierItem) {
-          alert('Chọn hồ sơ để thực hiện')
-          return
-        }
-        let result = {
-          stepCode: 400,
-          stepName: 'hoàn thành'
-        }
-        vm.gotoStep(dossierItem, result)
-      } else if (String(item.form) === 'GOTO_CANCEL') {
-        if (!dossierItem) {
-          alert('Chọn hồ sơ để thực hiện')
-          return
-        }
-        let result = {
-          stepCode: 410,
-          stepName: 'rút'
-        }
-        vm.gotoStep(dossierItem, result)
-      } else if (String(item.form) === 'GOTO_DENY') {
-        if (!dossierItem) {
-          alert('Chọn hồ sơ để thực hiện')
-          return
-        }
-        let result = {
-          stepCode: 420,
-          stepName: 'từ chối'
-        }
-        vm.gotoStep(dossierItem, result)
       }
+      
     },
     doPrint01 (dossierItem, item, index, isGroup) {
       let vm = this
+      vm.dossierSelect = dossierItem
       vm.dialogPDFLoading = true
       vm.dialogPDF = true
       let filter = {
         dossierId: dossierItem.dossierId,
         document: item.document
       }
+      vm.srcDownloadIframe = ''
       vm.$store.dispatch('doPrint01', filter).then(function (result) {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPDFPreview').src = result
-      })
+        vm.srcDownloadIframe = result
+      }).catch(function (){})
+    },
+    exportDoc () {
+      let vm = this
+      console.log('itemAction', vm.itemAction)
+      if (vm.itemAction.form === 'PRINT_01') {
+        let filter = {
+          dossierId: vm.dossierSelect.dossierId,
+          document: vm.itemAction.document,
+          reportType: 'word'
+        }
+        vm.$store.dispatch('doPrint01', filter).then(function (result) {
+        }).catch(function (){})
+      } else if (vm.itemAction.form === 'PRINT_02') {
+        let dossierSelect = vm.selectedDoAction.map(dossier => {
+          dossier['submissionNote'] = ''
+          return dossier
+        })
+        let filter2 = {
+          document: vm.itemAction.document,
+          dossiers: JSON.stringify(dossierSelect),
+          reportType: 'word'
+        }
+        vm.$store.dispatch('doPrint02', filter2).then(function (result) {
+        }).catch(function (){})
+      }
+      
     },
     doPrint02 (dossierItem, item, index, isGroup) {
       let vm = this
-      console.log('vm.selectedDoAction', vm.selectedDoAction)
-      if (vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
-        alert('Loại thủ tục bắt buộc phải chọn')
+      if ((vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') && !vm.doActionGroup && !vm.doActionGroupKhacThuTuc) {
+        alert('Loại thủ tục bắt buộc phải chọn khi thực hiện thao tác này')
       } else {
+        if (vm.selectedDoAction.length === 0) {
+          alert('Chọn hồ sơ để thực hiện')
+          return
+        }
+        let dossierSelect = vm.selectedDoAction.map(dossier => {
+            dossier['submissionNote'] = ''
+            return dossier
+          })
         let filter = {
           document: item.document,
-          'serviceCode': vm.thuTucHanhChinhSelected.serviceCode,
-          'govAgencyCode': vm.thuTucHanhChinhSelected.govAgencyCode,
-          dossiers: JSON.stringify(vm.selectedDoAction)
+          dossiers: JSON.stringify(dossierSelect)
         }
         vm.dialogPDFLoading = true
         vm.dialogPDF = true
+        vm.srcDownloadIframe = ''
         vm.$store.dispatch('doPrint02', filter).then(function (result) {
           vm.dialogPDFLoading = false
           document.getElementById('dialogPDFPreview').src = result
-        })
+          vm.srcDownloadIframe = result
+        }).catch(function (){})
       }
     },
     doPrint03 (dossierItem, item, index, isGroup) {
@@ -1943,16 +2612,80 @@ export default {
       vm.dialogPDF = true
       let filter = {
         dossierId: dossierItem.dossierId,
-        document: item.document
+        document: item ? item.document : ''
       }
-      vm.$store.dispatch('doPrint03', filter).then(function (result) {
-        vm.dialogPDFLoading = false
-        document.getElementById('dialogPDFPreview').src = result
-      })
+      let counter = 0
+      let callServer = function() {
+        setTimeout(function () {
+          vm.$store.dispatch('doPrint03', filter).then(function (result) {
+            if (result === 'pending' && counter <= 15) {
+              counter += 1
+              callServer()
+            } else {
+              if (counter > 15) {
+                vm.dialogPDFLoading = false
+              } else {
+                vm.dialogPDFLoading = false
+                vm.dialogPDF = true
+                setTimeout(function () {
+                  document.getElementById('dialogPDFPreview').src = result
+                }, 100)
+              }
+            }
+          })
+        }, 1000)
+      }
+      callServer()
     },
     doGuiding (type) {
       let vm = this
       if (vm.$refs.formGuide.validate()) {
+        vm.loadingAction = true
+        let partNoRequired = []
+        for (let key in vm.tphsGuide) {
+          if (!vm.tphsGuide[key]['fileMark']) {
+            partNoRequired.push(vm.tphsGuide[key]['partNo'])
+          }
+        }
+        let filter = {
+          serviceConfigId: vm.thuTucHanhChinhSelectedGuide.serviceConfigId,
+          serviceCode: vm.thuTucHanhChinhSelectedGuide.serviceCode,
+          serviceName: vm.thuTucHanhChinhSelectedGuide.serviceName,
+          templateNo: vm.templateNoGuide,
+          applicantName: vm.applicantNameGuide,
+          applicantAddress: vm.applicantAddressGuide,
+          applicantEmail: vm.applicantEmailGuide,
+          applicantTelNo: vm.applicantTelNoGuide,
+          govAgencyCode: vm.thuTucHanhChinhSelectedGuide.govAgencyCode,
+          govAgencyName: vm.thuTucHanhChinhSelectedGuide.govAgencyName,
+          typeCode: vm.docTypePrint ? vm.docTypePrint : 'DOC_03',
+          partNo: partNoRequired.toString(),
+          applicantNote: vm.applicantNoteGuide,
+          type: 'completed',
+          applicantType: vm.applicantTypeGuide ? 'citizen' : 'business'
+        }
+        if (type === 'doc') {
+          filter['reportType'] = 'word'
+        }
+        if (type !== 'doc') {
+          vm.dialogPDFLoading = true
+          vm.dialogPDF = true
+        }
+        vm.$store.dispatch('doGuiding', filter).then(function (result) {
+          vm.loadingAction = false
+          vm.dialog_printGuide = false
+          vm.dialogPDFLoading = false
+          if (type !== 'doc') {
+            document.getElementById('dialogPDFPreview').src = result
+          }
+        }).catch(function () {
+          vm.loadingAction = false
+        })
+      }
+    },
+    doDenied (type) {
+      let vm = this
+      if (vm.$refs.formDenied.validate()) {
         vm.loadingAction = true
         let filter = {
           serviceConfigId: vm.thuTucHanhChinhSelectedGuide.serviceConfigId,
@@ -1963,8 +2696,12 @@ export default {
           applicantAddress: vm.applicantAddressGuide,
           applicantEmail: vm.applicantEmailGuide,
           applicantTelNo: vm.applicantTelNoGuide,
-          // employeeName: window.themeDisplay.getUserName() ? window.themeDisplay.getUserName() : '',
-          typeCode: 'DOC_03'
+          govAgencyCode: vm.thuTucHanhChinhSelectedGuide.govAgencyCode,
+          govAgencyName: vm.thuTucHanhChinhSelectedGuide.govAgencyName,
+          typeCode: vm.docTypePrint ? vm.docTypePrint : 'DOC_03',
+          applicantNote: vm.applicantNoteGuide,
+          type: 'denied',
+          applicantType: vm.applicantTypeGuide ? 'citizen' : 'business'
         }
         if (type === 'doc') {
           filter['reportType'] = 'word'
@@ -1996,7 +2733,7 @@ export default {
       vm.$store.dispatch('doPrint03', filter).then(function (result) {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPDFPreview').src = result
-      })
+      }).catch(function (){})
     },
     doActions (dossierItem, item, index, isGroup) {
       let vm = this
@@ -2032,8 +2769,8 @@ export default {
                 path: '/danh-sach-ho-so/' + vm.index + '/xu-ly-ho-so',
                 query: query
               })
-            })
-          })
+            }).catch(function (){})
+          }).catch(function (){})
         } else {
           alert('Chọn hồ sơ để thao tác')
         }
@@ -2179,7 +2916,7 @@ export default {
             let filter = {
               dossierId: vm.selectedDoAction[key]['dossierId']
             }
-            console.log('filter Restore', filter)
+            // console.log('filter Restore', filter)
             if (vm.selectedDoAction[key]['originality']) {
               vm.$store.dispatch('restoreDossier', filter).then(function (result) {
                 restoreCounter += 1
@@ -2217,7 +2954,7 @@ export default {
             }
             filter['dossierId'] = deleteIds
             vm.$store.dispatch('deleteDossierPatch', filter).then(function (result) {
-            })
+            }).catch(function (){})
           } else {
             alert('Chọn hồ sơ để thực hiện')
           }
@@ -2228,7 +2965,7 @@ export default {
           vm.$store.dispatch('deleteDossier', filter).then(function (result) {
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
-           vm.$router.push({
+            vm.$router.push({
               path: vm.$router.history.current.path,
               query: {
                 recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -2236,10 +2973,23 @@ export default {
                 q: currentQuery['q']
               }
             })
-          })
+          }).catch(function (){})
         }
       } else {
         return false
+      }
+    },
+    deleteCongVan (item, index) {
+      let vm = this
+      let filter = {
+        dossierId: item.dossierId
+      }
+      let x = confirm('Bạn có chắc chắn thực hiện xóa công văn?')
+      if (x) {
+        vm.$store.dispatch('deleteDossier', filter).then(function (result) {
+          toastr.success('Xóa công văn thành công')
+          vm.doLoadingDataHoSo()
+        }).catch(function (){})
       }
     },
     doCreateDossier () {
@@ -2248,26 +2998,46 @@ export default {
         serviceCode: vm.serviceCode,
         govAgencyCode: vm.govAgencyCode,
         templateNo: vm.templateNo,
-        originality: vm.getOriginality()
+        originality: vm.itemAction['form'] === 'NEW_GROUP' || vm.itemAction['form'] === 'NEW_GROUP_CV' || vm.itemAction['form'] === 'NEW_GROUP_CV_DI' ? 9 : vm.getOriginality()
       }
-      vm.$store.commit('setDataCreateDossier', data)
-      vm.loadingAction = true
-      vm.$store.dispatch('postDossier', data).then(function (result) {
-        vm.loadingAction = false
-        vm.indexAction = -1
-       vm.$router.push({
-          path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
-          query: vm.$router.history.current.query
-        })
-      }).catch(reject => {
-        vm.loadingAction = false
-      })
+      // add new template
+      let filter = {
+        dossierTemplateNo: vm.templateNo
+      }
+      vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result1) {
+        let mauCongVan = result1['newFormScript'] && result1['newFormScript'].startsWith('MAU_CV_') ? result1['newFormScript'] : false 
+        if (result1['newFormScript'] && !mauCongVan) {
+          vm.$router.push({
+            path: '/danh-sach-ho-so/0/ho-so/0/' + vm.itemAction.form,
+            query: vm.$router.history.current.query
+          })
+        } else {
+          vm.$store.commit('setDataCreateDossier', data)
+          vm.loadingAction = true
+          let query_redirect = vm.$router.history.current.query
+          if (vm.itemAction['form'] === 'NEW_GROUP_CV' || vm.itemAction['form'] === 'NEW_GROUP_CV_DI') {
+            query_redirect = Object.assign(query_redirect, {formActionGroup: JSON.stringify(vm.itemAction)})
+            console.log('query_redirect_Landing', query_redirect)
+          }
+          vm.$store.dispatch('postDossier', data).then(function (result) {
+            vm.loadingAction = false
+            vm.indexAction = -1
+            vm.$router.push({
+              path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
+              query: query_redirect
+            })
+          }).catch(reject => {
+            vm.loadingAction = false
+          })
+        }
+      }).catch(function (){})
+      //
     },
     doSubmitDialogAction (item) {
       let vm = this
-      if (vm.$refs.form.validate()) {
-        // console.log('yes-----')
-        // console.log('item++++++++', item)
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      if (vm.$refs.form1.validate()) {
         vm.doCreateDossier()
       }
     },
@@ -2288,7 +3058,7 @@ export default {
       if (item.dossierStatus === '' || item.dossierSubStatus === '') {
         vm.$store.dispatch('pullNextactions', filter).then(result => {
           vm.btnDossierDynamics = result
-        })
+        }).catch(function (){})
       } else {
         vm.btnStepsDynamics = []
         var getbuttonAction = [vm.$store.dispatch('pullNextactions', filter), vm.$store.dispatch('pullBtnConfigStep', filter)]
@@ -2298,7 +3068,7 @@ export default {
         }).catch(reject => {
           vm.$store.dispatch('pullNextactions', filter).then(result => {
             vm.btnDossierDynamics = result
-          })
+          }).catch(function (){})
         })
       }
       // }
@@ -2342,7 +3112,7 @@ export default {
             vm.$router.push({
               path: vm.$router.history.current.path + queryString
             })
-          })
+          }).catch(function (){})
         } else {
           return false
         }
@@ -2392,7 +3162,7 @@ export default {
                 }
               } else {}
             })
-          })
+          }).catch(function (){})
         }
       }
     },
@@ -2521,209 +3291,60 @@ export default {
     },
     viewDetail (item, indexItem) {
       let vm = this
-      if (vm.menuType === 3) {
-        if (item.dossierStatus === 'done' || item.dossierStatus === 'unresolved' || item.dossierStatus === 'releasing') {
-          vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
-        } else {
-          if (item.permission) {
-            vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+      let currentQuery = vm.$router.history.current.query
+      if (item.permission) {
+        if (item['originality'] === 9) {
+          if (vm.trangThaiHoSoList[vm.index]['id'].indexOf('CV_DI') !== -1) {
+            vm.$router.push({
+              path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV_DI/' + item.dossierId,
+              query: vm.$router.history.current.query
+            })
           } else {
-            alert('Bạn không có quyền thao tác với hồ sơ này.')
+            vm.$router.push({
+              path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV/' + item.dossierId,
+              query: vm.$router.history.current.query
+            })
           }
+          
+        } else {
+          vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
         }
       } else {
-        if (item.permission) {
+        if (item['originality'] === 1) {
           vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
         } else {
-          alert('Bạn không có quyền thao tác với hồ sơ này.')
+          alert('Bạn không có quyền thao tác với hồ sơ này')
         }
       }
-      // phục vụ khi import hồ sơ không lấy được quyền thao tác -> không check quyền với hs đã hoàn thành và từ chối.
     },
     keywordEventChange (data) {
       let vm = this
-      vm.selectMultiplePage = []
-      console.log('keywordEventChange', data)
-      vm.advObjectSearch = {}
-      for (let key in data) {
-        if (typeof data[key] === 'string' && data[key] !== null && data[key] !== undefined && data[key] !== 'undefined') {
-          if (!data[key].startsWith('keyword:') && !data[key].startsWith('year_month_day:') && !data[key].startsWith('top:') &&
-            !data[key].startsWith('status:') && !data[key].startsWith('substatus:') && !data[key].startsWith('agency:') &&
-            !data[key].startsWith('service:') && !data[key].startsWith('domain:') && !data[key].startsWith('register:')) {
-            vm.advObjectSearch['keyword'] = data[key]
-          }
-          if (data[key].startsWith('keyword:')) {
-            vm.advObjectSearch['keyword'] = data[key].replace('keyword:', '')
-          } else {
-            for (let keyTool in vm.advSearchItems) {
-              if (data[key].startsWith(vm.advSearchItems[keyTool].spec + ':')) {
-                vm.advObjectSearch[vm.advSearchItems[keyTool].spec] = data[key].replace(vm.advSearchItems[keyTool].spec + ':', '')
-              }
-            }
-          }
-        } else {
-          let newText = data[key].value
-          vm.advObjectSearch[data[key].spec] = newText.replace(data[key].spec + ':', '')
-        }
-      }
-      vm.advSearchItems = []
-      for (let key in vm.advObjectSearch) {
-        if (!vm.advObjectSearch.hasOwnProperty(key)) continue
-        let value = vm.advObjectSearch[key]
-        if (typeof value === 'string' && value !== null && value !== undefined && value !== '') {
-          if (key === 'keyword') {
-            vm.advSearchItems.push({
-              spec: key,
-              value: key + ':' + value,
-              text: key + ':' + value,
-              index: -1
-            })
-          } else {
-            let toolIndex = -2
-            for (let keyTool in vm.advSearchTools) {
-              if (vm.advSearchTools[keyTool].spec === key) {
-                toolIndex = vm.advSearchTools[keyTool].index
-                break
-              }
-            }
-            vm.advSearchItems.push({
-              spec: key,
-              value: key + ':' + value,
-              text: key + ':' + value,
-              index: toolIndex
-            })
-          }
-        } else if (typeof value !== 'string' && value !== null && value !== undefined && value !== '') {
-          vm.advSearchItems.push({
-            spec: key,
-            value: key + ':' + value.value,
-            text: key + ':' + value.value,
-            index: key + ':' + value.index
-          })
-        }
-      }
-      for (let keyTool in vm.advSearchTools) {
-        vm.advSearchTools[keyTool].display = false
-        vm.advSearchTools[keyTool].disabled = false
-        if (vm.advObjectSearch[vm.advSearchTools[keyTool].spec] !== null && vm.advObjectSearch[vm.advSearchTools[keyTool].spec] !== undefined &&
-          vm.advObjectSearch[vm.advSearchTools[keyTool].spec] !== '') {
-          vm.advSearchTools[keyTool].display = true
-          vm.advSearchTools[keyTool].disabled = true
-        }
-      }
-      console.log('vm.advSearchItems', vm.advSearchItems)
       vm.doRedirectFilter()
-    },
-    selectedAdvFilter (item) {
-      let vm = this
-      vm.advSearchTools[item.index].display = true
-      vm.advSearchTools[item.index].disabled = true
-      let hasKey = false
-      for (let key in vm.advSearchItems) {
-        if (vm.advSearchItems[key].index === item.index) {
-          hasKey = true
-          break
-        }
-      }
-      if (!hasKey) {
-        vm.advSearchItems.push({
-          spec: vm.advSearchTools[item.index].spec,
-          value: vm.advSearchTools[item.index].spec + ':' + '__',
-          text: vm.advSearchTools[item.index].spec + ':' + '__',
-          index: item.index
-        })
-      }
     },
     showAdvFilter () {
       let vm = this
-      vm.menusss = !vm.menusss
-      vm.$store.dispatch('getStatusLists').then(function (result) {
-        vm.itemFilterSupport.statusLists = result
-        let statusDeleted = {
-          itemCode: 'deleted',
-          itemName: 'Đã xóa'
+      vm.advSearchShow = !vm.advSearchShow
+      setTimeout(function () {
+        if (vm.$refs.advSearch) {
+          vm.$refs.advSearch.setShow(vm.advSearchShow)
         }
-        if (vm.getUser('Administrator_data')) {
-          vm.itemFilterSupport.statusLists.push(statusDeleted)
-        }
-      })
-      let filter = {
-        itemCode: ''
-      }
-      vm.$store.dispatch('getSubstatusLists', filter).then(function (result) {
-        vm.itemFilterSupport.substatusLists = result
-      })
-      vm.$store.dispatch('getAgencyLists').then(function (result) {
-        vm.itemFilterSupport.agencyLists = result
-      })
-      vm.$store.dispatch('getServiceLists').then(function (result) {
-        vm.itemFilterSupport.serviceLists = result
-      })
-      vm.$store.dispatch('getDomainLists').then(function (result) {
-        vm.itemFilterSupport.domainLists = result
-      })
+      }, 200)
     },
-    changeAdvFilterData (data, spec, index) {
-      let vm = this
-      console.log('data change advSearch', data, spec, index)
-      if (spec === 'status') {
-        let filter = {
-          itemCode: data
-        }
-        vm.$store.dispatch('getSubstatusLists', filter).then(function (result) {
-          vm.itemFilterSupport.substatusLists = result
-        })
-      }
-      let valueFilter = data
-      if (spec === 'year') {
-        vm.itemFilterSupport.year = data
-        valueFilter = vm.itemFilterSupport.year + '_' + vm.itemFilterSupport.month + '_' + vm.itemFilterSupport.day
-        spec = 'year_month_day'
-      } else if (spec === 'month') {
-        vm.itemFilterSupport.month = data
-        valueFilter = vm.itemFilterSupport.year + '_' + vm.itemFilterSupport.month + '_' + vm.itemFilterSupport.day
-        spec = 'year_month_day'
-      } else if (spec === 'day') {
-        vm.itemFilterSupport.day = data
-        valueFilter = vm.itemFilterSupport.year + '_' + vm.itemFilterSupport.month + '_' + vm.itemFilterSupport.day
-        spec = 'year_month_day'
-      } else {
-        /* set State advSearch */
-        vm.itemFilterSupport[spec] = data
-      }
-      for (let key in vm.advSearchItems) {
-        console.log('adv Search index', vm.advSearchItems[key].index)
-        if (vm.advSearchItems[key].index === index) {
-          console.log('vm.itemFilterSupport2', vm.itemFilterSupport)
-          vm.advSearchItems[key].value = spec + ':' + valueFilter
-          vm.advSearchItems[key].text = spec + ':' + valueFilter
-          break
-        }
-      }
-      vm.doRedirectFilter()
-    },
+
     doRedirectFilter () {
       let vm = this
       vm.selectMultiplePage = []
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
+      newQuery['keyword'] = String(vm.keyword).trim()
+      newQuery['status'] = vm.status
+      newQuery['top'] = vm.top
       for (let key in newQuery) {
-        if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined &&
-          key !== 'top' && key !== 'status' && key !== 'substatus' && key !== 'agency' && key !== 'service' && key !== 'domain' &&
-          key !== 'register' && key !== 'year' && key !== 'month' && key !== 'day' && key !== 'adv_renew' && key !== 'keyword') {
+        if (key === 'page') {
+          queryString += key + '=1&'
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== 'adv_renew') {
           queryString += key + '=' + newQuery[key] + '&'
-        }
-      }
-      for (let key in vm.advSearchItems) {
-        let currentItemFilter = vm.advSearchItems[key]
-        if (currentItemFilter.spec === 'year_month_day') {
-          let currentYearMonth = currentItemFilter.text.replace(currentItemFilter.spec + ':', '')
-          const [year, month, day] = currentYearMonth.split('_')
-          queryString += 'year' + '=' + year + '&' + 'month' + '=' + month + '&' + 'day' + '=' + day + '&'
-        } else {
-          console.log('currentItemFilter.spec', currentItemFilter.text.replace(currentItemFilter.spec + ':', ''))
-          queryString += currentItemFilter.spec + '=' + currentItemFilter.text.replace(currentItemFilter.spec + ':', '') + '&'
         }
       }
       queryString += 'adv_renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
@@ -2734,56 +3355,120 @@ export default {
     },
     changeAdvFilterDataChips (item) {
       let vm = this
-      // console.log('changeAdvFilterDataChips', vm.advSearchItems)
-      let indexPush = -2
-      for (let key in vm.advSearchTools) {
-        if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming') {
-          if (vm.advSearchTools[key]['spec'] === 'top') {
-            indexPush = vm.advSearchTools[key]['index']
-            vm.advSearchTools[key].display = true
-            vm.advSearchTools[key].disabled = true
-          }
+      if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming' || item.key === 'overtime') {
+        if (vm.top === item.key) {
+          vm.top = ''
         } else {
-          if (vm.advSearchTools[key]['spec'] === 'status') {
-            indexPush = vm.advSearchTools[key]['index']
-            vm.advSearchTools[key].display = true
-            vm.advSearchTools[key].disabled = true
-          }
+          vm.top = item.key
+          vm.status = ''
         }
-      }
-      let typeSearch = ''
-      if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming') {
-        typeSearch = 'top'
       } else {
-        typeSearch = 'status'
-      }
-      let noFilterData = true
-      for (let key in vm.advSearchItems) {
-        if (vm.advSearchItems[key]['spec'] === 'status') {
-          if (item.key !== 'delay' && item.key !== 'overdue' && item.key !== 'coming') {
-            vm.advSearchItems[key].value = 'status' + ':' + item.key
-            vm.advSearchItems[key].text = 'status' + ':' + item.key
-            noFilterData = false
-            break
-          }
-        } else if (vm.advSearchItems[key]['spec'] === 'top') {
-          if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming') {
-            vm.advSearchItems[key].value = 'top' + ':' + item.key
-            vm.advSearchItems[key].text = 'top' + ':' + item.key
-            noFilterData = false
-            break
-          }
+        if (vm.status === item.key) {
+          vm.status = ''
+        } else {
+          vm.status = item.key
+          vm.top = ''
         }
-      }
-      if (noFilterData) {
-        vm.advSearchItems.push({
-          spec: typeSearch,
-          value: typeSearch + ':' + item.key,
-          text: typeSearch + ':' + item.key,
-          index: indexPush
-        })
       }
       vm.doRedirectFilter()
+    },
+    doImportDossier () {
+      let vm = this
+      let data = {
+        serviceCode: vm.serviceCode,
+        govAgencyCode: vm.govAgencyCode,
+        templateNo: vm.templateNo,
+        originality: vm.getOriginality()
+      }
+      vm.$store.commit('setDataCreateDossier', data)
+      vm.loadingAction = true
+      vm.$store.dispatch('postDossier', data).then(function (result) {
+        vm.loadingAction = false
+        vm.indexAction = -1
+        vm.$router.push({
+          path: '/import-ho-so/' + result.dossierId,
+          query: vm.$router.history.current.query
+        })
+      }).catch(reject => {
+        vm.loadingAction = false
+      })
+    },
+    getCountAdvSearch() {
+      let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let count = 0
+      for (let index in vm.filterKeyAdvSearch) {
+        if (newQuery.hasOwnProperty(vm.filterKeyAdvSearch[index]) && newQuery[vm.filterKeyAdvSearch[index]]) {
+          count+=1
+        }
+      }
+      return count
+    },
+    filterServiceConfig (serviceList) {
+      let vm = this
+      if (!vm.govAgencyFilterMenuConfig && !vm.groupServiceFilterMenuConfig) {
+        return serviceList
+      } else if (vm.govAgencyFilterMenuConfig && !vm.groupServiceFilterMenuConfig) {
+        let data = serviceList.filter(function (item) {
+          return item.govAgencyCode === vm.govAgencyFilterMenuConfig
+        })
+        return data
+      } else if (!vm.govAgencyFilterMenuConfig && vm.groupServiceFilterMenuConfig) {
+        let list = []
+        for (let index in serviceList) {
+          let exits = list.filter(function(item) {
+            return item.serviceCode === serviceList[index]['serviceCode']
+          }).length
+          if (exits === 0) {
+            console.log('serviceListIndex', serviceList[index], list)
+            list.push(serviceList[index])
+            console.log('list', list)
+          }
+        }
+        return list
+      } else {
+        let data1 = serviceList.filter(function (item) {
+          return item.govAgencyCode === vm.govAgencyFilterMenuConfig
+        })
+        let list = []
+        for (let index in data1) {
+          let exits = list.filter(function(item) {
+            return item.serviceCode === data1[index]['serviceCode']
+          }).length
+          if (exits === 0) {
+            list.push(data1[index])
+          }
+        }
+        return list
+      }
+      
+    },
+    changeDate() {
+      let vm = this
+      vm.menuDateCV = false
+      vm.dateCvFormatted = vm.formatDate(vm.dateCv)
+      setTimeout(function () {
+        vm.doLoadingDataHoSo()
+      }, 200)
+    },
+    formatDate(date) {
+      if (!date) return ''
+      const [year, month, day] = date.split('-')
+      return `${day}/${month}/${year}`
+    },
+    parseDate(date) {
+      if (!date) return ''
+      if (String(date).indexOf('/') > 0) {
+        const [day, month, year] = date.split('/')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      } else if (String(date).indexOf('-') > 0) {
+        const [day, month, year] = date.split('-')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      } else {
+        let date1 = new Date(Number(date))
+        return `${date1.getFullYear()}-${(date1.getMonth() + 1).toString().padStart(2, '0')}-${date1.getDate().toString().padStart(2, '0')}`
+      }
     },
     validate () {
       // validate your form , if you don't have validate prop , default validate pass .
@@ -2797,7 +3482,38 @@ export default {
         // if you use data-size show reCAPTCHA , maybe you will get empty token. 6LfuMm4UAAAAAIeNgZHhWHR-aVaqXqNUSsurnzm2
         alert('please check you are not robot')
       }
-    }
+    },
+    getFieldPick () {
+      let vm = this
+      let classPK = 'MOTCUA'
+      vm.$store.dispatch('getFieldPick', classPK).then(function (result) {
+          let formData = result
+          if(formData.domain) {
+             vm.linhVucSelected = JSON.parse(formData.domain)
+          }
+      }).catch (function (reject) {
+      }) 
+    },
+    postFieldPick(key,val){
+      let vm = this
+      let filter = {
+        classPK: 'MOTCUA',
+        key,
+        val
+      }
+      vm.$store.dispatch('postFieldPick', filter).then(function (result) {
+      
+      }).catch (function (reject) {
+      }) 
+    },
+    getMetaData (val) {
+      let metaDataOut = ''
+      try {
+        metaDataOut = JSON.parse(val.metaData)
+      } catch (error) {
+      }
+      return metaDataOut
+    },
   }
 }
 </script>

@@ -3,20 +3,10 @@
     <!-- Component Trao đổi thảo luận -->
     <div>
       <v-expansion-panel :value="[true]" expand  class="expansion-pl-transparent">
-        <v-expansion-panel-content>
-          <!-- <div slot="header">
-            <div class="background-triangle-small"> 
-              <v-icon size="18" color="white">star_rate</v-icon> 
-            </div>
-            TRAO ĐỔI THÔNG TIN
-          </div> -->
-          
+        <v-expansion-panel-content>         
           <v-card class="comments__container" >
             <v-card-text class="pl-4">
               <div id="comments-container-el"></div>
-              
-              <!-- <v-flex v-if="argShowMore2"><span class="action-show primary--text mx-2 my-2" @click="showMore2">Xem thêm</span></v-flex>
-              <v-flex v-if="!argShowMore2"><span class="action-show primary--text mx-2 my-2" @click="showMore2">Rút gọn</span></v-flex> -->
             </v-card-text>
           </v-card>
         </v-expansion-panel-content>
@@ -36,18 +26,6 @@ export default {
   props: ['classPK', 'className'],
   data: () => ({
     usersComment: [
-      // {
-      //   id: 1,
-      //   fullname: 'Trịnh Công Trình',
-      //   email: 'trinhtc@fds.vn.com',
-      //   pictureUrl: 'https://app.viima.com/static/media/user_profiles/user-icon.png'
-      // },
-      // {
-      //   id: 2,
-      //   fullname: 'Thái Hoàng Anh',
-      //   email: 'anhth@fds.vn',
-      //   pictureUrl: 'https://app.viima.com/static/media/user_profiles/user-icon.png'
-      // }
     ],
     comment: [],
     argShowMore: true,
@@ -76,12 +54,10 @@ export default {
     }
   },
   created () {
-    // var vm = this
-    // vm.$nextTick(function () {
-    //   vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
-    //     vm.usersComment = result
-    //   })
-    // })
+    var vm = this
+    vm.$nextTick(function () {
+      vm.runComment()
+    })
   },
   mounted () {
     // var vm = this
@@ -132,7 +108,7 @@ export default {
     initComment: function () {
       var vm = this
       window.$('#comments-container-el').comments({
-        profilePictureURL: 'https://png.icons8.com/material/50/000000/guest-male.png',
+        profilePictureURL: '/o/opencps-store/js/cli/motcua/app/image/icons-user-comment.png',
         textareaRows: 2,
         enableAttachments: true,
         enableHashtags: true,
@@ -225,7 +201,7 @@ export default {
             vm.comment = result
             vm.formatComment(vm.comment)
             onSuccess(vm.comment)
-          })
+          }).catch(function(){})
         },
         putComment: function (data, onSuccess, onError) {
           data.classPK = vm.classPK
@@ -234,7 +210,7 @@ export default {
             vm.comment = result
             vm.formatComment(vm.comment)
             onSuccess(vm.comment)
-          })
+          }).catch(function(){})
         },
         deleteComment: function (data, onSuccess, onError) {
           data.classPK = vm.classPK
@@ -303,7 +279,6 @@ export default {
                 type: 'POST',
                 headers: {
                   'groupId': vm.initData.groupId
-                  // 'groupId': 55301
                 },
                 data: formData,
                 cache: false,

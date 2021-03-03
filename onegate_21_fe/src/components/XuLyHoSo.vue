@@ -6,10 +6,10 @@
     <div v-else-if="dossierSelected.length > 0" class="row-header">
       <div class="background-triangle-big"> <span>{{actionActive['tiltle'] ? actionActive['tiltle'] : 'XỬ LÝ HỒ SƠ'}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
-        <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="dossierSelected[0].serviceName">
+        <div class="flex pl-3 text-ellipsis text-bold" :title="dossierSelected[0].serviceName" style="width: calc(100% - 100px);">
           {{dossierSelected[0].serviceName}}
         </div>
-        <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+        <div class="flex text-right" style="margin-left: auto; width: 100px">
           <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
             <v-icon size="16">reply</v-icon> &nbsp;
             Quay lại
@@ -55,14 +55,14 @@
                       <span>{{props.item.wardName}}, {{props.item.districtName}}, {{props.item.cityName}}</span>
                     </div>
                   </td>
-                  <td class="text-xs-left">
+                  <!-- <td class="text-xs-left">
                     <div>
                       <span> Tiếp nhận: {{props.item.receiveDate}}<br>
                         Hẹn trả: {{props.item.receiveDate}}<br>
                         <span>{{props.item.dossierOverdue}}</span>
                       </span>
                     </div>
-                  </td>
+                  </td> -->
                 </tr>
               </template>
             </v-data-table>
@@ -98,7 +98,7 @@
       <v-layout wrap v-if="btnStateVisible">
         <form-bo-sung-thong-tin v-if="showFormBoSungThongTinNgan" ref="formBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
         <phan-cong v-if="showPhanCongNguoiThucHien" ref="phancong" v-model="assign_items" :type="type_assign" ></phan-cong>
-        <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
+        <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" ref="tailieuketqua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
         <ngay-gia-han v-if="showExtendDateEdit" ref="ngaygiahan" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
         <ngay-hen-tra v-if="showEditDate" ref="ngayhentra" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
         <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
@@ -126,12 +126,13 @@
     </div>
     <v-dialog v-model="dialog_statusAction" scrollable persistent max-width="700px">
       <v-card>
-        <v-card-title class="headline">
-          Trạng thái xử lý
-        </v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="closeDialogStatusAction">
-          <v-icon>clear</v-icon>
-        </v-btn>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Trạng thái xử lý</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="closeDialogStatusAction">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <v-card-text style="max-height: 350px">
           <div v-for="(item, index) in dossierSelected" v-bind:key="item.dossierId">
             <v-layout wrap class="py-1 align-center row-list-style" style="border-bottom: 1px solid #ddd;position:relative"> 
@@ -182,9 +183,8 @@
 
 <script>
 
-// import $ from 'jquery'
-// import '../store/jquery-comments'
-import Comment from './Comment.vue'
+import toastr from 'toastr'
+
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
 import TraKetQua from './form_xu_ly/TraKetQua.vue'
@@ -193,7 +193,7 @@ import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
-import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
 import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
 import ThongTinBuuChinh from './form_xu_ly/ThongTinGuiBuuChinh.vue'
@@ -234,12 +234,12 @@ export default {
         text: 'Địa chỉ',
         align: 'center',
         sortable: false
-      },
-      {
-        text: 'Thời gian',
-        align: 'center',
-        sortable: false
       }
+      // {
+      //   text: 'Thời gian',
+      //   align: 'center',
+      //   sortable: false
+      // }
     ],
     mutilpleAction: false,
     actionExits: [],
@@ -289,7 +289,10 @@ export default {
     loadingActionProcess: false,
     loadingAction: false,
     arrDossierId: [],
-    actionActiveTmp: []
+    actionActiveTmp: [],
+    gopThuPhi: true,
+    changePaymentStatus: false,
+    createFiles: []
   }),
   computed: {
     loading () {
@@ -299,16 +302,21 @@ export default {
       var vm = this
       return vm.getOriginality()
     },
+    dossierSelectedDoAction () {
+      return this.$store.getters.dossierSelectedDoAction
+    },
     dossierSelected () {
       var vm = this
       return vm.$store.getters.dossierSelected
     },
     actionActive () {
-      console.log('actionActive-------', this.$store.getters.actionActive)
       return this.$store.getters.actionActive
     },
     activeGetCounter () {
       return this.$store.getters.activeGetCounter
+    },
+    menuConfigsToDo () {
+      return this.$store.getters.getMenuConfigsTodo
     }
   },
   created () {
@@ -317,7 +325,27 @@ export default {
       vm.btnIndex = -1
       let currentQuery = vm.$router.history.current.query
       console.log('currentQuery', currentQuery)
-      if (vm.dossierSelected.length === 0) {
+      let doAction = function () {
+        try {
+          if (vm.actionActive.action === undefined || vm.actionActive.action === null || vm.actionActive.action === '') {
+            let actionActive = JSON.parse(currentQuery.actionActive)
+            if (actionActive) {
+              vm.$store.dispatch('loadActionActive', actionActive)
+            }
+          }
+        } catch (e) {
+          console.log(e)
+        }
+        vm.getNextActions()
+        try{
+          if(typeof gopThuPhi !== 'undefined'){
+            vm.gopThuPhi = gopThuPhi
+          }
+        } catch {
+
+        }
+      }
+      if (vm.dossierSelectedDoAction.length === 0) {
         let arrDossier = []
         if (currentQuery.hasOwnProperty('dossiers')) {
           let arrDossierIdTemp = currentQuery.dossiers.split(',')
@@ -326,42 +354,18 @@ export default {
             arrDossier.push(vm.$store.dispatch('getDetailDossier', dossierId))
           })
           Promise.all(arrDossier).then(results => {
+            vm.thongTinChiTietHoSo = results[0]
             vm.$store.dispatch('loadDossierSelected', results)
+            doAction()
           }).catch(reject => {
           })
         }
       } else {
-        let arrDossier = []
-        if (currentQuery.hasOwnProperty('dossiers')) {
-          let arrDossierIdTemp = currentQuery.dossiers.split(',')
-          vm.arrDossierId = arrDossierIdTemp
-          arrDossierIdTemp.forEach(dossierId => {
-            arrDossier.push(vm.$store.dispatch('getDetailDossier', dossierId))
-          })
-          Promise.all(arrDossier).then(results => {
-            vm.$store.dispatch('loadDossierSelected', results)
-          }).catch(reject => {
-          })
-        }
+        vm.thongTinChiTietHoSo = vm.dossierSelectedDoAction[0]
+        vm.$store.dispatch('loadDossierSelected', vm.dossierSelectedDoAction)
+        doAction()
       }
-      try {
-        if (vm.actionActive.action === undefined || vm.actionActive.action === null || vm.actionActive.action === '') {
-          let actionActive = JSON.parse(currentQuery.actionActive)
-          if (actionActive) {
-            vm.$store.dispatch('loadActionActive', actionActive)
-          }
-        }
-      } catch (e) {
-        console.log(e)
-      }
-      vm.getNextActions()
-      // if (currentQuery.hasOwnProperty('activeTab')) {
-      //   vm.activeTab = currentQuery.activeTab
-      //   vm.btnIndex = currentQuery['btnIndex']
-      //   vm.thongTinChiTietHoSo['dossierId'] = vm.id
-      //   vm.btnStateVisible = true
-      //   vm.getNextActions()
-      // }
+      
     })
   },
   updated () {
@@ -419,10 +423,11 @@ export default {
           isPopup = true
           vm.showPhanCongNguoiThucHien = true
         }
-        if (result.hasOwnProperty('createFiles') && result.createFiles !== null && result.createFiles !== undefined && result.createFiles !== 'undefined' && result.createFiles.length > 0) {
+        if (result.hasOwnProperty('createFiles') && result.createFiles && result.createFiles !== null && result.createFiles !== undefined && result.createFiles !== 'undefined' && (result.createFiles.length > 0 || [result.createFiles].length > 0)) {
           isPopup = true
           vm.showTaoTaiLieuKetQua = true
-          vm.createFiles = result.createFiles
+          vm.createFiles = Array.isArray(result.createFiles) ? result.createFiles : [result.createFiles]
+          console.log('showTaoTaiLieuKetQua5555', vm.createFiles)
         }
         if (result.hasOwnProperty('eSignature') && result.eSignature) {
           isPopup = true
@@ -433,12 +438,32 @@ export default {
           vm.showTraKetQua = true
           vm.returnFiles = result.returnFiles
         }
-        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment === 5) {
-          isPopup = true
-          vm.showThuPhi = true
+        // Add thu phí
+        if (vm.gopThuPhi && result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
+          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3')) {
+            isPopup = true
+            vm.showThanhToanDienTu = true
+            let filter = {
+              dossierId: vm.dossierId,
+              referenceUid: dossierItem.referenceUid
+            }
+            vm.$store.dispatch('loadDossierPayments', filter).then(result => {
+              vm.paymentProfile = result
+            }).catch(reject => {
+            })
+          } else {
+            isPopup = true
+            vm.showThuPhi = true
+            vm.payments = result.payment
+            vm.viaPortalDetail = dossierItem.viaPostal
+          }
+        } else if (!vm.gopThuPhi && result.hasOwnProperty('payment') && result.payment !== null && 
+          result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0 && result.payment.requestPayment !== 3
+        ) {
           vm.payments = result.payment
-          vm.viaPortalDetail = dossierItem.viaPostal
+          vm.changePaymentStatus = true
         }
+        // add Thu phí
         if (result.hasOwnProperty('checkInput') && result.checkInput !== null && result.checkInput !== undefined && result.checkInput !== 'undefined') {
           vm.checkInput = result.checkInput
           if (result.checkInput === 2) {
@@ -513,31 +538,64 @@ export default {
       vm.dossierProcess = vm.dossierSelected.filter(function (item) {
         return (item['statusAction'] === false || !item['statusAction'])
       })
-      vm.countProcessed = 0
-      if (vm.mutilpleAction) {
-        for (let key in vm.actionExits) {
-          for (let key2 in vm.dossierSelected) {
-            if (vm.dossierSelected[key2]['statusAction'] === false || !vm.dossierSelected[key2]['statusAction']) {
+      let idDossiers = vm.dossierProcess.map(obj =>{
+        return obj.dossierId
+      }).toString()
+      let doAction = function () {
+        vm.countProcessed = 0
+        if (vm.mutilpleAction) {
+          for (let key in vm.actionExits) {
+            for (let key2 in vm.dossierSelected) {
+              if (vm.dossierSelected[key2]['statusAction'] === false || !vm.dossierSelected[key2]['statusAction']) {
+                let filter = {
+                  dossierId: vm.dossierSelected[key2].dossierId,
+                  actionCode: vm.actionExits[key].actionCode,
+                  actionUser: actionUser
+                }
+                // if (vm.menuConfigsToDo[vm.index]['tableConfig'].hasOwnProperty('activeGroupActionService') && vm.menuConfigsToDo[vm.index]['tableConfig'].activeGroupActionService) {
+                //   filter.actionCode = vm.actionActive.action
+                // }
+                console.log('filterActionGroup1', filter)
+                vm.postAction(filter, vm.dossierSelected[key2], key2)
+              }
+            }
+          }
+        } else {
+          for (let key in vm.dossierSelected) {
+            if (vm.dossierSelected[key]['statusAction'] === false || !vm.dossierSelected[key]['statusAction']) {
               let filter = {
-                dossierId: vm.dossierSelected[key2].dossierId,
-                actionCode: vm.actionExits[key].actionCode,
+                dossierId: vm.dossierSelected[key].dossierId,
+                actionCode: vm.actionActive.action,
                 actionUser: actionUser
               }
-              vm.postAction(filter, vm.dossierSelected[key2], key2)
+              console.log('filterActionGroup2', filter)
+              vm.postAction(filter, vm.dossierSelected[key], key)
             }
           }
         }
+      }
+      if (vm.showTaoTaiLieuKetQua) {
+        let createFileAttach = vm.$refs.tailieuketqua.getCreateFileAttach()
+        let arrFileAttach = []
+        for (let key in createFileAttach) {
+          if (createFileAttach[key].hasOwnProperty('filesAttach') && createFileAttach[key]['filesAttach'].length > 0) {
+            createFileAttach[key]['filesAttach'].forEach(item => {
+              arrFileAttach.push(vm.$store.dispatch('attachFileThaoTacGop', Object.assign(item, {dossierIds: idDossiers})))
+            })
+          }
+        }
+        if (arrFileAttach.length > 0) {
+          Promise.all(arrFileAttach).then(results => {
+            doAction()
+          }).catch(reject => {
+            toastr.error('Đính kèm tài liệu không thành công. Vui lòng thử lại')
+          })
+        } else {
+          doAction()
+        }
+        
       } else {
-        for (let key in vm.dossierSelected) {
-          if (vm.dossierSelected[key]['statusAction'] === false || !vm.dossierSelected[key]['statusAction']) {
-            let filter = {
-              dossierId: vm.dossierSelected[key].dossierId,
-              actionCode: vm.actionActive.action,
-              actionUser: actionUser
-            }
-            vm.postAction(filter, vm.dossierSelected[key], key)
-          }
-        }
+        doAction()
       }
     },
     postAction (filter, dossier, index) {
@@ -556,15 +614,22 @@ export default {
       }
       var paymentsOut = null
       if (vm.payments) {
-        paymentsOut = {
-          requestPayment: vm.payments['requestPayment'],
-          advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-          feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-          serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-          shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+        if (vm.showThuPhi) {
+          paymentsOut = {
+            requestPayment: vm.payments['requestPayment'],
+            advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+            feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+            serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+            shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+          }
+        } else if (!vm.showThuPhi && vm.changePaymentStatus) {
+          paymentsOut = {
+            requestPayment: vm.payments['requestPayment']
+          }
         }
+        
       }
-      if (vm.showThuPhi) {
+      if (vm.showThuPhi || vm.changePaymentStatus) {
         filter['payment'] = paymentsOut
       }
       if (vm.showFormBoSungThongTinNgan) {

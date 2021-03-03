@@ -1,218 +1,8 @@
 <template>
   <v-form ref="form" v-model="valid" lazy-validation class="px-3 py-3 vuejx__form">
-    <v-layout v-if="detailForm !== null && detailForm.length > 0" row wrap style="
-      margin-bottom: 100px;
-      max-width: 800px;
-      margin: 0 auto;
-    ">
-      <v-flex v-for="(item, index) in detailForm" v-bind:key="index" :class="item['class']">
-        <span v-if="item.type === 'label'" v-html="item['label']"></span>
-        <attached-file-avatar v-if="item.type === 'avatar'" :pk="data[item.model]" :pick-item="item" :current-data="data"></attached-file-avatar>
-        <datetime-picker :class="item['class_component']" v-if="item.type === 'date'" v-model="data[item.model]" :item="item" :data-value="data[item.model]"></datetime-picker>
-        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['link'] && ((item.dependency && String(id) !== '0') || !item.dependency)" :to="item.url + '?pk=' + data[item.pk] + '&col=' + item.pk">
-          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
-          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
-          {{item.label}}
-        </v-btn>
-        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['account'] && ((item.dependency && String(id) !== '0') || !item.dependency)" v-on:click.native="showAccount(item)">
-          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
-          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
-          {{item.label}}
-        </v-btn>
-        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['attached'] && ((item.dependency && String(id) !== '0') || !item.dependency)" v-on:click.native="showAttached(item)">
-          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
-          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
-          {{item.label}}
-        </v-btn>
-        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['fileform'] && ((item.dependency && String(id) !== '0') || !item.dependency)" v-on:click.native="showAttached(item)">
-          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
-          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
-          {{item.label}}
-        </v-btn>
-        <content-placeholders v-if="item.type === 'selects' && !pullOk && item.hasOwnProperty('datasource_key')">
-          <content-placeholders-text :lines="1" />
-        </content-placeholders>
-        <v-autocomplete :class="item['class_component']" v-if="item.type === 'selects' && pullOk && item.hasOwnProperty('datasource_key')"
-          v-model="data[item.model]"
-          :items="dataSocket[item['datasource_key']]"
-          :item-text="item.itemText"
-          :item-value="item.itemValue"
-          :label="item.required ? item['label'] + ' 💥': item['label']" 
-          :rules="processRules(item.rules)"
-          :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
-          @change="processChangeDataSource($event, item)"
-          :chips="item['chips']"
-          :multiple="item['multiple']"
-          clearable
-        >
-          <template slot="prepend" v-if="item['label_prepend'] !== ''">
-            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_prepend']"></v-subheader>
-          </template>
-          <template slot="append-outer" v-if="item['label_append'] !== ''">
-            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_append']"></v-subheader>
-          </template>
-        </v-autocomplete>
-        <v-autocomplete :class="item['class_component']" v-if="item.type === 'selects' && !item.hasOwnProperty('datasource_key')"
-          v-model="data[item.model]"
-          :items="item.datasource"
-          :item-text="item.itemText"
-          :item-value="item.itemValue"
-          :label="item.required ? item['label'] + ' 💥': item['label']" 
-          :rules="processRules(item.rules)"
-          :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
-          @change="processChangeDataSource($event, item)"
-          :chips="item['chips']"
-          :multiple="item['multiple']"
-          clearable
-        >
-          <template slot="prepend" v-if="item['label_prepend'] !== ''">
-            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_prepend']"></v-subheader>
-          </template>
-          <template slot="append-outer" v-if="item['label_append'] !== ''">
-            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_append']"></v-subheader>
-          </template>
-        </v-autocomplete>
-        <v-text-field :class="item['class_component']" v-if="item.type === 'text-fields'"
-          v-model="data[item.model]"
-          :label="item.required ? item['label'] + ' 💥': item['label']" 
-          :rules="processRules(item.rules)"
-          :placeholder="item['placeholder']"
-          clearable
-        >
-          <template slot="prepend" v-if="item['label_prepend'] !== ''">
-            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_prepend']"></v-subheader>
-          </template>
-          <template slot="append-outer" v-if="item['label_append'] !== ''">
-            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_append']"></v-subheader>
-          </template>
-        </v-text-field>
-        <v-textarea :class="item['class_component']" v-if="item.type === 'textarea'"
-          v-model="data[item.model]"
-          :label="item.required ? item['label'] + ' 💥': item['label']" 
-          :rules="processRules(item.rules)"
-          :placeholder="item['placeholder']"
-          clearable
-          :rows="item['rows'] !== undefined ? item['rows']: 2"
-          box
-        ></v-textarea>
-        <v-subheader class="px-0" v-if="item.type === 'codemirror'">{{item['label']}}</v-subheader>
-        <codemirror v-if="item.type === 'codemirror'" v-model="data[item.model]" :options="cmOptions"></codemirror>
-        <v-switch :class="item['class_component']" v-if="item.type === 'v-switch'"
-          :label="item['label']" 
-          v-model="data[item.model]"
-        >
-          <template slot="prepend" v-if="item['label_prepend'] !== ''">
-            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_prepend']"></v-subheader>
-          </template>
-          <template slot="append" v-if="item['label_append'] !== ''">
-            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_append']"></v-subheader>
-          </template>
-        </v-switch>
-        <div v-if="item.hasOwnProperty('alongside')" v-for="(itemChild, indexChild) in item['alongside']" v-bind:key="indexChild" :class="itemChild['class']" :style="itemChild['style']">
-          <span v-if="itemChild.type === 'label'" v-html="itemChild['label']"></span>
-          <attached-file-avatar :class="itemChild['class_component']" v-if="itemChild.type === 'avatar'" :pk="data[itemChild.model]" :pick-item="itemChild"></attached-file-avatar>
-          <datetime-picker :class="itemChild['class_component']" v-if="itemChild.type === 'date'" v-model="data[itemChild.model]" :item="itemChild" :data-value="data[itemChild.model]"></datetime-picker>
-          <v-btn :class="itemChild['class_component']" color="blue darken-3" dark v-if="itemChild.type === 'button' && itemChild['link'] && ((itemChild.dependency && String(id) !== '0') || !itemChild.dependency)" :to="itemChild.url + '?pk=' + data[itemChild.pk] + '&col=' + itemChild.pk">
-            <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'link'">how_to_vote</v-icon>
-            <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'popup'">flip_to_back</v-icon>
-            {{itemChild.label}}
-          </v-btn>
-          <v-btn :class="itemChild['class_component']" color="blue darken-3" dark v-if="itemChild.type === 'button' && itemChild['account'] && ((itemChild.dependency && String(id) !== '0') || !itemChild.dependency)" v-on:click.native="showAccount(itemChild)">
-            <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'link'">how_to_vote</v-icon>
-            <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'popup'">flip_to_back</v-icon>
-            {{itemChild.label}}
-          </v-btn>
-          <v-btn :class="itemChild['class_component']" color="blue darken-3" dark v-if="itemChild.type === 'button' && itemChild['attached'] && ((itemChild.dependency && String(id) !== '0') || !itemChild.dependency)" v-on:click.native="showAttached(itemChild)">
-            <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'link'">how_to_vote</v-icon>
-            <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'popup'">flip_to_back</v-icon>
-            {{itemChild.label}}
-          </v-btn>
-          <content-placeholders v-if="itemChild.type === 'selects' && !pullOk && itemChild.hasOwnProperty('datasource_key')">
-            <content-placeholders-text :lines="1" />
-          </content-placeholders>
-          <v-autocomplete :class="itemChild['class_component']" v-if="itemChild.type === 'selects' && pullOk && itemChild.hasOwnProperty('datasource_key')"
-            v-model="data[itemChild.model]"
-            :items="dataSocket[itemChild['datasource_key']]"
-            :item-text="itemChild.itemText"
-            :item-value="itemChild.itemValue"
-            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
-            :rules="processRules(itemChild.rules)"
-            :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
-            @change="processChangeDataSource($event, itemChild)"
-            :chips="item['chips']"
-            :multiple="item['multiple']"
-            clearable
-          >
-            <template slot="prepend" v-if="itemChild['label_prepend'] !== ''">
-              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_prepend']"></v-subheader>
-            </template>
-            <template slot="append-outer" v-if="itemChild['label_append'] !== ''">
-              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_append']"></v-subheader>
-            </template>
-          </v-autocomplete>
-          <v-autocomplete :class="itemChild['class_component']" v-if="itemChild.type === 'selects' && !itemChild.hasOwnProperty('datasource_key')"
-            v-model="data[itemChild.model]"
-            :items="itemChild.datasource"
-            :item-text="itemChild.itemText"
-            :item-value="itemChild.itemValue"
-            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
-            :rules="processRules(itemChild.rules)"
-            :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
-            @change="processChangeDataSource($event, itemChild)"
-            :chips="item['chips']"
-            :multiple="item['multiple']"
-            clearable
-          >
-            <template slot="prepend" v-if="itemChild['label_prepend'] !== ''">
-              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_prepend']"></v-subheader>
-            </template>
-            <template slot="append-outer" v-if="itemChild['label_append'] !== ''">
-              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_append']"></v-subheader>
-            </template>
-          </v-autocomplete>
-          <v-text-field :class="itemChild['class_component']" v-if="itemChild.type === 'text-fields'"
-            v-model="data[itemChild.model]"
-            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
-            :rules="processRules(itemChild.rules)"
-            :placeholder="itemChild['placeholder']"
-            clearable
-          >
-            <template slot="prepend" v-if="itemChild['label_prepend'] !== ''">
-              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_prepend']"></v-subheader>
-            </template>
-            <template slot="append-outer" v-if="itemChild['label_append'] !== ''">
-              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_append']"></v-subheader>
-            </template>
-          </v-text-field>
-          <v-textarea :class="itemChild['class_component']" v-if="itemChild.type === 'textarea'"
-            v-model="data[itemChild.model]"
-            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
-            :rules="processRules(itemChild.rules)"
-            :placeholder="itemChild['placeholder']"
-            clearable
-            box
-          ></v-textarea>
-          <v-subheader class="px-0" v-if="itemChild.type === 'codemirror'">{{itemChild['label']}}</v-subheader>
-          <codemirror v-if="itemChild.type === 'codemirror'" v-model="data[itemChild.model]" :options="cmOptions"></codemirror>
-          <v-switch :class="itemChild['class_component']" v-if="itemChild.type === 'v-switch'"
-            :label="itemChild['label']" 
-            v-model="data[itemChild.model]"
-          >
-            <template slot="prepend" v-if="itemChild['label_prepend'] !== ''">
-              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_prepend']"></v-subheader>
-            </template>
-            <template slot="append" v-if="itemChild['label_append'] !== ''">
-              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_append']"></v-subheader>
-            </template>
-          </v-switch>
-        </div>
-      </v-flex>
-    </v-layout>
-    <v-layout v-else row wrap>
+    <v-layout row wrap>
       <v-flex xs12>
-        <div id="video-preloader" class="video-preloader">
-          <video loop id="editor-video-preloader" width="100%" height="350" muted="true" src="https://editorassets.parastorage.com/video-preloader/editor-video-preloader-2-@2x.mp4"></video>
-        </div>
+        <div id="formDelivert" class="mb-5 pt-0"></div>
       </v-flex>
     </v-layout>
 
@@ -223,7 +13,7 @@
   import DatetimePicker from './DatetimePicker.vue'
 
   export default {
-    props: ['id', 'datainput'],
+    props: ['id', 'formid', 'datainput'],
     components: {
       DatetimePicker
     },
@@ -253,52 +43,86 @@
             const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
             return pattern.test(value) || 'Sai định dạng thư điện tử.'
           }
-        }
+        },
+        formTempalate: '',
+        active: false
       }
     },
     computed: {
       detailForm () {
+        let vm = this
         let detailDynamic = this.$store.getters.getContentFile
-        console.log('detailDynamic', detailDynamic)
+        vm.formTempalate = detailDynamic
         if (detailDynamic === '') {
           return []
         } else {
           return detailDynamic
         }
       },
-      dataSocket: {
-        // getter
-        get: function() {
-          return this.$store.getters.dataSocket
-        },
-        // setter
-        set: function(newValue) {
-          this.$store.commit('setdataSocket', newValue)
+      alpacaFormData () {
+        let vm = this
+        let control = window.$('#formDelivert').alpaca('get')
+        let formData = control.getValue()
+        console.log('alpacaFormData -+-+', formData)
+        if (formData) {
+          return formData
+        } else {
+          return {}
         }
       },
       pullCounterOrg () {
         return this.$store.getters.pullCounter
+      },
+      formData () {
+        return this.$store.getters.getChangeFormData
+      },
+      activeBindFormData () {
+        return this.$store.getters.getActiveBindFormData
       }
     },
     updated() {
       var vm = this
       vm.$nextTick(function () {
-        if (vm.isCallBack) {
-          vm.isCallBack = false
-          vm.processDataSource()
-          setTimeout(() => {
-            vm.processDataSourceVerify()
-            if (String(vm.id) !== '0') {
-              vm.data = JSON.parse(vm.datainput)
-            }
-            if (vm.pullCounterOrg === 0) {
-              vm.pullOk = true
-            }
-            setTimeout(() => {
-              vm.pullOk = true
-            }, 1000)
-          }, 500)
-        }
+      })
+    },
+    watch: {
+      activeBindFormData () {
+        let vm = this
+        // var runBind
+        // function runBindData () {
+        //   runBind = setTimeout(function () {
+        //     vm.bindFormData(vm.formData)
+        //   }, 500)
+        // }
+        // clearTimeout(runBind)
+        // runBindData()
+      }
+    },
+    mounted () {
+      let vm = this
+      vm.$nextTick(function () {
+        vm.$store.dispatch('getContentFile', vm.formid).then(function (result) {
+          // console.log('formScript --->', result)
+          vm.formTempalate = result
+          window.$('#formDelivert').empty()
+          let formScript, formData
+          /* eslint-disable */
+          if (result) {
+            formScript = result
+          } else {
+            formScript = {}
+          }
+          // console.log('form-Data', vm.datainput)
+          if (String(vm.id) !== '0' && vm.datainput) {
+            formData = eval('(' + vm.datainput + ')')
+          } else {
+            formData = {}
+          }
+          /* eslint-disable */
+          formScript.data = formData
+          window.$('#formDelivert').alpaca(formScript)
+          // 
+        })
       })
     },
     methods: {
@@ -364,6 +188,56 @@
               }
             )
           }
+        }
+      },
+      getFormData () {
+        let vm = this
+        let control = window.$('#formDelivert').alpaca('get')
+        let formData = control.getValue()
+        if (formData) {
+          return formData
+        } else {
+          return {}
+        }
+      },
+      bindFormData (form_data) {
+        let vm = this
+        console.log('form_data_bind', form_data)
+        let formDataRender = form_data
+        window.$('#formDelivert').empty()
+        let formScript, formData
+        /* eslint-disable */
+        if (vm.formTempalate) {
+          formScript = vm.formTempalate
+        } else {
+          formScript = {}
+        }
+        if (formDataRender) {
+          formData = formDataRender
+          for (let key in formData) {
+            if (String(key).toLowerCase().indexOf('date') >= 0 && formData[key] && String(formData[key]).indexOf('/') < 0) {
+              // console.log('key', key, vm.convertDate(formData[key]))
+              formData[key] = vm.convertDate(formData[key])
+            } else {
+              // console.log('key 2', key, formData[key])
+            }
+          }
+          // console.log('form_data 123', formData)
+        } else {
+          formData = {}
+        }
+        /* eslint-disable */
+        formScript.data = formData
+        window.$('#formDelivert').alpaca(formScript)
+        // console.log('vm.formTempalate ->', formScript)
+        // 
+      },
+      convertDate (val) {
+        if (Number(val) > 0) {
+          let date = new Date(val)
+          return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+        } else {
+          return ''
         }
       }
     }

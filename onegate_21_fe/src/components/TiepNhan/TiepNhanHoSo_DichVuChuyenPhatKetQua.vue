@@ -27,6 +27,7 @@
                   v-model="dichVuChuyenPhatKetQua.postalServiceCode"
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
+                  hide-no-data
                 ></v-autocomplete>
               </v-flex>
               <!--  -->
@@ -60,7 +61,7 @@
                 </content-placeholders>
                 <v-subheader v-else class="pl-0">Địa chỉ trả kết quả<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm6>
+              <v-flex xs12 sm10>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -71,25 +72,8 @@
                   required
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12 sm2>
-                <content-placeholders class="mt-1" v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <v-subheader v-else class="pl-0">SĐT người nhận<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
-              </v-flex>
-              <v-flex xs12 sm2>
-                <content-placeholders class="mt-1" v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <v-text-field
-                  v-else
-                  v-model="dichVuChuyenPhatKetQua.postalTelNo"
-                  append-icon="phone"
-                  :rules="[rules.telNo, rules.required]"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm2>
+              
+              <!-- <v-flex xs12 sm2>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -108,48 +92,52 @@
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
                 ></v-autocomplete>
-              </v-flex>
-              <!-- <v-flex xs12 sm2>
-                <content-placeholders class="mt-1" v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <v-subheader v-else class="pl-0">Tỉnh/Thành phố: </v-subheader>
-              </v-flex>
+              </v-flex> -->
               <v-flex xs12 sm2>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-select
+                <v-subheader v-else class="pl-0">Tỉnh/Thành phố<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-autocomplete
                   v-else
                   :items="citys"
                   item-text="itemName"
                   item-value="itemCode"
                   @change="onChangeResultCity"
                   v-model="dichVuChuyenPhatKetQua.postalCityCode"
-                  autocomplete
-                ></v-select>
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  required
+                  hide-no-data
+                ></v-autocomplete>
               </v-flex>
               <v-flex xs12 sm2>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-subheader v-else class="pl-0">Quận/Huyện: </v-subheader>
+                <v-subheader v-else class="pl-0">Quận/Huyện<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm2>
+              <v-flex xs12 sm4>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-select
+                <v-autocomplete
                   v-else
                   :items="resultDistricts"
                   item-text="itemName"
                   item-value="itemCode"
                   @change="onChangeResultDistrict"
                   v-model="dichVuChuyenPhatKetQua.postalDistrictCode"
-                  autocomplete
-                ></v-select>
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  required
+                  hide-no-data
+                ></v-autocomplete>
               </v-flex>
-              <v-flex xs12 sm2>
+              <!-- <v-flex xs12 sm2>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -168,13 +156,60 @@
                   autocomplete
                 ></v-select>
               </v-flex> -->
+              <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0">SĐT người nhận<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm10>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-text-field
+                  v-else
+                  v-model="dichVuChuyenPhatKetQua.postalTelNo"
+                  :rules="[rules.telNo, rules.required]"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm2 v-if="showTinhPhi">
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0">Khối lượng: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm4 v-if="showTinhPhi">
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-text-field
+                  v-else
+                  v-model="weight"
+                  @input="getFee"
+                  suffix="(gam)"
+                  type="number"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm2 v-if="showTinhPhi">
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0" style="padding-top: 7px;">Phí vận chuyển tạm tính: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm4 v-if="showTinhPhi" style="padding-top: 10px;">
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <span :style="loadingFee ? 'color:black;opacity:0.5' : 'color:red;font-weight: bold;'">{{feeVnPost}} VNĐ</span>
+              </v-flex>
             </v-layout>
           </v-form>
         </v-slide-y-transition>
         
       </v-card-text>
     </v-card>
-    <div class="absolute__btn" style="width: 350px; margin-top: 4px;">
+    <div class="absolute__btn" style="width: 350px; margin-top: 4px;"> <!-- style="width: 485/350px; margin-top: 4px;" -->
       <content-placeholders class="mt-1" v-if="loading">
         <content-placeholders-text :lines="1" />
       </content-placeholders>
@@ -182,28 +217,33 @@
       <v-radio-group class="mt-1" v-model="dichVuChuyenPhatKetQua.viaPostal" row @change="changeViaPostal($event)">
         <v-radio label="Nhận kết quả trực tiếp" :value="1" ></v-radio>
         <v-radio label="Nhận kết quả tại nhà" :value="2"></v-radio>
+        <!-- <v-radio label="Nhận trực tuyến" :value="9"></v-radio> -->
       </v-radio-group>
       <!--  -->
-      <!-- <v-checkbox
-        v-else
-        label="Đăng ký trả kết quả tại nhà"
-        v-model="dichVuChuyenPhatKetQua.viaPostal"
-        :value="2"
-        @change="changeViaPostal($event)"
-      ></v-checkbox> -->
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 export default {
+  props: ['detailDossier'],
   data: () => ({
+    functionTimeOutGetFee: '',
+    loadingFee: false,
+    showTinhPhi: false,
+    weight: '',
+    feeVnPost: '',
     valid_dichvuchuyenphat: false,
     citys: [],
     resultDistricts: [],
     resultWards: [],
     vnPostItems: [],
     postalServiceItems: [
+      // {
+      //   itemName: 'VIETTEL POST',
+      //   itemCode: 'VTPOST'
+      // },
       {
         itemName: 'VNPOST',
         itemCode: 'VNPOST'
@@ -212,11 +252,15 @@ export default {
     rules: {
       required: (value) => !!value || 'Trường dữ liệu bắt buộc',
       email: (value) => {
+        value = value.trim()
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
       },
       telNo: (value) => {
         const pattern = /^([0-9]{0,})$/
+        if(typeof value === 'string'){
+          value = value.trim()
+        }
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       }
     }
@@ -234,6 +278,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.showTinhPhi = showTinhPhi
+    } catch (error) {
+    }
     vm.$store.dispatch('getVNPOSTcode').then(result => {
       vm.vnPostItems = result
     })
@@ -252,7 +300,7 @@ export default {
       vm.dichVuChuyenPhatKetQua.postalTelNo = val.contactTelNo
       */
       // var filter = {
-      //   collectionCode: 'ADMINISTRATIVE_REGION',
+      //   collectionCode: 'VNPOST_CITY_CODE',
       //   level: 0,
       //   parent: 0
       // }
@@ -267,7 +315,7 @@ export default {
   mounted () {
     var vm = this
     var filter = {
-      collectionCode: 'ADMINISTRATIVE_REGION',
+      collectionCode: 'VNPOST_CITY_CODE',
       level: 0,
       parent: 0
     }
@@ -282,13 +330,13 @@ export default {
         vm.resultDistricts = result.data
       })
     }
-    if (data.postalDistrictCode) {
-      filter.parent = data.postalDistrictCode
-      filter.level = 1
-      vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.resultWards = result.data
-      })
-    }
+    // if (data.postalDistrictCode) {
+    //   filter.parent = data.postalDistrictCode
+    //   filter.level = 1
+    //   vm.$store.getters.getDictItems(filter).then(function (result) {
+    //     vm.resultWards = result.data
+    //   })
+    // }
   },
   methods: {
     initData (data) {
@@ -310,7 +358,7 @@ export default {
       // vm.dichVuChuyenPhatKetQua = dichVuChuyenPhatKetQuaTemp
       vm.$nextTick(function () {
         // var filter = {
-        //   collectionCode: 'ADMINISTRATIVE_REGION',
+        //   collectionCode: 'VNPOST_CITY_CODE',
         //   level: 0,
         //   parent: 0
         // }
@@ -344,7 +392,7 @@ export default {
     onChangeResultCity (data) {
       var vm = this
       let filter = {
-        collectionCode: 'ADMINISTRATIVE_REGION',
+        collectionCode: 'VNPOST_CITY_CODE',
         level: 1,
         parent: data
       }
@@ -352,25 +400,34 @@ export default {
       vm.$store.getters.getDictItems(filter).then(function (result) {
         vm.resultDistricts = result.data
       })
+      if (vm.showTinhPhi) {
+        vm.getFee()
+      }
     },
     onChangeResultDistrict (data) {
       var vm = this
-      let filter = {
-        collectionCode: 'ADMINISTRATIVE_REGION',
-        level: 2,
-        parent: data
+      // let filter = {
+      //   collectionCode: 'VNPOST_CITY_CODE',
+      //   level: 2,
+      //   parent: data
+      // }
+      // console.log('onChangeResultDistrict', data)
+      // vm.$store.getters.getDictItems(filter).then(function (result) {
+      //   vm.resultWards = result.data
+      // })
+      if (vm.showTinhPhi) {
+        vm.getFee()
       }
-      console.log('onChangeResultDistrict', data)
-      vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.resultWards = result.data
-      })
+      vm.dichVuChuyenPhatHoSo.postalDistrictName = vm.resultDistricts.filter(function(item) {
+        return item.itemCode === data
+      })[0]['itemName']
     },
     changeViaPostal (event) {
       console.log('changeViaPostal', event)
-      this.$store.commit('setViaPostal', event === 2 ? 2 : 1)
+      this.$store.commit('setViaPostal', event)
       this.$emit('changeViapostal', event)
       let dataChuyenPhat = {
-        viaPostal: event === 2 ? 2 : 1,
+        viaPostal: event,
         postalServiceCode: this.dichVuChuyenPhatKetQua.postalServiceCode ? this.dichVuChuyenPhatKetQua.postalServiceCode : '',
         postalAddress: this.dichVuChuyenPhatKetQua.postalAddress ? this.dichVuChuyenPhatKetQua.postalAddress : '',
         postalCityCode: this.dichVuChuyenPhatKetQua.postalCityCode ? this.dichVuChuyenPhatKetQua.postalCityCode : '',
@@ -384,7 +441,52 @@ export default {
     validDichVuChuyenPhat () {
       var vm = this
       return vm.$refs.formDichVuChuyenPhat.validate()
-    }
+    },
+    getFee () {
+      let vm = this
+      if (vm.functionTimeOutGetFee) {
+        clearTimeout(vm.functionTimeOutGetFee)
+      }
+      vm.functionTimeOutGetFee = setTimeout(function () {
+        if (vm.dichVuChuyenPhatKetQua.postalCityCode && vm.dichVuChuyenPhatKetQua.postalDistrictCode) {
+          vm.loadingFee = true
+          let url = '/o/rest/v2/postal/vnpostprice'
+          let typeMethod = 'POST'
+          let headers = {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+          let dataUpdate = new URLSearchParams()
+          dataUpdate.append("GovAgencyCode", vm.detailDossier.govAgencyCode)
+          dataUpdate.append("senderProvince", "")
+          dataUpdate.append("senderDistrict", "")
+          dataUpdate.append("receiverProvince", vm.dichVuChuyenPhatKetQua.postalCityCode)
+          dataUpdate.append("receiverDistrict", vm.dichVuChuyenPhatKetQua.postalDistrictCode)
+          dataUpdate.append("weight", vm.weight)
+          let paramGet = {}
+          axios({
+            method: typeMethod,
+            url: url,
+            headers: headers,
+            params: paramGet,
+            data: dataUpdate
+          }).then(function (response) {
+            vm.loadingFee = false
+            vm.feeVnPost = response.data ? vm.currency(response.data) : ''
+          }).catch(function (error) {
+          })
+        } else {
+          vm.feeVnPost = ''
+        }
+        
+      }, 1000)
+    },
+    currency (value) {
+      if (value) {
+        let moneyCur = (value / 1).toFixed(0).replace('.', ',')
+        return moneyCur.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+      }
+      return ''
+    },
   }
 }
 </script>

@@ -16,17 +16,28 @@ export const store = new Vuex.Store({
     initData: {},
     loading: false,
     index: 0,
+    indexQuestion: 0,
+    questionListDefault: [
+    ],
     questionList: [],
     questionDetail: '',
     activeAddQuestion: false,
     activeGetQuestion: false,
     questionPage: 1,
     totalQuestion: 0,
+    agencyFilter: '',
+    lvdsFilter: '',
+    lvttFilter: '',
+    keywordFilter: '',
+    typeFilter: '',
     user: {
       'role': ''
     },
+    serverConfig: '',
     endPointApi: '/o/rest/v2',
     // endPointApi: 'http://127.0.0.1:8081/api',
+    counter: true,
+    isMobile: false
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -50,7 +61,19 @@ export const store = new Vuex.Store({
           store.dispatch('getRoleUser').then(function (result) {
             state['user'].role = result
             commit('setInitData', state.initData)
-            resolve(state.initData)
+            let filter = {
+              serverNo: 'SERVER_DVC'
+            }
+            if (agencyCodeSite && state.serverConfig === '') {
+              store.dispatch('getServerConfig', filter).then(function (result) {
+                commit('setServerConfig', result)
+                resolve(state.initData)
+              }).catch(function (reject) {
+                resolve(state.initData)
+              })
+            } else {
+              resolve(state.initData)
+            }
           }).catch(function (error) {
             state['user'].role = ['default']
             commit('setInitData', state.initData)
@@ -72,46 +95,133 @@ export const store = new Vuex.Store({
           if (!roles) {
             admin = false
           } else {
-            let roleExits = roles.findIndex(item => item === 'Administrator')
+            let roleExits = roles.findIndex(item => (item === 'Administrator' || item === 'Administrator_data' || item === 'Administrator_Employee'))
             if (roleExits >= 0) {
               admin = true
             }
           }
           if (admin) {
+            let header = {
+              groupId: state.serverConfig ? state.serverConfig['groupId'] : window.themeDisplay.getScopeGroupId()
+            }
+            if (agencyCodeSite && state.serverConfig) {
+              header.Authorization = 'BASIC ' + window.btoa(state.serverConfig['username'] + ':' + state.serverConfig['password'])
+            }
             param = {
-              headers: {
-                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
-              },
+              headers: header,
               params: {
-                start: state.questionPage * 10 - 10,
-                end: state.questionPage * 10
+                start: state.questionPage * 20 - 20,
+                end: state.questionPage * 20,
+                govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
+                keyword: filter.keyword ? filter.keyword : '',
+                publish: filter.publish,
+                answered: filter.answered,
+                domainCode: filter.domainCode ? filter.domainCode : '',
+                subDomainCode: filter.subDomainCode ? filter.subDomainCode : '',
+                questionType: filter.hasOwnProperty('questionType') ? filter.questionType : ''
               }
             }
           } else {
             param = {
               headers: {
-                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+                groupId: state.serverConfig ? state.serverConfig['groupId'] : window.themeDisplay.getScopeGroupId()
               },
               params: {
-                start: state.questionPage * 10 - 10,
-                end: state.questionPage * 10,
-                publish: 1
+                start: state.questionPage * 20 - 20,
+                end: state.questionPage * 20,
+                publish: 1,
+                govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
+                keyword: filter.keyword ? filter.keyword : '',
+                domainCode: filter.domainCode ? filter.domainCode : '',
+                subDomainCode: filter.subDomainCode ? filter.subDomainCode : '',
+                questionType: filter.questionType ? filter.questionType : ''
               }
             }
           }
-          axios.get(state.endPointApi + '/faq/questions', param).then(function (response) {
+          console.log('param1', param)
+          let url = state.serverConfig ? state.serverConfig['url'] : state.endPointApi
+          axios.get(url + '/faq/questions', param).then(function (response) {
             if (response.data && response.data['total']) {
               commit('setTotalQuestion', response.data['total'])
-            }
-            if (response.data && response.data['data']) {
-              resolve(response.data['data'])
             } else {
-              resolve([])
+              commit('setTotalQuestion', 0)
             }
-          }).catch(function (xhr) {
-            console.log(xhr)
-            reject(xhr)
+            let dataOutput
+            if (response.data && response.data['data']) {
+              if (Array.isArray(response.data['data'])) {
+                dataOutput = response.data['data']
+              } else {
+                dataOutput = [response.data['data']]
+              }
+              if (dataOutput && dataOutput.length > 0) {
+                for (let key in dataOutput) {
+                  dataOutput[key].answers = []
+                  dataOutput[key].loading = false
+                }
+              }
+            } else {
+              dataOutput = state.questionListDefault
+              for (let key in dataOutput) {
+                dataOutput[key].answers = []
+                dataOutput[key].loading = false
+              }
+            }
+            resolve(dataOutput)
+          }).catch(function () {
+            commit('setTotalQuestion', 0)
+            let dataOutput = state.questionListDefault
+            for (let key in dataOutput) {
+              dataOutput[key].answers = []
+            }
+            reject(dataOutput)
           })
+        })
+      })
+    },
+    getQuestionsCounter ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let admin = false
+          let roles = state['user'].role
+          if (!roles) {
+            admin = false
+          } else {
+            let roleExits = roles.findIndex(item => (item === 'Administrator' || item === 'Administrator_data' || item === 'Administrator_Employee'))
+            if (roleExits >= 0) {
+              admin = true
+            }
+          }
+          if (admin) {
+            let header = {
+              groupId: state.serverConfig ? state.serverConfig['groupId'] : window.themeDisplay.getScopeGroupId()
+            }
+            if (agencyCodeSite && state.serverConfig) {
+              header.Authorization = 'BASIC ' + window.btoa(state.serverConfig['username'] + ':' + state.serverConfig['password'])
+            }
+            let param = {
+              headers: header,
+              params: {
+                start: 0,
+                end: 1,
+                govAgencyCode: filter['agencyCode'] ? filter['agencyCode'] : '',
+                publish: filter['publish'] ? filter['publish'] : '',
+                answered: filter['answered'] ? filter['answered'] : '',
+                questionType: filter['questionType'] ? filter['questionType'] : ''
+              }
+            }
+            let url = state.serverConfig ? state.serverConfig['url'] : state.endPointApi
+            axios.get(url + '/faq/questions', param).then(function (response) {
+              if (response.data) {
+                resolve(response.data)
+              } else {
+                resolve(response)
+              }
+            }).catch(function (xhr) {
+              reject(xhr)
+            })
+          } else {
+            reject('')
+          }
         })
       })
     },
@@ -130,13 +240,52 @@ export const store = new Vuex.Store({
           dataAdd.append('content', filter.content ? filter.content : '')
           dataAdd.append('fullname', filter.fullname ? filter.fullname : '')
           dataAdd.append('email', filter.email ? filter.email : '')
+          dataAdd.append('telNo', filter.telNo ? filter.telNo : '')
+          dataAdd.append('address', filter.address ? filter.address : '')
           dataAdd.append('publish', filter.publish ? filter.publish : '')
+          dataAdd.append('govAgencyCode', filter.agencyCode ? filter.agencyCode : '')
+          dataAdd.append('domainCode', filter.domainCode ? filter.domainCode : '')
+          dataAdd.append('domainName', filter.domainName ? filter.domainName : '')
+          dataAdd.append('subDomainCode', filter.subDomainCode ? filter.subDomainCode : '')
+          dataAdd.append('subDomainName', filter.subDomainName ? filter.subDomainName : '')
+          dataAdd.append('j_captcha_response', filter.j_captcha_response ? filter.j_captcha_response : '')
+          dataAdd.append('questionType', filter.questionType ? filter.questionType : '')
+          axios.post(url, dataAdd, param).then(response => {
+            if (response['status'] !== undefined && response['status'] === 203) {
+              toastr.clear()
+              toastr.error('Mã captcha không chính xác')
+              reject('captcha')
+            } else {
+              resolve(response.data)
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    adminAddQuestion ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+          var url = state.endPointApi + '/faq/questions'
+          var dataAdd = new URLSearchParams()
+          dataAdd.append('content', filter.content ? filter.content : '')
+          dataAdd.append('publish', filter.publish ? filter.publish : '')
+          dataAdd.append('govAgencyCode', filter.agencyCode ? filter.agencyCode : '')
+          dataAdd.append('questionType', filter.questionType ? filter.questionType : '')
           dataAdd.append('j_captcha_response', filter.j_captcha_response ? filter.j_captcha_response : '')
           axios.post(url, dataAdd, param).then(response => {
             if (response['status'] !== undefined && response['status'] === 203) {
               toastr.clear()
-              toastr.error('Nhập sai mã Captcha')
-              reject(xhr)
+              toastr.error('Mã captcha không chính xác')
+              reject('captcha')
             } else {
               resolve(response.data)
             }
@@ -149,18 +298,29 @@ export const store = new Vuex.Store({
     putQuestion ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-              'Accept': 'application/json',
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
+          let header = {
+            groupId: state.serverConfig ? state.serverConfig['groupId'] : window.themeDisplay.getScopeGroupId()
           }
-          var url = state.endPointApi + '/faq/questions/' + filter.questionId
-          var dataAdd = new URLSearchParams()
+          if (agencyCodeSite && state.serverConfig) {
+            header.Authorization = 'BASIC ' + window.btoa(state.serverConfig['username'] + ':' + state.serverConfig['password'])
+          }
+          let param = {
+            headers: header
+          }
+          let url = state.serverConfig ? state.serverConfig['url'] : state.endPointApi
+          let urlPut = url + '/faq/questions/' + filter.questionId
+          let dataAdd = new URLSearchParams()
+          dataAdd.append('email', filter.email ? filter.email : '')
           dataAdd.append('content', filter.content ? filter.content : '')
+          dataAdd.append('fullname', filter.fullname ? filter.fullname : '')
           dataAdd.append('publish', filter.publish)
-          axios.put(url, dataAdd, param).then(response => {
+          dataAdd.append('govAgencyCode', filter.govAgencyCode)
+          dataAdd.append('govAgencyName', filter.govAgencyName)
+          dataAdd.append('domainCode', filter.domainCode)
+          dataAdd.append('domainName', filter.domainName)
+          dataAdd.append('questionType', filter.questionType)
+          
+          axios.put(urlPut, dataAdd, param).then(response => {
             resolve(response)
           }).catch(xhr => {
             reject(xhr)
@@ -171,18 +331,21 @@ export const store = new Vuex.Store({
     putAnswer ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-              'Accept': 'application/json',
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
+          let header = {
+            groupId: state.serverConfig ? state.serverConfig['groupId'] : window.themeDisplay.getScopeGroupId()
           }
-          var url = state.endPointApi + '/faq/questions/' + filter.questionId + '/answers/' + filter.answerId
-          var dataAdd = new URLSearchParams()
+          if (agencyCodeSite && state.serverConfig) {
+            header.Authorization = 'BASIC ' + window.btoa(state.serverConfig['username'] + ':' + state.serverConfig['password'])
+          }
+          let param = {
+            headers: header
+          }
+          let url = state.serverConfig ? state.serverConfig['url'] : state.endPointApi
+          let urlPut = url + '/faq/questions/' + filter.questionId + '/answers/' + filter.answerId
+          let dataAdd = new URLSearchParams()
           dataAdd.append('content', filter.content ? filter.content : '')
           dataAdd.append('publish', filter.publish)
-          axios.put(url, dataAdd, param).then(response => {
+          axios.put(urlPut, dataAdd, param).then(response => {
             resolve(response)
           }).catch(xhr => {
             reject(xhr)
@@ -193,18 +356,21 @@ export const store = new Vuex.Store({
     addAnswer ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-              'Accept': 'application/json',
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
+          let header = {
+            groupId: state.serverConfig ? state.serverConfig['groupId'] : window.themeDisplay.getScopeGroupId()
           }
-          var url = state.endPointApi + '/faq/questions/' + filter['questionId'] + '/answers'
-          var dataAdd = new URLSearchParams()
+          if (agencyCodeSite && state.serverConfig) {
+            header.Authorization = 'BASIC ' + window.btoa(state.serverConfig['username'] + ':' + state.serverConfig['password'])
+          }
+          let param = {
+            headers: header
+          }
+          let url = state.serverConfig ? state.serverConfig['url'] : state.endPointApi
+          let urlPost = url + '/faq/questions/' + filter['questionId'] + '/answers'
+          let dataAdd = new URLSearchParams()
           dataAdd.append('content', filter.content ? filter.content : '')
           dataAdd.append('publish', filter.publish ? filter.publish : '')
-          axios.post(url, dataAdd, param).then(response => {
+          axios.post(urlPost, dataAdd, param).then(response => {
             resolve(response.data)
           }).catch(xhr => {
             reject(xhr)
@@ -215,15 +381,18 @@ export const store = new Vuex.Store({
     deleteAnswer ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-              'Accept': 'application/json',
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
+          let header = {
+            groupId: state.serverConfig ? state.serverConfig['groupId'] : window.themeDisplay.getScopeGroupId()
           }
-          var url = state.endPointApi + '/faq/questions/' + filter['questionId'] + '/answers/' + filter.answerId
-          axios.delete(url, param).then(response => {
+          if (agencyCodeSite && state.serverConfig) {
+            header.Authorization = 'BASIC ' + window.btoa(state.serverConfig['username'] + ':' + state.serverConfig['password'])
+          }
+          let param = {
+            headers: header
+          }
+          let url = state.serverConfig ? state.serverConfig['url'] : state.endPointApi
+          let urlDelete = url + '/faq/questions/' + filter['questionId'] + '/answers/' + filter.answerId
+          axios.delete(urlDelete, param).then(response => {
             resolve(response)
           }).catch(xhr => {
             reject(xhr)
@@ -234,15 +403,18 @@ export const store = new Vuex.Store({
     deleteQuestion ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-              'Accept': 'application/json',
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
+          let header = {
+            groupId: state.serverConfig ? state.serverConfig['groupId'] : window.themeDisplay.getScopeGroupId()
           }
-          var url = state.endPointApi + '/faq/questions/' + filter['questionId']
-          axios.delete(url, param).then(response => {
+          if (agencyCodeSite && state.serverConfig) {
+            header.Authorization = 'BASIC ' + window.btoa(state.serverConfig['username'] + ':' + state.serverConfig['password'])
+          }
+          let param = {
+            headers: header
+          }
+          let url = state.serverConfig ? state.serverConfig['url'] : state.endPointApi
+          let urlDelete = url + '/faq/questions/' + filter['questionId']
+          axios.delete(urlDelete, param).then(response => {
             resolve(response)
           }).catch(xhr => {
             reject(xhr)
@@ -253,20 +425,30 @@ export const store = new Vuex.Store({
     getAnswers ({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
-            }
+          let header = {
+            groupId: state.serverConfig ? state.serverConfig['groupId'] : window.themeDisplay.getScopeGroupId()
           }
-          axios.get(state.endPointApi + '/faq/questions/' + filter.questionId + '/answers', param).then(function (response) {
+          if (agencyCodeSite && state.serverConfig) {
+            header.Authorization = 'BASIC ' + window.btoa(state.serverConfig['username'] + ':' + state.serverConfig['password'])
+          }
+          let param = {
+            headers: header
+          }
+          let url = state.serverConfig ? state.serverConfig['url'] : state.endPointApi
+          axios.get(url + '/faq/questions/' + filter.questionId + '/answers', param).then(function (response) {
             if (response.data && response.data['data']) {
-              resolve(response.data['data'])
+              let resultData = response.data['data']
+              if (Array.isArray(resultData)) {
+                resolve(resultData)
+              } else {
+                resolve([resultData])
+              }
             } else {
               resolve([])
             }
           }).catch(function (xhr) {
             console.log(xhr)
-            reject(xhr)
+            reject([])
           })
         })
       })
@@ -316,6 +498,90 @@ export const store = new Vuex.Store({
           reject('default')
         })
       })
+    },
+    getGovAgency ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let paramGetGovAgency = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            sort: 'sibling'
+          }
+        }
+        axios.get('/o/rest/v2/dictcollections/SERVICE_ADMINISTRATION/dictitems', paramGetGovAgency).then(function (response) {
+          resolve(response.data.data)
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
+    getLvdsList ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let paramGetGovAgency = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            sort: 'sibling'
+          }
+        }
+        axios.get('/o/rest/v2/dictcollections/QUESTION_SUBDOMAIN_CODE/dictitems', paramGetGovAgency).then(function (response) {
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
+    getLvttList ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            agency: filter['agency'] ? filter['agency'] : '',
+            sort: 'siblingSearch'
+          }
+        }
+        axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
+    getServerConfig ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            }
+          }
+          let url = '/o/rest/v2/serverconfigs/' + filter.serverNo
+          axios.get(url, param).then(function (response) {
+            let serializable = response.data
+            try {
+              let configs = JSON.parse(serializable.configs)
+              resolve(configs)
+            } catch (error) {
+              resolve(serializable)
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
     }
   },
   mutations: {
@@ -324,6 +590,9 @@ export const store = new Vuex.Store({
     },
     setInitData (state, payload) {
       state.initData = payload
+    },
+    setServerConfig (state, payload) {
+      state.serverConfig = payload
     },
     setQuestionList (state, payload) {
       state.questionList = payload
@@ -337,12 +606,36 @@ export const store = new Vuex.Store({
     setActiveGetQuestion (state, payload) {
       state.activeGetQuestion = payload
     },
+    setAgencyFilter (state, payload) {
+      state.agencyFilter = payload
+    },
+    setLvdsFilter (state, payload) {
+      state.lvdsFilter = payload
+    },
+    setLvttFilter (state, payload) {
+      state.lvttFilter = payload
+    },
+    setTypeFilter (state, payload) {
+      state.typeFilter = payload
+    },
+    setKeywordFilter (state, payload) {
+      state.keywordFilter = payload
+    },
     setQuestionPage (state, payload) {
       state.questionPage = payload
     },
     setTotalQuestion (state, payload) {
       state.totalQuestion = payload
-    }
+    },
+    setIndexQuestion (state, payload) {
+      state.indexQuestion = payload
+    },
+    setCounter (state, payload) {
+      state.counter = payload
+    },
+    setIsMobile (state, payload) {
+      state.isMobile = payload
+    },
   },
   getters: {
     loading (state) {
@@ -369,8 +662,32 @@ export const store = new Vuex.Store({
     getActiveGetQuestion (state) {
       return state.activeGetQuestion
     },
+    getIndexQuestion (state) {
+      return state.indexQuestion
+    },
     getUser (state) {
       return state.user
-    }
+    },
+    getAgencyFilter (state) {
+      return state.agencyFilter
+    },
+    getLvdsFilter (state) {
+      return state.lvdsFilter
+    },
+    getLvttFilter (state) {
+      return state.lvttFilter
+    },
+    getTypeFilter (state) {
+      return state.typeFilter
+    },
+    getKeywordFilter (state) {
+      return state.keywordFilter
+    },
+    getCounter (state) {
+      return state.counter
+    },
+    getIsMobile (state) {
+      return state.isMobile
+    },
   }
 })

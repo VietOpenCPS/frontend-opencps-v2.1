@@ -12,8 +12,8 @@ export const store = new Vuex.Store({
     initData: {},
     loading: false,
     index: 0,
-    endPointApi: '/o/rest/v2'
-    // endPointApi: 'http://127.0.0.1:8081/api'
+    endPointApi: '/o/rest/v2',
+    isMobile: false
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -47,7 +47,12 @@ export const store = new Vuex.Store({
           }
           axios.get(state.endPointApi + '/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
             if (result.data) {
-              resolve(result.data.data)
+              let dataVoting = result.data.data
+              for (let i = 0; i < dataVoting.length; i++) {
+                dataVoting[i]['answerPercent'] = []
+                dataVoting[i]['averageScore'] = 0
+              }
+              resolve(dataVoting)
             } else {
               resolve([])
             }
@@ -152,7 +157,7 @@ export const store = new Vuex.Store({
     submitVoting ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result1) {
-          var params = new URLSearchParams()
+          let params = new URLSearchParams()
           const config = {
             headers: {
               'groupId': state.initData.groupId
@@ -171,7 +176,34 @@ export const store = new Vuex.Store({
           })
         })
       })
-    }
+    },
+    loadingDataHoSo ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              start: 0,
+              end: 1,
+              dossierNo: filter.dossierNo ? filter.dossierNo : ''
+            }
+          }
+          axios.get(state.endPointApi + '/dossiers', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.hasOwnProperty('data')) {
+              resolve(serializable.data[0])
+            } else {
+              reject(response)
+            }
+            
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
   },
   mutations: {
     setIndex (state, payload) {
@@ -182,7 +214,10 @@ export const store = new Vuex.Store({
     },
     setLoading (state, payload) {
       state.loading = payload
-    }
+    },
+    setIsMobile (state, payload) {
+      state.isMobile = payload
+    },
   },
   getters: {
     loading (state) {
@@ -190,6 +225,9 @@ export const store = new Vuex.Store({
     },
     index (state) {
       return state.index
-    }
+    },
+    getIsMobile (state) {
+      return state.isMobile
+    },
   }
 })

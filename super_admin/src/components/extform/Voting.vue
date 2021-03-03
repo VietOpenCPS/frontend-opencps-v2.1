@@ -60,9 +60,18 @@
           </v-btn>
           <div class="px-2 py-2">
             <div class="mb-2" v-if="Array.isArray(votingItems) && votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" style="position:relative">
-              <div class="text-bold">
+              <!-- <div class="text-bold" v-else>
                 {{index + 1}}.&nbsp; {{ item.subject }}
-              </div>
+              </div> -->
+              <v-layout wrap class="text-bold">
+                <div class="flex px-3 py-1" style="height:26px;max-width:80px;background-color: #034687;transform: skew(-25deg)">
+                  <span class="d-block white--text" style="transform: skew(25deg)">Câu {{index + 1}} : </span>
+                </div>
+                <!-- <div v-html="item.subject" class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687" v-if="String(item.subject).indexOf('/>') > 0 || String(item.subject).indexOf('<br') > 0">
+                </div> -->
+                <div v-html="item.subject" class="flex pl-3 pr-2 pt-0" style="max-width:calc(100% - 100px);color:#034687">
+                </div>
+              </v-layout>
               <div style="position:absolute;right:0px;top:-5px" :style="Array.isArray(item.choices) && item.choices.length > 1  ? 'width:50px' : 'width:85px'">
                 <v-tooltip top>
                   <v-btn slot="activator" class="mx-0 my-1" icon ripple @click="editVotings(item)">
@@ -91,7 +100,7 @@
             </div>
           </div>
         </v-card>
-        <v-dialog v-model="dialog_addQuestion" scrollable persistent max-width="700px">
+        <v-dialog v-model="dialog_addQuestion" scrollable persistent max-width="1000px">
           <v-card>
             <v-card-title class="headline pb-2">
               <span v-if="type === 'add'">Thêm câu hỏi</span>
@@ -100,43 +109,57 @@
             <v-card-text class="pt-0">
               <v-form ref="formAddQuestion" v-model="validForm" lazy-validation>
                 <v-layout wrap class="py-1 align-center row-list-style">
+                  <p class="my-2">Mã câu hỏi:</p>
                   <v-flex xs12>
                     <v-text-field
-                      label="Mã câu hỏi"
                       box
                       v-model="votingCode"
-                      :rules="type === 'add' ? [v => !!v || 'Trường dữ liệu bắt buộc'] : []"
+                      :rules="type === 'add' ? [rules.required, rules.varchar75, rules.syntaxError] : []"
                       :required="type === 'add'"
                       :disabled="type !== 'add'"
+                      :maxlength="75"
+                      :counter="75"
                     ></v-text-field>
                   </v-flex>
-                  <v-flex xs12 class="">
+                  <p class="my-2">Nội dung câu hỏi:</p>
+                  <v-flex xs12 class="" style="position: relative">
+                    <v-btn @click="editorVisible = !editorVisible" flat icon color="primary" style="position: absolute; top: 0; right: 0; z-index: 5">
+                      <v-icon v-if="!editorVisible">code</v-icon>
+                      <v-icon v-else>edit</v-icon>
+                    </v-btn>
                     <v-textarea
-                      label="Nội dung câu hỏi"
+                      v-if="!editorVisible"
                       box
-                      rows="2"
+                      rows="3"
                       v-model="subject"
-                      :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                      :rules="[rules.required, rules.varchar2000, rules.syntaxError]"
                       required
+                      :maxlength="2000"
+                      :counter="2000"
                     ></v-textarea>
+                    <vue-editor v-else v-model="subject" :editorToolbar="customToolbar"></vue-editor>
                   </v-flex>
+                  <p class="my-2">Câu trả lời: </p>
                   <v-flex xs12 class="">
                     <!-- <div class="my-2 text-bold">:</div> -->
                     <v-layout wrap>
                       <v-flex xs12 sm10 class="pr-2">
-                        <v-text-field
-                          label="Câu trả lời"
+                        <v-textarea
                           box
                           v-model="answer"
                           clearable
                           @keyup.enter="addChoices"
-                        ></v-text-field>
+                          rows="3"
+                          :maxlength="5000"
+                          :counter="5000"
+                        ></v-textarea>
                       </v-flex>
                       <v-flex xs12 sm2 class="text-xs-right">
                         <v-btn color="blue darken-3" dark
                           class="mt-0 mr-0"
-                          :disabled="answer?false:true"
+                          :disabled="answer && String(answer).length <= 5000 ? false : true"
                           @click="addChoices"
+                          :title="answer && String(answer).length > 5000 ? 'Câu trả lời tối đa 5000 ký tự' : ''"
                         >
                           <v-icon size="24">add</v-icon>&nbsp;
                           Thêm
@@ -197,9 +220,11 @@
 
 <script>
   import TinyPagination from '../ext/TinyPagination.vue'
+  import { VueEditor, Quill } from 'vue2-editor'
   export default {
     components: {
-      'tiny-pagination': TinyPagination
+      'tiny-pagination': TinyPagination,
+      VueEditor
     },
     data () {
       return {
@@ -242,11 +267,104 @@
         choicesCurrent: [],
         votingIdCurrent: '',
         type: '',
+        editorVisible: false,
         loading: false,
         dialog_addQuestion: false,
         rules: {
-          required: (value) => (!!value || value === 0) || 'Trường dữ liệu bắt buộc'
-        }
+          required: value => !!value || 'Bắt buộc phải nhập.',
+          number: value => {
+            const pattern = /^\d+$/
+            return pattern.test(value) || 'Bắt buộc phải nhập kiểu số.'
+          },
+          email: value => {
+            const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            return pattern.test(value) || 'Sai định dạng thư điện tử.'
+          },
+          passWord: (value) => {
+            const pattern = /^((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])([0-9a-zA-Z@$!%*#?&]{8,}))$/
+            return pattern.test(value) || 'Ít nhất 8 ký tự và có chữ hoa, chữ thường, ký tự đặc biệt @$!%*#?&'
+          },
+          telNo: (value) => {
+            const pattern = /^0([1-9]{1}\d{8})$/
+            if (value) {
+              return pattern.test(value) || 'Số điện thoại gồm 10 ký tự 0-9, eg: 0989123456, ...'
+            } else {
+              return []
+            }
+          },
+          syntaxError: (value) => {
+            if (value) {
+              value = String(value).trim()
+              return value.indexOf('</') < 0 ? true : 'Không được có ký tự </'   
+            } else {
+              return true
+            }  
+          },
+          varchar50: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 50 ? true : 'Không được nhập quá 50 ký tự'   
+            } else {
+              return true
+            }  
+          },
+          varchar75: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 75 ? true : 'Không được nhập quá 75 ký tự'   
+            } else {
+              return true
+            }
+          },
+          varchar255: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 255 ? true : 'Không được nhập quá 255 ký tự'   
+            } else {
+              return true
+            }  
+          },
+          varchar500: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 500 ? true : 'Không được nhập quá 500 ký tự'   
+            } else {
+              return true
+            }  
+          },
+          varchar2000: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+            } else {
+              return true
+            }
+          },
+          varchar5000: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val.length <= 5000 ? true : 'Không được nhập quá 5000 ký tự'   
+            } else {
+              return true
+            }
+          },
+        },
+        customToolbar: [
+          [{ header: [false, 1, 2, 3, 4, 5, 6] }],
+          ["bold", "italic", "underline", "strike"], // toggled buttons
+          [
+            { align: "" },
+            { align: "center" },
+            { align: "right" },
+            { align: "justify" }
+          ],
+          ["blockquote", "code-block"],
+          [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
+          [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
+          [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+          // ["link", "image", "video"],
+          ["clean"] // remove formatting button
+        ]
       }
     },
     created () {

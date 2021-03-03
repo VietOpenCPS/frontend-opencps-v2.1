@@ -7,7 +7,6 @@ import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import axios from 'axios'
 import VueApexCharts from 'vue-apexcharts'
-
 Vue.component('apexchart', VueApexCharts)
 Vue.use(VueContentPlaceholders)
 
@@ -20,6 +19,9 @@ axios.defaults.headers.common['groupId'] = groupId
 Vue.config.productionTip = true
 
 Vue.mixin({
+  data: () => ({
+    isOnegate: false
+  }),
   methods: {
     getScopeGroupId: function () {
       if (window.themeDisplay !== null && window.themeDisplay !== undefined) {

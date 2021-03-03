@@ -3,24 +3,11 @@
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="10" />
     </content-placeholders>
-    <div v-else>
-      <!-- <v-expansion-panel class="expansion-pl">
-        <v-expansion-panel-content value="1">
-          <div slot="header">
-            <div class="background-triangle-small"> 
-              <v-icon size="18" color="white">star_rate</v-icon> 
-            </div>Thông tin chung hồ sơ
-          </div>
-          <v-card style="border-top: 1px solid #ddd;">
-            <v-card-text class="py-0">
-              
-            </v-card-text>
-          </v-card>
-        </v-expansion-panel-content>
-      </v-expansion-panel> -->
+    <div v-else class="mt-3">
       <v-layout class="wrap">
         <v-flex class="pr-2 pb-2">
-          <span class="text-bold">{{dossierDetail.serviceName}}</span>
+          <span class="text-bold">Tên hồ sơ: </span>
+          <span>{{dossierDetail.serviceName}}</span>
         </v-flex>
       </v-layout>
       <div class="mt-2">
@@ -38,40 +25,6 @@
           <v-tab-item key="1" class="wrap-scroll wrap-scroll-dossier">
             <v-card >
               <v-card-text class="px-0 py-0">
-                <!-- <v-expansion-panel expand  class="expansion-pl ext__form">
-                  <v-expansion-panel-content v-bind:value="true">
-                    <div slot="header" class="text-bold">
-                      <div class="background-triangle-small"> I.</div>
-                      Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
-                    </div>
-                    <div v-for="(item, index) in tailieuNop" :key="index" style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;border-top: 1px solid rgb(221, 221, 221)">
-                      <div class="mr-2" style="min-width: 18px; display: flex; min-height: 38px;">
-                        <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
-                        <div class="header__tphs">
-                          {{item.partName}} <span v-if="item.required" style="color: red">&nbsp; (*) </span>
-                          &nbsp;&nbsp;
-                        </div>
-                      </div>
-                    </div>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel expand  class="expansion-pl ext__form">
-                  <v-expansion-panel-content v-bind:value="true">
-                    <div slot="header" class="text-bold">
-                      <div class="background-triangle-small"> II.</div>
-                      Kết quả xử lý
-                    </div>
-                    <div v-for="(item, index) in tailieuKeyQua" :key="index" style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;border-top: 1px solid rgb(221, 221, 221)">
-                      <div class="mr-2" style="min-width: 18px; display: flex; min-height: 38px;">
-                        <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
-                        <div class="header__tphs">
-                          {{item.partName}} <span v-if="item.required" style="color: red">&nbsp; (*) </span>
-                          &nbsp;&nbsp;
-                        </div>
-                      </div>
-                    </div>
-                  </v-expansion-panel-content>
-                </v-expansion-panel> -->
                 <v-layout wrap class="px-2 py-2">
                   <v-flex xs12 sm4 class="pr-3">
                     <div class="xs12 sm12 pb-1">
@@ -91,7 +44,7 @@
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm4>
-                    <div class="xs12 sm12 pb-1">
+                    <div class="xs12 sm12 pb-1" v-if="dossierDetail.online">
                       <span class="pr-2">Ngày gửi: </span>
                       <span class="pl-0 text-bold" v-if="dossierDetail.online"> {{dossierDetail.submitDate}} </span>
                       <span class="pl-0 text-bold" v-else> Một cửa </span>
@@ -175,7 +128,7 @@
                     <div class="text-bold">
                       {{index + 1}}.&nbsp; {{ item.subject }}
                     </div>
-                    <v-radio-group class="ml-3 pt-2" v-model="item.selected" row>
+                    <v-radio-group class="ml-3 pt-2 mt-0" v-model="item.selected" row>
                       <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1"></v-radio>
                     </v-radio-group>
                     <v-layout wrap class="ml-3" style="margin-top:-10px">
@@ -217,9 +170,16 @@
           </v-tab-item>
         </v-tabs>
       </div>
-      <v-btn class="back-btn" @click="goBack" fab color="primary">
-        <v-icon dark>arrow_back</v-icon>
+      <v-btn class="back-home" fab dark color="primary" @click="goHome"> 
+        <v-icon style="font-size: 24px !important;" class="white--text">home</v-icon>
       </v-btn>
+      <v-btn class="back-btn" outline large color="primary" @click="goBack" style="width: 120px !important;">
+        <v-icon style="font-size: 24px !important;">reply</v-icon>&nbsp;
+        Quay lại 
+      </v-btn>
+      <!-- <v-btn class="back-btn" @click="goBack" fab color="primary">
+        <v-icon dark>arrow_back</v-icon>
+      </v-btn> -->
     </div>
   </div>
 </template>
@@ -283,20 +243,26 @@
         var vm = this
         vm.dossierDetail = this.$store.getters.getDetailDossier
         if (vm.dossierDetail.submissionNote) {
-          let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
-          let resultTemp = submissionNote ? submissionNote.data : ''
-          if (resultTemp) {
-            for (var i = 0; i < resultTemp.length; i++) {
-              if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
-                if (!Array.isArray(resultTemp[i]['actions'])) {
-                  let arrActionsTemp = []
-                  arrActionsTemp.push(resultTemp[i]['actions'])
-                  resultTemp[i]['actions'] = arrActionsTemp
+          try {
+            let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
+            let resultTemp = submissionNote ? submissionNote.data : ''
+            if (resultTemp) {
+              for (var i = 0; i < resultTemp.length; i++) {
+                if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                  if (!Array.isArray(resultTemp[i]['actions'])) {
+                    let arrActionsTemp = []
+                    arrActionsTemp.push(resultTemp[i]['actions'])
+                    resultTemp[i]['actions'] = arrActionsTemp
+                  }
                 }
               }
+              vm.dossierActions = resultTemp
             }
-            vm.dossierActions = resultTemp
+          } catch (error) {
+            vm.loadDossierActions()
           }
+        } else {
+          vm.loadDossierActions()
         }
       })
     },
@@ -357,9 +323,9 @@
         let vm = this
         let filter = {
           className: 'dossier',
-          classPK: vm.dossierDetail.dossierId
+          dossierDetail: vm.dossierDetail
         }
-        vm.$store.dispatch('loadVoting', filter).then(function (result) {
+        vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
           vm.votingItems = result
           console.log('votingItems', vm.votingItems)
         }).catch(function (reject) {
@@ -373,6 +339,7 @@
           for (var index in vm.votingItems) {
             vm.votingItems[index]['className'] = 'dossier'
             vm.votingItems[index]['classPk'] = vm.dossierDetail.dossierId
+            vm.votingItems[index]['serverCode'] = 'SERVER_' + vm.dossierDetail['govAgencyCode']
             arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
           }
           Promise.all(arrAction).then(results => {
@@ -384,19 +351,7 @@
         }
       },
       goBack () {
-        let vm = this
-        let current = vm.$router.history.current
-        let newQuery = current.query
-        let queryString = '?'
-        newQuery['detail'] = ''
-        for (let key in newQuery) {
-          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null && newQuery[key] !== 'null') {
-            queryString += key + '=' + newQuery[key] + '&'
-          }
-        }
-        vm.$router.push({
-          path: current.path + queryString
-        })
+        window.history.back()
       },
       getColor (level) {
         if (level === 2) {

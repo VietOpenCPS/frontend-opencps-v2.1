@@ -197,7 +197,7 @@
 </template>
 <script>
   
-  import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+  import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
   export default {
     props: ['index', 'id'],
     data: () => ({

@@ -1,9 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import DetailForward from '@/components/blacklist/DetailForward'
 import NotFound from '@/components/NotFound'
 import LandingBaocao from '@/components/screens/Landing'
-
+import DetailForward from '@/components/blacklist/DetailForward'
 const routes = [
   { path: '/bao-cao/:index', name: 'LandingBaocao', component: LandingBaocao, props: true },
   {

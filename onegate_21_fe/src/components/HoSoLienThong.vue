@@ -6,8 +6,7 @@
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div>
-          <span v-if="!detailView">Danh sách hồ sơ liên thông</span>
-          <span v-else>{{currentHoSoLienThong ? currentHoSoLienThong.dossierName : ''}}</span>
+          <span>Danh sách hồ sơ liên thông</span>
         </div>
         <v-card class="">
           <v-card-text class="px-0 py-0">
@@ -17,11 +16,9 @@
               hide-actions
               class="table-landing table-bordered"
               item-key="dossierId"
-              v-if="!detailView"
             >
               <template slot="items" slot-scope="props">
-                <!-- <tr @click="viewDetail(props.item)" style="cursor: pointer"> -->
-                <tr>
+                <tr @click="viewDetail(props.item)" style="cursor: pointer">
                   <td class="text-xs-center" width="5%">
                     <span>{{props.index + 1}}</span>
                   </td>
@@ -35,131 +32,88 @@
                     {{ props.item.govAgencyName }}
                   </td>
                   <td class="text-xs-left" width="15%">
-                    {{ props.item.createDate }}
-                  </td>
-                  <td class="text-xs-left" width="15%">
-                    {{ props.item.dossierSubStatusText ? props.item.dossierSubStatusText : props.item.dossierStatusText }}
+                    {{ props.item.dueDate | dateTimeView }}
                   </td>
                 </tr>
               </template>
-              <!-- <template slot="expand" slot-scope="props">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <v-card flat v-else>
-                  <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form">
-                    <v-expansion-panel-content v-bind:value="true">
-                      <div slot="header">
-                        <div class="background-triangle-small"> 1.</div>
-                        Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
-                      </div>
-                      <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
-                    </v-expansion-panel-content>
-                  </v-expansion-panel>
-                  <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form">
-                    <v-expansion-panel-content v-bind:value="true">
-                      <div slot="header">
-                        <div class="background-triangle-small"> 2.</div>
-                        Tài liệu kết quả
-                      </div>
-                      <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
-                    </v-expansion-panel-content>
-                  </v-expansion-panel>
-                </v-card>
-              </template> -->
             </v-data-table>
-            <div v-else>
-              <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form">
-                <v-expansion-panel-content v-bind:value="true">
-                  <div slot="header">
-                    <div class="background-triangle-small"> I.</div>
-                    Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
-                  </div>
-                  <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-              <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form">
-                <v-expansion-panel-content v-bind:value="true">
-                  <div slot="header">
-                    <div class="background-triangle-small"> II.</div>
-                    Tài liệu kết quả
-                  </div>
-                  <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-              <v-flex xs12 class="mt-3 mb-2 text-right">
-                <v-btn color="primary" class="my-0 mx-0" @click="detailView = false">
-                  <v-icon size="16">undo</v-icon> &nbsp;
-                  Quay lại danh sách 
-                </v-btn>
-              </v-flex>
-            </div>
           </v-card-text>
         </v-card>
-        <!--  -->
-        <!-- <v-card v-for="(items, index) in hoSoLienThongItems" :key="items.dossierId" :class="index>0?'bdt-0':''" class="bdb-0">
-          <v-expansion-panel :value="[true]" expand  class="expansion-p0">
-            <v-expansion-panel-content :value="index===0?true:false">
-              <div slot="header" class="pl-3">
-                CƠ QUAN LIÊN THÔNG: <span style="font-weight:normal">{{items.govAgencyName}}</span>
-              </div>
-              <v-card class="bdt-0 bdb-0">
-                <v-card-text>
-                  <v-layout wrap>
-                    <v-flex xs12 sm2>
-                      <v-subheader class="pl-0 text-header">Tình trạng: </v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm10>
-                      <v-subheader class="pl-0 text-header header-text-field">  {{items.dossierSubStatusText}} </v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm2>
-                      <v-subheader class="pl-0 text-header">Ngày gửi hồ sơ: </v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm4>
-                      <v-subheader class="pl-0 text-header header-text-field"> {{items.submitDate|dateTimeView}}</v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm2>
-                      <v-subheader class="pl-0 text-header">Ngày tiếp nhận: </v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm4>
-                      <v-subheader class="pl-0 text-header header-text-field"> {{items.receiveDate|dateTimeView}}</v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm2>
-                      <v-subheader class="pl-0 text-header">Ngày hẹn trả: </v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm4>
-                      <v-subheader class="pl-0 text-header header-text-field"> {{items.dueDate|dateTimeView}}</v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm2>
-                      <v-subheader class="pl-0 text-header">Ngày hoàn thành: </v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm4>
-                      <v-subheader class="pl-0 text-header header-text-field"> {{items.releaseDate|dateTimeView}}</v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm2 >
-                      <v-subheader class="pl-0 text-header">Chi tiết nhật ký: </v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm10>
-                      <div class="mb-1" v-for="item in items.dossierLog" :key="item.dossierLogId">
-                        - {{item.createDate|dateTimeView}}: {{item.content}}
-                      </div>
-                    </v-flex>
-                  </v-layout>
-                </v-card-text>
-              </v-card>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-card> -->
-        <!--  -->
       </v-expansion-panel-content>
     </v-expansion-panel>
+    <v-dialog v-model="dialogDetailDossier" max-width="1200" transition="fade-transition">
+      <v-card flat>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Tiến trình xử lý hồ sơ tại {{dossierLienThong.govAgencyName}}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogDetailDossier = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="pt-0 pb-0 px-0">
+          <v-card>
+            <v-card-text class="py-0 mt-2">
+              <v-data-table :headers="headersTienTrinh" :items="dossierActions" class="table-landing table-bordered"
+              hide-actions no-data-text="Không có dữ liệu" style="border-left: 1px solid #dedede;"
+              >
+                <template slot="headerCell" slot-scope="props">
+                  <v-tooltip bottom>
+                    <span slot="activator">
+                      {{ props.header.text }}
+                    </span>
+                    <span>
+                      {{ props.header.text }}
+                    </span>
+                  </v-tooltip>
+                </template>
+                <template slot="items" slot-scope="props">
+                  <td class="text-xs-center">{{props.index + 1}}</td>
+                  <td class="text-xs-left">{{props.item.sequenceRole}}</td>
+                  <td class="text-xs-left">{{props.item.sequenceName}}</td>
+                  <td class="text-xs-left">{{props.item.durationCount|getThoiHanQuyDinh}}</td>
+                  <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
+                  <td class="text-xs-left">
+                    <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
+                      {{itemUser.userName}} <br>
+                    </div>
+                  </td>
+                  <td class="text-xs-left">
+                    <div v-for="(itemAction, index) in props.item.actions" :key="index">
+                      {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
+                      <span v-if="itemAction.actionNote && itemAction.actionNote !== 'null'"> - <i>{{itemAction.actionNote}}</i></span>
+                      
+                    </div>
+                    <div v-if="props.item.statusText">
+                      <span style="color: green" v-if="dossierLienThong['dossierStatus'] === 'done' || dossierLienThong['dossierStatus'] === 'unresolved'">
+                        {{props.item.statusText.replace("Đang thực hiện:", "")}}
+                      </span>
+                      <span style="color: green" v-else>
+                        {{props.item.statusText}}
+                      </span>
+                    </div>
+                  </td>
+                </template>
+              </v-data-table>
+            </v-card-text>
+          </v-card>
+        </v-card-text>
+        <v-card-actions class="mx-2">
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click.native="dialogDetailDossier = false"
+            >
+            <v-icon class="white--text">close</v-icon>&nbsp;
+            Thoát
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
-
+import axios from 'axios'
 import thongtinchunghoso from './form_xu_ly/ThongTinChungHoSo.vue'
-import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
 export default {
   components: {
     'thongtinchunghoso': thongtinchunghoso,
@@ -184,6 +138,9 @@ export default {
     hoSoLienThongItems: [],
     currentHoSoLienThong: '',
     lienthongPage: 1,
+    dialogDetailDossier: false,
+    dossierActions: [],
+    dossierLienThong: '',
     headers: [
       {
         text: 'STT',
@@ -206,16 +163,51 @@ export default {
         sortable: false
       },
       {
-        text: 'Ngày gửi liên thông',
+        text: 'Ngày hẹn trả',
+        align: 'center',
+        sortable: false
+      }
+    ],
+    headersTienTrinh: [
+      {
+        text: '#',
         align: 'center',
         sortable: false
       },
       {
-        text: 'Trạng thái',
+        text: 'Vai trò',
         align: 'center',
-        sortable: false
+        sortable: false,
+        class: 'vaitro_column'
+      }, {
+        text: 'Công việc',
+        align: 'center',
+        sortable: false,
+        class: 'congviec_column'
+      }, 
+      {
+        text: 'Thời hạn quy định',
+        align: 'center',
+        sortable: false,
+        class: 'thoihanquydinh_column'
+      }, 
+      {
+        text: 'Ngày bắt đầu',
+        align: 'center',
+        sortable: false,
+        class: 'ngaybatdau_column'
+      }, {
+        text: 'Người thực hiện',
+        align: 'center',
+        sortable: false,
+        class: 'nguoithuchien_column'
+      }, {
+        text: 'Kết quả',
+        align: 'center',
+        sortable: false,
+        class: 'ketqua_column'
       }
-    ]
+    ],
   }),
   computed: {
   },
@@ -240,18 +232,40 @@ export default {
       })
     },
     viewDetail (item) {
-      var vm = this
-      console.log('item', item)
-      vm.detailView = true
-      vm.currentHoSoLienThong = item
-      setTimeout(function () {
-        if (vm.$refs.thanhphanhoso1) {
-          vm.$refs.thanhphanhoso1.initData(item)
+      let vm = this
+      vm.dossierLienThong = item
+      vm.loadDossierActions(item)
+      vm.dialogDetailDossier = true
+    },
+    loadDossierActions (dossier) {
+      let vm = this
+      let config = {
+        headers: {
+          groupId: dossier.groupId
+        },
+        params: {}
+      }
+      let url = '/o/rest/v2/dossiers/' + dossier.dossierId + '/sequences'
+      axios.get(url, config).then(function (response) {
+        if (response.data) {
+          let resultTemp = response.data.data
+          for (let i = 0; i < resultTemp.length; i++) {
+            if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+              if (!Array.isArray(resultTemp[i]['actions'])) {
+                let arrActionsTemp = []
+                arrActionsTemp.push(resultTemp[i]['actions'])
+                resultTemp[i]['actions'] = arrActionsTemp
+              }
+            }
+          }
+          vm.dossierActions = resultTemp
+        } else {
+          vm.dossierActions = []
         }
-        if (vm.$refs.thanhphanhoso2) {
-          vm.$refs.thanhphanhoso2.initData(item)
-        }
-      }, 300)
+        
+      }).catch(function (xhr) {
+        vm.dossierActions = []
+      })
     },
     goBack () {
       window.history.back()
@@ -260,8 +274,15 @@ export default {
   filters: {
     dateTimeView (arg) {
       if (arg) {
-        let value = new Date(arg)
-        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()}  ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+        let value = new Date(isNaN(arg) ? arg : Number(arg))
+        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+      } else {
+        return ''
+      }
+    },
+    getThoiHanQuyDinh (val) {
+      if (val > 0) {
+        return val + ' ngày'
       } else {
         return ''
       }

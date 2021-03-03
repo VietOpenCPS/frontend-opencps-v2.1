@@ -27,13 +27,16 @@
 <script>
 
 import Vue from 'vue'
+import axios from 'axios'
 export default {
   props: ['index'],
   components: {
   },
   data: () => ({
     govAgencys: [],
-    btnLoading: false
+    btnLoading: false,
+    donViDanhGia: '',
+    isDVC: false
   }),
   computed: {
     loading () {
@@ -41,14 +44,91 @@ export default {
     }
   },
   created () {
-    var vm = this
-    console.log('landing---------')
+    let vm = this
+    try {
+      if (donViDanhGiaConfig) {
+        vm.donViDanhGia = donViDanhGiaConfig.split(',')
+      }
+    } catch (error) {
+    }
+    try {
+      if (isDVC) {
+        vm.isDVC = isDVC
+      }
+    } catch (error) {
+    }
     vm.$nextTick(function () {
-      vm.$store.dispatch('loadGovAgencys', {}).then(result => {
-        vm.govAgencys = result
-        console.log(vm.govAgencys)
-      }).catch(xhr => {
-      })
+      let viewListEmployee = function (item) {
+        vm.$router.push({
+          path: '/danh-gia-can-bo/' + item.itemCode,
+          query: {
+            itemName: item.itemName
+          }
+        })
+      }
+      if (vm.isDVC) {
+        vm.$router.push({
+          path: '/danh-gia-can-bo/dvc',
+          query: {
+          }
+        })
+      } else {
+        vm.$store.dispatch('loadGovAgencys', {}).then(result => {
+          let agencyList = result
+          let agencyLength = agencyList.length
+          if (vm.donViDanhGia) {
+            vm.govAgencys = []
+            for (let i = 0; i < agencyLength; i++) {
+              let exits = vm.donViDanhGia.filter(function (item) {
+                return item == agencyList[i]['itemCode']
+              })
+              if (exits && exits.length > 0) {
+                vm.govAgencys.push(agencyList[i])
+              }
+            }
+          } else {
+            if (agencyLength > 1) {
+              let count = 0
+              for (let i = 0; i < agencyLength; i++) {
+                let param = {
+                  headers: {
+                    groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+                  },
+                  params: {
+                    start: 0,
+                    end: 1,
+                    jobposCode: 'DANHGIA_' + agencyList[i].itemCode
+                  }
+                }
+                axios.get('/o/rest/v2/employees/publish/' + agencyList[i].itemCode, param).then(result => {
+                  count += 1
+                  if (result.data.data) {
+                    vm.govAgencys.push(agencyList[i])
+                  }
+                  if (count === agencyLength) {
+                    if (vm.govAgencys.length === 1) {
+                      viewListEmployee(vm.govAgencys[0])
+                    }
+                  }
+                }).catch(xhr => {
+                  count += 1
+                  if (count === agencyLength) {
+                    if (vm.govAgencys.length === 1) {
+                      viewListEmployee(vm.govAgencys[0])
+                    }
+                  }
+                })
+              }
+            } else if (agencyLength === 1) {
+              vm.govAgencys = agencyList
+              viewListEmployee(vm.govAgencys[0])
+            }
+          }
+          
+        }).catch(xhr => {
+        })
+      }
+      
     })
   },
   watch: {
@@ -56,7 +136,7 @@ export default {
   methods: {
     viewListEmployee (item) {
      this.$router.push({
-        path: '/danh-sach-can-bo/' + item.itemCode,
+        path: '/danh-gia-can-bo/' + item.itemCode,
         query: {
           itemName: item.itemName
         }

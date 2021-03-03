@@ -2,9 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
-import support from './support.json'
-import { stat } from 'fs'
-// 
 
 Vue.use(toastr)
 Vue.use(Vuex)
@@ -14,8 +11,9 @@ export const store = new Vuex.Store({
     initData: {},
     loading: false,
     index: 0,
-    endPointApi: '/o/rest/v2'
-    // endPointApi: 'http://127.0.0.1:8081/api'
+    endPointApi: '/o/rest/v2',
+    // endPointApi: 'http://127.0.0.1:8081/api',
+    employeeSelected: ''
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -40,7 +38,6 @@ export const store = new Vuex.Store({
     },
     loadVoting ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
@@ -49,14 +46,59 @@ export const store = new Vuex.Store({
           }
           axios.get(state.endPointApi + '/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
             if (result.data) {
-              resolve(result.data.data)
+              resolve(result.data)
             } else {
               resolve([])
             }
-            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            // commit('setLoading', false)
+          })
+        })
+      })
+    },
+    loadVotingMotcua ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/votings/' + data.className + '/' + data.classPk)
+          dataPost.append('serverCode', 'SERVER_' + data.itemCode)
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    loadImageEmployeeProxy ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/o/v1/opencps/users/avatar/org.opencps.usermgt.model.Employee/' + filter['employeeId'])
+          dataPost.append('serverCode', 'SERVER_' + filter.itemCode)
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+            let seriable = response.data
+            resolve(seriable)
+          }).catch(xhr => {
+            reject(xhr)
           })
         })
       })
@@ -80,34 +122,35 @@ export const store = new Vuex.Store({
     },
     loadGovAgencys ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
               groupId: state.initData.groupId
             }
           }
-          axios.get(state.endPointApi + '/dictcollections/GOVERNMENT_AGENCY' + '/dictitems', param).then(result => {
+          axios.get(state.endPointApi + '/dictcollections/GOVERNMENT_AGENCY/dictitems?sort=siblingSearch', param).then(result => {
             if (result.data) {
               resolve(result.data.data)
             } else {
               resolve([])
             }
-            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            // commit('setLoading', false)
           })
         })
       })
     },
     loadEmployees ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              jobposCode: 'DANHGIA_' + data.itemCode,
+              start: data.start,
+              end: data.end
             }
           }
           axios.get(state.endPointApi + '/employees/publish/' + data.itemCode, param).then(result => {
@@ -116,16 +159,91 @@ export const store = new Vuex.Store({
               if (employees && employees.length > 0) {
                 for (let key in employees) {
                   employees[key].imgSrc = ''
+                  employees[key].score = 0
+                  employees[key].totalVoting = 0
                 }
               }
-              resolve(employees)
+              let dataOutput = [result.data.total, employees]
+              resolve(dataOutput)
             } else {
               resolve([])
             }
-            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            // commit('setLoading', false)
+          })
+        })
+      })
+    },
+    loadEmployeesProxy ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let params = {
+            jobposCode: 'DANHGIA_' + data.itemCode,
+            start: data.start,
+            end: data.end
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/employees/publish/' + data.itemCode)
+          dataPost.append('data', JSON.stringify(params))
+          dataPost.append('serverCode', 'SERVER_' + data.itemCode)
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+            if (result.data) {
+              let employees = result.data.data
+              if (employees && employees.length > 0) {
+                for (let key in employees) {
+                  employees[key].imgSrc = ''
+                  employees[key].score = 0
+                  employees[key].totalVoting = 0
+                }
+              }
+              let dataOutput = [result.data.total, employees]
+              resolve(dataOutput)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    loadEmployeesMotcua ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              start: filter.start,
+              end: filter.end,
+              status: 1
+            }
+          }
+          axios.get(state.endPointApi + '/employees', param).then(result => {
+            if (result.data) {
+              let employees = result.data.data
+              if (employees && employees.length > 0) {
+                for (let key in employees) {
+                  employees[key].imgSrc = ''
+                  employees[key].score = 0
+                  employees[key].totalVoting = 0
+                }
+              }
+              let dataOutput = [result.data.total, employees]
+              resolve(dataOutput)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
           })
         })
       })
@@ -193,7 +311,61 @@ export const store = new Vuex.Store({
           })
         })
       })
-    }
+    },
+    submitVotingProxy ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let params = {
+            selected: data.selected,
+            className: data.className,
+            classPk: data.classPk
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
+          dataPost.append('data', JSON.stringify(params))
+          dataPost.append('serverCode', 'SERVER_' + data.itemCode)
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+            resolve(result.data)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    loadingDataHoSo ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              start: 0,
+              end: 1,
+              dossierNo: filter.dossierNo ? filter.dossierNo : ''
+            }
+          }
+          axios.get(state.endPointApi + '/dossiers', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.hasOwnProperty('data')) {
+              resolve(serializable.data[0])
+            } else {
+              reject(response)
+            }
+            
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
   },
   mutations: {
     setIndex (state, payload) {
@@ -201,6 +373,9 @@ export const store = new Vuex.Store({
     },
     setInitData (state, payload) {
       state.initData = payload
+    },
+    setEmployeeSelected (state, payload) {
+      state.employeeSelected = payload
     }
   },
   getters: {
@@ -209,6 +384,9 @@ export const store = new Vuex.Store({
     },
     index (state) {
       return state.index
+    },
+    employeeSelected (state) {
+      return state.employeeSelected
     }
   }
 })

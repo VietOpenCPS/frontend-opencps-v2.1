@@ -1,79 +1,168 @@
 <template>
   <div>
-    <v-layout row wrap class="mb-3">
-      <v-flex xs12 sm12 class="text-xs-center" style="margin-bottom: 20px;">
-        <h3 v-if="getUser('Administrator')" class="text-xs-center mt-2" style="color:#065694">QUẢN LÝ CÂU HỎI</h3>
-        <h3 v-else class="text-xs-center mt-2" style="color:#065694">HỎI ĐÁP THÔNG TIN</h3>
-      </v-flex>
-      <!-- template cũ -->
-      <!-- <v-flex xs12 sm12>
+    <v-layout row wrap class="mx-2 py-2" id="contentFaq">
+      <v-flex xs12 :class="(!getUser('Administrator') && !getUser('Administrator_data') && !getUser('Administrator_Employee')) ? 'md7' : ''" :style="!isMobile ? 'padding-right: 16px' : 'padding-right: 6px'">
+        <div v-if="!phanAnhKienNghi">
+          <h3 v-if="!getUser('Administrator') && !getUser('Administrator_data') && !getUser('Administrator_Employee')" class="text-bold mb-2" style="color:#034687">
+            <v-btn flat class="ml-0 px-0" :color="questionType === ''? '#0167d3' : ''" @click="changeType('')">CÂU HỎI THƯỜNG GẶP</v-btn>
+            <v-btn flat class="ml-3" :color="questionType === 'FAQ'? '#0167d3' : ''" @click="changeType('FAQ')">TỔNG HỢP HỎI ĐÁP</v-btn>
+          </h3>
+          <h3 v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" class="text-bold mb-3 text-xs-center" style="color:#034687">
+            DANH SÁCH CÂU HỎI
+          </h3>
+          <v-btn v-if="isMobile" @click="drawerMobile = true" small fab dark color="primary" style="position: absolute;right: 0;top: 0;">
+            <v-icon dark>fas fa fa-question</v-icon>
+          </v-btn>
+        </div>
+        
+        <div v-else>
+          <h3 class="text-bold mb-3 text-xs-center" style="color:#034687">
+            PHẢN ÁNH KIẾN NGHỊ
+          </h3>
+          <v-btn v-if="isMobile" @click="drawerMobile = true" small fab dark color="primary" style="position: absolute;right: 0;top: 0;">
+            <v-icon dark>fas fa fa-question</v-icon>
+          </v-btn>
+        </div>
+
         <content-placeholders v-if="loading" class="mt-3">
           <content-placeholders-text :lines="10" />
         </content-placeholders>
-        <v-card v-else>
+        <div v-else>
+          <v-layout wrap class="mt-2 pb-3">
+            <v-flex xs12 sm6 :class="!isMobile ? 'pr-2' : 'pr-0'" v-if="!agencyCodeSiteExits">
+              <v-autocomplete
+                class="select-border"
+                :items="agencyList"
+                v-model="agencyFilterSelected"
+                :placeholder="'Cơ quan tiếp nhận '+ titleData"
+                item-text="itemName"
+                item-value="itemCode"
+                return-object
+                :hide-selected="true"
+                box
+                clearable
+                @change="changeAdministration"
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm6 class="pl-0" v-if="!agencyCodeSiteExits">
+              <v-autocomplete
+                class="select-border"
+                :items="lvttList"
+                v-model="lvttFilterSelected"
+                placeholder="Lĩnh vực thủ tục hành chính"
+                item-text="domainName"
+                item-value="domainCode"
+                return-object
+                :hide-selected="true"
+                box
+                clearable
+                @change="changeLvtt"
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm12 class="selectLvds pl-0">
+              <v-autocomplete
+                class="select-border"
+                :items="lvdsList"
+                v-model="lvdsFilterSelected"
+                placeholder="Lĩnh vực đời sống"
+                item-text="itemName"
+                item-value="itemCode"
+                return-object
+                :hide-selected="true"
+                box
+                clearable
+                @change="changeLvds"
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 :class="agencyCodeSiteExits ? 'sm6 pl-2' : 'sm12 pl-0'">
+              <v-text-field
+                box
+                :placeholder="'Nội dung ' + titleData"
+                v-model="keyword"
+                @keyup.enter="filterKeyword"
+                @click:append="filterKeyword"
+                clearable
+                append-icon="search"
+              ></v-text-field>
+            </v-flex>
+          </v-layout>
           <div v-if="questionList.length > 0">
-            <v-expansion-panel >
-              <v-expansion-panel-content v-for="(itemQuestion, indexQuestion) in questionList"
-              :key="indexQuestion">
-                <v-icon slot="actions" color="primary" style="position:absolute;right:5px;top:10px">$vuetify.icons.expand</v-icon>
-                <div class="ml-3" slot="header" @click="getAnswers(itemQuestion, indexQuestion)" >
-                  <span class="text-bold primary--text">Câu hỏi {{questionPage * 10 - 10 + indexQuestion + 1}}. </span>
-                  <div class="ml-2 mt-2" v-html="itemQuestion.content"></div>
-                  <div v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:50px;top:0">
-                    <v-tooltip top class="mr-1">
-                      <v-btn title="Thêm câu trả lời" class="my-0" icon slot="activator" style="margin-top:-10px!important"
-                       @click="addAnswer($event, itemQuestion, indexQuestion)">
-                        <v-icon color="blue" size="24px">add</v-icon>
-                      </v-btn>
-                      <span>Thêm câu trả lời</span>
-                    </v-tooltip>
-                    <v-checkbox class="mt-1" style="display: inline-block" @click.stop="changePublic(itemQuestion, indexQuestion)"
-                      label="Công khai"
-                      v-model="itemQuestion['publish']"
-                    ></v-checkbox>
-                    <v-tooltip top class="ml-2">
-                      <v-btn icon slot="activator" @click.stop="deleteQuestion(itemQuestion)" style="margin-top:-8px!important">
-                        <v-icon color="red">delete</v-icon>
-                      </v-btn>
-                      <span>Xóa câu hỏi</span>
-                    </v-tooltip>
-                  </div>
+            <v-expansion-panel v-for="(itemQuestion, indexQuestion) in questionList"
+              :key="indexQuestion" class="mb-2" style="border: 1px solid #ddd;border-radius:5px;position:relative;">
+            <!-- <v-expansion-panel v-for="(itemQuestion, indexQuestion) in questionList" :value="[false]" expand class="expansion-pl mb-2"
+              :key="indexQuestion" style="border: 1px solid #ddd;border-radius:5px;position:relative;"
+            > -->
+              <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:25px;top:5px;z-index:1">
+                <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
+                  <v-icon>settings</v-icon>
+                </v-btn>
+                <v-list>
+                  <v-list-tile @click.stop="addAnswer(itemQuestion, indexQuestion)">
+                    <v-list-tile-title><v-icon color="primary" size="16px">notes</v-icon>&nbsp; Chi tiết</v-list-tile-title>
+                  </v-list-tile>
+                  <v-list-tile v-if="!itemQuestion['answered']">
+                    <v-list-tile-title @click.stop="addAnswer(itemQuestion, indexQuestion)">
+                      <v-icon color="blue" size="16px">message</v-icon>&nbsp; Trả lời
+                    </v-list-tile-title>
+                  </v-list-tile>
+                  <v-list-tile v-if="getUser('Administrator') || getUser('Administrator_data')">
+                    <v-list-tile-title @click.stop="changePublic(itemQuestion, indexQuestion)">
+                      <v-icon color="primary" size="16px">{{ itemQuestion.publish === 1 ? 'visibility_off' : 'visibility' }}</v-icon>&nbsp;
+                      {{ itemQuestion.publish === 1 ? 'Bỏ công khai' : 'Công khai' }}
+                    </v-list-tile-title>
+                  </v-list-tile>
+                  <v-list-tile v-if="getUser('Administrator') || getUser('Administrator_data')" @click.stop="deleteQuestion(itemQuestion)">
+                    <v-list-tile-title><v-icon color="red" size="16px">delete</v-icon>&nbsp; Xóa</v-list-tile-title>
+                  </v-list-tile>
+                </v-list>
+              </v-menu>
+              <v-expansion-panel-content :key="indexQuestion" style="border-radius:5px">
+                <v-icon slot="actions" color="primary" style="position:absolute;right:5px;top:10px" @click="getAnswers(itemQuestion, indexQuestion)">$vuetify.icons.expand</v-icon>
+                <div class="ml-2" slot="header" @click="getAnswers(itemQuestion, indexQuestion)">
+                  <span class="text-bold primary--text">Câu hỏi {{questionPage * 20 - 20 + indexQuestion + 1}}: </span>
+                  <div class="primary--text" v-html="String(itemQuestion.content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
                 </div>
-                <div v-if="loadingAnswer">
-                  <content-placeholders v-if="loading" class="mt-3">
-                    <content-placeholders-text :lines="10" />
+                <div v-if="itemQuestion['loading']">
+                  <content-placeholders class="mt-3">
+                    <content-placeholders-text :lines="3" />
                   </content-placeholders>
                 </div>
                 <div v-else>
-                  <v-card flat v-if="answerList.length > 0" style="background-color:#e9e9e945">
-                    <div class="ml-3 py-1">
-                      <i class="green--text text-bold">Trả lời: </i>
+                  <v-card flat v-if="itemQuestion['answers'].length > 0">
+                    <div class="ml-2 py-1">
+                      <span class="green--text text-bold">Trả lời: </span>
                     </div>
-                    <v-card-text class="my-0 py-0">
-                      <div>
-                        <div
-                          class="mb-2 px-2"
-                          style="border:1px solid #dedede;border-radius:3px"
-                          v-for="(itemAnswer, indexAnswer) in answerList"
-                          :key="indexAnswer"
-                        >
-                          <div>
-                            <div style="position:relative">
-                              <span class="text-bold">Câu trả lời {{ indexAnswer + 1}}. </span>
-                              <div class="ml-2 mt-2" v-html="itemAnswer.content"></div>
-                              <div v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:10px;top:0">
-                                <v-tooltip top class="mr-2">
-                                  <v-btn slot="activator" icon ripple @click="deleteAnswer(itemAnswer)" style="margin-top:-3px!important">
-                                    <v-icon color="red lighten-1">delete</v-icon>
-                                  </v-btn>
-                                  <span>Xóa</span>
-                                </v-tooltip>
-                                <v-checkbox class="mt-1" style="display: inline-block" @click.stop="changePublicAnswer(itemAnswer, indexAnswer)"
-                                  label="Công khai"
-                                  v-model="itemAnswer['publish']"
-                                ></v-checkbox>
-                              </div>
-                            </div>
+                    <v-card-text class="mx-2 my-0 py-0">
+                      <div
+                        class="mb-2"
+                        v-for="(itemAnswer, indexAnswer) in itemQuestion['answers']"
+                        :key="indexAnswer"
+                      >
+                        <div>
+                          <div style="position:relative">
+                            <div class="" v-html="itemAnswer.content"></div>
+                            <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:18px;top:-15px">
+                              <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
+                                <v-icon>settings</v-icon>
+                              </v-btn>
+                              <v-list>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="changePublicAnswer(itemAnswer, indexAnswer)">
+                                    <v-icon color="primary" size="16px">{{ itemAnswer.publish === 1 ? 'visibility_off' : 'visibility' }}</v-icon>&nbsp;
+                                    {{ itemAnswer.publish === 1 ? 'Bỏ công khai' : 'Công khai' }}
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="editAnswer(itemAnswer, indexAnswer, itemQuestion, indexQuestion)">
+                                    <v-icon color="primary" size="16px">edit</v-icon>&nbsp;
+                                    Sửa câu trả lời
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile @click.stop="deleteAnswer(itemAnswer, itemQuestion, indexQuestion)">
+                                  <v-list-tile-title><v-list-tile-title><v-icon color="red" size="16px">delete</v-icon>&nbsp; Xóa</v-list-tile-title>Xóa</v-list-tile-title>
+                                </v-list-tile>
+                              </v-list>
+                            </v-menu>
                           </div>
                         </div>
                       </div>
@@ -85,230 +174,380 @@
                     </v-alert>
                   </div>
                 </div>
-                
-                <div class="mx-2" v-if="questionSelected === indexQuestion">
-                  <div class="mx-3">
-                    <span><v-icon class="blue--text">contact_support</v-icon> </span>
-                    <span class="text-bold primary--text">Thêm câu trả lời:</span>
-                  </div>
-                  <div class="px-3 pt-3">
-                    <v-flex xs12 sm12 style="margin:0 auto">
-                      <vue-editor v-model="contentAnswer" :editorToolbar="customToolbar"></vue-editor>
-                    </v-flex>
-                    <div>
-                      <v-checkbox class="mt-0"
-                        label="Công khai"
-                        v-model="publishAnswer"
-                      ></v-checkbox>
-                    </div>
-                    <div class="text-xs-center my-2">
-                      <v-btn color="primary"
-                        :loading="loading"
-                        :disabled="loading"
-                        @click="submitAddAnswer(itemQuestion, indexQuestion)"
-                      >
-                        <v-icon>how_to_reg</v-icon>&nbsp;
-                        Gửi câu trả lời
-                      </v-btn>
-                      <v-btn color="primary"
-                        @click="questionSelected = ''"
-                      >
-                        <v-icon>clear</v-icon>&nbsp;
-                        Hủy
-                      </v-btn>
-                    </div>
-                  </div>
-                </div>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
-          <div class="px-3 py-2" v-else>
+          <div class="px-0 py-2" v-else>
             <v-alert outline color="warning" icon="priority_high" :value="true">
-              Không có câu hỏi nào
+              Không có {{titleData}} nào
             </v-alert>
           </div>
-        </v-card>
-        <div v-if="totalQuestion > 0" class="text-xs-right layout wrap mt-2" style="position: relative;">
-          <div class="flex pagging-table px-2"> 
+        </div>
+        <div v-if="totalQuestion > 0" class="text-xs-right layout wrap mt-4" style="position: relative;">
+          <div class="flex pagging-table"> 
             <tiny-pagination :total="totalQuestion" :page="questionPage" custom-class="custom-tiny-class" 
               @tiny:change-page="paggingData" ></tiny-pagination> 
           </div>
         </div>
       </v-flex>
-      <v-flex xs12 sm12 class="mx-3 mt-4" v-if="activeAddQuestion">
-        <div id="contentQuestion">
-          <span><v-icon class="blue--text">contact_support</v-icon> </span>
-          <span class="text-bold primary--text">Tạo câu hỏi:</span>
-        </div>
-        <div class="mx-1 my-2">
-          <vue-editor v-model="content" :editorToolbar="customToolbar"></vue-editor>
-        </div>
-        <div class="mx-2">
-          <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3">
-            <v-flex xs12 sm6 class="text-xs-center" style="margin:0 auto">
-              <v-text-field
-                box
-                label="Họ tên"
-                v-model="fullName"
-                :rules="[rules.required]"
-                name="input-10-2"
-                min="6"
-                required
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 class="text-xs-center" style="margin:0 auto">
-              <v-text-field
-                box
-                label="Thư điện tử"
-                v-model="contactEmail"
-                :rules="[rules.required, rules.email]"
-                name="input-10-2"
-                min="6"
-                required
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 v-if="captchaActive" style="margin:0 auto">
-              <captcha ref="captcha"></captcha>
-            </v-flex>
-            <div class="text-xs-center my-2">
-              <v-btn color="primary"
-                :loading="loading"
-                :disabled="loading"
-                @click="submitAddQuestion"
-              >
-                <v-icon>how_to_reg</v-icon>&nbsp;
-                Gửi câu hỏi
-              </v-btn>
-              <v-btn color="primary"
-                @click="cancelAddQuestion"
-              >
-                <v-icon>clear</v-icon>&nbsp;
-                Hủy
-              </v-btn>
+      <v-flex xs12 md5 v-if="!getUser('Administrator') && !getUser('Administrator_data') && !getUser('Administrator_Employee') && !isMobile">
+        <v-card flat style="border: 1px solid #ddd;border-top: 0">
+          <v-flex xs12 style="border-top: 1.5px solid #0053a4;">
+            <div class="head-title" v-if="!phanAnhKienNghi">
+              ĐẶT CÂU HỎI
             </div>
-          </v-form>
-        </div>
-      </v-flex> -->
-      <!-- end -->
-
-      <!-- template mới -->
-      <v-layout justify-center v-if="totalQuestion > 0">
-        <v-flex xs12>
-          <v-card flat>
-            <v-container fluid grid-list-md>
-              <v-layout row wrap>
-                <v-flex
-                  v-for="(itemQuestion, indexQuestion) in questionList"
-                  xs12 sm4 md3
-                  :key="itemQuestion.questionId"
+            <div class="head-title" v-else>
+              GỬI KIẾN NGHỊ
+            </div>
+          </v-flex>
+          <v-form ref="form1" v-model="valid" lazy-validation>
+            <v-layout wrap class="px-2 mt-2 pb-3">
+              <v-flex xs12>
+                <div class="mb-1">Cơ quan tiếp nhận <span style="color:red"></span></div>
+                <v-autocomplete
+                  class="select-border"
+                  :items="agencyList"
+                  v-model="agencySelected"
+                  :placeholder="'Chọn cơ quan tiếp nhận ' + titleData"
+                  item-text="itemName"
+                  item-value="itemCode"
+                  return-object
+                  :hide-selected="true"
+                  box
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 class="selectLvtt" style="display: none">
+                <div class="mb-1">Lĩnh vực thủ tục hành chính <span style="color:red"></span></div>
+                <v-autocomplete
+                  class="select-border"
+                  :items="lvttList"
+                  v-model="lvttSelectAdd"
+                  placeholder="Chọn lĩnh vực"
+                  item-text="domainName"
+                  item-value="domainCode"
+                  return-object
+                  :hide-selected="true"
+                  box
+                  clearable
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 class="selectLvds">
+                <div class="mb-1">Lĩnh vực đời sống <span style="color:red"></span></div>
+                <v-autocomplete
+                  class="select-border"
+                  :items="lvdsList"
+                  v-model="lvdsSelected"
+                  placeholder="Chọn lĩnh vực đời sống"
+                  item-text="itemName"
+                  item-value="itemCode"
+                  return-object
+                  :hide-selected="true"
+                  box
+                  clearable
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12>
+                <div class="mb-1">Họ và tên người gửi <span style="color:red">(*)</span></div>
+                <v-text-field
+                  box
+                  placeholder="Ghi rõ họ tên"
+                  v-model="fullName"
+                  :rules="[rules.required, rules.syntaxError]"
+                  min="6"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="">
+                <div class="mb-1">Thư điện tử <span style="color:red">(*)</span></div>
+                <v-text-field
+                  placeholder="Nhập thư điện tử"
+                  box
+                  v-model="contactEmail"
+                  :rules="contactEmail ? [rules.email] : [rules.required]"
+                  required
+                  name="input-10-2"
+                  min="6"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="">
+                <div class="mb-1">Số điện thoại <span style="color:red">(*)</span></div>
+                <v-text-field
+                  placeholder="Nhập số điện thoại"
+                  box
+                  v-model="contactTelNo"
+                  :rules="contactTelNo ? [rules.telNo] : [rules.required]"
+                  required
+                  name="input-10-2"
+                  min="6"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12>
+                <div class="mb-1">Địa chỉ</div>
+                <v-text-field
+                  box
+                  placeholder="Nhập địa chỉ"
+                  v-model="address"
+                  :rules="[rules.syntaxError]"
+                ></v-text-field>
+              </v-flex>
+              <!-- <v-flex xs12>
+                <div class="mb-1">Tiêu đề</div>
+                <v-text-field
+                  box
+                  placeholder="Nhập tiêu đề"
+                  v-model="titleQuestion"
+                ></v-text-field>
+              </v-flex> -->
+              <v-flex xs12>
+                <div class="mb-1">Nội dung {{titleData}} <span style="color:red">(*)</span></div>
+                <v-textarea
+                  box
+                  row="5"
+                  :placeholder="'Nhập nội dung ' + titleData"
+                  v-model="content"
+                  :rules="[rules.required, rules.syntaxError]"
+                  required
+                ></v-textarea>
+              </v-flex>
+              <v-flex xs12 style="margin:0 auto">
+                <captcha ref="captcha"></captcha>
+              </v-flex>
+              <v-flex xs12>
+                <v-btn color="primary"
+                  :loading="loading"
+                  :disabled="loading"
+                  @click="submitAddQuestion"
                 >
-                  <v-card style="cursor:pointer" flat color="#1a571b21" @click="viewDetail(itemQuestion)">
-                    <v-flex class="white--text py-3"  style="background:#2196f3;font-size:12px">
-                      <span class="text-bold">{{itemQuestion.fullname}}</span>
-                      <span class="right">{{splitDate(itemQuestion.createDate)}}</span>
-                    </v-flex>
-                    <v-divider light></v-divider>
-                    <v-card-text class="py-1 px-2 mb-2" style="height:150px;">
-                      <p class="content-question" v-html="itemQuestion.content"></p>
-                    </v-card-text>
-                    <v-divider light></v-divider>
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-tooltip top>
-                        <v-btn icon slot="activator" @click="addAnswer(itemQuestion)">
-                          <v-icon color="green" size="22px">announcement</v-icon>
-                        </v-btn>
-                        <span>Trả lời</span>
-                      </v-tooltip>
-                      <v-tooltip top class="ml-1" v-if="getUser('Administrator')">
-                        <v-btn icon slot="activator" @click.stop="changePublic(itemQuestion, indexQuestion)">
-                          <v-icon v-if="itemQuestion.publish === 1" color="blue" size="22px">visibility</v-icon>
-                          <v-icon v-else color="dark" size="22px">visibility_off</v-icon>
-                        </v-btn>
-                        <span v-if="itemQuestion.publish === 1">Bỏ công khai</span>
-                        <span v-else>Công khai</span>
-                      </v-tooltip>
-                      <v-tooltip top class="ml-1" v-if="getUser('Administrator')">
-                        <v-btn icon slot="activator" @click.stop="deleteQuestion(itemQuestion)">
-                          <v-icon color="red" size="22px">delete</v-icon>
-                        </v-btn>
-                        <span>Xóa</span>
-                      </v-tooltip>
-                    </v-card-actions>
-                  </v-card>
-                </v-flex>
-              </v-layout>
-            </v-container>
-            <div v-if="totalQuestion > 10" class="text-xs-right layout wrap px-3 mt-2" style="position: relative;">
-              <div class="flex pagging-table px-2"> 
-                <tiny-pagination :total="totalQuestion" :page="questionPage" custom-class="custom-tiny-class" 
-                  @tiny:change-page="paggingData" ></tiny-pagination> 
-              </div>
-            </div>
-          </v-card>
-        </v-flex>
-      </v-layout>
-      <div class="px-3 py-2" v-else style="width:100%;max-width:960px;margin:0 auto">
-        <v-alert outline color="warning" icon="priority_high" :value="true">
-          Không có câu hỏi nào
-        </v-alert>
-      </div>
-      <v-flex xs12 sm12 class="mx-0 mt-4" v-if="activeAddQuestion">
-        <div id="contentQuestion">
-          <span><v-icon class="blue--text">contact_support</v-icon> </span>
-          <span class="text-bold primary--text">NỘI DUNG CÂU HỎI:</span>
-        </div>
-        <v-card flat class="mx-1 my-2">
-          <vue-editor v-model="content" :editorToolbar="customToolbar"></vue-editor>
-        </v-card>
-        <div class="mx-2">
-          <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3">
-            <v-flex xs12 sm6 class="text-xs-center" style="margin:0 auto">
-              <v-text-field
-                box
-                label="Họ tên"
-                v-model="fullName"
-                :rules="[rules.required]"
-                name="input-10-2"
-                min="6"
-                required
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 class="text-xs-center" style="margin:0 auto">
-              <v-text-field
-                box
-                label="Thư điện tử"
-                v-model="contactEmail"
-                :rules="[rules.required, rules.email]"
-                name="input-10-2"
-                min="6"
-                required
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 v-if="captchaActive" style="margin:0 auto">
-              <captcha ref="captcha"></captcha>
-            </v-flex>
-            <div class="text-xs-center my-2">
-              <v-btn color="primary"
-                :loading="loading"
-                :disabled="loading"
-                @click="submitAddQuestion"
-              >
-                <v-icon>how_to_reg</v-icon>&nbsp;
-                Gửi câu hỏi
-              </v-btn>
-              <v-btn color="primary"
-                @click="cancelAddQuestion"
-              >
-                <v-icon>clear</v-icon>&nbsp;
-                Hủy
-              </v-btn>
-            </div>
+                  Gửi {{titleData}}
+                </v-btn>
+              </v-flex>
+            </v-layout>
           </v-form>
-        </div>
+        </v-card>
       </v-flex>
-      <!-- end -->
     </v-layout>
+    <v-navigation-drawer
+      v-if="isMobile"
+      v-model="drawerMobile"
+      absolute
+      right
+      temporary
+      width="350"
+    >
+      <v-list class="pa-1" style="background-color: #0054a6">
+        <v-list-tile>
+          <v-list-tile-action>
+            <v-btn icon @click.stop="drawerMobile = !drawerMobile">
+              <v-icon class="white--text" >exit_to_app</v-icon>
+            </v-btn>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>
+              <div class="text-xs-center white--text">ĐẶT CÂU HỎI</div>
+            </v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+
+      <v-list class="pt-0" >
+        <v-divider light class="my-0"></v-divider>
+        <v-card flat style="border: 1px solid #ddd;border-top: 0">
+          <v-form ref="form" v-model="valid" lazy-validation>
+            <v-layout wrap class="px-2 mt-2 pb-3">
+              <v-flex xs12>
+                <div class="mb-1">Cơ quan tiếp nhận <span style="color:red"></span></div>
+                <v-autocomplete
+                  class="select-border"
+                  :items="agencyList"
+                  v-model="agencySelected"
+                  :placeholder="'Chọn cơ quan tiếp nhận ' + titleData"
+                  item-text="itemName"
+                  item-value="itemCode"
+                  return-object
+                  :hide-selected="true"
+                  box
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 class="selectLvtt" style="display: none">
+                <div class="mb-1">Lĩnh vực thủ tục hành chính <span style="color:red"></span></div>
+                <v-autocomplete
+                  class="select-border"
+                  :items="lvttList"
+                  v-model="lvttSelectAdd"
+                  placeholder="Chọn lĩnh vực"
+                  item-text="domainName"
+                  item-value="domainCode"
+                  return-object
+                  :hide-selected="true"
+                  box
+                  clearable
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 class="selectLvds">
+                <div class="mb-1">Lĩnh vực đời sống <span style="color:red"></span></div>
+                <v-autocomplete
+                  class="select-border"
+                  :items="lvdsList"
+                  v-model="lvdsSelected"
+                  placeholder="Chọn lĩnh vực đời sống"
+                  item-text="itemName"
+                  item-value="itemCode"
+                  return-object
+                  :hide-selected="true"
+                  box
+                  clearable
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12>
+                <div class="mb-1">Họ và tên người gửi <span style="color:red">(*)</span></div>
+                <v-text-field
+                  box
+                  placeholder="Ghi rõ họ tên"
+                  v-model="fullName"
+                  :rules="[rules.required, rules.syntaxError]"
+                  min="6"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="">
+                <div class="mb-1">Thư điện tử <span style="color:red">(*)</span></div>
+                <v-text-field
+                  placeholder="Nhập thư điện tử"
+                  box
+                  v-model="contactEmail"
+                  :rules="contactEmail ? [rules.email] : [rules.required]"
+                  required
+                  name="input-10-2"
+                  min="6"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="">
+                <div class="mb-1">Số điện thoại <span style="color:red">(*)</span></div>
+                <v-text-field
+                  placeholder="Nhập số điện thoại"
+                  box
+                  v-model="contactTelNo"
+                  :rules="contactTelNo ? [rules.telNo] : [rules.required]"
+                  required
+                  name="input-10-2"
+                  min="6"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12>
+                <div class="mb-1">Địa chỉ</div>
+                <v-text-field
+                  box
+                  placeholder="Nhập địa chỉ"
+                  :rules="[rules.syntaxError]"
+                  v-model="address"
+                ></v-text-field>
+              </v-flex>
+              <!-- <v-flex xs12>
+                <div class="mb-1">Tiêu đề</div>
+                <v-text-field
+                  box
+                  placeholder="Nhập tiêu đề"
+                  v-model="titleQuestion"
+                ></v-text-field>
+              </v-flex> -->
+              <v-flex xs12>
+                <div class="mb-1">Nội dung {{titleData}} <span style="color:red">(*)</span></div>
+                <v-textarea
+                  box
+                  row="5"
+                  :placeholder="'Nhập nội dung ' + titleData"
+                  v-model="content"
+                  :rules="[rules.required]"
+                  required
+                ></v-textarea>
+              </v-flex>
+              <v-flex xs12 style="margin:0 auto">
+                <captcha ref="captcha"></captcha>
+              </v-flex>
+              <v-flex xs12>
+                <v-btn color="primary"
+                  :loading="loading"
+                  :disabled="loading"
+                  @click="submitAddQuestion"
+                >
+                  Gửi {{titleData}}
+                </v-btn>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card>
+      </v-list>
+    </v-navigation-drawer>
+    <v-dialog v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" v-model="dialog_addQuestion" scrollable persistent max-width="1000px">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Thêm mới câu hỏi</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_addQuestion = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-form ref="form" v-model="valid" lazy-validation>
+            <v-layout wrap class="px-2 mt-2 pb-3">
+              <v-flex xs12>
+                <div class="mb-1">Cơ quan tiếp nhận <span style="color:red"></span></div>
+                <v-autocomplete
+                  class="select-border"
+                  :items="agencyList"
+                  v-model="agencySelected"
+                  placeholder="Chọn cơ quan tiếp nhận câu hỏi"
+                  item-text="itemName"
+                  item-value="itemCode"
+                  return-object
+                  :hide-selected="true"
+                  box
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12>
+                <div class="mb-1">Nội dung câu hỏi <span style="color:red">(*)</span></div>
+                <v-textarea
+                  box
+                  row="5"
+                  placeholder="Nhập nội dung câu hỏi"
+                  v-model="contentAddQuestion"
+                  :rules="[rules.required]"
+                  required
+                ></v-textarea>
+              </v-flex>
+              <v-flex xs12>
+                <div class="mb-1">Nội dung trả lời <span style="color:red">(*)</span></div>
+                <v-textarea
+                  box
+                  row="5"
+                  placeholder="Nhập nội dung trả lời"
+                  v-model="contentAnswer"
+                  :rules="[rules.required]"
+                  required
+                ></v-textarea>
+              </v-flex>
+              <v-flex xs12 style="margin:0 auto">
+                <captcha ref="captcha_admin_add"></captcha>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+        <v-card-actions class="mx-3">
+          <v-spacer></v-spacer>
+          <v-btn color="primary"
+            :loading="loading"
+            :disabled="loading"
+            @click="submitAdminAddQuestion"
+          >
+            Tạo câu hỏi
+          </v-btn>
+          <v-btn @click="dialog_addQuestion = false" color="primary">
+            <v-icon>clear</v-icon>&nbsp;
+            Hủy
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -335,25 +574,63 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    phanAnhKienNghi: false,
+    titleData: 'câu hỏi',
+    agencyList: [],
+    lvdsList: [],
+    lvttList: [],
+    dialog_addQuestion: false,
+    agencyCodeSiteExits: '',
+    agencySelected: '',
+    lvdsSelected: '',
+    lvdsFilterSelected: '',
+    lvttFilterSelected: '',
+    agencyFilterSelected: '',
+    keyword: '',
     answerList: [],
     content: '',
+    contentAddQuestion: '',
     contentAnswer: '',
     loadingAnswer: false,
     config: {},
     captchaActive: false,
     valid: false,
     validAnswer: false,
+    address: '',
     contactEmail: '',
+    contactTelNo: '',
+    questionType: '',
     fullName: '',
+    titleQuestion: '',
+    answers: [
+    ],
     questionSelected: '',
     openQuestion: '',
     publishAnswer: false,
+    drawerMobile: null,
     rules: {
       required: (value) => !!value || 'Trường dữ liệu bắt buộc',
       email: (value) => {
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
-      }
+      },
+      telNo: (value) => {
+        // const pattern = /^(([0-9]{0,}))$/
+        const pattern = /^0([1-9]{1}\d{8})$/
+        if (value) {
+          return pattern.test(value) || 'Số điện thoại gồm 10 ký tự 0-9, eg: 0989123456, ...'
+        } else {
+          return []
+        }
+      },
+      syntaxError: (value) => {
+        if (value) {
+          value = String(value).trim()
+          return value.indexOf('</') >= 0 || value.indexOf('<img') >= 0 || value.indexOf('<script') >= 0 ? 'Dữ liệu nhập không hợp lệ' : true
+        } else {
+          return true
+        }  
+      },
     },
     customToolbar: [
       [{ header: [false, 1, 2, 3, 4, 5, 6] }],
@@ -394,22 +671,80 @@ export default {
     },
     totalQuestion () {
       return this.$store.getters.getTotalQuestion
+    },
+    answerDefault () {
+      return this.$store.getters.getAnswerDefault
+    },
+    keywordFilter () {
+      return this.$store.getters.getKeywordFilter
+    },
+    agencyFilter () {
+      return this.$store.getters.getAgencyFilter
+    },
+    lvdsFilter () {
+      return this.$store.getters.getLvdsFilter
+    },
+    lvttFilter () {
+      return this.$store.getters.getLvttFilter
+    },
+    activeCounter () {
+      return this.$store.getters.getCounter
+    },
+    isMobile () {
+      return this.$store.getters.getIsMobile
     }
   },
   created () {
     var vm = this
+    try {
+      vm.phanAnhKienNghi = phanAnhKienNghiPage
+      if (vm.phanAnhKienNghi) {
+        vm.titleData = 'kiến nghị'
+      }
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       var vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
-      if (newQuery.hasOwnProperty('crtQ')) {
-        vm.$store.commit('setActiveAddQuestion', true)
-        setTimeout (function () {
-          let elmnt = document.getElementById("contentQuestion")
-          elmnt.scrollIntoView()
-        }, 300)
+      vm.$store.dispatch('getGovAgency').then(function(result) {
+        // agencyConfig = "govAgencyCode_1, govAgencyCode_2, ..." cấu hình trên fragment 
+        try {
+          if (agencyConfig) {
+            vm.agencyList = []
+            for (let index in result) {
+              if (agencyConfig.split(',').filter(function (item) {
+                return item === result[index]['itemCode']
+              }).length > 0) {
+                vm.agencyList.push(result[index])
+              }
+            }
+          } else {
+            vm.agencyList = result
+          }
+        } catch (error) {
+          vm.agencyList = result
+        }
+      })
+      vm.$store.dispatch('getLvdsList').then(function(result) {
+        let sortDomain = function (domainList) {
+          function compare(a, b) {
+            if (a.itemName < b.itemName)
+              return -1
+            if (a.itemName > b.itemName)
+              return 1
+            return 0
+          }
+          return domainList.sort(compare)
+        }
+        vm.lvdsList = sortDomain(result)
+      })
+      let filter = {
+        agency: ''
       }
-      vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
+      vm.$store.dispatch('getLvttList', filter).then(function(result) {
+        vm.lvttList = result
+      })
     })
   },
   updated () {
@@ -417,11 +752,46 @@ export default {
     vm.$nextTick(function () {
     })
   },
+  mounted () {
+    let vm = this
+    // agencyCodeSite = "govAgencyCode" cấu hình trên fragment 
+    try {
+      vm.agencyCodeSiteExits = agencyCodeSite ? agencyCodeSite : ''
+    } catch (error) {
+    }
+    $('.v-expansion-panel__header').css('background', '#f1f1f1')
+  },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
+    },
+    keywordFilter (val) {
+      let vm = this
+      vm.keyword = val
+    },
+    agencyFilter (val) {
+      let vm = this
+      vm.agencyFilterSelected = val
+      vm.getLinhVucThuTuc()
+    },
+    lvdsFilter (val) {
+      let vm = this
+      vm.lvdsFilterSelected = val
+    },
+    lvttFilter (val) {
+      let vm = this
+      vm.lvttFilterSelected = val
+    },
+    activeAddQuestion (val) {
+      let vm = this
+      vm.dialog_addQuestion = val
+      if (val) {
+        vm.$refs.captcha_admin_add.makeImageCap()
+        vm.$refs.form.reset()
+        vm.$refs.form.resetValidation()
+      }
     }
   },
   methods: {
@@ -432,23 +802,39 @@ export default {
       } else {
         vm.openQuestion = index
       }
-      vm.loadingAnswer = true
-      vm.answerList = []
+      item['loading'] = true
       let filter = {
         questionId: item.questionId
       }
       vm.$store.dispatch('getAnswers', filter).then(function (result) {
-        vm.loadingAnswer = false
-        console.log(result)
+        item['loading'] = false
+        let answers = []
         if (Array.isArray(result)) {
-          vm.answerList = result
+          answers = result
         } else {
-          vm.answerList = [result]
+          answers = [result]
+        }
+        if (result) {
+          vm.questionList[index]['answers'] = answers
+        } else {
+          vm.questionList[index]['answers'] = vm.answers[index] ? vm.answers[index] : []
         }
       }).catch(function (reject) {
-        vm.loadingAnswer = false
-        console.log(reject)
+        item['loading'] = false
+        vm.questionList[index]['answers'] = vm.answers[index] ? vm.answers[index] : []
       })
+    },
+    getLinhVucThuTuc () {
+      let vm = this
+      setTimeout(function () {
+        let agencyCode = vm.agencyFilterSelected ? vm.agencyFilterSelected['itemCode'] : ''
+        let filter = {
+          agency: agencyCode
+        }
+        vm.$store.dispatch('getLvttList', filter).then(function(result) {
+          vm.lvttList = result
+        })
+      }, 200)
     },
     paggingData (config) {
       let vm = this
@@ -466,30 +852,125 @@ export default {
       let vm = this
       if (!vm.$refs.captcha) {
         vm.captchaActive = true
+        toastr.error('Mã captcha không chính xác')
         return
       } else if (vm.content) {
-        console.log('content', vm.content)
-        if (vm.$refs.form.validate()) {
+        if (vm.$refs.form1.validate()) {
           let filter = {
             content: vm.content,
             fullname: vm.fullName,
             email: vm.contactEmail,
+            telNo: vm.contactTelNo,
+            address: vm.address,
             publish: 0,
-            j_captcha_response: vm.$refs.captcha.j_captcha_response
+            j_captcha_response: vm.$refs.captcha.j_captcha_response,
+            agencyCode: vm.agencySelected ? vm.agencySelected['itemCode'] : '',
+            domainCode: vm.lvttSelectAdd ? vm.lvttSelectAdd['domainCode'] : '',
+            domainName: vm.lvttSelectAdd ? vm.lvttSelectAdd['domainName'] : '',
+            subDomainCode: vm.lvdsSelected ? vm.lvdsSelected['itemCode'] : '',
+            subDomainName: vm.lvdsSelected ? vm.lvdsSelected['itemName'] : '',
+            questionType: vm.phanAnhKienNghi ? 'PAKN' : 'FAQ'
           }
           vm.$store.dispatch('addQuestion', filter).then(function (result) {
-            toastr.success('Thêm câu hỏi thành công')
+            toastr.success('Hệ thống đã tiếp nhận ' + vm.titleData + ' của bạn')
+            setTimeout(function() {
+              vm.$refs.captcha.makeImageCap()
+              vm.$refs.form.reset()
+              vm.$refs.form.resetValidation()
+              // 
+              vm.drawerMobile = false
+            }, 200)
             vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
             vm.$store.commit('setActiveAddQuestion', false)
           }).catch(function (reject) {
+            if (reject === 'captcha') {
+              vm.$refs.captcha.makeImageCap()
+            }
             console.log(reject)
           })
         }
       }
     },
-    addAnswer (item) {
+    submitAdminAddQuestion () {
+      let vm = this
+      if (!vm.$refs.captcha_admin_add.j_captcha_response) {
+        vm.captchaActive = true
+        toastr.error('Vui lòng nhập mã captcha')
+        return
+      }
+      if (vm.$refs.form.validate()) {
+        let filter = {
+          content: vm.contentAddQuestion,
+          publish: 1,
+          agencyCode: vm.agencySelected ? vm.agencySelected['itemCode'] : '',
+          j_captcha_response: vm.$refs.captcha_admin_add.j_captcha_response,
+          questionType: ''
+        }
+        vm.$store.dispatch('adminAddQuestion', filter).then(function (result) {
+          let filter = {
+            questionId: result['questionId'],
+            content: vm.contentAnswer,
+            publish: 1
+          }
+          vm.$store.dispatch('addAnswer', filter).then(function (result) {
+            toastr.success('Tạo câu hỏi thành công')
+          }).catch(function (reject) {
+            toastr.error('Chưa thêm được câu trả lời cho câu hỏi vừa tạo, vui lòng thêm câu trả lời')
+          })
+          vm.dialog_addQuestion = false
+          vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
+          vm.$store.commit('setActiveAddQuestion', false)
+        }).catch(function (reject) {
+          toastr.error('Tạo câu hỏi thất bại')
+        })
+      }
+    },
+    changeAdministration () {
+      let vm = this
+      vm.lvttFilterSelected = ''
+      setTimeout (function () {
+        vm.$store.commit('setAgencyFilter', vm.agencyFilterSelected)
+        vm.$store.commit('setLvttFilter', vm.lvttFilterSelected)
+        vm.$store.commit('setQuestionPage', 1)
+        vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
+      }, 200)
+    },
+    changeLvds () {
+      let vm = this
+      setTimeout (function () {
+        vm.$store.commit('setLvdsFilter', vm.lvdsFilterSelected)
+        vm.$store.commit('setQuestionPage', 1)
+        vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
+      }, 200)
+    },
+    changeLvtt () {
+      let vm = this
+      setTimeout (function () {
+        vm.$store.commit('setLvttFilter', vm.lvttFilterSelected)
+        vm.$store.commit('setQuestionPage', 1)
+        vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
+      }, 200)
+    },
+    changeType (val) {
+      let vm = this
+      vm.questionType = val
+      setTimeout (function () {
+        vm.$store.commit('setTypeFilter', val)
+        vm.$store.commit('setQuestionPage', 1)
+        vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
+      }, 200)
+    },
+    filterKeyword () {
+      let vm = this
+      setTimeout (function () {
+        vm.$store.commit('setKeywordFilter', vm.keyword)
+        vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
+      }, 200)
+    },
+    addAnswer (item, index) {
       let vm = this
       vm.$store.commit('setQuestionDetail', item)
+      vm.$store.commit('setIndexQuestion', index)
       vm.$router.push({
         path: '/' + item.questionId
       })
@@ -517,13 +998,14 @@ export default {
     },
     deleteQuestion (item) {
       let vm = this
-      let x = confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')
+      let x = confirm('Bạn có chắc chắn muốn xóa ' + vm.titleData + ' này?')
       if (x) {
         let filter = {
           questionId: item['questionId']
         }
         vm.$store.dispatch('deleteQuestion', filter).then(function (result) {
-          toastr.success('Xóa câu hỏi thành công')
+          toastr.success('Xóa ' + vm.titleData + ' thành công')
+          vm.$store.commit('setCounter', !vm.activeCounter)
           vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
         }).catch(function (reject) {
           console.log(reject)
@@ -536,11 +1018,19 @@ export default {
       vm.$store.commit('setQuestionList', list)
       let filter = {
         questionId: item['questionId'],
-        publish: vm.questionList[index]['publish'],
-        content: vm.questionList[index]['content']
+        publish: vm.questionList[index]['publish'] === 1 ? 0 : 1,
+        content: item['content'],
+        email: item['email'],
+        fullname: item['fullname'],
+        govAgencyCode: item['govAgencyCode'],
+        govAgencyName: item['govAgencyName'],
+        domainCode: item['domainCode'],
+        domainName: item['domainName'],
+        questionType: item['questionType']
       }
       vm.$store.dispatch('putQuestion', filter).then(function (result) {
         toastr.success('Cập nhật thành công')
+        vm.$store.commit('setCounter', !vm.activeCounter)
         if (vm.questionList[index]['publish'] === 1) {
           vm.questionList[index]['publish'] = 0
         } else {
@@ -553,58 +1043,42 @@ export default {
     changePublicAnswer (item, index) {
       let vm = this
       console.log(item, index)
-      if (vm.answerList[index]['publish'] === 1) {
-        vm.answerList[index]['publish'] = 0
-      } else {
-        vm.answerList[index]['publish'] = 1
-      }
-
       let filter = {
         questionId: item['questionId'],
         answerId: item['answerId'],
-        publish: vm.answerList[index]['publish'],
-        content: vm.answerList[index]['content']
+        publish: vm.answerList[index]['publish'] === 1 ? 0 : 1,
+        content: item['content'],
       }
       vm.$store.dispatch('putAnswer', filter).then(function (result) {
         toastr.success('Cập nhật thành công')
-      }).catch(function (reject) {
-        console.log(reject)
-      })
-    },
-    editAnswer (item) {
-      console.log(item)
-    },
-    getAnswerList (item) {
-      let vm = this
-      vm.loadingAnswer = true
-      vm.answerList = []
-      let filter = {
-        questionId: item.questionId
-      }
-      vm.$store.dispatch('getAnswers', filter).then(function (result) {
-        vm.loadingAnswer = false
-        console.log(result)
-        if (Array.isArray(result)) {
-          vm.answerList = result
+        if (vm.answerList[index]['publish'] === 1) {
+          vm.answerList[index]['publish'] = 0
         } else {
-          vm.answerList = [result]
+          vm.answerList[index]['publish'] = 1
         }
       }).catch(function (reject) {
-        vm.loadingAnswer = false
         console.log(reject)
       })
     },
-    deleteAnswer (item) {
+    editAnswer (itemAnswer, indexAnswer, itemQuestion, indexQuestion) {
+      let vm = this
+      vm.$store.commit('setQuestionDetail', itemQuestion)
+      vm.$store.commit('setIndexQuestion', indexQuestion)
+      vm.$router.push({
+        path: '/' + itemQuestion.questionId + '?editAnswer=' + indexAnswer
+      })
+    },
+    deleteAnswer (itemAnswer, itemQuestion, indexQuestion) {
       let vm = this
       let x = confirm('Bạn có chắc chắn xóa câu trả lời này?')
       if (x) {
         let filter = {
-          questionId: item['questionId'],
-          answerId: item['answerId']
+          questionId: itemAnswer['questionId'],
+          answerId: itemAnswer['answerId']
         }
         vm.$store.dispatch('deleteAnswer', filter).then(function (result) {
           toastr.success('Xóa câu trả lời thành công')
-          vm.getAnswerList(item)
+          vm.getAnswers(itemQuestion, indexQuestion)
         }).catch(function (reject) {
           console.log(reject)
         })
@@ -645,7 +1119,7 @@ export default {
   }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
   $font-size: 14px;
   $line-height: 1.5;
   $lines-to-show: 7;

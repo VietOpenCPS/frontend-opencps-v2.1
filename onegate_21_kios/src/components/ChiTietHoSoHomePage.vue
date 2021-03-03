@@ -5,14 +5,14 @@
     </content-placeholders>
     <div v-else>
       <v-layout class="wrap">
-        <v-flex class="pr-2 pb-2">
-          <span class="text-bold">{{dossierDetail.serviceName}}</span>
+        <v-flex class="px-2 py-2">
+          <span class="text-bold">Tên thủ tục: {{dossierDetail.serviceName}}</span>
         </v-flex>
       </v-layout>
       <div class="mt-2">
         <v-tabs
           v-model="active"
-          color="cyan"
+          color="#0a72ba"
           dark
           slider-color="yellow"
         >
@@ -24,40 +24,6 @@
           <v-tab-item key="1">
             <v-card >
               <v-card-text class="px-0 py-0">
-                <!-- <v-expansion-panel expand  class="expansion-pl ext__form">
-                  <v-expansion-panel-content v-bind:value="true">
-                    <div slot="header" class="text-bold">
-                      <div class="background-triangle-small"> I.</div>
-                      Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
-                    </div>
-                    <div v-for="(item, index) in tailieuNop" :key="index" style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;border-top: 1px solid rgb(221, 221, 221)">
-                      <div class="mr-2" style="min-width: 18px; display: flex; min-height: 38px;">
-                        <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
-                        <div class="header__tphs">
-                          {{item.partName}} <span v-if="item.required" style="color: red">&nbsp; (*) </span>
-                          &nbsp;&nbsp;
-                        </div>
-                      </div>
-                    </div>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel expand  class="expansion-pl ext__form">
-                  <v-expansion-panel-content v-bind:value="true">
-                    <div slot="header" class="text-bold">
-                      <div class="background-triangle-small"> II.</div>
-                      Kết quả xử lý
-                    </div>
-                    <div v-for="(item, index) in tailieuKeyQua" :key="index" style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;border-top: 1px solid rgb(221, 221, 221)">
-                      <div class="mr-2" style="min-width: 18px; display: flex; min-height: 38px;">
-                        <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
-                        <div class="header__tphs">
-                          {{item.partName}} <span v-if="item.required" style="color: red">&nbsp; (*) </span>
-                          &nbsp;&nbsp;
-                        </div>
-                      </div>
-                    </div>
-                  </v-expansion-panel-content>
-                </v-expansion-panel> -->
                 <v-layout wrap class="px-2 py-2">
                   <v-flex xs12 sm4 class="pr-3">
                     <div class="xs12 sm12 pb-1">
@@ -77,7 +43,7 @@
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm4>
-                    <div class="xs12 sm12 pb-1">
+                    <div class="xs12 sm12 pb-1" v-if="dossierDetail.online">
                       <span class="pr-2">Ngày gửi: </span>
                       <span class="pl-0 text-bold" v-if="dossierDetail.online"> {{dossierDetail.submitDate}} </span>
                       <span class="pl-0 text-bold" v-else> Một cửa </span>
@@ -155,20 +121,20 @@
           </v-tab-item>
           <v-tab-item key="3">
             <v-card>
-              <v-card-text class="px-0 py-0">
+              <v-card-text class="px-2 py-2">
                 <div>
                   <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" >
                     <div class="text-bold">
                       {{index + 1}}.&nbsp; {{ item.subject }}
                     </div>
-                    <v-radio-group class="ml-3 pt-2" v-model="item.selected" row>
+                    <v-radio-group class="ml-3 pt-2 mt-0" v-model="item.selected" row>
                       <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" ></v-radio>
                     </v-radio-group>
-                    <v-layout wrap class="ml-3" style="margin-top:-10px">
+                    <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
                       <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
                         <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
                       </v-flex>
-                    </v-layout>
+                    </v-layout> -->
                   </div>
                   <div v-if="votingItems.length === 0" class="mx-3">
                     <v-alert outline color="warning" icon="priority_high" :value="true">
@@ -203,9 +169,6 @@
           </v-tab-item>
         </v-tabs>
       </div>
-      <v-btn class="back-btn" @click="goBack" fab color="primary">
-        <v-icon dark>arrow_back</v-icon>
-      </v-btn>
     </div>
   </div>
 </template>
@@ -348,9 +311,9 @@
         let vm = this
         let filter = {
           className: 'dossier',
-          classPK: vm.dossierDetail.dossierId
+          dossierDetail: vm.dossierDetail
         }
-        vm.$store.dispatch('loadVoting', filter).then(function (result) {
+        vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
           vm.votingItems = result
           console.log('votingItems', vm.votingItems)
         }).catch(function (reject) {
@@ -364,6 +327,7 @@
           for (var index in vm.votingItems) {
             vm.votingItems[index]['className'] = 'dossier'
             vm.votingItems[index]['classPk'] = vm.dossierDetail.dossierId
+            vm.votingItems[index]['serverCode'] = 'SERVER_' + vm.dossierDetail['govAgencyCode']
             arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
           }
           Promise.all(arrAction).then(results => {

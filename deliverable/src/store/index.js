@@ -16,6 +16,7 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    userPermission: false,
     groupId: window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0,
     snackbarerror: false,
     snackbarsocket: false,
@@ -30,7 +31,9 @@ export const store = new Vuex.Store({
         'role': ''
       }
     ],
-    user: null,
+    user: {
+      'role': ''
+    },
     socket: {
       isConnected: false,
       message: '',
@@ -41,10 +44,12 @@ export const store = new Vuex.Store({
     // endPointApi: 'http://127.0.0.1:8081/api',
     getDeliverableTypes: [],
     getContentFile: '',
-    getContentFileSimple: []
+    getContentFileSimple: [],
+    changeFormData: '',
+    activeBindFormData: false
   },
   actions: {
-    loadInitResource ({state}) {
+    loadInitResource ({commit, state}) {
       return new Promise((resolve) => {
         if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
           state.initData['groupId'] = window.themeDisplay.getScopeGroupId()
@@ -61,7 +66,21 @@ export const store = new Vuex.Store({
             'userId': 20103
           }
         }
-        resolve(state.initData)
+        if (state['user'].role === '') {
+          store.dispatch('getRoleUser').then(function (result) {
+            state['user'].role = result
+            commit('setInitData', state.initData)
+            resolve(state.initData)
+          }).catch(function (error) {
+            state['user'].role = ['default']
+            commit('setInitData', state.initData)
+            resolve(state.initData)
+            console.log(error)
+          })
+        } else {
+          commit('setInitData', state.initData)
+          resolve(state.initData)
+        }
       })
     },
     downloadServiceFileTemplate ({commit, state}, item) {
@@ -160,7 +179,7 @@ export const store = new Vuex.Store({
       })
     },
     getDeliverableTypes ({ commit, state }) {
-      return new Promise(() => {
+      return new Promise((resolve, reject) => {
         let options = {
           headers: {
             'groupId': state.groupId,
@@ -171,14 +190,16 @@ export const store = new Vuex.Store({
         let body = DeliverableTypes.getDeliverableTypes
         axios.post('/o/v1/opencps/deliverable', body, options).then(function (response) {
           state.getDeliverableTypes = response.data['getDeliverableTypes']
+          resolve(response.data['getDeliverableTypes'])
         }).catch(function () {
           state.getDeliverableTypes = []
           commit('setsnackbarerror', true)
+          reject(state.getDeliverableTypes)
         })
       })
     },
     getContentFile ({ commit, state }, fileEntryId) {
-      return new Promise(() => {
+      return new Promise((resolve, reject) => {
         let options = {
           headers: {
             'groupId': state.groupId,
@@ -186,14 +207,20 @@ export const store = new Vuex.Store({
           }
         }
         axios.get('/o/v1/opencps/fileattach/' + fileEntryId + '/text', options).then(function (response) {
-          state.getContentFile = eval('( ' + response.data + ' )')
+          try {
+            state.getContentFile = eval('( ' + response.data + ' )')
+            resolve(state.getContentFile)
+          } catch (error) {
+            resolve(response.data)
+          }
         }).catch(function () {
           state.getContentFile = ''
+          reject(state.getContentFile)
         })
       })
     },
     getContentFileSimple ({ commit, state }) {
-      return new Promise(() => {
+      return new Promise((resolve, reject) => {
         let options = {
           headers: {
             'groupId': state.groupId,
@@ -204,10 +231,11 @@ export const store = new Vuex.Store({
         let body = AdminConfig.getAdminConfig
         axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
           state.getContentFileSimple = eval('( ' + response.data['getAdminConfig']['detailColumns'] + ' )')
-          console.log('state.getContentFileSimple', state.getContentFileSimple)
+          resolve(state.getContentFileSimple)
         }).catch(function () {
           state.getContentFileSimple = []
           commit('setsnackbarerror', true)
+          reject(state.getContentFileSimple)
         })
       })
     },
@@ -229,6 +257,25 @@ export const store = new Vuex.Store({
         })
       })
     },
+    searchDeliverables ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.groupId
+          },
+          params: {
+            start: filter.page * 15 - 15,
+            end: filter.page * 15,
+            keyword: filter.keyword ? filter.keyword : ''
+          }
+        }
+        axios.get('/o/v1/opencps/deliverable/' + filter['type'], options).then(function (response) {
+          resolve(response.data)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
     getDeliverableById ({ commit, state }, id) {
       return new Promise((resolve, reject) => {
         let options = {
@@ -237,8 +284,10 @@ export const store = new Vuex.Store({
           }
         }
         axios.get('/o/v1/opencps/deliverable/' + id + '/detail', options).then(function (response) {
-          if (response.data['hits']['hits'].length > 0) {
-            resolve(response.data['hits']['hits'][0]['_source'])
+          if (response.data) {
+            response.data.govAgenciesItems = []
+            response.data.applicantIdNoItems = []
+            resolve(response.data)
           } else {
             resolve({})
           }
@@ -251,7 +300,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let files = window.$('#templateupload')[0].files
         let file = files[0]
-        console.log(file)
+        // console.log(file)
         let formData = new FormData()
         formData.append('UploadFiles', file)
         axios.post('/o/v1/opencps/users/upload/opencps_deliverable/org.opencps.deliverable.model.OpenCPSDeliverableFileEntryId/' + data['id'], formData, {
@@ -261,10 +310,10 @@ export const store = new Vuex.Store({
           }
         }).then(function (response) {
           resolve(response.data)
-          console.log('upload file success!')
+          // console.log('upload file success!')
         }).catch(function (xhr) {
           console.log(xhr)
-          toastr.error('Tải file thất bại.')
+          // toastr.error('Tải file thất bại.')
           reject(xhr)
         })
       })
@@ -285,6 +334,49 @@ export const store = new Vuex.Store({
         }).catch(function (error) {
           commit('setsnackbarerror', true)
           reject(error)
+        })
+      })
+    },
+    putFormData ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        let formDataUpdate = new URLSearchParams()
+        formDataUpdate.append('formdata', JSON.stringify(filter['formData']))
+        axios.put('/o/rest/v2/deliverables/' + filter['deliverableId'] + '/formdata', formDataUpdate, param).then(function (response) {
+          resolve(response)
+        }).catch(function(xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    getRoleUser ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/users/login', param).then(function (response) {
+          let serializable = response.data
+          if (serializable && serializable.length > 0) {
+            let roles = []
+            for (let key in serializable) {
+              if (serializable[key]['role']) {
+                roles.push(serializable[key]['role'])
+              }
+            }
+            // console.log('roles', roles)
+            resolve(roles)
+          } else {
+            resolve(['default'])
+          }
+        }).catch(function (error) {
+          console.log(error)
+          reject('default')
         })
       })
     }
@@ -316,6 +408,9 @@ export const store = new Vuex.Store({
     setInitData (state, payload) {
       state.initData = payload
     },
+    setUserPermission (state, payload) {
+      state.userPermission = payload
+    },
     setsnackbarerror (state, payload) {
       state.snackbarerror = payload
     },
@@ -330,9 +425,21 @@ export const store = new Vuex.Store({
     },
     setisConnected (state, payload) {
       state.isConnected = payload
+    },
+    setChangeFormData (state, payload) {
+      state.changeFormData = payload
+    },
+    setActiveBindFormData (state, payload) {
+      state.activeBindFormData = payload
     }
   },
   getters: {
+    getUser (state) {
+      return state.user
+    },
+    getUserPermission (state) {
+      return state.userPermission
+    },
     getsnackbarerror (state) {
       return state.snackbarerror
     },
@@ -357,5 +464,11 @@ export const store = new Vuex.Store({
     getisConnected (state) {
       return state.isConnected
     },
+    getChangeFormData (state) {
+      return state.changeFormData
+    },
+    getActiveBindFormData (state) {
+      return state.activeBindFormData
+    }
   }
 })

@@ -1,6 +1,5 @@
-
-/*
 module.exports = {
+  productionSourceMap: true,
   runtimeCompiler: true,
   configureWebpack: {
     output: {
@@ -11,57 +10,23 @@ module.exports = {
     config.module.rule('images').use('url-loader')
       .loader('file-loader') // replaces the url-loader
       .tap(options => Object.assign(options, {
-        name: 'images/register/[name].[ext]'
+        name: '../../wars/opencps-store/src/main/webapp/js/super_admin_bbat/images/[name].[ext]'
       }))
     config.module.rule('svg').use('file-loader')
       .tap(options => Object.assign(options, {
-        name: 'images/register/[name].[ext]'
+        name: '../../wars/opencps-store/src/main/webapp/js/super_admin_bbat/images/[name].[ext]'
       }))
   },
   css: {
     extract: {
-      filename: 'css/register/[name].css',
-      chunkFilename: 'css/register/[name].css'
+      filename: '../../wars/opencps-store/src/main/webapp/js/super_admin_bbat/css/[name].css',
+      chunkFilename: '../../wars/opencps-store/src/main/webapp/js/super_admin_bbat/css/[name].css'
     }
   },
   configureWebpack: {
     output: {
-      filename: 'js/register/[name].js',
-      chunkFilename: 'js/register/[name].js'
+      filename: '../../wars/opencps-store/src/main/webapp/js/super_admin_bbat/js/[name].js',
+      chunkFilename: '../../wars/opencps-store/src/main/webapp/js/super_admin_bbat/js/[name].js'
     }
   }
 }
-
-*/
-
-module.exports = {
-    runtimeCompiler: true,
-    configureWebpack: {
-      output: {
-        libraryExport: 'default'
-      }
-    },
-    chainWebpack: config => {
-      config.module.rule('images').use('url-loader')
-        .loader('file-loader') // replaces the url-loader
-        .tap(options => Object.assign(options, {
-          name: '../../docs/o/opencps-frontend/super_admin_bbat/images/[name].[ext]'
-        }))
-      config.module.rule('svg').use('file-loader')
-        .tap(options => Object.assign(options, {
-          name: '../../docs/o/opencps-frontend/super_admin_bbat/images/[name].[ext]'
-        }))
-    },
-    css: {
-      extract: {
-        filename: '../../docs/o/opencps-frontend/super_admin_bbat/css/[name].css',
-        chunkFilename: '../../docs/o/opencps-frontend/super_admin_bbat/css/[name].css'
-      }
-    },
-    configureWebpack: {
-      output: {
-        filename: '../../docs/o/opencps-frontend/super_admin_bbat/js/[name].js',
-        chunkFilename: '../../docs/o/opencps-frontend/super_admin_bbat/js/[name].js'
-      }
-    }
-  }
