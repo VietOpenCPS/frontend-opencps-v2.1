@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@chenfengyuan/vue-qrcode": "^1.0.2",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "file-saver": "^2.0.0-rc.4",
     "glyphicons": "^0.2.0",
