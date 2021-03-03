@@ -17,7 +17,7 @@
     "vue-datetime-2": "^0.6.1",
     "vue-simple-progress": "^1.1.0",
     "vue-touch-keyboard": "^0.3.0",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "file-saver": "^2.0.0-rc.4",
     "idempotent-babel-polyfill": "^7.0.0",
     "toastr": "^2.1.4",
