@@ -1109,6 +1109,10 @@ export default {
       vm.notifyConfig = notifyConfig
     } catch (error) {
     }
+    try {
+      vm.fromViaPostalConfig = fromViaPostalConfig
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       let currentQuery = vm.$router.history.current.query
       if (currentQuery.hasOwnProperty('formActionGroup') && currentQuery.formActionGroup) {

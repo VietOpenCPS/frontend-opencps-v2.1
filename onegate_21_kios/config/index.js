@@ -5,8 +5,8 @@ module.exports = {
   build: {
     env: require('./prod.env'),
     index: path.resolve(__dirname, '../dist/index.html'),
-    assetsRoot: path.resolve(__dirname, '../../docs'),
-    assetsSubDirectory: 'o/opencps-frontend/kios',
+    assetsRoot: path.resolve(__dirname, '../../wars/opencps-store'),
+    assetsSubDirectory: 'src/main/webapp/js/kios',
     assetsPublicPath: '/',
     productionSourceMap: true,
     // Gzip off by default as many popular static hosts such as
@@ -25,7 +25,7 @@ module.exports = {
     env: require('./dev.env'),
     port: 1080,
     autoOpenBrowser: true,
-    assetsSubDirectory: 'o/opencps-frontend/kios',
+    assetsSubDirectory: 'src/main/webapp/js/kios',
     assetsPublicPath: '/',
     proxyTable: {},
     // CSS Sourcemaps off by default because relative paths are "buggy"
@@ -36,4 +36,3 @@ module.exports = {
     cssSourceMap: false
   }
 }
-//assetsSubDirectory: 'o/front-end-super-gate',

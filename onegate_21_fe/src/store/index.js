@@ -935,7 +935,7 @@ export const store = new Vuex.Store({
                 }
               }).catch(function (xhr) {
                 toastr.clear()
-                toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+                toastr.error('Tài liệu ' + fileName + ' tải lên không thành công.')
                 count += 1
                 if (count === countFiles) {
                   reject(dataOutPut)

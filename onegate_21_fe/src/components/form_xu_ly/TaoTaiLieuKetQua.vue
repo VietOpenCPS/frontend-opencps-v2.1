@@ -124,7 +124,14 @@
               </content-placeholders>
               <v-layout row wrap v-else>
                 <v-flex :style="esignType === 'plugin' ? 'width: 120px' : 'width: 100px'">
-                  <input
+                  <input v-if="item['multiple']"
+                  type="file"
+                  multiple
+                  style="display: none"
+                  :id="'file' + item.partNo"
+                  @change="onUploadSingleFile($event, item, index)"
+                  >
+                  <input v-else
                   type="file"
                   style="display: none"
                   :id="'file' + item.partNo"
@@ -883,6 +890,14 @@
             // }
           }).catch(function (xhr) {
             vm.progressUploadPart = ''
+            vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
+              vm.dossierFilesItems = result
+              vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, vm.dossierFilesItems)
+              console.log('createFiles', vm.createFiles)
+              // 
+              vm.createFileSigned()
+              // 
+            })
           })
         } else {
           vm.progressUploadPart = ''
