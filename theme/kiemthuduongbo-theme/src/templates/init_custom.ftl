@@ -1,1 +1,0 @@
-<#assign theme_type = theme_display.getThemeSetting('theme_type')/>
