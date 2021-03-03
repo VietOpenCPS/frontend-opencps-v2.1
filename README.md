@@ -13,20 +13,19 @@ Hướng dẫn build + deploy Front-end OpenCPS.
 
 1.	Clone source code trên github tại địa chỉ:  https://github.com/VietOpenCPS/frontend-opencps-v2.1
     Nhánh đang phát triển https://github.com/VietOpenCPS/frontend-opencps-v2.1/tree/bgt
-2.	Install các package, plugin sử dụng với từng module
- 	    npm install
-3.	Build compile file *.js
-        npm run build
+2.	Install các package, plugin sử dụng với từng module:
+    + npm install
+3.	Build compile file *.js:
+    + npm run build
+	- example:
+        + cd ./asked_questions
+        + npm install
+        + npm run build
+    - Thư mục lưu các file *.js cấu hình trong file vue.config.js
 
-	(*) example:
-        cd ./asked_questions
-        npm install
-        npm run build
-    (*)Thư mục lưu các file *.js cấu hình trong file vue.config.js
-
-4.	Build file deploy *.war
-        cd /wars/opencps-store
-        npm i gradle (cài đặt gradle khi chạy lần đầu)
-        gradle build
-	(*) Thư mục chứa file *.war:  wars/opencps-store/build/libs
+4.	Build file deploy *.war:
+    + cd /wars/opencps-store
+    + npm i gradle (cài đặt gradle khi chạy lần đầu)
+    + gradle build
+	- Thư mục chứa file *.war:  wars/opencps-store/build/libs
 
