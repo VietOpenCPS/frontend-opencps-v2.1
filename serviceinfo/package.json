@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@inotom/vue-go-top": "^1.0.2",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "file-saver": "^2.0.0-rc.4",
     "idempotent-babel-polyfill": "^7.0.0",
