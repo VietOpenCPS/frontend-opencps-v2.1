@@ -895,6 +895,193 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDossiers ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            },
+            params: {
+            }
+          }
+          for (let key in filter['data']) {
+            let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
+            if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
+              let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
+              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+                param.params[key] = dateStr
+              } else {
+                if (String(key).indexOf('DateExtend') > 0) {
+                  let keySearch = String(key).replace('Extend', '')
+                  let dateCurrent = new Date()
+                  dateCurrent.setDate(dateCurrent.getDate() + Number(filter['data'][key]))
+                  param.params['from' + keySearch] = dateCurrent.getTime()
+                  param.params['to' + keySearch] = dateCurrent.getTime()
+                } else {
+                  let [day, month, year] = currentVal.split('/')
+                  if (day && month && year) {
+                    let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                    param.params[key] = timeStampDate
+                  } else {
+                    param.params[key] = currentVal
+                  } 
+                }
+              }
+            }
+          }
+          let govAgency = filter['govAgency']
+          let agencyLists = filter['agencyLists']
+          let agencyListsGet = agencyLists.filter(function (item) {
+            return String(item['value']) !== '0'
+          })
+          let requestURL = ''
+          requestURL = filter['api']
+          if (agencyLists.length === 0) {
+            axios.get(requestURL, param).then(function (response) {
+              let serializable = response.data
+              resolve(serializable)
+            }).catch(function (error) {
+              console.log(error)
+              reject(error)
+            })
+          } else if (String(govAgency) === '0' && agencyLists.length > 0) {
+            let promises = []
+            for (let key in agencyListsGet) {
+              if (String(agencyListsGet[key]['value']) !== '0') {
+                let paramCopy = Object.assign({}, param)
+                paramCopy['headers']['groupId'] = agencyListsGet[key]['value']
+                paramCopy['params']['v'] = Math.random() + key
+                
+                promises.push(axios.get(requestURL, {
+                  headers: {
+                    groupId: agencyListsGet[key]['value'],
+                    Accept: 'application/json'
+                  },
+                  params: {
+                    v: Math.random(),
+                    ...param.params
+                  }
+                }))
+              }
+            }
+            axios.all(promises)
+            .then(axios.spread((...args) => {
+              let myObject = []
+              for (let i = 0; i < args.length; i++) {
+                let dataOutput = args[i]['data'].hasOwnProperty('total') ? args[i]['data']['data'] : args[i]['data']
+                if (args[i]['data']['total'] > 0 || (!args[i]['data'].hasOwnProperty('total') && dataOutput)) {
+                  myObject = myObject.concat(dataOutput)
+                } else {
+                  let itemNoData = [
+                    {
+                      govAgencyCode: agencyListsGet[i]['value'],
+                      govAgencyName: agencyListsGet[i]['text']
+                    }
+                  ]
+                  myObject = myObject.concat(itemNoData)
+                }
+              }
+              if (myObject.length > 0) {
+                resolve(myObject)
+              } else {
+                resolve(null)
+              }
+            }))
+          } else if (String(govAgency) !== '0' && String(govAgency) !== '' && agencyLists.length > 0) {
+            if (String(govAgency) === 'all') {
+              param['headers']['groupId'] = 0
+            } else {
+              param['headers']['groupId'] = govAgency
+            }
+            param['params']['v'] = Math.random()
+            axios.get(requestURL, param).then(function (response) {
+              let serializable = response.data
+              if (serializable.data) {
+                resolve(serializable)
+              } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
+                resolve(serializable)
+              } else {
+                resolve(null)
+              }
+            }).catch(function (error) {
+              console.log(error)
+              reject(error)
+            })
+          } else if (String(govAgency) === '' && agencyLists.length > 0) {
+            let getAllUrlParams = function(arr) {
+              let obj = {}
+              for (var i = 0; i < arr.length; i++) {
+                let a = arr[i].split('=')
+                let paramName = a[0]
+                let paramValue = typeof (a[1]) === 'undefined' ? true : a[1]
+                paramName = paramName.toLowerCase()
+                if (typeof paramValue === 'string') paramValue = paramValue.toLowerCase()
+                if (paramName.match(/\[(\d+)?\]$/)) {
+                  var key = paramName.replace(/\[(\d+)?\]/, '')
+                  if (!obj[key]) obj[key] = []
+                  if (paramName.match(/\[\d+\]$/)) {
+                    var index = /\[(\d+)\]/.exec(paramName)[1]
+                    obj[key][index] = paramValue
+                  } else {
+                    obj[key].push(paramValue)
+                  }
+                } else {
+                  if (!obj[paramName]) {
+                    obj[paramName] = paramValue
+                  } else if (obj[paramName] && typeof obj[paramName] === 'string'){
+                    obj[paramName] = [obj[paramName]]
+                    obj[paramName].push(paramValue)
+                  } else {
+                    obj[paramName].push(paramValue)
+                  }
+                }
+              }
+              return obj
+            }
+            let typeMethod = 'POST'
+            let paramProxy = {
+                headers: {
+                    groupId: window.themeDisplay.getScopeGroupId(),
+                    Token: window.Liferay ? window.Liferay.authToken : ''
+                },
+                params: {}
+            }
+            let dataUpdate = new URLSearchParams()
+            let paramGetProxy = param.params
+            try {
+              let paramApi = getAllUrlParams(filter.api.split('?')[1].split('&'))
+              paramGetProxy = Object.assign(param.params, paramApi)
+            } catch (error) {
+            }
+            
+            dataUpdate.append("method", "GET")
+            dataUpdate.append("url", filter['proxyApi'])
+            dataUpdate.append('data', JSON.stringify(paramGetProxy))
+            axios({
+              method: typeMethod,
+              url: '/o/rest/v2/proxy',
+              headers: paramProxy.headers,
+              params: paramProxy.params,
+              data: dataUpdate
+            }).then(function (response) {
+              let serializable = response.data
+              if (serializable.data) {
+                resolve(serializable)
+              } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
+                resolve(serializable)
+              } else {
+                resolve(null)
+              }
+            }).catch(function (error) {
+              reject(error)
+            })
+          }
+          
+        })
+      })
+    },
     loadDossierActions ({commit, state}, data) {
       let config = {
         headers: {
@@ -1060,6 +1247,209 @@ export const store = new Vuex.Store({
         })
         .catch(function (error) {
           reject(error)
+        })
+      })
+    },
+    createReport ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            },
+            params: {
+            }
+          }
+          for (let key in filter['data']) {
+            let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
+            if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
+              let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
+              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+                param.params[key] = dateStr
+              } else {
+                if (String(key).indexOf('DateExtend') > 0) {
+                  let keySearch = String(key).replace('Extend', '')
+                  let dateCurrent = new Date()
+                  dateCurrent.setDate(dateCurrent.getDate() + Number(filter['data'][key]))
+                  param.params['from' + keySearch] = dateCurrent.getTime()
+                  param.params['to' + keySearch] = dateCurrent.getTime()
+                } else {
+                  let [day, month, year] = currentVal.split('/')
+                  if (day && month && year) {
+                    let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                    param.params[key] = timeStampDate
+                  } else {
+                    param.params[key] = currentVal
+                  }                  
+                }
+              }
+            }
+          }
+          let govAgency = filter['govAgency']
+          let agencyLists = filter['agencyLists']
+          let agencyListsGet = agencyLists.filter(function (item) {
+            return String(item['value']) !== '0'
+          })
+          let requestURL = ''
+          requestURL = filter['api']
+          if (agencyLists.length === 0) {
+            axios.post(requestURL, {}, param).then(function (response) {
+              let serializable = response.data
+              if (serializable.data) {
+                //test
+                if (Array.isArray(serializable.data)) {
+                  resolve(serializable.data)
+                } else {
+                  resolve([serializable.data])
+                }
+              } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
+                resolve(serializable)
+              } else {
+                console.log('docu', filter.document === 'STATISTIC_05')
+                if (filter.document === 'STATISTIC_05') {
+                  resolve([])
+                } else {
+                  resolve(null)
+                }
+              }
+            }).catch(function (error) {
+              console.log(error)
+              reject(error)
+            })
+          } else if (String(govAgency) === '0' && agencyLists.length > 0) {
+            let promises = []
+            for (let key in agencyListsGet) {
+              if (String(agencyListsGet[key]['value']) !== '0') {
+                let paramCopy = Object.assign({}, param)
+                paramCopy['headers']['groupId'] = agencyListsGet[key]['value']
+                paramCopy['params']['v'] = Math.random() + key
+                
+                promises.push(axios.post(requestURL, {}, {
+                  headers: {
+                    groupId: agencyListsGet[key]['value'],
+                    Accept: 'application/json'
+                  },
+                  params: {
+                    v: Math.random(),
+                    ...param.params
+                  }
+                }))
+              }
+            }
+            axios.all(promises)
+            .then(axios.spread((...args) => {
+              let myObject = []
+              for (let i = 0; i < args.length; i++) {
+                let dataOutput = args[i]['data'].hasOwnProperty('total') ? args[i]['data']['data'] : args[i]['data']
+                if (args[i]['data']['total'] > 0 || (!args[i]['data'].hasOwnProperty('total') && dataOutput)) {
+                  myObject = myObject.concat(dataOutput)
+                } else {
+                  let itemNoData = [
+                    {
+                      govAgencyCode: agencyListsGet[i]['value'],
+                      govAgencyName: agencyListsGet[i]['text']
+                    }
+                  ]
+                  myObject = myObject.concat(itemNoData)
+                }
+              }
+              if (myObject.length > 0) {
+                resolve(myObject)
+              } else {
+                resolve(null)
+              }
+            }))
+          } else if (String(govAgency) !== '0' && String(govAgency) !== '' && agencyLists.length > 0) {
+            if (String(govAgency) === 'all') {
+              param['headers']['groupId'] = 0
+            } else {
+              param['headers']['groupId'] = govAgency
+            }
+            param['params']['v'] = Math.random()
+            axios.post(requestURL, {}, param).then(function (response) {
+              let serializable = response.data
+              if (serializable.data) {
+                resolve(serializable.data)
+              } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
+                resolve(serializable)
+              } else {
+                resolve(null)
+              }
+            }).catch(function (error) {
+              console.log(error)
+              reject(error)
+            })
+          } else if (String(govAgency) === '' && agencyLists.length > 0) {
+            let getAllUrlParams = function(arr) {
+              let obj = {}
+              for (var i = 0; i < arr.length; i++) {
+                let a = arr[i].split('=')
+                let paramName = a[0]
+                let paramValue = typeof (a[1]) === 'undefined' ? true : a[1]
+                paramName = paramName.toLowerCase()
+                if (typeof paramValue === 'string') paramValue = paramValue.toLowerCase()
+                if (paramName.match(/\[(\d+)?\]$/)) {
+                  var key = paramName.replace(/\[(\d+)?\]/, '')
+                  if (!obj[key]) obj[key] = []
+                  if (paramName.match(/\[\d+\]$/)) {
+                    var index = /\[(\d+)\]/.exec(paramName)[1]
+                    obj[key][index] = paramValue
+                  } else {
+                    obj[key].push(paramValue)
+                  }
+                } else {
+                  if (!obj[paramName]) {
+                    obj[paramName] = paramValue
+                  } else if (obj[paramName] && typeof obj[paramName] === 'string'){
+                    obj[paramName] = [obj[paramName]]
+                    obj[paramName].push(paramValue)
+                  } else {
+                    obj[paramName].push(paramValue)
+                  }
+                }
+              }
+              return obj
+            }
+            let typeMethod = 'POST'
+            let paramProxy = {
+                headers: {
+                    groupId: window.themeDisplay.getScopeGroupId(),
+                    Token: window.Liferay ? window.Liferay.authToken : ''
+                },
+                params: {}
+            }
+            let dataUpdate = new URLSearchParams()
+            let paramGetProxy = param.params
+            try {
+              let paramApi = getAllUrlParams(filter.api.split('?')[1].split('&'))
+              paramGetProxy = Object.assign(param.params, paramApi)
+            } catch (error) {
+            }
+            
+            dataUpdate.append("method", "GET")
+            dataUpdate.append("url", filter['proxyApi'])
+            dataUpdate.append('data', JSON.stringify(paramGetProxy))
+            axios({
+              method: typeMethod,
+              url: '/o/rest/v2/proxy',
+              headers: paramProxy.headers,
+              params: paramProxy.params,
+              data: dataUpdate
+            }).then(function (response) {
+              let serializable = response.data
+              if (serializable.data) {
+                resolve(serializable.data)
+              } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
+                resolve(serializable)
+              } else {
+                resolve(null)
+              }
+            }).catch(function (error) {
+              reject(error)
+            })
+          }
+          
         })
       })
     },

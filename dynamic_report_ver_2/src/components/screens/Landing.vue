@@ -8,22 +8,6 @@
           <div class="flex xs12 pl-3 text-ellipsis text-bold">
             <v-layout wrap class="chart__report">
               <v-flex class="px-2 text-right">
-                <!--
-                <v-btn flat class="mx-0 my-0" v-if="showConfig" v-on:click.native="doSaveConfig">
-                  <v-icon>settings</v-icon> &nbsp;
-                  Lưu thay đổi
-                </v-btn>
-                <vue-csv-downloader
-                  :data="csvExport"
-                  :fields="fields"
-                  :downloadname="nameReport"
-                >
-                </vue-csv-downloader>
-                -->
-                
-                <!-- <v-btn flat v-if="!itemsReports[index]['filterConfig']['showTable']" class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds" :style="showGuilds ? 'color: #1565c0' : ''">
-                  <v-icon>receipt</v-icon> &nbsp; Hướng dẫn PDF -> Excel
-                </v-btn> -->
                 <v-select v-if="buttonsShow"
                   v-for="(button, btnIndex) in buttons" v-bind:key="btnIndex"
                   :items="button['source']"
@@ -47,22 +31,6 @@
           </div>
         </div>
       </div>
-      <v-flex v-if="hiddenAside" class="xs12" style="
-        background-color: #004b94 !important;
-        height: 36px;
-        padding: 9px 15px;
-        font-weight: 600;
-        color: white;">
-        <span>Đánh giá hài lòng của người sử dụng đối với dịch vụ công trực tuyến mức độ 3 và 4</span>
-        <div class="d-inline-block right" style="margin-top: -5px;">
-          <v-tooltip top>
-            <v-btn icon class="mx-0 my-0" slot="activator" @click="goToThongKe">
-              <v-icon size="20" color="white">assignment</v-icon>
-            </v-btn>
-            <span>Báo cáo tổng hợp</span>
-          </v-tooltip>
-        </div>
-      </v-flex>
       <v-layout row wrap class="filter_menu mt-4">
         <v-flex xs6 sm3 class="px-3 mb-3" v-if="agencyLists.length > 1">
           <v-autocomplete
@@ -149,8 +117,8 @@
           >
           </v-autocomplete>
         </v-flex>
-        <v-flex xs12 sm6 v-if="hiddenAside">
-          <div class="d-inline-block right">
+        <v-flex xs12 sm6 class="px-3 mb-3">
+          <div class="d-inline-block left" v-if="!itemsReports[index]['filterConfig']['version']">
             <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> 
               <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
             </v-btn>
@@ -168,6 +136,11 @@
             </v-btn>
             <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
           </div>
+          <div class="d-inline-block left" v-if="itemsReports[index]['filterConfig']['version']">
+            <v-btn dark color="blue darken-3" v-on:click.native="createReport()"> 
+              <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
+            </v-btn>
+          </div>
         </v-flex>
       </v-layout>
       <v-layout align-start justify-start row wrap class="filter_menu my-3 px-4" v-if="showConfig">
@@ -175,28 +148,59 @@
           <v-checkbox v-if="!reportType.startsWith('STATISTIC')" @change="changeConfig(index)" :label="item.text" v-model="item.selected"></v-checkbox>
         </v-flex>
       </v-layout>
-      <v-layout row wrap class="mx-2 my-2" v-if="!hiddenAside">
-        <v-flex xs12>
-          <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo</v-btn>
-          
-          <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
-            <v-icon>print</v-icon> &nbsp; In báo cáo
-          </v-btn>
-          <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
-            <v-icon size="16px">fas fa fa-file-excel-o</v-icon> &nbsp; Tải xuống Excel
-          </v-btn>
-          <v-btn v-if="!itemsReports[index]['filterConfig']['showTable'] && exportWordReport" dark color="blue darken-3" class="my-0" v-on:click.native="doCreateReport(true, 'word')">
-            <v-icon size="16px">fas fa fa-file-word-o</v-icon> &nbsp; Tải xuống Word
-          </v-btn>
-          <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
-            <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
-          </v-btn>
-          <v-btn v-if="itemsReports[index]['filterConfig']['showHTML']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="viewHTML()">
-            <v-icon>save_alt</v-icon> &nbsp; Xem HTML
-          </v-btn>
-          <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
-        </v-flex>
-      </v-layout>
+      <!-- table báo cáo số liệu tổng hợp -->
+      <div class="mx-3" v-if="isRender && !isShowLoading && itemsReports[index]['filterConfig']['version']">
+        <v-data-table
+          :headers="headerTongHop"
+          :items="listTongHop"
+          hide-actions
+          class="table-landing table-bordered"
+          style="border-left: 1px solid #dedede;"
+        >
+          <template slot="items" slot-scope="props">
+            <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
+              <td class="text-xs-left pt-2" style="min-width: 135px;" @click="viewListHoSo(props.item)" title="Xem danh sách">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.domainName}}</span>
+                </div>
+              </td>
+              <td class="text-xs-center pt-2" @click="viewListHoSo(props.item)" title="Xem danh sách">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <a style="font-weight: bold; color: #008000c7;text-decoration: underline;">
+                    <span>{{props.item.count}}</span>
+                  </a>
+                </div>
+              </td>
+              <td class="text-xs-left">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <v-menu v-for="n in props.item.pages" :key="n" bottom offset-y style="display: inline-block;position:relative !important">
+                    <v-btn small slot="activator" class="on-hover-btn my-1" color="primary" dark style="font-size: 13px !important"> 
+                      Quyển {{n}} &nbsp; <v-icon size="18">arrow_drop_down</v-icon>
+                    </v-btn>
+                    <v-list>
+                      <v-list-tile @click="printPdf(n)">
+                        <v-list-tile-title>In</v-list-tile-title>
+                      </v-list-tile>
+                      <v-list-tile @click="downloadExcel(n)">
+                        <v-list-tile-title>Tải excel</v-list-tile-title>
+                      </v-list-tile>
+                    </v-list>
+                  </v-menu>
+                </div>
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
+      </div>
       <!-- table bao cao -->
       <div>
         <div v-if="!itemsReports[index]['filterConfig']['showTable'] && !showHTML">
@@ -413,7 +417,124 @@
         </v-layout>
       </div>
     </div>
-    
+    <!-- danh sách hồ sơ -->
+    <v-dialog v-model="dialogDossierList" fullscreen hide-overlay transition="dialog-bottom-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Danh sách hồ sơ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogDossierList = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card class="py-0 px-0">
+          <v-layout row wrap v-if="loadingGetDossier">
+            <v-flex xs12 class="text-xs-center" mt-5>
+              <v-progress-circular
+                :size="100"
+                :width="1"
+                color="primary"
+                indeterminate
+              ></v-progress-circular>
+            </v-flex>
+          </v-layout>
+          <div v-else>
+            <v-data-table
+              :headers="headers"
+              :items="dossierList"
+              :pagination.sync="pagination"
+              hide-actions
+              class="table-landing table-bordered"
+            >
+              <template slot="items" slot-scope="props">
+                <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;" @click="viewDetail(props.item)">
+                  <td class="text-xs-center">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span><br>
+                    </div>
+                  </td>
+                  <td class="text-xs-left" style="min-width: 135px;">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>{{props.item.dossierNo}}</span>
+                    </div>
+                  </td>
+                  <td class="text-xs-left">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>{{props.item.dossierName}}</span>
+                    </div>
+                  </td>
+                  <td class="text-xs-left" style="min-width: 135px">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>
+                        <span>{{props.item.applicantName}}</span>
+                      </span>
+                    </div>
+                  </td>
+                  <td class="text-xs-center">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>
+                        <span>{{props.item.receiveDate}}</span>
+                      </span>
+                    </div>
+                  </td>
+                  <td class="text-xs-center">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>
+                        <span>{{props.item.dueDate}}</span>
+                      </span>
+                    </div>
+                  </td>
+                  <td class="text-xs-left">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>
+                        <span>{{props.item.dossierStatusText}}</span>
+                      </span>
+                    </div>
+                  </td>
+                  <td class="text-xs-left">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>
+                        <span>{{props.item.dossierOverdue}}</span>
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </v-data-table>
+            <div class="text-xs-right layout wrap mt-2" style="position: relative;">
+              <div class="flex pagging-table px-2"> 
+                <tiny-pagination :total="pagination.totalItems" :page="pagination.page" custom-class="custom-tiny-class" 
+                  @tiny:change-page="paggingData" ></tiny-pagination> 
+              </div>
+            </div>
+          </div>
+        </v-card>
+      </v-card>
+    </v-dialog>
     <!-- thong tin ho so -->
     <v-dialog v-model="dialogDossierDetail" max-width="1200" transition="fade-transition">
       <v-card>
@@ -534,6 +655,25 @@ export default {
     exportXML: false,
     jsonMapperJson: {},
     userData: '',
+    bookList: [],
+    listTongHop: [],
+    headerTongHop: [
+      {
+        text: 'Lĩnh vực',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Tổng số hồ sơ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'In danh sách/ tải danh sách excel',
+        align: 'center',
+        sortable: false
+      }
+    ],
     headers: [
       {
         text: 'STT',
@@ -578,12 +718,14 @@ export default {
     ],
     pagination: {
       page: 1,
-      rowsPerPage: 15,
+      rowsPerPage: 20,
       totalItems: 0
     },
     tableType: '',
     dossierList: [],
+    currentLimit: 100,
     dossierInfo: '',
+    dialogDossierList: false,
     dialogDossierDetail: false,
     dialogPDF: false,
     dialogPDFLoading: false,
@@ -596,7 +738,8 @@ export default {
     dataRowRenderHtmlTable: [],
     headerRenderHtmlTable: [],
     widthRenderHtmlTable: [],
-    statisticVotingDossiers: false
+    statisticVotingDossiers: false,
+    loadingGetDossier: false
   }),
   computed: {
     itemsReports () {
@@ -2110,6 +2253,97 @@ export default {
         vm.doCreatePDF()
       }
     },
+    createReport () {
+      let vm = this
+      try {
+        vm.headerTongHop[0]['text'] = vm.groupBy.filter(function (item) {
+          return item.key === vm.groupByVal
+        })[0]['label']
+      } catch (error) {
+      }
+      vm.currentLimit = Number(vm.itemsReports[vm.index]['filterConfig']['numberPerPage'])
+      vm.isRender = false
+      vm.isShowLoading = true
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+        vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
+      // build data
+      let filter = {
+        document: vm.reportType,
+        data: vm.data,
+        api: vm.api,
+        proxyApi: vm.proxyApi
+      }
+      let check =  true
+      console.log('groupIdListSelected 555', vm.groupIdListSelected)
+      for (let key in vm.filterGroup) {
+        if(key === vm.groupIdListSelected) {
+          let exits = vm.groupIdList.find(item => item.key === key)
+          filter['govAgency'] = vm.filterGroup[key]
+          filter['agencyLists'] = exits ? exits.value : []
+          check = false
+          break
+        }
+      }
+      if(check) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
+      }
+      vm.pdfBlob = null
+      vm.listTongHop = []
+      vm.$store.dispatch('createReport', filter).then(function (result) {
+        vm.isRender = true
+        vm.isShowLoading = false
+        let dataReport = result
+        dataReport.map(item => {
+          item['pages'] = item.count ? Math.ceil(item.count / vm.currentLimit) : 0
+          return item
+        })
+        vm.listTongHop = dataReport
+      })
+    },
+    viewListHoSo (item) {
+      let vm = this
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['apiLayDanhSach']
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+        vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
+      if (!vm.data[vm.groupByVal]) {
+        vm.data[vm.groupByVal] = item[vm.groupByVal]
+      }
+      // build data
+      let filter = {
+        document: vm.reportType,
+        data: vm.data,
+        api: vm.api,
+        proxyApi: vm.proxyApi
+      }
+      let check =  true
+      console.log('groupIdListSelected 555', vm.groupIdListSelected)
+      for (let key in vm.filterGroup) {
+        if(key === vm.groupIdListSelected) {
+          let exits = vm.groupIdList.find(item => item.key === key)
+          filter['govAgency'] = vm.filterGroup[key]
+          filter['agencyLists'] = exits ? exits.value : []
+          check = false
+          break
+        }
+      }
+      if(check) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
+      }
+      vm.loadingGetDossier = true
+      vm.dialogDossierList = true
+      vm.$store.dispatch('getDossiers', filter).then(function (result) {
+        vm.loadingGetDossier = false
+        vm.dossierList = result.data
+        vm.pagination.totalItems = result.total
+      })
+    },
     sortByKey (array, key) {
       return array.sort(function(a, b) {
         var x = a[key]; var y = b[key];
@@ -2300,6 +2534,9 @@ export default {
     printReport () {
       let vm = this
       vm.dialogPDF = true
+    },
+    printPdf () {
+      let vm = this
     },
     exportExcel () {
       let vm = this

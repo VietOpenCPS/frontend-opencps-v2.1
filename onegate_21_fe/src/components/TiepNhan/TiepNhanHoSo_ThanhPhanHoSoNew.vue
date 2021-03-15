@@ -1255,8 +1255,13 @@ export default {
           let templateNo = item.partNo
           let deliverableType = item.deliverableType ? item.deliverableType : ''
           let token = localStorage.getItem('jwt_token')
+          let dossierNo = vm.thongTinHoSo.dossierNo
+          let submitDate = vm.thongTinHoSo.submitDate
+          let govAgencyCode = vm.thongTinHoSo.govAgencyCode
+          let govAgencyName = vm.thongTinHoSo.govAgencyName
 
-          let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?referenceUid=' + referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) +'&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+          let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?referenceUid=' + referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) +'&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid 
+          + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo + '&dossierNo=' + dossierNo + '&submitDate=' + submitDate + '&govAgencyCode=' + govAgencyCode + '&govAgencyName=' + govAgencyName
           setTimeout(function () {
             document.getElementById('formAlpaca' + item.partNo + vm.id).src = ''
             setTimeout(function () {
@@ -1572,9 +1577,14 @@ export default {
         let deliverableType = item.deliverableType ? item.deliverableType : ''
 
         let token = localStorage.getItem('jwt_token')
+        let dossierNo = vm.thongTinHoSo.dossierNo
+        let submitDate = vm.thongTinHoSo.submitDate
+        let govAgencyCode = vm.thongTinHoSo.govAgencyCode
+        let govAgencyName = vm.thongTinHoSo.govAgencyName
 
         // let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
-        let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?referenceUid=' + referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) +'&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+        let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?referenceUid=' + referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) +'&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid 
+        + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo + '&dossierNo=' + dossierNo + '&submitDate=' + submitDate + '&govAgencyCode=' + govAgencyCode + '&govAgencyName=' + govAgencyName
         setTimeout(function () {
           document.getElementById('formAlpaca' + item.partNo + vm.id).src = urlEmbed
         }, 300)

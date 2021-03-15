@@ -471,6 +471,17 @@ export default {
         if (field) {
           for (var prop in field) {
             if (field[prop].isRequired() && field[prop].getValue() === '') {
+              // 
+              if (field[prop].options.type !== 'select') {
+                let dom = "#"+field[prop].options['id']
+                $(dom).attr("style","border-color: red !important")
+              } else {
+                let dom = "#select2-"+field[prop].options['id']+"-container"
+                $($(dom).parent()).attr("style","border-color: red !important")
+              }
+              document.getElementById(field[prop].options['id']).scrollIntoView();
+              window.scrollBy(0, -100);
+              // 
               toastr.clear()
               toastr.error(field[prop].options.title ? field[prop].options.title + ' là bắt buộc' : field[prop].options['name'] + ' là bắt buộc')
               return
