@@ -931,6 +931,8 @@ export const store = new Vuex.Store({
               }
             }
           }
+          param.params['start'] = filter.start
+          param.params['end'] = filter.end
           let govAgency = filter['govAgency']
           let agencyLists = filter['agencyLists']
           let agencyListsGet = agencyLists.filter(function (item) {
@@ -938,8 +940,9 @@ export const store = new Vuex.Store({
           })
           let requestURL = ''
           requestURL = filter['api']
+          console.log('params999', param.params)
           if (agencyLists.length === 0) {
-            axios.get(requestURL, param).then(function (response) {
+            axios.post(requestURL, {}, param).then(function (response) {
               let serializable = response.data
               resolve(serializable)
             }).catch(function (error) {
@@ -954,7 +957,7 @@ export const store = new Vuex.Store({
                 paramCopy['headers']['groupId'] = agencyListsGet[key]['value']
                 paramCopy['params']['v'] = Math.random() + key
                 
-                promises.push(axios.get(requestURL, {
+                promises.push(axios.post(requestURL, {}, {
                   headers: {
                     groupId: agencyListsGet[key]['value'],
                     Accept: 'application/json'
@@ -996,7 +999,7 @@ export const store = new Vuex.Store({
               param['headers']['groupId'] = govAgency
             }
             param['params']['v'] = Math.random()
-            axios.get(requestURL, param).then(function (response) {
+            axios.post(requestURL, {}, param).then(function (response) {
               let serializable = response.data
               if (serializable.data) {
                 resolve(serializable)

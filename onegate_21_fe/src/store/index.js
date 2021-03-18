@@ -3302,7 +3302,30 @@ export const store = new Vuex.Store({
             let file = window.URL.createObjectURL(serializable)
             resolve(file)
           }).catch(function (error) {
-            console.log(error)
+            toastr.clear()
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    printPayVnpt ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            responseType: 'blob'
+          }
+          let formData = new URLSearchParams()
+          formData.append('dossierId', filter.dossierId)
+          axios.post('/o/rest/v2/postal/downloadInvPDFFkeyNoPay', formData, param).then(function (response) {
+            let serializable = response.data
+            let file = window.URL.createObjectURL(serializable)
+            resolve(file)
+          }).catch(function (error) {
             toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)

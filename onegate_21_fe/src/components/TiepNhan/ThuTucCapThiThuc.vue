@@ -114,13 +114,15 @@
                         solo
                         @keyup.enter="getDataEform()"
                     ></v-text-field>
-                    <v-btn small color="primary" @click="getDataEform()" class="ml-2">Lấy dữ liệu</v-btn>
+                    <v-btn small color="primary" @click="getDataEform()" class="ml-2">
+                        <v-icon>save_alt</v-icon>&nbsp; Lấy dữ liệu
+                    </v-btn>
                 </div>
             </v-flex>
             <v-flex xs12 class="px-2 ">
                 <div style="display:flex; flex-wrap: wrap; align-items: center;">
                     <strong>Thông tin văn bản, quyết định <span class="red--text">*</span> </strong>
-                    <v-btn small color="primary" @click.stop="openDialogThemVanBan()">Thêm văn bản</v-btn>
+                    <v-btn small color="primary" @click.stop="openDialogThemVanBan()"><v-icon>add</v-icon>&nbsp; Thêm văn bản</v-btn>
                 </div>
             </v-flex>
             <v-flex xs12  class="px-2 my-2">
@@ -134,10 +136,10 @@
                 >
                     <template slot="items" slot-scope="props">
                     <tr>
-                        <td>{{props.item.Loai_Cong_Van}}</td>
-                        <td>{{props.item.So_Cong_Van}}</td>
-                        <td>{{props.item.Ngay_Cong_Van}}</td>
-                        <td>{{props.item.Cq_Ca_Nhan_Cong_Van}}</td>
+                        <td class="py-2">{{props.item.Loai_Cong_Van}}</td>
+                        <td class="py-2">{{props.item.So_Cong_Van}}</td>
+                        <td class="py-2">{{props.item.Ngay_Cong_Van}}</td>
+                        <td class="py-2">{{props.item.Cq_Ca_Nhan_Cong_Van}}</td>
                         <td class="text-xs-center">
                             <v-btn flat icon color="primary" @click="openDialogUpdateVanBan(props.index,props.item)">
                                 <v-icon>create</v-icon>
@@ -155,7 +157,7 @@
             <v-flex xs12 sm6  class="px-2 my-2">
                 <div style="display:flex; flex-wrap: wrap; align-items: center;">
                     <strong>Danh sách thành viên đoàn <span class="red--text">*</span></strong>
-                    <v-btn small color="primary" @click.stop="openDialogThemThanhVien()">Thêm thành viên</v-btn>
+                    <v-btn small color="primary" @click.stop="openDialogThemThanhVien()"><v-icon>add</v-icon>&nbsp; Thêm thành viên</v-btn>
                 </div>
             </v-flex>
             <v-flex xs12  class="px-2 my-2">
@@ -168,24 +170,38 @@
                     style="border-left: 0.5px solid #dedede;"
                 >
                     <template slot="items" slot-scope="props">
-                    <tr>
-                        <td>{{props.index + 1}}</td>
-                        <td>{{props.item.ho_ten}}</td>
-                        <td>{{props.item.so_cmt}}</td>
-                        <td>{{props.item.ngay_sinh}}/{{props.item.thang_sinh}}/{{props.item.nam_sinh}}</td>
-                        <td>{{props.item.noi_sinh_text}}</td>
-                        <td>{{props.item.vb_so_hieu_van_ban}} - {{props.item.vb_ngay_ky}} - {{props.item.co_quan_chu_quan_text}}</td>
-                        <td>
-                            <v-btn flat icon color="primary" @click="openDialogUpdateThanhVien(props.index,props.item)">
-                                <v-icon>create</v-icon>
-                            </v-btn>
-                        </td>
-                        <td>
-                            <v-btn flat icon color="#F44336" @click="deleteThanhVien(props.index)">
-                                <v-icon>delete</v-icon>
-                            </v-btn>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td style="width: 50px">
+                                <v-checkbox
+                                    v-model="props.item.kiem_tra"
+                                    primary
+                                    @change="toggleKT(props.index, props.item)"
+                                >
+                                </v-checkbox> 
+                            </td>
+                            <td class="text-xs-center py-2">{{props.index + 1}}</td>
+                            <td class="py-2">{{props.item.Ten}}</td>
+                            <td class="py-2">{{props.item.So_Ho_Chieu}}</td>
+                            <td class="py-2">{{props.item.Ngay_Sinh_F}}</td>
+                            <td class="py-2">
+                                <span v-if="props.item.So_Cv_Den">
+                                    {{props.item.So_Cv_Den}} - {{props.item.Ngay_Cv_Den}} - {{props.item.Co_Quan_De_Nghi_Ten}}
+                                </span>
+                                <span v-else style="color: red">
+                                    Chưa có văn bản quyết định
+                                </span>
+                            </td>
+                            <td class="text-xs-center">
+                                <v-btn flat icon color="primary" @click="openDialogUpdateThanhVien(props.index,props.item)">
+                                    <v-icon>create</v-icon>
+                                </v-btn>
+                            </td>
+                            <td class="text-xs-center">
+                                <v-btn flat icon color="#F44336" @click="deleteThanhVien(props.index)">
+                                    <v-icon>delete</v-icon>
+                                </v-btn>
+                            </td>
+                        </tr>
                     </template>
                 </v-data-table>
             </v-flex>
@@ -206,39 +222,39 @@
                 >
                     <template slot="items" slot-scope="props">
                     <tr v-if="(props.item.dossierPartNo != 'TP01' && props.item.dossierPartNo != 'TP02') && props.item.partType === 1">
-                            <td>          
-                                <v-checkbox
-                                    v-model="selected"
-                                    primary
-                                    hide-details
-                                    :value="props.item"
-                                    @change="toggleCheckbox(props.item, props.index)">
-                                ></v-checkbox>
-                            </td>
-                            <td>{{ props.item.partName }}</td>
-                            <td>                            
-                                <v-select
-                                    v-model="props.item.fileMark"
-                                    :items="fileMarks"
-                                    item-text="name"
-                                    item-value="value"
-                                    solo
-                                    @change="changeThanhPhan(props.item,props.index)"
-                                >
-                                </v-select>
-                            </td>
-                            <td>
-                                <v-text-field
-                                    solo
-                                    v-model="props.item.recordCount"
-                                    @change="changeThanhPhan(props.item,props.index)"
-                                ></v-text-field>
-                            </td>
+                        <td>          
+                            <v-checkbox
+                                v-model="selected"
+                                primary
+                                hide-details
+                                :value="props.item"
+                                @change="toggleCheckbox(props.item, props.index)">
+                            ></v-checkbox>
+                        </td>
+                        <td>{{ props.item.partName }}</td>
+                        <td>                            
+                            <v-select
+                                v-model="props.item.fileMark"
+                                :items="fileMarks"
+                                item-text="name"
+                                item-value="value"
+                                solo
+                                @change="changeThanhPhan(props.item,props.index)"
+                            >
+                            </v-select>
+                        </td>
+                        <td>
+                            <v-text-field
+                                solo
+                                v-model="props.item.recordCount"
+                                @change="changeThanhPhan(props.item,props.index)"
+                            ></v-text-field>
+                        </td>
                     </tr>
                     </template>
                 </v-data-table>
             </v-flex>
-            <v-flex xs12 sm4  class="px-2">
+            <v-flex xs12 sm4 class="px-2 my-2">
                 <label for="">Số người <span class="red--text">*</span></label>
                 <v-text-field
                     v-model="so_nguoi"
@@ -246,166 +262,7 @@
                     type="number"
                 ></v-text-field>
             </v-flex>
-            <v-flex xs12 sm8  class="px-2 ">
-                <label for="">Nước đi <span class="red--text"></span></label>
-                <v-autocomplete
-                    :items="listNuocDi"
-                    v-model="nuoc_di"
-                    item-text="TEN"
-                    item-value="ID"
-                    clearable
-                    hide-no-data
-                    multiple
-
-                    solo
-                ></v-autocomplete>
-            </v-flex>
-            <v-flex xs12 sm4  class="px-2 my-2">
-                <label>Hộ chiếu cũ</label>
-                <div style="display:flex; flex-wrap: wrap; align-items: center;">
-                    <div>
-                        <v-text-field
-                            v-model="ho_chieu_ngoai_giao_cu"
-                            style="width: 100px;"
-                            solo
-                            type="number"
-                            
-                        ></v-text-field>
-                        <label for="">(Ngoại giao)</label>
-                    </div>
-                    <div class="ml-2">
-                        <v-text-field
-                            v-model="ho_chieu_cong_vu_cu"
-                            style="width: 100px;"
-                            solo
-                            type="number"
-                            
-                        ></v-text-field>
-                        <label for="">(Công vụ)</label>
-                    </div>
-                    <div class="ml-2">
-                        <v-text-field
-                            v-model="ho_chieu_pho_thong_cu"
-                            style="width: 100px;"
-                            solo
-                            type="number"
-                        ></v-text-field>
-                        <label for="">(Phổ thông)</label>
-                    </div>
-                </div>
-            </v-flex>
-            <v-flex xs12 sm4  class="px-2 my-2">
-                <label>Hộ chiếu cấp mới</label>
-                <div style="display:flex; flex-wrap: wrap;align-items: center;">
-                    <div>
-                        <v-text-field
-                            v-model="ho_chieu_ngoai_giao_moi"
-                            style="width: 100px;"
-                            solo
-                            type="number"
-                            
-                        ></v-text-field>
-                        <label for="">(Ngoại giao)</label>
-                    </div>
-                    <div class="ml-2">
-                        <v-text-field
-                            v-model="ho_chieu_cong_vu_moi"
-                            style="width: 100px;"
-                            solo
-                            type="number"
-                            
-                        ></v-text-field>
-                        <label for="">(Công vụ)</label>
-                    </div>
-                </div>
-            </v-flex>
-            <v-flex xs12 sm4  class="px-2 my-2">
-                <label>Hộ chiếu</label>
-                <div style="display:flex; flex-wrap: wrap;align-items: center;">
-                    <div>
-                        <v-text-field
-                            v-model="ho_chieu_gia_han"
-                            style="width: 100px;"
-                            solo
-                            type="number"
-                        ></v-text-field>
-                        <label for="">(Gia hạn)</label>
-                    </div>
-                    <div class="ml-2">
-                        <v-text-field
-                            v-model="ho_chieu_hong"
-                            style="width: 100px;"
-                            solo
-                            type="number"
-                        ></v-text-field>  
-                        <label for="">(Hỏng)</label>                         
-                    </div>
-                    <div class="ml-2">
-                        <v-text-field
-                            v-model="ho_chieu_mat"
-                            style="width: 100px;"
-                            solo
-                            type="number"
-                        ></v-text-field>
-                        <label for="">(Mất)</label>
-                    </div>
-
-                </div>
-            </v-flex>
-            <v-flex xs12 class="px-2 my-2">
-                <label>Công hàm</label>
-                <div style="display:flex; flex-wrap: wrap;align-items: center;">
-                    <div>
-                        <v-text-field
-                            v-model="cong_ham_so_nuoc"
-                            style="width: 100px;"
-                            solo
-                            type="number"
-                        ></v-text-field>
-                        <label for="">(Số nước xin)</label>
-                    </div>
-                    <div class="ml-2">
-                        <v-text-field
-                            v-model="cong_ham_so_nguoi"  
-                            style="width: 100px;"
-                            solo
-                            type="number"
-                        ></v-text-field>
-                        <label for="">(Số người xin CH)</label>
-                    </div>
-                    <div class="ml-2">
-                        <v-text-field
-                            v-model="cong_ham_nhap_canh"
-                            style="width: 100px;"
-                            solo
-                            type="number"
-                            
-                        ></v-text-field>
-                        <label for="">(Nhập cảnh)</label>
-                    </div>
-                    <div class="ml-2">
-                        <v-text-field
-                            v-model="cong_ham_qua_canh"
-                            style="width: 100px;"
-                            solo
-                            type="number"
-                            
-                        ></v-text-field>
-                        <label for="">(Quá cảnh)</label>
-                    </div>
-                    <div class="ml-2">
-                        <v-text-field
-                            v-model="cong_ham_schengen"
-                            class="mx-2"
-                            style="width: 100px;"
-                            solo
-                            type="number"
-                            
-                        ></v-text-field>
-                        <label for="">(Schengen)</label>
-                    </div>
-                </div>
-            </v-flex>
+            
             <v-flex xs12 sm4  class="px-2 my-2">
                 <label for="">Dự thu lệ phí</label>
                 <v-text-field
@@ -479,88 +336,93 @@
                     <v-icon>close</v-icon>
                     </v-btn>
                 </v-toolbar>
-                <v-card-text class="form_vuejs">
+                <v-card-text class="form_vuejs px-0 pb-0">
                     <v-form ref="formVanBan" lazy-validation>
                         <v-layout wrap>
-                            <v-flex xs12 class="px-2 mb-2">
-                                <label for="">Cơ quan, cá nhân mời đón</label>
-                                <v-autocomplete
-                                    :items="listCoQuanChuQuan"
-                                    v-model="co_quan_chu_quan"
-                                    item-text="CQTen"
-                                    item-value="CQID"
-                                    clearable
-                                    hide-no-data
-                                    return-object
-                                    :rules="[rules.required]"
-                                    required
-                                    solo               
-                                ></v-autocomplete>
-                            </v-flex>
-                            <v-flex xs12 class="px-2 mb-2">
-                                <label for="">Văn bản đề nghị</label>
-                                <v-autocomplete
-                                    :items="listLoaiVanBan"
-                                    v-model="loaiVanBan"
-                                    item-text="itemName"
-                                    item-value="itemCode"
-                                    clearable
-                                    hide-no-data
-                                    return-object
-                                    solo               
-                                ></v-autocomplete>
-                            </v-flex>
-                            <v-flex xs12 md6 class="px-2 mb-2">
-                                <label for="">Số văn bản</label>
-                                <v-text-field
-                                    v-model="so_van_ban"
-                                    solo
-                                    type="number"
-                                ></v-text-field>
+                            <v-flex class="xs12 px-2">
+                                <v-layout wrap>
+                                    <v-flex xs12 class="px-2 mb-2">
+                                        <label for="">Cơ quan, cá nhân mời đón</label>
+                                        <v-autocomplete
+                                            :items="listCoQuanChuQuan"
+                                            v-model="co_quan_chu_quan"
+                                            item-text="CQTen"
+                                            item-value="CQID"
+                                            clearable
+                                            hide-no-data
+                                            return-object
+                                            :rules="[rules.required]"
+                                            required
+                                            solo               
+                                        ></v-autocomplete>
+                                    </v-flex>
+                                    <v-flex xs12 class="px-2 mb-2">
+                                        <label for="">Văn bản đề nghị</label>
+                                        <v-autocomplete
+                                            :items="listLoaiVanBan"
+                                            v-model="loaiVanBan"
+                                            item-text="itemName"
+                                            item-value="itemCode"
+                                            clearable
+                                            hide-no-data
+                                            return-object
+                                            solo               
+                                        ></v-autocomplete>
+                                    </v-flex>
+                                    <v-flex xs12 md6 class="px-2 mb-2">
+                                        <label for="">Số văn bản</label>
+                                        <v-text-field
+                                            v-model="so_van_ban"
+                                            solo
+                                            type="number"
+                                        ></v-text-field>
+                                    </v-flex>
+                                    
+                                    <v-flex xs12 md6 class="px-2 mb-2">
+                                        <label for="">Ngày gửi</label>
+                                        <v-menu
+                                            ref="menu"
+                                            :close-on-content-click="false"
+                                            v-model="menu"
+                                            transition="scale-transition"
+                                            offset-y
+                                            style="width: 100%;"
+                                        >
+                                            <v-text-field
+                                                slot="activator"
+                                                v-model="vb_ngay_ky"
+                                                persistent-hint
+                                                append-icon="event"
+                                                hint="DD/MM/YYYY"
+                                                @change="changeNgayKy()"
+                                                @input="inputNgayKy()"
+                                                solo
+                                                :rules="[rules.required,rules.checkDatePast]"
+                                                required
+                                            ></v-text-field>
+                                            <v-date-picker v-model="dateNgayKy" no-title @input="menu = false" locale="vi"></v-date-picker>
+                                        </v-menu>
+                                    </v-flex>
+                                    <v-flex xs12 class="px-2 mb-2">
+                                        <label for="">Đề nghị khác</label>
+                                        <v-textarea class="py-0"
+                                            box
+                                            v-model="de_nghi_khac"
+                                            rows="3"
+                                            solo
+                                        ></v-textarea>
+                                    </v-flex>
+                                </v-layout>
                             </v-flex>
                             
-                            <v-flex xs12 md6 class="px-2 mb-2">
-                                <label for="">Ngày gửi</label>
-                                <v-menu
-                                    ref="menu"
-                                    :close-on-content-click="false"
-                                    v-model="menu"
-                                    transition="scale-transition"
-                                    offset-y
-                                    style="width: 100%;"
-                                >
-                                    <v-text-field
-                                        slot="activator"
-                                        v-model="vb_ngay_ky"
-                                        persistent-hint
-                                        append-icon="event"
-                                        hint="DD/MM/YYYY"
-                                        @change="changeNgayKy()"
-                                        @input="inputNgayKy()"
-                                        solo
-                                        :rules="[rules.required,rules.checkDatePast]"
-                                        required
-                                    ></v-text-field>
-                                    <v-date-picker v-model="dateNgayKy" no-title @input="menu = false" locale="vi"></v-date-picker>
-                                </v-menu>
-                            </v-flex>
-                            <v-flex xs12 class="px-2 mb-2">
-                                <label for="">Đề nghị khác</label>
-                                <v-textarea class="py-0"
-                                    box
-                                    v-model="de_nghi_khac"
-                                    rows="3"
-                                    solo
-                                ></v-textarea>
+                            <v-flex xs12 class="mx-0 py-1 mt-2 px-3" style="background: #dededeb3;">
+                                <v-btn small color="red" class="white--text right mr-0" @click="dialogThemVanBan=false"><v-icon>clear</v-icon>&nbsp; Đóng</v-btn>
+                                <v-btn small color="primary" class="right" @click="updateCQCQ()">
+                                    <span v-if="update_cqcq !== 'add'"><v-icon>save</v-icon>&nbsp; Cập nhật</span>
+                                    <span v-else> <v-icon>add</v-icon>&nbsp; Thêm văn bản</span>
+                                </v-btn>
                             </v-flex>
                         </v-layout>
-                        <v-flex xs12 class="mx-2">
-                            <v-btn small color="primary" @click="updateCQCQ()">
-                                <span v-if="update_cqcq !== 'add'">Cập nhật</span>
-                                <span v-else>Thêm văn bản</span>
-                            </v-btn>
-                            <v-btn small color="primary" @click="dialogThemVanBan=false">Đóng</v-btn>
-                        </v-flex>
                     </v-form>
                 </v-card-text>
             </v-card>
@@ -576,11 +438,11 @@
                 <v-toolbar dark color="primary">
                     <v-toolbar-title>Thông tin thành viên</v-toolbar-title>
                     <v-spacer></v-spacer>
-                    <v-btn icon dark @click.native="dialogThemThanhVien = false">
+                    <v-btn icon dark @click.native="closeThemThanhVien">
                     <v-icon>close</v-icon>
                     </v-btn>
                 </v-toolbar>
-                <v-card-text class="form_vuejs mt-0 pt-0 mx-0 px-0">
+                <v-card-text class="form_vuejs mt-0 pt-0 mx-0 px-0 mb-0 pb-0">
                     <div class="">
                         <v-tabs icons-and-text v-model="active" slider-color="primary">
                             <!-- <v-tabs-slider color="primary"></v-tabs-slider> -->
@@ -609,17 +471,31 @@
                                                                 :rules="[rules.required]"
                                                                 required
                                                                 solo
-                                                            ></v-autocomplete>
+                                                            >
+                                                                <template slot="selection" slot-scope="props">
+                                                                    <div>{{ props.item.So_Cong_Van }} - {{ props.item.Ngay_Cong_Van }} - {{props.item.Cq_Ca_Nhan_Cong_Van}}</div>
+                                                                </template>
+                                                                <template slot="item" slot-scope="props">
+                                                                    <div>{{ props.item.So_Cong_Van }} - {{ props.item.Ngay_Cong_Van }} - {{props.item.Cq_Ca_Nhan_Cong_Van}}</div>
+                                                                </template>
+                                                            </v-autocomplete>
                                                         </v-flex>
                                                         <div class="mx-2 my-2 flex xs12" style="font-weight: bold; padding: 4px 10px 4px 10px; background: #645d7f; color: white;">I. Thông tin cá nhân</div>
+                                                        <v-flex class="xs12 mx-2" v-if="saiSoHoChieu">
+                                                            <span style="color: red">(*) </span> <span>Không tìm thấy thông tin hộ chiếu số: <b>{{so_ho_chieu}}</b></span>
+                                                        </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
                                                             <label for="">Số hộ chiếu</label>
                                                             <div style="display:flex; flex-wrap: wrap;align-items: center;">
                                                                 <v-text-field
                                                                     v-model="so_ho_chieu"
+                                                                    :rules="[rules.required]"
+                                                                    required
                                                                     solo
+                                                                    @input="changeSoHieuChieu"
                                                                 ></v-text-field>
-                                                                <v-btn small color="primary" @click="getThongTinNhanThan()">Kiểm tra thông tin</v-btn>
+                                                                <v-btn class="mt-0" small color="primary" @click="kiemTraHoChieu()" style="height: 34px;">
+                                                                    <v-icon>check_circle_outline</v-icon>&nbsp; Kiểm tra thông tin</v-btn>
                                                             </div>  
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
@@ -647,6 +523,34 @@
                                                                 <v-date-picker v-model="hanHoChieu" no-title @input="menu2 = false" locale="vi"></v-date-picker>
                                                             </v-menu>
                                                         </v-flex>
+                                                        <v-flex xs12 sm6 class="px-2 my-2">
+                                                            <label for="">Loại hộ chiếu</label>
+                                                            <v-autocomplete
+                                                                :items="listLoaiHoChieu"
+                                                                v-model="loai_ho_chieu"
+                                                                item-text="text"
+                                                                item-value="value"
+                                                                return-object
+                                                                clearable
+                                                                hide-no-data
+                                                                solo                  
+                                                            ></v-autocomplete>
+                                                        </v-flex>
+                                                        <v-flex xs12 sm6 class="px-2 my-2">
+                                                            <label for="">Cấp bởi <span class="red--text">*</span></label>
+                                                            <v-autocomplete
+                                                                :items="listNoiCapHoChieu"
+                                                                v-model="noi_cap_ho_chieu"
+                                                                item-text="itemName"
+                                                                item-value="itemCode"
+                                                                return-object
+                                                                clearable
+                                                                hide-no-data
+                                                                :rules="[rules.required]"
+                                                                required
+                                                                solo                  
+                                                            ></v-autocomplete>
+                                                        </v-flex>
                                                         <v-flex xs12 class="px-2 my-2">
                                                             <label for="">1. Họ và tên (Chữ in viết hoa) <span class="red--text">*</span></label>
                                                             <v-text-field
@@ -664,6 +568,7 @@
                                                                 v-model="gioi_tinh"
                                                                 item-text="name"
                                                                 item-value="value"
+                                                                return-object
                                                                 clearable
                                                                 hide-no-data
                                                                 :rules="[rules.required]"
@@ -702,8 +607,8 @@
                                                                 <v-autocomplete
                                                                     :items="listNuocDi"
                                                                     v-model="quoc_tich_hien_nay"
-                                                                    item-text="TEN"
-                                                                    item-value="ID"
+                                                                    item-text="itemName"
+                                                                    item-value="itemCode"
                                                                     clearable
                                                                     hide-no-data
                                                                     :rules="[rules.required]"
@@ -718,9 +623,9 @@
                                                             <div style="display:flex; flex-wrap: wrap;align-items: center;">
                                                                 <v-autocomplete
                                                                     :items="listNuocDi"
-                                                                    v-model="quoc_tich_hien_nay"
-                                                                    item-text="TEN"
-                                                                    item-value="ID"
+                                                                    v-model="quoc_tich_goc"
+                                                                    item-text="itemName"
+                                                                    item-value="itemCode"
                                                                     clearable
                                                                     hide-no-data
                                                                     :rules="[rules.required]"
@@ -963,9 +868,12 @@
                                                         </v-flex> -->
                                                     </v-layout>
                                                 </v-flex>
-                                                <v-flex xs12 class="text-xs-right mx-2">
-                                                    <v-btn small color="primary" @click="updateThanhVien()">Cập nhật</v-btn>
-                                                    <v-btn small color="primary" @click="dialogThemThanhVien=false">Đóng</v-btn>
+                                                <v-flex xs12 class="mx-0 py-1 mt-2 px-3" style="background: #dededeb3;">
+                                                    <v-btn small color="red" class="white--text right" @click="closeThemThanhVien"><v-icon>clear</v-icon>&nbsp; Đóng</v-btn>
+                                                    <v-btn small color="primary" class="right" @click="updateThanhVien()"><v-icon>save</v-icon>&nbsp; 
+                                                        <span v-if="update_thanhvien !== 'add'">Cập nhật thành viên</span>
+                                                        <span v-else>Thêm thành viên</span>
+                                                    </v-btn>
                                                 </v-flex>
                                             </v-layout>
                                         </v-form>
@@ -973,120 +881,131 @@
                                 </v-card>
                             </v-tab-item>
                             <v-tab-item :key="2" value="tab-2" >
-                                <v-card>
+                                <v-card style="min-height: calc(90vh - 150px)">
                                     <v-card-text class="px-0 py-0 mt-2">
                                         <v-form ref="formThanNhan" lazy-validation>
                                             <v-layout wrap>
-                                                <v-flex xs12 md4 class="px-2 mb-2">
-                                                    <label for="">1. Loại quan hệ <span class="red--text">*</span></label>
-                                                    <div style="display:flex; flex-wrap: wrap;align-items: center;">
-                                                        <v-autocomplete
-                                                            :items="listLoaiQuanHe"
-                                                            v-model="loai_quan_he"
-                                                            item-text="itemName"
-                                                            item-value="itemCode"
-                                                            clearable
-                                                            hide-no-data
-                                                            :rules="[rules.required]"
-                                                            required
-                                                            solo
-                                                            return-object
-                                                        ></v-autocomplete>
-                                                    </div>
+                                                <v-flex xs12 class="px-2">
+                                                    <v-layout wrap>
+                                                        <v-flex xs12 md4 class="px-2 mb-2">
+                                                            <label for="">1. Loại quan hệ <span class="red--text">*</span></label>
+                                                            <div style="display:flex; flex-wrap: wrap;align-items: center;">
+                                                                <v-autocomplete
+                                                                    :items="listLoaiQuanHe"
+                                                                    v-model="loai_quan_he"
+                                                                    item-text="itemName"
+                                                                    item-value="itemCode"
+                                                                    clearable
+                                                                    hide-no-data
+                                                                    :rules="[rules.required]"
+                                                                    required
+                                                                    solo
+                                                                    return-object
+                                                                ></v-autocomplete>
+                                                            </div>
+                                                        </v-flex>
+                                                        <v-flex xs12 md4 class="px-2 mb-2">
+                                                            <label for="">2. Họ tên <span class="red--text">*</span></label>
+                                                            <v-text-field
+                                                                v-model="ho_ten_than_nhan"
+                                                                :rules="[rules.required]"
+                                                                required
+                                                                solo
+                                                            ></v-text-field>
+                                                        </v-flex>
+                                                        <v-flex xs12 md4 class="px-2 mb-2">
+                                                            <label for="">3. Ngày sinh</label>
+                                                            <v-menu
+                                                                ref="menu10"
+                                                                :close-on-content-click="false"
+                                                                v-model="menu10"
+                                                                transition="scale-transition"
+                                                                offset-y
+                                                                style="width: 100%;"
+                                                            >
+                                                                <v-text-field
+                                                                    slot="activator"
+                                                                    v-model="birthdayThanNhanFormated"
+                                                                    persistent-hint
+                                                                    append-icon="event"
+                                                                    hint="DD/MM/YYYY"
+                                                                    @change="changeNgaySinhThanNhan()"
+                                                                    @input="inputNgaySinhThanNhan()"
+                                                                    solo
+                                                                    :rules="[rules.required,rules.checkDatePast]"
+                                                                    required
+                                                                ></v-text-field>
+                                                                <v-date-picker v-model="birthdayThanNhan" no-title @input="menu10 = false" locale="vi"></v-date-picker>
+                                                            </v-menu>
+                                                        </v-flex>
+                                                        <v-flex xs12 md6 class="px-2 mb-2">
+                                                            <label for="">4. Quốc tịch</label>
+                                                            <div style="display:flex; flex-wrap: wrap;align-items: center;">
+                                                                <v-autocomplete
+                                                                    :items="listNuocDi"
+                                                                    v-model="quoc_tich_than_nhan"
+                                                                    item-text="itemName"
+                                                                    item-value="itemCode"
+                                                                    clearable
+                                                                    hide-no-data
+                                                                    :rules="[rules.required]"
+                                                                    required
+                                                                    solo
+                                                                    return-object
+                                                                ></v-autocomplete>
+                                                            </div>
+                                                        </v-flex>
+                                                        <v-flex xs12 md6 class="px-2 mb-2">
+                                                            <label for="">5. Địa chỉ thường trú </label>
+                                                            <v-text-field
+                                                                v-model="dia_chi_thuong_tru_than_nhan"
+                                                                solo
+                                                            ></v-text-field>
+                                                        </v-flex>
+                                                        <v-flex xs12 class="mx-2 mb-2">
+                                                            <v-btn small color="red" class="right white--text mr-0" @click="cancelAction('than_nhan')"><v-icon>reply</v-icon>&nbsp; Hủy thao tác</v-btn>
+                                                            <v-btn small color="primary" class="right" @click="updateThanNhan">
+                                                                <span v-if="update_than_nhan !== 'add'"><v-icon>save</v-icon>&nbsp; Cập nhật</span>
+                                                                <span v-else><v-icon>add</v-icon>&nbsp; Thêm</span>
+                                                            </v-btn>
+                                                        </v-flex>
+                                                        <v-flex xs12 class="px-2 mb-2" style="padding-bottom: 50px;">
+                                                            <v-data-table
+                                                                :headers="headerThanNhan"
+                                                                :items="listThanNhan"
+                                                                hide-actions
+                                                                no-data-text="Không có thân nhân nào"
+                                                                class="table_vuejs"
+                                                                style="border-left: 0.5px solid #dedede;"
+                                                            >
+                                                                <template slot="items" slot-scope="props">
+                                                                <tr>
+                                                                    <td class="py-2 text-xs-center">{{props.index + 1}}</td>
+                                                                    <td class="py-2">{{props.item.Qhgd_Text}}</td>
+                                                                    <td class="py-2">{{props.item.Ten}}</td>
+                                                                    <td class="py-2">{{props.item.Ngay_Sinh}}</td>
+                                                                    <td class="py-2">{{props.item.Dia_Chi_Thuong_Tru}}</td>
+                                                                    <td class="py-2">{{props.item.Quoc_Tich_Text}}</td>
+                                                                    <td style="width: 95px;">
+                                                                        <v-btn small flat icon color="primary" @click="editThanNhan(props.item, props.index)">
+                                                                            <v-icon>create</v-icon>
+                                                                        </v-btn>
+                                                                        <v-btn small flat icon color="#F44336" @click="deleteThanNhan(props.item, props.index)">
+                                                                            <v-icon>delete</v-icon>
+                                                                        </v-btn>
+                                                                    </td>
+                                                                </tr>
+                                                                </template>
+                                                            </v-data-table>
+                                                        </v-flex>
+                                                    </v-layout>
                                                 </v-flex>
-                                                <v-flex xs12 md4 class="px-2 mb-2">
-                                                    <label for="">2. Họ tên <span class="red--text">*</span></label>
-                                                    <v-text-field
-                                                        v-model="ho_ten_than_nhan"
-                                                        :rules="[rules.required]"
-                                                        required
-                                                        solo
-                                                    ></v-text-field>
-                                                </v-flex>
-                                                <v-flex xs12 md4 class="px-2 mb-2">
-                                                    <label for="">3. Ngày sinh</label>
-                                                    <v-menu
-                                                        ref="menu10"
-                                                        :close-on-content-click="false"
-                                                        v-model="menu10"
-                                                        transition="scale-transition"
-                                                        offset-y
-                                                        style="width: 100%;"
-                                                    >
-                                                        <v-text-field
-                                                            slot="activator"
-                                                            v-model="birthdayFormated"
-                                                            persistent-hint
-                                                            append-icon="event"
-                                                            hint="DD/MM/YYYY"
-                                                            @change="changeNgaySinh()"
-                                                            @input="inputNgaySinh()"
-                                                            solo
-                                                            :rules="[rules.required,rules.checkDatePast]"
-                                                            required
-                                                        ></v-text-field>
-                                                        <v-date-picker v-model="birthday" no-title @input="menu10 = false" locale="vi"></v-date-picker>
-                                                    </v-menu>
-                                                </v-flex>
-                                                <v-flex xs12 md6 class="px-2 mb-2">
-                                                    <label for="">4. Quốc tịch</label>
-                                                    <div style="display:flex; flex-wrap: wrap;align-items: center;">
-                                                        <v-autocomplete
-                                                            :items="listNuocDi"
-                                                            v-model="quoc_tich_than_nhan"
-                                                            item-text="TEN"
-                                                            item-value="ID"
-                                                            clearable
-                                                            hide-no-data
-                                                            :rules="[rules.required]"
-                                                            required
-                                                            solo
-                                                            return-object
-                                                        ></v-autocomplete>
-                                                    </div>
-                                                </v-flex>
-                                                <v-flex xs12 md6 class="px-2 mb-2">
-                                                    <label for="">5. Địa chỉ thường trú </label>
-                                                    <v-text-field
-                                                        v-model="dia_chi_thuong_tru_than_nhan"
-                                                        solo
-                                                    ></v-text-field>
-                                                </v-flex>
-                                                <v-flex xs12 class="mx-2 mb-2">
-                                                    <v-btn small color="red" class="right white--text" @click="cancelAction('than_nhan')">Hủy thao tác</v-btn>
-                                                    <v-btn small color="primary" class="right" @click="updateThanNhan">
-                                                        <span v-if="update_than_nhan !== 'add'">Cập nhật</span>
-                                                        <span v-else>Thêm</span>
+                                                <v-flex xs12 class="mx-0 py-1 mt-2 px-3" style="background: #dededeb3;position: absolute;width: 100%;bottom: 0">
+                                                    <v-btn small color="red" class="white--text right" @click="closeThemThanhVien"><v-icon>clear</v-icon>&nbsp; Đóng</v-btn>
+                                                    <v-btn small color="primary" class="right" @click="updateThanhVien()"><v-icon>save</v-icon>&nbsp; 
+                                                        <span v-if="update_thanhvien !== 'add'">Cập nhật thành viên</span>
+                                                        <span v-else>Thêm thành viên</span>
                                                     </v-btn>
-                                                </v-flex>
-                                                <v-flex xs12 class="px-2 mb-2">
-                                                    <v-data-table
-                                                        :headers="headerThanNhan"
-                                                        :items="listThanNhan"
-                                                        hide-actions
-                                                        no-data-text="Không có thân nhân nào"
-                                                        class="table_vuejs"
-                                                        style="border-left: 0.5px solid #dedede;"
-                                                    >
-                                                        <template slot="items" slot-scope="props">
-                                                        <tr>
-                                                            <td class="py-2 text-xs-center">{{props.index + 1}}</td>
-                                                            <td class="py-2">{{props.item.Qhgd_Text}}</td>
-                                                            <td class="py-2">{{props.item.Ten}}</td>
-                                                            <td class="py-2">{{props.item.Ngay_Sinh}}</td>
-                                                            <td class="py-2">{{props.item.Dia_Chi_Thuong_Tru}}</td>
-                                                            <td class="py-2">{{props.item.Quoc_Tich_Text}}</td>
-                                                            <td style="width: 95px;">
-                                                                <v-btn small flat icon color="primary" @click="editThanNhan(props.item, props.index)">
-                                                                    <v-icon>create</v-icon>
-                                                                </v-btn>
-                                                                <v-btn small flat icon color="#F44336" @click="deleteThanNhan(props.item, props.index)">
-                                                                    <v-icon>delete</v-icon>
-                                                                </v-btn>
-                                                            </td>
-                                                        </tr>
-                                                        </template>
-                                                    </v-data-table>
                                                 </v-flex>
                                             </v-layout>
                                         </v-form>
@@ -1094,118 +1013,129 @@
                                 </v-card>
                             </v-tab-item>
                             <v-tab-item :key="3" value="tab-3" >
-                                <v-card>
+                                <v-card style="min-height: calc(90vh - 150px)">
                                     <v-card-text class="px-0 py-0 mt-2">
                                         <v-form ref="formNguoiDiCung" lazy-validation>
                                             <v-layout wrap>
-                                                <v-flex xs12 md4 class="px-2 mb-2">
-                                                    <label for="">1. Loại quan hệ <span class="red--text">*</span></label>
-                                                    <div style="display:flex; flex-wrap: wrap;align-items: center;">
-                                                        <v-autocomplete
-                                                            :items="listLoaiQuanHe"
-                                                            v-model="loai_quan_he"
-                                                            item-text="itemName"
-                                                            item-value="itemCode"
-                                                            clearable
-                                                            hide-no-data
-                                                            :rules="[rules.required]"
-                                                            required
-                                                            solo
-                                                            return-object
-                                                        ></v-autocomplete>
-                                                    </div>
+                                                <v-flex xs12 class="px-2">
+                                                    <v-layout wrap>
+                                                        <v-flex xs12 md4 class="px-2 mb-2">
+                                                            <label for="">1. Loại quan hệ <span class="red--text">*</span></label>
+                                                            <div style="display:flex; flex-wrap: wrap;align-items: center;">
+                                                                <v-autocomplete
+                                                                    :items="listLoaiQuanHe"
+                                                                    v-model="loai_quan_he"
+                                                                    item-text="itemName"
+                                                                    item-value="itemCode"
+                                                                    clearable
+                                                                    hide-no-data
+                                                                    :rules="[rules.required]"
+                                                                    required
+                                                                    solo
+                                                                    return-object
+                                                                ></v-autocomplete>
+                                                            </div>
+                                                        </v-flex>
+                                                        <v-flex xs12 md4 class="px-2 mb-2">
+                                                            <label for="">2. Họ tên <span class="red--text">*</span></label>
+                                                            <v-text-field
+                                                                v-model="ho_ten_di_cung"
+                                                                solo
+                                                            ></v-text-field>
+                                                        </v-flex>
+                                                        <v-flex xs12 md4 class="px-2 mb-2">
+                                                            <label for="">3. Ngày sinh</label>
+                                                            <v-menu
+                                                                ref="menu6"
+                                                                :close-on-content-click="false"
+                                                                v-model="menu6"
+                                                                transition="scale-transition"
+                                                                offset-y
+                                                                style="width: 100%;"
+                                                            >
+                                                                <v-text-field
+                                                                    slot="activator"
+                                                                    v-model="birthdayDiCungFormated"
+                                                                    persistent-hint
+                                                                    append-icon="event"
+                                                                    hint="DD/MM/YYYY"
+                                                                    @change="changeNgaySinhDiCung()"
+                                                                    @input="inputNgaySinhDiCung()"
+                                                                    solo
+                                                                    :rules="[rules.required,rules.checkDatePast]"
+                                                                    required
+                                                                ></v-text-field>
+                                                                <v-date-picker v-model="birthdayDiCung" no-title @input="menu6 = false" locale="vi"></v-date-picker>
+                                                            </v-menu>
+                                                        </v-flex>
+                                                        <v-flex xs12 md6 class="px-2 mb-2">
+                                                            <label for="">4. Quốc tịch</label>
+                                                            <div style="display:flex; flex-wrap: wrap;align-items: center;">
+                                                                <v-autocomplete
+                                                                    :items="listNuocDi"
+                                                                    v-model="quoc_tich_di_cung"
+                                                                    item-text="itemName"
+                                                                    item-value="itemCode"
+                                                                    clearable
+                                                                    hide-no-data
+                                                                    :rules="[rules.required]"
+                                                                    required
+                                                                    solo
+                                                                    return-object
+                                                                ></v-autocomplete>
+                                                            </div>
+                                                        </v-flex>
+                                                        <v-flex xs12 md6 class="px-2 mb-2">
+                                                            <label for="">5. Số hộ chiếu </label>
+                                                            <v-text-field
+                                                                v-model="so_ho_chieu_di_cung"
+                                                                solo
+                                                            ></v-text-field>
+                                                        </v-flex>
+                                                        <v-flex xs12 class="mx-2 mb-2">
+                                                            <v-btn small color="red" class="right white--text mr-0" @click="cancelAction('nguoi_di_cung')"><v-icon>reply</v-icon>&nbsp; Hủy thao tác</v-btn>
+                                                            <v-btn small color="primary" class="right" @click="updateNguoiDiCung">
+                                                                <span v-if="update_di_cung !== 'add'"><v-icon>save</v-icon>&nbsp; Cập nhật</span>
+                                                                <span v-else><v-icon>add</v-icon>&nbsp; Thêm</span>
+                                                            </v-btn>
+                                                        </v-flex>
+                                                        <v-flex xs12 class="px-2 mb-2" style="padding-bottom: 50px;">
+                                                            <v-data-table
+                                                                :headers="headerNguoiDiCung"
+                                                                :items="listNguoiDiCung"
+                                                                hide-actions
+                                                                no-data-text="Không có người đi cùng nào"
+                                                                class="table_vuejs"
+                                                                style="border-left: 0.5px solid #dedede;"
+                                                            >
+                                                                <template slot="items" slot-scope="props">
+                                                                <tr>
+                                                                    <td class="py-2 text-xs-center">{{props.index + 1}}</td>
+                                                                    <td class="py-2">{{props.item.Qhgd_Text}}</td>
+                                                                    <td class="py-2">{{props.item.Ten}}</td>
+                                                                    <td class="py-2">{{props.item.Ngay_Sinh}}</td>
+                                                                    <td class="py-2">{{props.item.Quoc_Tich_Text}}</td>
+                                                                    <td class="py-2">{{props.item.So_Ho_Chieu}}</td>
+                                                                    <td style="width: 95px;">
+                                                                        <v-btn small flat icon color="primary" @click="editNguoiDiCung(props.item, props.index)">
+                                                                            <v-icon>create</v-icon>
+                                                                        </v-btn>
+                                                                        <v-btn small flat icon color="#F44336" @click="deleteNguoiDiCung(props.item, props.index)">
+                                                                            <v-icon>delete</v-icon>
+                                                                        </v-btn>
+                                                                    </td>
+                                                                </tr>
+                                                                </template>
+                                                            </v-data-table>
+                                                        </v-flex>
+                                                    </v-layout>
                                                 </v-flex>
-                                                <v-flex xs12 md4 class="px-2 mb-2">
-                                                    <label for="">2. Họ tên <span class="red--text">*</span></label>
-                                                    <v-text-field
-                                                        v-model="ho_ten_di_cung"
-                                                        solo
-                                                    ></v-text-field>
-                                                </v-flex>
-                                                <v-flex xs12 md4 class="px-2 mb-2">
-                                                    <label for="">3. Ngày sinh</label>
-                                                    <v-menu
-                                                        ref="menu6"
-                                                        :close-on-content-click="false"
-                                                        v-model="menu6"
-                                                        transition="scale-transition"
-                                                        offset-y
-                                                        style="width: 100%;"
-                                                    >
-                                                        <v-text-field
-                                                            slot="activator"
-                                                            v-model="birthdayFormated"
-                                                            persistent-hint
-                                                            append-icon="event"
-                                                            hint="DD/MM/YYYY"
-                                                            @change="changeNgaySinh()"
-                                                            @input="inputNgaySinh()"
-                                                            solo
-                                                            :rules="[rules.required,rules.checkDatePast]"
-                                                            required
-                                                        ></v-text-field>
-                                                        <v-date-picker v-model="birthday" no-title @input="menu6 = false" locale="vi"></v-date-picker>
-                                                    </v-menu>
-                                                </v-flex>
-                                                <v-flex xs12 md6 class="px-2 mb-2">
-                                                    <label for="">4. Quốc tịch</label>
-                                                    <div style="display:flex; flex-wrap: wrap;align-items: center;">
-                                                        <v-autocomplete
-                                                            :items="listNuocDi"
-                                                            v-model="quoc_tich_di_cung"
-                                                            item-text="TEN"
-                                                            item-value="ID"
-                                                            clearable
-                                                            hide-no-data
-                                                            :rules="[rules.required]"
-                                                            required
-                                                            solo
-                                                            return-object
-                                                        ></v-autocomplete>
-                                                    </div>
-                                                </v-flex>
-                                                <v-flex xs12 md6 class="px-2 mb-2">
-                                                    <label for="">5. Số hộ chiếu </label>
-                                                    <v-text-field
-                                                        v-model="so_ho_chieu_di_cung"
-                                                        solo
-                                                    ></v-text-field>
-                                                </v-flex>
-                                                <v-flex xs12 class="mx-2 mb-2">
-                                                    <v-btn small color="red" class="right white--text" @click="cancelAction('nguoi_di_cung')">Hủy thao tác</v-btn>
-                                                    <v-btn small color="primary" class="right" @click="updateNguoiDiCung">
-                                                        <span v-if="update_di_cung !== 'add'">Cập nhật</span>
-                                                        <span v-else>Thêm</span>
+                                                <v-flex xs12 class="mx-0 py-1 mt-2 px-3" style="background: #dededeb3;position: absolute;width: 100%;bottom: 0">
+                                                    <v-btn small color="red" class="white--text right" @click="closeThemThanhVien"><v-icon>clear</v-icon>&nbsp; Đóng</v-btn>
+                                                    <v-btn small color="primary" class="right" @click="updateThanhVien()"><v-icon>save</v-icon>&nbsp; 
+                                                        <span v-if="update_thanhvien !== 'add'">Cập nhật thành viên</span>
+                                                        <span v-else>Thêm thành viên</span>
                                                     </v-btn>
-                                                </v-flex>
-                                                <v-flex xs12 class="px-2 mb-2">
-                                                    <v-data-table
-                                                        :headers="headerNguoiDiCung"
-                                                        :items="listNguoiDiCung"
-                                                        hide-actions
-                                                        no-data-text="Không có người đi cùng nào"
-                                                        class="table_vuejs"
-                                                        style="border-left: 0.5px solid #dedede;"
-                                                    >
-                                                        <template slot="items" slot-scope="props">
-                                                        <tr>
-                                                            <td class="py-2 text-xs-center">{{props.index + 1}}</td>
-                                                            <td class="py-2">{{props.item.Qhgd_Text}}</td>
-                                                            <td class="py-2">{{props.item.Ten}}</td>
-                                                            <td class="py-2">{{props.item.Ngay_Sinh}}</td>
-                                                            <td class="py-2">{{props.item.Dia_Chi_Thuong_Tru}}</td>
-                                                            <td class="py-2">{{props.item.So_Ho_Chieu}}</td>
-                                                            <td style="width: 95px;">
-                                                                <v-btn small flat icon color="primary" @click="editNguoiDiCung(props.item, props.index)">
-                                                                    <v-icon>create</v-icon>
-                                                                </v-btn>
-                                                                <v-btn small flat icon color="#F44336" @click="deleteNguoiDiCung(props.item, props.index)">
-                                                                    <v-icon>delete</v-icon>
-                                                                </v-btn>
-                                                            </td>
-                                                        </tr>
-                                                        </template>
-                                                    </v-data-table>
                                                 </v-flex>
                                             </v-layout>
                                         </v-form>
@@ -1217,7 +1147,7 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
-        <!-- Dialog danh sách thanh thành viên-->
+        <!-- Dialog danh sách thành viên-->
         <v-dialog
             v-model="dialogDanhSach"
             max-width="800px"
@@ -1279,16 +1209,22 @@ export default {
     },
     data: () => ({
         active: 'tab-1',
+        saiSoHoChieu: false,
         listMucDich: [],
         muc_dich: '',
         ten_theo_muc_dich: '',
         dia_chi_viet_nam: '',
         dia_chi_nuoc_ngoai: '',
-        listLoaiThiThuc: [
+        listLoaiHoChieu: [
             {"text": "Liên hợp quốc", "value": "LHQ"},
             {"text": "Phổ thông", "value": "PT"},
             {"text": "Ngoại giao", "value": "NG"},
             {"text": "Công vụ", "value": "CV"}
+        ],
+        loai_ho_chieu: '',
+        listLoaiThiThuc: [
+            {"text": "Dán", "value": "DAN"},
+            {"text": "Rời", "value": "ROI"}
         ],
         loai_thi_thuc: '',
         listSoLanThiThuc: [
@@ -1297,14 +1233,14 @@ export default {
         ],
         so_lan_thi_thuc: '',
         listLoaiQuanHe: [
-            {"itemName": "Bố", "itemCode": "1"},
-            {"itemName": "Mẹ", "itemCode": "2"}
         ],
         loai_quan_he: '',
         listKyHieu: [],
         ky_hieu_thi_thuc: '',
         ho_ten_than_nhan: '',
         ho_ten_di_cung: '',
+        quoc_tich_than_nhan: '',
+        quoc_tich_di_cung: '',
         menu: true,
         menu2: true,
         menu3: true,
@@ -1321,23 +1257,27 @@ export default {
         dialogDanhSach: false,
         messengeCMT: '',
         soNuocKhongDuocMien: 0,
-        dateNgayKy: new Date().toISOString().substr(0, 10),
-        dateNgayCapHCNG: new Date().toISOString().substr(0, 10),
-        dateNgayCapHCCV: new Date().toISOString().substr(0, 10),
-        dateNgayCapCMND: new Date().toISOString().substr(0, 10),
-        dateNgayHenTra: new Date().toISOString().substr(0, 10),
-        dateDueDate: new Date().toISOString().substr(0, 10),
-        dateNgayGuiVbNhanThan: new Date().toISOString().substr(0, 10),
-        dateNgayDuKienNk: new Date().toISOString().substr(0, 10),
-        dateNgayDuKienXk: new Date().toISOString().substr(0, 10),
+        dateNgayKy: '',
+        dateNgayCapHCNG: '',
+        dateNgayCapHCCV: '',
+        dateNgayCapCMND: '',
+        dateNgayHenTra: '',
+        dateDueDate: '',
+        dateNgayGuiVbNhanThan: '',
+        dateNgayDuKienNk: '',
+        dateNgayDuKienXk: '',
+        birthdayDiCung: '',
+        birthdayThanNhan: '',
         dateDueDateFormated: '',
         birthdayFormated: '',
+        birthdayDiCungFormated: '',
+        birthdayThanNhanFormated: '',
         hanHoChieuFormated: '',
         dateNgayGuiVbNhanThanFormated: '',
         dateNgayDuKienNkFormated: '',
         dateNgayDuKienXkFormated: '',
         crurentHours: '',
-        birthday: new Date().toISOString().substr(0, 10),
+        birthday: '',
         hanHoChieu: '',
         eFormCode: '',
         tinhSelected: '',
@@ -1350,6 +1290,8 @@ export default {
             inputClass: 'input_vuejs'
         },
         ngayHetHieuLuc: '',
+        quoc_tich_hien_nay: '',
+        quoc_tich_goc: '',
         nghe_nghiep: '',
         eFormCodeArr: [],
         listTinh: [],
@@ -1387,53 +1329,51 @@ export default {
           }
         ],
         listLoaiVanBan: [
-            {itemCode: 'CĐ', itemName: 'Công điện'},
-            {itemCode: 'CV', itemName: 'Công văn'},
-            {itemCode: 'CH', itemName: 'Công hàm'}
         ],
         loaiVanBan: '',
         listVanBan: [],
         headerThanhVien: [
-        {
-            text: 'STT',
-            align: 'center',
-            sortable: false
-          },
-          {
-            text: 'Họ tên',
-            align: 'center',
-            sortable: false
-          },
-          {
-            text: 'CMND/CCCD',
-            align: 'center',
-            sortable: false
-          },
-          {
-            text: 'Ngày sinh',
-            align: 'center',
-            sortable: false
-          },
-          {
-            text: 'Nơi sinh',
-            align: 'center',
-            sortable: false
-          },
-          {
-            text: 'Văn bản quyết định',
-            align: 'center',
-            sortable: false
-          },
-          {
-            text: 'Sửa',
-            align: 'center',
-            sortable: false
-          },
-          {
-            text: 'Xóa',
-            align: 'center',
-            sortable: false
-          }
+            {
+                text: 'Đã KT',
+                align: 'center',
+                sortable: false,
+                textEng: ''
+            },
+            {
+                text: 'STT',
+                align: 'center',
+                sortable: false
+            },
+            {
+                text: 'Họ tên',
+                align: 'center',
+                sortable: false
+            },
+            {
+                text: 'Số hộ chiếu',
+                align: 'center',
+                sortable: false
+            },
+            {
+                text: 'Ngày sinh',
+                align: 'center',
+                sortable: false
+            },
+            {
+                text: 'Văn bản quyết định',
+                align: 'center',
+                sortable: false
+            },
+            {
+                text: 'Sửa',
+                align: 'center',
+                sortable: false
+            },
+            {
+                text: 'Xóa',
+                align: 'center',
+                sortable: false
+            }
         ],
         listThanhVien: [],
         headerThanhPhanHoSo: [
@@ -1573,7 +1513,7 @@ export default {
         listThanNhan: [],
         listNguoiDiCung: [],
         listDanhSach: [],
-        listGioiTinh: [{name: 'Nam', value: 'Nam'},{name: 'Nữ', value: 'Nữ'}],
+        listGioiTinh: [{name: 'Nam', value: 'M'},{name: 'Nữ', value: 'F'}],
         fileMarks: [{value: 1, name: 'Bản chụp'},{value: 2, name: 'Bản sao'},{value: 3, name: 'Bản gốc'},{value: 4, name: 'Bản dịch'}],
         checkbox: false,
         dialogThemVanBan: false,
@@ -1631,7 +1571,6 @@ export default {
             "sampleCount": 1,
             "dueDate": '',
             "dossierNote": '',
-            "Doan_HCTN": '',
             "dossierFilePayment": '',
             'durationCount': 4,
             "metaData": '{}'
@@ -1693,6 +1632,7 @@ export default {
         cap_bac_ham: null,
         so_ho_chieu_ngoai_giao: null,
         ngay_ho_chieu_ngoai_giao: null,
+        noi_cap_ho_chieu: '',
         noi_cap_ho_chieu_ngoai_giao: null,
         so_ho_chieu_cong_vu: null,
         ngay_ho_chieu_cong_vu: null,
@@ -1794,6 +1734,14 @@ export default {
                   return true
               }
             },
+            thonTinHoChieu: () => {
+              let vm = this
+              if (vm.saiSoHoChieu) {
+                return 'Không tìm thấy thông tin hộ chiếu'
+              } else {
+                  return true
+              }
+            },
             telNo: (value) => {
                 const pattern = /^0([1-9]{1}\d{8})$/
                 if (value) {
@@ -1830,18 +1778,15 @@ export default {
             vm.getDelegateCity()
             vm.getCoQuanChuQuan()
             vm.getNoiCapHoChieu()
-            vm.getNuocDi()
+            vm.getQuocGia()
             vm.getMucDich()
-            vm.getNoiSinhTrongNuoc()
-            vm.getNoiSinhNuocNgoai()
-            vm.getBGMienCongHam()
             vm.getLoaiVanBan()
             vm.getLoaiQuanHe()
             setTimeout(()=>{
                 if(vm.formCode==='UPDATE'){
                     vm.getDetail()
                 } else {                   
-                    vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [], 'ma_to_khai': [], 'totalRecord': 0, 'delegateIdNo': '','delegateName': '','delegateTelNo': '','Doan_HCTN': '', 'durationCountMeta': 4})
+                    vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [], 'ma_to_khai': [], 'totalRecord': 0, 'delegateIdNo': '','delegateName': '','delegateTelNo': '', 'durationCountMeta': 4})
                     vm.getThanhPhan()
                     vm.genDueDate()
                     if(vm.eFormCode){
@@ -1903,8 +1848,8 @@ export default {
             this.dossiers.delegateWardCode = val 
         },
         co_quan_chu_quan (val) {
-            this.vb_nguoi_ky = ''
-            this.getNguoiKyVB()
+            // this.vb_nguoi_ky = ''
+            // this.getNguoiKyVB()
         },
         vb_nguoi_ky (val) {
             this.srcMauChuKy = ''
@@ -1929,6 +1874,12 @@ export default {
         },
         birthday(val){
             this.birthdayFormated =  this.formatDate(this.birthday)
+        },
+        birthdayDiCung(val) {
+            this.birthdayDiCungFormated = this.formatDate(this.birthdayDiCung)
+        },
+        birthdayThanNhan(val) {
+            this.birthdayThanNhanFormated = this.formatDate(this.birthdayThanNhan)
         },
         hanHoChieu(val){
             this.hanHoChieuFormated =  this.formatDate(this.hanHoChieu)
@@ -2047,23 +1998,6 @@ export default {
                 vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
                 vm.crurentHours = vm.dossiers.dueDate.substring(10)
                 vm.viaPostal = vm.dossiers.viaPostal === 2 ?  true : false
-                vm.nuoc_di = metaData.Doan_HCTN.CacNuocDi_ma.split(',')
-                
-
-                vm.ho_chieu_ngoai_giao_cu = metaData.Doan_HCTN.SoHCCu_NG ? parseInt(metaData.Doan_HCTN.SoHCCu_NG) : 0
-                vm.ho_chieu_cong_vu_cu = metaData.Doan_HCTN.SoHCCu_CV ? parseInt(metaData.Doan_HCTN.SoHCCu_CV) : 0
-                vm.ho_chieu_pho_thong_cu = metaData.Doan_HCTN.SoHCCu_PT ? parseInt(metaData.Doan_HCTN.SoHCCu_PT) : 0
-                vm.ho_chieu_cong_vu_moi = metaData.Doan_HCTN.SoHCCapMoi ? parseInt(metaData.Doan_HCTN.SoHCCapMoi) : 0
-                vm.cong_ham_so_nuoc = metaData.Doan_HCTN.SoNuocXinCH ? parseInt(metaData.Doan_HCTN.SoNuocXinCH) : 0
-                vm.ho_chieu_ngoai_giao_moi = metaData.Doan_HCTN.SoHCCapMoi_NG ? parseInt(metaData.Doan_HCTN.SoHCCapMoi_NG) : 0
-                vm.cong_ham_schengen = metaData.Doan_HCTN.SoNguoiMienCH ? parseInt(metaData.Doan_HCTN.SoNguoiMienCH) : 0
-                vm.cong_ham_nhap_canh = metaData.Doan_HCTN.SoCHNhapCanh ? parseInt(metaData.Doan_HCTN.SoCHNhapCanh) : 0
-                vm.cong_ham_qua_canh = metaData.Doan_HCTN.SoCHQuaCanh ? parseInt(metaData.Doan_HCTN.SoCHQuaCanh) : 0
-                vm.ho_chieu_gia_han = metaData.Doan_HCTN.SoHCGH ? parseInt(metaData.Doan_HCTN.SoHCGH) : 0
-                vm.ho_chieu_hong = metaData.Doan_HCTN.SoHCHong ? parseInt(metaData.Doan_HCTN.SoHCHong) : 0
-                vm.ho_chieu_mat = metaData.Doan_HCTN.SoHCMat ? parseInt(metaData.Doan_HCTN.SoHCMat) : 0
-                vm.so_nguoi = metaData.Doan_HCTN.SoNguoi ? parseInt(metaData.Doan_HCTN.SoNguoi) : 0
-
                 vm.dossierFileCustom.forEach(e=>{
                     if(e.partNo !== 'TP01' && e.partNo !== 'TP02'){
                         vm.dossierFileArr.push(e)
@@ -2123,7 +2057,7 @@ export default {
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
             }
             axios.request(config).then(res => {
-                // vm.listLoaiVanBan = vm.sortArr(res.data.data, 'itemName')
+                vm.listLoaiVanBan = vm.sortArr(res.data.data, 'itemName')
             }).catch(err => {})
         },
         getLoaiQuanHe () {
@@ -2133,7 +2067,7 @@ export default {
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
             }
             axios.request(config).then(res => {
-                // vm.listLoaiQuanHe = vm.sortArr(res.data.data, 'itemName')
+                vm.listLoaiQuanHe = vm.sortArr(res.data.data, 'itemName')
             }).catch(err => {})
         },
         getDelegateDistrict(){
@@ -2342,12 +2276,11 @@ export default {
         },
         fillDataEform (res) {
             let vm = this
-            // Tạm thời
-            // if(Object.keys(res).length !== 0 && res.constructor === Object){
-            //     vm.fillTableVanBan(res);
-            //     vm.fillTableThanhVien(res);
-            // }
-            // 
+            if(Object.keys(res).length !== 0 && res.constructor === Object){
+                // vm.fillTableVanBan(res);
+                vm.fillTableThanhVien(res);
+            }
+            
         },
         fillTableVanBan (res) {
             let vm = this
@@ -2383,160 +2316,157 @@ export default {
         },
         fillTableThanhVien (res) {
             let vm = this
-            vm.vb_so_thu_tu = res.vb_so_thu_tu ? res.vb_so_thu_tu : ''
-            if(res.vb_so_hieu_van_ban && res.vb_co_quan_chu_quan && res.vb_ma_co_quan_chu_quan){
-                let tg = {
-                    bookingName: res.bookingName ? res.bookingName : '',
-                    applicantName: res.applicantName ? res.applicantName : '',
-                    applicantIdNo: res.applicantIdNo ? res.applicantIdNo : '',
-                    address: res.address ? res.address : '',
-                    vb_so_thu_tu: res.vb_so_thu_tu ? res.vb_so_thu_tu : '',
-                    vb_so_hieu_van_ban: res.vb_so_hieu_van_ban ? res.vb_so_hieu_van_ban.toUpperCase() : '',
-                    vb_ngay_ky: res.vb_ngay_ky ? res.vb_ngay_ky : '',
-                    vb_co_quan_chu_quan: res.vb_co_quan_chu_quan ? res.vb_co_quan_chu_quan : '',
-                    vb_ma_co_quan_chu_quan: res.vb_ma_co_quan_chu_quan ? res.vb_ma_co_quan_chu_quan : '',
-                    vb_nguoi_ky: res.vb_nguoi_ky ? res.vb_nguoi_ky : '',
-                    vb_co_quan_tieng_anh: res.vb_co_quan_tieng_anh ? res.vb_co_quan_tieng_anh : '',
-                    
-                    ma_nhan_than: "",
-                    ho_chieu_ngoai_giao: res.ho_chieu_ngoai_giao ? res.ho_chieu_ngoai_giao : false,
-                    ho_chieu_cong_vu: res.ho_chieu_cong_vu ? res.ho_chieu_cong_vu : false,
-                    cong_ham: res.cong_ham ? res.cong_ham : false,
-                    so_ho_chieu: res.so_ho_chieu ? res.so_ho_chieu : '',
-                    so_hieu_van_ban: res.vb_so_hieu_van_ban ? res.vb_so_hieu_van_ban.toUpperCase() : '',
-                    co_quan_chu_quan: res.vb_ma_co_quan_chu_quan ? res.vb_ma_co_quan_chu_quan : '',
-                    co_quan_chu_quan_text: res.vb_co_quan_chu_quan ? res.vb_co_quan_chu_quan : '',
-                    ho_ten: res.ho_ten  ? res.ho_ten : '',
-                    gioi_tinh: res.gioi_tinh ? res.gioi_tinh : '',
-                    ngay_sinh: res.ngay_sinh ? res.ngay_sinh : '',
-                    thang_sinh: res.thang_sinh ? res.thang_sinh : '',
-                    nam_sinh: res.nam_sinh ? res.nam_sinh : '',
-                    noi_sinh_khac: "",
-                    noi_sinh: res.noi_sinh ? res.noi_sinh : '',
-                    noi_sinh_text: res.noi_sinh_text ? res.noi_sinh_text : '',
-                    ho_khau: res.ho_khau ? res.ho_khau : '',
-                    so_cmt: res.so_cmt ? res.so_cmt : '',
-                    ngay_cap_cmt: res.ngay_cap_cmt ? res.ngay_cap_cmt : '',
-                    noi_cap_cmt: res.noi_cap_cmt ? res.noi_cap_cmt : '',
-                    co_quan_cong_tac: res.co_quan_cong_tac ? res.co_quan_cong_tac : '',
-                    dien_thoai: res.dien_thoai ? res.dien_thoai : '',
-                    chuc_vu: res.chuc_vu ? res.chuc_vu : '',
-                    cap_bac_ham: res.cap_bac_ham ? res.cap_bac_ham : '',
-                    chuc_vu_tieng_anh: "",
-                    cong_chuc_loai: res.cong_chuc_loai ? res.cong_chuc_loai : '',
-                    cong_chuc_bac: res.cong_chuc_bac  ? res.cong_chuc_bac : '',
-                    cong_chuc_ngach: res.cong_chuc_ngach ? res.cong_chuc_ngach : '',
-                    can_bo_bo_nhiem: res.can_bo_bo_nhiem ? res.can_bo_bo_nhiem : '',
-                    so_ho_chieu_ngoai_giao: res.so_ho_chieu_ngoai_giao ? res.so_ho_chieu_ngoai_giao : '',
-                    ngay_ho_chieu_ngoai_giao: res.ngay_ho_chieu_ngoai_giao ? res.ngay_ho_chieu_ngoai_giao : '',
-                    noi_cap_ho_chieu_ngoai_giao: res.noi_cap_ho_chieu_ngoai_giao_text ? res.noi_cap_ho_chieu_ngoai_giao_text : '',
-                    so_ho_chieu_cong_vu: res.so_ho_chieu_cong_vu ? res.so_ho_chieu_cong_vu : '',
-                    ngay_ho_chieu_cong_vu: res.ngay_ho_chieu_cong_vu ? res.ngay_ho_chieu_cong_vu : '',
-                    noi_cap_ho_chieu_cong_vu: res.noi_cap_ho_chieu_cong_vu_text ? res.noi_cap_ho_chieu_cong_vu_text : '',
-                    gia_dinh: [],
-                    loai_ho_chieu: res.loai_ho_chieu ? res.loai_ho_chieu : ''
-                }
-                if(res.gia_dinh) {
-                    tg['gia_dinh'] = res.gia_dinh.map(obj=>{
-                        obj['gia_dinh'] = obj['gia_dinh']
-                        obj['ho_ten'] = obj['ho_ten'] ? obj['ho_ten'] : ''
-                        obj['nam_sinh'] = obj['nam_sinh'] ? obj['nam_sinh'] : ''
-                        obj['nghe_nghiep'] = obj['nghe_nghiep'] ? obj['nghe_nghiep'] : ''
-                        obj['dia_chi'] = obj['dia_chi'] ? obj['dia_chi'] : ''
-                        return obj
-                    })
-                } else {
-                    tg['gia_dinh'] = vm.gia_dinh
-                }
-                if(vm.serviceCode === 'BNG-270820' || vm.serviceCode === 'BNG-270816'){
-                    // if(tg['loai_ho_chieu'] === 'Công vụ'){
-                    //     tg['ho_chieu_cong_vu'] = true
-                    // }
-                    // if(tg['loai_ho_chieu'] === 'Ngoại giao'){
-                    //     tg['ho_chieu_ngoai_giao'] = true
-                    // }
-                    if(tg['loai_ho_chieu'] === 'Công vụ' || tg['loai_ho_chieu'] === 'Ngoại giao') {
-                        vm.ho_chieu_gia_han++
-                    }
-                }
-                if(vm.serviceCode === 'BNG-270819'){
-                    tg['cong_ham'] = true
-                }
-                vm.listThanhVien.push(tg)
-                vm.so_nguoi = vm.listThanhVien.length
-                // fill Nuoc di
-                // res.di_den.forEach(e => {
-                //     let nuocditg = vm.listNuocDi.find(item=>item.ID === e )
-                //     if(nuocditg){
-                //         let nuocditg2 = vm.nuoc_di.find(item=>item.ID === nuocditg.ID)
-                //         if(!nuocditg2){
-                //             vm.nuoc_di.push(nuocditg.ID) 
-                //         }   
-                //     }
-                // })
-                if(res.di_den) {
-                    for(let i = 0; i< res.di_den.length ; i++){
-                        let nuocditg = vm.listNuocDi.find(item=>item.ID === res.di_den[i] )
-                    
-                        if(nuocditg){
-                            
-                            let nuocditg2 = vm.nuoc_di.find(item=>item === nuocditg.ID)
-                            if(!nuocditg2){
-                                vm.nuoc_di.push(nuocditg.ID) 
-                            }   
-                        }
-                    }  
-                }
-    
-                
-                // Day  formData vao dossierFileArr 
-                for (let i =0; i< vm.dossierFileArr.length; i++){
-                    if(vm.dossierFileArr[i]['partNo'] === 'TP01'  && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
-                        vm.dossierFileArr[i]['formData'] = JSON.stringify({'thanh_vien_doan': vm.listThanhVien})
-                        vm.dossierFileArr[i]['eform'] = 'true'
-                    }
-                }
-                let dataOut = vm.dossierFileArr.filter(function (item) {
-                    return item.formData || (!item.formData && item.fileEntryId)
-                })
-                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
+            let tk = {
+                kiem_tra: false,
+                Id: '',
+                Ca_Nhan_Id: '',
+                Ten: res.Ten,
+                Ten_Kd: res.Ten,
+                Ngay_Sinh: vm.dateDef(res.Ngay_Sinh),
+                Ngay_Sinh_F: res.Ngay_Sinh,
+                Def_Ngay_Sinh: 'D',
+                Gioi_Tinh: res.Gioi_Tinh,
+                Gioi_Tinh_Text: res.Gioi_Tinh === 'M' ? 'Nam' : 'Nữ',
+                Quoc_Tich_Hn_Id: res.Quoc_Tich_Hn_Id,
+                Quoc_Tich_Hn_Text: res.Quoc_Tich_Hn_Id_Text,
+                So_Ho_Chieu: res.So_Ho_Chieu,
+                Ma_To_Khai: vm.eFormCode,
+                Loai_Ho_Chieu: res.Loai_Ho_Chieu,
+                Noi_Cap_Hc_Id: res.Noi_Cap_Hc_Id,
+                Noi_Cap_Hc_Id_Text: res.Noi_Cap_Hc_Id_Text,
+                Quoc_Tich_Goc_Id: res.Quoc_Tich_Goc_Id,
+                Quoc_Tich_Goc_Text: res.Quoc_Tich_Goc_Id_Text,
+                Nghe_Nghiep_Id: res.Nghe_Nghiep_Id,
+                Nghe_Nghiep: res.Nghe_Nghiep,
+                Muc_Dich_Id: res.Muc_Dich_Id,
+                Muc_Dich: res.Muc_Dich,
+                LOAI: '',
+                Gia_Tri_Tt: res.Xin_Gia_Tri_TT,
+                Ky_Hieu_Tt: '',
+                Duoc_Nc_Tu_Ngay: '',
+                Duoc_Nc_Den_Ngay: '',
+                Co_Quan_De_Nghi_Ten: '',
+                Co_Quan_De_Nghi_Id: '',
+                Loai_Cv_Den: '',
+                So_Cv_Den: '',
+                Ngay_Cv_Den: '',
+                De_Nghi_Khac: '',
+                Du_Kien_Thu: '',
+                Don_Vi_Tien_Te: 'VNĐ',
 
-                // 
-                vm.cong_ham_so_nguoi = vm.listThanhVien.filter(e => e.cong_ham).length
-                if(res.nhap_canh){
-                    vm.cong_ham_nhap_canh++
-                }
-                if(res.qua_canh){
-                    vm.cong_ham_qua_canh++
-                }
-                if(res.schengen){
-                    vm.cong_ham_schengen++
-                }
-                if(res.nhap_canh || res.qua_canh || res.schengen){
-                    if(res.di_den){
-                        vm.cong_ham_so_nuoc += res.di_den.length
-                    }
-                    if(res.di_den_text){
-                        let arrNuocDi = res.di_den_text.split(', ')
-                        for(let i = 0;i<arrNuocDi.length;i++){
-                            let find =  vm.danhSachQGMienCongHam.find(e=>e.itemName !== arrNuocDi[i])
-                            vm.soNuocKhongDuocMien++
-                        } 
-                    }
-                }
-                vm.countPassport()
-                vm.genLePhi()
+                So_Dien_Thoai: '',
+                So_Dien_Thoai_Cq: '',
+                So_Luong_Hc: '',
+                So_Luong_To_Khai: '',
+                Giay_To_Kem_Theo: '',
+                Noi_Hen_Tra_Kq_Id: '',
+                Noi_Hen_Tra_Kq: '',
+                Ngay_Hen_Tra: '',
+                Ngay_Huy: '',
+                Nguoi_Huy: '',
+                Ly_Do_Huy: '',
+                Ghi_Chu: '',
+                Nguoi_Tao: '',
+                Ngay_Tao: '',
+                Ngay_Lap_Phieu: '',
+                Nguoi_Sua_Cuoi: '',
+                Ngay_Sua_Cuoi: '',
+                Nguoi_Nhan: '',
+                Ngay_Nhan: '',
+                Bl_Ten_Cq_Ca_Nhan: '',
+                Bl_Dia_Chi_Id: '',
+                Bl_Dia_Chi_Chi_Tiet: '',
+                Bl_So_Dien_Thoai: '',
+                Noi_Gui_Cv_Den: '',
+                Noi_Dung_Tra_Loi: '',
+                Ngay_Luu_Ho_So: '',
+                Nguoi_Luu_Ho_So: '',
+                So_Giay_Hen: '',
+                Noi_Gui_Cv_Den_Id: '',
+
+                CaNhan: {
+                    Id: '',
+                    ca_nhan_goc_id: '',
+                    noi_sinh: null,
+                    Ten: '',
+                    Ten_Kd: '',
+                    Ngay_Sinh: '',
+                    Def_Ngay_Sinh: 'D',
+                    Gioi_Tinh: '',
+                    Quoc_Tich_Hn_Id: '',
+                    So_Ho_Chieu: '',
+                    Quoc_Tich_Goc_Id: '',
+                    Ngay_Tao: '',
+                    Nguoi_Tao: '',
+                },
+                PhepNhapCanh: {
+                    PhepNhapCanhChiTiet: [
+                        {
+                            Id: '',
+                            Phep_Nhap_Canh_Id: '',
+                            Ten: '',
+                            Ten_Kd: '',
+                            Ngay_Sinh: '',
+                            Def_Ngay_Sinh: 'D',
+                            Quoc_Tich_Id: '',
+                            So_Ho_Chieu: '',
+                            Duoc_Nc_Tu_Ngay: '',
+                            Duoc_Nc_Den_Ngay: '',
+                            Gia_Tri_Tt: '',
+                            Ngay_Tao: '',
+                            Nguoi_Tao: '',
+                            Muc_Dich_Id: '',
+                            Ky_Hieu_Tt: '',
+                            Hs_Thi_Thuc_Id: '',
+                            So_Fax: '',
+                            Ngay_Fax: '',
+                            Co_Quan_De_Nghi_Ten: '',
+                            Co_Quan_De_Nghi_Id: '',
+                            Don_Vi_Nhan_Phep_Id: ''
+                        }
+                    ],
+                    Id: '',
+                    So_Fax: '',
+                    Ngay_Fax: '',
+                    Ma_So_Khach: null,
+                    Don_Vi_Cap_Phep_Id: '',
+                    Ngay_Tao: '',
+                    Nguoi_Tao: '',
+                    Trang_Thai: '',
+                    Co_Quan_De_Nghi_Ten: null,
+                    Co_Quan_De_Nghi_Id: null,
+                    Nguoi_Ky: '',
+                    Chuc_Vu: ''
+                },
+                HsThanNhan: [],
+                HsTreEmDiCung: []
             }
+            console.log('thanhvien', tk)
+            
+            vm.listThanhVien.push(tk)
+            vm.so_nguoi = vm.listThanhVien.length
+            // Day  formData vao dossierFileArr 
+            for (let i =0; i< vm.dossierFileArr.length; i++){
+                if(vm.dossierFileArr[i]['partNo'] === 'TP01'  && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
+                    vm.dossierFileArr[i]['formData'] = JSON.stringify({'thanh_vien_doan': vm.listThanhVien})
+                    vm.dossierFileArr[i]['eform'] = 'true'
+                }
+            }
+            let dataOut = vm.dossierFileArr.filter(function (item) {
+                return item.formData || (!item.formData && item.fileEntryId)
+            })
+            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
+            vm.genLePhi()
+            
         },
-        getNuocDi(){
+        getQuocGia(){
             let vm = this
             let config = {
-                url: '/o/rest/v2/serverconfigs/HCTN_GET_DIA_DANH/protocols/API_CONNECT?loai=quoc_gia&ten=',
+                url: '/o/rest/v2/dictcollections/MOFA2_QUOC_GIA/dictitems',
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
             }
             axios.request(config).then(res => {
-                vm.listNuocDi = vm.sortArr(res.data.data, 'TEN') 
-
+                vm.listNuocDi = vm.sortArr(res.data.data, 'itemName') 
             }).catch(err => {})  
         },
         getMucDich(){
@@ -2605,7 +2535,7 @@ export default {
         getNoiCapHoChieu(){
             let vm = this
             let config = {
-                url: '/o/rest/v2/dictcollections/NOI_CAP_HO_CHIEU/dictitems',
+                url: '/o/rest/v2/dictcollections/MOFA2_QUOC_GIA/dictitems',
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
             }
             axios.request(config).then(res => {
@@ -2659,16 +2589,21 @@ export default {
             }
             if (vm.listNuocDi) {
                 vm.quoc_tich_than_nhan = vm.listNuocDi.filter(function (itemList) {
-                    return itemList.ID ==  item.Quoc_Tich_Id
+                    return itemList.itemCode ==  item.Quoc_Tich_Id
                 })[0]
             }
             vm.ho_ten_than_nhan = item.Ten
-            vm.birthdayFormated = item.Ngay_Sinh
+            vm.birthdayThanNhanFormated = item.Ngay_Sinh
             vm.dia_chi_thuong_tru_than_nhan = item.Dia_Chi_Thuong_Tru
         },
         deleteThanNhan (item, index) {
             let vm = this
-            vm.listThanNhan.splice(index,1)
+            vm.listThanNhan.splice(index, 1)
+            if (vm.update_than_nhan !== 'add') {
+                vm.$refs.formThanNhan.reset()
+                vm.$refs.formThanNhan.resetValidation()
+                vm.update_than_nhan = 'add'
+            }
         },
         updateThanNhan () {
             let vm = this
@@ -2678,9 +2613,9 @@ export default {
                     Qhgd_Text: vm.loai_quan_he['itemName'],
                     Ten: vm.ho_ten_than_nhan,
                     Ten_Kd: vm.ho_ten_than_nhan,
-                    Ngay_Sinh: vm.birthdayFormated,
-                    Quoc_Tich_Id: vm.quoc_tich_than_nhan ? vm.quoc_tich_than_nhan.ID : '',
-                    Quoc_Tich_Text: vm.quoc_tich_than_nhan ? vm.quoc_tich_than_nhan.TEN : '',
+                    Ngay_Sinh: vm.birthdayThanNhanFormated,
+                    Quoc_Tich_Id: vm.quoc_tich_than_nhan ? vm.quoc_tich_than_nhan.itemCode : '',
+                    Quoc_Tich_Text: vm.quoc_tich_than_nhan ? vm.quoc_tich_than_nhan.itemName : '',
                     Dia_Chi_Thuong_Tru: vm.dia_chi_thuong_tru_than_nhan ? vm.dia_chi_thuong_tru_than_nhan : ''
                 }
                 if(vm.update_than_nhan === 'add'){
@@ -2702,17 +2637,22 @@ export default {
                 })[0]
             }
             if (vm.listNuocDi) {
-                vm.quoc_tich_than_nhan = vm.listNuocDi.filter(function (itemList) {
-                    return itemList.ID ==  item.Quoc_Tich_Id
+                vm.quoc_tich_di_cung = vm.listNuocDi.filter(function (itemList) {
+                    return itemList.itemCode ==  item.Quoc_Tich_Id
                 })[0]
             }
-            vm.ho_ten_than_nhan = item.Ten
-            vm.birthdayFormated = item.Ngay_Sinh
+            vm.ho_ten_di_cung = item.Ten
+            vm.birthdayDiCungFormated = item.Ngay_Sinh
             vm.so_ho_chieu_di_cung = item.So_Ho_Chieu
         },
         deleteNguoiDiCung (item, index) {
             let vm = this
             vm.listNguoiDiCung.splice(index,1)
+            if (vm.update_di_cung !== 'add') {
+                vm.$refs.formNguoiDiCung.reset()
+                vm.$refs.formNguoiDiCung.resetValidation()
+                vm.update_di_cung = 'add'
+            }
         },
         updateNguoiDiCung () {
             let vm = this
@@ -2720,11 +2660,11 @@ export default {
                 let tg = {
                     Qhgd_Id: vm.loai_quan_he['itemCode'],
                     Qhgd_Text: vm.loai_quan_he['itemName'],
-                    Ten: vm.ho_ten_than_nhan,
-                    Ten_Kd: vm.ho_ten_than_nhan,
-                    Ngay_Sinh: vm.birthdayFormated,
-                    Quoc_Tich_Id: vm.quoc_tich_than_nhan ? vm.quoc_tich_than_nhan.ID : '',
-                    Quoc_Tich_Text: vm.quoc_tich_than_nhan ? vm.quoc_tich_than_nhan.TEN : '',
+                    Ten: vm.ho_ten_di_cung,
+                    Ten_Kd: vm.ho_ten_di_cung,
+                    Ngay_Sinh: vm.birthdayDiCungFormated,
+                    Quoc_Tich_Id: vm.quoc_tich_di_cung ? vm.quoc_tich_di_cung.itemCode : '',
+                    Quoc_Tich_Text: vm.quoc_tich_di_cung ? vm.quoc_tich_di_cung.itemName : '',
                     So_Ho_Chieu: vm.so_ho_chieu_di_cung
                 }
                 if(vm.update_di_cung === 'add'){
@@ -2753,73 +2693,147 @@ export default {
         },
         updateThanhVien(){
             let vm = this
-            if(this.$refs.formThanhVien.validate() && (this.ho_chieu_ngoai_giao || this.ho_chieu_cong_vu || this.cong_ham)){
-                const [day, month, year] = vm.birthdayFormated.split('/')
+            if(vm.$refs.formThanhVien.validate()){
+                let thanNhan = vm.listThanNhan.map(item => {
+                    item['Ngay_Sinh'] = vm.dateDef(item.Ngay_Sinh)
+                    item['Def_Ngay_Sinh'] = 'D'
+                    return item
+                })
+                let danhSachDiCung = vm.listNguoiDiCung.map(item => {
+                    item['Ngay_Sinh'] = vm.dateDef(item.Ngay_Sinh)
+                    item['Def_Ngay_Sinh'] = 'D'
+                    return item
+                })
                 let tk = {
-                    bookingName: vm.dossiers.delegateName,
-                    applicantName: vm.dossiers.applicantName,
-                    applicantIdNo: vm.dossiers.applicantIdNo,
-                    address: vm.dossiers.address,
-                    vb_so_thu_tu: vm.vb_so_thu_tu,
-                    vb_so_hieu_van_ban: vm.co_quan_chu_quan_thanh_vien_select.vb_so_hieu_van_ban,
-                    vb_ngay_ky: vm.co_quan_chu_quan_thanh_vien_select.vb_ngay_ky,
-                    vb_co_quan_chu_quan: vm.co_quan_chu_quan_thanh_vien_select.vb_co_quan_chu_quan,
-                    vb_ma_co_quan_chu_quan: vm.co_quan_chu_quan_thanh_vien_select.vb_ma_co_quan_chu_quan,
-                    vb_nguoi_ky: vm.co_quan_chu_quan_thanh_vien_select.vb_nguoi_ky,
-                    vb_co_quan_tieng_anh: vm.co_quan_chu_quan_thanh_vien_select.vb_co_quan_tieng_anh,
+                    kiem_tra: false,
+                    Id: '',
+                    Ca_Nhan_Id: '',
+                    Ten: vm.ho_ten.toUpperCase(),
+                    Ten_Kd: vm.ho_ten.toUpperCase(),
+                    Ngay_Sinh: vm.dateDef(vm.birthdayFormated),
+                    Ngay_Sinh_F: vm.birthdayFormated,
+                    Def_Ngay_Sinh: 'D',
+                    Gioi_Tinh: vm.gioi_tinh['value'],
+                    Gioi_Tinh_Text: vm.gioi_tinh['name'],
+                    Quoc_Tich_Hn_Id: vm.quoc_tich_hien_nay['itemCode'],
+                    Quoc_Tich_Hn_Text: vm.quoc_tich_hien_nay['itemName'],
+                    So_Ho_Chieu: vm.so_ho_chieu,
+                    Ma_To_Khai: '',
+                    Loai_Ho_Chieu: vm.loai_ho_chieu['value'],
+                    Noi_Cap_Hc_Id: vm.noi_cap_ho_chieu['itemCode'],
+                    Noi_Cap_Hc_Id_Text: vm.noi_cap_ho_chieu['itemName'],
+                    Quoc_Tich_Goc_Id: vm.quoc_tich_goc['itemCode'],
+                    Quoc_Tich_Goc_Text: vm.quoc_tich_goc['itemName'],
+                    Nghe_Nghiep_Id: '',
+                    Nghe_Nghiep: vm.nghe_nghiep,
+                    Muc_Dich_Id: vm.muc_dich['itemCode'],
+                    Muc_Dich: vm.muc_dich['itemName'],
+                    LOAI: vm.loai_thi_thuc['value'],
+                    Gia_Tri_Tt: vm.so_lan_thi_thuc['value'],
+                    Ky_Hieu_Tt: vm.ky_hieu_thi_thuc['itemDescription'],
+                    Duoc_Nc_Tu_Ngay: vm.dateDef(vm.dateNgayDuKienNkFormated),
+                    Duoc_Nc_Den_Ngay: vm.dateDef(vm.dateNgayDuKienXkFormated),
+                    Co_Quan_De_Nghi_Ten: vm.vb_co_quan_chu_quan['Cq_Ca_Nhan_Cong_Van'],
+                    Co_Quan_De_Nghi_Id: vm.vb_co_quan_chu_quan['Ma_Cq_Ca_Nhan_Cong_Van'],
+                    Loai_Cv_Den: vm.vb_co_quan_chu_quan['Ma_Loai_Cong_Van'],
+                    So_Cv_Den: vm.vb_co_quan_chu_quan['So_Cong_Van'],
+                    Ngay_Cv_Den: vm.dateDef(vm.vb_co_quan_chu_quan['Ngay_Cong_Van']),
+                    De_Nghi_Khac: vm.de_nghi_khac,
+                    Du_Kien_Thu: '',
+                    Don_Vi_Tien_Te: 'VNĐ',
 
-                    ma_nhan_than: vm.ma_nhan_than,
-                    ho_chieu_ngoai_giao: vm.ho_chieu_ngoai_giao,
-                    ho_chieu_cong_vu: vm.ho_chieu_cong_vu,
-                    cong_ham: vm.cong_ham,
-                    so_ho_chieu: vm.so_ho_chieu,
-                    so_hieu_van_ban: vm.co_quan_chu_quan_thanh_vien_select.vb_so_hieu_van_ban,
-                    co_quan_chu_quan: vm.co_quan_chu_quan_thanh_vien_select.vb_ma_co_quan_chu_quan,
-                    co_quan_chu_quan_text: vm.co_quan_chu_quan_thanh_vien_select.vb_co_quan_chu_quan,
-                    ho_ten: vm.ho_ten,
-                    gioi_tinh: vm.gioi_tinh,
-                    ngay_sinh: day,
-                    thang_sinh: month,
-                    nam_sinh: year,
-                    noi_sinh_khac: vm.noi_sinh_khac,
-                    noi_sinh: vm.noi_sinh.ID,
-                    noi_sinh_text: vm.noi_sinh.TEN,
-                    ho_khau: vm.ho_khau,
-                    so_cmt: vm.so_cmt,
-                    ngay_cap_cmt: vm.ngay_cap_cmt,
-                    noi_cap_cmt: vm.noi_cap_cmt,
-                    co_quan_cong_tac: vm.co_quan_cong_tac,
-                    dien_thoai: vm.dien_thoai,
-                    chuc_vu: vm.chuc_vu,
-                    cap_bac_ham: vm.cap_bac_ham,
-                    chuc_vu_tieng_anh: vm.chuc_vu_tieng_anh,
-                    cong_chuc_loai: vm.cong_chuc_loai,
-                    cong_chuc_bac: vm.cong_chuc_bac,
-                    cong_chuc_ngach: vm.cong_chuc_ngach,
-                    can_bo_bo_nhiem: vm.can_bo_bo_nhiem,
-                    so_ho_chieu_ngoai_giao: vm.so_ho_chieu_ngoai_giao,
-                    ngay_ho_chieu_ngoai_giao: vm.ngay_ho_chieu_ngoai_giao,
-                    noi_cap_ho_chieu_ngoai_giao: vm.noi_cap_ho_chieu_ngoai_giao,
-                    so_ho_chieu_cong_vu: vm.so_ho_chieu_ngoai_giao,
-                    ngay_ho_chieu_cong_vu: vm.ngay_ho_chieu_cong_vu,
-                    noi_cap_ho_chieu_cong_vu: vm.noi_cap_ho_chieu_ngoai_giao,
-                    gia_dinh: vm.gia_dinh
+                    So_Dien_Thoai: '',
+                    So_Dien_Thoai_Cq: '',
+                    So_Luong_Hc: '',
+                    So_Luong_To_Khai: '',
+                    Giay_To_Kem_Theo: '',
+                    Noi_Hen_Tra_Kq_Id: '',
+                    Noi_Hen_Tra_Kq: '',
+                    Ngay_Hen_Tra: '',
+                    Ngay_Huy: '',
+                    Nguoi_Huy: '',
+                    Ly_Do_Huy: '',
+                    Ghi_Chu: '',
+                    Nguoi_Tao: '',
+                    Ngay_Tao: '',
+                    Ngay_Lap_Phieu: '',
+                    Nguoi_Sua_Cuoi: '',
+                    Ngay_Sua_Cuoi: '',
+                    Nguoi_Nhan: '',
+                    Ngay_Nhan: '',
+                    Bl_Ten_Cq_Ca_Nhan: '',
+                    Bl_Dia_Chi_Id: '',
+                    Bl_Dia_Chi_Chi_Tiet: '',
+                    Bl_So_Dien_Thoai: '',
+                    Noi_Gui_Cv_Den: '',
+                    Noi_Dung_Tra_Loi: '',
+                    Ngay_Luu_Ho_So: '',
+                    Nguoi_Luu_Ho_So: '',
+                    So_Giay_Hen: '',
+                    Noi_Gui_Cv_Den_Id: '',
+
+                    CaNhan: {
+                        Id: '',
+                        ca_nhan_goc_id: '',
+                        noi_sinh: null,
+                        Ten: vm.ho_ten.toUpperCase(),
+                        Ten_Kd: vm.ho_ten.toUpperCase(),
+                        Ngay_Sinh: vm.dateDef(vm.birthdayFormated),
+                        Def_Ngay_Sinh: 'D',
+                        Gioi_Tinh: vm.gioi_tinh['value'],
+                        Quoc_Tich_Hn_Id: vm.quoc_tich_hien_nay['itemCode'],
+                        So_Ho_Chieu: vm.so_ho_chieu,
+                        Quoc_Tich_Goc_Id: vm.quoc_tich_goc['itemCode'],
+                        Ngay_Tao: vm.dateDef(vm.currentDate()),
+                        Nguoi_Tao: window.themeDisplay.getUserName(),
+                    },
+                    PhepNhapCanh: {
+                        PhepNhapCanhChiTiet: [
+                            {
+                                Id: '',
+                                Phep_Nhap_Canh_Id: '',
+                                Ten: '',
+                                Ten_Kd: '',
+                                Ngay_Sinh: '',
+                                Def_Ngay_Sinh: 'D',
+                                Quoc_Tich_Id: '',
+                                So_Ho_Chieu: '',
+                                Duoc_Nc_Tu_Ngay: vm.dateDef(vm.dateNgayDuKienNkFormated),
+                                Duoc_Nc_Den_Ngay: vm.dateDef(vm.dateNgayDuKienXkFormated),
+                                Gia_Tri_Tt: vm.so_lan_thi_thuc['value'],
+                                Ngay_Tao: '',
+                                Nguoi_Tao: '',
+                                Muc_Dich_Id: vm.muc_dich['itemCode'],
+                                Ky_Hieu_Tt: vm.ky_hieu_thi_thuc['itemDescription'],
+                                Hs_Thi_Thuc_Id: '',
+                                So_Fax: '',
+                                Ngay_Fax: '',
+                                Co_Quan_De_Nghi_Ten: vm.vb_co_quan_chu_quan['Cq_Ca_Nhan_Cong_Van'],
+                                Co_Quan_De_Nghi_Id: vm.vb_co_quan_chu_quan['Ma_Cq_Ca_Nhan_Cong_Van'],
+                                Don_Vi_Nhan_Phep_Id: ''
+                            }
+                        ],
+                        Id: '',
+                        So_Fax: '',
+                        Ngay_Fax: '',
+                        Ma_So_Khach: null,
+                        Don_Vi_Cap_Phep_Id: '',
+                        Ngay_Tao: '',
+                        Nguoi_Tao: '',
+                        Trang_Thai: '',
+                        Co_Quan_De_Nghi_Ten: null,
+                        Co_Quan_De_Nghi_Id: null,
+                        Nguoi_Ky: '',
+                        Chuc_Vu: ''
+                    },
+                    HsThanNhan: thanNhan,
+                    HsTreEmDiCung: danhSachDiCung
                 }
-
-                if(vm.serviceCode === 'BNG-270820' || vm.serviceCode === 'BNG-270816' || vm.serviceCode === 'BNG-270819') {
-                    if(vm.ho_chieu_ngoai_giao){
-                        tk['loai_ho_chieu'] = 'Ngoại giao'
-                    }
-                    if(vm.ho_chieu_cong_vu){
-                        tk['loai_ho_chieu'] = 'Công vụ'
-                    } 
-                }
-
+                console.log('thanhvien', tk)
                 if(vm.update_thanhvien === 'add'){
                     vm.listThanhVien.push(tk)
                 } else {
                    vm.$set(vm.listThanhVien, vm.update_thanhvien, tk)
-                
                 }
                 vm.so_nguoi = vm.listThanhVien.length
                 for (let i=0; i<vm.dossierFileArr.length; i++){
@@ -2832,38 +2846,25 @@ export default {
                     return item.formData || (!item.formData && item.fileEntryId)
                 })
                 $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
-                vm.cong_ham_so_nguoi = vm.listThanhVien.filter(e => e.cong_ham).length
-
-                vm.countPassport()
                 vm.genLePhi()
-
                 vm.dialogThemThanhVien = false
             } else {
                 toastr.clear()
-                toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
+                toastr.error('Vui lòng nhập đầy đủ thông tin nhân thân và hộ chiếu')
             }
         },
-        countPassport(){
+        closeThemThanhVien () {
             let vm = this
-            vm.ho_chieu_ngoai_giao_cu = 0
-            vm.ho_chieu_cong_vu_cu = 0
-            vm.ho_chieu_cong_vu_moi = 0
-            vm.ho_chieu_ngoai_giao_moi = 0
-            vm.listThanhVien.forEach(e=>{
-                if(e.so_ho_chieu_ngoai_giao){
-                    vm.ho_chieu_ngoai_giao_cu++
+            if (vm.update_thanhvien !== 'add') {
+                let x = confirm('Bạn có muốn lưu thông tin sửa đổi?')
+                if (x) {
+                    vm.updateThanhVien()
+                } else {
+                    vm.dialogThemThanhVien = false
                 }
-                if(e.so_ho_chieu_cong_vu){
-                    vm.ho_chieu_cong_vu_cu++
-                }
-                if(e.ho_chieu_cong_vu){
-                    vm.ho_chieu_cong_vu_moi++
-                }
-                if(e.ho_chieu_ngoai_giao){
-                    vm.ho_chieu_ngoai_giao_moi++
-                }
-            })
-
+            } else {
+                vm.dialogThemThanhVien = false
+            }
         },
         openDialogThemVanBan(){
             this.update_cqcq = 'add'
@@ -2874,11 +2875,12 @@ export default {
         },
         openDialogThemThanhVien(){
             let vm = this
+            vm.active = 'tab-1'
             vm.update_thanhvien = 'add'
             vm.update_di_cung = 'add'
             vm.update_than_nhan = 'add'
             vm.dictCollection = 'tinh_thanh'
-            vm.getNoiSinh(vm.dictCollection)
+            // vm.getNoiSinh(vm.dictCollection)
             vm.dialogThemThanhVien = true
             vm.$refs.formThanhVien.reset()
             vm.$refs.formThanhVien.resetValidation()
@@ -2908,38 +2910,58 @@ export default {
             // }, 1000)
             vm.dialogThemVanBan = true
         },
-        openDialogUpdateThanhVien(index,item){
+        openDialogUpdateThanhVien (index,item) {
             let vm = this
-            this.update_thanhvien = index
-            this.dialogThemThanhVien = true
-            let tg = 'ma_nhan_than,ho_chieu_ngoai_giao,ho_chieu_cong_vu,cong_ham,so_ho_chieu,so_hieu_van_ban,ho_ten,gioi_tinh,ngay_sinh,thang_sinh,nam_sinh,noi_sinh_khac,noi_sinh,noi_sinh_text,ho_khau,so_cmt,ngay_cap_cmt,noi_cap_cmt,co_quan_cong_tac,dien_thoai,chuc_vu,cap_bac_ham,chuc_vu_tieng_anh,cong_chuc_loai,cong_chuc_bac,cong_chuc_ngach,can_bo_bo_nhiem,so_ho_chieu_ngoai_giao,ngay_ho_chieu_ngoai_giao,noi_cap_ho_chieu_ngoai_giao,so_ho_chieu_cong_vu,ngay_ho_chieu_cong_vu,noi_cap_ho_chieu_cong_vu,gia_dinh'
-            let mang_key = tg.split(',')
-            console.log(item)
-            console.log(vm.co_quan_chu_quan_thanh_vien)
-            mang_key.forEach( e => {
-               
-                if (e === 'so_hieu_van_ban'){
-                    vm.co_quan_chu_quan_thanh_vien_select = vm.co_quan_chu_quan_thanh_vien.find(item2 => item2['vb_so_hieu_van_ban'].toLowerCase() === item[e].toLowerCase() && item2['vb_ngay_ky'] === item['vb_ngay_ky']  && item2['vb_ma_co_quan_chu_quan'] === item['vb_ma_co_quan_chu_quan'])
-                } else if (e === 'nam_sinh' ||e === 'thang_sinh' || e === 'ngay_sinh') {
-                    vm.birthday = vm.parseDate(item['ngay_sinh']+'/'+item['thang_sinh']+'/'+item['nam_sinh'])
-                } else if (e === 'noi_sinh') {
-                    if(isNaN(item[e])){
-                        vm.dictCollection = 'quoc_gia'
-                    } else {
-                        vm.dictCollection = 'tinh_thanh'
-                    }
-                    vm.getNoiSinh(vm.dictCollection)
-                    setTimeout(()=>{
-                        vm.noi_sinh =  vm.listNoiSinh.find(el=>el.ID===item[e])
-                    }, 1000)
-                }
-                 else {
-                    vm[e] = item[e]
-                }
-              
-            })
-
-
+            vm.update_thanhvien = index
+            vm.update_di_cung = 'add'
+            vm.update_than_nhan = 'add'
+            vm.dialogThemThanhVien = true
+            
+            vm.ho_ten = item.Ten
+            vm.birthdayFormated = item.Ngay_Sinh_F
+            vm.gioi_tinh = item.Gioi_Tinh ? vm.listGioiTinh.filter(function (itemSelect) {
+                return itemSelect.value == item.Gioi_Tinh
+            })[0] : ''
+            vm.quoc_tich_hien_nay = item.Quoc_Tich_Hn_Id ? vm.listNuocDi.filter(function (itemSelect) {
+                return itemSelect.itemCode == item.Quoc_Tich_Hn_Id
+            })[0] : ''
+            vm.so_ho_chieu = item.So_Ho_Chieu
+            vm.loai_ho_chieu = item.Loai_Ho_Chieu ? vm.listLoaiHoChieu.filter(function (itemSelect) {
+                return itemSelect.value == item.Loai_Ho_Chieu
+            })[0] : ''
+            vm.noi_cap_ho_chieu = item.Noi_Cap_Hc_Id ? vm.listNoiCapHoChieu.filter(function (itemSelect) {
+                return itemSelect.itemCode == item.Noi_Cap_Hc_Id
+            })[0] : ''
+            vm.quoc_tich_goc = item.Quoc_Tich_Goc_Id ? vm.listNuocDi.filter(function (itemSelect) {
+                return itemSelect.itemCode == item.Quoc_Tich_Goc_Id
+            })[0] : ''
+            vm.nghe_nghiep = item.Nghe_Nghiep
+            vm.muc_dich = item.Muc_Dich_Id ? vm.listMucDich.filter(function (itemSelect) {
+                return itemSelect.itemCode == item.Muc_Dich_Id
+            })[0] : ''
+            vm.loai_thi_thuc = item.LOAI ? vm.listLoaiThiThuc.filter(function (itemSelect) {
+                return itemSelect.value == item.LOAI
+            })[0] : ''
+            vm.so_lan_thi_thuc = item.Gia_Tri_Tt ? vm.listSoLanThiThuc.filter(function (itemSelect) {
+                return itemSelect.value == item.Gia_Tri_Tt
+            })[0] : ''
+            vm.ky_hieu_thi_thuc = item.Ky_Hieu_Tt ? vm.listKyHieu.filter(function (itemSelect) {
+                return itemSelect.itemDescription == item.Ky_Hieu_Tt
+            })[0] : ''
+            vm.dateNgayDuKienNkFormated = vm.dateDefReverd(item.Duoc_Nc_Tu_Ngay)
+            vm.dateNgayDuKienXkFormated = vm.dateDefReverd(item.Duoc_Nc_Den_Ngay)
+            vm.vb_co_quan_chu_quan = vm.listVanBan.filter(function (itemSelect) {
+                return itemSelect.Ma_Cq_Ca_Nhan_Cong_Van == item.Co_Quan_De_Nghi_Id && itemSelect.So_Cong_Van == item.So_Cv_Den
+            })[0]
+            vm.de_nghi_khac = item.De_Nghi_Khac
+            vm.listThanNhan = item.HsThanNhan && item.HsThanNhan.length > 0 ? item.HsThanNhan.map(item => {
+                item['Ngay_Sinh'] = vm.dateDefReverd(item.Ngay_Sinh)
+                return item
+            }) : []
+            vm.listNguoiDiCung = item.HsTreEmDiCung && item.HsTreEmDiCung.length > 0 ? item.HsTreEmDiCung.map(item => {
+                item['Ngay_Sinh'] = vm.dateDefReverd(item.Ngay_Sinh)
+                return item
+            }) : []
         },
         genSelectCQCQ(){
             let vm = this
@@ -2976,37 +2998,25 @@ export default {
             })
             $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
         },
-        checkThanhVien (index) {
-            let vm = this
-            console.log(vm.listVanBan[index])
-            let thanhvien =  vm.listThanhVien.find(e => e.vb_so_hieu_van_ban === vm.listVanBan[index].vb_so_hieu_van_ban && e.vb_ngay_ky === vm.listVanBan[index].vb_ngay_ky && e.vb_ma_co_quan_chu_quan === vm.listVanBan[index].vb_ma_co_quan_chu_quan)
-            console.log(thanhvien)
-            return thanhvien ? true : false
-        },
         deleteVanBan(index){
             let vm = this
-            if(!vm.checkThanhVien(index)){
-                vm.listVanBan.splice(index,1)
-                for (let i =0; i< vm.dossierFileArr.length; i++){
-                    if(vm.dossierFileArr[i]['partNo'] === 'TP02' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
-                        vm.dossierFileArr[i]['formData'] = JSON.stringify({'van_ban': vm.listVanBan})
-                        vm.dossierFileArr[i]['eform'] = 'true'
-                    }
+            vm.listVanBan.splice(index,1)
+            for (let i =0; i< vm.dossierFileArr.length; i++){
+                if(vm.dossierFileArr[i]['partNo'] === 'TP02' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
+                    vm.dossierFileArr[i]['formData'] = JSON.stringify({'van_ban': vm.listVanBan})
+                    vm.dossierFileArr[i]['eform'] = 'true'
                 }
-                // 
-                vm.dossierFileArr = vm.dossierFileArr.filter(function (item) {
-                    return !item.hasOwnProperty('fileEntryId')
-                })
-                // 
-                let dataOut = vm.dossierFileArr.filter(function (item) {
-                    return item.formData || (!item.formData && item.fileEntryId)
-                })
-                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
-                this.genSelectCQCQ()
-            } else {
-                toastr.clear()
-                toastr.error('Văn bản quyết định đã được sử dụng. Phải xóa thành viên sử dụng văn bản quyết định ' + vm.listVanBan[index].vb_so_hieu_van_ban + ' - ' + vm.listVanBan[index].vb_ngay_ky + ' - ' + vm.listVanBan[index].vb_co_quan_chu_quan)
             }
+            // 
+            vm.dossierFileArr = vm.dossierFileArr.filter(function (item) {
+                return !item.hasOwnProperty('fileEntryId')
+            })
+            // 
+            let dataOut = vm.dossierFileArr.filter(function (item) {
+                return item.formData || (!item.formData && item.fileEntryId)
+            })
+            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
+            this.genSelectCQCQ()
         },
         genLePhi(){
             let vm = this
@@ -3071,12 +3081,12 @@ export default {
             let nuoc_id = vm.nuoc_di.join()
             let nuoc_di = ''
             vm.nuoc_di.forEach((e)=>{
-                let nc = vm.listNuocDi.find(item=>item.ID === e)
+                let nc = vm.listNuocDi.find(item=>item.itemCode === e)
                 if(nc){
                     if(nuoc_di){
-                        nuoc_di+=', ' + nc.TEN
+                        nuoc_di+=', ' + nc.itemName
                     } else {
-                       nuoc_di+= nc.TEN
+                       nuoc_di+= nc.itemName
                     }
                     
                 }     
@@ -3085,30 +3095,6 @@ export default {
             console.log(vm.dossiers['metaData'] , typeof vm.dossiers['metaData'])   
             let hs = JSON.parse(vm.dossiers['metaData']);
             hs['dossierFilePayment'] = file_payment2
-            hs['Doan_HCTN'] = {
-                "CQCuDi": vm.dossiers.applicantName, 
-                "QD_CV": "", 
-                "SoNguoi": String(vm.so_nguoi), 
-                "MucDich": "", 
-                "TaiChinh": "", 
-                "CQChuQuan": 0, 
-                "SoNgay": "", 
-                "CacNuocDi_ma": nuoc_id, 
-                "CacNuocDi": nuoc_di, 
-                "SoHCCu_NG": vm.ho_chieu_ngoai_giao_cu.toString(),
-                "SoHCCu_CV": vm.ho_chieu_cong_vu_cu.toString(),
-                "SoHCCu_PT": vm.ho_chieu_pho_thong_cu.toString(),
-                "SoHCCapMoi": vm.ho_chieu_cong_vu_moi.toString(),
-                "SoNuocXinCH": vm.cong_ham_so_nuoc.toString(), 
-                "SoNguoiMLP": "", 
-                "SoHCCapMoi_NG": vm.ho_chieu_ngoai_giao_moi.toString(), 
-                "SoNguoiMienCH": vm.cong_ham_schengen.toString(),
-                "SoCHNhapCanh": vm.cong_ham_nhap_canh.toString(),
-                "SoCHQuaCanh": vm.cong_ham_qua_canh.toString(),
-                "SoHCGH": vm.ho_chieu_gia_han.toString(),
-                "SoHCHong": vm.ho_chieu_hong.toString(),
-                "SoHCMat": vm.ho_chieu_mat.toString()
-            };
             vm.dossiers['metaData'] = JSON.stringify(hs)
             
         },
@@ -3124,17 +3110,6 @@ export default {
         },
         genDueDate () {
             let vm = this
-            // let config = {
-            //     url: '/o/rest/v2/dossiers/dueDate?service='+vm.serviceCode+'&agency='+vm.govAgencyCode+'&template='+vm.dossierTemplateNo+'&fromReceiveDate=',
-            //     headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
-            // }
-            // axios.request(config).then(res => {
-            //     let tg = new Date(parseInt(res.data['dueDate']));
-                    
-            //     // let ngay = tg.getDate()+'/'+(tg.getMonth()+1)+'/'+tg.getFullYear()
-            //     // vm.dossiers['dueDate'] = ngay
-            //     vm.dateDueDate = tg.toISOString().substr(0, 10)
-            // }).catch(err => {}) 
             let config = {
                 url: '/o/rest/v2/dossiers/'+ 4 +'/calculate/duedate',
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
@@ -3149,51 +3124,52 @@ export default {
                 vm.dossiers['metaData'] = JSON.stringify(metaData)
             }).catch(err => {})  
         },
-        getThongTinNhanThan () {
+        kiemTraHoChieu (autorun) {
             let vm = this
-            vm.listDanhSach = []
-            let params = {}
-            params['soHoChieu'] = vm.so_ho_chieu ? vm.so_ho_chieu : ''
-            params['hoTen'] = vm.ho_ten ? vm.ho_ten : ''
-            params['ngaySinh'] = vm.birthdayFormated ? vm.birthdayFormated : ''
-            if(vm.noi_sinh){
-                if(Object.keys(vm.noi_sinh).length !== 0 && vm.noi_sinh.constructor === Object){
-                    params['noiSinh'] = vm.noi_sinh.ID ? vm.noi_sinh.ID : ''
-                }
-            }
-            let config = {
-                url: '/o/rest/v2/serverconfigs/HCTN_GET_CA_NHAN/protocols/API_CONNECT',
-                params: params,
-                headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
-            }
-            axios.request(config).then(res => {
-                if(res.data.data.length > 0) {
-                    let arr = res.data.data.map(obj=>{
-                        let NoiSinhText = {}
-                        if(isNaN(obj.NoiSinh)){
-                            NoiSinhText = vm.listNoiSinhNuocNgoai.find(e=>e.ID===obj.NoiSinh)
-                        } else {
-                            NoiSinhText = vm.listNoiSinhTrongNuoc.find(e=>e.ID===obj.NoiSinh)
+            if (vm.so_ho_chieu) {
+                let data = {}
+                data['ktHoChieu'] = 1
+                data['soHC'] = vm.so_ho_chieu.trim()
+                data['soPhep'] = ''
+                let config = {
+                    method: 'get',
+                    url: '/o/rest/v2/mofa2/KTHochieu',
+                    headers: { 
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'groupId' : Liferay.ThemeDisplay.getScopeGroupId()
+                    },
+                    params: data
+                };
+                axios.request(config).then(res => {
+                    let dataHoChieu
+                    try {
+                        let dataJson = JSON.parse(res.data.data)[0]
+                        dataHoChieu = dataJson['SoHc'] === vm.so_ho_chieu.trim() ? dataJson : ''
+                    } catch (error) {
+                    }
+                    if(dataHoChieu) {
+                        vm.saiSoHoChieu = false
+                        let [year, month, day] = dataHoChieu.NgaySinh.substr(0, 10).split('-')
+                        vm.birthdayFormated = `${day}/${month}/${year}`
+                        vm.ho_ten = dataHoChieu['HoTen']
+                        vm.noi_cap_ho_chieu = vm.listNoiCapHoChieu.filter(function(item) {
+                            return item.itemCode == dataHoChieu['QuocTichId']
+                        })[0]
+                    } else {
+                        vm.saiSoHoChieu = true
+                        toastr.clear()
+                        if (!autorun) {
+                            toastr.error('Không tìm thấy thông tin hộ chiếu số: ' + vm.so_ho_chieu)
                         }
-                        
-                        const [year, month, day] = obj.NgaySinh.substr(0, 10).split('-')
-                        const [year2, month2, day2] = obj.HanDung.substr(0, 10).split('-')
-                        let NgaySinhFormart = `${day}/${month}/${year}`
-                        let HanDungFormart = `${day2}/${month2}/${year2}`
-                        return {
-                            ...obj,
-                            NgaySinhFormart: NgaySinhFormart,
-                            NoiSinhText: NoiSinhText.TEN ? NoiSinhText.TEN : '',
-                            HanDungFormart: HanDungFormart
-                        }
-                    })
-                    vm.listDanhSach =  vm.sortDate(arr, 'HanDung')
-                    vm.dialogDanhSach = true
-                }else{
-                    toastr.clear()
-                    toastr.error('Không tìm thấy thông tin')
-                }
-            }).catch(err => {toastr.error('Không tìm thấy thông tin')}) 
+                    }
+                }).catch(err => {
+                    if (!autorun) {
+                        toastr.error('Kiểm tra thông tin thực hiện thất bại')}
+                    }
+                ) 
+            } else {
+                toastr.error('Vui lòng nhập số hộ chiếu')
+            }
         },
         chonThanhVien(item){
             let vm = this
@@ -3550,6 +3526,24 @@ export default {
             let vm = this
             vm.inputDate('birthdayFormated')
         },
+        changeNgaySinhThanNhan(){
+            let vm = this
+            vm.changeDate('birthdayThanNhanFormated')
+            vm.birthdayThanNhan = vm.parseDate(vm.birthdayThanNhanFormated)
+        },
+        inputNgaySinhThanNhan(){
+            let vm = this
+            vm.inputDate('birthdayThanNhanFormated')
+        },
+        changeNgaySinhDiCung(){
+            let vm = this
+            vm.changeDate('birthdayDiCungFormated')
+            vm.birthdayDiCung = vm.parseDate(vm.birthdayDiCungFormated)
+        },
+        inputNgaySinhDiCung(){
+            let vm = this
+            vm.inputDate('birthdayDiCungFormated')
+        },
         changeDate(key){
             let vm = this 
             let dateString = vm[key];
@@ -3571,7 +3565,7 @@ export default {
                         vm[key] = ''
                         }else
                         if(date[2].length == 2){
-                            if(key==="birthdayFormated"){
+                            if(key==="birthdayFormated" || key==="birthdayThanNhanFormated" || key==="birthdayDiCungFormated"){
                                 if(date[2] <= 20){
                                     vm[key] = day+'/'+month+'/20'+date[2]
                                 } else {
@@ -3626,59 +3620,59 @@ export default {
             let metaData = JSON.parse(vm.dossiers.metaData)
             console.log(metaData)
             metaData['delegateIdNo']= vm.dossiers.delegateIdNo
-            console.log('1')
             metaData['delegateName']=vm.dossiers.delegateName
-             console.log('2')
             metaData['delegateTelNo']=vm.dossiers.delegateTelNo
-            console.log('3')
             if( vm.auth === "false") {
-                 console.log('4')
                 vm.dossiers['contactTelNo'] = vm.dossiers['delegateTelNo']
-                 console.log('5')
                 vm.dossiers['contactEmail'] = vm.dossiers['delegateEmail']
-                 console.log('6')
                 vm.dossiers['contactName'] = vm.dossiers['delegateName']
-                 console.log('7')
                 vm.dossiers['applicantIdNo'] = vm.dossiers['delegateIdNo']
-                 console.log('8')
                 vm.dossiers['applicantName'] = vm.dossiers['bookingName']
-                 console.log('9')
                 vm.dossiers['address'] = vm.dossiers['delegateAddress']
-                 console.log('10')
                 vm.dossiers['cityCode'] = vm.dossiers['delegateCityCode']
-                 console.log('11')
                 vm.dossiers['districtCode'] = vm.dossiers['delegateDistrictCode']
-                 console.log('12')
                 vm.dossiers['wardCode'] = vm.dossiers['delegateWardCode']
-                 console.log('13')
                 vm.dossiers['contactTelNo'] = vm.dossiers['delegateTelNo']
-                 console.log('14')
                 vm.dossiers['contactEmail'] = vm.dossiers['delegateEmail']
-                 console.log('15')
             }
             vm.dossiers['applicantName'] = vm.dossiers['bookingName']
             vm.dossiers['metaData'] = JSON.stringify(metaData)
-            console.log('16')
             $('#dossiers_hidden').val(JSON.stringify(vm.dossiers))
         },
-        getBGMienCongHam(){
+        toggleKT(index, item){
             let vm = this
-            let headers = {
-                groupId: window.themeDisplay.getScopeGroupId(),
-                Token: window.Liferay ? window.Liferay.authToken : ''
+            vm.$set(vm.listThanhVien, index, item)
+        },
+        changeSoHieuChieu () {
+            let vm = this
+            if (vm.functionTimeOut) {
+                clearTimeout(vm.functionTimeOut)
             }
-            axios({
-                method: 'GET',
-                url: '/o/rest/v2/dictcollections/QG_MIENCONGHAM/dictitems',
-                headers: headers,
-            }).then(function (response) {
-                if(response.data.hasOwnProperty('data')){
-                    vm.danhSachQGMienCongHam =  response.data.data
-                } else {
-                    vm.danhSachQGMienCongHam = []
+            vm.functionTimeOut = setTimeout(function () {
+                if (vm.so_ho_chieu.length >= 3) {
+                    vm.kiemTraHoChieu('autorun')
                 }
-            }).catch(function (error) {
-            })
+            }, 1000)
+        },
+        dateDef (date) {
+            if (date) {
+                const [day, month, year] = date.split('/')
+                return `${month}/${day}/${year}`
+            } else {
+                return ''
+            }
+        },
+        dateDefReverd (date) {
+            if (date) {
+                const [month, day, year] = date.split('/')
+                return `${day}/${month}/${year}`
+            } else {
+                return ''
+            }
+        },
+        currentDate () {
+            let value = new Date()
+            return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()}`
         }
     }
 }

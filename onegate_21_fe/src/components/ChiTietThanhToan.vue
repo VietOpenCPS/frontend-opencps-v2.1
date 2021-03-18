@@ -132,6 +132,14 @@
 
                   <!-- end -->
                 </v-layout>
+                <v-layout wrap v-if="Number(payments.paymentStatus) < 3 && payments.hasOwnProperty('invoicePayload') && payments['invoicePayload'] == 'VNPT'">
+                  <v-flex xs12>
+                    <v-btn class="ml-3" color="primary" @click="printPay()">
+                      <v-icon>print</v-icon> &nbsp;
+                      In biên lai
+                    </v-btn>
+                  </v-flex>
+                </v-layout>
               </v-layout>
             </v-card-text>
           </v-card>
@@ -381,41 +389,48 @@ export default {
       }
       vm.dialogPDFLoading = true
       vm.dialogPDF = true
-      if (vm.payments['paymentMethod'] === 'KeyPayDVCQG') {
-        let confirmPayload = vm.payments.hasOwnProperty('confirmPayload') ? vm.getEPaymentProfile(vm.payments['confirmPayload']) : ''
-        vm.dialogPDFLoading = false
-        let url = confirmPayload ? confirmPayload['url_invoice'] : ''
-        if (url) {
-          window.open(url, "_blank")
-        } else {
-          alert('Không có biên lai')
-        }
-        
-      } else if (vm.payments['paymentMethod'] === 'PayPlatDVCQG' || vm.payments['paymentMethod'] === 'Paygov') {
-        // let param = {
-        //   headers: {
-        //     groupId: window.themeDisplay.getScopeGroupId()
-        //   },
-        //   responseType: 'blob'
-        // }
-        // axios.get('/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice', param).then(function (response) {
-        //   vm.dialogPDFLoading = false
-        //   let serializable = response.data
-        //   let file = window.URL.createObjectURL(serializable)
-        //   document.getElementById('dialogPaymentPreview').src = file
-        // }).catch(function (error) {
-        //   vm.dialogPDFLoading = false
-        // })
-        vm.dialogPDFLoading = false
-        vm.dialogPDF = false
-        let url = '/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice'
-        window.open(url, "_blank")
-      } else {
-        vm.$store.dispatch('printPay', filter).then(function (result) {
+      if (vm.payments.hasOwnProperty('invoicePayload') && vm.payments['invoicePayload'] == 'VNPT') {
+        vm.$store.dispatch('printPayVnpt', filter).then(function (result) {
           vm.dialogPDFLoading = false
           document.getElementById('dialogPaymentPreview').src = result
         }).catch(function(){})
+      } else {
+        if (vm.payments['paymentMethod'] === 'KeyPayDVCQG') {
+          let confirmPayload = vm.payments.hasOwnProperty('confirmPayload') ? vm.getEPaymentProfile(vm.payments['confirmPayload']) : ''
+          vm.dialogPDFLoading = false
+          let url = confirmPayload ? confirmPayload['url_invoice'] : ''
+          if (url) {
+            window.open(url, "_blank")
+          } else {
+            alert('Không có biên lai')
+          }
+        } else if (vm.payments['paymentMethod'] === 'PayPlatDVCQG' || vm.payments['paymentMethod'] === 'Paygov') {
+          // let param = {
+          //   headers: {
+          //     groupId: window.themeDisplay.getScopeGroupId()
+          //   },
+          //   responseType: 'blob'
+          // }
+          // axios.get('/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice', param).then(function (response) {
+          //   vm.dialogPDFLoading = false
+          //   let serializable = response.data
+          //   let file = window.URL.createObjectURL(serializable)
+          //   document.getElementById('dialogPaymentPreview').src = file
+          // }).catch(function (error) {
+          //   vm.dialogPDFLoading = false
+          // })
+          vm.dialogPDFLoading = false
+          vm.dialogPDF = false
+          let url = '/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice'
+          window.open(url, "_blank")
+        } else {
+          vm.$store.dispatch('printPay', filter).then(function (result) {
+            vm.dialogPDFLoading = false
+            document.getElementById('dialogPaymentPreview').src = result
+          }).catch(function(){})
+        }
       }
+      
     },
     getEinvoiceNo (string) {
       if (string && string.indexOf('#') >= 0) {

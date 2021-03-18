@@ -72,7 +72,6 @@
             let vm = this
             vm.toDateFormatted = vm.formatDate(val)
             // vm.rawDate = vm.parseDate(vm.toDateFormatted)
-            console.log('toDateFormatted', vm.toDateFormatted, vm.rawDate)
             vm.$emit('input', new Date(val).getTime())
             vm.$emit('change', new Date(val).getTime())
             // vm.$parent.reloadPicker()
@@ -80,6 +79,7 @@
         '$route': function (newRoute, oldRoute) {
             let vm = this
             vm.rawDate = vm.parseDate(vm.dataValue)
+            vm.toDateFormatted = vm.dataValue
             if (vm.item.hasOwnProperty('before')) {
                 let dataMax = vm.dataAll[vm.item['before']]
                 let dataMaxConvert = vm.parseDate(dataMax)

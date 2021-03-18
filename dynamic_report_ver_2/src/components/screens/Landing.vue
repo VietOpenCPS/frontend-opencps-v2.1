@@ -20,7 +20,7 @@
                   class="btn__chot"
                   @change="doChotSoLieu($event, button)"
                 ></v-select>
-                <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
+                <v-btn style="display: none" flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
                   <v-icon v-if="showConfig">reply</v-icon>
                   <v-icon v-else>settings</v-icon> &nbsp;
                   <span v-if="showConfig">Quay lại</span>
@@ -65,7 +65,6 @@
             label="Nhóm dữ liệu"
             item-text="label"
             item-value="key"
-            clearable
             >
           </v-autocomplete>
         </v-flex>
@@ -117,7 +116,7 @@
           >
           </v-autocomplete>
         </v-flex>
-        <v-flex xs12 sm6 class="px-3 mb-3">
+        <v-flex xs12 class="px-3 mb-3">
           <div class="d-inline-block left" v-if="!itemsReports[index]['filterConfig']['version']">
             <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> 
               <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
@@ -149,25 +148,31 @@
         </v-flex>
       </v-layout>
       <!-- table báo cáo số liệu tổng hợp -->
-      <div class="mx-3" v-if="isRender && !isShowLoading && itemsReports[index]['filterConfig']['version']">
+      <div class="mx-3" v-if="!isShowLoading && itemsReports[index]['filterConfig']['version']">
+        <div class="mb-2" v-if="listTongHop && listTongHop.length > 0" style="font-weight: 500;font-size: 14px;">
+          <span style="color: green">Tổng số hồ sơ: </span> <span style="color: red">{{totalCount}}</span>
+        </div>
         <v-data-table
           :headers="headerTongHop"
           :items="listTongHop"
           hide-actions
           class="table-landing table-bordered"
           style="border-left: 1px solid #dedede;"
+          no-data-text="Không có hồ sơ nào"
         >
           <template slot="items" slot-scope="props">
             <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
-              <td class="text-xs-left pt-2" style="min-width: 135px;" @click="viewListHoSo(props.item)" title="Xem danh sách">
+              <td class="text-xs-left pt-2" style="min-width: 135px;" @click="viewListHoSo(props.item, 'first')" title="Xem danh sách">
                 <content-placeholders v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
-                  <span>{{props.item.domainName}}</span>
+                  <span v-if="props.item.hasOwnProperty('domainName')">{{props.item.domainName}}</span>
+                  <span v-if="props.item.hasOwnProperty('serviceName')">{{props.item.serviceName}}</span>
+                  <span v-if="props.item.hasOwnProperty('govAgencyName')">{{props.item.govAgencyName}}</span>
                 </div>
               </td>
-              <td class="text-xs-center pt-2" @click="viewListHoSo(props.item)" title="Xem danh sách">
+              <td class="text-xs-center pt-2" @click="viewListHoSo(props.item, 'first')" title="Xem danh sách">
                 <content-placeholders v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -187,11 +192,21 @@
                       Quyển {{n}} &nbsp; <v-icon size="18">arrow_drop_down</v-icon>
                     </v-btn>
                     <v-list>
-                      <v-list-tile @click="printPdf(n)">
-                        <v-list-tile-title>In</v-list-tile-title>
+                      <v-list-tile @click="printPdf(props.item ,n)">
+                        <v-list-tile-title>
+                          <v-icon class="mr-1" color="blue" size="16">
+                            print
+                          </v-icon>
+                          In báo cáo
+                        </v-list-tile-title>
                       </v-list-tile>
-                      <v-list-tile @click="downloadExcel(n)">
-                        <v-list-tile-title>Tải excel</v-list-tile-title>
+                      <v-list-tile @click="downloadExcel(props.item, n)">
+                        <v-list-tile-title>
+                          <v-icon class="mx-1" color="green" size="14">
+                            fas fa fa-file-excel-o
+                          </v-icon>
+                          Tải excel
+                        </v-list-tile-title>
                       </v-list-tile>
                     </v-list>
                   </v-menu>
@@ -203,7 +218,7 @@
       </div>
       <!-- table bao cao -->
       <div>
-        <div v-if="!itemsReports[index]['filterConfig']['showTable'] && !showHTML">
+        <div v-if="!itemsReports[index]['filterConfig']['showTable'] && !showHTML && !itemsReports[index]['filterConfig']['version']">
           <vue-friendly-iframe v-if="showGuilds" :src="'/documents/' + groupId + '/0/hdsd.pdf'"></vue-friendly-iframe>
           <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' && !showGuilds" :src="pdfBlob"></vue-friendly-iframe>
         </div>
@@ -300,48 +315,6 @@
                 @tiny:change-page="paggingData" ></tiny-pagination> 
             </div>
           </div>
-        </div>
-        <!-- view HTML -->
-        <div v-if="showHTML">
-                <table v-if="tableType === 'table-1'" class="my-2 table-report" hide-default-footer>
-                  <thead>
-                    <tr>
-                      <th v-for="(header, index) in headerRenderHtmlTable" :key="index">
-                        <span>{{header.text}}</span>
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    <tr class="note__column">
-                      <td align="center" class="px-2" v-for="(header, index) in headerRenderHtmlTable" :key="index">({{index + 1}})</td>
-                    </tr>
-                    <tr v-for="(item,index) in dataBodyHTML" :key="index">
-                      <td v-if="item.colSpan > 1" :colspan="item.colSpan" class="font-weight-bold">
-                        <span>{{item.text}}({{item.totalChild}})</span>
-                      </td>
-                      <td v-else v-for="(val, name) in headerRenderHtmlTable" :key="name" :align="val.align">
-                        <span>{{item.dossier[val.value]}}</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                <table v-if="tableType === 'table-2'" class="my-2 table-report" hide-default-footer>
-                  <thead>
-                    <tr v-for="(header, index) in headerRenderHtmlTable" :key="index" v-if="header !== '[$report$]'">
-                      <td v-for="(item, index2)  in header" :key="index2" v-if="item" :rowspan="item.rowSpan ? item.rowSpan  : 1" :colspan="item.colSpan ? item.colSpan : 1" :align="item.alignment" :class="{'font-weight-bold': item.bold}">
-                        <span>{{item.text}}</span>
-                      </td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(item, index) in dataRowRenderHtmlTable" :key="index">
-                      <td v-for="(item2, index2) in item" :key="index2" :align="item2.alignment" :style="{width: widthRenderHtmlTable[index2] + 'px'}"> 
-                        <span>{{item2.text}}</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
         </div>
         <!--  -->
         <v-layout wrap v-if="reportType.startsWith('DANH_GIA_CAN_BO')">
@@ -442,7 +415,6 @@
             <v-data-table
               :headers="headers"
               :items="dossierList"
-              :pagination.sync="pagination"
               hide-actions
               class="table-landing table-bordered"
             >
@@ -462,14 +434,6 @@
                     </content-placeholders>
                     <div v-else>
                       <span>{{props.item.dossierNo}}</span>
-                    </div>
-                  </td>
-                  <td class="text-xs-left">
-                    <content-placeholders v-if="loading">
-                      <content-placeholders-text :lines="1" />
-                    </content-placeholders>
-                    <div v-else>
-                      <span>{{props.item.dossierName}}</span>
                     </div>
                   </td>
                   <td class="text-xs-left" style="min-width: 135px">
@@ -512,16 +476,6 @@
                       </span>
                     </div>
                   </td>
-                  <td class="text-xs-left">
-                    <content-placeholders v-if="loading">
-                      <content-placeholders-text :lines="1" />
-                    </content-placeholders>
-                    <div v-else>
-                      <span>
-                        <span>{{props.item.dossierOverdue}}</span>
-                      </span>
-                    </div>
-                  </td>
                 </tr>
               </template>
             </v-data-table>
@@ -552,7 +506,7 @@
     </v-dialog>
     <!-- dialog pdf -->
     <v-dialog v-model="dialogPDF" max-width="1200" transition="fade-transition">
-      <v-card>
+      <v-card style="min-height: calc(90vh - 100px)">
         <v-toolbar flat dark color="primary">
           <v-toolbar-title>Báo cáo thống kê</v-toolbar-title>
           <v-spacer></v-spacer>
@@ -560,7 +514,19 @@
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
-        <vue-friendly-iframe :src="pdfBlob"></vue-friendly-iframe>
+        <v-card-text v-if="loadingPdfVer2">
+          <v-flex xs12 class="text-xs-center" style="margin-top: 150px">
+            <v-progress-circular
+              :size="100"
+              :width="1"
+              color="primary"
+              indeterminate
+            ></v-progress-circular>
+          </v-flex>
+        </v-card-text>
+        <!-- <iframe v-else id="dialogPDFVer2" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe> -->
+        <vue-friendly-iframe v-else :src="pdfBlob"></vue-friendly-iframe>
       </v-card>
     </v-dialog>
     <!--  -->
@@ -638,6 +604,7 @@ export default {
     danhSachBaoCao: [],
     pdfBlob: null,
     isShowLoading: false,
+    loadingPdfVer2: false,
     isCallData: false,
     nameReport: '',
     showConfig: false,
@@ -656,6 +623,7 @@ export default {
     jsonMapperJson: {},
     userData: '',
     bookList: [],
+    totalCount: 0,
     listTongHop: [],
     headerTongHop: [
       {
@@ -664,7 +632,7 @@ export default {
         sortable: false
       },
       {
-        text: 'Tổng số hồ sơ',
+        text: 'Số lượng hồ sơ',
         align: 'center',
         sortable: false
       },
@@ -682,11 +650,6 @@ export default {
       },
       {
         text: 'Mã hồ sơ',
-        align: 'center',
-        sortable: false
-      },
-      {
-        text: 'Tên hồ sơ',
         align: 'center',
         sortable: false
       },
@@ -709,11 +672,6 @@ export default {
         text: 'Trạng thái',
         align: 'center',
         sortable: false
-      },
-      {
-        text: 'Hạn xử lý',
-        align: 'center',
-        sortable: false
       }
     ],
     pagination: {
@@ -721,6 +679,8 @@ export default {
       rowsPerPage: 20,
       totalItems: 0
     },
+    sttQuyen: 1,
+    targetFilter: '',
     tableType: '',
     dossierList: [],
     currentLimit: 100,
@@ -880,6 +840,19 @@ export default {
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
             vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+            // 
+            if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+              if (vm.groupByVal === 'domainCode') {
+                vm.filters = vm.filters.filter(function (item) {
+                  return item.key !== 'serviceCode' && item.key !== 'govAgencyCode'
+                })
+              }
+              if (vm.groupByVal === 'serviceCode') {
+                vm.filters = vm.filters.filter(function (item) {
+                  return item.key !== 'domainCode' && item.key !== 'govAgencyCode'
+                })
+              }
+            }
           }
           // 
           if(vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIdList')) {
@@ -1019,7 +992,18 @@ export default {
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
-        // console.log('filterssssss', vm.filters)
+        if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+          if (vm.groupByVal === 'domainCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'serviceCode' && item.key !== 'govAgencyCode'
+            })
+          }
+          if (vm.groupByVal === 'serviceCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'domainCode' && item.key !== 'govAgencyCode'
+            })
+          }
+        }
       }
       // 
       if(vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIdList')) {
@@ -1187,14 +1171,24 @@ export default {
         }
       }, 200)
     },
-    // groupByVal (val) {
-    //   let vm = this
-    //   if (val) {
-    //     vm.groupByValObj = vm.groupBy.filter(function (item) {
-    //       return item.key === val
-    //     })[0]
-    //   }
-    // },
+    groupByVal (val) {
+      let vm = this
+      if (val && vm.itemsReports[vm.index]['filterConfig']['version']) {
+        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
+          vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+        }
+        if (vm.groupByVal === 'domainCode') {
+          vm.filters = vm.filters.filter(function (item) {
+            return item.key !== 'serviceCode' && item.key !== 'govAgencyCode'
+          })
+        }
+        if (vm.groupByVal === 'serviceCode') {
+          vm.filters = vm.filters.filter(function (item) {
+            return item.key !== 'domainCode' && item.key !== 'govAgencyCode'
+          })
+        }
+      }
+    },
     api (val) {
       let vm = this
       if (val.indexOf('isGetVotingData') !== -1) {
@@ -1408,7 +1402,12 @@ export default {
           break
         }
       }
-      vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+        vm.api = vm.itemsReports[vm.index]['filterConfig']['apiLayDanhSach']
+        vm.data[vm.groupByVal] = vm.targetFilter[vm.groupByVal]
+      } else {
+        vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
         vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
       }
@@ -1479,18 +1478,33 @@ export default {
         filter['agencyLists'] = vm.agencyLists
       }
       vm.pdfBlob = null
-      vm.isShowLoading = true
+      if (!vm.itemsReports[vm.index]['filterConfig']['version']) {
+        vm.isShowLoading = true
+      }
+      if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+        let counterPage = vm.itemsReports[vm.index]['filterConfig']['numberPerPage']
+        filter['start'] = vm.sttQuyen * counterPage - counterPage,
+        filter['end'] = vm.sttQuyen * counterPage
+        vm.dialogPDF = true
+        vm.loadingPdfVer2 = true
+      }
       console.log('getAgencyReportLists',filter)
-      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+      let dispatchUse = vm.itemsReports[vm.index]['filterConfig']['version'] ? 'getDossiers' : 'getAgencyReportLists'
+      vm.$store.dispatch(dispatchUse, filter).then(function (result) {
         // console.log('result',result)
         if (result !== null && result !== undefined) {
           // set dossierList
-          vm.dossierList = result
+          let dataReport
+          if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+            dataReport = result.data
+            vm.dossierList = result.data
+          } else {
+            dataReport = result
+            vm.dossierList = result
+          }
           vm.pagination.totalItems = vm.dossierList.length
-          // console.log('dossiers', vm.dossierList)
           //
           vm.showErrorData = false
-          let dataReport = result
           let dossierRaw = {}
           let dataReportCurrent = {}
           let dataReportTotal = ''
@@ -1761,7 +1775,7 @@ export default {
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           // create blob
           // check showTable
-          if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+          if(vm.itemsReports[vm.index]['filterConfig']['version']){
             pdfDocGenerator.getBlob((blob) => {
               vm.pdfBlob = window.URL.createObjectURL(blob)
               if (vm.pdfBlob) {
@@ -1769,8 +1783,10 @@ export default {
               } else {
                 vm.isRender = false
               }
-              vm.isShowLoading = false
             })
+            setTimeout(function () {
+              vm.loadingPdfVer2 = false
+            }, 300)
           } else {
             pdfDocGenerator.getBlob((blob) => {
               vm.pdfBlob = window.URL.createObjectURL(blob)
@@ -2269,6 +2285,7 @@ export default {
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
         vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
       }
+      vm.data['groupBy'] = vm.groupByVal
       // build data
       let filter = {
         document: vm.reportType,
@@ -2294,32 +2311,42 @@ export default {
       vm.pdfBlob = null
       vm.listTongHop = []
       vm.$store.dispatch('createReport', filter).then(function (result) {
+        let counter = 0
         vm.isRender = true
         vm.isShowLoading = false
         let dataReport = result
-        dataReport.map(item => {
-          item['pages'] = item.count ? Math.ceil(item.count / vm.currentLimit) : 0
-          return item
-        })
+        // dataReport.map(item => {
+        //   item['pages'] = item.count ? Math.ceil(item.count / vm.currentLimit) : 0
+        //   return item
+        // })
+        for (let key in dataReport) {
+          dataReport[key]['pages'] = dataReport[key].count ? Math.ceil(dataReport[key].count / vm.currentLimit) : 0
+          counter+=Number(dataReport[key].count)
+        }
         vm.listTongHop = dataReport
+        vm.totalCount = counter
       })
     },
-    viewListHoSo (item) {
+    viewListHoSo (item, first) {
       let vm = this
+      vm.targetFilter = item
+      if (first) {
+        vm.pagination.page = 1
+      }
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
       vm.api = vm.itemsReports[vm.index]['filterConfig']['apiLayDanhSach']
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
         vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
       }
-      if (!vm.data[vm.groupByVal]) {
-        vm.data[vm.groupByVal] = item[vm.groupByVal]
-      }
+      vm.data[vm.groupByVal] = item[vm.groupByVal]
       // build data
       let filter = {
         document: vm.reportType,
         data: vm.data,
         api: vm.api,
-        proxyApi: vm.proxyApi
+        proxyApi: vm.proxyApi,
+        start: vm.pagination.page * vm.pagination.rowsPerPage - vm.pagination.rowsPerPage,
+        end: vm.pagination.page * vm.pagination.rowsPerPage
       }
       let check =  true
       console.log('groupIdListSelected 555', vm.groupIdListSelected)
@@ -2338,10 +2365,13 @@ export default {
       }
       vm.loadingGetDossier = true
       vm.dialogDossierList = true
+
       vm.$store.dispatch('getDossiers', filter).then(function (result) {
         vm.loadingGetDossier = false
         vm.dossierList = result.data
-        vm.pagination.totalItems = result.total
+        if (first) {
+          vm.pagination.totalItems = result.total
+        }
       })
     },
     sortByKey (array, key) {
@@ -2525,18 +2555,18 @@ export default {
     paggingData (config) {
       let vm = this
       vm.pagination.page = config.page
+      vm.viewListHoSo(vm.targetFilter)
     },
     viewDetail (item) {
       let vm = this
       vm.dossierInfo = item
       vm.dialogDossierDetail = true
     },
-    printReport () {
+    printPdf (item, n) {
       let vm = this
-      vm.dialogPDF = true
-    },
-    printPdf () {
-      let vm = this
+      vm.sttQuyen = n
+      vm.targetFilter = item
+      vm.doDynamicReport()
     },
     exportExcel () {
       let vm = this

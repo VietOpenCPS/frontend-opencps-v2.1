@@ -1818,8 +1818,8 @@ export default {
       }
       if(vm.data_form_template === 'formTT'){
         if(vm.$refs.formTiepNhan.validate()){
-          if(vm.checkQuyetDinh()){
-            if(vm.checkCKCD){
+          if(vm.checkThanhVien()){
+            // if(vm.checkCKCD){
               if(vm.formCode === 'NEW') {
                 vm.loadingAction = true
                 vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
@@ -1898,11 +1898,12 @@ export default {
                   }
                 }
               }
-            } else {
-              vm.dialogXacNhanThaoTac = true
-              vm.loadingAction = false 
-            }
+            // } else {
+              // vm.dialogXacNhanThaoTac = true
+              // vm.loadingAction = false 
+            // }
           } else {
+            vm.dialogXacNhanThaoTac = true
             vm.loadingAction = false
           }
         } else {
@@ -2496,6 +2497,30 @@ export default {
           let thanh_vien_doan = listThanhVien.find(e => e.vb_so_hieu_van_ban === listVanBan[i]['vb_so_hieu_van_ban'])
           if(!thanh_vien_doan) {
             toastr.error('Văn bản quyết định số ' + listVanBan[i]['vb_so_hieu_van_ban'] + ' chưa có thành viên nào')
+            return false
+          }
+        }
+        return true
+      } catch (err) {
+        return false
+      }
+    },
+    checkThanhVien () {
+      try{
+        let dossierFileArr = JSON.parse($('#dossierFileArr_hidden').val())
+        let TP02 = dossierFileArr.find(e=>e.partNo === 'TP02')
+        let listVanBan = JSON.parse(TP02.formData).van_ban
+        let TP01 = dossierFileArr.find(e=>e.partNo === 'TP01')
+        let listThanhVien = JSON.parse(TP01.formData).thanh_vien_doan
+        console.log(listThanhVien)
+        console.log(listVanBan)
+        for(let i =0; i<listThanhVien.length;i++){
+          if(!listThanhVien[i]['So_Cv_Den']){
+            toastr.error('Thành viên đoàn số thứ tự ' + i + 1 + ' chưa có văn bản quyết định')
+            return false
+          }
+          if(!listThanhVien[i]['kiem_tra']){
+            toastr.error('Thành viên đoàn số thứ tự ' + i + 1 + ' chưa được kiểm tra')
             return false
           }
         }
