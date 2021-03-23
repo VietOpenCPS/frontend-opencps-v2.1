@@ -17,7 +17,7 @@
         >
             <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
         </v-text-field>
-        <v-date-picker :max="maxDate" :min="minDate" v-model="toDate" no-title></v-date-picker>
+        <v-date-picker :max="maxDate" :min="minDate" v-model="toDate" no-title locale="vi" :first-day-of-week="1"></v-date-picker>
     </v-menu>
 </template>
 

@@ -251,7 +251,8 @@ export default {
     dialogLoadingCreate: false,
     dialogSelectGovagency: false,
     agencyItems: [
-      {name: 'Cục lãnh sự - 40 Trần Phú, Ba Đình, Hà Nội', value: '124302', code: 'CLS', serverNo: 'SERVER_CLS'}
+      {name: 'Cục lãnh sự - 40 Trần Phú, Ba Đình, Hà Nội', value: '124302', code: 'CLS', serverNo: 'SERVER_CLS'},
+      {name: 'Sở ngoại vụ thành phố Hồ Chí Minh', value: '1246110', code: 'SNVHCM', serverNo: 'SERVER_SNVHCM'}
     ],
     agencySelected: ''
   }),

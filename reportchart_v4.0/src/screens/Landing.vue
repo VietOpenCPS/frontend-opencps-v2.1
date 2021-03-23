@@ -26,7 +26,7 @@
               ></apexchart>
             </v-flex>
             <v-flex md6 xs12>
-              <v-layout wrap class="run-down">
+              <!-- <v-layout wrap class="run-down">
                 <v-flex md6 xs12 text-center>
                   <span style="color:#1976d2;">{{statistics.receivedCount}}</span>
                   <p>Tổng số đã tiếp nhận</p>
@@ -41,6 +41,24 @@
                 </v-flex>
                 <v-flex md6 xs12 text-center>
                   <span style="color:#1976d2;">{{statistics.overtimeCount}}</span>
+                  <p>Trễ hạn</p>
+                </v-flex>
+              </v-layout> -->
+              <v-layout wrap class="run-down">
+                <v-flex md6 xs12 text-center>
+                  <span style="color:#1976d2;">{{statisticSum.receivedCount}}</span>
+                  <p>Tổng số đã tiếp nhận</p>
+                </v-flex>
+                <v-flex md6 xs12 text-center>
+                  <span style="color:#1976d2;">{{thongKeHauGiang ? statisticSum.releaseInAPeriodCount : statisticSum.releaseCount}}</span>
+                  <p>Tổng số hoàn thành</p>
+                </v-flex>
+                <v-flex md6 xs12 text-center>
+                  <span style="color:#1976d2;">{{thongKeHauGiang ? processingTotal : statisticSum.processingCount}}</span>
+                  <p>Tổng số đang xử lý</p>
+                </v-flex>
+                <v-flex md6 xs12 text-center>
+                  <span style="color:#1976d2;">{{statisticSum.overtimeCount}}</span>
                   <p>Trễ hạn</p>
                 </v-flex>
               </v-layout>
@@ -837,6 +855,7 @@ export default {
       { name: "Tháng 12", value: 12 }
     ],
     listDoiTuong: [],
+    statisticSum: '',
     statistics: {
       betimesCount: 1,
       cancelledCount: 0,
@@ -960,27 +979,31 @@ export default {
       vm.getDictgroups('SBN');
       vm.getDictgroups('QUAN_HUYEN');
       vm.getDictgroups('XA_PHUONG');
-      vm.getStatisticsYear();
+      // vm.getStatisticsYear();
       vm.getStatisticsYearSBN();
       vm.getStatisticsYearQUAN_HUYEN();
       vm.getStatisticsYearXA_PHUONG();
       vm.getStatisticsMonth(vm.groupCode);
       vm.getLevelService()
+      vm.sumReport()
     })
   },
   watch: {
     yearSelected() {
+      let vm = this
       // 
       try {
-        this.labelPieChartConfig = labelPieChartConfig ? labelPieChartConfig : ''
+        vm.labelPieChartConfig = labelPieChartConfig ? labelPieChartConfig : ''
       } catch (error) {
-        this.labelPieChartConfig = ''
+        vm.labelPieChartConfig = ''
       }
       // 
-      this.getStatisticsYear();
-      this.getStatisticsYearSBN();
-      this.getStatisticsYearQUAN_HUYEN();
-      this.getStatisticsYearXA_PHUONG();
+      // vm.getStatisticsYear();
+      vm.getStatisticsYearSBN();
+      vm.getStatisticsYearQUAN_HUYEN();
+      vm.getStatisticsYearXA_PHUONG();
+      // 
+      vm.sumReport()
     },
     yearSelected2() {
       let vm = this
@@ -1552,6 +1575,68 @@ export default {
       if (vm.thongKeHauGiang) {
         vm.chartOptionsSoQuanXa = vm.chartOptionsYearHauGiang
       }
+    },
+    sumReport () {
+      let vm = this
+      let itemsGroups = ['SBN', 'QUAN_HUYEN', 'XA_PHUONG']
+      let arrAction = []
+      for (let index in itemsGroups) {
+        arrAction.push(
+          new Promise((resolve, reject) => {
+            let config = {
+              url: "/o/rest/statistics",
+              headers: {
+                groupId: window.themeDisplay.getScopeGroupId(),
+                Accept: "application/json"
+              },
+              params: {
+                domain: "total",
+                agency: "total",
+                year: vm.yearSelected,
+                month: 0,
+                groupCode: itemsGroups[index]
+              }
+            };
+            axios
+            .request(config)
+            .then(function(response) {
+              if (response.data.data) {
+                resolve(response.data.data[0])
+              } else {
+                reject({})
+              }
+            }).catch(function() {
+              reject({})
+            })
+          })
+        )
+      }
+      vm.statisticSum = ''
+      let sumReport = {
+        releaseInAPeriodCount: 0,
+        receivedCount: 0,
+        releaseCount: 0,
+        processingCount: 0,
+        betimesCount: 0,
+        ontimeCount: 0,
+        overtimeCount: 0
+      }
+      Promise.all(arrAction).then(results => {
+        sumReport.receivedCount = results[0]['receivedCount'] + results[1]['receivedCount'] + results[2]['receivedCount']
+        sumReport.releaseCount = results[0]['releaseCount'] + results[1]['releaseCount'] + results[2]['releaseCount']
+        sumReport.releaseInAPeriodCount = results[0]['releaseInAPeriodCount'] + results[1]['releaseInAPeriodCount'] + results[2]['releaseInAPeriodCount']
+        sumReport.processingCount = results[0]['processingInAPeriodCount'] +results[1]['processingInAPeriodCount'] + results[2]['processingInAPeriodCount']
+        sumReport.betimesCount = results[0]['betimesCount'] +results[1]['betimesCount'] + results[2]['betimesCount']
+        sumReport.ontimeCount = results[0]['ontimeCount'] +results[1]['ontimeCount'] + results[2]['ontimeCount']
+        sumReport.overtimeCount = results[0]['overtimeCount'] +results[1]['overtimeCount'] + results[2]['overtimeCount']
+        vm.processingTotal = sumReport.processingCount
+        vm.statisticSum = sumReport
+        vm.statisticalYear = [
+          sumReport.ontimeCount + sumReport.betimesCount,
+          sumReport.overtimeCount
+        ]
+      }).catch(xhr => {
+      })
     }
   }
 };

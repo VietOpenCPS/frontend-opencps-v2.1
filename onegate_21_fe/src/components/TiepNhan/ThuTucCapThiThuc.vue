@@ -342,7 +342,7 @@
                             <v-flex class="xs12 px-2">
                                 <v-layout wrap>
                                     <v-flex xs12 class="px-2 mb-2">
-                                        <label for="">Cơ quan, cá nhân mời đón</label>
+                                        <label for="">Cơ quan, cá nhân mời đón <span class="red--text">*</span></label>
                                         <v-autocomplete
                                             :items="listCoQuanChuQuan"
                                             v-model="co_quan_chu_quan"
@@ -357,7 +357,7 @@
                                         ></v-autocomplete>
                                     </v-flex>
                                     <v-flex xs12 class="px-2 mb-2">
-                                        <label for="">Văn bản đề nghị</label>
+                                        <label for="">Văn bản đề nghị <span class="red--text">*</span></label>
                                         <v-autocomplete
                                             :items="listLoaiVanBan"
                                             v-model="loaiVanBan"
@@ -366,20 +366,23 @@
                                             clearable
                                             hide-no-data
                                             return-object
+                                            :rules="[rules.required]"
+                                            required
                                             solo               
                                         ></v-autocomplete>
                                     </v-flex>
                                     <v-flex xs12 md6 class="px-2 mb-2">
-                                        <label for="">Số văn bản</label>
+                                        <label for="">Số văn bản <span class="red--text">*</span></label>
                                         <v-text-field
                                             v-model="so_van_ban"
                                             solo
-                                            type="number"
+                                            :rules="[rules.required]"
+                                            required
                                         ></v-text-field>
                                     </v-flex>
                                     
                                     <v-flex xs12 md6 class="px-2 mb-2">
-                                        <label for="">Ngày gửi</label>
+                                        <label for="">Ngày gửi <span class="red--text">*</span></label>
                                         <v-menu
                                             ref="menu"
                                             :close-on-content-click="false"
@@ -485,7 +488,7 @@
                                                             <span style="color: red">(*) </span> <span>Không tìm thấy thông tin hộ chiếu số: <b>{{so_ho_chieu}}</b></span>
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
-                                                            <label for="">Số hộ chiếu</label>
+                                                            <label for="">1. Số hộ chiếu <span class="red--text">*</span></label>
                                                             <div style="display:flex; flex-wrap: wrap;align-items: center;">
                                                                 <v-text-field
                                                                     v-model="so_ho_chieu"
@@ -499,7 +502,7 @@
                                                             </div>  
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
-                                                            <label for="">Hạn hộ chiếu</label>
+                                                            <label for="">2. Hạn hộ chiếu <span class="red--text">*</span></label>
                                                             <v-menu
                                                                 ref="menu2"
                                                                 :close-on-content-click="false"
@@ -517,14 +520,14 @@
                                                                     @change="changeHanHoChieu()"
                                                                     @input="inputHanHoChieu()"
                                                                     solo
-                                                                    :rules="[rules.required,rules.checkDatePast]"
+                                                                    :rules="[rules.required,rules.checkDateFuture]"
                                                                     required
                                                                 ></v-text-field>
                                                                 <v-date-picker v-model="hanHoChieu" no-title @input="menu2 = false" locale="vi"></v-date-picker>
                                                             </v-menu>
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
-                                                            <label for="">Loại hộ chiếu</label>
+                                                            <label for="">3. Loại hộ chiếu</label>
                                                             <v-autocomplete
                                                                 :items="listLoaiHoChieu"
                                                                 v-model="loai_ho_chieu"
@@ -537,7 +540,7 @@
                                                             ></v-autocomplete>
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
-                                                            <label for="">Cấp bởi <span class="red--text">*</span></label>
+                                                            <label for="">4. Cấp bởi <span class="red--text">*</span></label>
                                                             <v-autocomplete
                                                                 :items="listNoiCapHoChieu"
                                                                 v-model="noi_cap_ho_chieu"
@@ -552,7 +555,7 @@
                                                             ></v-autocomplete>
                                                         </v-flex>
                                                         <v-flex xs12 class="px-2 my-2">
-                                                            <label for="">1. Họ và tên (Chữ in viết hoa) <span class="red--text">*</span></label>
+                                                            <label for="">5. Họ và tên (Chữ in viết hoa) <span class="red--text">*</span></label>
                                                             <v-text-field
                                                                 v-model="ho_ten"
                                                                 :rules="[rules.required]"
@@ -562,7 +565,7 @@
                                                             ></v-text-field>
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
-                                                            <label for="">2. Giới tính <span class="red--text">*</span></label>
+                                                            <label for="">6. Giới tính <span class="red--text">*</span></label>
                                                             <v-autocomplete
                                                                 :items="listGioiTinh"
                                                                 v-model="gioi_tinh"
@@ -577,7 +580,7 @@
                                                             ></v-autocomplete>
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
-                                                            <label for="">3.Ngày sinh</label>
+                                                            <label for="">7.Ngày sinh <span class="red--text">*</span></label>
                                                             <v-menu
                                                                 ref="menu7"
                                                                 :close-on-content-click="false"
@@ -602,7 +605,7 @@
                                                             </v-menu>
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
-                                                            <label for="">4. Quốc tịch hiện nay <span class="red--text">*</span></label>
+                                                            <label for="">8. Quốc tịch hiện nay <span class="red--text">*</span></label>
                                                             <div style="display:flex; flex-wrap: wrap;align-items: center;">
                                                                 <v-autocomplete
                                                                     :items="listNuocDi"
@@ -619,7 +622,7 @@
                                                             </div>
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
-                                                            <label for="">5. Quốc tịch gốc <span class="red--text">*</span></label>
+                                                            <label for="">9. Quốc tịch gốc</label>
                                                             <div style="display:flex; flex-wrap: wrap;align-items: center;">
                                                                 <v-autocomplete
                                                                     :items="listNuocDi"
@@ -628,15 +631,13 @@
                                                                     item-value="itemCode"
                                                                     clearable
                                                                     hide-no-data
-                                                                    :rules="[rules.required]"
-                                                                    required
                                                                     solo
                                                                     return-object
                                                                 ></v-autocomplete>
                                                             </div>
                                                         </v-flex>
                                                         <v-flex xs12 class="px-2 my-2">
-                                                            <label for="">6. Nghề nghiệp </label>
+                                                            <label for="">10. Nghề nghiệp </label>
                                                             <div style="display:flex; flex-wrap: wrap;align-items: center;">
                                                                 <v-text-field
                                                                     v-model="nghe_nghiep"
@@ -645,7 +646,7 @@
                                                             </div>
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
-                                                            <label for="">7. Mục đích <span class="red--text">*</span></label>
+                                                            <label for="">11. Mục đích <span class="red--text">*</span></label>
                                                             <div style="display:flex; flex-wrap: wrap;align-items: center;">
                                                                 <v-autocomplete
                                                                     :items="listMucDich"
@@ -670,7 +671,7 @@
                                                             ></v-text-field>
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
-                                                            <label for="">8. Địa chỉ Việt Nam </label>
+                                                            <label for="">12. Địa chỉ Việt Nam </label>
                                                             <div style="display:flex; flex-wrap: wrap;align-items: center;">
                                                                 <v-text-field
                                                                     v-model="dia_chi_viet_nam"
@@ -679,7 +680,7 @@
                                                             </div>
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
-                                                            <label for="">9. Địa chỉ nước ngoài </label>
+                                                            <label for="">13. Địa chỉ nước ngoài </label>
                                                             <div style="display:flex; flex-wrap: wrap;align-items: center;">
                                                                 <v-text-field
                                                                     v-model="dia_chi_nuoc_ngoai"
@@ -742,7 +743,7 @@
                                                             </div>
                                                         </v-flex>
                                                         <v-flex xs12 md4 class="px-2 my-2">
-                                                            <label for="">Dự kiến nhập cảnh từ ngày <span class="red--text">*</span></label>
+                                                            <label for="">4. Dự kiến nhập cảnh từ ngày <span class="red--text">*</span></label>
                                                             <v-menu
                                                                 ref="menu8"
                                                                 :close-on-content-click="false"
@@ -760,14 +761,14 @@
                                                                     @change="changeNgayDuKienNk()"
                                                                     @input="inputNgayDuKienNk()"
                                                                     solo
-                                                                    :rules="[rules.required,rules.checkDatePast]"
+                                                                    :rules="[rules.required,rules.checkDateFuture]"
                                                                     required
                                                                 ></v-text-field>
-                                                                <v-date-picker v-model="dateNgayDuKienNk" no-title @input="menu8 = false" locale="vi"></v-date-picker>
+                                                                <v-date-picker :max="dateNgayDuKienXkFormated ? getMinMax(dateNgayDuKienXkFormated) : null" v-model="dateNgayDuKienNk" no-title @input="menu8 = false" locale="vi"></v-date-picker>
                                                             </v-menu>
                                                         </v-flex>
                                                         <v-flex xs12 md4 class="px-2 my-2">
-                                                            <label for="">Đến ngày <span class="red--text">*</span></label>
+                                                            <label for="">5. Đến ngày <span class="red--text">*</span></label>
                                                             <v-menu
                                                                 ref="menu9"
                                                                 :close-on-content-click="false"
@@ -785,10 +786,10 @@
                                                                     @change="changeNgayDuKienXk()"
                                                                     @input="inputNgayDuKienXk()"
                                                                     solo
-                                                                    :rules="[rules.required,rules.checkDatePast]"
+                                                                    :rules="[rules.required,rules.checkDateFuture]"
                                                                     required
                                                                 ></v-text-field>
-                                                                <v-date-picker v-model="dateNgayDuKienXk" no-title @input="menu9 = false" locale="vi"></v-date-picker>
+                                                                <v-date-picker :min="dateNgayDuKienNkFormated ? getMinMax(dateNgayDuKienNkFormated) : null" v-model="dateNgayDuKienXk" no-title @input="menu9 = false" locale="vi"></v-date-picker>
                                                             </v-menu>
                                                         </v-flex>
                                                         <!-- <v-flex xs12 md4 class="px-2 my-2"></v-flex>
@@ -869,7 +870,7 @@
                                                     </v-layout>
                                                 </v-flex>
                                                 <v-flex xs12 class="mx-0 py-1 mt-2 px-3" style="background: #dededeb3;">
-                                                    <v-btn small color="red" class="white--text right" @click="closeThemThanhVien"><v-icon>clear</v-icon>&nbsp; Đóng</v-btn>
+                                                    <v-btn small color="red" class="white--text right mr-0" @click="closeThemThanhVien"><v-icon>clear</v-icon>&nbsp; Đóng</v-btn>
                                                     <v-btn small color="primary" class="right" @click="updateThanhVien()"><v-icon>save</v-icon>&nbsp; 
                                                         <span v-if="update_thanhvien !== 'add'">Cập nhật thành viên</span>
                                                         <span v-else>Thêm thành viên</span>
@@ -888,7 +889,7 @@
                                                 <v-flex xs12 class="px-2">
                                                     <v-layout wrap>
                                                         <v-flex xs12 md4 class="px-2 mb-2">
-                                                            <label for="">1. Loại quan hệ <span class="red--text">*</span></label>
+                                                            <label for="">1. Loại quan hệ</label>
                                                             <div style="display:flex; flex-wrap: wrap;align-items: center;">
                                                                 <v-autocomplete
                                                                     :items="listLoaiQuanHe"
@@ -897,8 +898,6 @@
                                                                     item-value="itemCode"
                                                                     clearable
                                                                     hide-no-data
-                                                                    :rules="[rules.required]"
-                                                                    required
                                                                     solo
                                                                     return-object
                                                                 ></v-autocomplete>
@@ -932,8 +931,6 @@
                                                                     @change="changeNgaySinhThanNhan()"
                                                                     @input="inputNgaySinhThanNhan()"
                                                                     solo
-                                                                    :rules="[rules.required,rules.checkDatePast]"
-                                                                    required
                                                                 ></v-text-field>
                                                                 <v-date-picker v-model="birthdayThanNhan" no-title @input="menu10 = false" locale="vi"></v-date-picker>
                                                             </v-menu>
@@ -948,8 +945,6 @@
                                                                     item-value="itemCode"
                                                                     clearable
                                                                     hide-no-data
-                                                                    :rules="[rules.required]"
-                                                                    required
                                                                     solo
                                                                     return-object
                                                                 ></v-autocomplete>
@@ -1001,7 +996,7 @@
                                                     </v-layout>
                                                 </v-flex>
                                                 <v-flex xs12 class="mx-0 py-1 mt-2 px-3" style="background: #dededeb3;position: absolute;width: 100%;bottom: 0">
-                                                    <v-btn small color="red" class="white--text right" @click="closeThemThanhVien"><v-icon>clear</v-icon>&nbsp; Đóng</v-btn>
+                                                    <v-btn small color="red" class="white--text right mr-0" @click="closeThemThanhVien"><v-icon>clear</v-icon>&nbsp; Đóng</v-btn>
                                                     <v-btn small color="primary" class="right" @click="updateThanhVien()"><v-icon>save</v-icon>&nbsp; 
                                                         <span v-if="update_thanhvien !== 'add'">Cập nhật thành viên</span>
                                                         <span v-else>Thêm thành viên</span>
@@ -1020,7 +1015,7 @@
                                                 <v-flex xs12 class="px-2">
                                                     <v-layout wrap>
                                                         <v-flex xs12 md4 class="px-2 mb-2">
-                                                            <label for="">1. Loại quan hệ <span class="red--text">*</span></label>
+                                                            <label for="">1. Loại quan hệ</label>
                                                             <div style="display:flex; flex-wrap: wrap;align-items: center;">
                                                                 <v-autocomplete
                                                                     :items="listLoaiQuanHe"
@@ -1029,8 +1024,6 @@
                                                                     item-value="itemCode"
                                                                     clearable
                                                                     hide-no-data
-                                                                    :rules="[rules.required]"
-                                                                    required
                                                                     solo
                                                                     return-object
                                                                 ></v-autocomplete>
@@ -1041,10 +1034,12 @@
                                                             <v-text-field
                                                                 v-model="ho_ten_di_cung"
                                                                 solo
+                                                                :rules="[rules.required]"
+                                                                required
                                                             ></v-text-field>
                                                         </v-flex>
                                                         <v-flex xs12 md4 class="px-2 mb-2">
-                                                            <label for="">3. Ngày sinh</label>
+                                                            <label for="">3. Ngày sinh <span class="red--text">*</span></label>
                                                             <v-menu
                                                                 ref="menu6"
                                                                 :close-on-content-click="false"
@@ -1078,8 +1073,6 @@
                                                                     item-value="itemCode"
                                                                     clearable
                                                                     hide-no-data
-                                                                    :rules="[rules.required]"
-                                                                    required
                                                                     solo
                                                                     return-object
                                                                 ></v-autocomplete>
@@ -1131,7 +1124,7 @@
                                                     </v-layout>
                                                 </v-flex>
                                                 <v-flex xs12 class="mx-0 py-1 mt-2 px-3" style="background: #dededeb3;position: absolute;width: 100%;bottom: 0">
-                                                    <v-btn small color="red" class="white--text right" @click="closeThemThanhVien"><v-icon>clear</v-icon>&nbsp; Đóng</v-btn>
+                                                    <v-btn small color="red" class="white--text right mr-0" @click="closeThemThanhVien"><v-icon>clear</v-icon>&nbsp; Đóng</v-btn>
                                                     <v-btn small color="primary" class="right" @click="updateThanhVien()"><v-icon>save</v-icon>&nbsp; 
                                                         <span v-if="update_thanhvien !== 'add'">Cập nhật thành viên</span>
                                                         <span v-else>Thêm thành viên</span>
@@ -2318,8 +2311,8 @@ export default {
             let vm = this
             let tk = {
                 kiem_tra: false,
-                Id: '',
-                Ca_Nhan_Id: '',
+                Id: null,
+                Ca_Nhan_Id: null,
                 Ten: res.Ten,
                 Ten_Kd: res.Ten,
                 Ngay_Sinh: vm.dateDef(res.Ngay_Sinh),
@@ -2340,103 +2333,105 @@ export default {
                 Nghe_Nghiep: res.Nghe_Nghiep,
                 Muc_Dich_Id: res.Muc_Dich_Id,
                 Muc_Dich: res.Muc_Dich,
-                LOAI: '',
+                LOAI: null,
                 Gia_Tri_Tt: res.Xin_Gia_Tri_TT,
-                Ky_Hieu_Tt: '',
-                Duoc_Nc_Tu_Ngay: '',
-                Duoc_Nc_Den_Ngay: '',
-                Co_Quan_De_Nghi_Ten: '',
-                Co_Quan_De_Nghi_Id: '',
-                Loai_Cv_Den: '',
-                So_Cv_Den: '',
-                Ngay_Cv_Den: '',
-                De_Nghi_Khac: '',
-                Du_Kien_Thu: '',
-                Don_Vi_Tien_Te: 'VNĐ',
+                Ky_Hieu_Tt: null,
+                Duoc_Nc_Tu_Ngay: null,
+                Duoc_Nc_Den_Ngay: null,
+                Co_Quan_De_Nghi_Ten: null,
+                Co_Quan_De_Nghi_Id: null,
+                Loai_Cv_Den: null,
+                So_Cv_Den: null,
+                Ngay_Cv_Den: null,
+                De_Nghi_Khac: null,
+                Du_Kien_Thu: null,
+                Don_Vi_Tien_Te: '$',
 
-                So_Dien_Thoai: '',
-                So_Dien_Thoai_Cq: '',
-                So_Luong_Hc: '',
-                So_Luong_To_Khai: '',
-                Giay_To_Kem_Theo: '',
-                Noi_Hen_Tra_Kq_Id: '',
-                Noi_Hen_Tra_Kq: '',
-                Ngay_Hen_Tra: '',
-                Ngay_Huy: '',
-                Nguoi_Huy: '',
-                Ly_Do_Huy: '',
-                Ghi_Chu: '',
-                Nguoi_Tao: '',
-                Ngay_Tao: '',
-                Ngay_Lap_Phieu: '',
-                Nguoi_Sua_Cuoi: '',
-                Ngay_Sua_Cuoi: '',
-                Nguoi_Nhan: '',
-                Ngay_Nhan: '',
-                Bl_Ten_Cq_Ca_Nhan: '',
-                Bl_Dia_Chi_Id: '',
-                Bl_Dia_Chi_Chi_Tiet: '',
-                Bl_So_Dien_Thoai: '',
-                Noi_Gui_Cv_Den: '',
-                Noi_Dung_Tra_Loi: '',
-                Ngay_Luu_Ho_So: '',
-                Nguoi_Luu_Ho_So: '',
-                So_Giay_Hen: '',
-                Noi_Gui_Cv_Den_Id: '',
+                So_Dien_Thoai: null,
+                So_Dien_Thoai_Cq: null,
+                So_Luong_Hc: null,
+                So_Luong_To_Khai: null,
+                Giay_To_Kem_Theo: null,
+                Noi_Hen_Tra_Kq_Id: null,
+                Noi_Hen_Tra_Kq: null,
+                Ngay_Hen_Tra: null,
+                Ngay_Huy: null,
+                Nguoi_Huy: null,
+                Ly_Do_Huy: null,
+                Ghi_Chu: null,
+                Ngay_Tao: vm.dateDef(vm.currentDate()),
+                Nguoi_Tao: window.themeDisplay.getUserName(),
+                Ngay_Lap_Phieu: vm.dateDef(vm.currentDate()),
+                Nguoi_Sua_Cuoi: null,
+                Ngay_Sua_Cuoi: null,
+                Nguoi_Nhan: null,
+                Ngay_Nhan: null,
+                Bl_Ten_Cq_Ca_Nhan: null,
+                Bl_Dia_Chi_Id: null,
+                Bl_Dia_Chi_Chi_Tiet: null,
+                Bl_So_Dien_Thoai: null,
+                Noi_Gui_Cv_Den: null,
+                Noi_Dung_Tra_Loi: null,
+                Ngay_Luu_Ho_So: null,
+                Nguoi_Luu_Ho_So: null,
+                So_Giay_Hen: null,
+                Noi_Gui_Cv_Den_Id: null,
+                Ten_Co_Quan: null,
+                HsAnh: null,
 
                 CaNhan: {
-                    Id: '',
-                    ca_nhan_goc_id: '',
+                    Id: null,
+                    ca_nhan_goc_id: null,
                     noi_sinh: null,
-                    Ten: '',
-                    Ten_Kd: '',
-                    Ngay_Sinh: '',
+                    Ten: null,
+                    Ten_Kd: null,
+                    Ngay_Sinh: null,
                     Def_Ngay_Sinh: 'D',
-                    Gioi_Tinh: '',
-                    Quoc_Tich_Hn_Id: '',
-                    So_Ho_Chieu: '',
-                    Quoc_Tich_Goc_Id: '',
-                    Ngay_Tao: '',
-                    Nguoi_Tao: '',
+                    Gioi_Tinh: null,
+                    Quoc_Tich_Hn_Id: null,
+                    So_Ho_Chieu: null,
+                    Quoc_Tich_Goc_Id: null,
+                    Ngay_Tao: vm.dateDef(vm.currentDate()),
+                    Nguoi_Tao: window.themeDisplay.getUserName()
                 },
                 PhepNhapCanh: {
                     PhepNhapCanhChiTiet: [
                         {
-                            Id: '',
-                            Phep_Nhap_Canh_Id: '',
-                            Ten: '',
-                            Ten_Kd: '',
-                            Ngay_Sinh: '',
+                            Id: null,
+                            Phep_Nhap_Canh_Id: null,
+                            Ten: null,
+                            Ten_Kd: null,
+                            Ngay_Sinh: null,
                             Def_Ngay_Sinh: 'D',
-                            Quoc_Tich_Id: '',
-                            So_Ho_Chieu: '',
-                            Duoc_Nc_Tu_Ngay: '',
-                            Duoc_Nc_Den_Ngay: '',
-                            Gia_Tri_Tt: '',
-                            Ngay_Tao: '',
-                            Nguoi_Tao: '',
-                            Muc_Dich_Id: '',
-                            Ky_Hieu_Tt: '',
-                            Hs_Thi_Thuc_Id: '',
-                            So_Fax: '',
-                            Ngay_Fax: '',
-                            Co_Quan_De_Nghi_Ten: '',
-                            Co_Quan_De_Nghi_Id: '',
-                            Don_Vi_Nhan_Phep_Id: ''
+                            Quoc_Tich_Id: null,
+                            So_Ho_Chieu: null,
+                            Duoc_Nc_Tu_Ngay: null,
+                            Duoc_Nc_Den_Ngay: null,
+                            Gia_Tri_Tt: null,
+                            Ngay_Tao: vm.dateDef(vm.currentDate()),
+                            Nguoi_Tao: window.themeDisplay.getUserName(),
+                            Muc_Dich_Id: null,
+                            Ky_Hieu_Tt: null,
+                            Hs_Thi_Thuc_Id: null,
+                            So_Fax: null,
+                            Ngay_Fax: null,
+                            Co_Quan_De_Nghi_Ten: null,
+                            Co_Quan_De_Nghi_Id: null,
+                            Don_Vi_Nhan_Phep_Id: null
                         }
                     ],
-                    Id: '',
-                    So_Fax: '',
-                    Ngay_Fax: '',
+                    Id: null,
+                    So_Fax: null,
+                    Ngay_Fax: null,
                     Ma_So_Khach: null,
-                    Don_Vi_Cap_Phep_Id: '',
-                    Ngay_Tao: '',
-                    Nguoi_Tao: '',
-                    Trang_Thai: '',
+                    Don_Vi_Cap_Phep_Id: null,
+                    Ngay_Tao: vm.dateDef(vm.currentDate()),
+                    Nguoi_Tao: window.themeDisplay.getUserName(),
+                    Trang_Thai: null,
                     Co_Quan_De_Nghi_Ten: null,
                     Co_Quan_De_Nghi_Id: null,
-                    Nguoi_Ky: '',
-                    Chuc_Vu: ''
+                    Nguoi_Ky: null,
+                    Chuc_Vu: null
                 },
                 HsThanNhan: [],
                 HsTreEmDiCung: []
@@ -2609,14 +2604,18 @@ export default {
             let vm = this
             if (vm.$refs.formThanNhan.validate()) {
                 let tg = {
-                    Qhgd_Id: vm.loai_quan_he['itemCode'],
-                    Qhgd_Text: vm.loai_quan_he['itemName'],
+                    Qhgd_Id: vm.loai_quan_he ? vm.loai_quan_he['itemCode'] : '',
+                    Qhgd_Text: vm.loai_quan_he ? vm.loai_quan_he['itemName'] : '',
                     Ten: vm.ho_ten_than_nhan,
                     Ten_Kd: vm.ho_ten_than_nhan,
                     Ngay_Sinh: vm.birthdayThanNhanFormated,
                     Quoc_Tich_Id: vm.quoc_tich_than_nhan ? vm.quoc_tich_than_nhan.itemCode : '',
                     Quoc_Tich_Text: vm.quoc_tich_than_nhan ? vm.quoc_tich_than_nhan.itemName : '',
-                    Dia_Chi_Thuong_Tru: vm.dia_chi_thuong_tru_than_nhan ? vm.dia_chi_thuong_tru_than_nhan : ''
+                    Dia_Chi_Thuong_Tru: vm.dia_chi_thuong_tru_than_nhan ? vm.dia_chi_thuong_tru_than_nhan : '',
+                    Id: '',
+                    Hs_Thi_Thuc_Id: '',
+                    Ngay_Tao: vm.dateDef(vm.currentDate()),
+                    Nguoi_Tao: window.themeDisplay.getUserName()
                 }
                 if(vm.update_than_nhan === 'add'){
                     vm.listThanNhan.push(tg)
@@ -2658,14 +2657,18 @@ export default {
             let vm = this
             if (vm.$refs.formNguoiDiCung.validate()) {
                 let tg = {
-                    Qhgd_Id: vm.loai_quan_he['itemCode'],
-                    Qhgd_Text: vm.loai_quan_he['itemName'],
+                    Qhgd_Id: vm.loai_quan_he? vm.loai_quan_he['itemCode'] : '',
+                    Qhgd_Text: vm.loai_quan_he ? vm.loai_quan_he['itemName'] : '',
                     Ten: vm.ho_ten_di_cung,
                     Ten_Kd: vm.ho_ten_di_cung,
                     Ngay_Sinh: vm.birthdayDiCungFormated,
                     Quoc_Tich_Id: vm.quoc_tich_di_cung ? vm.quoc_tich_di_cung.itemCode : '',
                     Quoc_Tich_Text: vm.quoc_tich_di_cung ? vm.quoc_tich_di_cung.itemName : '',
-                    So_Ho_Chieu: vm.so_ho_chieu_di_cung
+                    So_Ho_Chieu: vm.so_ho_chieu_di_cung,
+                    Id: '',
+                    Hs_Thi_Thuc_Id: '',
+                    Ngay_Tao: vm.dateDef(vm.currentDate()),
+                    Nguoi_Tao: window.themeDisplay.getUserName()
                 }
                 if(vm.update_di_cung === 'add'){
                     vm.listNguoiDiCung.push(tg)
@@ -2706,8 +2709,8 @@ export default {
                 })
                 let tk = {
                     kiem_tra: false,
-                    Id: '',
-                    Ca_Nhan_Id: '',
+                    Id: null,
+                    Ca_Nhan_Id: null,
                     Ten: vm.ho_ten.toUpperCase(),
                     Ten_Kd: vm.ho_ten.toUpperCase(),
                     Ngay_Sinh: vm.dateDef(vm.birthdayFormated),
@@ -2715,22 +2718,22 @@ export default {
                     Def_Ngay_Sinh: 'D',
                     Gioi_Tinh: vm.gioi_tinh['value'],
                     Gioi_Tinh_Text: vm.gioi_tinh['name'],
-                    Quoc_Tich_Hn_Id: vm.quoc_tich_hien_nay['itemCode'],
-                    Quoc_Tich_Hn_Text: vm.quoc_tich_hien_nay['itemName'],
+                    Quoc_Tich_Hn_Id: vm.quoc_tich_hien_nay ? vm.quoc_tich_hien_nay['itemCode'] : null,
+                    Quoc_Tich_Hn_Text: vm.quoc_tich_hien_nay ? vm.quoc_tich_hien_nay['itemName'] : null,
                     So_Ho_Chieu: vm.so_ho_chieu,
-                    Ma_To_Khai: '',
-                    Loai_Ho_Chieu: vm.loai_ho_chieu['value'],
-                    Noi_Cap_Hc_Id: vm.noi_cap_ho_chieu['itemCode'],
-                    Noi_Cap_Hc_Id_Text: vm.noi_cap_ho_chieu['itemName'],
-                    Quoc_Tich_Goc_Id: vm.quoc_tich_goc['itemCode'],
-                    Quoc_Tich_Goc_Text: vm.quoc_tich_goc['itemName'],
-                    Nghe_Nghiep_Id: '',
+                    Ma_To_Khai: null,
+                    Loai_Ho_Chieu: vm.loai_ho_chieu ? vm.loai_ho_chieu['value'] : null,
+                    Noi_Cap_Hc_Id: vm.noi_cap_ho_chieu ? vm.noi_cap_ho_chieu['itemCode'] : null,
+                    Noi_Cap_Hc_Id_Text: vm.noi_cap_ho_chieu ? vm.noi_cap_ho_chieu['itemName'] : null,
+                    Quoc_Tich_Goc_Id: vm.quoc_tich_goc ? vm.quoc_tich_goc['itemCode'] : null,
+                    Quoc_Tich_Goc_Text: vm.quoc_tich_goc ? vm.quoc_tich_goc['itemName'] : null,
+                    Nghe_Nghiep_Id: null,
                     Nghe_Nghiep: vm.nghe_nghiep,
-                    Muc_Dich_Id: vm.muc_dich['itemCode'],
-                    Muc_Dich: vm.muc_dich['itemName'],
-                    LOAI: vm.loai_thi_thuc['value'],
-                    Gia_Tri_Tt: vm.so_lan_thi_thuc['value'],
-                    Ky_Hieu_Tt: vm.ky_hieu_thi_thuc['itemDescription'],
+                    Muc_Dich_Id: vm.muc_dich ? vm.muc_dich['itemCode'] : null,
+                    Muc_Dich: vm.muc_dich ? vm.muc_dich['itemName'] : null,
+                    LOAI: vm.loai_thi_thuc ? vm.loai_thi_thuc['value'] : null,
+                    Gia_Tri_Tt: vm.so_lan_thi_thuc ? vm.so_lan_thi_thuc['value'] : null,
+                    Ky_Hieu_Tt: vm.ky_hieu_thi_thuc ? vm.ky_hieu_thi_thuc['itemDescription'] : null,
                     Duoc_Nc_Tu_Ngay: vm.dateDef(vm.dateNgayDuKienNkFormated),
                     Duoc_Nc_Den_Ngay: vm.dateDef(vm.dateNgayDuKienXkFormated),
                     Co_Quan_De_Nghi_Ten: vm.vb_co_quan_chu_quan['Cq_Ca_Nhan_Cong_Van'],
@@ -2739,97 +2742,98 @@ export default {
                     So_Cv_Den: vm.vb_co_quan_chu_quan['So_Cong_Van'],
                     Ngay_Cv_Den: vm.dateDef(vm.vb_co_quan_chu_quan['Ngay_Cong_Van']),
                     De_Nghi_Khac: vm.de_nghi_khac,
-                    Du_Kien_Thu: '',
-                    Don_Vi_Tien_Te: 'VNĐ',
+                    Du_Kien_Thu: null,
+                    Don_Vi_Tien_Te: '$',
 
-                    So_Dien_Thoai: '',
-                    So_Dien_Thoai_Cq: '',
-                    So_Luong_Hc: '',
-                    So_Luong_To_Khai: '',
-                    Giay_To_Kem_Theo: '',
-                    Noi_Hen_Tra_Kq_Id: '',
-                    Noi_Hen_Tra_Kq: '',
-                    Ngay_Hen_Tra: '',
-                    Ngay_Huy: '',
-                    Nguoi_Huy: '',
-                    Ly_Do_Huy: '',
-                    Ghi_Chu: '',
-                    Nguoi_Tao: '',
-                    Ngay_Tao: '',
-                    Ngay_Lap_Phieu: '',
-                    Nguoi_Sua_Cuoi: '',
-                    Ngay_Sua_Cuoi: '',
-                    Nguoi_Nhan: '',
-                    Ngay_Nhan: '',
-                    Bl_Ten_Cq_Ca_Nhan: '',
-                    Bl_Dia_Chi_Id: '',
-                    Bl_Dia_Chi_Chi_Tiet: '',
-                    Bl_So_Dien_Thoai: '',
-                    Noi_Gui_Cv_Den: '',
-                    Noi_Dung_Tra_Loi: '',
-                    Ngay_Luu_Ho_So: '',
-                    Nguoi_Luu_Ho_So: '',
-                    So_Giay_Hen: '',
-                    Noi_Gui_Cv_Den_Id: '',
-
+                    So_Dien_Thoai: null,
+                    So_Dien_Thoai_Cq: null,
+                    So_Luong_Hc: null,
+                    So_Luong_To_Khai: null,
+                    Giay_To_Kem_Theo: null,
+                    Noi_Hen_Tra_Kq_Id: null,
+                    Noi_Hen_Tra_Kq: null,
+                    Ngay_Hen_Tra: null,
+                    Ngay_Huy: null,
+                    Nguoi_Huy: null,
+                    Ly_Do_Huy: null,
+                    Ghi_Chu: null,
+                    Ngay_Tao: vm.dateDef(vm.currentDate()),
+                    Nguoi_Tao: window.themeDisplay.getUserName(),
+                    Ngay_Lap_Phieu: vm.dateDef(vm.currentDate()),
+                    Nguoi_Sua_Cuoi: null,
+                    Ngay_Sua_Cuoi: null,
+                    Nguoi_Nhan: null,
+                    Ngay_Nhan: null,
+                    Bl_Ten_Cq_Ca_Nhan: null,
+                    Bl_Dia_Chi_Id: null,
+                    Bl_Dia_Chi_Chi_Tiet: null,
+                    Bl_So_Dien_Thoai: null,
+                    Noi_Gui_Cv_Den: null,
+                    Noi_Dung_Tra_Loi: null,
+                    Ngay_Luu_Ho_So: null,
+                    Nguoi_Luu_Ho_So: null,
+                    So_Giay_Hen: null,
+                    Noi_Gui_Cv_Den_Id: null,
+                    Ten_Co_Quan: null,
+                    HsAnh: null,
                     CaNhan: {
-                        Id: '',
-                        ca_nhan_goc_id: '',
+                        Id: null,
+                        ca_nhan_goc_id: null,
                         noi_sinh: null,
                         Ten: vm.ho_ten.toUpperCase(),
                         Ten_Kd: vm.ho_ten.toUpperCase(),
                         Ngay_Sinh: vm.dateDef(vm.birthdayFormated),
                         Def_Ngay_Sinh: 'D',
                         Gioi_Tinh: vm.gioi_tinh['value'],
-                        Quoc_Tich_Hn_Id: vm.quoc_tich_hien_nay['itemCode'],
+                        Quoc_Tich_Hn_Id: vm.quoc_tich_hien_nay ? vm.quoc_tich_hien_nay['itemCode'] : null,
                         So_Ho_Chieu: vm.so_ho_chieu,
-                        Quoc_Tich_Goc_Id: vm.quoc_tich_goc['itemCode'],
+                        Quoc_Tich_Goc_Id: vm.quoc_tich_goc ? vm.quoc_tich_goc['itemCode'] : null,
                         Ngay_Tao: vm.dateDef(vm.currentDate()),
-                        Nguoi_Tao: window.themeDisplay.getUserName(),
+                        Nguoi_Tao: window.themeDisplay.getUserName()
                     },
                     PhepNhapCanh: {
                         PhepNhapCanhChiTiet: [
                             {
-                                Id: '',
-                                Phep_Nhap_Canh_Id: '',
-                                Ten: '',
-                                Ten_Kd: '',
-                                Ngay_Sinh: '',
+                                Id: null,
+                                Phep_Nhap_Canh_Id: null,
+                                Ten: null,
+                                Ten_Kd: null,
+                                Ngay_Sinh: null,
                                 Def_Ngay_Sinh: 'D',
-                                Quoc_Tich_Id: '',
-                                So_Ho_Chieu: '',
+                                Quoc_Tich_Id: null,
+                                So_Ho_Chieu: null,
                                 Duoc_Nc_Tu_Ngay: vm.dateDef(vm.dateNgayDuKienNkFormated),
                                 Duoc_Nc_Den_Ngay: vm.dateDef(vm.dateNgayDuKienXkFormated),
                                 Gia_Tri_Tt: vm.so_lan_thi_thuc['value'],
-                                Ngay_Tao: '',
-                                Nguoi_Tao: '',
-                                Muc_Dich_Id: vm.muc_dich['itemCode'],
-                                Ky_Hieu_Tt: vm.ky_hieu_thi_thuc['itemDescription'],
-                                Hs_Thi_Thuc_Id: '',
-                                So_Fax: '',
-                                Ngay_Fax: '',
+                                Ngay_Tao: vm.dateDef(vm.currentDate()),
+                                Nguoi_Tao: window.themeDisplay.getUserName(),
+                                Muc_Dich_Id: vm.muc_dich ? vm.muc_dich['itemCode'] :null,
+                                Ky_Hieu_Tt: vm.ky_hieu_thi_thuc ? vm.ky_hieu_thi_thuc['itemDescription'] : null,
+                                Hs_Thi_Thuc_Id: null,
+                                So_Fax: null,
+                                Ngay_Fax: null,
                                 Co_Quan_De_Nghi_Ten: vm.vb_co_quan_chu_quan['Cq_Ca_Nhan_Cong_Van'],
                                 Co_Quan_De_Nghi_Id: vm.vb_co_quan_chu_quan['Ma_Cq_Ca_Nhan_Cong_Van'],
-                                Don_Vi_Nhan_Phep_Id: ''
+                                Don_Vi_Nhan_Phep_Id: null
                             }
                         ],
-                        Id: '',
-                        So_Fax: '',
-                        Ngay_Fax: '',
+                        Id: null,
+                        So_Fax: null,
+                        Ngay_Fax: null,
                         Ma_So_Khach: null,
-                        Don_Vi_Cap_Phep_Id: '',
-                        Ngay_Tao: '',
-                        Nguoi_Tao: '',
-                        Trang_Thai: '',
+                        Don_Vi_Cap_Phep_Id: null,
+                        Ngay_Tao: vm.dateDef(vm.currentDate()),
+                        Nguoi_Tao: window.themeDisplay.getUserName(),
+                        Trang_Thai: null,
                         Co_Quan_De_Nghi_Ten: null,
                         Co_Quan_De_Nghi_Id: null,
-                        Nguoi_Ky: '',
-                        Chuc_Vu: ''
+                        Nguoi_Ky: null,
+                        Chuc_Vu: null
                     },
                     HsThanNhan: thanNhan,
                     HsTreEmDiCung: danhSachDiCung
                 }
-                console.log('thanhvien', tk)
+
                 if(vm.update_thanhvien === 'add'){
                     vm.listThanhVien.push(tk)
                 } else {
@@ -2948,6 +2952,9 @@ export default {
             vm.ky_hieu_thi_thuc = item.Ky_Hieu_Tt ? vm.listKyHieu.filter(function (itemSelect) {
                 return itemSelect.itemDescription == item.Ky_Hieu_Tt
             })[0] : ''
+            if (!vm.ky_hieu_thi_thuc) {
+                vm.ky_hieu_thi_thuc = vm.muc_dich
+            }
             vm.dateNgayDuKienNkFormated = vm.dateDefReverd(item.Duoc_Nc_Tu_Ngay)
             vm.dateNgayDuKienXkFormated = vm.dateDefReverd(item.Duoc_Nc_Den_Ngay)
             vm.vb_co_quan_chu_quan = vm.listVanBan.filter(function (itemSelect) {
@@ -3673,6 +3680,11 @@ export default {
         currentDate () {
             let value = new Date()
             return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()}`
+        },
+        getMinMax (date) {
+            if (!date) return null
+            const [day, month, year] = date.split('/')
+            return `${year}-${month}-${day}`
         }
     }
 }

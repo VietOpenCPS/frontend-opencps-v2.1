@@ -600,7 +600,7 @@
         <v-card-text>
           <span v-if="data_form_template === 'formHPH'">Bạn chưa chọn CKCD, bạn có chắc tiếp tục thực hiện thao tác?</span>
           <span v-if="data_form_template === 'formCH'">Bạn chưa kiểm tra thông tin văn bản<noframes></noframes>, bạn có chắc tiếp tục thực hiện thao tác?</span>
-          
+          <span v-if="data_form_template === 'formTT'" style="font-size: 14px;font-weight: 500;">{{confirmMess}}, bạn có chắc chắc tiếp tục thực hiện thao tác?</span>
         </v-card-text>
 
         <v-card-actions>
@@ -667,6 +667,7 @@ export default {
   },
   data: () => ({
     // add new template
+    confirmMess: '',
     isNotarization: false,
     dialogXacNhanThaoTac: false,
     checkCKCD: false,
@@ -2506,28 +2507,52 @@ export default {
       }
     },
     checkThanhVien () {
-      try{
-        let dossierFileArr = JSON.parse($('#dossierFileArr_hidden').val())
+      let vm = this
+      let valid = true
+      let dossierFileArr = JSON.parse($('#dossierFileArr_hidden').val())
+      let listVanBan = []
+      let listThanhVien = []
+      try {
         let TP02 = dossierFileArr.find(e=>e.partNo === 'TP02')
-        let listVanBan = JSON.parse(TP02.formData).van_ban
-        let TP01 = dossierFileArr.find(e=>e.partNo === 'TP01')
-        let listThanhVien = JSON.parse(TP01.formData).thanh_vien_doan
-        console.log(listThanhVien)
-        console.log(listVanBan)
-        for(let i =0; i<listThanhVien.length;i++){
-          if(!listThanhVien[i]['So_Cv_Den']){
-            toastr.error('Thành viên đoàn số thứ tự ' + i + 1 + ' chưa có văn bản quyết định')
-            return false
-          }
-          if(!listThanhVien[i]['kiem_tra']){
-            toastr.error('Thành viên đoàn số thứ tự ' + i + 1 + ' chưa được kiểm tra')
-            return false
-          }
-        }
-        return true
-      } catch (err) {
-        return false
+        listVanBan = JSON.parse(TP02.formData).van_ban
+        console.log('listVanBan', listVanBan)
+      } catch (error) {
       }
+      try {
+        let TP01 = dossierFileArr.find(e=>e.partNo === 'TP01')
+        listThanhVien = JSON.parse(TP01.formData).thanh_vien_doan
+        console.log('listThanhVien', listThanhVien)
+      } catch (error) {
+      }
+      if (listVanBan.length === 0 && listThanhVien.length !== 0) {
+        vm.confirmMess = 'Chưa có văn bản quyết định nào'
+        valid = false
+        return valid
+      }
+      if (listThanhVien.length === 0 && listVanBan.length !== 0) {
+        vm.confirmMess = 'Chưa có thành viên nào'
+        valid = false
+        return valid
+      }
+      if (listVanBan.length === 0 && listThanhVien.length === 0) {
+        vm.confirmMess = 'Chưa có văn bản quyết định và thành viên nào'
+        valid = false
+        return valid
+      }
+      for(let i =0; i<listThanhVien.length;i++){
+        if(!listThanhVien[i]['So_Cv_Den']){
+          vm.confirmMess = 'Thành viên đoàn số thứ tự ' + i + 1 + ' chưa có văn bản quyết định'
+          valid = false
+          return valid
+        }
+        if(!listThanhVien[i]['kiem_tra']){
+          vm.confirmMess = 'Thành viên đoàn số thứ tự ' + i + 1 + ' chưa được kiểm tra'
+          valid = false
+          return valid
+        }
+      }
+      return valid
+
     }
   }
 }

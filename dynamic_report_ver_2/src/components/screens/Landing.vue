@@ -58,7 +58,7 @@
           </v-autocomplete>
         </v-flex>
         <!--  -->
-        <v-flex xs6 sm3 class="px-3 mb-3" v-if="groupBy.length > 1">
+        <v-flex xs6 sm6 class="px-3 mb-3" v-if="groupBy.length > 1">
           <v-autocomplete
             :items="groupBy"
             v-model="groupByVal"
@@ -1187,6 +1187,18 @@ export default {
             return item.key !== 'domainCode' && item.key !== 'govAgencyCode'
           })
         }
+        for (let key in vm.filters) {
+          if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+            if (!vm.filters[key]['source'] || vm.filters[key]['source'].length === 0) {
+              vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+                vm.filters[key]['source'] = result
+                if (vm.filters[key]['appendItem']) {
+                  vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
+                }
+              }).catch(function(){})
+            }
+          }
+        }
       }
     },
     api (val) {
@@ -1460,7 +1472,8 @@ export default {
         document: vm.reportType,
         data: vm.data,
         api: vm.api,
-        proxyApi: vm.proxyApi
+        proxyApi: vm.proxyApi,
+        formatDate: vm.itemsReports[vm.index]['filterConfig']['version'] ? 'date' : 'timestamp'
       }
       let check =  true
       console.log('groupIdListSelected 555', vm.groupIdListSelected)
@@ -2567,6 +2580,44 @@ export default {
       vm.sttQuyen = n
       vm.targetFilter = item
       vm.doDynamicReport()
+    },
+    downloadExcel (item, n) {
+      let vm = this
+      vm.sttQuyen = n
+      vm.targetFilter = item
+      let counterPage = vm.itemsReports[vm.index]['filterConfig']['numberPerPage']
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['apiExportExcel']
+      vm.data[vm.groupByVal] = item[vm.groupByVal]
+      // build data
+      let filter = {
+        document: vm.reportType,
+        data: vm.data,
+        api: vm.api,
+        proxyApi: vm.proxyApi,
+        start: vm.sttQuyen * counterPage - counterPage,
+        end: vm.sttQuyen * counterPage,
+        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xlsx'
+      }
+      let check =  true
+      console.log('groupIdListSelected 555', vm.groupIdListSelected)
+      for (let key in vm.filterGroup) {
+        if(key === vm.groupIdListSelected) {
+          let exits = vm.groupIdList.find(item => item.key === key)
+          filter['govAgency'] = vm.filterGroup[key]
+          filter['agencyLists'] = exits ? exits.value : []
+          check = false
+          break
+        }
+      }
+      if(check) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
+      }
+      vm.loadingGetDossier = true
+      vm.$store.dispatch('exportExcel', filter).then(function (result) {
+        vm.loadingGetDossier = false
+      })
     },
     exportExcel () {
       let vm = this
