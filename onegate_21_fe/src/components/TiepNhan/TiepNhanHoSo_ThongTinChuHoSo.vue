@@ -1120,6 +1120,7 @@ export default {
         if(!value.applicantIdNo) {
           vm.checkApplicantId = true
         }
+        console.log('ThongTinChuHS', value)
         vm.$store.commit('setThongTinChuHoSo', value)
         let tempData = {
           delegateName: value.applicantName,
@@ -1349,7 +1350,15 @@ export default {
       vm.$refs.formChuHoSo.resetValidation()
     },
     onChangeCity (data, editDelegate) {
-      var vm = this
+      let vm = this
+      console.log('dataCityChange', data, vm.citys)
+      try {
+        vm.thongTinChuHoSo.cityName = vm.citys.filter(function (item) {
+          return item['itemCode'] == data
+        })[0]['itemName']
+      } catch (error) {
+        vm.thongTinChuHoSo.cityName = ''
+      }
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
         level: 1,
@@ -1358,6 +1367,8 @@ export default {
       if (!editDelegate) {
         vm.thongTinChuHoSo.districtCode = ''
         vm.thongTinChuHoSo.wardCode = ''
+        vm.thongTinChuHoSo.districtName = ''
+        vm.thongTinChuHoSo.wardName = ''
         vm.$store.commit('setCityVal', data)
       }
       vm.$store.getters.getDictItems(filter).then(function (result) {
@@ -1373,7 +1384,14 @@ export default {
       })
     },
     onChangeDistrict (data, editDelegate) {
-      var vm = this
+      let vm = this
+      try {
+        vm.thongTinChuHoSo.districtName = vm.districts.filter(function (item) {
+          return item['itemCode'] == data
+        })[0]['itemName']
+      } catch (error) {
+        vm.thongTinChuHoSo.districtName = ''
+      }
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
         level: 1,
@@ -1381,6 +1399,7 @@ export default {
       }
       if (!editDelegate) {
         vm.thongTinChuHoSo.wardCode = ''
+        vm.thongTinChuHoSo.wardName = ''
         vm.$store.commit('setDistrictVal', data)
       }
       
@@ -1395,6 +1414,14 @@ export default {
       })
     },
     onChangeWard (data) {
+      let vm = this
+      try {
+        vm.thongTinChuHoSo.wardName = vm.wards.filter(function (item) {
+          return item['itemCode'] == data
+        })[0]['itemName']
+      } catch (error) {
+        vm.thongTinChuHoSo.wardName = ''
+      }
       this.$store.commit('setWardVal', data)
     },
     querySelections (val) {

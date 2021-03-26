@@ -5330,10 +5330,12 @@ export const store = new Vuex.Store({
         applicantIdNo: payload.applicantIdNo,
         applicantName: payload.applicantName,
         address: payload.address,
-        // cityCode: payload.cityCode,
         cityCode: payload.cityCode,
         districtCode: payload.districtCode,
         wardCode: payload.wardCode,
+        cityName: payload.hasOwnProperty('cityName') ? payload.cityName : '',
+        districtName: payload.hasOwnProperty('districtName') ? payload.districtName : '',
+        wardName: payload.hasOwnProperty('wardName') ? payload.wardName : '',
         contactEmail: payload.contactEmail,
         contactTelNo: payload.contactTelNo,
         userType: userTypeCondition

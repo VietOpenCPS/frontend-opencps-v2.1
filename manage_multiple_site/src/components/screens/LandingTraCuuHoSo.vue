@@ -18,7 +18,7 @@
           <div class="adv_search my-2 px-2" :style="!boNganh ? 'background: #eeeeee' : 'background: #eeeeee;width: 100%'">
             <div :class="!boNganh ? 'searchAdvanced-content pb-3' : 'searchAdvanced-content py-3'">
               <v-layout wrap>
-                <v-flex xs12 class="px-2" v-if="!boNganh">
+                <v-flex xs12 class="px-2" v-if="!boNganh && !donViHuyen">
                   <v-layout wrap align-center>
                     <v-flex class="text-bold" style="font-weight:450;width: 200px;">Cấp đơn vị thực hiện:</v-flex>
                     <v-flex style="width: calc(100% - 200px);">    
@@ -45,31 +45,9 @@
                     </v-flex>
                   </v-layout>
                 </v-flex>
-                <!-- <v-flex xs12 class="px-2" v-if="capCoQuanThucHien === 'XA_PHUONG'">
+                <v-flex class="mb-2 px-2 xs12" v-if="!boNganh" :class="donViHuyen ? 'mt-2' : ''">
                   <div>
-                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Quận, huyện, thị xã :</div>
-                    <v-autocomplete
-                      class="select-search d-inline-block"
-                      style="width: calc(100% - 200px);"
-                      placeholder="Chọn quận, huyện, thị xã"
-                      :items="listQuanHuyen"
-                      v-model="quanHuyenSelect"
-                      :hide-selected="true"
-                      item-text="itemName"
-                      item-value="itemCode"
-                      clearable
-                      hide-details
-                      hide-no-data
-                      solo
-                      flat
-                      height="32"
-                      min-height="32"
-                    ></v-autocomplete>
-                  </div>
-                </v-flex> -->
-                <v-flex class="mb-2 px-2 xs12" v-if="!boNganh">
-                  <div>
-                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Đơn vị <span style="color: red" > (*)</span>:</div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Đơn vị thực hiện<span style="color: red" > (*)</span>:</div>
                     <v-autocomplete
                       placeholder="Chọn đơn vị thực hiện"
                       class="select-search d-inline-block"
@@ -133,6 +111,139 @@
                     ></v-autocomplete>
                   </div>
                 </v-flex>
+                <v-flex xs12 sm6 class="mb-2 px-2">
+                  <div class="layout wrap">
+                    <div class="d-inline-block text-bold pt-1" style="font-weight:450;width: 200px;">Ngày tiếp nhận:</div>
+                    <v-layout wrap style="width: calc(100% - 200px);">
+                      <v-flex xs6>
+                        <v-menu
+                          ref="menuDate1"
+                          v-model="menuDate1"
+                          :close-on-content-click="true"
+                          transition="scale-transition"
+                          offset-y
+                          full-width
+                        >
+                          <v-text-field
+                          slot="activator"
+                          class="search-input-appbar input-search"
+                          v-model="fromReceiveDateFormatted"
+                          persistent-hint
+                          append-icon="event"
+                          @blur="fromReceiveDate = parseDate(fromReceiveDateFormatted)"
+                          placeholder="Từ ngày"
+                          hide-details
+                          solo
+                          flat
+                          height="32"
+                          min-height="32"
+                          append-outer-icon="remove"
+                          clearable
+                          >
+                            <template slot='append-outer'>
+                              <v-icon color="primary">remove</v-icon>
+                            </template>
+                          </v-text-field>
+                          <v-date-picker :max="toReceiveDateFormatted ? getMinMax(toReceiveDateFormatted) : null" v-model="fromReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate('1')"></v-date-picker>
+                        </v-menu>
+                      </v-flex>
+                      <v-flex xs6 class="pl-2">
+                        <v-menu
+                          ref="menuDate2"
+                          v-model="menuDate2"
+                          :close-on-content-click="true"
+                          transition="scale-transition"
+                          offset-y
+                          full-width
+                        >
+
+                          <v-text-field
+                          slot="activator"
+                          class="search-input-appbar input-search"
+                          v-model="toReceiveDateFormatted"
+                          persistent-hint
+                          append-icon="event"
+                          @blur="toReceiveDate = parseDate(toReceiveDateFormatted)"
+                          placeholder="Đến ngày"
+                          hide-details
+                          solo
+                          flat
+                          height="32"
+                          min-height="32"
+                          clearable
+                          ></v-text-field>
+                          <v-date-picker :min="fromReceiveDateFormatted ? getMinMax(fromReceiveDateFormatted) : null" v-model="toReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate('2')"></v-date-picker>
+                        </v-menu>
+                      </v-flex>
+                    </v-layout>
+                  </div>
+                </v-flex>
+                <v-flex xs12 sm6 class="mb-2 px-2">
+                  <div class="layout wrap">
+                    <div class="d-inline-block text-bold pt-1" style="font-weight:450;width: 200px;">Ngày hẹn trả:</div>
+                    <v-layout wrap style="width: calc(100% - 200px);">
+                      <v-flex xs6>
+                        <v-menu
+                          ref="menuDate5"
+                          v-model="menuDate5"
+                          :close-on-content-click="true"
+                          transition="scale-transition"
+                          offset-y
+                          full-width
+                        >
+                          <v-text-field
+                          slot="activator"
+                          class="search-input-appbar input-search"
+                          v-model="fromReleaseDateFormatted"
+                          persistent-hint
+                          append-icon="event"
+                          @blur="fromReleaseDate = parseDate(fromReleaseDateFormatted)"
+                          placeholder="Từ ngày"
+                          hide-details
+                          solo
+                          flat
+                          height="32"
+                          min-height="32"
+                          clearable
+                          >
+                            <template slot='append-outer'>
+                              <v-icon color="primary">remove</v-icon>
+                            </template>
+                          </v-text-field>
+                          <v-date-picker :max="toReleaseDateFormatted ? getMinMax(toReleaseDateFormatted) : null" v-model="fromReleaseDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate('5')"></v-date-picker>
+                        </v-menu>
+                      </v-flex>
+                      <v-flex xs6 class="pl-2">
+                        <v-menu
+                          ref="menuDate6"
+                          v-model="menuDate6"
+                          :close-on-content-click="true"
+                          transition="scale-transition"
+                          offset-y
+                          full-width
+                        >
+                          <v-text-field
+                          slot="activator"
+                          class="search-input-appbar input-search"
+                          v-model="toReleaseDateFormatted"
+                          persistent-hint
+                          append-icon="event"
+                          @blur="toReleaseDate = parseDate(toReleaseDateFormatted)"
+                          placeholder="Đến ngày"
+                          hide-details
+                          solo
+                          flat
+                          height="32"
+                          min-height="32"
+                          clearable
+                          ></v-text-field>
+                          <v-date-picker :min="fromReleaseDateFormatted ? getMinMax(fromReleaseDateFormatted) : null" v-model="toReleaseDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate('6')"></v-date-picker>
+                        </v-menu>
+                      </v-flex>
+                    </v-layout>
+
+                  </div>
+                </v-flex>
                 <v-flex :class="!boNganh ? 'mb-2 px-2 xs12 sm6' : 'mb-2 px-2 xs12'">
                   <div>
                     <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Mã hồ sơ :</div>
@@ -175,7 +286,7 @@
               </v-layout>
               
               <v-flex class="xs12 mx-2">
-                <v-btn :loading="loadingTable" :style="loadingTable ? 'pointer-events: none' : ''" class="mx-0 mb-0" color="primary" dark @click.native="getDossiers">
+                <v-btn :loading="loadingTable" :style="loadingTable ? 'pointer-events: none' : ''" class="mx-0 mb-0" color="primary" dark @click.native="getDossiers('reset')">
                   <v-icon size="18">search</v-icon> &nbsp; Tìm kiếm
                 </v-btn>
               </v-flex>
@@ -226,6 +337,14 @@
               </content-placeholders>
               <div v-else>
                 <span>{{props.item.applicantName}}</span>
+              </div>
+            </td>
+            <td class="text-xs-left" style="height:36px;min-width:200px">
+              <content-placeholders v-if="loadingTable">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{props.item.govAgencyName}}</span>
               </div>
             </td>
             <td class="text-xs-left" style="height:36px;width:100px">
@@ -457,6 +576,7 @@
   export default {
     data: () => ({
       loadingTable: false,
+      agencySiteList: [],
       listDonVi: [],
       domainList: [],
       serviceInfoList: [],
@@ -485,6 +605,19 @@
       dossierActions: [],
       quanhuyenSelected: '',
       boNganh: false,
+      donViHuyen: false,
+      menuDate1: false,
+      fromReceiveDate: '',
+      fromReceiveDateFormatted: '',
+      menuDate2: false,
+      toReceiveDate: '',
+      toReceiveDateFormatted: '',
+      menuDate5: false,
+      fromReleaseDate: '',
+      fromReleaseDateFormatted: '',
+      menuDate6: false,
+      toReleaseDate: '',
+      toReleaseDateFormatted: '',
       dossierListHeader: [
         {
           text: 'STT',
@@ -503,6 +636,11 @@
         },
         {
           text: 'Chủ hồ sơ',
+          align: 'center',
+          sortable: false
+        },
+        {
+          text: 'Đơn vị thực hiện',
           align: 'center',
           sortable: false
         },
@@ -583,11 +721,24 @@
       let current = vm.$router.history.current
       let newQuery = current.query
       try {
+        vm.donViHuyen = donViHuyen
+        // sử dụng cho các đơn vị huyện quản lý hồ sơ cấp xã
+      } catch (error) {
+      }
+      try {
         vm.boNganh = boNganh
+        // sử dụng cho các đơn vị bộ ngành
       } catch (error) {
       }
       if (!vm.boNganh) {
-        vm.getServiceAdminisTration()
+        vm.getAgencyConfigs()
+        if (vm.donViHuyen) {
+          vm.capCoQuanThucHien = 'CAP_XA'
+          vm.getDomains('CAP_XA')
+          vm.getServiceInfo('CAP_XA')
+        } else {
+          vm.getServiceAdminisTration()
+        }
       } else {
         vm.getDomains()
         vm.getServiceInfo()
@@ -597,50 +748,58 @@
     watch: {
       capCoQuanThucHien (val) {
         let vm = this
-        vm.govAgencyFilter = ''
-        vm.domainFilter = ''
-        vm.serviceFilter = ''
-        vm.quanhuyenSelected = ''
-        if(val){
-          vm.getAgencys(val)
-          if (val === 'XA_PHUONG') {
-            vm.getDictcollectionsQuanHuyen()
-          }
-          if (val === 'QUAN_HUYEN' || val === 'XA_PHUONG') {
-            vm.getDomains(val === 'QUAN_HUYEN' ? 'CAP_HUYEN' : 'CAP_XA')
-            vm.getServiceInfo(val === 'QUAN_HUYEN' ? 'CAP_HUYEN' : 'CAP_XA', vm.domainFilter)
-          } else {
-            vm.domainList = []
-            vm.serviceInfoList = []
+        if (!vm.donViHuyen) {
+          vm.govAgencyFilter = ''
+          vm.domainFilter = ''
+          vm.serviceFilter = ''
+          vm.quanhuyenSelected = ''
+          if(val){
+            vm.getAgencys(val)
+            if (val === 'XA_PHUONG') {
+              vm.getDictcollectionsQuanHuyen()
+            }
+            if (val === 'QUAN_HUYEN' || val === 'XA_PHUONG') {
+              vm.getDomains(val === 'QUAN_HUYEN' ? 'CAP_HUYEN' : 'CAP_XA')
+              vm.getServiceInfo(val === 'QUAN_HUYEN' ? 'CAP_HUYEN' : 'CAP_XA', vm.domainFilter)
+            } else {
+              vm.domainList = []
+              vm.serviceInfoList = []
+            }
           }
         }
       },
-      // quanHuyenSelect (val) {
-      //   let vm = this
-      //   if (val) {
-      //     vm.getAgencys(vm.capCoQuanThucHien, val)
-      //   } else {
-      //     vm.getAgencys(vm.capCoQuanThucHien)
-      //   }
-      // },
+
       govAgencyFilter (val) {
         let vm = this
-        if (val) {
-          vm.getServerAgency(val)
-          if (vm.capCoQuanThucHien === 'SBN') {
-            vm.domainFilter = ''
-            vm.serviceFilter = ''
-            vm.getDomains(val)
-            vm.getServiceInfo(val, vm.domainFilter)
-          }
-        } else {
-          if (vm.capCoQuanThucHien === 'SBN') {
-            vm.domainList = []
-            vm.serviceInfoList = []
-            vm.statusList = []
-            vm.domainFilter = ''
-            vm.serviceFilter = ''
-            vm.statusFilter = ''
+        if (!vm.donViHuyen) {
+          if (val) {
+            if (vm.agencySiteList.length > 0) {
+              try {
+                vm.groupIdDonVi = vm.agencySiteList.filter(function (item) {
+                  return item.itemCode === val
+                })[0]['value']
+                vm.getStatusList()
+              } catch (error) {
+              }
+            }
+            if (!vm.groupIdDonVi) {
+              vm.getServerAgency(val)
+            }
+            if (vm.capCoQuanThucHien === 'SBN') {
+              vm.domainFilter = ''
+              vm.serviceFilter = ''
+              vm.getDomains(val)
+              vm.getServiceInfo(val, vm.domainFilter)
+            }
+          } else {
+            if (vm.capCoQuanThucHien === 'SBN') {
+              vm.domainList = []
+              vm.serviceInfoList = []
+              vm.statusList = []
+              vm.domainFilter = ''
+              vm.serviceFilter = ''
+              vm.statusFilter = ''
+            }
           }
         }
       },
@@ -728,6 +887,47 @@
           vm.groupIdDonVi = ''
         })
       },
+      getAgencyConfigs () {
+        let vm = this
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        
+        let dataGet = {}
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('serverCode', 'SERVER_DVC')
+        dataPost.append('url', '/serverconfigs/GROUP_ID_SITE_MOTCUA')
+        dataPost.append('data', JSON.stringify(dataGet))
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+          let serializable = response.data
+          let configs = JSON.parse(serializable.configs)
+          vm.agencySiteList = configs['groupIds']
+          let groupHuyen = vm.agencySiteList.filter(function(item) {
+            return item.value == window.themeDisplay.getScopeGroupId()
+          })[0]
+          let groupSiteCapXa = vm.agencySiteList.filter(function(item) {
+            return item.hasOwnProperty('parent') && item.parent === groupHuyen['code']
+          })[0]
+          vm.groupIdDonVi = groupSiteCapXa['value']
+          vm.getStatusList()
+          let param = {
+            groupIdTrungTam: 968548,
+            parent: groupHuyen['code']
+          }
+          vm.$store.dispatch('getAgencysFromParent', param).then(
+            res => {
+              vm.govAgencyList = res
+            }
+          ).catch(()=>{
+            vm.govAgencyList = []
+          })
+        }).catch(function (xhr) {
+        })
+      },
       getDomains (agencyCode) {
         let vm = this
         let data = {
@@ -777,8 +977,11 @@
           }
         ).catch(()=>{})
       },
-      getDossiers () {
+      getDossiers (reset) {
         let vm = this
+        if (reset) {
+          vm.dossierPage = 1
+        }
         vm.loadingTable = true
         let params = {
           groupId: vm.groupIdDonVi ? vm.groupIdDonVi : '',
@@ -788,7 +991,11 @@
           domain: vm.domainFilter ? vm.domainFilter : '',
           service: vm.serviceFilter ? vm.serviceFilter : '',
           dossierNo: vm.dossierNoKey,
-          status: vm.statusFilter
+          status: vm.statusFilter,
+          fromReceiveDate: vm.fromReceiveDateFormatted ? vm.fromReceiveDateFormatted : '',
+          toReceiveDate: vm.toReceiveDateFormatted ? vm.toReceiveDateFormatted : '',
+          fromReleaseDate: vm.fromReleaseDateFormatted ? vm.fromReleaseDateFormatted : '',
+          toReleaseDate: vm.toReleaseDateFormatted ? vm.toReleaseDateFormatted : ''
         }
         if (!vm.boNganh) {
           vm.$store.dispatch('getDossiers', params).then(res => {
@@ -830,7 +1037,7 @@
           },
           params: {}
         }
-        if (!boNganh) {
+        if (!vm.boNganh) {
           let url = '/o/rest/v2/dossiers/' + data.dossierId
           axios.get(url, config).then(function (response) {
             vm.thongTinChiTietHoSo = response.data
@@ -930,6 +1137,42 @@
           durationText = durationCount + ' giờ'
         }
         return durationText
+      },
+      parseDate(date) {
+        if (!date) return ''
+        if (String(date).indexOf('/') > 0) {
+          const [day, month, year] = date.split('/')
+          return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+        } else if (String(date).indexOf('-') > 0) {
+          const [day, month, year] = date.split('-')
+          return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+        } else {
+          let date1 = new Date(Number(date))
+          return `${date1.getFullYear()}-${(date1.getMonth() + 1).toString().padStart(2, '0')}-${date1.getDate().toString().padStart(2, '0')}`
+        }
+      },
+      getMinMax (date) {
+        if (!date) return null
+        const [day, month, year] = date.split('/')
+        return `${year}-${month}-${day}`
+      },
+      formatDate(date) {
+        if (!date) return ''
+        const [year, month, day] = date.split('-')
+        return `${day}/${month}/${year}`
+      },
+      changeDate(index) {
+        let vm = this
+        vm.menuDate1 = vm.menuDate2 = vm.menuDate5 = vm.menuDate6 = false
+        if (index === '1') {
+          vm.fromReceiveDateFormatted = vm.formatDate(vm.fromReceiveDate)
+        } else if (index === '2') {
+          vm.toReceiveDateFormatted = vm.formatDate(vm.toReceiveDate)
+        } else if (index === '5') {
+          vm.fromReleaseDateFormatted= vm.formatDate(vm.fromReleaseDate)
+        } else if (index === '6') {
+          vm.toReleaseDateFormatted= vm.formatDate(vm.toReleaseDate)
+        }
       },
       goBack () {
         window.history.back()

@@ -1529,6 +1529,7 @@ export default {
         van_ban_de_nghi: '',
         so_van_ban: '',
         de_nghi_khac: '',
+        eformCodeThanhVienEdit: '',
         serviceCode: $('#serviceCode_hidden').val(),
         govAgencyCode: $('#govAgencyCode_hidden').val(),
         dossierTemplateNo: "",
@@ -2313,6 +2314,7 @@ export default {
                 kiem_tra: false,
                 Id: null,
                 Ca_Nhan_Id: null,
+                Buoc_Xl: 'DA_NHAP_TO_KHAI',
                 Ten: res.Ten,
                 Ten_Kd: res.Ten,
                 Ngay_Sinh: vm.dateDef(res.Ngay_Sinh),
@@ -2604,16 +2606,16 @@ export default {
             let vm = this
             if (vm.$refs.formThanNhan.validate()) {
                 let tg = {
-                    Qhgd_Id: vm.loai_quan_he ? vm.loai_quan_he['itemCode'] : '',
-                    Qhgd_Text: vm.loai_quan_he ? vm.loai_quan_he['itemName'] : '',
-                    Ten: vm.ho_ten_than_nhan,
-                    Ten_Kd: vm.ho_ten_than_nhan,
-                    Ngay_Sinh: vm.birthdayThanNhanFormated,
-                    Quoc_Tich_Id: vm.quoc_tich_than_nhan ? vm.quoc_tich_than_nhan.itemCode : '',
-                    Quoc_Tich_Text: vm.quoc_tich_than_nhan ? vm.quoc_tich_than_nhan.itemName : '',
-                    Dia_Chi_Thuong_Tru: vm.dia_chi_thuong_tru_than_nhan ? vm.dia_chi_thuong_tru_than_nhan : '',
-                    Id: '',
-                    Hs_Thi_Thuc_Id: '',
+                    Qhgd_Id: vm.loai_quan_he ? vm.loai_quan_he['itemCode'] : null,
+                    Qhgd_Text: vm.loai_quan_he ? vm.loai_quan_he['itemName'] : null,
+                    Ten: vm.ho_ten_than_nhan ? vm.ho_ten_than_nhan : null,
+                    Ten_Kd: vm.ho_ten_than_nhan ? vm.ho_ten_than_nhan : null,
+                    Ngay_Sinh: vm.birthdayThanNhanFormated ?  vm.birthdayThanNhanFormated : null,
+                    Quoc_Tich_Id: vm.quoc_tich_than_nhan ? vm.quoc_tich_than_nhan.itemCode : null,
+                    Quoc_Tich_Text: vm.quoc_tich_than_nhan ? vm.quoc_tich_than_nhan.itemName : null,
+                    Dia_Chi_Thuong_Tru: vm.dia_chi_thuong_tru_than_nhan ? vm.dia_chi_thuong_tru_than_nhan : null,
+                    Id: null,
+                    Hs_Thi_Thuc_Id: null,
                     Ngay_Tao: vm.dateDef(vm.currentDate()),
                     Nguoi_Tao: window.themeDisplay.getUserName()
                 }
@@ -2657,16 +2659,16 @@ export default {
             let vm = this
             if (vm.$refs.formNguoiDiCung.validate()) {
                 let tg = {
-                    Qhgd_Id: vm.loai_quan_he? vm.loai_quan_he['itemCode'] : '',
-                    Qhgd_Text: vm.loai_quan_he ? vm.loai_quan_he['itemName'] : '',
-                    Ten: vm.ho_ten_di_cung,
-                    Ten_Kd: vm.ho_ten_di_cung,
-                    Ngay_Sinh: vm.birthdayDiCungFormated,
-                    Quoc_Tich_Id: vm.quoc_tich_di_cung ? vm.quoc_tich_di_cung.itemCode : '',
-                    Quoc_Tich_Text: vm.quoc_tich_di_cung ? vm.quoc_tich_di_cung.itemName : '',
-                    So_Ho_Chieu: vm.so_ho_chieu_di_cung,
-                    Id: '',
-                    Hs_Thi_Thuc_Id: '',
+                    Qhgd_Id: vm.loai_quan_he? vm.loai_quan_he['itemCode'] : null,
+                    Qhgd_Text: vm.loai_quan_he ? vm.loai_quan_he['itemName'] : null,
+                    Ten: vm.ho_ten_di_cung ? vm.ho_ten_di_cung : null,
+                    Ten_Kd: vm.ho_ten_di_cung ? vm.ho_ten_di_cung : null,
+                    Ngay_Sinh: vm.birthdayDiCungFormated ? vm.birthdayDiCungFormated : null,
+                    Quoc_Tich_Id: vm.quoc_tich_di_cung ? vm.quoc_tich_di_cung.itemCode : null,
+                    Quoc_Tich_Text: vm.quoc_tich_di_cung ? vm.quoc_tich_di_cung.itemName : null,
+                    So_Ho_Chieu: vm.so_ho_chieu_di_cung ? vm.so_ho_chieu_di_cung : null,
+                    Id: null,
+                    Hs_Thi_Thuc_Id: null,
                     Ngay_Tao: vm.dateDef(vm.currentDate()),
                     Nguoi_Tao: window.themeDisplay.getUserName()
                 }
@@ -2711,6 +2713,7 @@ export default {
                     kiem_tra: false,
                     Id: null,
                     Ca_Nhan_Id: null,
+                    Buoc_Xl: 'DA_NHAP_TO_KHAI',
                     Ten: vm.ho_ten.toUpperCase(),
                     Ten_Kd: vm.ho_ten.toUpperCase(),
                     Ngay_Sinh: vm.dateDef(vm.birthdayFormated),
@@ -2721,7 +2724,7 @@ export default {
                     Quoc_Tich_Hn_Id: vm.quoc_tich_hien_nay ? vm.quoc_tich_hien_nay['itemCode'] : null,
                     Quoc_Tich_Hn_Text: vm.quoc_tich_hien_nay ? vm.quoc_tich_hien_nay['itemName'] : null,
                     So_Ho_Chieu: vm.so_ho_chieu,
-                    Ma_To_Khai: null,
+                    Ma_To_Khai: vm.eformCodeThanhVienEdit ? vm.eformCodeThanhVienEdit : (new Date()).getTime(),
                     Loai_Ho_Chieu: vm.loai_ho_chieu ? vm.loai_ho_chieu['value'] : null,
                     Noi_Cap_Hc_Id: vm.noi_cap_ho_chieu ? vm.noi_cap_ho_chieu['itemCode'] : null,
                     Noi_Cap_Hc_Id_Text: vm.noi_cap_ho_chieu ? vm.noi_cap_ho_chieu['itemName'] : null,
@@ -2969,6 +2972,7 @@ export default {
                 item['Ngay_Sinh'] = vm.dateDefReverd(item.Ngay_Sinh)
                 return item
             }) : []
+            vm.eformCodeThanhVienEdit = item.Ma_To_Khai
         },
         genSelectCQCQ(){
             let vm = this

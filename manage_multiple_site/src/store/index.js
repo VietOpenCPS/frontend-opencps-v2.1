@@ -81,7 +81,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject)=>{
         let param = {
           headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
+            groupId: data.hasOwnProperty('groupIdTrungTam') ? data.groupIdTrungTam :  window.themeDisplay.getScopeGroupId()
           },
           params: {
           }
@@ -173,7 +173,11 @@ export const store = new Vuex.Store({
           dossierNo: filter.dossierNo,
           order: true,
           start: filter.start,
-          end: filter.end
+          end: filter.end,
+          fromReceiveDate: filter.fromReceiveDate ? filter.fromReceiveDate : '',
+          toReceiveDate: filter.toReceiveDate ? filter.toReceiveDate : '',
+          fromDueDate: filter.fromReleaseDate ? filter.fromReleaseDate : '',
+          toDueDate: filter.toReleaseDate ? filter.toReleaseDate : '',
         }
         let config = {
           url: '/o/rest/v2/dossiers',
