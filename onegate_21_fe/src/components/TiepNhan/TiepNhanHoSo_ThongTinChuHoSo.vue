@@ -36,7 +36,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span v-if="requiredOptions['applicantIdNo'] || (originality === 1 && requiredOptions['applicantIdNo'])" style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0"> {{ thongTinChuHoSo.userType && labelSwitch[thongTinChuHoSo.userType] ? labelSwitch[thongTinChuHoSo.userType].cmtnd : 'CMND/ Hộ chiếu' }} <span v-if="requiredOptions['applicantIdNo'] || (originality === 1 && requiredOptions['applicantIdNo'])" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2 style="position:relative">
                       <v-text-field
@@ -65,7 +65,7 @@
                           </v-list-tile-content>
                         </div>
                       </suggestions>
-                      <span style="color:#ff5252;font-size: 12px;" v-if="(originality === 3 || originality === '3') && !applicantIdRequired && !thongTinChuHoSo.applicantIdNo">Thông tin bắt buộc</span>
+                      <span style="color:#ff5252;font-size: 12px;" v-if="(originality === 3 || originality === '3') && requiredOptions['applicantIdNo'] && !applicantIdRequired && !thongTinChuHoSo.applicantIdNo">Thông tin bắt buộc</span>
                       <v-tooltip top v-if="(originality === 3 || originality === '3') && applicantConfig">
                         <v-btn @click="showDialogApplicantList('ChuHoSo')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
                           <v-icon size="14">fas fa fa-address-card</v-icon>
@@ -77,7 +77,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].nguoi_nop }}<span v-if="requiredOptions['applicantName']" style="color:red"> &nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0"> {{ thongTinChuHoSo.userType && labelSwitch[thongTinChuHoSo.userType] ? labelSwitch[thongTinChuHoSo.userType].nguoi_nop : 'Họ và tên' }}<span v-if="requiredOptions['applicantName']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm6>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -283,7 +283,7 @@
                             </v-list-tile-content>
                           </div>
                         </suggestions>
-                        <span style="color:#ff5252;font-size: 12px" v-if="(originality === 3 || originality === '3') && !applicantIdRequired && !thongTinNguoiNopHoSo.delegateIdNo">Thông tin bắt buộc</span>
+                        <span style="color:#ff5252;font-size: 12px" v-if="(originality === 3 || originality === '3') && requiredOptions['delegateIdNo'] && !applicantIdRequired && !thongTinNguoiNopHoSo.delegateIdNo">Thông tin bắt buộc</span>
                         <v-tooltip top v-if="(originality === 3 || originality === '3') && applicantConfig">
                           <v-btn @click="showDialogApplicantList('NguoiNop')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
                             <v-icon size="14">fas fa fa-address-card</v-icon>

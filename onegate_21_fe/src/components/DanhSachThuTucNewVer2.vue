@@ -689,20 +689,24 @@
                       originality: vm.getOriginality(),
                       j_captcha_response: ''
                     }
-                    if (!vm.isOffLine) {
-                      vm.trackingBTTT(resServiceInfo.serviceCode)
-                      vm.$store.dispatch('postDossier', data).then(function (result) {
-                        vm.loadingAction = false
-                        vm.indexAction = -1
-                        vm.$router.push({
-                          path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                          query: vm.$router.history.current.query
-                        })
-                      })
+                    if (item.serviceUrl) {
+                      window.location.href = item.serviceUrl
                     } else {
-                      vm.dataPostDossier = data
-                      vm.$refs.captcha.makeImageCap()
-                      vm.dialog_captcha = true
+                      if (!vm.isOffLine) {
+                        vm.trackingBTTT(resServiceInfo.serviceCode)
+                        vm.$store.dispatch('postDossier', data).then(function (result) {
+                          vm.loadingAction = false
+                          vm.indexAction = -1
+                          vm.$router.push({
+                            path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+                            query: vm.$router.history.current.query
+                          })
+                        })
+                      } else {
+                        vm.dataPostDossier = data
+                        vm.$refs.captcha.makeImageCap()
+                        vm.dialog_captcha = true
+                      }
                     }
                   })
                 }
@@ -719,20 +723,24 @@
                       originality: vm.getOriginality(),
                       j_captcha_response: ''
                     }
-                    if (!vm.isOffLine) {
-                      vm.trackingBTTT(resServiceInfo.serviceCode)
-                      vm.$store.dispatch('postDossier', data).then(function (result) {
-                        vm.loadingAction = false
-                        vm.indexAction = -1
-                        vm.$router.push({
-                          path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                          query: vm.$router.history.current.query
-                        })
-                      })
+                    if (item.serviceUrl) {
+                      window.location.href = item.serviceUrl
                     } else {
-                      vm.dataPostDossier = data
-                      vm.$refs.captcha.makeImageCap()
-                      vm.dialog_captcha = true
+                      if (!vm.isOffLine) {
+                        vm.trackingBTTT(resServiceInfo.serviceCode)
+                        vm.$store.dispatch('postDossier', data).then(function (result) {
+                          vm.loadingAction = false
+                          vm.indexAction = -1
+                          vm.$router.push({
+                            path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+                            query: vm.$router.history.current.query
+                          })
+                        })
+                      } else {
+                        vm.dataPostDossier = data
+                        vm.$refs.captcha.makeImageCap()
+                        vm.dialog_captcha = true
+                      }
                     }
                   })
                 } else {
@@ -773,20 +781,24 @@
             originality: vm.getOriginality(),
             j_captcha_response: ''
           }
-          if (!vm.isOffLine) {
-            vm.trackingBTTT(resServiceInfo.serviceCode)
-            vm.$store.dispatch('postDossier', data).then(function (result) {
-              vm.loadingAction = false
-              vm.indexAction = -1
-              vm.$router.push({
-                path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                query: vm.$router.history.current.query
-              })
-            })
+          if ((itemServiceConfig && itemServiceConfig.serviceUrl) || (govAgencyCodeSelect && govAgencyCodeSelect.serviceUrl)) {
+            window.location.href = itemServiceConfig ? itemServiceConfig.serviceUrl : govAgencyCodeSelect.serviceUrl
           } else {
-            vm.dataPostDossier = data
-            vm.$refs.captcha.makeImageCap()
-            vm.dialog_captcha = true
+            if (!vm.isOffLine) {
+              vm.trackingBTTT(resServiceInfo.serviceCode)
+              vm.$store.dispatch('postDossier', data).then(function (result) {
+                vm.loadingAction = false
+                vm.indexAction = -1
+                vm.$router.push({
+                  path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+                  query: vm.$router.history.current.query
+                })
+              })
+            } else {
+              vm.dataPostDossier = data
+              vm.$refs.captcha.makeImageCap()
+              vm.dialog_captcha = true
+            }
           }
         })
       },
@@ -810,7 +822,7 @@
       createDossier (data) {
         let vm = this
         if (vm.serviceConfigSelect.serviceUrl) {
-          window.location.href = vm.serviceConfigSelect
+          window.location.href = vm.serviceConfigSelect.serviceUrl
         } else {
           vm.trackingBTTT(data.serviceCode)
           vm.$store.dispatch('postDossier', data).then(function (result) {

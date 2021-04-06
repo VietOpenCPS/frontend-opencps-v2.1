@@ -176,13 +176,6 @@
       let vm = this
       let isMobile = window.innerWidth < 1264
       vm.$store.commit('setIsMobile', isMobile)
-      // if (window.location.href.includes('/m/') && vm.isMobile) {
-      //   $('head meta[name=viewport]').remove()
-      // } else {
-      //   if ($('head meta[name=viewport]').length === 0) {
-      //     $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
-      //   }
-      // }
       axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
         let userData = response.data
         vm.$store.commit('setUserLogin', userData)
@@ -254,13 +247,6 @@
         let vm = this
         let isMobile = window.innerWidth < 1264
         vm.$store.commit('setIsMobile', isMobile)
-        // if (window.location.href.includes('/m/') && vm.isMobile) {
-        //   $('head meta[name=viewport]').remove()
-        // } else {
-        //   if ($('head meta[name=viewport]').length === 0) {
-        //     $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
-        //   }
-        // }
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
         if (currentQuery.hasOwnProperty('step')) {

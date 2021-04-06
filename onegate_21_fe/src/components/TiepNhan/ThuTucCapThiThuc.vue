@@ -114,7 +114,7 @@
                         solo
                         @keyup.enter="getDataEform()"
                     ></v-text-field>
-                    <v-btn small color="primary" @click="getDataEform()" class="ml-2">
+                    <v-btn small color="primary" @click="getDataEform()" class="ml-2 mt-0" style="height: 32px;">
                         <v-icon>save_alt</v-icon>&nbsp; Lấy dữ liệu
                     </v-btn>
                 </div>
@@ -280,7 +280,7 @@
                     required
                     solo
                 ></v-text-field> -->
-                <v-menu
+                <!-- <v-menu
                     ref="menu5"
                     :close-on-content-click="false"
                     v-model="menu5"
@@ -289,7 +289,7 @@
                 
 
 
-                >
+                > -->
                     <v-text-field
                         slot="activator"
                         v-model="dateDueDateFormated"
@@ -302,8 +302,8 @@
                         
                     ></v-text-field>
             
-                    <v-date-picker v-model="dateDueDate" no-title @input="menu5 = false" locale="vi"></v-date-picker>
-                </v-menu>      
+                    <!-- <v-date-picker v-model="dateDueDate" no-title @input="menu5 = false" locale="vi"></v-date-picker>
+                </v-menu>       -->
             </v-flex>
             <v-flex xs12 sm4  class="px-2 ">
                 <v-checkbox
@@ -383,14 +383,14 @@
                                     
                                     <v-flex xs12 md6 class="px-2 mb-2">
                                         <label for="">Ngày gửi <span class="red--text">*</span></label>
-                                        <v-menu
+                                        <!-- <v-menu
                                             ref="menu"
                                             :close-on-content-click="false"
                                             v-model="menu"
                                             transition="scale-transition"
                                             offset-y
                                             style="width: 100%;"
-                                        >
+                                        > -->
                                             <v-text-field
                                                 slot="activator"
                                                 v-model="vb_ngay_ky"
@@ -403,8 +403,8 @@
                                                 :rules="[rules.required,rules.checkDatePast]"
                                                 required
                                             ></v-text-field>
-                                            <v-date-picker v-model="dateNgayKy" no-title @input="menu = false" locale="vi"></v-date-picker>
-                                        </v-menu>
+                                            <!-- <v-date-picker v-model="dateNgayKy" no-title @input="menu = false" locale="vi"></v-date-picker>
+                                        </v-menu> -->
                                     </v-flex>
                                     <v-flex xs12 class="px-2 mb-2">
                                         <label for="">Đề nghị khác</label>
@@ -498,19 +498,20 @@
                                                                     @input="changeSoHieuChieu"
                                                                 ></v-text-field>
                                                                 <v-btn class="mt-0" small color="primary" @click="kiemTraHoChieu()" style="height: 34px;">
-                                                                    <v-icon>check_circle_outline</v-icon>&nbsp; Kiểm tra thông tin</v-btn>
+                                                                    <v-icon>check_circle_outline</v-icon>&nbsp; Kiểm tra thông tin
+                                                                </v-btn>
                                                             </div>  
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
                                                             <label for="">2. Hạn hộ chiếu <span class="red--text">*</span></label>
-                                                            <v-menu
+                                                            <!-- <v-menu
                                                                 ref="menu2"
                                                                 :close-on-content-click="false"
                                                                 v-model="menu2"
                                                                 transition="scale-transition"
                                                                 offset-y
                                                                 style="width: 100%;"
-                                                            >
+                                                            > -->
                                                                 <v-text-field
                                                                     slot="activator"
                                                                     v-model="hanHoChieuFormated"
@@ -523,8 +524,8 @@
                                                                     :rules="[rules.required,rules.checkDateFuture]"
                                                                     required
                                                                 ></v-text-field>
-                                                                <v-date-picker v-model="hanHoChieu" no-title @input="menu2 = false" locale="vi"></v-date-picker>
-                                                            </v-menu>
+                                                                <!-- <v-date-picker v-model="hanHoChieu" no-title @input="menu2 = false" locale="vi"></v-date-picker>
+                                                            </v-menu> -->
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
                                                             <label for="">3. Loại hộ chiếu</label>
@@ -581,14 +582,14 @@
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
                                                             <label for="">7.Ngày sinh <span class="red--text">*</span></label>
-                                                            <v-menu
+                                                            <!-- <v-menu
                                                                 ref="menu7"
                                                                 :close-on-content-click="false"
                                                                 v-model="menu7"
                                                                 transition="scale-transition"
                                                                 offset-y
                                                                 style="width: 100%;"
-                                                            >
+                                                            > -->
                                                                 <v-text-field
                                                                     slot="activator"
                                                                     v-model="birthdayFormated"
@@ -601,8 +602,8 @@
                                                                     :rules="[rules.required,rules.checkDatePast]"
                                                                     required
                                                                 ></v-text-field>
-                                                                <v-date-picker v-model="birthday" no-title @input="menu7 = false" locale="vi"></v-date-picker>
-                                                            </v-menu>
+                                                                <!-- <v-date-picker v-model="birthday" no-title @input="menu7 = false" locale="vi"></v-date-picker>
+                                                            </v-menu> -->
                                                         </v-flex>
                                                         <v-flex xs12 sm6 class="px-2 my-2">
                                                             <label for="">8. Quốc tịch hiện nay <span class="red--text">*</span></label>
@@ -744,14 +745,14 @@
                                                         </v-flex>
                                                         <v-flex xs12 md4 class="px-2 my-2">
                                                             <label for="">4. Dự kiến nhập cảnh từ ngày <span class="red--text">*</span></label>
-                                                            <v-menu
+                                                            <!-- <v-menu
                                                                 ref="menu8"
                                                                 :close-on-content-click="false"
                                                                 v-model="menu8"
                                                                 transition="scale-transition"
                                                                 offset-y
                                                                 style="width: 100%;"
-                                                            >
+                                                            > -->
                                                                 <v-text-field
                                                                     slot="activator"
                                                                     v-model="dateNgayDuKienNkFormated"
@@ -764,19 +765,19 @@
                                                                     :rules="[rules.required,rules.checkDateFuture]"
                                                                     required
                                                                 ></v-text-field>
-                                                                <v-date-picker :max="dateNgayDuKienXkFormated ? getMinMax(dateNgayDuKienXkFormated) : null" v-model="dateNgayDuKienNk" no-title @input="menu8 = false" locale="vi"></v-date-picker>
-                                                            </v-menu>
+                                                                <!-- <v-date-picker :max="dateNgayDuKienXkFormated ? getMinMax(dateNgayDuKienXkFormated) : null" v-model="dateNgayDuKienNk" no-title @input="menu8 = false" locale="vi"></v-date-picker>
+                                                            </v-menu> -->
                                                         </v-flex>
                                                         <v-flex xs12 md4 class="px-2 my-2">
                                                             <label for="">5. Đến ngày <span class="red--text">*</span></label>
-                                                            <v-menu
+                                                            <!-- <v-menu
                                                                 ref="menu9"
                                                                 :close-on-content-click="false"
                                                                 v-model="menu9"
                                                                 transition="scale-transition"
                                                                 offset-y
                                                                 style="width: 100%;"
-                                                            >
+                                                            > -->
                                                                 <v-text-field
                                                                     slot="activator"
                                                                     v-model="dateNgayDuKienXkFormated"
@@ -789,8 +790,8 @@
                                                                     :rules="[rules.required,rules.checkDateFuture]"
                                                                     required
                                                                 ></v-text-field>
-                                                                <v-date-picker :min="dateNgayDuKienNkFormated ? getMinMax(dateNgayDuKienNkFormated) : null" v-model="dateNgayDuKienXk" no-title @input="menu9 = false" locale="vi"></v-date-picker>
-                                                            </v-menu>
+                                                                <!-- <v-date-picker :min="dateNgayDuKienNkFormated ? getMinMax(dateNgayDuKienNkFormated) : null" v-model="dateNgayDuKienXk" no-title @input="menu9 = false" locale="vi"></v-date-picker>
+                                                            </v-menu> -->
                                                         </v-flex>
                                                         <!-- <v-flex xs12 md4 class="px-2 my-2"></v-flex>
                                                         <div class="mx-2 my-2 flex xs12" style="font-weight: bold; padding: 4px 10px 4px 10px; background: #645d7f; color: white;">
@@ -914,14 +915,14 @@
                                                         </v-flex>
                                                         <v-flex xs12 md4 class="px-2 mb-2">
                                                             <label for="">3. Ngày sinh</label>
-                                                            <v-menu
+                                                            <!-- <v-menu
                                                                 ref="menu10"
                                                                 :close-on-content-click="false"
                                                                 v-model="menu10"
                                                                 transition="scale-transition"
                                                                 offset-y
                                                                 style="width: 100%;"
-                                                            >
+                                                            > -->
                                                                 <v-text-field
                                                                     slot="activator"
                                                                     v-model="birthdayThanNhanFormated"
@@ -932,8 +933,8 @@
                                                                     @input="inputNgaySinhThanNhan()"
                                                                     solo
                                                                 ></v-text-field>
-                                                                <v-date-picker v-model="birthdayThanNhan" no-title @input="menu10 = false" locale="vi"></v-date-picker>
-                                                            </v-menu>
+                                                                <!-- <v-date-picker v-model="birthdayThanNhan" no-title @input="menu10 = false" locale="vi"></v-date-picker>
+                                                            </v-menu> -->
                                                         </v-flex>
                                                         <v-flex xs12 md6 class="px-2 mb-2">
                                                             <label for="">4. Quốc tịch</label>
@@ -1040,14 +1041,14 @@
                                                         </v-flex>
                                                         <v-flex xs12 md4 class="px-2 mb-2">
                                                             <label for="">3. Ngày sinh <span class="red--text">*</span></label>
-                                                            <v-menu
+                                                            <!-- <v-menu
                                                                 ref="menu6"
                                                                 :close-on-content-click="false"
                                                                 v-model="menu6"
                                                                 transition="scale-transition"
                                                                 offset-y
                                                                 style="width: 100%;"
-                                                            >
+                                                            > -->
                                                                 <v-text-field
                                                                     slot="activator"
                                                                     v-model="birthdayDiCungFormated"
@@ -1060,8 +1061,8 @@
                                                                     :rules="[rules.required,rules.checkDatePast]"
                                                                     required
                                                                 ></v-text-field>
-                                                                <v-date-picker v-model="birthdayDiCung" no-title @input="menu6 = false" locale="vi"></v-date-picker>
-                                                            </v-menu>
+                                                                <!-- <v-date-picker v-model="birthdayDiCung" no-title @input="menu6 = false" locale="vi"></v-date-picker>
+                                                            </v-menu> -->
                                                         </v-flex>
                                                         <v-flex xs12 md6 class="px-2 mb-2">
                                                             <label for="">4. Quốc tịch</label>
@@ -2325,6 +2326,7 @@ export default {
                 Quoc_Tich_Hn_Id: res.Quoc_Tich_Hn_Id,
                 Quoc_Tich_Hn_Text: res.Quoc_Tich_Hn_Id_Text,
                 So_Ho_Chieu: res.So_Ho_Chieu,
+                Han_Hc: vm.dateDef(res.Han_Hc),
                 Ma_To_Khai: vm.eFormCode,
                 Loai_Ho_Chieu: res.Loai_Ho_Chieu,
                 Noi_Cap_Hc_Id: res.Noi_Cap_Hc_Id,
@@ -2338,8 +2340,8 @@ export default {
                 LOAI: null,
                 Gia_Tri_Tt: res.Xin_Gia_Tri_TT,
                 Ky_Hieu_Tt: null,
-                Duoc_Nc_Tu_Ngay: null,
-                Duoc_Nc_Den_Ngay: null,
+                Duoc_Nc_Tu_Ngay: res.hasOwnProperty('Ngay_Dk_Nhap_Canh') && res.Ngay_Dk_Nhap_Canh ? vm.dateDef(res.Ngay_Dk_Nhap_Canh) : '',
+                Duoc_Nc_Den_Ngay: res.hasOwnProperty('Ngay_Dk_Xuat_Canh') && res.Ngay_Dk_Xuat_Canh ? vm.dateDef(res.Ngay_Dk_Xuat_Canh) : '',
                 Co_Quan_De_Nghi_Ten: null,
                 Co_Quan_De_Nghi_Id: null,
                 Loai_Cv_Den: null,
@@ -2380,7 +2382,16 @@ export default {
                 Noi_Gui_Cv_Den_Id: null,
                 Ten_Co_Quan: null,
                 HsAnh: null,
-
+                Loai_To_Khai: 'THI_THUC',
+                Noi_Nop_Hs_Id: window.themeDisplay.getScopeGroupId() == "124302" ? '2' : '3',
+                HsThiThucNoi:{
+                    Id:null, 
+                    Hs_Thi_Thuc_Id:null, 
+                    Noi_Nhan_Thi_Thuc_Id: window.themeDisplay.getScopeGroupId() == "124302" ? '2' : '3', 
+                    Hieu_Luc: 'Y', 
+                    Ngay_Tao: vm.dateDef(vm.currentDate()),
+                    Nguoi_Tao: window.themeDisplay.getUserName()
+                },
                 CaNhan: {
                     Id: null,
                     ca_nhan_goc_id: null,
@@ -2396,45 +2407,46 @@ export default {
                     Ngay_Tao: vm.dateDef(vm.currentDate()),
                     Nguoi_Tao: window.themeDisplay.getUserName()
                 },
-                PhepNhapCanh: {
-                    PhepNhapCanhChiTiet: [
-                        {
-                            Id: null,
-                            Phep_Nhap_Canh_Id: null,
-                            Ten: null,
-                            Ten_Kd: null,
-                            Ngay_Sinh: null,
-                            Def_Ngay_Sinh: 'D',
-                            Quoc_Tich_Id: null,
-                            So_Ho_Chieu: null,
-                            Duoc_Nc_Tu_Ngay: null,
-                            Duoc_Nc_Den_Ngay: null,
-                            Gia_Tri_Tt: null,
-                            Ngay_Tao: vm.dateDef(vm.currentDate()),
-                            Nguoi_Tao: window.themeDisplay.getUserName(),
-                            Muc_Dich_Id: null,
-                            Ky_Hieu_Tt: null,
-                            Hs_Thi_Thuc_Id: null,
-                            So_Fax: null,
-                            Ngay_Fax: null,
-                            Co_Quan_De_Nghi_Ten: null,
-                            Co_Quan_De_Nghi_Id: null,
-                            Don_Vi_Nhan_Phep_Id: null
-                        }
-                    ],
-                    Id: null,
-                    So_Fax: null,
-                    Ngay_Fax: null,
-                    Ma_So_Khach: null,
-                    Don_Vi_Cap_Phep_Id: null,
-                    Ngay_Tao: vm.dateDef(vm.currentDate()),
-                    Nguoi_Tao: window.themeDisplay.getUserName(),
-                    Trang_Thai: null,
-                    Co_Quan_De_Nghi_Ten: null,
-                    Co_Quan_De_Nghi_Id: null,
-                    Nguoi_Ky: null,
-                    Chuc_Vu: null
-                },
+                // PhepNhapCanh: {
+                //     PhepNhapCanhChiTiet: [
+                //         {
+                //             Id: null,
+                //             Phep_Nhap_Canh_Id: null,
+                //             Ten: null,
+                //             Ten_Kd: null,
+                //             Ngay_Sinh: null,
+                //             Def_Ngay_Sinh: 'D',
+                //             Quoc_Tich_Id: null,
+                //             So_Ho_Chieu: null,
+                //             Duoc_Nc_Tu_Ngay: null,
+                //             Duoc_Nc_Den_Ngay: null,
+                //             Gia_Tri_Tt: null,
+                //             Ngay_Tao: vm.dateDef(vm.currentDate()),
+                //             Nguoi_Tao: window.themeDisplay.getUserName(),
+                //             Muc_Dich_Id: null,
+                //             Ky_Hieu_Tt: null,
+                //             Hs_Thi_Thuc_Id: null,
+                //             So_Fax: null,
+                //             Ngay_Fax: null,
+                //             Co_Quan_De_Nghi_Ten: window.themeDisplay.getScopeGroupId() == "124302" ? 'Cục lãnh sự' : 'Sở ngoại vụ thành phố Hồ Chí Minh',
+                //             Co_Quan_De_Nghi_Id: window.themeDisplay.getScopeGroupId() == "124302" ? '2' : '3',
+                //             Don_Vi_Nhan_Phep_Id: window.themeDisplay.getScopeGroupId() == "124302" ? '2' : '3'
+                //         }
+                //     ],
+                //     Id: null,
+                //     So_Fax: null,
+                //     Ngay_Fax: null,
+                //     Ma_So_Khach: null,
+                //     Don_Vi_Cap_Phep_Id: null,
+                //     Ngay_Tao: vm.dateDef(vm.currentDate()),
+                //     Nguoi_Tao: window.themeDisplay.getUserName(),
+                //     Trang_Thai: null,
+                //     Co_Quan_De_Nghi_Ten: null,
+                //     Co_Quan_De_Nghi_Id: null,
+                //     Nguoi_Ky: null,
+                //     Chuc_Vu: null
+                // },
+                PhepNhapCanh: null,
                 HsThanNhan: [],
                 HsTreEmDiCung: []
             }
@@ -2724,6 +2736,7 @@ export default {
                     Quoc_Tich_Hn_Id: vm.quoc_tich_hien_nay ? vm.quoc_tich_hien_nay['itemCode'] : null,
                     Quoc_Tich_Hn_Text: vm.quoc_tich_hien_nay ? vm.quoc_tich_hien_nay['itemName'] : null,
                     So_Ho_Chieu: vm.so_ho_chieu,
+                    Han_Hc: vm.dateDef(vm.hanHoChieuFormated),
                     Ma_To_Khai: vm.eformCodeThanhVienEdit ? vm.eformCodeThanhVienEdit : (new Date()).getTime(),
                     Loai_Ho_Chieu: vm.loai_ho_chieu ? vm.loai_ho_chieu['value'] : null,
                     Noi_Cap_Hc_Id: vm.noi_cap_ho_chieu ? vm.noi_cap_ho_chieu['itemCode'] : null,
@@ -2779,6 +2792,16 @@ export default {
                     Noi_Gui_Cv_Den_Id: null,
                     Ten_Co_Quan: null,
                     HsAnh: null,
+                    Loai_To_Khai: 'THI_THUC',
+                    Noi_Nop_Hs_Id: window.themeDisplay.getScopeGroupId() == "124302" ? '2' : '3',
+                    HsThiThucNoi:{
+                        Id:null, 
+                        Hs_Thi_Thuc_Id:null, 
+                        Noi_Nhan_Thi_Thuc_Id: window.themeDisplay.getScopeGroupId() == "124302" ? '2' : '3', 
+                        Hieu_Luc: 'Y', 
+                        Ngay_Tao: vm.dateDef(vm.currentDate()),
+                        Nguoi_Tao: window.themeDisplay.getUserName()
+                    },
                     CaNhan: {
                         Id: null,
                         ca_nhan_goc_id: null,
@@ -2794,45 +2817,46 @@ export default {
                         Ngay_Tao: vm.dateDef(vm.currentDate()),
                         Nguoi_Tao: window.themeDisplay.getUserName()
                     },
-                    PhepNhapCanh: {
-                        PhepNhapCanhChiTiet: [
-                            {
-                                Id: null,
-                                Phep_Nhap_Canh_Id: null,
-                                Ten: null,
-                                Ten_Kd: null,
-                                Ngay_Sinh: null,
-                                Def_Ngay_Sinh: 'D',
-                                Quoc_Tich_Id: null,
-                                So_Ho_Chieu: null,
-                                Duoc_Nc_Tu_Ngay: vm.dateDef(vm.dateNgayDuKienNkFormated),
-                                Duoc_Nc_Den_Ngay: vm.dateDef(vm.dateNgayDuKienXkFormated),
-                                Gia_Tri_Tt: vm.so_lan_thi_thuc['value'],
-                                Ngay_Tao: vm.dateDef(vm.currentDate()),
-                                Nguoi_Tao: window.themeDisplay.getUserName(),
-                                Muc_Dich_Id: vm.muc_dich ? vm.muc_dich['itemCode'] :null,
-                                Ky_Hieu_Tt: vm.ky_hieu_thi_thuc ? vm.ky_hieu_thi_thuc['itemDescription'] : null,
-                                Hs_Thi_Thuc_Id: null,
-                                So_Fax: null,
-                                Ngay_Fax: null,
-                                Co_Quan_De_Nghi_Ten: vm.vb_co_quan_chu_quan['Cq_Ca_Nhan_Cong_Van'],
-                                Co_Quan_De_Nghi_Id: vm.vb_co_quan_chu_quan['Ma_Cq_Ca_Nhan_Cong_Van'],
-                                Don_Vi_Nhan_Phep_Id: null
-                            }
-                        ],
-                        Id: null,
-                        So_Fax: null,
-                        Ngay_Fax: null,
-                        Ma_So_Khach: null,
-                        Don_Vi_Cap_Phep_Id: null,
-                        Ngay_Tao: vm.dateDef(vm.currentDate()),
-                        Nguoi_Tao: window.themeDisplay.getUserName(),
-                        Trang_Thai: null,
-                        Co_Quan_De_Nghi_Ten: null,
-                        Co_Quan_De_Nghi_Id: null,
-                        Nguoi_Ky: null,
-                        Chuc_Vu: null
-                    },
+                    // PhepNhapCanh: {
+                    //     PhepNhapCanhChiTiet: [
+                    //         {
+                    //             Id: null,
+                    //             Phep_Nhap_Canh_Id: null,
+                    //             Ten: null,
+                    //             Ten_Kd: null,
+                    //             Ngay_Sinh: null,
+                    //             Def_Ngay_Sinh: 'D',
+                    //             Quoc_Tich_Id: null,
+                    //             So_Ho_Chieu: null,
+                    //             Duoc_Nc_Tu_Ngay: vm.dateDef(vm.dateNgayDuKienNkFormated),
+                    //             Duoc_Nc_Den_Ngay: vm.dateDef(vm.dateNgayDuKienXkFormated),
+                    //             Gia_Tri_Tt: vm.so_lan_thi_thuc['value'],
+                    //             Ngay_Tao: vm.dateDef(vm.currentDate()),
+                    //             Nguoi_Tao: window.themeDisplay.getUserName(),
+                    //             Muc_Dich_Id: vm.muc_dich ? vm.muc_dich['itemCode'] :null,
+                    //             Ky_Hieu_Tt: vm.ky_hieu_thi_thuc ? vm.ky_hieu_thi_thuc['itemDescription'] : null,
+                    //             Hs_Thi_Thuc_Id: null,
+                    //             So_Fax: null,
+                    //             Ngay_Fax: null,
+                    //             Co_Quan_De_Nghi_Ten: window.themeDisplay.getScopeGroupId() == "124302" ? 'Cục lãnh sự' : 'Sở ngoại vụ thành phố Hồ Chí Minh',
+                    //             Co_Quan_De_Nghi_Id: window.themeDisplay.getScopeGroupId() == "124302" ? '2' : '3',
+                    //             Don_Vi_Nhan_Phep_Id: window.themeDisplay.getScopeGroupId() == "124302" ? '2' : '3'
+                    //         }
+                    //     ],
+                    //     Id: null,
+                    //     So_Fax: null,
+                    //     Ngay_Fax: null,
+                    //     Ma_So_Khach: null,
+                    //     Don_Vi_Cap_Phep_Id: null,
+                    //     Ngay_Tao: vm.dateDef(vm.currentDate()),
+                    //     Nguoi_Tao: window.themeDisplay.getUserName(),
+                    //     Trang_Thai: null,
+                    //     Co_Quan_De_Nghi_Ten: null,
+                    //     Co_Quan_De_Nghi_Id: null,
+                    //     Nguoi_Ky: null,
+                    //     Chuc_Vu: null
+                    // },
+                    PhepNhapCanh: null,
                     HsThanNhan: thanNhan,
                     HsTreEmDiCung: danhSachDiCung
                 }
@@ -2958,6 +2982,7 @@ export default {
             if (!vm.ky_hieu_thi_thuc) {
                 vm.ky_hieu_thi_thuc = vm.muc_dich
             }
+            vm.hanHoChieuFormated = vm.dateDefReverd(item.Han_Hc)
             vm.dateNgayDuKienNkFormated = vm.dateDefReverd(item.Duoc_Nc_Tu_Ngay)
             vm.dateNgayDuKienXkFormated = vm.dateDefReverd(item.Duoc_Nc_Den_Ngay)
             vm.vb_co_quan_chu_quan = vm.listVanBan.filter(function (itemSelect) {

@@ -683,6 +683,10 @@ export default {
     tempLienThong: {
       type: Boolean,
       default: () => false
+    },
+    expandEform: {
+      type: Boolean,
+      default: () => false
     }
   },
   components: {
@@ -1010,7 +1014,6 @@ export default {
       Promise.all(arrTemp).then(values => {
         var dossierTemplates = values[0]['dossierParts']
         var dossierMarks = values[1]
-        console.log('dossierMarksdossierMarksdossierMarksdossierMarks',dossierMarks)
         var dossierFiles = values[2]
         var fileTemplates = []
         if (values[3].hasOwnProperty('serviceInfoId')) {
@@ -1069,6 +1072,22 @@ export default {
             vm.getDossierFileApplicants(vm.applicantId, vm.fileTemplateNoString)
           }
         }
+        // autoExpand form
+        setTimeout(function () {
+          try {
+            if (vm.expandEform && vm.currentFormView === '') {
+              console.log('expandEform', vm.expandEform)
+              console.log('dossierTemplateItemsFilter', vm.dossierTemplateItemsFilter)
+              let tpEform = vm.dossierTemplateItemsFilter.filter(function (item) {
+                return item.partNo === 'TP01'
+              })[0]
+              console.log('tpEform', tpEform)
+              vm.loadAlpcaFormClick(tpEform)
+            }
+          } catch (error) {
+          }
+        }, 1000)
+        // 
       }).catch(reject => {
       })
       console.log('onlyView,checkInput', vm.onlyView, vm.checkInput, vm.progressUploadPart)
@@ -1278,7 +1297,8 @@ export default {
               wardCode: vm.thongTinChuHoSo['wardCode'],
               wardName: vm.thongTinChuHoSo['wardName'],
               contactEmail: vm.thongTinChuHoSo['contactEmail'],
-              contactTelNo: vm.thongTinChuHoSo['contactTelNo']
+              contactTelNo: vm.thongTinChuHoSo['contactTelNo'],
+              userType: vm.thongTinChuHoSo['userType'] == '1' ? 'citizen' : 'business'
             })
           }
 
@@ -1620,7 +1640,8 @@ export default {
             wardCode: vm.thongTinChuHoSo['wardCode'],
             wardName: vm.thongTinChuHoSo['wardName'],
             contactEmail: vm.thongTinChuHoSo['contactEmail'],
-            contactTelNo: vm.thongTinChuHoSo['contactTelNo']
+            contactTelNo: vm.thongTinChuHoSo['contactTelNo'],
+            userType: vm.thongTinChuHoSo['userType'] == '1' ? 'citizen' : 'business'
           })
         }
         let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)

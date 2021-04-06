@@ -45,7 +45,7 @@
                     </v-flex>
                   </v-layout>
                 </v-flex>
-                <v-flex class="mb-2 px-2 xs12" v-if="!boNganh" :class="donViHuyen ? 'mt-2' : ''">
+                <v-flex class="mb-2 px-2 xs12" :class="donViHuyen ? 'mt-2' : ''">
                   <div>
                     <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Đơn vị thực hiện<span style="color: red" > (*)</span>:</div>
                     <v-autocomplete
@@ -244,7 +244,7 @@
 
                   </div>
                 </v-flex>
-                <v-flex :class="!boNganh ? 'mb-2 px-2 xs12 sm6' : 'mb-2 px-2 xs12'">
+                <v-flex xs12 sm6 class="mb-2 px-2">
                   <div>
                     <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Mã hồ sơ :</div>
                     <v-text-field
@@ -262,11 +262,12 @@
                     ></v-text-field>
                   </div>
                 </v-flex>
-                <v-flex xs12 sm6 class="mb-2 px-2" v-if="!boNganh">
+                <v-flex xs12 sm6 class="mb-2 px-2">
                   <div>
-                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Trạng thái hồ sơ :</div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;" v-if="boNganh">Tình trạng hồ sơ :</div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;" v-else>Trạng thái hồ sơ :</div>
                     <v-autocomplete
-                      placeholder="Chọn trạng thái"
+                      :placeholder="boNganh ? 'Chọn tình trạng' : 'Chọn trạng thái'"
                       class="select-search d-inline-block"
                       style="width: calc(100% - 200px)"
                       :items="statusList"
@@ -740,6 +741,14 @@
           vm.getServiceAdminisTration()
         }
       } else {
+        try {
+          vm.statusList = statusListConfig
+          vm.statusFilter = vm.statusList.filter(function(item) {
+            return item.hasOwnProperty('selected') && item.selected
+          })[0]['key']
+        } catch (error) {
+        }
+        vm.getAgencyConfigs()
         vm.getDomains()
         vm.getServiceInfo()
       }
@@ -771,36 +780,43 @@
 
       govAgencyFilter (val) {
         let vm = this
-        if (!vm.donViHuyen) {
-          if (val) {
-            if (vm.agencySiteList.length > 0) {
-              try {
-                vm.groupIdDonVi = vm.agencySiteList.filter(function (item) {
-                  return item.itemCode === val
-                })[0]['value']
-                vm.getStatusList()
-              } catch (error) {
+        if (!vm.boNganh) {
+          if (!vm.donViHuyen) {
+            if (val) {
+              if (vm.agencySiteList.length > 0) {
+                try {
+                  vm.groupIdDonVi = vm.agencySiteList.filter(function (item) {
+                    return item.itemCode === val
+                  })[0]['value']
+                  vm.getStatusList()
+                } catch (error) {
+                }
+              }
+              if (!vm.groupIdDonVi) {
+                vm.getServerAgency(val)
+              }
+              if (vm.capCoQuanThucHien === 'SBN') {
+                vm.domainFilter = ''
+                vm.serviceFilter = ''
+                vm.getDomains(val)
+                vm.getServiceInfo(val, vm.domainFilter)
+              }
+            } else {
+              if (vm.capCoQuanThucHien === 'SBN') {
+                vm.domainList = []
+                vm.serviceInfoList = []
+                vm.statusList = []
+                vm.domainFilter = ''
+                vm.serviceFilter = ''
+                vm.statusFilter = ''
               }
             }
-            if (!vm.groupIdDonVi) {
-              vm.getServerAgency(val)
-            }
-            if (vm.capCoQuanThucHien === 'SBN') {
-              vm.domainFilter = ''
-              vm.serviceFilter = ''
-              vm.getDomains(val)
-              vm.getServiceInfo(val, vm.domainFilter)
-            }
-          } else {
-            if (vm.capCoQuanThucHien === 'SBN') {
-              vm.domainList = []
-              vm.serviceInfoList = []
-              vm.statusList = []
-              vm.domainFilter = ''
-              vm.serviceFilter = ''
-              vm.statusFilter = ''
-            }
           }
+        } else {
+          vm.domainFilter = ''
+          vm.serviceFilter = ''
+          vm.getDomains(val)
+          vm.getServiceInfo(val, vm.domainFilter)
         }
       },
       domainFilter (val) {
@@ -869,6 +885,18 @@
         }
              
       },
+      getAgencysBoNganh() {
+        let vm = this
+        let data = {}
+        vm.govAgencyList = []
+        vm.$store.dispatch('getAgencysFromDict', data).then(
+          res => {
+            vm.govAgencyList = res
+          }
+        ).catch(()=>{
+          vm.govAgencyList = []
+        })
+      },
       getServerAgency (agencyCode) {
         let vm = this
         let data = {
@@ -905,26 +933,31 @@
         axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
           let serializable = response.data
           let configs = JSON.parse(serializable.configs)
-          vm.agencySiteList = configs['groupIds']
-          let groupHuyen = vm.agencySiteList.filter(function(item) {
-            return item.value == window.themeDisplay.getScopeGroupId()
-          })[0]
-          let groupSiteCapXa = vm.agencySiteList.filter(function(item) {
-            return item.hasOwnProperty('parent') && item.parent === groupHuyen['code']
-          })[0]
-          vm.groupIdDonVi = groupSiteCapXa['value']
-          vm.getStatusList()
-          let param = {
-            groupIdTrungTam: 968548,
-            parent: groupHuyen['code']
-          }
-          vm.$store.dispatch('getAgencysFromParent', param).then(
-            res => {
-              vm.govAgencyList = res
+          if (!vm.boNganh) {
+            vm.agencySiteList = configs['groupIds']
+            let groupHuyen = vm.agencySiteList.filter(function(item) {
+              return item.value == window.themeDisplay.getScopeGroupId()
+            })[0]
+            let groupSiteCapXa = vm.agencySiteList.filter(function(item) {
+              return item.hasOwnProperty('parent') && item.parent === groupHuyen['code']
+            })[0]
+            vm.groupIdDonVi = groupSiteCapXa['value']
+            vm.getStatusList()
+            let param = {
+              groupIdTrungTam: 968548,
+              parent: groupHuyen['code']
             }
-          ).catch(()=>{
-            vm.govAgencyList = []
-          })
+            vm.$store.dispatch('getAgencysFromParent', param).then(
+              res => {
+                vm.govAgencyList = res
+              }
+            ).catch(()=>{
+              vm.govAgencyList = []
+            })
+          } else {
+            vm.govAgencyList = configs['groupIds']
+          }
+          
         }).catch(function (xhr) {
         })
       },

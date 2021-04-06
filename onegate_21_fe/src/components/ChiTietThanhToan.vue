@@ -45,7 +45,7 @@
                 <v-flex style="width:100px" class="my-0 pl-3 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
                 <v-flex style="width:calc(100% - 100px)">
                   <p class="px-2 my-0 py-1">
-                    {{ePaymentProfile['paymentNote'] ? ePaymentProfile['paymentNote'] : ''}} &nbsp;&nbsp;
+                    {{paymentNote}} &nbsp;&nbsp;
                   </p>
                 </v-flex>
               </v-layout>
@@ -251,8 +251,6 @@
 
 <script>
 
-import Vue from 'vue'
-import axios from 'axios'
 export default {
   props: {
     payments: {
@@ -274,7 +272,8 @@ export default {
     activePrintPay: false,
     transId: '',
     goodCode: '',
-    doneVTpay: false
+    doneVTpay: false,
+    paymentNote: ''
   }),
   computed: {
     paymentFileName () {
@@ -301,7 +300,11 @@ export default {
   created () {
     let vm = this
     vm.$nextTick(function () {
-      var vm = this
+      vm.paymentNote = vm.payments['paymentNote']
+      try {
+        vm.paymentNote = JSON.parse(vm.payments['paymentNote'])['paymentNote']
+      } catch (error) {
+      }
     })
   },
   watch: {
@@ -315,6 +318,11 @@ export default {
       // if (!vm.paymentFile && val['paymentMethod'] === 'Chuyển khoản') {
       //   vm.payments.paymentMethod = 'Keypay'
       // }
+      vm.paymentNote = val['paymentNote']
+      try {
+        vm.paymentNote = JSON.parse(val['paymentNote'])['paymentNote']
+      } catch (error) {
+      }
       let paymentProfile = vm.getEPaymentProfile(val.epaymentProfile)
       // keypay
       if (paymentProfile && paymentProfile['keypayUrl']) {

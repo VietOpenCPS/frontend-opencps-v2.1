@@ -49,7 +49,7 @@
           </div>
           <!--  -->
           <thong-tin-chu-ho-so v-if="!mauCongVan" ref="thongtinchuhoso" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="isNotarization ? true : false" :applicantIdRequired="applicantIdRequired"></thong-tin-chu-ho-so>
-          <thong-tin-chu-ho-so-cong-van v-if="mauCongVan" ref="thongtinchuhosocongvan" :mauCongVan="mauCongVan"></thong-tin-chu-ho-so-cong-van>
+          <!-- <thong-tin-chu-ho-so-cong-van v-if="mauCongVan" ref="thongtinchuhosocongvan" :mauCongVan="mauCongVan"></thong-tin-chu-ho-so-cong-van> -->
           <!--  -->
           <div v-if="!isNotarization">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -192,7 +192,7 @@
           <div :style="isNotarization ? 'display: none' : 'position: relative;'">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
-                <thu-phi v-if="showThuPhi" v-model="payments" :detailDossier="thongTinChiTietHoSo" :viaPortal="viaPortalDetail"></thu-phi>
+                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :detailDossier="thongTinChiTietHoSo" :viaPortal="viaPortalDetail"></thu-phi>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
@@ -623,8 +623,8 @@ import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
 import DichVuChuyenPhatHoSo from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatHoSo.vue'
-import ThongTinCongVan from './TiepNhan/TiepNhanHoSo_ThongTinCongVan.vue'
-import ThongTinChuHoSoCongVan from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSoCongVan.vue'
+// import ThongTinCongVan from './TiepNhan/TiepNhanHoSo_ThongTinCongVan.vue'
+// import ThongTinChuHoSoCongVan from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSoCongVan.vue'
 import TinyPagination from './pagging/opencps_pagination.vue'
 toastr.options = {
   'closeButton': true,
@@ -634,14 +634,14 @@ export default {
   props: ['index', 'id', 'formCode'],
   components: {
     'thong-tin-chu-ho-so': ThongTinChuHoSo,
-    'thong-tin-chu-ho-so-cong-van': ThongTinChuHoSoCongVan,
+    // 'thong-tin-chu-ho-so-cong-van': ThongTinChuHoSoCongVan,
     'thanh-phan-ho-so': ThanhPhanHoSo,
     'tai-lieu-chung-thuc': TaiLieuChungThuc,
     'thong-tin-chung': ThongTinChung,
     'thu-phi': LePhi,
     'dich-vu-chuyen-phat-ho-so': DichVuChuyenPhatHoSo,
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua,
-    'thong-tin-cong-van': ThongTinCongVan,
+    // 'thong-tin-cong-van': ThongTinCongVan,
     'tiny-pagination': TinyPagination
   },
   data: () => ({
@@ -666,6 +666,7 @@ export default {
     tiepNhanState: true,
     thongTinChiTietHoSo: {},
     payments: {},
+    paymentsOriginal: '',
     paymentProfile: {},
     briefNote: '',
     receiveDateEdit: '',
@@ -855,7 +856,8 @@ export default {
     },
     applicantIdRequired :true,
     showGuiHoSoConfig: false,
-    showGuiHoSo: false
+    showGuiHoSo: false,
+    showCounterFee: false
   }),
   computed: {
     loading () {
@@ -899,6 +901,10 @@ export default {
     }
     try {
       vm.fromViaPostalConfig = fromViaPostalConfig
+    } catch (error) {
+    }
+    try {
+      vm.showCounterFee = showCounterFee
     } catch (error) {
     }
     vm.$nextTick(function () {
@@ -1118,7 +1124,19 @@ export default {
                     vm.durationPhase = resAction && resAction.receiving && resAction.receiving.hasOwnProperty('durationPhase') ? resAction.receiving.durationPhase : ''
                     if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
                       vm.showThuPhi = true
-                      vm.payments = resAction.payment
+                      vm.paymentsOriginal = resAction.payment
+                      let dataJson = ''
+                      try {
+                        dataJson = JSON.parse(resAction.payment['paymentNote'])
+                        if (dataJson) {
+                          dataJson = Object.assign(dataJson, {
+                            editable: resAction.payment['editable'],
+                            requestPayment: resAction.payment['requestPayment']
+                          })
+                        }
+                      } catch (error) {
+                      }
+                      vm.payments = dataJson ? dataJson : resAction.payment
                     }
                     // call initData thong tin chung ho so
                     if (vm.$refs.thongtinchunghoso) {
@@ -1345,7 +1363,7 @@ export default {
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
             // cập nhật notify config
-            vm.updateNotifyConfig()
+            vm.updateMetaData()
           }, 500)
         }
       }
@@ -1427,6 +1445,19 @@ export default {
                     serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
                     shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
                   }
+                  if (vm.payments && vm.payments.hasOwnProperty('counter')) {
+                    let dataNote = ''
+                    try {
+                      dataNote = JSON.parse(vm.paymentsOriginal['paymentNote'])
+                      dataNote.paymentNote = vm.payments['paymentNote']
+                      dataNote.counter = vm.payments['counter']
+                    } catch (error) {
+                    }
+                    paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
+                    paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
+                    paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
+                    paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
+                  }
                   if (vm.isNotarization) {
                     let dataNotarization = vm.$refs.tailieuchungthuc.dataExport()
                     paymentsOut.feeAmount = dataNotarization.feeTotal
@@ -1499,7 +1530,7 @@ export default {
               toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
-            vm.updateNotifyConfig()
+            vm.updateMetaData()
           }
 
           if (!vm.mauCongVan) {
@@ -1757,7 +1788,7 @@ export default {
             })
           })
           // 
-          vm.updateNotifyConfig()
+          vm.updateMetaData()
         }).catch(reject => {
         })
       }
@@ -1820,7 +1851,7 @@ export default {
           toastr.error('Yêu cầu của bạn thực hiện thất bại')
         })
         // 
-        vm.updateNotifyConfig()
+        vm.updateMetaData()
       })
     },
     // 
@@ -1912,9 +1943,9 @@ export default {
         }
       })
     },
-    updateNotifyConfig () {
+    updateMetaData () {
       let vm = this
-      if (!vm.notifyConfig || vm.originality !== 3) {
+      if (vm.originality !== 3 || !vm.notifyConfig) {
         return
       }
       let filter = {
@@ -1922,7 +1953,7 @@ export default {
         smsNotify: vm.smsNotify,
         emailNotify: vm.emailNotify
       }
-      vm.$store.dispatch('putNotifyConfig', filter).then(result => {})
+      vm.$store.dispatch('updateMetaData', filter).then(result => {})
     },
     showHDTT () {
       let vm = this

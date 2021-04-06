@@ -58,13 +58,16 @@
               </v-flex>
               <v-flex xs12 v-if="applicantType === '2'">
                 <div v-if="!validBussinessInfos && hasCheckBussiness" class="mb-2">
-                  <v-chip color="red" outline text-color="red" class="mx-0" style="width: 100%">
-                    <v-avatar>
-                      <v-icon size=18>warning</v-icon>
-                    </v-avatar>
-                    <span v-if="!bussinessExits">{{'Mã số ĐKKD, mã số thuế ' + applicantIdNo + ' không chính xác'}}</span>
+                  <v-alert
+                    :value="true"
+                    color="error"
+                    icon="warning"
+                    outline
+                    class="px-2 py-2"
+                  >
+                    <span v-if="!bussinessExits">{{'Mã số ĐKKD, mã số thuế ' + applicantIdNo + ' không có trên CSDL quốc gia về đăng ký doanh	nghiệp'}}</span>
                     <span v-if="bussinessExits && !bussinessStatus">{{'Doanh nghiệp mã số thuế ' + applicantIdNo + ' không còn hoạt động'}}</span>
-                  </v-chip>
+                  </v-alert>
                 </div>
                 <div>
                   <span>{{applicantType === '1' ? 'Họ và tên ' : (applicantType === '2' ? 'Tên tổ chức, doanh nghiệp ' : 'Tên cơ quan, tổ chức ')}}</span> <span style="color:red">(*)</span>
@@ -527,16 +530,16 @@ export default {
       console.log('dataForm', dataForm)
       if (vm.$refs.form.validate() && vm.agreeRules) {
         let passValid = true
-        if (vm.applicantType === '2' && vm.hasCheckBussiness && (!vm.bussinessExits || !vm.bussinessStatus || 
-          (vm.bussinessExits && vm.bussinessStatus && vm.applicantName.toLocaleLowerCase().trim() !== vm.bussinessInfomation['NAME'].toLocaleLowerCase().trim()))
-        ) {
+        if (vm.applicantType === '2' && vm.hasCheckBussiness && vm.bussinessInfomation && vm.applicantName.toLocaleLowerCase().trim() !== vm.bussinessInfomation['NAME'].toLocaleLowerCase().trim()) {
           passValid = false
           if (vm.applicantName.toLocaleLowerCase().trim() !== vm.bussinessInfomation['NAME'].toLocaleLowerCase().trim()) {
             vm.messageCheckApplicant = 'Vui lòng nhập tên tổ chức, doanh nghiệp đúng với tên đăng ký kinh doanh'
           }
           toastr.error(vm.messageCheckApplicant)
           return
-        } else { passValid = true }
+        } else { 
+          passValid = true 
+        }
         if (passValid) {
           vm.loading = true
           let filter = dataForm
@@ -637,7 +640,7 @@ export default {
             vm.bussinessExits = false
             vm.applicantName = ''
             vm.applicantIdDateFormatted = null
-            vm.messageCheckApplicant = 'Mã số ĐKKD, mã số thuế ' + vm.applicantIdNo + ' không chính xác. Vui lòng kiểm tra lại'
+            vm.messageCheckApplicant = 'Mã số ĐKKD, mã số thuế ' + vm.applicantIdNo + ' không có trên CSDL quốc gia về đăng ký doanh	nghiệp'
           }
         }).catch(function () {
           vm.validBussinessInfos = false

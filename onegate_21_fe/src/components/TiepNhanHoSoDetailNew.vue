@@ -277,9 +277,9 @@
         <div v-else>
           <v-card flat color="#fff">
             <div style="position: absolute;right: 0">
-              <v-btn color="primary" @click="showHDTT()">Phiếu hướng dẫn thủ tục</v-btn>
-              <v-btn color="primary" @click="showTCTN()">
-                Phiếu từ chối tiếp nhận
+              <v-btn small color="primary" @click="showHDTT()" class="mr-2"><v-icon>print</v-icon>&nbsp; Phiếu hướng dẫn thủ tục</v-btn>
+              <v-btn small color="#d28a05" @click="showTCTN()" class="white--text">
+                <v-icon>print</v-icon>&nbsp;Phiếu từ chối tiếp nhận
               </v-btn>
             </div>
             <div id="formAlpacaNewTemplate" class="mb-5 pt-0" v-if="data_form_template !== 'formHPH' && data_form_template !== 'formCH'  && data_form_template !== 'formHT' && data_form_template !== 'formTT'"></div>

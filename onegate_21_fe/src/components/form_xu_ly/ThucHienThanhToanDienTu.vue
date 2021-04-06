@@ -57,12 +57,12 @@
               </v-flex>
               <v-flex xs12 sm1></v-flex>
             </v-layout>
-            <!-- paymentNote -->
+
             <v-layout wrap style="position: relative">
               <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
               <v-flex style="width:calc(100% - 80px)">
                 <p class="px-2 my-0 py-1">
-                  {{paymentProfile.paymentNote}} &nbsp;&nbsp;
+                  {{paymentNote}} &nbsp;&nbsp;
                 </p>
               </v-flex>
             </v-layout>
@@ -294,7 +294,8 @@ export default {
     methodSelect: 0,
     ipAddress:'',
     loadingPay: false,
-    thanhToanChuyenKhoan: true
+    thanhToanChuyenKhoan: true,
+    paymentNote: ''
   }),
   directives: {money: VMoney},
   created () {
@@ -327,6 +328,12 @@ export default {
     paymentProfile (val) {
       var vm = this
       if (vm.paymentProfile) {
+        // 
+        vm.paymentNote = val['paymentNote'] ? val['paymentNote'] : ''
+        try {
+          vm.paymentNote = JSON.parse(val['paymentNote'])['paymentNote']
+        } catch (error) {
+        }
         //
         if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && vm.paymentProfile.epaymentProfile) {
           let paymentConfigInfo = vm.getEPaymentProfile(vm.paymentProfile.epaymentProfile)

@@ -4,14 +4,16 @@
             <v-flex xs12 sm6 class="px-2 my-2">
                 <div style="display:flex; flex-wrap: wrap; align-items: center;">
                     <strong>Tham chiếu thông tin từ mã tờ khai trực tuyến</strong>
-                    <div style="width: 100px;" class="mx-2">
+                    <div style="width: 150px;" class="mx-2">
                         <v-text-field
                             v-model="eFormCode"
                             solo
                             @keyup.enter="getDataEform()"
                         ></v-text-field>
                     </div>
-                    <v-btn small color="primary" @click="getDataEform()" class="ml-2">Lấy dữ liệu</v-btn>
+                    <v-btn small color="primary" @click="getDataEform()" class="ml-2 mt-0" style="height: 32px;">
+                        <v-icon>save_alt</v-icon>&nbsp; Lấy dữ liệu
+                    </v-btn>
                 </div>
             </v-flex>
             <v-flex xs12 class="px-2 my-2">
@@ -115,7 +117,7 @@
             <v-flex xs12 sm6 class="px-2 ">
                 <div style="display:flex; flex-wrap: wrap; align-items: center;">
                     <strong>Danh sách các giấy tờ cần đăng ký CNLS/HPHLS <span class="red--text">*</span></strong>
-                     <v-btn small color="primary" class="ml-2" @click="openThemGiayTo()">Thêm giấy tờ</v-btn>
+                    <v-btn small color="primary" class="ml-2" @click.stop="openThemGiayTo()"><v-icon>add</v-icon>&nbsp; Thêm giấy tờ</v-btn>
                 </div>
             </v-flex>
             <v-flex xs12  class="px-2 my-2">
@@ -309,19 +311,16 @@
             persistent
         >
             <v-card v-if="!dialogTimKiemConDau">
-                <v-card-title
-                    class="headline lighten-2"
-                    primary-title
-                    style="display: flex;justify-content: space-between;"
-                >
-                    Thông tin giấy tờ
-                    <v-btn color="#115ebe" fab small dark  @click="close()">
-                        <v-icon>cancel</v-icon>
+                <v-toolbar dark color="primary">
+                    <v-toolbar-title>Thông tin giấy tờ</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn icon dark @click.native="close()">
+                    <v-icon>close</v-icon>
                     </v-btn>
-                </v-card-title>
-                <v-card-text class="form_vuejs">
+                </v-toolbar>
+                <v-card-text class="form_vuejs pb-0 px-0">
                     <v-layout wrap>
-                        <v-flex xs12 sm8>
+                        <v-flex xs12 sm8 class="px-2">
                             <v-form ref="formGiayTo" lazy-validation>
                                 <v-layout wrap>
                                     <v-flex xs12 sm4 class="px-2 my-2">
@@ -455,7 +454,9 @@
                                         </v-text-field>
                                     </v-flex>
                                     <v-flex xs12 class="text-xs-right">
-                                        <v-btn small color="primary" @click="openKiemTraChuKyConDau()">Kiểm tra chữ ký con dấu</v-btn>
+                                        <v-btn small color="primary" @click="openKiemTraChuKyConDau()">
+                                            <v-icon>check_circle_outline</v-icon>&nbsp; Kiểm tra chữ ký con dấu
+                                        </v-btn>
                                         <v-btn small color="primary" @click="backGiayto()" :disabled="update_giayto === 'add' || update_giayto === 0"><v-icon>skip_previous</v-icon></v-btn>
                                         <v-btn small color="primary" @click="nextGiayto()" :disabled="update_giayto === 'add' || update_giayto === (listGiayTo.length - 1)"><v-icon>skip_next</v-icon></v-btn>
                                     </v-flex>                     
@@ -480,29 +481,29 @@
                                 </v-flex>
                             </v-layout>
                         </v-flex>
-                        <v-flex xs12 class="text-xs-right">
-                            <v-btn small color="primary" @click="updateGiayTo()">Cập nhập</v-btn>
-                            <v-btn small color="primary" @click="dialogGiayTo=false">Đóng</v-btn>
+
+                        <v-flex xs12 class="mx-0 py-1 mt-2 px-3" style="background: #dededeb3;">
+                            <v-btn small color="red" class="white--text right mr-0" @click="dialogGiayTo=false"><v-icon>clear</v-icon>&nbsp; Đóng</v-btn>
+                            <v-btn small color="primary" class="right" @click="updateGiayTo()"><v-icon>save</v-icon>&nbsp; 
+                                Cập nhật
+                            </v-btn>
                         </v-flex>
                     </v-layout>
                 </v-card-text>
             </v-card>
             <v-card v-else>
-                <v-card-title
-                    class="headline lighten-2"
-                    primary-title
-                    style="display: flex;justify-content: space-between;"
-                >
-                    Thông tin giấy tờ
-                    <v-btn color="#115ebe" fab small dark  @click="close()">
-                        <v-icon>cancel</v-icon>
+                <v-toolbar dark color="primary">
+                    <v-toolbar-title>Chữ ký, con dấu</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn icon dark @click.native="closeConDauChuKy()">
+                    <v-icon>close</v-icon>
                     </v-btn>
-                </v-card-title>
-                <v-card-text class="form_vuejs">
+                </v-toolbar>
+                <v-card-text class="form_vuejs pb-0 px-0">
                     <v-layout wrap>
                         <v-flex xs12 sm8>
                             <v-layout wrap>
-                                <v-flex xs12 class="px-2 my-2">
+                                <v-flex xs12 class="px-2 mb-2">
                                     <label for="">Tên cơ quan</label>
                                     <v-text-field
                                         solo
@@ -520,7 +521,7 @@
                                             @keyup.enter="getDSNguoiKy()"
                                         >
                                         </v-text-field>
-                                        <v-btn small color="primary" @click="getDSNguoiKy()">Tìm kiếm</v-btn>
+                                        <v-btn class="mt-0" small color="primary" @click="getDSNguoiKy()" style="height:34px"><v-icon>search</v-icon>&nbsp; Tìm kiếm</v-btn>
                                     </div>
                                 </v-flex>
                                 <v-flex xs12 class="px-2 my-2">
@@ -533,7 +534,7 @@
                                         
                                         no-data-text="Không có người ký nào"
                                         class="table_vuejs"
-                                        style="border-left: 0.5px solid #dedede;"
+                                        style="border: 0.5px solid #dedede;"
                                         rows-per-page-text
                                     >
                                         <template slot="items" slot-scope="props">
@@ -556,7 +557,7 @@
                                             <div v-if="loadingImage" style="height: 140px;font-size: 16pt;color: blue;">Loading ....</div>
                                             <div v-if="!loadingImage" style="width: 100%; height: 190px;display:flex;">
                                                 <div v-for="(item, index) in listConDau" :key="index">
-                                                    <img :src="'data:image/png;base64,' +  item.strConDau" alt="" style=" height: 140px;" @click="phongTo(item.strConDau)">
+                                                    <img :src="'data:image/png;base64,' +  item.strConDau" alt="" style=" height: 140px;cursor: zoom-in;" @click="phongTo(item.strConDau)">
                                                     <!-- <img :src="item.strConDau" alt="" style=" height: 140px;" @click="phongTo(item.strConDau)"> -->
                                                     <v-checkbox
                                                         v-model="chonConDau"
@@ -579,7 +580,7 @@
                                             <div v-if="loadingImage" style="height: 140px;font-size: 16pt;color: blue;">Loading ....</div>
                                             <div v-if="!loadingImage" style="width: 100%; height: 190px;display:flex;">
                                                 <div v-for="(item, index) in listChuKy" :key="index">
-                                                    <img :src="'data:image/png;base64,' +  item.strChuKy" alt="" style=" height: 140px;" @click="phongTo(item.strChuKy)">
+                                                    <img :src="'data:image/png;base64,' +  item.strChuKy" alt="" style=" height: 140px;cursor: zoom-in;" @click="phongTo(item.strChuKy)">
                                                     
                                                     <v-checkbox
                                                         v-model="chonChuKy"
@@ -597,9 +598,15 @@
                                 </v-flex>
                             </v-layout>
                         </v-flex>
-                        <v-flex xs12 class="text-xs-right">
+                        <!-- <v-flex xs12 class="text-xs-right">
                             <v-btn small color="primary" @click="chonConDauChuKy()">Chọn</v-btn>
                             <v-btn small color="primary" @click="closeConDauChuKy()">Quay lại</v-btn>
+                        </v-flex> -->
+                        <v-flex xs12 class="mx-0 py-1 mt-2 px-3" style="background: #dededeb3;width: 100%;bottom: 0">
+                            <v-btn small color="red" class="white--text right mr-0" @click="closeConDauChuKy"><v-icon>clear</v-icon>&nbsp; Đóng</v-btn>
+                            <v-btn small color="primary" class="right" @click="chonConDauChuKy()"><v-icon>save</v-icon>&nbsp; 
+                                <span>Chọn</span>
+                            </v-btn>
                         </v-flex>
                     </v-layout>
                 </v-card-text>
@@ -612,16 +619,13 @@
             persistent
         >
             <v-card>
-                <v-card-title
-                    class="headline lighten-2"
-                    primary-title
-                    style="display: flex;justify-content: space-between;"
-                >
-                
-                    <v-btn color="#115ebe" fab small dark  @click="dialogPhongTO = false">
-                        <v-icon>cancel</v-icon>
+                <v-toolbar dark color="primary">
+                    <v-toolbar-title></v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn icon dark @click.native="dialogPhongTO = false">
+                    <v-icon>close</v-icon>
                     </v-btn>
-                </v-card-title>
+                </v-toolbar>
                 <v-card-text class="form_vuejs">
                     <v-layout wrap>
                         <v-flex xs12>

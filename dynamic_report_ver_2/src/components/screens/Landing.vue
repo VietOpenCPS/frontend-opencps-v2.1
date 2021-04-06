@@ -124,13 +124,13 @@
             <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
               <v-icon>print</v-icon> &nbsp; In báo cáo
             </v-btn>
-            <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
+            <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="downloadExcel()">
               <v-icon size="16px">fas fa fa-file-excel-o</v-icon> &nbsp; Tải xuống Excel
             </v-btn>
             <v-btn v-if="!itemsReports[index]['filterConfig']['showTable'] && exportWordReport" dark color="blue darken-3" class="my-0" v-on:click.native="doCreateReport(true, 'word')">
               <v-icon size="16px">fas fa fa-file-word-o</v-icon> &nbsp; Tải xuống Word
             </v-btn>
-            <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
+            <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="downloadExcel()">
               <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
             </v-btn>
             <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
@@ -918,6 +918,8 @@ export default {
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
+      vm.listTongHop = []
+      vm.totalCount = 0
       vm.showHTML = false
       vm.showErrorData = false
       vm.showCSVDownload = false
@@ -1359,8 +1361,6 @@ export default {
     },
     doDynamicReport () {
       let vm = this
-      console.log('getAgencyReportLists2', vm.itemsReports)
-      console.log('itemsReports', vm.itemsReports[vm.index])
       vm.isRender = false
       vm.docDefinition = {}
       let docDString = {}
@@ -1473,7 +1473,7 @@ export default {
         data: vm.data,
         api: vm.api,
         proxyApi: vm.proxyApi,
-        formatDate: vm.itemsReports[vm.index]['filterConfig']['version'] ? 'date' : 'timestamp'
+        formatDate: vm.itemsReports[vm.index]['filterConfig']['version'] ? 'timestamp' : 'date'
       }
       let check =  true
       console.log('groupIdListSelected 555', vm.groupIdListSelected)
@@ -1501,8 +1501,7 @@ export default {
         vm.dialogPDF = true
         vm.loadingPdfVer2 = true
       }
-      console.log('getAgencyReportLists',filter)
-      let dispatchUse = vm.itemsReports[vm.index]['filterConfig']['version'] ? 'getDossiers' : 'getAgencyReportLists'
+      let dispatchUse = vm.itemsReports[vm.index]['filterConfig']['version'] ? 'getDossiers' : 'getAgencyReportListsOld'
       vm.$store.dispatch(dispatchUse, filter).then(function (result) {
         // console.log('result',result)
         if (result !== null && result !== undefined) {
@@ -1897,6 +1896,9 @@ export default {
         api: vm.api,
         proxyApi: vm.proxyApi
       }
+      if (vm.api.indexOf('/o/statistic/dossier') >= 0) {
+        filter.formatDate = 'timestamp'
+      }
       let check =  true
       for (let key in vm.filterGroup) {
         if (key === vm.groupIdListSelected) {
@@ -1919,9 +1921,9 @@ export default {
       let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
       let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
       
-      console.log('getAgencyReportLists2', filter)
       console.log('itemsReports', vm.itemsReports[vm.index])
-      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+      let dispatchUse = vm.api.indexOf('/o/statistic/dossier') >= 0 ? 'getAgencyReportLists' : 'getAgencyReportListsOld'
+      vm.$store.dispatch(dispatchUse, filter).then(function (result) {
         // console.log('result',result)
         if (result !== null) {
           // set dossierList
@@ -2304,7 +2306,8 @@ export default {
         document: vm.reportType,
         data: vm.data,
         api: vm.api,
-        proxyApi: vm.proxyApi
+        proxyApi: vm.proxyApi,
+        formatDate: vm.itemsReports[vm.index]['filterConfig']['version'] ? 'timestamp' : 'date'
       }
       let check =  true
       console.log('groupIdListSelected 555', vm.groupIdListSelected)
@@ -2359,7 +2362,8 @@ export default {
         api: vm.api,
         proxyApi: vm.proxyApi,
         start: vm.pagination.page * vm.pagination.rowsPerPage - vm.pagination.rowsPerPage,
-        end: vm.pagination.page * vm.pagination.rowsPerPage
+        end: vm.pagination.page * vm.pagination.rowsPerPage,
+        formatDate: vm.itemsReports[vm.index]['filterConfig']['version'] ? 'timestamp' : 'date'
       }
       let check =  true
       console.log('groupIdListSelected 555', vm.groupIdListSelected)
@@ -2583,21 +2587,26 @@ export default {
     },
     downloadExcel (item, n) {
       let vm = this
-      vm.sttQuyen = n
-      vm.targetFilter = item
-      let counterPage = vm.itemsReports[vm.index]['filterConfig']['numberPerPage']
+      let counterPage = 1
+      if (n) {
+        vm.sttQuyen = n
+        counterPage = vm.itemsReports[vm.index]['filterConfig']['numberPerPage']
+        vm.targetFilter = item
+        vm.data[vm.groupByVal] = item[vm.groupByVal]
+      }
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
       vm.api = vm.itemsReports[vm.index]['filterConfig']['apiExportExcel']
-      vm.data[vm.groupByVal] = item[vm.groupByVal]
       // build data
       let filter = {
         document: vm.reportType,
         data: vm.data,
         api: vm.api,
         proxyApi: vm.proxyApi,
-        start: vm.sttQuyen * counterPage - counterPage,
-        end: vm.sttQuyen * counterPage,
         fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xlsx'
+      }
+      if (n) {
+        filter.start = vm.sttQuyen * counterPage - counterPage
+        filter.end = vm.sttQuyen * counterPage
       }
       let check =  true
       console.log('groupIdListSelected 555', vm.groupIdListSelected)

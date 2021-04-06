@@ -716,6 +716,9 @@ export const store = new Vuex.Store({
                   return partTip
                 }
               }
+              if (!Array.isArray(serializable['dossierParts'])) {
+                serializable.dossierParts = [serializable.dossierParts]
+              }
               if (serializable && serializable['dossierParts']) {
                 for (let key in serializable['dossierParts']) {
                   serializable['dossierParts'][key].hasTemplate = false
@@ -759,6 +762,9 @@ export const store = new Vuex.Store({
                 }
                 return partTip
               }
+            }
+            if (!Array.isArray(serializable['dossierParts'])) {
+              serializable.dossierParts = [serializable.dossierParts]
             }
             if (serializable && serializable['dossierParts']) {
               for (let key in serializable['dossierParts']) {
@@ -4415,7 +4421,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    putNotifyConfig ({commit, state}, filter) {
+    updateMetaData ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
