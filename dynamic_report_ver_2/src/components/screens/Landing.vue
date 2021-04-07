@@ -2194,7 +2194,7 @@ export default {
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
-                dataRowTotal[indexTotalXXTT]['text'] = parseInt(dataTextXXTT) + ' '
+                dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? '0' : parseInt(dataTextXXTT) + ' '
                 if (currentConfigXXTT['value'] === 'note') {
                   dataRowTotal[indexTotalXXTT]['text'] = ' '
                 }

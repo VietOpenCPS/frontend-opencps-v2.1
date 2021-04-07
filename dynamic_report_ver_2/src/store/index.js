@@ -447,9 +447,14 @@ export const store = new Vuex.Store({
               axios.post(requestURL, {}, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
-                  //test
                   if (Array.isArray(serializable.data)) {
-                    resolve(serializable.data)
+                    let dataOut = serializable.data
+                    if (dataOut.length > 0 && Object.keys(dataOut[0]).length > 0) {
+                      resolve(dataOut)
+                    } else {
+                      resolve(null)
+                    }
+                    
                   } else {
                     resolve([serializable.data])
                   }
@@ -520,7 +525,17 @@ export const store = new Vuex.Store({
               axios.post(requestURL, {}, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
-                  resolve(serializable.data)
+                  if (Array.isArray(serializable.data)) {
+                    let dataOut = serializable.data
+                    if (dataOut.length > 0 && Object.keys(dataOut[0]).length > 0) {
+                      resolve(dataOut)
+                    } else {
+                      resolve(null)
+                    }
+                    
+                  } else {
+                    resolve([serializable.data])
+                  }
                 } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
                   resolve(serializable)
                 } else {
@@ -654,7 +669,12 @@ export const store = new Vuex.Store({
                 if (serializable.data) {
                   //test
                   if (Array.isArray(serializable.data)) {
-                    resolve(serializable.data)
+                    let dataOut = serializable.data
+                    if (dataOut.length > 0 && Object.keys(dataOut[0]).length > 0) {
+                      resolve(dataOut)
+                    } else {
+                      resolve(null)
+                    }
                   } else {
                     resolve([serializable.data])
                   }
@@ -725,7 +745,17 @@ export const store = new Vuex.Store({
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
-                  resolve(serializable.data)
+                  if (Array.isArray(serializable.data)) {
+                    let dataOut = serializable.data
+                    if (dataOut.length > 0 && Object.keys(dataOut[0]).length > 0) {
+                      resolve(dataOut)
+                    } else {
+                      resolve(null)
+                    }
+                    
+                  } else {
+                    resolve([serializable.data])
+                  }
                 } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
                   resolve(serializable)
                 } else {
@@ -1757,14 +1787,18 @@ export const store = new Vuex.Store({
               if (serializable.data) {
                 //test
                 if (Array.isArray(serializable.data)) {
-                  resolve(serializable.data)
+                  let dataOut = serializable.data
+                  if (dataOut.length > 0 && Object.keys(dataOut[0]).length > 0) {
+                    resolve(dataOut)
+                  } else {
+                    resolve(null)
+                  }
                 } else {
                   resolve([serializable.data])
                 }
               } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
                 resolve(serializable)
               } else {
-                console.log('docu', filter.document === 'STATISTIC_05')
                 if (filter.document === 'STATISTIC_05') {
                   resolve([])
                 } else {
@@ -1828,7 +1862,17 @@ export const store = new Vuex.Store({
             axios.post(requestURL, {}, param).then(function (response) {
               let serializable = response.data
               if (serializable.data) {
-                resolve(serializable.data)
+                if (Array.isArray(serializable.data)) {
+                  let dataOut = serializable.data
+                  if (dataOut.length > 0 && Object.keys(dataOut[0]).length > 0) {
+                    resolve(dataOut)
+                  } else {
+                    resolve(null)
+                  }
+                  
+                } else {
+                  resolve([serializable.data])
+                }
               } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
                 resolve(serializable)
               } else {

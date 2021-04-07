@@ -2325,6 +2325,8 @@ export default {
                 Gioi_Tinh_Text: res.Gioi_Tinh === 'M' ? 'Nam' : 'Nữ',
                 Quoc_Tich_Hn_Id: res.Quoc_Tich_Hn_Id,
                 Quoc_Tich_Hn_Text: res.Quoc_Tich_Hn_Id_Text,
+                Dc_Tam_Tru_Chi_Tiet: null,
+                Dia_Chi_Thuong_Tru: null,
                 So_Ho_Chieu: res.So_Ho_Chieu,
                 Han_Hc: vm.dateDef(res.Han_Hc),
                 Ma_To_Khai: vm.eFormCode,
@@ -2735,6 +2737,8 @@ export default {
                     Gioi_Tinh_Text: vm.gioi_tinh['name'],
                     Quoc_Tich_Hn_Id: vm.quoc_tich_hien_nay ? vm.quoc_tich_hien_nay['itemCode'] : null,
                     Quoc_Tich_Hn_Text: vm.quoc_tich_hien_nay ? vm.quoc_tich_hien_nay['itemName'] : null,
+                    Dc_Tam_Tru_Chi_Tiet: vm.dia_chi_viet_nam ? vm.dia_chi_viet_nam : null,
+                    Dia_Chi_Thuong_Tru: vm.dia_chi_nuoc_ngoai ? vm.dia_chi_nuoc_ngoai : null,
                     So_Ho_Chieu: vm.so_ho_chieu,
                     Han_Hc: vm.dateDef(vm.hanHoChieuFormated),
                     Ma_To_Khai: vm.eformCodeThanhVienEdit ? vm.eformCodeThanhVienEdit : (new Date()).getTime(),
@@ -2956,6 +2960,8 @@ export default {
             vm.quoc_tich_hien_nay = item.Quoc_Tich_Hn_Id ? vm.listNuocDi.filter(function (itemSelect) {
                 return itemSelect.itemCode == item.Quoc_Tich_Hn_Id
             })[0] : ''
+            vm.dia_chi_viet_nam = item.Dc_Tam_Tru_Chi_Tiet
+            vm.dia_chi_nuoc_ngoai = item.Dia_Chi_Thuong_Tru
             vm.so_ho_chieu = item.So_Ho_Chieu
             vm.loai_ho_chieu = item.Loai_Ho_Chieu ? vm.listLoaiHoChieu.filter(function (itemSelect) {
                 return itemSelect.value == item.Loai_Ho_Chieu
