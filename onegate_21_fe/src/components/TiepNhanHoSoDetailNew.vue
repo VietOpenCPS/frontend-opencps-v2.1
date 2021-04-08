@@ -1640,6 +1640,25 @@ export default {
                 vm.loadingAction = true
                 vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
                     let metaData = dossiers.metaData
+                    try {
+                      let metaDataObj = JSON.parse(metaData)
+                      let listFiles = JSON.parse(dataCreate['dossierFileArr'])
+                      let listThanhVienObj = listFiles.filter(function(item) {
+                        return item.eform === 'true' && item.partNo === 'TP01'
+                      })[0]
+                      let listThanhVienArr = JSON.parse(listThanhVienObj['formData'])['thanh_vien_doan']
+                      for (let i=0; i < listThanhVienArr.length; i++) {
+                          if (listThanhVienArr[i]['cong_ham']) {
+                            metaDataObj = Object.assign(metaDataObj, {'hasXinThiThuc': true})
+                            break
+                          }
+                      }
+                      console.log('metaDataObj', metaDataObj)
+                      metaData = JSON.stringify(metaDataObj)
+                    } catch (error) {
+                    }
+                    
+                    console.log('metadata666666', metaData)
                     let dataMetaData = {
                       id: result.dossierId,
                       data: metaData

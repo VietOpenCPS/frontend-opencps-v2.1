@@ -1553,11 +1553,6 @@ export const store = new Vuex.Store({
           }
         }
         let dataPostdossier = new URLSearchParams()
-        // dataPostdossier.append('dossierFileCustom',data.dossierFileCustom)
-        // dataPostdossier.append('ma_to_khai',data.ma_to_khai)
-        // dataPostdossier.append('totalRecord',data.totalRecord)
-        // dataPostdossier.append('dossierFilePayment',data.dossierFilePayment)
-        // dataPostdossier.append('Doan_HCTN',data.Doan_HCTN)
         console.log('data put metadata111', filter.data)
         dataPostdossier.append('data',filter.data)
         axios.put('/o/rest/v2/dossiers/'+filter.id+'/metadata', dataPostdossier, options).then(function (response) {

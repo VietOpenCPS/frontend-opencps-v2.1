@@ -1656,8 +1656,8 @@ export default {
                                 vm.su_dung_tai_nuoc_ma = res.data.su_dung_tai_nuoc_ma
                             }
                             if(res.data.de_nghi_chung_nhan) {
-                                vm.de_nghi_chung_nhan = res.data.de_nghi_chung_nhan
-                                vm.changeDeNghiChungNhan()
+                                // vm.de_nghi_chung_nhan = res.data.de_nghi_chung_nhan
+                                // vm.changeDeNghiChungNhan()
                             }
                             vm.viaPostal = res.data.viaPostal ? true : false
                             if(res.data.ma_muc_dich) {

@@ -751,7 +751,7 @@
                                         ></v-text-field>
                                     </v-flex> -->
                                     <v-flex xs12 sm3 class="px-2 my-2">
-                                        <label for="">2.Ngày sinh</label>
+                                        <label for="">2.Ngày sinh <span class="red--text">*</span></label>
                                         <v-text-field
                                             slot="activator"
                                             v-model="birthdayFormated"
@@ -1919,18 +1919,18 @@ export default {
             }
         },
         ho_chieu_cong_vu (val) {
-            // if(val) {
-            //     if(this.ho_chieu_ngoai_giao){
-            //          this.ho_chieu_ngoai_giao = !this.ho_chieu_ngoai_giao 
-            //     }
-            // }
+            if(val) {
+                if(this.ho_chieu_ngoai_giao){
+                    this.ho_chieu_ngoai_giao = !this.ho_chieu_ngoai_giao 
+                }
+            }
         },
         ho_chieu_ngoai_giao (val) {
-            // if(val) {
-            //     if(this.ho_chieu_cong_vu) {
-            //         this.ho_chieu_cong_vu = !this.ho_chieu_cong_vu 
-            //     }
-            // }    
+            if(val) {
+                if(this.ho_chieu_cong_vu) {
+                    this.ho_chieu_cong_vu = !this.ho_chieu_cong_vu 
+                }
+            }    
         },
         nuoc_di (val) {
             // this.cong_ham_so_nuoc = this.nuoc_di.length
@@ -2399,6 +2399,9 @@ export default {
                     gia_dinh: [],
                     loai_ho_chieu: res.loai_ho_chieu ? res.loai_ho_chieu : ''
                 }
+                // if (!res.ho_chieu_ngoai_giao && !res.ho_chieu_cong_vu) {
+                //     tg.ho_chieu_ngoai_giao = true
+                // }
                 if(res.gia_dinh) {
                     tg['gia_dinh'] = res.gia_dinh.map(obj=>{
                         obj['gia_dinh'] = obj['gia_dinh']
@@ -2412,12 +2415,6 @@ export default {
                     tg['gia_dinh'] = vm.gia_dinh
                 }
                 if(vm.serviceCode === 'BNG-270820' || vm.serviceCode === 'BNG-270816'){
-                    // if(tg['loai_ho_chieu'] === 'Công vụ'){
-                    //     tg['ho_chieu_cong_vu'] = true
-                    // }
-                    // if(tg['loai_ho_chieu'] === 'Ngoại giao'){
-                    //     tg['ho_chieu_ngoai_giao'] = true
-                    // }
                     if(tg['loai_ho_chieu'] === 'Công vụ' || tg['loai_ho_chieu'] === 'Ngoại giao') {
                         vm.ho_chieu_gia_han++
                     }
@@ -2604,12 +2601,10 @@ export default {
             } else {
                 toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
             }
-
-            
         },
         updateThanhVien(){
             let vm = this
-            if(this.$refs.formThanhVien.validate() && (this.ho_chieu_ngoai_giao || this.ho_chieu_cong_vu || this.cong_ham)){
+            if(this.$refs.formThanhVien.validate() && (this.ho_chieu_ngoai_giao || this.ho_chieu_cong_vu)){
                 const [day, month, year] = vm.birthdayFormated.split('/')
                 let tk = {
                     bookingName: vm.dossiers.delegateName,
@@ -2695,7 +2690,13 @@ export default {
 
                 vm.dialogThemThanhVien = false
             } else {
-                toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
+                if (!this.$refs.formThanhVien.validate()) {
+                    toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
+                    return
+                }
+                if (!this.ho_chieu_ngoai_giao && !this.ho_chieu_cong_vu) {
+                    toastr.error('Bắt buộc phải chọn hộ chiếu ngoại giao hoặc hộ chiếu công vụ')
+                }
             }
         },
         countPassport(){
@@ -2735,6 +2736,7 @@ export default {
             vm.getNoiSinh(vm.dictCollection)
             this.dialogThemThanhVien = true
             this.$refs.formThanhVien.reset()
+            vm.ho_chieu_ngoai_giao = true
         },
         openDialogUpdateVanBan(index,item){
             let vm = this
@@ -2991,16 +2993,18 @@ export default {
         },
         getThongTinNhanThan () {
             let vm = this
-            if (vm.so_ho_chieu) {
+            if (vm.so_ho_chieu || vm.ho_ten || vm.birthdayFormated || vm.noi_sinh) {
                 vm.loadingCheckHc = true
                 vm.listDanhSach = []
                 let params = {}
                 params['soHoChieu'] = vm.so_ho_chieu
-                // params['hoTen'] = vm.ho_ten ? vm.ho_ten : ''
-                // params['ngaySinh'] = vm.birthdayFormated ? vm.birthdayFormated : ''
-                if(vm.noi_sinh){
-                    if(Object.keys(vm.noi_sinh).length !== 0 && vm.noi_sinh.constructor === Object){
-                        params['noiSinh'] = vm.noi_sinh.ID ? vm.noi_sinh.ID : ''
+                if (!vm.so_ho_chieu) {
+                    params['hoTen'] = vm.ho_ten ? vm.ho_ten : ''
+                    params['ngaySinh'] = vm.birthdayFormated ? vm.birthdayFormated : ''
+                    if(vm.noi_sinh){
+                        if(Object.keys(vm.noi_sinh).length !== 0 && vm.noi_sinh.constructor === Object){
+                            params['noiSinh'] = vm.noi_sinh.ID ? vm.noi_sinh.ID : ''
+                        }
                     }
                 }
                 let config = {
@@ -3426,45 +3430,26 @@ export default {
         },
         changeDossier(){
             let vm = this
-            console.log(vm.dossiers)
             let metaData = JSON.parse(vm.dossiers.metaData)
-            console.log(metaData)
             metaData['delegateIdNo']= vm.dossiers.delegateIdNo
-            console.log('1')
             metaData['delegateName']=vm.dossiers.delegateName
-             console.log('2')
             metaData['delegateTelNo']=vm.dossiers.delegateTelNo
-            console.log('3')
             if( vm.auth === "false") {
-                 console.log('4')
                 vm.dossiers['contactTelNo'] = vm.dossiers['delegateTelNo']
-                 console.log('5')
                 vm.dossiers['contactEmail'] = vm.dossiers['delegateEmail']
-                 console.log('6')
                 vm.dossiers['contactName'] = vm.dossiers['delegateName']
-                 console.log('7')
                 vm.dossiers['applicantIdNo'] = vm.dossiers['delegateIdNo']
-                 console.log('8')
                 vm.dossiers['applicantName'] = vm.dossiers['bookingName']
-                 console.log('9')
                 vm.dossiers['address'] = vm.dossiers['delegateAddress']
-                 console.log('10')
                 vm.dossiers['cityCode'] = vm.dossiers['delegateCityCode']
-                 console.log('11')
                 vm.dossiers['districtCode'] = vm.dossiers['delegateDistrictCode']
-                 console.log('12')
                 vm.dossiers['wardCode'] = vm.dossiers['delegateWardCode']
-                 console.log('13')
                 vm.dossiers['contactTelNo'] = vm.dossiers['delegateTelNo']
-                 console.log('14')
                 vm.dossiers['contactEmail'] = vm.dossiers['delegateEmail']
-                 console.log('15')
             }
             vm.dossiers['applicantName'] = vm.dossiers['bookingName']
             vm.dossiers['metaData'] = JSON.stringify(metaData)
-            console.log('16')
             $('#dossiers_hidden').val(JSON.stringify(vm.dossiers))
-            console.log('17')
         },
         getBGMienCongHam(){
             let vm = this

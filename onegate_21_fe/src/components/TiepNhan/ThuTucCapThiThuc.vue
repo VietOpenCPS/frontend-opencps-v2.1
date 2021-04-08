@@ -1217,8 +1217,8 @@ export default {
         ],
         loai_ho_chieu: '',
         listLoaiThiThuc: [
-            {"text": "Dán", "value": "DAN"},
-            {"text": "Rời", "value": "ROI"}
+            {"text": "Dán", "value": "D"},
+            {"text": "Rời", "value": "R"}
         ],
         loai_thi_thuc: '',
         listSoLanThiThuc: [
@@ -2339,11 +2339,11 @@ export default {
                 Nghe_Nghiep: res.Nghe_Nghiep,
                 Muc_Dich_Id: res.Muc_Dich_Id,
                 Muc_Dich: res.Muc_Dich,
-                LOAI: null,
-                Gia_Tri_Tt: res.Xin_Gia_Tri_TT,
-                Ky_Hieu_Tt: null,
-                Duoc_Nc_Tu_Ngay: res.hasOwnProperty('Ngay_Dk_Nhap_Canh') && res.Ngay_Dk_Nhap_Canh ? vm.dateDef(res.Ngay_Dk_Nhap_Canh) : '',
-                Duoc_Nc_Den_Ngay: res.hasOwnProperty('Ngay_Dk_Xuat_Canh') && res.Ngay_Dk_Xuat_Canh ? vm.dateDef(res.Ngay_Dk_Xuat_Canh) : '',
+                Loai_TT: null,
+                Xin_Gia_Tri_TT: res.Xin_Gia_Tri_TT,
+                xin_ky_hieu_tt: null,
+                Xin_Tt_Tu_Ngay: res.hasOwnProperty('Ngay_Dk_Nhap_Canh') && res.Ngay_Dk_Nhap_Canh ? vm.dateDef(res.Ngay_Dk_Nhap_Canh) : '',
+                Xin_Tt_Den_Ngay: res.hasOwnProperty('Ngay_Dk_Xuat_Canh') && res.Ngay_Dk_Xuat_Canh ? vm.dateDef(res.Ngay_Dk_Xuat_Canh) : '',
                 Co_Quan_De_Nghi_Ten: null,
                 Co_Quan_De_Nghi_Id: null,
                 Loai_Cv_Den: null,
@@ -2751,11 +2751,11 @@ export default {
                     Nghe_Nghiep: vm.nghe_nghiep,
                     Muc_Dich_Id: vm.muc_dich ? vm.muc_dich['itemCode'] : null,
                     Muc_Dich: vm.muc_dich ? vm.muc_dich['itemName'] : null,
-                    LOAI: vm.loai_thi_thuc ? vm.loai_thi_thuc['value'] : null,
-                    Gia_Tri_Tt: vm.so_lan_thi_thuc ? vm.so_lan_thi_thuc['value'] : null,
-                    Ky_Hieu_Tt: vm.ky_hieu_thi_thuc ? vm.ky_hieu_thi_thuc['itemDescription'] : null,
-                    Duoc_Nc_Tu_Ngay: vm.dateDef(vm.dateNgayDuKienNkFormated),
-                    Duoc_Nc_Den_Ngay: vm.dateDef(vm.dateNgayDuKienXkFormated),
+                    Loai_TT: vm.loai_thi_thuc ? vm.loai_thi_thuc['value'] : null,
+                    Xin_Gia_Tri_TT: vm.so_lan_thi_thuc ? vm.so_lan_thi_thuc['value'] : null,
+                    xin_ky_hieu_tt: vm.ky_hieu_thi_thuc ? vm.ky_hieu_thi_thuc['itemDescription'] : null,
+                    Xin_Tt_Tu_Ngay: vm.dateDef(vm.dateNgayDuKienNkFormated),
+                    Xin_Tt_Den_Ngay: vm.dateDef(vm.dateNgayDuKienXkFormated),
                     Co_Quan_De_Nghi_Ten: vm.vb_co_quan_chu_quan['Cq_Ca_Nhan_Cong_Van'],
                     Co_Quan_De_Nghi_Id: vm.vb_co_quan_chu_quan['Ma_Cq_Ca_Nhan_Cong_Van'],
                     Loai_Cv_Den: vm.vb_co_quan_chu_quan['Ma_Loai_Cong_Van'],
@@ -2976,21 +2976,21 @@ export default {
             vm.muc_dich = item.Muc_Dich_Id ? vm.listMucDich.filter(function (itemSelect) {
                 return itemSelect.itemCode == item.Muc_Dich_Id
             })[0] : ''
-            vm.loai_thi_thuc = item.LOAI ? vm.listLoaiThiThuc.filter(function (itemSelect) {
-                return itemSelect.value == item.LOAI
+            vm.loai_thi_thuc = item.Loai_TT ? vm.listLoaiThiThuc.filter(function (itemSelect) {
+                return itemSelect.value == item.Loai_TT
             })[0] : ''
-            vm.so_lan_thi_thuc = item.Gia_Tri_Tt ? vm.listSoLanThiThuc.filter(function (itemSelect) {
-                return itemSelect.value == item.Gia_Tri_Tt
+            vm.so_lan_thi_thuc = item.Xin_Gia_Tri_TT ? vm.listSoLanThiThuc.filter(function (itemSelect) {
+                return itemSelect.value == item.Xin_Gia_Tri_TT
             })[0] : ''
-            vm.ky_hieu_thi_thuc = item.Ky_Hieu_Tt ? vm.listKyHieu.filter(function (itemSelect) {
-                return itemSelect.itemDescription == item.Ky_Hieu_Tt
+            vm.ky_hieu_thi_thuc = item.xin_ky_hieu_tt ? vm.listKyHieu.filter(function (itemSelect) {
+                return itemSelect.itemDescription == item.xin_ky_hieu_tt
             })[0] : ''
             if (!vm.ky_hieu_thi_thuc) {
                 vm.ky_hieu_thi_thuc = vm.muc_dich
             }
             vm.hanHoChieuFormated = vm.dateDefReverd(item.Han_Hc)
-            vm.dateNgayDuKienNkFormated = vm.dateDefReverd(item.Duoc_Nc_Tu_Ngay)
-            vm.dateNgayDuKienXkFormated = vm.dateDefReverd(item.Duoc_Nc_Den_Ngay)
+            vm.dateNgayDuKienNkFormated = vm.dateDefReverd(item.Xin_Tt_Tu_Ngay)
+            vm.dateNgayDuKienXkFormated = vm.dateDefReverd(item.Xin_Tt_Den_Ngay)
             vm.vb_co_quan_chu_quan = vm.listVanBan.filter(function (itemSelect) {
                 return itemSelect.Ma_Cq_Ca_Nhan_Cong_Van == item.Co_Quan_De_Nghi_Id && itemSelect.So_Cong_Van == item.So_Cv_Den
             })[0]
