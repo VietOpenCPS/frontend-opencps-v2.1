@@ -89,6 +89,12 @@ export const store = new Vuex.Store({
             text: 'Đồng bộ danh mục lĩnh vực'
           },
           {
+            icon: 'api',
+            link: '/table/opencps_tracking/api',
+            code: 'tracking',
+            text: 'Quản lý danh mục API'
+          },
+          {
             icon: 'filter',
             link: '/table/opencps_mapping/agency',
             code: 'mapping',

@@ -1,5 +1,5 @@
 module.exports = {
-  productionSourceMap: true,
+  productionSourceMap: false,
   runtimeCompiler: true,
   configureWebpack: {
     output: {

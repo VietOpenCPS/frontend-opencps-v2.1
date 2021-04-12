@@ -1,7 +1,9 @@
 <template>
   <v-app>
-    <v-navigation-drawer :clipped="$vuetify.breakpoint.lgAndUp" v-model="drawer" fixed app width="240" dark>
-      <div class="sidebar-background" style="background-image: url(&quot;/o/vue-admin/images/bg_menu.jpg&quot;);"></div>
+    <v-navigation-drawer :clipped="$vuetify.breakpoint.lgAndUp" v-model="drawer" fixed app width="260" dark
+      style="background-image: url(&quot;/o/vue-admin/images/bg_menu.jpg&quot;);"
+    >
+      <div class="sidebar-background" ></div>
       <v-list dense v-if="!scopeAdmin">
         <template v-for="item in items">
             <v-layout
@@ -130,7 +132,16 @@
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
-      <div>
+      <div v-if="hasTrackingApi">
+        <v-btn class="mx-0 my-0 white--text" color="#0b72ba"
+          @click="theoDoiLog"
+        >
+          <v-icon>send_and_archive</v-icon>&nbsp;
+          Theo dõi truy cập API hệ thống
+        </v-btn>
+
+      </div>
+      <!-- <div>
         <v-btn class="ml-1 mr-1 my-0 white--text" color="#0b72ba"
           @click="thongKeTruyCap"
         >
@@ -138,7 +149,7 @@
           Thống kê truy cập hệ thống
         </v-btn>
 
-      </div>
+      </div> -->
     </v-navigation-drawer>
     <v-toolbar
       :clipped-left="$vuetify.breakpoint.lgAndUp"
@@ -238,7 +249,8 @@
       dialog: false,
       drawer: null,
       dataSocket: {},
-      scopeAdmin: false
+      scopeAdmin: false,
+      hasTrackingApi: false
     }),
     props: {
       tableName: String
@@ -251,6 +263,10 @@
           if (scopeAdminConfig && !isAdmin) {
             vm.scopeAdmin = true
           }
+        } catch (error) {
+        }
+        try {
+          vm.hasTrackingApi = hasTrackingApi
         } catch (error) {
         }
       })
@@ -339,6 +355,11 @@
       },
       doLogOut() {
         window.location.href = '/c/portal/logout'
+      },
+      theoDoiLog () {
+        this.$router.push({
+          name: 'TheoDoiLogTruyCap'
+        })
       },
       thongKeTruyCap () {
         // window.location.href = 'https://analytics.google.com'

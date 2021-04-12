@@ -1791,7 +1791,7 @@ export const store = new Vuex.Store({
                   if (dataOut.length > 0 && Object.keys(dataOut[0]).length > 0) {
                     resolve(dataOut)
                   } else {
-                    resolve(null)
+                    resolve([])
                   }
                 } else {
                   resolve([serializable.data])
@@ -1867,7 +1867,7 @@ export const store = new Vuex.Store({
                   if (dataOut.length > 0 && Object.keys(dataOut[0]).length > 0) {
                     resolve(dataOut)
                   } else {
-                    resolve(null)
+                    resolve([])
                   }
                   
                 } else {
@@ -1876,7 +1876,7 @@ export const store = new Vuex.Store({
               } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
                 resolve(serializable)
               } else {
-                resolve(null)
+                resolve([])
               }
             }).catch(function (error) {
               console.log(error)
