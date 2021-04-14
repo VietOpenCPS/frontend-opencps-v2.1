@@ -764,7 +764,8 @@ export default {
     onlyLoginDvcqg: false,
     titleNopHoSo: '',
     setAgency: false,     /**fix 1 đơn vị */
-    luaChonXaPhuong: false
+    luaChonXaPhuong: false,
+    useJwt: false
   }),
   computed: {
     govAgencyList () {
@@ -823,6 +824,10 @@ export default {
     //
     try {
       vm.titleNopHoSo = titleNopHoSo ? titleNopHoSo : ''
+    } catch (error) {
+    }
+    try {
+      vm.useJwt = useJwt
     } catch (error) {
     }
     // 
@@ -1419,7 +1424,14 @@ export default {
       let vm = this
       vm.serviceSelected = item
       if (item.serviceUrl) {
-        window.location.href = item.serviceUrl
+        let urlRedirect = item.serviceUrl
+        try {
+          if (vm.useJwt) {
+            urlRedirect = item.serviceUrl.split('?').length > 1 ? item.serviceUrl + '&token=' + localStorage.getItem('jwt_token') : item.serviceUrl + '?token=' + localStorage.getItem('jwt_token')
+          }
+        } catch (error) {
+        }
+        window.location.href = urlRedirect
       } else {
         if (!vm.formToKhai) {
           let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''

@@ -432,7 +432,8 @@
       serviceInfoLastestList: [],
       hasFilterAgency: false,
       agencyListXuLyThuTuc: [],
-      agencyXuLyThuTuc: ''
+      agencyXuLyThuTuc: '',
+      useJwt: false
     }),
     computed: {
       currentIndex () {
@@ -451,6 +452,10 @@
     created () {
       var vm = this
       //
+      try {
+        vm.useJwt = useJwt
+      } catch (error) {
+      }
       try {
         vm.verificationApplicantCreateDossier = hasVerificationCreateDossier
       } catch (error) {
@@ -690,7 +695,14 @@
                       j_captcha_response: ''
                     }
                     if (item.serviceUrl) {
-                      window.location.href = item.serviceUrl
+                      let urlRedirect = item.serviceUrl
+                      try {
+                        if (vm.useJwt) {
+                          urlRedirect = item.serviceUrl.split('?').length > 1 ? item.serviceUrl + '&token=' + localStorage.getItem('jwt_token') : item.serviceUrl + '?token=' + localStorage.getItem('jwt_token')
+                        }
+                      } catch (error) {
+                      }
+                      window.location.href = urlRedirect
                     } else {
                       if (!vm.isOffLine) {
                         vm.trackingBTTT(resServiceInfo.serviceCode)
@@ -724,7 +736,14 @@
                       j_captcha_response: ''
                     }
                     if (item.serviceUrl) {
-                      window.location.href = item.serviceUrl
+                      let urlRedirect = item.serviceUrl
+                      try {
+                        if (vm.useJwt) {
+                          urlRedirect = item.serviceUrl.split('?').length > 1 ? item.serviceUrl + '&token=' + localStorage.getItem('jwt_token') : item.serviceUrl + '?token=' + localStorage.getItem('jwt_token')
+                        }
+                      } catch (error) {
+                      }
+                      window.location.href = urlRedirect
                     } else {
                       if (!vm.isOffLine) {
                         vm.trackingBTTT(resServiceInfo.serviceCode)
@@ -752,7 +771,14 @@
             } else {
               vm.$store.dispatch('getServiceConfigDetail', item).then(result => {
                 if (result.hasOwnProperty('serviceUrl') && result.serviceUrl) {
-                  window.location.href = result.serviceUrl
+                  let urlRedirect = result.serviceUrl
+                  try {
+                    if (vm.useJwt) {
+                      urlRedirect = result.serviceUrl.split('?').length > 1 ? result.serviceUrl + '&token=' + localStorage.getItem('jwt_token') : result.serviceUrl + '?token=' + localStorage.getItem('jwt_token')
+                    }
+                  } catch (error) {
+                  }
+                  window.location.href = urlRedirect
                 }
               }).catch(function(){})
             }
@@ -782,7 +808,15 @@
             j_captcha_response: ''
           }
           if ((itemServiceConfig && itemServiceConfig.serviceUrl) || (govAgencyCodeSelect && govAgencyCodeSelect.serviceUrl)) {
-            window.location.href = itemServiceConfig ? itemServiceConfig.serviceUrl : govAgencyCodeSelect.serviceUrl
+            let url = itemServiceConfig ? itemServiceConfig.serviceUrl : govAgencyCodeSelect.serviceUrl
+            let urlRedirect = url
+            try {
+              if (vm.useJwt) {
+                urlRedirect = url.split('?').length > 1 ? url + '&token=' + localStorage.getItem('jwt_token') : url + '?token=' + localStorage.getItem('jwt_token')
+              }
+            } catch (error) {
+            }
+            window.location.href = urlRedirect
           } else {
             if (!vm.isOffLine) {
               vm.trackingBTTT(resServiceInfo.serviceCode)
@@ -822,7 +856,14 @@
       createDossier (data) {
         let vm = this
         if (vm.serviceConfigSelect.serviceUrl) {
-          window.location.href = vm.serviceConfigSelect.serviceUrl
+          let urlRedirect = vm.serviceConfigSelect.serviceUrl
+          try {
+            if (vm.useJwt) {
+              urlRedirect = vm.serviceConfigSelect.serviceUrl.split('?').length > 1 ? vm.serviceConfigSelect.serviceUrl + '&token=' + localStorage.getItem('jwt_token') : vm.serviceConfigSelect.serviceUrl + '?token=' + localStorage.getItem('jwt_token')
+            }
+          } catch (error) {
+          }
+          window.location.href = urlRedirect
         } else {
           vm.trackingBTTT(data.serviceCode)
           vm.$store.dispatch('postDossier', data).then(function (result) {

@@ -1309,11 +1309,11 @@ export default {
           
         })
         setTimeout(function () {
-          if (data.cityCode) {
+          if (data.cityCode || vm.defaultCityCode) {
             vm.$store.getters.getDictItems({
               collectionCode: 'ADMINISTRATIVE_REGION',
               level: 1,
-              parent: data.cityCode
+              parent: data.cityCode ? data.cityCode : vm.defaultCityCode
             }).then(function (resultDistricts) {
               vm.districts = resultDistricts.data
             })

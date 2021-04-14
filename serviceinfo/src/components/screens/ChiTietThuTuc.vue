@@ -674,7 +674,8 @@ export default {
     setAgency: false,
     luaChonXaPhuong: false,
     danhSachQuanHuyen: [],
-    quanHuyen: ''
+    quanHuyen: '',
+    useJwt: false
   }),
   computed: {
     isMobile () {
@@ -713,6 +714,10 @@ export default {
     } catch (error) {
     }
     // 
+    try {
+      vm.useJwt = useJwt
+    } catch (error) {
+    }
     if ( typeof(Storage) !== 'undefined') {
       let count = sessionStorage.getItem('isbot')
       if (window.themeDisplay.isSignedIn() || !count) {
@@ -809,7 +814,14 @@ export default {
       let vm = this
       vm.serviceSelected = item
       if (item.serviceUrl) {
-        window.location.href = item.serviceUrl
+        let urlRedirect = item.serviceUrl
+        try {
+          if (vm.useJwt) {
+            urlRedirect = item.serviceUrl.split('?').length > 1 ? item.serviceUrl + '&token=' + localStorage.getItem('jwt_token') : item.serviceUrl + '?token=' + localStorage.getItem('jwt_token')
+          }
+        } catch (error) {
+        }
+        window.location.href = urlRedirect
       } else {
         if (!vm.formToKhai) {
           let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''

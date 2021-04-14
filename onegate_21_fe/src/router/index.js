@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Landing from '@/components/Landing'
-import TiepNhanHoSoDetail from '@/components/TiepNhanHoSoDetailNew'
+import TiepNhanHoSoDetail from '@/components/TiepNhanHoSoDetail'
 // import TiepNhanNhomHoSo from '@/components/TiepNhanHoSoTheoNhom'
 import XemChiTietHoSoDetailCanBo from '@/components/XemChiTietHoSoDetailCanBo'
 import XuLyHoSo from '@/components/XuLyHoSo'
