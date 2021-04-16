@@ -95,7 +95,7 @@ export default {
   },
   data: () => ({
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-    activeCalling: true,
+    activeCalling: false,
     called: true,
     currentCalling: '',
     loadData: false,

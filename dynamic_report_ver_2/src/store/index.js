@@ -127,7 +127,7 @@ export const store = new Vuex.Store({
           let currentVal = filter['data'][key]
           if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
             let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
-            if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+            if (dateStr !== 'Invalid Date' && String(currentVal).length === 13 && !isNaN(dateStr)) {
               param.params[key] = dateStr
             } else {
               param.params[key] = currentVal
@@ -413,7 +413,7 @@ export const store = new Vuex.Store({
             let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
               let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
-              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13 && !isNaN(dateStr)) {
                 param.params[key] = dateStr
               } else {
                 if (String(key).indexOf('DateExtend') > 0) {
@@ -426,6 +426,9 @@ export const store = new Vuex.Store({
                   let [day, month, year] = currentVal.split('/')
                   if (day && month && year && filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp') {
                     let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                    if (key === 'toDate') {
+                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} 23:59`)).getTime()
+                    }
                     param.params[key] = timeStampDate
                   } else {
                     param.params[key] = currentVal
@@ -633,7 +636,7 @@ export const store = new Vuex.Store({
             let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
               let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
-              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13 && !isNaN(dateStr)) {
                 param.params[key] = dateStr
               } else {
                 if (String(key).indexOf('DateExtend') > 0) {
@@ -646,6 +649,9 @@ export const store = new Vuex.Store({
                   let [day, month, year] = currentVal.split('/')
                   if (day && month && year && filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp') {
                     let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                    if (key === 'toDate') {
+                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} 23:59`)).getTime()
+                    }
                     param.params[key] = timeStampDate
                   } else {
                     param.params[key] = currentVal
@@ -1194,7 +1200,7 @@ export const store = new Vuex.Store({
             let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
               let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).getTime() : currentVal
-              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13 && !isNaN(dateStr)) {
                 param.params[key] = dateStr
               } else {
                 if (String(key).indexOf('DateExtend') > 0) {
@@ -1207,6 +1213,9 @@ export const store = new Vuex.Store({
                   let [day, month, year] = currentVal.split('/')
                   if (day && month && year && filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp') {
                     let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                    if (key === 'toDate') {
+                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} 23:59`)).getTime()
+                    }
                     param.params[key] = timeStampDate
                   } else {
                     param.params[key] = currentVal
@@ -1385,7 +1394,7 @@ export const store = new Vuex.Store({
             let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
               let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).getTime() : currentVal
-              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13 && !isNaN(dateStr)) {
                 param.params[key] = dateStr
               } else {
                 if (String(key).indexOf('DateExtend') > 0) {
@@ -1398,6 +1407,9 @@ export const store = new Vuex.Store({
                   let [day, month, year] = currentVal.split('/')
                   if (day && month && year) {
                     let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                    if (key === 'toDate') {
+                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} 23:59`)).getTime()
+                    }
                     param.params[key] = timeStampDate
                   } else {
                     param.params[key] = currentVal
@@ -1659,7 +1671,7 @@ export const store = new Vuex.Store({
           let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
           if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
             let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
-            if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+            if (dateStr !== 'Invalid Date' && String(currentVal).length === 13 && !isNaN(dateStr)) {
               config.params[key] = dateStr
             } else {
               if (String(key).indexOf('DateExtend') > 0) {
@@ -1702,7 +1714,7 @@ export const store = new Vuex.Store({
           let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
           if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
             let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
-            if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+            if (dateStr !== 'Invalid Date' && String(currentVal).length === 13 && !isNaN(dateStr)) {
               config.params[key] = dateStr
             } else {
               if (String(key).indexOf('DateExtend') > 0) {
@@ -1753,7 +1765,7 @@ export const store = new Vuex.Store({
             let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
               let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).getTime() : currentVal
-              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13 && !isNaN(dateStr)) {
                 param.params[key] = dateStr
               } else {
                 if (String(key).indexOf('DateExtend') > 0) {
@@ -1766,6 +1778,9 @@ export const store = new Vuex.Store({
                   let [day, month, year] = currentVal.split('/')
                   if (day && month && year) {
                     let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                    if (key === 'toDate') {
+                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} 23:59`)).getTime()
+                    }
                     param.params[key] = timeStampDate
                   } else {
                     param.params[key] = currentVal

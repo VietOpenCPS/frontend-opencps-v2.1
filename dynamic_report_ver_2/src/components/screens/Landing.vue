@@ -1175,6 +1175,7 @@ export default {
     },
     groupByVal (val) {
       let vm = this
+      console.log('valGroupBy', val)
       if (val && vm.itemsReports[vm.index]['filterConfig']['version']) {
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
           vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
@@ -1202,6 +1203,7 @@ export default {
           }
         }
       }
+      console.log('valGroupBy123123', val)
     },
     api (val) {
       let vm = this
@@ -1535,7 +1537,11 @@ export default {
             })[0]
           } catch (error) {
           }
-          
+          // 
+          if (vm.itemsReports[vm.index]['filterConfig']['sumKey'] && vm.itemsReports[vm.index]['filterConfig']['version']) {
+            vm.itemsReports[vm.index]['filterConfig']['sumKey'] = vm.groupByVal
+          }
+          // 
           for (let key in dataReport) {
             dataReportCurrent = dataReport[key]
             if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
@@ -2300,7 +2306,9 @@ export default {
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
         vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
       }
+      console.log('valGroupBy789', vm.groupByVal)
       vm.data['groupBy'] = vm.groupByVal
+      console.log('valGroupByvm.data333', vm.data)
       // build data
       let filter = {
         document: vm.reportType,
