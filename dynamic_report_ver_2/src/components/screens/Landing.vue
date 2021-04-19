@@ -8,22 +8,6 @@
           <div class="flex xs12 pl-3 text-ellipsis text-bold">
             <v-layout wrap class="chart__report">
               <v-flex class="px-2 text-right">
-                <!--
-                <v-btn flat class="mx-0 my-0" v-if="showConfig" v-on:click.native="doSaveConfig">
-                  <v-icon>settings</v-icon> &nbsp;
-                  Lưu thay đổi
-                </v-btn>
-                <vue-csv-downloader
-                  :data="csvExport"
-                  :fields="fields"
-                  :downloadname="nameReport"
-                >
-                </vue-csv-downloader>
-                -->
-                
-                <!-- <v-btn flat v-if="!itemsReports[index]['filterConfig']['showTable']" class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds" :style="showGuilds ? 'color: #1565c0' : ''">
-                  <v-icon>receipt</v-icon> &nbsp; Hướng dẫn PDF -> Excel
-                </v-btn> -->
                 <v-select v-if="buttonsShow"
                   v-for="(button, btnIndex) in buttons" v-bind:key="btnIndex"
                   :items="button['source']"
@@ -36,7 +20,7 @@
                   class="btn__chot"
                   @change="doChotSoLieu($event, button)"
                 ></v-select>
-                <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
+                <v-btn style="display: none" flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
                   <v-icon v-if="showConfig">reply</v-icon>
                   <v-icon v-else>settings</v-icon> &nbsp;
                   <span v-if="showConfig">Quay lại</span>
@@ -47,22 +31,6 @@
           </div>
         </div>
       </div>
-      <v-flex v-if="hiddenAside" class="xs12" style="
-        background-color: #004b94 !important;
-        height: 36px;
-        padding: 9px 15px;
-        font-weight: 600;
-        color: white;">
-        <span>Đánh giá hài lòng của người sử dụng đối với dịch vụ công trực tuyến mức độ 3 và 4</span>
-        <div class="d-inline-block right" style="margin-top: -5px;">
-          <v-tooltip top>
-            <v-btn icon class="mx-0 my-0" slot="activator" @click="goToThongKe">
-              <v-icon size="20" color="white">assignment</v-icon>
-            </v-btn>
-            <span>Báo cáo tổng hợp</span>
-          </v-tooltip>
-        </div>
-      </v-flex>
       <v-layout row wrap class="filter_menu mt-4">
         <v-flex xs6 sm3 class="px-3 mb-3" v-if="agencyLists.length > 1">
           <v-autocomplete
@@ -90,14 +58,13 @@
           </v-autocomplete>
         </v-flex>
         <!--  -->
-        <v-flex xs6 sm3 class="px-3 mb-3" v-if="groupBy.length > 1">
+        <v-flex xs6 sm6 class="px-3 mb-3" v-if="groupBy.length > 1">
           <v-autocomplete
             :items="groupBy"
             v-model="groupByVal"
             label="Nhóm dữ liệu"
             item-text="label"
             item-value="key"
-            clearable
             >
           </v-autocomplete>
         </v-flex>
@@ -149,24 +116,29 @@
           >
           </v-autocomplete>
         </v-flex>
-        <v-flex xs12 sm6 v-if="hiddenAside">
-          <div class="d-inline-block right">
+        <v-flex xs12 class="px-3 mb-3">
+          <div class="d-inline-block left" v-if="!itemsReports[index]['filterConfig']['version']">
             <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> 
               <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
             </v-btn>
             <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
               <v-icon>print</v-icon> &nbsp; In báo cáo
             </v-btn>
-            <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
+            <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="downloadExcel()">
               <v-icon size="16px">fas fa fa-file-excel-o</v-icon> &nbsp; Tải xuống Excel
             </v-btn>
             <v-btn v-if="!itemsReports[index]['filterConfig']['showTable'] && exportWordReport" dark color="blue darken-3" class="my-0" v-on:click.native="doCreateReport(true, 'word')">
               <v-icon size="16px">fas fa fa-file-word-o</v-icon> &nbsp; Tải xuống Word
             </v-btn>
-            <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
+            <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="downloadExcel()">
               <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
             </v-btn>
             <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
+          </div>
+          <div class="d-inline-block left" v-if="itemsReports[index]['filterConfig']['version']">
+            <v-btn dark color="blue darken-3" v-on:click.native="createReport()"> 
+              <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
+            </v-btn>
           </div>
         </v-flex>
       </v-layout>
@@ -175,31 +147,78 @@
           <v-checkbox v-if="!reportType.startsWith('STATISTIC')" @change="changeConfig(index)" :label="item.text" v-model="item.selected"></v-checkbox>
         </v-flex>
       </v-layout>
-      <v-layout row wrap class="mx-2 my-2" v-if="!hiddenAside">
-        <v-flex xs12>
-          <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo</v-btn>
-          
-          <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
-            <v-icon>print</v-icon> &nbsp; In báo cáo
-          </v-btn>
-          <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
-            <v-icon size="16px">fas fa fa-file-excel-o</v-icon> &nbsp; Tải xuống Excel
-          </v-btn>
-          <v-btn v-if="!itemsReports[index]['filterConfig']['showTable'] && exportWordReport" dark color="blue darken-3" class="my-0" v-on:click.native="doCreateReport(true, 'word')">
-            <v-icon size="16px">fas fa fa-file-word-o</v-icon> &nbsp; Tải xuống Word
-          </v-btn>
-          <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="exportExcel()">
-            <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
-          </v-btn>
-          <v-btn v-if="itemsReports[index]['filterConfig']['showHTML']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="viewHTML()">
-            <v-icon>save_alt</v-icon> &nbsp; Xem HTML
-          </v-btn>
-          <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
-        </v-flex>
-      </v-layout>
+      <!-- table báo cáo số liệu tổng hợp -->
+      <div class="mx-3" v-if="!isShowLoading && itemsReports[index]['filterConfig']['version']">
+        <div class="mb-2" v-if="listTongHop && listTongHop.length > 0" style="font-weight: 500;font-size: 14px;">
+          <span style="color: green">Tổng số hồ sơ: </span> <span style="color: red">{{totalCount}}</span>
+        </div>
+        <v-data-table
+          :headers="headerTongHop"
+          :items="listTongHop"
+          hide-actions
+          class="table-landing table-bordered"
+          style="border-left: 1px solid #dedede;"
+          no-data-text="Không có hồ sơ nào"
+        >
+          <template slot="items" slot-scope="props">
+            <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
+              <td class="text-xs-left pt-2" style="min-width: 135px;" @click="viewListHoSo(props.item, 'first')" title="Xem danh sách">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span v-if="props.item.hasOwnProperty('domainName')">{{props.item.domainName}}</span>
+                  <span v-if="props.item.hasOwnProperty('serviceName')">{{props.item.serviceName}}</span>
+                  <span v-if="props.item.hasOwnProperty('govAgencyName')">{{props.item.govAgencyName}}</span>
+                </div>
+              </td>
+              <td class="text-xs-center pt-2" @click="viewListHoSo(props.item, 'first')" title="Xem danh sách">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <a style="font-weight: bold; color: #008000c7;text-decoration: underline;">
+                    <span>{{props.item.count}}</span>
+                  </a>
+                </div>
+              </td>
+              <td class="text-xs-left">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <v-menu v-for="n in props.item.pages" :key="n" bottom offset-y style="display: inline-block;position:relative !important">
+                    <v-btn small slot="activator" class="on-hover-btn my-1" color="primary" dark style="font-size: 13px !important"> 
+                      Quyển {{n}} &nbsp; <v-icon size="18">arrow_drop_down</v-icon>
+                    </v-btn>
+                    <v-list>
+                      <v-list-tile @click="printPdf(props.item ,n)">
+                        <v-list-tile-title>
+                          <v-icon class="mr-1" color="blue" size="16">
+                            print
+                          </v-icon>
+                          In báo cáo
+                        </v-list-tile-title>
+                      </v-list-tile>
+                      <v-list-tile @click="downloadExcel(props.item, n)">
+                        <v-list-tile-title>
+                          <v-icon class="mx-1" color="green" size="14">
+                            fas fa fa-file-excel-o
+                          </v-icon>
+                          Tải excel
+                        </v-list-tile-title>
+                      </v-list-tile>
+                    </v-list>
+                  </v-menu>
+                </div>
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
+      </div>
       <!-- table bao cao -->
       <div>
-        <div v-if="!itemsReports[index]['filterConfig']['showTable'] && !showHTML">
+        <div v-if="!itemsReports[index]['filterConfig']['showTable'] && !showHTML && !itemsReports[index]['filterConfig']['version']">
           <vue-friendly-iframe v-if="showGuilds" :src="'/documents/' + groupId + '/0/hdsd.pdf'"></vue-friendly-iframe>
           <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' && !showGuilds" :src="pdfBlob"></vue-friendly-iframe>
         </div>
@@ -297,48 +316,6 @@
             </div>
           </div>
         </div>
-        <!-- view HTML -->
-        <div v-if="showHTML">
-                <table v-if="tableType === 'table-1'" class="my-2 table-report" hide-default-footer>
-                  <thead>
-                    <tr>
-                      <th v-for="(header, index) in headerRenderHtmlTable" :key="index">
-                        <span>{{header.text}}</span>
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    <tr class="note__column">
-                      <td align="center" class="px-2" v-for="(header, index) in headerRenderHtmlTable" :key="index">({{index + 1}})</td>
-                    </tr>
-                    <tr v-for="(item,index) in dataBodyHTML" :key="index">
-                      <td v-if="item.colSpan > 1" :colspan="item.colSpan" class="font-weight-bold">
-                        <span>{{item.text}}({{item.totalChild}})</span>
-                      </td>
-                      <td v-else v-for="(val, name) in headerRenderHtmlTable" :key="name" :align="val.align">
-                        <span>{{item.dossier[val.value]}}</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                <table v-if="tableType === 'table-2'" class="my-2 table-report" hide-default-footer>
-                  <thead>
-                    <tr v-for="(header, index) in headerRenderHtmlTable" :key="index" v-if="header !== '[$report$]'">
-                      <td v-for="(item, index2)  in header" :key="index2" v-if="item" :rowspan="item.rowSpan ? item.rowSpan  : 1" :colspan="item.colSpan ? item.colSpan : 1" :align="item.alignment" :class="{'font-weight-bold': item.bold}">
-                        <span>{{item.text}}</span>
-                      </td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(item, index) in dataRowRenderHtmlTable" :key="index">
-                      <td v-for="(item2, index2) in item" :key="index2" :align="item2.alignment" :style="{width: widthRenderHtmlTable[index2] + 'px'}"> 
-                        <span>{{item2.text}}</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-        </div>
         <!--  -->
         <v-layout wrap v-if="reportType.startsWith('DANH_GIA_CAN_BO')">
           <v-flex xs12 class="report__table" style="overflow:auto;max-height: 1000px" v-if="!showErrorData && dataTableVottingList.length > 0">
@@ -413,7 +390,105 @@
         </v-layout>
       </div>
     </div>
-    
+    <!-- danh sách hồ sơ -->
+    <v-dialog v-model="dialogDossierList" fullscreen hide-overlay transition="dialog-bottom-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Danh sách hồ sơ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogDossierList = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card class="py-0 px-0">
+          <v-layout row wrap v-if="loadingGetDossier">
+            <v-flex xs12 class="text-xs-center" mt-5>
+              <v-progress-circular
+                :size="100"
+                :width="1"
+                color="primary"
+                indeterminate
+              ></v-progress-circular>
+            </v-flex>
+          </v-layout>
+          <div v-else>
+            <v-data-table
+              :headers="headers"
+              :items="dossierList"
+              hide-actions
+              class="table-landing table-bordered"
+            >
+              <template slot="items" slot-scope="props">
+                <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;" @click="viewDetail(props.item)">
+                  <td class="text-xs-center">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span><br>
+                    </div>
+                  </td>
+                  <td class="text-xs-left" style="min-width: 135px;">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>{{props.item.dossierNo}}</span>
+                    </div>
+                  </td>
+                  <td class="text-xs-left" style="min-width: 135px">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>
+                        <span>{{props.item.applicantName}}</span>
+                      </span>
+                    </div>
+                  </td>
+                  <td class="text-xs-center">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>
+                        <span>{{props.item.receiveDate}}</span>
+                      </span>
+                    </div>
+                  </td>
+                  <td class="text-xs-center">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>
+                        <span>{{props.item.dueDate}}</span>
+                      </span>
+                    </div>
+                  </td>
+                  <td class="text-xs-left">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>
+                        <span>{{props.item.dossierStatusText}}</span>
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </v-data-table>
+            <div class="text-xs-right layout wrap mt-2" style="position: relative;">
+              <div class="flex pagging-table px-2"> 
+                <tiny-pagination :total="pagination.totalItems" :page="pagination.page" custom-class="custom-tiny-class" 
+                  @tiny:change-page="paggingData" ></tiny-pagination> 
+              </div>
+            </div>
+          </div>
+        </v-card>
+      </v-card>
+    </v-dialog>
     <!-- thong tin ho so -->
     <v-dialog v-model="dialogDossierDetail" max-width="1200" transition="fade-transition">
       <v-card>
@@ -431,7 +506,7 @@
     </v-dialog>
     <!-- dialog pdf -->
     <v-dialog v-model="dialogPDF" max-width="1200" transition="fade-transition">
-      <v-card>
+      <v-card style="min-height: calc(90vh - 100px)">
         <v-toolbar flat dark color="primary">
           <v-toolbar-title>Báo cáo thống kê</v-toolbar-title>
           <v-spacer></v-spacer>
@@ -439,7 +514,19 @@
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
-        <vue-friendly-iframe :src="pdfBlob"></vue-friendly-iframe>
+        <v-card-text v-if="loadingPdfVer2">
+          <v-flex xs12 class="text-xs-center" style="margin-top: 150px">
+            <v-progress-circular
+              :size="100"
+              :width="1"
+              color="primary"
+              indeterminate
+            ></v-progress-circular>
+          </v-flex>
+        </v-card-text>
+        <!-- <iframe v-else id="dialogPDFVer2" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe> -->
+        <vue-friendly-iframe v-else :src="pdfBlob"></vue-friendly-iframe>
       </v-card>
     </v-dialog>
     <!--  -->
@@ -517,6 +604,7 @@ export default {
     danhSachBaoCao: [],
     pdfBlob: null,
     isShowLoading: false,
+    loadingPdfVer2: false,
     isCallData: false,
     nameReport: '',
     showConfig: false,
@@ -534,6 +622,26 @@ export default {
     exportXML: false,
     jsonMapperJson: {},
     userData: '',
+    bookList: [],
+    totalCount: 0,
+    listTongHop: [],
+    headerTongHop: [
+      {
+        text: 'Lĩnh vực',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Số lượng hồ sơ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'In danh sách/ tải danh sách excel',
+        align: 'center',
+        sortable: false
+      }
+    ],
     headers: [
       {
         text: 'STT',
@@ -542,11 +650,6 @@ export default {
       },
       {
         text: 'Mã hồ sơ',
-        align: 'center',
-        sortable: false
-      },
-      {
-        text: 'Tên hồ sơ',
         align: 'center',
         sortable: false
       },
@@ -569,21 +672,20 @@ export default {
         text: 'Trạng thái',
         align: 'center',
         sortable: false
-      },
-      {
-        text: 'Hạn xử lý',
-        align: 'center',
-        sortable: false
       }
     ],
     pagination: {
       page: 1,
-      rowsPerPage: 15,
+      rowsPerPage: 20,
       totalItems: 0
     },
+    sttQuyen: 1,
+    targetFilter: '',
     tableType: '',
     dossierList: [],
+    currentLimit: 100,
     dossierInfo: '',
+    dialogDossierList: false,
     dialogDossierDetail: false,
     dialogPDF: false,
     dialogPDFLoading: false,
@@ -596,7 +698,8 @@ export default {
     dataRowRenderHtmlTable: [],
     headerRenderHtmlTable: [],
     widthRenderHtmlTable: [],
-    statisticVotingDossiers: false
+    statisticVotingDossiers: false,
+    loadingGetDossier: false
   }),
   computed: {
     itemsReports () {
@@ -737,6 +840,19 @@ export default {
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
             vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+            // 
+            if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+              if (vm.groupByVal === 'domainCode') {
+                vm.filters = vm.filters.filter(function (item) {
+                  return item.key !== 'serviceCode' && item.key !== 'govAgencyCode'
+                })
+              }
+              if (vm.groupByVal === 'serviceCode') {
+                vm.filters = vm.filters.filter(function (item) {
+                  return item.key !== 'domainCode' && item.key !== 'govAgencyCode'
+                })
+              }
+            }
           }
           // 
           if(vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIdList')) {
@@ -802,6 +918,8 @@ export default {
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
+      vm.listTongHop = []
+      vm.totalCount = 0
       vm.showHTML = false
       vm.showErrorData = false
       vm.showCSVDownload = false
@@ -876,7 +994,18 @@ export default {
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
-        // console.log('filterssssss', vm.filters)
+        if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+          if (vm.groupByVal === 'domainCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'serviceCode' && item.key !== 'govAgencyCode'
+            })
+          }
+          if (vm.groupByVal === 'serviceCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'domainCode' && item.key !== 'govAgencyCode'
+            })
+          }
+        }
       }
       // 
       if(vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIdList')) {
@@ -1044,14 +1173,38 @@ export default {
         }
       }, 200)
     },
-    // groupByVal (val) {
-    //   let vm = this
-    //   if (val) {
-    //     vm.groupByValObj = vm.groupBy.filter(function (item) {
-    //       return item.key === val
-    //     })[0]
-    //   }
-    // },
+    groupByVal (val) {
+      let vm = this
+      console.log('valGroupBy', val)
+      if (val && vm.itemsReports[vm.index]['filterConfig']['version']) {
+        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
+          vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+        }
+        if (vm.groupByVal === 'domainCode') {
+          vm.filters = vm.filters.filter(function (item) {
+            return item.key !== 'serviceCode' && item.key !== 'govAgencyCode'
+          })
+        }
+        if (vm.groupByVal === 'serviceCode') {
+          vm.filters = vm.filters.filter(function (item) {
+            return item.key !== 'domainCode' && item.key !== 'govAgencyCode'
+          })
+        }
+        for (let key in vm.filters) {
+          if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+            if (!vm.filters[key]['source'] || vm.filters[key]['source'].length === 0) {
+              vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+                vm.filters[key]['source'] = result
+                if (vm.filters[key]['appendItem']) {
+                  vm.filters[key]['source'] = vm.filters[key]['appendItem'].concat(result)
+                }
+              }).catch(function(){})
+            }
+          }
+        }
+      }
+      console.log('valGroupBy123123', val)
+    },
     api (val) {
       let vm = this
       if (val.indexOf('isGetVotingData') !== -1) {
@@ -1210,8 +1363,6 @@ export default {
     },
     doDynamicReport () {
       let vm = this
-      console.log('getAgencyReportLists2', vm.itemsReports)
-      console.log('itemsReports', vm.itemsReports[vm.index])
       vm.isRender = false
       vm.docDefinition = {}
       let docDString = {}
@@ -1265,7 +1416,12 @@ export default {
           break
         }
       }
-      vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+        vm.api = vm.itemsReports[vm.index]['filterConfig']['apiLayDanhSach']
+        vm.data[vm.groupByVal] = vm.targetFilter[vm.groupByVal]
+      } else {
+        vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
         vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
       }
@@ -1318,7 +1474,8 @@ export default {
         document: vm.reportType,
         data: vm.data,
         api: vm.api,
-        proxyApi: vm.proxyApi
+        proxyApi: vm.proxyApi,
+        formatDate: vm.itemsReports[vm.index]['filterConfig']['version'] ? 'timestamp' : 'date'
       }
       let check =  true
       console.log('groupIdListSelected 555', vm.groupIdListSelected)
@@ -1336,18 +1493,32 @@ export default {
         filter['agencyLists'] = vm.agencyLists
       }
       vm.pdfBlob = null
-      vm.isShowLoading = true
-      console.log('getAgencyReportLists',filter)
-      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+      if (!vm.itemsReports[vm.index]['filterConfig']['version']) {
+        vm.isShowLoading = true
+      }
+      if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+        let counterPage = vm.itemsReports[vm.index]['filterConfig']['numberPerPage']
+        filter['start'] = vm.sttQuyen * counterPage - counterPage,
+        filter['end'] = vm.sttQuyen * counterPage
+        vm.dialogPDF = true
+        vm.loadingPdfVer2 = true
+      }
+      let dispatchUse = vm.itemsReports[vm.index]['filterConfig']['version'] ? 'getDossiers' : 'getAgencyReportListsOld'
+      vm.$store.dispatch(dispatchUse, filter).then(function (result) {
         // console.log('result',result)
         if (result !== null && result !== undefined) {
           // set dossierList
-          vm.dossierList = result
+          let dataReport
+          if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+            dataReport = result.data
+            vm.dossierList = result.data
+          } else {
+            dataReport = result
+            vm.dossierList = result
+          }
           vm.pagination.totalItems = vm.dossierList.length
-          // console.log('dossiers', vm.dossierList)
           //
           vm.showErrorData = false
-          let dataReport = result
           let dossierRaw = {}
           let dataReportCurrent = {}
           let dataReportTotal = ''
@@ -1366,7 +1537,11 @@ export default {
             })[0]
           } catch (error) {
           }
-          
+          // 
+          if (vm.itemsReports[vm.index]['filterConfig']['sumKey'] && vm.itemsReports[vm.index]['filterConfig']['version']) {
+            vm.itemsReports[vm.index]['filterConfig']['sumKey'] = vm.groupByVal
+          }
+          // 
           for (let key in dataReport) {
             dataReportCurrent = dataReport[key]
             if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
@@ -1618,7 +1793,7 @@ export default {
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           // create blob
           // check showTable
-          if(vm.itemsReports[vm.index]['filterConfig']['showTable']){
+          if(vm.itemsReports[vm.index]['filterConfig']['version']){
             pdfDocGenerator.getBlob((blob) => {
               vm.pdfBlob = window.URL.createObjectURL(blob)
               if (vm.pdfBlob) {
@@ -1626,8 +1801,10 @@ export default {
               } else {
                 vm.isRender = false
               }
-              vm.isShowLoading = false
             })
+            setTimeout(function () {
+              vm.loadingPdfVer2 = false
+            }, 300)
           } else {
             pdfDocGenerator.getBlob((blob) => {
               vm.pdfBlob = window.URL.createObjectURL(blob)
@@ -1725,6 +1902,9 @@ export default {
         api: vm.api,
         proxyApi: vm.proxyApi
       }
+      if (vm.api.indexOf('/o/statistic/dossier') >= 0) {
+        filter.formatDate = 'timestamp'
+      }
       let check =  true
       for (let key in vm.filterGroup) {
         if (key === vm.groupIdListSelected) {
@@ -1747,9 +1927,9 @@ export default {
       let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
       let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
       
-      console.log('getAgencyReportLists2', filter)
       console.log('itemsReports', vm.itemsReports[vm.index])
-      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+      let dispatchUse = vm.api.indexOf('/o/statistic/dossier') >= 0 ? 'getAgencyReportLists' : 'getAgencyReportListsOld'
+      vm.$store.dispatch(dispatchUse, filter).then(function (result) {
         // console.log('result',result)
         if (result !== null) {
           // set dossierList
@@ -2020,7 +2200,7 @@ export default {
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
-                dataRowTotal[indexTotalXXTT]['text'] = parseInt(dataTextXXTT) + ' '
+                dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? '0' : parseInt(dataTextXXTT) + ' '
                 if (currentConfigXXTT['value'] === 'note') {
                   dataRowTotal[indexTotalXXTT]['text'] = ' '
                 }
@@ -2109,6 +2289,115 @@ export default {
         vm.showConfig = false
         vm.doCreatePDF()
       }
+    },
+    createReport () {
+      let vm = this
+      try {
+        vm.headerTongHop[0]['text'] = vm.groupBy.filter(function (item) {
+          return item.key === vm.groupByVal
+        })[0]['label']
+      } catch (error) {
+      }
+      vm.currentLimit = Number(vm.itemsReports[vm.index]['filterConfig']['numberPerPage'])
+      vm.isRender = false
+      vm.isShowLoading = true
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+        vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
+      console.log('valGroupBy789', vm.groupByVal)
+      vm.data['groupBy'] = vm.groupByVal
+      console.log('valGroupByvm.data333', vm.data)
+      // build data
+      let filter = {
+        document: vm.reportType,
+        data: vm.data,
+        api: vm.api,
+        proxyApi: vm.proxyApi,
+        formatDate: vm.itemsReports[vm.index]['filterConfig']['version'] ? 'timestamp' : 'date'
+      }
+      let check =  true
+      console.log('groupIdListSelected 555', vm.groupIdListSelected)
+      for (let key in vm.filterGroup) {
+        if(key === vm.groupIdListSelected) {
+          let exits = vm.groupIdList.find(item => item.key === key)
+          filter['govAgency'] = vm.filterGroup[key]
+          filter['agencyLists'] = exits ? exits.value : []
+          check = false
+          break
+        }
+      }
+      if(check) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
+      }
+      vm.pdfBlob = null
+      vm.listTongHop = []
+      vm.$store.dispatch('createReport', filter).then(function (result) {
+        let counter = 0
+        vm.isRender = true
+        vm.isShowLoading = false
+        let dataReport = result
+        // dataReport.map(item => {
+        //   item['pages'] = item.count ? Math.ceil(item.count / vm.currentLimit) : 0
+        //   return item
+        // })
+        for (let key in dataReport) {
+          dataReport[key]['pages'] = dataReport[key].count ? Math.ceil(dataReport[key].count / vm.currentLimit) : 0
+          counter+=Number(dataReport[key].count)
+        }
+        vm.listTongHop = dataReport
+        vm.totalCount = counter
+      })
+    },
+    viewListHoSo (item, first) {
+      let vm = this
+      vm.targetFilter = item
+      if (first) {
+        vm.pagination.page = 1
+      }
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['apiLayDanhSach']
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
+        vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
+      vm.data[vm.groupByVal] = item[vm.groupByVal]
+      // build data
+      let filter = {
+        document: vm.reportType,
+        data: vm.data,
+        api: vm.api,
+        proxyApi: vm.proxyApi,
+        start: vm.pagination.page * vm.pagination.rowsPerPage - vm.pagination.rowsPerPage,
+        end: vm.pagination.page * vm.pagination.rowsPerPage,
+        formatDate: vm.itemsReports[vm.index]['filterConfig']['version'] ? 'timestamp' : 'date'
+      }
+      let check =  true
+      console.log('groupIdListSelected 555', vm.groupIdListSelected)
+      for (let key in vm.filterGroup) {
+        if(key === vm.groupIdListSelected) {
+          let exits = vm.groupIdList.find(item => item.key === key)
+          filter['govAgency'] = vm.filterGroup[key]
+          filter['agencyLists'] = exits ? exits.value : []
+          check = false
+          break
+        }
+      }
+      if(check) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
+      }
+      vm.loadingGetDossier = true
+      vm.dialogDossierList = true
+
+      vm.$store.dispatch('getDossiers', filter).then(function (result) {
+        vm.loadingGetDossier = false
+        vm.dossierList = result.data
+        if (first) {
+          vm.pagination.totalItems = result.total
+        }
+      })
     },
     sortByKey (array, key) {
       return array.sort(function(a, b) {
@@ -2291,15 +2580,61 @@ export default {
     paggingData (config) {
       let vm = this
       vm.pagination.page = config.page
+      vm.viewListHoSo(vm.targetFilter)
     },
     viewDetail (item) {
       let vm = this
       vm.dossierInfo = item
       vm.dialogDossierDetail = true
     },
-    printReport () {
+    printPdf (item, n) {
       let vm = this
-      vm.dialogPDF = true
+      vm.sttQuyen = n
+      vm.targetFilter = item
+      vm.doDynamicReport()
+    },
+    downloadExcel (item, n) {
+      let vm = this
+      let counterPage = 1
+      if (n) {
+        vm.sttQuyen = n
+        counterPage = vm.itemsReports[vm.index]['filterConfig']['numberPerPage']
+        vm.targetFilter = item
+        vm.data[vm.groupByVal] = item[vm.groupByVal]
+      }
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['apiExportExcel']
+      // build data
+      let filter = {
+        document: vm.reportType,
+        data: vm.data,
+        api: vm.api,
+        proxyApi: vm.proxyApi,
+        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xlsx'
+      }
+      if (n) {
+        filter.start = vm.sttQuyen * counterPage - counterPage
+        filter.end = vm.sttQuyen * counterPage
+      }
+      let check =  true
+      console.log('groupIdListSelected 555', vm.groupIdListSelected)
+      for (let key in vm.filterGroup) {
+        if(key === vm.groupIdListSelected) {
+          let exits = vm.groupIdList.find(item => item.key === key)
+          filter['govAgency'] = vm.filterGroup[key]
+          filter['agencyLists'] = exits ? exits.value : []
+          check = false
+          break
+        }
+      }
+      if(check) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
+      }
+      vm.loadingGetDossier = true
+      vm.$store.dispatch('exportExcel', filter).then(function (result) {
+        vm.loadingGetDossier = false
+      })
     },
     exportExcel () {
       let vm = this

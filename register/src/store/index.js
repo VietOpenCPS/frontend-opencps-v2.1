@@ -231,10 +231,20 @@ export const store = new Vuex.Store({
                 toastr.error('Đăng ký thất bại. Thông tin sử dụng đăng ký đã tồn tại trên hệ thống. Vui lòng kiểm tra Email, Số CMND/Mã số thuế, Số điện thoại')
               } else if (dataError && dataError.description && dataError.description === 'DuplicateContactEmailException') {
                 toastr.error('Đăng ký thất bại. Email sử dụng đã tồn tại trên hệ thống. Sử dụng Email khác để đăng ký')
-              } else if (dataError && dataError.description && dataError.description === 'DuplicateApplicantIdException') {
-                toastr.error('Đăng ký thất bại. Số CMND/Mã số thuế đã tồn tại trên hệ thống. Sử dụng số CMND/mã số thuế khác để đăng ký')
-              } else if (dataError && dataError.description && dataError.description === 'DuplicateContactTelNoException') {
-                toastr.error('Đăng ký thất bại. Số điện thoại đã được sử dụng trên hệ thống. Sử dụng số điện thoại khác để đăng ký')
+              } else if (dataError && dataError.description && dataError.description.split('-')[0] === 'DuplicateApplicantIdException') {
+                let email = dataError.description.split('-')[1] ? dataError.description.split('-')[1] : ''
+                if (email) {
+                  toastr.error('Đăng ký thất bại. Số CMND/Mã số thuế đã đăng ký với tài khoản email ' + email)
+                } else {
+                  toastr.error('Đăng ký thất bại. Số CMND/Mã số thuế đã tồn tại trên hệ thống. Sử dụng số CMND/mã số thuế khác để đăng ký')
+                }
+              } else if (dataError && dataError.description && dataError.description.split('-')[0] === 'DuplicateContactTelNoException') {
+                let email = dataError.description.split('-')[1] ? dataError.description.split('-')[1] : ''
+                if (email) {
+                  toastr.error('Đăng ký thất bại. Số điện thoại đã sử dụng đăng ký với tài khoản email ' + email)
+                } else {
+                  toastr.error('Đăng ký thất bại. Số điện thoại đã được sử dụng trên hệ thống. Sử dụng số điện thoại khác để đăng ký')
+                }
               } else if (dataError && dataError.description && dataError.description === 'Invalid ID, could not validate unexisting or already validated captcha') {
                 toastr.error('Nhập sai Captcha')
               } else {
@@ -299,10 +309,20 @@ export const store = new Vuex.Store({
                   toastr.error('Đăng ký thất bại. Thông tin sử dụng đăng ký đã tồn tại trên hệ thống. Vui lòng kiểm tra Email, Số CMND/Mã số thuế, Số điện thoại')
                 } else if (dataError && dataError.description && dataError.description === 'DuplicateContactEmailException') {
                   toastr.error('Đăng ký thất bại. Email sử dụng đã tồn tại trên hệ thống. Sử dụng Email khác để đăng ký')
-                } else if (dataError && dataError.description && dataError.description === 'DuplicateApplicantIdException') {
-                  toastr.error('Đăng ký thất bại. Số CMDN/Mã số thuế đã tồn tại trên hệ thống. Sử dụng số CMDN/mã số thuế khác để đăng ký')
-                } else if (dataError && dataError.description && dataError.description === 'DuplicateContactTelNoException') {
-                  toastr.error('Đăng ký thất bại. Số điện thoại đã được sử dụng trên hệ thống. Sử dụng số điện thoại khác để đăng ký')
+                } else if (dataError && dataError.description && dataError.description.split('-')[0] === 'DuplicateApplicantIdException') {
+                  let email = dataError.description.split('-')[1] ? dataError.description.split('-')[1] : ''
+                  if (email) {
+                    toastr.error('Đăng ký thất bại. Số CMND/Mã số thuế đã đăng ký với tài khoản email ' + email)
+                  } else {
+                    toastr.error('Đăng ký thất bại. Số CMND/Mã số thuế đã tồn tại trên hệ thống. Sử dụng số CMND/mã số thuế khác để đăng ký')
+                  }
+                } else if (dataError && dataError.description && dataError.description.split('-')[0] === 'DuplicateContactTelNoException') {
+                  let email = dataError.description.split('-')[1] ? dataError.description.split('-')[1] : ''
+                  if (email) {
+                    toastr.error('Đăng ký thất bại. Số điện thoại đã sử dụng đăng ký với tài khoản email ' + email)
+                  } else {
+                    toastr.error('Đăng ký thất bại. Số điện thoại đã được sử dụng trên hệ thống. Sử dụng số điện thoại khác để đăng ký')
+                  }
                 } else if (dataError && dataError.description && dataError.description === 'Invalid ID, could not validate unexisting or already validated captcha') {
                   toastr.error('Nhập sai Captcha')
                 } else {

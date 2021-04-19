@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app_dynamic_report_ver2" :class="hiddenAside ? 'px-3' : ''">
+  <v-app id="app_dynamic_report" :class="hiddenAside ? 'px-3' : ''">
     <v-navigation-drawer app clipped floating width="300" v-if="isSigned">
       <div class="drawer__filter">
         <div class="px-2 pt-0">
@@ -392,7 +392,7 @@
         } else {
           doGetReport()
         }
-        vm.checkAdmin()
+        // vm.checkAdmin()
       })
     },
     methods: {
@@ -401,9 +401,6 @@
       },
       closeError() {
         this.$store.commit('setsnackbarerror', false)
-      },
-      reloadPage() {
-        window.location.reload(true)
       },
       deliverableRouter (item) {
         console.log(item)

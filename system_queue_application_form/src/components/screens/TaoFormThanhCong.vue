@@ -157,7 +157,8 @@ export default {
     timeBooking: '',
     checkinDate: '',
     agencyItems: [
-      {name: 'Cục lãnh sự - 40 Trần Phú, Ba Đình, Hà Nội', value: '124302', code: 'CLS', serverNo: 'SERVER_CLS'}
+      {name: 'Cục lãnh sự - 40 Trần Phú, Ba Đình, Hà Nội', value: '124302', code: 'CLS', serverNo: 'SERVER_CLS'},
+      {name: 'Sở ngoại vụ thành phố Hồ Chí Minh', value: '703021', code: 'SNVHCM', serverNo: 'SERVER_SNVHCM'}
     ],
     agencyTiepNhan: ''
   }),
@@ -187,16 +188,16 @@ export default {
       if (!vm.eformDetail.secret && !vm.eformDetail.eFormNo) {
         vm.goBack()
       }
-      if (String(vm.index) === '1') {
-        vm.getDetailBooking()
-      }
       try {
         vm.agencyTiepNhan = vm.agencyItems.filter(function (item) {
           return item.code === vm.eformDetail.govAgencyCode
         })[0]
       } catch (error) {
       }
-      
+      if (String(vm.index) === '1') {
+        vm.getDetailBooking()
+      }
+            
     })
   },
   updated () {

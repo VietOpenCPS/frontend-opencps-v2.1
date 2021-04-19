@@ -412,6 +412,10 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      vm.idVoicePortlet = idDocumentVoicePortlet
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query

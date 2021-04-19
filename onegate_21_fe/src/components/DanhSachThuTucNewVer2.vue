@@ -432,7 +432,8 @@
       serviceInfoLastestList: [],
       hasFilterAgency: false,
       agencyListXuLyThuTuc: [],
-      agencyXuLyThuTuc: ''
+      agencyXuLyThuTuc: '',
+      useJwt: false
     }),
     computed: {
       currentIndex () {
@@ -451,6 +452,10 @@
     created () {
       var vm = this
       //
+      try {
+        vm.useJwt = useJwt
+      } catch (error) {
+      }
       try {
         vm.verificationApplicantCreateDossier = hasVerificationCreateDossier
       } catch (error) {
@@ -689,20 +694,31 @@
                       originality: vm.getOriginality(),
                       j_captcha_response: ''
                     }
-                    if (!vm.isOffLine) {
-                      vm.trackingBTTT(resServiceInfo.serviceCode)
-                      vm.$store.dispatch('postDossier', data).then(function (result) {
-                        vm.loadingAction = false
-                        vm.indexAction = -1
-                        vm.$router.push({
-                          path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                          query: vm.$router.history.current.query
-                        })
-                      })
+                    if (item.serviceUrl) {
+                      let urlRedirect = item.serviceUrl
+                      try {
+                        if (vm.useJwt) {
+                          urlRedirect = item.serviceUrl.split('?').length > 1 ? item.serviceUrl + '&token=' + localStorage.getItem('jwt_token') : item.serviceUrl + '?token=' + localStorage.getItem('jwt_token')
+                        }
+                      } catch (error) {
+                      }
+                      window.location.href = urlRedirect
                     } else {
-                      vm.dataPostDossier = data
-                      vm.$refs.captcha.makeImageCap()
-                      vm.dialog_captcha = true
+                      if (!vm.isOffLine) {
+                        vm.trackingBTTT(resServiceInfo.serviceCode)
+                        vm.$store.dispatch('postDossier', data).then(function (result) {
+                          vm.loadingAction = false
+                          vm.indexAction = -1
+                          vm.$router.push({
+                            path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+                            query: vm.$router.history.current.query
+                          })
+                        })
+                      } else {
+                        vm.dataPostDossier = data
+                        vm.$refs.captcha.makeImageCap()
+                        vm.dialog_captcha = true
+                      }
                     }
                   })
                 }
@@ -719,20 +735,31 @@
                       originality: vm.getOriginality(),
                       j_captcha_response: ''
                     }
-                    if (!vm.isOffLine) {
-                      vm.trackingBTTT(resServiceInfo.serviceCode)
-                      vm.$store.dispatch('postDossier', data).then(function (result) {
-                        vm.loadingAction = false
-                        vm.indexAction = -1
-                        vm.$router.push({
-                          path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                          query: vm.$router.history.current.query
-                        })
-                      })
+                    if (item.serviceUrl) {
+                      let urlRedirect = item.serviceUrl
+                      try {
+                        if (vm.useJwt) {
+                          urlRedirect = item.serviceUrl.split('?').length > 1 ? item.serviceUrl + '&token=' + localStorage.getItem('jwt_token') : item.serviceUrl + '?token=' + localStorage.getItem('jwt_token')
+                        }
+                      } catch (error) {
+                      }
+                      window.location.href = urlRedirect
                     } else {
-                      vm.dataPostDossier = data
-                      vm.$refs.captcha.makeImageCap()
-                      vm.dialog_captcha = true
+                      if (!vm.isOffLine) {
+                        vm.trackingBTTT(resServiceInfo.serviceCode)
+                        vm.$store.dispatch('postDossier', data).then(function (result) {
+                          vm.loadingAction = false
+                          vm.indexAction = -1
+                          vm.$router.push({
+                            path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+                            query: vm.$router.history.current.query
+                          })
+                        })
+                      } else {
+                        vm.dataPostDossier = data
+                        vm.$refs.captcha.makeImageCap()
+                        vm.dialog_captcha = true
+                      }
                     }
                   })
                 } else {
@@ -744,7 +771,14 @@
             } else {
               vm.$store.dispatch('getServiceConfigDetail', item).then(result => {
                 if (result.hasOwnProperty('serviceUrl') && result.serviceUrl) {
-                  window.location.href = result.serviceUrl
+                  let urlRedirect = result.serviceUrl
+                  try {
+                    if (vm.useJwt) {
+                      urlRedirect = result.serviceUrl.split('?').length > 1 ? result.serviceUrl + '&token=' + localStorage.getItem('jwt_token') : result.serviceUrl + '?token=' + localStorage.getItem('jwt_token')
+                    }
+                  } catch (error) {
+                  }
+                  window.location.href = urlRedirect
                 }
               }).catch(function(){})
             }
@@ -773,20 +807,32 @@
             originality: vm.getOriginality(),
             j_captcha_response: ''
           }
-          if (!vm.isOffLine) {
-            vm.trackingBTTT(resServiceInfo.serviceCode)
-            vm.$store.dispatch('postDossier', data).then(function (result) {
-              vm.loadingAction = false
-              vm.indexAction = -1
-              vm.$router.push({
-                path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                query: vm.$router.history.current.query
-              })
-            })
+          if ((itemServiceConfig && itemServiceConfig.serviceUrl) || (govAgencyCodeSelect && govAgencyCodeSelect.serviceUrl)) {
+            let url = itemServiceConfig ? itemServiceConfig.serviceUrl : govAgencyCodeSelect.serviceUrl
+            let urlRedirect = url
+            try {
+              if (vm.useJwt) {
+                urlRedirect = url.split('?').length > 1 ? url + '&token=' + localStorage.getItem('jwt_token') : url + '?token=' + localStorage.getItem('jwt_token')
+              }
+            } catch (error) {
+            }
+            window.location.href = urlRedirect
           } else {
-            vm.dataPostDossier = data
-            vm.$refs.captcha.makeImageCap()
-            vm.dialog_captcha = true
+            if (!vm.isOffLine) {
+              vm.trackingBTTT(resServiceInfo.serviceCode)
+              vm.$store.dispatch('postDossier', data).then(function (result) {
+                vm.loadingAction = false
+                vm.indexAction = -1
+                vm.$router.push({
+                  path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+                  query: vm.$router.history.current.query
+                })
+              })
+            } else {
+              vm.dataPostDossier = data
+              vm.$refs.captcha.makeImageCap()
+              vm.dialog_captcha = true
+            }
           }
         })
       },
@@ -810,7 +856,14 @@
       createDossier (data) {
         let vm = this
         if (vm.serviceConfigSelect.serviceUrl) {
-          window.location.href = vm.serviceConfigSelect
+          let urlRedirect = vm.serviceConfigSelect.serviceUrl
+          try {
+            if (vm.useJwt) {
+              urlRedirect = vm.serviceConfigSelect.serviceUrl.split('?').length > 1 ? vm.serviceConfigSelect.serviceUrl + '&token=' + localStorage.getItem('jwt_token') : vm.serviceConfigSelect.serviceUrl + '?token=' + localStorage.getItem('jwt_token')
+            }
+          } catch (error) {
+          }
+          window.location.href = urlRedirect
         } else {
           vm.trackingBTTT(data.serviceCode)
           vm.$store.dispatch('postDossier', data).then(function (result) {

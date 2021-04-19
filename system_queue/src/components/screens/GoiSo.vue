@@ -95,7 +95,7 @@ export default {
   },
   data: () => ({
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-    activeCalling: true,
+    activeCalling: false,
     called: true,
     currentCalling: '',
     loadData: false,
@@ -139,6 +139,11 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      vm.idVoicePortlet = idDocumentVoicePortlet
+    } catch (error) {
+      console.log('not config')
+    }
     $('header').css('display','none')
     $('#banner').css('display','none')
     $('.navbar-container').css('display','none')
@@ -300,13 +305,6 @@ export default {
     },
     callingApplicant (item) {
       let vm = this
-      try {
-        if (idDocumentVoicePortlet) {
-          vm.idVoicePortlet = idDocumentVoicePortlet
-        }
-      } catch (error) {
-        console.log('not config')
-      }
       vm.updateStateBooking(item, true)
       if (item) {
         vm.called = false

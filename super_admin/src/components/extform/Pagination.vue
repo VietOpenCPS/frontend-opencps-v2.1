@@ -24,7 +24,7 @@
           </button>
         </li>
         <li class="page-item" style="margin-right: 0;">
-          <button class="pagination__navigation pagination__navigation--disabled text-bold primary--text" style="border-right: 0; border-left: 0;">
+          <button class="pagination__navigation pagination__navigation--disabled text-bold primary--text" style="border-right: 0; border-left: 0;height:30px;width: 30px;">
             {{titlePage}}
           </button>
         </li>

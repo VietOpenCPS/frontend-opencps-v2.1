@@ -683,6 +683,10 @@ export default {
     tempLienThong: {
       type: Boolean,
       default: () => false
+    },
+    expandEform: {
+      type: Boolean,
+      default: () => false
     }
   },
   components: {
@@ -895,6 +899,9 @@ export default {
     userLoginInfomation () {
       return this.$store.getters.getUserLogin
     },
+    thongTinChuHoSo () {
+      return this.$store.getters.thongTinChuHoSo
+    }
   },
   mounted () {
     var vm = this
@@ -1007,7 +1014,6 @@ export default {
       Promise.all(arrTemp).then(values => {
         var dossierTemplates = values[0]['dossierParts']
         var dossierMarks = values[1]
-        console.log('dossierMarksdossierMarksdossierMarksdossierMarks',dossierMarks)
         var dossierFiles = values[2]
         var fileTemplates = []
         if (values[3].hasOwnProperty('serviceInfoId')) {
@@ -1066,6 +1072,22 @@ export default {
             vm.getDossierFileApplicants(vm.applicantId, vm.fileTemplateNoString)
           }
         }
+        // autoExpand form
+        setTimeout(function () {
+          try {
+            if (vm.expandEform && vm.currentFormView === '') {
+              console.log('expandEform', vm.expandEform)
+              console.log('dossierTemplateItemsFilter', vm.dossierTemplateItemsFilter)
+              let tpEform = vm.dossierTemplateItemsFilter.filter(function (item) {
+                return item.partNo === 'TP01'
+              })[0]
+              console.log('tpEform', tpEform)
+              vm.loadAlpcaFormClick(tpEform)
+            }
+          } catch (error) {
+          }
+        }, 1000)
+        // 
       }).catch(reject => {
       })
       console.log('onlyView,checkInput', vm.onlyView, vm.checkInput, vm.progressUploadPart)
@@ -1246,17 +1268,44 @@ export default {
         /* eslint-disable */
         if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
           // console.log('eformEmbed', eformScript)
+          console.log('chuHoSoA2', vm.thongTinChuHoSo)
           item.embed = true
-          let userId = window.themeDisplay.getUserId()
-          let userEmail = vm.originality === 1 ? vm.userLoginInfomation.applicantContactEmail : vm.userLoginInfomation.employeeEmail
-          let referenceUid = vm.thongTinHoSo.referenceUid
-          let dossierStatus = vm.thongTinHoSo.dossierStatus
-          let dossierSubStatus = vm.thongTinHoSo.dossierSubStatus
-          let templateNo = item.partNo
           let deliverableType = item.deliverableType ? item.deliverableType : ''
-          let token = localStorage.getItem('jwt_token')
+          let paramsEmbed = {
+            userId: window.themeDisplay.getUserId(),
+            userEmail: vm.originality === 1 ? vm.userLoginInfomation.applicantContactEmail : vm.userLoginInfomation.employeeEmail,
+            referenceUid: vm.thongTinHoSo.referenceUid,
+            code: vm.thongTinHoSo.referenceUid,
+            dossierStatus: vm.thongTinHoSo.dossierStatus,
+            dossierSubStatus: vm.thongTinHoSo.dossierSubStatus,
+            tp: item.partNo,
+            token: localStorage.getItem('jwt_token'),
+            dossierNo: vm.thongTinHoSo.dossierNo,
+            submitDate: vm.thongTinHoSo.submitDate,
+            govAgencyCode: vm.thongTinHoSo.govAgencyCode,
+            govAgencyName: vm.thongTinHoSo.govAgencyName
+          }
+          if (vm.thongTinHoSo.dossierStatus === '' || vm.thongTinHoSo.dossierStatus === 'new') {
+            paramsEmbed = Object.assign(paramsEmbed, {
+              applicantIdNo: vm.thongTinChuHoSo['applicantIdNo'],
+              applicantName: vm.thongTinChuHoSo['applicantName'],
+              address: vm.thongTinChuHoSo['address'],
+              cityCode: vm.thongTinChuHoSo['cityCode'],
+              cityName: vm.thongTinChuHoSo['cityName'],
+              districtCode: vm.thongTinChuHoSo['districtCode'],
+              districtName: vm.thongTinChuHoSo['districtName'],
+              wardCode: vm.thongTinChuHoSo['wardCode'],
+              wardName: vm.thongTinChuHoSo['wardName'],
+              contactEmail: vm.thongTinChuHoSo['contactEmail'],
+              contactTelNo: vm.thongTinChuHoSo['contactTelNo'],
+              userType: vm.thongTinChuHoSo['userType'] == '1' ? 'citizen' : 'business'
+            })
+          }
 
-          let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?referenceUid=' + referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) +'&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+          let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
+          for (let key in paramsEmbed) {
+            urlEmbed += ('&' + key + '=' + paramsEmbed[key])
+          }
           setTimeout(function () {
             document.getElementById('formAlpaca' + item.partNo + vm.id).src = ''
             setTimeout(function () {
@@ -1562,19 +1611,44 @@ export default {
       /* eslint-disable */
       if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
         // console.log('eformEmbed', eformScript)
+        console.log('chuHoSoA1', vm.thongTinChuHoSo)
         item.embed = true
-        let userId = window.themeDisplay.getUserId()
-        let userEmail = vm.originality === 1 ? vm.userLoginInfomation.applicantContactEmail : vm.userLoginInfomation.employeeEmail
-        let referenceUid = vm.thongTinHoSo.referenceUid
-        let dossierStatus = vm.thongTinHoSo.dossierStatus
-        let dossierSubStatus = vm.thongTinHoSo.dossierSubStatus
-        let templateNo = item.partNo
         let deliverableType = item.deliverableType ? item.deliverableType : ''
-
-        let token = localStorage.getItem('jwt_token')
-
-        // let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '/referenceUid/' +  referenceUid + '/' + token + '/' + encodeURIComponent(document.location.origin) +'?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
-        let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?referenceUid=' + referenceUid + '&token=' + token + '&originURL=' + encodeURIComponent(document.location.origin) +'&userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+        let paramsEmbed = {
+          userId: window.themeDisplay.getUserId(),
+          userEmail: vm.originality === 1 ? vm.userLoginInfomation.applicantContactEmail : vm.userLoginInfomation.employeeEmail,
+          referenceUid: vm.thongTinHoSo.referenceUid,
+          code: vm.thongTinHoSo.referenceUid,
+          dossierStatus: vm.thongTinHoSo.dossierStatus,
+          dossierSubStatus: vm.thongTinHoSo.dossierSubStatus,
+          tp: item.partNo,
+          token: localStorage.getItem('jwt_token'),
+          dossierNo: vm.thongTinHoSo.dossierNo,
+          submitDate: vm.thongTinHoSo.submitDate,
+          govAgencyCode: vm.thongTinHoSo.govAgencyCode,
+          govAgencyName: vm.thongTinHoSo.govAgencyName
+        }
+        if (vm.thongTinHoSo.dossierStatus === '' || vm.thongTinHoSo.dossierStatus === 'new') {
+          paramsEmbed = Object.assign(paramsEmbed, {
+            applicantIdNo: vm.thongTinChuHoSo['applicantIdNo'],
+            applicantName: vm.thongTinChuHoSo['applicantName'],
+            address: vm.thongTinChuHoSo['address'],
+            cityCode: vm.thongTinChuHoSo['cityCode'],
+            cityName: vm.thongTinChuHoSo['cityName'],
+            districtCode: vm.thongTinChuHoSo['districtCode'],
+            districtName: vm.thongTinChuHoSo['districtName'],
+            wardCode: vm.thongTinChuHoSo['wardCode'],
+            wardName: vm.thongTinChuHoSo['wardName'],
+            contactEmail: vm.thongTinChuHoSo['contactEmail'],
+            contactTelNo: vm.thongTinChuHoSo['contactTelNo'],
+            userType: vm.thongTinChuHoSo['userType'] == '1' ? 'citizen' : 'business'
+          })
+        }
+        let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
+        for (let key in paramsEmbed) {
+          urlEmbed += ('&' + key + '=' + paramsEmbed[key])
+        }
+        
         setTimeout(function () {
           document.getElementById('formAlpaca' + item.partNo + vm.id).src = urlEmbed
         }, 300)

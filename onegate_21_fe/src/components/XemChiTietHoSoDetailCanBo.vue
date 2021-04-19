@@ -178,7 +178,7 @@
                       <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> 
                       <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; 
                     </div>
-                    <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="checkInput === 2 ? false : true" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                    <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="checkInput === 2 ? false : true" :id="'ci'" :partTypes="inputTypes" :expandEform="confirmGuiHoSoTrucTuyen && checkInput === 2 && originality === 1 && thongTinChiTietHoSo.dossierStatus === 'new' ? true : false"></thanh-phan-ho-so>
                   </v-expansion-panel-content>
                 </v-expansion-panel>
               </div>
@@ -280,7 +280,7 @@
                 <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :data_rolegroup="roleGroupPhanCong" :detailDossier="thongTinChiTietHoSo" :data_uyquyen="reAsignUsers" :type="type_assign"></phan-cong>
                 <tai-lieu-ket-qua :esignType="typeEsign" ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
                 <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
-                <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
+                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
                 <!-- thanh toán điện tử -->
                 <thanh-toan-dien-tu ref="epayment" v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
                 <ky-duyet :style="dataEsign['signatureType'] === '' ? 'display:none' : ''" ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo"
@@ -824,6 +824,7 @@ export default {
     'phan-cong-lai': PhanCongLai
   },
   data: () => ({
+    confirmGuiHoSoTrucTuyen: false,
     viTriLuuTru: false,
     docLuuTru: [],
     validTraoDoi: false,
@@ -863,6 +864,7 @@ export default {
     processSteps: [],
     documents: [],
     payments: '',
+    paymentsOriginal: '',
     dossierActions: [],
     dossierImportActions: [],
     reAsignUsers: [],
@@ -1174,6 +1176,10 @@ export default {
     }
     try {
       vm.viTriLuuTru = viTriLuuTru
+    } catch (error) {
+    }
+    try {
+      vm.confirmGuiHoSoTrucTuyen = confirmGuiHoSoTrucTuyen
     } catch (error) {
     }
     window.toastr = toastr
@@ -1799,13 +1805,25 @@ export default {
           } else {
             isPopup = true
             vm.showThuPhi = true
-            vm.payments = result.payment
+            vm.paymentsOriginal = result.payment
+            let dataJson = ''
+            try {
+              dataJson = JSON.parse(result.payment['paymentNote'])
+              if (dataJson) {
+                dataJson = Object.assign(dataJson, {
+                  editable: result.payment['editable'],
+                  requestPayment: result.payment['requestPayment']
+                })
+              }
+            } catch (error) {
+            }
+            if (dataJson) {
+              vm.payments = Object.assign(result.payment, dataJson)
+            } else {
+              vm.payments = result.payment
+            }
             vm.viaPortalDetail = dossierItem.viaPostal
           }
-          // isPopup = true
-          // vm.showThuPhi = true
-          // vm.payments = result.payment
-          // vm.viaPortalDetail = dossierItem.viaPostal
         }
         if ((result.hasOwnProperty('receiving') && result.receiving !== null && result.receiving !== undefined && result.receiving !== 'undefined' && result.receiving.editable === true)) {
           isPopup = true
@@ -1855,13 +1873,29 @@ export default {
       vm.loadingAction = true
       vm.dialogActionProcess = false
       vm.loadingActionProcess = true
-      vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
-        vm.loadingActionProcess = false
-        vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, item, result, index)
-      }).catch(function (reject) {
-        vm.loadingAction = false
-        vm.loadingActionProcess = false
-      })
+      // 
+      let doAction = function () {
+        vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
+          vm.loadingActionProcess = false
+          vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, item, result, index)
+        }).catch(function (reject) {
+          vm.loadingAction = false
+          vm.loadingActionProcess = false
+        })
+      }
+      if (vm.originality === 1 && vm.confirmGuiHoSoTrucTuyen && item.actionCode == 1300) {
+        let x = confirm('Bạn có chắc chắn muốn gửi hồ sơ?')
+        if (x) {
+          doAction()
+        } else {
+          vm.loadingAction = false
+          vm.dialogActionProcess = false
+          vm.loadingActionProcess = false
+        }
+      } else {
+        doAction()
+      }
+      
     },
     btnActionEvent (item, index) {
       let vm = this
@@ -1873,7 +1907,6 @@ export default {
       } else {
         vm.titleDialogPdf = "Tài liệu đính kèm"
       }
-      console.log('vm.titleDialogPdf++++++++++', vm.titleDialogPdf)
       if (String(item.form) === 'UPDATE') {
         let query = vm.$router.history.current.query
         query['template_no'] = vm.thongTinChiTietHoSo.dossierTemplateNo
@@ -2177,6 +2210,13 @@ export default {
         }
       }
       if (vm.showThuPhi) {
+        if (vm.payments && vm.payments.hasOwnProperty('counter')) {
+          let dataNote = paymentsOut
+          paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
+          paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
+          paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
+          paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
+        }
         filter['payment'] = paymentsOut
         let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
         if (feeTotal === 0 && vm.originality === 3) {
@@ -2454,6 +2494,13 @@ export default {
                     feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
                     serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
                     shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+                  }
+                  if (vm.payments && vm.payments.hasOwnProperty('counter')) {
+                    let dataNote = paymentsOut
+                    paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
+                    paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
+                    paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
+                    paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
                   }
                   resultAction['payment'] = paymentsOut
                   let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
@@ -3176,6 +3223,13 @@ export default {
             feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
             serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
             shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+          }
+          if (vm.payments && vm.payments.hasOwnProperty('counter')) {
+            let dataNote = paymentsOut
+            paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
+            paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
+            paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
+            paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
           }
           resultAction['payment'] = paymentsOut
         }

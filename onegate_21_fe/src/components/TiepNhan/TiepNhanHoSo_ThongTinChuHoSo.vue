@@ -36,7 +36,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span v-if="requiredOptions['applicantIdNo'] || (originality === 1 && requiredOptions['applicantIdNo'])" style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0"> {{ thongTinChuHoSo.userType && labelSwitch[thongTinChuHoSo.userType] ? labelSwitch[thongTinChuHoSo.userType].cmtnd : 'CMND/ Hộ chiếu' }} <span v-if="requiredOptions['applicantIdNo'] || (originality === 1 && requiredOptions['applicantIdNo'])" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2 style="position:relative">
                       <v-text-field
@@ -65,7 +65,7 @@
                           </v-list-tile-content>
                         </div>
                       </suggestions>
-                      <span style="color:#ff5252;font-size: 12px;" v-if="(originality === 3 || originality === '3') && !applicantIdRequired && !thongTinChuHoSo.applicantIdNo">Thông tin bắt buộc</span>
+                      <span style="color:#ff5252;font-size: 12px;" v-if="(originality === 3 || originality === '3') && requiredOptions['applicantIdNo'] && !applicantIdRequired && !thongTinChuHoSo.applicantIdNo">Thông tin bắt buộc</span>
                       <v-tooltip top v-if="(originality === 3 || originality === '3') && applicantConfig">
                         <v-btn @click="showDialogApplicantList('ChuHoSo')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
                           <v-icon size="14">fas fa fa-address-card</v-icon>
@@ -77,7 +77,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].nguoi_nop }}<span v-if="requiredOptions['applicantName']" style="color:red"> &nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0"> {{ thongTinChuHoSo.userType && labelSwitch[thongTinChuHoSo.userType] ? labelSwitch[thongTinChuHoSo.userType].nguoi_nop : 'Họ và tên' }}<span v-if="requiredOptions['applicantName']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm6>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -283,7 +283,7 @@
                             </v-list-tile-content>
                           </div>
                         </suggestions>
-                        <span style="color:#ff5252;font-size: 12px" v-if="(originality === 3 || originality === '3') && !applicantIdRequired && !thongTinNguoiNopHoSo.delegateIdNo">Thông tin bắt buộc</span>
+                        <span style="color:#ff5252;font-size: 12px" v-if="(originality === 3 || originality === '3') && requiredOptions['delegateIdNo'] && !applicantIdRequired && !thongTinNguoiNopHoSo.delegateIdNo">Thông tin bắt buộc</span>
                         <v-tooltip top v-if="(originality === 3 || originality === '3') && applicantConfig">
                           <v-btn @click="showDialogApplicantList('NguoiNop')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
                             <v-icon size="14">fas fa fa-address-card</v-icon>
@@ -1120,6 +1120,7 @@ export default {
         if(!value.applicantIdNo) {
           vm.checkApplicantId = true
         }
+        console.log('ThongTinChuHS', value)
         vm.$store.commit('setThongTinChuHoSo', value)
         let tempData = {
           delegateName: value.applicantName,
@@ -1308,11 +1309,11 @@ export default {
           
         })
         setTimeout(function () {
-          if (data.cityCode) {
+          if (data.cityCode || vm.defaultCityCode) {
             vm.$store.getters.getDictItems({
               collectionCode: 'ADMINISTRATIVE_REGION',
               level: 1,
-              parent: data.cityCode
+              parent: data.cityCode ? data.cityCode : vm.defaultCityCode
             }).then(function (resultDistricts) {
               vm.districts = resultDistricts.data
             })
@@ -1349,7 +1350,15 @@ export default {
       vm.$refs.formChuHoSo.resetValidation()
     },
     onChangeCity (data, editDelegate) {
-      var vm = this
+      let vm = this
+      console.log('dataCityChange', data, vm.citys)
+      try {
+        vm.thongTinChuHoSo.cityName = vm.citys.filter(function (item) {
+          return item['itemCode'] == data
+        })[0]['itemName']
+      } catch (error) {
+        vm.thongTinChuHoSo.cityName = ''
+      }
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
         level: 1,
@@ -1358,6 +1367,8 @@ export default {
       if (!editDelegate) {
         vm.thongTinChuHoSo.districtCode = ''
         vm.thongTinChuHoSo.wardCode = ''
+        vm.thongTinChuHoSo.districtName = ''
+        vm.thongTinChuHoSo.wardName = ''
         vm.$store.commit('setCityVal', data)
       }
       vm.$store.getters.getDictItems(filter).then(function (result) {
@@ -1373,7 +1384,14 @@ export default {
       })
     },
     onChangeDistrict (data, editDelegate) {
-      var vm = this
+      let vm = this
+      try {
+        vm.thongTinChuHoSo.districtName = vm.districts.filter(function (item) {
+          return item['itemCode'] == data
+        })[0]['itemName']
+      } catch (error) {
+        vm.thongTinChuHoSo.districtName = ''
+      }
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
         level: 1,
@@ -1381,6 +1399,7 @@ export default {
       }
       if (!editDelegate) {
         vm.thongTinChuHoSo.wardCode = ''
+        vm.thongTinChuHoSo.wardName = ''
         vm.$store.commit('setDistrictVal', data)
       }
       
@@ -1395,6 +1414,14 @@ export default {
       })
     },
     onChangeWard (data) {
+      let vm = this
+      try {
+        vm.thongTinChuHoSo.wardName = vm.wards.filter(function (item) {
+          return item['itemCode'] == data
+        })[0]['itemName']
+      } catch (error) {
+        vm.thongTinChuHoSo.wardName = ''
+      }
       this.$store.commit('setWardVal', data)
     },
     querySelections (val) {

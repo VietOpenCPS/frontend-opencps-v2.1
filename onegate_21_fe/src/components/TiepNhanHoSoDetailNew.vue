@@ -277,16 +277,17 @@
         <div v-else>
           <v-card flat color="#fff">
             <div style="position: absolute;right: 0">
-              <v-btn color="primary" @click="showHDTT()">Phiếu hướng dẫn thủ tục</v-btn>
-              <v-btn color="primary" @click="showTCTN()">
-                Phiếu từ chối tiếp nhận
+              <v-btn small color="primary" @click="showHDTT()" class="mr-2"><v-icon>print</v-icon>&nbsp; Phiếu hướng dẫn thủ tục</v-btn>
+              <v-btn small color="#d28a05" @click="showTCTN()" class="white--text">
+                <v-icon>print</v-icon>&nbsp;Phiếu từ chối tiếp nhận
               </v-btn>
             </div>
-            <div id="formAlpacaNewTemplate" class="mb-5 pt-0" v-if="data_form_template !== 'formHPH' && data_form_template !== 'formCH'  && data_form_template !== 'formHT'"></div>
+            <div id="formAlpacaNewTemplate" class="mb-5 pt-0" v-if="data_form_template !== 'formHPH' && data_form_template !== 'formCH'  && data_form_template !== 'formHT' && data_form_template !== 'formTT'"></div>
             <v-form  ref="formTiepNhan" lazy-validation>
               <thu-tuc-cap-ho-chieu-ngoai-giao-cong-vu v-if="data_form_template === 'formCH'" :formCode="formCode" :id="id" @changeCheckCKCD="changeCheckCKCD"></thu-tuc-cap-ho-chieu-ngoai-giao-cong-vu>
               <thu-tuc-hop-phap-hoa-lanh-su v-if="data_form_template === 'formHPH'"  :formCode="formCode" :id="id" @changeCheckCKCD="changeCheckCKCD" @changeCheckGiayTo="changeCheckGiayTo"></thu-tuc-hop-phap-hoa-lanh-su>
               <thu-tuc-cap-ban-sao-trich-luc-ho-tich v-if="data_form_template === 'formHT'"  :formCode="formCode" :id="id" ></thu-tuc-cap-ban-sao-trich-luc-ho-tich>
+              <thu-tuc-cap-thi-thuc v-if="data_form_template === 'formTT'" :formCode="formCode" :id="id" @changeCheckCKCD="changeCheckCKCD"></thu-tuc-cap-thi-thuc>
             </v-form>
           </v-card>
           <!--  -->
@@ -599,7 +600,7 @@
         <v-card-text>
           <span v-if="data_form_template === 'formHPH'">Bạn chưa chọn CKCD, bạn có chắc tiếp tục thực hiện thao tác?</span>
           <span v-if="data_form_template === 'formCH'">Bạn chưa kiểm tra thông tin văn bản<noframes></noframes>, bạn có chắc tiếp tục thực hiện thao tác?</span>
-          
+          <span v-if="data_form_template === 'formTT'" style="font-size: 14px;font-weight: 500;">{{confirmMess}}, bạn có chắc chắc tiếp tục thực hiện thao tác?</span>
         </v-card-text>
 
         <v-card-actions>
@@ -643,6 +644,7 @@ import DichVuChuyenPhatHoSo from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatHoSo.v
 import ThuTucCapHoChieuNgoaiGiaoCongVu from './TiepNhan/ThuTucCapHoChieuNgoaiGiaoCongVu.vue'
 import ThuTucCapBanSaoTrichLucHoTich from './TiepNhan/ThuTucCapBanSaoTrichLucHoTich.vue'
 import ThuTucHopPhapHoaLanhSu from './TiepNhan/ThuTucHopPhapHoaLanhSu.vue'
+import ThuTucCapThiThuc from './TiepNhan/ThuTucCapThiThuc.vue'
 
 toastr.options = {
   'closeButton': true,
@@ -660,10 +662,12 @@ export default {
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua,
     'thu-tuc-cap-ho-chieu-ngoai-giao-cong-vu': ThuTucCapHoChieuNgoaiGiaoCongVu,
     'thu-tuc-cap-ban-sao-trich-luc-ho-tich': ThuTucCapBanSaoTrichLucHoTich,
-    'thu-tuc-hop-phap-hoa-lanh-su': ThuTucHopPhapHoaLanhSu
+    'thu-tuc-hop-phap-hoa-lanh-su': ThuTucHopPhapHoaLanhSu,
+    'thu-tuc-cap-thi-thuc': ThuTucCapThiThuc
   },
   data: () => ({
     // add new template
+    confirmMess: '',
     isNotarization: false,
     dialogXacNhanThaoTac: false,
     checkCKCD: false,
@@ -908,7 +912,7 @@ export default {
               vm.dossierTemplateNo_hidden = currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
               vm.eformCode_hidden = currentQuery.hasOwnProperty('eformCode') && currentQuery.eformCode ? currentQuery.eformCode : ''
               setTimeout (function () {
-                if (vm.data_form_template && vm.data_form_template !== 'formHPH'  && vm.data_form_template !== 'formCH'  && vm.data_form_template !== 'formHT') {
+                if (vm.data_form_template && vm.data_form_template !== 'formHPH'  && vm.data_form_template !== 'formCH'  && vm.data_form_template !== 'formHT' && vm.data_form_template !== 'formTT') {
                   let formScript, formData
                   /* eslint-disable */
                   if (vm.data_form_template) {
@@ -1477,7 +1481,7 @@ export default {
     // 
     tiepNhanHoSoNewTemplate (type) {
       let vm = this
-      if(vm.data_form_template !== 'formHPH' && vm.data_form_template !== 'formCH'  && vm.data_form_template !== 'formHT') {
+      if(vm.data_form_template !== 'formHPH' && vm.data_form_template !== 'formCH'  && vm.data_form_template !== 'formHT' && vm.data_form_template !== 'formTT') {
         vm.formAlpaca()
       } else {
         vm.formVue()
@@ -1636,6 +1640,25 @@ export default {
                 vm.loadingAction = true
                 vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
                     let metaData = dossiers.metaData
+                    try {
+                      let metaDataObj = JSON.parse(metaData)
+                      let listFiles = JSON.parse(dataCreate['dossierFileArr'])
+                      let listThanhVienObj = listFiles.filter(function(item) {
+                        return item.eform === 'true' && item.partNo === 'TP01'
+                      })[0]
+                      let listThanhVienArr = JSON.parse(listThanhVienObj['formData'])['thanh_vien_doan']
+                      for (let i=0; i < listThanhVienArr.length; i++) {
+                          if (listThanhVienArr[i]['cong_ham']) {
+                            metaDataObj = Object.assign(metaDataObj, {'hasXinThiThuc': true})
+                            break
+                          }
+                      }
+                      console.log('metaDataObj', metaDataObj)
+                      metaData = JSON.stringify(metaDataObj)
+                    } catch (error) {
+                    }
+                    
+                    console.log('metadata666666', metaData)
                     let dataMetaData = {
                       id: result.dossierId,
                       data: metaData
@@ -1812,6 +1835,102 @@ export default {
             //   }
             // }
           }
+      }
+      if(vm.data_form_template === 'formTT'){
+        if(vm.$refs.formTiepNhan.validate()){
+          if(vm.checkThanhVien()){
+            // if(vm.checkCKCD){
+              if(vm.formCode === 'NEW') {
+                vm.loadingAction = true
+                vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
+                    let metaData = dossiers.metaData
+                    let dataMetaData = {
+                      id: result.dossierId,
+                      data: metaData
+                    }
+                    vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
+                      vm.loadingAction = false
+                      vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+                      vm.goBack() 
+                    }).catch(()=>{
+                      vm.loadingAction = false
+                    })
+                }).catch(reject => {
+                  vm.loadingAction = false
+                })
+              } else {
+                let dataPUTDossier = {
+                  id: vm.id,
+                  dossier: dossiers
+                }
+                vm.loadingAction = true
+                vm.$store.dispatch('putDossierNew', dataPUTDossier).then(function (result) {
+                    let metaData = dossiers.metaData
+                    let dataMetaData = {
+                      id: vm.id,
+                      data: metaData
+                    }
+                  vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
+                    console.log(result)
+                    let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+                    dossierFile.forEach(async (e)=>{
+                      if(vm.data_form_template === 'formTT'){
+                        if(e.partNo === 'TP01' || e.partNo === 'TP02'){
+                          let dataPUTDossierFile = {
+                            id: vm.id,
+                            referenceUid: e.referenceUid,
+                            formData: e.formData
+                          }
+                          await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+
+                          }).catch(reject=>{
+                            
+                          })
+                        }
+                      }
+                    })
+                    let dataPayment = {
+                      dossierId: vm.id,
+                      payment: {}
+                    }
+                    if($('#payment_hidden').val()){
+                      dataPayment['payment'] = JSON.parse($('#payment_hidden').val())
+                    }
+                    vm.$store.dispatch('putPayment', dataPayment).then(()=>{
+                      vm.loadingAction = false
+                      vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+                      vm.goBack()
+                    }).catch(()=>{
+                      vm.loadingAction = false
+                    })
+                  }).catch(err=> {
+                    vm.loadingAction = false
+                  })
+      
+
+
+                }).catch(reject => {
+                  vm.loadingAction = false
+                })
+                if(dossiersMark.length){
+                  for(let i =0;i<dossiersMark.length;i++){
+                    vm.$store.dispatch('postDossierMark', dossiersMark[i])
+                  }
+                }
+              }
+            // } else {
+              // vm.dialogXacNhanThaoTac = true
+              // vm.loadingAction = false 
+            // }
+          } else {
+            vm.dialogXacNhanThaoTac = true
+            vm.loadingAction = false
+          }
+        } else {
+          toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
+          vm.loadingAction = false
+          return 
+        }
       }
     },
     formAlpaca () {
@@ -2040,6 +2159,93 @@ export default {
                     }
                   }
 
+                })
+                let dataPayment = {
+                  dossierId: vm.id,
+                  payment: {}
+                }
+                if($('#payment_hidden').val()){
+                  dataPayment['payment'] = JSON.parse($('#payment_hidden').val())
+                }
+                vm.$store.dispatch('putPayment', dataPayment).then(()=>{
+                  vm.loadingAction = false
+                  vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+                  vm.goBack()
+                }).catch(()=>{
+                  vm.loadingAction = false
+                })
+              }).catch(err=> {
+                vm.loadingAction = false
+              })
+  
+
+
+            }).catch(reject => {
+              vm.loadingAction = false
+            })
+              if(dossiersMark.length){
+                for(let i =0;i<dossiersMark.length;i++){
+                  vm.$store.dispatch('postDossierMark', dossiersMark[i])
+                }
+              }
+           }
+        } else {
+          toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
+          vm.loadingAction = false
+          return 
+        }
+      }
+      if(vm.data_form_template === 'formTT'){
+        if(vm.$refs.formTiepNhan.validate()){
+           if(vm.formCode === 'NEW') {
+            vm.loadingAction = true
+            vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
+                let metaData = dossiers.metaData
+                let dataMetaData = {
+                  id: result.dossierId,
+                  data: metaData
+                }
+                vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
+                  vm.loadingAction = false
+                  vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+                  vm.goBack() 
+                }).catch(()=>{
+                  vm.loadingAction = false
+                })
+            }).catch(reject => {
+              vm.loadingAction = false
+            })
+           } else {
+            let dataPUTDossier = {
+              id: vm.id,
+              dossier: dossiers
+            }
+
+            vm.loadingAction = true
+            vm.$store.dispatch('putDossierNew', dataPUTDossier).then(function (result) {
+              let metaData = dossiers.metaData
+              let dataMetaData = {
+                id: vm.id,
+                data: metaData
+              }
+              vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
+                console.log(result)
+                let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+                dossierFile.forEach(async (e)=>{
+                  if(vm.data_form_template === 'formTT'){
+                    if(e.partNo === 'TP01' || e.partNo === 'TP02'){
+                      let dataPUTDossierFile = {
+                        id: vm.id,
+                        referenceUid: e.referenceUid,
+                        formData: e.formData
+                      }
+                      await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+
+                      }).catch(reject=>{
+                        
+                      })
+                    }
+                  }
                 })
                 let dataPayment = {
                   dossierId: vm.id,
@@ -2318,6 +2524,54 @@ export default {
       } catch (err) {
         return false
       }
+    },
+    checkThanhVien () {
+      let vm = this
+      let valid = true
+      let dossierFileArr = JSON.parse($('#dossierFileArr_hidden').val())
+      let listVanBan = []
+      let listThanhVien = []
+      try {
+        let TP02 = dossierFileArr.find(e=>e.partNo === 'TP02')
+        listVanBan = JSON.parse(TP02.formData).van_ban
+        console.log('listVanBan', listVanBan)
+      } catch (error) {
+      }
+      try {
+        let TP01 = dossierFileArr.find(e=>e.partNo === 'TP01')
+        listThanhVien = JSON.parse(TP01.formData).thanh_vien_doan
+        console.log('listThanhVien', listThanhVien)
+      } catch (error) {
+      }
+      if (listVanBan.length === 0 && listThanhVien.length !== 0) {
+        vm.confirmMess = 'Chưa có văn bản quyết định nào'
+        valid = false
+        return valid
+      }
+      if (listThanhVien.length === 0 && listVanBan.length !== 0) {
+        vm.confirmMess = 'Chưa có thành viên nào'
+        valid = false
+        return valid
+      }
+      if (listVanBan.length === 0 && listThanhVien.length === 0) {
+        vm.confirmMess = 'Chưa có văn bản quyết định và thành viên nào'
+        valid = false
+        return valid
+      }
+      for(let i =0; i<listThanhVien.length;i++){
+        if(!listThanhVien[i]['So_Cv_Den']){
+          vm.confirmMess = 'Thành viên đoàn số thứ tự ' + i + 1 + ' chưa có văn bản quyết định'
+          valid = false
+          return valid
+        }
+        if(!listThanhVien[i]['kiem_tra']){
+          vm.confirmMess = 'Thành viên đoàn số thứ tự ' + i + 1 + ' chưa được kiểm tra'
+          valid = false
+          return valid
+        }
+      }
+      return valid
+
     }
   }
 }

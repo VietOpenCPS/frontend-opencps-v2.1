@@ -2,7 +2,7 @@
   <v-card flat color="#064787" id="contain-dktn" class="">
     <v-flex xs12 class="header_login text-xs-center pt-2">
       <div class="logo d-inline-block">
-        <img src="/documents/124302/0/logo-login-dvc.png?t=9312">
+        <img :src="'/documents/' + groupId + '/0/logo-login-dvc.png?t=93121'">
         <!-- <div style="font-size:22px;color:#e5e0e0" class="mt-2 text-xs-center">BỘ NGOẠI GIAO</div> -->
         <h1 style="font-size:26px; color: #ffffff" class="text-bold my-2">BỘ PHẬN TIẾP NHẬN HỒ SƠ VÀ TRẢ KẾT QUẢ
         </h1>

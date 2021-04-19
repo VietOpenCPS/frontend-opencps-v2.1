@@ -159,7 +159,8 @@ export default {
       if (this.currentPage !== this.totalPages) {
         this.currentPage += 1
         this.$emit('tiny:change-page', {
-          page: this.currentPage
+          page: this.currentPage,
+          numberPerPage: this.numberPerPage
         })
       }
     },
@@ -167,25 +168,29 @@ export default {
       if (this.currentPage > 1) {
         this.currentPage -= 1
         this.$emit('tiny:change-page', {
-          page: this.currentPage
+          page: this.currentPage,
+          numberPerPage: this.numberPerPage
         })
       }
     },
     nextPageLast () {
       this.currentPage = this.totalPages
       this.$emit('tiny:change-page', {
-        page: this.totalPages
+        page: this.totalPages,
+        numberPerPage: this.numberPerPage
       })
     },
     lastPageLast () {
       this.currentPage = 1
       this.$emit('tiny:change-page', {
-        page: 1
+        page: 1,
+        numberPerPage: this.numberPerPage
       })
     },
     goToPage () {
       this.$emit('tiny:change-page', {
-        page: this.currentPage
+        page: this.currentPage,
+        numberPerPage: this.numberPerPage
       })
     },
     onLimitChange () {

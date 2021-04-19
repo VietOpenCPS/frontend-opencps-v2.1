@@ -10,11 +10,13 @@ import ThamSoHeThong from '@/components/extform/ThamSoHeThong.vue'
 import Voting from '@/components/extform/Voting.vue'
 import MappingTTHC from '@/components/extform/MappingTTHC.vue'
 import ThongKeTruyCap from '@/components/extform/ThongKeTruyCap.vue'
+import TheoDoiLogTruyCap from '@/components/extform/TheoDoiLogTruyCap.vue'
 import SyncAgency from '@/components/extform/SyncAgency.vue'
 import SyncSharingqa from '@/components/extform/SyncSharingqa.vue'
 import SyncStatistics from '@/components/extform/SyncStatistics.vue'
 import RevesionLog from '@/components/extform/RevesionLog.vue'
 import SyncDomain from '@/components/extform/SyncDomain.vue'
+import ManagerApi from '@/components/extform/ManagerApi.vue'
 import SoTTSoTheoDoi from '@/components/extform/SoTTSoTheoDoi.vue'
 import Report from '@/components/extform/Report.vue'
 import Import from '@/components/screens/import.vue'
@@ -95,6 +97,15 @@ const routes = [
         }
       },
       {
+        path: '/table/opencps_tracking/api',
+        name: 'ManagerApi',
+        component: ManagerApi,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
         path: '/table/opencps_mapping/domain',
         name: 'SyncDomain',
         component: SyncDomain,
@@ -161,6 +172,15 @@ const routes = [
         path: '/table/opencps_statists/statists',
         name: 'ThongKeTruyCap',
         component: ThongKeTruyCap,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_tracking/tracking-api',
+        name: 'TheoDoiLogTruyCap',
+        component: TheoDoiLogTruyCap,
         props: true,
         meta: {
           requiresAuth: true

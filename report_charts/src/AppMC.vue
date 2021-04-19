@@ -11,10 +11,10 @@
           <span>Thống kê chung</span>
         </v-tooltip>
         <v-tooltip left>
-          <v-btn slot="activator" flat icon color="green" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('bao-cao-admin')">
+          <v-btn slot="activator" flat icon color="green" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('tra-cuu-ho-so')">
             <v-icon size="20">book</v-icon>
           </v-btn>
-          <span>Báo cáo tình hình giải quyết</span>
+          <span>Theo dõi tình hình giải quyết</span>
         </v-tooltip>
         <v-menu left offset-x open-on-hover>
           <v-btn slot="activator" flat icon color="teal" class="mx-0 my-0" style="width: 32px;height:32px">
@@ -30,12 +30,12 @@
             </v-list-tile>
           </v-list>
         </v-menu>
-        <v-tooltip left>
+        <!-- <v-tooltip left>
           <v-btn slot="activator" flat icon color="orange" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('tra-cuu-ho-so')">
             <v-icon size="20">search</v-icon>
           </v-btn>
           <span>Tra cứu thông tin hồ sơ</span>
-        </v-tooltip>
+        </v-tooltip> -->
         <!-- <v-menu left offset-x open-on-hover>
           <v-btn slot="activator" flat icon color="orange" class="mx-0 my-0" style="width: 32px;height:32px">
             <v-icon size="20">perm_identity</v-icon>

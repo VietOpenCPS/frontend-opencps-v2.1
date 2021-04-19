@@ -251,7 +251,8 @@ export default {
     dialogLoadingCreate: false,
     dialogSelectGovagency: false,
     agencyItems: [
-      {name: 'Cục lãnh sự - 40 Trần Phú, Ba Đình, Hà Nội', value: '124302', code: 'CLS', serverNo: 'SERVER_CLS'}
+      {name: 'Cục lãnh sự - 40 Trần Phú, Ba Đình, Hà Nội', value: '124302', code: 'CLS', serverNo: 'SERVER_CLS'},
+      {name: 'Sở ngoại vụ thành phố Hồ Chí Minh', value: '703021', code: 'SNVHCM', serverNo: 'SERVER_SNVHCM'}
     ],
     agencySelected: ''
   }),
@@ -471,6 +472,17 @@ export default {
         if (field) {
           for (var prop in field) {
             if (field[prop].isRequired() && field[prop].getValue() === '') {
+              // 
+              if (field[prop].options.type !== 'select') {
+                let dom = "#"+field[prop].options['id']
+                $(dom).attr("style","border-color: red !important")
+              } else {
+                let dom = "#select2-"+field[prop].options['id']+"-container"
+                $($(dom).parent()).attr("style","border-color: red !important")
+              }
+              document.getElementById(field[prop].options['id']).scrollIntoView();
+              window.scrollBy(0, -100);
+              // 
               toastr.clear()
               toastr.error(field[prop].options.title ? field[prop].options.title + ' là bắt buộc' : field[prop].options['name'] + ' là bắt buộc')
               return

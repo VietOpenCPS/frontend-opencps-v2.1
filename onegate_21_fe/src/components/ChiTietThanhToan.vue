@@ -45,7 +45,7 @@
                 <v-flex style="width:100px" class="my-0 pl-3 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
                 <v-flex style="width:calc(100% - 100px)">
                   <p class="px-2 my-0 py-1">
-                    {{ePaymentProfile['paymentNote'] ? ePaymentProfile['paymentNote'] : ''}} &nbsp;&nbsp;
+                    {{paymentNote}} &nbsp;&nbsp;
                   </p>
                 </v-flex>
               </v-layout>
@@ -131,6 +131,14 @@
                   </v-flex>
 
                   <!-- end -->
+                </v-layout>
+                <v-layout wrap v-if="Number(payments.paymentStatus) < 3 && payments.hasOwnProperty('invoicePayload') && payments['invoicePayload'] == 'VNPT'">
+                  <v-flex xs12>
+                    <v-btn class="ml-3" color="primary" @click="printPay()">
+                      <v-icon>print</v-icon> &nbsp;
+                      In biên lai
+                    </v-btn>
+                  </v-flex>
                 </v-layout>
               </v-layout>
             </v-card-text>
@@ -243,8 +251,6 @@
 
 <script>
 
-import Vue from 'vue'
-import axios from 'axios'
 export default {
   props: {
     payments: {
@@ -266,7 +272,8 @@ export default {
     activePrintPay: false,
     transId: '',
     goodCode: '',
-    doneVTpay: false
+    doneVTpay: false,
+    paymentNote: ''
   }),
   computed: {
     paymentFileName () {
@@ -293,7 +300,11 @@ export default {
   created () {
     let vm = this
     vm.$nextTick(function () {
-      var vm = this
+      vm.paymentNote = vm.payments['paymentNote']
+      try {
+        vm.paymentNote = JSON.parse(vm.payments['paymentNote'])['paymentNote']
+      } catch (error) {
+      }
     })
   },
   watch: {
@@ -307,6 +318,11 @@ export default {
       // if (!vm.paymentFile && val['paymentMethod'] === 'Chuyển khoản') {
       //   vm.payments.paymentMethod = 'Keypay'
       // }
+      vm.paymentNote = val['paymentNote']
+      try {
+        vm.paymentNote = JSON.parse(val['paymentNote'])['paymentNote']
+      } catch (error) {
+      }
       let paymentProfile = vm.getEPaymentProfile(val.epaymentProfile)
       // keypay
       if (paymentProfile && paymentProfile['keypayUrl']) {
@@ -381,41 +397,48 @@ export default {
       }
       vm.dialogPDFLoading = true
       vm.dialogPDF = true
-      if (vm.payments['paymentMethod'] === 'KeyPayDVCQG') {
-        let confirmPayload = vm.payments.hasOwnProperty('confirmPayload') ? vm.getEPaymentProfile(vm.payments['confirmPayload']) : ''
-        vm.dialogPDFLoading = false
-        let url = confirmPayload ? confirmPayload['url_invoice'] : ''
-        if (url) {
-          window.open(url, "_blank")
-        } else {
-          alert('Không có biên lai')
-        }
-        
-      } else if (vm.payments['paymentMethod'] === 'PayPlatDVCQG' || vm.payments['paymentMethod'] === 'Paygov') {
-        // let param = {
-        //   headers: {
-        //     groupId: window.themeDisplay.getScopeGroupId()
-        //   },
-        //   responseType: 'blob'
-        // }
-        // axios.get('/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice', param).then(function (response) {
-        //   vm.dialogPDFLoading = false
-        //   let serializable = response.data
-        //   let file = window.URL.createObjectURL(serializable)
-        //   document.getElementById('dialogPaymentPreview').src = file
-        // }).catch(function (error) {
-        //   vm.dialogPDFLoading = false
-        // })
-        vm.dialogPDFLoading = false
-        vm.dialogPDF = false
-        let url = '/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice'
-        window.open(url, "_blank")
-      } else {
-        vm.$store.dispatch('printPay', filter).then(function (result) {
+      if (vm.payments.hasOwnProperty('invoicePayload') && vm.payments['invoicePayload'] == 'VNPT') {
+        vm.$store.dispatch('printPayVnpt', filter).then(function (result) {
           vm.dialogPDFLoading = false
           document.getElementById('dialogPaymentPreview').src = result
         }).catch(function(){})
+      } else {
+        if (vm.payments['paymentMethod'] === 'KeyPayDVCQG') {
+          let confirmPayload = vm.payments.hasOwnProperty('confirmPayload') ? vm.getEPaymentProfile(vm.payments['confirmPayload']) : ''
+          vm.dialogPDFLoading = false
+          let url = confirmPayload ? confirmPayload['url_invoice'] : ''
+          if (url) {
+            window.open(url, "_blank")
+          } else {
+            alert('Không có biên lai')
+          }
+        } else if (vm.payments['paymentMethod'] === 'PayPlatDVCQG' || vm.payments['paymentMethod'] === 'Paygov') {
+          // let param = {
+          //   headers: {
+          //     groupId: window.themeDisplay.getScopeGroupId()
+          //   },
+          //   responseType: 'blob'
+          // }
+          // axios.get('/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice', param).then(function (response) {
+          //   vm.dialogPDFLoading = false
+          //   let serializable = response.data
+          //   let file = window.URL.createObjectURL(serializable)
+          //   document.getElementById('dialogPaymentPreview').src = file
+          // }).catch(function (error) {
+          //   vm.dialogPDFLoading = false
+          // })
+          vm.dialogPDFLoading = false
+          vm.dialogPDF = false
+          let url = '/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice'
+          window.open(url, "_blank")
+        } else {
+          vm.$store.dispatch('printPay', filter).then(function (result) {
+            vm.dialogPDFLoading = false
+            document.getElementById('dialogPaymentPreview').src = result
+          }).catch(function(){})
+        }
       }
+      
     },
     getEinvoiceNo (string) {
       if (string && string.indexOf('#') >= 0) {
