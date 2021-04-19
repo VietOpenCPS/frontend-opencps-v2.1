@@ -81,7 +81,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject)=>{
         let param = {
           headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
+            groupId: data.hasOwnProperty('groupIdTrungTam') ? data.groupIdTrungTam :  window.themeDisplay.getScopeGroupId()
           },
           params: {
           }
@@ -114,6 +114,28 @@ export const store = new Vuex.Store({
         let dataPost = new URLSearchParams()
         dataPost.append('method', 'GET')
         dataPost.append('url', '/serviceinfos/statistics/domains')
+        dataPost.append('data', JSON.stringify(textPost))
+        axios.post('/o/rest/v2/proxy', dataPost, config).then(function (response) {
+          let serializable = response.data
+          resolve(serializable.data)
+        }).catch(xhr => {
+          reject(xhr)
+        })   
+      })     
+    },
+    getAgencysFromDict ({commit,state}, data) {
+      return new Promise((resolve, reject)=>{
+        let config = {
+          headers: {
+            'groupId': window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let textPost = {
+          sort: 'sibling'
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/dictcollections/SERVICE_ADMINISTRATION/dictitems')
         dataPost.append('data', JSON.stringify(textPost))
         axios.post('/o/rest/v2/proxy', dataPost, config).then(function (response) {
           let serializable = response.data
@@ -173,7 +195,11 @@ export const store = new Vuex.Store({
           dossierNo: filter.dossierNo,
           order: true,
           start: filter.start,
-          end: filter.end
+          end: filter.end,
+          fromReceiveDate: filter.fromReceiveDate ? filter.fromReceiveDate : '',
+          toReceiveDate: filter.toReceiveDate ? filter.toReceiveDate : '',
+          fromDueDate: filter.fromReleaseDate ? filter.fromReleaseDate : '',
+          toDueDate: filter.toReleaseDate ? filter.toReleaseDate : '',
         }
         let config = {
           url: '/o/rest/v2/dossiers',
@@ -214,7 +240,16 @@ export const store = new Vuex.Store({
           dossierNo: filter.dossierNo,
           order: true,
           start: filter.start,
-          end: filter.end
+          end: filter.end,
+          fromReceiveDate: filter.fromReceiveDate ? filter.fromReceiveDate : '',
+          toReceiveDate: filter.toReceiveDate ? filter.toReceiveDate : '',
+          fromDueDate: filter.fromReleaseDate ? filter.fromReleaseDate : '',
+          toDueDate: filter.toReleaseDate ? filter.toReleaseDate : '',
+        }
+        if (filter.status && (filter.status === 'delay' || filter.status === 'overdue' || filter.status === 'coming' || filter.status === 'overtime')) {
+          params = Object.assign(params, {top: filter.status})
+        } else {
+          params = Object.assign(params, {status: filter.status})
         }
         let dataPost = new URLSearchParams()
         let textPost = params

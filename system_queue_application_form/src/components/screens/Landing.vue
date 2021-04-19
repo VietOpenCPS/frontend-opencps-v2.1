@@ -204,7 +204,9 @@
                   </v-text-field>
                 </v-flex>
                 <v-flex xs12>
-                  <v-autocomplete :items="agencyItems" v-model="agencyTiepNhan"
+                  <v-autocomplete 
+                    :items="agencyItems"
+                    v-model="agencyTiepNhan"
                     item-text="name" 
                     item-value="value"
                     :hide-selected="true" 
@@ -438,7 +440,8 @@ export default {
     serviceInfoListRender: [],
     formTemplateList: [],
     agencyItems: [
-      {name: 'Cục lãnh sự - 40 Trần Phú, Ba Đình, Hà Nội', value: '124302', code: 'CLS', serverNo: 'SERVER_CLS'}
+      {name: 'Cục lãnh sự - 40 Trần Phú, Ba Đình, Hà Nội', value: '124302', code: 'CLS', serverNo: 'SERVER_CLS'},
+      {name: 'Sở ngoại vụ thành phố Hồ Chí Minh', value: '703021', code: 'SNVHCM', serverNo: 'SERVER_SNVHCM'}
     ],
     dialogSecret: false,
     loading: false,

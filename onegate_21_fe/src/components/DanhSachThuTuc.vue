@@ -369,7 +369,8 @@
       verificationApplicantCreateDossier: false,
       hasVerify: false,
       dialogLoadingCreate: true,
-      dialog_selectOption: true
+      dialog_selectOption: true,
+      useJwt: false
     }),
     computed: {
       currentIndex () {
@@ -387,6 +388,10 @@
     },
     created () {
       var vm = this
+      try {
+        vm.useJwt = useJwt
+      } catch (error) {
+      }
       //
       try {
         vm.verificationApplicantCreateDossier = hasVerificationCreateDossier
@@ -710,7 +715,14 @@
             } else {
               vm.$store.dispatch('getServiceConfigDetail', item).then(result => {
                 if (result.hasOwnProperty('serviceUrl') && result.serviceUrl) {
-                  window.location.href = result.serviceUrl
+                  let urlRedirect = result.serviceUrl
+                  try {
+                    if (vm.useJwt) {
+                      urlRedirect = result.serviceUrl.split('?').length > 1 ? result.serviceUrl + '&token=' + localStorage.getItem('jwt_token') : result.serviceUrl + '?token=' + localStorage.getItem('jwt_token')
+                    }
+                  } catch (error) {
+                  }
+                  window.location.href = urlRedirect
                 }
               }).catch(function(){})
             }
@@ -791,7 +803,14 @@
       createDossier (data) {
         let vm = this
         if (vm.serviceConfigSelect.serviceUrl) {
-          window.location.href = vm.serviceConfigSelect
+          let urlRedirect = vm.serviceConfigSelect.serviceUrl
+          try {
+            if (vm.useJwt) {
+              urlRedirect = vm.serviceConfigSelect.serviceUrl.split('?').length > 1 ? vm.serviceConfigSelect.serviceUrl + '&token=' + localStorage.getItem('jwt_token') : vm.serviceConfigSelect.serviceUrl + '?token=' + localStorage.getItem('jwt_token')
+            }
+          } catch (error) {
+          }
+          window.location.href = urlRedirect
         } else {
           vm.trackingBTTT(data.serviceCode)
           vm.$store.dispatch('postDossier', data).then(function (result) {

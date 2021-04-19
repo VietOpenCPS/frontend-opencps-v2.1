@@ -36,10 +36,6 @@
 
         <thong-tin-chu-ho-so v-if="formCode === 'NEW_GROUP'" :showApplicant="true" :showDelegate="false" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
 
-        <thong-tin-cong-van v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" ref="thongtincongvan" :detailDossier="thongTinNhomHoSo"
-         :tphs="tphsCV" :taoQuyetDinh="hasTaoQuyetDinh" :createFileCongVan="createFileCongVan" :formCodeInput="formCode" :requiredCVDenGroupId="requiredCVDenGroupId" :requiredCVDenGovCode="requiredCVDenGovCode" :donvinhanCollection="donvinhanCollection" :lengthDossier="dossiersCounterIntoGroupFilter">
-        </thong-tin-cong-van>
-
         <div v-if="formCode === 'NEW_GROUP'" style="position: relative;border-top: 1px solid #dedede;">
           <v-expansion-panel :value="0" class="expansion-pl">
             <v-expansion-panel-content>
@@ -272,7 +268,6 @@
       </div>
       <!-- Thông tin hồ sơ trong nhóm -->
       <div v-if="activeAddDossierIntoGroup">
-        <thong-tin-chu-ho-so-cong-van v-if="activeAddDossierIntoGroup && (formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI')" ref="thongtinchuhosocongvan" :mauCongVan="mauCongVan"></thong-tin-chu-ho-so-cong-van>
         <thong-tin-chu-ho-so :showApplicant="false" :showDelegate="true" v-if="activeAddDossierIntoGroup && formCode === 'NEW_GROUP'" ref="thongtinchuhoso"></thong-tin-chu-ho-so>
 
         <v-expansion-panel v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" :value="[true]" expand  class="expansion-pl">
@@ -784,7 +779,6 @@
 import toastr from 'toastr'
 import $ from 'jquery'
 import axios from 'axios'
-import ThongTinChuHoSoCongVan from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSoCongVan.vue'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhomNew.vue'
 import ThanhPhanHoSo1 from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhomNew.vue'
@@ -793,7 +787,6 @@ import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
 import TinyPagination from './pagging/opencps_pagination.vue'
-import ThongTinCongVan from './TiepNhan/TiepNhanHoSo_ThongTinCongVan.vue'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -801,7 +794,6 @@ toastr.options = {
 export default {
   props: ['index', 'id', 'formCode'],
   components: {
-    'thong-tin-chu-ho-so-cong-van': ThongTinChuHoSoCongVan,
     'thong-tin-chu-ho-so': ThongTinChuHoSo,
     'thanh-phan-ho-so': ThanhPhanHoSo,
     'thanh-phan-ho-so-1': ThanhPhanHoSo1,
@@ -809,8 +801,7 @@ export default {
     'thong-tin-chung': ThongTinChung,
     'thu-phi': LePhi,
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua,
-    'tiny-pagination': TinyPagination,
-    'thong-tin-cong-van': ThongTinCongVan
+    'tiny-pagination': TinyPagination
   },
   data: () => ({
     valid_tenHoSo: false,

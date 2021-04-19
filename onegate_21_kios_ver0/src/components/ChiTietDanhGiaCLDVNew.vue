@@ -160,7 +160,7 @@ export default {
           }
           if (dossier.dossierStatus === 'done' || (dossier.dossierStatus !== 'done' && dossier.dossierOverdue.indexOf('Quá') >=0)) {
             let filter2 = {
-              password: currentQuery.hasOwnProperty('secret') ? currentQuery.secret : '',
+              password: $('#secretKey').val(),
               dossierId: dossier.dossierId,
               referenceUid: dossier.referenceUid,
               isDvc: vm.isDvc,

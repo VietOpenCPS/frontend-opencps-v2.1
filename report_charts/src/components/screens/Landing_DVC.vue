@@ -1132,7 +1132,7 @@ export default {
               vm.showTableTotal = false
             }
             // ghép số liệu các năm 2019+2020+2021
-            vm.$store.dispatch('getReportTotal', 2021).then(function (result) {
+            vm.$store.dispatch('getReportTotalMC', 2021).then(function (result) {
               let total2021 = ''
               let agencyListsTotal = result
               for (let key in agencyListsTotal) {
@@ -2183,16 +2183,33 @@ export default {
           Token: window.Liferay ? window.Liferay.authToken : ''
         }
       }
-
-      let url = '/o/rest/v2/serverconfigs/SERVER_REPORT_IMPORT'
-      axios.get(url, param).then(function (response) {
-        let serializable = response.data
-        vm.serverImportId = serializable.serverConfigId
-        let stringConfigs = serializable.configs.replace(/&#34;/g, '"')
-        let configs = JSON.parse(stringConfigs)
-        vm.dataImportExcel = configs
-      }).catch(function (error) {
-      })
+      if (vm.isOnegate) {
+        let dataPost = new URLSearchParams()
+        let textPost = {}
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/serverconfigs/SERVER_REPORT_IMPORT')
+        dataPost.append('data', JSON.stringify(textPost))
+        dataPost.append('serverCode', 'SERVER_DVC')
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+          let serializable = response.data
+          vm.serverImportId = serializable.serverConfigId
+          let stringConfigs = serializable.configs.replace(/&#34;/g, '"')
+          let configs = JSON.parse(stringConfigs)
+          vm.dataImportExcel = configs
+        }).catch(function () {
+        })
+      } else {
+        let url = '/o/rest/v2/serverconfigs/SERVER_REPORT_IMPORT'
+        axios.get(url, param).then(function (response) {
+          let serializable = response.data
+          vm.serverImportId = serializable.serverConfigId
+          let stringConfigs = serializable.configs.replace(/&#34;/g, '"')
+          let configs = JSON.parse(stringConfigs)
+          vm.dataImportExcel = configs
+        }).catch(function (error) {
+        })
+      }
+      
     },
     putServerConfig (valueConfigs) {
       let vm = this

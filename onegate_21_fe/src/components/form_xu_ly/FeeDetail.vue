@@ -55,7 +55,21 @@
                 ></v-text-field>
                 <p class="mt-1 mb-0" v-else>{{currency(data_payment.shipAmount.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</p>
               </v-flex>
-              <v-flex xs12 sm2></v-flex>
+              <!-- Số lượng tính phí -->
+              <v-flex xs12 sm2 class="pt-1" v-if="showCounterFee">
+                <v-subheader class="pl-0 text-right">Số lượng: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm3 class="pt-1" v-if="showCounterFee">
+                <v-text-field
+                  @keyup="changeFee"
+                  v-model="data_payment.counter"
+                  type="number"
+                  v-if="data_payment.editable === 2 || data_payment.editable === 3"
+                ></v-text-field>
+                <p class="mt-1 mb-0" v-else>{{data_payment.counter}}</p>
+              </v-flex>
+              <v-flex xs12 sm7></v-flex>
+              <!--  -->
             </v-layout>
           </v-card-text>
           <v-card-text class="pt-0">
@@ -202,6 +216,7 @@ export default {
     prop: 'payments'
   },
   data: () => ({
+    showCounterFee: false,
     data_payment: {},
     money: {
       decimal: '',
@@ -224,6 +239,7 @@ export default {
   created () {
     var vm = this
     vm.data_payment = vm.payments
+    vm.showCounterFee = vm.payments.hasOwnProperty('counter')
     if (vm.payments) {
       setTimeout(function () {
         let feeAmount = typeof(vm.payments.feeAmount) === 'number' ? Number(vm.payments.feeAmount) : Number(vm.payments.feeAmount.toString().replace(/\./g, ''))
@@ -258,6 +274,10 @@ export default {
               vm.paymentFile = result
             })
           }
+        }
+        if (vm.showCounterFee) {
+          vm.feeTong = vm.feeTong*vm.payments.counter
+          vm.totalFee = vm.totalFee*vm.payments.counter
         }
         if (vm.totalFee < 0) {
           vm.totalFee = 0
@@ -321,6 +341,10 @@ export default {
           vm.feeTong = feeAmount + serviceAmount
           vm.totalFee = feeAmount + serviceAmount - advanceAmount
         }
+      }
+      if (vm.showCounterFee) {
+        vm.feeTong = vm.feeTong*val.counter
+        vm.totalFee = vm.totalFee*val.counter
       }
       if (vm.totalFee < 0) {
         vm.totalFee = 0

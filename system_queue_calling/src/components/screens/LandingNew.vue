@@ -411,6 +411,10 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      vm.idVoicePortlet = idDocumentVoicePortlet
+    } catch (error) {
+    }
     vm.$nextTick(async function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
@@ -932,7 +936,8 @@ export default {
         }).catch (function (reject1) {
         })
         let dossierId = item['classPK']
-        let urlRedirect = '/web/cuc-lanh-su#/danh-sach-ho-so/0/chi-tiet-ho-so/' + dossierId + '?activeAction=true'
+        let pathSite = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+        let urlRedirect = pathSite + '#/danh-sach-ho-so/0/chi-tiet-ho-so/' + dossierId + '?activeAction=true'
         window.open(urlRedirect, '_blank')
       }
     },
@@ -954,9 +959,9 @@ export default {
           vm.$store.dispatch('updateBooking', vm.currentBooking).then(function (result1) {
           }).catch (function (reject1) {
           })
-          let urlRedirect = '/web/cuc-lanh-su/mot-cua-dien-tu#/danh-sach-ho-so/0/ho-so/0/NEW'
+          let pathSite = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+          let urlRedirect = pathSite + '/mot-cua-dien-tu#/danh-sach-ho-so/0/ho-so/0/NEW'
           let query = '?q=/o/rest/v2/dossiers/todo?order=true&step=110,500&service_config=' + vm.filterCreateDossier['serviceConfigId'] + '&template_no=' + vm.filterCreateDossier['dossierTemplateNo'] + '&eform=true&eformCode=' + vm.currentBooking['codeNumber']
-          // window.location.href = urlRedirect + query
           window.open(urlRedirect + query, '_blank')
         } else {
           vm.$store.dispatch('postDossier', vm.filterCreateDossier).then(function (result) {
@@ -964,9 +969,9 @@ export default {
             vm.$store.dispatch('updateBooking', vm.currentBooking).then(function (result1) {
             }).catch (function (reject1) {
             })
-            let urlRedirect = '/web/cuc-lanh-su/mot-cua-dien-tu#/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW'
+            let pathSite = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+            let urlRedirect = pathSite + '/mot-cua-dien-tu#/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW'
             let query = '?q=/o/rest/v2/dossiers/todo?order=true&step=110,500&service_config=' + vm.filterCreateDossier['serviceConfigId'] + '&template_no=' + vm.filterCreateDossier['dossierTemplateNo'] + '&eform=true'
-            // window.location.href = urlRedirect + query
             window.open(urlRedirect + query, '_blank')
           }).catch (function (reject) {
           })

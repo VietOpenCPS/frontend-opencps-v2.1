@@ -49,7 +49,7 @@
           </div>
           <!--  -->
           <thong-tin-chu-ho-so v-if="!mauCongVan" ref="thongtinchuhoso" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="isNotarization ? true : false" :applicantIdRequired="applicantIdRequired"></thong-tin-chu-ho-so>
-          <thong-tin-chu-ho-so-cong-van v-if="mauCongVan" ref="thongtinchuhosocongvan" :mauCongVan="mauCongVan"></thong-tin-chu-ho-so-cong-van>
+          <!-- <thong-tin-chu-ho-so-cong-van v-if="mauCongVan" ref="thongtinchuhosocongvan" :mauCongVan="mauCongVan"></thong-tin-chu-ho-so-cong-van> -->
           <!--  -->
           <div v-if="!isNotarization">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -192,159 +192,12 @@
           <div :style="isNotarization ? 'display: none' : 'position: relative;'">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
-                <thu-phi v-if="showThuPhi" v-model="payments" :detailDossier="thongTinChiTietHoSo" :viaPortal="viaPortalDetail"></thu-phi>
+                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :detailDossier="thongTinChiTietHoSo" :viaPortal="viaPortalDetail"></thu-phi>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
           <!--  -->
         
-        </div>
-
-        <div v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'">
-          <div>
-            <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-              <v-expansion-panel-content>
-                <thong-tin-cong-van ref="thongtincongvan" :taoQuyetDinh="hasTaoQuyetDinh" :detailDossier="thongTinChiTietHoSo" :tphs="tphsCV" :createFileCongVan="createFileCongVan"
-                  :formCodeInput="formCode" :donvinhanCollection="donvinhanCollection" :requiredCVDenGroupId="requiredCVDenGroupId" :requiredCVDenGovCode="requiredCVDenGovCode" :lengthDossier="dossiersCounterIntoGroupFilter" >
-                </thong-tin-cong-van>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </div>
-          <!--  -->
-          <!-- <div style="position: relative;">
-            <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-              <v-expansion-panel-content>
-                <div slot="header" style="display: flex; align-items: center;">
-                  <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                  <span>Thành phần hồ sơ dùng chung</span>
-                  &nbsp;&nbsp;&nbsp;&nbsp;
-                </div>
-                <thanh-phan-ho-so ref="thanhphanhoso" :formCodeInput="formCode"  :onlyView="false" :id="'nm'" :partTypes="formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI' ? inputTypesGroup : inputTypes"></thanh-phan-ho-so>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </div> -->
-          <!--  -->
-          <div style="position: relative;" v-if="formCode === 'NEW_GROUP_CV_DI'">
-            <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-              <v-expansion-panel-content>
-                <div slot="header" style="display: flex; align-items: center;">
-                  <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                  <span>Danh sách hồ sơ</span>
-                  &nbsp;&nbsp;&nbsp;&nbsp;
-                </div>
-                <div>
-                  <div class="mb-3" v-if="dossiersIntoGroupRender.length > 0">
-                    <v-data-table
-                      :headers="headersCV"
-                      :items="dossiersIntoGroupRenderTemp"
-                      hide-actions
-                      class="table-landing table-bordered"
-                      item-key="dossierId"
-                    >
-                      <!--  -->
-                      <template slot="headers" slot-scope="props">
-                        <tr>
-                          <th
-                            v-for="header in headersCV"
-                            :key="header.text"
-                            :class="header['class'] ? header['class'] : ''"
-                            :width="header['width'] ? header['width'] + 'px' : ''"
-                          >
-                            <v-tooltip bottom>
-                              <span slot="activator">{{ header.text }}</span>
-                              <span>{{ header.text }}</span>
-                            </v-tooltip>
-                          </th>
-                        </tr>
-                      </template>
-                      <!--  -->
-                      <template slot="items" slot-scope="props">
-                        <tr style="cursor: pointer">
-                          <td class="text-xs-center" width="50px" style="height: 40px !important">
-                            <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
-                          </td>
-                          <td class="text-xs-left" width="150px" style="height: 40px !important">
-                            <span :style="formCode === 'NEW_GROUP_CV_DI' && String(formActionGroup['stepCode']) !== String(props.item.stepCode) ? 'text-decoration: underline;color: red;' : ''">
-                              {{ props.item.dossierNo }}
-                            </span><br> 
-                            <span v-if="formCode === 'NEW_GROUP_CV_DI' && String(formActionGroup['stepCode']) !== String(props.item.stepCode)" style="color: red;">Hồ sơ đã xử lý</span>
-                          </td>
-                          <td class="text-xs-left" width="150px" style="height: 40px !important">
-                            {{ props.item.applicantName }}
-                          </td>
-                          <td class="text-xs-left" width="100px" style="height: 40px !important">
-                            <span v-if="getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateDay') && getMetaData(props.item).hasOwnProperty('birthDateMonth') && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateDay}}/</span>
-                            <span v-if="props.item && getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateMonth') && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateMonth}}/</span>
-                            <span v-if="props.item && getMetaData(props.item) && getMetaData(props.item).hasOwnProperty('birthDateYear')">{{getMetaData(props.item).birthDateYear}} </span>
-                          </td>
-                          <td class="text-xs-left"  style="height: 40px !important">
-                            <span v-if="props.item.address">{{props.item.address}}, </span>
-                            <span v-if="props.item.wardName">{{props.item.wardName}}, </span>
-                            <span v-if="props.item.districtName">{{props.item.districtName}}, </span>
-                            <span v-if="props.item.cityName">{{props.item.cityName}} </span>
-                          </td>
-                          <td class="text-xs-left" width="100px" style="height: 40px !important">
-                            <span v-if="props.item.metaData && getMetaData(props.item) && getMetaData(props.item).yearPayment">{{getMetaData(props.item).yearPayment}} </span>
-                          </td>
-                          <td class="text-xs-left" width="100px" style="height: 40px !important">
-                            <span v-if="props.item.metaData && getMetaData(props.item) && getMetaData(props.item).subsidy">{{currency(getMetaData(props.item).subsidy)}} </span>
-                          </td>
-                          <td class="text-xs-left" width="100px" style="height: 40px !important">
-                            <span v-if="props.item.dossierStatusText">{{props.item.dossierStatusText}} </span>
-                          </td>
-                          <td class="text-xs-left" width="100px" style="height: 40px !important">
-                            <span v-if="props.item.applicantNote">{{props.item.applicantNote}} </span>
-                          </td>
-                          
-                          <td class="text-xs-center" width="120px" style="height: 40px !important">
-                            <v-btn flat icon color="indigo" class="mr-2 my-0" @click="viewDetail(props.item)" title="Xem chi tiết">
-                              <v-icon>fas fa fa-file-text</v-icon>
-                            </v-btn>
-                            <v-btn flat icon color="red" class="my-0" @click="removeDossierFromGroup(props.item)" title="Xóa khỏi công văn">
-                              <v-icon size="22">delete</v-icon>
-                            </v-btn>
-                          </td>
-                        </tr>
-                      </template>
-                    </v-data-table>
-                    <v-layout wrap class="mt-3 ml-3">
-                      <v-flex xs12 sm2 class="pt-2">
-                        <span>Tổng số hồ sơ xử lý: </span>
-                        <span class="text-bold">{{dossiersCounterIntoGroupFilter}} </span>
-                      </v-flex>
-                      <v-flex xs12 sm3 class="pt-2">
-                        <span>Tổng số tiền: </span>
-                        <span class="text-bold">{{currency(totalFee)}} đồng</span>
-                      </v-flex>
-                      <v-flex xs12 sm7>
-                        <div  class="text-xs-center layout wrap pr-1" style="position: relative;">
-                          <div class="flex pagging-table px-2">
-                            <tiny-pagination :showLimit="true" :total="dossiersIntoGroupRender.length" :showTotal="false" :currentLimit="30" :page="pagination.page" custom-class="custom-tiny-class" 
-                              @tiny:change-page="paggingData" ></tiny-pagination> 
-                          </div>
-                        </div>
-                      </v-flex>
-                    </v-layout>
-                    <div v-if="formCode === 'NEW_GROUP_CV_DI' && hoSoDaXuLy.length > 0" class="ml-2">
-                      <v-icon color="red darken-2" size="24">report_problem</v-icon> &nbsp;
-                      <span style="font-size:14px">Hồ sơ 
-                        <span style="font-weight: bold;">{{hoSoDaXuLyList}}</span>
-                       đã xử lý. Vui lòng xóa khỏi công văn trước khi gửi.
-                      </span>
-                    </div>
-                  </div>
-                  <div v-else class="pl-5 py-2">Chưa có hồ sơ nào</div>
-                  <v-flex xs12 class="text-right mb-3 mr-2" v-if="formCode === 'NEW_GROUP_CV_DI' && hoSoDaXuLy.length > 0">
-                    <v-btn small color="primary" @click="removeAllDossierFromGroup" class="mx-0 my-0" >
-                      <v-icon size="20">delete</v-icon> &nbsp;
-                      <span>Xóa hồ sơ đã xử lý</span>
-                    </v-btn>
-                  </v-flex>
-                </div>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </div>
-
         </div>
         
         <v-tabs v-if="formCode !== 'NEW_GROUP_CV' && formCode !== 'NEW_GROUP_CV_DI'" icons-and-text centered class="mb-4">
@@ -418,61 +271,6 @@
             </v-btn>
           </v-tab>
         </v-tabs>
-        <v-tabs v-if="formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI'" icons-and-text centered class="mb-4">
-          <v-tab v-if="formCode === 'NEW_GROUP_CV_DI'" href="#tab-1" @click="tiepNhanCongVan('add', 'save')" class="px-0 py-0"> 
-            <v-btn flat class="" 
-              :loading="loadingAction"
-              :disabled="loadingAction"
-            >
-              <v-icon size="20">save</v-icon>  &nbsp;
-              <span>Lưu công văn</span>
-              <span slot="loader">Loading...</span>
-            </v-btn>
-          </v-tab>
-          <v-tab v-if="formCode === 'NEW_GROUP_CV_DI'" href="#tab-2" @click="tiepNhanCongVan('add', 'saveSend')" class="px-0 py-0"> 
-            <v-btn flat class="" 
-              :loading="loadingAction"
-              :disabled="loadingAction || dossiersCounterIntoGroupFilter === 0"
-            >
-              <v-icon size="20">save</v-icon>  &nbsp;
-              <span>Lưu và gửi công văn</span>
-              <span slot="loader">Loading...</span>
-            </v-btn>
-          </v-tab>
-          <v-tab v-if="formCode === 'NEW_GROUP_CV'" href="#tab-3" @click="tiepNhanCongVan('add')" class="px-0 py-0"> 
-            <v-btn flat class="" 
-              :loading="loadingAction"
-              :disabled="loadingAction"
-            >
-              <v-icon size="20">save</v-icon>  &nbsp;
-              <span>Thêm công văn</span>
-              <span slot="loader">Loading...</span>
-            </v-btn>
-          </v-tab>
-          <!-- <v-tab v-if="formCode === 'NEW_GROUP_CV_DI' && createFileCongVan" href="#tab-4" class="px-0 py-0">
-            <v-btn flat class=""
-              :loading="loadingAction"
-              :disabled="loadingAction"
-              @click=""
-            >
-              <v-icon size="18">printer</v-icon> &nbsp;
-              <span style="margin-left: -30px;">In công văn</span>
-              <span slot="loader">Loading...</span>
-            </v-btn>
-          </v-tab> -->
-          <v-tab href="#tab-5" class="px-0 py-0" @click="goBackHistory"> 
-            <v-btn flat class=""
-              :loading="loadingAction"
-              :disabled="loadingAction"
-              @click="goBackHistory"
-            >
-              <v-icon size="18">reply</v-icon> &nbsp;
-              Quay lại
-              <span slot="loader">Loading...</span>
-            </v-btn>
-          </v-tab>
-          
-        </v-tabs>
       </div>
       <!-- add new template -->
       <div v-if="formTemplate === 'version_2.0'">
@@ -534,16 +332,6 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
             </v-tab>
-            <!-- <v-tab href="#tab-4" @click="tiepNhanHoSoNewTemplate('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && formCode !== 'COPY' && tiepNhanState" class="px-0 py-0"> 
-              <v-btn flat class=""
-                :loading="loadingAction"
-                :disabled="loadingAction"
-              >
-                <v-icon size="20">note_add</v-icon>  &nbsp;
-                <span>Tiếp nhận và thêm mới</span>
-                <span slot="loader">Loading...</span>
-              </v-btn>
-            </v-tab> -->
             <v-tab href="#tab-3" @click="luuHoSo" v-if="originality === 1" class="px-0 py-0"> 
               <v-btn flat class=""
                 :loading="loadingAction"
@@ -835,8 +623,8 @@ import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
 import DichVuChuyenPhatHoSo from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatHoSo.vue'
-import ThongTinCongVan from './TiepNhan/TiepNhanHoSo_ThongTinCongVan.vue'
-import ThongTinChuHoSoCongVan from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSoCongVan.vue'
+// import ThongTinCongVan from './TiepNhan/TiepNhanHoSo_ThongTinCongVan.vue'
+// import ThongTinChuHoSoCongVan from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSoCongVan.vue'
 import TinyPagination from './pagging/opencps_pagination.vue'
 toastr.options = {
   'closeButton': true,
@@ -846,14 +634,14 @@ export default {
   props: ['index', 'id', 'formCode'],
   components: {
     'thong-tin-chu-ho-so': ThongTinChuHoSo,
-    'thong-tin-chu-ho-so-cong-van': ThongTinChuHoSoCongVan,
+    // 'thong-tin-chu-ho-so-cong-van': ThongTinChuHoSoCongVan,
     'thanh-phan-ho-so': ThanhPhanHoSo,
     'tai-lieu-chung-thuc': TaiLieuChungThuc,
     'thong-tin-chung': ThongTinChung,
     'thu-phi': LePhi,
     'dich-vu-chuyen-phat-ho-so': DichVuChuyenPhatHoSo,
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua,
-    'thong-tin-cong-van': ThongTinCongVan,
+    // 'thong-tin-cong-van': ThongTinCongVan,
     'tiny-pagination': TinyPagination
   },
   data: () => ({
@@ -878,6 +666,7 @@ export default {
     tiepNhanState: true,
     thongTinChiTietHoSo: {},
     payments: {},
+    paymentsOriginal: '',
     paymentProfile: {},
     briefNote: '',
     receiveDateEdit: '',
@@ -1067,7 +856,8 @@ export default {
     },
     applicantIdRequired :true,
     showGuiHoSoConfig: false,
-    showGuiHoSo: false
+    showGuiHoSo: false,
+    showCounterFee: false
   }),
   computed: {
     loading () {
@@ -1111,6 +901,10 @@ export default {
     }
     try {
       vm.fromViaPostalConfig = fromViaPostalConfig
+    } catch (error) {
+    }
+    try {
+      vm.showCounterFee = showCounterFee
     } catch (error) {
     }
     vm.$nextTick(function () {
@@ -1231,54 +1025,6 @@ export default {
     initData: function (data) {
       let vm = this
       let currentQuery = vm.$router.history.current.query
-      if (vm.formCode === 'NEW_GROUP_CV_DI') {
-        console.log('vm.dossiersIntoGroupRender', vm.dossiersIntoGroupRender)
-        vm.donvinhanCollection = vm.formActionGroup.hasOwnProperty('donvinhan') ? vm.formActionGroup.donvinhan : ''
-        vm.requiredCVDenGroupId = vm.formActionGroup.hasOwnProperty('requiredCVDenGroupId') ? vm.formActionGroup.requiredCVDenGroupId : ''
-        vm.requiredCVDenGovCode = vm.formActionGroup.hasOwnProperty('requiredCVDenGovCode') ? vm.formActionGroup.requiredCVDenGovCode : ''
-        vm.hasTaoQuyetDinh = vm.formActionGroup.hasOwnProperty('taoQuyetDinh') ? vm.formActionGroup.taoQuyetDinh : false
-        let totalFee = 0
-        let arr = vm.dossiersIntoGroupRender
-        vm.dossiersCounterIntoGroupFilter = arr.length
-        if (vm.formCode === 'NEW_GROUP_CV_DI') {
-          vm.dossiersCounterIntoGroupFilter = arr.filter(function (item) {
-            return String(item.stepCode) === String(vm.formActionGroup.stepCode)
-          }).length
-          vm.hoSoDaXuLy = vm.dossiersIntoGroupRender.filter(function (item) {
-            return String(item.stepCode) !== String(vm.formActionGroup.stepCode)
-          })
-          if (vm.hoSoDaXuLy.length > 0) {
-            vm.hoSoDaXuLyList = vm.hoSoDaXuLy.map(obj =>{ 
-              return obj.dossierNo
-            }).toString()
-          }
-        }
-        if (arr && arr.length > 0) {
-          for (let i = 0; i < arr.length; i++) {
-            if (vm.formCode === 'NEW_GROUP_CV_DI') {
-              if (String(arr[i].stepCode) === String(vm.formActionGroup.stepCode)) {
-                let metaData = vm.getMetaData(arr[i])
-                let fee = 0
-                if (metaData) {
-                  let trocapmotlan = metaData.hasOwnProperty('trocapmotlan') && metaData['trocapmotlan'] ? true : false
-                  fee = trocapmotlan ? Number(metaData['subsidy']) : Number(metaData['yearPayment'])*Number(metaData['subsidy'])
-                  totalFee += fee
-                }
-              }
-            } else {
-              let metaData = vm.getMetaData(arr[i])
-              let fee = 0
-              if (metaData) {
-                let trocapmotlan = metaData.hasOwnProperty('trocapmotlan') && metaData['trocapmotlan'] ? true : false
-                fee = trocapmotlan ? Number(metaData['subsidy']) : Number(metaData['yearPayment'])*Number(metaData['subsidy'])
-                totalFee += fee
-              }
-            }
-          }
-          vm.dossiersIntoGroupRenderTemp = arr.slice(0, vm.pagination.rowsPerPage )
-          vm.totalFee = totalFee
-        }
-      }
       let filter = {
         dossierTemplateNo: currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
       }
@@ -1378,7 +1124,19 @@ export default {
                     vm.durationPhase = resAction && resAction.receiving && resAction.receiving.hasOwnProperty('durationPhase') ? resAction.receiving.durationPhase : ''
                     if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
                       vm.showThuPhi = true
-                      vm.payments = resAction.payment
+                      vm.paymentsOriginal = resAction.payment
+                      let dataJson = ''
+                      try {
+                        dataJson = JSON.parse(resAction.payment['paymentNote'])
+                        if (dataJson) {
+                          dataJson = Object.assign(dataJson, {
+                            editable: resAction.payment['editable'],
+                            requestPayment: resAction.payment['requestPayment']
+                          })
+                        }
+                      } catch (error) {
+                      }
+                      vm.payments = dataJson ? dataJson : resAction.payment
                     }
                     // call initData thong tin chung ho so
                     if (vm.$refs.thongtinchunghoso) {
@@ -1605,7 +1363,7 @@ export default {
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
             // cập nhật notify config
-            vm.updateNotifyConfig()
+            vm.updateMetaData()
           }, 500)
         }
       }
@@ -1687,6 +1445,19 @@ export default {
                     serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
                     shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
                   }
+                  if (vm.payments && vm.payments.hasOwnProperty('counter')) {
+                    let dataNote = ''
+                    try {
+                      dataNote = JSON.parse(vm.paymentsOriginal['paymentNote'])
+                      dataNote.paymentNote = vm.payments['paymentNote']
+                      dataNote.counter = vm.payments['counter']
+                    } catch (error) {
+                    }
+                    paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
+                    paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
+                    paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
+                    paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
+                  }
                   if (vm.isNotarization) {
                     let dataNotarization = vm.$refs.tailieuchungthuc.dataExport()
                     paymentsOut.feeAmount = dataNotarization.feeTotal
@@ -1759,7 +1530,7 @@ export default {
               toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
-            vm.updateNotifyConfig()
+            vm.updateMetaData()
           }
 
           if (!vm.mauCongVan) {
@@ -2017,7 +1788,7 @@ export default {
             })
           })
           // 
-          vm.updateNotifyConfig()
+          vm.updateMetaData()
         }).catch(reject => {
         })
       }
@@ -2080,7 +1851,7 @@ export default {
           toastr.error('Yêu cầu của bạn thực hiện thất bại')
         })
         // 
-        vm.updateNotifyConfig()
+        vm.updateMetaData()
       })
     },
     // 
@@ -2172,9 +1943,9 @@ export default {
         }
       })
     },
-    updateNotifyConfig () {
+    updateMetaData () {
       let vm = this
-      if (!vm.notifyConfig || vm.originality !== 3) {
+      if (vm.originality !== 3 || !vm.notifyConfig) {
         return
       }
       let filter = {
@@ -2182,7 +1953,7 @@ export default {
         smsNotify: vm.smsNotify,
         emailNotify: vm.emailNotify
       }
-      vm.$store.dispatch('putNotifyConfig', filter).then(result => {})
+      vm.$store.dispatch('updateMetaData', filter).then(result => {})
     },
     showHDTT () {
       let vm = this
