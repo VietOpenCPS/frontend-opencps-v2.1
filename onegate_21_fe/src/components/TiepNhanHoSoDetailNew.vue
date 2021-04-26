@@ -1573,7 +1573,7 @@ export default {
                         }
                       }
                       if(vm.data_form_template === 'formHPH'){
-                        if(e.partNo === 'TP01'){
+                        if(e.partNo === 'TP01' && e.eForm){
                           let dataPUTDossierFile = {
                             id: vm.id,
                             referenceUid: e.referenceUid,

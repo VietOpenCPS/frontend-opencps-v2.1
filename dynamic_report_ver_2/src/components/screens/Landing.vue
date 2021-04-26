@@ -2772,8 +2772,12 @@ export default {
           if (indexChildren) {
             console.log('filters', vm.filters)
             console.log('data', vm.data)
+            let keySearch = item['key']
+            if (item.hasOwnProperty('keySearch')) {
+              keySearch = item['keySearch']
+            }
             vm.filters[indexChildren]['api'] = vm.filters[indexChildren]['api'].split('?')[0]
-            vm.filters[indexChildren]['api'] += '?' + item['key'] + '=' + vm.data[item['key']].toString()
+            vm.filters[indexChildren]['api'] += '?' + keySearch + '=' + vm.data[item['key']].toString()
             vm.$store.dispatch('loadDataSource', vm.filters[indexChildren]).then(function(result) {
               vm.filters[indexChildren]['source'] = result
               if (vm.filters[indexChildren]['appendItem']) {

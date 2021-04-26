@@ -113,10 +113,15 @@
                         v-model="eFormCode"
                         solo
                         @keyup.enter="getDataEform()"
+                        :disabled="formCode==='UPDATE'"
                     ></v-text-field>
-                    <v-btn small color="primary" @click="getDataEform()" class="ml-2 mt-0" style="height: 32px;">
+                    <v-btn :disabled="formCode==='UPDATE'" small color="primary" @click="getDataEform()" class="ml-2 mt-0" style="height: 32px;">
                         <v-icon>save_alt</v-icon>&nbsp; Lấy dữ liệu
                     </v-btn>
+                </div>
+                <div class="my-2" v-if="eFormCodeArr.length > 0">
+                    <span style="color: red">(*) </span> 
+                    Mã tờ khai đã lấy dữ liệu: <span style="font-size: 14px;font-weight: bold">{{eFormCodeArr.toString()}}</span>
                 </div>
             </v-flex>
             <v-flex xs12 class="px-2 ">
@@ -140,12 +145,12 @@
                         <td class="py-2">{{props.item.So_Cong_Van}}</td>
                         <td class="py-2">{{props.item.Ngay_Cong_Van}}</td>
                         <td class="py-2">{{props.item.Cq_Ca_Nhan_Cong_Van}}</td>
-                        <td class="text-xs-center">
+                        <td class="text-xs-center" style="width: 80px">
                             <v-btn flat icon color="primary" @click="openDialogUpdateVanBan(props.index,props.item)">
                                 <v-icon>create</v-icon>
                             </v-btn>
                         </td>
-                        <td class="text-xs-center">
+                        <td class="text-xs-center" v-if="formCode !== 'UPDATE'" style="width: 80px">
                             <v-btn flat icon color="#F44336" @click="deleteVanBan(props.index)">
                                 <v-icon>delete</v-icon>
                             </v-btn>
@@ -191,12 +196,13 @@
                                     Chưa có văn bản quyết định
                                 </span>
                             </td>
-                            <td class="text-xs-center">
+                            <td>{{props.item.Ma_To_Khai ? props.item.Ma_To_Khai : ''}}</td>
+                            <td class="text-xs-center" style="width: 80px">
                                 <v-btn flat icon color="primary" @click="openDialogUpdateThanhVien(props.index,props.item)">
                                     <v-icon>create</v-icon>
                                 </v-btn>
                             </td>
-                            <td class="text-xs-center">
+                            <td class="text-xs-center" v-if="formCode !== 'UPDATE'" style="width: 80px">
                                 <v-btn flat icon color="#F44336" @click="deleteThanhVien(props.index)">
                                     <v-icon>delete</v-icon>
                                 </v-btn>
@@ -254,8 +260,8 @@
                     </template>
                 </v-data-table>
             </v-flex>
-            <v-flex xs12 sm4 class="px-2 my-2">
-                <label for="">Số người <span class="red--text">*</span></label>
+            <!-- <v-flex xs12 sm4 class="px-2 my-2">
+                <label for="">Số người </label>
                 <v-text-field
                     v-model="so_nguoi"
                     solo
@@ -271,7 +277,7 @@
                     type="number"
                     @change="changLePhi()"
                 ></v-text-field>        
-            </v-flex>
+            </v-flex> -->
             <v-flex xs12 sm4  class="px-2 my-2">
                 <label for="">Ngày hẹn trả <span class="red--text">*</span></label><br/>
                 <!-- <v-text-field
@@ -296,15 +302,15 @@
                         persistent-hint
                         append-icon="event"
                         hint="DD/MM/YYYY"
-                        
-                        @change="dateDueDate = parseDate(dateDueDateFormated)"
+                        @change="changeNgayHenTra()"
+                        @input="inputNgayHenTra()"
                         :rules="[rules.required, rules.checkDateFuture]"
-                        
+                        required
                     ></v-text-field>
-            
                     <!-- <v-date-picker v-model="dateDueDate" no-title @input="menu5 = false" locale="vi"></v-date-picker>
                 </v-menu>       -->
             </v-flex>
+            <v-flex xs12 sm8  class="px-2 my-2"></v-flex>
             <v-flex xs12 sm4  class="px-2 ">
                 <v-checkbox
                     v-model="viaPostal"
@@ -1359,6 +1365,11 @@ export default {
                 sortable: false
             },
             {
+                text: 'Mã tờ khai',
+                align: 'center',
+                sortable: false
+            },
+            {
                 text: 'Sửa',
                 align: 'center',
                 sortable: false
@@ -1780,6 +1791,10 @@ export default {
             setTimeout(()=>{
                 if(vm.formCode==='UPDATE'){
                     vm.getDetail()
+                    let lengthHeaderVanBan = vm.headerVanBan.length
+                    let lengthHeaderThanhVien = vm.headerThanhVien.length
+                    vm.headerVanBan.splice(lengthHeaderVanBan - 1, 1)
+                    vm.headerThanhVien.splice(lengthHeaderThanhVien - 1, 1)
                 } else {                   
                     vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [], 'ma_to_khai': [], 'totalRecord': 0, 'delegateIdNo': '','delegateName': '','delegateTelNo': '', 'durationCountMeta': 4})
                     vm.getThanhPhan()
@@ -2021,11 +2036,12 @@ export default {
                         }
                         
                         vm.dossierFileArr.push(tg)
-                        if(data[i]['dossierPartNo'] === 'TP01'){
+                        if(data[i]['dossierPartNo'] === 'TP01' && data[i]['eForm']){
                             let formData = JSON.parse(data[i]['formData'])
                             vm.listThanhVien = formData.thanh_vien_doan
+                            vm.so_nguoi = vm.listThanhVien.length
                         }
-                        if(data[i]['dossierPartNo'] === 'TP02'){
+                        if(data[i]['dossierPartNo'] === 'TP02' && data[i]['eForm']){
                             let formData = JSON.parse(data[i]['formData'])
                             vm.listVanBan = formData.van_ban
                             vm.fillCheckBox()
@@ -2171,7 +2187,6 @@ export default {
                         let metaData = JSON.parse(vm.dossiers['metaData'])
                         metaData['ma_to_khai'].push(vm.eFormCode)
                         vm.dossiers['metaData'] = JSON.stringify(metaData)
-                        vm.eFormCode = ''
                         if(res.data.auth){
                             vm.auth = res.data.auth
                         }
@@ -2237,7 +2252,8 @@ export default {
                             } 
                         }
                         vm.changeDossier()            
-                        vm.fillDataEform(res.data)
+                        vm.fillDataEform(res.data, vm.eFormCode)
+                        vm.eFormCode = ''
                     } else {
                         vm.eFormCode = ''
                         toastr.clear()
@@ -2269,11 +2285,11 @@ export default {
                 }).catch({})
             }
         },
-        fillDataEform (res) {
+        fillDataEform (res, eFormCode) {
             let vm = this
             if(Object.keys(res).length !== 0 && res.constructor === Object){
                 // vm.fillTableVanBan(res);
-                vm.fillTableThanhVien(res);
+                vm.fillTableThanhVien(res, eFormCode);
             }
             
         },
@@ -2309,7 +2325,7 @@ export default {
             }
 
         },
-        fillTableThanhVien (res) {
+        fillTableThanhVien (res, eFormCode) {
             let vm = this
             let tk = {
                 kiem_tra: false,
@@ -2329,7 +2345,7 @@ export default {
                 Dia_Chi_Thuong_Tru: null,
                 So_Ho_Chieu: res.So_Ho_Chieu,
                 Han_Hc: vm.dateDef(res.Han_Hc),
-                Ma_To_Khai: vm.eFormCode,
+                Ma_To_Khai: eFormCode,
                 Loai_Ho_Chieu: res.Loai_Ho_Chieu,
                 Noi_Cap_Hc_Id: res.Noi_Cap_Hc_Id,
                 Noi_Cap_Hc_Id_Text: res.Noi_Cap_Hc_Id_Text,
@@ -2562,7 +2578,8 @@ export default {
                     Ma_Cq_Ca_Nhan_Cong_Van: vm.co_quan_chu_quan.CQID.toString(),
                     Ngay_Cong_Van: vm.vb_ngay_ky,
                     Loai_Cong_Van: vm.loaiVanBan ? vm.loaiVanBan.itemName : '',
-                    Ma_Loai_Cong_Van: vm.loaiVanBan ? vm.loaiVanBan.itemCode : ''
+                    Ma_Loai_Cong_Van: vm.loaiVanBan ? vm.loaiVanBan.itemCode : '',
+                    De_Nghi_Khac: vm.de_nghi_khac ? vm.de_nghi_khac : ''
                 }
                 if(vm.update_cqcq === 'add'){
                     vm.listVanBan.push(tg)
@@ -2724,7 +2741,7 @@ export default {
                     return item
                 })
                 let tk = {
-                    kiem_tra: false,
+                    kiem_tra: true,
                     Id: null,
                     Ca_Nhan_Id: null,
                     Buoc_Xl: 'DA_NHAP_TO_KHAI',
@@ -2924,25 +2941,14 @@ export default {
             vm.$refs.formNguoiDiCung.resetValidation()
             vm.$refs.formThanNhan.resetValidation()
         },
-        openDialogUpdateVanBan(index,item){
+        openDialogUpdateVanBan(index, item){
             let vm = this
             vm.update_cqcq = index
-            // vm.vb_so_hieu_van_ban = item.vb_so_hieu_van_ban
-            // vm.co_quan_chu_quan =vm.listCoQuanChuQuan.find(e=>e.CQTen === item.vb_co_quan_chu_quan) 
-            // vm.vb_ngay_ky = item.vb_ngay_ky
-            // vm.vb_co_quan_tieng_anh = item.vb_co_quan_tieng_anh
-            // setTimeout(()=>{
-            //     vm.vb_nguoi_ky = vm.listVanBanNguoiKy.find( e=> e.ID === item.vb_nguoi_ky)
-            // }, 1000)
-            // vm.dialogThemVanBan = true
-
             vm.so_van_ban = item.So_Cong_Van
             vm.co_quan_chu_quan =vm.listCoQuanChuQuan.find(e=>e.CQID == item.Ma_Cq_Ca_Nhan_Cong_Van) 
             vm.vb_ngay_ky = item.Ngay_Cong_Van
-            vm.van_ban_de_nghi = vm.listVanBanDeNghi.find(e=>e.ID == item.Ma_Loai_Cong_Van)
-            // setTimeout(()=>{
-            //     vm.vb_nguoi_ky = vm.listVanBanDeNghi.find( e=> e.ID === item.vb_nguoi_ky)
-            // }, 1000)
+            vm.loaiVanBan = vm.listLoaiVanBan.find(e=>e.itemCode == item.Ma_Loai_Cong_Van)
+            vm.de_nghi_khac = item.De_Nghi_Khac
             vm.dialogThemVanBan = true
         },
         openDialogUpdateThanhVien (index,item) {
@@ -3134,7 +3140,7 @@ export default {
                 }     
             });
             vm.payment = {"requestPayment":1,"paymentNote":"","advanceAmount":0,"feeAmount":le_phi,"serviceAmount":0,"shipAmount":0}
-            console.log(vm.dossiers['metaData'] , typeof vm.dossiers['metaData'])   
+            // console.log(vm.dossiers['metaData'] , typeof vm.dossiers['metaData'])   
             let hs = JSON.parse(vm.dossiers['metaData']);
             hs['dossierFilePayment'] = file_payment2
             vm.dossiers['metaData'] = JSON.stringify(hs)
@@ -3558,6 +3564,15 @@ export default {
         inputNgayDuKienXk(){
             let vm = this
             vm.inputDate('dateNgayDuKienXkFormated')
+        },
+        changeNgayHenTra () {
+            let vm = this
+            vm.changeDate('dateDueDateFormated')
+            vm.dateDueDate = vm.parseDate(vm.dateDueDateFormated)
+        },
+        inputNgayHenTra(){
+            let vm = this
+            vm.inputDate('dateDueDateFormated')
         },
         changeNgaySinh(){
             let vm = this

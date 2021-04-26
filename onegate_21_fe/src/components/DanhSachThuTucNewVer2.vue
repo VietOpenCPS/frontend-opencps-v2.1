@@ -812,7 +812,14 @@
             let urlRedirect = url
             try {
               if (vm.useJwt) {
-                urlRedirect = url.split('?').length > 1 ? url + '&token=' + localStorage.getItem('jwt_token') : url + '?token=' + localStorage.getItem('jwt_token')
+                let serviceConfigId = itemServiceConfig ? itemServiceConfig['serviceConfigId'] : govAgencyCodeSelect['serviceConfigId']
+                let token = localStorage.getItem('jwt_token')
+                let templateNo = item['templateNo']
+                let groupId = window.themeDisplay.getScopeGroupId()
+                let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId
+                urlRedirect = url.split('?').length > 1 ? url + '&' + paramsAdd : url + '?' + paramsAdd
+
+                // urlRedirect = url.split('?').length > 1 ? url + '&token=' + localStorage.getItem('jwt_token') : url + '?token=' + localStorage.getItem('jwt_token')
               }
             } catch (error) {
             }

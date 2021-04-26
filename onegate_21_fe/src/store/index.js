@@ -349,9 +349,11 @@ export const store = new Vuex.Store({
             year: filter.year ? filter.year : 0,
             month: filter.month ? filter.month : 0,
             day: filter.day ? filter.day : 0,
-            top: filter.top ? filter.top : '',
             dossierNo: filter.dossierNo ? filter.dossierNo : '',
             paymentStatus: filter.paymentStatus ? filter.paymentStatus : ''
+          }
+          if (filter.queryParams.indexOf('top=') < 0) {
+            paramSearch.top = filter.top ? filter.top : ''
           }
           if (filter['follow']) {
             paramSearch.follow = filter.follow
@@ -500,12 +502,14 @@ export const store = new Vuex.Store({
             year: filter.year ? filter.year : 0,
             month: filter.month ? filter.month : 0,
             day: filter.day ? filter.day : 0,
-            top: filter.top ? filter.top : '',
             dossierNo: filter.dossierNo ? filter.dossierNo : '',
             viapostal: filter.viapostal ? filter.viapostal : ''
           }
           if (filter['originality']) {
             paramSearch['originality'] = filter.originality
+          }
+          if (filter.queryParams.indexOf('top=') < 0) {
+            paramSearch.top = filter.top ? filter.top : ''
           }
           let param = {
             headers: {
@@ -3758,8 +3762,6 @@ export const store = new Vuex.Store({
             params: {
             }
           }
-          // test local
-          // axios.get('http://127.0.0.1:8080/api/serviceinfos/' + data.serviceConfigId + '/processes', param).then(function (response) {
           axios.get(state.initData.getServiceConfigs + '/' + data.serviceConfigId + '/processes', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {

@@ -9,9 +9,10 @@
                             v-model="eFormCode"
                             solo
                             @keyup.enter="getDataEform()"
+                            :disabled="formCode==='UPDATE'"
                         ></v-text-field>
                     </div>
-                    <v-btn small color="primary" @click="getDataEform()" class="ml-2 mt-0" style="height: 32px;">
+                    <v-btn small color="primary" @click="getDataEform()" :disabled="formCode==='UPDATE'" class="ml-2 mt-0" style="height: 32px;">
                         <v-icon>save_alt</v-icon>&nbsp; Lấy dữ liệu
                     </v-btn>
                 </div>
@@ -146,7 +147,7 @@
                         <td>{{props.item.ten_giay_to}}</td>
                         <td>{{props.item.loai_giay_to}}</td>
                         <td>{{props.item.ten_nguoi_duoc_cap}}</td>
-                        <td>{{props.item.so_ban}}</td>
+                        <td class="text-xs-center">{{props.item.so_ban}}</td>
                         <td>{{props.item.so_hieu_giay_to}}</td>
                         <td>{{props.item.co_quan_cap}}</td>
                         <td>{{props.item.nguoi_ky}}</td>
@@ -157,12 +158,12 @@
                                 <v-icon>create</v-icon>
                             </v-btn>
                         </td>
-                        <td>
+                        <td v-if="formCode !== 'UPDATE'">
                             <v-btn flat icon color="primary" @click="openDialogCopyGiayTo(props.index,props.item)">
                                 <v-icon>file_copy</v-icon>
                             </v-btn>
                         </td>
-                        <td>
+                        <td v-if="formCode !== 'UPDATE'">
                             <v-btn flat icon color="#F44336" @click="deleteGiayTo(props.index)">
                                 <v-icon>delete</v-icon>
                             </v-btn>
@@ -297,7 +298,7 @@
             <v-flex xs12  class="px-2 ">
                 <label for="">Ghi chú</label>
                 <v-textarea
-                    v-model="dossiers.dossierNote"
+                    v-model="dossiers.briefNote"
                     name="input-7-1" 
                     solo   
                 ></v-textarea>
@@ -980,7 +981,7 @@ export default {
             "postalTelNo": "",
             "sampleCount": 1,
             "dueDate": '',
-            "dossierNote": '',
+            "briefNote": '',
             "Doan_HCTN": '',
             "dossierFilePayment": '',
             "metaData": '{}'
@@ -998,6 +999,8 @@ export default {
             vm.eFormCode = currentQuery.hasOwnProperty('eformCode') && currentQuery.eformCode ? currentQuery.eformCode : ''
             if(vm.formCode==='UPDATE'){
                 vm.getDetail()
+                let lengthHeader = vm.headerGiayTo.length
+                vm.headerGiayTo.splice(lengthHeader - 2, 2)
             } else {
                 vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [],  'totalRecord': 0, 'ma_to_khai':[], 'durationCountMeta': 2, })
                 vm.getThanhPhan()
@@ -1271,6 +1274,7 @@ export default {
                 }
                 if(metaData.ma_to_khai){
                     vm.eFormCodeArr = metaData.ma_to_khai
+                    vm.eFormCode = metaData.ma_to_khai
                 }
                 vm.dossiers = res.data
                 vm.dossiers['bookingName'] = res.data['applicantName']
@@ -1298,13 +1302,14 @@ export default {
                         let tg = {
                             partNo: data[i]['dossierPartNo'],
                             formData: data[i]['formData'],
-                            eform: 'true',
+                            eform: data[i]['eForm'],
                             referenceUid: data[i]['referenceUid']
                         }
                         vm.dossierFileArr.push(tg)
-                        if(data[i]['dossierPartNo'] === 'TP01'){
+                        if(data[i]['dossierPartNo'] === 'TP01' && data[i]['eForm']){
                             let formData = JSON.parse(data[i]['formData'])
                             vm.listGiayTo = formData.list_giay_to
+                            console.log('listGiayTo-1', vm.listGiayTo)
                             vm.checkCKCD()
                             vm.de_nghi_chung_nhan = formData.de_nghi_chung_nhan
                             vm.changeDeNghiChungNhan()
@@ -1320,6 +1325,7 @@ export default {
                             vm.tongSoBanTG = vm.tongSoBan
                             vm.computeDate()
                             vm.genLePhi()
+                            console.log('listGiayTo-2', vm.listGiayTo)
                         }
                     }
                 }
@@ -1554,178 +1560,157 @@ export default {
         },
         getDataEform() {
             let vm = this
-            let checkEformCode = vm.eFormCodeArr.find(e => e === vm.eFormCode)
-            if(checkEformCode){
-                vm.eFormCode = ''
-                toastr.error('Không hợp lệ. Mã tờ khai đã được lấy dữ liệu')
-            } else {
-                let config = {
-                    url: '/o/rest/v2/serverconfigs/SERVER_EFORM_DATA_DVC/protocols/API_CONNECT?eFormNo=' + vm.eFormCode,
-                    headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
-                }
-                axios.request(config).then(res => {
-                    if(Object.keys(res.data).length !== 0 && res.data.constructor === Object){
-                        if(Array.isArray(res.data.list_giay_to) && res.data.list_giay_to.length){
-                            vm.eFormCodeArr.push(vm.eFormCode)
-                            let metaData = JSON.parse(vm.dossiers['metaData'])
-                            metaData['ma_to_khai'].push(vm.eFormCode)
-                            vm.dossiers['metaData'] = JSON.stringify(metaData)
-                            vm.eFormCode = ''
-                            if(res.data.auth) {
-                                vm.auth = res.data.auth
-                            }
-                            
-                            // if(res.data.bookingName) {
-                            //     vm.dossiers.delegateName = res.data.bookingName
-                            //     vm.dossiers.applicantName = res.data.bookingName
-                            // }
-                            // if(res.data.so_cmnd) {
-                            // vm.dossiers.delegateIdNo = res.data.so_cmnd
-                            // }
-                            // if(res.data.dien_thoai) {
-                            //     vm.dossiers.delegateTelNo = res.data.dien_thoai
-                            // }
-                            // if(res.data.email) {
-                            //     vm.dossiers.delegateEmail = res.data.email
-                            // }
-                            // if(res.data.dia_chi) {
-                            //     vm.dossiers.delegateAddress = res.data.dia_chi.length < 100 ? res.data.dia_chi : ''
-                            //     vm.dossiers.address = res.data.dia_chi.length < 100 ? res.data.dia_chi : ''
-                            // }
-                        if(!vm.dossiers.delegateName){
-                                if(res.data.delegateName) {
-                                    vm.dossiers.delegateName = res.data.delegateName
+            if (vm.formCode !== 'UPDATE') {
+                let checkEformCode = vm.eFormCodeArr.find(e => e === vm.eFormCode)
+                if (checkEformCode) {
+                    vm.eFormCode = ''
+                    toastr.error('Không hợp lệ. Mã tờ khai đã được lấy dữ liệu')
+                } else {
+                    let config = {
+                        url: '/o/rest/v2/serverconfigs/SERVER_EFORM_DATA_DVC/protocols/API_CONNECT?eFormNo=' + vm.eFormCode,
+                        headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                    }
+                    axios.request(config).then(res => {
+                        if (Object.keys(res.data).length !== 0 && res.data.constructor === Object) {
+                            if (Array.isArray(res.data.list_giay_to) && res.data.list_giay_to.length) {
+                                vm.eFormCodeArr.push(vm.eFormCode)
+                                let metaData = JSON.parse(vm.dossiers['metaData'])
+                                metaData['ma_to_khai'].push(vm.eFormCode)
+                                vm.dossiers['metaData'] = JSON.stringify(metaData)
+                                vm.eFormCode = ''
+                                if (res.data.auth) {
+                                    vm.auth = res.data.auth
                                 }
-                            }
-                            if(!vm.dossiers.delegateIdNo){
-                                if(res.data.delegateIdNo) {
-                                    vm.dossiers.delegateIdNo = res.data.delegateIdNo
+                                
+                                // if(res.data.bookingName) {
+                                //     vm.dossiers.delegateName = res.data.bookingName
+                                //     vm.dossiers.applicantName = res.data.bookingName
+                                // }
+                                // if(res.data.so_cmnd) {
+                                // vm.dossiers.delegateIdNo = res.data.so_cmnd
+                                // }
+                                // if(res.data.dien_thoai) {
+                                //     vm.dossiers.delegateTelNo = res.data.dien_thoai
+                                // }
+                                // if(res.data.email) {
+                                //     vm.dossiers.delegateEmail = res.data.email
+                                // }
+                                // if(res.data.dia_chi) {
+                                //     vm.dossiers.delegateAddress = res.data.dia_chi.length < 100 ? res.data.dia_chi : ''
+                                //     vm.dossiers.address = res.data.dia_chi.length < 100 ? res.data.dia_chi : ''
+                                // }
+                            if(!vm.dossiers.delegateName){
+                                    if(res.data.delegateName) {
+                                        vm.dossiers.delegateName = res.data.delegateName
+                                    }
                                 }
-                            }
-                            if(!vm.dossiers.delegateTelNo){
-                                if(res.data.delegateTelNo) {
-                                    vm.dossiers.delegateTelNo = res.data.delegateTelNo
+                                if(!vm.dossiers.delegateIdNo){
+                                    if(res.data.delegateIdNo) {
+                                        vm.dossiers.delegateIdNo = res.data.delegateIdNo
+                                    }
                                 }
-                            }
-                            if(!vm.dossiers.delegateAddress){
-                                if(res.data.delegateAddress ){
-                                    vm.dossiers.delegateAddress = res.data.delegateAddress.length < 100 ? res.data.delegateAddress : ''
-                                } 
-                            }
-                            if(!vm.dossiers.delegateEmail){
-                                if(res.data.delegateEmail ){
-                                    vm.dossiers.delegateEmail = res.data.delegateEmail
-                                } 
-                            }
-                            if(!vm.dossiers.applicantName){
-                                if(res.data.delegateName) {
-                                    vm.dossiers.applicantName = res.data.delegateName
+                                if(!vm.dossiers.delegateTelNo){
+                                    if(res.data.delegateTelNo) {
+                                        vm.dossiers.delegateTelNo = res.data.delegateTelNo
+                                    }
                                 }
-                            }
-                            if(!vm.dossiers.applicantIdNo){
-                                if(res.data.applicantIdNo) {
-                                    vm.dossiers.applicantIdNo = res.data.applicantIdNo
+                                if(!vm.dossiers.delegateAddress){
+                                    if(res.data.delegateAddress ){
+                                        vm.dossiers.delegateAddress = res.data.delegateAddress.length < 100 ? res.data.delegateAddress : ''
+                                    } 
                                 }
-                            }
-                            if(!vm.dossiers.contactTelNo){
-                                if(res.data.contactTelNo) {
-                                    vm.dossiers.contactTelNo = res.data.contactTelNo
+                                if(!vm.dossiers.delegateEmail){
+                                    if(res.data.delegateEmail ){
+                                        vm.dossiers.delegateEmail = res.data.delegateEmail
+                                    } 
                                 }
-                            }
-                            if(!vm.dossiers.contactEmail){
-                                if(res.data.contactEmail) {
-                                    vm.dossiers.contactEmail = res.data.contactEmail
+                                if(!vm.dossiers.applicantName){
+                                    if(res.data.delegateName) {
+                                        vm.dossiers.applicantName = res.data.delegateName
+                                    }
                                 }
-                            }
-                            if(!vm.dossiers.contactName){
-                                if(res.data.delegateName) {
-                                    vm.dossiers.contactName = res.data.delegateName
+                                if(!vm.dossiers.applicantIdNo){
+                                    if(res.data.applicantIdNo) {
+                                        vm.dossiers.applicantIdNo = res.data.applicantIdNo
+                                    }
                                 }
+                                if(!vm.dossiers.contactTelNo){
+                                    if(res.data.contactTelNo) {
+                                        vm.dossiers.contactTelNo = res.data.contactTelNo
+                                    }
+                                }
+                                if(!vm.dossiers.contactEmail){
+                                    if(res.data.contactEmail) {
+                                        vm.dossiers.contactEmail = res.data.contactEmail
+                                    }
+                                }
+                                if(!vm.dossiers.contactName){
+                                    if(res.data.delegateName) {
+                                        vm.dossiers.contactName = res.data.delegateName
+                                    }
+                                }
+                                if(!vm.dossiers.address){
+                                    if(res.data.address ){
+                                        vm.dossiers.address = res.data.address.length < 100 ? res.data.address : ''
+                                    } 
+                                }
+                                if(!vm.dossiers.bookingName){
+                                    if(res.data.delegateName ){
+                                        vm.dossiers.bookingName = res.data.delegateName
+                                    } 
+                                }
+                                if(res.data.su_dung_tai_nuoc_ma) {
+                                    vm.su_dung_tai_nuoc_ma = res.data.su_dung_tai_nuoc_ma
+                                }
+                                if(res.data.de_nghi_chung_nhan) {
+                                    // vm.de_nghi_chung_nhan = res.data.de_nghi_chung_nhan
+                                    // vm.changeDeNghiChungNhan()
+                                }
+                                vm.viaPostal = res.data.viaPostal ? true : false
+                                if(res.data.ma_muc_dich) {
+                                    vm.muc_dich = vm.listMucDichSuDung.find(e=>e.MA === res.data.ma_muc_dich)
+                                }
+                                if(res.data.ngay_cap_cmnd) {
+                                    vm.ngay_cap_cmnd = res.data.ngay_cap_cmnd
+                                }
+                                
+                                if(res.data.list_giay_to) {
+                                    vm.fillTableGiayTo(res.data.list_giay_to)
+                                }
+                                vm.changeDossier()
                             }
-                            if(!vm.dossiers.address){
-                                if(res.data.address ){
-                                    vm.dossiers.address = res.data.address.length < 100 ? res.data.address : ''
-                                } 
-                            }
-                            if(!vm.dossiers.bookingName){
-                                if(res.data.delegateName ){
-                                    vm.dossiers.bookingName = res.data.delegateName
-                                } 
-                            }
-                            if(res.data.su_dung_tai_nuoc_ma) {
-                                vm.su_dung_tai_nuoc_ma = res.data.su_dung_tai_nuoc_ma
-                            }
-                            if(res.data.de_nghi_chung_nhan) {
-                                // vm.de_nghi_chung_nhan = res.data.de_nghi_chung_nhan
-                                // vm.changeDeNghiChungNhan()
-                            }
-                            vm.viaPostal = res.data.viaPostal ? true : false
-                            if(res.data.ma_muc_dich) {
-                                vm.muc_dich = vm.listMucDichSuDung.find(e=>e.MA === res.data.ma_muc_dich)
-                            }
-                            if(res.data.ngay_cap_cmnd) {
-                                vm.ngay_cap_cmnd = res.data.ngay_cap_cmnd
-                            }
-                            
-                            if(res.data.list_giay_to) {
-                                vm.fillTableGiayTo(res.data.list_giay_to)
-                            }
-                            vm.changeDossier()
                         }
-                    }
-                    else {
-                        toastr.error('Mã tờ khai không hợp lệ')  
-                    }
-                }).catch(err => {
-                    toastr.error('Mã tờ khai không tìm thấy') 
-                })
-                // 
-                let filterGetDetailEform = {
-                    eFormNo: vm.eFormCode
-                }
-                vm.$store.dispatch('getThongTinToKhai', filterGetDetailEform).then(function (response) {
-                    console.log('eformInfomation', response)
-                    if (response && response.hasOwnProperty('eFormId') && response.hasOwnProperty('secret')) {
-                        let filterGetFileEform = {
-                            eFormId: response.eFormId,
-                            secret: response.secret
+                        else {
+                            toastr.error('Mã tờ khai không hợp lệ')  
                         }
-                        vm.$store.dispatch('getFileToKhai', filterGetFileEform).then(function (responseFile) {
-                            console.log('fileEntryId', responseFile)
-                            let partNoEform = response.fileTemplateNo.split('_')[0]
-                            let fileEform = [{fileEntryId: responseFile ? responseFile : 0, partNo: partNoEform, eform: false, displayName: 'Tờ khai - ' +  response.eFormNo}]
-                            vm.dossierFileArr = vm.dossierFileArr.concat(fileEform)
-                        }).catch(function (reject) {
-                        })
+                    }).catch(err => {
+                        toastr.error('Mã tờ khai không tìm thấy') 
+                    })
+                    // 
+                    let filterGetDetailEform = {
+                        eFormNo: vm.eFormCode
                     }
-                }).catch({})
+                    vm.$store.dispatch('getThongTinToKhai', filterGetDetailEform).then(function (response) {
+                        console.log('eformInfomation', response)
+                        if (response && response.hasOwnProperty('eFormId') && response.hasOwnProperty('secret')) {
+                            let filterGetFileEform = {
+                                eFormId: response.eFormId,
+                                secret: response.secret
+                            }
+                            vm.$store.dispatch('getFileToKhai', filterGetFileEform).then(function (responseFile) {
+                                console.log('fileEntryId', responseFile)
+                                let partNoEform = response.fileTemplateNo.split('_')[0]
+                                let fileEform = [{fileEntryId: responseFile ? responseFile : 0, partNo: partNoEform, eform: false, displayName: 'Tờ khai - ' +  response.eFormNo}]
+                                vm.dossierFileArr = vm.dossierFileArr.concat(fileEform)
+                            }).catch(function (reject) {
+                            })
+                        }
+                    }).catch({})
+                }
             }
-            
         },
         fillTableGiayTo (data) {
-            let vm = this
-          
-            // let gt = {
-            //     ten_giay_to: data.ten_giay_to,
-            //     ma_ten_giay_to: data.ma_ten_giay_to,
-            //     ma_loai_giay_to:  data.ma_loai_giay_to,
-            //     loai_giay_to: data.loai_giay_to,
-            //     so_ban: data.so_ban,
-            //     loai_cong_viec: data.loai_cong_viec,
-            //     so_hieu_giay_to: data.so_hieu_giay_to,
-            //     ten_nguoi_duoc_cap: data.ten_nguoi_duoc_cap,
-            //     co_quan_cap: data.co_quan_cap,
-            //     ma_co_quan_cap: data.ma_co_quan_cap,
-            //     nguoi_ky: data.nguoi_ky,
-            //     ma_nguoi_ky: data.ma_nguoi_ky,
-            //     chuc_danh_ky: data.chuc_danh_ky,
-            //     ma_chuc_vu: data.ma_chuc_vu,
-            //     ngay_ky: data.ngay_ky,
-            //     ma_con_dau: data.ma_con_dau,
-            //     ma_chu_ky: data.ma_chu_ky,
-            //     kiem_tra: 1,
-            // }
-
+            let vm = this            
             vm.listGiayTo = data
             vm.checkCKCD()
             vm.tongSoBan = 0
@@ -2266,63 +2251,68 @@ export default {
         },
         deleteGiayTo(index) {
             let vm = this
-            vm.listGiayTo.splice(index,1)
-            vm.checkCKCD()
-            // Count Sl giay to
-            vm.tongSoBan = 0
-            vm.listGiayTo.forEach(e=>{
-                vm.tongSoBan+=parseInt(e['so_ban'])
-            })
-            vm.computeDate()
-            // 
-            for (let i=0; i<vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
-                    let arr = []
-                    vm.listGiayTo.forEach(e=>{
-                        let obj = Object.assign({}, e)
-                        // delete obj['anh_chu_ky']
-                        // delete obj['anh_con_dau']
-                        arr.push(obj)
-                    }) 
-                    let arrNuocSD = ''
-                    for(let i = 0; i<vm.su_dung_tai_nuoc_ma.length; i++) {
-                        let find = vm.listQuocGia.find(e=>e.MA === vm.su_dung_tai_nuoc_ma[i])
-                            if(find){
-                                if(arrNuocSD === '') {
-                                    arrNuocSD+=find.TEN
-                                } else {
-                                    arrNuocSD+= ', ' + find.TEN
-                                }
-                                
-                            }
-                    }
-                    let formData = {
-                        ho_ten_yeu_cau: vm.dossiers.delegateName,
-                        so_cmnd: vm.dossiers.delegateIdNo,
-                        dien_thoai: vm.dossiers.delegateTelNo,
-                        email: vm.dossiers.delegateEmail,
-                        dia_chi: vm.dossiers.delegateAddress,
-                        de_nghi_chung_nhan: vm.de_nghi_chung_nhan ? true : false,
-                        list_giay_to : arr,
-                        tong_so: vm.tongSoBan,
-                        su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
-                        su_dung_tai_nuoc: arrNuocSD,
-                        ma_muc_dich: vm.muc_dich ? vm.muc_dich.MA : '',
-                        muc_dich: vm.muc_dich ? vm.muc_dich.TEN : '',
-                        ngay_cap_cmnd: vm.ngay_cap_cmnd
-                    }
-                    console.log('1111111111111',formData)
-                    vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
-                    vm.dossierFileArr[i]['eform'] = 'true'
+            let x = confirm('Bạn có chắc chắn xóa giấy tờ này?')
+            if (x) {
+                vm.listGiayTo.splice(index,1)
+                if (vm.listGiayTo.length === 0) {
+                    vm.eFormCodeArr = []
                 }
-            }
-            let dataOut = vm.dossierFileArr.filter(function (item) {
-                return item.formData || (!item.formData && item.fileEntryId)
-            })
-            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
+                vm.checkCKCD()
+                // Count Sl giay to
+                vm.tongSoBan = 0
+                vm.listGiayTo.forEach(e=>{
+                    vm.tongSoBan+=parseInt(e['so_ban'])
+                })
+                vm.computeDate()
+                // 
+                for (let i=0; i<vm.dossierFileArr.length; i++){
+                    if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
+                        let arr = []
+                        vm.listGiayTo.forEach(e=>{
+                            let obj = Object.assign({}, e)
+                            // delete obj['anh_chu_ky']
+                            // delete obj['anh_con_dau']
+                            arr.push(obj)
+                        }) 
+                        let arrNuocSD = ''
+                        for(let i = 0; i<vm.su_dung_tai_nuoc_ma.length; i++) {
+                            let find = vm.listQuocGia.find(e=>e.MA === vm.su_dung_tai_nuoc_ma[i])
+                                if(find){
+                                    if(arrNuocSD === '') {
+                                        arrNuocSD+=find.TEN
+                                    } else {
+                                        arrNuocSD+= ', ' + find.TEN
+                                    }
+                                    
+                                }
+                        }
+                        let formData = {
+                            ho_ten_yeu_cau: vm.dossiers.delegateName,
+                            so_cmnd: vm.dossiers.delegateIdNo,
+                            dien_thoai: vm.dossiers.delegateTelNo,
+                            email: vm.dossiers.delegateEmail,
+                            dia_chi: vm.dossiers.delegateAddress,
+                            de_nghi_chung_nhan: vm.de_nghi_chung_nhan ? true : false,
+                            list_giay_to : arr,
+                            tong_so: vm.tongSoBan,
+                            su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
+                            su_dung_tai_nuoc: arrNuocSD,
+                            ma_muc_dich: vm.muc_dich ? vm.muc_dich.MA : '',
+                            muc_dich: vm.muc_dich ? vm.muc_dich.TEN : '',
+                            ngay_cap_cmnd: vm.ngay_cap_cmnd
+                        }
+                        vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
+                        // vm.dossierFileArr[i]['eform'] = 'true'
+                    }
+                }
+                let dataOut = vm.dossierFileArr.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
 
-            // Gen le phi
-            vm.genLePhi()
+                // Gen le phi
+                vm.genLePhi()
+            }
         },
         toggleCheckbox (item, index){
             let vm = this
