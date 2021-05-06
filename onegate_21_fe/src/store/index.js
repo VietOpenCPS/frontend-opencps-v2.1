@@ -3564,6 +3564,9 @@ export const store = new Vuex.Store({
           if (filter.domain) {
             paramGet.sort = "siblingSearch"
           }
+          if (filter.hasOwnProperty('filterApplicant')) {
+            paramGet['filterApplicant'] = true
+          }
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -4276,12 +4279,16 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get(state.initData.dossierTemplatesApi + '/' + data.dossierTemplateNo, param).then(function (response) {
-            let serializable = response.data
-            resolve(serializable)
-          }, error => {
-            reject(error)
-          })
+          if (data.dossierTemplateNo) {
+            axios.get(state.initData.dossierTemplatesApi + '/' + data.dossierTemplateNo, param).then(function (response) {
+              let serializable = response.data
+              resolve(serializable)
+            }, error => {
+              reject(error)
+            })
+          } else {
+            resolve([])
+          }
         }).catch(function (){})
       })
     },

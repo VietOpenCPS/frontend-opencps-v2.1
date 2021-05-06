@@ -1470,6 +1470,7 @@ export default {
       let vm = this
       vm.serviceSelected = item
       if (item.serviceUrl) {
+        vm.serviceInfoSelected = serviceInfoItem
         let urlRedirect = item.serviceUrl
         if (activeRun) {
           try {
@@ -1478,7 +1479,8 @@ export default {
               let token = localStorage.getItem('jwt_token')
               let templateNo = vm.dichVuSelected['templateNo']
               let groupId = window.themeDisplay.getScopeGroupId()
-              let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId
+              let serviceCode = serviceInfoItem['serviceCode']
+              let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId + '&serviceCode=' + serviceCode
               urlRedirect = item.serviceUrl.split('?').length > 1 ? item.serviceUrl + '&' + paramsAdd : item.serviceUrl + '?' + paramsAdd
             }
           } catch (error) {
@@ -1556,7 +1558,8 @@ export default {
           let token = localStorage.getItem('jwt_token')
           let templateNo = vm.dichVuSelected['templateNo']
           let groupId = window.themeDisplay.getScopeGroupId()
-          let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId
+          let serviceCode = vm.serviceInfoSelected['serviceCode']
+          let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId + '&serviceCode=' + serviceCode
           urlRedirect = serviceConfig.serviceUrl.split('?').length > 1 ? serviceConfig.serviceUrl + '&' + paramsAdd : serviceConfig.serviceUrl + '?' + paramsAdd
         }
       } catch (error) {

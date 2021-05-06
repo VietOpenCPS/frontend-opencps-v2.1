@@ -124,7 +124,7 @@
             <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
               <v-icon>print</v-icon> &nbsp; In báo cáo
             </v-btn>
-            <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="downloadExcel()">
+            <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="itemsReports[index]['filterConfig']['version'] ? downloadExcel() : doCreateReport(true)">
               <v-icon size="16px">fas fa fa-file-excel-o</v-icon> &nbsp; Tải xuống Excel
             </v-btn>
             <v-btn v-if="!itemsReports[index]['filterConfig']['showTable'] && exportWordReport" dark color="blue darken-3" class="my-0" v-on:click.native="doCreateReport(true, 'word')">
@@ -1896,6 +1896,21 @@ export default {
         vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
       }
       vm.isShowLoading = true
+      try {
+        if (vm.api.indexOf('groupBy=serviceCode') >= 0 && vm.data['domainCode'] && !vm.data['serviceCode']) {
+          let dataSource = vm.filters.filter(function (item) {
+            return item['key'] === 'serviceCode'
+          })[0]
+          console.log('dataSource', dataSource['source'])
+          let serviceCode = []
+          for (let i = 0; i < dataSource['source'].length; i++) {
+            serviceCode.push(dataSource['source'][i]['value'])
+          }
+          console.log('serviceCode', serviceCode)
+          vm.data['serviceCode'] = serviceCode.toString()
+        }
+      } catch (error) {
+      }
       let filter = {
         document: vm.reportType,
         data: vm.data,
@@ -2603,7 +2618,7 @@ export default {
         vm.data[vm.groupByVal] = item[vm.groupByVal]
       }
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
-      vm.api = vm.itemsReports[vm.index]['filterConfig']['apiExportExcel']
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['apiExportExcel'] ? vm.itemsReports[vm.index]['filterConfig']['apiExportExcel'] : vm.itemsReports[vm.index]['filterConfig']['api']
       // build data
       let filter = {
         document: vm.reportType,

@@ -1,7 +1,7 @@
 <template>
-  <div style="width: 1300px; margin: 0 auto">
+  <div style="max-width: 1300px; margin: 0 auto">
     <v-layout wrap>
-      <v-flex xs12 md6 class="pa-2">
+      <v-flex xs12 md6 class="statistic-total-year pa-2">
         <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
           <div class="row-header" style="height: 38px; overflow: hidden;background: #fff">
             <div class="background-triangle-big1">THỐNG KÊ THEO NĂM</div>
@@ -16,7 +16,7 @@
             </div>
           </div>
           <v-layout wrap align-center>
-            <v-flex md6 xs12>
+            <v-flex sm6 xs12>
               <apexchart
                 type="pie"
                 width=400 height=220
@@ -25,7 +25,7 @@
                 class="pieChartTotal"
               ></apexchart>
             </v-flex>
-            <v-flex md6 xs12>
+            <v-flex sm6 xs12>
               <!-- <v-layout wrap class="run-down">
                 <v-flex md6 xs12 text-center>
                   <span style="color:#1976d2;">{{statistics.receivedCount}}</span>
@@ -66,7 +66,7 @@
           </v-layout>
         </div>
       </v-flex>
-      <v-flex xs12 md6 class="pa-2">
+      <v-flex xs12 md6 class="statistic-service pa-2">
         <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
           <div class="row-header mb-1" style="height: 38px; overflow: hidden;background: #fff">
             <div class="background-triangle-big1">THỐNG KÊ THỦ TỤC HÀNH CHÍNH</div>
@@ -139,9 +139,9 @@
       </v-flex>
       <v-flex xs12>
         <v-layout wrap>
-          <v-flex md4 xs12 class="pa-2">
+          <v-flex md4 xs12 class="statistic-sbn pa-2">
             <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
-              <div class style="height: 38px; overflow: hidden;background: #fff">
+              <div class="wrap-filter" style="height: 38px; overflow: hidden;background: #fff">
                 <div class="background-triangle-big1">SỞ BAN NGÀNH</div>
                 <v-flex class="right">
                   <div class="agencyFilter agencyFilter1">
@@ -168,7 +168,7 @@
               ></apexchart>
               <!-- Hậu Giang -->
               <v-layout wrap align-center v-else class="pieChartHauGiang">
-                <v-flex md7 xs12>
+                <v-flex class="wrap-chart" sm7 xs12>
                   <apexchart
                     type="pie"
                     width=350 height=220
@@ -177,7 +177,7 @@
                     class=""
                   ></apexchart>
                 </v-flex>
-                <v-flex md5 xs12>
+                <v-flex sm5 xs12>
                   <v-layout wrap class="run-down">
                     <v-flex xs12 text-center>
                       <span style="color:#1976d2;">{{statisticTotalSBN.receivedCount}}</span>
@@ -197,9 +197,9 @@
               <!--  -->
             </div>
           </v-flex>
-          <v-flex md4 xs12 class="pt-2 pr-2 pb-2 pl-0">
+          <v-flex md4 xs12 class="statistic-qh pt-2 pr-2 pb-2 pl-0">
             <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
-              <div class style="height: 38px; overflow: hidden;">
+              <div class="wrap-filter" style="height: 38px; overflow: hidden;">
                 <div class="background-triangle-big1">HUYỆN/ THỊ XÃ/ THÀNH PHỐ</div>
                 <v-flex class="right">
                   <div class="agencyFilter agencyFilter2">
@@ -226,7 +226,7 @@
               ></apexchart>
               <!-- Hậu Giang -->
               <v-layout wrap align-center v-else class="pieChartHauGiang">
-                <v-flex md7 xs12>
+                <v-flex class="wrap-chart" sm7 xs12>
                   <apexchart
                     type="pie"
                     width=350 height=220
@@ -235,7 +235,7 @@
                     class=""
                   ></apexchart>
                 </v-flex>
-                <v-flex md5 xs12>
+                <v-flex sm5 xs12>
                   <v-layout wrap class="run-down">
                     <v-flex xs12 text-center>
                       <span style="color:#1976d2;">{{statisticTotalQuanHuyen.receivedCount}}</span>
@@ -255,9 +255,9 @@
               <!--  -->
             </div>
           </v-flex>
-          <v-flex md4 xs12 class="pt-2 pr-2 pb-2 pl-0">
+          <v-flex md4 xs12 class="statistic-xp pt-2 pr-2 pb-2 pl-0">
             <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
-              <div class style="height: 38px; overflow: hidden;">
+              <div class="wrap-filter" style="height: 38px; overflow: hidden;">
                 <div class="background-triangle-big1">XÃ/ PHƯỜNG/ THỊ TRẤN</div>
                 <v-flex class="right">
                   <div class="agencyFilter agencyFilter3">
@@ -285,7 +285,7 @@
                 ></apexchart>
                 <!-- Hậu Giang -->
                 <v-layout wrap align-center v-else class="pieChartHauGiang">
-                  <v-flex md7 xs12>
+                  <v-flex class="wrap-chart" sm7 xs12>
                     <apexchart
                       type="pie"
                       width=350 height=220
@@ -294,7 +294,7 @@
                       class=""
                     ></apexchart>
                   </v-flex>
-                  <v-flex md5 xs12>
+                  <v-flex sm5 xs12>
                     <v-layout wrap class="run-down">
                       <v-flex xs12 text-center>
                         <span style="color:#1976d2;">{{statisticTotalXaPhuong.receivedCount}}</span>
@@ -317,12 +317,12 @@
           </v-flex>
         </v-layout>
       </v-flex>
-      <v-flex xs12 class="pa-2">
+      <v-flex xs12 class="statistic-month pa-2">
         <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
           <div class="row-header" style="height: 38px; overflow: hidden;background: #fff">
             <div class="background-triangle-big1" style="width: 228px;">THỐNG KÊ THEO THÁNG</div>
             <v-layout wrap>
-              <v-flex md7>
+              <v-flex md7 class="filter-agency">
                 <div style="display: flex; align-items: center; height: 40px;">
                   <span
                     class="mx-3"
@@ -348,7 +348,7 @@
                   </v-menu>
                 </div>
               </v-flex>
-              <v-flex md5 class="text-right">
+              <v-flex md5 class="filter-time text-right">
                 <v-select
                   v-model="monthSelected"
                   :items="monthList"
@@ -396,9 +396,9 @@
               </v-flex>
             </v-layout>
           </div>
-          <v-layout wrap>
+          <v-layout wrap class="wrap-chart-month">
             <v-flex xs12 class="my-3 report__table" style="overflow: hidden;">
-              <apexchart v-if="!isTable && !isLoading" type="bar" :height="heightChart" width='100%'
+              <apexchart v-if="!isTable && !isLoading" type="bar" :height="heightChart" :width="widthBarChart"
                 :options="chartOptionsMonth" 
                 :series="statisticalMonth" 
                 :stacked="true"
@@ -743,13 +743,14 @@ export default {
       plotOptions: {
         bar: {
           barHeight: '100%',
-          horizontal: window.innerWidth < 600 ? false : true,
+          horizontal: window.innerWidth < 768 ? false : true,
           dataLabels: {
             hideOverflowingLabels: true
           }
         },
       },
       chart: {
+        height: 350,
         stacked: true,
         locales: [{
           "name": "en",
@@ -771,7 +772,12 @@ export default {
           formatter: function(val) {
             return val
           },
-          trim: false
+          rotate: -60,
+          style: {
+            fontSize: '11px'
+          },
+          trim: false,
+          maxHeight: 170
         },
         min: 1
       },
@@ -805,6 +811,14 @@ export default {
             return val
           }
         }
+      },
+      legend: window.innerWidth < 768 ? {
+        position: 'top',
+        horizontalAlign: 'left',
+        offsetX: 0
+      } : {
+        position: 'bottom',
+        horizontalAlign: 'center'
       }
     },
     chartOptionsSoQuanXa: {
@@ -942,7 +956,8 @@ export default {
     processingTotal: 0,
     processingSBN: 0,
     processingQuanHuyen: 0,
-    processingXaPhuong: 0
+    processingXaPhuong: 0,
+    widthBarChart: '100%'
   }),
   computed: {
     yearList() {
@@ -954,12 +969,19 @@ export default {
       return arr;
     },
     heightChart() {
-      return this.statisticalMonth[0].data.length < 5 ? "300" : "auto";
+      return this.statisticalMonth[0].data.length < 5 ? "300" : (window.innerWidth <= 768 ? "600" : "auto");
     }
   },
   created() {
     let vm = this
     //
+    try {
+      if (window.innerWidth <= 768) {
+        vm.widthBarChart = 700
+      }
+    } catch (error) {
+      
+    }
     try {
       vm.thongKeHauGiang = thongKeHauGiang ? thongKeHauGiang : false
     } catch (error) {

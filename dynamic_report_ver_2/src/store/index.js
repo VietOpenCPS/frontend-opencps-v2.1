@@ -1410,7 +1410,11 @@ export const store = new Vuex.Store({
                     if (key === 'toDate') {
                       timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} 23:59`)).getTime()
                     }
-                    param.params[key] = timeStampDate
+                    if (key === 'fromDate' || key === 'toDate') {
+                      param.params[key] = timeStampDate
+                    } else {
+                      param.params[key] = currentVal
+                    }
                   } else {
                     param.params[key] = currentVal
                   } 

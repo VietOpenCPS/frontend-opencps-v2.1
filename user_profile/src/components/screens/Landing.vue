@@ -136,7 +136,7 @@
                 </v-menu>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen'">
-                <v-text-field v-model="user['applicantContactTelNo']" box>
+                <v-text-field v-model="user['applicantContactTelNo']" box :rules="[rules.telNo, rules.required]" required>
                   <template slot="label"> 
                     <span>Điện thoại di động</span> 
                     <span class="red--text darken-3"> *</span>
@@ -319,7 +319,7 @@
                 <v-text-field label="Điện thoại cố định" v-model="user['applicantProfile']['Phone']" box clearable></v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'business'">
-                <v-text-field v-model="user['applicantContactTelNo']" box clearable>
+                <v-text-field v-model="user['applicantContactTelNo']" box :rules="[rules.telNo, rules.required]" required>
                   <template slot="label"> 
                     <span>Điện thoại di động</span> 
                     <span class="red--text darken-3"> *</span>
@@ -841,11 +841,18 @@
         'class_name': 'org.opencps.usermgt.model.ApplicantEsignCert'
       },
       rules: {
-        required: (value) => !!value || 'Trường dữ liệu bắt buộc',
+        required: (value) => !!value || 'Thông tin bắt buộc',
         passWord: (value) => {
           const pattern = /^((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])([0-9a-zA-Z@$!%*#?&]{8,}))$/
           return pattern.test(value) || 'Ít nhất 8 ký tự và có chữ hoa, chữ thường, ký tự đặc biệt @$!%*#?&'
-        }
+        },
+        telNo: (value) => {
+          const pattern = /^([0-9]{0,})$/
+          if(typeof value === 'string'){
+            value = value.trim()
+          }
+          return pattern.test(value) || 'Gồm các ký tự 0-9'
+        },
       },
       e1: true,
       e2: true,

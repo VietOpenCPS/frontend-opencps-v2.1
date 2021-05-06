@@ -625,7 +625,8 @@
             level: newQuery.hasOwnProperty('lever') && newQuery.lever ? newQuery.lever : '3,4',
             domain: newQuery.hasOwnProperty('domain') && newQuery.domain ? newQuery.domain : '',
             keyword: newQuery.hasOwnProperty('keyword') && newQuery.keyword ? newQuery.keyword : '',
-            agency: vm.hasFilterAgency && newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
+            agency: vm.hasFilterAgency && newQuery.hasOwnProperty('agency') ? newQuery.agency : '',
+            filterApplicant: true
           }
           vm.$store.dispatch('getServiceInfos', params).then(res => {
             vm.loading = false
@@ -812,14 +813,14 @@
             let urlRedirect = url
             try {
               if (vm.useJwt) {
+                let serviceCode = resServiceInfo.serviceCode
                 let serviceConfigId = itemServiceConfig ? itemServiceConfig['serviceConfigId'] : govAgencyCodeSelect['serviceConfigId']
                 let token = localStorage.getItem('jwt_token')
                 let templateNo = item['templateNo']
                 let groupId = window.themeDisplay.getScopeGroupId()
-                let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId
+                let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId + '&serviceCode=' + serviceCode
                 urlRedirect = url.split('?').length > 1 ? url + '&' + paramsAdd : url + '?' + paramsAdd
 
-                // urlRedirect = url.split('?').length > 1 ? url + '&token=' + localStorage.getItem('jwt_token') : url + '?token=' + localStorage.getItem('jwt_token')
               }
             } catch (error) {
             }
