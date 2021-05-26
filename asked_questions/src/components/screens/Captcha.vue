@@ -89,6 +89,14 @@ export default {
       }
       return arra1
     },
+    requiredCapcha () {
+      let vm = this
+      if (vm.j_captcha_response) {
+        return true
+      } else {
+        return false
+      }
+    },
     checkValidCaptcha () {
       var vm = this
       var str = ''

@@ -34,7 +34,8 @@ export default {
   },
   data: () => ({
     govAgencys: [],
-    btnLoading: false
+    btnLoading: false,
+    donViDanhGia: ''
   }),
   computed: {
     loading () {
@@ -42,7 +43,13 @@ export default {
     }
   },
   created () {
-    var vm = this
+    let vm = this
+    try {
+      if (donViDanhGiaConfig) {
+        vm.donViDanhGia = donViDanhGiaConfig.split(',')
+      }
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       let viewListEmployee = function (item) {
         vm.$router.push({
@@ -55,42 +62,55 @@ export default {
       vm.$store.dispatch('loadGovAgencys', {}).then(result => {
         let agencyList = result
         let agencyLength = agencyList.length
-        if (agencyLength > 1) {
-          let count = 0
+        if (vm.donViDanhGia) {
+          vm.govAgencys = []
           for (let i = 0; i < agencyLength; i++) {
-            let param = {
-              headers: {
-                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
-              },
-              params: {
-                start: 0,
-                end: 1,
-                jobposCode: 'DANHGIA_' + agencyList[i].itemCode
-              }
-            }
-            axios.get('/o/rest/v2/employees/publish/' + agencyList[i].itemCode, param).then(result => {
-              count += 1
-              if (result.data.data) {
-                vm.govAgencys.push(agencyList[i])
-              }
-              if (count === agencyLength) {
-                if (vm.govAgencys.length === 1) {
-                  viewListEmployee(vm.govAgencys[0])
-                }
-              }
-            }).catch(xhr => {
-              count += 1
-              if (count === agencyLength) {
-                if (vm.govAgencys.length === 1) {
-                  viewListEmployee(vm.govAgencys[0])
-                }
-              }
+            let exits = vm.donViDanhGia.filter(function (item) {
+              return item == agencyList[i]['itemCode']
             })
+            if (exits && exits.length > 0) {
+              vm.govAgencys.push(agencyList[i])
+            }
           }
-        } else if (agencyLength === 1) {
-          vm.govAgencys = agencyList
-          viewListEmployee(vm.govAgencys[0])
+        } else {
+          if (agencyLength > 1) {
+            let count = 0
+            for (let i = 0; i < agencyLength; i++) {
+              let param = {
+                headers: {
+                  groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+                },
+                params: {
+                  start: 0,
+                  end: 1,
+                  jobposCode: 'DANHGIA_' + agencyList[i].itemCode
+                }
+              }
+              axios.get('/o/rest/v2/employees/publish/' + agencyList[i].itemCode, param).then(result => {
+                count += 1
+                if (result.data.data) {
+                  vm.govAgencys.push(agencyList[i])
+                }
+                if (count === agencyLength) {
+                  if (vm.govAgencys.length === 1) {
+                    viewListEmployee(vm.govAgencys[0])
+                  }
+                }
+              }).catch(xhr => {
+                count += 1
+                if (count === agencyLength) {
+                  if (vm.govAgencys.length === 1) {
+                    viewListEmployee(vm.govAgencys[0])
+                  }
+                }
+              })
+            }
+          } else if (agencyLength === 1) {
+            vm.govAgencys = agencyList
+            viewListEmployee(vm.govAgencys[0])
+          }
         }
+        
       }).catch(xhr => {
       })
     })

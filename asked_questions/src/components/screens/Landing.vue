@@ -132,6 +132,7 @@
                         <div>
                           <div style="position:relative">
                             <div class="" v-html="String(itemAnswer.content).replace(/\</g, '&lt;').replace(/\>/g, '%gt;')"></div>
+                            <!-- <div class="" v-html="itemAnswer.content"></div> -->
                             <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:18px;top:-15px">
                               <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
                                 <v-icon>settings</v-icon>

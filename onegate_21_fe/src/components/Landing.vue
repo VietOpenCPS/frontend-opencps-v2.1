@@ -293,7 +293,7 @@
             <v-checkbox v-else
               :input-value="props.all"
               :indeterminate="props.indeterminate"
-              :disabled="!thuTucHanhChinhSelected && (!doActionGroup || !doActionGroupKhacThuTuc) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0' && (!doActionGroup || !doActionGroupKhacThuTuc)) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '' && (!doActionGroup || !doActionGroupKhacThuTuc))"
+              :disabled="(!thuTucHanhChinhSelected && (!doActionGroup && !doActionGroupKhacThuTuc)) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0' && (!doActionGroup && !doActionGroupKhacThuTuc)) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '' && (!doActionGroup && !doActionGroupKhacThuTuc))"
               primary
               hide-details
               @click.native="toggleAll"
@@ -339,8 +339,8 @@
               v-if="getUser('Administrator') || getUser('Administrator_data')"
             ></v-checkbox>
             <v-checkbox v-else
-              :disabled="props.item['assigned'] === 0 && (!doActionGroup || !doActionGroupKhacThuTuc) || (!thuTucHanhChinhSelected && !doActionGroupKhacThuTuc) || 
-              (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0' && !doActionGroupKhacThuTuc) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '' && !doActionGroupKhacThuTuc)"
+              :disabled="(props.item['assigned'] === 0 && (!doActionGroup && !doActionGroupKhacThuTuc)) || (!thuTucHanhChinhSelected && (!doActionGroup && !doActionGroupKhacThuTuc)) || 
+              (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0' && (!doActionGroup && !doActionGroupKhacThuTuc)) || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '' && (!doActionGroup && !doActionGroupKhacThuTuc))"
               v-model="props.selected"
               @change="changeSelected"
               primary
@@ -1500,7 +1500,7 @@ export default {
         } else {
           vm.selectedDoAction = []
         }
-       console.log('selectedDoAction', vm.selectedDoAction)
+        console.log('selectedDoAction', vm.selectedDoAction)
         vm.$store.commit('setDossierSelectedDoAction', vm.selectedDoAction)
         
       },
@@ -1846,7 +1846,7 @@ export default {
         let employeeLogin = response1
         console.log('1111111111',response1)
         console.log('2222222222222', vm.employeeLoginInfomation)
-        if(referenceDonViGuiCongVan === '_firstscope'){
+        if (referenceDonViGuiCongVan === '_firstscope'){
           if (employeeLogin.hasOwnProperty('scope') && employeeLogin.scope) {
             scope = String(employeeLogin.scope).split(',')[0]
           }
@@ -1855,7 +1855,7 @@ export default {
         } else {
           scope = referenceDonViGuiCongVan
         }
-        if(referenceDonViGuiCongVan.includes('_group@')){
+        if (referenceDonViGuiCongVan.includes('_group@')){
           let filterDictGroup = {
             collectionCode: 'DON_VI_CONG_VAN',
             groupCode: scope
@@ -1874,7 +1874,7 @@ export default {
           }).catch(()=>{
             vm.listDonviCongVan = []
           })
-        } else {
+        } else if (referenceDonViGuiCongVan === '_firstscope') {
           let filterDictItems = {
             collectionCode: 'DON_VI_CONG_VAN',
             level: '',
@@ -1912,6 +1912,20 @@ export default {
               vm.donviguiSelected = null
             }
           })
+        } else {
+          try {
+            vm.listDonviCongVan = JSON.parse(referenceDonViGuiCongVan)
+            if (currentQuery.hasOwnProperty('donvigui') && String(currentQuery.donvigui) !== '') {
+              for (let key in vm.listDonviCongVan) {
+                if (String(vm.listDonviCongVan[key]['itemCode']) === String(currentQuery.donvigui)) {
+                  vm.donviguiSelected = vm.listDonviCongVan[key]
+                }
+              }
+            } else {
+              vm.donviguiSelected = null
+            }
+          } catch (error) {
+          }
         }
       })
     },

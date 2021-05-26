@@ -250,11 +250,11 @@ export default {
       let vm = this;
       let configs = {
         headers: {
-          'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
+          // 'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
         },
       }
       let dataPostApplicant = new URLSearchParams()
-      // dataPostApplicant.append('Authorization', 'BASIC ' + window.btoa(vm.userName + ':' + vm.passWord))
+      dataPostApplicant.append('Authorization', 'BASIC ' + window.btoa(vm.userName + ':' + vm.passWord))
       axios.post('/o/v1/opencps/login', dataPostApplicant,configs).then(function(response) {
         if (
           response.data !== '' &&

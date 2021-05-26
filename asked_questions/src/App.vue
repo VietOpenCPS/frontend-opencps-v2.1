@@ -1,14 +1,14 @@
 <template>
   <v-app id="app_asked_questions" style="background: #fff !important">
     <v-navigation-drawer app clipped floating width="255" v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')">
-      <!-- <div class="">
+      <div class="">
         <v-btn class="px-0 my-0 ml-0" block color="primary" v-on:click.native="addQuestion"
           style="height:36px"
         >
           <v-icon size="22" color="white">add</v-icon>&nbsp;
           Thêm mới câu hỏi
         </v-btn>
-      </div> -->
+      </div>
       <v-list class="pt-0">
         <v-list-tile :style="activeTab === 0 ? 'border-left: 7px solid #00aeef' : ''">
           <v-list-tile-content class="pl-2" @click="filterQuestion(0, 'all')">
@@ -69,11 +69,105 @@
     <v-content :style="(!getUser('Administrator') && !getUser('Administrator_data') && !getUser('Administrator_Employee')) ? 'width: 100%;max-width: 1300px;margin: 0 auto' : ''">
       <router-view></router-view>
     </v-content>
+    <v-dialog v-model="dialog_addQuestion" scrollable persistent max-width="1000px">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Thêm câu hỏi thường gặp</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_addQuestion = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-form ref="form" v-model="validForm" lazy-validation>
+            <v-layout wrap class="px-2 mt-2 pb-3">
+              <v-flex xs12>
+                <div class="mb-1">Cơ quan tiếp nhận</div>
+                <v-autocomplete
+                  class="select-border"
+                  :items="agencyList"
+                  v-model="agencySelected"
+                  placeholder="Chọn cơ quan tiếp nhận câu hỏi"
+                  item-text="itemName"
+                  item-value="itemCode"
+                  return-object
+                  :hide-selected="true"
+                  box
+                  @change="changeAgency"
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 class="selectLvtt" >
+                <div class="mb-1">Lĩnh vực thủ tục hành chính</div>
+                <v-autocomplete
+                  class="select-border"
+                  :items="lvttList"
+                  v-model="lvttSelectAdd"
+                  placeholder="Chọn lĩnh vực"
+                  item-text="domainName"
+                  item-value="domainCode"
+                  return-object
+                  :hide-selected="true"
+                  box
+                  clearable
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12>
+                <div class="mb-1">Nội dung câu hỏi <span style="color:red">(*)</span></div>
+                <v-textarea
+                  box
+                  row="5"
+                  placeholder="Nhập nội dung câu hỏi"
+                  v-model="contentQuestion"
+                  :rules="[rules.required]"
+                  required
+                ></v-textarea>
+              </v-flex>
+              <v-flex xs12>
+                <div class="mb-1">Nội dung trả lời <span style="color:red">(*)</span></div>
+                <v-textarea
+                  box
+                  row="5"
+                  placeholder="Nhập nội dung trả lời"
+                  v-model="contentAnswer"
+                  :rules="[rules.required]"
+                  required
+                ></v-textarea>
+              </v-flex>
+              <v-flex xs12 md6 style="margin:0 auto">
+                <captcha ref="captcha"></captcha>
+              </v-flex>
+              <v-flex xs12>
+                <v-btn color="primary"
+                  :loading="loadingAdd"
+                  :disabled="loadingAdd"
+                  @click="submitAddQuestion"
+                >
+                  <v-icon>save</v-icon> &nbsp;
+                  Thêm câu hỏi
+                </v-btn>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
+  import Vue from 'vue'
+  import $ from 'jquery'
+  import Captcha from './components/screens/Captcha.vue'
+  import toastr from 'toastr'
+  Vue.use(toastr)
+  toastr.options = {
+    'closeButton': true,
+    'timeOut': '5000'
+  }
   export default {
+    components: {
+    'captcha': Captcha
+    },
     data: () => ({
       activeTab: 0,
       totalQuestionCounter: 0,
@@ -82,7 +176,18 @@
       totalPublished: 0,
       totalNotPublish: 0,
       totalFAQ: 0,
-      agencyList: []
+      agencyList: [],
+      dialog_addQuestion: false,
+      agencySelected: '',
+      lvttList: [],
+      lvttSelectAdd: '',
+      contentQuestion: '',
+      contentAnswer: '',
+      rules: {
+        required: (value) => !!value || 'Nội dung bắt buộc'
+      },
+      loadingAdd: false,
+      validForm: false
     }),
     computed: {
       loading () {
@@ -126,6 +231,31 @@
         let newQuery = current.query
         vm.getQuestionList()
         vm.getCounter()
+        vm.$store.dispatch('getGovAgency').then(function(result) {
+          // agencyConfig = "govAgencyCode_1, govAgencyCode_2, ..." cấu hình trên fragment 
+          try {
+            if (agencyConfig) {
+              vm.agencyList = []
+              for (let index in result) {
+                if (agencyConfig.split(',').filter(function (item) {
+                  return item === result[index]['itemCode']
+                }).length > 0) {
+                  vm.agencyList.push(result[index])
+                }
+              }
+            } else {
+              vm.agencyList = result
+            }
+          } catch (error) {
+            vm.agencyList = result
+          }
+        })
+        let filter = {
+          agency: ''
+        }
+        vm.$store.dispatch('getLvttList', filter).then(function(result) {
+          vm.lvttList = result
+        })
       })
     },
     beforeDestroy () {
@@ -159,6 +289,66 @@
       }
     },
     methods: {
+      changeAgency () {
+        let vm = this
+        setTimeout(function () {
+          let filter = {
+            agency: vm.agencySelected.itemCode
+          }
+          vm.lvttSelectAdd = ''
+          vm.$store.dispatch('getLvttList', filter).then(function(result) {
+            vm.lvttList = result
+          })
+        }, 100)
+      },
+      submitAddQuestion () {
+        let vm = this
+        if (!vm.$refs.captcha.requiredCapcha()) {
+          toastr.error('Vui lòng nhập mã captcha')
+          return
+        } else {
+          if (vm.$refs.form.validate()) {
+            vm.loadingAdd = true
+            let filter = {
+              content: vm.contentQuestion,
+              fullname: '',
+              email: '',
+              telNo: '',
+              address: '',
+              publish: 1,
+              agencyCode: vm.agencySelected ? vm.agencySelected['itemCode'] : '',
+              domainCode: vm.lvttSelectAdd ? vm.lvttSelectAdd['domainCode'] : '',
+              domainName: vm.lvttSelectAdd ? vm.lvttSelectAdd['domainName'] : '',
+              questionType: '',
+              j_captcha_response: vm.$refs.captcha.j_captcha_response,
+            }
+            vm.$store.dispatch('addQuestion', filter).then(function (result) {
+              setTimeout (function () {
+                vm.loadingAdd = false
+                let filter = {
+                  questionId: result['questionId'],
+                  content: vm.contentAnswer,
+                  publish: 1
+                }
+                vm.$store.dispatch('addAnswer', filter).then(function (result) {
+                  toastr.success('Thêm câu hỏi và nội dung trả lời thành công.')
+                }).catch(function () {
+                  toastr.error('Nội dung trả lời chưa được thêm thành công. Vui lòng thêm nội dung trả lời cho câu hỏi đã tạo.')
+                })
+                vm.$refs.form.reset()
+                vm.$refs.form.resetValidation()
+                vm.$refs.captcha.makeImageCap()
+                vm.dialog_addQuestion = false
+              }, 300)
+            }).catch (function () {
+              vm.$refs.captcha.makeImageCap()
+              vm.loadingAdd = false
+              toastr.error('Thêm câu hỏi không thành công')
+            })
+          }
+        }
+        
+      },
       getQuestionList () {
         let vm = this
         let current = vm.$router.history.current
@@ -286,19 +476,21 @@
       },
       addQuestion () {
         let vm = this
-        let current = vm.$router.history.current
-        let newQuery = current.query
-        if (current['name'] === 'Landing') {
-          vm.$store.commit('setActiveAddQuestion', true)
-        } else {
-          vm.$store.commit('setActiveAddQuestion', true)
-          vm.$router.push({
-            path: '/',
-            query: {
-              crtQ: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            }
-          })
-        }
+        vm.dialog_addQuestion = true
+        vm.$refs.captcha.makeImageCap()
+        // let current = vm.$router.history.current
+        // let newQuery = current.query
+        // if (current['name'] === 'Landing') {
+        //   vm.$store.commit('setActiveAddQuestion', true)
+        // } else {
+        //   vm.$store.commit('setActiveAddQuestion', true)
+        //   vm.$router.push({
+        //     path: '/',
+        //     query: {
+        //       crtQ: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+        //     }
+        //   })
+        // }
       },
       getUser (roleItem) {
         let vm = this

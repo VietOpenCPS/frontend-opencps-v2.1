@@ -8,8 +8,14 @@
                 <ejs-uploader id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders" :selected= "onFileSelect">
                 </ejs-uploader>
                 <div class="e-upload-done-list" v-if="fileTemplateTotal > 0 && code === 'opencps_serviceinfo'">
+                  <v-text-field
+                    class="px-3"
+                    v-model="fileTemplateKey"
+                    placeholder="Nhập tên biểu mẫu"
+                    @input="filterFileTemplate"
+                  ></v-text-field>
                   <ul class="e-upload-files">
-                    <li class="e-upload-file-list" v-for="(item, index) in fileTemplateData" v-bind:key="index">
+                    <li class="e-upload-file-list" v-for="(item, index) in fileTemplateFilter" v-bind:key="index">
                       <div class='container' style="position: relative;">
                         <span class='wrapper' style="
                           line-height: 10px;
@@ -90,7 +96,7 @@
                 </div>
                 <div class="e-upload-done-list" v-if="fileTemplateTotal > 0 && code !== 'opencps_serviceinfo'">
                   <ul class="e-upload-files">
-                    <li class="e-upload-file-list" v-for="(item, index) in fileTemplateData" v-bind:key="index">
+                    <li class="e-upload-file-list" v-for="(item, index) in fileTemplateFilter" v-bind:key="index">
                       <div class='container' style="position: relative;min-height: 75px;">
                         <span class='wrapper' style="
                           line-height: 10px;
@@ -155,6 +161,7 @@
   import Vue from 'vue'
   import { UploaderPlugin } from '@syncfusion/ej2-vue-inputs'
   import { detach } from '@syncfusion/ej2-base'
+import TiepNhanHoSoDetailVue from '../../../../dynamic_report_admin/src/components/blacklist/TiepNhanHoSoDetail.vue'
 
   Vue.use(UploaderPlugin)
 
@@ -165,6 +172,7 @@
         loading: false,
         valid: false,
         fileTemplateData: [],
+        fileTemplateFilter: [],
         fileTemplateTotal: 0,
         path:  {
           saveUrl: '',
@@ -175,7 +183,8 @@
         rawData: [],
         className: '',
         fileUpdate: null,
-        indexFile: null
+        indexFile: null,
+        fileTemplateKey: ''
       }
     },
     props: ['pickItem', 'pk', 'code'],
@@ -234,6 +243,7 @@
         if (vm.code === 'opencps_serviceinfo') {
           vm.$store.dispatch('getServiceFileTemplate', vm.pk).then(function (result) {
             vm.fileTemplateData = result.data
+            vm.fileTemplateFilter = result.data
             vm.fileTemplateTotal = result.total
             for (let key in vm.fileTemplateData) {
               vm.rawData.push({
@@ -257,7 +267,7 @@
             for(let i = 0; i < result.data.length ; i++){
               vm.fileTemplateData.push(JSON.parse(result.data[i]))
             }
-            
+            vm.fileTemplateFilter = vm.fileTemplateData
           }).catch(reject => {
             console.log(reject)
           })              
@@ -268,6 +278,7 @@
           }
           vm.$store.dispatch('getAttachFileData', filter).then(function (result) {
             vm.fileTemplateData = result.data
+            vm.fileTemplateFilter = result.data
             vm.fileTemplateTotal = result.total
             let rightAttachedCounter = document.getElementById('rightAttachedCounter')
             if (rightAttachedCounter !== null && rightAttachedCounter !== undefined && vm.fileTemplateTotal > 0) {
@@ -410,6 +421,37 @@
             }) 
           }  
         }
+      },
+      filterFileTemplate () {
+        let vm = this
+        if (vm.fileTemplateKey) {
+          let keySearch = vm.convertString(vm.fileTemplateKey)
+          vm.fileTemplateFilter = vm.fileTemplateData.filter(function (item) {
+            return vm.convertString(String(item['templateName'])).indexOf(keySearch) >= 0
+          })
+          console.log('fileTemplateFilter', vm.fileTemplateKey, vm.fileTemplateFilter)
+        } else {
+          vm.fileTemplateFilter = vm.fileTemplateData
+          console.log('fileTemplateFilter', vm.fileTemplateKey, vm.fileTemplateFilter)
+        }
+      },
+      convertString(str) {
+        str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
+        str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
+        str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i')
+        str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
+        str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
+        str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
+        str = str.replace(/đ/g, 'd')
+        str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, 'A')
+        str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, 'E')
+        str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, 'I')
+        str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, 'O')
+        str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
+        str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
+        str = str.replace(/Đ/g, 'D')
+        str = str.toLocaleLowerCase().replace(/\s/g, '')
+        return str
       }
     }
   }

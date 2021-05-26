@@ -1071,7 +1071,20 @@ export default {
       return this.$store.getters.getMenuConfigsTodo
     },
     dossiersIntoGroupRender () {
-      return this.$store.getters.dossierSelectedDoAction
+      let vm = this
+      let dossiers = vm.$store.getters.dossierSelectedDoAction
+      if (!dossiers || dossiers.length === 0) {
+        try {
+          dossiers = JSON.parse(localStorage.getItem('hscv_' + vm.id))
+        } catch (error) {
+        }
+      } else {
+        if (typeof(Storage) !== 'undefined') {
+          localStorage.setItem('hscv_' + vm.id, JSON.stringify(dossiers))
+        } else {
+        }
+      }
+      return dossiers
     },
     // formActionGroup () {
     //   return this.$store.getters.formActionGroup
@@ -1090,6 +1103,13 @@ export default {
       vm.requiredCVDenGroupId = vm.formActionGroup.hasOwnProperty('requiredCVDenGroupId') ? vm.formActionGroup.requiredCVDenGroupId : ''
       vm.requiredCVDenGovCode = vm.formActionGroup.hasOwnProperty('requiredCVDenGovCode') ? vm.formActionGroup.requiredCVDenGovCode : ''
       vm.hasTaoQuyetDinh = vm.formActionGroup.hasOwnProperty('taoQuyetDinh') ? vm.formActionGroup.taoQuyetDinh : false
+      if (typeof(Storage) !== 'undefined') {
+        for (let i =0; i < localStorage.length; i++) {
+          if (localStorage.key(i).indexOf('hscv_') == 0 && localStorage.key(i) !== 'hscv_' + vm.id) {
+            localStorage.removeItem(localStorage.key(i))
+          }
+        }
+      }
     })
   },
   beforeDestroy () {
@@ -1398,14 +1418,23 @@ export default {
                 result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
 
                 vnpostalProfile['vnpostalStatus'] = result.vnpostalStatus
-                vnpostalProfile['postalAddress'] = result.address
-                vnpostalProfile['postalCityCode'] = result.cityCode
-                vnpostalProfile['postalCityName'] = result.cityName
-                vnpostalProfile['postalDistrictCode'] = result.districtCode
-                vnpostalProfile['postalDistrictName'] = result.districtName
-                vnpostalProfile['postalWardCode'] = result.wardCode
-                vnpostalProfile['postalWardName'] = result.wardName
-                vnpostalProfile['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
+                if (result.hasOwnProperty('vnpostalProfile') && result.vnpostalProfile) {
+                  try {
+                    let data = JSON.parse(result.vnpostalProfile)
+                    if (data) {
+                      vnpostalProfile['postalAddress'] = data.postalAddress
+                      vnpostalProfile['postalCityCode'] = data.postalCityCode
+                      vnpostalProfile['postalCityName'] = data.postalCityName
+                      vnpostalProfile['postalDistrictCode'] = data.postalDistrictCode
+                      vnpostalProfile['postalDistrictName'] = data.postalDistrictName
+                      vnpostalProfile['postalWardCode'] = data.postalWardCode
+                      vnpostalProfile['postalWardName'] = data.postalWardName
+                      vnpostalProfile['postalTelNo'] = data.postalTelNo ? data.postalTelNo : vm.thongTinChuHoSo['contactTelNo']
+                    }
+                  } catch (error) {
+                  }
+                }
+                
               }
               vm.$store.commit('setDichVuChuyenPhatKetQua', result)
               vm.$store.commit('setDichVuChuyenPhatHoSo', vnpostalProfile)
@@ -1747,6 +1776,12 @@ export default {
     },
     tiepNhanCongVan (type, isDraf) {
       let vm = this
+      try {
+        if (typeof(Storage) !== 'undefined') {
+          localStorage.removeItem('hscv_' + vm.id)
+        }
+      } catch (error) {
+      }
       let thongtincongvan = this.$refs.thongtincongvan.getThongTinCongVan()
       let tempData = thongtincongvan
       tempData.dueDate = vm.dateTimeView(thongtincongvan.dueDate)

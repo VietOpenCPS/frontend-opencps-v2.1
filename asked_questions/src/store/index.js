@@ -248,7 +248,9 @@ export const store = new Vuex.Store({
           dataAdd.append('domainName', filter.domainName ? filter.domainName : '')
           dataAdd.append('subDomainCode', filter.subDomainCode ? filter.subDomainCode : '')
           dataAdd.append('subDomainName', filter.subDomainName ? filter.subDomainName : '')
-          dataAdd.append('j_captcha_response', filter.j_captcha_response ? filter.j_captcha_response : '')
+          if (filter.hasOwnProperty('j_captcha_response')) {
+            dataAdd.append('j_captcha_response', filter.j_captcha_response ? filter.j_captcha_response : '')
+          }
           dataAdd.append('questionType', filter.questionType ? filter.questionType : '')
           axios.post(url, dataAdd, param).then(response => {
             if (response['status'] !== undefined && response['status'] === 203) {

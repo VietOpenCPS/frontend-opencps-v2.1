@@ -163,6 +163,21 @@
                     clearable
                     @keyup.enter="filterAdvance"
                   ></v-text-field>
+                  <v-text-field
+                    v-if="item.fieldType === 'birthDate'"
+                    v-model="filterData[item.fieldName]"
+                    class="search-input-appbar input-search d-inline-block"
+                    style="width: calc(100% - 150px);"
+                    single-lines
+                    hide-details
+                    solo
+                    flat
+                    height="32"
+                    min-height="32"
+                    clearable
+                    @keyup.enter="filterAdvance"
+                    placeholder="dd/mm/yyyy"
+                  ></v-text-field>
                   <v-textarea
                     v-if="item['fieldType'] === 'textarea'"
                     v-model="filterData[item.fieldName]"
@@ -1015,9 +1030,24 @@
         // if (vm.deliverableKey ) {
         //   searchParams.deliverableCode = vm.deliverableKey
         // }
-        for(let key in vm.filterData){
-          if(vm.filterData[key]){
+        for (let key in vm.filterData) {
+          if (vm.filterData[key]) {
             searchParams[key] = typeof vm.filterData[key] === 'string' ? vm.filterData[key].trim() : vm.filterData[key]
+          }
+          if (String(vm.filterData[key]).indexOf('/') > 0) {
+            console.log('vm.filterData[key]', key, vm.filterData[key])
+            let itemIndex = vm.filters.filter(function (item) {
+              return item.fieldName === key
+            })
+            console.log('vm.filterData[key]22', itemIndex)
+            if (itemIndex && itemIndex.length > 0) {
+              console.log('vm.filterData[key]33', itemIndex)
+              if (itemIndex[0]['fieldType'] === 'birthDate') {
+                console.log('vm.filterData[key]44', key, vm.filterData[key])
+                searchParams[key] = vm.parseBirthDate(vm.filterData[key])
+                console.log('vm.filterData[key]55', searchParams)
+              }
+            }
           }
         }
         try {
@@ -1026,7 +1056,7 @@
             if (type_search === 'keyword') {
               searchParams = Object.assign({}, tableConfig.paramUrl)
             } else {
-              searchParams = Object.assign(searchParams, tableConfig.paramUrl)
+              searchParams = Object.assign(tableConfig.paramUrl, searchParams)
             }
           } else {
             if (type_search === 'keyword') {
@@ -1060,6 +1090,7 @@
       },
       filterAdvance () {
         let vm = this
+        console.log('dataFilter', vm.filterData)
         let current = vm.$router.history.current
         let newQuery = current.query
         let queryString = '?'
@@ -1281,6 +1312,21 @@
           return String(value).replace(/\B(?=(\d{3})+(?!\d))/g, '.')
         }
         return ''
+      },
+      parseBirthDate(date) {
+        let lengthArr = date.split('/').length
+        if (!date) return ''
+        if (lengthArr > 1 && lengthArr <=3) {
+          if (lengthArr === 2) {
+            const [month, year] = date.split('/')
+            return `${month.padStart(2, '0')}/${year}`
+          } else if (lengthArr === 3) {
+            const [day, month, year] = date.split('/')
+            return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`
+          }
+        } else {
+          return date
+        }
       }
     }
   }
