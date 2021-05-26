@@ -637,8 +637,12 @@
               govAgencyCode: vm.detailDossier.govAgencyCode,
               govAgencyName: vm.detailDossier.govAgencyName
             }
-
-            let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
+            let fileTemplateNo = ''
+            try {
+              fileTemplateNo = item.fileTemplateNo ? item.fileTemplateNo : item.templateFileNo
+            } catch (error) {
+            }
+            let urlEmbed = eformScript.eformEmbed + '/' + fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
             for (let key in paramsEmbed) {
               urlEmbed += ('&' + key + '=' + paramsEmbed[key])
             }
@@ -668,10 +672,15 @@
                 formData = {}
               }
               // giấy phép
+              let fileTemplateNo = ''
+              try {
+                fileTemplateNo = item.fileTemplateNo ? item.fileTemplateNo : item.templateFileNo
+              } catch (error) {
+              }
               formData.dossierId_hidden = vm.detailDossier.dossierId
               formData.dossierStatus_hidden = vm.detailDossier.dossierStatus
               formData.dossierSubStatus_hidden = vm.detailDossier.dossierSubStatus
-              formData.fileTemplateNo_hidden = item.templateFileNo
+              formData.fileTemplateNo_hidden = fileTemplateNo
               formData.deliverableType_hidden = item.deliverableType
               formData.userEmailAddress_hidden = vm.originality === 1 ? vm.userLoginInfomation.applicantContactEmail : vm.userLoginInfomation.employeeEmail
               formData.referenceUid = vm.detailDossier.referenceUid
@@ -709,8 +718,12 @@
                 govAgencyCode: vm.detailDossier.govAgencyCode,
                 govAgencyName: vm.detailDossier.govAgencyName
               }
-
-              let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
+              let fileTemplateNo = ''
+              try {
+                fileTemplateNo = item.templateFileNo ? item.templateFileNo : item.fileTemplateNo
+              } catch (error) {
+              }
+              let urlEmbed = eformScript.eformEmbed + '/' + fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
               for (let key in paramsEmbed) {
                 urlEmbed += ('&' + key + '=' + paramsEmbed[key])
               }
@@ -736,10 +749,15 @@
                   formData = {}
                 }
                 // giấy phép
+                let fileTemplateNo = ''
+                try {
+                  fileTemplateNo = item.templateFileNo ? item.templateFileNo : item.fileTemplateNo
+                } catch (error) {
+                }
                 formData.dossierId_hidden = vm.detailDossier.dossierId
                 formData.dossierStatus_hidden = vm.detailDossier.dossierStatus
                 formData.dossierSubStatus_hidden = vm.detailDossier.dossierSubStatus
-                formData.fileTemplateNo_hidden = item.templateFileNo
+                formData.fileTemplateNo_hidden = fileTemplateNo
                 formData.deliverableType_hidden = item.deliverableType
                 formData.userEmailAddress_hidden = vm.originality === 1 ? vm.userLoginInfomation.applicantContactEmail : vm.userLoginInfomation.employeeEmail
                 formData.referenceUid = vm.detailDossier.referenceUid
@@ -829,6 +847,7 @@
           if (fileFind) {
             let index = vm.createFiles.findIndex(item => item.partNo === dataOutPut.tp)
             fileFind['dossierId'] = vm.detailDossier.dossierId
+            fileFind['formData'] = dataOutPut
             vm.$store.dispatch('putAlpacaFormCallBack', fileFind).then(resData => {
               setTimeout(function () {
                 toastr.clear()
@@ -935,6 +954,11 @@
                   fileName = fileName.replace(/\\/g, '')
                 }
               }
+              let fileTemplateNo = ''
+              try {
+                fileTemplateNo = data.templateFileNo ? data.templateFileNo : data.fileTemplateNo
+              } catch (error) {
+              }
               let fileCreate = {
                 displayName: fileName,
                 fileType: file.type,
@@ -943,7 +967,7 @@
                 file: file,
                 dossierPartNo: data.partNo,
                 dossierTemplateNo: data.dossierTemplateNo,
-                fileTemplateNo: data.templateFileNo,
+                fileTemplateNo: fileTemplateNo,
                 formData: '',
                 referenceUid: '',
                 modifiedDate: vm.getCurentDateTime(),
@@ -1078,8 +1102,12 @@
             govAgencyCode: vm.detailDossier.govAgencyCode,
             govAgencyName: vm.detailDossier.govAgencyName
           }
-
-          let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
+          let fileTemplateNo = ''
+          try {
+            fileTemplateNo = item.fileTemplateNo ? item.fileTemplateNo : item.templateFileNo
+          } catch (error) {
+          }
+          let urlEmbed = eformScript.eformEmbed + '/' + fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
           for (let key in paramsEmbed) {
             urlEmbed += ('&' + key + '=' + paramsEmbed[key])
           }
@@ -1211,8 +1239,12 @@
                         govAgencyCode: vm.detailDossier.govAgencyCode,
                         govAgencyName: vm.detailDossier.govAgencyName
                       }
-
-                      let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
+                      let fileTemplateNo = ''
+                      try {
+                        fileTemplateNo = item.fileTemplateNo ? item.fileTemplateNo : item.templateFileNo
+                      } catch (error) {
+                      }
+                      let urlEmbed = eformScript.eformEmbed + '/' + fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
                       for (let key in paramsEmbed) {
                         urlEmbed += ('&' + key + '=' + paramsEmbed[key])
                       }
@@ -1239,10 +1271,15 @@
                           formData = {}
                         }
                         // giấy phép
+                        let fileTemplateNo = ''
+                        try {
+                          fileTemplateNo = item.templateFileNo ? item.templateFileNo : item.fileTemplateNo
+                        } catch (error) {
+                        }
                         formData.dossierId_hidden = vm.detailDossier.dossierId
                         formData.dossierStatus_hidden = vm.detailDossier.dossierStatus
                         formData.dossierSubStatus_hidden = vm.detailDossier.dossierSubStatus
-                        formData.fileTemplateNo_hidden = item.templateFileNo
+                        formData.fileTemplateNo_hidden = fileTemplateNo
                         formData.deliverableType_hidden = item.deliverableType
                         formData.userEmailAddress_hidden = vm.originality === 1 ? vm.userLoginInfomation.applicantContactEmail : vm.userLoginInfomation.employeeEmail
                         formData.referenceUid = vm.detailDossier.referenceUid

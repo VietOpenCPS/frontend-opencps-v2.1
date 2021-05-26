@@ -36,7 +36,8 @@
             <v-subheader class="pl-0">Địa chỉ: </v-subheader>
           </v-flex>
           <v-flex xs12 sm10>
-            <p class="mb-0" style="padding-top:9px">{{postalService.postalAddress}}</p>
+            <p class="mb-0" style="padding-top:9px" v-if="!postalService['postalWardName']">{{postalService.postalAddress}} - {{postalService['postalDistrictName']}} - {{postalService['postalCityName']}}</p>
+            <p class="mb-0" style="padding-top:9px" v-else>{{postalService.postalAddress}} - {{postalService['postalWardName']}} - {{postalService['postalDistrictName']}} - {{postalService['postalCityName']}}</p>
           </v-flex>
         </v-layout>
       </v-card>

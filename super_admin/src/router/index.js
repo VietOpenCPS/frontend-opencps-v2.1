@@ -4,12 +4,16 @@ import Home from '@/components/Home'
 import NotFound from '@/components/NotFound'
 import TableEditor from '@/components/screens/TableEditor'
 import TableEditorForm from '@/components/screens/TableEditorForm.vue'
+// import DichVuCong from '@/components/extform/DichVuCong.vue'
+// import ChiTietDichVuCong from '@/components/extform/ChiTietDichVuCong.vue'
+// import QuyTrinhThucHienDvc from '@/components/extform/QuyTrinhThucHienDvc.vue'
+// import ChiTietQuyTrinhThucHienDvc from '@/components/extform/ChiTietQuyTrinhThucHienDvc.vue'
 import QuyTrinhThuTuc from '@/components/extform/QuyTrinhThuTuc.vue'
 import DinhKemThuTuc from '@/components/extform/DinhKemThuTuc.vue'
 import ThamSoHeThong from '@/components/extform/ThamSoHeThong.vue'
 import Voting from '@/components/extform/Voting.vue'
 import MappingTTHC from '@/components/extform/MappingTTHC.vue'
-import ThongKeTruyCap from '@/components/extform/ThongKeTruyCap.vue'
+// import ThongKeTruyCap from '@/components/extform/ThongKeTruyCap.vue'
 import TheoDoiLogTruyCap from '@/components/extform/TheoDoiLogTruyCap.vue'
 import SyncAgency from '@/components/extform/SyncAgency.vue'
 import SyncSharingqa from '@/components/extform/SyncSharingqa.vue'
@@ -33,6 +37,42 @@ const routes = [
       requiresAuth: true
     },
     children: [
+      // {
+      //   path: '/table/opencps_serviceconfig',
+      //   name: 'DichVuCong',
+      //   component: DichVuCong,
+      //   props: true,
+      //   meta: {
+      //     requiresAuth: true
+      //   }
+      // },
+      // {
+      //   path: '/table/opencps_serviceconfig/editor/:id',
+      //   name: 'ChiTietDichVuCong',
+      //   component: ChiTietDichVuCong,
+      //   props: true,
+      //   meta: {
+      //     requiresAuth: true
+      //   }
+      // },
+      // {
+      //   path: '/table/opencps_processoption',
+      //   name: 'QuyTrinhThucHienDvc',
+      //   component: QuyTrinhThucHienDvc,
+      //   props: true,
+      //   meta: {
+      //     requiresAuth: true
+      //   }
+      // },
+      // {
+      //   path: '/table/opencps_processoption/editor/:id',
+      //   name: 'ChiTietQuyTrinhThucHienDvc',
+      //   component: ChiTietQuyTrinhThucHienDvc,
+      //   props: true,
+      //   meta: {
+      //     requiresAuth: true
+      //   }
+      // },
       {
         path: '/table/:tableName',
         name: 'TableEditor',

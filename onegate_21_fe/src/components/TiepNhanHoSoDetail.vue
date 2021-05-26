@@ -857,7 +857,8 @@ export default {
     applicantIdRequired :true,
     showGuiHoSoConfig: false,
     showGuiHoSo: false,
-    showCounterFee: false
+    showCounterFee: false,
+    rememberApplicant: false
   }),
   computed: {
     loading () {
@@ -905,6 +906,11 @@ export default {
     }
     try {
       vm.showCounterFee = showCounterFee
+    } catch (error) {
+    }
+    try {
+      // lưu trữ thông tin applicant khi Tiếp nhận và thêm mới
+      vm.rememberApplicant = rememberApplicant
     } catch (error) {
     }
     vm.$nextTick(function () {
@@ -1143,6 +1149,20 @@ export default {
                       vm.$refs.thongtinchunghoso.initData(result)
                     }
                     // call initData thong tin cong van
+                    if (currentQuery.hasOwnProperty('rememberApplicant') && currentQuery.rememberApplicant && vm.rememberApplicant && vm.$refs.thongtinchuhoso) {
+                      let dataApplicant = ''
+                      try {
+                        if ( typeof(Storage) !== 'undefined') {
+                          dataApplicant = JSON.parse(sessionStorage.getItem('rememberApplicant'))
+                        }
+                      } catch (error) {
+                      }
+                      if (dataApplicant) {
+                        vm.$refs.thongtinchuhoso.initData(dataApplicant)
+                      }
+                    }
+                    // 
+                    // call initData thong tin cong van
                     if (vm.$refs.thongtincongvan) {
                       vm.$refs.thongtincongvan.initData(result)
                     }
@@ -1265,7 +1285,7 @@ export default {
           let dossierTemplates = thanhphanhoso
           let listAction = []
           let listDossierMark = []
-          if (dossierFiles) {
+          if (dossierFiles && vm.formCode !== 'UPDATE') {
             dossierFiles.forEach(function (value, index) {
               if (value.eForm) {
                 value['dossierId'] = vm.dossierId
@@ -1427,10 +1447,19 @@ export default {
           tempData['fromViaPostal'] = vm.fromViaPostal ? 1 : 0
 
           let doAction = function () {
-            vm.$store.dispatch('putDossier', tempData).then(function (result) {
+            vm.$store.dispatch('putDossier', tempData).then(function (resultDossier) {
               vm.loadingAction = false
               if (vm.formCode === 'UPDATE') {
-                window.history.back()
+                if (vm.originality === 3) {
+                  window.history.back()
+                } else {
+                  vm.$router.push({
+                    path: '/danh-sach-ho-so/0/chi-tiet-ho-so/' + vm.dossierId + queryString,
+                    query: {
+                      renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                    }
+                  })
+                }
               } else {
                 var initData = vm.$store.getters.loadingInitData
                 let actionUser = initData.user.userName ? initData.user.userName : ''
@@ -1494,10 +1523,20 @@ export default {
                   if (!type) {
                     vm.goBack()
                     vm.tiepNhanState = false
+                    if ( typeof(Storage) !== 'undefined') {
+                      sessionStorage.removeItem('rememberApplicant')
+                    }
                   } else {
                     // tạo hồ sơ mới
                     let current = vm.$router.history.current
                     let newQuery = current.query
+                    if (vm.rememberApplicant && tempData['userType'] == '2') {
+                      newQuery['rememberApplicant'] = true
+                      if ( typeof(Storage) !== 'undefined') {
+                        console.log('rememberApplicant123123', resultDossier)
+                        sessionStorage.setItem('rememberApplicant', JSON.stringify(resultDossier))
+                      }
+                    }
                     let dataCreateDossier = vm.$store.getters.getDataCreateDossier
                     vm.loadingAction = true
                     vm.$store.dispatch('postDossier', dataCreateDossier).then(function (result) {

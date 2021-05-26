@@ -375,6 +375,7 @@ export default {
           paymentMethod: vm.isBank ? 'Chuyển khoản' : 'Keypay'
         }
         vm.$store.commit('setPaymentProfile', vm.data_payment)
+        console.log('vm.data_payment3123123', vm.data_payment)
         // }
       }
     },
@@ -386,6 +387,7 @@ export default {
           vm.paymentFile = result
           vm.data_payment['paymentFile'] = vm.paymentFile
           vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : 'Keypay'
+          console.log('vm.data_payment555555', vm.data_payment)
           vm.$store.commit('setPaymentProfile', vm.data_payment)
         })
       }
@@ -416,6 +418,7 @@ export default {
         vm.progressUploadPart = false
         vm.paymentFile = result
         vm.data_payment['paymentFile'] = vm.paymentFile
+        vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : 'Keypay'
         vm.$store.commit('setPaymentProfile', vm.data_payment)
         vm.$store.dispatch('getPaymentFiles', data).then(result => {
           vm.paymentFile = result

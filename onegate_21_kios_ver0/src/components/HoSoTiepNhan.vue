@@ -40,11 +40,10 @@
             </content-placeholders>
             <div v-else>
 
-              <div v-if="dossierList.length > 0">
+              <div v-if="totalPages > 0">
                   <v-data-table
                   :headers="headerTable"
                   :items="dossierList"
-                  :pagination.sync="pagination"
                   hide-actions
                   class="table-bordered"
                   light
@@ -76,9 +75,9 @@
                   Không có hồ sơ tiếp nhận ngày {{fromDate()}}
                 </v-alert>
               </v-flex>
-              <div v-if="dossierList.length > pagination.rowsPerPage" class="text-xs-center layout wrap mt-2" style="position: relative;">
+              <div v-if="totalPages > pagination.rowsPerPage" class="text-xs-center layout wrap mt-2" style="position: relative;">
                 <div class="flex pagging-table px-2">
-                  <tiny-pagination :total="dossierList.length" :page="pagination.page" :currentLimit="pagination.rowsPerPage" custom-class="custom-tiny-class" 
+                  <tiny-pagination :total="totalPages" :page="pagination.page" :currentLimit="pagination.rowsPerPage" custom-class="custom-tiny-class" 
                     @tiny:change-page="paggingData" ></tiny-pagination> 
                 </div>
               </div>
@@ -226,6 +225,7 @@ export default {
     paggingData (config) {
       let vm = this
       vm.pagination.page = config.page
+      vm.searchDossier()
     },
     goBack () {
       window.history.back()
@@ -250,13 +250,15 @@ export default {
         fromDate: vm.fromDate(),
         toDate: vm.fromDate(),
         groupId: '',
-        keyword: vm.dossierNoKey
+        keyword: vm.dossierNoKey,
+        start: vm.pagination.page * vm.pagination.rowsPerPage - vm.pagination.rowsPerPage,
+        end: vm.pagination.page * vm.pagination.rowsPerPage
       }
       vm.$store.dispatch('loadingDataHoSoTN', filter).then(function (result) {
         vm.loading = false
         if (result.data) {
           vm.dossierList = result.data
-          vm.totalPages = Math.ceil(vm.dossierList.length / vm.pagination.rowsPerPage)
+          vm.totalPages = result.total
         }
       }).catch(reject => {
         vm.loading = false

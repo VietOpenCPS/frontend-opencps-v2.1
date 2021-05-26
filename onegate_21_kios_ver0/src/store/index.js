@@ -194,7 +194,9 @@ export const store = new Vuex.Store({
             params: {
               fromReceiveDate: filter.fromDate,
               toReceiveDate: filter.toDate,
-              keyword: filter.keyword
+              keyword: filter.keyword,
+              start: filter.start,
+              end: filter.end
             }
           }
           axios.get(state.endPoint + '/dossiers', param).then(function (response) {

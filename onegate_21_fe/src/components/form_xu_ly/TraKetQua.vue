@@ -17,9 +17,11 @@
                       <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 25px; font-size: 12px;">
                         <span class="text-bold">{{index + 1}}. </span>
                         <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
-                          <v-icon v-if="itemFileView.eForm">border_color</v-icon>
-                          <v-icon v-else>attach_file</v-icon>
-                          {{itemFileView.displayName}} - 
+                          <v-icon class="mr-1" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
+                            :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
+                            {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
+                          </v-icon>
+                          {{itemFileView.displayName ? itemFileView.displayName : itemFileView.dossierTemplateNo}} - 
                           <i>{{itemFileView.modifiedDate}}</i>
                         </span>
                       </div>
@@ -133,13 +135,10 @@
       var vm = this
       vm.page = 1
       vm.$nextTick(function () {
-        console.log('vm.detailDossier------------', vm.detailDossier)
         if (vm.detailDossier['dossierId']) {
           vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
             vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, resFiles)
-            console.log('vm.createFiles------------', vm.createFiles)
-            console.log('vm.dossierFilesItems------------', vm.dossierFilesItems)
           }).catch(reject => {
           })
         }
@@ -150,8 +149,6 @@
       vm.$nextTick(function () {
         if (vm.createFiles.length > 0) {
           setTimeout(function () {
-            console.log('vm.createFiles------------', vm.createFiles)
-            console.log('vm.dossierFilesItems------------', vm.dossierFilesItems)
             vm.genAllAlpacaForm(vm.dossierFilesItems, vm.createFiles)
           }, 300)
         }
@@ -346,7 +343,52 @@
             console.log('ko thay file')
           }
         }
-      }
+      },
+      getDocumentTypeIcon (type) {
+        let vm = this
+        let typeDoc = 'doc,docx'
+        let typeExcel = 'xls,xlsx'
+        let typeImage = 'png,jpg,jpeg'
+        if (type) {
+          if (typeDoc.indexOf(type.toLowerCase()) >= 0) {
+            return {
+              icon: 'fas fa fa-file-word-o',
+              color: 'blue',
+              size: 14
+            }
+          } else if (typeExcel.indexOf(type.toLowerCase()) >= 0) {
+            return {
+              icon: 'fas fa fa-file-excel-o',
+              color: 'green',
+              size: 14
+            }
+          } else if (type.toLowerCase() === 'pdf') {
+            return {
+              icon: 'fa fa-file-pdf-o',
+              color: 'red',
+              size: 14
+            }
+          } else if (typeImage.indexOf(type.toLowerCase()) >= 0) {
+            return {
+              icon: 'fas fa fa-file-image-o',
+              color: 'primary',
+              size: 14
+            }
+          } else {
+            return {
+              icon: 'fas fa fa-paperclip',
+              color: '',
+              size: 14
+            }
+          }
+        } else {
+          return {
+            icon: 'attach_file',
+            color: 'primary',
+            size: 14
+          }
+        }
+      },
     }
   }
 </script>

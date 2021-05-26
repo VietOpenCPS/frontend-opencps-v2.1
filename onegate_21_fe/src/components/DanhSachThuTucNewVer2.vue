@@ -813,12 +813,13 @@
             let urlRedirect = url
             try {
               if (vm.useJwt) {
+                let govAgencyCode = itemServiceConfig ? itemServiceConfig.govAgencyCode : govAgencyCodeSelect.govAgencyCode
                 let serviceCode = resServiceInfo.serviceCode
                 let serviceConfigId = itemServiceConfig ? itemServiceConfig['serviceConfigId'] : govAgencyCodeSelect['serviceConfigId']
                 let token = localStorage.getItem('jwt_token')
                 let templateNo = item['templateNo']
                 let groupId = window.themeDisplay.getScopeGroupId()
-                let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId + '&serviceCode=' + serviceCode
+                let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId + '&serviceCode=' + serviceCode + '&govAgencyCode=' + govAgencyCode
                 urlRedirect = url.split('?').length > 1 ? url + '&' + paramsAdd : url + '?' + paramsAdd
 
               }

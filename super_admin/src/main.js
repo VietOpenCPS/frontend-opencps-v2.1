@@ -12,13 +12,10 @@ import VueCodemirror from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/base16-light.css'
 import 'codemirror/mode/javascript/javascript.js'
-//import VueNativeSock from 'vue-native-websocket'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import { UploaderPlugin } from '@syncfusion/ej2-vue-inputs'
-import VueApexCharts from 'vue-apexcharts'
 import axios from 'axios'
 
-Vue.component('apexchart', VueApexCharts)
 Vue.use(UploaderPlugin)
 Vue.use(VueContentPlaceholders)
 

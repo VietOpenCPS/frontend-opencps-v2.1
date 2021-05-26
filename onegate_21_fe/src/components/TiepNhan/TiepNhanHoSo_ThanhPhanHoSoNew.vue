@@ -1403,7 +1403,7 @@ export default {
       let vm = this
       console.log('dataTBTV', data)
       let dataOutPut = data.data ? JSON.parse(data.data) : ''
-      // console.log('data_output new_eform_2', dataOutPut, dataOutPut.tp)
+      console.log('data_output new_eform_2', dataOutPut)
       if (dataOutPut.hasOwnProperty('tp') && dataOutPut.tp) {
         let fileFind = vm.dossierFilesItems.find(itemFile => {
           // return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm && itemFile.fileSize!==0
@@ -1414,8 +1414,9 @@ export default {
           console.log('item put 5555', fileFind)
           fileFind['dossierId'] = vm.thongTinHoSo.dossierId
           fileFind['id'] = vm.id
+          fileFind['formData'] = dataOutPut
           vm.loadingApacal = true
-          
+          console.log('dataTBTV', fileFind['formData'])
           vm.$store.dispatch('putAlpacaFormCallBack', fileFind).then(resData => {
             let index = vm.dossierTemplateItemsFilter.findIndex(item => item.partNo === dataOutPut.tp);
             vm.dossierTemplateItemsFilter[index]['passRequired'] = true
@@ -1549,7 +1550,6 @@ export default {
       let vm = this
       window.removeEventListener('message', vm.receiveMessage)
       window.addEventListener('message', vm.receiveMessage)
-      console.log("message123123", window.message)
       //
       if (vm.currentFormView === 'formAlpaca' + data.partNo + vm.id) {
         vm.currentFormView = ''

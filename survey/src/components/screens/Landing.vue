@@ -478,7 +478,7 @@ export default {
         if (String(vm.votingItems[key]['selected']) !== '0') {
           valid = true
           if (vm.ksBgt) {
-            if (key === 0 || key === 1 || key === 2 || key === 3 || key === 6) {
+            if (key == 0 || key == 1 || key == 2 || key == 3 || key == 6) {
               arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
             }
           } else {

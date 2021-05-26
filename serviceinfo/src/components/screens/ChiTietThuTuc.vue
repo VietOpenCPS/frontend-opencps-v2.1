@@ -866,7 +866,8 @@ export default {
               let token = localStorage.getItem('jwt_token')
               let templateNo = vm.dichVuSelected['templateNo']
               let groupId = window.themeDisplay.getScopeGroupId()
-              let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId + '&serviceCode=' + serviceCode
+              let govAgencyCode = item.govAgencyCode
+              let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId + '&serviceCode=' + serviceCode + '&govAgencyCode=' + govAgencyCode
               urlRedirect = item.serviceUrl.split('?').length > 1 ? item.serviceUrl + '&' + paramsAdd : item.serviceUrl + '?' + paramsAdd
             }
           } catch (error) {
@@ -941,7 +942,8 @@ export default {
           let token = localStorage.getItem('jwt_token')
           let templateNo = vm.dichVuSelected['templateNo']
           let groupId = window.themeDisplay.getScopeGroupId()
-          let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId + '&serviceCode=' + serviceCode
+          let govAgencyCode = serviceConfig.govAgencyCode
+          let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId + '&serviceCode=' + serviceCode + '&govAgencyCode=' + govAgencyCode
           urlRedirect = serviceConfig.serviceUrl.split('?').length > 1 ? serviceConfig.serviceUrl + '&' + paramsAdd : serviceConfig.serviceUrl + '?' + paramsAdd
         }
       } catch (error) {

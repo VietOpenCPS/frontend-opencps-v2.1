@@ -220,10 +220,19 @@
         <v-card-text class="py-1" >
           <v-layout wrap class="py-1 align-center">
             <v-flex xs12 sm6 class="px-2 data-request" style="height: 350px;">
-              <v-jsoneditor class="content-data" ref="editorData" v-model="dataRequest" :options="options" :plus="true" height="100%">
+              <v-textarea
+                v-model="dataRequest"
+                :rows="3"
+                box
+              ></v-textarea>
+              
             </v-flex>
             <v-flex xs12 sm6 class="px-2 data-response" style="height: 350px;">
-              <v-jsoneditor class="content-data" ref="editorData" v-model="dataResponse" :options="options" :plus="true" height="100%">
+              <v-textarea
+                v-model="dataResponse"
+                :rows="3"
+                box
+              ></v-textarea>
             </v-flex>
           </v-layout>
         </v-card-text>
@@ -243,13 +252,10 @@
 import Vue from 'vue'
 import axios from "axios"
 import TinyPagination from './Pagination.vue'
-import VJsoneditor from 'v-jsoneditor'
 
-Vue.use(VJsoneditor)
 export default {
   components: {
-    'tiny-pagination': TinyPagination,
-    VJsoneditor
+    'tiny-pagination': TinyPagination
   },
   data: () => ({
     fromDate: '',

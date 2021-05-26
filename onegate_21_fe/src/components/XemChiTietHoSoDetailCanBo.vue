@@ -463,7 +463,10 @@
                   <td class="text-xs-left">{{props.item.durationCount|getThoiHanQuyDinh}}</td>
                   <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
                   <td class="text-xs-left">
-                    <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
+                    <div v-if="props.item.assignUsers.length === 1 && props.item.actions.length === 1 && props.item.actions[0]['actionCode'] == '4100' && props.item.assignUsers[0]['userName'].indexOf('Admin') >= 0">
+                      {{props.item.actions[0]['actionUser']}}
+                    </div>
+                    <div v-else v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
                       {{itemUser.userName}} <br>
                     </div>
                   </td>
@@ -2211,13 +2214,23 @@ export default {
       }
       if (vm.showThuPhi) {
         if (vm.payments && vm.payments.hasOwnProperty('counter')) {
-          let dataNote = paymentsOut
+          let dataNote = {
+            requestPayment: vm.payments['requestPayment'],
+            paymentNote: vm.payments['paymentNote'],
+            advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+            feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+            serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+            shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
+            counter: vm.payments.counter
+          }
           paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
           paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
           paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
+          console.log('dataNote99999', dataNote)
           paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
         }
         filter['payment'] = paymentsOut
+        console.log('payment99999', filter['payment'])
         let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
         if (feeTotal === 0 && vm.originality === 3) {
           let x = confirm('Tổng phí còn phải nộp: 0 đồng. Bạn có muốn tiếp tục?')
@@ -2496,13 +2509,23 @@ export default {
                     shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
                   }
                   if (vm.payments && vm.payments.hasOwnProperty('counter')) {
-                    let dataNote = paymentsOut
+                    let dataNote = {
+                      requestPayment: vm.payments['requestPayment'],
+                      paymentNote: vm.payments['paymentNote'],
+                      advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                      feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                      serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                      shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
+                      counter: vm.payments.counter
+                    }
                     paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
                     paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
                     paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
+                    console.log('dataNote99999', dataNote)
                     paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
                   }
                   resultAction['payment'] = paymentsOut
+                  console.log('payment99999', resultAction['payment'])
                   let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
                   if (feeTotal === 0 && vm.originality === 3) {
                     let x = confirm('Tổng phí còn phải nộp: 0 đồng. Bạn có muốn tiếp tục?')
@@ -2649,7 +2672,6 @@ export default {
                   }
                 }
                 let doActionKySo = function () {
-                  console.log('fileEntries 12312', fileEntries, dossierFiles)
                   let filterUpdateFile = {
                     dossierId: vm.thongTinChiTietHoSo['dossierId'],
                     fileEntries: fileEntries.toString(),
@@ -3225,13 +3247,23 @@ export default {
             shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
           }
           if (vm.payments && vm.payments.hasOwnProperty('counter')) {
-            let dataNote = paymentsOut
+            let dataNote = {
+              requestPayment: vm.payments['requestPayment'],
+              paymentNote: vm.payments['paymentNote'],
+              advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+              feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+              serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+              shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
+              counter: vm.payments.counter
+            }
             paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
             paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
             paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
+            console.log('dataNote99999111', dataNote)
             paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
           }
           resultAction['payment'] = paymentsOut
+          console.log('payment99999', resultAction['payment'])
         }
         if (vm.showYkienCanBoThucHien) {
           let result = vm.$refs.ykiencanbo.doExport()

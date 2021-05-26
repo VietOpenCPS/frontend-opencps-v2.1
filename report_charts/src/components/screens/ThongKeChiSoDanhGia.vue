@@ -26,7 +26,7 @@
                     <div class="text-xs-center" style="color:#034687">Năm {{(new Date()).getFullYear()}}</div>
                     <v-flex xs12 v-for="(item, index) in votingItemsTTHC" :key="index" class="white--text mt-2">
                       <v-layout row justify-center>
-                        <v-flex xs7 class="text-xs-center">
+                        <v-flex xs12 class="text-xs-center">
                           <span class="black--text">Chỉ số {{index + 1}}:</span>
                           <span class="blue--text">&nbsp; &nbsp;{{item.answersCount ? item.averageScore + ' / 2 điểm' : 'Chưa có đánh giá'}}</span>
                         </v-flex>
@@ -38,13 +38,30 @@
             </v-flex>
             <v-flex xs12 sm9 class="pl-4" style="padding-top: 8px;">
                 <v-layout v-for="(item, index) in votingItemsTTHC" :key="index" class="mb-3" row wrap  style="background-color: #ffff;">
-                    <v-flex class="xs12" style="
+                    <v-flex v-if="reRender" class="xs12" style="
                         background-color: #004b94 !important;
                         height: 36px;
                         padding: 9px 15px;
                         font-weight: 600;
                         color: white;">
                         <span>Chi tiết chỉ số {{index + 1}}</span>
+                        <v-btn v-if="(index === 4 || index === 5 || index === 7 || index === 8) && !item['isEdit']" color="green" dark small class="right"
+                          @click="updateVotingEmp(item, index)" style="margin-top: -6px; margin-right: -12px;"
+                        >
+                          <v-icon :size="18">edit</v-icon> &nbsp; Cập nhật
+                        </v-btn>
+                        <v-btn v-if="(index === 4 || index === 5 || index === 7 || index === 8) && item['isEdit']" color="green" dark small class="right"
+                          @click="submitUpdateVoting(item, index)" style="margin-top: -6px; margin-right: -12px;"
+                          :loading="btnLoading" :disabled="btnLoading"
+                        >
+                          <v-icon :size="18">save</v-icon> &nbsp; Lưu
+                        </v-btn>
+                        <v-btn v-if="(index === 4 || index === 5 || index === 7 || index === 8) && item['isEdit']" color="green" dark small class="right"
+                          @click="exitUpdate(item, index)" style="margin-top: -6px;"
+                          :loading="btnLoading" :disabled="btnLoading"
+                        >
+                          <v-icon :size="18">clear</v-icon> &nbsp; Thoát
+                        </v-btn>
                     </v-flex>
                     <v-flex xs12 sm12 class="my-3 pl-3">
                         <div style="margin-bottom: 5px;">
@@ -53,18 +70,49 @@
                                 <v-card-text class="px-2 py-1 pr-0">
                                   <v-flex xs12><strong class="primary--text">{{item.subject}}</strong></v-flex>
                                   <v-flex xs12>
-                                    <v-layout wrap>
+                                    <v-layout wrap class="check-update">
                                         <v-flex xs12 md4>
-                                            <p class="headline primary--text">{{item['answers'][0]}}</p>
-                                            <p>{{item['choices'][0]}}</p>
+                                            <p class="headline primary--text">
+                                              <v-checkbox
+                                                v-if="votingUpdate === index && reRender && item['isEdit']"
+                                                v-model="item['selected'][0]"
+                                                color="success"
+                                                :value="true"
+                                                hide-details
+                                                class="mt-0 d-inline-block"
+                                                @change="changeSelectedUpdate($event, index, 0)"
+                                              ></v-checkbox>
+                                              <span :class="item['isEdit'] ? 'right mr-2' : ''">{{item['answers'][0]}}</span>
+                                            </p>
+                                            <p :style="item['selected'][0] ? 'color: green;font-weight: 500;text-align: justify' : 'text-align: justify'">{{item['choices'][0]}}</p>
                                         </v-flex>
                                         <v-flex xs12 md4>
-                                            <p class="headline primary--text">{{item['answers'][1]}}</p>
-                                            <p>{{item['choices'][1]}}</p>
+                                            <p class="headline primary--text">
+                                              <v-checkbox
+                                                v-if="votingUpdate === index && reRender && item['isEdit']"
+                                                v-model="item['selected'][1]"
+                                                color="success"
+                                                hide-details
+                                                class="mt-0 d-inline-block"
+                                                @change="changeSelectedUpdate($event, index, 1)"
+                                              ></v-checkbox>
+                                              <span :class="item['isEdit'] ? 'right mr-2' : ''">{{item['answers'][1]}}</span>
+                                            </p>
+                                            <p :style="item['selected'][1] ? 'color: green;font-weight: 500;text-align: justify' : 'text-align: justify'">{{item['choices'][1]}}</p>
                                         </v-flex>
                                         <v-flex xs12 md4>
-                                            <p class="headline primary--text">{{item['answers'][2]}}</p>
-                                            <p>{{item['choices'][2]}}</p>
+                                            <p class="headline primary--text">
+                                              <v-checkbox
+                                                v-if="votingUpdate === index && reRender && item['isEdit']"
+                                                v-model="item['selected'][2]"
+                                                color="success"
+                                                hide-details
+                                                class="mt-0 d-inline-block"
+                                                @change="changeSelectedUpdate($event, index, 2)"
+                                              ></v-checkbox>
+                                              <span :class="item['isEdit'] ? 'right mr-2' : ''">{{item['answers'][2]}}</span>
+                                            </p>
+                                            <p :style="item['selected'][2] ? 'color: green;font-weight: 500;text-align: justify' : 'text-align: justify'">{{item['choices'][2]}}</p>
                                         </v-flex>
                                     </v-layout>
                                   </v-flex>
@@ -101,6 +149,8 @@ export default {
   },
   data: () => ({
     loading: false,
+    reRender: true,
+    votingUpdate: '',
     votingItemsTTHC: [],
     votingItemsCLDV: [],
     agencyLists: [],
@@ -138,6 +188,8 @@ export default {
         vm.totalAnswer = 0
         for (let i = 0; i < vm.votingItemsTTHC.length; i++) {
           vm.totalAnswer += Number(vm.votingItemsTTHC[i]['answersCount'])
+          vm.votingItemsTTHC[i]['selected'] = [false, false, false]
+          vm.votingItemsTTHC[i]['isEdit'] = false
           vm.getPercentItem(vm.votingItemsTTHC[i], i)
         }
       }).catch(xhr => {
@@ -189,6 +241,69 @@ export default {
   watch: {
   },
   methods: {
+    updateVotingEmp (item, index) {
+      let vm = this
+      vm.votingUpdate = index
+      vm.votingItemsTTHC[index]['isEdit'] = true
+      vm.reRender = false
+      vm.reRender = true
+    },
+    exitUpdate (item, index) {
+      let vm = this
+      vm.votingItemsTTHC[index]['isEdit'] = false
+      vm.reRender = false
+      vm.reRender = true
+    },
+    changeSelectedUpdate (value, index, key) {
+      let vm = this
+      console.log('333333', vm.votingItemsTTHC)
+      if (value) {
+        for (let key1 in vm.votingItemsTTHC[index]['selected']) {
+          if (key == key1) {
+            vm.votingItemsTTHC[index]['selected'][key1] = true
+          } else {
+            vm.votingItemsTTHC[index]['selected'][key1] = false
+          }
+        }
+      }
+      console.log('44444', vm.votingItemsTTHC)
+      vm.reRender = false
+      vm.reRender = true
+    },
+    submitUpdateVoting (item, index) {
+      let vm = this
+      vm.votingItemsTTHC[index]['className'] = 'survey' 
+      vm.votingItemsTTHC[index]['classPk'] = 0
+      let selected = vm.votingItemsTTHC[index]['selected'].findIndex(function(item){return item === true})
+      
+      if (selected !== -1) {
+        vm.btnLoading = true
+        vm.votingItemsTTHC[index]['voted'] = selected + 1
+        vm.$store.dispatch('submitVotingMC', vm.votingItemsTTHC[index]).then(function () {
+          //
+          vm.btnLoading = false
+          vm.$store.dispatch('loadVoting', {
+            className: 'survey',
+            classPk: 0
+          }).then(result => {
+            vm.votingItemsTTHC = result
+            vm.totalAnswer = 0
+            for (let i = 0; i < vm.votingItemsTTHC.length; i++) {
+              vm.totalAnswer += Number(vm.votingItemsTTHC[i]['answersCount'])
+              vm.votingItemsTTHC[i]['selected'] = [false, false, false]
+              vm.votingItemsTTHC[i]['isEdit'] = false
+              vm.getPercentItem(vm.votingItemsTTHC[i], i)
+            }
+          }).catch(xhr => {
+          })
+          // +-+
+        }).catch(function () {
+          vm.btnLoading = false
+        })
+      } else {
+        toastr.error('Vui lòng chọn đánh giá')
+      }
+    },
     reloadPickerChange (key) {
       let vm = this
       vm.showPicker = false

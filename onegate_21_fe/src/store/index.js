@@ -2125,7 +2125,7 @@ export const store = new Vuex.Store({
         }
         try {
           let dataPutAlpacaForm = new URLSearchParams()
-          dataPutAlpacaForm.append('formdata', JSON.stringify(data))
+          dataPutAlpacaForm.append('formdata', JSON.stringify(data['formData']))
           let url = state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid + '/formdata'
           axios.put(url, dataPutAlpacaForm, options).then(function (response) {
             resolve(response.data)

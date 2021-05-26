@@ -882,7 +882,37 @@ export const store = new Vuex.Store({
           })
         })
       })
-    }
+    },
+    submitVotingMC ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            className: data.className,
+            classPk: data.classPk,
+            selected: data.voted,
+            votingCode: ''
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            toastr.success('Cập nhật đánh giá thành công')
+            resolve(result.data)
+          }).catch(xhr => {
+            toastr.clear()
+            toastr.error('Cập nhật đánh giá thất bại')
+            reject(xhr)
+          })
+        }).catch(function (){})
+      })
+    },
   },
   mutations: {
     setInitData (state, payload) {
