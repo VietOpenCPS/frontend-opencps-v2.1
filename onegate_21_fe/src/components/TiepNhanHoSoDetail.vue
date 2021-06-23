@@ -48,8 +48,8 @@
             </v-expansion-panel>
           </div>
           <!--  -->
-          <thong-tin-chu-ho-so v-if="!mauCongVan" ref="thongtinchuhoso" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="isNotarization ? true : false" :applicantIdRequired="applicantIdRequired"></thong-tin-chu-ho-so>
-          <!-- <thong-tin-chu-ho-so-cong-van v-if="mauCongVan" ref="thongtinchuhosocongvan" :mauCongVan="mauCongVan"></thong-tin-chu-ho-so-cong-van> -->
+          <thong-tin-chu-ho-so v-if="!mauCongVan" ref="thongtinchuhoso" :detailDossier="thongTinChiTietHoSo" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="isNotarization ? true : false" :applicantIdRequired="applicantIdRequired"></thong-tin-chu-ho-so>
+          
           <!--  -->
           <div v-if="!isNotarization">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -674,6 +674,7 @@ export default {
     dueDateEdit: '',
     durationPhase: '',
     viaPortalDetail: 0,
+    showOptionName: false,
     showThuPhi: false,
     inputTypes: [1, 3],
     // inputTypes: [1, 3, 6],
@@ -898,6 +899,10 @@ export default {
     }
     try {
       vm.notifyConfig = notifyConfig
+    } catch (error) {
+    }
+    try {
+      vm.showOptionName = showOptionName
     } catch (error) {
     }
     try {
@@ -1253,6 +1258,7 @@ export default {
     },
     luuHoSo (type) {
       var vm = this
+      let currentQuery = vm.$router.history.current.query
       // console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
       let thongtinchunghoso = this.$refs.thongtinchunghoso ? this.$refs.thongtinchunghoso.getthongtinchunghoso() : {}
@@ -1301,6 +1307,7 @@ export default {
           tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
           tempData['originality'] = vm.originality
           tempData['dossierName'] = vm.briefNote
+          
           // console.log('data put dossier -->', tempData)
           if (dichvuchuyenphathoso) {
             let vnpostal = {
@@ -1322,6 +1329,8 @@ export default {
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               if (vm.formCode === 'UPDATE') {
+                // cập nhật notify config
+                vm.updateMetaData()
                 vm.loadingAction = false
                 window.history.back()
                 // vm.goBack()
@@ -1351,6 +1360,8 @@ export default {
                   if (x) {
                     vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
                       vm.loadingAction = false
+                      // cập nhật notify config
+                      vm.updateMetaData()
                       vm.$router.push({
                         path: '/danh-sach-ho-so/' + vm.index,
                         query: {
@@ -1366,6 +1377,8 @@ export default {
                 } else {
                   vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
                     vm.loadingAction = false
+                    // cập nhật notify config
+                    vm.updateMetaData()
                     let currentQuery = vm.$router.history.current.query
                     vm.$router.push({
                       path: '/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId,
@@ -1377,13 +1390,13 @@ export default {
                   })
                 }
               }
+              
             }).catch(function (xhr) {
               vm.loadingAction = false
               toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
-            // cập nhật notify config
-            vm.updateMetaData()
+            
           }, 500)
         }
       }
@@ -1391,6 +1404,7 @@ export default {
     tiepNhanHoSo (type) {
       let vm = this
       // console.log('luu Ho So--------------------')
+      let currentQuery = vm.$router.history.current.query
       vm.$store.commit('setPrintPH', false)
       let thongtinchunghoso = this.$refs.thongtinchunghoso ? this.$refs.thongtinchunghoso.getthongtinchunghoso() : {}
       let thongtinchuhoso = this.$refs.thongtinchuhoso ? this.$refs.thongtinchuhoso.getThongTinChuHoSo() : {}
@@ -1445,7 +1459,8 @@ export default {
           tempData['dossierName'] = vm.briefNote
           tempData['originality'] = vm.originality
           tempData['fromViaPostal'] = vm.fromViaPostal ? 1 : 0
-
+          
+          console.log('tempData_PUT', tempData)
           let doAction = function () {
             vm.$store.dispatch('putDossier', tempData).then(function (resultDossier) {
               vm.loadingAction = false
@@ -1568,8 +1583,8 @@ export default {
               vm.loadingAction = false
               toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+              vm.updateMetaData()
             })
-            vm.updateMetaData()
           }
 
           if (!vm.mauCongVan) {
@@ -1615,10 +1630,7 @@ export default {
         }
       } else {
         toastr.error('Dữ liệu không hợp lệ')
-        console.log(validThongtinchuhoso)
         vm.applicantIdRequired = validThongtinchuhoso['applicantIdRequired']
-        console.log(validThongtinchuhoso['applicantIdRequired'])
-       
       }
     },
     tiepNhanCongVan (type, isDraf) {
@@ -1813,6 +1825,9 @@ export default {
           // console.log('data put dossier -->', tempData)
           tempData['dossierId'] = vm.dossierId
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
+            // 
+            vm.updateMetaData()
+            // 
             let dataPostAction = {
               dossierId: vm.dossierId,
               actionCode: 7100,
@@ -1826,8 +1841,7 @@ export default {
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
             })
           })
-          // 
-          vm.updateMetaData()
+          
         }).catch(reject => {
         })
       }
@@ -1879,6 +1893,9 @@ export default {
       vm.$store.dispatch('postDossier', dataCreateGroup).then(function (result) {
         tempData['dossierId'] = result.dossierId
         vm.$store.dispatch('putDossier', tempData).then(function (result) {
+          // 
+          vm.updateMetaData()
+          // 
           vm.loadingAction = false
           vm.$router.push({
             path: '/danh-sach-ho-so/0/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,
@@ -1886,11 +1903,13 @@ export default {
           })
         }).catch(rejectXhr => {
           vm.loadingAction = false
+          // 
+          vm.updateMetaData()
+          // 
           toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại')
         })
-        // 
-        vm.updateMetaData()
+        
       })
     },
     // 
@@ -1984,15 +2003,38 @@ export default {
     },
     updateMetaData () {
       let vm = this
-      if (vm.originality !== 3 || !vm.notifyConfig) {
-        return
+      let currentQuery = vm.$router.history.current.query
+      if (vm.originality == 1 && vm.notifyConfig && !vm.showOptionName) {
+        let filter = {
+          dossierId: vm.dossierId,
+          smsNotify: vm.smsNotify,
+          emailNotify: vm.emailNotify
+        }
+        vm.$store.dispatch('updateMetaData', filter).then(result => {})
       }
-      let filter = {
-        dossierId: vm.dossierId,
-        smsNotify: vm.smsNotify,
-        emailNotify: vm.emailNotify
+      if (vm.showOptionName) {
+        let optionName = ''
+        if (currentQuery.hasOwnProperty('optionName') && currentQuery['optionName']) {
+          optionName = currentQuery['optionName']
+        }
+        if (vm.originality == 1 && vm.notifyConfig) {
+          let filter = {
+            dossierId: vm.dossierId,
+            smsNotify: vm.smsNotify,
+            emailNotify: vm.emailNotify,
+            optionName: optionName
+          }
+          vm.$store.dispatch('updateMetaData', filter).then(result => {})
+        } else {
+          let filter = {
+            dossierId: vm.dossierId,
+            optionName: optionName
+          }
+          vm.$store.dispatch('updateMetaData', filter).then(result => {})
+        }
+        
       }
-      vm.$store.dispatch('updateMetaData', filter).then(result => {})
+      
     },
     showHDTT () {
       let vm = this

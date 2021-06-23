@@ -367,7 +367,7 @@
       </v-form>
     </v-dialog>
     <!--  -->
-    <v-dialog v-model="dialogSelectGovagency" persistent max-width="580">
+    <v-dialog v-model="dialogSelectGovagency" persistent max-width="800">
       <v-toolbar flat dark color="primary">
         <v-toolbar-title>Chọn nơi nộp tờ khai</v-toolbar-title>
         <v-spacer></v-spacer>

@@ -6,6 +6,12 @@
         <v-card v-if="!mauCongVan">
           <v-card-text class="py-0">
             <v-layout wrap class="px-2 py-2">
+              <v-flex xs12 v-if="showOptionName && metaData && metaData.hasOwnProperty('optionName') && metaData['optionName']">
+                <div class="xs12 sm12 pb-1">
+                  <span class="pl-0">Dịch vụ: </span>
+                  <span class="pl-0 text-bold" style="text-align: justify;"> {{metaData['optionName']}} </span>
+                </div>
+              </v-flex>
               <v-flex xs12 sm4 class="pr-3" v-if="originality !== 1" style="word-break: break-word;">
                 <div class="xs12 sm12 pb-1">
                   <span class="pr-2">Chủ hồ sơ: </span>
@@ -400,7 +406,8 @@
       groupDossierNo: '',
       groupDossierName: '',
       showContactDetail: false,
-      xacthuc_BNG: false
+      xacthuc_BNG: false,
+      showOptionName: false
     }),
     computed: {
       loading() {
@@ -413,6 +420,10 @@
     },
     created() {
       var vm = this
+      try {
+        vm.showOptionName = showOptionName
+      } catch (error) {
+      }
       vm.thongTinChiTietHoSo = vm.detailDossier
       if (vm.thongTinChiTietHoSo['groupDossierId']) {
         vm.$store.dispatch('getDetailDossier', vm.thongTinChiTietHoSo['groupDossierId']).then(resultDossier => {
@@ -423,7 +434,6 @@
       try {
         if (xacthuc_BNG) {
           vm.xacthuc_BNG = true
-          
         }
       } catch (error) {
       }

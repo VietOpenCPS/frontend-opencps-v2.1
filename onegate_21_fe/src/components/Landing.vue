@@ -92,7 +92,6 @@
             item-value="serviceConfigId"
             return-object
             hide-no-data
-            :hide-selected="true"
             @change="changeServiceConfigs"
             clearable
             box
@@ -109,7 +108,6 @@
             item-value="processOptionId"
             return-object
             hide-no-data
-            :hide-selected="true"
             @change="changeDichVuConfigs"
             box
           ></v-autocomplete>
@@ -465,7 +463,6 @@
                   item-value="processOptionId"
                   return-object
                   hide-no-data
-                  :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
                   :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn']"
                   @change="changeDichVuConfigs"
@@ -673,7 +670,6 @@
                   item-value="processOptionId"
                   return-object
                   hide-no-data
-                  :hide-selected="true"
                   :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
@@ -1111,6 +1107,7 @@ export default {
     hiddenFilterDomain: false,
     focusSelect: 0,
     srcDownloadIframe: '',
+    showOptionName: false,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       cmndHoChieu: (value) => {
@@ -1213,6 +1210,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.showOptionName = showOptionName
+    } catch (error) {
+    }
     vm.selectMultiplePage = []
     vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
     vm.$nextTick(function () {
@@ -3017,6 +3018,10 @@ export default {
           let query_redirect = vm.$router.history.current.query
           if (vm.itemAction['form'] === 'NEW_GROUP_CV' || vm.itemAction['form'] === 'NEW_GROUP_CV_DI') {
             query_redirect = Object.assign(query_redirect, {formActionGroup: JSON.stringify(vm.itemAction)})
+            console.log('query_redirect_Landing', query_redirect)
+          }
+          if (vm.itemAction['form'] === 'NEW' && vm.showOptionName) {
+            query_redirect = Object.assign(query_redirect, {optionName: vm.dichVuSelected['optionName']})
             console.log('query_redirect_Landing', query_redirect)
           }
           vm.$store.dispatch('postDossier', data).then(function (result) {

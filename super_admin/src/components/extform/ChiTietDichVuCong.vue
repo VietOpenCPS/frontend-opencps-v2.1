@@ -371,7 +371,7 @@ export default {
     getDomains (agencyCode) {
       let vm = this
       let data = {
-        agency: agencyCode ? agencyCode : ''
+        agencyCode: agencyCode ? agencyCode : ''
       }
       vm.domainList = []
       vm.$store.dispatch('getDomain', data).then(
@@ -386,7 +386,7 @@ export default {
       let vm = this
       let data = {
         domain: domainCode ? domainCode : '',
-        agency: agencyCode ? agencyCode : ''
+        administration: agencyCode ? agencyCode : ''
       }
       vm.serviceInfoList = []
       vm.$store.dispatch('getServiceInfo', data).then(function(res) {

@@ -27,7 +27,7 @@
                 >
               </v-select>
             </v-flex>
-            <v-flex xs12 sm8 class="px-2 text-right" style="    padding-top: 1px;">
+            <v-flex xs12 sm8 class="px-2 text-right" style="padding-top: 1px;">
               <v-btn v-if="govAgencyCode === ''" flat class="mx-0 my-0" v-on:click.native="toNativeViewType()">
                 <span v-if="chartView">Lĩnh vực</span>
                 <span v-else>Đơn vị</span>
@@ -276,7 +276,7 @@
                     <td align="center">(20)</td>
                   </tr>
                   <tr v-for="(item, index) in agencyLists" v-bind:key="index" v-if="((govAgencyCode === '' || String(chartView) === 'true') && item.govAgencyName !== '') || ((govAgencyCode !== ''  || String(chartView) === 'false') && item.domainName !== '')">
-                    <td align="center">{{index}}</td>
+                    <td align="center">{{index + 1}}</td>
                     <td v-if="govAgencyCode !== '' || String(chartView) === 'false'" align="left" style="padding: 8px 10px;">{{item.domainName}}</td>
                     <td v-else align="left" style="padding: 8px 10px;">{{item.govAgencyName}}</td>
                     <td align="center">{{item.processCount}}</td>
@@ -758,7 +758,7 @@ export default {
         for (let key in vm.agencyLists) {
           let currentData = vm.agencyLists[key]
           console.log('currentData', currentData)
-          if (currentData.domainName === '' && currentData.domainName === '') {
+          if (currentData.domainCode === '' && currentData.govAgencyCode === '') {
             vm.totalCounter['total_3'] = currentData.processCount
             vm.totalCounter['total_4'] = currentData.remainingCount
             vm.totalCounter['total_5'] = currentData.receivedCount

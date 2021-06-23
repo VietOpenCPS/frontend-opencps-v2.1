@@ -4,10 +4,11 @@ import Home from '@/components/Home'
 import NotFound from '@/components/NotFound'
 import TableEditor from '@/components/screens/TableEditor'
 import TableEditorForm from '@/components/screens/TableEditorForm.vue'
-// import DichVuCong from '@/components/extform/DichVuCong.vue'
-// import ChiTietDichVuCong from '@/components/extform/ChiTietDichVuCong.vue'
-// import QuyTrinhThucHienDvc from '@/components/extform/QuyTrinhThucHienDvc.vue'
-// import ChiTietQuyTrinhThucHienDvc from '@/components/extform/ChiTietQuyTrinhThucHienDvc.vue'
+import DichVuCong from '@/components/extform/DichVuCong.vue'
+import ChiTietDichVuCong from '@/components/extform/ChiTietDichVuCong.vue'
+import QuyTrinhThucHienDvc from '@/components/extform/QuyTrinhThucHienDvc.vue'
+import ChiTietQuyTrinhThucHienDvc from '@/components/extform/ChiTietQuyTrinhThucHienDvc.vue'
+import ThuTucHanhChinh from '@/components/extform/ThuTucHanhChinh.vue'
 import QuyTrinhThuTuc from '@/components/extform/QuyTrinhThuTuc.vue'
 import DinhKemThuTuc from '@/components/extform/DinhKemThuTuc.vue'
 import ThamSoHeThong from '@/components/extform/ThamSoHeThong.vue'
@@ -37,42 +38,52 @@ const routes = [
       requiresAuth: true
     },
     children: [
-      // {
-      //   path: '/table/opencps_serviceconfig',
-      //   name: 'DichVuCong',
-      //   component: DichVuCong,
-      //   props: true,
-      //   meta: {
-      //     requiresAuth: true
-      //   }
-      // },
-      // {
-      //   path: '/table/opencps_serviceconfig/editor/:id',
-      //   name: 'ChiTietDichVuCong',
-      //   component: ChiTietDichVuCong,
-      //   props: true,
-      //   meta: {
-      //     requiresAuth: true
-      //   }
-      // },
-      // {
-      //   path: '/table/opencps_processoption',
-      //   name: 'QuyTrinhThucHienDvc',
-      //   component: QuyTrinhThucHienDvc,
-      //   props: true,
-      //   meta: {
-      //     requiresAuth: true
-      //   }
-      // },
-      // {
-      //   path: '/table/opencps_processoption/editor/:id',
-      //   name: 'ChiTietQuyTrinhThucHienDvc',
-      //   component: ChiTietQuyTrinhThucHienDvc,
-      //   props: true,
-      //   meta: {
-      //     requiresAuth: true
-      //   }
-      // },
+      {
+        path: '/table/opencps_serviceconfig',
+        name: 'DichVuCong',
+        component: DichVuCong,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_serviceconfig/editor/:id',
+        name: 'ChiTietDichVuCong',
+        component: ChiTietDichVuCong,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_processoption',
+        name: 'QuyTrinhThucHienDvc',
+        component: QuyTrinhThucHienDvc,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_processoption/editor/:id',
+        name: 'ChiTietQuyTrinhThucHienDvc',
+        component: ChiTietQuyTrinhThucHienDvc,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+
+      {
+        path: '/table/opencps_serviceinfo',
+        name: 'ThuTucHanhChinh',
+        component: ThuTucHanhChinh,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
       {
         path: '/table/:tableName',
         name: 'TableEditor',
@@ -208,15 +219,15 @@ const routes = [
           requiresAuth: true
         }
       },
-      {
-        path: '/table/opencps_statists/statists',
-        name: 'ThongKeTruyCap',
-        component: ThongKeTruyCap,
-        props: true,
-        meta: {
-          requiresAuth: true
-        }
-      },
+      // {
+      //   path: '/table/opencps_statists/statists',
+      //   name: 'ThongKeTruyCap',
+      //   component: ThongKeTruyCap,
+      //   props: true,
+      //   meta: {
+      //     requiresAuth: true
+      //   }
+      // },
       {
         path: '/table/opencps_tracking/tracking-api',
         name: 'TheoDoiLogTruyCap',

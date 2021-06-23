@@ -5,6 +5,7 @@ import axios from 'axios'
 import support from './support.json'
 import $ from 'jquery'
 import saveAs from 'file-saver'
+import parseString from'xml2js'
 // 
 
 Vue.use(toastr)
@@ -1389,6 +1390,9 @@ export const store = new Vuex.Store({
         dataPostdossier.append('govAgencyCode', data.govAgencyCode)
         dataPostdossier.append('dossierTemplateNo', data.templateNo)
         dataPostdossier.append('originality', data.originality)
+        if (data.hasOwnProperty('originality') && data.originality == 3) {
+          dataPostdossier.append('serviceLevel', 2)
+        }
         if (data.j_captcha_response) {
           dataPostdossier.append('j_captcha_response', data.j_captcha_response)
         }
@@ -1744,6 +1748,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('applicantNote', state.applicantNote)
         dataPutdossier.append('dossierName', data.dossierName ? data.dossierName : '')
         dataPutdossier.append('isSameAsApplicant', isSameAsApplicant)
+        dataPutdossier.append('briefNote', data.briefNote ? data.briefNote : '')
         if (data.editable) {
           dataPutdossier.append('dueDate', data.dueDate ? data.dueDate : '')
         }
@@ -2458,7 +2463,6 @@ export const store = new Vuex.Store({
             }
           }
           let listHistoryProcessing = []
-          // axios.get('http://127.0.0.1:8080/api/dossiers/dossierlogs/77602/logs', param).then(function (response) {
           axios.get(state.initData.dossierlogsApi + '/' + data.dossierId + '/logs', param).then(function (response) {
             let serializable = response.data
             for (let key in serializable.data) {
@@ -4438,8 +4442,11 @@ export const store = new Vuex.Store({
             smsNotify: filter['smsNotify'],
             emailNotify: filter['emailNotify']
           }
+          if (filter['optionName']) {
+            data['optionName'] = filter['optionName']
+          }
           let formData = new URLSearchParams()
-          formData.append('metaData', JSON.stringify(data))
+          formData.append('data', JSON.stringify(data))
           axios.put('/o/rest/v2/dossiers/' + filter['dossierId'] + '/metadata' ,formData , param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
@@ -5192,7 +5199,7 @@ export const store = new Vuex.Store({
             'Content-Type': 'application/octet-stream'
           },
           responseType: 'blob'
-        };
+        }
 
         axios(config)
         .then(function (response) {
@@ -5229,7 +5236,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    searchLgsp({commit, state}, filter) {
+    searchLgspDoanhNghiep({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let config = {
           headers: {
@@ -5240,6 +5247,87 @@ export const store = new Vuex.Store({
           resolve(response.data)
         }).catch(xhr => {
           reject('')
+        })
+      })
+    },
+    searchLgspCongDan({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {}
+        }
+        let systemLgsp = ''
+        try {
+          systemLgsp = systemLgspConfig
+        } catch (error) {
+        }
+        let dataInput = ''
+        if (systemLgsp === 'DongThap') {
+          dataInput = {
+            "MaYeuCau" : (new Date()).getTime(),
+            "MaTichHop" : "003",
+            "StaffEmail" : filter.StaffEmail,
+            "GovAgencyCode": filter.GovAgencyCode,
+            "MaDVC" : "G18-YT04",
+            "MaTichHop" : "003",
+            "HoVaTen" : filter.applicantName,
+            "type" : "XacThucThongTinCongDan",
+            "NgayThangNamSinh" : filter.birthDate,
+            "MaCanBo" : "vhcgiang@dongthap.gov.vn"
+          }
+        } else if (systemLgsp === '' || systemLgsp === 'HauGiang') {
+          dataInput = {
+            "MaYeuCau" : (new Date()).getTime(),
+            "MaTichHop" : "003",
+            "StaffEmail" : filter.StaffEmail,
+            "GovAgencyCode": filter.GovAgencyCode,
+            "MaDVC" : filter.MaDVC,
+            "MaTichHop" : "003",
+            "HoVaTen" : filter.applicantName,
+            "type" : "XacThucThongTinCongDan",
+            "NgayThangNamSinh" : filter.birthDate,
+          }
+        }
+        
+        if (String(filter.applicantIdNo).length === 9) {
+          dataInput['SoCMND'] = filter.applicantIdNo
+        } else {
+          dataInput['SoDinhDanh'] = filter.applicantIdNo
+        }
+        axios({
+          method: 'POST',
+          url: '/o/rest/v2/qldc',
+          headers: config.headers,
+          params: config.params,
+          data: dataInput
+        }).then(function (response) {
+          let serializable = response.data
+          let dataCitizen = ''
+          if (systemLgsp === 'DongThap') {
+            if (serializable && serializable.hasOwnProperty('data') && String(serializable.data) == 'true') {
+              dataCitizen = {
+                SoLuongCongDan: 1
+              }
+              resolve(dataCitizen)
+            } else {
+              dataCitizen = {
+                SoLuongCongDan: 0
+              }
+              resolve(dataCitizen)
+            }
+          } else if (systemLgsp === '' || systemLgsp === 'HauGiang') {
+            if (serializable && serializable.hasOwnProperty('Body') && serializable["Body"].hasOwnProperty('XacThucThongTinCongDanResponse')) {
+              dataCitizen = serializable["Body"]["XacThucThongTinCongDanResponse"]
+              resolve(dataCitizen)
+            } else {
+              reject('')
+            }
+          }
+        }).catch(function (error) {
+          let dataReject = error.response.data
+          reject(dataReject)
         })
       })
     },

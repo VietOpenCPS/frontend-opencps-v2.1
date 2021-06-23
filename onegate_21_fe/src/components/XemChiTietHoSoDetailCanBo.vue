@@ -319,7 +319,7 @@
                   :disabled="dialogPDFLoading"
                 >
                   <v-icon>print</v-icon> &nbsp;
-                  In biên lai
+                  In biên lai điện tử
                   <span slot="loader">Loading...</span>
                 </v-btn>
               </div>
@@ -1062,6 +1062,7 @@ export default {
     srcDownloadIframe: '',
     itemAction: '',
     hasDownloadAllFile: false,
+    sendInvoice: false,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -1792,9 +1793,12 @@ export default {
           isPopup = true
           vm.showPostalService = true
         }
+        if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' && result.preCondition.indexOf('sendInvoiceVNPT=1') >= 0) {
+          vm.sendInvoice = true
+        }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
-          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3')) {
+          if (vm.originality == '1' && (result.payment.requestPayment == 3 || result.payment.requestPayment == 5) && vm.paymentDetail && vm.paymentDetail['paymentStatus'] != 3 && vm.paymentDetail['paymentStatus'] != 5) {
             isPopup = true
             vm.showThanhToanDienTu = true
             let filter = {
@@ -3312,16 +3316,30 @@ export default {
         referenceUid: vm.thongTinChiTietHoSo.referenceUid
       }
       vm.dialogPDFLoading = true
-      vm.$store.dispatch('printPay', filter).then(function (result) {
-        vm.dialogPDFLoading = false
-        vm.titleDialogPdf = 'Biên lai thanh toán'
-        vm.dialogPDF = true
-        setTimeout(function () {
-          document.getElementById('dialogPDFPreviewXl').src = result
-        }, 200)
-      }).catch(function(){
-        vm.dialogPDFLoading = false
-      })
+      if (!vm.sendInvoice) {
+        vm.$store.dispatch('printPay', filter).then(function (result) {
+          vm.dialogPDFLoading = false
+          vm.titleDialogPdf = 'Biên lai thanh toán'
+          vm.dialogPDF = true
+          setTimeout(function () {
+            document.getElementById('dialogPDFPreviewXl').src = result
+          }, 200)
+        }).catch(function(){
+          vm.dialogPDFLoading = false
+        })
+      } else {
+        vm.$store.dispatch('printPayVnpt', filter).then(function (result) {
+          vm.dialogPDFLoading = false
+          vm.titleDialogPdf = 'Biên lai thanh toán'
+          vm.dialogPDF = true
+          setTimeout(function () {
+            document.getElementById('dialogPDFPreviewXl').src = result
+          }, 200)
+        }).catch(function(){
+          vm.dialogPDFLoading = false
+        })
+      }
+      
     },
     filterNextActionEnable (nextaction) {
       var isEnabale = false

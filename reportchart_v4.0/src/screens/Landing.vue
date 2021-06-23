@@ -83,7 +83,10 @@
                     </v-flex>
                     <v-flex class="xs9 pl-4 pt-2">
                       <p><span>Thủ tục </span> <span class="text-bold">mức độ 2</span> </p>
-                      <p class="text-bold" style="font-size: 1.75em">{{levelList[0]['count']}}</p>
+                      <p>
+                        <span class="text-bold" style="font-size: 1.75em;">{{levelList[0]['count']}}</span>
+                        <span style="font-size: 1.3em;">&nbsp;({{levelList[0]['percent']}}%)</span>
+                      </p>
                     </v-flex>
                   </v-layout>
                 </v-card>
@@ -98,7 +101,10 @@
                     </v-flex>
                     <v-flex class="xs9 pl-4 pt-2">
                       <p><span>Thủ tục </span> <span class="text-bold">mức độ 3</span> </p>
-                      <p class="text-bold" style="font-size: 1.75em">{{levelList[1]['count']}}</p>
+                      <p>
+                        <span class="text-bold" style="font-size: 1.75em;">{{levelList[1]['count']}}</span>
+                        <span style="font-size: 1.3em;">&nbsp;({{levelList[1]['percent']}}%)</span>
+                      </p>
                     </v-flex>
                   </v-layout>
                 </v-card>
@@ -113,7 +119,10 @@
                     </v-flex>
                     <v-flex class="xs9 pl-4 pt-2">
                       <p><span>Thủ tục </span> <span class="text-bold">mức độ 4</span> </p>
-                      <p class="text-bold" style="font-size: 1.75em">{{levelList[2]['count']}}</p>
+                      <p>
+                        <span class="text-bold" style="font-size: 1.75em;">{{levelList[2]['count']}}</span>
+                        <span style="font-size: 1.3em;">&nbsp;({{levelList[2]['percent']}}%)</span>
+                      </p>
                     </v-flex>
                   </v-layout>
                 </v-card>
@@ -657,9 +666,9 @@ export default {
     listDonViXa: [],
     donViXa: 'total',
     levelList: [
-      {level: 2, count: "0", levelName: 2},
-      {level: 3, count: "0", levelName: 3},
-      {level: 4, count: "0", levelName: 4}
+      {level: 2, count: "0", levelName: 2, percent: "0%"},
+      {level: 3, count: "0", levelName: 3, percent: "0%"},
+      {level: 4, count: "0", levelName: 4, percent: "0%"}
     ],
     totalTTHC: 0,
     groupCode: "SBN",
@@ -1115,14 +1124,18 @@ export default {
         if (serializable.data) {
           let totalXXX = 0
           let result = serializable.data
+          let total = serializable.total
           for (let key in result) {
             totalXXX = totalXXX + parseInt(result[key]['count'])
             if (result[key]['level'] === 2) {
               vm.levelList[0]['count'] = result[key]['count']
+              vm.levelList[0]['percent'] = ((Number(result[key]['count'])/total)*100).toFixed(1)
             } else if (result[key]['level'] === 3) {
               vm.levelList[1]['count'] = result[key]['count']
+              vm.levelList[1]['percent'] = ((Number(result[key]['count'])/total)*100).toFixed(1)
             } else if (result[key]['level'] === 4) {
               vm.levelList[2]['count'] = result[key]['count']
+              vm.levelList[2]['percent'] = ((Number(result[key]['count'])/total)*100).toFixed(1)
             }
           }
           vm.totalTTHC = totalXXX

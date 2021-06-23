@@ -17,12 +17,35 @@
                 </v-tooltip>
                 <v-card-text :class="originality === 3 && thongTinChuHoSo.userType === '2' && traCuuLgsp ? 'pt-0' : 'pt-3'">
                   <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '2' && traCuuLgsp">
-                    <v-btn class="mx-0" color="primary" @click.stop="showDialogSearchLgsp()">
+                    <v-btn class="mx-0" color="primary" @click.stop="showDialogSearchLgspDoanhNghiep()">
                       <v-icon>fas fa fa-search-plus</v-icon> &nbsp;
                       Tra cứu CSDL Quốc Gia
                     </v-btn>
                   </v-flex>
+                  <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '1' && traCuuLgspCongDan">
+                    <v-btn :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
+                      <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
+                      <v-progress-circular :size="24" v-if="loadingSearchLgsp"
+                        indeterminate
+                        color="white"
+                      ></v-progress-circular>&nbsp;
+                      <span v-if="!loadingSearchLgsp">Kiểm tra thông tin công dân</span>
+                      <span v-if="loadingSearchLgsp">Đang kiểm tra thông tin công dân</span>
+                    </v-btn>
+                  </v-flex>
                   <v-layout wrap>
+                    <v-flex xs12 v-if="originality == '3' && thongTinChuHoSo.userType == '1' && traCuuLgspCongDan && warningLgsp" class="mb-2">
+                      <v-alert
+                        :value="true"
+                        :color="lgspAlertColor"
+                        icon="warning"
+                        outline
+                        class="px-2 py-2"
+                        style="max-width: 570px;"
+                      >
+                        <span>{{messageLgsp}}</span>
+                      </v-alert>
+                    </v-flex>
                     <v-flex xs12 class="mb-3 text-xs-center" v-if="validateSameApplicantIdNo && sameApplicantIdNo">
                       <div>
                         <span class="mr-2"><v-icon color="warning">error_outline</v-icon></span>
@@ -710,7 +733,7 @@
             <v-icon>clear</v-icon> &nbsp;
             Thoát
           </v-btn>
-          <v-btn class="mr-3" color="primary" @click.native="updateApplicant">
+          <v-btn class="mr-3" :loading="loadingUpdateLgsp" :disabled="loadingUpdateLgsp"  color="primary" @click.native="updateApplicant">
             <v-icon>save</v-icon> &nbsp;
             Cập nhật
           </v-btn>
@@ -721,9 +744,10 @@
     <v-dialog v-model="dialog_searchLgsp" scrollable persistent max-width="700px">
       <v-card>
         <v-toolbar dark color="primary">
-          <v-toolbar-title>Tra cứu CSDL Quốc Gia về thông tin doanh nghiệp</v-toolbar-title>
+          <v-toolbar-title v-if="lgspType === 'business'">Tra cứu CSDL Quốc Gia về thông tin doanh nghiệp</v-toolbar-title>
+          <v-toolbar-title v-if="lgspType === 'citizen'">Tra cứu CSDL Quốc Gia về dân cư</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn icon dark @click.native="dialog_searchLgsp = false">
+          <v-btn icon dark @click.native="closeSearchLgsp">
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
@@ -731,12 +755,55 @@
           <v-form ref="formLgsp" v-model="valid" class="py-3 px-0 grid-list">
             <v-layout row wrap class="px-0 py-0">
               <v-flex xs12>
-                <v-text-field label="Mã số thuế doanh nghiệp" v-model="applicantIdNoLgsp"
-                 box clearable :rules="[rules.required]"></v-text-field>
+                <v-text-field :label="lgspType === 'business' ? 'Mã số thuế doanh nghiệp' : 'Số CCCD hoặc số CMND'" v-model="applicantIdNoLgsp"
+                 box clearable :rules="lgspType === 'business' ? [rules.required] : [rules.required, rules.credit]"></v-text-field>
               </v-flex>
+              <v-flex xs12 v-if="lgspType === 'citizen'">
+                <v-text-field label="Họ và tên" v-model="applicantNameLgsp" :rules="[rules.required]"
+                 box clearable></v-text-field>
+              </v-flex>
+              <v-flex xs12 v-if="lgspType === 'citizen'">
+                <!-- <v-text-field
+                  box
+                  label="Ngày tháng năm sinh"
+                  :rules="[rules.required]"
+                  v-model="applicantBirthDate"
+                  placeholder="dd/mm/yyyy"
+                  mask="##/##/####"
+                  clearable
+                ></v-text-field> -->
+                <v-menu
+                  ref="menuApplicantIdDate"
+                  :close-on-content-click="false"
+                  v-model="menuApplicantIdDate"
+                  :nudge-right="40"
+                  lazy
+                  transition="scale-transition"
+                  offset-y
+                  full-width
+                  max-width="290px"
+                  min-width="290px"
+                >
+                  <v-text-field
+                    label="Ngày sinh"
+                    :rules="[rules.required]"
+                    box
+                    slot="activator"
+                    v-model="applicantBirthDate"
+                    append-icon="event"
+                    @blur="ngaysinh = parseDate(applicantBirthDate)"
+                    placeholder="dd/mm/yyyy"
+                    mask="##/##/####"
+                  ></v-text-field>
+                  <v-date-picker min="1900-01-01" :max="getMaxdate()" ref="picker"
+                  :first-day-of-week="1" locale="vi" v-model="ngaysinh" no-title @input="menuApplicantIdDate = false"></v-date-picker>
+                </v-menu>
+              </v-flex>
+              
               <v-flex xs12 class="text-right">
                 <v-btn color="primary"
-                  @click="searchLgsp"
+                  v-if="lgspType === 'business'"
+                  @click="searchLgspDoanhNghiep"
                   :loading="loadingSearchLgsp"
                   :disabled="loadingSearchLgsp"
                   class="mx-0 my-0"
@@ -746,13 +813,25 @@
                   Tra cứu
                   <span slot="loader">Loading...</span>
                 </v-btn>
+                <v-btn color="primary"
+                  v-if="lgspType === 'citizen'"
+                  @click="searchLgspCongDan"
+                  :loading="loadingSearchLgsp"
+                  :disabled="loadingSearchLgsp"
+                  class="mx-0 my-0"
+                >
+                  <v-icon size="20">search</v-icon>
+                  &nbsp;
+                  Tra cứu
+                  <span slot="loader">Đang tải...</span>
+                </v-btn>
               </v-flex>
               
             </v-layout>
           </v-form>
           <div>
-            <table class="datatable table" style="border-top: 1px solid #dedede;" v-if="applicantLgspInfomation">
-              <tbody>
+            <table :class="lgspType === 'business' ? 'datatable table' : 'datatable table my-3'" style="border-top: 1px solid #dedede;" v-if="lgspType === 'business' && applicantLgspInfomation">
+              <tbody v-if="lgspType === 'business'">
                 <tr>
                   <td width="200" class="pt-2"><span class="text-bold">Tên doanh nghiệp</span></td>
                   <td class="pt-2"><span>{{applicantLgspInfomation.NAME}}</span></td>
@@ -783,8 +862,31 @@
                 </tr>
                 
               </tbody>
+              <tbody v-if="lgspType === 'citizen'">
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Họ và tên công dân</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.HoVaTen}}</span></td>
+                </tr>
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Số căn cước công dân</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.SoDinhDanh}}</span></td>
+                </tr>
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Số chứng minh nhân dân</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.SoCMND}}</span></td>
+                </tr>
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Ngày sinh</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.NgayThangNamSinh}}</span></td>
+                </tr>
+                <tr>
+                  <td width="200" class="pt-2"><span class="text-bold">Giới tính</span></td>
+                  <td class="pt-2"><span>{{applicantLgspInfomation.GioiTinh == '1' ? 'Nam' : (applicantLgspInfomation.GioiTinh == '2' ? 'Nữ' : 'Chưa có thông tin')}}</span></td>
+                </tr>
+                
+              </tbody>
             </table>
-            <v-flex xs12 class="text-right my-2" v-if="applicantLgspInfomation">
+            <v-flex xs12 class="text-right my-2" v-if="applicantLgspInfomation && lgspType === 'business'">
               <v-btn color="primary"
                 @click="addApplicantLgsp"
                 class="mx-0 my-0"
@@ -794,11 +896,35 @@
                 Lấy thông tin
               </v-btn>
             </v-flex>
-            <div v-if="applicantLgspInfomation === false" class="mx-1 flex mb-3">
-              <v-alert outline color="warning" icon="priority_high" :value="true">
+            
+            <div v-if="applicantLgspInfomation === false && lgspType === 'business'" class="mx-1 flex mb-3">
+              <v-alert v-if="lgspType === 'business'" outline color="primary" icon="priority_high" :value="true">
                 Không có thông tin doanh nghiệp
               </v-alert>
             </div>
+            <div v-if="lgspType === 'citizen' && applicantLgspInfomation !== ''" class="mx-1 flex mb-3">
+              <v-alert outline :color="lgspAlertColor" icon="warning" :value="true">
+                {{messageLgsp}}
+              </v-alert>
+            </div>
+            <v-flex xs12 class="text-right my-2" v-if="applicantLgspInfomation && lgspType === 'citizen'">
+              <!-- <v-btn color="primary"
+                @click="syncApplicantLgsp"
+                class="mx-0 my-0"
+              >
+                <v-icon size="20">sync</v-icon>
+                &nbsp;
+                Đồng bộ thông tin
+              </v-btn> -->
+              <v-btn color="primary"
+                @click="closeSearchLgsp"
+                class="mx-0 my-0 white--text"
+              >
+                <v-icon size="20" class="white--text">clear</v-icon>
+                &nbsp;
+                Đóng
+              </v-btn>
+            </v-flex>
           </div>
         </v-card-text>
       </v-card>
@@ -820,7 +946,7 @@ export default {
     'suggestions': Suggestions,
     'tiny-pagination': TinyPagination
   },
-  props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode', 'applicantIdRequired'],
+  props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode', 'applicantIdRequired', 'detailDossier'],
   data: () => ({
     validateSameApplicantIdNo: false,
     sameApplicantIdNo: '',
@@ -889,7 +1015,7 @@ export default {
     ],
     labelSwitch: {
       '1': {
-        cmtnd: 'CMND/ Hộ chiếu',
+        cmtnd: 'CCCD/ CMND/ Hộ chiếu',
         nguoi_nop: 'Họ và tên'
       },
       '2': {
@@ -969,6 +1095,15 @@ export default {
         }
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       },
+      credit: (value) => {
+        if (value.length === 9) {
+          const pattern = /^(([0-9]{9,9}))$/
+          return pattern.test(value) || 'Số CCCD, số CMND gồm 9 hoặc 12 ký tự 0-9'
+        } else {
+          const pattern = /^(([0-9]{12,12}))$/
+          return pattern.test(value) || 'Số CCCD, số CMND gồm 9 hoặc 12 ký tự 0-9'
+        }
+      },
       varchar50: (val) => {
         if(val){
           val = String(val).trim()
@@ -1024,9 +1159,19 @@ export default {
     traCuuLgsp: false,
     dialog_searchLgsp: false,
     loadingSearchLgsp: false,
+    loadingUpdateLgsp: false,
     applicantIdNoLgsp: '',
+    applicantNameLgsp: '',
+    applicantBirthDate: null,
+    ngaysinh: null,
+    menuApplicantIdDate: false,
     applicantLgspInfomation: '',
-    defaultCityCode: false
+    defaultCityCode: false,
+    traCuuLgspCongDan: false,
+    lgspType: 'business',
+    warningLgsp: false,
+    messageLgsp: '',
+    lgspAlertColor: 'primary'
   }),
   computed: {
     loading () {
@@ -1055,10 +1200,17 @@ export default {
         contactTelNo: this.thongTinChuHoSo.contactTelNo
       }
       return data
-    }
+    },
+    userLoginInfomation () {
+      return this.$store.getters.getUserLogin
+    },
   },
   created () {
     let vm = this
+    try {
+      vm.traCuuLgspCongDan = traCuuLgspCongDan
+    } catch (error) {
+    }
     try {
       vm.validateSameApplicantIdNo = checkTrungChuHoSo
     } catch (error) {
@@ -1084,7 +1236,7 @@ export default {
     if (vm.hasOrganization) {
       vm.labelSwitch = {
         '1': {
-          cmtnd: 'CMND/ Hộ chiếu',
+          cmtnd: 'CCCD/ CMND/ Hộ chiếu',
           nguoi_nop: 'Họ và tên'
         },
         '2': {
@@ -1247,6 +1399,12 @@ export default {
       this.toDateFormatted = this.formatDate(val)
       this.applicantEdit['applicantIdDate'] = this.toDateFormatted
     },
+    ngaysinh (val) {
+      this.applicantBirthDate = this.formatDate(val)
+    },
+    menuApplicantIdDate (val) {
+      val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
+    }
   },
   methods: {
     changeSuggess (val) {
@@ -1504,6 +1662,10 @@ export default {
           // vm.thongTinChuHoSo.applicantIdNo = query.trim()
         }
         vm.$store.commit('setApplicantId', query)
+        // check LGSP
+        // if (vm.originality === 3 && vm.traCuuLgspCongDan && vm.thongTinChuHoSo.userType === '1') {
+        //   vm.searchLgspCongDan('auto')
+        // }
       }, 2000)
       if (query.trim().length === 0) {
         vm.thongTinChuHoSo.applicantIdNo = ''
@@ -1583,9 +1745,16 @@ export default {
       vm.thongTinChuHoSo['contactTelNo'] = item['contactTelNo'] ? item['contactTelNo'] : ''
       vm.thongTinChuHoSo['contactEmail'] = item['contactEmail'] ? item['contactEmail'] : ''
       vm.thongTinChuHoSo.cityCode = item['cityCode'] ? item['cityCode'] : ''
+      if (vm.functionTimeOut) {
+        clearTimeout(vm.functionTimeOut)
+      }
       setTimeout(function () {
         vm.$store.commit('setApplicantId', vm.thongTinChuHoSo['applicantIdNo'])
         vm.checkApplicantInfos()
+        // check LGSP
+        // if (vm.originality === 3 && vm.traCuuLgspCongDan && vm.thongTinChuHoSo.userType === '1') {
+        //   vm.searchLgspCongDan('auto')
+        // }
       }, 2000)
       
       function changeCity (data) {
@@ -2009,22 +2178,36 @@ export default {
       vm.thongTinChuHoSo['applicantName'] = ''
 
     },
-    showDialogSearchLgsp () {
+    showDialogSearchLgspDoanhNghiep () {
       let vm = this
+      vm.lgspType = 'business'
       vm.applicantIdNoLgsp = vm.thongTinChuHoSo['applicantIdNo']
       vm.applicantLgspInfomation = ''
       vm.dialog_searchLgsp = true
       if (vm.applicantIdNoLgsp.trim()) {
-        vm.searchLgsp()
+        vm.searchLgspDoanhNghiep()
       }
     },
-    searchLgsp () {
+    showDialogSearchLgspCongDan () {
+      let vm = this
+      vm.lgspType = 'citizen'
+      vm.applicantIdNoLgsp = vm.thongTinChuHoSo['applicantIdNo']
+      vm.applicantNameLgsp = vm.thongTinChuHoSo['applicantName']
+      vm.applicantLgspInfomation = ''
+      vm.dialog_searchLgsp = true
+      // if (vm.applicantIdNoLgsp.trim() && vm.applicantNameLgsp.trim()) {
+      //   vm.searchLgspCongDan('auto')
+      // } else {
+      //   toastr.error('Vui lòng nhập đầy đủ số CCCD/CMND và họ tên để kiểm tra')
+      // }
+    },
+    searchLgspDoanhNghiep () {
       let vm = this
       let filter = {
         applicantIdNo: vm.applicantIdNoLgsp.trim()
       }
       if (vm.applicantIdNoLgsp.trim()) {
-        vm.$store.dispatch('searchLgsp', filter).then(result => {
+        vm.$store.dispatch('searchLgspDoanhNghiep', filter).then(result => {
           vm.applicantLgspInfomation = result
         }).catch(xhr => {
           vm.applicantLgspInfomation = false
@@ -2033,12 +2216,227 @@ export default {
         vm.applicantLgspInfomation = false
       }
     },
+    searchLgspCongDan (event) {
+      let vm = this
+      if (String(vm.applicantIdNoLgsp).trim() && String(vm.applicantNameLgsp).trim() && vm.applicantBirthDate && String(vm.applicantBirthDate).length === 8) {
+        let dateInput = ''
+        if (String(vm.applicantBirthDate).indexOf('/') > 0) {
+          let date = String(vm.applicantBirthDate).split('/')
+          dateInput = date[2] + '-' + date[1] + '-' + date[0]
+        } else {
+          dateInput = String(vm.applicantBirthDate).substring(4,8) + '-' + String(vm.applicantBirthDate).substring(2,4) + '-' + String(vm.applicantBirthDate).substring(0,2)
+        }
+        let filter = {
+          applicantIdNo: event === 'auto' ? String(vm.thongTinChuHoSo.applicantIdNo).trim() : String(vm.applicantIdNoLgsp).trim(),
+          applicantName: event === 'auto' ? vm.convertString((String(vm.thongTinChuHoSo.applicantName).trim())).toUpperCase() : vm.convertString(String(vm.applicantNameLgsp).trim()).toUpperCase(),
+          birthDate: dateInput,
+          StaffEmail : vm.userLoginInfomation && vm.userLoginInfomation.hasOwnProperty('employeeEmail') ? vm.userLoginInfomation.employeeEmail : '',
+          GovAgencyCode: vm.detailDossier ? vm.detailDossier.govAgencyCode : '',
+          MaDVC: vm.detailDossier ? vm.detailDossier.serviceCode : ''
+        }
+        vm.loadingSearchLgsp = true
+        vm.$store.dispatch('searchLgspCongDan', filter).then(result => {
+          vm.loadingSearchLgsp = false
+          vm.applicantLgspInfomation = result
+          // let birthDate = result['NgayThangNamSinh'] ? result['NgayThangNamSinh'] : ''
+          // if (birthDate) {
+          //   vm.applicantLgspInfomation['NgayThangNamSinh'] = birthDate.slice(6,8) + '/' + birthDate.slice(4,6) + '/' + birthDate.slice(0,4)
+          // }
+          vm.warningLgsp = false
+          if (vm.applicantLgspInfomation && vm.applicantLgspInfomation.hasOwnProperty('SoLuongCongDan') && String(vm.applicantLgspInfomation["SoLuongCongDan"]) != '0') {
+            vm.lgspAlertColor = 'green'
+            vm.warningLgsp = true
+            vm.messageLgsp = 'Số CCCD/ CMND: "' + vm.applicantIdNoLgsp + '", họ tên: "' + vm.applicantNameLgsp + '" có thông tin trên CSDL quốc gia về dân cư'
+            // vm.dialog_searchLgsp = false
+          } else {
+            // vm.dialog_searchLgsp = true
+            vm.lgspAlertColor = 'red'
+            vm.warningLgsp = true
+            vm.messageLgsp = 'Số CCCD/ CMND: "' + vm.applicantIdNoLgsp + '", họ tên: "' + vm.applicantNameLgsp + '" không có thông tin trên CSDL quốc gia về dân cư'
+          }
+        }).catch(function (result) {
+          vm.lgspAlertColor = 'red'
+          vm.loadingSearchLgsp = false
+          vm.applicantLgspInfomation = false
+          vm.warningLgsp = true
+          vm.messageLgsp = 'Không truy cập được CSDL dân cư'
+          if (result.hasOwnProperty('errorCode')) {
+            let errorCode = result.errorCode
+            switch(errorCode) {
+              case "004":
+                vm.messageLgsp = "Thủ tục chưa được cấp phép khai thác CSDL dân cư";
+                break;
+              case "005":
+                vm.messageLgsp = "Tài khoản cán bộ không có quyền thao tác";
+                break;
+              default:
+                vm.messageLgsp = 'Không truy cập được CSDL dân cư';
+            }
+          }
+        })
+      } else {
+        toastr.error('Vui lòng nhập đầy đủ số CCCD/ CMND, họ tên và ngày sinh để tra cứu')
+      }
+    },
+    closeSearchLgsp () {
+      let vm = this
+      if (vm.lgspType === 'citizen') {
+        vm.thongTinChuHoSo['applicantIdNo'] = String(vm.applicantIdNoLgsp).trim()
+        vm.thongTinChuHoSo['applicantName'] = String(vm.applicantNameLgsp).trim()
+      }
+      vm.dialog_searchLgsp = false
+    },
     addApplicantLgsp () {
       let vm = this
-      vm.thongTinChuHoSo['applicantIdNo'] = vm.applicantLgspInfomation.ENTERPRISE_GDT_CODE
-      vm.thongTinChuHoSo['applicantName'] = vm.applicantLgspInfomation.NAME
-      vm.thongTinChuHoSo['address'] = vm.applicantLgspInfomation.AddressFullText
+      if (vm.lgspType === 'business') {
+        vm.thongTinChuHoSo['applicantIdNo'] = vm.applicantLgspInfomation.ENTERPRISE_GDT_CODE
+        vm.thongTinChuHoSo['applicantName'] = vm.applicantLgspInfomation.NAME
+        vm.thongTinChuHoSo['address'] = vm.applicantLgspInfomation.AddressFullText
+      }
+      if (vm.lgspType === 'citizen') {
+        vm.thongTinChuHoSo['applicantIdNo'] = vm.applicantLgspInfomation.SoDinhDanh ? vm.applicantLgspInfomation.SoDinhDanh : vm.applicantLgspInfomation.SoCMND
+        vm.thongTinChuHoSo['applicantName'] = vm.applicantLgspInfomation.HoVaTen
+      }
       vm.dialog_searchLgsp = false
+    },
+    addApplicant (filter, type) {
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId()
+        }
+      }
+      vm.loadingUpdateLgsp = true
+      let dataPutUser = new URLSearchParams()
+      let url = '/o/rest/v2/applicants'
+      dataPutUser.append('applicantName', filter.hasOwnProperty('applicantName') ? filter['applicantName'] : ''),
+      dataPutUser.append('applicantIdNo', filter.hasOwnProperty('applicantIdNo') ? filter['applicantIdNo'] : ''),
+      dataPutUser.append('applicantIdDate', filter.hasOwnProperty('applicantIdDate') ? filter['applicantIdDate'] : ''),
+      dataPutUser.append('applicantIdType', filter.hasOwnProperty('applicantIdType') ? filter['applicantIdType'] : ''),
+      dataPutUser.append('contactTelNo', filter.hasOwnProperty('contactTelNo') ? filter['contactTelNo'] : ''),
+      dataPutUser.append('address', filter.hasOwnProperty('address') ? filter['address'] : ''),
+      dataPutUser.append('contactEmail', filter.hasOwnProperty('contactEmail') ? filter['contactEmail'] : ''),
+      dataPutUser.append('cityCode', filter.hasOwnProperty('cityCode') ? filter['cityCode'] : ''),
+      dataPutUser.append('cityName', filter.hasOwnProperty('cityName') ? filter['cityName'] : ''),
+      dataPutUser.append('districtCode', filter.hasOwnProperty('districtCode') ? filter['districtCode'] : ''),
+      dataPutUser.append('districtName', filter.hasOwnProperty('districtName') ? filter['districtName'] : ''),
+      dataPutUser.append('wardCode', filter.hasOwnProperty('wardCode') ? filter['wardCode'] : ''),
+      dataPutUser.append('wardName', filter.hasOwnProperty('wardName') ? filter['wardName'] : '')
+      
+      axios.post(url, dataPutUser, param).then(result1 => {
+        vm.loadingUpdateLgsp = false
+        toastr.success('Đồng bộ thành công')
+        if (type === 'bind') {
+          vm.thongTinChuHoSo['applicantName'] = filter['applicantName']
+          vm.dialog_searchLgsp = false
+          vm.warningLgsp = false
+        }
+      }).catch(xhr => {
+        toastr.error('Đồng bộ thất bại')
+        vm.loadingUpdateLgsp = false
+      })
+
+    },
+    updateApplicant (filter, type) {
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId()
+        }
+      }
+      vm.loadingUpdateLgsp = true
+      let dataPutUser = new URLSearchParams()
+      let url = '/o/rest/v2/applicants/' + filter['applicantId']
+      let mapping = ['applicantName', 'applicantIdDate', 'applicantIdType', 'contactTelNo', 'address', 'cityCode', 'cityName', 'districtCode', 'districtName', 'wardCode', 'wardName']
+      for (let key in mapping) {
+        if (filter.hasOwnProperty(mapping[key]) && filter[mapping[key]]) {
+          dataPutUser.append(mapping[key], filter[mapping[key]])
+        }
+      }
+      
+      axios.put(url, dataPutUser, param).then(result1 => {
+        vm.loadingUpdateLgsp = false
+        toastr.success('Đồng bộ thành công')
+        if (type === 'bind') {
+          vm.thongTinChuHoSo['applicantName'] = filter['applicantName']
+          vm.dialog_searchLgsp = false
+          vm.warningLgsp = false
+        }
+      }).catch(xhr => {
+        toastr.error('Đồng bộ thất bại')
+        vm.loadingUpdateLgsp = false
+      })
+    },
+    syncApplicantLgsp () {
+      let vm = this
+      let param = {
+        headers: {
+        }
+      }
+      let profile = {
+        "QuocTich": vm.applicantLgspInfomation['QuocTich'],
+        "GioiTinh": vm.applicantLgspInfomation['GioiTinh'],
+        "DanToc": vm.applicantLgspInfomation['TonGiao'],
+        "TonGiao": vm.applicantLgspInfomation['QuocTich'],
+        "TinhTrangHonNhan": vm.applicantLgspInfomation['TinhTrangHonNhan'],
+        "NhomMau": vm.applicantLgspInfomation['NhomMau'],
+        "NgayThangNamSinh": vm.applicantLgspInfomation['NgayThangNamSinh'],
+        "NoiDangKyKhaiSinh": vm.applicantLgspInfomation['NoiDangKyKhaiSinh'],
+        "QueQuan": vm.applicantLgspInfomation['QueQuan'],
+        "ThuongTru": vm.applicantLgspInfomation['ThuongTru'],
+        "NoiOHienTai": vm.applicantLgspInfomation['NoiOHienTai'],
+        "Cha": vm.applicantLgspInfomation['Cha'],
+        "Me": vm.applicantLgspInfomation['Me'],
+        "VoChong": vm.applicantLgspInfomation['VoChong'],
+        "NguoiDaiDien": vm.applicantLgspInfomation['NguoiDaiDien'],
+        "ChuHo": vm.applicantLgspInfomation['ChuHo'],
+        "TrangThai": vm.applicantLgspInfomation['TrangThai']
+      }
+      axios.get('/o/rest/v2/applicants?start=0&end=1&idNo=' + vm.thongTinChuHoSo['applicantIdNo'], param).then(response => {
+        let items = []
+        if (response.data.hasOwnProperty('data')) {
+          items = response.data.data
+        }
+        if (items.length !== 0) {
+          let data = {
+            applicantId: vm.thongTinChuHoSo['applicantIdNo'],
+            applicantName: vm.parserFullName(vm.applicantLgspInfomation['HoVaTen']),
+            applicantIdType: 'citizen',
+            profile: JSON.stringify(profile)
+          }
+          vm.updateApplicant(data, 'bind')
+        } else {
+          let data = {
+            applicantName: vm.parserFullName(vm.applicantLgspInfomation['HoVaTen']),
+            applicantIdType: 'citizen',
+            profile: JSON.stringify(profile)
+          }
+          vm.addApplicant(data, 'bind')
+        }
+      })
+    },
+    parserFullName (fullName) {
+      let arrName = fullName.toLocaleLowerCase().split(' ')
+      for (let key in arrName) {
+        arrName[key] = arrName[key].charAt(0).toUpperCase() + letter.slice(1)
+      }
+      return arrName.join(' ')
+    },
+    convertString(str) {
+      str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
+      str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
+      str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i')
+      str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
+      str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
+      str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
+      str = str.replace(/đ/g, 'd')
+      str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, 'A')
+      str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, 'E')
+      str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, 'I')
+      str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, 'O')
+      str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
+      str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
+      str = str.replace(/Đ/g, 'D')
+      str = str.toLocaleLowerCase().replace(/\s/g, '')
+      return str
     }
   }
 }

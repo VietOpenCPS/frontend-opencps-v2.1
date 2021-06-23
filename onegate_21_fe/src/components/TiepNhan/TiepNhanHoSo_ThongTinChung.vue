@@ -2,6 +2,7 @@
   <div>
     <v-card>
       <v-card-text>
+        <div v-if="showOptionName && thongTinChungHoSo['briefNote']" class="px-2 pt-2" style="text-align: justify;">Dịch vụ: <span class="text-bold">{{thongTinChungHoSo['briefNote']}}</span></div>
         <v-layout wrap>
           <!--  -->
           <v-flex xs12 sm2>
@@ -121,12 +122,17 @@
         dossierStatusText: '',
         durationUnit: '',
         durationCount: ''
-      }
+      },
+      showOptionName: false
     }),
     created () {
       var vm = this
       vm.$nextTick(function () {
         vm.minDate = vm.getCurentDateTime('date')
+        try {
+          vm.showOptionName = showOptionName
+        } catch (error) {
+        }
       })
     },
     computed: {

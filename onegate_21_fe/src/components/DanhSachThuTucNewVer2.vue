@@ -790,6 +790,15 @@
       },
       selectServiceOption (item, govAgencyCodeSelect, itemServiceConfig) {
         let vm = this
+        let newQuery = vm.$router.history.current.query
+        let queryString = '?'
+        newQuery['page'] = ''
+        newQuery['optionName'] = item.hasOwnProperty('optionName') ? item['optionName'] : ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
         if (itemServiceConfig) {
           vm.serviceConfigSelect = itemServiceConfig
           vm.govAgencyCodeSelect = itemServiceConfig.govAgencyCode
@@ -833,8 +842,7 @@
                 vm.loadingAction = false
                 vm.indexAction = -1
                 vm.$router.push({
-                  path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                  query: vm.$router.history.current.query
+                  path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW' + queryString
                 })
               })
             } else {
@@ -1051,7 +1059,16 @@
         // vm.filterAndSort()
       },
       selectServiceOptionCRD (item, govAgencyCode) {
-        var vm = this
+        let vm = this
+        let newQuery = vm.$router.history.current.query
+        let queryString = '?'
+        newQuery['page'] = ''
+        newQuery['optionName'] = item['optionName']
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
         vm.$store.dispatch('getServiceInfo', {
           serviceInfoId: vm.serviceInfoIdSelect
         }).then(resServiceInfo => {
@@ -1066,8 +1083,7 @@
             vm.loadingAction = false
             vm.indexAction = -1
             vm.$router.push({
-              path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-              query: vm.$router.history.current.query
+              path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW' + queryString
             })
           })
         })

@@ -89,7 +89,7 @@ export const store = new Vuex.Store({
             text: 'Đồng bộ danh mục lĩnh vực'
           },
           {
-            icon: 'api',
+            icon: 'filter',
             link: '/table/opencps_tracking/api',
             code: 'tracking',
             text: 'Quản lý danh mục API'
@@ -654,6 +654,29 @@ export const store = new Vuex.Store({
           reject(error)
         })
       })     
+    },
+    getAdministration ({state}) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            }
+          }
+          axios.get(state.endPointApi +'/serviceinfos/statistics/agencies?sort=siblingSearch', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
     },
     REGISTER_GOVAGENCY ({state}) {
       return new Promise((resolve, reject) => {

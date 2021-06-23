@@ -1,4 +1,4 @@
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = {
   productionSourceMap: false,
   runtimeCompiler: true,
@@ -25,7 +25,7 @@ module.exports = {
     }
   },
   configureWebpack: {
-    plugins: [new BundleAnalyzerPlugin()],
+    // plugins: [new BundleAnalyzerPlugin()],
     output: {
       filename: '../../wars/opencps-store/src/main/webapp/js/super_admin_bbat/js/[name].js',
       chunkFilename: '../../wars/opencps-store/src/main/webapp/js/super_admin_bbat/js/[name].js'

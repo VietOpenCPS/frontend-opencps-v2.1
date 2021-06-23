@@ -209,26 +209,26 @@
             </v-card>
           </v-tab-item>
           <v-tab-item key="3" v-if="paymentInfo">
-            <v-card class="px-2 py-2" style="border: 1px solid #dedede;border-top: none;">
+            <v-card class="px-3 py-2" style="border: 1px solid #dedede;border-top: none;">
               <v-card-text class="px-0 py-0">
                 <v-layout wrap>
                   <v-flex xs12 sm2 style="height: 32px;">
-                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;">Lệ phí: </v-subheader>
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;color: black;">Lệ phí: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
-                    <p class="mt-1 mb-0">{{currency(Number(paymentInfo.feeAmount))}} &nbsp;&nbsp; vnđ</p>
+                    <p class="mt-2 mb-0">{{currency(Number(paymentInfo.feeAmount))}} &nbsp;&nbsp; vnđ</p>
                   </v-flex>
                   <v-flex xs12 sm2 style="height: 32px;">
-                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;">Phí: </v-subheader>
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;color: black;">Phí: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
-                    <p class="mt-1 mb-0">{{currency(Number(paymentInfo.serviceAmount))}} &nbsp;&nbsp; vnđ</p>
+                    <p class="mt-2 mb-0">{{currency(Number(paymentInfo.serviceAmount))}} &nbsp;&nbsp; vnđ</p>
                   </v-flex>
                   <v-flex xs12 sm2 v-if="paymentInfo.shipAmount !== 0" style="height: 32px;">
-                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;">Phí chuyển phát: </v-subheader>
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;color: black;">Phí chuyển phát: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
-                    <p class="mt-1 mb-0" v-if="paymentInfo.shipAmount !== 0">
+                    <p class="mt-2 mb-0" v-if="paymentInfo.shipAmount !== 0">
                       {{currency(Number(paymentInfo.shipAmount))}} &nbsp;&nbsp; vnđ
                     </p>
                   </v-flex>
@@ -237,14 +237,14 @@
               <v-card-text class="px-0 py-0">
                 <v-layout wrap>
                   <v-flex xs12 sm2 style="height: 32px;">
-                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;"><span class="text-bold">Tổng: </span></v-subheader>
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;color: black;"><span class="text-bold">Tổng: </span></v-subheader>
                   </v-flex>
                   <v-flex xs12 sm3 style="padding-top:7px">
                     <span>{{currency(Number(paymentInfo.paymentAmount))}} &nbsp;&nbsp; vnđ</span>
                   </v-flex>
                 </v-layout>
                 <v-layout wrap v-if="paymentInfo.paymentNote">
-                  <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
+                  <v-flex style="width:70px;color: black;" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
                   <v-flex style="width:calc(100% - 80px)">
                     <p class="px-2 my-0 py-1">
                       {{paymentInfo.paymentNote}} &nbsp;&nbsp;

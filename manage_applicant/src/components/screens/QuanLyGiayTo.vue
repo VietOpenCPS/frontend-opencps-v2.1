@@ -706,6 +706,7 @@ export default {
               vm.getApplicantDocument()
             }, 200)
           }).catch(xhr => {
+            vm.loadingAction = false
             toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
           })
         } else {
@@ -729,6 +730,7 @@ export default {
               vm.getApplicantDocument()
             }, 200)
           }).catch(xhr => {
+            vm.loadingAction = false
             toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
           })
         }

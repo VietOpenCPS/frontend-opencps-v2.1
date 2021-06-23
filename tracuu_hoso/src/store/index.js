@@ -427,7 +427,7 @@ export const store = new Vuex.Store({
       let year = (new Date()).getFullYear()
       let hours = (new Date()).getHours()
       let minutes = (new Date()).getMinutes()
-      let currentDate = (new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')} ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`)).getTime()
+      let currentDate = (new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`)).getTime()
       let token = md5('opencps' + currentDate)
       commit('setMd5Token', token)
     }

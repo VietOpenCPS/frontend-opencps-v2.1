@@ -2,7 +2,10 @@
   <div>
     <v-layout row wrap :class="isMobile ? 'pt-0' : 'pt-2'">
       <v-flex xs12 md3>
-        <div id="titlePortlet" style="font-size: 20px;font-weight: 500;color:#0054a6" :class="isMobile ? 'px-2 text-xs-center' : 'px-2'">
+        <div v-if="forEPayment" id="titlePortlet" style="font-size: 20px;font-weight: 500;color:#0054a6" :class="isMobile ? 'px-2 text-xs-center' : 'px-2'">
+          THANH TOÁN TRỰC TUYẾN
+        </div>
+        <div v-else id="titlePortlet" style="font-size: 20px;font-weight: 500;color:#0054a6" :class="isMobile ? 'px-2 text-xs-center' : 'px-2'">
           {{!qrscan ? 'TRA CỨU HỒ SƠ' : 'THÔNG TIN HỒ SƠ'}}
         </div>
         <v-card v-if="!qrscan" flat color="#ffffff" class="px-2 py-2">
@@ -35,7 +38,8 @@
             ></v-autocomplete>
           </v-flex> -->
           <v-flex xs12 class="mb-1">
-            <div><span style="color: red">(*) </span> Nhập mã hồ sơ hoặc số CMND/ hộ chiếu để thực hiện tra cứu hồ sơ.</div>
+            <div v-if="forEPayment"><span style="color: red">(*) </span> Nhập mã hồ sơ hoặc số CMND/ hộ chiếu để thực hiện thanh toán trực tuyến.</div>
+            <div v-else><span style="color: red">(*) </span> Nhập mã hồ sơ hoặc số CMND/ hộ chiếu để thực hiện tra cứu hồ sơ.</div>
           </v-flex>
           <v-flex xs12 :class="isMobile ? 'mb-2 right' : 'mb-2'">
             <v-btn class="mr-2 ml-0" color="primary" @click="changeDataSearch"
@@ -223,6 +227,7 @@ export default {
     valid: false,
     secretKey: '',
     dialogCheckPass: false,
+    forEPayment: false,
     headers: [
       {
         text: 'STT',
@@ -287,7 +292,11 @@ export default {
     }
   },
   created () {
-    var vm = this
+    let vm = this
+    try {
+      vm.forEPayment = forEPayment
+    } catch (error) {  
+    }
     vm.$nextTick(function () {
       var vm = this
       let current = vm.$router.history.current

@@ -339,10 +339,16 @@ export default {
           let paymentConfigInfo = vm.getEPaymentProfile(vm.paymentProfile.epaymentProfile)
           if (paymentConfigInfo && paymentConfigInfo.hasOwnProperty('isPaygov') && paymentConfigInfo['isPaygov']) {
             vm.showPayGov = true
-            $.getJSON('https://api.ipify.org?format=jsonp&callback=?', function(data) {
-              vm.ipAddress = data && data.hasOwnProperty('ip') ? data.ip : ''
-              console.log('ipAddress', vm.ipAddress)
-            })
+            let ssl = window.location.protocol
+            if (ssl == 'http:') {
+              $.getJSON('http://ipinfo.io', function(data){
+                vm.ipAddress = data && data.hasOwnProperty('ip') ? data.ip : ''
+              })
+            } else if (ssl == 'https:') {
+              $.getJSON('https://api.ipify.org?format=jsonp&callback=?', function(data) {
+                vm.ipAddress = data && data.hasOwnProperty('ip') ? data.ip : ''
+              })
+            }
           } else {
             vm.showPayGov = false
           }
