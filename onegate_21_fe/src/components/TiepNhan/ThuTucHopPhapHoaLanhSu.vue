@@ -255,7 +255,6 @@
                     clearable
                     return-object
                     hide-no-data
-
                     solo
                 ></v-autocomplete>
             </v-flex>
@@ -990,11 +989,15 @@ export default {
         tongSoBanTG: 0,
         auth: 'false',
         ngay_cap_cmnd: '',
+        doAction: false
     }),
     created () {
         let vm = this
         vm.$nextTick( ()=>{
             let currentQuery = vm.$router.history.current.query
+            if (currentQuery.hasOwnProperty('updateDossierDoAction') && currentQuery.updateDossierDoAction) {
+                vm.doAction = currentQuery.updateDossierDoAction
+            }
             vm.dossierTemplateNo = currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
             vm.eFormCode = currentQuery.hasOwnProperty('eformCode') && currentQuery.eformCode ? currentQuery.eformCode : ''
             if(vm.formCode==='UPDATE'){
@@ -1027,8 +1030,7 @@ export default {
         dossiers: {
             deep: true,
             handler:  (val, oldVal) => {
-                console.log(val)
-                console.log(oldVal)
+                console.log('dossierWatch', val)
                 // val['applicantIdNo'] = val.delegateIdNo
                 // val['address'] = val.delegateAddress
                 // val['cityCode'] = val.delegateCityCode
@@ -1267,12 +1269,15 @@ export default {
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
             }
             axios.request(config).then(res => {
-                let metaData = JSON.parse(res.data.metaData)
-                if(metaData.dossierFileCustom)
-                {   
+                let metaData = ''
+                try {
+                    metaData = JSON.parse(res.data.metaData)
+                } catch (error) {
+                }
+                if(metaData.dossierFileCustom) {   
                     vm.dossierFileCustom = metaData.dossierFileCustom
                 }
-                if(metaData.ma_to_khai){
+                if(metaData && metaData.ma_to_khai){
                     vm.eFormCodeArr = metaData.ma_to_khai
                     vm.eFormCode = metaData.ma_to_khai
                 }
@@ -1281,8 +1286,10 @@ export default {
                 vm.delegateCityCode = vm.dossiers.delegateCityCode
                 vm.delegateDistrictCode = vm.dossiers.delegateDistrictCode
                 vm.delegateWardCode = vm.dossiers.delegateWardCode
-                vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
-                vm.crurentHours = vm.dossiers.dueDate.substring(10)
+                if (vm.dossiers && vm.dossiers.dueDate) {
+                    vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
+                    vm.crurentHours = vm.dossiers.dueDate.substring(10)
+                }
                 vm.viaPostal = vm.dossiers.viaPostal === 2 ?  true : false
                
                 vm.getThanhPhan()
@@ -1366,7 +1373,7 @@ export default {
                 let vm = this
                 let tg = JSON.parse(vm.dossiers['metaData'])
                 let file_bien_nhan = tg['dossierFileCustom']
-
+                console.log('metaData changeThanhPhan', tg)
                 for(let i=0; i< vm.dossierFileArr.length; i++){
                     if(vm.dossierFileArr[i]['partNo'] === item.dossierPartNo){
                         let tp = {'partNo': item.dossierPartNo, 'partName': item.partName, 'fileMark': item['fileMark'],'recordCount': item.recordCount}
@@ -1388,6 +1395,7 @@ export default {
                 tg['totalRecord'] = totalRecord
                 tg['dossierFileCustom'] = file_bien_nhan
                 vm.dossiers['metaData'] = JSON.stringify(tg)
+                console.log('metaData2 changeThanhPhan', JSON.stringify(tg))
             },200)
         },
         getQuocGia(){
@@ -1419,9 +1427,11 @@ export default {
             axios.request(config).then(res => {
                 vm.dossierParts = res.data.dossierParts
                 if(vm.formCode === 'UPDATE') {
+                    let file_bien_nhan = new Array()
+                    let j = 0
                     for (let i=0; i<vm.dossierParts.length; i++){
                         let check = vm.dossierFileCustom.find(e=> e.partNo === vm.dossierParts[i]['partNo'])
-                        if(check){
+                        if (check) {
                             let temp = {
                                 dossierPartNo: vm.dossierParts[i]['partNo'],
                                 fileMark: check.fileMark,
@@ -1433,8 +1443,7 @@ export default {
                             }
                             vm.selected.push(temp)
                             vm.dossierMarkArr.push(temp)
-                        }
-                        else {
+                        } else {
                             vm.dossierMarkArr.push({
                                 dossierPartNo: vm.dossierParts[i]['partNo'],
                                 fileMark: vm.dossierParts[i]['fileMark'],
@@ -1444,6 +1453,15 @@ export default {
                                 fileComment: '',
                                 recordCount: ''
                             })
+                        }
+                        if (vm.doAction) {
+                            if((vm.dossierParts[i]['partNo'] === 'TP01' || vm.dossierParts[i]['partNo'] === 'TP03') && vm.dossierParts[i].partType === 1){
+                                file_bien_nhan[j] = {'partNo': vm.dossierParts[i]['partNo'], 'partName': vm.dossierParts[i]['partName'], 'fileMark': vm.dossierParts[i]['fileMark'], 'recordCount': 1}
+                                j++
+                            }
+                            let tg2 = vm.dossiers['metaData'] ? JSON.parse(vm.dossiers['metaData']) : {}
+                            tg2['dossierFileCustom'] = file_bien_nhan
+                            vm.dossiers['metaData'] = JSON.stringify(tg2)
                         }
                     }
                 } else {
@@ -1818,40 +1836,6 @@ export default {
                 vm.listChuKy = vm.sortDate (arrChuKy, 'CK_NGAY_HL')
                 vm.loadingImage = false
             }).catch(err => {})
-            // let data = {
-            //     CHU_KY: [
-            //         {
-            //             CK_CHUC_DANH: 'Phó Hiệu trưởng',
-            //             CK_GHI_CHU: '',
-            //             strChuKy: `https://scontent-hkt1-1.xx.fbcdn.net/v/t1.0-9/83560216_2827598057470043_4398724110518723501_n.jpg?_nc_cat=102&_nc_sid=8024bb&_nc_ohc=MyytmLxn_SkAX_7NTQF&_nc_ht=scontent-hkt1-1.xx&oh=b3027bea2885a2cac1a26707f3942c41&oe=5F250B8B`,
-            //             CK_MA_CAN_BO: '9fb20e67afb743a9bd3c96500c7aff82',
-            //             CK_MA_CK: 'ba16b3d4286b449e854bc837e5776cd2',
-            //             CK_MA_CO_QUAN: '01',
-            //             CK_MA_DON_VI_XL: '1',
-            //             CK_NGAY_HL: '2013-08-31 00:00:00.0',
-            //             CK_PHIEN_BAN: 1,
-            //             CK_TEN_CAN_BO: 'Lê Văn'
-            //         }
-            //     ],
-            //     CON_DAU: [
-            //         {
-            //         CD_DONG_BO: true,
-            //         CD_GHI_CHU: '',
-            //         strConDau: `https://scontent-hkt1-1.xx.fbcdn.net/v/t1.0-9/106129297_2827598070803375_2684170447443855793_n.jpg?_nc_cat=106&_nc_sid=8024bb&_nc_ohc=tquhJOGgdC4AX8rkq1n&_nc_ht=scontent-hkt1-1.xx&oh=a61e5c4a6c36eea82444a5c1bc3c63a5&oe=5F256D5A`,
-            //         CD_MA_CAN_BO: '',
-            //         CD_MA_CON_DAU: '4d8d2ea84d2e41689756009c2a6b6e57',
-            //         CD_MA_CQ: '661a5e7826254b58b872fa4f9c965ef8',
-            //         CD_MA_DON_VI: 'HCM',
-            //         CD_NGAY_HL: "2013-08-31 00:00:00.0",
-            //         CD_PHIEN_BAN: 1,
-            //         CD_TEN_CAN_BO: "",
-            //         }
-            //     ]
-            // }
-            //     let arrConDau = data.CON_DAU
-            //     let arrChuKy = data.CHU_KY
-            //     vm.listConDau = vm.sortDate(arrConDau, 'CD_NGAY_HL')
-            //     vm.listChuKy = vm.sortDate (arrChuKy, 'CK_NGAY_HL')
         },
         checkedConDau (item) {
             let vm = this
@@ -1927,6 +1911,7 @@ export default {
                     
                 }  
                 if(vm.update_giayto === 'add') {
+                    console.log('LIST GIAYTO', vm.listGiayTo)
                     vm.listGiayTo.push(gt) 
                     vm.checkCKCD()
                     vm.$refs.formGiayTo.reset()
@@ -1996,8 +1981,32 @@ export default {
 
                 // Gen le phi
                 vm.genLePhi()
-                
-
+                // update dossierFile
+                if (vm.formCode === 'UPDATE') {
+                    let fileFind = vm.dossierFileArr.find(itemFile => {
+                        return itemFile.partNo === 'TP01' && (itemFile.eForm || itemFile.eform)
+                    })
+                    if (fileFind) {
+                        let dataUpdate = {
+                            dossierId: vm.id,
+                            tp: 'TP01',
+                            referenceUid: fileFind['referenceUid'],
+                            formData: JSON.parse(fileFind['formData'])
+                        }
+                        vm.$store.dispatch('putAlpacaFormCallBack', dataUpdate).then(resData => {
+                        }).catch(reject => {
+                        })
+                    } 
+                    // else {
+                    //     let dataUpdate = Object.assign(fileFind['formData'], {
+                    //         dossierId: vm.id,
+                    //         tp: 'TP01'
+                    //     }) 
+                    //     vm.$store.dispatch('postEformCallBack', dataUpdate).then(resPostEform => {
+                    //     }).catch(reject => {
+                    //     })
+                    // }
+                }
             }
         },
         genLePhi () {
@@ -2033,9 +2042,9 @@ export default {
                 }
             }
             tg2['totalRecord'] = totalRecord
-            tg2['dossierFileCustom'] =file_bien_nhan2;
-            tg2['dossierFilePayment'] =file_payment2;
-            vm.dossiers['metaData'] = JSON.stringify(tg2);
+            tg2['dossierFileCustom'] =file_bien_nhan2
+            tg2['dossierFilePayment'] =file_payment2
+            vm.dossiers['metaData'] = JSON.stringify(tg2)
             let le_phi = 30000*tong_so;
             vm.le_phi_format = le_phi
             vm.payment = {"requestPayment":1,"paymentNote":"","advanceAmount":0,"feeAmount":le_phi,"serviceAmount": 0,"shipAmount":0}
@@ -2354,7 +2363,6 @@ export default {
                 tg['dossierFileCustom'] = file_bien_nhan
                 vm.dossiers['metaData'] = JSON.stringify(tg)
             } else {
-                            // let check = true
                 let tg = JSON.parse(vm.dossiers['metaData'])
                 let file_bien_nhan = tg['dossierFileCustom']
                 for(let i=0; i< vm.dossierFileArr.length; i++){

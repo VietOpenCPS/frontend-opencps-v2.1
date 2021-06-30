@@ -415,8 +415,8 @@ export default {
         applicantIdNo: vm.index,
         fileTemplateNo: vm.fileTemplateNo,
         status: vm.status,
-        keywordSearch: vm.keySearch,
-        fileNoSearch: vm.fileNoSearch,
+        keyword: vm.keySearch,
+        fileNo: vm.fileNoSearch,
         applicantDataType: ''
       }
       let dataPost = new URLSearchParams()

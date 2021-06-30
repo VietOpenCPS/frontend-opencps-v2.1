@@ -813,7 +813,7 @@ export default {
       }
       vm.$store.dispatch('getServiceDetail', filter).then(function (result) {
         vm.serviceDetail = result
-        if (!query.hasOwnProperty('notCreate') && (query.hasOwnProperty('code') && query.code) || (query.hasOwnProperty('MaTTHCDP') && query.MaTTHCDP)) {
+        if (!query.hasOwnProperty('notCreate') && ((query.hasOwnProperty('code') && query.code) || (query.hasOwnProperty('MaTTHCDP') && query.MaTTHCDP))) {
           if (window.themeDisplay.isSignedIn()) {
             let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
             if (Array.isArray(vm.serviceDetail['serviceConfigs']) && vm.serviceDetail['serviceConfigs'].length === 1) {
@@ -834,6 +834,7 @@ export default {
           vm.serviceDetail.serviceCodeDVCQG = query.MaTTHCDP
         }
         vm.trackingBTTT(vm.serviceDetail.serviceCode)
+        console.log('run 5555')
         vm.loading = false
       }).catch(function (reject) {
         vm.loading = false

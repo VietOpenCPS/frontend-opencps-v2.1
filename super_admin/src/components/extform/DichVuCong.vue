@@ -78,7 +78,7 @@
                   </v-flex>
                   <v-flex xs12 :class="!isDvc ? 'my-2 px-2' : 'mb-2 px-2'">
                     <div>
-                      <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Lĩnh vực:</div>
+                      <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Lĩnh vực<span style="color: red"> (*)</span></div>
                       <v-autocomplete
                         placeholder="Chọn lĩnh vực"
                         class="select-search d-inline-block"
@@ -448,7 +448,7 @@ export default {
         vm.getServiceAdminisTration()
       } else {
         vm.getDomains()
-        vm.getServiceInfo()
+        // vm.getServiceInfo()
       }
     })
   },

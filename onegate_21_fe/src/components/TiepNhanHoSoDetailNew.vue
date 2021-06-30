@@ -291,7 +291,7 @@
             </v-form>
           </v-card>
           <!--  -->
-          <v-tabs icons-and-text centered class="mb-4">
+          <v-tabs v-if="!doAction" icons-and-text centered class="mb-4">
             <v-tabs-slider color="primary"></v-tabs-slider>
             <v-tab href="#tab-2" @click="tiepNhanHoSoNewTemplate()" :style="loadingAction ? 'pointer-events: none;': '' " v-if="originality !== 1 && tiepNhanState" class="px-0 py-0"> 
               <v-btn flat class="" 
@@ -334,6 +334,17 @@
               </v-btn>
             </v-tab>
           </v-tabs>
+          <div v-if="doAction" class="mt-3 mb-4 mx-2">
+            <v-btn color="primary"  v-for="(item, index) in dossierActionList" v-bind:key="index" 
+              v-on:click.native="tiepNhanHoSoNewTemplate(item)" 
+              :loading="loadingAction"
+              :disabled="loadingAction"
+            >
+              {{item.actionName}}
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </div>
+          
         </div>
         
       </div>
@@ -742,6 +753,9 @@ export default {
     requiredConfigData: false,
     templateDescription : '',
     actionDetail: '',
+    doAction: false,
+    actionCode: '',
+    dossierActionList: [],
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -829,7 +843,19 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
+      let currentQuery = vm.$router.history.current.query
       vm.dossierId = vm.id
+      if (currentQuery.hasOwnProperty('updateDossierDoAction') && currentQuery.updateDossierDoAction) {
+        vm.doAction = currentQuery.updateDossierDoAction
+      }
+      let filter = {
+        dossierId: vm.dossierId
+      }
+      vm.$store.dispatch('pullNextactions', filter).then(function (result) {
+        if (result) {
+          vm.dossierActionList  = result.filter(e => e.enable === 1)
+        }
+      })
     })
   },
   beforeDestroy () {
@@ -944,8 +970,6 @@ export default {
             vm.loadingForm = false
             vm.serviceCode_hidden = currentQuery.hasOwnProperty('serviceCode') && currentQuery.serviceCode ? currentQuery.serviceCode : ''
           }
-          
-
         } else {
           vm.formTemplate = 'version_1.0'
           vm.$store.dispatch('getDetailDossier', data).then(result => {
@@ -1479,8 +1503,11 @@ export default {
       })
     },
     // 
-    tiepNhanHoSoNewTemplate (type) {
+    tiepNhanHoSoNewTemplate (item) {
       let vm = this
+      if (item && item.hasOwnProperty('actionCode')) {
+        vm.actionCode = item.actionCode
+      }
       if(vm.data_form_template !== 'formHPH' && vm.data_form_template !== 'formCH'  && vm.data_form_template !== 'formHT' && vm.data_form_template !== 'formTT') {
         vm.formAlpaca()
       } else {
@@ -1508,6 +1535,27 @@ export default {
         o.partNo = o.dossierPartNo
         return o;
       })
+      let activeDoAction = ''
+      if (vm.doAction) {
+        let initData = vm.$store.getters.loadingInitData
+        let actionUser = initData.user.userName ? initData.user.userName : ''
+        activeDoAction = function () {
+          let params = {
+            dossierId: vm.id,
+            actionCode: vm.actionCode,
+            actionUser: actionUser,
+            payload: '',
+            security: '',
+            assignUsers: '',
+            payment: '',
+            createDossiers: ''
+          }
+          vm.$store.dispatch('postAction', params).then(resPostAction => {
+          }).catch(function() {
+            toastr.error('Yêu cầu thực hiện thất bại')
+          })
+        }
+      }
       if (vm.data_form_template === 'formHPH') {
         if(vm.$refs.formTiepNhan.validate()){
           if (vm.formCode === 'NEW') {
@@ -1558,20 +1606,6 @@ export default {
                     console.log(result)
                     let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
                     dossierFile.forEach(async (e)=>{
-                      if(vm.data_form_template === 'formCH'){
-                        if(e.partNo === 'TP01' || e.partNo === 'TP02'){
-                          let dataPUTDossierFile = {
-                            id: vm.id,
-                            referenceUid: e.referenceUid,
-                            formData: e.formData
-                          }
-                          await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-
-                          }).catch(reject=>{
-                            
-                          })
-                        }
-                      }
                       if(vm.data_form_template === 'formHPH'){
                         if(e.partNo === 'TP01' && e.eForm){
                           let dataPUTDossierFile = {
@@ -1586,7 +1620,6 @@ export default {
                           })
                         }
                       }
-
                     })
                     let dataPayment = {
                       dossierId: vm.id,
@@ -1602,12 +1635,12 @@ export default {
                     }).catch(()=>{
                       vm.loadingAction = false
                     })
+                    if (vm.doAction) {
+                      activeDoAction()
+                    }
                   }).catch(err=> {
                     vm.loadingAction = false
                   })
-      
-
-
                 }).catch(reject => {
                   vm.loadingAction = false
                 })
@@ -1691,20 +1724,6 @@ export default {
                     dossierFile.forEach(async (e)=>{
                       if(vm.data_form_template === 'formCH'){
                         if(e.partNo === 'TP01' || e.partNo === 'TP02'){
-                          let dataPUTDossierFile = {
-                            id: vm.id,
-                            referenceUid: e.referenceUid,
-                            formData: e.formData
-                          }
-                          await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-
-                          }).catch(reject=>{
-                            
-                          })
-                        }
-                      }
-                      if(vm.data_form_template === 'formHPH'){
-                        if(e.partNo === 'TP01'){
                           let dataPUTDossierFile = {
                             id: vm.id,
                             referenceUid: e.referenceUid,

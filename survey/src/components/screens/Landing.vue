@@ -138,8 +138,8 @@
                   <v-layout row justify-center v-else>
                     <v-flex xs7 class="text-xs-center">
                       <span>Chỉ số {{index + 1}}: </span>
-                      <span v-if="index === 4 || index === 5 || index === 7 || index === 8" style="color:#6dcff6">2 / 2 điểm</span>
-                      <span v-else style="color:#6dcff6">{{item.answersCount ? item.averageScore + ' / 2 điểm' : 'Chưa có đánh giá'}}</span>
+                      <!-- <span v-if="index === 4 || index === 5 || index === 7 || index === 8" style="color:#6dcff6">2 / 2 điểm</span> -->
+                      <span style="color:#6dcff6">{{item.answersCount ? item.averageScore + ' / 2 điểm' : 'Chưa có đánh giá'}}</span>
                     </v-flex>
                   </v-layout>
                 </v-flex>
@@ -467,7 +467,7 @@ export default {
         toastr.error('Hồ sơ ' + vm.dossierNo + ' không tồn tại. Quý khách vui lòng kiểm tra lại.')
       })
     },
-    doVottingResultSubmit: function () {
+    doVottingResultSubmit () {
       var vm = this
       vm.btnLoading = true
       let arrAction = []

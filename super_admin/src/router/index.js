@@ -65,15 +65,15 @@ const routes = [
           requiresAuth: true
         }
       },
-      {
-        path: '/table/opencps_processoption/editor/:id',
-        name: 'ChiTietQuyTrinhThucHienDvc',
-        component: ChiTietQuyTrinhThucHienDvc,
-        props: true,
-        meta: {
-          requiresAuth: true
-        }
-      },
+      // {
+      //   path: '/table/opencps_processoption/editor/:id',
+      //   name: 'ChiTietQuyTrinhThucHienDvc',
+      //   component: ChiTietQuyTrinhThucHienDvc,
+      //   props: true,
+      //   meta: {
+      //     requiresAuth: true
+      //   }
+      // },
 
       {
         path: '/table/opencps_serviceinfo',

@@ -3298,22 +3298,36 @@ export default {
       let vm = this
       let currentQuery = vm.$router.history.current.query
       if (item.permission) {
-        if (item['originality'] === 9) {
-          if (vm.trangThaiHoSoList[vm.index]['id'].indexOf('CV_DI') !== -1) {
-            vm.$router.push({
-              path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV_DI/' + item.dossierId,
-              query: vm.$router.history.current.query
-            })
-          } else {
-            vm.$router.push({
-              path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV/' + item.dossierId,
-              query: vm.$router.history.current.query
-            })
-          }
-          
+        // check với hồ sơ trực tuyến BNG
+        if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('updateDossierDoAction') && vm.originality === 3
+          && item.dossierStatus === 'receiving' && item.online
+        ) {
+          currentQuery['template_no'] = item.dossierTemplateNo
+          currentQuery['serviceCode'] = item.serviceCode
+          currentQuery['updateDossierDoAction'] = vm.trangThaiHoSoList[vm.index]['tableConfig']['updateDossierDoAction']
+          vm.$router.push({
+            path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + item.dossierId + '/UPDATE',
+            query: currentQuery
+          })
         } else {
-          vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+          if (item['originality'] === 9) {
+            if (vm.trangThaiHoSoList[vm.index]['id'].indexOf('CV_DI') !== -1) {
+              vm.$router.push({
+                path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV_DI/' + item.dossierId,
+                query: vm.$router.history.current.query
+              })
+            } else {
+              vm.$router.push({
+                path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV/' + item.dossierId,
+                query: vm.$router.history.current.query
+              })
+            }
+            
+          } else {
+            vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+          }
         }
+        
       } else {
         if (item['originality'] === 1) {
           vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
