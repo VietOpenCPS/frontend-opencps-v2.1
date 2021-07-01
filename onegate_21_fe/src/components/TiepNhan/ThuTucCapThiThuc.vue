@@ -196,7 +196,9 @@
                                     Chưa có văn bản quyết định
                                 </span>
                             </td>
-                            <td>{{props.item.Ma_To_Khai ? props.item.Ma_To_Khai : ''}}</td>
+                            <td>
+                                <span v-if="props.item.Ma_To_Khai && String(props.item.Ma_To_Khai).indexOf('TK-') < 0">{{props.item.Ma_To_Khai}}</span>
+                            </td>
                             <td class="text-xs-center" style="width: 80px">
                                 <v-btn flat icon color="primary" @click="openDialogUpdateThanhVien(props.index,props.item)">
                                     <v-icon>create</v-icon>
@@ -1690,6 +1692,7 @@ export default {
         ],
         payment: {},
         auth: 'false',
+        doAction: false,
         rules: {
             required: (v) => !!v || 'Thông tin này là bắt buộc',
             checkDatePast: (date)=> {
@@ -1778,6 +1781,9 @@ export default {
         let vm = this
         vm.$nextTick(()=>{
             let currentQuery = vm.$router.history.current.query
+            if (currentQuery.hasOwnProperty('updateDossierDoAction') && currentQuery.updateDossierDoAction) {
+                vm.doAction = currentQuery.updateDossierDoAction
+            }
             vm.dossierTemplateNo = currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
             // vm.dossierTemplateNo = $('#dossierTemplateNo_hidden').val()
             vm.eFormCode = currentQuery.hasOwnProperty('eformCode') && currentQuery.eformCode ? currentQuery.eformCode : ''
@@ -1831,6 +1837,7 @@ export default {
         dossierFileArr: {
             deep: true,
             handler:  (val, oldVal) => {
+                console.log('watch dossierFileArr', val)
                 let dataOut = val.filter(function (item) {
                     return item.formData || (!item.formData && item.fileEntryId)
                 })
@@ -1992,9 +1999,12 @@ export default {
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
             }
             axios.request(config).then(res => {
-                let metaData = JSON.parse(res.data.metaData)
-                if(metaData.dossierFileCustom)
-                {   
+                let metaData = ''
+                try {
+                    metaData = JSON.parse(res.data.metaData)
+                } catch (error) {
+                }
+                if(metaData.dossierFileCustom) {   
                     vm.dossierFileCustom = metaData.dossierFileCustom
                 }
                 if(metaData.ma_to_khai){
@@ -2005,14 +2015,20 @@ export default {
                 vm.delegateCityCode = vm.dossiers.delegateCityCode
                 vm.delegateDistrictCode = vm.dossiers.delegateDistrictCode
                 vm.delegateWardCode = vm.dossiers.delegateWardCode
-                vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
-                vm.crurentHours = vm.dossiers.dueDate.substring(10)
+                if (vm.dossiers && vm.dossiers.dueDate) {
+                    vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
+                    vm.crurentHours = vm.dossiers.dueDate.substring(10)
+                } else {
+                    vm.genDueDate()
+                }
                 vm.viaPostal = vm.dossiers.viaPostal === 2 ?  true : false
-                vm.dossierFileCustom.forEach(e=>{
-                    if(e.partNo !== 'TP01' && e.partNo !== 'TP02'){
-                        vm.dossierFileArr.push(e)
-                    }
-                })
+                if (vm.dossierFileCustom) {
+                    vm.dossierFileCustom.forEach(e=>{
+                        if(e.partNo !== 'TP01' && e.partNo !== 'TP02'){
+                            vm.dossierFileArr.push(e)
+                        }
+                    })
+                }
                 vm.genLePhi()
                 vm.getThanhPhan()
                 vm.getDossierFile()
@@ -2038,8 +2054,13 @@ export default {
                         vm.dossierFileArr.push(tg)
                         if(data[i]['dossierPartNo'] === 'TP01' && data[i]['eForm']){
                             let formData = JSON.parse(data[i]['formData'])
-                            vm.listThanhVien = formData.thanh_vien_doan
-                            vm.so_nguoi = vm.listThanhVien.length
+                            if (formData.thanh_vien_doan) {
+                                vm.listThanhVien = formData.thanh_vien_doan
+                                vm.so_nguoi = vm.listThanhVien.length
+                            }
+                            if (vm.doAction && !formData.thanh_vien_doan) {
+                                vm.fillTableThanhVien(formData, '')
+                            }
                         }
                         if(data[i]['dossierPartNo'] === 'TP02' && data[i]['eForm']){
                             let formData = JSON.parse(data[i]['formData'])
@@ -2110,6 +2131,9 @@ export default {
             axios.request(config).then(res => {
                 vm.dossierParts = res.data.dossierParts
                 if(vm.formCode === 'UPDATE') {
+                    let file_bien_nhan = new Array()
+                    let j = 0
+                    vm.dossierFileArr = []
                     for (let i=0; i<vm.dossierParts.length; i++){
                         let check = vm.dossierFileCustom.find(e=> e.partNo === vm.dossierParts[i]['partNo'])
                         if(check){
@@ -2135,6 +2159,16 @@ export default {
                                 fileComment: '',
                                 recordCount: ''
                             })
+                        }
+                        if (vm.doAction) {
+                            if((vm.dossierParts[i]['partNo'] === 'TP01' || vm.dossierParts[i]['partNo'] === 'TP02') && vm.dossierParts[i].partType === 1){
+                                vm.dossierFileArr[j] = {formData: '', partNo: vm.dossierParts[i]['partNo'], eform: false}
+                                file_bien_nhan[j] = {'partNo': vm.dossierParts[i]['partNo'], 'partName': vm.dossierParts[i]['partName'], 'fileMark': vm.dossierParts[i]['fileMark'], 'recordCount': 1}
+                                j++;
+                            }
+                            let tg2 = vm.dossiers['metaData'] ? JSON.parse(vm.dossiers['metaData']) : {};
+                            tg2['dossierFileCustom'] = file_bien_nhan;
+                            vm.dossiers['metaData'] = JSON.stringify(tg2);
                         }
                     }
                 } else {
@@ -2762,7 +2796,7 @@ export default {
                     Dia_Chi_Thuong_Tru: vm.dia_chi_nuoc_ngoai ? vm.dia_chi_nuoc_ngoai : null,
                     So_Ho_Chieu: vm.so_ho_chieu,
                     Han_Hc: vm.dateDef(vm.hanHoChieuFormated),
-                    Ma_To_Khai: vm.eformCodeThanhVienEdit ? vm.eformCodeThanhVienEdit : (new Date()).getTime(),
+                    Ma_To_Khai: vm.eformCodeThanhVienEdit ? vm.eformCodeThanhVienEdit : 'TK-' + (new Date()).getTime(),
                     Loai_Ho_Chieu: vm.loai_ho_chieu ? vm.loai_ho_chieu['value'] : null,
                     Noi_Cap_Hc_Id: vm.noi_cap_ho_chieu ? vm.noi_cap_ho_chieu['itemCode'] : null,
                     Noi_Cap_Hc_Id_Text: vm.noi_cap_ho_chieu ? vm.noi_cap_ho_chieu['itemName'] : null,
@@ -3076,83 +3110,74 @@ export default {
         },
         genLePhi(){
             let vm = this
-            let hcng_moi = vm.ho_chieu_ngoai_giao_moi != '' ? parseInt(vm.ho_chieu_ngoai_giao_moi) : 0
-            let hccv_moi = vm.ho_chieu_cong_vu_moi != '' ? parseInt(vm.ho_chieu_cong_vu_moi) : 0
-            let hc_gh = vm.ho_chieu_gia_han != '' ? parseInt(vm.ho_chieu_gia_han) : 0
-            let hc_hong = vm.ho_chieu_hong != '' ? parseInt(vm.ho_chieu_hong) : 0
-            let hc_mat = vm.ho_chieu_mat != '' ? parseInt(vm.ho_chieu_mat) : 0
-            for(let i=0;i<vm.nuoc_di.length;i++){
+            try {
+                let hcng_moi = vm.ho_chieu_ngoai_giao_moi != '' ? parseInt(vm.ho_chieu_ngoai_giao_moi) : 0
+                let hccv_moi = vm.ho_chieu_cong_vu_moi != '' ? parseInt(vm.ho_chieu_cong_vu_moi) : 0
+                let hc_gh = vm.ho_chieu_gia_han != '' ? parseInt(vm.ho_chieu_gia_han) : 0
+                let hc_hong = vm.ho_chieu_hong != '' ? parseInt(vm.ho_chieu_hong) : 0
+                let hc_mat = vm.ho_chieu_mat != '' ? parseInt(vm.ho_chieu_mat) : 0
+                for(let i=0;i<vm.nuoc_di.length;i++){
 
-            }
-            // let so_nuoc = vm.cong_ham_so_nuoc != '' ? parseInt(vm.cong_ham_so_nuoc) : 0
-            let so_nuoc = vm.soNuocKhongDuocMien
-            let so_schengen = vm.cong_ham_schengen != '' ? parseInt(vm.cong_ham_schengen) : 0
-            let so_nhap_canh = vm.cong_ham_nhap_canh != '' ? parseInt(vm.cong_ham_nhap_canh) : 0
-            let so_qua_canh = vm.cong_ham_qua_canh != '' ? parseInt(vm.cong_ham_qua_canh) : 0
-            
-            let giaLePhiMoi = 160000
-            if(vm.serviceCode === 'BNG-270820'){
-                giaLePhiMoi = 80000
-            }
-            let lp_moi = (hcng_moi + hccv_moi)*giaLePhiMoi;
-            let lp_gia_han = hc_gh * 80000;
-            let lp_hong = (hc_hong + hc_mat) * 320000;
-            let lp_schengen = so_schengen * 10000;
-            let lp_nhap = so_nuoc * so_nhap_canh * 10000;
-            let lp_qua = so_nuoc * so_qua_canh * 10000;
-            let so_cong_ham = so_schengen + so_nhap_canh + so_qua_canh
-            let lp_cong_ham = lp_schengen + lp_nhap + lp_qua
-            
-            let le_phi = lp_moi + lp_gia_han + lp_hong + lp_schengen + lp_nhap + lp_qua;
-            
-            let file_payment2 = new Array();
-            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 160000, 'thanh_tien': lp_moi};
-            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 80000, 'thanh_tien': lp_gia_han};
-            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 320000, 'thanh_tien': lp_hong};
-            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp công hàm đề nghị cấp thị thực', 'partName': 'Công hàm', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_cong_ham, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_cong_ham};
+                }
+                // let so_nuoc = vm.cong_ham_so_nuoc != '' ? parseInt(vm.cong_ham_so_nuoc) : 0
+                let so_nuoc = vm.soNuocKhongDuocMien
+                let so_schengen = vm.cong_ham_schengen != '' ? parseInt(vm.cong_ham_schengen) : 0
+                let so_nhap_canh = vm.cong_ham_nhap_canh != '' ? parseInt(vm.cong_ham_nhap_canh) : 0
+                let so_qua_canh = vm.cong_ham_qua_canh != '' ? parseInt(vm.cong_ham_qua_canh) : 0
+                
+                let giaLePhiMoi = 160000
+                if(vm.serviceCode === 'BNG-270820'){
+                    giaLePhiMoi = 80000
+                }
+                let lp_moi = (hcng_moi + hccv_moi)*giaLePhiMoi;
+                let lp_gia_han = hc_gh * 80000;
+                let lp_hong = (hc_hong + hc_mat) * 320000;
+                let lp_schengen = so_schengen * 10000;
+                let lp_nhap = so_nuoc * so_nhap_canh * 10000;
+                let lp_qua = so_nuoc * so_qua_canh * 10000;
+                let so_cong_ham = so_schengen + so_nhap_canh + so_qua_canh
+                let lp_cong_ham = lp_schengen + lp_nhap + lp_qua
+                
+                let le_phi = lp_moi + lp_gia_han + lp_hong + lp_schengen + lp_nhap + lp_qua;
+                
+                let file_payment2 = new Array();
+                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 160000, 'thanh_tien': lp_moi};
+                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 80000, 'thanh_tien': lp_gia_han};
+                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 320000, 'thanh_tien': lp_hong};
+                file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp công hàm đề nghị cấp thị thực', 'partName': 'Công hàm', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_cong_ham, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_cong_ham};
 
-            // if(lp_moi > 0)
-            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 160000, 'thanh_tien': lp_moi};
-            // if(lp_gia_han > 0)
-            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_gia_han};
+                if(file_payment2.length === 2)
+                {
+                    file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'}; 
+                    file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'};   
+                }
+                if(file_payment2.length === 3)
+                {
+                    file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'}; 
+                }
+                if(le_phi != '' && le_phi != null)
+                    vm.le_phi_format = le_phi.toString()
             
-            // if(lp_hong > 0)
-            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 320000, 'thanh_tien': lp_hong};
-                  
-            // if (lp_cong_ham > 0 ){
-            //     file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp công hàm đề nghị cấp thị thực', 'partName': 'Công hàm', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_cong_ham, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_cong_ham};
-            // }
-            if(file_payment2.length === 2)
-            {
-                file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'}; 
-                file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'};   
+                let nuoc_id = vm.nuoc_di.join()
+                let nuoc_di = ''
+                vm.nuoc_di.forEach((e)=>{
+                    let nc = vm.listNuocDi.find(item=>item.itemCode === e)
+                    if(nc){
+                        if(nuoc_di){
+                            nuoc_di+=', ' + nc.itemName
+                        } else {
+                        nuoc_di+= nc.itemName
+                        }
+                        
+                    }     
+                });
+                vm.payment = {"requestPayment":1,"paymentNote":"","advanceAmount":0,"feeAmount":le_phi,"serviceAmount":0,"shipAmount":0}
+                // console.log(vm.dossiers['metaData'] , typeof vm.dossiers['metaData'])   
+                let hs = vm.dossiers['metaData'] ? JSON.parse(vm.dossiers['metaData']) : {};
+                hs['dossierFilePayment'] = file_payment2
+                vm.dossiers['metaData'] = JSON.stringify(hs)
+            } catch (error) {
             }
-            if(file_payment2.length === 3)
-            {
-                file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'}; 
-            }
-            if(le_phi != '' && le_phi != null)
-                vm.le_phi_format = le_phi.toString()
-           
-            let nuoc_id = vm.nuoc_di.join()
-            let nuoc_di = ''
-            vm.nuoc_di.forEach((e)=>{
-                let nc = vm.listNuocDi.find(item=>item.itemCode === e)
-                if(nc){
-                    if(nuoc_di){
-                        nuoc_di+=', ' + nc.itemName
-                    } else {
-                       nuoc_di+= nc.itemName
-                    }
-                    
-                }     
-            });
-            vm.payment = {"requestPayment":1,"paymentNote":"","advanceAmount":0,"feeAmount":le_phi,"serviceAmount":0,"shipAmount":0}
-            // console.log(vm.dossiers['metaData'] , typeof vm.dossiers['metaData'])   
-            let hs = JSON.parse(vm.dossiers['metaData']);
-            hs['dossierFilePayment'] = file_payment2
-            vm.dossiers['metaData'] = JSON.stringify(hs)
-            
         },
         formatDate (date) {
             if (!date) return null
@@ -3175,7 +3200,7 @@ export default {
                 let dateString =  res.data.substr(0, 10)
                 vm.crurentHours = res.data.substr(10)
                 vm.dateDueDate = vm.parseDate(dateString)
-                let metaData = JSON.parse(vm.dossiers['metaData'])
+                let metaData = vm.dossiers['metaData'] ? JSON.parse(vm.dossiers['metaData']) : {}
                 metaData['durationCountMeta'] = 4
                 vm.dossiers['metaData'] = JSON.stringify(metaData)
             }).catch(err => {})  

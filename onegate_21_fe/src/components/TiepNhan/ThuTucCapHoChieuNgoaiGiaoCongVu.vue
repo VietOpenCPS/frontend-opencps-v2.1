@@ -1654,6 +1654,7 @@ export default {
         ],
         payment: {},
         auth: 'false',
+        doAction: false,
         rules: {
             required: (v) => !!v || 'Thông tin này là bắt buộc',
             checkDatePast: (date)=> {
@@ -1734,6 +1735,9 @@ export default {
         let vm = this
         vm.$nextTick(()=>{
             let currentQuery = vm.$router.history.current.query
+            if (currentQuery.hasOwnProperty('updateDossierDoAction') && currentQuery.updateDossierDoAction) {
+                vm.doAction = currentQuery.updateDossierDoAction
+            }
             vm.dossierTemplateNo = currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
             // vm.dossierTemplateNo = $('#dossierTemplateNo_hidden').val()
             vm.eFormCode = currentQuery.hasOwnProperty('eformCode') && currentQuery.eformCode ? currentQuery.eformCode : ''
@@ -1989,12 +1993,12 @@ export default {
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
             }
             axios.request(config).then(res => {
-                let metaData = JSON.parse(res.data.metaData)
-                if(metaData.dossierFileCustom)
-                {   
+                let metaData = res.data.metaData ? JSON.parse(res.data.metaData) : ''
+                if(metaData && metaData.dossierFileCustom)
+                {
                     vm.dossierFileCustom = metaData.dossierFileCustom
                 }
-                if(metaData.ma_to_khai){
+                if(metaData && metaData.ma_to_khai){
                     vm.eFormCodeArr = metaData.ma_to_khai
                 }
                 vm.dossiers = res.data
@@ -2002,31 +2006,35 @@ export default {
                 vm.delegateCityCode = vm.dossiers.delegateCityCode
                 vm.delegateDistrictCode = vm.dossiers.delegateDistrictCode
                 vm.delegateWardCode = vm.dossiers.delegateWardCode
-                vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
-                vm.crurentHours = vm.dossiers.dueDate.substring(10)
+                if (vm.dossiers.dueDate) {
+                    vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
+                    vm.crurentHours = vm.dossiers.dueDate.substring(10)
+                } else {
+                    vm.genDueDate()
+                }
                 vm.viaPostal = vm.dossiers.viaPostal === 2 ?  true : false
-                vm.nuoc_di = metaData.Doan_HCTN.CacNuocDi_ma.split(',')
+                vm.nuoc_di = metaData && metaData.Doan_HCTN ? metaData.Doan_HCTN.CacNuocDi_ma.split(',') : []
                 
-
-                vm.ho_chieu_ngoai_giao_cu = metaData.Doan_HCTN.SoHCCu_NG ? parseInt(metaData.Doan_HCTN.SoHCCu_NG) : 0
-                vm.ho_chieu_cong_vu_cu = metaData.Doan_HCTN.SoHCCu_CV ? parseInt(metaData.Doan_HCTN.SoHCCu_CV) : 0
-                vm.ho_chieu_pho_thong_cu = metaData.Doan_HCTN.SoHCCu_PT ? parseInt(metaData.Doan_HCTN.SoHCCu_PT) : 0
-                vm.ho_chieu_cong_vu_moi = metaData.Doan_HCTN.SoHCCapMoi ? parseInt(metaData.Doan_HCTN.SoHCCapMoi) : 0
-                vm.cong_ham_so_nuoc = metaData.Doan_HCTN.SoNuocXinCH ? parseInt(metaData.Doan_HCTN.SoNuocXinCH) : 0
-                vm.ho_chieu_ngoai_giao_moi = metaData.Doan_HCTN.SoHCCapMoi_NG ? parseInt(metaData.Doan_HCTN.SoHCCapMoi_NG) : 0
-                vm.cong_ham_schengen = metaData.Doan_HCTN.SoNguoiMienCH ? parseInt(metaData.Doan_HCTN.SoNguoiMienCH) : 0
-                vm.cong_ham_nhap_canh = metaData.Doan_HCTN.SoCHNhapCanh ? parseInt(metaData.Doan_HCTN.SoCHNhapCanh) : 0
-                vm.cong_ham_qua_canh = metaData.Doan_HCTN.SoCHQuaCanh ? parseInt(metaData.Doan_HCTN.SoCHQuaCanh) : 0
-                vm.ho_chieu_gia_han = metaData.Doan_HCTN.SoHCGH ? parseInt(metaData.Doan_HCTN.SoHCGH) : 0
-                vm.ho_chieu_hong = metaData.Doan_HCTN.SoHCHong ? parseInt(metaData.Doan_HCTN.SoHCHong) : 0
-                vm.ho_chieu_mat = metaData.Doan_HCTN.SoHCMat ? parseInt(metaData.Doan_HCTN.SoHCMat) : 0
-                vm.so_nguoi = metaData.Doan_HCTN.SoNguoi ? parseInt(metaData.Doan_HCTN.SoNguoi) : 0
-
-                vm.dossierFileCustom.forEach(e=>{
-                    if(e.partNo !== 'TP01' && e.partNo !== 'TP02'){
-                        vm.dossierFileArr.push(e)
-                    }
-                })
+                vm.ho_chieu_ngoai_giao_cu = metaData && metaData.Doan_HCTN.SoHCCu_NG ? parseInt(metaData.Doan_HCTN.SoHCCu_NG) : 0
+                vm.ho_chieu_cong_vu_cu = metaData && metaData.Doan_HCTN.SoHCCu_CV ? parseInt(metaData.Doan_HCTN.SoHCCu_CV) : 0
+                vm.ho_chieu_pho_thong_cu = metaData && metaData.Doan_HCTN.SoHCCu_PT ? parseInt(metaData.Doan_HCTN.SoHCCu_PT) : 0
+                vm.ho_chieu_cong_vu_moi = metaData && metaData.Doan_HCTN.SoHCCapMoi ? parseInt(metaData.Doan_HCTN.SoHCCapMoi) : 0
+                vm.cong_ham_so_nuoc = metaData && metaData.Doan_HCTN.SoNuocXinCH ? parseInt(metaData.Doan_HCTN.SoNuocXinCH) : 0
+                vm.ho_chieu_ngoai_giao_moi = metaData && metaData.Doan_HCTN.SoHCCapMoi_NG ? parseInt(metaData.Doan_HCTN.SoHCCapMoi_NG) : 0
+                vm.cong_ham_schengen = metaData && metaData.Doan_HCTN.SoNguoiMienCH ? parseInt(metaData.Doan_HCTN.SoNguoiMienCH) : 0
+                vm.cong_ham_nhap_canh = metaData && metaData.Doan_HCTN.SoCHNhapCanh ? parseInt(metaData.Doan_HCTN.SoCHNhapCanh) : 0
+                vm.cong_ham_qua_canh = metaData && metaData.Doan_HCTN.SoCHQuaCanh ? parseInt(metaData.Doan_HCTN.SoCHQuaCanh) : 0
+                vm.ho_chieu_gia_han = metaData && metaData.Doan_HCTN.SoHCGH ? parseInt(metaData.Doan_HCTN.SoHCGH) : 0
+                vm.ho_chieu_hong = metaData && metaData.Doan_HCTN.SoHCHong ? parseInt(metaData.Doan_HCTN.SoHCHong) : 0
+                vm.ho_chieu_mat = metaData && metaData.Doan_HCTN.SoHCMat ? parseInt(metaData.Doan_HCTN.SoHCMat) : 0
+                vm.so_nguoi = metaData && metaData.Doan_HCTN.SoNguoi ? parseInt(metaData.Doan_HCTN.SoNguoi) : 0
+                if (vm.dossierFileCustom && vm.dossierFileCustom.length > 0) {
+                    vm.dossierFileCustom.forEach(e=>{
+                        if(e.partNo !== 'TP01' && e.partNo !== 'TP02'){
+                            vm.dossierFileArr.push(e)
+                        }
+                    })
+                }
                 vm.genLePhi()
                 vm.getThanhPhan()
                 vm.getDossierFile()
@@ -2052,7 +2060,12 @@ export default {
                         vm.dossierFileArr.push(tg)
                         if(data[i]['dossierPartNo'] === 'TP01' && data[i]['eForm']){
                             let formData = JSON.parse(data[i]['formData'])
-                            vm.listThanhVien = formData.thanh_vien_doan
+                            if (formData.thanh_vien_doan) {
+                                vm.listThanhVien = formData.thanh_vien_doan
+                            }
+                            if (vm.doAction && !formData.thanh_vien_doan) {
+                                vm.fillTableThanhVien(formData, '')
+                            }
                         }
                         if(data[i]['dossierPartNo'] === 'TP02'){
                             let formData = JSON.parse(data[i]['formData'])
@@ -2103,6 +2116,9 @@ export default {
             axios.request(config).then(res => {
                 vm.dossierParts = res.data.dossierParts
                 if(vm.formCode === 'UPDATE') {
+                    let file_bien_nhan = new Array();
+                    let j = 0
+                    vm.dossierFileArr = []
                     for (let i=0; i<vm.dossierParts.length; i++){
                         let check = vm.dossierFileCustom.find(e=> e.partNo === vm.dossierParts[i]['partNo'])
                         if(check){
@@ -2128,6 +2144,16 @@ export default {
                                 fileComment: '',
                                 recordCount: ''
                             })
+                        }
+                        if (vm.doAction) {
+                            if((vm.dossierParts[i]['partNo'] === 'TP01' || vm.dossierParts[i]['partNo'] === 'TP02') && vm.dossierParts[i].partType === 1){
+                                vm.dossierFileArr[j] = {formData: '', partNo: vm.dossierParts[i]['partNo'], eform: false}
+                                file_bien_nhan[j] = {'partNo': vm.dossierParts[i]['partNo'], 'partName': vm.dossierParts[i]['partName'], 'fileMark': vm.dossierParts[i]['fileMark'], 'recordCount': 1}
+                                j++;
+                            }
+                            let tg2 = vm.dossiers['metaData'] ? JSON.parse(vm.dossiers['metaData']) : {};
+                            tg2['dossierFileCustom'] = file_bien_nhan;
+                            vm.dossiers['metaData'] = JSON.stringify(tg2);
                         }
                     }
                 } else {
@@ -2944,33 +2970,35 @@ export default {
             });
             vm.payment = {"requestPayment":1,"paymentNote":"","advanceAmount":0,"feeAmount":le_phi,"serviceAmount":0,"shipAmount":0}
             // console.log(vm.dossiers['metaData'] , typeof vm.dossiers['metaData'])   
-            let hs = JSON.parse(vm.dossiers['metaData']);
-            hs['dossierFilePayment'] = file_payment2
-            hs['Doan_HCTN'] = {
-                "CQCuDi": vm.dossiers.applicantName, 
-                "QD_CV": "", 
-                "SoNguoi": String(vm.so_nguoi), 
-                "MucDich": "", 
-                "TaiChinh": "", 
-                "CQChuQuan": 0, 
-                "SoNgay": "", 
-                "CacNuocDi_ma": nuoc_id, 
-                "CacNuocDi": nuoc_di, 
-                "SoHCCu_NG": vm.ho_chieu_ngoai_giao_cu.toString(),
-                "SoHCCu_CV": vm.ho_chieu_cong_vu_cu.toString(),
-                "SoHCCu_PT": vm.ho_chieu_pho_thong_cu.toString(),
-                "SoHCCapMoi": vm.ho_chieu_cong_vu_moi.toString(),
-                "SoNuocXinCH": vm.cong_ham_so_nuoc.toString(), 
-                "SoNguoiMLP": "", 
-                "SoHCCapMoi_NG": vm.ho_chieu_ngoai_giao_moi.toString(), 
-                "SoNguoiMienCH": vm.cong_ham_schengen.toString(),
-                "SoCHNhapCanh": vm.cong_ham_nhap_canh.toString(),
-                "SoCHQuaCanh": vm.cong_ham_qua_canh.toString(),
-                "SoHCGH": vm.ho_chieu_gia_han.toString(),
-                "SoHCHong": vm.ho_chieu_hong.toString(),
-                "SoHCMat": vm.ho_chieu_mat.toString()
-            };
-            vm.dossiers['metaData'] = JSON.stringify(hs)
+            let hs = vm.dossiers['metaData'] ? JSON.parse(vm.dossiers['metaData']) : '';
+            if (hs) {
+                hs['dossierFilePayment'] = file_payment2
+                hs['Doan_HCTN'] = {
+                    "CQCuDi": vm.dossiers.applicantName, 
+                    "QD_CV": "", 
+                    "SoNguoi": String(vm.so_nguoi), 
+                    "MucDich": "", 
+                    "TaiChinh": "", 
+                    "CQChuQuan": 0, 
+                    "SoNgay": "", 
+                    "CacNuocDi_ma": nuoc_id, 
+                    "CacNuocDi": nuoc_di, 
+                    "SoHCCu_NG": vm.ho_chieu_ngoai_giao_cu.toString(),
+                    "SoHCCu_CV": vm.ho_chieu_cong_vu_cu.toString(),
+                    "SoHCCu_PT": vm.ho_chieu_pho_thong_cu.toString(),
+                    "SoHCCapMoi": vm.ho_chieu_cong_vu_moi.toString(),
+                    "SoNuocXinCH": vm.cong_ham_so_nuoc.toString(), 
+                    "SoNguoiMLP": "", 
+                    "SoHCCapMoi_NG": vm.ho_chieu_ngoai_giao_moi.toString(), 
+                    "SoNguoiMienCH": vm.cong_ham_schengen.toString(),
+                    "SoCHNhapCanh": vm.cong_ham_nhap_canh.toString(),
+                    "SoCHQuaCanh": vm.cong_ham_qua_canh.toString(),
+                    "SoHCGH": vm.ho_chieu_gia_han.toString(),
+                    "SoHCHong": vm.ho_chieu_hong.toString(),
+                    "SoHCMat": vm.ho_chieu_mat.toString()
+                };
+                vm.dossiers['metaData'] = JSON.stringify(hs)
+            }
             
         },
         formatDate (date) {

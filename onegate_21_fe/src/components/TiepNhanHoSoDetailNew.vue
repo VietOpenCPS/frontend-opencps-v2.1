@@ -1603,7 +1603,6 @@ export default {
                     data: metaData
                   }
                   vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
-                    console.log(result)
                     let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
                     dossierFile.forEach(async (e)=>{
                       if(vm.data_form_template === 'formHPH'){
@@ -1614,9 +1613,11 @@ export default {
                             formData: e.formData
                           }
                           await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-
+                            if (vm.doAction) {
+                              activeDoAction()
+                            }
                           }).catch(reject=>{
-                            
+
                           })
                         }
                       }
@@ -1635,9 +1636,6 @@ export default {
                     }).catch(()=>{
                       vm.loadingAction = false
                     })
-                    if (vm.doAction) {
-                      activeDoAction()
-                    }
                   }).catch(err=> {
                     vm.loadingAction = false
                   })
@@ -1724,16 +1722,37 @@ export default {
                     dossierFile.forEach(async (e)=>{
                       if(vm.data_form_template === 'formCH'){
                         if(e.partNo === 'TP01' || e.partNo === 'TP02'){
-                          let dataPUTDossierFile = {
-                            id: vm.id,
-                            referenceUid: e.referenceUid,
-                            formData: e.formData
+                          if (e.referenceUid) {
+                            let dataPUTDossierFile = {
+                              id: vm.id,
+                              referenceUid: e.referenceUid,
+                              formData: e.formData
+                            }
+                            vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+                              counter+=1
+                              if (counter >= 1) {
+                                if (vm.doAction) {
+                                  // activeDoAction()
+                                }
+                              }
+                            }).catch(reject=>{
+                            })
+                          } else {
+                            let formData = JSON.parse(e.formData)
+                            let dataUpdate = Object.assign(formData, {
+                              dossierId: vm.id,
+                              tp: e.partNo
+                            }) 
+                            vm.$store.dispatch('postEformCallBack', dataUpdate).then(resPostEform => {
+                              counter+=1
+                              if (counter >= 1) {
+                                if (vm.doAction) {
+                                  // activeDoAction()
+                                }
+                              }
+                            }).catch(reject => {
+                            })
                           }
-                          await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-
-                          }).catch(reject=>{
-                            
-                          })
                         }
                       }
 
@@ -1892,20 +1911,41 @@ export default {
                   vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
                     console.log(result)
                     let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
-                    dossierFile.forEach(async (e)=>{
-                      if(vm.data_form_template === 'formTT'){
-                        if(e.partNo === 'TP01' || e.partNo === 'TP02'){
+                    let counter = 0
+                    dossierFile.forEach(function (e) {
+                      if(e.partNo === 'TP01' || e.partNo === 'TP02'){
+                        if (e.referenceUid) {
                           let dataPUTDossierFile = {
                             id: vm.id,
                             referenceUid: e.referenceUid,
                             formData: e.formData
                           }
-                          await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-
+                          vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+                            counter+=1
+                            if (counter >= 1) {
+                              if (vm.doAction) {
+                                activeDoAction()
+                              }
+                            }
                           }).catch(reject=>{
-                            
+                          })
+                        } else {
+                          let formData = JSON.parse(e.formData)
+                          let dataUpdate = Object.assign(formData, {
+                            dossierId: vm.id,
+                            tp: e.partNo
+                          }) 
+                          vm.$store.dispatch('postEformCallBack', dataUpdate).then(resPostEform => {
+                            counter+=1
+                            if (counter >= 1) {
+                              if (vm.doAction) {
+                                activeDoAction()
+                              }
+                            }
+                          }).catch(reject => {
                           })
                         }
+                        
                       }
                     })
                     let dataPayment = {
@@ -2518,15 +2558,10 @@ export default {
     checkQuyetDinh(){
       try{
         let dossierFileArr = JSON.parse($('#dossierFileArr_hidden').val())
-        console.log(dossierFileArr)
         let TP02 = dossierFileArr.find(e=>e.partNo === 'TP02')
-        console.log(TP01)
         let listVanBan = JSON.parse(TP02.formData).van_ban
         let TP01 = dossierFileArr.find(e=>e.partNo === 'TP01')
-        console.log(TP01)
         let listThanhVien = JSON.parse(TP01.formData).thanh_vien_doan
-        console.log(listThanhVien)
-        console.log(listVanBan)
         for(let i =0; i<listVanBan.length;i++){
           let vb_so_hieu_van_ban = listVanBan.filter(e => e.vb_so_hieu_van_ban === listVanBan[i]['vb_so_hieu_van_ban']) 
           if(vb_so_hieu_van_ban.length > 1){
