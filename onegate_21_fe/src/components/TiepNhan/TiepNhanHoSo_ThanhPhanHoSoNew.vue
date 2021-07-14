@@ -1978,13 +1978,15 @@ export default {
     saveMark () {
       let vm = this
       // console.log('save mark', vm.dossierTemplateItems)
-      if (vm.dossierTemplateItemsFilter) {
-        vm.dossierTemplateItemsFilter.forEach(function (value, index) {
-          if (value.partType === 1 && value.fileMark && !value.recordCountDefault) {
-            value['dossierId'] = vm.thongTinHoSo.dossierId
-            vm.$store.dispatch('postDossierMark', value)
-          }
-        })
+      if (!vm.onlyView && !vm.thongTinHoSo['dossierStatus']) {
+        if (vm.dossierTemplateItemsFilter) {
+          vm.dossierTemplateItemsFilter.forEach(function (value, index) {
+            if (value.partType === 1 && value.fileMark && !value.recordCountDefault) {
+              value['dossierId'] = vm.thongTinHoSo.dossierId
+              vm.$store.dispatch('postDossierMark', value)
+            }
+          })
+        }
       }
     },
     changeFileMark (event, index) {

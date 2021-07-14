@@ -239,7 +239,19 @@
                                 @change="toggleCheckbox(props.item, props.index)">
                             ></v-checkbox>
                         </td>
-                        <td>{{ props.item.partName }}</td>
+                        <td>
+                            <p>{{ props.item.partName }}</p>
+                            <p class="mt-0" v-for="(itemFileView, index) in dossierFileAttach" :key="index" v-if="doAction && props.item.dossierPartNo === itemFileView.dossierPartNo" >
+                                <span v-on:click.stop="viewFile2(itemFileView, index)" class="ml-1" style="cursor: pointer;">
+                                    <v-icon class="mr-1" v-if="itemFileView.fileSize !== 0" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
+                                        :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
+                                        {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
+                                    </v-icon>
+                                    {{itemFileView.displayName}} - 
+                                    <i>{{itemFileView.modifiedDate}}</i>
+                                </span>
+                            </p>
+                        </td>
                         <td>                            
                             <v-select
                                 v-model="props.item.fileMark"
@@ -1192,6 +1204,35 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
+        <!--  -->
+        <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
+            <v-card>
+                <v-toolbar dark color="primary">
+                <v-toolbar-title>
+                    <span>Tài liệu đính kèm</span>
+                </v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon dark @click.native="dialogPDF = false">
+                    <v-icon>close</v-icon>
+                </v-btn>
+                </v-toolbar>
+                <div v-if="dialogPDFLoading" style="
+                    min-height: 600px;
+                    text-align: center;
+                    margin: auto;
+                    padding: 25%;
+                ">
+                <v-progress-circular
+                    :size="100"
+                    :width="1"
+                    color="primary"
+                    indeterminate
+                ></v-progress-circular>
+                </div>
+                <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+                </iframe>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 <script>
@@ -1211,6 +1252,8 @@ export default {
     },
     data: () => ({
         active: 'tab-1',
+        dialogPDF: false,
+        dialogPDFLoading: false,
         saiSoHoChieu: false,
         listMucDich: [],
         muc_dich: '',
@@ -1390,7 +1433,7 @@ export default {
                 sortable: false,
             },
           {
-            text: 'Tên thành phần',
+            text: 'Thành phần hồ sơ',
             align: 'center',
             sortable: false
           },
@@ -1693,6 +1736,7 @@ export default {
         payment: {},
         auth: 'false',
         doAction: false,
+        dossierFileAttach: [],
         rules: {
             required: (v) => !!v || 'Thông tin này là bắt buộc',
             checkDatePast: (date)=> {
@@ -1846,10 +1890,38 @@ export default {
         },
         dossierMarkArr: {
             deep: true,
-            handler:  (val, oldVal) => {
-                let arr = val.filter(e => e.recordCount) 
-                arr.push({"dossierPartNo":"TP01","fileMark":3,"partName":"Tờ khai đề nghị cấp hộ chiếu ngoại giao, hộ chiếu công vụ và công hàm","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
-                arr.push({"dossierPartNo":"TP02","fileMark":3,"partName":"Văn bản hoặc quyết định cử hoặc cho phép cán bộ, công chức, viên chức, sỹ quan, quân nhân chuyên nghiệp ra nước ngoài","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
+            handler (val, oldVal) {
+                let arr = val.filter(e => e.recordCount)
+                let temp = this.dossierParts.filter(function (item) {
+                    return item.partNo === 'TP01'
+                })
+                if (temp && temp.length > 0) {
+                    let part = {
+                        "dossierPartNo": temp[0]['partNo'],
+                        "fileMark": 3,
+                        "partName": temp[0]['partName'],
+                        "partType":1,
+                        "fileCheck":0,
+                        "fileComment":"",
+                        "recordCount":1
+                    }
+                    arr.push(part)
+                }
+                let temp2 = this.dossierParts.filter(function (item) {
+                    return item.partNo === 'TP02'
+                })
+                if (temp2 && temp2.length > 0) {
+                    let part = {
+                        "dossierPartNo": temp2[0]['partNo'],
+                        "fileMark": 3,
+                        "partName": temp2[0]['partName'],
+                        "partType":1,
+                        "fileCheck":0,
+                        "fileComment":"",
+                        "recordCount":1
+                    }
+                    arr.push(part)
+                }
                 $('#dossierMarkArr_hidden').val(JSON.stringify(arr))
             }
         },
@@ -2043,6 +2115,9 @@ export default {
             axios.request(config).then(res => {
                 let data = res.data.data
                 if(data.length){
+                    vm.dossierFileAttach = data.filter(function (item) {
+                        return !item.eForm
+                    })
                     for(let i =0; i<data.length; i++){
                         let tg = {
                             partNo: data[i]['dossierPartNo'],
@@ -3768,6 +3843,69 @@ export default {
             if (!date) return null
             const [day, month, year] = date.split('/')
             return `${year}-${month}-${day}`
+        },
+        viewFile2 (data, index) {
+            let vm = this
+            if (data.fileSize === 0) {
+                return
+            }
+            if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt' || data.fileType === 'mp3' || data.fileType === 'mp4') {
+                let url = '/o/rest/v2/dossiers/' + vm.id + '/files/' + data.referenceUid
+                window.location.assign(url)
+            } else {
+                data['dossierId'] = vm.id
+                if (data.referenceUid) {
+                    vm.dialogPDFLoading = true
+                    vm.dialogPDF = true
+                    vm.$store.dispatch('viewFile', data).then(result => {
+                        vm.dialogPDFLoading = false
+                        document.getElementById('dialogPDFPreview' + vm.id).src = result
+                    })
+                } else {
+                    toastr.clear()
+                    toastr.error('File dữ liệu không tồn tại')
+                }
+            }
+        },
+        getDocumentTypeIcon (type) {
+            let typeDoc = 'doc,docx'
+            let typeExcel = 'xls,xlsx'
+            let typeImage = 'png,jpg,jpeg'
+            if (type) {
+                if (typeDoc.indexOf(type.toLowerCase()) >= 0) {
+                return {
+                    icon: 'fas fa fa-file-word-o',
+                    color: 'blue',
+                    size: 14
+                }
+                } else if (typeExcel.indexOf(type.toLowerCase()) >= 0) {
+                return {
+                    icon: 'fas fa fa-file-excel-o',
+                    color: 'green',
+                    size: 14
+                }
+                } else if (type.toLowerCase() === 'pdf') {
+                return {
+                    icon: 'fa fa-file-pdf-o',
+                    color: 'red',
+                    size: 14
+                }
+                } else if (typeImage.indexOf(type.toLowerCase()) >= 0) {
+                return {
+                    icon: 'fas fa fa-file-image-o',
+                    color: 'primary',
+                    size: 14
+                }
+                } else {
+                return {
+                    icon: 'fas fa fa-paperclip',
+                    color: '',
+                    size: 14
+                }
+                }
+            } else {
+                return ''
+            }
         }
     }
 }

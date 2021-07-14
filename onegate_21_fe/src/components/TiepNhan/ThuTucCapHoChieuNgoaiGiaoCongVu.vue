@@ -206,13 +206,13 @@
                     >
                         <template slot="items" slot-scope="props">
                         <tr>
-                            <td class="text-xs-center">{{props.index + 1}}</td>
-                            <td>{{props.item.ho_ten}}</td>
-                            <td>{{props.item.so_cmt}}</td>
-                            <td>{{props.item.ngay_sinh}}/{{props.item.thang_sinh}}/{{props.item.nam_sinh}}</td>
-                            <td>{{props.item.noi_sinh_text}}</td>
-                            <td>{{props.item.vb_so_hieu_van_ban}} - {{props.item.vb_ngay_ky}} - {{props.item.co_quan_chu_quan_text}}</td>
-                            <td>{{props.item.ma_to_khai ? props.item.ma_to_khai : ''}}</td>
+                            <td class="text-xs-center py-2">{{props.index + 1}}</td>
+                            <td class="py-2">{{props.item.ho_ten}}</td>
+                            <td class="py-2">{{props.item.so_cmt}}</td>
+                            <td class="py-2">{{props.item.ngay_sinh}}/{{props.item.thang_sinh}}/{{props.item.nam_sinh}}</td>
+                            <td class="py-2">{{props.item.noi_sinh_text}}</td>
+                            <td class="py-2">{{props.item.vb_so_hieu_van_ban}} - {{props.item.vb_ngay_ky}} - {{props.item.co_quan_chu_quan_text}}</td>
+                            <td class="py-2">{{props.item.ma_to_khai ? props.item.ma_to_khai : ''}}</td>
                             <td class="text-xs-center" style="width: 80px">
                                 <v-btn flat icon color="primary" @click="openDialogUpdateThanhVien(props.index,props.item)">
                                     <v-icon>create</v-icon>
@@ -253,7 +253,19 @@
                                     @change="toggleCheckbox(props.item, props.index)">
                                 ></v-checkbox>
                             </td>
-                            <td class="py-2">{{ props.item.partName }}</td>
+                            <td class="py-2">
+                                <p>{{ props.item.partName }}</p>
+                                <p class="mt-0" v-for="(itemFileView, index) in dossierFileAttach" :key="index" v-if="doAction && props.item.dossierPartNo === itemFileView.dossierPartNo" >
+                                    <span v-on:click.stop="viewFile2(itemFileView, index)" class="ml-1" style="cursor: pointer;">
+                                        <v-icon class="mr-1" v-if="itemFileView.fileSize !== 0" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
+                                            :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
+                                            {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
+                                        </v-icon>
+                                        {{itemFileView.displayName}} - 
+                                        <i>{{itemFileView.modifiedDate}}</i>
+                                    </span>
+                                </p>
+                            </td>
                             <td class="py-1">                            
                                 <v-select
                                     v-model="props.item.fileMark"
@@ -591,7 +603,7 @@
                                             :items="listVanBanNguoiKy"
                                             v-model="vb_nguoi_ky"
                                             item-text="NguoiKy"
-                                            item-value="NguoiKy"
+                                            item-value="ID"
                                             clearable
                                             :rules="[rules.required]"
                                             required
@@ -600,9 +612,12 @@
                                             return-object
                                         >
                                             <template slot="selection" slot-scope="{ item, selected }">
-                                                {{item.NguoiKy}}- {{item.ChucVu}}
+                                                <b>{{item.NguoiKy}}</b>- {{item.ChucVu}} - <i>Ngày HL: {{item.ngayHL.split(' ')[0]}}</i>
                                             </template>
-                                            <template slot="item" slot-scope="{ item, tile }">{{item.NguoiKy}} -{{item.ChucVu}}</template>
+                                            <template slot="item" slot-scope="{ item, tile }">
+                                                <b>{{item.NguoiKy}}</b>- {{item.ChucVu}} - 
+                                                <i>Ngày HL: {{item.ngayHL.split(' ')[0]}}</i>
+                                            </template>
                                         </v-autocomplete>
                                     </v-flex>
                                 </v-layout>
@@ -800,7 +815,7 @@
                                     </v-flex>
                                     <v-flex xs12 class="px-2 my-2">
                                         <label for="">4. Nơi sinh <span class="red--text">*</span></label>
-                                        <div style="display:flex; flex-wrap: wrap;align-items: center;">
+                                        <div style="display:flex; flex-wrap: wrap;align-items: top;">
                                             <v-autocomplete
                                                 :items="listNoiSinh"
                                                 v-model="noi_sinh"
@@ -813,7 +828,7 @@
                                                 solo
                                                 return-object
                                             ></v-autocomplete>
-                                            <v-btn small color="primary" @click="getNoiKhac()">Nơi khác</v-btn>
+                                            <v-btn class="mt-0" small color="primary" @click="getNoiKhac()">Nơi khác</v-btn>
                                         </div>
                                     </v-flex>
                                     <v-flex xs12 class="px-2 my-2">
@@ -1288,6 +1303,34 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
+            <v-card>
+                <v-toolbar dark color="primary">
+                <v-toolbar-title>
+                    <span>Tài liệu đính kèm</span>
+                </v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon dark @click.native="dialogPDF = false">
+                    <v-icon>close</v-icon>
+                </v-btn>
+                </v-toolbar>
+                <div v-if="dialogPDFLoading" style="
+                    min-height: 600px;
+                    text-align: center;
+                    margin: auto;
+                    padding: 25%;
+                ">
+                <v-progress-circular
+                    :size="100"
+                    :width="1"
+                    color="primary"
+                    indeterminate
+                ></v-progress-circular>
+                </div>
+                <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+                </iframe>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 <script>
@@ -1306,6 +1349,8 @@ export default {
         'suggestions': Suggestions,
     },
     data: () => ({
+        dialogPDF: false,
+        dialogPDFLoading: false,
         loadingCheckHc: false,
         menu: true,
         menu2: true,
@@ -1340,6 +1385,7 @@ export default {
         eFormCodeArr: [],
         listTinh: [],
         checkVanBan: [],
+        vanBanUpdate: '',
         headerVanBan: [
             {
             text: 'Đã KT',
@@ -1433,7 +1479,7 @@ export default {
                 sortable: false,
             },
           {
-            text: 'Tên thành phần',
+            text: 'Thành phần hồ sơ',
             align: 'center',
             sortable: false
           },
@@ -1655,6 +1701,8 @@ export default {
         payment: {},
         auth: 'false',
         doAction: false,
+        dossierFileAttach: [],
+
         rules: {
             required: (v) => !!v || 'Thông tin này là bắt buộc',
             checkDatePast: (date)=> {
@@ -1863,10 +1911,38 @@ export default {
         },
         dossierMarkArr: {
             deep: true,
-            handler:  (val, oldVal) => {
+            handler (val, oldVal) {
                 let arr = val.filter(e => e.recordCount) 
-                arr.push({"dossierPartNo":"TP01","fileMark":3,"partName":"Tờ khai đề nghị cấp hộ chiếu ngoại giao, hộ chiếu công vụ và công hàm","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
-                arr.push({"dossierPartNo":"TP02","fileMark":3,"partName":"Văn bản hoặc quyết định cử hoặc cho phép cán bộ, công chức, viên chức, sỹ quan, quân nhân chuyên nghiệp ra nước ngoài","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
+                let temp = this.dossierParts.filter(function (item) {
+                    return item.partNo === 'TP01'
+                })
+                if (temp && temp.length > 0) {
+                    let part = {
+                        "dossierPartNo": temp[0]['partNo'],
+                        "fileMark": 3,
+                        "partName": temp[0]['partName'],
+                        "partType":1,
+                        "fileCheck":0,
+                        "fileComment":"",
+                        "recordCount":1
+                    }
+                    arr.push(part)
+                }
+                let temp2 = this.dossierParts.filter(function (item) {
+                    return item.partNo === 'TP02'
+                })
+                if (temp2 && temp2.length > 0) {
+                    let part = {
+                        "dossierPartNo": temp2[0]['partNo'],
+                        "fileMark": 3,
+                        "partName": temp2[0]['partName'],
+                        "partType":1,
+                        "fileCheck":0,
+                        "fileComment":"",
+                        "recordCount":1
+                    }
+                    arr.push(part)
+                }
                 $('#dossierMarkArr_hidden').val(JSON.stringify(arr))
             }
         },
@@ -2049,6 +2125,9 @@ export default {
             axios.request(config).then(res => {
                 let data = res.data.data
                 if(data.length){
+                    vm.dossierFileAttach = data.filter(function (item) {
+                        return !item.eForm
+                    })
                     for(let i =0; i<data.length; i++){
                         let tg = {
                             partNo: data[i]['dossierPartNo'],
@@ -2562,6 +2641,9 @@ export default {
                 }
                 axios.request(config).then(res => {
                     vm.listVanBanNguoiKy = vm.sortArr(res.data.data, 'NguoiKy')
+                    if (vm.vanBanUpdate && vm.listVanBanNguoiKy && vm.listVanBanNguoiKy.length > 0) {
+                        vm.vb_nguoi_ky = vm.listVanBanNguoiKy.find( e=> e.ID === vm.vanBanUpdate.vb_nguoi_ky)
+                    }
                 }).catch(err => {}) 
             }
             
@@ -2767,6 +2849,7 @@ export default {
 
         },
         openDialogThemVanBan(){
+            this.vanBanUpdate = ''
             this.update_cqcq = 'add'
             this.dialogThemVanBan = true
             this.srcMauChuKy = ''
@@ -2789,8 +2872,11 @@ export default {
             vm.co_quan_chu_quan =vm.listCoQuanChuQuan.find(e=>e.CQTen === item.vb_co_quan_chu_quan) 
             vm.vb_ngay_ky = item.vb_ngay_ky
             vm.vb_co_quan_tieng_anh = item.vb_co_quan_tieng_anh
+            vm.vanBanUpdate = item
             setTimeout(()=>{
-                vm.vb_nguoi_ky = vm.listVanBanNguoiKy.find( e=> e.ID === item.vb_nguoi_ky)
+                if (vm.listVanBanNguoiKy && vm.listVanBanNguoiKy.length > 0) {
+                    vm.vb_nguoi_ky = vm.listVanBanNguoiKy.find( e=> e.ID === item.vb_nguoi_ky)
+                }
             }, 1000)
             vm.dialogThemVanBan = true
         },
@@ -3516,6 +3602,69 @@ export default {
                 }
             }).catch(function (error) {
             })
+        },
+        viewFile2 (data, index) {
+            let vm = this
+            if (data.fileSize === 0) {
+                return
+            }
+            if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt' || data.fileType === 'mp3' || data.fileType === 'mp4') {
+                let url = '/o/rest/v2/dossiers/' + vm.id + '/files/' + data.referenceUid
+                window.location.assign(url)
+            } else {
+                data['dossierId'] = vm.id
+                if (data.referenceUid) {
+                    vm.dialogPDFLoading = true
+                    vm.dialogPDF = true
+                    vm.$store.dispatch('viewFile', data).then(result => {
+                        vm.dialogPDFLoading = false
+                        document.getElementById('dialogPDFPreview' + vm.id).src = result
+                    })
+                } else {
+                    toastr.clear()
+                    toastr.error('File dữ liệu không tồn tại')
+                }
+            }
+        },
+        getDocumentTypeIcon (type) {
+            let typeDoc = 'doc,docx'
+            let typeExcel = 'xls,xlsx'
+            let typeImage = 'png,jpg,jpeg'
+            if (type) {
+                if (typeDoc.indexOf(type.toLowerCase()) >= 0) {
+                return {
+                    icon: 'fas fa fa-file-word-o',
+                    color: 'blue',
+                    size: 14
+                }
+                } else if (typeExcel.indexOf(type.toLowerCase()) >= 0) {
+                return {
+                    icon: 'fas fa fa-file-excel-o',
+                    color: 'green',
+                    size: 14
+                }
+                } else if (type.toLowerCase() === 'pdf') {
+                return {
+                    icon: 'fa fa-file-pdf-o',
+                    color: 'red',
+                    size: 14
+                }
+                } else if (typeImage.indexOf(type.toLowerCase()) >= 0) {
+                return {
+                    icon: 'fas fa fa-file-image-o',
+                    color: 'primary',
+                    size: 14
+                }
+                } else {
+                return {
+                    icon: 'fas fa fa-paperclip',
+                    color: '',
+                    size: 14
+                }
+                }
+            } else {
+                return ''
+            }
         }
     }
 }

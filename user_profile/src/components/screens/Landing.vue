@@ -1457,7 +1457,7 @@
       getZaloIsFollowing (uid) {
         let vm = this
         let zaloOaToken = vm.zaloOaid_token_access
-        let url = 'https://cors-anywhere.herokuapp.com/https://openapi.zalo.me/v2.0/oa/getprofile?access_token=' + zaloOaToken + '&data={"user_id":"' + uid + '"}'
+        let url = 'https://openapi.zalo.me/v2.0/oa/getprofile?access_token=' + zaloOaToken + '&data={"user_id":"' + uid + '"}'
         $.ajax({
           url: url,
           method: 'GET',

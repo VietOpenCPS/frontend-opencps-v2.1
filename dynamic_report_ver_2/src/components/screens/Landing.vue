@@ -2709,6 +2709,7 @@ export default {
         for(let i in vm.filterGroup){
           vm.filterGroup[i] = null
         }
+        vm.data[vm.groupByVal] = ''
       }, 300)
     },
     viewHTML () {

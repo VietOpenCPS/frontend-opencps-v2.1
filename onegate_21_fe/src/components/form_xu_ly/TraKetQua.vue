@@ -14,7 +14,7 @@
                 <div slot="header" @click="stateView = false" style="background-color:#fff">
                   <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
                     <div v-for="(itemFileView, index) in dossierFilesItems" :key="index + 'cr'" v-if="item.dossierPartNo + id === itemFileView.dossierPartNo + id">
-                      <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 25px; font-size: 12px;">
+                      <div class="mb-2" style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 25px; font-size: 12px;">
                         <span class="text-bold">{{index + 1}}. </span>
                         <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
                           <v-icon class="mr-1" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
@@ -28,7 +28,7 @@
                     </div>
                   </div>
                 </div>
-                <v-card v-if="item.eForm">
+                <!-- <v-card v-if="item.eForm">
                   <v-card-text style="background-color: rgba(244, 247, 213, 0.19);">
                     <v-layout wrap>
                       <v-flex xs12 class="text-xs-right">
@@ -38,7 +38,7 @@
                       </v-flex>
                     </v-layout>
                   </v-card-text>
-                </v-card>
+                </v-card> -->
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
@@ -138,7 +138,17 @@
         if (vm.detailDossier['dossierId']) {
           vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
-            vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, resFiles)
+            // vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, resFiles)
+            let arr = []
+            for (let key in vm.createFiles) {
+              let exits = arr.filter(function (item) {
+                return vm.createFiles[key]['dossierPartNo'] === item.dossierPartNo
+              })
+              if (!exits || exits.length === 0) {
+                arr.push(vm.createFiles[key])
+              }
+            }
+            vm.createFiles = arr
           }).catch(reject => {
           })
         }

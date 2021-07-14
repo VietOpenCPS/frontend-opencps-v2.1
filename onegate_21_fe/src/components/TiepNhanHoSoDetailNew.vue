@@ -1507,14 +1507,27 @@ export default {
       let vm = this
       if (item && item.hasOwnProperty('actionCode')) {
         vm.actionCode = item.actionCode
-      }
-      if(vm.data_form_template !== 'formHPH' && vm.data_form_template !== 'formCH'  && vm.data_form_template !== 'formHT' && vm.data_form_template !== 'formTT') {
-        vm.formAlpaca()
+        let filter = {
+          dossierId: vm.id,
+          actionId: item.processActionId
+        }
+        vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
+          if(vm.data_form_template !== 'formHPH' && vm.data_form_template !== 'formCH'  && vm.data_form_template !== 'formHT' && vm.data_form_template !== 'formTT') {
+            vm.formAlpaca()
+          } else {
+            vm.formVue(result)
+          }
+        }).catch(function (reject) {
+        })
       } else {
-        vm.formVue()
+        if(vm.data_form_template !== 'formHPH' && vm.data_form_template !== 'formCH'  && vm.data_form_template !== 'formHT' && vm.data_form_template !== 'formTT') {
+          vm.formAlpaca()
+        } else {
+          vm.formVue()
+        }
       }
     },
-    formVue () {
+    formVue (data) {
       let vm = this
       vm.loadingAction = true
       let dataCreate = {
@@ -1549,6 +1562,9 @@ export default {
             assignUsers: '',
             payment: '',
             createDossiers: ''
+          }
+          if (data && data.hasOwnProperty('payment') && data.payment) {
+            params.payment = JSON.parse(dataCreate.payment)
           }
           vm.$store.dispatch('postAction', params).then(resPostAction => {
           }).catch(function() {
@@ -1603,39 +1619,59 @@ export default {
                     data: metaData
                   }
                   vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
-                    let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
-                    dossierFile.forEach(async (e)=>{
-                      if(vm.data_form_template === 'formHPH'){
-                        if(e.partNo === 'TP01' && e.eForm){
-                          let dataPUTDossierFile = {
-                            id: vm.id,
-                            referenceUid: e.referenceUid,
-                            formData: e.formData
-                          }
-                          await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-                            if (vm.doAction) {
-                              activeDoAction()
+                    if (vm.doAction) {
+                      let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+                      dossierFile.forEach(function (e) {
+                        if(vm.data_form_template === 'formHPH'){
+                          if(e.partNo === 'TP01' && e.eform){
+                            let dataPUTDossierFile = {
+                              id: vm.id,
+                              referenceUid: e.referenceUid,
+                              formData: e.formData
                             }
-                          }).catch(reject=>{
-
-                          })
+                            vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+                              activeDoAction()
+                            }).catch(reject=>{
+                            })
+                          }
                         }
-                      }
-                    })
-                    let dataPayment = {
-                      dossierId: vm.id,
-                      payment: {}
-                    }
-                    if($('#payment_hidden').val()){
-                      dataPayment['payment'] = JSON.parse($('#payment_hidden').val())
-                    }
-                    vm.$store.dispatch('putPayment', dataPayment).then(()=>{
+                      })
                       vm.loadingAction = false
                       vm.$store.commit('setActivePrintBienNhan', result.dossierId)
                       vm.goBack()
-                    }).catch(()=>{
-                      vm.loadingAction = false
-                    })
+                    } else {
+                      let dataPayment = {
+                        dossierId: vm.id,
+                        payment: {}
+                      }
+                      if($('#payment_hidden').val()){
+                        dataPayment['payment'] = JSON.parse($('#payment_hidden').val())
+                      }
+                      vm.$store.dispatch('putPayment', dataPayment).then(()=>{
+                        let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+                        dossierFile.forEach(function (e) {
+                          if(vm.data_form_template === 'formHPH'){
+                            if(e.partNo === 'TP01' && e.eform){
+                              let dataPUTDossierFile = {
+                                id: vm.id,
+                                referenceUid: e.referenceUid,
+                                formData: e.formData
+                              }
+                              vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+                                
+                              }).catch(reject=>{
+
+                              })
+                            }
+                          }
+                        })
+                        vm.loadingAction = false
+                        vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+                        vm.goBack()
+                      }).catch(()=>{
+                        vm.loadingAction = false
+                      })
+                    }
                   }).catch(err=> {
                     vm.loadingAction = false
                   })
@@ -1717,60 +1753,95 @@ export default {
                       data: metaData
                     }
                   vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
-                    console.log(result)
-                    let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
-                    dossierFile.forEach(async (e)=>{
-                      if(vm.data_form_template === 'formCH'){
-                        if(e.partNo === 'TP01' || e.partNo === 'TP02'){
-                          if (e.referenceUid) {
-                            let dataPUTDossierFile = {
-                              id: vm.id,
-                              referenceUid: e.referenceUid,
-                              formData: e.formData
+                    if (vm.doAction) {
+                      let counter = 0
+                      vm.loadingAction = false
+                      let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+                      dossierFile.forEach(function (e) {
+                        if(vm.data_form_template === 'formCH'){
+                          if(e.partNo === 'TP01' || e.partNo === 'TP02'){
+                            if (e.referenceUid) {
+                              let dataPUTDossierFile = {
+                                id: vm.id,
+                                referenceUid: e.referenceUid,
+                                formData: e.formData
+                              }
+                              vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+                                counter+=1
+                                if (counter == 1) {
+                                  if (vm.doAction) {
+                                    activeDoAction()
+                                  }
+                                }
+                              }).catch(reject=>{
+                              })
+                            } else {
+                              let formData = JSON.parse(e.formData)
+                              let dataUpdate = Object.assign(formData, {
+                                dossierId: vm.id,
+                                tp: e.partNo
+                              }) 
+                              vm.$store.dispatch('postEformCallBack', dataUpdate).then(resPostEform => {
+                                counter+=1
+                                if (counter == 1) {
+                                  if (vm.doAction) {
+                                    activeDoAction()
+                                  }
+                                }
+                              }).catch(reject => {
+                              })
                             }
-                            vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-                              counter+=1
-                              if (counter >= 1) {
-                                if (vm.doAction) {
-                                  // activeDoAction()
-                                }
-                              }
-                            }).catch(reject=>{
-                            })
-                          } else {
-                            let formData = JSON.parse(e.formData)
-                            let dataUpdate = Object.assign(formData, {
-                              dossierId: vm.id,
-                              tp: e.partNo
-                            }) 
-                            vm.$store.dispatch('postEformCallBack', dataUpdate).then(resPostEform => {
-                              counter+=1
-                              if (counter >= 1) {
-                                if (vm.doAction) {
-                                  // activeDoAction()
-                                }
-                              }
-                            }).catch(reject => {
-                            })
                           }
                         }
-                      }
 
-                    })
-                    let dataPayment = {
-                      dossierId: vm.id,
-                      payment: {}
-                    }
-                    if($('#payment_hidden').val()){
-                      dataPayment['payment'] = JSON.parse($('#payment_hidden').val())
-                    }
-                    vm.$store.dispatch('putPayment', dataPayment).then(()=>{
-                      vm.loadingAction = false
+                      })
                       vm.$store.commit('setActivePrintBienNhan', result.dossierId)
                       vm.goBack()
-                    }).catch(()=>{
-                      vm.loadingAction = false
-                    })
+                    } else {
+                      let dataPayment = {
+                        dossierId: vm.id,
+                        payment: {}
+                      }
+                      if($('#payment_hidden').val()){
+                        dataPayment['payment'] = JSON.parse($('#payment_hidden').val())
+                      }
+                      vm.$store.dispatch('putPayment', dataPayment).then(()=>{
+                        vm.loadingAction = false
+                        let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+                        dossierFile.forEach(function (e) {
+                          if(vm.data_form_template === 'formCH'){
+                            if(e.partNo === 'TP01' || e.partNo === 'TP02'){
+                              if (e.referenceUid) {
+                                let dataPUTDossierFile = {
+                                  id: vm.id,
+                                  referenceUid: e.referenceUid,
+                                  formData: e.formData
+                                }
+                                vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+
+                                }).catch(reject=>{
+                                })
+                              } else {
+                                let formData = JSON.parse(e.formData)
+                                let dataUpdate = Object.assign(formData, {
+                                  dossierId: vm.id,
+                                  tp: e.partNo
+                                }) 
+                                vm.$store.dispatch('postEformCallBack', dataUpdate).then(resPostEform => {
+
+                                }).catch(reject => {
+                                })
+                              }
+                            }
+                          }
+
+                        })
+                        vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+                        vm.goBack()
+                      }).catch(()=>{
+                        vm.loadingAction = false
+                      })
+                    }
                   }).catch(err=> {
                     vm.loadingAction = false
                   })
@@ -1909,59 +1980,91 @@ export default {
                       data: metaData
                     }
                   vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
-                    console.log(result)
-                    let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
-                    let counter = 0
-                    dossierFile.forEach(function (e) {
-                      if(e.partNo === 'TP01' || e.partNo === 'TP02'){
-                        if (e.referenceUid) {
-                          let dataPUTDossierFile = {
-                            id: vm.id,
-                            referenceUid: e.referenceUid,
-                            formData: e.formData
+                    if (vm.doAction) {
+                      let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+                      let counter = 0
+                      dossierFile.forEach(function (e) {
+                        if(e.partNo === 'TP01' || e.partNo === 'TP02'){
+                          if (e.referenceUid) {
+                            let dataPUTDossierFile = {
+                              id: vm.id,
+                              referenceUid: e.referenceUid,
+                              formData: e.formData
+                            }
+                            vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+                              counter+=1
+                              if (counter == 1) {
+                                if (vm.doAction) {
+                                  activeDoAction()
+                                }
+                              }
+                            }).catch(reject=>{
+                            })
+                          } else {
+                            let formData = JSON.parse(e.formData)
+                            let dataUpdate = Object.assign(formData, {
+                              dossierId: vm.id,
+                              tp: e.partNo
+                            }) 
+                            vm.$store.dispatch('postEformCallBack', dataUpdate).then(resPostEform => {
+                              counter+=1
+                              if (counter == 1) {
+                                if (vm.doAction) {
+                                  activeDoAction()
+                                }
+                              }
+                            }).catch(reject => {
+                            })
                           }
-                          vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-                            counter+=1
-                            if (counter >= 1) {
-                              if (vm.doAction) {
-                                activeDoAction()
-                              }
-                            }
-                          }).catch(reject=>{
-                          })
-                        } else {
-                          let formData = JSON.parse(e.formData)
-                          let dataUpdate = Object.assign(formData, {
-                            dossierId: vm.id,
-                            tp: e.partNo
-                          }) 
-                          vm.$store.dispatch('postEformCallBack', dataUpdate).then(resPostEform => {
-                            counter+=1
-                            if (counter >= 1) {
-                              if (vm.doAction) {
-                                activeDoAction()
-                              }
-                            }
-                          }).catch(reject => {
-                          })
+                          
                         }
-                        
-                      }
-                    })
-                    let dataPayment = {
-                      dossierId: vm.id,
-                      payment: {}
-                    }
-                    if($('#payment_hidden').val()){
-                      dataPayment['payment'] = JSON.parse($('#payment_hidden').val())
-                    }
-                    vm.$store.dispatch('putPayment', dataPayment).then(()=>{
+                      })
                       vm.loadingAction = false
                       vm.$store.commit('setActivePrintBienNhan', result.dossierId)
                       vm.goBack()
-                    }).catch(()=>{
-                      vm.loadingAction = false
-                    })
+                    } else {
+                      let dataPayment = {
+                        dossierId: vm.id,
+                        payment: {}
+                      }
+                      if($('#payment_hidden').val()){
+                        dataPayment['payment'] = JSON.parse($('#payment_hidden').val())
+                      }
+                      vm.$store.dispatch('putPayment', dataPayment).then(()=>{
+                        let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+                        dossierFile.forEach(function (e) {
+                          if(e.partNo === 'TP01' || e.partNo === 'TP02'){
+                            if (e.referenceUid) {
+                              let dataPUTDossierFile = {
+                                id: vm.id,
+                                referenceUid: e.referenceUid,
+                                formData: e.formData
+                              }
+                              vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+                                
+                              }).catch(reject=>{
+                              })
+                            } else {
+                              let formData = JSON.parse(e.formData)
+                              let dataUpdate = Object.assign(formData, {
+                                dossierId: vm.id,
+                                tp: e.partNo
+                              }) 
+                              vm.$store.dispatch('postEformCallBack', dataUpdate).then(resPostEform => {
+                                
+                              }).catch(reject => {
+                              })
+                            }
+                            
+                          }
+                        })
+                        vm.loadingAction = false
+                        vm.$store.commit('setActivePrintBienNhan', result.dossierId)
+                        vm.goBack()
+                      }).catch(()=>{
+                        vm.loadingAction = false
+                      })
+                    }
                   }).catch(err=> {
                     vm.loadingAction = false
                   })
@@ -2047,6 +2150,27 @@ export default {
         o.partNo = o.dossierPartNo
         return o;
       })
+      let activeDoAction = ''
+      if (vm.doAction) {
+        let initData = vm.$store.getters.loadingInitData
+        let actionUser = initData.user.userName ? initData.user.userName : ''
+        activeDoAction = function () {
+          let params = {
+            dossierId: vm.id,
+            actionCode: vm.actionCode,
+            actionUser: actionUser,
+            payload: '',
+            security: '',
+            assignUsers: '',
+            payment: '',
+            createDossiers: ''
+          }
+          vm.$store.dispatch('postAction', params).then(resPostAction => {
+          }).catch(function() {
+            toastr.error('Yêu cầu thực hiện thất bại')
+          })
+        }
+      }
       if (vm.data_form_template === 'formHPH') {
         if(vm.$refs.formTiepNhan.validate()){
           if (vm.formCode === 'NEW') {
@@ -2085,38 +2209,6 @@ export default {
                 }
                 vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
                   console.log(result)
-                  let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
-                  dossierFile.forEach(async (e)=>{
-                    if(vm.data_form_template === 'formCH'){
-                      if(e.partNo === 'TP01' || e.partNo === 'TP02'){
-                        let dataPUTDossierFile = {
-                          id: vm.id,
-                          referenceUid: e.referenceUid,
-                          formData: e.formData
-                        }
-                        await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-
-                        }).catch(reject=>{
-                          
-                        })
-                      }
-                    }
-                    if(vm.data_form_template === 'formHPH'){
-                      if(e.partNo === 'TP01'){
-                        let dataPUTDossierFile = {
-                          id: vm.id,
-                          referenceUid: e.referenceUid,
-                          formData: e.formData
-                        }
-                        await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-
-                        }).catch(reject=>{
-                          
-                        })
-                      }
-                    }
-
-                  })
                   let dataPayment = {
                     dossierId: vm.id,
                     payment: {}
@@ -2125,6 +2217,26 @@ export default {
                     dataPayment['payment'] = JSON.parse($('#payment_hidden').val())
                   }
                   vm.$store.dispatch('putPayment', dataPayment).then(()=>{
+                    let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+                    dossierFile.forEach(function (e) {
+                      if(vm.data_form_template === 'formHPH'){
+                        if(e.partNo === 'TP01'){
+                          let dataPUTDossierFile = {
+                            id: vm.id,
+                            referenceUid: e.referenceUid,
+                            formData: e.formData
+                          }
+                          vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+                            if (vm.doAction) {
+                              activeDoAction()
+                            }
+                          }).catch(reject=>{
+                            
+                          })
+                        }
+                      }
+
+                    })
                     vm.loadingAction = false
                     vm.$store.commit('setActivePrintBienNhan', result.dossierId)
                     vm.goBack()
@@ -2187,38 +2299,6 @@ export default {
               }
               vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
                 console.log(result)
-                let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
-                dossierFile.forEach(async (e)=>{
-                  if(vm.data_form_template === 'formCH'){
-                    if(e.partNo === 'TP01' || e.partNo === 'TP02'){
-                      let dataPUTDossierFile = {
-                        id: vm.id,
-                        referenceUid: e.referenceUid,
-                        formData: e.formData
-                      }
-                      await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-
-                      }).catch(reject=>{
-                        
-                      })
-                    }
-                  }
-                  if(vm.data_form_template === 'formHPH'){
-                    if(e.partNo === 'TP01'){
-                      let dataPUTDossierFile = {
-                        id: vm.id,
-                        referenceUid: e.referenceUid,
-                        formData: e.formData
-                      }
-                      await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-
-                      }).catch(reject=>{
-                        
-                      })
-                    }
-                  }
-
-                })
                 let dataPayment = {
                   dossierId: vm.id,
                   payment: {}
@@ -2227,6 +2307,48 @@ export default {
                   dataPayment['payment'] = JSON.parse($('#payment_hidden').val())
                 }
                 vm.$store.dispatch('putPayment', dataPayment).then(()=>{
+                  let counter = 0
+                  let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
+                  dossierFile.forEach(function (e) {
+                    if(vm.data_form_template === 'formCH'){
+                      if(e.partNo === 'TP01' || e.partNo === 'TP02'){
+                        if (e.referenceUid) {
+                          let dataPUTDossierFile = {
+                            id: vm.id,
+                            referenceUid: e.referenceUid,
+                            formData: e.formData
+                          }
+                          vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+                            counter+=1
+                            if (counter == 1) {
+                              if (vm.doAction) {
+                                activeDoAction()
+                              }
+                            }
+                          }).catch(reject=>{
+                            
+                          })
+                        } else {
+                          let formData = JSON.parse(e.formData)
+                          let dataUpdate = Object.assign(formData, {
+                            dossierId: vm.id,
+                            tp: e.partNo
+                          }) 
+                          vm.$store.dispatch('postEformCallBack', dataUpdate).then(resPostEform => {
+                            counter+=1
+                            if (counter == 1) {
+                              if (vm.doAction) {
+                                activeDoAction()
+                              }
+                            }
+                          }).catch(reject => {
+                          })
+                        }
+                        
+                      }
+                    }
+                    
+                  })
                   vm.loadingAction = false
                   vm.$store.commit('setActivePrintBienNhan', result.dossierId)
                   vm.goBack()
@@ -2289,20 +2411,44 @@ export default {
               }
               vm.$store.dispatch('putMetaData', dataMetaData).then(()=>{
                 console.log(result)
+                let counter = 0
                 let dossierFile = JSON.parse($('#dossierFileArr_hidden').val())
-                dossierFile.forEach(async (e)=>{
+                dossierFile.forEach(function (e) {
                   if(vm.data_form_template === 'formTT'){
                     if(e.partNo === 'TP01' || e.partNo === 'TP02'){
-                      let dataPUTDossierFile = {
-                        id: vm.id,
-                        referenceUid: e.referenceUid,
-                        formData: e.formData
+                      if (e.referenceUid) {
+                        let dataPUTDossierFile = {
+                          id: vm.id,
+                          referenceUid: e.referenceUid,
+                          formData: e.formData
+                        }
+                        vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
+                          counter+=1
+                          if (counter == 1) {
+                            if (vm.doAction) {
+                              activeDoAction()
+                            }
+                          }
+                        }).catch(reject=>{
+                          
+                        })
+                      } else {
+                        let formData = JSON.parse(e.formData)
+                        let dataUpdate = Object.assign(formData, {
+                          dossierId: vm.id,
+                          tp: e.partNo
+                        }) 
+                        vm.$store.dispatch('postEformCallBack', dataUpdate).then(resPostEform => {
+                          counter+=1
+                          if (counter == 1) {
+                            if (vm.doAction) {
+                              activeDoAction()
+                            }
+                          }
+                        }).catch(reject => {
+                        })
                       }
-                      await vm.$store.dispatch('putDossierFileNew', dataPUTDossierFile).then( result2 => {
-
-                      }).catch(reject=>{
-                        
-                      })
+                      
                     }
                   }
                 })

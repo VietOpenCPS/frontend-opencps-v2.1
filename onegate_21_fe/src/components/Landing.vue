@@ -202,7 +202,7 @@
       <v-menu bottom v-if="getUser('Administrator_data')" style="position:relative !important">
         <v-btn slot="activator" color="red" dark>Go to &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
         <v-list>
-          <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_DONE'}, 0, true)" >
+          <!-- <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_DONE'}, 0, true)" >
             <v-list-tile-title>Hoàn thành</v-list-tile-title>
           </v-list-tile>
           <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_CANCEL'}, 0, true)">
@@ -210,7 +210,12 @@
           </v-list-tile>
           <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_DENY'}, 0, true)">
             <v-list-tile-title>Từ chối</v-list-tile-title>
+          </v-list-tile> -->
+
+          <v-list-tile v-for="(item, index) in stepCodeForGoTo" v-bind:key="index" @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_STEP', stepCode: item.stepCode, stepName: item.stepName}, 0, true)" >
+            <v-list-tile-title>{{item.stepName}}</v-list-tile-title>
           </v-list-tile>
+          
         </v-list>
       </v-menu>
       
@@ -1108,6 +1113,11 @@ export default {
     focusSelect: 0,
     srcDownloadIframe: '',
     showOptionName: false,
+    stepCodeForGoTo: [
+      {stepName: 'Hoàn thành', stepCode: '400'},
+      {stepName: 'Rút hồ sơ', stepCode: '410'},
+      {stepName: 'Từ chối', stepCode: '420'}
+    ],
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       cmndHoChieu: (value) => {
@@ -1254,6 +1264,11 @@ export default {
         }
       } catch (error) {
       }
+      try {
+        if (stepCodeForGoTo) {
+          vm.stepCodeForGoTo = stepCodeForGoTo
+        }
+      } catch (error) {}
     })
   },
   updated () {
@@ -2083,6 +2098,9 @@ export default {
             } else {
               vm.dossierCounting = []
             }
+            if (vm.getUser('Administrator_data') && (!vm.dossierCounting || vm.dossierCounting.length == 0)) {
+              vm.dossierCounting = [{key: 'deleted', title: 'Hồ sơ đã xóa', count: 0}]
+            }
             vm.dossierCountingShow = true
           }).catch(function (){})
         }, 200)
@@ -2504,34 +2522,14 @@ export default {
           vm.doUndoDossier(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'RESTORE_DOSSIER') {
           vm.doRestoreDossier(dossierItem, item, index, isGroup)
-        } else if (String(item.form) === 'GOTO_DONE') {
+        } else if (String(item.form) === 'GOTO_STEP') {
           if (!dossierItem) {
             alert('Chọn hồ sơ để thực hiện')
             return
           }
           let result = {
-            stepCode: 400,
-            stepName: 'hoàn thành'
-          }
-          vm.gotoStep(dossierItem, result)
-        } else if (String(item.form) === 'GOTO_CANCEL') {
-          if (!dossierItem) {
-            alert('Chọn hồ sơ để thực hiện')
-            return
-          }
-          let result = {
-            stepCode: 410,
-            stepName: 'rút'
-          }
-          vm.gotoStep(dossierItem, result)
-        } else if (String(item.form) === 'GOTO_DENY') {
-          if (!dossierItem) {
-            alert('Chọn hồ sơ để thực hiện')
-            return
-          }
-          let result = {
-            stepCode: 420,
-            stepName: 'từ chối'
+            stepCode: item.stepCode,
+            stepName: item.stepName
           }
           vm.gotoStep(dossierItem, result)
         }

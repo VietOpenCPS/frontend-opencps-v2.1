@@ -278,7 +278,7 @@
                 </v-expansion-panel>
                 <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
                 <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :data_rolegroup="roleGroupPhanCong" :detailDossier="thongTinChiTietHoSo" :data_uyquyen="reAsignUsers" :type="type_assign"></phan-cong>
-                <tai-lieu-ket-qua :esignType="typeEsign" ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
+                <tai-lieu-ket-qua :esignType="typeEsign" :preCondition="preCondition" ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
                 <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
                 <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
                 <!-- thanh toán điện tử -->
@@ -891,6 +891,7 @@ export default {
       {fileName: 'Tài liệu ký duyệt 002', time: '21/08/2019 10:10:13',url: 'http://103.101.163.17:8080/documents/35166/0/testKS.pdf', fileSigned: false}
     ],
     typeEsign: '',
+    preCondition: '',
     showTraKetQua: false,
     showThanhPhanLienThong: false,
     showThuPhi: false,
@@ -1759,6 +1760,7 @@ export default {
           vm.showTaoTaiLieuKetQua = true
           if (result.hasOwnProperty('signatureType') && result.signatureType === 'plugin') {
             vm.typeEsign = result.signatureType
+            vm.preCondition = result.preCondition
           }
         }
         if (result.hasOwnProperty('eSignature') && result.eSignature && result.signatureType !== 'plugin') {
@@ -2638,12 +2640,181 @@ export default {
           } else {
             // ký số với plugin cài đặt
             // check không sử dụng ký số trong quy trình có ký số
-            let doNotSign = false
+            // let doNotSign = false
+            let requiredSign = false
             if (vm.showTaoTaiLieuKetQua && vm.typeEsign === 'plugin') {
-              doNotSign = vm.$refs.tailieuketqua.checkUseSign()
+              // doNotSign = vm.$refs.tailieuketqua.checkUseSign()
+              requiredSign = vm.$refs.tailieuketqua.checkRequiredSignPlugin()
             }
-            if (result.signatureType === 'plugin' && !doNotSign && vm.showTaoTaiLieuKetQua) {
-              console.log('file ký số', vm.createFileSignedSync)
+            // chia 2 trường hợp cấu hình Bắt buộc ký số và Không bắt buộc ký số (cấu hình preCondition)
+            if (requiredSign == true) {
+              if (result.signatureType === 'plugin' && vm.showTaoTaiLieuKetQua) {
+                console.log('file ký số', vm.createFileSignedSync)
+                let hasIsSigned = false
+                try {
+                  hasIsSigned = vm.createFileSignedSync['createFiles'].filter(function(item) {
+                    return item.isSigned
+                  })
+                } catch (error) {
+                }
+                let valid = true
+                // chia 2 trường hợp có tài liệu đã ký và chưa có tài liệu nào được ký
+                if (!vm.createFileSignedSync || !hasIsSigned || hasIsSigned.length === 0) {
+                  console.log('TH1')
+                  toastr.clear()
+                  toastr.error('Chưa có tài liệu nào được ký duyệt')
+                  vm.loadingAction = false
+                  vm.loadingActionProcess = false
+                } else {
+                  console.log('TH1.2')
+                  let fileChuaKy = []
+                  let files = vm.createFileSignedSync.createFiles
+                  var fileEntries = []
+                  let dossierFiles = []
+                  for (let index in files) {
+                    if (
+                      (!files[index]['isSigned'] && files[index]['fileSize'] && files[index]['fileType'].toLocaleLowerCase() === 'pdf' && !files[index]['eForm']) || 
+                      (!files[index]['isSigned'] && files[index]['eForm'] && files[index]['fileSize'] && files[index]['createFileDossierPartEform'])
+                    ) {
+                      fileChuaKy.push(files[index]['displayName'])
+                    } else {
+                      if (files[index]['fileSize'] && files[index]['isSigned']) {
+                        fileEntries.push(files[index]['fileEntryId'])
+                        dossierFiles.push(files[index]['dossierFileId'])
+                      }
+                    }
+                  }
+                  let doActionKySo = function () {
+                    let filterUpdateFile = {
+                      dossierId: vm.thongTinChiTietHoSo['dossierId'],
+                      fileEntries: fileEntries.toString(),
+                      dossierFiles: dossierFiles.toString()
+                    }
+                    vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
+                      vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                        vm.getDetailDossier()
+                        if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
+                          vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+                          })
+                        }
+                        if (filter['payment']) {
+                          vm.loadThanhToan()
+                        }
+                        vm.loadingAction = false
+                        vm.dialogActionProcess = false
+                        vm.loadingActionProcess = false
+                        vm.alertObj = {
+                          icon: 'check_circle',
+                          color: 'success',
+                          message: 'Thực hiện thành công!'
+                        }
+                        vm.btnStateVisible = false
+                        if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                          vm.rollbackable = result.rollbackable
+                        }
+                        if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                          vm.printDocument = true
+                        }
+                        if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                          vm.printInvoicefilePayment = true
+                          vm.printPay()
+                        }
+                        if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                          vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+                        }
+                        vm.checkInput = 0
+                        vm.$store.commit('setCheckInput', 0)
+                        if (String(item.form) === 'ACTIONS') {
+                        } else {
+                          vm.$router.push({
+                            path: vm.$router.history.current.path,
+                            query: {
+                              recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                              q: currentQuery['q']
+                            }
+                          })
+                        }
+                        $('html, body').animate({
+                          scrollTop: 0
+                        }, 500, 'linear')
+                      }).catch(function (reject) {
+                        vm.loadingAction = false
+                        vm.loadingActionProcess = false
+                      })
+                    }).catch(function () {
+                      toastr.error('Cập nhật kết quả xử lý thất bại')
+                      vm.loadingAction = false
+                      vm.loadingActionProcess = false
+                    })
+                  }
+                  if (fileChuaKy.length > 0) {
+                    let x = confirm('Tài liệu "' + fileChuaKy.toString() + '" chưa được ký duyệt, bạn có muốn tiếp tục?')
+                    if (x) {
+                      doActionKySo()
+                    } else {
+                      vm.loadingActionProcess = false
+                    }
+                  } else {
+                    doActionKySo()
+                  }
+                }
+              } else {
+                vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                  vm.getDetailDossier()
+                  if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
+                    vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+                    })
+                  }
+                  if (filter['payment']) {
+                    vm.loadThanhToan()
+                  }
+                  vm.loadingAction = false
+                  vm.dialogActionProcess = false
+                  vm.loadingActionProcess = false
+                  vm.alertObj = {
+                    icon: 'check_circle',
+                    color: 'success',
+                    message: 'Thực hiện thành công!'
+                  }
+                  vm.btnStateVisible = false
+                  if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                    vm.rollbackable = result.rollbackable
+                  }
+                  if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                    vm.printDocument = true
+                  }
+                  if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                    vm.printInvoicefilePayment = true
+                    vm.printPay()
+                  }
+                  if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                    vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+                  }
+                  vm.checkInput = 0
+                  vm.$store.commit('setCheckInput', 0)
+                  if (String(item.form) === 'ACTIONS') {
+                  } else {
+                    vm.$router.push({
+                      path: vm.$router.history.current.path,
+                      query: {
+                        recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                        renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                        q: currentQuery['q']
+                      }
+                    })
+                  }
+                  $('html, body').animate({
+                    scrollTop: 0
+                  }, 500, 'linear')
+                }).catch(function (reject) {
+                  vm.loadingAction = false
+                  vm.loadingActionProcess = false
+                })
+              }
+            }
+            // 
+            if (requiredSign == false) {
               let hasIsSigned = false
               try {
                 hasIsSigned = vm.createFileSignedSync['createFiles'].filter(function(item) {
@@ -2651,12 +2822,61 @@ export default {
                 })
               } catch (error) {
               }
-              let valid = true
+              let doAction = function () {
+                vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                  vm.getDetailDossier()
+                  if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
+                    vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+                    })
+                  }
+                  if (filter['payment']) {
+                    vm.loadThanhToan()
+                  }
+                  vm.loadingAction = false
+                  vm.dialogActionProcess = false
+                  vm.loadingActionProcess = false
+                  vm.alertObj = {
+                    icon: 'check_circle',
+                    color: 'success',
+                    message: 'Thực hiện thành công!'
+                  }
+                  vm.btnStateVisible = false
+                  if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                    vm.rollbackable = result.rollbackable
+                  }
+                  if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                    vm.printDocument = true
+                  }
+                  if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                    vm.printInvoicefilePayment = true
+                    vm.printPay()
+                  }
+                  if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                    vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+                  }
+                  vm.checkInput = 0
+                  vm.$store.commit('setCheckInput', 0)
+                  if (String(item.form) === 'ACTIONS') {
+                  } else {
+                    vm.$router.push({
+                      path: vm.$router.history.current.path,
+                      query: {
+                        recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                        renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                        q: currentQuery['q']
+                      }
+                    })
+                  }
+                  $('html, body').animate({
+                    scrollTop: 0
+                  }, 500, 'linear')
+                }).catch(function (reject) {
+                  vm.loadingAction = false
+                  vm.loadingActionProcess = false
+                })
+              }
               if (!vm.createFileSignedSync || !hasIsSigned || hasIsSigned.length === 0) {
-                toastr.clear()
-                toastr.error('Chưa có tài liệu nào được ký duyệt')
-                vm.loadingAction = false
-                vm.loadingActionProcess = false
+                doAction()
               } else {
                 let fileChuaKy = []
                 let files = vm.createFileSignedSync.createFiles
@@ -2675,134 +2895,20 @@ export default {
                     }
                   }
                 }
-                let doActionKySo = function () {
-                  let filterUpdateFile = {
-                    dossierId: vm.thongTinChiTietHoSo['dossierId'],
-                    fileEntries: fileEntries.toString(),
-                    dossierFiles: dossierFiles.toString()
-                  }
-                  vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
-                    // 1
-                    vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-                      vm.getDetailDossier()
-                      if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
-                        vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
-                        })
-                      }
-                      if (filter['payment']) {
-                        vm.loadThanhToan()
-                      }
-                      vm.loadingAction = false
-                      vm.dialogActionProcess = false
-                      vm.loadingActionProcess = false
-                      vm.alertObj = {
-                        icon: 'check_circle',
-                        color: 'success',
-                        message: 'Thực hiện thành công!'
-                      }
-                      vm.btnStateVisible = false
-                      if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
-                        vm.rollbackable = result.rollbackable
-                      }
-                      if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
-                        vm.printDocument = true
-                      }
-                      if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
-                        vm.printInvoicefilePayment = true
-                        vm.printPay()
-                      }
-                      if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
-                        vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
-                      }
-                      vm.checkInput = 0
-                      vm.$store.commit('setCheckInput', 0)
-                      if (String(item.form) === 'ACTIONS') {
-                      } else {
-                        vm.$router.push({
-                          path: vm.$router.history.current.path,
-                          query: {
-                            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                            q: currentQuery['q']
-                          }
-                        })
-                      }
-                      $('html, body').animate({
-                        scrollTop: 0
-                      }, 500, 'linear')
-                    }).catch(function (reject) {
-                      vm.loadingAction = false
-                      vm.loadingActionProcess = false
-                    })
-                  }).catch(function () {
-                    toastr.error('Cập nhật kết quả xử lý thất bại')
-                    vm.loadingAction = false
-                    vm.loadingActionProcess = false
-                  })
+
+                let filterUpdateFile = {
+                  dossierId: vm.thongTinChiTietHoSo['dossierId'],
+                  fileEntries: fileEntries.toString(),
+                  dossierFiles: dossierFiles.toString()
                 }
-                if (fileChuaKy.length > 0) {
-                  let x = confirm('Tài liệu "' + fileChuaKy.toString() + '" chưa được ký duyệt, bạn có muốn tiếp tục?')
-                  if (x) {
-                    doActionKySo()
-                  } else {
-                    vm.loadingActionProcess = false
-                  }
-                } else {
-                  doActionKySo()
-                }
+                vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
+                  doAction()
+                }).catch(function () {
+                  toastr.error('Cập nhật kết quả xử lý thất bại')
+                  vm.loadingAction = false
+                  vm.loadingActionProcess = false
+                })
               }
-            } else {
-              vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-                vm.getDetailDossier()
-                if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
-                  vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
-                  })
-                }
-                if (filter['payment']) {
-                  vm.loadThanhToan()
-                }
-                vm.loadingAction = false
-                vm.dialogActionProcess = false
-                vm.loadingActionProcess = false
-                vm.alertObj = {
-                  icon: 'check_circle',
-                  color: 'success',
-                  message: 'Thực hiện thành công!'
-                }
-                vm.btnStateVisible = false
-                if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
-                  vm.rollbackable = result.rollbackable
-                }
-                if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
-                  vm.printDocument = true
-                }
-                if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
-                  vm.printInvoicefilePayment = true
-                  vm.printPay()
-                }
-                if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
-                  vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
-                }
-                vm.checkInput = 0
-                vm.$store.commit('setCheckInput', 0)
-                if (String(item.form) === 'ACTIONS') {
-                } else {
-                  vm.$router.push({
-                    path: vm.$router.history.current.path,
-                    query: {
-                      recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                      renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                      q: currentQuery['q']
-                    }
-                  })
-                }
-                $('html, body').animate({
-                  scrollTop: 0
-                }, 500, 'linear')
-              }).catch(function (reject) {
-                vm.loadingAction = false
-                vm.loadingActionProcess = false
-              })
             }
             
           }

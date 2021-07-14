@@ -8,7 +8,7 @@
           :to="'/danh-sach-giay-to/' + indexItem"
         >
           <v-list-tile-action>
-            <v-icon v-if="String(indexItem) === String(index)" color="blue darken-3">play_arrow</v-icon>
+            <v-icon v-if="String(indexItem) === String(index)" color="blue darken-3">description</v-icon>
             <v-icon v-else>description</v-icon>
           </v-list-tile-action>
 

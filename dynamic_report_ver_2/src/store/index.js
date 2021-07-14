@@ -1474,6 +1474,20 @@ export const store = new Vuex.Store({
             .then(axios.spread((...args) => {
               let myObject = []
               for (let i = 0; i < args.length; i++) {
+                // 
+                try {
+                  var fileName = filter.fileName
+                  var a = document.createElement('a')
+                  document.body.appendChild(a)
+                  a.style = 'display: none'
+                  var url = window.URL.createObjectURL(args[i]['data'])
+                  a.href = url
+                  a.download = fileName
+                  a.click()
+                  window.URL.revokeObjectURL(url)
+                } catch (error) {
+                }
+                // 
                 let dataOutput = args[i]['data'].hasOwnProperty('total') ? args[i]['data']['data'] : args[i]['data']
                 if (args[i]['data']['total'] > 0 || (!args[i]['data'].hasOwnProperty('total') && dataOutput)) {
                   myObject = myObject.concat(dataOutput)
@@ -1502,6 +1516,20 @@ export const store = new Vuex.Store({
             param['params']['v'] = Math.random()
             axios.post(requestURL, {}, param).then(function (response) {
               let serializable = response.data
+              // 
+              try {
+                var fileName = filter.fileName
+                var a = document.createElement('a')
+                document.body.appendChild(a)
+                a.style = 'display: none'
+                var url = window.URL.createObjectURL(response.data)
+                a.href = url
+                a.download = fileName
+                a.click()
+                window.URL.revokeObjectURL(url)
+              } catch (error) {
+              }
+              // 
               if (serializable.data) {
                 resolve(serializable)
               } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {

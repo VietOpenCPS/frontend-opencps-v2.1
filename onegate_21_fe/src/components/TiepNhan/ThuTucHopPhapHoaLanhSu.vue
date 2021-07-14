@@ -144,15 +144,15 @@
                             >
                             </v-checkbox> 
                         </td>
-                        <td>{{props.item.ten_giay_to}}</td>
-                        <td>{{props.item.loai_giay_to}}</td>
-                        <td>{{props.item.ten_nguoi_duoc_cap}}</td>
-                        <td class="text-xs-center">{{props.item.so_ban}}</td>
-                        <td>{{props.item.so_hieu_giay_to}}</td>
-                        <td>{{props.item.co_quan_cap}}</td>
-                        <td>{{props.item.nguoi_ky}}</td>
-                        <td>{{props.item.chuc_danh_ky}}</td>
-                        <td>{{props.item.ngay_ky}}</td>
+                        <td class="py-2">{{props.item.ten_giay_to}}</td>
+                        <td class="py-2">{{props.item.loai_giay_to}}</td>
+                        <td class="py-2">{{props.item.ten_nguoi_duoc_cap}}</td>
+                        <td class="text-xs-center py-2">{{props.item.so_ban}}</td>
+                        <td class="py-2">{{props.item.so_hieu_giay_to}}</td>
+                        <td class="py-2">{{props.item.co_quan_cap}}</td>
+                        <td class="py-2">{{props.item.nguoi_ky}}</td>
+                        <td class="py-2">{{props.item.chuc_danh_ky}}</td>
+                        <td class="py-2">{{props.item.ngay_ky}}</td>
                         <td>
                             <v-btn flat icon color="primary" @click="openDialogUpdateGiayTo(props.index,props.item)">
                                 <v-icon>create</v-icon>
@@ -179,48 +179,61 @@
                 <strong>Thành phần hồ sơ kèm theo</strong>
             </v-flex>
             <v-flex xs12  class="px-2 my-2">
-                    <v-data-table
-                        :headers="headerThanhPhanHoSo"
-                        :items="dossierMarkArr"
-                        hide-actions
-                        no-data-text="Không có thành phần hồ sơ nào"
-                        class="table_vuejs"
-                        style="border-left: 0.5px solid #dedede;"
-                        
-                    >
-                        <template slot="items" slot-scope="props">
-                        <tr v-if="(props.item.dossierPartNo != 'TP01' && props.item.dossierPartNo != 'TP03') && props.item.partType === 1">
-                                <td>          
-                                    <v-checkbox
-                                        v-model="selected"
-                                        primary
-                                        hide-details
-                                        :value="props.item"
-                                        @change="toggleCheckbox(props.item, props.index)">
-                                    ></v-checkbox>
-                                </td>
-                                <td>{{ props.item.partName }}</td>
-                                <td>                            
-                                    <v-select
-                                        v-model="props.item.fileMark"
-                                        :items="fileMarks"
-                                        item-text="name"
-                                        item-value="value"
-                                        solo
-                                        @change="changeThanhPhan(props.item,props.index)"
-                                    >
-                                    </v-select>
-                                </td>
-                                <td>
-                                    <v-text-field
-                                        solo
-                                        v-model="props.item.recordCount"
-                                        @change="changeThanhPhan(props.item,props.index)"
-                                    ></v-text-field>
-                                </td>
-                        </tr>
-                        </template>
-                    </v-data-table>
+                <v-data-table
+                    :headers="headerThanhPhanHoSo"
+                    :items="dossierMarkArr"
+                    hide-actions
+                    no-data-text="Không có thành phần hồ sơ nào"
+                    class="table_vuejs"
+                    style="border-left: 0.5px solid #dedede;"
+                    
+                >
+                    <template slot="items" slot-scope="props">
+                    <tr v-if="(props.item.dossierPartNo != 'TP01') && props.item.partType === 1">
+                        <td>          
+                            <v-checkbox
+                                v-model="selected"
+                                primary
+                                hide-details
+                                :value="props.item"
+                                @change="toggleCheckbox(props.item, props.index)"
+                            >
+                            </v-checkbox>
+                        </td>
+                        <td>
+                            <p>{{ props.item.partName }}</p>
+                            <p class="mt-0" v-for="(itemFileView, index) in dossierFileAttach" :key="index" v-if="doAction && props.item.dossierPartNo === itemFileView.dossierPartNo" >
+                                <span v-on:click.stop="viewFile2(itemFileView, index)" class="ml-1" style="cursor: pointer;">
+                                    <v-icon class="mr-1" v-if="itemFileView.fileSize !== 0" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
+                                        :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
+                                        {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
+                                    </v-icon>
+                                    {{itemFileView.displayName}} - 
+                                    <i>{{itemFileView.modifiedDate}}</i>
+                                </span>
+                            </p>
+                        </td>
+                        <td>                            
+                            <v-select
+                                v-model="props.item.fileMark"
+                                :items="fileMarks"
+                                item-text="name"
+                                item-value="value"
+                                solo
+                                @change="changeThanhPhan(props.item,props.index)"
+                            >
+                            </v-select>
+                        </td>
+                        <td>
+                            <v-text-field
+                                solo
+                                v-model="props.item.recordCount"
+                                @change="changeThanhPhan(props.item,props.index)"
+                            ></v-text-field>
+                        </td>
+                    </tr>
+                    </template>
+                </v-data-table>
             </v-flex>
             <v-flex xs12 class="px-2">
                 <v-checkbox
@@ -638,6 +651,34 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
+            <v-card>
+                <v-toolbar dark color="primary">
+                <v-toolbar-title>
+                    <span>Tài liệu đính kèm</span>
+                </v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon dark @click.native="dialogPDF = false">
+                    <v-icon>close</v-icon>
+                </v-btn>
+                </v-toolbar>
+                <div v-if="dialogPDFLoading" style="
+                    min-height: 600px;
+                    text-align: center;
+                    margin: auto;
+                    padding: 25%;
+                ">
+                <v-progress-circular
+                    :size="100"
+                    :width="1"
+                    color="primary"
+                    indeterminate
+                ></v-progress-circular>
+                </div>
+                <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+                </iframe>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 <script>
@@ -658,6 +699,8 @@ export default {
         eFormCode: '',
         eFormCodeArr: [],
         updateStratus: false,
+        dialogPDF: false,
+        dialogPDFLoading: false,
         dialogPhongTO: false,
         dialogGiayTo: false,
         dialogTimKiemConDau: false,
@@ -761,10 +804,10 @@ export default {
             {
                 text: 'Chọn',
                 align: 'center',
-                sorttable: false,
+                sortable: false,
             },
           {
-            text: 'Tên thành phần',
+            text: 'Thành phần hồ sơ',
             align: 'center',
             sortable: false
           },
@@ -989,7 +1032,8 @@ export default {
         tongSoBanTG: 0,
         auth: 'false',
         ngay_cap_cmnd: '',
-        doAction: false
+        doAction: false,
+        dossierFileAttach: []
     }),
     created () {
         let vm = this
@@ -1030,7 +1074,6 @@ export default {
         dossiers: {
             deep: true,
             handler:  (val, oldVal) => {
-                console.log('dossierWatch', val)
                 // val['applicantIdNo'] = val.delegateIdNo
                 // val['address'] = val.delegateAddress
                 // val['cityCode'] = val.delegateCityCode
@@ -1039,8 +1082,6 @@ export default {
                 // val['contactTelNo'] = val.delegateTelNo
                 // val['contactEmail'] = val.delegateEmail
                 $('#dossiers_hidden').val(JSON.stringify(val))
-                console.log(val['applicantIdNo'],val.delegateIdNo)
-                console.log($('#dossiers_hidden').val(JSON.stringify(val)))
             }
         },
         dossierFileArr: {
@@ -1054,9 +1095,24 @@ export default {
         },
         dossierMarkArr: {
             deep: true,
-            handler:  (val, oldVal) => {
-                let arr = val.filter(e => e.recordCount) 
-                arr.push({"dossierPartNo":"TP01","fileMark":3,"partName":"Tờ khai hợp pháp hoá lãnh sự, chứng nhận lãnh sự","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
+            handler (val, oldVal) {
+                let arr = val.filter(e => e.recordCount)
+                let temp = this.dossierParts.filter(function (item) {
+                    return item.partNo === 'TP01'
+                })
+                if (temp && temp.length > 0) {
+                    let part = {
+                        "dossierPartNo": temp[0]['partNo'],
+                        "fileMark": 3,
+                        "partName": temp[0]['partName'],
+                        "partType":1,
+                        "fileCheck":0,
+                        "fileComment":"",
+                        "recordCount":1
+                    }
+                    arr.push(part)
+                }
+                
                 $('#dossierMarkArr_hidden').val(JSON.stringify(arr))
             }
         },
@@ -1095,8 +1151,6 @@ export default {
                       }
                       vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
                     }
-
-                    // vm.dossierFileArr[i]['eform'] = 'true'
                 }
             }
             let dataOut = vm.dossierFileArr.filter(function (item) {
@@ -1205,27 +1259,37 @@ export default {
         changeDeNghiChungNhan(){
             let vm = this
             if(vm.de_nghi_chung_nhan){
-                let temp = {
-                        dossierPartNo: 'TP03',
-                        fileMark: 3,
-                        partName: 'Giấy tờ, tài liệu đề nghị chứng nhận lãnh sự',
-                        partType: 1,
-                        fileCheck: 0,
-                        fileComment: '',
-                        recordCount: 1
-                }
-                let check = true
-                for(let i = 0 ; i<vm.dossierMarkArr.length;i++){
-                    if(vm.dossierMarkArr[i]['dossierPartNo'] === 'TP03'){
-                        vm.$set(vm.dossierMarkArr, i, temp)
-                        check = false
+                // let temp = {
+                //     dossierPartNo: 'TP03',
+                //     fileMark: 3,
+                //     partName: 'Giấy tờ, tài liệu đề nghị chứng nhận lãnh sự',
+                //     partType: 1,
+                //     fileCheck: 0,
+                //     fileComment: '',
+                //     recordCount: 1
+                // }
+                let temp = vm.dossierParts.filter(function (item) {
+                    return item.partNo === 'TP03'
+                })
+                let check = vm.dossierMarkArr.filter(function (item) {
+                    return item.dossierPartNo === 'TP03'
+                })
+                if (!check || check.length === 0) {
+                    if (temp && temp.length > 0) {
+                        let part = {
+                            "dossierPartNo": temp[0]['partNo'],
+                            "fileMark": 3,
+                            "partName": temp[0]['partName'],
+                            "partType":1,
+                            "fileCheck":0,
+                            "fileComment":"",
+                            "recordCount":1
+                        }
+                        vm.dossierMarkArr.push(part)
                     }
                 }
-                if(check){
-                    vm.dossierMarkArr.push(temp)
-                }
             } else {
-                 vm.dossierMarkArr = vm.dossierMarkArr.filter(e=>e.dossierPartNo !== 'TP03')
+                vm.dossierMarkArr = vm.dossierMarkArr.filter(e=>e.dossierPartNo !== 'TP03')
             }
         },
         computeDate () {
@@ -1304,7 +1368,10 @@ export default {
             }
             axios.request(config).then(res => {
                 let data = res.data.data
-                if(data.length){
+                if (data.length) {
+                    vm.dossierFileAttach = data.filter(function (item) {
+                        return !item.eForm
+                    })
                     for(let i =0; i<data.length; i++){
                         let tg = {
                             partNo: data[i]['dossierPartNo'],
@@ -1336,7 +1403,7 @@ export default {
                         }
                     }
                 }
-            }).catch(err => {})       
+            }).catch(err => {})
         },
         getDelegateCity(){
             let vm = this
@@ -2687,6 +2754,69 @@ export default {
             console.log('16')
             $('#dossiers_hidden').val(JSON.stringify(vm.dossiers))
             console.log('17')
+        },
+        viewFile2 (data, index) {
+            let vm = this
+            if (data.fileSize === 0) {
+                return
+            }
+            if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt' || data.fileType === 'mp3' || data.fileType === 'mp4') {
+                let url = '/o/rest/v2/dossiers/' + vm.id + '/files/' + data.referenceUid
+                window.location.assign(url)
+            } else {
+                data['dossierId'] = vm.id
+                if (data.referenceUid) {
+                    vm.dialogPDFLoading = true
+                    vm.dialogPDF = true
+                    vm.$store.dispatch('viewFile', data).then(result => {
+                        vm.dialogPDFLoading = false
+                        document.getElementById('dialogPDFPreview' + vm.id).src = result
+                    })
+                } else {
+                    toastr.clear()
+                    toastr.error('File dữ liệu không tồn tại')
+                }
+            }
+        },
+        getDocumentTypeIcon (type) {
+            let typeDoc = 'doc,docx'
+            let typeExcel = 'xls,xlsx'
+            let typeImage = 'png,jpg,jpeg'
+            if (type) {
+                if (typeDoc.indexOf(type.toLowerCase()) >= 0) {
+                return {
+                    icon: 'fas fa fa-file-word-o',
+                    color: 'blue',
+                    size: 14
+                }
+                } else if (typeExcel.indexOf(type.toLowerCase()) >= 0) {
+                return {
+                    icon: 'fas fa fa-file-excel-o',
+                    color: 'green',
+                    size: 14
+                }
+                } else if (type.toLowerCase() === 'pdf') {
+                return {
+                    icon: 'fa fa-file-pdf-o',
+                    color: 'red',
+                    size: 14
+                }
+                } else if (typeImage.indexOf(type.toLowerCase()) >= 0) {
+                return {
+                    icon: 'fas fa fa-file-image-o',
+                    color: 'primary',
+                    size: 14
+                }
+                } else {
+                return {
+                    icon: 'fas fa fa-paperclip',
+                    color: '',
+                    size: 14
+                }
+                }
+            } else {
+                return ''
+            }
         }
     }
 }

@@ -50,7 +50,7 @@
                         </v-btn> -->
                         <v-menu @click.native.stop right offset-y 
                           transition="slide-x-transition" title="Ký số tài liệu đính kèm" 
-                          v-if="esignType === 'plugin' && itemFileView.fileType.toLowerCase() === 'pdf'">
+                          v-if="esignType === 'plugin' && itemFileView.fileType.toLowerCase() === 'pdf' && !typeSignPlugin">
                           <v-btn slot="activator" flat icon color="indigo">
                             <v-icon size="18">fa fa-pencil-square-o</v-icon>
                           </v-btn>
@@ -72,6 +72,14 @@
                             </v-list-tile>
                           </v-list>
                         </v-menu>
+                        <v-tooltip top>
+                          <v-btn v-if="esignType === 'plugin' && itemFileView.fileType.toLowerCase() === 'pdf' && typeSignPlugin" flat icon color="indigo"
+                            slot="activator" @click.stop="signAction(itemFileView, index2, '', typeSignPlugin)"
+                          >
+                            <v-icon size="18">fa fa-pencil-square-o</v-icon>
+                          </v-btn>
+                          <span>Ký duyệt, đóng dấu</span>
+                        </v-tooltip>
                       </div>
                     </div>
                   </div>
@@ -189,14 +197,14 @@
               </v-layout>
             </div>
           </div>
-          <div class="mt-2" style="padding-left: 25px" v-if="esignType === 'plugin'">
+          <!-- <div class="mt-2" style="padding-left: 25px" v-if="esignType === 'plugin' && requiredSignPlugin == 'true'">
             <v-checkbox
               class="mt-0"
               v-model="doNotSign"
             >
               <template slot="label"><span class="black--text">Không sử dụng ký số</span></template>
             </v-checkbox>
-          </div>
+          </div> -->
         </v-card>
         <!-- <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1 && !onlyView">
           <span>Không chọn</span>
@@ -381,6 +389,10 @@
       esignType: {
         type: String,
         default: () => ''
+      },
+      preCondition: {
+        type: String,
+        default: () => ''
       }
     },
     components: {
@@ -426,7 +438,9 @@
       loadingApacal: false,
       thaoTacGop: false,
       doNotSign: false,
-      fileEditor: ''
+      fileEditor: '',
+      typeSignPlugin: '',
+      requiredSignPlugin: false
     }),
     computed: {
       loading () {
@@ -465,6 +479,25 @@
       vm.page = 1
       vm.$nextTick(function () {
         console.log('vm.detailDossier--TLKQ--', vm.detailDossier)
+        try {
+          let typeSignPlugin = ''
+          let requiredSignPlugin = true
+          let preCondition = vm.preCondition.split(',')
+          if (preCondition && preCondition.length > 0) {
+            let item = preCondition.filter(function (item) {
+              return item.indexOf('typeSignPlugin=') >= 0
+            })
+            typeSignPlugin = item && item.length > 0 ? item[0].split('=')[1] : ''
+            // 
+            let requiredSign = preCondition.filter(function (item) {
+              return item.indexOf('requiredSignPlugin=') >= 0
+            })
+            requiredSignPlugin = requiredSign && requiredSign.length > 0 ? requiredSign[0].split('=')[1] : false
+          }
+          vm.typeSignPlugin = typeSignPlugin
+          vm.requiredSignPlugin = requiredSignPlugin
+        } catch (error) {
+        }
         if (vm.detailDossier['dossierId']) {
           if (!vm.thaoTacGop) {
             var arrTemp = []
@@ -1332,7 +1365,7 @@
         console.log('file ký duyệt', item)
         let signFileCallBack = function (rv) {
           let received_msg = JSON.parse(rv)
-          if (received_msg.Status === 0) {
+          if (received_msg.Status === 0 && received_msg.FileServer) {
             let dataSigned
             try {
               dataSigned = JSON.parse(received_msg.FileServer)
@@ -1400,7 +1433,7 @@
               toastr.error(received_msg.Message)
             } else {
               toastr.clear()
-              toastr.error('Ký duyệt không thành công')
+              toastr.error('Quá trình ký số bị hủy bỏ')
             }
           }
         }
@@ -1414,8 +1447,10 @@
           vgca_sign_approved(json_prms, signFileCallBack)
         } else if (typeSign === 'issued') {
           vgca_sign_issued(json_prms, signFileCallBack)
-        } else {
+        } else if (typeSign === 'income') {
           vgca_sign_income(json_prms, signFileCallBack)
+        } else if (typeSign === 'copy') {
+          vgca_sign_copy(json_prms, signFileCallBack)
         }
           
       },
@@ -1602,6 +1637,10 @@
       checkUseSign () {
         let vm = this
         return vm.doNotSign
+      },
+      checkRequiredSignPlugin () {
+        let vm = this
+        return vm.requiredSignPlugin === 'true' || vm.requiredSignPlugin === true ? true : false
       },
       createFileSigned (type) {
         let vm = this

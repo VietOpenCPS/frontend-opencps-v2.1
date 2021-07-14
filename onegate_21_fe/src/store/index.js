@@ -693,7 +693,7 @@ export const store = new Vuex.Store({
             resolve([])
           }
         }).catch(function (error){
-          reject(error)
+          resolve([])
         })
       })
     },
@@ -1398,18 +1398,24 @@ export const store = new Vuex.Store({
         }
         // console.log('dataPostdossier-------------', dataPostdossier)
         axios.post(state.initData.postDossierApi, dataPostdossier, options).then(function (response) {
-          response.data.serviceConfig = state.serviceConfigObj
-          commit('setLoading', false)
-          commit('setDossier', response.data)
-          commit('setThongTinChuHoSo', response.data)
-          commit('setLePhi', response.data)
-          commit('setThongTinChungHoSo', response.data)
-          toastr.clear()
-          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-          if (data.j_captcha_response) {
-            resolve(response)
+          if (response && response['status'] == 200) {
+            response.data.serviceConfig = state.serviceConfigObj
+            commit('setLoading', false)
+            commit('setDossier', response.data)
+            commit('setThongTinChuHoSo', response.data)
+            commit('setLePhi', response.data)
+            commit('setThongTinChungHoSo', response.data)
+            toastr.clear()
+            if (data.j_captcha_response) {
+              resolve(response)
+            } else {
+              resolve(response.data)
+            }
           } else {
-            resolve(response.data)
+            reject(error)
+            toastr.clear()
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            commit('setLoading', false)
           }
         }).catch(function (error) {
           reject(error)
@@ -2774,10 +2780,7 @@ export const store = new Vuex.Store({
               }
               let nextactions = serializableNextActionConvert
               let plugins = serializablePluginsConvert
-              // console.log('nextactions++++++++++++', nextactions)
-              // console.log('plugins++++++++++++', plugins)
-              nextactions.push(...plugins);
-              // console.log('nextactions2++++++++++++', nextactions)
+              nextactions.push(...plugins)
               resolve(nextactions)
             }))
             .catch(function (xhr) {
@@ -3401,8 +3404,9 @@ export const store = new Vuex.Store({
     loadFormScript ({state, commit}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
+          let t = (new Date).getTime()
           $.ajax({
-            url: state.initData.dossierTemplatesApi + '/' + data.templateFileNo + '/parts/' + data.partNo + '/formscript',
+            url: state.initData.dossierTemplatesApi + '/' + data.templateFileNo + '/parts/' + data.partNo + '/formscript?t=' + t,
             type: 'GET',
             headers: {
               groupId: state.initData.groupId,
@@ -3425,8 +3429,9 @@ export const store = new Vuex.Store({
     loadFormScriptKQ ({state, commit}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
+          let t = (new Date).getTime()
           $.ajax({
-            url: state.initData.dossierTemplatesApi + '/' + data.templateNo + '/parts/' + data.partNo + '/formscript',
+            url: state.initData.dossierTemplatesApi + '/' + data.templateNo + '/parts/' + data.partNo + '/formscript?t=' + t,
             type: 'GET',
             headers: {
               groupId: state.initData.groupId,

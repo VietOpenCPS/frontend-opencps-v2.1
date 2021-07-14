@@ -17,7 +17,7 @@
                   <span class="pr-2">Chủ hồ sơ: </span>
                   <v-tooltip top>
                     <span  class="text-bold ">{{thongTinChiTietHoSo.applicantName}}</span>
-                    <span  slot="activator" class="pl-0 text-bold"> {{thongTinChiTietHoSo.applicantName.length > 100 ? thongTinChiTietHoSo.applicantName.substr(0, 100) + '...' : thongTinChiTietHoSo.applicantName}}</span>
+                    <span  slot="activator" class="pl-0 text-bold"> {{thongTinChiTietHoSo && thongTinChiTietHoSo.applicantName && thongTinChiTietHoSo.applicantName.length > 100 ? thongTinChiTietHoSo.applicantName.substr(0, 100) + '...' : thongTinChiTietHoSo.applicantName}}</span>
                   </v-tooltip>
                 </div>
                 <div class="xs12 sm12 pb-1">

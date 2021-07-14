@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-form v-model="valid_thongtinchuhoso" ref="formChuHoSo" lazy-validation>
+    <v-form id="form_applicantInfo" v-model="valid_thongtinchuhoso" ref="formChuHoSo" lazy-validation>
       <div>
         <div style="position: relative;">
           <v-expansion-panel :value="[true]" expand  class="expansion-pl" v-if="!showApplicant">
