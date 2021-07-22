@@ -2,6 +2,7 @@ import Vue from 'vue/dist/vue.min.js'
 import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
+import md5 from 'md5'
 import support from './support.json'
 
 Vue.use(Vuex)
@@ -27,7 +28,8 @@ export const store = new Vuex.Store({
     applicantIdNoSearch: '',
     dossierNoSearch: '',
     fullScreen: false,
-    isMobile: false
+    isMobile: false,
+    md5Token: ''
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -53,9 +55,17 @@ export const store = new Vuex.Store({
     loadingDataHoSo ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
+          let date = (new Date()).getDate()
+          let month = (new Date()).getMonth() + 1
+          let year = (new Date()).getFullYear()
+          let hours = (new Date()).getHours()
+          let minutes = (new Date()).getMinutes()
+          let currentDate = (new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`)).getTime()
+          let md5Hash = md5('opencps' + currentDate)
           let param = {
             headers: {
-              groupId: state.initData.groupId
+              groupId: state.initData.groupId,
+              authenKey: md5Hash
             },
             params: {
               start: filter.page * 10 - 10,
@@ -104,9 +114,17 @@ export const store = new Vuex.Store({
     loadingDanhSachHoSo ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
+          let date = (new Date()).getDate()
+          let month = (new Date()).getMonth() + 1
+          let year = (new Date()).getFullYear()
+          let hours = (new Date()).getHours()
+          let minutes = (new Date()).getMinutes()
+          let currentDate = (new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`)).getTime()
+          let md5Hash = md5('opencps' + currentDate)
           let param = {
             headers: {
-              groupId: state.initData.groupId
+              groupId: state.initData.groupId,
+              authenKey: md5Hash
             },
             params: {
               dossierNo: filter.dossierNo ? filter.dossierNo : '',
@@ -127,9 +145,17 @@ export const store = new Vuex.Store({
     loadingDataHoSoKQ ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
+          let date = (new Date()).getDate()
+          let month = (new Date()).getMonth() + 1
+          let year = (new Date()).getFullYear()
+          let hours = (new Date()).getHours()
+          let minutes = (new Date()).getMinutes()
+          let currentDate = (new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`)).getTime()
+          let md5Hash = md5('opencps' + currentDate)
           let param = {
             headers: {
-              groupId: filter['groupId'] ? filter['groupId'] : state.initData.groupId
+              groupId: filter['groupId'] ? filter['groupId'] : state.initData.groupId,
+              authenKey: md5Hash
             },
             params: {
               step: '300,310,400',
@@ -153,14 +179,24 @@ export const store = new Vuex.Store({
     loadingDataHoSoTN ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
+          let date = (new Date()).getDate()
+          let month = (new Date()).getMonth() + 1
+          let year = (new Date()).getFullYear()
+          let hours = (new Date()).getHours()
+          let minutes = (new Date()).getMinutes()
+          let currentDate = (new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`)).getTime()
+          let md5Hash = md5('opencps' + currentDate)
           let param = {
             headers: {
-              groupId: filter['groupId'] ? filter['groupId'] : state.initData.groupId
+              groupId: filter['groupId'] ? filter['groupId'] : state.initData.groupId,
+              authenKey: md5Hash
             },
             params: {
               fromReceiveDate: filter.fromDate,
               toReceiveDate: filter.toDate,
-              keyword: filter.keyword
+              keyword: filter.keyword,
+              start: filter.start,
+              end: filter.end
             }
           }
           axios.get(state.endPoint + '/dossiers', param).then(function (response) {
@@ -757,6 +793,16 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    getTokenMd5 ({commit, state}) {
+      let date = (new Date()).getDate()
+      let month = (new Date()).getMonth() + 1
+      let year = (new Date()).getFullYear()
+      let hours = (new Date()).getHours()
+      let minutes = (new Date()).getMinutes()
+      let currentDate = (new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`)).getTime()
+      let token = md5('opencps' + currentDate)
+      commit('setMd5Token', token)
     }
   },
   mutations: {
@@ -805,7 +851,10 @@ export const store = new Vuex.Store({
     },
     setIsMobile (state, payload) {
       state.isMobile = payload
-    }
+    },
+    setMd5Token (state, payload) {
+      state.md5Token = payload
+    },
   },
   getters: {
     index (state) {

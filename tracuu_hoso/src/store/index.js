@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
 import $ from 'jquery'
+import md5 from 'md5'
 // 
 
 Vue.use(toastr)
@@ -20,7 +21,8 @@ export const store = new Vuex.Store({
     },
     endPointApi: '/o/rest/v2',
     dossierDetail: '',
-    secretCode: ''
+    secretCode: '',
+    md5Token: ''
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -60,9 +62,11 @@ export const store = new Vuex.Store({
     loadingDataHoSo ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
+          store.dispatch('getTokenMd5')
           let param = {
             headers: {
-              groupId: state.initData.groupId
+              groupId: state.initData.groupId,
+              authenKey: state.md5Token
             },
             params: {
               start: filter.page * 10 - 10,
@@ -417,6 +421,16 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    getTokenMd5 ({commit, state}) {
+      let date = (new Date()).getDate()
+      let month = (new Date()).getMonth() + 1
+      let year = (new Date()).getFullYear()
+      let hours = (new Date()).getHours()
+      let minutes = (new Date()).getMinutes()
+      let currentDate = (new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`)).getTime()
+      let token = md5('opencps' + currentDate)
+      commit('setMd5Token', token)
+    }
   },
   mutations: {
     setLoading (state, payload) {
@@ -430,6 +444,9 @@ export const store = new Vuex.Store({
     },
     setScretCode (state, payload) {
       state.secretCode = payload
+    },
+    setMd5Token (state, payload) {
+      state.md5Token = payload
     },
   },
   getters: {

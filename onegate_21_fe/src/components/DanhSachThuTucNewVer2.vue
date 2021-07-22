@@ -625,7 +625,8 @@
             level: newQuery.hasOwnProperty('lever') && newQuery.lever ? newQuery.lever : '3,4',
             domain: newQuery.hasOwnProperty('domain') && newQuery.domain ? newQuery.domain : '',
             keyword: newQuery.hasOwnProperty('keyword') && newQuery.keyword ? newQuery.keyword : '',
-            agency: vm.hasFilterAgency && newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
+            agency: vm.hasFilterAgency && newQuery.hasOwnProperty('agency') ? newQuery.agency : '',
+            filterApplicant: true
           }
           vm.$store.dispatch('getServiceInfos', params).then(res => {
             vm.loading = false
@@ -789,6 +790,15 @@
       },
       selectServiceOption (item, govAgencyCodeSelect, itemServiceConfig) {
         let vm = this
+        let newQuery = vm.$router.history.current.query
+        let queryString = '?'
+        newQuery['page'] = ''
+        newQuery['optionName'] = item.hasOwnProperty('optionName') ? item['optionName'] : ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
         if (itemServiceConfig) {
           vm.serviceConfigSelect = itemServiceConfig
           vm.govAgencyCodeSelect = itemServiceConfig.govAgencyCode
@@ -812,7 +822,15 @@
             let urlRedirect = url
             try {
               if (vm.useJwt) {
-                urlRedirect = url.split('?').length > 1 ? url + '&token=' + localStorage.getItem('jwt_token') : url + '?token=' + localStorage.getItem('jwt_token')
+                let govAgencyCode = itemServiceConfig ? itemServiceConfig.govAgencyCode : govAgencyCodeSelect.govAgencyCode
+                let serviceCode = resServiceInfo.serviceCode
+                let serviceConfigId = itemServiceConfig ? itemServiceConfig['serviceConfigId'] : govAgencyCodeSelect['serviceConfigId']
+                let token = localStorage.getItem('jwt_token')
+                let templateNo = item['templateNo']
+                let groupId = window.themeDisplay.getScopeGroupId()
+                let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId + '&serviceCode=' + serviceCode + '&govAgencyCode=' + govAgencyCode
+                urlRedirect = url.split('?').length > 1 ? url + '&' + paramsAdd : url + '?' + paramsAdd
+
               }
             } catch (error) {
             }
@@ -824,8 +842,7 @@
                 vm.loadingAction = false
                 vm.indexAction = -1
                 vm.$router.push({
-                  path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                  query: vm.$router.history.current.query
+                  path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW' + queryString
                 })
               })
             } else {
@@ -1042,7 +1059,16 @@
         // vm.filterAndSort()
       },
       selectServiceOptionCRD (item, govAgencyCode) {
-        var vm = this
+        let vm = this
+        let newQuery = vm.$router.history.current.query
+        let queryString = '?'
+        newQuery['page'] = ''
+        newQuery['optionName'] = item['optionName']
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
         vm.$store.dispatch('getServiceInfo', {
           serviceInfoId: vm.serviceInfoIdSelect
         }).then(resServiceInfo => {
@@ -1057,8 +1083,7 @@
             vm.loadingAction = false
             vm.indexAction = -1
             vm.$router.push({
-              path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-              query: vm.$router.history.current.query
+              path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW' + queryString
             })
           })
         })

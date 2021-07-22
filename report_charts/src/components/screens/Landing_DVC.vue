@@ -371,10 +371,24 @@
           <v-card-text class="pt-2 pb-0 px-0">
             <!-- report_3 -->
             <div style="max-width: 100%;">
+              <div class="apexcharts-legend center position-top mb-2" style="inset: auto 0px 10px;">
+                <div class="apexcharts-legend-series mr-3" style="margin: 0px 5px;">
+                  <span class="apexcharts-legend-marker mr-2" style="background: rgb(79, 195, 247); color: rgb(79, 195, 247); height: 16px; width: 16px; left: 0px; top: 0px; border-width: 0px; border-color: rgb(255, 255, 255); border-radius: 2px;"></span>
+                  <span class="apexcharts-legend-text" style="color: rgb(55, 61, 63); font-family: Helvetica, Arial, sans-serif;">
+                    <span style="font-weight: bold">{{onegateCount}}</span> - Hồ sơ nộp trực tiếp
+                  </span>
+                </div>
+                <div class="apexcharts-legend-series" style="margin: 0px 5px;">
+                  <span class="apexcharts-legend-marker mr-2" style="background: rgb(179, 229, 252); color: rgb(179, 229, 252); height: 16px; width: 16px; left: 0px; top: 0px; border-width: 0px; border-color: rgb(255, 255, 255); border-radius: 2px;"> </span>
+                  <span class="apexcharts-legend-text" style="color: rgb(55, 61, 63); font-family: Helvetica, Arial, sans-serif;">
+                    <span style="font-weight: bold">{{onlineCount}}</span> - Hồ sơ nộp trực tuyến
+                  </span>
+                </div>
+              </div>
               <apexchart type="bar" :height="isMobile ? 500 : 500" width='100%'
                 :options="dossierTypeChartOption" 
                 :series="seriesDossierTypeChart" 
-                style="margin-top: -30px"
+                style="margin-top: -15px"
               ></apexchart>
             </div>
             
@@ -618,6 +632,8 @@ export default {
     agencyLists: [],
     agencyListsMonth: [],
     group: '',
+    onegateCount: 0,
+    onlineCount: 0,
     years: [
       {
         'value': '2019',
@@ -862,7 +878,10 @@ export default {
           // barHeight: '100%',
           columnWidth: '40%',
           horizontal: false
-        },
+        }
+      },
+      legend: {
+        show: false
       },
       chart: {
         stacked: true,
@@ -2006,6 +2025,8 @@ export default {
       // Bind data report THÁNG
       for (let key in data) {
         if (!data[key].govAgencyName && !data[key].domainName) {
+          vm.onegateCount = data[key].onegateCount
+          vm.onlineCount = data[key].onlineCount
         } else {
           if (!data[key].govAgencyName && String(data[key].domainName) !== '') {
             if (vm.year == 2020) {

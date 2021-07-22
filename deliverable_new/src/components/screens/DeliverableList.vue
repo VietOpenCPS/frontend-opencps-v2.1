@@ -359,7 +359,7 @@
             </content-placeholders>
 
             <v-tooltip top v-if="!loadingTable">
-              <v-btn :disabled="props.item['fileAttachs'] && String(props.item['fileAttachs']) !== '0' ? false : true" slot="activator" flat icon class="mx-0 my-0" v-on:click.native="showPDFG(props.item)">
+              <v-btn color="orange darken-3" :disabled="props.item['fileAttachs'] && String(props.item['fileAttachs']) !== '0' ? false : true" slot="activator" flat icon class="mx-0 my-0" v-on:click.native="showPDFG(props.item)">
                 <v-icon>attach_file</v-icon>
               </v-btn>
               <!-- <span>Xem &nbsp;{{String(loaiDuLieu).toLowerCase()}}</span> -->
@@ -374,14 +374,14 @@
             </v-tooltip> -->
 
             <v-tooltip top v-if="!loadingTable">
-              <v-btn :disabled="props.item['dossierId'] === '0' && props.item['moderator'] ? false : true" slot="activator" flat icon class="mx-0 my-0" v-if="!loadingTable" v-on:click.native="editDeliverables(props.item)">
+              <v-btn color="blue darken-3" :disabled="props.item['dossierId'] === '0' && props.item['moderator'] ? false : true" slot="activator" flat icon class="mx-0 my-0" v-if="!loadingTable" v-on:click.native="editDeliverables(props.item)">
                 <v-icon>edit</v-icon>
               </v-btn>
               <span>Sửa&nbsp;{{String(loaiDuLieu).toLowerCase()}}</span>
             </v-tooltip>
 
             <v-tooltip top v-if="!loadingTable">
-              <v-btn slot="activator" :disabled="props.item['moderator'] ? false : true" flat icon class="mx-0 my-0" v-if="props.item['dossierId'] === '0' && !loadingTable" v-on:click.native="deleteDeliverable(props.item)">
+              <v-btn color="red darken-3" slot="activator" :disabled="props.item['moderator'] ? false : true" flat icon class="mx-0 my-0" v-if="props.item['dossierId'] === '0' && !loadingTable" v-on:click.native="deleteDeliverable(props.item)">
                 <v-icon>delete</v-icon>
               </v-btn>
               <span>Xóa&nbsp;{{String(loaiDuLieu).toLowerCase()}}</span>

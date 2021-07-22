@@ -72,13 +72,16 @@ export default {
     showLimit: {
       type: Boolean,
       default: true
-    }
+    },
+    numberPerPage: {
+      type: Number,
+      default: 15
+    },
   },
   data () {
     return {
       version: '0.2.1',
       currentPage: 1,
-      currentLimit: 15,
       translations: {
         en: {
           prev: 'Previous',
@@ -104,7 +107,7 @@ export default {
         : this.translations['en']
     },
     totalPages () {
-      return Math.ceil(this.total / this.currentLimit)
+      return Math.ceil(this.total / this.numberPerPage)
     },
     totalPagesData () {
       var totalDatas = []

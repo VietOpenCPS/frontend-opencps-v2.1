@@ -69,10 +69,10 @@
                 </div>
                 <!-- <div v-html="item.subject" class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687" v-if="String(item.subject).indexOf('/>') > 0 || String(item.subject).indexOf('<br') > 0">
                 </div> -->
-                <div v-html="item.subject" class="flex pl-3 pr-2 pt-0" style="max-width:calc(100% - 100px);color:#034687">
+                <div v-html="lastestVersion !== 2 ? item.subject : item.title" class="flex pl-3 pr-2 pt-0" style="max-width:calc(100% - 100px);color:#034687">
                 </div>
               </v-layout>
-              <div style="position:absolute;right:0px;top:-5px" :style="Array.isArray(item.choices) && item.choices.length > 1  ? 'width:50px' : 'width:85px'">
+              <div v-if="lastestVersion !== 2" style="position:absolute;right:0px;top:-5px" :style="Array.isArray(item.choices) && item.choices.length > 1  ? 'width:50px' : 'width:85px'">
                 <v-tooltip top>
                   <v-btn slot="activator" class="mx-0 my-1" icon ripple @click="editVotings(item)">
                     <v-icon color="blue lighten-1">edit</v-icon>
@@ -86,8 +86,25 @@
                   <span>Xóa</span>
                 </v-tooltip>
               </div>
-              <v-radio-group class="ml-3 mt-2" column :style="Array.isArray(item.choices) && item.choices.length > 1 ? 'width:calc(100% - 50px)' : 'width:calc(100% - 85px)'">
+              <div v-if="lastestVersion === 2" style="position:absolute;right:0px;top:-5px" :style="Array.isArray(item.lstChoiceDetailModels) && item.lstChoiceDetailModels.length > 1  ? 'width:50px' : 'width:85px'">
+                <v-tooltip top>
+                  <v-btn slot="activator" class="mx-0 my-1" icon ripple @click="editVotings(item)">
+                    <v-icon color="blue lighten-1">edit</v-icon>
+                  </v-btn>
+                  <span>Sửa</span>
+                </v-tooltip>
+                <v-tooltip top>
+                  <v-btn slot="activator" class="mx-0 my-1" icon ripple @click="deleteVotings(item)">
+                    <v-icon color="red lighten-1">delete</v-icon>
+                  </v-btn>
+                  <span>Xóa</span>
+                </v-tooltip>
+              </div>
+              <v-radio-group v-if="lastestVersion !== 2" class="ml-3 mt-2" column :style="Array.isArray(item.choices) && item.choices.length > 1 ? 'width:calc(100% - 50px)' : 'width:calc(100% - 85px)'">
                 <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" readonly></v-radio>
+              </v-radio-group>
+              <v-radio-group v-if="lastestVersion === 2" class="ml-3 mt-2" column :style="Array.isArray(item.lstChoiceDetailModels) && item.lstChoiceDetailModels.length > 1 ? 'width:calc(100% - 50px)' : 'width:calc(100% - 85px)'">
+                <v-radio v-for="(item1, index1) in item.lstChoiceDetailModels" v-bind:key="index1" :label="item1['subject']" :value="index1 + 1" readonly></v-radio>
               </v-radio-group>
               <v-divider
                 v-if="Array.isArray(votingItems) && index + 1 < votingItems.length"
@@ -108,7 +125,8 @@
             </v-card-title>
             <v-card-text class="pt-0">
               <v-form ref="formAddQuestion" v-model="validForm" lazy-validation>
-                <v-layout wrap class="py-1 align-center row-list-style">
+                <!-- model ver_1 -->
+                <v-layout v-if="lastestVersion !== 2" wrap class="py-1 align-center row-list-style">
                   <p class="my-2">Mã câu hỏi:</p>
                   <v-flex xs12>
                     <v-text-field
@@ -137,7 +155,6 @@
                       :maxlength="2000"
                       :counter="2000"
                     ></v-textarea>
-                    <vue-editor v-else v-model="subject" :editorToolbar="customToolbar"></vue-editor>
                   </v-flex>
                   <p class="my-2">Câu trả lời: </p>
                   <v-flex xs12 class="">
@@ -177,11 +194,144 @@
                         <v-list-tile-title style="font-size:13px">{{item}}</v-list-tile-title>
                       </v-list-tile-content>
                       <v-list-tile-action>
-                        <v-btn class="mx-0 my-0" icon ripple @click="deleteChoice(index)">
+                        <v-btn class="mx-0 my-0" icon ripple @click="deleteChoice(index, item)">
                           <v-icon color="red lighten-1">clear</v-icon>
                         </v-btn>
                       </v-list-tile-action>
                     </v-list-tile>
+                  </v-flex>
+                </v-layout>
+                <!-- model ver_2 -->
+                <v-layout v-else wrap class="py-1 align-center row-list-style">
+                  <p class="my-2">Mã câu hỏi <span style="color: red">(*)</span>:</p>
+                  <v-flex xs12>
+                    <v-text-field
+                      box
+                      v-model="votingCode"
+                      :rules="type === 'add' ? [rules.required, rules.varchar75, rules.syntaxError] : []"
+                      :maxlength="75"
+                      :counter="75"
+                    ></v-text-field>
+                  </v-flex>
+                  <p class="my-2">Nội dung câu hỏi <span style="color: red">(*)</span>:</p>
+                  <v-flex xs12 class="" style="position: relative">
+                    <v-textarea
+                      box
+                      rows="5"
+                      v-model="subject"
+                      :rules="[rules.required, rules.varchar5000, rules.syntaxError]"
+                      required
+                      :maxlength="5000"
+                      :counter="5000"
+                    ></v-textarea>
+                  </v-flex>
+                  <p class="my-2">Trạng thái <span style="color: red">(*)</span>:</p>
+                  <v-flex xs12 class="">
+                    <v-autocomplete
+                      box
+                      :items="statusItems"
+                      v-model="status"
+                      item-text="text"
+                      item-value="value"
+                      :rules="[rules.required]"
+                      required
+                    >
+                    </v-autocomplete>
+                  </v-flex>
+                  <p class="my-2">Câu trả lời: </p>
+                  <v-flex xs12 class="">
+                    <!-- <div class="my-2 text-bold">:</div> -->
+                    <v-layout wrap>
+                      <v-flex xs12 sm10 class="pr-2">
+                        <v-textarea
+                          box
+                          v-model="answer"
+                          clearable
+                          rows="6"
+                          :maxlength="5000"
+                          :counter="5000"
+                        ></v-textarea>
+                      </v-flex>
+                      <v-flex xs12 sm2 class="text-xs-right">
+                        <v-layout wrap class="">
+                          <v-autocomplete
+                            label="Trạng thái"
+                            box
+                            :items="statusItems"
+                            v-model="statusChoice"
+                            item-text="text"
+                            item-value="value"
+                          >
+                          </v-autocomplete>
+                          <v-text-field
+                            label="Thứ tự"
+                            box
+                            v-model="sibling"
+                            :rules="type === 'add' ? [rules.varchar75, rules.syntaxError] : []"
+                            :maxlength="75"
+                          ></v-text-field>
+                          <v-text-field
+                            label="Số điểm"
+                            box
+                            v-model="votePoint"
+                            :rules="[rules.varchar75, rules.syntaxError]"
+                            :maxlength="75"
+                          ></v-text-field>
+                        </v-layout>
+                      </v-flex>
+                      <v-flex xs12>
+                        <v-btn color="blue darken-3" dark v-if="!updateChoice"
+                          class="mt-0 mr-0"
+                          :disabled="answer && String(answer).length <= 5000 ? false : true"
+                          @click.stop="addChoices"
+                          :title="answer && String(answer).length > 5000 ? 'Câu trả lời tối đa 5000 ký tự' : ''"
+                        >
+                          <v-icon size="24">add</v-icon>
+                          <span>Thêm trả lời</span>
+                        </v-btn>
+                        <v-btn color="blue darken-3" dark v-if="updateChoice"
+                          class="mt-0 mr-0"
+                          :disabled="answer && String(answer).length <= 5000 ? false : true"
+                          @click="updateChoiceAction"
+                          :title="answer && String(answer).length > 5000 ? 'Câu trả lời tối đa 5000 ký tự' : ''"
+                        >
+                          <v-icon size="24">save</v-icon>&nbsp;
+                          <span >Cập nhật trả lời</span>
+                        </v-btn>
+                        <v-btn v-if="updateChoice" color="blue darken-3" dark
+                          class="mt-0 mr-0"
+                          @click="cancelUpdateChoices"
+                        >
+                          <v-icon size="20">clear</v-icon>&nbsp;
+                          <span>Hủy</span>
+                        </v-btn>
+                      </v-flex>
+                    </v-layout>
+                    <!--  -->
+                    <div
+                      v-for="(item, index) in choicesCurrent"
+                      :key="index"
+                      class="mt-2 px-2 py-2"
+                      style="border: 1px solid #8fbc8f;"
+                    >
+                      <v-layout wrap>
+                        <v-flex style="width: calc(100% - 100px);">
+                          <div class="mb-2" style="font-weight: 500;">
+                            <span>STT: {{item.sibling}}</span> - <span> Trạng thái: {{item.status === 1 ? 'Công khai' : 'Không công khai'}}</span> - 
+                            <span> Số điểm: {{item.votePoint}}</span>
+                          </div>
+                          <div>{{item.subject}}</div>
+                        </v-flex>
+                        <v-flex class="text-xs-right" style="width: 100px;max-width: 100px;">
+                          <v-btn class="mx-0 my-0" icon ripple @click="editChoice(item, index)">
+                            <v-icon color="blue lighten-1">edit</v-icon>
+                          </v-btn>
+                          <v-btn class="mx-0 my-0" icon ripple @click="deleteChoice(index, item)">
+                            <v-icon color="red lighten-1">clear</v-icon>
+                          </v-btn>
+                        </v-flex>
+                      </v-layout>
+                    </div>
                   </v-flex>
                 </v-layout>
               </v-form>
@@ -191,7 +341,7 @@
               <v-btn color="blue darken-3" dark
                 :loading="loading"
                 :disabled="loading"
-                @click="updateQuestion('add')"
+                @click="lastestVersion !== 2 ? updateQuestion('add') : createQuestionVer2('add')"
                 v-if="type === 'add'"
               >
                 <v-icon>add_circle_outline</v-icon>&nbsp;
@@ -201,7 +351,7 @@
                 v-else
                 :loading="loading"
                 :disabled="loading"
-                @click="updateQuestion('update')"
+                @click="lastestVersion !== 2 ? updateQuestion('update') : createQuestionVer2('update')"
               >
                 <v-icon>save</v-icon>&nbsp;
                 Cập nhật
@@ -221,6 +371,7 @@
 <script>
   import TinyPagination from '../ext/TinyPagination.vue'
   import { VueEditor, Quill } from 'vue2-editor'
+  import toastr from 'toastr'
   export default {
     components: {
       'tiny-pagination': TinyPagination,
@@ -253,14 +404,33 @@
           },
           {
             text: 'Khảo sát',
-            value: 'survey'
+            value: 'survey',
+            lastestVersion: 2
           }
         ],
+        lastestVersion: 1,
         votingItems: [],
         className: '',
         validForm: false,
         currentQuestion: {
         },
+        currentChoice: '',
+        indexChoiceUpdate: '',
+        updateChoice: false,
+        votePoint: '',
+        statusItems: [
+          {
+            text: 'Công khai',
+            value: 1
+          },
+          {
+            text: 'Không công khai',
+            value: 0
+          }
+        ],
+        status: 1,
+        statusChoice: 1,
+        sibling: '',
         subject: '',
         votingCode: '',
         answer: '',
@@ -271,7 +441,9 @@
         loading: false,
         dialog_addQuestion: false,
         rules: {
-          required: value => !!value || 'Bắt buộc phải nhập.',
+          required: (value) => {
+            return value || value === 0 ? true : 'Bắt buộc phải nhập.'
+          },
           number: value => {
             const pattern = /^\d+$/
             return pattern.test(value) || 'Bắt buộc phải nhập kiểu số.'
@@ -371,10 +543,27 @@
       var vm = this
       vm.$nextTick(function () {
         let currentQuery = vm.$router.history.current.query
-        vm.className = vm.classNameItems[0]['value']
-        if (vm.className) {
-          vm.getVotingList()
-        }
+        let serverconfig = 'CLASSNAME_VOTING'
+        vm.$store.dispatch('getServerconfigs', serverconfig).then(function (result) {
+          let configs = JSON.parse(result.configs)
+          vm.classNameItems = configs.classNames
+          vm.className = vm.classNameItems[0]['value']
+          if (vm.classNameItems[0] && vm.classNameItems[0].hasOwnProperty('lastestVersion') && vm.classNameItems[0]['lastestVersion']) {
+            vm.lastestVersion = vm.classNameItems[0]['lastestVersion']
+          }
+          if (vm.className) {
+            vm.getVotingList()
+          }
+        }).catch(function (){
+          vm.className = vm.classNameItems[0]['value']
+          if (vm.classNameItems[0] && vm.classNameItems[0].hasOwnProperty('lastestVersion') && vm.classNameItems[0]['lastestVersion']) {
+            vm.lastestVersion = vm.classNameItems[0]['lastestVersion']
+          }
+          if (vm.className) {
+            vm.getVotingList()
+          }
+        })
+        
       })
     },
     computed: {
@@ -388,23 +577,48 @@
     methods: {
       getVotingList () {
         let vm = this
-        let currentQuery = vm.$router.history.current.query
         let filter = {
           className: vm.className
         }
         vm.loading = true
-        vm.$store.dispatch('getVotingList', filter).then(function (result) {
-          vm.loading = false
-          vm.votingItems = result.data
-        }).catch(reject => {
-          vm.loading = false
-          console.log(reject)
-        })
+        if (vm.lastestVersion !== 2) {
+          vm.$store.dispatch('getVotingList', filter).then(function (result) {
+            vm.loading = false
+            vm.votingItems = Array.isArray(result.data) ? result.data : [result.data]
+          }).catch(reject => {
+            vm.loading = false
+            console.log(reject)
+          })
+        } else {
+          vm.$store.dispatch('getVotingListVer2', filter).then(function (result) {
+            vm.loading = false
+            let items = Array.isArray(result.data) ? result.data : [result.data]
+            let lengthQuestion = items.length
+            for (let index = 0; index < lengthQuestion; index++) {
+              if (items[index]['lstChoiceDetailModels']) {
+                let listChoice = Array.isArray(items[index]['lstChoiceDetailModels']) ? items[index]['lstChoiceDetailModels'] : [items[index]['lstChoiceDetailModels']]
+                items[index] = Object.assign(items[index]['voteModel'], {lstChoiceDetailModels: listChoice})
+              } else {
+                items[index] = Object.assign(items[index]['voteModel'], {lstChoiceDetailModels: []})
+              }
+            }
+            vm.votingItems = items
+          }).catch(reject => {
+            vm.loading = false
+            console.log(reject)
+          })
+        }
       },
       changeClassName () {
         let vm = this
         setTimeout(function () {
           if (vm.className) {
+            let filter = vm.classNameItems.filter(function (item) {
+              return item.value == vm.className
+            })[0]
+            if (filter && filter.hasOwnProperty('lastestVersion') && filter['lastestVersion']) {
+              vm.lastestVersion = filter['lastestVersion']
+            }
             vm.getVotingList()
           }
         }, 300)
@@ -416,18 +630,78 @@
         vm.answer = ''
         vm.choicesCurrent = []
         vm.$refs.formAddQuestion.reset()
+        vm.status = 1
+        vm.statusChoice = 1
         vm.dialog_addQuestion = true
       },
       addChoices () {
         let vm = this
-        if (vm.answer) {
-          vm.choicesCurrent.push(vm.answer)
+        if (vm.lastestVersion !== 2) {
+          if (vm.answer) {
+            vm.choicesCurrent.push(vm.answer)
+          }
+        } else {
+          if (vm.answer && vm.statusChoice) {
+            if (vm.type === 'add') {
+              let choice = {
+                subject: vm.answer,
+                sibling: vm.sibling,
+                status: vm.statusChoice,
+                votePoint: vm.votePoint
+              }
+              vm.choicesCurrent.push(choice)
+              vm.answer = ''
+              vm.sibling = ''
+              vm.statusChoice = 1
+              vm.votePoint = ''
+            } else {
+              let dataChoice = {
+                className: vm.className,
+                subject: vm.answer,
+                sibling: vm.sibling,
+                status: vm.statusChoice,
+                votePoint: vm.votePoint,
+                voteId: vm.votingIdCurrent
+              }
+              vm.$store.dispatch('createChoices', dataChoice).then(function (response) {
+                vm.choicesCurrent.push(response)
+                vm.answer = ''
+                vm.sibling = ''
+                vm.statusChoice = 1
+                vm.votePoint = ''
+              }).catch(function () {
+                toastr.error('Thêm câu trả lời thất bại')
+              })
+            }
+          }
         }
       },
-      deleteChoice (index) {
+      deleteChoice (index, item) {
         let vm = this
-        console.log(index)
-        vm.choicesCurrent.splice(index, 1)
+        vm.updateChoice = false
+        vm.currentChoice = ''
+        vm.answer = ''
+        vm.statusChoice = 1
+        vm.sibling = ''
+        if (vm.lastestVersion !== 2) {
+          vm.choicesCurrent.splice(index, 1)
+        } else {
+          let x = confirm('Bạn có chắc chắn xóa trả lời này?')
+          if (x) {
+            let filter = {
+              voteChoiceId: item.voteChoiceId,
+              className: vm.className
+            }
+            vm.$store.dispatch('deleteChoiceNew', filter).then(function () {
+              toastr.success('Xóa trả lời thành công')
+              setTimeout (function () {
+                vm.choicesCurrent.splice(index, 1)
+              }, 300)
+            }).catch(reject => {
+              toastr.error('Xóa trả lời thất bại')
+            })
+          }
+        }
       },
       updateQuestion (type) {
         let vm = this
@@ -462,6 +736,35 @@
           })
         }
       },
+      createQuestionVer2 (type) {
+        let vm = this
+        let filter = {
+          className: vm.className,
+          title: vm.subject,
+          description: '',
+          voteCode: vm.votingCode ? vm.votingCode : '',
+          type: vm.type,
+          status: vm.status,
+          choiceItems: vm.choicesCurrent
+        }
+        if (vm.type === 'update') {
+          filter['votingId'] = vm.votingIdCurrent
+        }
+        if (vm.$refs.formAddQuestion.validate()) {
+          vm.loading = true
+          vm.$store.dispatch('updateVotingsNew', filter).then(function (result) {
+            vm.loading = false
+            toastr.success('Yêu cầu thực hiện thành công')
+            setTimeout (function () {
+              vm.getVotingList()
+            }, 300)
+            vm.dialog_addQuestion = false
+          }).catch(reject => {
+            vm.loading = false
+            console.log(reject)
+          })
+        }
+      },
       cancelDialog () {
         let vm = this
         vm.getVotingList()
@@ -471,26 +774,111 @@
         let vm = this
         vm.answer = ''
         vm.type = 'update'
-        vm.votingCode = item['votingCode']
-        vm.subject = item['subject']
-        vm.choicesCurrent = item['choices']
-        vm.votingIdCurrent = item['votingId']
+        if (vm.lastestVersion !== 2) {
+          vm.votingCode = item['votingCode']
+          vm.subject = item['subject']
+          vm.choicesCurrent = item['choices']
+          vm.votingIdCurrent = item['votingId']
+        } else {
+          vm.votingCode = item['voteCode']
+          vm.subject = item['title']
+          vm.status = item['status']
+          vm.choicesCurrent = item['lstChoiceDetailModels']
+          vm.votingIdCurrent = item['voteId']
+        }
+        console.log('choicesCurrent', vm.choicesCurrent)
         vm.dialog_addQuestion = true
       },
-      deleteVotings (item) {
-        let x = confirm('Xác nhận xóa dữ liệu')
-        if (x) {
-          var vm = this
-          let filter = {
-            votingId: item.votingId
+      editChoice (item, index) {
+        let vm = this
+        vm.updateChoice = true
+        vm.currentChoice = item
+        vm.indexChoiceUpdate = index
+        vm.answer = item.subject
+        vm.statusChoice = item.status
+        vm.sibling = item.sibling
+        vm.votePoint = item.votePoint
+      },
+      updateChoiceAction () {
+        let vm = this
+        if (vm.type === 'add') {
+          let update = {
+            answer: vm.answer,
+            status: vm.statusChoice,
+            sibling: vm.sibling
           }
-          vm.$store.dispatch('deleteVotings', filter).then(function () {
-            setTimeout (function () {
-              vm.getVotingList()
-            }, 300)
+          vm.choicesCurrent[vm.indexChoiceUpdate] = Object.assign(vm.choicesCurrent[vm.indexChoiceUpdate], update)
+        } else {
+          vm.updateChoiceDetail()
+        }
+      },
+      cancelUpdateChoices () {
+        let vm = this
+        vm.updateChoice = false
+        vm.currentChoice = ''
+        vm.answer = ''
+        vm.statusChoice = 1
+        vm.sibling = ''
+        vm.votePoint = ''
+      },
+      updateChoiceDetail () {
+        let vm = this
+        let filter = {
+          className: vm.className,
+          subject: vm.answer,
+          voteId: vm.votingIdCurrent,
+          status: vm.statusChoice,
+          votePoint: vm.votePoint,
+          sibling: vm.sibling,
+          voteChoiceId: vm.currentChoice['voteChoiceId']
+        }
+        if (vm.answer && vm.statusChoice !== '') {
+          vm.$store.dispatch('updateChoices', filter).then(function (result) {
+            toastr.success('Cập nhật trả lời thành công')
+            let update = {
+              subject: vm.answer,
+              status: vm.statusChoice,
+              sibling: vm.sibling,
+              votePoint: vm.votePoint,
+              voteId: vm.votingIdCurrent,
+              voteChoiceId: vm.currentChoice['voteChoiceId']
+            }
+            vm.choicesCurrent[vm.indexChoiceUpdate] = Object.assign(vm.choicesCurrent[vm.indexChoiceUpdate], update)
+            vm.cancelUpdateChoices()
           }).catch(reject => {
-            console.log(reject)
+            toastr.error('Cập nhật trả lời thất bại')
           })
+        }
+      },
+      deleteVotings (item) {
+        let vm = this
+        let x = confirm('Bạn có chắc chắn xóa câu hỏi này?')
+        if (x) {
+          if (vm.lastestVersion !== 2) {
+            let filter = {
+              votingId: item.votingId
+            }
+            vm.$store.dispatch('deleteVotings', filter).then(function () {
+              setTimeout (function () {
+                vm.getVotingList()
+              }, 300)
+            }).catch(reject => {
+              console.log(reject)
+            })
+          } else {
+            let filter = {
+              votingId: item.voteId,
+              className: vm.className
+            }
+            vm.$store.dispatch('deleteVotingsNew', filter).then(function () {
+              toastr.success('Xóa câu hỏi thành công')
+              setTimeout (function () {
+                vm.getVotingList()
+              }, 300)
+            }).catch(reject => {
+              toastr.error('Xóa câu hỏi thất bại')
+            })
+          }
         }
       },
       backToList () {

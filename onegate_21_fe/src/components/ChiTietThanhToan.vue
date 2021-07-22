@@ -136,7 +136,7 @@
                   <v-flex xs12>
                     <v-btn class="ml-3" color="primary" @click="printPay()">
                       <v-icon>print</v-icon> &nbsp;
-                      In biên lai
+                      In biên lai điện tử
                     </v-btn>
                   </v-flex>
                 </v-layout>

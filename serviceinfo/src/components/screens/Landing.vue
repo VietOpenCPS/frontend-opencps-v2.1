@@ -151,7 +151,7 @@
                 </content-placeholders>
                 <div v-else>
 
-                  <v-menu bottom right offset-y v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 1 && serviceConfigs(props.item.serviceConfigs).length <= 5">
+                  <!-- <v-menu bottom right offset-y v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 1 && serviceConfigs(props.item.serviceConfigs).length <= 5">
                     <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel >= 3" style="min-width: 110px;">
                       <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
                       <span v-else>Tạo tờ khai</span>
@@ -163,10 +163,10 @@
                         <v-list-tile-title v-else @click="viewGuide(item2, props.item.serviceCode, props.item)">{{item2.govAgencyName}}</v-list-tile-title>
                       </v-list-tile>
                     </v-list>
-                  </v-menu>
+                  </v-menu> -->
 
                   <v-btn small color="primary" class="my-1" style="min-width: 110px;"
-                    v-if="props.item.maxLevel >= 3 && props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 5"
+                    v-if="props.item.maxLevel >= 3 && props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 1"
                     @click="showSelectGov(props.item, props.item.serviceConfigs)"
                   >
                     <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
@@ -174,7 +174,7 @@
                   </v-btn>
 
                   <v-btn small color="primary" class="my-1" style="min-width: 110px;"
-                    v-if="props.item.maxLevel < 3 && props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 5"
+                    v-if="props.item.maxLevel < 3 && props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 1"
                     @click="showSelectGov(props.item, props.item.serviceConfigs, 'guide')"
                   >
                     Hướng dẫn
@@ -235,6 +235,30 @@
               Đóng
             </v-btn>
           </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="dialog_selectOption" scrollable persistent max-width="1000px">
+        <v-card style="width: 100%">
+          <v-toolbar flat dark color="primary">
+            <v-toolbar-title>Chọn dịch vụ</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon dark @click.native="dialog_selectOption = false">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-card-text class="pt-3">
+            <v-layout class="py-2" wrap v-for="(item, index) in listDichVu" :key="index" style="border-bottom: 1px solid #dedede;">
+              <v-flex style="width: calc(100% - 110px)">
+                <span>{{item.optionName}}</span>
+              </v-flex>
+              <v-flex style="width: 100px">
+                <v-btn class="px-3 right" color="primary" @click="createDossierRedirect(serviceSelected)">
+                  Chọn
+                </v-btn>
+              </v-flex>
+              
+            </v-layout>
+          </v-card-text>
         </v-card>
       </v-dialog>
     </div>
@@ -338,7 +362,7 @@
                       <v-icon color="primary lighten-1">more_vert</v-icon>
                     </v-btn>
                     <v-list>
-                      <v-menu :close-on-content-click="false" bottom right offset-y v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 1 && serviceConfigs(item.serviceConfigs).length <=5" style="position:relative !important;">
+                      <!-- <v-menu :close-on-content-click="false" bottom right offset-y v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 1 && serviceConfigs(item.serviceConfigs).length <=5" style="position:relative !important;">
                         <v-btn class="mx-0 my-0" small slot="activator" color="primary" v-if="item.maxLevel >= 3">
                           <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
                           <span v-if="formToKhai">Tạo tờ khai</span> &nbsp; 
@@ -351,17 +375,17 @@
                             <v-list-tile-title v-else @click="viewGuide(item2, item.serviceCode, item)">{{item2.govAgencyName}}</v-list-tile-title>
                           </v-list-tile>
                         </v-list>
-                      </v-menu>
+                      </v-menu> -->
 
                       <v-btn class="mx-0 my-0" small color="primary" 
-                        v-if="item.maxLevel >= 3 && item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 5"
+                        v-if="item.maxLevel >= 3 && item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 1"
                         @click="showSelectGov(item, item.serviceConfigs)"
                       >
                         <span v-if="!formToKhai">{{titleNopHoSo ? titleNopHoSo : 'Nộp hồ sơ'}}</span>
                         <span v-else>Tạo tờ khai</span>
                       </v-btn>
                       <v-btn small color="primary" class="my-1" style="min-width: 110px;"
-                        v-if="item.maxLevel < 3 && item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 5"
+                        v-if="item.maxLevel < 3 && item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 1"
                         @click="showSelectGov(item, item.serviceConfigs, 'guide')"
                       >
                         Hướng dẫn
@@ -609,15 +633,30 @@
               :rules="[v => !!v || 'Chọn cơ quan tiếp nhận']"
               required
               return-object
+              @change="changeCoQuanTiepNhan"
+            ></v-autocomplete>
+
+            <v-autocomplete
+              v-if="showChonDichVu"
+              class="mt-2"
+              placeholder="Chọn dịch vụ"
+              :items="listDichVu"
+              v-model="dichVuSelected"
+              item-text="optionName"
+              item-value="processOptionId"
+              return-object
+              hide-no-data
+              required
+              @change="changeDichVuConfigs"
             ></v-autocomplete>
           </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="submitSelectGov">
+          <v-btn color="primary" @click="submitSelectGov" :disabled="loadingProcess">
             <v-icon size="20">save</v-icon>&nbsp; Đồng ý
           </v-btn>
-          <v-btn class="white--text" color="red"  @click="dialog_selectAgency = false">
+          <v-btn class="white--text" color="red"  @click="dialog_selectAgency = false" :disabled="loadingProcess">
             <v-icon size="20">clear</v-icon>&nbsp; Thoát
           </v-btn>
         </v-card-actions>
@@ -708,6 +747,7 @@ export default {
     serviceDetail: '',
     dialogGuide: false,
     loading: true,
+    loadingProcess: false,
     headers: [
       {
         text: 'STT',
@@ -760,12 +800,16 @@ export default {
     govAgencyListTiepNhan: [],
     govAgencyTiepNhanSelected: '',
     govAgencyListTiepNhanFilters: [],
+    dichVuSelected: '',
+    listDichVu: [],
     selectGuide: false,
     onlyLoginDvcqg: false,
     titleNopHoSo: '',
     setAgency: false,     /**fix 1 đơn vị */
     luaChonXaPhuong: false,
-    useJwt: false
+    useJwt: false,
+    showChonDichVu: false,
+    dialog_selectOption: false
   }),
   computed: {
     govAgencyList () {
@@ -1128,13 +1172,15 @@ export default {
       vm.serviceInfoList = []
       vm.loading = true
       let currentQuery = vm.$router.history.current.query
+      console.log('currentQuery555', currentQuery)
       let filter = {
         page: currentQuery.page ? currentQuery.page : 1,
         administration: currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : ''),
         agency: currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : '',
         keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
         level: currentQuery.hasOwnProperty('level') ? currentQuery.level : '',
-        domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
+        domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
+        tagCode: currentQuery.hasOwnProperty('tagCode') ? currentQuery.tagCode : ''
       }
       vm.$store.dispatch('getServiceLists', filter).then(function (result) {
         vm.loading = false
@@ -1420,18 +1466,48 @@ export default {
       let vm = this
       vm.viewDetail(vm.serviceInfoSelected, 2)
     },
-    createDossier (item, serviceInfoItem) {
+    createDossier (item, serviceInfoItem, activeRun) {
       let vm = this
       vm.serviceSelected = item
       if (item.serviceUrl) {
+        vm.serviceInfoSelected = serviceInfoItem
         let urlRedirect = item.serviceUrl
-        try {
-          if (vm.useJwt) {
-            urlRedirect = item.serviceUrl.split('?').length > 1 ? item.serviceUrl + '&token=' + localStorage.getItem('jwt_token') : item.serviceUrl + '?token=' + localStorage.getItem('jwt_token')
+        if (activeRun) {
+          try {
+            if (vm.useJwt) {
+              let serviceConfigId = vm.dichVuSelected['serviceConfigId']
+              let token = localStorage.getItem('jwt_token')
+              let templateNo = vm.dichVuSelected['templateNo']
+              let groupId = window.themeDisplay.getScopeGroupId()
+              let serviceCode = serviceInfoItem['serviceCode']
+              let govAgencyCode = item.govAgencyCode
+              let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId + '&serviceCode=' + serviceCode + '&govAgencyCode=' + govAgencyCode
+              urlRedirect = item.serviceUrl.split('?').length > 1 ? item.serviceUrl + '&' + paramsAdd : item.serviceUrl + '?' + paramsAdd
+            }
+          } catch (error) {
           }
-        } catch (error) {
+          window.location.href = urlRedirect
+        } else {
+          if (serviceInfoItem) {
+            let filterSearch = {
+              serviceConfigId: item.serviceConfigId
+            }
+            vm.dichVuSelected = ''
+            vm.$store.dispatch('getServiceOpionByProcess', filterSearch).then(function (result) {
+              if (result && result.length > 1) {
+                vm.dialog_selectOption = true
+                vm.listDichVu = result
+              } else {
+                vm.dialog_selectOption = false
+                vm.dichVuSelected = result[0]
+                vm.createDossierRedirect(item)
+              }
+            }).catch(function () {
+            })
+          } else {
+            window.location.href = urlRedirect
+          }
         }
-        window.location.href = urlRedirect
       } else {
         if (!vm.formToKhai) {
           let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
@@ -1474,6 +1550,24 @@ export default {
         }
       }
     },
+    createDossierRedirect (serviceConfig) {
+      let vm = this
+      let urlRedirect = serviceConfig.serviceUrl
+      try {
+        if (vm.useJwt) {
+          let serviceConfigId = vm.dichVuSelected['serviceConfigId']
+          let token = localStorage.getItem('jwt_token')
+          let templateNo = vm.dichVuSelected['templateNo']
+          let groupId = window.themeDisplay.getScopeGroupId()
+          let serviceCode = vm.serviceInfoSelected['serviceCode']
+          let govAgencyCode = serviceConfig.govAgencyCode
+          let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId + '&serviceCode=' + serviceCode + '&govAgencyCode=' + govAgencyCode
+          urlRedirect = serviceConfig.serviceUrl.split('?').length > 1 ? serviceConfig.serviceUrl + '&' + paramsAdd : serviceConfig.serviceUrl + '?' + paramsAdd
+        }
+      } catch (error) {
+      }
+      window.location.href = urlRedirect
+    },
     doLogin () {
       let vm = this
       let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
@@ -1491,6 +1585,7 @@ export default {
     },
     showSelectGov (serviceInfo, govList, guide) {
       let vm = this
+      vm.showChonDichVu = false
       vm.serviceInfoSelected = serviceInfo
       vm.govAgencyTiepNhanSelected = ''
       vm.selectGuide = guide ? true : false
@@ -1530,6 +1625,31 @@ export default {
         
       }, 50)
     },
+    changeCoQuanTiepNhan() {
+      let vm = this
+      vm.showChonDichVu = false
+      setTimeout(function () {
+        if (vm.govAgencyTiepNhanSelected && vm.govAgencyTiepNhanSelected['serviceUrl']) {
+          let filterSearch = {
+            serviceConfigId: vm.govAgencyTiepNhanSelected.serviceConfigId
+          }
+          vm.loadingProcess = true
+          vm.$store.dispatch('getServiceOpionByProcess', filterSearch).then(function (result) {
+            vm.loadingProcess = false
+            if (result && result.length > 1) {
+              vm.showChonDichVu = true
+              vm.listDichVu = result
+            } else {
+              vm.showChonDichVu = false
+              vm.dichVuSelected = result[0]
+            }
+          }).catch(function () {
+            vm.loadingProcess = false
+          })
+        } else {
+        }
+      }, 50)
+    },
     submitSelectGov () {
       let vm = this
       if (vm.$refs.formSelect.validate()) {
@@ -1539,7 +1659,7 @@ export default {
             vm.viewGuide(vm.govAgencyTiepNhanSelected)
           }, 200)
         } else {
-          vm.createDossier(vm.govAgencyTiepNhanSelected, vm.serviceInfoSelected)
+          vm.createDossier(vm.govAgencyTiepNhanSelected, vm.serviceInfoSelected, 'activeRun')
         }
       }
     },

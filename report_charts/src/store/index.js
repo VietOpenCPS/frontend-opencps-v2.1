@@ -143,9 +143,31 @@ export const store = new Vuex.Store({
             headers: {
               groupId: state.initData.groupId,
               Accept: 'application/json'
+            },
+            params: {
+              year: year,
+              month: 0,
+              domain: 'total',
+              agency: 'total',
+              system: 'total'
             }
           }
-          axios.get('/o/rest/statistics?year=' + year + '&month=0&domain=total&agency=total&system=total', param).then(function (response) {
+          let urlStatistic = '/o/rest/statistics'
+          try {
+            if (urlApiConfig && groupIdConfig) {
+              urlStatistic = urlApiConfig
+              param.params = {
+                year: year,
+                month: 0,
+                domainCode: 'total',
+                govAgencyCode: 'total',
+                groupBy: 1,
+                groupId: groupIdConfig
+              }
+            }
+          } catch (error) {
+          }
+          axios.get(urlStatistic, param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -218,15 +240,34 @@ export const store = new Vuex.Store({
           if (filter['report'] === 'linemonth') {
             param.params['domain'] = ''
           }
-          // 
-          // let childsCode = []
-          // if (state.groupConfig) {
-          //   for (let key in state.groupConfig) {
-          //     childsCode = childsCode.concat(state.groupConfig[key][1].split(','))
-          //   }
-          // }
-          // 
-          axios.get('/o/rest/statistics', param).then(function (response) {
+          let urlStatistic = '/o/rest/statistics'
+          try {
+            if (urlApiConfig && groupIdConfig) {
+              urlStatistic = urlApiConfig
+              param.params = {
+                year: filter.year,
+                month: filter.month,
+                govAgencyCode: filter['agency'],
+                groupBy: 1,
+                groupId: groupIdConfig
+              }
+              if (filter['report']) {
+                param.params['domainCode'] = 'total'
+              }
+              if (filter['report'] === 'linemonth') {
+                param.params['domainCode'] = ''
+              }
+
+              if (param.params['domain'] === 'total' && param.params['govAgencyCode'] !== 'total') {
+                param.params['groupBy'] = 1
+              }
+              if (param.params['domain'] !== 'total' && param.params['govAgencyCode'] === 'total') {
+                param.params['groupBy'] = 2
+              }
+            }
+          } catch (error) {
+          }
+          axios.get(urlStatistic, param).then(function (response) {
             let serializable = response.data
             // Khởi tạo group cha với fix trường hợp group cha không có dữ liệu, group con có dữ liệu
             let childsCode = []
@@ -882,7 +923,38 @@ export const store = new Vuex.Store({
           })
         })
       })
-    }
+    },
+    submitVotingMC ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            className: data.className,
+            classPk: data.classPk,
+            selected: data.voted,
+            votingCode: '',
+            overwrite: true
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            toastr.success('Cập nhật đánh giá thành công')
+            resolve(result.data)
+          }).catch(xhr => {
+            toastr.clear()
+            toastr.error('Cập nhật đánh giá thất bại')
+            reject(xhr)
+          })
+        }).catch(function (){})
+      })
+    },
   },
   mutations: {
     setInitData (state, payload) {

@@ -110,6 +110,13 @@
                 <v-icon>how_to_reg</v-icon>&nbsp;
                 Đăng nhập
               </v-btn>
+              <!-- <v-btn class="ml-2 my-0 white--text xacthuc-btn" color="#0b72ba"
+                v-if="showXacThucSso"
+                @click="redirectXacThucSso"
+              >
+                <v-icon>done_all</v-icon>&nbsp;
+                Xác thực SSO
+              </v-btn> -->
               <v-btn class="ml-1 mr-0 my-0 white--text" color="#0b72ba"
                 :loading="loadingLogin"
                 :disabled="loadingLogin"
@@ -118,7 +125,8 @@
               >
                 <v-icon>reply</v-icon>&nbsp;
                 Quay lại
-              </v-btn><br>
+              </v-btn>
+              <br>
               <v-btn v-if="conectDvcqg && !mapping" class="mt-2 mx-0 px-2 my-0 white--text" color="#0b72ba"
                 :loading="loading"
                 :disabled="loading"
@@ -165,12 +173,14 @@
 <script>
 
 import Vue from 'vue'
+import axios from 'axios'
 import $ from 'jquery'
 import support from '../../store/support.json'
 export default {
   props: [],
   components: {},
   data: () => ({
+    showXacThucSso: false,
     npmreactlogin_login: '',
     npmreactlogin_password: '',
     j_captcha_response: '',
@@ -193,7 +203,8 @@ export default {
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
       }
-    }
+    },
+    loginLiferay: false
   }),
   computed: {
     loadingLogin () {
@@ -203,13 +214,17 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
-      var vm = this
+      // vm.checkShowXacThucSso()
       $('body').addClass('body_login')
       let current = vm.$router.history.current
       let currentQuery = current.query
       vm.makeImageCap()
       try {
         vm.conectDvcqg = ssoConfig ? ssoConfig['active'] : false
+      } catch (error) {
+      }
+      try {
+        vm.loginLiferay = loginLiferay
       } catch (error) {
       }
       // 
@@ -242,6 +257,25 @@ export default {
   watch: {
   },
   methods: {
+    checkShowXacThucSso () {
+      let vm = this
+      let headers = {
+      }
+      axios({
+        method: 'GET',
+        url: '/o/v1/opencps/is-enabled-sso-login',
+        headers: headers
+      }).then(function (response) {
+        if (response.hasOwnProperty('data') && response.data) {
+          vm.showXacThucSso = response.data
+        }
+      }).catch(function (error) {
+      })
+    },
+    redirectXacThucSso () {
+      let vm = this
+      window.location.href = vm.showXacThucSso
+    },
     makeImageCap () {
       var vm = this
       vm.chapchablob = ''
@@ -277,38 +311,40 @@ export default {
         j_captcha_response: vm.j_captcha_response
       }
       if (vm.$refs.form.validate()) {
-        vm.$store.dispatch('goToDangNhap', filter).then(function (result) {
-          console.log('goToDangNhap', result)
-          if (vm.mapping && result === 'success') {
-            vm.doMappingDvcqg()
-          }
-          if (result === 'captcha') {
-            vm.captcha = true
-            vm.makeImageCap()
-          }
-          if (result === 'changeSecrect') {
-            window.location.href = window.themeDisplay ? window.themeDisplay.getLayoutURL() + '/#/thay-doi-mat-khau' : ''
-          }
-          if (result === 'verify') {
-            let applicantId = ''
-            if ( typeof(Storage) !== 'undefined') {
-              applicantId = sessionStorage.getItem('applicantId')
+        if (!vm.loginLiferay) {
+          vm.$store.dispatch('goToDangNhap', filter).then(function (result) {
+            if (vm.mapping && result === 'success') {
+              vm.doMappingDvcqg()
             }
-            vm.$router.push({
-              path: '/xac-thuc-tai-khoan?active_user_id=' + applicantId
-            })
-          }
-        })
-        
-        // let pAuth = Liferay.authToken
-        // $.post("?p_p_id=com_liferay_login_web_portlet_LoginPortlet&p_p_lifecycle=1&p_p_state=maximized&p_p_mode=view&_com_liferay_login_web_portlet_LoginPortlet_javax.portlet.action=%2Flogin%2Flogin&_com_liferay_login_web_portlet_LoginPortlet_mvcRenderCommandName=%2Flogin%2Flogin&p_auth=" + pAuth,
-        // {
-        //   "_com_liferay_login_web_portlet_LoginPortlet_login": vm.npmreactlogin_login,
-        //   "_com_liferay_login_web_portlet_LoginPortlet_password": vm.npmreactlogin_password
-        // },
-        // function(data, status){
-        //   window.location.href = window.location.origin
-        // })
+            if (result === 'captcha') {
+              vm.captcha = true
+              vm.makeImageCap()
+            }
+            if (result === 'changeSecrect') {
+              window.location.href = window.themeDisplay ? window.themeDisplay.getLayoutURL() + '/#/thay-doi-mat-khau' : ''
+            }
+            if (result === 'verify') {
+              let applicantId = ''
+              if ( typeof(Storage) !== 'undefined') {
+                applicantId = sessionStorage.getItem('applicantId')
+              }
+              vm.$router.push({
+                path: '/xac-thuc-tai-khoan?active_user_id=' + applicantId
+              })
+            }
+          })
+        } else {
+          let pAuth = Liferay.authToken
+          $.post("?p_p_id=com_liferay_login_web_portlet_LoginPortlet&p_p_lifecycle=1&p_p_state=maximized&p_p_mode=view&_com_liferay_login_web_portlet_LoginPortlet_javax.portlet.action=%2Flogin%2Flogin&_com_liferay_login_web_portlet_LoginPortlet_mvcRenderCommandName=%2Flogin%2Flogin&p_auth=" + pAuth,
+          {
+            "_com_liferay_login_web_portlet_LoginPortlet_login": vm.npmreactlogin_login,
+            "_com_liferay_login_web_portlet_LoginPortlet_password": vm.npmreactlogin_password
+          },
+          function(data, status){
+            window.location.href = window.location.origin
+          })
+        }
+                
       }
     },
     doLogOut () {

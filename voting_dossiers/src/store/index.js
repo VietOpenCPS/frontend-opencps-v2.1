@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
 import support from './support.json'
+import md5 from 'md5'
 // 
 Vue.use(toastr)
 Vue.use(Vuex)
@@ -228,10 +229,18 @@ export const store = new Vuex.Store({
     },
     loadingDataHoSo ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
+        let date = (new Date()).getDate()
+        let month = (new Date()).getMonth() + 1
+        let year = (new Date()).getFullYear()
+        let hours = (new Date()).getHours()
+        let minutes = (new Date()).getMinutes()
+        let currentDate = (new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`)).getTime()
+        let token = md5('opencps' + currentDate)
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: state.initData.groupId
+              groupId: state.initData.groupId,
+              authenKey: token
             },
             params: {
               start: 0,

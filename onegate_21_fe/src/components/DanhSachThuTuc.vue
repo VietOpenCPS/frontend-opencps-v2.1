@@ -698,8 +698,7 @@
                       vm.loadingAction = false
                       vm.indexAction = -1
                       vm.$router.push({
-                        path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                        query: vm.$router.history.current.query
+                        path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW?agency=' + govAgencyCode
                       })
                     })
                   } else {
@@ -758,8 +757,7 @@
               vm.loadingAction = false
               vm.indexAction = -1
               vm.$router.push({
-                path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                query: vm.$router.history.current.query
+                path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW?agency=' + govAgencyCode
               })
             })
           } else {
@@ -785,8 +783,7 @@
             vm.loadingAction = false
             vm.indexAction = -1
             vm.$router.push({
-              path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-              query: vm.$router.history.current.query
+              path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW?agency=' + govAgencyCode
             })
           })
         })
@@ -824,8 +821,7 @@
               vm.dialog_captcha = false
               vm.indexAction = -1
               vm.$router.push({
-                path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.data.dossierId + '/NEW',
-                query: vm.$router.history.current.query
+                path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.data.dossierId + '/NEW?agency=' + govAgencyCode
               })
             }
           }).catch (function (reject) {

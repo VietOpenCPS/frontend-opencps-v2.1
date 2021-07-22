@@ -60,7 +60,7 @@
                 <div v-if="!validBussinessInfos && hasCheckBussiness" class="mb-2">
                   <v-alert
                     :value="true"
-                    color="error"
+                    color="warning"
                     icon="warning"
                     outline
                     class="px-2 py-2"
@@ -358,6 +358,7 @@ export default {
     bussinessInfomation: '',
     validBussinessInfos: true,
     messageCheckApplicant: '',
+    onlyWarring: true,
     ruleContent: '',
     fileCMNDName: '',
     fileCMND: '',
@@ -480,6 +481,10 @@ export default {
       }
     } catch (error) {
     }
+    try {
+      vm.onlyWarring = onlyWarring !== undefined ? onlyWarring : true
+    } catch (error) {
+    }
     let elements = document.querySelectorAll('[autocomplete="off"]');
     if (!elements) {
       return
@@ -530,7 +535,7 @@ export default {
       console.log('dataForm', dataForm)
       if (vm.$refs.form.validate() && vm.agreeRules) {
         let passValid = true
-        if (vm.applicantType === '2' && vm.hasCheckBussiness && vm.bussinessInfomation && vm.applicantName.toLocaleLowerCase().trim() !== vm.bussinessInfomation['NAME'].toLocaleLowerCase().trim()) {
+        if (vm.applicantType === '2' && vm.hasCheckBussiness && !vm.onlyWarring && vm.bussinessInfomation && vm.applicantName.toLocaleLowerCase().trim() !== vm.bussinessInfomation['NAME'].toLocaleLowerCase().trim()) {
           passValid = false
           if (vm.applicantName.toLocaleLowerCase().trim() !== vm.bussinessInfomation['NAME'].toLocaleLowerCase().trim()) {
             vm.messageCheckApplicant = 'Vui lòng nhập tên tổ chức, doanh nghiệp đúng với tên đăng ký kinh doanh'

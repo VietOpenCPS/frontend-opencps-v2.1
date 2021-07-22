@@ -72,11 +72,11 @@
 
 <script>
 
-import Vue from 'vue'
 export default {
   props: [],
   components: {},
   data: () => ({
+    dossierNoShift: false,
     loading: true,
     loadingAction: false,
     statusDeal: false,
@@ -144,6 +144,11 @@ export default {
   computed: {},
   created () {
     let vm = this
+    try {
+      vm.dossierNoShift = dossierNoShift
+    } catch (error) {
+      
+    }
     vm.$nextTick(function () {
       let searchParams = window.location.search.replace('?','')
       if (searchParams) {
@@ -163,6 +168,9 @@ export default {
           vm.payGate = true
           let dossierNo = query['orderId'].split('-')
           dossierNo.pop()
+          if (vm.dossierNoShift) {
+            dossierNo.shift()
+          }
           let filter = {
             dossierNo: dossierNo.join('-')
           }

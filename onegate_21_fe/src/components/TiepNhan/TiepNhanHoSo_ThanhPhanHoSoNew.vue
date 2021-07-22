@@ -1283,7 +1283,8 @@ export default {
             dossierNo: vm.thongTinHoSo.dossierNo,
             submitDate: vm.thongTinHoSo.submitDate,
             govAgencyCode: vm.thongTinHoSo.govAgencyCode,
-            govAgencyName: vm.thongTinHoSo.govAgencyName
+            govAgencyName: vm.thongTinHoSo.govAgencyName,
+            dossierTemplateNo: vm.thongTinHoSo.dossierTemplateNo
           }
           if (vm.thongTinHoSo.dossierStatus === '' || vm.thongTinHoSo.dossierStatus === 'new') {
             paramsEmbed = Object.assign(paramsEmbed, {
@@ -1403,7 +1404,7 @@ export default {
       let vm = this
       console.log('dataTBTV', data)
       let dataOutPut = data.data ? JSON.parse(data.data) : ''
-      // console.log('data_output new_eform_2', dataOutPut, dataOutPut.tp)
+      console.log('data_output new_eform_2', dataOutPut)
       if (dataOutPut.hasOwnProperty('tp') && dataOutPut.tp) {
         let fileFind = vm.dossierFilesItems.find(itemFile => {
           // return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm && itemFile.fileSize!==0
@@ -1414,8 +1415,9 @@ export default {
           console.log('item put 5555', fileFind)
           fileFind['dossierId'] = vm.thongTinHoSo.dossierId
           fileFind['id'] = vm.id
+          fileFind['formData'] = dataOutPut
           vm.loadingApacal = true
-          
+          console.log('dataTBTV', fileFind['formData'])
           vm.$store.dispatch('putAlpacaFormCallBack', fileFind).then(resData => {
             let index = vm.dossierTemplateItemsFilter.findIndex(item => item.partNo === dataOutPut.tp);
             vm.dossierTemplateItemsFilter[index]['passRequired'] = true
@@ -1549,7 +1551,6 @@ export default {
       let vm = this
       window.removeEventListener('message', vm.receiveMessage)
       window.addEventListener('message', vm.receiveMessage)
-      console.log("message123123", window.message)
       //
       if (vm.currentFormView === 'formAlpaca' + data.partNo + vm.id) {
         vm.currentFormView = ''
@@ -1626,7 +1627,8 @@ export default {
           dossierNo: vm.thongTinHoSo.dossierNo,
           submitDate: vm.thongTinHoSo.submitDate,
           govAgencyCode: vm.thongTinHoSo.govAgencyCode,
-          govAgencyName: vm.thongTinHoSo.govAgencyName
+          govAgencyName: vm.thongTinHoSo.govAgencyName,
+          dossierTemplateNo: vm.thongTinHoSo.dossierTemplateNo
         }
         if (vm.thongTinHoSo.dossierStatus === '' || vm.thongTinHoSo.dossierStatus === 'new') {
           paramsEmbed = Object.assign(paramsEmbed, {
@@ -1978,13 +1980,15 @@ export default {
     saveMark () {
       let vm = this
       // console.log('save mark', vm.dossierTemplateItems)
-      if (vm.dossierTemplateItemsFilter) {
-        vm.dossierTemplateItemsFilter.forEach(function (value, index) {
-          if (value.partType === 1 && value.fileMark && !value.recordCountDefault) {
-            value['dossierId'] = vm.thongTinHoSo.dossierId
-            vm.$store.dispatch('postDossierMark', value)
-          }
-        })
+      if (!vm.onlyView && !vm.thongTinHoSo['dossierStatus']) {
+        if (vm.dossierTemplateItemsFilter) {
+          vm.dossierTemplateItemsFilter.forEach(function (value, index) {
+            if (value.partType === 1 && value.fileMark && !value.recordCountDefault) {
+              value['dossierId'] = vm.thongTinHoSo.dossierId
+              vm.$store.dispatch('postDossierMark', value)
+            }
+          })
+        }
       }
     },
     changeFileMark (event, index) {

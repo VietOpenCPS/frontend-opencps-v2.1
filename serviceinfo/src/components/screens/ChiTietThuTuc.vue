@@ -20,7 +20,7 @@
             <p class="text-bold">{{serviceDetail.serviceName}}</p>
           </div>
           <div v-if="!setAgency && (!userLoginInfomation || !userLoginInfomation.hasOwnProperty('className') || (userLoginInfomation && userLoginInfomation.hasOwnProperty('className') &&  userLoginInfomation.className !== 'org.opencps.usermgt.model.Employee'))">
-            <v-menu bottom right offset-y class="ml-2 my-2" style="display: inline-block;position:relative !important;"
+            <!-- <v-menu bottom right offset-y class="ml-2 my-2" style="display: inline-block;position:relative !important;"
               v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1 && serviceConfigs(serviceDetail.serviceConfigs).length <= 5"
             >
               <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">
@@ -34,7 +34,7 @@
                   <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                 </v-list-tile>
               </v-list>
-            </v-menu>
+            </v-menu> -->
             <v-btn class="mx-2 my-2" small color="primary" 
               v-if="serviceDetail.maxLevel >= 3 && serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 5"
               @click="showSelectGov(serviceDetail.serviceConfigs)"
@@ -567,6 +567,21 @@
               :rules="[v => !!v || 'Chọn cơ quan tiếp nhận']"
               required
               return-object
+              @change="changeCoQuanTiepNhan"
+            ></v-autocomplete>
+
+            <v-autocomplete
+              v-if="showChonDichVu"
+              class="mt-2"
+              placeholder="Chọn dịch vụ"
+              :items="listDichVu"
+              v-model="dichVuSelected"
+              item-text="optionName"
+              item-value="processOptionId"
+              return-object
+              hide-no-data
+              required
+              @change="changeDichVuConfigs"
             ></v-autocomplete>
           </v-form>
         </v-card-text>
@@ -617,6 +632,31 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="dialog_selectOption" scrollable persistent max-width="1000px">
+        <v-card style="width: 100%">
+          <v-toolbar flat dark color="primary">
+            <v-toolbar-title>Chọn dịch vụ</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon dark @click.native="dialog_selectOption = false">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-card-text class="pt-3">
+            <v-layout class="py-2" wrap v-for="(item, index) in listDichVu" :key="index" style="border-bottom: 1px solid #dedede;">
+              <v-flex style="width: calc(100% - 110px)">
+                <span>{{item.optionName}}</span>
+              </v-flex>
+              <v-flex style="width: 100px">
+                <v-btn class="px-3 right" color="primary" @click="createDossierRedirect(serviceSelected)">
+                  Chọn
+                </v-btn>
+              </v-flex>
+              
+            </v-layout>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
   </div>
 </template>
 
@@ -624,7 +664,6 @@
 
 import Vue from 'vue'
 import toastr from 'toastr'
-import $ from 'jquery'
 Vue.use(toastr)
 export default {
   props: ['index'],
@@ -675,7 +714,11 @@ export default {
     luaChonXaPhuong: false,
     danhSachQuanHuyen: [],
     quanHuyen: '',
-    useJwt: false
+    useJwt: false,
+    showChonDichVu: false,
+    dichVuSelected: '',
+    listDichVu: [],
+    loadingProcess: false,
   }),
   computed: {
     isMobile () {
@@ -770,7 +813,7 @@ export default {
       }
       vm.$store.dispatch('getServiceDetail', filter).then(function (result) {
         vm.serviceDetail = result
-        if (!query.hasOwnProperty('notCreate') && (query.hasOwnProperty('code') && query.code) || (query.hasOwnProperty('MaTTHCDP') && query.MaTTHCDP)) {
+        if (!query.hasOwnProperty('notCreate') && ((query.hasOwnProperty('code') && query.code) || (query.hasOwnProperty('MaTTHCDP') && query.MaTTHCDP))) {
           if (window.themeDisplay.isSignedIn()) {
             let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
             if (Array.isArray(vm.serviceDetail['serviceConfigs']) && vm.serviceDetail['serviceConfigs'].length === 1) {
@@ -791,6 +834,7 @@ export default {
           vm.serviceDetail.serviceCodeDVCQG = query.MaTTHCDP
         }
         vm.trackingBTTT(vm.serviceDetail.serviceCode)
+        console.log('run 5555')
         vm.loading = false
       }).catch(function (reject) {
         vm.loading = false
@@ -810,18 +854,45 @@ export default {
     }
   },
   methods: {
-    createDossier (item) {
+    createDossier (item, activeRun) {
       let vm = this
       vm.serviceSelected = item
       if (item.serviceUrl) {
         let urlRedirect = item.serviceUrl
-        try {
-          if (vm.useJwt) {
-            urlRedirect = item.serviceUrl.split('?').length > 1 ? item.serviceUrl + '&token=' + localStorage.getItem('jwt_token') : item.serviceUrl + '?token=' + localStorage.getItem('jwt_token')
+        if (activeRun) {
+          try {
+            if (vm.useJwt) {
+              let serviceCode = vm.serviceDetail['serviceCode']
+              let serviceConfigId = vm.dichVuSelected['serviceConfigId']
+              let token = localStorage.getItem('jwt_token')
+              let templateNo = vm.dichVuSelected['templateNo']
+              let groupId = window.themeDisplay.getScopeGroupId()
+              let govAgencyCode = item.govAgencyCode
+              let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId + '&serviceCode=' + serviceCode + '&govAgencyCode=' + govAgencyCode
+              urlRedirect = item.serviceUrl.split('?').length > 1 ? item.serviceUrl + '&' + paramsAdd : item.serviceUrl + '?' + paramsAdd
+            }
+          } catch (error) {
           }
-        } catch (error) {
+          window.location.href = urlRedirect
+        } else {
+          
+          let filterSearch = {
+            serviceConfigId: item.serviceConfigId
+          }
+          vm.dichVuSelected = ''
+          vm.$store.dispatch('getServiceOpionByProcess', filterSearch).then(function (result) {
+            if (result && result.length > 1) {
+              vm.dialog_selectOption = true
+              vm.listDichVu = result
+            } else {
+              vm.dialog_selectOption = false
+              vm.dichVuSelected = result[0]
+              vm.createDossierRedirect(item)
+            }
+          }).catch(function () {
+          })
+          
         }
-        window.location.href = urlRedirect
       } else {
         if (!vm.formToKhai) {
           let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
@@ -861,6 +932,24 @@ export default {
         }
         
       }
+    },
+    createDossierRedirect (serviceConfig) {
+      let vm = this
+      let urlRedirect = serviceConfig.serviceUrl
+      try {
+        if (vm.useJwt) {
+          let serviceCode = vm.serviceDetail['serviceCode']
+          let serviceConfigId = vm.dichVuSelected['serviceConfigId']
+          let token = localStorage.getItem('jwt_token')
+          let templateNo = vm.dichVuSelected['templateNo']
+          let groupId = window.themeDisplay.getScopeGroupId()
+          let govAgencyCode = serviceConfig.govAgencyCode
+          let paramsAdd = 'token=' + token + '&serviceConfigId=' + serviceConfigId + '&templateNo=' + templateNo + '&groupId=' + groupId + '&serviceCode=' + serviceCode + '&govAgencyCode=' + govAgencyCode
+          urlRedirect = serviceConfig.serviceUrl.split('?').length > 1 ? serviceConfig.serviceUrl + '&' + paramsAdd : serviceConfig.serviceUrl + '?' + paramsAdd
+        }
+      } catch (error) {
+      }
+      window.location.href = urlRedirect
     },
     submitSelectTemplateForm () {
       let vm = this
@@ -1020,6 +1109,31 @@ export default {
         
       }, 50)
     },
+    changeCoQuanTiepNhan() {
+      let vm = this
+      vm.showChonDichVu = false
+      setTimeout(function () {
+        if (vm.govAgencyTiepNhanSelected && vm.govAgencyTiepNhanSelected['serviceUrl']) {
+          let filterSearch = {
+            serviceConfigId: vm.govAgencyTiepNhanSelected.serviceConfigId
+          }
+          vm.loadingProcess = true
+          vm.$store.dispatch('getServiceOpionByProcess', filterSearch).then(function (result) {
+            vm.loadingProcess = false
+            if (result && result.length > 1) {
+              vm.showChonDichVu = true
+              vm.listDichVu = result
+            } else {
+              vm.showChonDichVu = false
+              vm.dichVuSelected = result[0]
+            }
+          }).catch(function () {
+            vm.loadingProcess = false
+          })
+        } else {
+        }
+      }, 50)
+    },
     submitSelectGov () {
       let vm = this
       if (vm.$refs.formSelect.validate()) {
@@ -1029,7 +1143,7 @@ export default {
             vm.viewGuide(vm.govAgencyTiepNhanSelected)
           }, 200)
         } else {
-          vm.createDossier(vm.govAgencyTiepNhanSelected)
+          vm.createDossier(vm.govAgencyTiepNhanSelected, 'activeRun')
         }
       }
     },

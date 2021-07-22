@@ -757,15 +757,19 @@
     watch: {
       capCoQuanThucHien (val) {
         let vm = this
+        vm.govAgencyList = []
         if (!vm.donViHuyen) {
           vm.govAgencyFilter = ''
           vm.domainFilter = ''
           vm.serviceFilter = ''
           vm.quanhuyenSelected = ''
           if(val){
-            vm.getAgencys(val)
+            if (val !== 'XA_PHUONG') {
+              vm.getAgencys(val)
+            }
             if (val === 'XA_PHUONG') {
               vm.getDictcollectionsQuanHuyen()
+              vm.govAgencyList = []
             }
             if (val === 'QUAN_HUYEN' || val === 'XA_PHUONG') {
               vm.getDomains(val === 'QUAN_HUYEN' ? 'CAP_HUYEN' : 'CAP_XA')
@@ -780,14 +784,17 @@
 
       govAgencyFilter (val) {
         let vm = this
+        console.log('val-govAgencyFilter', val)
         if (!vm.boNganh) {
           if (!vm.donViHuyen) {
             if (val) {
-              if (vm.agencySiteList.length > 0) {
+              if (vm.agencySiteList.length > 0 && vm.capCoQuanThucHien !== 'XA_PHUONG') {
                 try {
+                  console.log('val-agencySiteList', vm.agencySiteList)
                   vm.groupIdDonVi = vm.agencySiteList.filter(function (item) {
-                    return item.itemCode === val
+                    return item.itemCode === val || item.code === val
                   })[0]['value']
+                  console.log('val-groupIdDonVi', vm.groupIdDonVi)
                   vm.getStatusList()
                 } catch (error) {
                 }
@@ -875,6 +882,16 @@
           }) 
         } else {
           vm.quanhuyenSelected = parentFilter
+          if (vm.capCoQuanThucHien === 'XA_PHUONG' && parentFilter) {
+            try {
+              vm.groupIdDonVi = vm.agencySiteList.filter(function (item) {
+                return item.parent === parentFilter.itemCode || item.parent === parentFilter.itemCode
+              })[0]['value']
+              console.log('val-groupIdDonVi123', vm.groupIdDonVi)
+              vm.getStatusList()
+            } catch (error) {
+            }
+          }
           vm.$store.dispatch('getAgencysFromParent', data).then(
             res => {
               vm.govAgencyList = res

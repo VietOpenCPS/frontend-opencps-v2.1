@@ -339,10 +339,16 @@ export default {
           let paymentConfigInfo = vm.getEPaymentProfile(vm.paymentProfile.epaymentProfile)
           if (paymentConfigInfo && paymentConfigInfo.hasOwnProperty('isPaygov') && paymentConfigInfo['isPaygov']) {
             vm.showPayGov = true
-            $.getJSON('https://api.ipify.org?format=jsonp&callback=?', function(data) {
-              vm.ipAddress = data && data.hasOwnProperty('ip') ? data.ip : ''
-              console.log('ipAddress', vm.ipAddress)
-            })
+            let ssl = window.location.protocol
+            if (ssl == 'http:') {
+              $.getJSON('http://ipinfo.io', function(data){
+                vm.ipAddress = data && data.hasOwnProperty('ip') ? data.ip : ''
+              })
+            } else if (ssl == 'https:') {
+              $.getJSON('https://api.ipify.org?format=jsonp&callback=?', function(data) {
+                vm.ipAddress = data && data.hasOwnProperty('ip') ? data.ip : ''
+              })
+            }
           } else {
             vm.showPayGov = false
           }
@@ -375,6 +381,7 @@ export default {
           paymentMethod: vm.isBank ? 'Chuyển khoản' : 'Keypay'
         }
         vm.$store.commit('setPaymentProfile', vm.data_payment)
+        console.log('vm.data_payment3123123', vm.data_payment)
         // }
       }
     },
@@ -386,6 +393,7 @@ export default {
           vm.paymentFile = result
           vm.data_payment['paymentFile'] = vm.paymentFile
           vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : 'Keypay'
+          console.log('vm.data_payment555555', vm.data_payment)
           vm.$store.commit('setPaymentProfile', vm.data_payment)
         })
       }
@@ -416,6 +424,7 @@ export default {
         vm.progressUploadPart = false
         vm.paymentFile = result
         vm.data_payment['paymentFile'] = vm.paymentFile
+        vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : 'Keypay'
         vm.$store.commit('setPaymentProfile', vm.data_payment)
         vm.$store.dispatch('getPaymentFiles', data).then(result => {
           vm.paymentFile = result

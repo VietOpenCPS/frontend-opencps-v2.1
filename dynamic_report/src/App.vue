@@ -2,14 +2,14 @@
   <v-app id="app_dynamic_report" :class="hiddenAside ? 'px-3' : ''">
     <v-navigation-drawer app clipped floating width="300" v-if="isSigned">
       <div class="drawer__filter">
-        <div class="px-2 pt-0">
+        <!-- <div class="px-2 pt-0">
           <v-btn v-if="isAdmin" class="px-0 mt-0 ml-0" block color="primary" v-on:click.native="dialog_chotsolieu = true"
             style="height:36px"
           >
             <v-icon size="22" color="white">sync</v-icon>&nbsp;
             Chốt số liệu báo cáo
           </v-btn>
-        </div>
+        </div> -->
         <v-list dense style="padding: 0;" class="report_list">
           <v-list-tile
             v-for="(item, indexItem) in itemsReports"

@@ -1,7 +1,7 @@
 <template>
-  <div style="width: 1300px; margin: 0 auto">
+  <div style="max-width: 1300px; margin: 0 auto">
     <v-layout wrap>
-      <v-flex xs12 md6 class="pa-2">
+      <v-flex xs12 md6 class="statistic-total-year pa-2">
         <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
           <div class="row-header" style="height: 38px; overflow: hidden;background: #fff">
             <div class="background-triangle-big1">THỐNG KÊ THEO NĂM</div>
@@ -16,7 +16,7 @@
             </div>
           </div>
           <v-layout wrap align-center>
-            <v-flex md6 xs12>
+            <v-flex sm6 xs12>
               <apexchart
                 type="pie"
                 width=400 height=220
@@ -25,7 +25,7 @@
                 class="pieChartTotal"
               ></apexchart>
             </v-flex>
-            <v-flex md6 xs12>
+            <v-flex sm6 xs12>
               <!-- <v-layout wrap class="run-down">
                 <v-flex md6 xs12 text-center>
                   <span style="color:#1976d2;">{{statistics.receivedCount}}</span>
@@ -66,7 +66,7 @@
           </v-layout>
         </div>
       </v-flex>
-      <v-flex xs12 md6 class="pa-2">
+      <v-flex xs12 md6 class="statistic-service pa-2">
         <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
           <div class="row-header mb-1" style="height: 38px; overflow: hidden;background: #fff">
             <div class="background-triangle-big1">THỐNG KÊ THỦ TỤC HÀNH CHÍNH</div>
@@ -83,7 +83,10 @@
                     </v-flex>
                     <v-flex class="xs9 pl-4 pt-2">
                       <p><span>Thủ tục </span> <span class="text-bold">mức độ 2</span> </p>
-                      <p class="text-bold" style="font-size: 1.75em">{{levelList[0]['count']}}</p>
+                      <p>
+                        <span class="text-bold" style="font-size: 1.75em;">{{levelList[0]['count']}}</span>
+                        <span style="font-size: 1.3em;">&nbsp;({{levelList[0]['percent']}}%)</span>
+                      </p>
                     </v-flex>
                   </v-layout>
                 </v-card>
@@ -98,7 +101,10 @@
                     </v-flex>
                     <v-flex class="xs9 pl-4 pt-2">
                       <p><span>Thủ tục </span> <span class="text-bold">mức độ 3</span> </p>
-                      <p class="text-bold" style="font-size: 1.75em">{{levelList[1]['count']}}</p>
+                      <p>
+                        <span class="text-bold" style="font-size: 1.75em;">{{levelList[1]['count']}}</span>
+                        <span style="font-size: 1.3em;">&nbsp;({{levelList[1]['percent']}}%)</span>
+                      </p>
                     </v-flex>
                   </v-layout>
                 </v-card>
@@ -113,7 +119,10 @@
                     </v-flex>
                     <v-flex class="xs9 pl-4 pt-2">
                       <p><span>Thủ tục </span> <span class="text-bold">mức độ 4</span> </p>
-                      <p class="text-bold" style="font-size: 1.75em">{{levelList[2]['count']}}</p>
+                      <p>
+                        <span class="text-bold" style="font-size: 1.75em;">{{levelList[2]['count']}}</span>
+                        <span style="font-size: 1.3em;">&nbsp;({{levelList[2]['percent']}}%)</span>
+                      </p>
                     </v-flex>
                   </v-layout>
                 </v-card>
@@ -139,9 +148,9 @@
       </v-flex>
       <v-flex xs12>
         <v-layout wrap>
-          <v-flex md4 xs12 class="pa-2">
+          <v-flex md4 xs12 class="statistic-sbn pa-2">
             <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
-              <div class style="height: 38px; overflow: hidden;background: #fff">
+              <div class="wrap-filter" style="height: 38px; overflow: hidden;background: #fff">
                 <div class="background-triangle-big1">SỞ BAN NGÀNH</div>
                 <v-flex class="right">
                   <div class="agencyFilter agencyFilter1">
@@ -168,7 +177,7 @@
               ></apexchart>
               <!-- Hậu Giang -->
               <v-layout wrap align-center v-else class="pieChartHauGiang">
-                <v-flex md7 xs12>
+                <v-flex class="wrap-chart" sm7 xs12>
                   <apexchart
                     type="pie"
                     width=350 height=220
@@ -177,7 +186,7 @@
                     class=""
                   ></apexchart>
                 </v-flex>
-                <v-flex md5 xs12>
+                <v-flex sm5 xs12>
                   <v-layout wrap class="run-down">
                     <v-flex xs12 text-center>
                       <span style="color:#1976d2;">{{statisticTotalSBN.receivedCount}}</span>
@@ -197,9 +206,9 @@
               <!--  -->
             </div>
           </v-flex>
-          <v-flex md4 xs12 class="pt-2 pr-2 pb-2 pl-0">
+          <v-flex md4 xs12 class="statistic-qh pt-2 pr-2 pb-2 pl-0">
             <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
-              <div class style="height: 38px; overflow: hidden;">
+              <div class="wrap-filter" style="height: 38px; overflow: hidden;">
                 <div class="background-triangle-big1">HUYỆN/ THỊ XÃ/ THÀNH PHỐ</div>
                 <v-flex class="right">
                   <div class="agencyFilter agencyFilter2">
@@ -226,7 +235,7 @@
               ></apexchart>
               <!-- Hậu Giang -->
               <v-layout wrap align-center v-else class="pieChartHauGiang">
-                <v-flex md7 xs12>
+                <v-flex class="wrap-chart" sm7 xs12>
                   <apexchart
                     type="pie"
                     width=350 height=220
@@ -235,7 +244,7 @@
                     class=""
                   ></apexchart>
                 </v-flex>
-                <v-flex md5 xs12>
+                <v-flex sm5 xs12>
                   <v-layout wrap class="run-down">
                     <v-flex xs12 text-center>
                       <span style="color:#1976d2;">{{statisticTotalQuanHuyen.receivedCount}}</span>
@@ -255,9 +264,9 @@
               <!--  -->
             </div>
           </v-flex>
-          <v-flex md4 xs12 class="pt-2 pr-2 pb-2 pl-0">
+          <v-flex md4 xs12 class="statistic-xp pt-2 pr-2 pb-2 pl-0">
             <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
-              <div class style="height: 38px; overflow: hidden;">
+              <div class="wrap-filter" style="height: 38px; overflow: hidden;">
                 <div class="background-triangle-big1">XÃ/ PHƯỜNG/ THỊ TRẤN</div>
                 <v-flex class="right">
                   <div class="agencyFilter agencyFilter3">
@@ -285,7 +294,7 @@
                 ></apexchart>
                 <!-- Hậu Giang -->
                 <v-layout wrap align-center v-else class="pieChartHauGiang">
-                  <v-flex md7 xs12>
+                  <v-flex class="wrap-chart" sm7 xs12>
                     <apexchart
                       type="pie"
                       width=350 height=220
@@ -294,7 +303,7 @@
                       class=""
                     ></apexchart>
                   </v-flex>
-                  <v-flex md5 xs12>
+                  <v-flex sm5 xs12>
                     <v-layout wrap class="run-down">
                       <v-flex xs12 text-center>
                         <span style="color:#1976d2;">{{statisticTotalXaPhuong.receivedCount}}</span>
@@ -317,12 +326,13 @@
           </v-flex>
         </v-layout>
       </v-flex>
-      <v-flex xs12 class="pa-2">
+      <!-- Thống kê đơn vị theo tháng -->
+      <v-flex xs12 class="statistic-month pa-2">
         <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
           <div class="row-header" style="height: 38px; overflow: hidden;background: #fff">
-            <div class="background-triangle-big1" style="width: 228px;">THỐNG KÊ THEO THÁNG</div>
+            <div class="background-triangle-big1" style="width: 228px;">THỐNG KÊ ĐƠN VỊ THEO THÁNG</div>
             <v-layout wrap>
-              <v-flex md7>
+              <v-flex md7 class="filter-agency">
                 <div style="display: flex; align-items: center; height: 40px;">
                   <span
                     class="mx-3"
@@ -348,7 +358,7 @@
                   </v-menu>
                 </div>
               </v-flex>
-              <v-flex md5 class="text-right">
+              <v-flex md5 class="filter-time text-right">
                 <v-select
                   v-model="monthSelected"
                   :items="monthList"
@@ -396,9 +406,9 @@
               </v-flex>
             </v-layout>
           </div>
-          <v-layout wrap>
+          <v-layout wrap class="wrap-chart-month">
             <v-flex xs12 class="my-3 report__table" style="overflow: hidden;">
-              <apexchart v-if="!isTable && !isLoading" type="bar" :height="heightChart" width='100%'
+              <apexchart v-if="!isTable && !isLoading" type="bar" :height="heightChart" :width="widthBarChart"
                 :options="chartOptionsMonth" 
                 :series="statisticalMonth" 
                 :stacked="true"
@@ -567,6 +577,197 @@
           </v-layout>
         </div>
       </v-flex>
+      <!-- Thống kê lĩnh vực theo tháng -->
+      <v-flex xs12 class="statistic-month pa-2" v-if="showStatisticDomainMonth">
+        <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
+          <div class="row-header" style="height: 38px; overflow: hidden;background: #fff">
+            <div class="background-triangle-big1" style="width: 228px;">THỐNG KÊ LĨNH VỰC THEO THÁNG</div>
+            <v-layout wrap>
+              <v-flex xs12 class="filter-time text-right">
+                <v-select
+                  v-model="monthSelectedDomain"
+                  :items="monthList"
+                  style="width: 27%; display:inline-block; margin: 0 10px;"
+                  item-text="name"
+                  item-value="value"
+                ></v-select>
+                <v-select
+                  v-model="yearSelected3"
+                  :items="yearList"
+                  style="width: 27%; display:inline-block; margin: 0 10px;"
+                  item-text="name"
+                  item-value="value"
+                ></v-select>
+              </v-flex>
+            </v-layout>
+          </div>
+          <v-layout wrap class="wrap-chart-month">
+            <v-flex xs12 class="my-3 report__table" style="max-height: 500px; overflow-y: scroll; height: 800px;">
+              <v-flex xs12 class="text-center text-bold my-3">
+                BÁO CÁO TỔNG HỢP TÌNH HÌNH GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH <br/>
+                <span v-if="String(monthSelectedDomain) !== '0'">Tháng {{monthSelectedDomain}}</span> Năm {{yearSelected3}}
+              </v-flex>
+              <table class="my-2" hide-default-footer>
+                <thead>
+                  <tr>
+                    <th rowspan="3" class="text-center px-2">
+                      <span>STT</span>
+                    </th>
+                    <th rowspan="3" class="text-center px-2">
+                      <span>Lĩnh vực</span>
+                    </th>
+                    <th colspan="5" class="text-center px-2 py-1">
+                      <span>Nhận giải quyết</span>
+                    </th>
+                    <th colspan="7" class="text-center px-2">
+                      <span>Kết quả nhận giải quyết</span>
+                    </th>
+                    <th colspan="3" class="text-center px-2">
+                      <span>Đang giải quyết</span>
+                    </th>
+                    <th rowspan="3" style="text-align: center;" width="60" class="px-2">
+                      <span>Tạm dừng bổ sung điều kiện</span>
+                    </th>
+                    <!-- <th rowspan="3" style="text-align: center;" width="60" class="px-2">
+                      <span>Rút không giải quyết</span>
+                    </th> -->
+                    <th rowspan="3" style="text-align: center;" width="60" class="px-2">
+                      <span>Tỉ lệ sớm và đúng hạn</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th rowspan="2" class="text-center px-2 py-2">
+                      <span>Tổng số</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Tồn trước</span>
+                    </th>
+                    <th colspan="3" class="text-center px-2 py-1">
+                      <span>Nhận trong kì</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2 py-1">
+                      <span>Tổng số</span>
+                    </th>
+                    <th colspan="3" class="text-center px-2">
+                      <span>Tình hình thực hiện</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Từ chối giải quyết</span>
+                    </th>
+                    <th colspan="2" class="text-center px-2">
+                      <span>Trả kết quả</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Tổng số</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Còn hạn</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Quá hạn</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="text-center px-2">
+                      <span>Tổng số</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Một cửa</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Trực tuyến</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Trước hạn</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Đúng hạn</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Quá hạn</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Đã trả</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Chưa trả</span>
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr class="note__column">
+                    <td align="center" class="px-2">(1)</td>
+                    <td align="center" class="px-2">(2)</td>
+                    <td align="center" class="px-2">(3)</td>
+                    <td align="center" class="px-2">(4)</td>
+                    <td align="center" class="px-2">(5)</td>
+                    <td align="center" class="px-2">(6)</td>
+                    <td align="center" class="px-2">(7)</td>
+                    <td align="center" class="px-2">(8)</td>
+                    <td align="center" class="px-2">(9)</td>
+                    <td align="center" class="px-2">(10)</td>
+                    <td align="center" class="px-2">(11)</td>
+                    <td align="center" class="px-2">(12)</td>
+                    <td align="center" class="px-2">(13)</td>
+                    <td align="center" class="px-2">(14)</td>
+                    <td align="center" class="px-2">(15)</td>
+                    <td align="center" class="px-2">(16)</td>
+                    <td align="center" class="px-2">(17)</td>
+                    <td align="center" class="px-2">(18)</td>
+                    <td align="center" class="px-2">(19)</td>
+                    <!-- <td align="center" class="px-2">(20)</td> -->
+                  </tr>
+                  <tr v-for="(item,index) in danhSachThongKeThangLinhVuc" :key="index">
+                    <td align="center"  class="px-2">{{index + 1}}</td>
+                    <td align="left"  class="px-2" style="padding: 8px 10px;">{{item.domainName}}</td>
+                    <td align="center"  class="px-2">{{item.processCount}}</td>
+                    <td align="center"  class="px-2">{{item.remainingCount}}</td>
+                    <td align="center" class="px-2">{{item.receivedCount}}</td>
+                    <td align="center" class="px-2">{{item.onegateCount}}</td>
+                    <td align="center" class="px-2">{{item.onlineCount}}</td>
+                    <td align="center" class="px-2">{{item.releaseCount}}</td>
+                    <td align="center" class="px-2">{{item.betimesCount}}</td>
+                    <td align="center" class="px-2">{{item.ontimeCount}}</td>
+                    <td align="center" class="px-2">{{item.overtimeCount}}</td>
+                    <td align="center" class="px-2">{{item.unresolvedCount}}</td>
+                    <td align="center" class="px-2">{{item.doneCount}}</td>
+                    <td align="center" class="px-2">{{item.releasingCount}}</td>
+                    <td align="center" class="px-2">{{item.processingCount}}</td>
+                    <td align="center" class="px-2">{{item.undueCount}}</td>
+                    <td align="center" class="px-2">{{item.overdueCount}}</td>
+                    <td align="center" class="px-2">{{item.waitingCount}}</td>
+                    <!-- <td align="center" class="px-2">{{item.cancelledCount}}</td> -->
+                    <td align="center" class="px-2">{{item.ontimePercentage}}</td>
+                  </tr>
+                  <tr class="sum__column" style="font-weight: bold;">
+                    <td align="center" colspan="2">Tổng số</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_3']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_4']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_5']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_6']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_7']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_8']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_9']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_10']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_11']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_12']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_13']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_14']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_15']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_16']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_17']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_18']}}</td>
+                    <!-- <td align="center" class="px-2">{{domainTotalCounter['total_19']}}</td> -->
+                    <td align="center" class="px-2">{{domainTotalCounter['total_20']}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </v-flex>
+          </v-layout>
+        </div>
+      </v-flex>
+      <!--  -->
     </v-layout>
 
     <v-dialog v-model="dialogServiceInfo" fullscreen hide-overlay transition="fade-transition">
@@ -657,9 +858,9 @@ export default {
     listDonViXa: [],
     donViXa: 'total',
     levelList: [
-      {level: 2, count: "0", levelName: 2},
-      {level: 3, count: "0", levelName: 3},
-      {level: 4, count: "0", levelName: 4}
+      {level: 2, count: "0", levelName: 2, percent: "0%"},
+      {level: 3, count: "0", levelName: 3, percent: "0%"},
+      {level: 4, count: "0", levelName: 4, percent: "0%"}
     ],
     totalTTHC: 0,
     groupCode: "SBN",
@@ -667,6 +868,8 @@ export default {
     yearSelected: new Date().getFullYear(),
     yearSelected2: new Date().getFullYear(),
     monthSelected: new Date().getMonth() + 1,
+    monthSelectedDomain: new Date().getMonth() + 1,
+    yearSelected3: new Date().getFullYear(),
     distGroupSelected: "",
     isTable: false,
     statisticalYear: [0, 0],
@@ -743,13 +946,14 @@ export default {
       plotOptions: {
         bar: {
           barHeight: '100%',
-          horizontal: window.innerWidth < 600 ? false : true,
+          horizontal: window.innerWidth < 768 ? false : true,
           dataLabels: {
             hideOverflowingLabels: true
           }
         },
       },
       chart: {
+        height: 350,
         stacked: true,
         locales: [{
           "name": "en",
@@ -771,7 +975,12 @@ export default {
           formatter: function(val) {
             return val
           },
-          trim: false
+          rotate: -60,
+          style: {
+            fontSize: '11px'
+          },
+          trim: false,
+          maxHeight: 170
         },
         min: 1
       },
@@ -805,6 +1014,14 @@ export default {
             return val
           }
         }
+      },
+      legend: window.innerWidth < 768 ? {
+        position: 'top',
+        horizontalAlign: 'left',
+        offsetX: 0
+      } : {
+        position: 'bottom',
+        horizontalAlign: 'center'
       }
     },
     chartOptionsSoQuanXa: {
@@ -903,8 +1120,10 @@ export default {
     statisticTotalQuanHuyen: '',
     statisticTotalXaPhuong: '',
     danhSachThongKeThang: [],
+    danhSachThongKeThangLinhVuc: [],
     quanhuyenSelected: '',
     totalCounter: {},
+    domainTotalCounter: {},
     labelPieChartConfig: '',
     serviceInfoList: [],
     totalThuTuc: 0,
@@ -942,7 +1161,9 @@ export default {
     processingTotal: 0,
     processingSBN: 0,
     processingQuanHuyen: 0,
-    processingXaPhuong: 0
+    processingXaPhuong: 0,
+    widthBarChart: '100%',
+    showStatisticDomainMonth: true
   }),
   computed: {
     yearList() {
@@ -954,12 +1175,19 @@ export default {
       return arr;
     },
     heightChart() {
-      return this.statisticalMonth[0].data.length < 5 ? "300" : "auto";
+      return this.statisticalMonth[0].data.length < 5 ? "300" : (window.innerWidth <= 768 ? "600" : "auto");
     }
   },
   created() {
     let vm = this
     //
+    try {
+      if (window.innerWidth <= 768) {
+        vm.widthBarChart = 700
+      }
+    } catch (error) {
+      
+    }
     try {
       vm.thongKeHauGiang = thongKeHauGiang ? thongKeHauGiang : false
     } catch (error) {
@@ -973,17 +1201,24 @@ export default {
     } catch (error) {
       vm.labelPieChartConfig = ''
     }
+    try {
+      vm.showStatisticDomainMonth = showStatisticDomainMonth
+    } catch (error) {
+    }
     // 
     vm.groupCode = 'SBN'
     this.$nextTick(() => {
-      vm.getDictgroups('SBN');
-      vm.getDictgroups('QUAN_HUYEN');
-      vm.getDictgroups('XA_PHUONG');
-      // vm.getStatisticsYear();
-      vm.getStatisticsYearSBN();
-      vm.getStatisticsYearQUAN_HUYEN();
-      vm.getStatisticsYearXA_PHUONG();
-      vm.getStatisticsMonth(vm.groupCode);
+      vm.getDictgroups('SBN')
+      vm.getDictgroups('QUAN_HUYEN')
+      vm.getDictgroups('XA_PHUONG')
+      // vm.getStatisticsYear()
+      vm.getStatisticsYearSBN()
+      vm.getStatisticsYearQUAN_HUYEN()
+      vm.getStatisticsYearXA_PHUONG()
+      vm.getStatisticsMonth(vm.groupCode)
+      if (vm.showStatisticDomainMonth) {
+        vm.getDomainStatisticsMonth()
+      }
       vm.getLevelService()
       vm.sumReport()
     })
@@ -1020,6 +1255,14 @@ export default {
       } else {
         vm.getStatisticsMonth(this.groupCode)
       }
+    },
+    monthSelectedDomain() {
+      let vm = this
+      vm.getDomainStatisticsMonth()
+    },
+    yearSelected3() {
+      let vm = this
+      vm.getDomainStatisticsMonth()
     },
     // distGroupSelected(val) {
     //   let vm = this
@@ -1093,14 +1336,18 @@ export default {
         if (serializable.data) {
           let totalXXX = 0
           let result = serializable.data
+          let total = serializable.total
           for (let key in result) {
             totalXXX = totalXXX + parseInt(result[key]['count'])
             if (result[key]['level'] === 2) {
               vm.levelList[0]['count'] = result[key]['count']
+              vm.levelList[0]['percent'] = ((Number(result[key]['count'])/total)*100).toFixed(1)
             } else if (result[key]['level'] === 3) {
               vm.levelList[1]['count'] = result[key]['count']
+              vm.levelList[1]['percent'] = ((Number(result[key]['count'])/total)*100).toFixed(1)
             } else if (result[key]['level'] === 4) {
               vm.levelList[2]['count'] = result[key]['count']
+              vm.levelList[2]['percent'] = ((Number(result[key]['count'])/total)*100).toFixed(1)
             }
           }
           vm.totalTTHC = totalXXX
@@ -1528,6 +1775,78 @@ export default {
       vm.totalCounter['total_18'] = 0
       vm.totalCounter['total_19'] = 0
       vm.totalCounter['total_20'] = 0
+    },
+    getDomainStatisticsMonth() {
+      let vm = this
+      vm.isLoading = true
+      let originUrl = window.location.origin
+      let config =  {
+        url: originUrl + "/o/rest/statistics",
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId(),
+          Accept: "application/json"
+        },
+        params: {
+          agency: "total",
+          year: vm.yearSelected3,
+          month: vm.monthSelectedDomain
+        }
+      }
+      
+      axios
+        .request(config)
+        .then(function(response) {
+          vm.isLoading = false
+          if (response.data.data) {
+            vm.danhSachThongKeThangLinhVuc = response.data.data;
+            let currentData = response.data.data[0]
+            vm.danhSachThongKeThangLinhVuc.shift()
+            vm.domainTotalCounter['total_3'] = currentData.processCount
+            vm.domainTotalCounter['total_4'] = currentData.remainingCount
+            vm.domainTotalCounter['total_5'] = currentData.receivedCount
+            vm.domainTotalCounter['total_6'] = currentData.onegateCount
+            vm.domainTotalCounter['total_7'] = currentData.onlineCount
+            vm.domainTotalCounter['total_8'] = currentData.releaseCount
+            vm.domainTotalCounter['total_9'] = currentData.betimesCount
+            vm.domainTotalCounter['total_10'] = currentData.ontimeCount
+            vm.domainTotalCounter['total_11'] = currentData.overtimeCount
+            vm.domainTotalCounter['total_12'] = currentData.unresolvedCount
+            vm.domainTotalCounter['total_13'] = currentData.doneCount
+            vm.domainTotalCounter['total_14'] = currentData.releasingCount
+            vm.domainTotalCounter['total_15'] = currentData.processingCount
+            vm.domainTotalCounter['total_16'] = currentData.undueCount
+            vm.domainTotalCounter['total_17'] = currentData.overdueCount
+            vm.domainTotalCounter['total_18'] = currentData.waitingCount
+            vm.domainTotalCounter['total_19'] = currentData.cancelledCount
+            vm.domainTotalCounter['total_20'] = currentData.ontimePercentage
+          } else {
+            vm.setDomainTotalCounter()
+          }
+        })
+        .catch(function () {
+          vm.isLoading = false
+        })
+    },
+    setDomainTotalCounter () {
+      let vm = this
+      vm.domainTotalCounter['total_3'] = 0
+      vm.domainTotalCounter['total_4'] = 0
+      vm.domainTotalCounter['total_5'] = 0
+      vm.domainTotalCounter['total_6'] = 0
+      vm.domainTotalCounter['total_7'] = 0
+      vm.domainTotalCounter['total_8'] = 0
+      vm.domainTotalCounter['total_9'] = 0
+      vm.domainTotalCounter['total_10'] = 0
+      vm.domainTotalCounter['total_11'] = 0
+      vm.domainTotalCounter['total_12'] = 0
+      vm.domainTotalCounter['total_13'] = 0
+      vm.domainTotalCounter['total_14'] = 0
+      vm.domainTotalCounter['total_15'] = 0
+      vm.domainTotalCounter['total_16'] = 0
+      vm.domainTotalCounter['total_17'] = 0
+      vm.domainTotalCounter['total_18'] = 0
+      vm.domainTotalCounter['total_19'] = 0
+      vm.domainTotalCounter['total_20'] = 0
     },
     getLabelPieChartConfig () {
       let vm = this

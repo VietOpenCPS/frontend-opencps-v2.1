@@ -20,7 +20,7 @@
                       :items="agencyList"
                       v-model="agencyFilter"
                       item-text="text"
-                      item-value="value"
+                      item-value="code"
                       hide-details
                       hide-no-data
                       solo

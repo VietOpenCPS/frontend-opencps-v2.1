@@ -92,7 +92,6 @@
             item-value="serviceConfigId"
             return-object
             hide-no-data
-            :hide-selected="true"
             @change="changeServiceConfigs"
             clearable
             box
@@ -109,7 +108,6 @@
             item-value="processOptionId"
             return-object
             hide-no-data
-            :hide-selected="true"
             @change="changeDichVuConfigs"
             box
           ></v-autocomplete>
@@ -204,7 +202,7 @@
       <v-menu bottom v-if="getUser('Administrator_data')" style="position:relative !important">
         <v-btn slot="activator" color="red" dark>Go to &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
         <v-list>
-          <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_DONE'}, 0, true)" >
+          <!-- <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_DONE'}, 0, true)" >
             <v-list-tile-title>Hoàn thành</v-list-tile-title>
           </v-list-tile>
           <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_CANCEL'}, 0, true)">
@@ -212,7 +210,12 @@
           </v-list-tile>
           <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_DENY'}, 0, true)">
             <v-list-tile-title>Từ chối</v-list-tile-title>
+          </v-list-tile> -->
+
+          <v-list-tile v-for="(item, index) in stepCodeForGoTo" v-bind:key="index" @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_STEP', stepCode: item.stepCode, stepName: item.stepName}, 0, true)" >
+            <v-list-tile-title>{{item.stepName}}</v-list-tile-title>
           </v-list-tile>
+          
         </v-list>
       </v-menu>
       
@@ -465,7 +468,6 @@
                   item-value="processOptionId"
                   return-object
                   hide-no-data
-                  :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
                   :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn']"
                   @change="changeDichVuConfigs"
@@ -673,7 +675,6 @@
                   item-value="processOptionId"
                   return-object
                   hide-no-data
-                  :hide-selected="true"
                   :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
@@ -1111,6 +1112,12 @@ export default {
     hiddenFilterDomain: false,
     focusSelect: 0,
     srcDownloadIframe: '',
+    showOptionName: false,
+    stepCodeForGoTo: [
+      {stepName: 'Hoàn thành', stepCode: '400'},
+      {stepName: 'Rút hồ sơ', stepCode: '410'},
+      {stepName: 'Từ chối', stepCode: '420'}
+    ],
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       cmndHoChieu: (value) => {
@@ -1213,6 +1220,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.showOptionName = showOptionName
+    } catch (error) {
+    }
     vm.selectMultiplePage = []
     vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
     vm.$nextTick(function () {
@@ -1253,6 +1264,11 @@ export default {
         }
       } catch (error) {
       }
+      try {
+        if (stepCodeForGoTo) {
+          vm.stepCodeForGoTo = stepCodeForGoTo
+        }
+      } catch (error) {}
     })
   },
   updated () {
@@ -2082,6 +2098,9 @@ export default {
             } else {
               vm.dossierCounting = []
             }
+            if (vm.getUser('Administrator_data') && (!vm.dossierCounting || vm.dossierCounting.length == 0)) {
+              vm.dossierCounting = [{key: 'deleted', title: 'Hồ sơ đã xóa', count: 0}]
+            }
             vm.dossierCountingShow = true
           }).catch(function (){})
         }, 200)
@@ -2503,34 +2522,14 @@ export default {
           vm.doUndoDossier(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'RESTORE_DOSSIER') {
           vm.doRestoreDossier(dossierItem, item, index, isGroup)
-        } else if (String(item.form) === 'GOTO_DONE') {
+        } else if (String(item.form) === 'GOTO_STEP') {
           if (!dossierItem) {
             alert('Chọn hồ sơ để thực hiện')
             return
           }
           let result = {
-            stepCode: 400,
-            stepName: 'hoàn thành'
-          }
-          vm.gotoStep(dossierItem, result)
-        } else if (String(item.form) === 'GOTO_CANCEL') {
-          if (!dossierItem) {
-            alert('Chọn hồ sơ để thực hiện')
-            return
-          }
-          let result = {
-            stepCode: 410,
-            stepName: 'rút'
-          }
-          vm.gotoStep(dossierItem, result)
-        } else if (String(item.form) === 'GOTO_DENY') {
-          if (!dossierItem) {
-            alert('Chọn hồ sơ để thực hiện')
-            return
-          }
-          let result = {
-            stepCode: 420,
-            stepName: 'từ chối'
+            stepCode: item.stepCode,
+            stepName: item.stepName
           }
           vm.gotoStep(dossierItem, result)
         }
@@ -3019,6 +3018,10 @@ export default {
             query_redirect = Object.assign(query_redirect, {formActionGroup: JSON.stringify(vm.itemAction)})
             console.log('query_redirect_Landing', query_redirect)
           }
+          if (vm.itemAction['form'] === 'NEW' && vm.showOptionName) {
+            query_redirect = Object.assign(query_redirect, {optionName: vm.dichVuSelected['optionName']})
+            console.log('query_redirect_Landing', query_redirect)
+          }
           vm.$store.dispatch('postDossier', data).then(function (result) {
             vm.loadingAction = false
             vm.indexAction = -1
@@ -3293,22 +3296,36 @@ export default {
       let vm = this
       let currentQuery = vm.$router.history.current.query
       if (item.permission) {
-        if (item['originality'] === 9) {
-          if (vm.trangThaiHoSoList[vm.index]['id'].indexOf('CV_DI') !== -1) {
-            vm.$router.push({
-              path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV_DI/' + item.dossierId,
-              query: vm.$router.history.current.query
-            })
-          } else {
-            vm.$router.push({
-              path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV/' + item.dossierId,
-              query: vm.$router.history.current.query
-            })
-          }
-          
+        // check với hồ sơ trực tuyến BNG
+        if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('updateDossierDoAction') && vm.originality === 3
+          && item.dossierStatus === 'receiving' && item.online
+        ) {
+          currentQuery['template_no'] = item.dossierTemplateNo
+          currentQuery['serviceCode'] = item.serviceCode
+          currentQuery['updateDossierDoAction'] = vm.trangThaiHoSoList[vm.index]['tableConfig']['updateDossierDoAction']
+          vm.$router.push({
+            path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + item.dossierId + '/UPDATE',
+            query: currentQuery
+          })
         } else {
-          vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+          if (item['originality'] === 9) {
+            if (vm.trangThaiHoSoList[vm.index]['id'].indexOf('CV_DI') !== -1) {
+              vm.$router.push({
+                path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV_DI/' + item.dossierId,
+                query: vm.$router.history.current.query
+              })
+            } else {
+              vm.$router.push({
+                path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV/' + item.dossierId,
+                query: vm.$router.history.current.query
+              })
+            }
+            
+          } else {
+            vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+          }
         }
+        
       } else {
         if (item['originality'] === 1) {
           vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])

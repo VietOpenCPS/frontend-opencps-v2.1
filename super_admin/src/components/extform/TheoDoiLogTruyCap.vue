@@ -218,12 +218,14 @@
           </v-btn>
         </v-toolbar>
         <v-card-text class="py-1" >
-          <v-layout wrap class="py-1 align-center">
-            <v-flex xs12 sm6 class="px-2 data-request" style="height: 350px;">
-              <v-jsoneditor class="content-data" ref="editorData" v-model="dataRequest" :options="options" :plus="true" height="100%">
+          <v-layout wrap class="py-1">
+            <v-flex xs12 sm6 class="px-2 data-request" style="border: 1px solid #dedede;border-radius: 5px;padding-top: 10px;">
+              <p style="font-weight: bold;">Dữ liệu gửi:</p>
+              <vue-json-pretty :path="'res'" :data="dataRequest" > </vue-json-pretty>
             </v-flex>
-            <v-flex xs12 sm6 class="px-2 data-response" style="height: 350px;">
-              <v-jsoneditor class="content-data" ref="editorData" v-model="dataResponse" :options="options" :plus="true" height="100%">
+            <v-flex xs12 sm6 class="px-2 data-response" style="border: 1px solid #dedede;border-radius: 5px;padding-top: 10px;">
+              <p style="font-weight: bold;">Dữ liệu nhận:</p>
+              <vue-json-pretty :path="'res'" :data="dataResponse" > </vue-json-pretty>
             </v-flex>
           </v-layout>
         </v-card-text>
@@ -243,13 +245,12 @@
 import Vue from 'vue'
 import axios from "axios"
 import TinyPagination from './Pagination.vue'
-import VJsoneditor from 'v-jsoneditor'
-
-Vue.use(VJsoneditor)
+import VueJsonPretty from 'vue-json-pretty'
+import 'vue-json-pretty/lib/styles.css'
 export default {
   components: {
-    'tiny-pagination': TinyPagination,
-    VJsoneditor
+    VueJsonPretty,
+    'tiny-pagination': TinyPagination
   },
   data: () => ({
     fromDate: '',
@@ -329,8 +330,6 @@ export default {
         vm.dataResponse = {}
       }
       vm.dialog_dataInfo = true
-      $('.data-request .jsoneditor-menu').html('<div class="px-2 py-2">Dữ liệu gửi</div>')
-      $('.data-response .jsoneditor-menu').html('<div class="px-2 py-2">Dữ liệu nhận</div>')
     },
     searchSyncDossier () {
       let vm = this

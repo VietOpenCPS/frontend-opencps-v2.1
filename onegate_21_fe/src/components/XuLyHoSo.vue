@@ -556,7 +556,9 @@ export default {
                 //   filter.actionCode = vm.actionActive.action
                 // }
                 console.log('filterActionGroup1', filter)
-                vm.postAction(filter, vm.dossierSelected[key2], key2)
+                setTimeout(function() {
+                  vm.postAction(filter, vm.dossierSelected[key2], key2)
+                }, key2*200)
               }
             }
           }
@@ -569,7 +571,9 @@ export default {
                 actionUser: actionUser
               }
               console.log('filterActionGroup2', filter)
-              vm.postAction(filter, vm.dossierSelected[key], key)
+              setTimeout(function() {
+                vm.postAction(filter, vm.dossierSelected[key], key)
+              }, key*200)
             }
           }
         }
@@ -687,8 +691,6 @@ export default {
             vm.countProcessed += 1
             vm.activeNotify = true
             vm.dossierSelected[index]['statusAction'] = false
-            // console.log('countProcessed', vm.countProcessed)
-            // console.log('length', vm.dossierProcess.length)
             if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
               vm.dialog_statusAction = true
             } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
@@ -699,7 +701,6 @@ export default {
                 vm.goBack()
               }, 500)
             }
-            // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
           })
         }
       } else {
