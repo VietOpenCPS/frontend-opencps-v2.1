@@ -66,7 +66,102 @@ export const store = new Vuex.Store({
         })
       })
     },
-
+    loadVotingNew ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        commit('setLoading', true)
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get(state.endPointApi + '/postal/vote/' + data.className, param).then(result => {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              items = items.filter(function(item) {
+                return item.voteModel && item.voteModel['status'] == 1
+              })
+              let lengthQuestion = items.length
+              for (let index = 0; index < lengthQuestion; index++) {
+                if (items[index]['lstChoiceDetailModels']) {
+                  let listChoice = Array.isArray(items[index]['lstChoiceDetailModels']) ? items[index]['lstChoiceDetailModels'] : [items[index]['lstChoiceDetailModels']]
+                  items[index] = Object.assign(items[index]['voteModel'], {choices: listChoice})
+                } else {
+                  items[index] = Object.assign(items[index]['voteModel'], {choices: []})
+                }
+              }
+              console.log('itemResult', items)
+              resolve(items)
+            } else {
+              resolve([])
+            }
+            commit('setLoading', false)
+          }).catch(xhr => {
+            reject(xhr)
+            commit('setLoading', false)
+          })
+        })
+      })
+    },
+    loadVotingResult ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get(state.endPointApi + '/postal/vote/survey/statistic/voteResult?govAgencyCode=' + data.govAgencyCode, param).then(result => {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              items = items.filter(function (item) {
+                return item.govAgencyCode && item.voteCode
+              })
+              resolve(items)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    increCounter ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let params = new URLSearchParams()
+          params.append('dossierNo', data.dossierNo)
+          axios.post(state.endPointApi + '/postal/vote/survey/voteCount', params, config).then(result => {
+            resolve(result)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getCounter ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get(state.endPointApi + '/postal/vote/survey/voteCount', config).then(result => {
+            let counters = result && result.data && result.data['counter'] ? result.data['counter'] : 0
+            resolve(counters)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
     loadGovAgencys ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
@@ -179,6 +274,24 @@ export const store = new Vuex.Store({
         })
       })
     },
+    submitVotingNew ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let params = new URLSearchParams()
+          const config = {
+            headers: {
+              'groupId': state.initData.groupId
+            }
+          }
+          params.append('dossierNo', data.dossierNo)
+          axios.post(state.endPointApi + '/postal/vote/survey/question/' + data.voteId + '/choice/' + data.voteChoiceId, params, config).then(result => {
+            resolve(result.data)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
     loadingDataHoSo ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -214,7 +327,7 @@ export const store = new Vuex.Store({
       let year = (new Date()).getFullYear()
       let hours = (new Date()).getHours()
       let minutes = (new Date()).getMinutes()
-      let currentDate = (new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')} ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`)).getTime()
+      let currentDate = (new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`)).getTime()
       let token = md5('opencps' + currentDate)
       commit('setMd5Token', token)
     }

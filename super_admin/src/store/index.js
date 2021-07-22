@@ -1487,6 +1487,26 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getVotingListVer2 ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get(state.endPointApi + '/postal/vote/' + filter.className, param).then(function (response) {
+            let seriable = response.data
+            if (seriable) {
+              resolve(seriable)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
     updateVotings ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -1520,6 +1540,109 @@ export const store = new Vuex.Store({
         })
       })
     },
+    updateVotingsNew ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          var dataPostVoting = new URLSearchParams()
+          dataPostVoting.append('className', data.className ? data.className : '')
+          dataPostVoting.append('voteCode', data.voteCode ? data.voteCode : '')
+          dataPostVoting.append('title', data.title ? data.title : '')
+          dataPostVoting.append('description', data.description ? data.description : '')
+          dataPostVoting.append('status', data.status ? data.status : 0)
+          if (data.type === 'add') {
+            axios.post(state.endPointApi + '/postal/vote/' + data.className + '/question', dataPostVoting, options).then(function (response) {
+              if (data.choiceItems && data.choiceItems.length > 0) {
+                let count = 0
+                let lengthChoice = data.choiceItems.length
+                for (let index in data.choiceItems) {
+                  let dataChoice = Object.assign(data.choiceItems[index], {className: data.className,voteId: response.data.voteId})
+                  store.dispatch('createChoices', dataChoice).then(function () {
+                    count+=1
+                    if (count === lengthChoice) {
+                      resolve(response.data)
+                    }
+                  }).catch(function () {
+                    count+=1
+                    if (count === lengthChoice) {
+                      resolve(response.data)
+                    }
+                  })
+                }
+              } else {
+                resolve(response.data)
+              }
+            }).catch(function (error) {
+              reject(error)
+            })
+          } else {
+            axios.put(state.endPointApi + '/postal/vote/' + data.className + '/question/' + data.votingId, dataPostVoting, options).then(function (response) {
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+              commit('setsnackbarerror', true)
+            })
+          }
+        })
+      })
+    },
+    createChoices ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          var dataPostVoting = new URLSearchParams()
+          dataPostVoting.append('className', data.className ? data.className : '')
+          dataPostVoting.append('voteId', data.voteId ? data.voteId : '')
+          dataPostVoting.append('subject', data.subject ? data.subject : '')
+          dataPostVoting.append('sibling', data.sibling ? data.sibling : 1)
+          dataPostVoting.append('status', data.status ? data.status : 1),
+          dataPostVoting.append('votePoint', data.votePoint !== '' ? data.votePoint : '')
+          
+          axios.post(state.endPointApi + '/postal/vote/'+ data.className + '/choice', dataPostVoting, options).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+          })
+        
+        })
+      })
+    },
+    updateChoices ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          var dataPostVoting = new URLSearchParams()
+          dataPostVoting.append('voteId', data.voteId ? data.voteId : '')
+          dataPostVoting.append('subject', data.subject ? data.subject : '')
+          dataPostVoting.append('sibling', data.sibling ? data.sibling : 1)
+          dataPostVoting.append('votePoint', data.votePoint !== '' ? data.votePoint : '')
+          dataPostVoting.append('status', data.status !== '' ? data.status : '')
+
+          axios.put(state.endPointApi + '/postal/vote/' + data.className + '/choice/' + data.voteChoiceId, dataPostVoting, options).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            commit('setsnackbarerror', true)
+          })
+          
+        })
+      })
+    },
     deleteVotings ({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -1530,6 +1653,42 @@ export const store = new Vuex.Store({
             }
           }
           axios.delete(state.endPointApi + '/postal/votings/' + filter.votingId).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    deleteVotingsNew ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          axios.delete(state.endPointApi + '/postal/vote/'+ filter.className +'/question/' + filter.votingId).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    deleteChoiceNew ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          axios.delete(state.endPointApi + '/postal/vote/' + filter.className + '/choice/' + filter.voteChoiceId).then(function (response) {
             resolve(response.data)
           }).catch(function (error) {
             reject(error)

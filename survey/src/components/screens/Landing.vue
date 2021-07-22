@@ -1,6 +1,6 @@
 <template>
   <div :class="!isMobile ? 'pt-3' : 'pt-0'" style="max-width:1300px;height: 100%; background-color: #ffff;" >
-    <v-layout row wrap>
+    <v-layout row wrap v-if="surveyLayoutVersion !== 2">
       <v-flex xs12 md9 v-if="votingItems.length > 0">
         <v-layout row wrap>
           <v-flex xs12 sm12 class="mb-4 px-2" v-if="!isMobile">
@@ -26,22 +26,28 @@
                   <span class="d-block white--text" style="transform: skew(25deg)">Chỉ số {{index + 1}} : </span>
                 </div>
                 <div class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687">
-                  {{ item.subject }}
+                  {{ ksBgt ? item.title : item.subject }}
                 </div>
               </v-layout>
               <div class="text-bold px-2" v-if="isMobile">
                 <div class="" style="text-align: justify;color:#034687">
-                  Chỉ số {{index + 1}}: {{ item.subject }}
+                  Chỉ số {{index + 1}}: {{ ksBgt ? item.title : item.subject }}
                 </div>
               </div>
               <div :class="!isMobile ? 'ml-4' : 'ml-2'">
-                <div v-if="ksBgt && (index === 4 || index === 5 || index === 7 || index === 8)" class="mt-2">
+                <!-- <div v-if="ksBgt && (index === 4 || index === 5 || index === 7 || index === 8)" class="mt-2">
                   <span style="color: red">(*) </span> <i>Chỉ số giành cho cơ quan quản lý đánh giá</i>
                 </div>
                 <v-radio-group v-model="item.selected" column class="mt-1">
                   <v-radio :disabled="ksBgt && (index === 4 || index === 5 || index === 7 || index === 8)" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
-                    <div v-if="ksBgt && (index === 4 || index === 5 || index === 7 || index === 8)" style="text-align: justify; opacity: 0.7; color: black" slot="label">{{itemChoise}}</div>
-                    <div v-else style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{itemChoise}}</div>
+                    <div v-if="ksBgt && (index === 4 || index === 5 || index === 7 || index === 8)" style="text-align: justify; opacity: 0.7; color: black" slot="label">{{itemChoise.subject}}</div>
+                    <div v-else style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{ksBgt ? itemChoise.subject : itemChoise}}</div>
+                  </v-radio>
+                </v-radio-group> -->
+
+                <v-radio-group v-model="item.selected" column class="mt-1">
+                  <v-radio :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                    <div style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{ksBgt ? itemChoise.subject : itemChoise}}</div>
                   </v-radio>
                 </v-radio-group>
               </div>
@@ -111,7 +117,6 @@
                   v-model="agency"
                   item-text="govAgencyName"
                   item-value="govAgencyCode"
-                  @change="changeAgency()"
                   hide-details
                   hide-no-data
                   solo
@@ -128,7 +133,7 @@
                 ></v-progress-circular>
               </div>
               <div v-else>
-                <v-flex xs12 v-for="(item, index) in votingItems" :key="index" class="white--text mt-2">
+                <v-flex v-if="!ksBgt" xs12 v-for="(item, index) in votingItems" :key="index" class="white--text mt-2">
                   <v-layout row justify-center v-if="!ksBgt">
                     <v-flex xs7 class="text-xs-center">
                       <span>Chỉ số {{index + 1}}: </span>
@@ -138,8 +143,16 @@
                   <v-layout row justify-center v-else>
                     <v-flex xs7 class="text-xs-center">
                       <span>Chỉ số {{index + 1}}: </span>
-                      <!-- <span v-if="index === 4 || index === 5 || index === 7 || index === 8" style="color:#6dcff6">2 / 2 điểm</span> -->
                       <span style="color:#6dcff6">{{item.answersCount ? item.averageScore + ' / 2 điểm' : 'Chưa có đánh giá'}}</span>
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
+                <v-flex v-if="ksBgt" xs12 v-for="(item, index) in votingResult" :key="index" class="white--text mt-2">
+                  <v-layout row justify-center>
+                    <v-flex xs7 class="text-xs-center">
+                      <span>Chỉ số {{index + 1}}: </span>
+                      <!-- <span v-if="index === 4 || index === 5 || index === 7 || index === 8" style="color:#6dcff6">2 / 2 điểm</span> -->
+                      <span style="color:#6dcff6">{{item.point ? item.point + ' điểm' : 'Chưa có đánh giá'}}</span>
                     </v-flex>
                   </v-layout>
                 </v-flex>
@@ -169,6 +182,132 @@
       <v-flex xs12 sm1>
       </v-flex>
     </v-layout>
+    <div v-if="surveyLayoutVersion === 2" style="border: 2px solid #e9e9e9;border-radius: 5px;">
+      <v-tabs
+        color="white"
+        dark
+        icons-and-text
+      >
+        <v-tabs-slider color="blue"></v-tabs-slider>
+    
+        <v-tab href="#tab-1" class="ml-3 mr-4 black--text" >
+          <span style="font-size: 16px">THỰC HIỆN ĐÁNH GIÁ</span>
+          <v-icon class="black--text" size=26>done_all</v-icon>
+        </v-tab>
+    
+        <v-tab href="#tab-2" class="black--text">
+          <span style="font-size: 16px">KẾT QUẢ ĐÁNH GIÁ</span>
+          <v-icon class="black--text" size=26>ballot</v-icon>
+        </v-tab>
+    
+        <v-tab-item
+          value="tab-1"
+        >
+          <v-card flat>
+            <v-card-text class="mt-2">
+              <v-layout row wrap class="ml-2">
+                <v-flex xs12 sm12>
+                  <div v-for="(item, index) in votingItems" style="margin-bottom: 5px;" :key="index">
+                    <v-layout wrap class="text-bold" v-if="!isMobile">
+                      <div class="flex px-3 py-1" style="height:26px;max-width:87px;background-color: #034687;transform: skew(-25deg)">
+                        <span class="d-block white--text" style="transform: skew(25deg)">Chỉ số {{index + 1}} : </span>
+                      </div>
+                      <div class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687">
+                        {{ item.title}}
+                      </div>
+                    </v-layout>
+                    <div class="text-bold px-2" v-if="isMobile">
+                      <div class="" style="text-align: justify;color:#034687">
+                        Chỉ số {{index + 1}}: {{ item.title }}
+                      </div>
+                    </div>
+                    <div :class="!isMobile ? 'ml-4' : 'ml-2'">
+                    <v-radio-group v-model="item.selected" column class="mt-1">
+                      <v-radio :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                        <div style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{itemChoise.subject}}</div>
+                      </v-radio>
+                    </v-radio-group>
+                  </div>
+                </div>
+                <v-flex xs12 sm12 class="mx-2 my-3" v-if="showCaptcha">
+                  <div style="max-width: 400px;background: #dedede;margin: 0 auto;" class="pb-2">
+                    <v-flex xs12 class="py-2" style="
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    ">
+                      <div id="captcha" class="d-inline-block text-xs-center" style="padding-top: 15px;background: #fff;border-radius: 5px;"></div>
+                      <v-btn class="right ml-3 mx-0 my-0" title="refresh" flat icon v-on:click.native="createCaptcha">
+                        <v-icon color="primary" size="32">refresh</v-icon>
+                      </v-btn>
+                    </v-flex>
+                    <v-text-field
+                      class="mx-3"
+                      single-lines
+                      hide-details
+                      solo
+                      flat
+                      height="36"
+                      min-height="36"
+                      clearable
+                      v-model="captchaValue"
+                      placeholder="Nhập mã captcha"
+                    ></v-text-field>
+                  </div>
+                  
+                </v-flex>
+                <v-flex xs12 sm12 :class="!isMobile ? 'text-xs-left mt-2' : 'text-xs-left my-2 px-2'">
+                  <v-btn class="white--text" @click="showFormVerify" color="#004C98" :loading="btnLoading" :disabled="btnLoading">
+                    <v-icon>save</v-icon>&nbsp;
+                    Gửi đánh giá
+                  </v-btn>
+                </v-flex>
+              </v-flex>
+            </v-layout>
+            </v-card-text>
+          </v-card>
+        </v-tab-item>
+        <v-tab-item
+          value="tab-2"
+        >
+          <v-card flat>
+            <v-card-text class="reportTable">
+              <table class="my-2" hide-default-footer>
+                <thead>
+                  <tr>
+                    <th class="text-center px-2">
+                      <span>STT</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Chỉ số đánh giá</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Tiêu chí đánh giá</span>
+                    </th>
+                    <th class="text-center px-2 py-1">
+                      <span>Số điểm</span>
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody v-for="(item,index) in statisticGovAgency" :key="index">
+                  <tr>
+                    <td align="left" colspan="4"  class="px-2 text-bold">{{item.govAgencyName}}</td>
+                  </tr>
+                  
+                  <tr v-for="(item2,index2) in item['votings']" :key="index2">
+                    <td align="center" class="px-2">{{index2 + 1}}</td>
+                    <td align="left"  class="px-2">Chỉ số {{index2 + 1}}</td>
+                    <td align="left"  class="px-2">{{item2.title}}</td>
+                    <td align="center"  class="px-2">{{item2.point}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </v-card-text>
+          </v-card>
+        </v-tab-item>
+      </v-tabs>
+    </div>
     <v-dialog v-model="dialogVerify" persistent max-width="500">
       <v-card>
         <v-card-title class="headline">
@@ -236,7 +375,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialog_voting_result" fullscreen hide-overlay transition="dialog-bottom-transition">
+    <v-dialog v-if="!ksBgt" v-model="dialog_voting_result" fullscreen hide-overlay transition="dialog-bottom-transition">
       <v-card>
         <v-toolbar dark color="primary">
           <v-toolbar-title class="pl-5">Kết quả đánh giá</v-toolbar-title>
@@ -364,9 +503,12 @@ export default {
     dossierNo: '',
     dialogVerify: false,
     ksBgt: false,
+    surveyLayoutVersion: 1,
+    statisticGovAgency: [],
     agencyList: [],
     agency: '',
-    loadingChangeAgency: false
+    loadingChangeAgency: false,
+    votingResult: []
   }),
   computed: {
     loading () {
@@ -379,29 +521,54 @@ export default {
   created () {
     var vm = this
     try {
+      vm.surveyLayoutVersion = surveyLayoutVersion ? surveyLayoutVersion : 1
+    } catch (error) {
+    }
+    try {
       vm.ksBgt = ksBgt
     } catch (error) {
     }
     try {
       vm.agencyList = agencyList
-      vm.agency = vm.agencyList[0]
+      // vm.agency = vm.agencyList[0]
     } catch (error) {
     }
     vm.$nextTick(function () {
-      vm.$store.dispatch('loadVoting', {
-        className: 'survey',
-        classPk: 0
-      }).then(result => {
-        vm.votingItems = result
-        vm.totalAnswer = 0
-        for (let i = 0; i < vm.votingItems.length; i++) {
-          vm.totalAnswer += Number(vm.votingItems[i]['answersCount'])
-          vm.getPercentItem(vm.votingItems[i], i)
-        }
-        // vm.getPercentTotal(vm.votingItems)
-        console.log(vm.votingItems)
-      }).catch(xhr => {
-      })
+      if (vm.ksBgt) {
+        vm.$store.dispatch('loadVotingNew', {
+          className: 'survey'
+        }).then(function(result) {
+          vm.votingItems = result
+          let sortVote = function (voteList) {
+            function compare(a, b) {
+              if (a.voteCode < b.voteCode)
+                return -1
+              if (a.voteCode > b.voteCode)
+                return 1
+              return 0
+            }
+            return voteList.sort(compare)
+          }
+          vm.votingItems = sortVote(vm.votingItems)
+          vm.getReportAgency()
+        }).catch(xhr => {
+        })
+        vm.getCounter()
+      } else {
+        vm.$store.dispatch('loadVoting', {
+          className: 'survey',
+          classPk: 0
+        }).then(result => {
+          vm.votingItems = result
+          vm.totalAnswer = 0
+          for (let i = 0; i < vm.votingItems.length; i++) {
+            vm.totalAnswer += Number(vm.votingItems[i]['answersCount'])
+            vm.getPercentItem(vm.votingItems[i], i)
+          }
+        }).catch(xhr => {
+        })
+      }
+      
     })
   },
   watch: {
@@ -418,6 +585,7 @@ export default {
     showFormVerify () {
       let vm = this
       let valid = false
+      console.log('votingItems', vm.votingItems)
       for (let key in vm.votingItems) {
         if (String(vm.votingItems[key]['selected']) !== '0') {
           valid = true
@@ -456,7 +624,11 @@ export default {
       vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
         if (String(result.dossierNo) === String(vm.dossierNo)) {
           if (String(result.applicantIdNo) === String(vm.applicantIdNo)) {
-            vm.doVottingResultSubmit()
+            if (vm.ksBgt) {
+              vm.doVottingResultSubmitNew()
+            } else {
+              vm.doVottingResultSubmit()
+            }
           } else {
             toastr.error('Hồ sơ ' + vm.dossierNo + ' không phải hồ sơ quý khách đã đăng ký. Quý khách vui lòng kiểm tra lại.')
           }
@@ -465,6 +637,19 @@ export default {
         }
       }).catch(function () {
         toastr.error('Hồ sơ ' + vm.dossierNo + ' không tồn tại. Quý khách vui lòng kiểm tra lại.')
+      })
+    },
+    increCounter () {
+      let vm = this
+      let data = {
+        dossierNo: vm.dossierNo
+      }
+      vm.$store.dispatch('increCounter', data).then(function (result) {})
+    },
+    getCounter () {
+      let vm = this
+      vm.$store.dispatch('getCounter',{}).then(function (result) {
+        vm.totalAnswer = result
       })
     },
     doVottingResultSubmit () {
@@ -504,6 +689,57 @@ export default {
               vm.getPercentItem(vm.votingItems[i], i)
             }
             // vm.getPercentTotal(vm.votingItems)
+          }).catch( function () {
+          })
+        }).catch(xhr => {
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          vm.btnLoading = false
+        })
+      } else {
+        vm.btnLoading = false
+        toastr.error('Bạn chưa chọn đánh giá nào')
+      }
+      
+    },
+    doVottingResultSubmitNew () {
+      var vm = this
+      vm.btnLoading = true
+      let arrAction = []
+      let valid = false
+      for (var key in vm.votingItems) {
+        vm.votingItems[key]['className'] = 'survey'
+        if (String(vm.votingItems[key]['selected']) !== '0') {
+          valid = true
+          let indexChoice = vm.votingItems[key]['selected'] - 1
+          // if (key == 0 || key == 1 || key == 2 || key == 3 || key == 6) {
+            arrAction.push(vm.$store.dispatch('submitVotingNew', Object.assign(vm.votingItems[key]['choices'][indexChoice], {dossierNo: vm.dossierNo})))
+          // }
+        }
+      }
+      if (valid) {
+        Promise.all(arrAction).then(results => {
+          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          vm.increCounter()
+          vm.dialogVerify = false
+          vm.createCaptcha()
+          vm.captchaValue = ''
+          vm.btnLoading = false
+          vm.$store.dispatch('loadVotingNew', {
+            className: 'survey'
+          }).then(result => {
+            vm.votingItems = result
+            let sortVote = function (voteList) {
+              function compare(a, b) {
+                if (a.voteCode < b.voteCode)
+                  return -1
+                if (a.voteCode > b.voteCode)
+                  return 1
+                return 0
+              }
+              return voteList.sort(compare)
+            }
+            vm.votingItems = sortVote(vm.votingItems)
+            vm.getReportAgency()
           }).catch( function () {
           })
         }).catch(xhr => {
@@ -649,8 +885,71 @@ export default {
       let vm = this
       vm.loadingChangeAgency = true
       setTimeout(function () {
-        vm.loadingChangeAgency = false
+        vm.$store.dispatch('loadVotingResult', {
+          govAgencyCode: vm.agency ? vm.agency['govAgencyCode'] : ''
+        }).then(result => {
+          vm.votingResult = []
+          vm.votingItems.forEach(element => {
+            let itemPoint = element
+            if (result && result.length > 0) {
+              let kq = result.filter(function (item) {
+                return item.voteCode == element.voteCode
+              })
+              if (kq && kq.length > 0) {
+                itemPoint['point'] = kq[0]['point']
+              } else {
+                itemPoint['point'] = 0
+              }
+            } else {
+              itemPoint['point'] = 0
+            }
+            vm.votingResult.push(itemPoint)
+          })
+          vm.loadingChangeAgency = false
+        }).catch(xhr => {
+          vm.loadingChangeAgency = false
+        })
       }, 500)
+    },
+    getReportAgency () {
+      let vm = this
+      vm.$store.dispatch('loadVotingResult', {
+        govAgencyCode: ''
+      }).then(function(result) {
+        let voteStatistic = result
+        let sortVote = function (voteList) {
+          function compare(a, b) {
+            if (a.voteCode < b.voteCode)
+              return -1
+            if (a.voteCode > b.voteCode)
+              return 1
+            return 0
+          }
+          return voteList.sort(compare)
+        }
+        voteStatistic = sortVote(voteStatistic)
+        if (voteStatistic && voteStatistic.length) {
+          let statistic = []
+          voteStatistic.forEach(element => {
+            let indexSt = statistic.findIndex(function(st) {
+              return st.govAgencyCode == element.govAgencyCode
+            })
+            if (indexSt >= 0) {
+              statistic[indexSt]['votings'].push(element)
+            } else {
+              let itemSt = {
+                govAgencyCode: element.govAgencyCode,
+                govAgencyName: element.govAgencyName,
+                votings: [element]
+              }
+              statistic.push(itemSt)
+            }
+          })
+          vm.statisticGovAgency = statistic
+          console.log('statisticGovAgency', vm.statisticGovAgency)
+        }
+      }).catch(xhr => {
+      })
     },
     validateCaptcha () {
       let vm = this

@@ -5,7 +5,7 @@ import NotFound from '@/components/NotFound'
 import LandingReportCharts from '@/components/screens/Landing'
 import LandingDanhGia from '@/components/screens/ThongKeDanhGiaHoSo'
 import ThongKeDanhGiaHaiLong from '@/components/screens/ThongKeDanhGiaHaiLong'
-import ThongKeChiSoDanhGia from '@/components/screens/ThongKeChiSoDanhGia'
+import ThongKeChiSoDanhGia from '@/components/screens/ThongKeChiSoDanhGiaNew'
 import ThongKeDanhGiaCanBo from '@/components/screens/ThongKeDanhGiaCanBo'
 import ThongKeTinhHinhGiaiQuyet from '@/components/screens/ThongKeTinhHinhGiaiQuyet'
 

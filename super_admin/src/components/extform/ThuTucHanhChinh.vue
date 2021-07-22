@@ -574,7 +574,8 @@ export default {
           administration: vm.govAgencyFilter,
           domain: vm.domainFilter,
           level: vm.levelFilter,
-          keyword: vm.keyword
+          keyword: vm.keyword,
+          all: true
         }
       }
       axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {

@@ -1283,7 +1283,8 @@ export default {
             dossierNo: vm.thongTinHoSo.dossierNo,
             submitDate: vm.thongTinHoSo.submitDate,
             govAgencyCode: vm.thongTinHoSo.govAgencyCode,
-            govAgencyName: vm.thongTinHoSo.govAgencyName
+            govAgencyName: vm.thongTinHoSo.govAgencyName,
+            dossierTemplateNo: vm.thongTinHoSo.dossierTemplateNo
           }
           if (vm.thongTinHoSo.dossierStatus === '' || vm.thongTinHoSo.dossierStatus === 'new') {
             paramsEmbed = Object.assign(paramsEmbed, {
@@ -1626,7 +1627,8 @@ export default {
           dossierNo: vm.thongTinHoSo.dossierNo,
           submitDate: vm.thongTinHoSo.submitDate,
           govAgencyCode: vm.thongTinHoSo.govAgencyCode,
-          govAgencyName: vm.thongTinHoSo.govAgencyName
+          govAgencyName: vm.thongTinHoSo.govAgencyName,
+          dossierTemplateNo: vm.thongTinHoSo.dossierTemplateNo
         }
         if (vm.thongTinHoSo.dossierStatus === '' || vm.thongTinHoSo.dossierStatus === 'new') {
           paramsEmbed = Object.assign(paramsEmbed, {

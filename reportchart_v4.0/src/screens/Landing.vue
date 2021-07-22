@@ -326,10 +326,11 @@
           </v-flex>
         </v-layout>
       </v-flex>
+      <!-- Thống kê đơn vị theo tháng -->
       <v-flex xs12 class="statistic-month pa-2">
         <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
           <div class="row-header" style="height: 38px; overflow: hidden;background: #fff">
-            <div class="background-triangle-big1" style="width: 228px;">THỐNG KÊ THEO THÁNG</div>
+            <div class="background-triangle-big1" style="width: 228px;">THỐNG KÊ ĐƠN VỊ THEO THÁNG</div>
             <v-layout wrap>
               <v-flex md7 class="filter-agency">
                 <div style="display: flex; align-items: center; height: 40px;">
@@ -576,6 +577,197 @@
           </v-layout>
         </div>
       </v-flex>
+      <!-- Thống kê lĩnh vực theo tháng -->
+      <v-flex xs12 class="statistic-month pa-2" v-if="showStatisticDomainMonth">
+        <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
+          <div class="row-header" style="height: 38px; overflow: hidden;background: #fff">
+            <div class="background-triangle-big1" style="width: 228px;">THỐNG KÊ LĨNH VỰC THEO THÁNG</div>
+            <v-layout wrap>
+              <v-flex xs12 class="filter-time text-right">
+                <v-select
+                  v-model="monthSelectedDomain"
+                  :items="monthList"
+                  style="width: 27%; display:inline-block; margin: 0 10px;"
+                  item-text="name"
+                  item-value="value"
+                ></v-select>
+                <v-select
+                  v-model="yearSelected3"
+                  :items="yearList"
+                  style="width: 27%; display:inline-block; margin: 0 10px;"
+                  item-text="name"
+                  item-value="value"
+                ></v-select>
+              </v-flex>
+            </v-layout>
+          </div>
+          <v-layout wrap class="wrap-chart-month">
+            <v-flex xs12 class="my-3 report__table" style="max-height: 500px; overflow-y: scroll; height: 800px;">
+              <v-flex xs12 class="text-center text-bold my-3">
+                BÁO CÁO TỔNG HỢP TÌNH HÌNH GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH <br/>
+                <span v-if="String(monthSelectedDomain) !== '0'">Tháng {{monthSelectedDomain}}</span> Năm {{yearSelected3}}
+              </v-flex>
+              <table class="my-2" hide-default-footer>
+                <thead>
+                  <tr>
+                    <th rowspan="3" class="text-center px-2">
+                      <span>STT</span>
+                    </th>
+                    <th rowspan="3" class="text-center px-2">
+                      <span>Lĩnh vực</span>
+                    </th>
+                    <th colspan="5" class="text-center px-2 py-1">
+                      <span>Nhận giải quyết</span>
+                    </th>
+                    <th colspan="7" class="text-center px-2">
+                      <span>Kết quả nhận giải quyết</span>
+                    </th>
+                    <th colspan="3" class="text-center px-2">
+                      <span>Đang giải quyết</span>
+                    </th>
+                    <th rowspan="3" style="text-align: center;" width="60" class="px-2">
+                      <span>Tạm dừng bổ sung điều kiện</span>
+                    </th>
+                    <!-- <th rowspan="3" style="text-align: center;" width="60" class="px-2">
+                      <span>Rút không giải quyết</span>
+                    </th> -->
+                    <th rowspan="3" style="text-align: center;" width="60" class="px-2">
+                      <span>Tỉ lệ sớm và đúng hạn</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th rowspan="2" class="text-center px-2 py-2">
+                      <span>Tổng số</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Tồn trước</span>
+                    </th>
+                    <th colspan="3" class="text-center px-2 py-1">
+                      <span>Nhận trong kì</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2 py-1">
+                      <span>Tổng số</span>
+                    </th>
+                    <th colspan="3" class="text-center px-2">
+                      <span>Tình hình thực hiện</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Từ chối giải quyết</span>
+                    </th>
+                    <th colspan="2" class="text-center px-2">
+                      <span>Trả kết quả</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Tổng số</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Còn hạn</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Quá hạn</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="text-center px-2">
+                      <span>Tổng số</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Một cửa</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Trực tuyến</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Trước hạn</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Đúng hạn</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Quá hạn</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Đã trả</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Chưa trả</span>
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr class="note__column">
+                    <td align="center" class="px-2">(1)</td>
+                    <td align="center" class="px-2">(2)</td>
+                    <td align="center" class="px-2">(3)</td>
+                    <td align="center" class="px-2">(4)</td>
+                    <td align="center" class="px-2">(5)</td>
+                    <td align="center" class="px-2">(6)</td>
+                    <td align="center" class="px-2">(7)</td>
+                    <td align="center" class="px-2">(8)</td>
+                    <td align="center" class="px-2">(9)</td>
+                    <td align="center" class="px-2">(10)</td>
+                    <td align="center" class="px-2">(11)</td>
+                    <td align="center" class="px-2">(12)</td>
+                    <td align="center" class="px-2">(13)</td>
+                    <td align="center" class="px-2">(14)</td>
+                    <td align="center" class="px-2">(15)</td>
+                    <td align="center" class="px-2">(16)</td>
+                    <td align="center" class="px-2">(17)</td>
+                    <td align="center" class="px-2">(18)</td>
+                    <td align="center" class="px-2">(19)</td>
+                    <!-- <td align="center" class="px-2">(20)</td> -->
+                  </tr>
+                  <tr v-for="(item,index) in danhSachThongKeThangLinhVuc" :key="index">
+                    <td align="center"  class="px-2">{{index + 1}}</td>
+                    <td align="left"  class="px-2" style="padding: 8px 10px;">{{item.domainName}}</td>
+                    <td align="center"  class="px-2">{{item.processCount}}</td>
+                    <td align="center"  class="px-2">{{item.remainingCount}}</td>
+                    <td align="center" class="px-2">{{item.receivedCount}}</td>
+                    <td align="center" class="px-2">{{item.onegateCount}}</td>
+                    <td align="center" class="px-2">{{item.onlineCount}}</td>
+                    <td align="center" class="px-2">{{item.releaseCount}}</td>
+                    <td align="center" class="px-2">{{item.betimesCount}}</td>
+                    <td align="center" class="px-2">{{item.ontimeCount}}</td>
+                    <td align="center" class="px-2">{{item.overtimeCount}}</td>
+                    <td align="center" class="px-2">{{item.unresolvedCount}}</td>
+                    <td align="center" class="px-2">{{item.doneCount}}</td>
+                    <td align="center" class="px-2">{{item.releasingCount}}</td>
+                    <td align="center" class="px-2">{{item.processingCount}}</td>
+                    <td align="center" class="px-2">{{item.undueCount}}</td>
+                    <td align="center" class="px-2">{{item.overdueCount}}</td>
+                    <td align="center" class="px-2">{{item.waitingCount}}</td>
+                    <!-- <td align="center" class="px-2">{{item.cancelledCount}}</td> -->
+                    <td align="center" class="px-2">{{item.ontimePercentage}}</td>
+                  </tr>
+                  <tr class="sum__column" style="font-weight: bold;">
+                    <td align="center" colspan="2">Tổng số</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_3']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_4']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_5']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_6']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_7']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_8']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_9']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_10']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_11']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_12']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_13']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_14']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_15']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_16']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_17']}}</td>
+                    <td align="center" class="px-2">{{domainTotalCounter['total_18']}}</td>
+                    <!-- <td align="center" class="px-2">{{domainTotalCounter['total_19']}}</td> -->
+                    <td align="center" class="px-2">{{domainTotalCounter['total_20']}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </v-flex>
+          </v-layout>
+        </div>
+      </v-flex>
+      <!--  -->
     </v-layout>
 
     <v-dialog v-model="dialogServiceInfo" fullscreen hide-overlay transition="fade-transition">
@@ -676,6 +868,8 @@ export default {
     yearSelected: new Date().getFullYear(),
     yearSelected2: new Date().getFullYear(),
     monthSelected: new Date().getMonth() + 1,
+    monthSelectedDomain: new Date().getMonth() + 1,
+    yearSelected3: new Date().getFullYear(),
     distGroupSelected: "",
     isTable: false,
     statisticalYear: [0, 0],
@@ -926,8 +1120,10 @@ export default {
     statisticTotalQuanHuyen: '',
     statisticTotalXaPhuong: '',
     danhSachThongKeThang: [],
+    danhSachThongKeThangLinhVuc: [],
     quanhuyenSelected: '',
     totalCounter: {},
+    domainTotalCounter: {},
     labelPieChartConfig: '',
     serviceInfoList: [],
     totalThuTuc: 0,
@@ -966,7 +1162,8 @@ export default {
     processingSBN: 0,
     processingQuanHuyen: 0,
     processingXaPhuong: 0,
-    widthBarChart: '100%'
+    widthBarChart: '100%',
+    showStatisticDomainMonth: true
   }),
   computed: {
     yearList() {
@@ -1004,17 +1201,24 @@ export default {
     } catch (error) {
       vm.labelPieChartConfig = ''
     }
+    try {
+      vm.showStatisticDomainMonth = showStatisticDomainMonth
+    } catch (error) {
+    }
     // 
     vm.groupCode = 'SBN'
     this.$nextTick(() => {
-      vm.getDictgroups('SBN');
-      vm.getDictgroups('QUAN_HUYEN');
-      vm.getDictgroups('XA_PHUONG');
-      // vm.getStatisticsYear();
-      vm.getStatisticsYearSBN();
-      vm.getStatisticsYearQUAN_HUYEN();
-      vm.getStatisticsYearXA_PHUONG();
-      vm.getStatisticsMonth(vm.groupCode);
+      vm.getDictgroups('SBN')
+      vm.getDictgroups('QUAN_HUYEN')
+      vm.getDictgroups('XA_PHUONG')
+      // vm.getStatisticsYear()
+      vm.getStatisticsYearSBN()
+      vm.getStatisticsYearQUAN_HUYEN()
+      vm.getStatisticsYearXA_PHUONG()
+      vm.getStatisticsMonth(vm.groupCode)
+      if (vm.showStatisticDomainMonth) {
+        vm.getDomainStatisticsMonth()
+      }
       vm.getLevelService()
       vm.sumReport()
     })
@@ -1051,6 +1255,14 @@ export default {
       } else {
         vm.getStatisticsMonth(this.groupCode)
       }
+    },
+    monthSelectedDomain() {
+      let vm = this
+      vm.getDomainStatisticsMonth()
+    },
+    yearSelected3() {
+      let vm = this
+      vm.getDomainStatisticsMonth()
     },
     // distGroupSelected(val) {
     //   let vm = this
@@ -1563,6 +1775,78 @@ export default {
       vm.totalCounter['total_18'] = 0
       vm.totalCounter['total_19'] = 0
       vm.totalCounter['total_20'] = 0
+    },
+    getDomainStatisticsMonth() {
+      let vm = this
+      vm.isLoading = true
+      let originUrl = window.location.origin
+      let config =  {
+        url: originUrl + "/o/rest/statistics",
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId(),
+          Accept: "application/json"
+        },
+        params: {
+          agency: "total",
+          year: vm.yearSelected3,
+          month: vm.monthSelectedDomain
+        }
+      }
+      
+      axios
+        .request(config)
+        .then(function(response) {
+          vm.isLoading = false
+          if (response.data.data) {
+            vm.danhSachThongKeThangLinhVuc = response.data.data;
+            let currentData = response.data.data[0]
+            vm.danhSachThongKeThangLinhVuc.shift()
+            vm.domainTotalCounter['total_3'] = currentData.processCount
+            vm.domainTotalCounter['total_4'] = currentData.remainingCount
+            vm.domainTotalCounter['total_5'] = currentData.receivedCount
+            vm.domainTotalCounter['total_6'] = currentData.onegateCount
+            vm.domainTotalCounter['total_7'] = currentData.onlineCount
+            vm.domainTotalCounter['total_8'] = currentData.releaseCount
+            vm.domainTotalCounter['total_9'] = currentData.betimesCount
+            vm.domainTotalCounter['total_10'] = currentData.ontimeCount
+            vm.domainTotalCounter['total_11'] = currentData.overtimeCount
+            vm.domainTotalCounter['total_12'] = currentData.unresolvedCount
+            vm.domainTotalCounter['total_13'] = currentData.doneCount
+            vm.domainTotalCounter['total_14'] = currentData.releasingCount
+            vm.domainTotalCounter['total_15'] = currentData.processingCount
+            vm.domainTotalCounter['total_16'] = currentData.undueCount
+            vm.domainTotalCounter['total_17'] = currentData.overdueCount
+            vm.domainTotalCounter['total_18'] = currentData.waitingCount
+            vm.domainTotalCounter['total_19'] = currentData.cancelledCount
+            vm.domainTotalCounter['total_20'] = currentData.ontimePercentage
+          } else {
+            vm.setDomainTotalCounter()
+          }
+        })
+        .catch(function () {
+          vm.isLoading = false
+        })
+    },
+    setDomainTotalCounter () {
+      let vm = this
+      vm.domainTotalCounter['total_3'] = 0
+      vm.domainTotalCounter['total_4'] = 0
+      vm.domainTotalCounter['total_5'] = 0
+      vm.domainTotalCounter['total_6'] = 0
+      vm.domainTotalCounter['total_7'] = 0
+      vm.domainTotalCounter['total_8'] = 0
+      vm.domainTotalCounter['total_9'] = 0
+      vm.domainTotalCounter['total_10'] = 0
+      vm.domainTotalCounter['total_11'] = 0
+      vm.domainTotalCounter['total_12'] = 0
+      vm.domainTotalCounter['total_13'] = 0
+      vm.domainTotalCounter['total_14'] = 0
+      vm.domainTotalCounter['total_15'] = 0
+      vm.domainTotalCounter['total_16'] = 0
+      vm.domainTotalCounter['total_17'] = 0
+      vm.domainTotalCounter['total_18'] = 0
+      vm.domainTotalCounter['total_19'] = 0
+      vm.domainTotalCounter['total_20'] = 0
     },
     getLabelPieChartConfig () {
       let vm = this
