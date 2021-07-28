@@ -16,13 +16,13 @@
                   <span>Đối chiếu thông tin doanh nghiệp</span>
                 </v-tooltip>
                 <v-card-text :class="originality === 3 && thongTinChuHoSo.userType === '2' && traCuuLgsp ? 'pt-0' : 'pt-3'">
-                  <!-- <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '2' && traCuuLgsp">
+                  <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '2' && traCuuLgsp">
                     <v-btn class="mx-0" color="primary" @click.stop="showDialogSearchLgspDoanhNghiep()">
                       <v-icon>fas fa fa-search-plus</v-icon> &nbsp;
                       Tra cứu CSDL Quốc Gia
                     </v-btn>
-                  </v-flex> -->
-                  <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '1' && traCuuLgspCongDan">
+                  </v-flex>
+                  <!-- <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '1' && traCuuLgspCongDan">
                     <v-btn :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
                       <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
                       <v-progress-circular :size="24" v-if="loadingSearchLgsp"
@@ -32,7 +32,7 @@
                       <span v-if="!loadingSearchLgsp">Kiểm tra thông tin công dân</span>
                       <span v-if="loadingSearchLgsp">Đang kiểm tra thông tin công dân</span>
                     </v-btn>
-                  </v-flex>
+                  </v-flex> -->
                   <v-layout wrap>
                     <v-flex xs12 v-if="originality == '3' && thongTinChuHoSo.userType == '1' && traCuuLgspCongDan && warningLgsp" class="mb-2">
                       <v-alert

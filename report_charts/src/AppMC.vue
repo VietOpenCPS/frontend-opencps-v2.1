@@ -16,7 +16,19 @@
           </v-btn>
           <span>Theo dõi tình hình giải quyết</span>
         </v-tooltip>
-        <v-menu left offset-x open-on-hover>
+        <v-tooltip left>
+          <v-btn slot="activator" flat icon color="teal" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('thong-ke#/danh-gia-hai-long')">
+            <v-icon size="20">assignment_turned_in</v-icon>
+          </v-btn>
+          <span>Đánh giá DVC mức độ 3, 4</span>
+        </v-tooltip>
+        <v-tooltip left>
+          <v-btn slot="activator" flat icon color="orange" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('thong-ke#/chi-so-danh-gia')">
+            <v-icon size="20">assignment_turned_in</v-icon>
+          </v-btn>
+          <span>Chỉ số đánh giá giải quyết TTHC</span>
+        </v-tooltip>
+        <!-- <v-menu left offset-x open-on-hover>
           <v-btn slot="activator" flat icon color="teal" class="mx-0 my-0" style="width: 32px;height:32px">
             <v-icon size="20">assignment_turned_in</v-icon>
           </v-btn>
@@ -29,7 +41,7 @@
               <v-list-tile-title @click="goTo('thong-ke#/chi-so-danh-gia')">Chỉ số đánh giá giải quyết TTHC</v-list-tile-title>
             </v-list-tile>
           </v-list>
-        </v-menu>
+        </v-menu> -->
         <!-- <v-tooltip left>
           <v-btn slot="activator" flat icon color="orange" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('tra-cuu-ho-so')">
             <v-icon size="20">search</v-icon>

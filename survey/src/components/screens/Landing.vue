@@ -587,7 +587,7 @@ export default {
       let valid = false
       console.log('votingItems', vm.votingItems)
       for (let key in vm.votingItems) {
-        if (String(vm.votingItems[key]['selected']) !== '0') {
+        if (vm.votingItems[key]['selected'] && String(vm.votingItems[key]['selected']) !== '0') {
           valid = true
         }
       }
@@ -660,7 +660,7 @@ export default {
       for (var key in vm.votingItems) {
         vm.votingItems[key]['className'] = 'survey' 
         vm.votingItems[key]['classPk'] = 0
-        if (String(vm.votingItems[key]['selected']) !== '0') {
+        if (vm.votingItems[key]['selected'] && String(vm.votingItems[key]['selected']) !== '0') {
           valid = true
           if (vm.ksBgt) {
             if (key == 0 || key == 1 || key == 2 || key == 3 || key == 6) {
@@ -708,12 +708,10 @@ export default {
       let valid = false
       for (var key in vm.votingItems) {
         vm.votingItems[key]['className'] = 'survey'
-        if (String(vm.votingItems[key]['selected']) !== '0') {
+        if (vm.votingItems[key]['selected']) {
           valid = true
           let indexChoice = vm.votingItems[key]['selected'] - 1
-          // if (key == 0 || key == 1 || key == 2 || key == 3 || key == 6) {
-            arrAction.push(vm.$store.dispatch('submitVotingNew', Object.assign(vm.votingItems[key]['choices'][indexChoice], {dossierNo: vm.dossierNo})))
-          // }
+          arrAction.push(vm.$store.dispatch('submitVotingNew', Object.assign(vm.votingItems[key]['choices'][indexChoice], {dossierNo: vm.dossierNo})))
         }
       }
       if (valid) {

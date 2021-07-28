@@ -2,9 +2,9 @@
   <v-app>
     <v-content v-if="!isKeToan">
 
-      <v-btn color="primary" fab small dark @click="drawer = !drawer" class="show-draw">
+      <!-- <v-btn color="primary" fab small dark @click="drawer = !drawer" class="show-draw">
         <v-icon>list</v-icon>
-      </v-btn>
+      </v-btn> -->
 
       <router-view></router-view>
 

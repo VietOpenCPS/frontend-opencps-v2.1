@@ -4112,14 +4112,22 @@ export const store = new Vuex.Store({
               'groupId': state.initData.groupId
             }
           }
-          let dataPost = new URLSearchParams()
-          dataPost.append('method', 'GET')
-          dataPost.append('url', '/postal/votings/' + data.className + '/' + result['dossierId'])
-          dataPost.append('data', '')
-          dataPost.append('serverCode', 'SERVER_' + result['govAgencyCode'])
-          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result1) {
-            if (result1.data) {
-              resolve(result1.data.data)
+          axios.get('/o/rest/v2/postal/vote/dossier', config).then(result => {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              items = items.filter(function(item) {
+                return item.voteModel && item.voteModel['status'] == 1
+              })
+              let lengthQuestion = items.length
+              for (let index = 0; index < lengthQuestion; index++) {
+                if (items[index]['lstChoiceDetailModels']) {
+                  let listChoice = Array.isArray(items[index]['lstChoiceDetailModels']) ? items[index]['lstChoiceDetailModels'] : [items[index]['lstChoiceDetailModels']]
+                  items[index] = Object.assign(items[index]['voteModel'], {choices: listChoice})
+                } else {
+                  items[index] = Object.assign(items[index]['voteModel'], {choices: []})
+                }
+              }
+              resolve(items)
             } else {
               resolve([])
             }
@@ -4127,6 +4135,42 @@ export const store = new Vuex.Store({
             reject(xhr)
           })
         }).catch(xhr => {
+        })
+      })
+    },
+    submitVotingNew ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let params = new URLSearchParams()
+          const config = {
+            headers: {
+              'groupId': state.initData.groupId
+            }
+          }
+          params.append('dossierNo', data.dossierNo)
+          axios.post('/o/rest/v2/postal/vote/dossier/question/' + data.voteId + '/choice/' + data.voteChoiceId, params, config).then(result => {
+            resolve(result.data)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    increCounter ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let params = new URLSearchParams()
+          params.append('dossierNo', data.dossierNo)
+          axios.post('/o/rest/v2/postal/vote/survey/voteCount', params, config).then(result => {
+            resolve(result)
+          }).catch(xhr => {
+            reject(xhr)
+          })
         })
       })
     },

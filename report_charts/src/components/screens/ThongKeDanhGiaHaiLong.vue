@@ -9,17 +9,17 @@
                     </v-flex>
                     <v-flex xs12 class="my-2">
                         <v-autocomplete
-                            label="Đơn vị"
-                            :items="agencyLists"
-                            v-model="govAgency"
-                            item-text="text"
-                            item-value="value"
-                            return-object
-                            @change="getThuTucHanhChinh"
+                          label="Đơn vị"
+                          :items="agencyLists"
+                          v-model="govAgency"
+                          item-text="govAgencyName"
+                          item-value="govAgencyCode"
+                          return-object
+                          clearable
                         >
                         </v-autocomplete>
                     </v-flex>
-                    <v-flex xs12 class="my-2">
+                    <!-- <v-flex xs12 class="my-2">
                         <v-autocomplete
                             label="Thủ tục"
                             :items="listThuTuc"
@@ -29,20 +29,61 @@
                             return-object
                         >
                         </v-autocomplete>
+                    </v-flex> -->
+                    <v-flex xs12 class="my-2">
+                      <v-menu
+                        ref="menuDate1"
+                        v-model="menuDate1"
+                        :close-on-content-click="true"
+                        transition="scale-transition"
+                        offset-y
+                        full-width
+                      >
+                        <v-text-field
+                        slot="activator"
+                        class="search-input-appbar input-search"
+                        v-model="fromReceiveDateFormatted"
+                        persistent-hint
+                        append-icon="event"
+                        @blur="fromReceiveDate = parseDate(fromReceiveDateFormatted)"
+                        label="Từ ngày"
+                        hide-details
+                        height="32"
+                        min-height="32"
+                        >
+                        </v-text-field>
+                        <v-date-picker :max="toReceiveDateFormatted ? getMinMax(toReceiveDateFormatted) : null" v-model="fromReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate()"></v-date-picker>
+                      </v-menu>
                     </v-flex>
-                    <v-flex xs12 class="my-2" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
-                        <datetime-picker
-                            v-if="item['type'] === 'date' && showPicker"
-                            v-model="data[item.key]" 
-                            :item="item" 
-                            :data-value="data[item.key]"
-                            :data-all="data"
-                            :label="true"
-                            @change="reloadPickerChange(item.key)">
-                        </datetime-picker>
+                    <v-flex>
+                      <v-menu
+                        ref="menuDate2"
+                        v-model="menuDate2"
+                        :close-on-content-click="true"
+                        transition="scale-transition"
+                        offset-y
+                        full-width
+                      >
+
+                        <v-text-field
+                        slot="activator"
+                        class="search-input-appbar input-search"
+                        v-model="toReceiveDateFormatted"
+                        persistent-hint
+                        append-icon="event"
+                        @blur="toReceiveDate = parseDate(toReceiveDateFormatted)"
+                        label="Đến ngày"
+                        hide-details
+                        height="32"
+                        min-height="32"
+                        ></v-text-field>
+                        <v-date-picker :min="fromReceiveDateFormatted ? getMinMax(fromReceiveDateFormatted) : null" v-model="toReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate()"></v-date-picker>
+                      </v-menu>
                     </v-flex>
                     <v-flex xs12 class="my-2">
-                        <v-btn depressed small color="primary" @click="getStatistic"><v-icon>image_search</v-icon>Xem chi tiết</v-btn>
+                      <v-btn class="mx-0" depressed small color="primary" @click="getReportVotingDossier" :loading="btnLoading" :disabled="btnLoading">
+                        <v-icon>image_search</v-icon>Xem kết quả
+                      </v-btn>
                     </v-flex>
                 </v-layout>
             </v-flex>
@@ -55,10 +96,10 @@
                         padding: 9px 15px;
                         font-weight: 600;
                         color: white;">
-                        <span>{{domainCode['serviceName']}}</span>
+                        <span>Kết quả đánh giá</span>
                     </v-flex>
-                    <v-flex xs12 sm12 class="my-3 pl-3">
-                        <div style="margin-bottom: 5px;">
+                    <v-flex xs12 sm12 class="my-3 px-0">
+                        <!-- <div style="margin-bottom: 5px;">
                             <v-layout wrap class="text-bold mb-3">
                                 <div class="flex px-3 py-1" style="height:26px;max-width:88px;background-color: #034687;transform: skew(-25deg)">
                                     <span class="d-block white--text" style="transform: skew(25deg)">Phần 1 </span>
@@ -137,13 +178,45 @@
                                   </v-card-text>
                                 </v-card>
                             </div>
-                        </div>
+                        </div> -->
+
+                        <v-card flat>
+                          <v-card-text class="reportTable">
+                            <table class="my-2" hide-default-footer>
+                              <thead>
+                                <tr>
+                                  <th class="text-center px-2">
+                                    <span>STT</span>
+                                  </th>
+                                  <th class="text-center px-2">
+                                    <span>Tiêu chí đánh giá</span>
+                                  </th>
+                                  <th class="text-center px-2 py-1">
+                                    <span>Số điểm</span>
+                                  </th>
+                                </tr>
+                              </thead>
+
+                              <tbody v-for="(item,index) in statisticDossier" :key="index">
+                                <tr>
+                                  <td align="left" colspan="3"  class="px-2 text-bold">{{item.govAgencyName}}</td>
+                                </tr>
+                                
+                                <tr v-for="(item2,index2) in item['votings']" :key="index2">
+                                  <td align="center" class="px-2">{{index2 + 1}}</td>
+                                  <td align="left"  class="px-2">{{item2.title}}</td>
+                                  <td align="center"  class="px-2">{{item2.point}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </v-card-text>
+                        </v-card>
                     </v-flex>
-                    <v-flex xs12>
+                    <!-- <v-flex xs12>
                       <v-btn outline color="primary" @click="back"> 
                           <v-icon>arrow_back</v-icon>  Quay lại
                       </v-btn>
-                    </v-flex>
+                    </v-flex> -->
                 </v-layout>
             </v-flex>
             
@@ -172,6 +245,13 @@ export default {
   },
   data: () => ({
     loading: false,
+    statisticDossier: [],
+    menuDate1: false,
+    fromReceiveDate: '',
+    fromReceiveDateFormatted: '',
+    menuDate2: false,
+    toReceiveDate: '',
+    toReceiveDateFormatted: '',
     votingItemsTTHC: [],
     agencyLists: [],
     listThuTuc: [],
@@ -196,51 +276,17 @@ export default {
     }
   },
   created () {
-    var vm = this
+    let vm = this
     vm.$nextTick(function () {
-      let query = vm.$router.history.current.query
-      // 
-      // +-+
-      let filter = {
-        reportCode: 'STATISTIC_05'
+      try {
+        vm.agencyLists = agencyList
+      } catch (error) {
       }
-      vm.$store.dispatch('getDynamicReports', filter).then(function (result) {
-        vm.filterConfig = eval('( ' + result['filterConfig'] + ' )')
-        console.log(vm.filterConfig)
-        if (vm.filterConfig.hasOwnProperty('groupIdsAdmin')) {
-          vm.agencyLists = vm.filterConfig['groupIdsAdmin']
-          if (vm.agencyLists.length > 0) {
-            let defaultVal = vm.agencyLists[0]
-            for (let key in vm.agencyLists) {
-              if (vm.agencyLists[key]['selected']) {
-                defaultVal = vm.agencyLists[key]
-                break
-              }
-            }
-            if (query.hasOwnProperty('groupId') && query['groupId']) {
-              vm.govAgency = vm.agencyLists.filter(function (item) {
-                return String(item['value']) === String(query['groupId'])
-              })[0]
-              vm.getThuTucHanhChinh('statistic')
-            } else {
-              vm.govAgency = defaultVal
-              vm.getThuTucHanhChinh('statistic')
-            }
-          }
-        }
-        if (vm.filterConfig.hasOwnProperty('filters')) {
-          vm.filters = vm.filterConfig['filters']
-        }
-        for (let key in vm.filters) {
-          if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
-            vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
-            if (vm.filters[key]['type'] === 'date' && query.hasOwnProperty(vm.filters[key]['key']) && query[vm.filters[key]['key']]) {
-              vm.data[vm.filters[key]['key']] = query[vm.filters[key]['key']]
-            }
-          }
-        }
-        // vm.getStatistic()
-      })
+      vm.toReceiveDateFormatted = vm.currentDateFormat()
+      let time = (new Date(vm.parseDate(vm.toReceiveDateFormatted))).getTime() - 30*86400000
+      vm.fromReceiveDateFormatted = vm.currentDateFormat(time)
+      vm.getReportVotingDossier()
+      //
     })
   },
   mounted () {
@@ -250,9 +296,89 @@ export default {
     })
   },
   watch: {
-
+    
   },
   methods: {
+    getReportVotingDossier () {
+      let vm = this
+      vm.btnLoading = true
+      vm.$store.dispatch('loadVotingResultDossier', {
+        fromReceiveDate: vm.fromReceiveDateFormatted,
+        toReceiveDate: vm.toReceiveDateFormatted,
+        govAgencyCode: vm.govAgency ? vm.govAgency['govAgencyCode'] : ''
+      }).then(function(result) {
+        vm.btnLoading = false
+        let voteStatistic = result
+        let sortVote = function (voteList) {
+          function compare(a, b) {
+            if (a.voteCode < b.voteCode)
+              return -1
+            if (a.voteCode > b.voteCode)
+              return 1
+            return 0
+          }
+          return voteList.sort(compare)
+        }
+        voteStatistic = sortVote(voteStatistic)
+        if (voteStatistic && voteStatistic.length) {
+          let statistic = []
+          voteStatistic.forEach(element => {
+            let indexSt = statistic.findIndex(function(st) {
+              return st.govAgencyCode == element.govAgencyCode
+            })
+            if (indexSt >= 0) {
+              statistic[indexSt]['votings'].push(element)
+            } else {
+              let itemSt = {
+                govAgencyCode: element.govAgencyCode,
+                govAgencyName: element.govAgencyName,
+                votings: [element]
+              }
+              statistic.push(itemSt)
+            }
+          })
+          vm.statisticDossier = statistic
+        } else {
+          vm.statisticDossier = []
+        }
+      }).catch(xhr => {
+        vm.btnLoading = false
+        vm.statisticDossier = []
+      })
+    },
+    currentDateFormat (date) {
+      let date1 = date ? new Date(date) : new Date()
+      return `${date1.getDate().toString().padStart(2, '0')}/${(date1.getMonth() + 1).toString().padStart(2, '0')}/${date1.getFullYear()}`
+    },
+    parseDate(date) {
+      if (!date) return ''
+      if (String(date).indexOf('/') > 0) {
+        const [day, month, year] = date.split('/')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      } else if (String(date).indexOf('-') > 0) {
+        const [day, month, year] = date.split('-')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      } else {
+        let date1 = new Date(Number(date))
+        return `${date1.getFullYear()}-${(date1.getMonth() + 1).toString().padStart(2, '0')}-${date1.getDate().toString().padStart(2, '0')}`
+      }
+    },
+    getMinMax (date) {
+      if (!date) return null
+      const [day, month, year] = date.split('/')
+      return `${year}-${month}-${day}`
+    },
+    formatDate(date) {
+      if (!date) return ''
+      const [year, month, day] = date.split('-')
+      return `${day}/${month}/${year}`
+    },
+    changeDate(index) {
+      let vm = this
+      vm.menuDate1 = vm.menuDate2  = false
+      vm.fromReceiveDateFormatted = vm.formatDate(vm.fromReceiveDate)
+      vm.toReceiveDateFormatted = vm.formatDate(vm.toReceiveDate)
+    },
     reloadPickerChange (key) {
       let vm = this
       vm.showPicker = false

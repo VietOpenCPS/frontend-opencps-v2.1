@@ -11003,91 +11003,94 @@ export default {
           'messageType': vm.messageType
         }
       }
-      // Nghiệp vụ ký số cũ
-      // let kysocrypto = vm.$refs.kysocrypto
-      // kysocrypto.loading_process_btn = true
-      // if (plugin().valid) {
-      //   axios.get(vm.getComputerHash, config).then(function (response) {
-      //     var serializable = response.data
-      //     let jsonData = serializable
-      //     let hashComputers = jsonData.hashComputers
-      //     let signFieldNames = jsonData.signFieldNames
-      //     let filePaths = jsonData.filePaths
-      //     let msgs = jsonData.msg
-      //     for (let i = 0; i < hashComputers.length; i++) {
-      //       let hashComputer = hashComputers[i]
-      //       vm.signFieldName = signFieldNames[i]
-      //       vm.filePath = filePaths[i]
-      //       let msg = msgs[i]
-      //       vm.msgKey = msg
-      //       vm.cryptoFlag = 2
-      //       if (plugin().valid) {
-      //         if (msg === 'success') {
-      //           let code = plugin().Sign(hashComputer)
-      //           console.log(code)
-      //           if (code === 0 || code === 7) {
-      //             vm.sign = plugin().Signature
-      //             vm.cryptoFlag = 0
-      //           } else {
-      //             vm.customMessage = 'Không ký được hồ sơ (' + code + ')'
-      //             vm.cryptoFlag = 1
-      //           }
-      //         } else {
-      //           vm.customMessage = msg
-      //           vm.cryptoFlag = 2
-      //         }
-      //       }
-      //       break
-      //     }
-      //     if (vm.cryptoFlag === 0) {
-      //       var config = {
-      //         item: configOBJ.item,
-      //         messageType: configOBJ.messageType,
-      //         actionType: configOBJ.actionType,
-      //         desStatus: configOBJ.desStatus,
-      //         isConfirm: configOBJ.isConfirm,
-      //         returnState: configOBJ.returnState,
-      //         sign: vm.sign,
-      //         signFieldName: vm.signFieldName,
-      //         filePath: vm.filePath,
-      //         signLocation: configOBJ.signLocation
-      //       }
-      //       if (kysocrypto.doValidate()) {
-      //         vm.kysoSubmit(config)
-      //       } else {
-      //         alert('Trường thông tin (*) bắt buộc phải nhập.')
-      //       }
-      //     } else {
-      //       alert(vm.customMessage)
-      //     }
-      //     kysocrypto.loading_process_btn = false
-      //   }).catch(function (error) {
-      //     console.log(error)
-      //     kysocrypto.loading_process_btn = false
-      //   })
-      // } else {
-      //   setTimeout(() => {
-      //     kysocrypto.loading_process_btn = false
-      //     alert('CryptoLib05Plugin trên trình duyệt không hoạt động')
-      //   }, 500)
-      // }
-      // end
-
-      // Nghiệp vụ ký số mới (ký số plugin vgca signservice)
-      let configAction = {
-        item: configOBJ.item,
-        messageType: configOBJ.messageType,
-        actionType: configOBJ.actionType,
-        desStatus: configOBJ.desStatus,
-        isConfirm: configOBJ.isConfirm,
-        returnState: configOBJ.returnState,
-        sign: '',
-        signFieldName: '',
-        filePath: '',
-        signLocation: configOBJ.signLocation ? configOBJ.signLocation : '',
-        FileServer: configOBJ.hasOwnProperty('FileServer') && configOBJ.FileServer ? configOBJ.FileServer : ''
+      
+      if (configOBJ.hasOwnProperty('FileServer')) {
+        // Nghiệp vụ ký số mới (ký số plugin vgca signservice)
+        let configAction = {
+          item: configOBJ.item,
+          messageType: configOBJ.messageType,
+          actionType: configOBJ.actionType,
+          desStatus: configOBJ.desStatus,
+          isConfirm: configOBJ.isConfirm,
+          returnState: configOBJ.returnState,
+          sign: '',
+          signFieldName: '',
+          filePath: '',
+          signLocation: configOBJ.signLocation ? configOBJ.signLocation : '',
+          FileServer: configOBJ.hasOwnProperty('FileServer') && configOBJ.FileServer ? configOBJ.FileServer : ''
+        }
+        vm.kysoSubmit(configAction)
+        // end
+      } else {
+        // Nghiệp vụ ký số cũ
+        let kysocrypto = vm.$refs.kysocrypto
+        kysocrypto.loading_process_btn = true
+        if (plugin().valid) {
+          axios.get(vm.getComputerHash, config).then(function (response) {
+            var serializable = response.data
+            let jsonData = serializable
+            let hashComputers = jsonData.hashComputers
+            let signFieldNames = jsonData.signFieldNames
+            let filePaths = jsonData.filePaths
+            let msgs = jsonData.msg
+            for (let i = 0; i < hashComputers.length; i++) {
+              let hashComputer = hashComputers[i]
+              vm.signFieldName = signFieldNames[i]
+              vm.filePath = filePaths[i]
+              let msg = msgs[i]
+              vm.msgKey = msg
+              vm.cryptoFlag = 2
+              if (plugin().valid) {
+                if (msg === 'success') {
+                  let code = plugin().Sign(hashComputer)
+                  console.log(code)
+                  if (code === 0 || code === 7) {
+                    vm.sign = plugin().Signature
+                    vm.cryptoFlag = 0
+                  } else {
+                    vm.customMessage = 'Không ký được hồ sơ (' + code + ')'
+                    vm.cryptoFlag = 1
+                  }
+                } else {
+                  vm.customMessage = msg
+                  vm.cryptoFlag = 2
+                }
+              }
+              break
+            }
+            if (vm.cryptoFlag === 0) {
+              var config = {
+                item: configOBJ.item,
+                messageType: configOBJ.messageType,
+                actionType: configOBJ.actionType,
+                desStatus: configOBJ.desStatus,
+                isConfirm: configOBJ.isConfirm,
+                returnState: configOBJ.returnState,
+                sign: vm.sign,
+                signFieldName: vm.signFieldName,
+                filePath: vm.filePath,
+                signLocation: configOBJ.signLocation
+              }
+              if (kysocrypto.doValidate()) {
+                vm.kysoSubmit(config)
+              } else {
+                alert('Trường thông tin (*) bắt buộc phải nhập.')
+              }
+            } else {
+              alert(vm.customMessage)
+            }
+            kysocrypto.loading_process_btn = false
+          }).catch(function (error) {
+            console.log(error)
+            kysocrypto.loading_process_btn = false
+          })
+        } else {
+          setTimeout(() => {
+            kysocrypto.loading_process_btn = false
+            alert('CryptoLib05Plugin trên trình duyệt không hoạt động')
+          }, 500)
+        }
       }
-      vm.kysoSubmit(configAction)
       // end
     },
     getThanhPhan: function () {

@@ -545,8 +545,11 @@
         let currentQuery = vm.$router.history.current.query
         let serverconfig = 'CLASSNAME_VOTING'
         vm.$store.dispatch('getServerconfigs', serverconfig).then(function (result) {
-          let configs = JSON.parse(result.configs)
-          vm.classNameItems = configs.classNames
+          try {
+            let configs = JSON.parse(result.configs)
+            vm.classNameItems = configs.classNames
+          } catch (error) {
+          }
           vm.className = vm.classNameItems[0]['value']
           if (vm.classNameItems[0] && vm.classNameItems[0].hasOwnProperty('lastestVersion') && vm.classNameItems[0]['lastestVersion']) {
             vm.lastestVersion = vm.classNameItems[0]['lastestVersion']
@@ -580,6 +583,7 @@
         let filter = {
           className: vm.className
         }
+        vm.votingItems = []
         vm.loading = true
         if (vm.lastestVersion !== 2) {
           vm.$store.dispatch('getVotingList', filter).then(function (result) {
@@ -618,6 +622,8 @@
             })[0]
             if (filter && filter.hasOwnProperty('lastestVersion') && filter['lastestVersion']) {
               vm.lastestVersion = filter['lastestVersion']
+            } else {
+              vm.lastestVersion = ''
             }
             vm.getVotingList()
           }

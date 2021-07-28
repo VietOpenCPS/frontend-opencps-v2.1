@@ -556,10 +556,10 @@
                 <div v-if="votingItems && votingItems.length > 0">
                   <div v-for="(item, index) in votingItems" :key="index" >
                     <div class="text-bold">
-                      {{index + 1}}.&nbsp; {{ item.subject }}
+                      {{index + 1}}.&nbsp; {{ item.title }}
                     </div>
                     <v-radio-group class="ml-3 mt-2" v-model="item.selected" column>
-                      <v-radio class="ml-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" :disabled="originality === 3"></v-radio>
+                      <v-radio class="ml-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1.subject" :value="index1 + 1" :disabled="originality === 3"></v-radio>
                     </v-radio-group>
                     <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
                       <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
@@ -578,7 +578,7 @@
                   <v-btn color="primary"
                     :loading="loadingVoting"
                     :disabled="loadingVoting"
-                    @click="submitVoting"
+                    @click="doVottingResultSubmitNew"
                   >Gửi đánh giá</v-btn>
                 </div>
               </div>
@@ -3338,6 +3338,41 @@ export default {
           toastr.error('Gửi đánh giá không thành công')
         })
       }
+    },
+    doVottingResultSubmitNew () {
+      var vm = this
+      vm.loadingVoting = true
+      let arrAction = []
+      let valid = false
+      for (var key in vm.votingItems) {
+        vm.votingItems[key]['className'] = 'dossier'
+        if (String(vm.votingItems[key]['selected']) !== '0') {
+          valid = true
+          let indexChoice = vm.votingItems[key]['selected'] - 1
+          arrAction.push(vm.$store.dispatch('submitVotingNew', Object.assign(vm.votingItems[key]['choices'][indexChoice], {dossierNo: vm.thongTinChiTietHoSo['dossierNo']})))
+        }
+      }
+      if (valid) {
+        Promise.all(arrAction).then(results => {
+          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          vm.increCounter()
+          vm.loadingVoting = false
+        }).catch(xhr => {
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          vm.loadingVoting = false
+        })
+      } else {
+        vm.loadingVoting = false
+        toastr.error('Bạn chưa chọn đánh giá nào')
+      }
+      
+    },
+    increCounter () {
+      let vm = this
+      let data = {
+        dossierNo: vm.thongTinChiTietHoSo['dossierNo']
+      }
+      vm.$store.dispatch('increCounter', data).then(function (result) {})
     },
     doAction () {
       let vm = this
