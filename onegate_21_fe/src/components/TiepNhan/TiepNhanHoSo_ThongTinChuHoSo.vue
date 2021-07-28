@@ -256,7 +256,7 @@
               <v-radio label="Doanh nghiệp" :value="'2'"></v-radio>
               <v-radio label="Cơ quan, tổ chức" :value="'3'"></v-radio>
             </v-radio-group>
-            <!-- <v-radio-group class="mt-2" v-if="!loading && !hasOrganization" v-model="thongTinChuHoSo.userType" row @change="checkApplicantInfos">
+            <v-radio-group class="mt-2" v-if="!loading && !hasOrganization" v-model="thongTinChuHoSo.userType" row @change="checkApplicantInfos">
               <v-radio label="Công dân" :value="'1'"></v-radio>
               <v-radio label="Tổ chức, doanh nghiệp" :value="'2'"></v-radio>
             </v-radio-group>
@@ -264,7 +264,7 @@
               <v-radio label="Công dân" :value="'1'"></v-radio>
               <v-radio label="Doanh nghiệp" :value="'2'"></v-radio>
               <v-radio label="Cơ quan, tổ chức" :value="'3'"></v-radio>
-            </v-radio-group> -->
+            </v-radio-group>
           </div>
           <div style="position: relative;" v-if="originality !== 1  && !showDelegate">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
