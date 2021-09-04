@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app_manage_applicant" style="max-width: 1300px;margin: 0 auto;">
+  <v-app id="app" style="max-width: 1300px;margin: 0 auto;">
     <v-navigation-drawer app clipped floating width="0">
     </v-navigation-drawer>
     <v-content>

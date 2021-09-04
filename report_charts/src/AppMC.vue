@@ -20,13 +20,13 @@
           <v-btn slot="activator" flat icon color="teal" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('thong-ke#/danh-gia-hai-long')">
             <v-icon size="20">assignment_turned_in</v-icon>
           </v-btn>
-          <span>Đánh giá DVC mức độ 3, 4</span>
+          <span>Đánh giá sự hài lòng của NLTT khi thực hiện dịch vụ công trực tuyến</span>
         </v-tooltip>
         <v-tooltip left>
           <v-btn slot="activator" flat icon color="orange" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('thong-ke#/chi-so-danh-gia')">
             <v-icon size="20">assignment_turned_in</v-icon>
           </v-btn>
-          <span>Chỉ số đánh giá giải quyết TTHC</span>
+          <span>Đánh giá chỉ số giải quyết thủ tục hành hính</span>
         </v-tooltip>
         <!-- <v-menu left offset-x open-on-hover>
           <v-btn slot="activator" flat icon color="teal" class="mx-0 my-0" style="width: 32px;height:32px">

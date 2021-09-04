@@ -2,93 +2,8 @@
   <div style="height: 100%;">
     <v-container grid-list-md >
         <v-layout row wrap>
-            <v-flex xs12 sm3>
-                <v-layout row wrap style="background-color: #ffff;border-top: 1px solid #004b94;" class="pa-2">
-                    <v-flex xs12 text-center>
-                        <span style="color: #004b94; font-weight: 600;">Đánh giá hài lòng của người dùng về việc thực hiện thủ tục hành chính</span>
-                    </v-flex>
-                    <v-flex xs12 class="my-2">
-                        <v-autocomplete
-                          label="Đơn vị"
-                          :items="agencyLists"
-                          v-model="govAgency"
-                          item-text="govAgencyName"
-                          item-value="govAgencyCode"
-                          return-object
-                          clearable
-                        >
-                        </v-autocomplete>
-                    </v-flex>
-                    <!-- <v-flex xs12 class="my-2">
-                        <v-autocomplete
-                            label="Thủ tục"
-                            :items="listThuTuc"
-                            v-model="domainCode"
-                            item-text="serviceName"
-                            item-value="serviceCode"
-                            return-object
-                        >
-                        </v-autocomplete>
-                    </v-flex> -->
-                    <v-flex xs12 class="my-2">
-                      <v-menu
-                        ref="menuDate1"
-                        v-model="menuDate1"
-                        :close-on-content-click="true"
-                        transition="scale-transition"
-                        offset-y
-                        full-width
-                      >
-                        <v-text-field
-                        slot="activator"
-                        class="search-input-appbar input-search"
-                        v-model="fromReceiveDateFormatted"
-                        persistent-hint
-                        append-icon="event"
-                        @blur="fromReceiveDate = parseDate(fromReceiveDateFormatted)"
-                        label="Từ ngày"
-                        hide-details
-                        height="32"
-                        min-height="32"
-                        >
-                        </v-text-field>
-                        <v-date-picker :max="toReceiveDateFormatted ? getMinMax(toReceiveDateFormatted) : null" v-model="fromReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate()"></v-date-picker>
-                      </v-menu>
-                    </v-flex>
-                    <v-flex>
-                      <v-menu
-                        ref="menuDate2"
-                        v-model="menuDate2"
-                        :close-on-content-click="true"
-                        transition="scale-transition"
-                        offset-y
-                        full-width
-                      >
-
-                        <v-text-field
-                        slot="activator"
-                        class="search-input-appbar input-search"
-                        v-model="toReceiveDateFormatted"
-                        persistent-hint
-                        append-icon="event"
-                        @blur="toReceiveDate = parseDate(toReceiveDateFormatted)"
-                        label="Đến ngày"
-                        hide-details
-                        height="32"
-                        min-height="32"
-                        ></v-text-field>
-                        <v-date-picker :min="fromReceiveDateFormatted ? getMinMax(fromReceiveDateFormatted) : null" v-model="toReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate()"></v-date-picker>
-                      </v-menu>
-                    </v-flex>
-                    <v-flex xs12 class="my-2">
-                      <v-btn class="mx-0" depressed small color="primary" @click="getReportVotingDossier" :loading="btnLoading" :disabled="btnLoading">
-                        <v-icon>image_search</v-icon>Xem kết quả
-                      </v-btn>
-                    </v-flex>
-                </v-layout>
-            </v-flex>
-            <v-flex xs12 sm9 class="pl-4">
-                <v-layout row wrap  style="background-color: #ffff;">
+            <v-flex xs12 class="pl-4">
+                <v-layout row wrap style="background-color: #ffff;">
                     <v-flex class="xs12" style="
                         background-color: #004b94 !important;
                         height: auto;
@@ -96,121 +11,112 @@
                         padding: 9px 15px;
                         font-weight: 600;
                         color: white;">
-                        <span>Kết quả đánh giá</span>
+                        <span>Kết quả đánh giá sự hài lòng của NLTT khi thực hiện dịch vụ công trực tuyến</span>
                     </v-flex>
-                    <v-flex xs12 sm12 class="my-3 px-0">
-                        <!-- <div style="margin-bottom: 5px;">
-                            <v-layout wrap class="text-bold mb-3">
-                                <div class="flex px-3 py-1" style="height:26px;max-width:88px;background-color: #034687;transform: skew(-25deg)">
-                                    <span class="d-block white--text" style="transform: skew(25deg)">Phần 1 </span>
-                                </div>
-                                <div class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687">
-                                    Đánh giá tổng thể dịch vụ
-                                </div>
-                            </v-layout>
-                            <div class="ml-4">
-                                <v-card flat class="pl-2">
-                                <v-card-text class="px-2 py-1 pr-0">
-                                    <v-flex xs12 class="mb-2">
-                                    <v-layout wrap>
-                                        <v-flex xs12 md3>
-                                            <p class="headline primary--text">{{percentVeryGoodTotal}}</p>
-                                            <p>Rất hài lòng</p>
-                                        </v-flex>
-                                        <v-flex xs12 md3>
-                                            <p class="headline primary--text">{{percentGoodTotal}}</p>
-                                            <p>Hài lòng</p>
-                                        </v-flex>
-                                        <v-flex xs12 md3>
-                                            <p class="headline primary--text">{{percentBadTotal}}</p>
-                                            <p>Không hài lòng</p>
-                                        </v-flex>
-                                    </v-layout>    
-                                </v-card-text>
-                                </v-card>
-                            </div>
-                        </div>
-                        <div style="margin-bottom: 5px;">
-                            <v-layout wrap class="text-bold mb-3">
-                              <div class="flex px-3 py-1" style="height:26px;max-width:88px;background-color: #034687;transform: skew(-25deg)">
-                                <span class="d-block white--text" style="transform: skew(25deg)">Phần 2 </span>
-                              </div>
-                              <div class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687">
-                                Đánh giá chi tiết dịch vụ
-                              </div>
-                            </v-layout>
-                            <div class="ml-4">
-                                <v-card flat class="pl-2">
-                                  <v-card-text class="px-2 py-1 pr-0">
-                                    <v-flex xs12 class="mb-2" v-if="votingItemsDetal.length > 0">
-                                      <v-flex xs12 v-for="(item, index) in votingItemsDetal" :key="index">
-                                        <v-layout wrap>
-                                          <v-flex xs12><strong class="primary--text">{{item.votingSubject}}</strong></v-flex>
-                                          <v-flex xs12 class="mb-3">
-                                              <v-layout wrap>
-                                                  <v-flex xs12 md3>
-                                                      <p class="headline primary--text">{{item.veryGoodCount}}</p>
-                                                      <p>Rất hài lòng</p>
-                                                  </v-flex>
-                                                  <v-flex xs12 md3>
-                                                      <p class="headline primary--text">{{item.goodCount}}</p>
-                                                      <p>Hài lòng</p>
-                                                  </v-flex>
-                                                  <v-flex xs12 md3>
-                                                      <p class="headline primary--text">{{item.badCount}}</p>
-                                                      <p>Không hài lòng</p>
-                                                  </v-flex>
-                                              </v-layout>
-                                          </v-flex>
-                                        </v-layout>
-                                      </v-flex>
-                                    </v-flex>
-                                    <v-flex v-else>
-                                      <v-alert
-                                        :value="true"
-                                        color="info"
-                                        icon="info"
-                                        outline
-                                      >
-                                        Không có đánh giá
-                                      </v-alert>
-                                    </v-flex>
-                                  </v-card-text>
-                                </v-card>
-                            </div>
-                        </div> -->
+                    <v-flex xs12>
+                      <v-layout row wrap style="background-color: #ffff;border-top: 1px solid #004b94;" class="pa-2 pt-3">
+                          
+                          <v-flex xs12 md5 class="my-2 pl-2">
+                            <v-menu
+                              ref="menuDate1"
+                              v-model="menuDate1"
+                              :close-on-content-click="true"
+                              transition="scale-transition"
+                              offset-y
+                              full-width
+                            >
+                              <v-text-field
+                              slot="activator"
+                              class="search-input-appbar input-search"
+                              v-model="fromReceiveDateFormatted"
+                              persistent-hint
+                              append-icon="event"
+                              @blur="fromReceiveDate = parseDate(fromReceiveDateFormatted)"
+                              label="Từ ngày"
+                              hide-details
+                              height="32"
+                              min-height="32"
+                              >
+                              </v-text-field>
+                              <v-date-picker :max="toReceiveDateFormatted ? getMinMax(toReceiveDateFormatted) : null" v-model="fromReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate()"></v-date-picker>
+                            </v-menu>
+                          </v-flex>
+                          <v-flex xs12 md5 class="my-2 pl-3">
+                            <v-menu
+                              ref="menuDate2"
+                              v-model="menuDate2"
+                              :close-on-content-click="true"
+                              transition="scale-transition"
+                              offset-y
+                              full-width
+                            >
 
-                        <v-card flat>
-                          <v-card-text class="reportTable">
-                            <table class="my-2" hide-default-footer>
-                              <thead>
-                                <tr>
-                                  <th class="text-center px-2">
-                                    <span>STT</span>
-                                  </th>
-                                  <th class="text-center px-2">
-                                    <span>Tiêu chí đánh giá</span>
-                                  </th>
-                                  <th class="text-center px-2 py-1">
-                                    <span>Số điểm</span>
-                                  </th>
-                                </tr>
-                              </thead>
+                              <v-text-field
+                              slot="activator"
+                              class="search-input-appbar input-search"
+                              v-model="toReceiveDateFormatted"
+                              persistent-hint
+                              append-icon="event"
+                              @blur="toReceiveDate = parseDate(toReceiveDateFormatted)"
+                              label="Đến ngày"
+                              hide-details
+                              height="32"
+                              min-height="32"
+                              ></v-text-field>
+                              <v-date-picker :min="fromReceiveDateFormatted ? getMinMax(fromReceiveDateFormatted) : null" v-model="toReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate()"></v-date-picker>
+                            </v-menu>
+                          </v-flex>
+                          <v-flex xs12 md2 class="pl-4">
+                            <v-btn class="mx-0" depressed small color="primary" @click="getReportVotingDossier" :loading="btnLoading" :disabled="btnLoading">
+                              <v-icon>image_search</v-icon>Xem kết quả
+                            </v-btn>
+                          </v-flex>
+                      </v-layout>
+                  </v-flex>
+                    <v-flex xs12 sm12 class="mb-3 px-0">
+                      <v-card flat>
+                        <v-card-text class="reportTable">
+                          <table class="my-2" hide-default-footer>
+                            <thead>
+                              <tr>
+                                <th class="text-center px-2">
+                                  <span>STT</span>
+                                </th>
+                                <th class="text-center px-2">
+                                  <span>Tiêu chí đánh giá</span>
+                                </th>
+                                <th class="text-center px-2 py-1">
+                                  <span>Lượt đánh giá</span>
+                                </th>
+                                <th class="text-center px-2 py-1">
+                                  <span>Rất hài lòng</span>
+                                </th>
+                                <th class="text-center px-2 py-1">
+                                  <span>Hài lòng</span>
+                                </th>
+                                <th class="text-center px-2 py-1">
+                                  <span>Không hài lòng</span>
+                                </th>
+                              </tr>
+                            </thead>
 
-                              <tbody v-for="(item,index) in statisticDossier" :key="index">
-                                <tr>
-                                  <td align="left" colspan="3"  class="px-2 text-bold">{{item.govAgencyName}}</td>
-                                </tr>
-                                
-                                <tr v-for="(item2,index2) in item['votings']" :key="index2">
-                                  <td align="center" class="px-2">{{index2 + 1}}</td>
-                                  <td align="left"  class="px-2">{{item2.title}}</td>
-                                  <td align="center"  class="px-2">{{item2.point}}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </v-card-text>
-                        </v-card>
+                            <tbody v-for="(item,index) in statisticDossier" :key="index">
+                              <tr>
+                                <td align="left" colspan="6"  class="px-2 text-bold">{{item.govAgencyName}}</td>
+                              </tr>
+                              
+                              <tr v-for="(item2,index2) in item['votings']" :key="index2">
+                                <td align="center" class="px-2">{{index2 + 1}}</td>
+                                <td align="left"  class="px-2">{{item2.title}}</td>
+                                <td align="center"  class="px-2">{{item2.countVoteResult}}</td>
+                                <td align="center"  class="px-2">{{item2.countVeryGood}}</td>
+                                <td align="center"  class="px-2">{{item2.countGood}}</td>
+                                <td align="center"  class="px-2">{{item2.countBad}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </v-card-text>
+                      </v-card>
                     </v-flex>
                     <!-- <v-flex xs12>
                       <v-btn outline color="primary" @click="back"> 
@@ -219,7 +125,6 @@
                     </v-flex> -->
                 </v-layout>
             </v-flex>
-            
         </v-layout>
     </v-container>
   </div>
@@ -283,8 +188,8 @@ export default {
       } catch (error) {
       }
       vm.toReceiveDateFormatted = vm.currentDateFormat()
-      let time = (new Date(vm.parseDate(vm.toReceiveDateFormatted))).getTime() - 30*86400000
-      vm.fromReceiveDateFormatted = vm.currentDateFormat(time)
+      let currentYear = (new Date()).getFullYear()
+      vm.fromReceiveDateFormatted = '01/01/' + currentYear
       vm.getReportVotingDossier()
       //
     })
@@ -308,7 +213,15 @@ export default {
         govAgencyCode: vm.govAgency ? vm.govAgency['govAgencyCode'] : ''
       }).then(function(result) {
         vm.btnLoading = false
-        let voteStatistic = result
+        let voteStatistic = []
+        result.forEach(element => {
+          let indexSt = vm.agencyLists.findIndex(function(gov) {
+            return gov.govAgencyCode == element.govAgencyCode
+          })
+          if (indexSt >=0) {
+            voteStatistic.push(element)
+          }
+        })
         let sortVote = function (voteList) {
           function compare(a, b) {
             if (a.voteCode < b.voteCode)

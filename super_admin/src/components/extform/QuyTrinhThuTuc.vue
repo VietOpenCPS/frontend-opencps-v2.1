@@ -57,6 +57,7 @@
                       :rules="[rules.required, rules.varchar75, rules.syntaxError]"
                       :maxlength="75"
                       :counter="75"
+                      @blur="formatDataInput()"
                       required
                     >
                       <template slot="label">Số hiệu quy trình <span class="red--text darken-3">*</span></template>
@@ -1328,7 +1329,14 @@
         validAddAction: false,
         //
         rules: {
-          required: value => !!value || 'Bắt buộc phải nhập.',
+          required: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val ? true : 'Thông tin bắt buộc'
+            } else {
+              return true
+            }
+          },
           number: value => {
             const pattern = /^\d+$/
             return pattern.test(value) || 'Bắt buộc phải nhập kiểu số.'

@@ -700,10 +700,31 @@
               } else {
                 formScript = {}
               }
+              // 
+              let fileExist = ''
+              let dataFormFile = ''
+              try {
+                fileExist = vm.dossierFilesItems.find(itemFile => {
+                  return itemFile.dossierPartNo === item.partNo && itemFile.eForm
+                })
+              } catch (error) {
+              }
+              let hasDataFormFile = ''
+              if (fileExist && fileExist.formData) {
+                try {
+                  dataFormFile = JSON.parse(fileExist.formData)
+                  hasDataFormFile = Object.keys(dataFormFile).length
+                } catch (error) {
+                }
+              }
+              // 
               if (resData) {
                 formData = eval('(' + resData + ')')
               } else {
                 formData = {}
+              }
+              if (hasDataFormFile) {
+                formData = dataFormFile
               }
               // giấy phép
               let fileTemplateNo = ''

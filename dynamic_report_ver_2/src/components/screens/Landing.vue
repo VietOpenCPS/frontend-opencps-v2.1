@@ -2307,6 +2307,7 @@ export default {
     },
     createReport () {
       let vm = this
+      vm.targetFilter = ''
       try {
         vm.headerTongHop[0]['text'] = vm.groupBy.filter(function (item) {
           return item.key === vm.groupByVal

@@ -370,6 +370,14 @@
                 </v-btn>
                 <span>Giấy tờ đã nộp</span>
               </v-tooltip>
+              <!-- <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && khoTaiLieuCongDan">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click="showFilesApplicant(item.partNo)">
+                  <v-badge>
+                    <v-icon size="24" color="orange darken-3">folder</v-icon>
+                  </v-badge>
+                </v-btn>
+                <span>Giấy tờ đã nộp</span>
+              </v-tooltip> -->
 
               <!-- Sử dụng kho tài liệu công dân -->
               <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView && khoTaiLieuCongDan">
@@ -384,7 +392,7 @@
               <v-tooltip class="pl-1 pt-1" top v-if="!onlyView && khoTaiLieuCongDan">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="showDocumentApplicant(item, index)">
                   <v-badge>
-                    <v-icon size="20" color="orange darken-3">fas fa fa-folder-open</v-icon>
+                    <v-icon size="20" color="orange darken-3">storage</v-icon>
                   </v-badge>
                 </v-btn>
                 <span>Tải giấy tờ từ kho</span>
@@ -1068,9 +1076,11 @@ export default {
         vm.$store.commit('setDossierTemplateLienThong', vm.dossierTemplateLienThong)
         if (fileTemplateNoArr.length > 0) {
           vm.fileTemplateNoString = fileTemplateNoArr.toString()
-          if (vm.applicantId && !vm.onlyView && !khoTaiLieuCongDan) {
-            vm.getDossierFileApplicants(vm.applicantId, vm.fileTemplateNoString)
-          }
+          // setTimeout(function () {
+            if (vm.applicantId && !vm.onlyView && !vm.khoTaiLieuCongDan) {
+              vm.getDossierFileApplicants(vm.applicantId, vm.fileTemplateNoString)
+            }
+          // }, 500)
         }
         // autoExpand form
         setTimeout(function () {
@@ -2088,6 +2098,9 @@ export default {
         if (!vm.onlyView) {
           divPx += 90
         }
+        if (vm.khoTaiLieuCongDan) {
+          divPx += 40
+        }
         return 'calc(100% - ' + divPx + 'px)'
       }
     },
@@ -2246,17 +2259,26 @@ export default {
       })
     },
     getDossierFileApplicants (applicantIdNo, fileTemplateNo) {
-      // var vm = this
-      // let filter = {
-      //   dossierId: vm.thongTinHoSo.dossierId,
-      //   applicantIdNo: applicantIdNo,
-      //   fileTemplateNo: fileTemplateNo
-      // }
-      // vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
-      //   vm.dossierFilesApplicant = result
-      // }).catch(reject => {
-      //   console.log('error')
-      // })
+      var vm = this
+      let filter = {
+        dossierId: vm.thongTinHoSo.dossierId,
+        applicantIdNo: applicantIdNo,
+        fileTemplateNo: fileTemplateNo
+      }
+      if (!vm.khoTaiLieuCongDan) {
+        vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
+          vm.dossierFilesApplicant = result
+        }).catch(reject => {
+          console.log('error')
+        })
+      } else {
+        filter['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
+        vm.$store.dispatch('getDossierFilesApplicantsVer2', filter).then(result => {
+          vm.dossierFilesApplicant = result
+        }).catch(reject => {
+          console.log('error')
+        })
+      }
     },
     showFilesApplicant (partNo) {
       let vm = this

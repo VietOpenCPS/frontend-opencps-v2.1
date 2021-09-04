@@ -1005,6 +1005,8 @@ export const store = new Vuex.Store({
             }
           }
           let textPost = {
+            fromReceiveDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            toReceiveDate: data.toReceiveDate ? data.toReceiveDate : ''
           }
           let dataPost = new URLSearchParams()
           dataPost.append('method', 'GET')
@@ -1014,9 +1016,15 @@ export const store = new Vuex.Store({
           axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
             if (result.data.data) {
               let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
-              items = items.filter(function (item) {
-                return item.govAgencyCode && item.voteCode
-              })
+              if (data.govAgencyCode) {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode && item.govAgencyCode === data.govAgencyCode
+                })
+              } else {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode
+                })
+              }
               resolve(items)
             } else {
               resolve([])
@@ -1036,6 +1044,8 @@ export const store = new Vuex.Store({
             }
           }
           let textPost = {
+            fromReceiveDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            toReceiveDate: data.toReceiveDate ? data.toReceiveDate : ''
           }
           let dataPost = new URLSearchParams()
           dataPost.append('method', 'GET')
@@ -1045,9 +1055,15 @@ export const store = new Vuex.Store({
           axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
             if (result.data.data) {
               let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
-              items = items.filter(function (item) {
-                return item.govAgencyCode && item.voteCode
-              })
+              if (data.govAgencyCode) {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode && item.govAgencyCode === data.govAgencyCode
+                })
+              } else {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode
+                })
+              }
               resolve(items)
             } else {
               resolve([])
@@ -1072,7 +1088,7 @@ export const store = new Vuex.Store({
           }
           let dataPost = new URLSearchParams()
           dataPost.append('method', 'GET')
-          dataPost.append('url', '/postal/vote/dossier/statistic/voteResult/serviceL34')
+          dataPost.append('url', '/postal/vote/survey/statistic/voteResult/serviceL34')
           dataPost.append('data', JSON.stringify(textPost))
           dataPost.append('serverCode', 'SERVER_DVC')
           axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {

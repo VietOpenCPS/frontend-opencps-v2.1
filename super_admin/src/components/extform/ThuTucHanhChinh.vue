@@ -575,7 +575,7 @@ export default {
           domain: vm.domainFilter,
           level: vm.levelFilter,
           keyword: vm.keyword,
-          active: true
+          active: "true"
         }
       }
       axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {

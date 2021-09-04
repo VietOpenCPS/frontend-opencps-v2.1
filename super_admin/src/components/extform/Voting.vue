@@ -225,19 +225,31 @@
                       :counter="5000"
                     ></v-textarea>
                   </v-flex>
-                  <p class="my-2">Trạng thái <span style="color: red">(*)</span>:</p>
-                  <v-flex xs12 class="">
-                    <v-autocomplete
-                      box
-                      :items="statusItems"
-                      v-model="status"
-                      item-text="text"
-                      item-value="value"
-                      :rules="[rules.required]"
-                      required
-                    >
-                    </v-autocomplete>
-                  </v-flex>
+                  <v-layout wrap style="width: 100%">
+                    <v-flex :class="className === 'survey' ? 'xs12 md6' : 'xs12'">
+                      <p class="my-2">Trạng thái <span style="color: red">(*)</span>:</p>
+                      <v-flex xs12 class="">
+                        <v-autocomplete
+                          box
+                          :items="statusItems"
+                          v-model="status"
+                          item-text="text"
+                          item-value="value"
+                          :rules="[rules.required]"
+                          required
+                        >
+                        </v-autocomplete>
+                      </v-flex>
+                    </v-flex>
+                    <v-flex class="pl-3" xs12 md6 v-if="className === 'survey'">
+                      <p class="my-2">ProcessTime :</p>
+                      <v-flex xs12 class="">
+                        <v-switch
+                          v-model="processTime"
+                        ></v-switch>
+                      </v-flex>
+                    </v-flex>
+                  </v-layout>
                   <p class="my-2">Câu trả lời: </p>
                   <v-flex xs12 class="">
                     <!-- <div class="my-2 text-bold">:</div> -->
@@ -428,6 +440,7 @@
             value: 0
           }
         ],
+        processTime: false,
         status: 1,
         statusChoice: 1,
         sibling: '',
@@ -753,6 +766,9 @@
           status: vm.status,
           choiceItems: vm.choicesCurrent
         }
+        if (vm.className === 'survey') {
+          filter.processTime = vm.processTime ? 1 : 0
+        }
         if (vm.type === 'update') {
           filter['votingId'] = vm.votingIdCurrent
         }
@@ -791,6 +807,9 @@
           vm.status = item['status']
           vm.choicesCurrent = item['lstChoiceDetailModels']
           vm.votingIdCurrent = item['voteId']
+          if (vm.className === 'survey') {
+            vm.processTime = item['processTime'] === 1 ? true : false
+          }
         }
         console.log('choicesCurrent', vm.choicesCurrent)
         vm.dialog_addQuestion = true

@@ -444,6 +444,7 @@ export default {
     },
     getFee () {
       let vm = this
+      let currentQuery = vm.$router.history.current.query
       if (vm.functionTimeOutGetFee) {
         clearTimeout(vm.functionTimeOutGetFee)
       }
@@ -453,7 +454,7 @@ export default {
           let url = '/o/rest/v2/postal/vnpostprice'
           let typeMethod = 'POST'
           let headers = {
-            groupId: window.themeDisplay.getScopeGroupId()
+            groupId: currentQuery.hasOwnProperty('groupIdSiteMng') && currentQuery.groupIdSiteMng ? currentQuery.groupIdSiteMng : window.themeDisplay.getScopeGroupId()
           }
           let dataUpdate = new URLSearchParams()
           dataUpdate.append("GovAgencyCode", vm.detailDossier.govAgencyCode)

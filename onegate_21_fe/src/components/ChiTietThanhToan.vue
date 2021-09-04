@@ -85,7 +85,7 @@
                   </v-flex>
                   <v-flex xs12 sm7></v-flex>
                 </v-layout>
-                <v-layout wrap v-if="Number(payments.paymentStatus) >= 3">
+                <v-layout wrap v-if="Number(payments.paymentStatus) >= 3" style="width: 100%">
                   <v-flex xs12 sm2>
                     <v-subheader class="pl-0 text-right">Hình thức thanh toán: </v-subheader>
                   </v-flex>
@@ -132,21 +132,21 @@
 
                   <!-- end -->
                 </v-layout>
-                <v-layout wrap v-if="Number(payments.paymentStatus) < 3 && payments.hasOwnProperty('invoicePayload') && payments['invoicePayload'] == 'VNPT'">
+                <!-- <v-layout wrap v-if="Number(payments.paymentStatus) < 5 && payments.hasOwnProperty('invoicePayload') && payments['invoicePayload'] == 'VNPT'">
                   <v-flex xs12>
                     <v-btn class="ml-3" color="primary" @click="printPay()">
                       <v-icon>print</v-icon> &nbsp;
                       In biên lai điện tử
                     </v-btn>
                   </v-flex>
-                </v-layout>
+                </v-layout> -->
               </v-layout>
             </v-card-text>
           </v-card>
         </v-expansion-panel-content>
       </v-expansion-panel>
       <!--  -->
-      <v-expansion-panel :value="[true]" expand  class="expansion-pl" v-if="Number(payments.paymentStatus) >= 3">
+      <v-expansion-panel :value="[true]" expand  class="expansion-pl" v-if="Number(payments.paymentStatus) >= 5">
         <v-expansion-panel-content>
           <div slot="header">
             <div class="background-triangle-small"> 

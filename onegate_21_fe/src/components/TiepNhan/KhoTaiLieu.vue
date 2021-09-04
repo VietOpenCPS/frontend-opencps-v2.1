@@ -101,20 +101,20 @@
                   <span>{{ documentPage * numberPerPage - numberPerPage + props.index + 1 }}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px; min-width:450px">
+              <td class="text-xs-left" style="height:36px; min-width:350px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
-                  <span>{{props.item.hasOwnProperty('fileName') ? props.item.fileName : ''}}</span>
+                  <span style="word-break: break-word;">{{props.item.hasOwnProperty('fileName') ? props.item.fileName : ''}}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px;min-width:150px">
+              <td class="text-xs-left" style="height:36px;min-width:150px;max-width: 300px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
-                  <span>{{props.item.hasOwnProperty('fileNo') ? props.item.fileNo : ''}}</span>
+                  <span style="word-break: break-word;">{{props.item.hasOwnProperty('fileNo') ? props.item.fileNo : ''}}</span>
                 </div>
               </td>
               <td class="text-xs-left" style="height:36px;min-width:120px">
@@ -133,7 +133,7 @@
                   <span>{{props.item.hasOwnProperty('createDate') ? props.item.createDate : ''}}</span>
                 </div>
               </td>
-              <td class="text-xs-center" style="height:36px;width:135px">
+              <td class="text-xs-center" style="height:36px;min-width:125px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -143,7 +143,7 @@
                   </span>
                 </div>
               </td>
-              <td class="text-xs-center" style="height:36px;width: 100px">
+              <td class="text-xs-center" style="height:36px;min-width: 100px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>

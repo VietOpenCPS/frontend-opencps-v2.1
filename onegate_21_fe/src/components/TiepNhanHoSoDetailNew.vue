@@ -638,6 +638,40 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialogDoAction" scrollable persistent max-width="700px">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>{{dataDetailAction['actionName']}}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogDoAction = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-layout wrap class="py-1 align-center row-list-style">
+            <v-flex xs12 class="px-2">
+              <div class="my-2 text-bold">Ý kiến của cán bộ:</div>
+              <v-textarea class="py-0"
+              box
+              v-model="userNoteAction"
+              rows="3"
+              ></v-textarea>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-3" color="primary" @click="formVue(dataDetailAction)"
+          :loading="loadingAction"
+          :disabled="loadingAction">
+            <v-icon>save</v-icon> &nbsp;
+            Xác nhận
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -692,6 +726,9 @@ export default {
     govAgencyName_hidden: '',
     dossierTemplateNo_hidden: '',
     eformCode_hidden: '',
+    dataDetailAction: '',
+    userNoteAction: '',
+    dialogDoAction: false,
     // 
     validTNHS: false,
     dossierId: '',
@@ -1512,10 +1549,15 @@ export default {
           actionId: item.processActionId
         }
         vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
+          vm.dataDetailAction = result
           if(vm.data_form_template !== 'formHPH' && vm.data_form_template !== 'formCH'  && vm.data_form_template !== 'formHT' && vm.data_form_template !== 'formTT') {
             vm.formAlpaca()
           } else {
-            vm.formVue(result)
+            if (result.hasOwnProperty('userNote') && (result['userNote'] === 1 || result['userNote'] === 2)) {
+              vm.dialogDoAction = true
+            } else {
+              vm.formVue(result)
+            }
           }
         }).catch(function (reject) {
         })
@@ -1565,6 +1607,9 @@ export default {
           }
           if (data && data.hasOwnProperty('payment') && data.payment) {
             params.payment = JSON.parse(dataCreate.payment)
+          }
+          if (vm.dataDetailAction.hasOwnProperty('userNote') && (vm.dataDetailAction['userNote'] === 1 || vm.dataDetailAction['userNote'] === 2)) {
+            params.userNote = vm.userNoteAction
           }
           vm.$store.dispatch('postAction', params).then(resPostAction => {
           }).catch(function() {
@@ -1947,7 +1992,7 @@ export default {
       }
       if(vm.data_form_template === 'formTT'){
         if(vm.$refs.formTiepNhan.validate()){
-          if(vm.checkThanhVien()){
+          if((vm.dataDetailAction.hasOwnProperty('userNote') && (vm.dataDetailAction['userNote'] === 1 || vm.dataDetailAction['userNote'] === 2)) || vm.checkThanhVien()){
             // if(vm.checkCKCD){
               if(vm.formCode === 'NEW') {
                 vm.loadingAction = true
@@ -2743,21 +2788,21 @@ export default {
         console.log('listThanhVien', listThanhVien)
       } catch (error) {
       }
-      if (listVanBan.length === 0 && listThanhVien.length !== 0) {
-        vm.confirmMess = 'Chưa có văn bản quyết định nào'
-        valid = false
-        return valid
-      }
+      // if (listVanBan && listVanBan.length === 0 && listThanhVien.length !== 0) {
+      //   vm.confirmMess = 'Chưa có văn bản quyết định nào'
+      //   valid = false
+      //   return valid
+      // }
       if (listThanhVien.length === 0 && listVanBan.length !== 0) {
         vm.confirmMess = 'Chưa có thành viên nào'
         valid = false
         return valid
       }
-      if (listVanBan.length === 0 && listThanhVien.length === 0) {
-        vm.confirmMess = 'Chưa có văn bản quyết định và thành viên nào'
-        valid = false
-        return valid
-      }
+      // if (listVanBan.length === 0 && listThanhVien.length === 0) {
+      //   vm.confirmMess = 'Chưa có văn bản quyết định và thành viên nào'
+      //   valid = false
+      //   return valid
+      // }
       for(let i =0; i<listThanhVien.length;i++){
         if(!listThanhVien[i]['So_Cv_Den']){
           vm.confirmMess = 'Thành viên đoàn số thứ tự ' + i + 1 + ' chưa có văn bản quyết định'

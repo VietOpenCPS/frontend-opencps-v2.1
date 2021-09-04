@@ -193,6 +193,7 @@ export const store = new Vuex.Store({
           domain: filter.domain,
           service: filter.service,
           dossierNo: filter.dossierNo,
+          keyword: filter.keyword,
           order: true,
           start: filter.start,
           end: filter.end,

@@ -8,13 +8,13 @@
       >
         <v-tabs-slider color="blue"></v-tabs-slider>
     
-        <v-tab href="#tab-1" class="ml-3 mr-4 black--text" >
-          <span style="font-size: 16px">KẾT QUẢ ĐÁNH GIÁ THEO TTHC</span>
+        <v-tab href="#tab-1" class="ml-3 mr-4 black--text" @click="resetDataFilter(1)">
+          <span style="font-size: 16px">KẾT QUẢ ĐÁNH GIÁ CỦA NLTT</span>
           <v-icon class="black--text" size=26>done_all</v-icon>
         </v-tab>
     
-        <v-tab href="#tab-2" class="black--text">
-          <span style="font-size: 16px">KẾT QUẢ ĐÁNH GIÁ CƠ QUAN</span>
+        <v-tab style="max-width: 350px;" href="#tab-2" class="black--text" @click="resetDataFilter(2)">
+          <span style="font-size: 16px">KẾT QUẢ ĐÁNH GIÁ CỦA CƠ QUAN QLNN</span>
           <v-icon class="black--text" size=26>ballot</v-icon>
         </v-tab>
     
@@ -22,6 +22,78 @@
           value="tab-1"
         >
           <v-card flat>
+            <v-flex xs12>
+              <v-layout wrap class="px-3 pt-3">
+                <v-flex xs12 md4 class="my-2">
+                    <v-autocomplete
+                      label="Đơn vị"
+                      :items="agencyList"
+                      v-model="govAgency"
+                      item-text="govAgencyName"
+                      item-value="govAgencyCode"
+                      return-object
+                      clearable
+                    >
+                    </v-autocomplete>
+                </v-flex>
+                
+                <v-flex xs12 md3 class="my-2 pl-3">
+                  <v-menu
+                    ref="menuDate3"
+                    v-model="menuDate3"
+                    :close-on-content-click="true"
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                  >
+                    <v-text-field
+                    slot="activator"
+                    class="search-input-appbar input-search"
+                    v-model="fromReceiveDateFormatted"
+                    persistent-hint
+                    append-icon="event"
+                    @blur="fromReceiveDate = parseDate(fromReceiveDateFormatted)"
+                    label="Từ ngày"
+                    hide-details
+                    height="32"
+                    min-height="32"
+                    >
+                    </v-text-field>
+                    <v-date-picker :max="toReceiveDateFormatted ? getMinMax(toReceiveDateFormatted) : null" v-model="fromReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate(2)"></v-date-picker>
+                  </v-menu>
+                </v-flex>
+                <v-flex xs12 md3 class="my-2 pl-3">
+                  <v-menu
+                    ref="menuDate4"
+                    v-model="menuDate4"
+                    :close-on-content-click="true"
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                  >
+
+                    <v-text-field
+                    slot="activator"
+                    class="search-input-appbar input-search"
+                    v-model="toReceiveDateFormatted"
+                    persistent-hint
+                    append-icon="event"
+                    @blur="toReceiveDate = parseDate(toReceiveDateFormatted)"
+                    label="Đến ngày"
+                    hide-details
+                    height="32"
+                    min-height="32"
+                    ></v-text-field>
+                    <v-date-picker :min="fromReceiveDateFormatted ? getMinMax(fromReceiveDateFormatted) : null" v-model="toReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate(2)"></v-date-picker>
+                  </v-menu>
+                </v-flex>
+                <v-flex xs12 md2 class="pl-4">
+                  <v-btn class="mx-0" depressed small color="primary" @click="getReportAgency" :loading="btnLoading" :disabled="btnLoading">
+                    <v-icon>image_search</v-icon>Xem kết quả
+                  </v-btn>
+                </v-flex>
+              </v-layout>
+            </v-flex>
             <v-card-text class="reportTable">
               <table class="my-2" hide-default-footer>
                 <thead>
@@ -36,21 +108,25 @@
                       <span>Tiêu chí đánh giá</span>
                     </th>
                     <th class="text-center px-2 py-1">
-                      <span>Số điểm</span>
+                      <span>Lượt đánh giá</span>
+                    </th>
+                    <th class="text-center px-2 py-1">
+                      <span>Điểm trung bình</span>
                     </th>
                   </tr>
                 </thead>
 
                 <tbody v-for="(item,index) in statisticGovAgency" :key="index">
                   <tr>
-                    <td align="left" colspan="4"  class="px-2 text-bold">{{item.govAgencyName}}</td>
+                    <td align="left" colspan="5"  class="px-2 text-bold">{{item.govAgencyName}}</td>
                   </tr>
                   
                   <tr v-for="(item2,index2) in item['votings']" :key="index2">
                     <td align="center" class="px-2">{{index2 + 1}}</td>
                     <td align="left"  class="px-2">Chỉ số {{index2 + 1}}</td>
                     <td align="left"  class="px-2">{{item2.title}}</td>
-                    <td align="center"  class="px-2">{{item2.point}}</td>
+                    <td align="center"  class="px-2">{{item2.countVoteResult}}</td>
+                    <td align="center"  class="px-2">{{Number(item2.countVoteResult ? (item2.point/item2.countVoteResult).toFixed(2) : 0)}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -61,9 +137,90 @@
           value="tab-2"
         >
           <v-card flat>
+            <v-flex xs12>
+              <v-layout wrap class="px-3 pt-3">
+                <v-flex xs12 md4 class="my-2">
+                    <v-autocomplete
+                      label="Đơn vị"
+                      :items="agencyList"
+                      v-model="govAgency"
+                      item-text="govAgencyName"
+                      item-value="govAgencyCode"
+                      return-object
+                      clearable
+                    >
+                    </v-autocomplete>
+                </v-flex>
+                
+                <!-- <v-flex xs12 md3 class="my-2 pl-3">
+                  <v-menu
+                    ref="menuDate1"
+                    v-model="menuDate1"
+                    :close-on-content-click="true"
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                  >
+                    <v-text-field
+                    slot="activator"
+                    class="search-input-appbar input-search"
+                    v-model="fromReceiveDateFormatted"
+                    persistent-hint
+                    append-icon="event"
+                    @blur="fromReceiveDate = parseDate(fromReceiveDateFormatted)"
+                    label="Từ ngày"
+                    hide-details
+                    height="32"
+                    min-height="32"
+                    >
+                    </v-text-field>
+                    <v-date-picker :max="toReceiveDateFormatted ? getMinMax(toReceiveDateFormatted) : null" v-model="fromReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate(1)"></v-date-picker>
+                  </v-menu>
+                </v-flex>
+                <v-flex xs12 md3 class="my-2 pl-3">
+                  <v-menu
+                    ref="menuDate2"
+                    v-model="menuDate2"
+                    :close-on-content-click="true"
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                  >
+
+                    <v-text-field
+                    slot="activator"
+                    class="search-input-appbar input-search"
+                    v-model="toReceiveDateFormatted"
+                    persistent-hint
+                    append-icon="event"
+                    @blur="toReceiveDate = parseDate(toReceiveDateFormatted)"
+                    label="Đến ngày"
+                    hide-details
+                    height="32"
+                    min-height="32"
+                    ></v-text-field>
+                    <v-date-picker :min="fromReceiveDateFormatted ? getMinMax(fromReceiveDateFormatted) : null" v-model="toReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate(1)"></v-date-picker>
+                  </v-menu>
+                </v-flex> -->
+                <v-flex xs12 md4 class="my-2 pl-3 layout wrap">
+                  <v-select
+                    style="width: 150px"
+                    :items="yearList"
+                    item-value="value"
+                    item-text="name"
+                    v-model="yearQlnn"
+                    class="right"
+                    @change="changeYear()"
+                  ></v-select>
+                  <v-btn class="mx-0 ml-4 mt-0" depressed small color="primary" @click="getReportAgencyMc(yearQlnn)" :loading="btnLoading" :disabled="btnLoading">
+                    <v-icon>image_search</v-icon>Xem kết quả
+                  </v-btn>
+                </v-flex>
+              </v-layout>
+            </v-flex>
             <v-card-text class="reportTable">
               <v-flex xs12 class="text-xs-right">
-                <v-btn class="white--text" @click="dialogVoting = true" color="#004C98" :loading="btnLoading" :disabled="btnLoading">
+                <v-btn class="white--text mx-0" @click="dialogVoting = true" color="#004C98" :loading="btnLoading" :disabled="btnLoading">
                   <v-icon>verified</v-icon>&nbsp;
                   Thực hiện đánh giá
                 </v-btn>
@@ -81,7 +238,7 @@
                       <span>Tiêu chí đánh giá</span>
                     </th>
                     <th class="text-center px-2 py-1">
-                      <span>Số điểm</span>
+                      <span>Điểm đánh giá</span>
                     </th>
                   </tr>
                 </thead>
@@ -208,6 +365,10 @@
                   <v-icon>save</v-icon>&nbsp;
                   Gửi đánh giá
                 </v-btn>
+                <v-btn class="white--text ml-3" @click="dialogVoting = false" color="red" :loading="btnLoading" :disabled="btnLoading">
+                  <v-icon>close</v-icon>&nbsp;
+                  Thoát
+                </v-btn>
               </v-flex>
             </v-flex>
           </v-layout>
@@ -237,6 +398,14 @@ export default {
   },
   data: () => ({
     loading: false,
+    menuDate1: false,
+    menuDate3: false,
+    fromReceiveDate: '',
+    fromReceiveDateFormatted: '',
+    menuDate2: false,
+    menuDate4: false,
+    toReceiveDate: '',
+    toReceiveDateFormatted: '',
     statisticGovAgency: [],
     statisticGovAgencyMc: [],
     votingItemsSurvey: [],
@@ -248,10 +417,9 @@ export default {
     votingUpdate: '',
     votingItemsTTHC: [],
     votingItemsCLDV: [],
-    agencyLists: [],
     filterConfig: '',
     filters: [],
-    govAgency: 0,
+    govAgency: '',
     hasData: true,
     data: {},
     btnLoading: false,
@@ -260,7 +428,9 @@ export default {
     barColor: ['#5cb85c', '#f0ad4e', '#d9534f', '#2e4fc8', '#2ec8bad9', '#142f14'],
     dialog_voting_result: false,
     resultTotal: [],
-    totalAnswer: 0
+    totalAnswer: 0,
+    currentYear: (new Date()).getFullYear(),
+    yearQlnn: (new Date()).getFullYear(),
   }),
   computed: {
     loading () {
@@ -268,6 +438,14 @@ export default {
     },
     indexReport () {
       return this.$store.getters.getIndexReport
+    },
+    yearList() {
+      let arr = [];
+      let year = new Date().getFullYear();
+      for (let i = 0; i <= 3; i++) {
+        arr.push({ name: "Năm " + (year - i), value: year - i });
+      }
+      return arr;
     }
   },
   created () {
@@ -278,6 +456,8 @@ export default {
         vm.agencyList = agencyList
       } catch (error) {
       }
+      vm.toReceiveDateFormatted = vm.currentDateFormat()
+      vm.fromReceiveDateFormatted = '01/01/' + vm.currentYear
       // 
       // vm.$store.dispatch('loadVoting', {
       //   className: 'survey',
@@ -294,7 +474,7 @@ export default {
       // }).catch(xhr => {
       // })
       vm.getReportAgency()
-      vm.getReportAgencyMc()
+      vm.getReportAgencyMc(vm.currentYear)
       vm.$store.dispatch('loadVotingNew', {
         className: 'surveyAgency'
       }).then(function(result) {
@@ -323,13 +503,37 @@ export default {
   watch: {
   },
   methods: {
+    resetDataFilter (index) {
+      let vm = this
+      vm.govAgency = ''
+      vm.toReceiveDateFormatted = vm.currentDateFormat()
+      let currentYear = (new Date()).getFullYear()
+      vm.fromReceiveDateFormatted = '01/01/' + currentYear
+      if (index === 1) {
+        vm.getReportAgency()
+      } else {
+        vm.getReportAgencyMc(vm.currentYear)
+      }
+    },
     getReportAgency () {
       let vm = this
+      vm.btnLoading = true
       vm.$store.dispatch('loadVotingResult', {
-        govAgencyCode: '',
-        className: 'survey'
+        className: 'survey',
+        fromReceiveDate: vm.fromReceiveDateFormatted,
+        toReceiveDate: vm.toReceiveDateFormatted,
+        govAgencyCode: vm.govAgency ? vm.govAgency['govAgencyCode'] : ''
       }).then(function(result) {
-        let voteStatistic = result
+        vm.btnLoading = false
+        let voteStatistic = []
+        result.forEach(element => {
+          let indexSt = vm.agencyList.findIndex(function(gov) {
+            return gov.govAgencyCode == element.govAgencyCode
+          })
+          if (indexSt >=0) {
+            voteStatistic.push(element)
+          }
+        })
         let sortVote = function (voteList) {
           function compare(a, b) {
             if (a.voteCode < b.voteCode)
@@ -361,13 +565,16 @@ export default {
           vm.statisticGovAgency = statistic
         }
       }).catch(xhr => {
+        vm.btnLoading = false
       })
     },
-    getReportAgencyMc () {
+    getReportAgencyMc (year) {
       let vm = this
       vm.$store.dispatch('loadVotingResultGov', {
-        govAgencyCode: '',
-        className: 'surveyAgency'
+        className: 'surveyAgency',
+        fromReceiveDate: '01/01/' + year,
+        toReceiveDate: '31/12/' + year,
+        govAgencyCode: vm.govAgency ? vm.govAgency['govAgencyCode'] : ''
       }).then(function(result) {
         let voteStatistic = result
         let sortVote = function (voteList) {
@@ -421,6 +628,7 @@ export default {
     },
     doVottingResultSubmitNew () {
       var vm = this
+      vm.yearQlnn = vm.currentYear
       vm.btnLoading = true
       let arrAction = []
       let valid = false
@@ -457,7 +665,7 @@ export default {
               return voteList.sort(compare)
             }
             vm.votingItemsSurvey = sortVote(vm.votingItemsSurvey)
-            vm.getReportAgencyMc()
+            vm.getReportAgencyMc(vm.currentYear)
           }).catch( function () {
           })
         }).catch(xhr => {
@@ -688,7 +896,46 @@ export default {
         vm.resultTotal = votingPercent
         console.log('votingPercent', votingPercent)
       }
-    }
+    },
+    currentDateFormat (date) {
+      let date1 = date ? new Date(date) : new Date()
+      return `${date1.getDate().toString().padStart(2, '0')}/${(date1.getMonth() + 1).toString().padStart(2, '0')}/${date1.getFullYear()}`
+    },
+    parseDate(date) {
+      if (!date) return ''
+      if (String(date).indexOf('/') > 0) {
+        const [day, month, year] = date.split('/')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      } else if (String(date).indexOf('-') > 0) {
+        const [day, month, year] = date.split('-')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      } else {
+        let date1 = new Date(Number(date))
+        return `${date1.getFullYear()}-${(date1.getMonth() + 1).toString().padStart(2, '0')}-${date1.getDate().toString().padStart(2, '0')}`
+      }
+    },
+    getMinMax (date) {
+      if (!date) return null
+      const [day, month, year] = date.split('/')
+      return `${year}-${month}-${day}`
+    },
+    formatDate(date) {
+      if (!date) return ''
+      const [year, month, day] = date.split('-')
+      return `${day}/${month}/${year}`
+    },
+    changeDate(index) {
+      let vm = this
+      if (index === 1) {
+        vm.menuDate1 = vm.menuDate2  = false
+        vm.fromReceiveDateFormatted = vm.formatDate(vm.fromReceiveDate)
+        vm.toReceiveDateFormatted = vm.formatDate(vm.toReceiveDate)
+      } else {
+        vm.menuDate3 = vm.menuDate4  = false
+        vm.fromReceiveDateFormatted = vm.formatDate(vm.fromReceiveDate)
+        vm.toReceiveDateFormatted = vm.formatDate(vm.toReceiveDate)
+      }
+    },
   },
   filters: {
   }

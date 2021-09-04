@@ -159,24 +159,7 @@
               </div>
             </v-card-text>
           </v-card>
-          
-          <!-- Thống kê chi tiết các chỉ số. Sử dụng sau -->
-          <!-- <v-card v-for="(item, index) in votingItems" :key="index" color="#0072bc" flat class="px-2 py-2 mt-4" style="border-radius: 7px;">
-            <v-card-text class="px-2 py-1 pr-0">
-              <div class="text-xs-center white--text text-bold">Kết quả đánh giá Chỉ số {{index + 1}}</div>
-              <div class="text-xs-center white--text" >Năm {{(new Date()).getFullYear()}}</div>
-              <div class="mt-3" v-for="(item1, index1) in item['answerPercent']" :key="index1">
-                <v-layout wrap class="mb-2">
-                  <div class="flex white--text" style="width:70px">{{item1.name}} : </div>
-                  <progress-bar class="flex pt-1" size="13" :spacing="1" bar-transition="all 1s ease"
-                  :val="Number(item1.percent)" 
-                  bg-color="#e0e0e0" bar-color="#6dcff6" text-fg-color="#fff" style="z-index:10000;width: calc(100% - 120px)">
-                  </progress-bar>
-                  <div style="width:50px;color:#6dcff6" class="flex pl-2 text-bold">{{item1.percent}} % </div>
-                </v-layout>
-              </div>
-            </v-card-text>
-          </v-card> -->
+        
         </div>
       </v-flex>
       <v-flex xs12 sm1>
@@ -195,8 +178,13 @@
           <v-icon class="black--text" size=26>done_all</v-icon>
         </v-tab>
     
-        <v-tab href="#tab-2" class="black--text">
-          <span style="font-size: 16px">KẾT QUẢ ĐÁNH GIÁ</span>
+        <v-tab href="#tab-2" class="black--text" @click="getResultNltt(currentYear)">
+          <span style="font-size: 16px">KẾT QUẢ ĐÁNH GIÁ CỦA NLTT</span>
+          <v-icon class="black--text" size=26>ballot</v-icon>
+        </v-tab>
+
+        <v-tab href="#tab-3" style="max-width: 350px;" class="black--text" @click="getResultQlnn(currentYear)">
+          <span style="font-size: 16px">KẾT QUẢ ĐÁNH GIÁ CỦA CƠ QUAN QLNN</span>
           <v-icon class="black--text" size=26>ballot</v-icon>
         </v-tab>
     
@@ -222,12 +210,13 @@
                       </div>
                     </div>
                     <div :class="!isMobile ? 'ml-4' : 'ml-2'">
-                    <v-radio-group v-model="item.selected" column class="mt-1">
-                      <v-radio :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
-                        <div style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{itemChoise.subject}}</div>
-                      </v-radio>
-                    </v-radio-group>
-                  </div>
+                      <v-radio-group v-model="item.selected" column class="mt-1">
+                        <v-radio :disabled="item.processTime" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                          <div v-if="item.processTime" style="text-align: justify; opacity: 0.7; color: black" slot="label">{{itemChoise.subject}}</div>
+                          <div v-else style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{itemChoise.subject}}</div>
+                        </v-radio>
+                      </v-radio-group>
+                    </div>
                 </div>
                 <v-flex xs12 sm12 class="mx-2 my-3" v-if="showCaptcha">
                   <div style="max-width: 400px;background: #dedede;margin: 0 auto;" class="pb-2">
@@ -267,11 +256,28 @@
             </v-card-text>
           </v-card>
         </v-tab-item>
+
         <v-tab-item
           value="tab-2"
         >
           <v-card flat>
             <v-card-text class="reportTable">
+              <v-layout wrap>
+                <v-flex xs12 md8>
+                  <p class="mb-3" style="font-size: 14px;font-weight: bold;color: #0054a6;">TỔNG HỢP KẾT QUẢ ĐÁNH GIÁ GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH CỦA NGƯỜI LÀM THỦ TỤC NĂM {{yearNltt}}</p>
+                </v-flex>
+                <v-flex xs12 md4>
+                  <v-select
+                    style="width: 150px"
+                    :items="yearList"
+                    item-value="value"
+                    item-text="name"
+                    v-model="yearNltt"
+                    class="right"
+                    @change="changeYear('nltt')"
+                  ></v-select>
+                </v-flex>
+              </v-layout>
               <table class="my-2" hide-default-footer>
                 <thead>
                   <tr>
@@ -285,14 +291,76 @@
                       <span>Tiêu chí đánh giá</span>
                     </th>
                     <th class="text-center px-2 py-1">
-                      <span>Số điểm</span>
+                      <span>Lượt đánh giá</span>
+                    </th>
+                    <th class="text-center px-2 py-1">
+                      <span>Điểm trung bình</span>
                     </th>
                   </tr>
                 </thead>
 
-                <tbody v-for="(item,index) in statisticGovAgency" :key="index">
+                <tbody v-for="(item,index) in statisticNltt" :key="index">
                   <tr>
                     <td align="left" colspan="4"  class="px-2 text-bold">{{item.govAgencyName}}</td>
+                  </tr>
+                  
+                  <tr v-for="(item2,index2) in item['votings']" :key="index2">
+                    <td align="center" class="px-2">{{index2 + 1}}</td>
+                    <td align="left"  class="px-2">Chỉ số {{index2 + 1}}</td>
+                    <td align="left"  class="px-2">{{item2.title}}</td>
+                    <td align="center"  class="px-2">{{item2.countVoteResult}}</td>
+                    <td align="center"  class="px-2">{{Number(item2.countVoteResult ? (item2.point/item2.countVoteResult).toFixed(2) : 0)}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </v-card-text>
+          </v-card>
+        </v-tab-item>
+
+        <v-tab-item
+          value="tab-3"
+        >
+          <v-card flat>
+            <v-card-text class="reportTable">
+              <v-layout wrap>
+                <v-flex xs12 md8>
+                  <p class="mb-3" style="font-size: 14px;font-weight: bold;color: #0054a6;">TỔNG HỢP KẾT QUẢ ĐÁNH GIÁ GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH CỦA CƠ QUAN QUẢN LÝ NHÀ NƯỚC NĂM {{yearQlnn}}</p>
+                </v-flex>
+                <v-flex xs12 md4>
+                  <v-select
+                    style="width: 150px"
+                    :items="yearList"
+                    item-value="value"
+                    item-text="name"
+                    v-model="yearQlnn"
+                    class="right"
+                    @change="changeYear('qlnn')"
+                  ></v-select>
+                </v-flex>
+              </v-layout>
+              
+              <table class="my-2" hide-default-footer>
+                <thead>
+                  <tr>
+                    <th class="text-center px-2">
+                      <span>STT</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Chỉ số đánh giá</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Tiêu chí đánh giá</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Số điểm</span>
+                    </th>
+                    
+                  </tr>
+                </thead>
+
+                <tbody v-for="(item,index) in statisticQlnn" :key="index">
+                  <tr>
+                    <td align="left" colspan="5"  class="px-2 text-bold">{{item.govAgencyName}}</td>
                   </tr>
                   
                   <tr v-for="(item2,index2) in item['votings']" :key="index2">
@@ -489,6 +557,9 @@ export default {
     ProgressBar
   },
   data: () => ({
+    currentYear: (new Date()).getFullYear(),
+    yearNltt: (new Date()).getFullYear(),
+    yearQlnn: (new Date()).getFullYear(),
     votingItems: [],
     btnLoading: false,
     showCaptcha: false,
@@ -504,11 +575,13 @@ export default {
     dialogVerify: false,
     ksBgt: false,
     surveyLayoutVersion: 1,
-    statisticGovAgency: [],
+    statisticNltt: [],
+    statisticQlnn: [],
     agencyList: [],
     agency: '',
     loadingChangeAgency: false,
-    votingResult: []
+    votingResult: [],
+    statisticDossier: []
   }),
   computed: {
     loading () {
@@ -516,10 +589,22 @@ export default {
     },
     isMobile () {
       return this.$store.getters.getIsMobile
+    },
+    yearList() {
+      let arr = [];
+      let year = new Date().getFullYear();
+      for (let i = 0; i <= 3; i++) {
+        arr.push({ name: "Năm " + (year - i), value: year - i });
+      }
+      return arr;
     }
   },
   created () {
     var vm = this
+    try {
+      vm.agencyLists = agencyList
+    } catch (error) {
+    }
     try {
       vm.surveyLayoutVersion = surveyLayoutVersion ? surveyLayoutVersion : 1
     } catch (error) {
@@ -550,7 +635,6 @@ export default {
             return voteList.sort(compare)
           }
           vm.votingItems = sortVote(vm.votingItems)
-          vm.getReportAgency()
         }).catch(xhr => {
         })
         vm.getCounter()
@@ -708,7 +792,7 @@ export default {
       let valid = false
       for (var key in vm.votingItems) {
         vm.votingItems[key]['className'] = 'survey'
-        if (vm.votingItems[key]['selected']) {
+        if (vm.votingItems[key]['selected'] && !vm.votingItems[key]) {
           valid = true
           let indexChoice = vm.votingItems[key]['selected'] - 1
           arrAction.push(vm.$store.dispatch('submitVotingNew', Object.assign(vm.votingItems[key]['choices'][indexChoice], {dossierNo: vm.dossierNo})))
@@ -737,7 +821,7 @@ export default {
               return voteList.sort(compare)
             }
             vm.votingItems = sortVote(vm.votingItems)
-            vm.getReportAgency()
+            vm.getResultNltt(vm.currentYear)
           }).catch( function () {
           })
         }).catch(xhr => {
@@ -909,12 +993,35 @@ export default {
         })
       }, 500)
     },
-    getReportAgency () {
+    changeYear(target) {
       let vm = this
-      vm.$store.dispatch('loadVotingResult', {
-        govAgencyCode: ''
-      }).then(function(result) {
-        let voteStatistic = result
+      setTimeout(function () {
+        if (target === 'nltt') {
+          vm.getResultNltt(vm.yearNltt)
+        } else if (target === 'qlnn') {
+          vm.getResultQlnn(vm.yearQlnn)
+        }
+      }, 100)
+    },
+    getResultNltt (year) {
+      let vm = this
+      let data = {
+        govAgencyCode: '',
+        fromReceiveDate: '01/01/' + year,
+        toReceiveDate: '31/12/' + year
+      }
+      vm.$store.dispatch('loadVotingResult', data).then(function(result) {
+        let voteStatistic = []
+        result.forEach(element => {
+          let indexSt = vm.agencyList.findIndex(function(gov) {
+            return gov.govAgencyCode == element.govAgencyCode
+          })
+          if (indexSt >=0) {
+            element['govAgencyName'] = vm.agencyList[indexSt]['govAgencyName']
+            voteStatistic.push(element)
+          }
+        })
+
         let sortVote = function (voteList) {
           function compare(a, b) {
             if (a.voteCode < b.voteCode)
@@ -943,10 +1050,60 @@ export default {
               statistic.push(itemSt)
             }
           })
-          vm.statisticGovAgency = statistic
-          console.log('statisticGovAgency', vm.statisticGovAgency)
+          vm.statisticNltt = statistic
         }
       }).catch(xhr => {
+        vm.statisticNltt = []
+      })
+    },
+    getResultQlnn (year) {
+      let vm = this
+      vm.$store.dispatch('loadVotingResultQlnn', {
+        fromReceiveDate: '01/01/' + year,
+        toReceiveDate: '31/12/' + year
+      }).then(function(result) {
+        let voteStatistic = []
+        result.forEach(element => {
+          let indexSt = vm.agencyList.findIndex(function(gov) {
+            return gov.govAgencyCode == element.govAgencyCode
+          })
+          if (indexSt >=0) {
+            element['govAgencyName'] = vm.agencyList[indexSt]['govAgencyName']
+            voteStatistic.push(element)
+          }
+        })
+        let sortVote = function (voteList) {
+          function compare(a, b) {
+            if (a.voteCode < b.voteCode)
+              return -1
+            if (a.voteCode > b.voteCode)
+              return 1
+            return 0
+          }
+          return voteList.sort(compare)
+        }
+        voteStatistic = sortVote(voteStatistic)
+        if (voteStatistic && voteStatistic.length) {
+          let statistic = []
+          voteStatistic.forEach(element => {
+            let indexSt = statistic.findIndex(function(st) {
+              return st.govAgencyCode == element.govAgencyCode
+            })
+            if (indexSt >= 0) {
+              statistic[indexSt]['votings'].push(element)
+            } else {
+              let itemSt = {
+                govAgencyCode: element.govAgencyCode,
+                govAgencyName: element.govAgencyName,
+                votings: [element]
+              }
+              statistic.push(itemSt)
+            }
+          })
+          vm.statisticQlnn = statistic
+        }
+      }).catch(xhr => {
+        vm.statisticQlnn = []
       })
     },
     validateCaptcha () {
