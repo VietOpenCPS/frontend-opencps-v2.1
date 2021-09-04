@@ -955,6 +955,190 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    loadVotingNew ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/vote/' + data.className)
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              items = items.filter(function(item) {
+                return item.voteModel && item.voteModel['status'] == 1
+              })
+              let lengthQuestion = items.length
+              for (let index = 0; index < lengthQuestion; index++) {
+                if (items[index]['lstChoiceDetailModels']) {
+                  let listChoice = Array.isArray(items[index]['lstChoiceDetailModels']) ? items[index]['lstChoiceDetailModels'] : [items[index]['lstChoiceDetailModels']]
+                  items[index] = Object.assign(items[index]['voteModel'], {choices: listChoice})
+                } else {
+                  items[index] = Object.assign(items[index]['voteModel'], {choices: []})
+                }
+              }
+              resolve(items)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+
+        })
+      })
+    },
+    loadVotingResult ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            fromReceiveDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            toReceiveDate: data.toReceiveDate ? data.toReceiveDate : ''
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/vote/' + data.className + '/statistic/voteResult')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              if (data.govAgencyCode) {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode && item.govAgencyCode === data.govAgencyCode
+                })
+              } else {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode
+                })
+              }
+              resolve(items)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    loadVotingResultGov ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            fromReceiveDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            toReceiveDate: data.toReceiveDate ? data.toReceiveDate : ''
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/vote/' + data.className + '/statistic/voteResultGov')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              if (data.govAgencyCode) {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode && item.govAgencyCode === data.govAgencyCode
+                })
+              } else {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode
+                })
+              }
+              resolve(items)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    loadVotingResultDossier ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            fromReceiveDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            toReceiveDate: data.toReceiveDate ? data.toReceiveDate : ''
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/vote/survey/statistic/voteResult/serviceL34')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              if (data.govAgencyCode) {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode && item.govAgencyCode === data.govAgencyCode
+                })
+              } else {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode
+                })
+              }
+              resolve(items)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    submitVotingNew ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            govAgencyCode: data.govAgencyCode,
+            govAgencyName: data.govAgencyName
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/vote/' + data.className + '/question/' + data.voteId + '/choice/' + data.voteChoiceId + '/gov')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            resolve(result)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+
+        })
+      })
+    },
   },
   mutations: {
     setInitData (state, payload) {

@@ -273,7 +273,7 @@ export default {
       let current = vm.$router.history.current
       let newQuery = current.query
       vm.$router.push({
-        path: '/table/opencps_processoption/editor/0?serviceConfigId=' + vm.serviceConfigId + '&serviceConfigName=' + vm.serviceConfigName
+        path: '/table/opencps_processoption/editor/0?serviceConfigId=' + vm.serviceConfigId + '&serviceConfigName=' + vm.serviceConfigName + '&col=serviceConfigId&pk=' + vm.serviceConfigId
       })
     },
     getserviceProcessOptionList (reset) {

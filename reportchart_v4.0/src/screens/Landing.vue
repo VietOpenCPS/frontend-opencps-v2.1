@@ -1420,19 +1420,13 @@ export default {
             vm.statistics = response.data.data[0]
             vm.processingTotal = vm.statistics.processingCount + vm.statistics.waitingCount
             // số liệu hoàn thành, đang xử lý chỉ lấy hồ sơ trong năm hiện tại
-            if (vm.thongKeHauGiang) {
-              vm.processingTotal = vm.statistics.processingInAPeriodCount
-            }
+            // if (vm.thongKeHauGiang) {
+            //   vm.processingTotal = vm.statistics.processingInAPeriodCount
+            // }
             vm.statisticalYear = [
               response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
               response.data.data[0].overtimeCount
             ]
-            // if (vm.thongKeHauGiang) {
-            //   vm.statisticalYear = [
-            //     response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
-            //     response.data.data[0].overtimeCount + response.data.data[0].overdueCount
-            //   ]
-            // }
           } else {
             vm.processingTotal = 0
             vm.statisticalYear = [0, 0]
@@ -1503,9 +1497,9 @@ export default {
               if (vm.thongKeHauGiang) {
                 vm.statisticTotalSBN = response.data.data[0]
                 vm.processingSBN = vm.statisticTotalSBN.processingCount + vm.statisticTotalSBN.waitingCount
-                if (vm.thongKeHauGiang) {
-                  vm.processingSBN = vm.statisticTotalSBN.processingInAPeriodCount
-                }
+                // if (vm.thongKeHauGiang) {
+                //   vm.processingSBN = vm.statisticTotalSBN.processingInAPeriodCount
+                // }
                 vm.statisticalSBN = [
                   response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
                   response.data.data[0].overtimeCount
@@ -1577,9 +1571,9 @@ export default {
               if (vm.thongKeHauGiang) {
                 vm.statisticTotalQuanHuyen = response.data.data[0]
                 vm.processingQuanHuyen = vm.statisticTotalQuanHuyen.processingCount + vm.statisticTotalQuanHuyen.waitingCount
-                if (vm.thongKeHauGiang) {
-                  vm.processingQuanHuyen = vm.statisticTotalQuanHuyen.processingInAPeriodCount
-                }
+                // if (vm.thongKeHauGiang) {
+                //   vm.processingQuanHuyen = vm.statisticTotalQuanHuyen.processingInAPeriodCount
+                // }
                 vm.statisticalQUAN_HUYEN = [
                   response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
                   response.data.data[0].overtimeCount
@@ -1651,9 +1645,9 @@ export default {
               if (vm.thongKeHauGiang) {
                 vm.statisticTotalXaPhuong = response.data.data[0]
                 vm.processingXaPhuong = vm.statisticTotalXaPhuong.processingCount + vm.statisticTotalXaPhuong.waitingCount
-                if (vm.thongKeHauGiang) {
-                  vm.processingXaPhuong = vm.statisticTotalXaPhuong.processingInAPeriodCount
-                }
+                // if (vm.thongKeHauGiang) {
+                //   vm.processingXaPhuong = vm.statisticTotalXaPhuong.processingInAPeriodCount
+                // }
                 vm.statisticalXA_PHUONG = [
                   response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
                   response.data.data[0].overtimeCount
@@ -1944,7 +1938,8 @@ export default {
         sumReport.receivedCount = results[0]['receivedCount'] + results[1]['receivedCount'] + results[2]['receivedCount']
         sumReport.releaseCount = results[0]['releaseCount'] + results[1]['releaseCount'] + results[2]['releaseCount']
         sumReport.releaseInAPeriodCount = results[0]['releaseInAPeriodCount'] + results[1]['releaseInAPeriodCount'] + results[2]['releaseInAPeriodCount']
-        sumReport.processingCount = results[0]['processingInAPeriodCount'] +results[1]['processingInAPeriodCount'] + results[2]['processingInAPeriodCount']
+        // sumReport.processingCount = results[0]['processingInAPeriodCount'] +results[1]['processingInAPeriodCount'] + results[2]['processingInAPeriodCount']
+        sumReport.processingCount = results[0]['processingCount'] +results[1]['processingCount'] + results[2]['processingCount'] + results[0]['waitingCount'] +results[1]['waitingCount'] + results[2]['waitingCount']
         sumReport.betimesCount = results[0]['betimesCount'] +results[1]['betimesCount'] + results[2]['betimesCount']
         sumReport.ontimeCount = results[0]['ontimeCount'] +results[1]['ontimeCount'] + results[2]['ontimeCount']
         sumReport.overtimeCount = results[0]['overtimeCount'] +results[1]['overtimeCount'] + results[2]['overtimeCount']

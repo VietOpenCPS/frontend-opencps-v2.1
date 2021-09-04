@@ -552,7 +552,32 @@
           <v-tabs-items v-model="activeTab2" reverse-transition="fade-transition" transition="fade-transition">
             <v-tab-item v-if="originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done'"
             value="tabs-1b" :key="1" reverse-transition="fade-transition" transition="fade-transition">
-              <div class="px-2 py-2">
+              <div class="px-2 py-2" v-if="votingVersion === 1">
+                <div v-if="votingItems && votingItems.length > 0">
+                  <div v-for="(item, index) in votingItems" :key="index" >
+                    <div class="text-bold">
+                      {{index + 1}}.&nbsp; {{ item.title }}
+                    </div>
+                    <v-radio-group class="ml-3 mt-2" v-model="item.selected" column>
+                      <v-radio class="ml-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1.subject" :value="index1 + 1" :disabled="originality === 3"></v-radio>
+                    </v-radio-group>
+                  </div>
+                </div>
+                
+                <div v-if="!votingItems || (votingItems && votingItems.length === 0)" class="mx-3">
+                  <v-alert outline color="warning" icon="priority_high" :value="true">
+                    Không có đánh giá
+                  </v-alert>
+                </div>
+                <div class="ml-3 mt-4" v-if="votingItems && votingItems.length > 0 && originality === 1">
+                  <v-btn color="primary"
+                    :loading="loadingVoting"
+                    :disabled="loadingVoting"
+                    @click="doVottingResultSubmitNew"
+                  >Gửi đánh giá</v-btn>
+                </div>
+              </div>
+              <div class="px-2 py-2" v-if="votingVersion === 2">
                 <div v-if="votingItems && votingItems.length > 0">
                   <div v-for="(item, index) in votingItems" :key="index" >
                     <div class="text-bold">
@@ -561,11 +586,6 @@
                     <v-radio-group class="ml-3 mt-2" v-model="item.selected" column>
                       <v-radio class="ml-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" :disabled="originality === 3"></v-radio>
                     </v-radio-group>
-                    <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
-                      <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
-                        <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
-                      </v-flex>
-                    </v-layout> -->
                   </div>
                 </div>
                 
@@ -827,6 +847,8 @@ export default {
     'phan-cong-lai': PhanCongLai
   },
   data: () => ({
+    loadingActionProcess: false,
+    votingVersion: 1,
     confirmGuiHoSoTrucTuyen: false,
     viTriLuuTru: false,
     docLuuTru: [],
@@ -1172,6 +1194,10 @@ export default {
   created () {
     let vm = this
     try {
+      vm.votingVersion = votingVersion
+    } catch (error) {
+    }
+    try {
       vm.hasPreviewSync = hasPreviewSync
     } catch (error) {
     }
@@ -1191,7 +1217,7 @@ export default {
     vm.$nextTick(function () {
       $('#m-navigation').css('display', 'none')
       // console.log('meunconfig created', vm.menuConfigs, vm.index)
-      if (vm.menuConfigs && vm.menuConfigs[vm.index]['hasViewText']) {
+      if (vm.menuConfigs && vm.menuConfigs[vm.index] && vm.menuConfigs[vm.index]['hasViewText']) {
         vm.viewScript = true
         vm.loadingForm = true
         let filter = {
@@ -1344,6 +1370,14 @@ export default {
               vm.btnStepsDynamics = vm.btnStepsDynamics.filter(function (item) {
                 return !item.hasOwnProperty('roleCode') || (item.hasOwnProperty('roleCode') && vm.getUser(item.roleCode))
               })
+              // bỏ thao tác sửa hồ sơ tk trung tâm
+              let currentQuery = vm.$router.history.current.query
+              if (currentQuery.hasOwnProperty('groupIdSiteMng')) {
+                vm.btnStepsDynamics = vm.btnStepsDynamics.filter(function (item) {
+                  return item.form !== 'UPDATE'
+                })
+              }
+              // 
             }
             if (vm.btnStepsDynamics.filter(function(item) {
               return item.form !== 'UPDATE'
@@ -2162,6 +2196,9 @@ export default {
     // Hàm xử lý Actions
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
+      if (vm.loadingActionProcess) {
+        return
+      }
       var validPhanCong = true
       var validYKien = true
       var validTreHan = true
@@ -2403,13 +2440,14 @@ export default {
             if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
               vm.printDocument = true
             }
+            try {
+              currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            } catch (error) {
+            }
             vm.$router.push({
               path: vm.$router.history.current.path,
-              query: {
-                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                q: currentQuery['q']
-              }
+              query: currentQuery
             })
           }).catch(function (reject) {
             vm.loadingAction = false
@@ -2612,13 +2650,14 @@ export default {
                   vm.$store.commit('setCheckInput', 0)
                   if (String(item.form) === 'ACTIONS') {
                   } else {
+                    try {
+                      currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                      currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                    } catch (error) {
+                    }
                     vm.$router.push({
                       path: vm.$router.history.current.path,
-                      query: {
-                        recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                        renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                        q: currentQuery['q']
-                      }
+                      query: currentQuery
                     })
                   }
                   $('html, body').animate({
@@ -2726,13 +2765,14 @@ export default {
                         vm.$store.commit('setCheckInput', 0)
                         if (String(item.form) === 'ACTIONS') {
                         } else {
+                          try {
+                            currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                            currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                          } catch (error) {
+                          }
                           vm.$router.push({
                             path: vm.$router.history.current.path,
-                            query: {
-                              recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                              q: currentQuery['q']
-                            }
+                            query: currentQuery
                           })
                         }
                         $('html, body').animate({
@@ -2795,13 +2835,14 @@ export default {
                   vm.$store.commit('setCheckInput', 0)
                   if (String(item.form) === 'ACTIONS') {
                   } else {
+                    try {
+                      currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                      currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                    } catch (error) {
+                    }
                     vm.$router.push({
                       path: vm.$router.history.current.path,
-                      query: {
-                        recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                        renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                        q: currentQuery['q']
-                      }
+                      query: currentQuery
                     })
                   }
                   $('html, body').animate({
@@ -2858,13 +2899,14 @@ export default {
                   vm.$store.commit('setCheckInput', 0)
                   if (String(item.form) === 'ACTIONS') {
                   } else {
+                    try {
+                      currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                      currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                    } catch (error) {
+                    }
                     vm.$router.push({
                       path: vm.$router.history.current.path,
-                      query: {
-                        recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                        renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                        q: currentQuery['q']
-                      }
+                      query: currentQuery
                     })
                   }
                   $('html, body').animate({
@@ -2876,7 +2918,18 @@ export default {
                 })
               }
               if (!vm.createFileSignedSync || !hasIsSigned || hasIsSigned.length === 0) {
-                doAction()
+                let filterUpdateFile = {
+                  dossierId: vm.thongTinChiTietHoSo['dossierId'],
+                  fileEntries: '',
+                  dossierFiles: ''
+                }
+                vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
+                  doAction()
+                }).catch(function () {
+                  toastr.error('Cập nhật tài liệu kết quả thất bại')
+                  vm.loadingAction = false
+                  vm.loadingActionProcess = false
+                })
               } else {
                 let fileChuaKy = []
                 let files = vm.createFileSignedSync.createFiles
@@ -3021,13 +3074,14 @@ export default {
         }
         vm.checkInput = 0
         vm.$store.commit('setCheckInput', 0)
+        try {
+          currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        } catch (error) {
+        }
         vm.$router.push({
           path: vm.$router.history.current.path,
-          query: {
-            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            q: currentQuery['q']
-          }
+          query: currentQuery
         })
       }).catch(function (reject) {
         vm.loadingActionProcess = false
@@ -3282,29 +3336,30 @@ export default {
         console.log(reject)
       })
     },
-    // loadVoting () {
-    //   let vm = this
-    //   let filter = {
-    //     className: 'dossier',
-    //     classPk: vm.id
-    //   }
-    //   vm.$store.dispatch('loadVoting', filter).then(function (result) {
-    //     vm.votingItems = result
-    //     console.log('votingItems', vm.votingItems)
-    //   }).catch(function (reject) {
-    //   })
-    // },
     loadVoting () {
       let vm = this
-      let filter = {
-        className: 'dossier',
-        dossierDetail: vm.thongTinChiTietHoSo
+      if (vm.votingVersion === 1) {
+        let filter = {
+          className: 'dossier',
+          classPk: vm.id
+        }
+        vm.$store.dispatch('loadVoting', filter).then(function (result) {
+          vm.votingItems = result
+          console.log('votingItems', vm.votingItems)
+        }).catch(function (reject) {
+        })
+      } else {
+        let filter = {
+          className: 'dossier',
+          dossierDetail: vm.thongTinChiTietHoSo
+        }
+        vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
+          vm.votingItems = result
+          console.log('votingItems', vm.votingItems)
+        }).catch(function (reject) {
+        })
       }
-      vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
-        vm.votingItems = result
-        console.log('votingItems', vm.votingItems)
-      }).catch(function (reject) {
-      })
+      
     },
     getPreAction () {
       let vm = this
@@ -3338,6 +3393,41 @@ export default {
           toastr.error('Gửi đánh giá không thành công')
         })
       }
+    },
+    doVottingResultSubmitNew () {
+      var vm = this
+      vm.loadingVoting = true
+      let arrAction = []
+      let valid = false
+      for (var key in vm.votingItems) {
+        vm.votingItems[key]['className'] = 'dossier'
+        if (String(vm.votingItems[key]['selected']) !== '0') {
+          valid = true
+          let indexChoice = vm.votingItems[key]['selected'] - 1
+          arrAction.push(vm.$store.dispatch('submitVotingNew', Object.assign(vm.votingItems[key]['choices'][indexChoice], {dossierNo: vm.thongTinChiTietHoSo['dossierNo']})))
+        }
+      }
+      if (valid) {
+        Promise.all(arrAction).then(results => {
+          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          vm.increCounter()
+          vm.loadingVoting = false
+        }).catch(xhr => {
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          vm.loadingVoting = false
+        })
+      } else {
+        vm.loadingVoting = false
+        toastr.error('Bạn chưa chọn đánh giá nào')
+      }
+      
+    },
+    increCounter () {
+      let vm = this
+      let data = {
+        dossierNo: vm.thongTinChiTietHoSo['dossierNo']
+      }
+      vm.$store.dispatch('increCounter', data).then(function (result) {})
     },
     doAction () {
       let vm = this

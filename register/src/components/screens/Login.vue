@@ -110,14 +110,14 @@
                 <v-icon>how_to_reg</v-icon>&nbsp;
                 Đăng nhập
               </v-btn>
-              <!-- <v-btn class="ml-2 my-0 white--text xacthuc-btn" color="#0b72ba"
+              <v-btn class="ml-2 my-0 white--text xacthuc-btn" color="#0b72ba"
                 v-if="showXacThucSso"
                 @click="redirectXacThucSso"
               >
                 <v-icon>done_all</v-icon>&nbsp;
                 Xác thực SSO
-              </v-btn> -->
-              <v-btn class="ml-1 mr-0 my-0 white--text" color="#0b72ba"
+              </v-btn>
+              <v-btn :class="showXacThucSso ? 'ml-1 mr-0 my-0 white--text mt-2' : 'ml-1 mr-0 my-0 white--text'" color="#0b72ba"
                 :loading="loadingLogin"
                 :disabled="loadingLogin"
                 @click="goBack"
@@ -175,11 +175,11 @@
 import Vue from 'vue'
 import axios from 'axios'
 import $ from 'jquery'
-import support from '../../store/support.json'
 export default {
   props: [],
   components: {},
   data: () => ({
+    xacThucSso: false,
     showXacThucSso: false,
     npmreactlogin_login: '',
     npmreactlogin_password: '',
@@ -213,8 +213,14 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      vm.xacThucSso = xacThucSso
+    } catch (error) {
+    }
     vm.$nextTick(function () {
-      // vm.checkShowXacThucSso()
+      if (vm.xacThucSso) {
+        vm.checkShowXacThucSso()
+      }
       $('body').addClass('body_login')
       let current = vm.$router.history.current
       let currentQuery = current.query

@@ -1075,8 +1075,15 @@
       },
       getDomains(agencyCode) {
         let vm = this
+        let agency = agencyCode
+        if (vm.capCoQuanThucHien === 'QUAN_HUYEN') {
+          agency = 'CAP_HUYEN'
+        }
+        if (vm.capCoQuanThucHien === 'XA_PHUONG') {
+          agency = 'CAP_XA'
+        }
         let data = {
-          agency: agencyCode ? agencyCode : ''
+          agency: agency
         }
         vm.$store.dispatch('getDomains', data).then(
           res => {

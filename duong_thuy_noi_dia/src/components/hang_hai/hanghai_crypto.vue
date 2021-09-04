@@ -4,21 +4,21 @@
       <div>
         <v-layout wrap>
           <!-- ký số bản mới dùng plugin -->
-          <v-flex xs12 md12>
-            <!-- <p><b>I. Ký số phiên bản mới</b></p> -->
+          <v-flex xs12 md6 style="border-right: 2px solid #dedede">
+            <p><b>I. Ký số phiên bản mới</b></p>
             <div>
               <v-btn color="primary" v-on:click.native="vgcaSign()"
                 :loading="loading_process_btn"
                 :disabled="loading_process_btn"
               >
                 <v-icon class="mr-2 white--text">edit</v-icon>
-                Ký duyệt
+                {{typeJobpos === 'van_thu' ? 'Đóng dấu' : 'Ký duyệt'}}
                 <span slot="loader">Loading...</span>
               </v-btn>
             </div>
           </v-flex>
           <!-- ký số bản cũ -->
-          <!-- <v-flex xs12 md6 class="px-3">
+          <v-flex xs12 md6 class="px-3">
             <v-layout wrap>
               <v-flex xs12>
                 <p><b>II. Ký số phiên bản cũ</b></p>
@@ -67,7 +67,7 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
             </v-card-actions>
-          </v-flex> -->
+          </v-flex>
 
         </v-layout>
         
@@ -96,6 +96,7 @@ export default {
   },
   data () {
     return {
+      typeJobpos: '',
       loading_process_btn: false,
       pluginValid: false,
       sign: null,
@@ -143,7 +144,12 @@ export default {
       prms['FileName'] = vm.urlSign
 
       let json_prms = JSON.stringify(prms)
-      vgca_sign_approved(json_prms, signFileCallBack)
+      if (vm.typeJobpos === 'van_thu') {
+        vgca_sign_issued(json_prms, signFileCallBack)
+      } else {
+        vgca_sign_approved(json_prms, signFileCallBack)
+      }
+      // 
     },
     doActionCallBack (data) {
       let vm = this
@@ -170,6 +176,7 @@ export default {
     },
     bindData (documentTypeCode, documentName, documentYear, type) {
       let vm = this
+      vm.typeJobpos = type
       let config = {
         'documentType': documentTypeCode,
         'documentName': documentName,
@@ -204,8 +211,10 @@ export default {
         sign: vm.sign,
         signFieldName: vm.signFieldName,
         filePath: vm.filePath,
-        signLocation: vm.signLocation,
-        FileServer: vm.FileServer
+        signLocation: vm.signLocation
+      }
+      if (vm.FileServer) {
+        config['FileServer'] = vm.FileServer
       }
       vm.$emit('kyso-submit-func', config)
     }

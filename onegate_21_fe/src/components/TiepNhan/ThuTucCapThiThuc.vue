@@ -126,7 +126,8 @@
             </v-flex>
             <v-flex xs12 class="px-2 ">
                 <div style="display:flex; flex-wrap: wrap; align-items: center;">
-                    <strong>Thông tin văn bản, quyết định <span class="red--text">*</span> </strong>
+                    <!-- <strong>Thông tin văn bản, quyết định <span class="red--text">*</span> </strong> -->
+                    <strong>Thông tin văn bản, quyết định </strong>
                     <v-btn small color="primary" @click.stop="openDialogThemVanBan()"><v-icon>add</v-icon>&nbsp; Thêm văn bản</v-btn>
                 </div>
             </v-flex>
@@ -491,8 +492,6 @@
                                                                 return-object
                                                                 clearable
                                                                 hide-no-data
-                                                                :rules="[rules.required]"
-                                                                required
                                                                 solo
                                                             >
                                                                 <template slot="selection" slot-scope="props">
@@ -2890,11 +2889,11 @@ export default {
                     Duyet_Tt_Den_Ngay: vm.dateDef(vm.dateNgayDuKienXkFormated),
                     Duyet_Ky_Hieu_Tt: vm.ky_hieu_thi_thuc ? vm.ky_hieu_thi_thuc['itemDescription'] : null,
                     Duyet_Gia_Tri_Tt: vm.so_lan_thi_thuc ? vm.so_lan_thi_thuc['value'] : null,
-                    Co_Quan_De_Nghi_Ten: vm.vb_co_quan_chu_quan['Cq_Ca_Nhan_Cong_Van'],
-                    Co_Quan_De_Nghi_Id: vm.vb_co_quan_chu_quan['Ma_Cq_Ca_Nhan_Cong_Van'],
-                    Loai_Cv_Den: vm.vb_co_quan_chu_quan['Ma_Loai_Cong_Van'],
-                    So_Cv_Den: vm.vb_co_quan_chu_quan['So_Cong_Van'],
-                    Ngay_Cv_Den: vm.dateDef(vm.vb_co_quan_chu_quan['Ngay_Cong_Van']),
+                    Co_Quan_De_Nghi_Ten: vm.vb_co_quan_chu_quan ? vm.vb_co_quan_chu_quan['Cq_Ca_Nhan_Cong_Van'] : '',
+                    Co_Quan_De_Nghi_Id: vm.vb_co_quan_chu_quan ? vm.vb_co_quan_chu_quan['Ma_Cq_Ca_Nhan_Cong_Van'] : '',
+                    Loai_Cv_Den: vm.vb_co_quan_chu_quan ? vm.vb_co_quan_chu_quan['Ma_Loai_Cong_Van'] : '',
+                    So_Cv_Den: vm.vb_co_quan_chu_quan ? vm.vb_co_quan_chu_quan['So_Cong_Van'] : '',
+                    Ngay_Cv_Den: vm.vb_co_quan_chu_quan ? vm.dateDef(vm.vb_co_quan_chu_quan['Ngay_Cong_Van']) : '',
                     De_Nghi_Khac: vm.de_nghi_khac,
                     Du_Kien_Thu: null,
                     Don_Vi_Tien_Te: '$',

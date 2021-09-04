@@ -788,7 +788,7 @@
           service: vm.serviceFilter ? vm.serviceFilter : '',
           start: vm.dossierPage * vm.numberPerPage - vm.numberPerPage,
           end: vm.dossierPage * vm.numberPerPage,
-          agency: vm.agencyFilterXa ? vm.agencyFilterXa['itemCode'] : ''
+          agency: vm.agencyFilterXa ? vm.agencyFilterXa['itemCode'] : (vm.agencyFilter ? vm.agencyFilter['code'] : '')
         }
         vm.$store.dispatch('getDossiers', params).then(res => {
           vm.loadingTable = false

@@ -246,10 +246,25 @@
                 </v-flex>
                 <v-flex xs12 sm6 class="mb-2 px-2">
                   <div>
-                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Mã hồ sơ :</div>
+                    <!-- <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Mã hồ sơ :</div>
                     <v-text-field
                       placeholder="Nhập mã hồ sơ"
                       v-model="dossierNoKey"
+                      class="search-input-appbar input-search d-inline-block"
+                      style="width: calc(100% - 200px);"
+                      single-lines
+                      hide-details
+                      solo
+                      flat
+                      height="32"
+                      min-height="32"
+                      clearable
+                    ></v-text-field> -->
+
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Từ khóa :</div>
+                    <v-text-field
+                      placeholder="Nhập từ khóa tìm kiếm"
+                      v-model="keywordSearch"
                       class="search-input-appbar input-search d-inline-block"
                       style="width: calc(100% - 200px);"
                       single-lines
@@ -376,7 +391,7 @@
         </template>
       </v-data-table>
       <!--  -->
-      <div class="my-2">
+      <div class="my-2" v-if="dossierList.length > 0">
         <div class="text-xs-right layout wrap" style="position: relative;">
           <div class="flex pagging-table"> 
             <tiny-pagination :total="totalDossierSearch" :page="dossierPage" :numberPerPage="limitRecord" nameRecord="hồ sơ" custom-class="custom-tiny-class" 
@@ -596,6 +611,7 @@
       govAgencyList: [],
       govAgencyFilter: '',
       dossierNoKey: '',
+      keywordSearch: '',
       dossierList: [],
       limitRecord: 20,
       numberPerPage: 20,
@@ -619,6 +635,7 @@
       menuDate6: false,
       toReleaseDate: '',
       toReleaseDateFormatted: '',
+      xuLyHoSo: false,
       dossierListHeader: [
         {
           text: 'STT',
@@ -721,6 +738,10 @@
       let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
+      try {
+        vm.xuLyHoSo = xuLyHoSo
+      } catch (error) {
+      }
       try {
         vm.donViHuyen = donViHuyen
         // sử dụng cho các đơn vị huyện quản lý hồ sơ cấp xã
@@ -1040,12 +1061,13 @@
           agency: vm.govAgencyFilter ? vm.govAgencyFilter : '',
           domain: vm.domainFilter ? vm.domainFilter : '',
           service: vm.serviceFilter ? vm.serviceFilter : '',
-          dossierNo: vm.dossierNoKey,
+          dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
           status: vm.statusFilter,
           fromReceiveDate: vm.fromReceiveDateFormatted ? vm.fromReceiveDateFormatted : '',
           toReceiveDate: vm.toReceiveDateFormatted ? vm.toReceiveDateFormatted : '',
           fromReleaseDate: vm.fromReleaseDateFormatted ? vm.fromReleaseDateFormatted : '',
-          toReleaseDate: vm.toReleaseDateFormatted ? vm.toReleaseDateFormatted : ''
+          toReleaseDate: vm.toReleaseDateFormatted ? vm.toReleaseDateFormatted : '',
+          keyword: vm.keywordSearch ? vm.keywordSearch : ''
         }
         if (!vm.boNganh) {
           vm.$store.dispatch('getDossiers', params).then(res => {
@@ -1165,10 +1187,20 @@
       },
       viewDetailDossier (data) {
         let vm = this
-        vm.getDetailDossier(data)
-        setTimeout(function() {
-          vm.dialogDetailDossier = true
-        }, 100)
+        if (!vm.xuLyHoSo) {
+          vm.getDetailDossier(data)
+          setTimeout(function() {
+            vm.dialogDetailDossier = true
+          }, 100)
+        } else {
+          let pathName = window.location.origin + window.location.pathname
+          try {
+            pathName = pathNameConfig
+          } catch (error) {
+          }
+          window.location.href = pathName + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + data.dossierId + '?groupIdSiteMng=' + data.groupId
+        }
+        
       },
       durationText(durationUnit, durationCount) {
         let durationText

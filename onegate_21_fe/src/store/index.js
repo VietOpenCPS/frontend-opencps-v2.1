@@ -17,6 +17,7 @@ toastr.options = {
 export const store = new Vuex.Store({
   state: {
     initData: support.initData,
+    groupIdSite: '',
     endPointApi: '/o/rest/v2',
     // endPointApi: 'http://127.0.0.1:8080/api',
     loading: false,
@@ -160,7 +161,7 @@ export const store = new Vuex.Store({
     loadInitResource ({commit, state}) {
       return new Promise((resolve, reject) => {
         if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
-          state.initData['groupId'] = window.themeDisplay.getScopeGroupId()
+          state.initData['groupId'] = state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId()
           state.initData['user'] = {
             'userName': window.themeDisplay.getUserName(),
             'userEmail': '',
@@ -1935,6 +1936,25 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDossierFilesApplicantsVer2 ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        axios.get('/o/rest/v2/applicantdatas/dossierpart?applicantIdNo=' + filter.applicantIdNo + '&templateNo=' + filter.templateNo, param).then(function (response) {
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+          reject(xhr)
+        })
+      })
+    },
     putDuedateDossier ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         commit('setLoading', false)
@@ -3696,7 +3716,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let paramGetGovAgency = {
           headers: {
-            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId()
           },
           params: {
             sort: 'sibling'
@@ -4112,14 +4132,22 @@ export const store = new Vuex.Store({
               'groupId': state.initData.groupId
             }
           }
-          let dataPost = new URLSearchParams()
-          dataPost.append('method', 'GET')
-          dataPost.append('url', '/postal/votings/' + data.className + '/' + result['dossierId'])
-          dataPost.append('data', '')
-          dataPost.append('serverCode', 'SERVER_' + result['govAgencyCode'])
-          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result1) {
-            if (result1.data) {
-              resolve(result1.data.data)
+          axios.get('/o/rest/v2/postal/vote/dossier', config).then(result => {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              items = items.filter(function(item) {
+                return item.voteModel && item.voteModel['status'] == 1
+              })
+              let lengthQuestion = items.length
+              for (let index = 0; index < lengthQuestion; index++) {
+                if (items[index]['lstChoiceDetailModels']) {
+                  let listChoice = Array.isArray(items[index]['lstChoiceDetailModels']) ? items[index]['lstChoiceDetailModels'] : [items[index]['lstChoiceDetailModels']]
+                  items[index] = Object.assign(items[index]['voteModel'], {choices: listChoice})
+                } else {
+                  items[index] = Object.assign(items[index]['voteModel'], {choices: []})
+                }
+              }
+              resolve(items)
             } else {
               resolve([])
             }
@@ -4127,6 +4155,42 @@ export const store = new Vuex.Store({
             reject(xhr)
           })
         }).catch(xhr => {
+        })
+      })
+    },
+    submitVotingNew ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let params = new URLSearchParams()
+          const config = {
+            headers: {
+              'groupId': state.initData.groupId
+            }
+          }
+          params.append('dossierNo', data.dossierNo)
+          axios.post('/o/rest/v2/postal/vote/dossier/question/' + data.voteId + '/choice/' + data.voteChoiceId, params, config).then(result => {
+            resolve(result.data)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    increCounter ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let params = new URLSearchParams()
+          params.append('dossierNo', data.dossierNo)
+          axios.post('/o/rest/v2/postal/vote/survey/voteCount', params, config).then(result => {
+            resolve(result)
+          }).catch(xhr => {
+            reject(xhr)
+          })
         })
       })
     },
@@ -4237,7 +4301,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId(),
             'Accept': 'application/json'
           },
           responseType: 'blob'
@@ -4650,7 +4714,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId()
             }
           }
           let params = {
@@ -4695,7 +4759,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId()
             },
             params: {
               start: filter.start ? filter.start : 0,
@@ -4735,7 +4799,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId()
             }
           }
           let params = {
@@ -4760,7 +4824,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId()
             },
             params: {
               status: filter.status ? filter.status : ''
@@ -4779,7 +4843,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId()
           },
           responseType: 'blob'
         }
@@ -4801,7 +4865,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId()
           },
           responseType: 'blob'
         }
@@ -4818,7 +4882,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId()
           }
         }
         let url = filter.key === 'kpdvcqg' ? '/o/pgi/kpdvcqg/createtransaction' : '/o/pgi/ppdvcqg/inittransaction'
@@ -4981,7 +5045,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let options = {
           headers: {
-            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            'groupId': state.groupIdSite ? state.groupIdSite :  window.themeDisplay.getScopeGroupId() 
           },
           params: {
             formDataKey: JSON.stringify(filter.formDataKey)
@@ -5022,7 +5086,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId(),
             Token: window.Liferay ? window.Liferay.authToken : ''
           }
         }
@@ -5039,7 +5103,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId(),
             Token: window.Liferay ? window.Liferay.authToken : ''
           }
         }
@@ -5058,7 +5122,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId(),
             Token: window.Liferay ? window.Liferay.authToken : ''
           }
         }
@@ -5079,7 +5143,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId(),
             Token: window.Liferay ? window.Liferay.authToken : ''
           }
         }
@@ -5098,7 +5162,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId(),
             Token: window.Liferay ? window.Liferay.authToken : ''
           }
         }
@@ -5150,7 +5214,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let options = {
           headers: {
-            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            'groupId': state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId()
           },
           params: {
             eFormNo: filter.eFormNo
@@ -5167,7 +5231,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let config = {
           headers: {
-            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId()
           }
         }
         axios.get('/o/rest/v2/eforms/saveeforms/SERVER_DVC/' + filter.eFormId + '/' + filter.secret, config).then(function (response) {
@@ -5200,7 +5264,7 @@ export const store = new Vuex.Store({
           method: 'get',
           url: '/o/rest/v2/dossiers/' + filter.dossierId + '/downloadAllFile',
           headers: { 
-            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            'groupId': state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId() ,
             'Content-Type': 'application/octet-stream'
           },
           responseType: 'blob'
@@ -5231,7 +5295,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let config = {
           headers: {
-            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId()
           }
         }
         axios.get('/o/rest/v2/applicants/checkenterprisedvcqg', config).then(function (response) {
@@ -5245,7 +5309,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let config = {
           headers: {
-            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId()
           }
         }
         axios.get('/o/rest/v2/applicants/enterprisedvcqg/' + filter.applicantIdNo, config).then(function (response) {
@@ -5276,7 +5340,6 @@ export const store = new Vuex.Store({
             "StaffEmail" : filter.StaffEmail,
             "GovAgencyCode": filter.GovAgencyCode,
             "MaDVC" : "G18-YT04",
-            "MaTichHop" : "003",
             "HoVaTen" : filter.applicantName,
             "type" : "XacThucThongTinCongDan",
             "NgayThangNamSinh" : filter.birthDate,
@@ -5289,7 +5352,6 @@ export const store = new Vuex.Store({
             "StaffEmail" : filter.StaffEmail,
             "GovAgencyCode": filter.GovAgencyCode,
             "MaDVC" : filter.MaDVC,
-            "MaTichHop" : "003",
             "HoVaTen" : filter.applicantName,
             "type" : "XacThucThongTinCongDan",
             "NgayThangNamSinh" : filter.birthDate,
@@ -5660,8 +5722,14 @@ export const store = new Vuex.Store({
     setIsMobile (state, payload) {
       state.isMobile = payload
     },
+    setGroupIdSite (state, payload) {
+      state.groupIdSite = payload
+    },
   },
   getters: {
+    groupIdSite (state) {
+      return state.groupIdSite
+    },
     loading (state) {
       return state.loading
     },

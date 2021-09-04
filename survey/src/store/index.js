@@ -109,9 +109,14 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              govAgencyCode: data.govAgencyCode,
+              fromReceiveDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+              toReceiveDate: data.toReceiveDate ? data.toReceiveDate : ''
             }
           }
-          axios.get(state.endPointApi + '/postal/vote/survey/statistic/voteResult?govAgencyCode=' + data.govAgencyCode, param).then(result => {
+          axios.get(state.endPointApi + '/postal/vote/survey/statistic/voteResult', param).then(result => {
             if (result.data.data) {
               let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
               items = items.filter(function (item) {
@@ -124,6 +129,42 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
+        })
+      })
+    },
+    loadVotingResultQlnn ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              govAgencyCode: data.govAgencyCode,
+              fromReceiveDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+              toReceiveDate: data.toReceiveDate ? data.toReceiveDate : ''
+            }
+          }
+          axios.get(state.endPointApi + '/postal/vote/surveyAgency/statistic/voteResultGov', param).then(function (result) {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              if (data.govAgencyCode) {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode && item.govAgencyCode === data.govAgencyCode
+                })
+              } else {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode
+                })
+              }
+              resolve(items)
+            } else {
+              resolve([])
+            }
+          }).catch(function () {
+            reject(xhr)
+          })
+
         })
       })
     },

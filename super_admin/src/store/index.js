@@ -1555,6 +1555,9 @@ export const store = new Vuex.Store({
           dataPostVoting.append('title', data.title ? data.title : '')
           dataPostVoting.append('description', data.description ? data.description : '')
           dataPostVoting.append('status', data.status ? data.status : 0)
+          if (data.className === 'survey') {
+            dataPostVoting.append('processTime', data.processTime)
+          }
           if (data.type === 'add') {
             axios.post(state.endPointApi + '/postal/vote/' + data.className + '/question', dataPostVoting, options).then(function (response) {
               if (data.choiceItems && data.choiceItems.length > 0) {
