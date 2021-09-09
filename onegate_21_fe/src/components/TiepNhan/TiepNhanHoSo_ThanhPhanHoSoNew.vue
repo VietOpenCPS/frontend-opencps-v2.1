@@ -150,7 +150,8 @@
                           
                   </div>
                 </div>
-                <div class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;max-height: 250px;overflow:auto;border:1px dashed #f3ae75;border-radius: 5px;position:relative">
+                <div v-if="dossierFilesApplicant && dossierFilesApplicant.length" class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" 
+                  :style="!khoTaiLieuCongDan ? 'display:none;max-height: 250px;overflow:auto;border:1px dashed #f3ae75;border-radius: 5px;position:relative' : ''">
                   <div v-for="(itemFileView, indexFile) in dossierFilesApplicant" :key="indexFile" v-if="itemFileView.dossierTemplateNo === thongTinHoSo['dossierTemplateNo'] && item.partNo === itemFileView.dossierPartNo" >
                     <div v-if="itemFileView.eForm && itemFileView.fileSize !== 0" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '3px'}">
                       <v-tooltip top style="max-width:100%">
@@ -203,7 +204,7 @@
                       </v-tooltip>
                     </div>
                   </div>
-                  <v-btn class="mx-0 my-0" flat icon color="red" style="position:absolute;right:0px;top:0px"
+                  <v-btn v-if="!khoTaiLieuCongDan" class="mx-0 my-0" flat icon color="red" style="position:absolute;right:0px;top:0px"
                   @click.stop="showFilesApplicant(item.partNo)"
                   >
                     <v-icon>clear</v-icon>
@@ -920,14 +921,20 @@ export default {
   watch: {
     applicantBussinessExit (val) {
       let vm = this
-      if (val && vm.fileTemplateNoString) {
+      if (val && vm.fileTemplateNoString && !vm.khoTaiLieuCongDan) {
         vm.getDossierFileApplicants(val, vm.fileTemplateNoString)
+      }
+      if (vm.khoTaiLieuCongDan) {
+        vm.getDossierFileApplicants(val)
       }
     },
     applicantId (val) {
       let vm = this
       if (val && vm.fileTemplateNoString) {
         vm.getDossierFileApplicants(val, vm.fileTemplateNoString)
+      }
+      if (vm.khoTaiLieuCongDan) {
+        vm.getDossierFileApplicants(val)
       }
     },
     dossierTemplateItemsFilter () {
@@ -1074,7 +1081,10 @@ export default {
           }
         }
         vm.$store.commit('setDossierTemplateLienThong', vm.dossierTemplateLienThong)
-        if (fileTemplateNoArr.length > 0) {
+        if (vm.khoTaiLieuCongDan) {
+          vm.getDossierFileApplicants(vm.applicantId, vm.fileTemplateNoString)
+        }
+        if (fileTemplateNoArr.length > 0 && !vm.khoTaiLieuCongDan) {
           vm.fileTemplateNoString = fileTemplateNoArr.toString()
           // setTimeout(function () {
             if (vm.applicantId && !vm.onlyView && !vm.khoTaiLieuCongDan) {
@@ -2265,19 +2275,21 @@ export default {
         applicantIdNo: applicantIdNo,
         fileTemplateNo: fileTemplateNo
       }
-      if (!vm.khoTaiLieuCongDan) {
-        vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
-          vm.dossierFilesApplicant = result
-        }).catch(reject => {
-          console.log('error')
-        })
-      } else {
-        filter['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
-        vm.$store.dispatch('getDossierFilesApplicantsVer2', filter).then(result => {
-          vm.dossierFilesApplicant = result
-        }).catch(reject => {
-          console.log('error')
-        })
+      if (applicantIdNo) {
+        if (!vm.khoTaiLieuCongDan) {
+          vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
+            vm.dossierFilesApplicant = result
+          }).catch(reject => {
+            console.log('error')
+          })
+        } else {
+          filter['templateNo'] = vm.thongTinHoSo.dossierTemplateNo
+          vm.$store.dispatch('getDossierFilesApplicantsVer2', filter).then(result => {
+            vm.dossierFilesApplicant = result
+          }).catch(reject => {
+            console.log('error')
+          })
+        }
       }
     },
     showFilesApplicant (partNo) {

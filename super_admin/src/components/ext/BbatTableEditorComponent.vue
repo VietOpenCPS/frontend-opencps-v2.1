@@ -969,7 +969,7 @@
       },
       formatDataInput (item) {
         let vm = this
-        vm.data[item['model']] = String(vm.data[item['model']]).trim()
+        vm.data[item['model']] = vm.data[item['model']] ? String(vm.data[item['model']]).trim() : ''
       },
       getCurrentDate () {
         let date1 = new Date()
@@ -978,8 +978,8 @@
       validateMaxlength (item) {
         let vm = this
         if (item.hasOwnProperty('maxLength') && item.maxLength) {
-          vm.data[item['model']] = String(vm.data[item['model']]).trim()
-          vm.data[item['model']] = vm.data[item['model']].substring(0, item.maxLength)
+          vm.data[item['model']] = vm.data[item['model']] ? String(vm.data[item['model']]).trim() : ''
+          vm.data[item['model']] = vm.data[item['model']] ? vm.data[item['model']].substring(0, item.maxLength) : ''
         }
       },
       processChangeDataSource (data, item) {
