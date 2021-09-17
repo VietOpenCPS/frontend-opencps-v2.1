@@ -6,12 +6,22 @@
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div>
-          <span v-if="data_payment.requestPayment === 1 || data_payment.requestPayment === 4 || data_payment.requestPayment === 5">{{data_payment.paymentFee}}</span>
+          <span v-if="data_payment.requestPayment === 1 || data_payment.requestPayment === 3 || data_payment.requestPayment === 4 || data_payment.requestPayment === 5">{{data_payment.paymentFee}}</span>
           <span v-if="data_payment.requestPayment === 2">Lập phiếu thanh toán</span>
         </div>
         <v-card>
           <v-card-text class="pb-1">
             <v-layout wrap>
+              <v-flex xs12 md2>
+                <v-subheader class="pl-0 text-right">Tên phí, lệ phí: </v-subheader>
+              </v-flex>
+              <v-flex xs12 md10>
+                <v-text-field
+                  v-model="data_payment.paymentFee"
+                  v-if="data_payment.editable === 1 || data_payment.editable === 2 || data_payment.editable === 3"
+                ></v-text-field>
+                <p class="mt-1 mb-0" v-else>{{data_payment.paymentFee}}</p>
+              </v-flex>
               <v-flex xs12 sm2>
                 <v-subheader class="pl-0 text-right">Lệ phí: </v-subheader>
               </v-flex>

@@ -10,7 +10,7 @@
       <v-card-text class="px-0 pt-0">
         <v-layout wrap class="">
           <v-flex xs12 class="pr-2 mt-3">
-            <div class="text-bold d-inline-block mr-3" style="color: #903938;line-height: 24px;vertical-align: top;">Loại thông tin người dùng: </div>
+            <div class="text-bold d-inline-block mr-3" style="color: #004b94;line-height: 24px;vertical-align: top;">Đối tượng người dùng: </div>
             <v-radio-group class="pt-0 d-inline-block ml-3 mt-0" v-model="typeSearch" row @change="changeTypeSearch">
               <v-radio label="Công dân" :value="'citizen'"></v-radio>
               <v-radio label="Doanh nghiệp" :value="'business'"></v-radio>
@@ -100,27 +100,27 @@
                   <span>{{fullAddress(props.item['address'], props.item['cityName'], props.item['districtName'], props.item['wardName'])}}</span>
                 </div>
               </td>
-              <td class="text-xs-center" style="height:36px;width: 100px">
+              <td class="text-xs-center" style="height:36px;width: 150px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <v-tooltip top v-if="!loadingTable">
-                  <v-btn @click="showEditApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
-                    <v-icon>edit</v-icon>
+                  <v-btn @click="showEditApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 mr-3 my-0">
+                    <v-icon size="22">edit</v-icon>
                   </v-btn>
-                  <span>Sửa thông tin</span>
+                  <span>Cập nhật thông tin</span>
                 </v-tooltip>
                 <v-tooltip top v-if="!loadingTable && (getUser('Administrator') || getUser('Administrator_data')) && props.item['verification'] == 1">
-                  <v-btn @click="deleteApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
-                    <v-icon>delete</v-icon>
+                  <v-btn @click="deleteApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0 mr-3">
+                    <v-icon size="22">delete</v-icon>
                   </v-btn>
                   <span>Xóa</span>
                 </v-tooltip>
                 <v-tooltip top v-if="!loadingTable" class="ml-2">
                   <v-btn @click="documentManage(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
-                    <v-icon>fas fa fa-folder-open</v-icon>
+                    <v-icon size="22">fas fa fa-folder-open</v-icon>
                   </v-btn>
-                  <span>Quản lý tài liệu</span>
+                  <span>Kho tài liệu</span>
                 </v-tooltip>
               </td>
             </tr>
@@ -289,7 +289,7 @@ export default {
         sortable: false
       },
       {
-        text: 'Loại thông tin người dùng',
+        text: 'Đối tượng người dùng',
         align: 'center',
         sortable: false
       },

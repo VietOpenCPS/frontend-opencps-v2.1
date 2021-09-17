@@ -1007,8 +1007,8 @@ export default {
       let vm = this
       let data = {
         govAgencyCode: '',
-        fromReceiveDate: '01/01/' + year,
-        toReceiveDate: '31/12/' + year
+        fromReceiveDate: (new Date(year + '-01-01')).getTime(),
+        toReceiveDate: (new Date(year + '-12-31')).getTime()
       }
       vm.$store.dispatch('loadVotingResult', data).then(function(result) {
         let voteStatistic = []

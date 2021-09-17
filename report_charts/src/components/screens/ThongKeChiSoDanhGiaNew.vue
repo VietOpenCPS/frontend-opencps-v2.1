@@ -520,9 +520,10 @@ export default {
       vm.btnLoading = true
       vm.$store.dispatch('loadVotingResult', {
         className: 'survey',
-        fromReceiveDate: vm.fromReceiveDateFormatted,
-        toReceiveDate: vm.toReceiveDateFormatted,
-        govAgencyCode: vm.govAgency ? vm.govAgency['govAgencyCode'] : ''
+        fromReceiveDate: (new Date(vm.parseDate(vm.fromReceiveDateFormatted))).getTime(),
+        toReceiveDate: (new Date(vm.parseDate(vm.toReceiveDateFormatted))).getTime(),
+        govAgencyCode: vm.govAgency ? vm.govAgency['govAgencyCode'] : '',
+        type: 23
       }).then(function(result) {
         vm.btnLoading = false
         let voteStatistic = []

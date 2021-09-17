@@ -112,11 +112,13 @@ export const store = new Vuex.Store({
             },
             params: {
               govAgencyCode: data.govAgencyCode,
-              fromReceiveDate: data.fromReceiveDate ? data.fromReceiveDate : '',
-              toReceiveDate: data.toReceiveDate ? data.toReceiveDate : ''
+              fromDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+              toDate: data.toReceiveDate ? data.toReceiveDate : '',
+              type: 23
             }
           }
-          axios.get(state.endPointApi + '/postal/vote/survey/statistic/voteResult', param).then(result => {
+          let dataPost = {}
+          axios.post(state.endPointApi + '/postal/vote/survey/statistic', dataPost, param).then(result => {
             if (result.data.data) {
               let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
               items = items.filter(function (item) {

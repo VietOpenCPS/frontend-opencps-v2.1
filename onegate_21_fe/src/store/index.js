@@ -4147,6 +4147,7 @@ export const store = new Vuex.Store({
                   items[index] = Object.assign(items[index]['voteModel'], {choices: []})
                 }
               }
+              console.log('items vote', items)
               resolve(items)
             } else {
               resolve([])

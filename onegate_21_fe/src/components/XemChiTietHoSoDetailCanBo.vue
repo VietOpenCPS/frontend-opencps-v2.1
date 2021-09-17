@@ -581,10 +581,10 @@
                 <div v-if="votingItems && votingItems.length > 0">
                   <div v-for="(item, index) in votingItems" :key="index" >
                     <div class="text-bold">
-                      {{index + 1}}.&nbsp; {{ item.subject }}
+                      {{index + 1}}.&nbsp; {{ item.title }}
                     </div>
                     <v-radio-group class="ml-3 mt-2" v-model="item.selected" column>
-                      <v-radio class="ml-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" :disabled="originality === 3"></v-radio>
+                      <v-radio class="ml-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1.subject" :value="index1 + 1" :disabled="originality === 3"></v-radio>
                     </v-radio-group>
                   </div>
                 </div>
@@ -2252,7 +2252,8 @@ export default {
           advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
           feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
           serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-          shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+          shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
+          paymentFee: vm.payments['paymentFee']
         }
       }
       if (vm.showThuPhi) {
@@ -2264,7 +2265,8 @@ export default {
             feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
             serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
             shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
-            counter: vm.payments.counter
+            counter: vm.payments.counter,
+            paymentFee: vm.payments['paymentFee']
           }
           paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
           paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
@@ -2298,6 +2300,7 @@ export default {
             serviceAmount: paymentData.serviceAmount ? paymentData.serviceAmount : 0,
             shipAmount: paymentData.shipAmount ? paymentData.shipAmount : 0,
             paymentMethod: paymentData.paymentMethod ? paymentData.paymentMethod : 'Chuyển khoản',
+            paymentFee: paymentData.paymentFee ? paymentData.paymentFee : '',
           }
           let paymentsOut = filter['payment']
           // console.log('payment data check', paymentsOut)
@@ -2550,7 +2553,8 @@ export default {
                     advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
                     feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
                     serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-                    shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+                    shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
+                    paymentFee: vm.payments['paymentFee']
                   }
                   if (vm.payments && vm.payments.hasOwnProperty('counter')) {
                     let dataNote = {
@@ -2560,7 +2564,8 @@ export default {
                       feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
                       serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
                       shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
-                      counter: vm.payments.counter
+                      counter: vm.payments.counter,
+                      paymentFee: vm.payments['paymentFee']
                     }
                     paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
                     paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
@@ -3444,7 +3449,8 @@ export default {
             advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
             feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
             serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-            shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+            shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
+            paymentFee: vm.payments['paymentFee']
           }
           if (vm.payments && vm.payments.hasOwnProperty('counter')) {
             let dataNote = {
@@ -3454,7 +3460,8 @@ export default {
               feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
               serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
               shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
-              counter: vm.payments.counter
+              counter: vm.payments.counter,
+              paymentFee: vm.payments['paymentFee']
             }
             paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
             paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter

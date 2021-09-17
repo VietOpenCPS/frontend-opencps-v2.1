@@ -1,9 +1,10 @@
 <template>
   <div>
     <v-card>
-      <div class="row-header no__hidden_class">
+      <div class="row-header no__hidden_class" id="top-header">
         <div class="background-triangle-big">
-          <span>QUẢN LÝ TÀI LIỆU CÔNG DÂN, CƠ QUAN TỔ CHỨC, DOANH NGHIỆP</span>
+          <span v-if="!showDetail">QUẢN LÝ TÀI LIỆU CÔNG DÂN, CƠ QUAN TỔ CHỨC, DOANH NGHIỆP</span>
+          <span v-else>CẬP NHẬT, SỐ HÓA TÀI LIỆU</span>
         </div>
         <div class="layout row wrap header_tools row-blue">
           <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
@@ -12,9 +13,9 @@
               Quay lại
             </v-btn>
           </div>
-        </div> 
+        </div>
       </div>
-      <v-card-text class="px-0 pt-0">
+      <v-card-text class="px-0 pt-0" v-if="!showDetail">
         <v-card-text class="py-0 px-0">
           <v-layout wrap class="px-0 py-3">
             <v-flex xs12 sm5 class="pr-2">
@@ -51,7 +52,7 @@
           </v-layout>
         </v-card-text>
         <v-layout wrap class="mt-0">
-          <v-flex xs12 sm6 class="pr-2">
+          <v-flex xs12 sm6 class="px-0 pr-2">
             <v-autocomplete
               :items="fileTemplateList"
               v-model="fileTemplateNo"
@@ -64,7 +65,7 @@
               box
             ></v-autocomplete>
           </v-flex>
-          <v-flex xs12 sm6 class="pr-0">
+          <v-flex xs12 sm6 class="px-0">
             <v-autocomplete
               :items="statusList"
               v-model="status"
@@ -77,7 +78,7 @@
               box
             ></v-autocomplete>
           </v-flex>
-          <v-flex xs12 sm6 class="pr-2">
+          <v-flex xs12 sm6 class="px-0 pr-2">
             <v-text-field
               label="Tìm theo tên tài liệu"
               v-model="keySearch"
@@ -142,14 +143,6 @@
                   <span>{{props.item.hasOwnProperty('fileNo') ? props.item.fileNo : ''}}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px;min-width:120px">
-                <content-placeholders v-if="loadingTable">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>{{props.item.hasOwnProperty('fileExtension') ? props.item.fileExtension : ''}}</span>
-                </div>
-              </td>
               <td class="text-xs-left" style="height:36px; min-width:150px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
@@ -168,27 +161,27 @@
                   </span>
                 </div>
               </td>
-              <td class="text-xs-center" style="height:36px;width: 150px">
+              <td class="text-right" style="height:36px;width: 150px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-tooltip top v-if="!loadingTable" class="mr-2">
+                <v-tooltip top v-if="!loadingTable && props.item.fileEntryId" class="mr-2">
                   <v-btn @click="viewDocument(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
-                    <v-icon>visibility</v-icon>
+                    <v-icon size="22">visibility</v-icon>
                   </v-btn>
-                  <span>Xem trước</span>
+                  <span>Xem tài liệu</span>
                 </v-tooltip>
-                <v-tooltip top v-if="!loadingTable" class="mr-2">
+                <v-tooltip top v-if="!loadingTable && props.item.fileEntryId" class="mr-2">
                   <v-btn @click="downloadDocument(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
-                    <v-icon>fas fa fa-download</v-icon>
+                    <v-icon size="22">fas fa fa-download</v-icon>
                   </v-btn>
                   <span>Tải xuống</span>
                 </v-tooltip>
                 <v-tooltip top v-if="!loadingTable" class="mr-2">
                   <v-btn @click="showEditDocument(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
-                    <v-icon>edit</v-icon>
+                    <v-icon size="22">edit</v-icon>
                   </v-btn>
-                  <span>Chỉnh sửa</span>
+                  <span>Số hóa, cập nhật tài liệu</span>
                 </v-tooltip>
               </td>
             </tr>
@@ -209,89 +202,81 @@
           </div>
         </div>
       </v-card-text>
-    </v-card>
-    <v-dialog v-model="dialog_createDocument" scrollable persistent max-width="900px">
-      <v-card>
-        <v-toolbar dark color="primary">
-          <v-toolbar-title>{{typeCreate === 'create' ? 'Thêm mới tài liệu' : 'Cập nhật tài liệu'}}</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-btn icon dark @click.native="dialog_createDocument = false">
-            <v-icon>close</v-icon>
-          </v-btn>
-        </v-toolbar>
-        <v-card-text class="py-1">
-          <v-form ref="form" v-model="valid" lazy-validation class="px-0 grid-list">
-            <v-layout row wrap class="px-0 py-3">
-              <v-flex xs12 sm6 class="pr-2">
-                <v-autocomplete
-                  :items="fileTemplateList"
-                  v-model="fileTemplateNoCreate"
-                  label="Chọn loại tài liệu"
-                  item-text="name"
-                  item-value="fileTemplateNo"
-                  return-object
-                  :hide-selected="true"
-                  box
-                  :rules="[v => !!v || 'Loại tài liệu là bắt buộc']"
-                  required
-                ></v-autocomplete>
-              </v-flex>
-              <v-flex xs12 sm6 class="pr-2">
-                <v-autocomplete
-                  :items="statusList"
-                  v-model="statusCreate"
-                  label="Chọn tình trạng"
-                  item-text="text"
-                  item-value="value"
-                  :hide-selected="true"
-                  box
-                  :rules="[v => v !== '' && v !== null || 'Tình trạng là bắt buộc']"
-                  required
-                ></v-autocomplete>
-              </v-flex>
-              <v-flex xs12 class="">
-                <v-text-field
-                  label="Tên tài liệu"
-                  v-model="fileName"
-                  box
-                  clearable
-                  :rules="[v => !!v || 'Tên tài liệu là bắt buộc']"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs12 class="">
-                <v-text-field
-                  label="Mã tài liệu"
-                  v-model="fileNo"
-                  box
-                  clearable
-                  :rules="[v => !!v || 'Mã tài liệu là bắt buộc']"
-                  required
-                ></v-text-field>
-              </v-flex>
+      <v-card-text class="py-1 px-0" v-else>
+        <v-form ref="form" v-model="valid" lazy-validation class="px-0 grid-list">
+          <v-layout row wrap class="px-0 py-3">
+            <v-flex xs12 sm6 class="pr-2 pl-0">
+              <v-autocomplete
+                :items="fileTemplateList"
+                v-model="fileTemplateNoCreate"
+                label="Loại tài liệu"
+                item-text="name"
+                item-value="fileTemplateNo"
+                return-object
+                :hide-selected="true"
+                box
+                :rules="[v => !!v || 'Loại tài liệu là bắt buộc']"
+                required
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm6 class="pr-0">
+              <v-autocomplete
+                :items="statusList"
+                v-model="statusCreate"
+                label="Tình trạng"
+                item-text="text"
+                item-value="value"
+                :hide-selected="true"
+                box
+                :rules="[v => v !== '' && v !== null || 'Tình trạng là bắt buộc']"
+                required
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 class="px-0">
+              <v-text-field
+                label="Tên tài liệu"
+                v-model="fileName"
+                box
+                clearable
+                :rules="[v => !!v || 'Tên tài liệu là bắt buộc']"
+                required
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 class="px-0">
+              <v-text-field
+                label="Mã tài liệu"
+                v-model="fileNo"
+                box
+                clearable
+                :rules="[v => !!v || 'Mã tài liệu là bắt buộc']"
+                required
+              ></v-text-field>
+            </v-flex>
 
-              <v-flex xs12 class="mt-2">
-                <div v-if="fileNameView" class="mb-3">
-                  <v-icon size="18" color="#004b94">attach_file</v-icon>
-                  <span class="ml-2" style="font-style: italic">{{fileNameView}}</span>
-                </div>
-                <input type="file" id="documentFile" @input="uploadDocumentFile($event)" style="display:none">
-                <v-btn block color="primary" class="mx-0" dark @click.native="uploadFile" style="height: 42px;">
-                  <v-icon size="20">fas fa fa-upload</v-icon> &nbsp; &nbsp;
-                  Chọn file tải lên
-                </v-btn>
-                <div>
-                  <span style="color:red">(*) </span>
-                  <span v-if="fileTemplateNoCreate && fileTemplateNoCreate.fileType">File tải lên chấp nhận các định dạng: {{fileTemplateNoCreate.fileType}} .</span>
-                  <span>Dung lượng tải lên tối đa {{fileTemplateNoCreate && fileTemplateNoCreate.size ? fileTemplateNoCreate.size : maxFileSize}}MB.</span>
-                </div>
-              </v-flex>
-            </v-layout>
-          </v-form>
-        </v-card-text>
-        <v-card-actions class="mx-3">
-          <v-spacer></v-spacer>
-          <v-btn class="mr-2" color="primary" :disabled="loadingAction" @click.native="dialog_createDocument = false">
+            <v-flex xs12 class="mt-2">
+              <div v-if="fileNameView" class="pb-3" @click="viewDocument(documentSelect)">
+                <v-icon size="18" color="red">fa fa-file-pdf-o</v-icon>
+                <a class="ml-2" style="font-style: italic;font-size: 14px;text-decoration: underline;">{{fileNameView}}</a>
+              </div>
+              <input type="file" id="documentFile" @input="uploadDocumentFile($event)" style="display:none">
+              <v-btn block color="primary" class="mx-0 px-0 mr-4 d-inline-block" dark @click.native="uploadFile()" style="width: 175px">
+                <v-icon size="16">fas fa fa-upload</v-icon> &nbsp; &nbsp;
+                Tải lên tài liệu
+              </v-btn>
+              <v-btn block color="primary" class="mx-0 px-0 d-inline-block" dark @click.native="vgsignCopy('https://kiemthu-mt-gov-vn-9001.fds.vn')" style="width: 230px">
+                <v-icon size="16">border_color</v-icon> &nbsp; &nbsp;
+                Tải lên và ký duyệt tài liệu
+              </v-btn>
+              <div v-if="fileTemplateNoCreate && fileTemplateNoCreate.fileType">
+                <span style="color:red">(*) </span>
+                <span>File tải lên chấp nhận các định dạng: {{fileTemplateNoCreate.fileType}} .</span>
+                <!-- <span>Dung lượng tải lên tối đa {{fileTemplateNoCreate && fileTemplateNoCreate.size ? fileTemplateNoCreate.size : maxFileSize}}MB.</span> -->
+              </div>
+            </v-flex>
+          </v-layout>
+        </v-form>
+        <v-flex class="text-right">
+          <v-btn class="mr-2 white--text" color="red" :disabled="loadingAction" @click.native="showDetail = false">
             <v-icon>clear</v-icon> &nbsp;
             Thoát
           </v-btn>
@@ -306,9 +291,9 @@
             <v-icon>save</v-icon> &nbsp;
             <span>Cập nhật tài liệu</span> 
           </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+        </v-flex>
+      </v-card-text>
+    </v-card>
     <v-dialog v-model="dialogPDF" max-width="1200" transition="fade-transition">
       <v-card>
         <v-toolbar flat dark color="primary">
@@ -319,6 +304,19 @@
           </v-btn>
         </v-toolbar>
         <iframe id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialogViewFileSign" max-width="1200" transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title></v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogViewFileSign = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <iframe id="dialogEsignPreview" :src="pathNameFileESign" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
       </v-card>
     </v-dialog>
@@ -351,9 +349,10 @@ export default {
     documentPage: 1,
     numberPerPage: 15,
     statusList: [
-      {text: 'Chưa duyệt', value: 0},
+      {text: 'Yêu cầu số hóa', value: 0},
       {text: 'Có hiệu lực', value: 1},
-      {text: 'Hết hiệu lực', value: 2}
+      {text: 'Hết hiệu lực', value: 2},
+      {text: 'Hủy', value: 3}
     ],
     status: '',
     statusCreate: '',
@@ -367,10 +366,12 @@ export default {
     fileNoSearch: '',
     keySearch: '',
     dialog_createDocument: false,
+    showDetail: false,
     updateFile: false,
     loadingAction: false,
     loadingTable: false,
     dialogPDF: false,
+    dialogViewFileSign: false,
     valid: false,
     documentListHeader: [
       {
@@ -384,12 +385,7 @@ export default {
         sortable: false
       },
       {
-        text: 'Mã số',
-        align: 'center',
-        sortable: false
-      },
-      {
-        text: 'Định dạng',
+        text: 'Mã tài liệu',
         align: 'center',
         sortable: false
       },
@@ -413,7 +409,10 @@ export default {
     typeCreate: 'create',
     documentSelect: '',
     fileNameView: '',
-    srcDownload: ''
+    srcDownload: '',
+    fileEntryESign: '',
+    pathNameFileESign: '',
+    hasEsign: false
   }),
   computed: {
     
@@ -450,6 +449,42 @@ export default {
   watch: {
   },
   methods: {
+    vgsignCopy() {
+      let vm = this
+      vm.hasEsign = true
+      let prms = {}
+      prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/vgca/fileupload'
+      prms['SessionId'] = ''
+      prms['FileName'] = ''
+      let signFileCallBack = function (rv) {
+        let received_msg = JSON.parse(rv)
+        console.log('received_msg', received_msg)
+        if (received_msg.Status === 0) {
+          let dataSigned
+          try {
+            dataSigned = JSON.parse(received_msg.FileServer)
+            vm.fileEntryESign = dataSigned.fileEntryId
+            vm.pathNameFileESign = dataSigned.url
+            vm.fileNameView = dataSigned.url
+          } catch (error) {
+          }
+          console.log('dataSigned', dataSigned)
+          toastr.clear()
+          toastr.success('Tài liệu đã được ký duyệt')
+          vm.dialogViewFileSign = true
+        } else {
+          if (received_msg.Message) {
+            toastr.clear()
+            toastr.error(received_msg.Message)
+          } else {
+            toastr.clear()
+            toastr.error('Ký duyệt không thành công')
+          }
+        }
+      }
+      let json_prms = JSON.stringify(prms)
+      vgca_sign_copy(json_prms, signFileCallBack)
+    },
     getApplicantInfos () {
       let vm = this
       let filter = {
@@ -529,6 +564,7 @@ export default {
     },
     uploadFile () {
       let vm = this
+      vm.hasEsign = false
       document.getElementById('documentFile').value = ''
       document.getElementById('documentFile').click()
     },
@@ -580,23 +616,97 @@ export default {
     },
     showCreatedocument () {
       let vm = this
+      vm.showDetail = true
       vm.typeCreate = 'create'
-      vm.dialog_createDocument = true
+      vm.pathNameFileESign = ''
+      vm.fileNameView = ''
+      vm.statusCreate = ''
+      vm.fileName = ''
+      vm.fileNo = ''
+      // vm.dialog_createDocument = true
       vm.$refs.form.reset()
       vm.$refs.form.resetValidation()
-      vm.fileNameView = ''
     },
     createDocument () {
       let vm = this
-      let validFileUpload = true
-      if (vm.updateFile) {
-        let files = $('#documentFile')[0].files
-        let file = files[0]
-        validFileUpload = vm.validFileUpload(file)
+      if (!vm.hasEsign) {
+        let validFileUpload = true
+        if (vm.updateFile) {
+          let files = $('#documentFile')[0].files
+          let file = files[0]
+          validFileUpload = vm.validFileUpload(file)
+        }
+        if (!validFileUpload) {
+          return
+        }
+        if (vm.$refs.form.validate()) {
+          if (vm.fileNameView) {
+            vm.loadingAction = true
+            let filter = {
+              fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
+              status: vm.statusCreate ? vm.statusCreate : 0,
+              fileNo: vm.fileNo,
+              fileName: vm.fileName,
+              applicantIdNo: vm.applicantInfos.applicantIdNo,
+            }
+            let param = {
+              headers: {
+                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+              }
+            }
+            if (vm.isDvc) {
+              let dataPost = new FormData()
+              dataPost.append('method', 'POST')
+              dataPost.append('url', '/applicantdatas')
+              dataPost.append('data', JSON.stringify(filter))
+              dataPost.append('file', vm.fileUpdate)
+              
+              axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
+                vm.loadingAction = false
+                toastr.success('Thêm mới tài liệu thành công')
+                vm.dialog_createDocument = false
+                setTimeout(function () {
+                  vm.getApplicantDocument()
+                }, 200)
+              }).catch(xhr => {
+                toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
+              })
+            } else {
+              let dataCreateFile = new FormData()
+              let url = '/o/rest/v2/applicantdatas'
+              dataCreateFile.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
+              dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 0)
+              dataCreateFile.append('fileNo', vm.fileNo)
+              dataCreateFile.append('fileName', vm.fileName)
+              dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
+              dataCreateFile.append('file', vm.fileUpdate)
+              
+              axios.post(url, dataCreateFile, param).then(result1 => {
+                vm.loadingAction = false
+                toastr.success('Thêm mới tài liệu thành công')
+                vm.dialog_createDocument = false
+                setTimeout(function () {
+                  vm.getApplicantDocument()
+                }, 200)
+              }).catch(xhr => {
+                vm.loadingAction = false
+                toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
+              })
+            }
+            
+          } else {
+            toastr.clear()
+            toastr.error('Vui lòng đính kèm tài liệu')
+          }
+        }
+      } else {
+        vm.createDocumentKySo()
       }
-      if (!validFileUpload) {
-        return
-      }
+    },
+    createDocumentKySo () {
+      let vm = this
       if (vm.$refs.form.validate()) {
         if (vm.fileNameView) {
           vm.loadingAction = true
@@ -619,7 +729,7 @@ export default {
             dataPost.append('method', 'POST')
             dataPost.append('url', '/applicantdatas')
             dataPost.append('data', JSON.stringify(filter))
-            dataPost.append('file', vm.fileUpdate)
+            dataPost.append('file', vm.fileEntryESign)
             
             axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
               vm.loadingAction = false
@@ -639,7 +749,7 @@ export default {
             dataCreateFile.append('fileNo', vm.fileNo)
             dataCreateFile.append('fileName', vm.fileName)
             dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
-            dataCreateFile.append('file', vm.fileUpdate)
+            dataCreateFile.append('file', vm.fileEntryESign)
             
             axios.post(url, dataCreateFile, param).then(result1 => {
               vm.loadingAction = false
@@ -662,15 +772,87 @@ export default {
     },
     updateDocument () {
       let vm = this
-      let validFileUpload = true
-      if (vm.updateFile) {
-        let files = $('#documentFile')[0].files
-        let file = files[0]
-        validFileUpload = vm.validFileUpload(file)
+      if (!vm.hasEsign) {
+        let validFileUpload = true
+        if (vm.updateFile) {
+          let files = $('#documentFile')[0].files
+          let file = files[0]
+          validFileUpload = vm.validFileUpload(file)
+        }
+        if (!validFileUpload) {
+          return
+        }
+        if (vm.$refs.form.validate()) {
+          vm.loadingAction = true
+          let filter = {
+            fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
+            status: vm.statusCreate ? vm.statusCreate : 0,
+            fileNo: vm.fileNo,
+            fileName: vm.fileName,
+            applicantIdNo: vm.applicantInfos.applicantIdNo
+          }
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+          if (vm.isDvc) {
+            let dataPost = new FormData()
+            dataPost.append('method', 'PUT')
+            dataPost.append('url', '/applicantdatas/' + vm.documentSelect.applicantDataId)
+            dataPost.append('data', JSON.stringify(filter))
+            if (vm.updateFile) {
+              dataPost.append('file', vm.fileUpdate)
+            } else {
+              dataPost.append('file', '')
+            }
+
+            axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
+              vm.loadingAction = false
+              toastr.success('Cập nhật tài liệu thành công')
+              vm.dialog_createDocument = false
+              setTimeout(function () {
+                vm.getApplicantDocument()
+              }, 200)
+            }).catch(xhr => {
+              vm.loadingAction = false
+              toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
+            })
+          } else {
+            let dataPost = new FormData()
+            let url = '/o/rest/v2/applicantdatas/' + vm.documentSelect.applicantDataId
+            dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
+            dataPost.append('status', vm.statusCreate ? vm.statusCreate : 0)
+            dataPost.append('fileNo', vm.fileNo)
+            dataPost.append('fileName', vm.fileName)
+            dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
+            if (vm.updateFile) {
+              dataPost.append('file', vm.fileUpdate)
+            } else {
+              dataPost.append('file', '')
+            } 
+            axios.put(url, dataPost, param).then(result1 => {
+              vm.loadingAction = false
+              toastr.success('Cập nhật tài liệu thành công')
+              vm.dialog_createDocument = false
+              setTimeout(function () {
+                vm.getApplicantDocument()
+              }, 200)
+            }).catch(xhr => {
+              vm.loadingAction = false
+              toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
+            })
+          }
+          
+        }
+      } else {
+        vm.updateDocumentKySo()
       }
-      if (!validFileUpload) {
-        return
-      }
+    },
+    updateDocumentKySo () {
+      let vm = this
       if (vm.$refs.form.validate()) {
         vm.loadingAction = true
         let filter = {
@@ -693,15 +875,16 @@ export default {
           dataPost.append('url', '/applicantdatas/' + vm.documentSelect.applicantDataId)
           dataPost.append('data', JSON.stringify(filter))
           if (vm.updateFile) {
-            dataPost.append('file', vm.fileUpdate)
+            dataPost.append('file', vm.fileEntryESign)
           } else {
-            dataPost.append('file', '')
+            dataPost.append('file', null)
           }
 
           axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
             vm.loadingAction = false
             toastr.success('Cập nhật tài liệu thành công')
             vm.dialog_createDocument = false
+            vm.showDetail = false
             setTimeout(function () {
               vm.getApplicantDocument()
             }, 200)
@@ -718,14 +901,15 @@ export default {
           dataPost.append('fileName', vm.fileName)
           dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
           if (vm.updateFile) {
-            dataPost.append('file', vm.fileUpdate)
+            dataPost.append('file', vm.fileEntryESign)
           } else {
-            dataPost.append('file', '')
+            dataPost.append('file', null)
           } 
           axios.put(url, dataPost, param).then(result1 => {
             vm.loadingAction = false
             toastr.success('Cập nhật tài liệu thành công')
             vm.dialog_createDocument = false
+            vm.showDetail = false
             setTimeout(function () {
               vm.getApplicantDocument()
             }, 200)
@@ -792,16 +976,23 @@ export default {
     },
     showEditDocument (item) {
       let vm = this
+      $('html, body').animate({
+          scrollTop: $('#top-header').offset().top,
+        },
+        100,
+        'linear'
+      )
       vm.documentSelect = item
       vm.typeCreate = 'update'
-      vm.fileNameView = item.filePath
+      vm.fileNameView = item.fileName
       vm.fileTemplateNoCreate = vm.fileTemplateList.filter(function (items) {
         return items.fileTemplateNo === item.fileTemplateNo
       })[0]
       vm.statusCreate = item.status
       vm.fileName = item.fileName
       vm.fileNo = item.fileNo
-      vm.dialog_createDocument = true
+      // vm.dialog_createDocument = true
+      vm.showDetail = true
     },
     validFileUpload (file) {
       let vm = this
@@ -855,45 +1046,48 @@ export default {
     },
     viewDocument (item) {
       let vm = this
-      vm.srcDownload = ''
-      let url = item.filePath
-      let filter = {
-        applicantDataId: item.applicantDataId
-      }
-      if (vm.isDvc) {
-        vm.$store.dispatch('getFileAttachProxy', filter).then(function (result) {
-          let fileType = item.fileExtension.toLowerCase()
-          if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
-            fileType === 'tif' || fileType === 'tiff'
-          ) {
-            vm.dialogPDF = true
-            document.getElementById('dialogPDFPreview').src = result
-          } else {
-            vm.srcDownload = result
-            setTimeout(function () {
-              document.getElementById('downloadFile').click()
-            }, 100)
-          }
-        }).catch(function () {
-        })
+      if (vm.pathNameFileESign) {
+        vm.dialogViewFileSign = true
       } else {
-        vm.$store.dispatch('getFileAttach', filter).then(function (result) {
-          let fileType = item.fileExtension.toLowerCase()
-          if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
-            fileType === 'tif' || fileType === 'tiff'
-          ) {
-            vm.dialogPDF = true
-            document.getElementById('dialogPDFPreview').src = result
-          } else {
-            vm.srcDownload = result
-            setTimeout(function () {
-              document.getElementById('downloadFile').click()
-            }, 100)
-          }
-        }).catch(function () {
-        })
-        
+        vm.srcDownload = ''
+        let filter = {
+          applicantDataId: item.applicantDataId
+        }
+        if (vm.isDvc) {
+          vm.$store.dispatch('getFileAttachProxy', filter).then(function (result) {
+            let fileType = item.fileExtension.toLowerCase()
+            if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+              fileType === 'tif' || fileType === 'tiff'
+            ) {
+              vm.dialogPDF = true
+              document.getElementById('dialogPDFPreview').src = result
+            } else {
+              vm.srcDownload = result
+              setTimeout(function () {
+                document.getElementById('downloadFile').click()
+              }, 100)
+            }
+          }).catch(function () {
+          })
+        } else {
+          vm.$store.dispatch('getFileAttach', filter).then(function (result) {
+            let fileType = item.fileExtension.toLowerCase()
+            if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+              fileType === 'tif' || fileType === 'tiff'
+            ) {
+              vm.dialogPDF = true
+              document.getElementById('dialogPDFPreview').src = result
+            } else {
+              vm.srcDownload = result
+              setTimeout(function () {
+                document.getElementById('downloadFile').click()
+              }, 100)
+            }
+          }).catch(function () {
+          })
+        }
       }
+      
     },
     getApplicantType (item) {
       let vm = this
@@ -912,16 +1106,23 @@ export default {
       }
     },
     getStatus (val) {
-      if (String(val) === '1') {
+      if (String(val) === '0') {
+        return 'Yêu cầu số hóa'
+      } else if (String(val) === '1') {
         return 'Có hiệu lực'
       } else if (String(val) === '2') {
         return 'Hết hiệu lực'
-      } else {
-        return 'Chưa duyệt'
+      } else if (String(val) === '3') {
+        return 'Hủy'
       }
     },
     goBack () {
-      window.history.back()
+      let vm = this
+      if (vm.showDetail) {
+        vm.showDetail = false
+      } else {
+        window.history.back()
+      }
     }
   }
 }

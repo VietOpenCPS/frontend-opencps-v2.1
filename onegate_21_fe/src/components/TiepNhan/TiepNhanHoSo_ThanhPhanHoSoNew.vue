@@ -151,7 +151,7 @@
                   </div>
                 </div>
                 <div v-if="dossierFilesApplicant && dossierFilesApplicant.length" class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" 
-                  :style="!khoTaiLieuCongDan ? 'display:none;max-height: 250px;overflow:auto;border:1px dashed #f3ae75;border-radius: 5px;position:relative' : ''">
+                  style="display:none;max-height: 250px;overflow:auto;border:1px dashed #f3ae75;border-radius: 5px;position:relative">
                   <div v-for="(itemFileView, indexFile) in dossierFilesApplicant" :key="indexFile" v-if="itemFileView.dossierTemplateNo === thongTinHoSo['dossierTemplateNo'] && item.partNo === itemFileView.dossierPartNo" >
                     <div v-if="itemFileView.eForm && itemFileView.fileSize !== 0" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '3px'}">
                       <v-tooltip top style="max-width:100%">
@@ -311,7 +311,7 @@
                 <span>Không đạt</span>
               </v-tooltip>
             </v-flex>
-            <v-flex :style="{width: !onlyView ? '120px' : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
+            <v-flex :style="{width: !onlyView ? (khoTaiLieuCongDan && partNoApplicantHasFile(item.partNo) && item.hasForm ? '150px' : '120px') : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
               <input v-if="item['multiple']"
               type="file"
               multiple
@@ -371,14 +371,6 @@
                 </v-btn>
                 <span>Giấy tờ đã nộp</span>
               </v-tooltip>
-              <!-- <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && khoTaiLieuCongDan">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click="showFilesApplicant(item.partNo)">
-                  <v-badge>
-                    <v-icon size="24" color="orange darken-3">folder</v-icon>
-                  </v-badge>
-                </v-btn>
-                <span>Giấy tờ đã nộp</span>
-              </v-tooltip> -->
 
               <!-- Sử dụng kho tài liệu công dân -->
               <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView && khoTaiLieuCongDan">
@@ -390,13 +382,21 @@
                 <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ từ máy</span>
                 <span v-else>Tải giấy tờ từ máy (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
               </v-tooltip>
-              <v-tooltip class="pl-1 pt-1" top v-if="!onlyView && khoTaiLieuCongDan">
+              <v-tooltip class="pl-1 pt-1" top v-if="applicantId && partNoApplicantHasFile(item.partNo) && !onlyView && khoTaiLieuCongDan">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="showDocumentApplicant(item, index)">
                   <v-badge>
                     <v-icon size="20" color="orange darken-3">storage</v-icon>
                   </v-badge>
                 </v-btn>
-                <span>Tải giấy tờ từ kho</span>
+                <span>Giấy tờ trong kho</span>
+              </v-tooltip>
+              <v-tooltip class="pl-1 pt-1" top v-if="applicantId && !onlyView && khoTaiLieuCongDan && checkSoHoa(item.partNo)">
+                <v-btn :disabled="progress_sohoa" slot="activator" icon class="mx-0 my-0" @click="guiYeuCauSoHoa(item, index)">
+                  <v-badge>
+                    <v-icon size="20" color="#004b94">share</v-icon>
+                  </v-badge>
+                </v-btn>
+                <span>Yêu cầu số hóa</span>
               </v-tooltip>
               <!-- end -->
 
@@ -508,14 +508,14 @@
     <v-dialog v-model="dialog_documentApplicant" scrollable persistent max-width="1300px">
       <v-card>
         <v-toolbar dark color="primary">
-          <v-toolbar-title>Kho tài liệu công dân, tổ chức, doanh nghiệp</v-toolbar-title>
+          <v-toolbar-title>Giấy tờ, tài liệu</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="dialog_documentApplicant = false">
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-card-text class="py-1">
-          <kho-tai-lieu ref="khotailieu" :index="applicantId" v-on:trigger-attach="attachFileFromStorage"></kho-tai-lieu>
+        <v-card-text class="py-1" style="min-height: 350px">
+          <kho-tai-lieu ref="khotailieu" :index="applicantId" :fileTemplateNoScope="fileTemplateNoScope" :status="statusApplicantData" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorage"></kho-tai-lieu>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -661,6 +661,7 @@
 
 <script>
 import $ from 'jquery'
+import axios from 'axios'
 import toastr from 'toastr'
 import KhoTaiLieu from '../TiepNhan/KhoTaiLieu'
 toastr.options = {
@@ -844,7 +845,9 @@ export default {
     dialogSignDigital: false,
     fileKySo: '',
     indexFileSelect: '',
-    fileEditor: ''
+    fileEditor: '',
+    statusApplicantData: '',
+    fileTemplateNoScope: ''
   }),
   created () {
     let vm = this
@@ -1319,7 +1322,8 @@ export default {
               wardName: vm.thongTinChuHoSo['wardName'],
               contactEmail: vm.thongTinChuHoSo['contactEmail'],
               contactTelNo: vm.thongTinChuHoSo['contactTelNo'],
-              userType: vm.thongTinChuHoSo['userType'] == '1' ? 'citizen' : 'business'
+              userType: vm.thongTinChuHoSo['userType'] == '1' ? 'citizen' : 'business',
+              view_mode: 'view'
             })
           }
 
@@ -1663,7 +1667,8 @@ export default {
             wardName: vm.thongTinChuHoSo['wardName'],
             contactEmail: vm.thongTinChuHoSo['contactEmail'],
             contactTelNo: vm.thongTinChuHoSo['contactTelNo'],
-            userType: vm.thongTinChuHoSo['userType'] == '1' ? 'citizen' : 'business'
+            userType: vm.thongTinChuHoSo['userType'] == '1' ? 'citizen' : 'business',
+            view_mode: 'view'
           })
         }
         let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
@@ -2109,7 +2114,7 @@ export default {
           divPx += 90
         }
         if (vm.khoTaiLieuCongDan) {
-          divPx += 40
+          divPx += 80
         }
         return 'calc(100% - ' + divPx + 'px)'
       }
@@ -2286,6 +2291,7 @@ export default {
           filter['templateNo'] = vm.thongTinHoSo.dossierTemplateNo
           vm.$store.dispatch('getDossierFilesApplicantsVer2', filter).then(result => {
             vm.dossierFilesApplicant = result
+            console.log('hasFile', vm.dossierFilesApplicant)
           }).catch(reject => {
             console.log('error')
           })
@@ -2315,13 +2321,35 @@ export default {
         return true
       }
     },
-    partNoApplicantHasFile (partNo) {
+    checkSoHoa (partNo) {
       let vm = this
       let hasFile = vm.dossierFilesApplicant.find(file => {
-        return (file.dossierTemplateNo === vm.thongTinHoSo['dossierTemplateNo'] && file.dossierPartNo === partNo)
+        return (file.partNo === partNo && file.yeucausohoa)
       })
       if (hasFile) {
         return true
+      } else {
+        return false
+      }
+    },
+    partNoApplicantHasFile (partNo) {
+      let vm = this
+      let hasFile = vm.dossierFilesApplicant.find(file => {
+        return file.partNo === partNo
+      })
+      console.log('hasFile', hasFile)
+      if (hasFile && hasFile.hasOwnProperty('applicantDataModels') && hasFile.applicantDataModels) {
+        let fileArr = Array.isArray(hasFile.applicantDataModels) ? hasFile.applicantDataModels : [hasFile.applicantDataModels]
+        console.log('fileArrApplicant', fileArr)
+        let hasFileStatus1 = fileArr.find(file => {
+          return file.status == 1
+        })
+        console.log('hasFileStatus1', hasFileStatus1)
+        if (hasFileStatus1) {
+          return true
+        } else {
+          return false
+        }
       } else {
         return false
       }
@@ -2442,12 +2470,40 @@ export default {
     },
     showDocumentApplicant (part, index) {
       let vm = this
+      vm.fileTemplateNoScope = part.fileTemplateNo
+      vm.statusApplicantData = 1
       vm.dossierPartAttach = part
       vm.indexPart = index
       vm.dialog_documentApplicant = true
       setTimeout(function () {
         vm.$refs.khotailieu.initData()
       }, 200)
+    },
+    guiYeuCauSoHoa (part, index) {
+      let vm = this
+      vm.progress_sohoa = true
+      let param = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+          'Accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+      let dataCreateFile = new FormData()
+      let url = '/o/rest/v2/applicantdatas'
+      dataCreateFile.append('fileTemplateNo', part.fileTemplateNo)
+      dataCreateFile.append('status', 0)
+      dataCreateFile.append('fileNo', '')
+      dataCreateFile.append('fileName', part.partName)
+      dataCreateFile.append('applicantIdNo', vm.applicantId)
+      dataCreateFile.append('file', null)
+      
+      axios.post(url, dataCreateFile, param).then(result1 => {
+        vm.progress_sohoa = false
+        toastr.success('Yêu cầu số hóa đã được gửi')
+      }).catch(xhr => {
+        vm.progress_sohoa = false
+      })      
     },
     changeAllFileMark (event) {
       let vm = this

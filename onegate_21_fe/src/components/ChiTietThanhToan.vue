@@ -12,6 +12,12 @@
           <v-card class="">
             <v-card-text class="px-0 py-0">
               <v-layout wrap>
+                <v-flex xs12 md2>
+                  <v-subheader class="pl-0 text-right">Tên phí, lệ phí: </v-subheader>
+                </v-flex>
+                <v-flex xs12 md10>
+                  <p class="mt-1 mb-0">{{payments.paymentFee}}</p>
+                </v-flex>
                 <v-flex xs12 sm2>
                   <v-subheader class="pl-0 text-right">Lệ phí: </v-subheader>
                 </v-flex>

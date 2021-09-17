@@ -1,8 +1,8 @@
 <template>
   <div>
     <v-card>
-      <v-card-text class="px-0 pt-0 mt-3">
-        <v-layout wrap class="mt-0">
+      <v-card-text class="px-0 pt-0 mt-4">
+        <v-layout wrap class="mt-0" v-if="!index">
           <v-flex xs12 sm6 class="pr-2" v-if="originality === 3">
             <v-text-field
               label="Số CMND/ căn cước công dân, mã số thuế doanh nghiệp, mã tổ chức"
@@ -83,17 +83,48 @@
           </v-flex>
           
         </v-layout>
-
+        <v-layout wrap class="mt-0" v-if="index && thongTinChuHoSo">
+          <v-flex xs12 sm5 class="pr-2">
+            <div class="xs12 sm12 pb-1 mb-1">
+              <span class="pr-2">Tên công dân, tổ chức, doanh nghiệp: </span>
+              <span class="pl-0 text-bold"> {{thongTinChuHoSo.applicantName}}</span>
+            </div>
+          </v-flex>
+          <v-flex xs12 sm7 class="mb-1">
+            <div class="xs12 sm12 pb-1">
+              <span class="pr-2">Số định danh: </span>
+              <span class="pl-0 text-bold"> {{thongTinChuHoSo.applicantIdNo}}</span>
+            </div>
+          </v-flex>
+          <v-flex xs12 sm5 class="pr-2 mb-1">
+            <div class="xs12 sm12 pb-1">
+              <span class="pr-2">Điện thoại: </span>
+              <span class="pl-0 text-bold"> {{thongTinChuHoSo.contactTelNo}} </span>
+            </div>
+          </v-flex>
+          <v-flex xs12 sm7 class="mb-1">
+            <div class="xs12 sm12 pb-1">
+              <span class="pl-0">Thư điện tử: </span>
+              <span class="pl-0 text-bold"> {{thongTinChuHoSo.contactEmail}} </span>
+            </div>
+          </v-flex>
+          <!-- <v-flex xs12 class="">
+            <div class="xs12 sm12 pb-1">
+              <span class="pr-2">Địa chỉ: </span>
+              <span class="pl-0 text-bold"> {{String(thongTinChuHoSo.address).replace(/\./g, "")}} {{thongTinChuHoSo.wardName}}<span v-if="thongTinChuHoSo.wardName">, {{thongTinChuHoSo.districtName}}, {{thongTinChuHoSo.cityName}}</span></span>
+            </div>
+          </v-flex> -->
+        </v-layout>
         <v-data-table
           :headers="documentListHeader"
           :items="documentApplicantList"
           hide-actions
-          class="table-landing table-bordered mt-2"
+          class="table-landing table-bordered mt-4"
           style="border-left: 1px solid #dedede"
         >
           <template slot="items" slot-scope="props">
             <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
-              <td class="text-xs-center" style="width:50px;height:36px">
+              <td class="text-xs-center py-3" style="width:50px;height:36px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -101,7 +132,7 @@
                   <span>{{ documentPage * numberPerPage - numberPerPage + props.index + 1 }}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px; min-width:350px">
+              <td class="text-xs-left py-3" style="height:36px; min-width:350px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -109,7 +140,7 @@
                   <span style="word-break: break-word;">{{props.item.hasOwnProperty('fileName') ? props.item.fileName : ''}}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px;min-width:150px;max-width: 300px">
+              <td class="text-xs-left py-3" style="height:36px;min-width:150px;max-width: 300px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -117,15 +148,7 @@
                   <span style="word-break: break-word;">{{props.item.hasOwnProperty('fileNo') ? props.item.fileNo : ''}}</span>
                 </div>
               </td>
-              <td class="text-xs-left" style="height:36px;min-width:120px">
-                <content-placeholders v-if="loadingTable">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>{{props.item.hasOwnProperty('fileExtension') ? props.item.fileExtension : ''}}</span>
-                </div>
-              </td>
-              <td class="text-xs-left" style="height:36px; min-width:150px">
+              <td class="text-xs-left py-3" style="height:36px; min-width:150px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -133,7 +156,7 @@
                   <span>{{props.item.hasOwnProperty('createDate') ? props.item.createDate : ''}}</span>
                 </div>
               </td>
-              <td class="text-xs-center" style="height:36px;min-width:125px">
+              <td class="text-xs-center py-3" style="height:36px;min-width:125px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -143,7 +166,7 @@
                   </span>
                 </div>
               </td>
-              <td class="text-xs-center" style="height:36px;min-width: 100px">
+              <td class="text-xs-center py-3" style="height:36px;min-width: 100px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -153,7 +176,7 @@
                   </v-btn>
                   <span>Xem trước</span>
                 </v-tooltip>
-                <v-tooltip top v-if="!loadingTable" class="mr-2">
+                <v-tooltip top v-if="!loadingTable && !applicantId" class="mr-2">
                   <v-btn @click="$emit('trigger-attach', props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon>fas fa fa-download</v-icon>
                   </v-btn>
@@ -208,7 +231,7 @@ import $ from 'jquery'
 import TinyPagination from '../../components/pagging/opencps_pagination'
 Vue.use(toastr)
 export default {
-  props: ['index'],
+  props: ['index', 'fileTemplateNoScope', 'status', 'thongTinChuHoSo'],
   components: {
     'tiny-pagination': TinyPagination
   },
@@ -221,11 +244,10 @@ export default {
     documentPage: 1,
     numberPerPage: 15,
     statusList: [
-      {text: 'Chưa duyệt', value: 0},
-      {text: 'Có hiệu lực', value: 1},
-      {text: 'Hết hiệu lực', value: 2}
+      {text: 'Yêu cầu số hóa', value: 0},
+      {text: 'Đã duyệt', value: 1},
+      {text: 'Hủy', value: 2}
     ],
-    status: '',
     statusCreate: '',
     fileTemplateNoCreate: '',
     fileTemplateList: [],
@@ -255,11 +277,6 @@ export default {
       },
       {
         text: 'Mã số',
-        align: 'center',
-        sortable: false
-      },
-      {
-        text: 'Định dạng',
         align: 'center',
         sortable: false
       },
@@ -300,6 +317,10 @@ export default {
     },
     index (val) {
       this.applicantIdNo = val
+      console.log('thongtinchuhoso', this.thongTinChuHoSo)
+    },
+    fileTemplateNoScope (val) {
+      this.fileTemplateNo = val
     }
   },
   created () {

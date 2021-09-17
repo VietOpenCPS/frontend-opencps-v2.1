@@ -1005,12 +1005,13 @@ export const store = new Vuex.Store({
             }
           }
           let textPost = {
-            fromReceiveDate: data.fromReceiveDate ? data.fromReceiveDate : '',
-            toReceiveDate: data.toReceiveDate ? data.toReceiveDate : ''
+            fromDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            toDate: data.toReceiveDate ? data.toReceiveDate : '',
+            type: data.type ? data.type : '',
           }
           let dataPost = new URLSearchParams()
-          dataPost.append('method', 'GET')
-          dataPost.append('url', '/postal/vote/' + data.className + '/statistic/voteResult')
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/vote/' + data.className + '/statistic')
           dataPost.append('data', JSON.stringify(textPost))
           dataPost.append('serverCode', 'SERVER_DVC')
           axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
@@ -1083,12 +1084,13 @@ export const store = new Vuex.Store({
             }
           }
           let textPost = {
-            fromReceiveDate: data.fromReceiveDate ? data.fromReceiveDate : '',
-            toReceiveDate: data.toReceiveDate ? data.toReceiveDate : ''
+            fromDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            toDate: data.toReceiveDate ? data.toReceiveDate : '',
+            type: 24
           }
           let dataPost = new URLSearchParams()
-          dataPost.append('method', 'GET')
-          dataPost.append('url', '/postal/vote/survey/statistic/voteResult/serviceL34')
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/vote/dossier/statistic')
           dataPost.append('data', JSON.stringify(textPost))
           dataPost.append('serverCode', 'SERVER_DVC')
           axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
