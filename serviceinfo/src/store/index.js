@@ -154,7 +154,7 @@ export const store = new Vuex.Store({
             start: 0,
             end: 1,
             tagCode: data.tagCode,
-            active: 'true'
+            // active: 'true'
           }
           let param = {
             headers: {
@@ -183,7 +183,7 @@ export const store = new Vuex.Store({
             level: filter.level ? filter.level : 0,
             domain: filter.domain ? filter.domain : '',
             tagCode: filter.tagCode ? filter.tagCode : '',
-            active: 'true'
+            // active: 'true'
           }
           console.log('paramGet555', paramGet)
           if (filter.domain) {
@@ -219,7 +219,7 @@ export const store = new Vuex.Store({
             start: 0,
             end: 1,
             keyword: filter.keyword ? filter.keyword.replace(/[!@#$%^&*(),?":{}|<>]/g, '') : '',
-            active: 'true'
+            // active: 'true'
           }
           let param = {
             headers: {

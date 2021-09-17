@@ -339,13 +339,13 @@
               v-if="progressUploadPart === item.partNo"
               ></v-progress-circular>
 
-              <v-tooltip top v-if="progressUploadPart !== item.partNo && !onlyView & item.hasForm">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item)">
+              <v-tooltip top v-if="progressUploadPart !== item.partNo && item.hasForm">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item, 'viewform')">
                   <v-badge>
                     <v-icon size="24" color="#004b94">edit</v-icon>
                   </v-badge>
                 </v-btn>
-                <span>Khai trực tuyến</span>
+                <span>Xem bản khai</span>
               </v-tooltip>
               <v-tooltip top v-if="progressUploadPart !== item.partNo && onlyView & item.hasForm">
                 <v-btn slot="activator" class="mx-1 my-0" fab dark small color="primary" @click="loadAlpcaFormClick(item)" style="height:25px;width:25px">
@@ -1322,11 +1322,12 @@ export default {
               wardName: vm.thongTinChuHoSo['wardName'],
               contactEmail: vm.thongTinChuHoSo['contactEmail'],
               contactTelNo: vm.thongTinChuHoSo['contactTelNo'],
-              userType: vm.thongTinChuHoSo['userType'] == '1' ? 'citizen' : 'business',
-              view_mode: 'view'
+              userType: vm.thongTinChuHoSo['userType'] == '1' ? 'citizen' : 'business'
             })
           }
-
+          if (vm.onlyView) {
+            paramsEmbed['view_mode'] = 'view'
+          }
           let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
           for (let key in paramsEmbed) {
             urlEmbed += ('&' + key + '=' + paramsEmbed[key])
@@ -1571,7 +1572,7 @@ export default {
         })
       }
     },
-    loadAlpcaFormClick (data) {
+    loadAlpcaFormClick (data, viewform) {
       let vm = this
       window.removeEventListener('message', vm.receiveMessage)
       window.addEventListener('message', vm.receiveMessage)
@@ -1595,7 +1596,7 @@ export default {
       let fileFind = vm.dossierFilesItems.find(itemFile => {
         return itemFile.dossierPartNo === data.partNo && itemFile.eForm
       })
-      if (fileFind) {
+      if (fileFind && !viewform) {
         console.log('fileFind', fileFind)
         if (fileFind.fileSize) {
           fileFind['id'] = vm.id
@@ -1667,9 +1668,11 @@ export default {
             wardName: vm.thongTinChuHoSo['wardName'],
             contactEmail: vm.thongTinChuHoSo['contactEmail'],
             contactTelNo: vm.thongTinChuHoSo['contactTelNo'],
-            userType: vm.thongTinChuHoSo['userType'] == '1' ? 'citizen' : 'business',
-            view_mode: 'view'
+            userType: vm.thongTinChuHoSo['userType'] == '1' ? 'citizen' : 'business'
           })
+        }
+        if (vm.onlyView) {
+          paramsEmbed['view_mode'] = 'view'
         }
         let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
         for (let key in paramsEmbed) {
@@ -2496,7 +2499,7 @@ export default {
       dataCreateFile.append('fileNo', '')
       dataCreateFile.append('fileName', part.partName)
       dataCreateFile.append('applicantIdNo', vm.applicantId)
-      dataCreateFile.append('file', null)
+      dataCreateFile.append('file', '')
       
       axios.post(url, dataCreateFile, param).then(result1 => {
         vm.progress_sohoa = false
