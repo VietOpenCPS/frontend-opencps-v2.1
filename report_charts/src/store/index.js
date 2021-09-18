@@ -1010,7 +1010,7 @@ export const store = new Vuex.Store({
             type: data.type ? data.type : '',
           }
           let dataPost = new URLSearchParams()
-          dataPost.append('method', 'POST')
+          dataPost.append('method', 'GET')
           dataPost.append('url', '/postal/vote/' + data.className + '/statistic')
           dataPost.append('data', JSON.stringify(textPost))
           dataPost.append('serverCode', 'SERVER_DVC')
@@ -1089,7 +1089,7 @@ export const store = new Vuex.Store({
             type: 24
           }
           let dataPost = new URLSearchParams()
-          dataPost.append('method', 'POST')
+          dataPost.append('method', 'GET')
           dataPost.append('url', '/postal/vote/dossier/statistic')
           dataPost.append('data', JSON.stringify(textPost))
           dataPost.append('serverCode', 'SERVER_DVC')

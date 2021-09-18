@@ -117,8 +117,7 @@ export const store = new Vuex.Store({
               type: 23
             }
           }
-          let dataPost = {}
-          axios.post(state.endPointApi + '/postal/vote/survey/statistic', dataPost, param).then(result => {
+          axios.get(state.endPointApi + '/postal/vote/survey/statistic', param).then(result => {
             if (result.data.data) {
               let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
               items = items.filter(function (item) {
