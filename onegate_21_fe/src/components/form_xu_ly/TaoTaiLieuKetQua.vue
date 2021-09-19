@@ -669,7 +669,8 @@
               submitDate: vm.detailDossier.submitDate,
               govAgencyCode: vm.detailDossier.govAgencyCode,
               govAgencyName: vm.detailDossier.govAgencyName,
-              dossierTemplateNo: vm.detailDossier.dossierTemplateNo
+              dossierTemplateNo: vm.detailDossier.dossierTemplateNo,
+              dossierId: vm.detailDossier.dossierId
             }
             let fileTemplateNo = ''
             try {
@@ -772,7 +773,8 @@
                 submitDate: vm.detailDossier.submitDate,
                 govAgencyCode: vm.detailDossier.govAgencyCode,
                 govAgencyName: vm.detailDossier.govAgencyName,
-                dossierTemplateNo: vm.detailDossier.dossierTemplateNo
+                dossierTemplateNo: vm.detailDossier.dossierTemplateNo,
+                dossierId: vm.detailDossier.dossierId
               }
               let fileTemplateNo = ''
               try {
@@ -1157,7 +1159,8 @@
             submitDate: vm.detailDossier.submitDate,
             govAgencyCode: vm.detailDossier.govAgencyCode,
             govAgencyName: vm.detailDossier.govAgencyName,
-            dossierTemplateNo: vm.detailDossier.dossierTemplateNo
+            dossierTemplateNo: vm.detailDossier.dossierTemplateNo,
+            dossierId: vm.detailDossier.dossierId
           }
           let fileTemplateNo = ''
           try {
@@ -1295,7 +1298,8 @@
                         submitDate: vm.detailDossier.submitDate,
                         govAgencyCode: vm.detailDossier.govAgencyCode,
                         govAgencyName: vm.detailDossier.govAgencyName,
-                        dossierTemplateNo: vm.detailDossier.dossierTemplateNo
+                        dossierTemplateNo: vm.detailDossier.dossierTemplateNo,
+                        dossierId: vm.detailDossier.dossierId
                       }
                       let fileTemplateNo = ''
                       try {

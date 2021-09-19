@@ -578,6 +578,7 @@ export default {
     statisticNltt: [],
     statisticQlnn: [],
     agencyList: [],
+    domainList: [],
     agency: '',
     loadingChangeAgency: false,
     votingResult: [],
@@ -616,6 +617,10 @@ export default {
     try {
       vm.agencyList = agencyList
       // vm.agency = vm.agencyList[0]
+    } catch (error) {
+    }
+    try {
+      vm.domainList = domainList
     } catch (error) {
     }
     vm.$nextTick(function () {
@@ -1013,11 +1018,11 @@ export default {
       vm.$store.dispatch('loadVotingResult', data).then(function(result) {
         let voteStatistic = []
         result.forEach(element => {
-          let indexSt = vm.agencyList.findIndex(function(gov) {
+          let indexSt = vm.domainList.findIndex(function(gov) {
             return gov.govAgencyCode == element.govAgencyCode
           })
           if (indexSt >=0) {
-            element['govAgencyName'] = vm.agencyList[indexSt]['govAgencyName']
+            element['govAgencyName'] = vm.domainList[indexSt]['govAgencyName']
             voteStatistic.push(element)
           }
         })

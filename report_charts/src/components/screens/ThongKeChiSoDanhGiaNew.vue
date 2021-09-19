@@ -26,8 +26,8 @@
               <v-layout wrap class="px-3 pt-3">
                 <v-flex xs12 md4 class="my-2">
                     <v-autocomplete
-                      label="Đơn vị"
-                      :items="agencyList"
+                      label="Lĩnh vực"
+                      :items="domainList"
                       v-model="govAgency"
                       item-text="govAgencyName"
                       item-value="govAgencyCode"
@@ -412,6 +412,8 @@ export default {
     dialogSelectGov: false,
     dialogVoting: false,
     agencyList: [],
+    agencyListDanhGia: [],
+    domainList: [],
     agency: '',
     reRender: true,
     votingUpdate: '',
@@ -454,6 +456,11 @@ export default {
       let query = vm.$router.history.current.query
       try {
         vm.agencyList = agencyList
+        vm.agencyListDanhGia = agencyListDanhGia
+      } catch (error) {
+      }
+      try {
+        vm.domainList = domainList
       } catch (error) {
       }
       vm.toReceiveDateFormatted = vm.currentDateFormat()
@@ -528,10 +535,11 @@ export default {
         vm.btnLoading = false
         let voteStatistic = []
         result.forEach(element => {
-          let indexSt = vm.agencyList.findIndex(function(gov) {
+          let indexSt = vm.domainList.findIndex(function(gov) {
             return gov.govAgencyCode == element.govAgencyCode
           })
           if (indexSt >=0) {
+            element['govAgencyName'] = vm.domainList[indexSt]['govAgencyName']
             voteStatistic.push(element)
           }
         })
