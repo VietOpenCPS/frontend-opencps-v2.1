@@ -1,12 +1,17 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import NotFound from '@/components/NotFound'
-import LandingApp from '@/components/screens/LandingTraCuuHoSo'
-import ChiTietHoSo from '@/components/screens/ChiTietHoSo'
+import Landing from '@/components/screens/Landing'
+import SoHoaGiayTo from '@/components/screens/SoHoaGiayTo'
+import KhoTaiLieu from '@/components/screens/KhoTaiLieu'
+import DanhMucGiayTo from '@/components/screens/DanhMucGiayTo'
+import BaoCao from '@/components/screens/BaoCao'
 import DetailForward from '@/components/blacklist/DetailForward'
 const routes = [
-  { path: '/', name: 'LandingApp', component: LandingApp, props: true },
-  { path: '/thong-tin-ho-so/:index', name: 'ChiTietHoSo', component: ChiTietHoSo, props: true},
+  { path: '/', name: 'SoHoaGiayTo', component: SoHoaGiayTo, props: true },
+  { path: '/kho-tai-lieu', name: 'KhoTaiLieu', component: KhoTaiLieu, props: true},
+  { path: '/danh-muc-giay-to', name: 'DanhMucGiayTo', component: DanhMucGiayTo, props: true},
+  { path: '/bao-cao', name: 'BaoCao', component: BaoCao, props: true},
   {
     path: '/danh-sach-ho-so/:index',
     name: 'Landing',

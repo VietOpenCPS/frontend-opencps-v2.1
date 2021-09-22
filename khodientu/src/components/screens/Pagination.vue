@@ -2,16 +2,6 @@
   <div>
     <div v-if="!isMobile" style="text-align: left;position: absolute;line-height: 46px">Tổng số <span class="text-bold primary--text">{{total}}</span> {{nameRecord}} </div>
     <div v-if="total > 0" class="vue-tiny-pagination pagination layout" :style="!isMobile ? 'justify-content: flex-end; -webkit-justify-content: flex-end;' : ''">
-      <div v-if="showLimit" class="pr-2 flex" style="width:120px">
-        Số hồ sơ mỗi trang:
-      </div>
-      <div v-if="showLimit" class="pr-3 xs4 sm2 flex" style="max-width: 70px !important;">
-        <v-autocomplete
-          v-bind:items="limits"
-          v-model="numberPerPage"
-          @input="onLimitChange"
-        ></v-autocomplete>
-      </div>
       <div :class="!isMobile ? 'px-3 xs4 flex' : 'pr-3 xs4 flex'">
         <v-select
           v-bind:items="totalPagesData"
@@ -66,10 +56,6 @@ export default {
       type: Number,
       default: 1
     },
-    numberPerPage: {
-      type: Number,
-      default: 20
-    },
     lang: {
       type: String,
       default: 'en'
@@ -80,7 +66,7 @@ export default {
     limits: {
       type: Array,
       default () {
-        return [20, 50, 100]
+        return [10, 15, 20, 50, 100]
       }
     },
     showLimit: {
@@ -104,8 +90,7 @@ export default {
           next: 'Next'
         }
       },
-      availableLanguages: ['en'],
-      isMobile: false
+      availableLanguages: ['en']
     }
   },
   created () {
@@ -123,7 +108,7 @@ export default {
         : this.translations['en']
     },
     totalPages () {
-      return Math.ceil(this.total / this.numberPerPage)
+      return Math.ceil(this.total / this.currentLimit)
     },
     totalPagesData () {
       var totalDatas = []
@@ -150,17 +135,16 @@ export default {
         'c-not-allowed pagination__navigation--disabled': this.currentPage === this.totalPages
       }
     },
-    // isMobile () {
-    //   return this.$store.getters.getIsMobile
-    // }
+    isMobile () {
+      return this.$store.getters.getIsMobile
+    }
   },
   methods: {
     nextPage () {
       if (this.currentPage !== this.totalPages) {
         this.currentPage += 1
         this.$emit('tiny:change-page', {
-          page: this.currentPage,
-          numberPerPage: this.numberPerPage
+          page: this.currentPage
         })
       }
     },
@@ -168,37 +152,29 @@ export default {
       if (this.currentPage > 1) {
         this.currentPage -= 1
         this.$emit('tiny:change-page', {
-          page: this.currentPage,
-          numberPerPage: this.numberPerPage
+          page: this.currentPage
         })
       }
     },
     nextPageLast () {
       this.currentPage = this.totalPages
       this.$emit('tiny:change-page', {
-        page: this.totalPages,
-        numberPerPage: this.numberPerPage
+        page: this.totalPages
       })
     },
     lastPageLast () {
       this.currentPage = 1
       this.$emit('tiny:change-page', {
-        page: 1,
-        numberPerPage: this.numberPerPage
+        page: 1
       })
     },
     goToPage () {
       this.$emit('tiny:change-page', {
-        page: this.currentPage,
-        numberPerPage: this.numberPerPage
+        page: this.currentPage
       })
     },
     onLimitChange () {
       this.currentPage = 1
-      this.$emit('tiny:change-page', {
-        page: 1,
-        numberPerPage: this.numberPerPage
-      })
     }
   }
 }
