@@ -121,7 +121,7 @@ export const store = new Vuex.Store({
             if (result.data.data) {
               let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
               items = items.filter(function (item) {
-                return item.govAgencyCode && item.voteCode
+                return item.domainCode && item.voteCode
               })
               resolve(items)
             } else {

@@ -52,8 +52,8 @@
               <v-flex style="max-width: 85px;">
                 <v-img class="mx-3 my-3"
                   :src="activeTab === 3 ? '/documents/2832265/0/list-icon1.png?t=9312312' : '/documents/2832265/0/list-icon2.png'"
-                  height="50px"
-                  width="50px"
+                  height="45px"
+                  width="45px"
                   contain
                 ></v-img>
               </v-flex>
@@ -67,7 +67,7 @@
             </v-layout>
           </v-card>
         </v-flex>
-        <v-flex xs12 md3 class="px-2">
+        <!-- <v-flex xs12 md3 class="px-2">
           <v-card @click="redirectPage(4)" :color="activeTab === 4 ? '#11cdefeb' : 'white'" class="" hover style="border-radius: 12px;box-shadow: 0 6px 10px -4px rgb(0 0 0 / 15%);">
             <v-layout row>
               <v-flex style="max-width: 85px;">
@@ -82,6 +82,29 @@
                 <v-card-title primary-title style="height: 100%;" class="px-2">
                   <div>
                     <div class="headline" :style="activeTab === 4 ? 'color: #ffffff;font-size: 20px !important' : 'color: #252422;font-size: 20px !important'">BÁO CÁO, THỐNG KÊ</div>
+                  </div>
+                </v-card-title>
+              </v-flex>
+            </v-layout>
+          </v-card>
+        </v-flex> -->
+        <v-flex xs12 md3 class="px-2">
+          <v-card @click="redirectPage(4)" :color="activeTab === 4 ? '#11cdefeb' : 'white'" class="" hover style="border-radius: 12px;box-shadow: 0 6px 10px -4px rgb(0 0 0 / 15%);">
+            <v-layout row>
+              <v-flex style="max-width: 85px;">
+                <v-img class="mx-3 my-3"
+                  :src="activeTab === 4 ? '/documents/2832265/0/applicant-icon1.png' : '/documents/2832265/0/applicant-icon2.png'"
+                  height="50px"
+                  width="50px"
+                  contain
+                ></v-img>
+              </v-flex>
+              <v-flex>
+                <v-card-title primary-title style="height: 100%;" class="px-2">
+                  <div>
+                    <div class="headline" :style="activeTab === 4 ? 'color: #ffffff;font-size: 20px !important' : 'color: #252422;font-size: 20px !important'">
+                      DỮ LIỆU NGƯỜI DÙNG  
+                    </div>
                   </div>
                 </v-card-title>
               </v-flex>
@@ -118,12 +141,41 @@
 
     },
     created () {
+      let vm = this
+      if (!window.themeDisplay.isSignedIn()) {
+        window.location.href = "/c/portal/logout"
+      }
+      try {
+        let currentQuery = vm.$router.history.current
+        if (currentQuery.name === 'SoHoaGiayTo') {
+          vm.activeTab = 1
+        } else if (currentQuery.name === 'KhoTaiLieu') {
+          vm.activeTab = 2
+        } else if (currentQuery.name === 'DanhMucGiayTo') {
+          vm.activeTab = 3
+        } else if (currentQuery.name === 'DuLieuCongDan') {
+          vm.activeTab = 4
+        }
+      } catch (error) {
+      }
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
         let vm = this
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
+        try {
+          if (newRoute.name === 'SoHoaGiayTo') {
+            vm.activeTab = 1
+          } else if (newRoute.name === 'KhoTaiLieu') {
+            vm.activeTab = 2
+          } else if (newRoute.name === 'DanhMucGiayTo') {
+            vm.activeTab = 3
+          } else if (newRoute.name === 'DuLieuCongDan') {
+            vm.activeTab = 4
+          }
+        } catch (error) {
+        }
       }
     },
     methods: {
@@ -138,7 +190,7 @@
         } else if (page === 3) {
           path = '/danh-muc-giay-to'
         } else if (page === 4) {
-          path = '/bao-cao'
+          path = '/du-lieu-cong-dan'
         }
         vm.$router.push({
           path: path,

@@ -1,11 +1,7 @@
 <template>
-  <div>
-    <v-card>
-      <div class="row-header no__hidden_class">
-        <div class="background-triangle-big">
-          <span>QUẢN LÝ THÔNG TIN CÔNG DÂN, CƠ QUAN TỔ CHỨC, DOANH NGHIỆP</span>
-        </div>
-      </div>
+  <div style="padding: 0px 25px; max-width: 1500px; margin: 0px auto" class="mt-5 pb-3" id="top-header">
+    <v-card class="px-3 py-3" style="width: 100%; background: #ffffff;border-radius: 12px;box-shadow: 0 6px 10px -4px rgb(0 0 0 / 15%)">
+      <div class="headline mb-3" style="font-size: 20px!important;">DỮ LIỆU CÔNG DÂN, TỔ CHỨC, DOANH NGHIỆP</div>
       
       <v-card-text class="px-0 pt-0">
         <v-layout wrap class="">
@@ -18,33 +14,35 @@
               <v-radio label="Tất cả" :value="''" ></v-radio>
             </v-radio-group>
           </v-flex>
-
-          <v-flex xs12 sm6 class="pr-2 input-group--text-field-box mt-1">
-            <v-text-field
-                label="Tìm kiếm theo tên người dùng"
-                v-model="keySearch"
-                @keyup.enter="searchKeyword"
-                append-icon="search"
-                box
-                clear-icon="clear"
-                clearable
-                @click:clear="clearKeySearch('keyword')"
-                @click:append="searchKeyword"
-              ></v-text-field>
-          </v-flex>
-          <v-flex xs12 sm6 class="input-group--text-field-box mt-1 pl-2">
-            <v-text-field
-                label="Số CMND/ căn cước, mã tổ chức, doanh nghiệp"
-                v-model="idNoSearch"
-                @keyup.enter="searchKeyword"
-                append-icon="search"
-                box
-                clear-icon="clear"
-                clearable
-                @click:clear="clearKeySearch('idNo')"
-                @click:append="searchKeyword"
-              ></v-text-field>
-          </v-flex>
+          <v-layout wrap class="" id="form-search">
+            <v-flex xs12 sm6 class="pr-2 input-group--text-field-box mt-1">
+              <v-text-field
+                  label="Tìm kiếm theo tên người dùng"
+                  v-model="keySearch"
+                  @keyup.enter="searchKeyword"
+                  append-icon="search"
+                  box
+                  clear-icon="clear"
+                  clearable
+                  @click:clear="clearKeySearch('keyword')"
+                  @click:append="searchKeyword"
+                ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 class="input-group--text-field-box mt-1 pl-2">
+              <v-text-field
+                  label="Số CMND/ căn cước, mã tổ chức, doanh nghiệp"
+                  v-model="idNoSearch"
+                  @keyup.enter="searchKeyword"
+                  append-icon="search"
+                  box
+                  clear-icon="clear"
+                  clearable
+                  @click:clear="clearKeySearch('idNo')"
+                  @click:append="searchKeyword"
+                ></v-text-field>
+            </v-flex>
+          </v-layout>
+          
         </v-layout>
         <div style="text-align: right">
           <v-btn color="blue darken-3" dark @click="addApplicant">
@@ -120,7 +118,7 @@
                   <v-btn @click="documentManage(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon size="22">fas fa fa-folder-open</v-icon>
                   </v-btn>
-                  <span>Kho tài liệu</span>
+                  <span>Kho giấy tờ</span>
                 </v-tooltip>
               </td>
             </tr>
@@ -262,7 +260,6 @@ import Vue from 'vue'
 import $ from 'jquery'
 import toastr from 'toastr'
 import axios from 'axios'
-import support from '../../store/support.json'
 import TinyPagination from './Pagination.vue'
 Vue.use(toastr)
 export default {
@@ -396,6 +393,7 @@ export default {
         vm.$store.dispatch('loadInitResource').then(result => {
           let param = {
             headers: {
+              groupId: 0
             },
             params: {
               start: vm.applicantPage * vm.numberPerPage - vm.numberPerPage,
@@ -423,48 +421,6 @@ export default {
         })
       })
     },
-
-    // getApplicantList () {
-    //   let vm = this
-    //   vm.loadingTable = true
-    //   return new Promise(resolve => {
-    //     vm.$store.dispatch('loadInitResource').then(result => {
-    //       let param = {
-    //         headers: {
-    //           groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
-    //         }
-    //       }
-    //       let filter = {
-    //         start: vm.applicantPage * vm.numberPerPage - vm.numberPerPage,
-    //         end: vm.applicantPage * vm.numberPerPage,
-    //         type: vm.typeSearch,
-    //         applicantName: vm.keySearch,
-    //         idNo: vm.idNoSearch
-    //       }
-
-    //       let dataPost = new URLSearchParams()
-    //       dataPost.append('method', 'GET')
-    //       dataPost.append('url', '/applicants')
-    //       dataPost.append('data', JSON.stringify(filter))
-
-    //       axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
-    //         let items = []
-    //         if (response.data.hasOwnProperty('data')) {
-    //           items = response.data.data
-    //         } else {
-    //         }
-    //         let dataOut = {
-    //           data: items,
-    //           total: response.data['total']
-    //         }
-    //         vm.loadingTable = false
-    //         resolve(dataOut)
-    //       }).catch(function () {
-    //         vm.loadingTable = false
-    //       })
-    //     })
-    //   })
-    // },
     addApplicant () {
       let vm = this
       vm.typeUpdateApplicant = 'create'
@@ -561,8 +517,9 @@ export default {
       let vm = this
       vm.$store.commit('setApplicantInfos', item)
       vm.$router.push({
-        path: '/' + item.applicantIdNo + '/quan-ly-giay-to',
+        path: '/kho-tai-lieu',
         query: {
+          applicantIdNo: item.applicantIdNo,
           renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
         }
       })

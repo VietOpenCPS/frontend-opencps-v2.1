@@ -5,12 +5,14 @@ import Landing from '@/components/screens/Landing'
 import SoHoaGiayTo from '@/components/screens/SoHoaGiayTo'
 import KhoTaiLieu from '@/components/screens/KhoTaiLieu'
 import DanhMucGiayTo from '@/components/screens/DanhMucGiayTo'
+import DuLieuCongDan from '@/components/screens/DuLieuCongDan'
 import BaoCao from '@/components/screens/BaoCao'
 import DetailForward from '@/components/blacklist/DetailForward'
 const routes = [
   { path: '/', name: 'SoHoaGiayTo', component: SoHoaGiayTo, props: true },
   { path: '/kho-tai-lieu', name: 'KhoTaiLieu', component: KhoTaiLieu, props: true},
   { path: '/danh-muc-giay-to', name: 'DanhMucGiayTo', component: DanhMucGiayTo, props: true},
+  { path: '/du-lieu-cong-dan', name: 'DuLieuCongDan', component: DuLieuCongDan, props: true},
   { path: '/bao-cao', name: 'BaoCao', component: BaoCao, props: true},
   {
     path: '/danh-sach-ho-so/:index',

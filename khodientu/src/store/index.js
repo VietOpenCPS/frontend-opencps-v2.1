@@ -43,10 +43,33 @@ export const store = new Vuex.Store({
               groupId: window.themeDisplay.getScopeGroupId()
             },
             params: {
-              status: filter.status ? filter.status : ''
+              start: filter.start ? filter.start : 0,
+              end: filter.end ? filter.end : 15,
+              status: filter.status ? filter.status : '',
+              fileTemplateNo: filter.fileTemplateNo ? filter.fileTemplateNo : '',
+              name: filter.name ? filter.name : '',
             }
           }
           axios.get('/o/rest/v2/fileitems', param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    loadDictItems ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+              parent: data.parent
+            }
+          }
+          axios.get('/o/rest/v2/dictcollections/' + data.collectionCode + '/dictitems', param).then(function (response) {
             resolve(response.data)
           }, error => {
             reject(error)
@@ -196,6 +219,97 @@ export const store = new Vuex.Store({
         axios.get('/o/rest/v2/applicantdatas/' + filter.applicantDataId + '/preview', param).then(response => {
           let url = window.URL.createObjectURL(response.data)
           resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
+    deleteUser ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let url = '/o/rest/v2/applicants/' + filter['applicantId']
+        axios.delete(url, param).then(result1 => {
+          resolve(result1)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
+    addUser ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let dataPutUser = new URLSearchParams()
+        let url = '/o/rest/v2/applicants'
+        dataPutUser.append('applicantName', filter['applicantName'])
+        dataPutUser.append('applicantIdNo', filter['applicantIdNo'])
+        dataPutUser.append('applicantIdDate', filter['applicantIdDate'])
+        dataPutUser.append('applicantIdType', filter['applicantIdType'])
+        dataPutUser.append('contactTelNo', filter['contactTelNo'])
+        dataPutUser.append('address', filter['address'])
+        dataPutUser.append('contactEmail', filter['contactEmail'])
+        dataPutUser.append('cityCode', filter['cityCode'])
+        dataPutUser.append('cityName', filter['cityName'])
+        dataPutUser.append('districtCode', filter['districtCode'])
+        dataPutUser.append('districtName', filter['districtName'])
+        dataPutUser.append('wardCode', filter['wardCode'])
+        dataPutUser.append('wardName', filter['wardName'])
+        
+        axios.post(url, dataPutUser, param).then(result1 => {
+          resolve(result1)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
+    putUser ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let dataPutUser = new URLSearchParams()
+        let url = ''
+        url = '/o/rest/v2/applicants/' + filter['applicantId']
+        dataPutUser.append('applicantName', filter['applicantName'])
+        dataPutUser.append('applicantIdType', filter['applicantIdType'])
+        dataPutUser.append('contactTelNo', filter['contactTelNo'])
+        dataPutUser.append('address', filter['address'])
+        dataPutUser.append('contactEmail', filter['contactEmail'])
+        dataPutUser.append('cityCode', filter['cityCode'])
+        dataPutUser.append('cityName', filter['cityName'])
+        dataPutUser.append('districtCode', filter['districtCode'])
+        dataPutUser.append('districtName', filter['districtName'])
+        dataPutUser.append('wardCode', filter['wardCode'])
+        dataPutUser.append('wardName', filter['wardName'])
+        dataPutUser.append('applicantIdDate', filter['applicantIdDate'])
+        axios.put(url, dataPutUser, param).then(result1 => {
+          resolve(result1)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
+    putVerification ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let dataPutUser = new URLSearchParams()
+        let url = ''
+        url = '/o/rest/v2/applicants/' + filter['applicantId'] + '/verify/' + filter['verification']
+        axios.put(url, dataPutUser, param).then(result1 => {
+          resolve(result1)
         }).catch(xhr => {
           reject(xhr)
         })

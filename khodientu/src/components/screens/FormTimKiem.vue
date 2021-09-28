@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <v-card-text class="px-0">
-        <v-row>
+  <div id="form-search">
+    <v-card-text class="px-0 pt-0">
+        <v-row v-if="form !== 'danhmuc'">
           <v-layout wrap class="mt-0">
-            <v-flex xs12 class="px-0 pr-2">
+            <v-flex xs12 sm6 class="px-0 pr-3">
               <v-autocomplete
                 :items="fileTemplateList"
                 v-model="dataSearch['fileTemplateNo']"
@@ -26,7 +26,29 @@
                 clearable
               ></v-text-field>
             </v-flex>
-            <v-flex xs12 sm6 class="px-0">
+            <v-flex xs12 sm6 class="px-0 pr-3">
+              <v-text-field
+                label="Số CMND/ CCCD, mã số thuế doanh nghiệp, tổ chức"
+                v-model="dataSearch['applicantIdNo']"
+                @keyup.enter="changeFilterSearch"
+                box
+                clear-icon="clear"
+                clearable
+                :readonly="disableInput"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 :class="!form || form !== 'sohoa' ? 'px-0 pr-3 sm3' : 'px-0 pr-0 sm6'">
+              <v-text-field
+                label="Chủ sở hữu"
+                v-model="dataSearch['applicantName']"
+                @keyup.enter="changeFilterSearch"
+                box
+                clear-icon="clear"
+                clearable
+                :readonly="disableInput"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm3 class="px-0" v-if="!form || form !== 'sohoa'">
               <v-autocomplete
                 :items="statusList"
                 v-model="dataSearch['status']"
@@ -39,10 +61,14 @@
                 box
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 sm6 class="px-0 pr-2">
+          </v-layout>
+        </v-row>
+        <v-row v-if="form === 'danhmuc'">
+          <v-layout wrap class="mt-0">
+            <v-flex xs12 sm6 class="pr-3">
               <v-text-field
-                label="Chủ sở hữu"
-                v-model="dataSearch['applicantName']"
+                label="Mã loại giấy tờ"
+                v-model="dataSearch['fileTemplateNo']"
                 @keyup.enter="changeFilterSearch"
                 box
                 clear-icon="clear"
@@ -51,8 +77,8 @@
             </v-flex>
             <v-flex xs12 sm6 class="px-0">
               <v-text-field
-                label="Số CMND/ CCCD, mã số thuế doanh nghiệp, tổ chức"
-                v-model="dataSearch['applicantIdNo']"
+                label="Tên loại giấy tờ"
+                v-model="dataSearch['name']"
                 @keyup.enter="changeFilterSearch"
                 box
                 clear-icon="clear"
@@ -61,20 +87,20 @@
             </v-flex>
           </v-layout>
         </v-row>
-        <v-row class="justify-end">
-          <v-btn color="red" small class="mt-3 mx-3" @click="cancelSearch">
-              <v-icon left size="20">
-              mdi-close
-              </v-icon>
+        <v-flex class="text-right">
+          <v-btn color="red" small class="mr-3 ml-0 white--text" @click="cancelSearch">
+              <v-icon size="20">
+              clear
+              </v-icon> &nbsp;
               Thoát
           </v-btn>
-          <v-btn color="#0072bc" small class="mt-3 mx-3" @click="changeFilterSearch">
-              <v-icon left size="20">
-              mdi-content-save
-              </v-icon>
+          <v-btn color="#0072bc" small class="mx-0 white--text" @click="changeFilterSearch">
+              <v-icon size="20">
+              search
+              </v-icon> &nbsp;
               Tìm kiếm
           </v-btn>
-        </v-row>
+        </v-flex>
     </v-card-text>
     
   </div>
@@ -84,7 +110,7 @@
 <script>
   export default {
     name: 'Search',
-    props: ['form'],
+    props: ['form', 'inputSearch'],
     data () {
       return {
         statusList: [
@@ -97,18 +123,34 @@
           applicantName: '',
           applicantIdNo: '',
           fileTemplateNo: '',
-          status: 0,
+          status: '',
           keywordSearch: '',
-          fileNoSearch: ''
+          fileNoSearch: '',
+          name: ''
         },
-        isDvc: false
+        isDvc: false,
+        disableInput: false
       }
     },
     created () {
       let vm = this
+      if (vm.inputSearch) {
+        vm.dataSearch = Object.assign(vm.dataSearch, vm.inputSearch)
+      }
       vm.getDanhMucGiayTo()
+      let currentQuery = vm.$router.history.current.query
+      if (currentQuery.hasOwnProperty('applicantIdNo') && currentQuery.applicantIdNo) {
+        vm.disableInput = true
+      }
     },
     watch: {
+      '$route': function (newRoute, oldRoute) {
+        let vm = this
+        let currentQuery = newRoute.query
+        if (currentQuery.hasOwnProperty('applicantIdNo') && currentQuery.applicantIdNo) {
+          vm.disableInput = true
+        }
+      }
     },
     computed: {
     },
@@ -125,12 +167,16 @@
           fileTemplateNo: '',
           status: '',
           keywordSearch: '',
-          fileNoSearch: ''
+          fileNoSearch: '',
+          name: ''
         },
         vm.$emit('trigger-cancel', vm.dataSearch)
       },
       changeFilterSearch () {
-        this.$emit('trigger-search', dataSearch)
+        let vm = this
+        setTimeout(function () {
+          vm.$emit('trigger-search', vm.dataSearch)
+        }, 200)
       },
       getDanhMucGiayTo () {
         let vm = this

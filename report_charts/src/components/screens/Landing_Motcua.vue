@@ -1123,8 +1123,14 @@ export default {
         group: vm.group,
         reporting: true,
         agency: vm.govAgencyCode,
-        report: vm.chartView ? false : 'linemonth',
-        system: vm.systemReport
+        report: vm.chartView ? false : 'linemonth'
+      }
+      if (vm.systemReport !== '' && vm.systemReport !== null && vm.systemReport !== 'total') {
+        if (vm.systemReport == 0) {
+          filter['system'] = 'internal'
+        } else if (vm.systemReport == 1) {
+          filter['system'] = 'qlvt.mt.gov.vn'
+        }
       }
       let tempGov = vm.govAgencyCode
       if (vm.chartView) {
@@ -1217,8 +1223,14 @@ export default {
             year: vm.year,
             group: vm.group,
             agency: tempGov,
-            report: vm.chartView ? true : 'linemonth',
-            system: vm.systemReport
+            report: vm.chartView ? true : 'linemonth'
+          }
+          if (vm.systemReport !== '' && vm.systemReport !== null && vm.systemReport !== 'total') {
+            if (vm.systemReport == 0) {
+              filter['system'] = 'internal'
+            } else if (vm.systemReport == 1) {
+              filter['system'] = 'qlvt.mt.gov.vn'
+            }
           }
           if (!vm.chartView) {
             filter.agency = 'total'

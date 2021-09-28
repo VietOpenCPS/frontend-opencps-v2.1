@@ -1,5 +1,24 @@
 <template>
   <div style="height: 100%;">
+    <v-dialog
+      v-model="dialogLoading"
+      persistent
+      width="300"
+      v-if="loadingData"
+    >
+      <v-card
+        color="primary"
+        dark
+      >
+        <v-card-text>
+          <v-progress-linear
+            indeterminate
+            color="white"
+            class="mb-0"
+          ></v-progress-linear>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <div style="border: 2px solid #e9e9e9;border-radius: 5px;">
       <v-tabs
         color="white"
@@ -28,9 +47,9 @@
                     <v-autocomplete
                       label="Lĩnh vực"
                       :items="domainList"
-                      v-model="govAgency"
-                      item-text="govAgencyName"
-                      item-value="govAgencyCode"
+                      v-model="domainFilter"
+                      item-text="domainName"
+                      item-value="domainCode"
                       return-object
                       clearable
                     >
@@ -118,7 +137,7 @@
 
                 <tbody v-for="(item,index) in statisticGovAgency" :key="index">
                   <tr>
-                    <td align="left" colspan="5"  class="px-2 text-bold">{{item.govAgencyName}}</td>
+                    <td align="left" colspan="5"  class="px-2 text-bold">{{item.domainName}}</td>
                   </tr>
                   
                   <tr v-for="(item2,index2) in item['votings']" :key="index2">
@@ -397,6 +416,9 @@ export default {
     ProgressBar
   },
   data: () => ({
+    dialogLoading: true,
+    domainFilter: '',
+    loadingData: false,
     loading: false,
     menuDate1: false,
     menuDate3: false,
@@ -525,21 +547,23 @@ export default {
     getReportAgency () {
       let vm = this
       vm.btnLoading = true
-      vm.$store.dispatch('loadVotingResult', {
+      vm.loadingData = true
+      vm.$store.dispatch('loadVotingResultNltt', {
         className: 'survey',
         fromReceiveDate: (new Date(vm.parseDate(vm.fromReceiveDateFormatted))).getTime(),
         toReceiveDate: (new Date(vm.parseDate(vm.toReceiveDateFormatted))).getTime(),
-        govAgencyCode: vm.govAgency ? vm.govAgency['govAgencyCode'] : '',
+        domainCode: vm.domainFilter ? vm.domainFilter['domainCode'] : '',
         type: 23
       }).then(function(result) {
         vm.btnLoading = false
+        vm.loadingData = false
         let voteStatistic = []
         result.forEach(element => {
           let indexSt = vm.domainList.findIndex(function(gov) {
-            return gov.govAgencyCode == element.govAgencyCode
+            return gov.domainCode == element.domainCode
           })
           if (indexSt >=0) {
-            element['govAgencyName'] = vm.domainList[indexSt]['govAgencyName']
+            element['domainName'] = vm.domainList[indexSt]['domainName']
             voteStatistic.push(element)
           }
         })
@@ -558,14 +582,14 @@ export default {
           let statistic = []
           voteStatistic.forEach(element => {
             let indexSt = statistic.findIndex(function(st) {
-              return st.govAgencyCode == element.govAgencyCode
+              return st.domainCode == element.domainCode
             })
             if (indexSt >= 0) {
               statistic[indexSt]['votings'].push(element)
             } else {
               let itemSt = {
-                govAgencyCode: element.govAgencyCode,
-                govAgencyName: element.govAgencyName,
+                domainCode: element.domainCode,
+                domainName: element.domainName,
                 votings: [element]
               }
               statistic.push(itemSt)
@@ -575,16 +599,19 @@ export default {
         }
       }).catch(xhr => {
         vm.btnLoading = false
+        vm.loadingData = false
       })
     },
     getReportAgencyMc (year) {
       let vm = this
+      // vm.loadingData = true
       vm.$store.dispatch('loadVotingResultGov', {
         className: 'surveyAgency',
         fromReceiveDate: '01/01/' + year,
         toReceiveDate: '31/12/' + year,
         govAgencyCode: vm.govAgency ? vm.govAgency['govAgencyCode'] : ''
       }).then(function(result) {
+        // vm.loadingData = false
         let voteStatistic = result
         let sortVote = function (voteList) {
           function compare(a, b) {
@@ -617,6 +644,7 @@ export default {
           vm.statisticGovAgencyMc = statistic
         }
       }).catch(xhr => {
+        // vm.loadingData = false
       })
     },
     showFormVerify () {

@@ -464,6 +464,10 @@ export default {
           try {
             dataSigned = JSON.parse(received_msg.FileServer)
             vm.fileEntryESign = dataSigned.fileEntryId
+            if (window.top.location.protocol === 'https:') {
+              dataSigned.url = dataSigned.url.replace('http:', 'https:')
+            }
+            dataSigned.url = dataSigned.url.replace(':80/', '/')
             vm.pathNameFileESign = dataSigned.url
             vm.fileNameView = dataSigned.url
           } catch (error) {
@@ -682,6 +686,10 @@ export default {
               dataCreateFile.append('fileName', vm.fileName)
               dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
               dataCreateFile.append('file', vm.fileUpdate)
+              dataPost.append('govAgencyName', '')
+              dataPost.append('issueDate', '')
+              dataPost.append('expireDate', '')
+              dataPost.append('desciption', '')
               
               axios.post(url, dataCreateFile, param).then(result1 => {
                 vm.loadingAction = false
@@ -724,45 +732,30 @@ export default {
               'Content-Type': 'application/x-www-form-urlencoded'
             }
           }
-          if (vm.isDvc) {
-            let dataPost = new FormData()
-            dataPost.append('method', 'POST')
-            dataPost.append('url', '/applicantdatas')
-            dataPost.append('data', JSON.stringify(filter))
-            dataPost.append('file', vm.fileEntryESign)
-            
-            axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
-              vm.loadingAction = false
-              toastr.success('Thêm mới tài liệu thành công')
-              vm.dialog_createDocument = false
-              setTimeout(function () {
-                vm.getApplicantDocument()
-              }, 200)
-            }).catch(xhr => {
-              toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
-            })
-          } else {
-            let dataCreateFile = new FormData()
-            let url = '/o/rest/v2/applicantdatas'
-            dataCreateFile.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-            dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 0)
-            dataCreateFile.append('fileNo', vm.fileNo)
-            dataCreateFile.append('fileName', vm.fileName)
-            dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
-            dataCreateFile.append('file', vm.fileEntryESign)
-            
-            axios.post(url, dataCreateFile, param).then(result1 => {
-              vm.loadingAction = false
-              toastr.success('Thêm mới tài liệu thành công')
-              vm.dialog_createDocument = false
-              setTimeout(function () {
-                vm.getApplicantDocument()
-              }, 200)
-            }).catch(xhr => {
-              vm.loadingAction = false
-              toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
-            })
-          }
+          let dataCreateFile = new FormData()
+          let url = '/o/rest/v2/applicantdatas'
+          dataCreateFile.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
+          dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 0)
+          dataCreateFile.append('fileNo', vm.fileNo)
+          dataCreateFile.append('fileName', vm.fileName)
+          dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
+          dataCreateFile.append('fileEntryId', vm.fileEntryESign)
+          dataPost.append('govAgencyName', '')
+          dataPost.append('issueDate', '')
+          dataPost.append('expireDate', '')
+          dataPost.append('desciption', '')
+          
+          axios.post(url, dataCreateFile, param).then(result1 => {
+            vm.loadingAction = false
+            toastr.success('Thêm mới tài liệu thành công')
+            vm.dialog_createDocument = false
+            setTimeout(function () {
+              vm.getApplicantDocument()
+            }, 200)
+          }).catch(xhr => {
+            vm.loadingAction = false
+            toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
+          })
           
         } else {
           toastr.clear()
@@ -828,6 +821,10 @@ export default {
             dataPost.append('fileNo', vm.fileNo)
             dataPost.append('fileName', vm.fileName)
             dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
+            dataPost.append('govAgencyName', '')
+            dataPost.append('issueDate', '')
+            dataPost.append('expireDate', '')
+            dataPost.append('desciption', '')
             if (vm.updateFile) {
               dataPost.append('file', vm.fileUpdate)
             } else {
@@ -869,55 +866,31 @@ export default {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }
-        if (vm.isDvc) {
-          let dataPost = new FormData()
-          dataPost.append('method', 'PUT')
-          dataPost.append('url', '/applicantdatas/' + vm.documentSelect.applicantDataId)
-          dataPost.append('data', JSON.stringify(filter))
-          if (vm.updateFile) {
-            dataPost.append('file', vm.fileEntryESign)
-          } else {
-            dataPost.append('file', null)
-          }
+        let dataPost = new FormData()
+        let url = '/o/rest/v2/applicantdatas/' + vm.documentSelect.applicantDataId
+        dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
+        dataPost.append('status', vm.statusCreate ? vm.statusCreate : 0)
+        dataPost.append('fileNo', vm.fileNo)
+        dataPost.append('fileName', vm.fileName)
+        dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
+        dataPost.append('fileEntryId', vm.fileEntryESign)
+        dataPost.append('govAgencyName', '')
+        dataPost.append('issueDate', '')
+        dataPost.append('expireDate', '')
+        dataPost.append('desciption', '')
 
-          axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
-            vm.loadingAction = false
-            toastr.success('Cập nhật tài liệu thành công')
-            vm.dialog_createDocument = false
-            vm.showDetail = false
-            setTimeout(function () {
-              vm.getApplicantDocument()
-            }, 200)
-          }).catch(xhr => {
-            vm.loadingAction = false
-            toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
-          })
-        } else {
-          let dataPost = new FormData()
-          let url = '/o/rest/v2/applicantdatas/' + vm.documentSelect.applicantDataId
-          dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-          dataPost.append('status', vm.statusCreate ? vm.statusCreate : 0)
-          dataPost.append('fileNo', vm.fileNo)
-          dataPost.append('fileName', vm.fileName)
-          dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
-          if (vm.updateFile) {
-            dataPost.append('file', vm.fileEntryESign)
-          } else {
-            dataPost.append('file', null)
-          } 
-          axios.put(url, dataPost, param).then(result1 => {
-            vm.loadingAction = false
-            toastr.success('Cập nhật tài liệu thành công')
-            vm.dialog_createDocument = false
-            vm.showDetail = false
-            setTimeout(function () {
-              vm.getApplicantDocument()
-            }, 200)
-          }).catch(xhr => {
-            vm.loadingAction = false
-            toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
-          })
-        }
+        axios.put(url, dataPost, param).then(result1 => {
+          vm.loadingAction = false
+          toastr.success('Cập nhật tài liệu thành công')
+          vm.dialog_createDocument = false
+          vm.showDetail = false
+          setTimeout(function () {
+            vm.getApplicantDocument()
+          }, 200)
+        }).catch(xhr => {
+          vm.loadingAction = false
+          toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
+        })
         
       }
     },
