@@ -7,6 +7,7 @@ import KhoTaiLieu from '@/components/screens/KhoTaiLieu'
 import DanhMucGiayTo from '@/components/screens/DanhMucGiayTo'
 import DuLieuCongDan from '@/components/screens/DuLieuCongDan'
 import BaoCao from '@/components/screens/BaoCao'
+import Login from '@/components/screens/Login'
 import DetailForward from '@/components/blacklist/DetailForward'
 const routes = [
   { path: '/', name: 'SoHoaGiayTo', component: SoHoaGiayTo, props: true },

@@ -382,7 +382,7 @@
                 <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ từ máy</span>
                 <span v-else>Tải giấy tờ từ máy (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
               </v-tooltip>
-              <v-tooltip class="pl-1 pt-1" top v-if="applicantId && partNoApplicantHasFile(item.partNo) && !onlyView && khoTaiLieuCongDan">
+              <v-tooltip class="pl-1 pt-1" top v-if="applicantId && partNoApplicantHasFile(item.partNo) && khoTaiLieuCongDan">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="showDocumentApplicant(item, index)">
                   <v-badge>
                     <v-icon size="20" color="orange darken-3">storage</v-icon>

@@ -127,16 +127,6 @@
         <v-card-text class="py-1 px-0">
           <v-form ref="form" v-model="valid" lazy-validation class="px-0 grid-list">
             <v-layout row wrap class="px-0 py-3">
-              <v-flex xs12 class="px-0">
-                <v-text-field
-                  label="Tên giấy tờ"
-                  v-model="fileName"
-                  box
-                  clearable
-                  :rules="[v => !!v || 'Tên giấy tờ là bắt buộc']"
-                  required
-                ></v-text-field>
-              </v-flex>
               <v-flex xs12 sm4 class="pr-2 pl-0">
                 <v-autocomplete
                   :items="fileTemplateList"
@@ -171,6 +161,16 @@
                   box
                   clearable
                   :rules="[v => !!v || 'Mã giấy tờ là bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="px-0">
+                <v-text-field
+                  label="Tên giấy tờ"
+                  v-model="fileName"
+                  box
+                  clearable
+                  :rules="[v => !!v || 'Tên giấy tờ là bắt buộc']"
                   required
                 ></v-text-field>
               </v-flex>
@@ -241,7 +241,7 @@
           </v-form>
           <v-flex class="text-right">
             <v-btn class="mr-2 white--text" color="red" :disabled="loadingAction" @click.native="showDetail = false">
-              <v-icon>clear</v-icon> &nbsp;
+              <v-icon>reply</v-icon> &nbsp;
               Quay lại
             </v-btn>
             <v-btn v-if="typeCreate === 'create'" :disabled="loadingAction" class="mr-0" color="primary" @click.native="createDocument">
@@ -397,6 +397,12 @@
       vm.getDanhMucGiayTo()
     },
     watch: {
+      fileTemplateNoCreate (val) {
+        let vm = this
+        if (val && vm.typeCreate === 'create') {
+          vm.fileName = val.name
+        }
+      }
     },
     methods: {
       showTimKiem () {

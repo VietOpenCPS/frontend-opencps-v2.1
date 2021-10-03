@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import toastr from 'toastr'
 import Vuex from 'vuex'
 import axios from 'axios'
 // 
@@ -312,6 +313,63 @@ export const store = new Vuex.Store({
           resolve(result1)
         }).catch(xhr => {
           reject(xhr)
+        })
+      })
+    },
+    makeImageCapLogin ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId ? state.initData.groupId : '',
+            'Accept': 'application/json'
+          },
+          responseType: 'blob'
+        }
+        // test local
+        var url = '/o/v1/opencps/users/login/jcaptcha'
+        axios.get(url, param).then(response => {
+          var url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
+    goToDangNhap({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let configs = {
+            headers: {
+              'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
+            }
+          }
+          var dataPostApplicant = new URLSearchParams()
+          if (filter.j_captcha_response) {
+            dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
+          }
+          axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
+            console.log(response.data)
+            if (response.data === 'ok' || (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha' && response.data !== 'lockout')) {
+              setTimeout(function () {
+                window.location.href = window.location.origin + '/web/kho-dien-tu#/so-hoa-giay-to'
+              }, 200)
+              
+            } else if (response.data === 'captcha') {
+              if (filter.j_captcha_response && response['status'] !== undefined && response['status'] === 203) {
+                toastr.error("Mã captcha không chính xác")
+              }
+              resolve('captcha')
+            } else if (response.data === "lockout") {
+              resolve('lockout')
+              toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị tạm khóa trong 10 phút.")
+            } else {
+              resolve('fail')
+              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+            }
+          }).catch(function (error) {
+            reject(error)
+            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+          })
         })
       })
     },

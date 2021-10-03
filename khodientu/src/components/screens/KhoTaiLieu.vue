@@ -162,16 +162,6 @@
         <v-card-text class="py-1 px-0">
           <v-form ref="form" v-model="valid" lazy-validation class="px-0 grid-list">
             <v-layout row wrap class="px-0 py-3">
-              <v-flex xs12 class="px-0">
-                <v-text-field
-                  label="Tên giấy tờ"
-                  v-model="fileName"
-                  box
-                  clearable
-                  :rules="[v => !!v || 'Tên giấy tờ là bắt buộc']"
-                  required
-                ></v-text-field>
-              </v-flex>
               <v-flex xs12 sm4 class="pr-2 pl-0">
                 <v-autocomplete
                   :items="fileTemplateList"
@@ -216,6 +206,16 @@
                   box
                   clearable
                   :rules="[v => !!v || 'Chủ sở hữu giấy tờ là bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="px-0">
+                <v-text-field
+                  label="Tên giấy tờ"
+                  v-model="fileName"
+                  box
+                  clearable
+                  :rules="[v => !!v || 'Tên giấy tờ là bắt buộc']"
                   required
                 ></v-text-field>
               </v-flex>
@@ -497,6 +497,12 @@
         }
         vm.getDanhMucGiayTo()
       },
+      fileTemplateNoCreate (val) {
+        let vm = this
+        if (val && vm.typeCreate === 'create') {
+          vm.fileName = val.name
+        }
+      }
     },
     methods: {
       showTimKiem () {

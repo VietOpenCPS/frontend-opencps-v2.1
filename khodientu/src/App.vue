@@ -3,7 +3,7 @@
     <v-navigation-drawer app clipped floating width="0">
     </v-navigation-drawer>
     <v-content style="padding-top: 25px;">
-      <v-layout wrap style="max-width: 1500px; margin: 0 auto; padding: 0 15px;">
+      <v-layout wrap style="max-width: 1500px; margin: 0 auto; padding: 0 15px;" v-if="isSigned">
         <v-flex xs12 md3 class="px-2">
           <v-card @click="redirectPage(1)" :color="activeTab === 1 ? '#11cdefeb' : 'white'" class="" hover style="border-radius: 12px;box-shadow: 0 6px 10px -4px rgb(0 0 0 / 15%);">
             <v-layout row>
@@ -112,9 +112,9 @@
           </v-card>
         </v-flex>
       </v-layout>
-      <transition name="slide-x-reverse-transition">
+      <!-- <transition name="slide-x-reverse-transition"> -->
         <router-view></router-view>
-      </transition>
+      <!-- </transition> -->
     </v-content>
   </v-app>
 </template>
@@ -123,7 +123,8 @@
   import axios from 'axios'
   export default {
     data: () => ({
-      activeTab: 1
+      activeTab: 1,
+      isSigned: window.themeDisplay.isSignedIn()
     }),
     components: {
 
@@ -142,19 +143,32 @@
     },
     created () {
       let vm = this
-      if (!window.themeDisplay.isSignedIn()) {
-        window.location.href = "/c/portal/logout"
-      }
       try {
         let currentQuery = vm.$router.history.current
         if (currentQuery.name === 'SoHoaGiayTo') {
           vm.activeTab = 1
+          if (!window.themeDisplay.isSignedIn()) {
+            let path = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
+            window.location.href = path + "/login"
+          }
         } else if (currentQuery.name === 'KhoTaiLieu') {
           vm.activeTab = 2
+          if (!window.themeDisplay.isSignedIn()) {
+            let path = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
+            window.location.href = path + "/login"
+          }
         } else if (currentQuery.name === 'DanhMucGiayTo') {
           vm.activeTab = 3
+          if (!window.themeDisplay.isSignedIn()) {
+            let path = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
+            window.location.href = path + "/login"
+          }
         } else if (currentQuery.name === 'DuLieuCongDan') {
           vm.activeTab = 4
+          if (!window.themeDisplay.isSignedIn()) {
+            let path = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
+            window.location.href = path + "/login"
+          }
         }
       } catch (error) {
       }
