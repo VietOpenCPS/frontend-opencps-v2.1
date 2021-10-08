@@ -122,12 +122,12 @@
       <v-card v-else class="px-3 py-3" style="width: 100%; background: #ffffff;border-radius: 12px;box-shadow: 0 6px 10px -4px rgb(0 0 0 / 15%)">
         <div class="headline mb-0" style="font-size: 20px!important;">
           <span v-if="typeCreate === 'create'">THÊM MỚI GIẤY TỜ</span>
-          <span v-else>ĐÓNG DẤU, CẬP NHẬT GIẤY TỜ</span>
+          <span v-else>KÝ DUYỆT, CẬP NHẬT GIẤY TỜ</span>
         </div>
         <v-card-text class="py-1 px-0">
           <v-form ref="form" v-model="valid" lazy-validation class="px-0 grid-list">
             <v-layout row wrap class="px-0 py-3">
-              <v-flex xs12 sm4 class="pr-2 pl-0">
+              <v-flex xs12 class="pr-0 pl-0">
                 <v-autocomplete
                   :items="fileTemplateList"
                   v-model="fileTemplateNoCreate"
@@ -141,7 +141,39 @@
                   required
                 ></v-autocomplete>
               </v-flex>
-              <v-flex xs12 sm4 class="pr-3">
+              <v-flex xs12 class="px-0">
+                <v-text-field
+                  label="Tên giấy tờ"
+                  v-model="fileName"
+                  box
+                  clearable
+                  :rules="[v => !!v || 'Tên giấy tờ là bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm4 class="px-0 pr-3">
+                <v-text-field
+                  label="Số hiệu giấy tờ"
+                  v-model="fileNo"
+                  box
+                  clearable
+                  :rules="[v => !!v || 'Số hiệu giấy tờ là bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm4 class="px-0 pr-3">
+                <v-text-field
+                  label="Ngày cấp"
+                  v-model="createDate"
+                  placeholder="dd/mm/yyyy, ddmmyyyy"
+                  @blur="formatDate"
+                  box
+                  clearable
+                  :rules="[v => !!v || 'Ngày cấp là bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm4 class="pr-0">
                 <v-autocomplete
                   :items="statusList"
                   v-model="statusCreate"
@@ -154,47 +186,7 @@
                   required
                 ></v-autocomplete>
               </v-flex>
-              <v-flex xs12 sm4 class="px-0">
-                <v-text-field
-                  label="Số hiệu giấy tờ"
-                  v-model="fileNo"
-                  box
-                  clearable
-                  :rules="[v => !!v || 'Mã giấy tờ là bắt buộc']"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs12 class="px-0">
-                <v-text-field
-                  label="Tên giấy tờ"
-                  v-model="fileName"
-                  box
-                  clearable
-                  :rules="[v => !!v || 'Tên giấy tờ là bắt buộc']"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm8 class="px-0 pr-3">
-                <v-text-field
-                  label="Chủ sở hữu"
-                  v-model="applicantNameCreate"
-                  box
-                  clearable
-                  :rules="[v => !!v || 'Chủ sở hữu giấy tờ là bắt buộc']"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm4 class="px-0">
-                <v-text-field
-                  label="Số cmnd/cccd, MST doanh nghiệp, tổ chức"
-                  v-model="applicantIdNoCreate"
-                  box
-                  clearable
-                  :rules="[v => !!v || 'Thông tin bắt buộc']"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm8 class="px-0 pr-3">
+              <v-flex xs12 class="px-0 pr-0">
                 <v-text-field
                   label="Đơn vị cấp"
                   v-model="govAgencyCreate"
@@ -204,15 +196,23 @@
                   required
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12 sm4 class="px-0">
+              <v-flex xs12 sm6 class="px-0 pr-3">
                 <v-text-field
-                  label="Ngày cấp"
-                  v-model="createDate"
-                  placeholder="dd/mm/yyyy, ddmmyyyy"
-                  @blur="formatDate"
+                  label="Số cmnd/cccd, MST doanh nghiệp, tổ chức"
+                  v-model="applicantIdNoCreate"
                   box
                   clearable
-                  :rules="[v => !!v || 'Ngày cấp là bắt buộc']"
+                  :rules="[v => !!v || 'Thông tin bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 class="px-0 pr-0">
+                <v-text-field
+                  label="Chủ sở hữu"
+                  v-model="applicantNameCreate"
+                  box
+                  clearable
+                  :rules="[v => !!v || 'Chủ sở hữu giấy tờ là bắt buộc']"
                   required
                 ></v-text-field>
               </v-flex>
@@ -228,9 +228,9 @@
                   <v-icon size="16">fas fa fa-upload</v-icon> &nbsp; &nbsp;
                   Tải lên giấy tờ
                 </v-btn>
-                <v-btn block color="primary" class="mx-0 px-0 d-inline-block" dark @click.native="vgsignCopy('https://kiemthu-mt-gov-vn-9001.fds.vn')" style="width: 230px">
+                <v-btn block color="primary" class="mx-0 px-0 d-inline-block" dark @click.native="vgca_sign_approved('https://kiemthu-mt-gov-vn-9001.fds.vn')" style="width: 230px">
                   <v-icon size="16">border_color</v-icon> &nbsp; &nbsp;
-                  Tải lên và đóng dấu giấy tờ
+                  Tải lên và ký duyệt giấy tờ
                 </v-btn>
                 <div v-if="fileTemplateNoCreate && fileTemplateNoCreate.fileType">
                   <span style="color:red">(*) </span>
@@ -859,7 +859,7 @@
           
         }
       },
-      vgsignCopy() {
+      vgca_sign_approved() {
         let vm = this
         vm.hasEsign = true
         let prms = {}
@@ -885,7 +885,7 @@
             }
             console.log('dataSigned', dataSigned)
             toastr.clear()
-            toastr.success('Giấy tờ đã được đóng dấu')
+            toastr.success('Giấy tờ đã được ký duyệt')
             vm.dialogViewFileSign = true
           } else {
             if (received_msg.Message) {
@@ -893,12 +893,12 @@
               toastr.error(received_msg.Message)
             } else {
               toastr.clear()
-              toastr.error('Đóng dấu không thành công')
+              toastr.error('Ký duyệt không thành công')
             }
           }
         }
         let json_prms = JSON.stringify(prms)
-        vgca_sign_copy(json_prms, signFileCallBack)
+        vgca_sign_approved(json_prms, signFileCallBack)
       },
       formatDate () {
         let vm = this

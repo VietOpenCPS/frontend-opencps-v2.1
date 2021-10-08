@@ -41,7 +41,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupId: 0
             },
             params: {
               start: filter.start ? filter.start : 0,

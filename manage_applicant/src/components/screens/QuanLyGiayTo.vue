@@ -487,7 +487,7 @@ export default {
         }
       }
       let json_prms = JSON.stringify(prms)
-      vgca_sign_copy(json_prms, signFileCallBack)
+      vgca_sign_approved(json_prms, signFileCallBack)
     },
     getApplicantInfos () {
       let vm = this

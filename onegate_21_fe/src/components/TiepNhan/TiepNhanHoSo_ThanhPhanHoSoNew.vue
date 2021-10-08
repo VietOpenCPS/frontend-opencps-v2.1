@@ -390,7 +390,7 @@
                 </v-btn>
                 <span>Giấy tờ trong kho</span>
               </v-tooltip>
-              <v-tooltip class="pl-1 pt-1" top v-if="applicantId && !onlyView && khoTaiLieuCongDan && checkSoHoa(item.partNo)">
+              <v-tooltip class="pl-1 pt-1" top v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && checkSoHoa(item.partNo)">
                 <v-btn :disabled="progress_sohoa" slot="activator" icon class="mx-0 my-0" @click="guiYeuCauSoHoa(item, index)">
                   <v-badge>
                     <v-icon size="20" color="#004b94">share</v-icon>
@@ -2502,6 +2502,12 @@ export default {
       dataCreateFile.append('fileName', part.partName)
       dataCreateFile.append('applicantIdNo', vm.applicantId)
       dataCreateFile.append('file', '')
+
+      dataCreateFile.append('applicantName', vm.thongTinChuHoSo['applicantName'] ? vm.thongTinChuHoSo['applicantName'] : '')
+      dataCreateFile.append('govAgencyName', vm.thongTinHoSo.govAgencyName)
+      dataCreateFile.append('issueDate', '')
+      dataCreateFile.append('expireDate', '')
+      dataCreateFile.append('desciption', '')
       
       axios.post(url, dataCreateFile, param).then(result1 => {
         vm.progress_sohoa = false

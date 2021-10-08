@@ -886,6 +886,21 @@ export default {
     }
     // 
     vm.$nextTick(function () {
+      let search = window.location.search
+      if (search) {
+        let params = decodeURI(search)
+        .replace('?', '')
+        .split('&')
+        .map(param => param.split('='))
+        .reduce((values, [ key, value ]) => {
+          values[ key ] = value
+          return values
+        }, {})
+        if (params && params.MaTTHCDP && params.vnconnect == '1') {
+          let url = window.location.origin + window.location.pathname + "#/thu-tuc-hanh-chinh" + window.location.search
+          window.location.href = url
+        }
+      }
       vm.makeImageCap()
       let current = vm.$router.history.current
       let currentQuery = current.query

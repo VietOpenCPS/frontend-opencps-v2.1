@@ -52,7 +52,7 @@
               <v-flex style="max-width: 85px;">
                 <v-img class="mx-3 my-3"
                   :src="activeTab === 3 ? '/documents/2832265/0/list-icon1.png?t=9312312' : '/documents/2832265/0/list-icon2.png'"
-                  height="45px"
+                  height="50px"
                   width="45px"
                   contain
                 ></v-img>

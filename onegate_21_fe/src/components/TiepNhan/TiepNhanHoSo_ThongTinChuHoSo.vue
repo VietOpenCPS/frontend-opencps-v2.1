@@ -1671,7 +1671,7 @@ export default {
         vm.thongTinChuHoSo.applicantIdNo = ''
         return null
       }
-      let url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
+      let url = `/o/rest/v2/applicants?start=0&end=30&idNo=${query}`
 
       // if (vm.functionTimeOutApplicant) {
       //   clearTimeout(vm.functionTimeOutApplicant)
@@ -1702,7 +1702,7 @@ export default {
         vm.thongTinNguoiNopHoSo.delegateIdNo = ''
         return null
       }
-      let url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
+      let url = `/o/rest/v2/applicants?start=0&end=30&idNo=${query}`
 
       // if (vm.functionTimeOutApplicant) {
       //   clearTimeout(vm.functionTimeOutApplicant)

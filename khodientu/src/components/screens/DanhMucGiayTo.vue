@@ -101,20 +101,20 @@
         <v-card-text class="py-1">
           <v-form ref="form" v-model="valid" lazy-validation class="py-3 px-0 grid-list">
             <v-layout row wrap class="px-0 py-3">
+              <v-flex class="px-0">
+                <v-text-field
+                  label="Mã giấy tờ"
+                  v-model="fileTemplateNoCreate"
+                  box
+                  clearable
+                  :rules="[v => !!v || 'Mã giấy tờ là bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
               <v-flex xs12 class="px-0">
                 <v-text-field
                   label="Tên loại giấy tờ"
                   v-model="nameCreate"
-                  box
-                  clearable
-                  :rules="[v => !!v || 'Tên loại giấy tờ là bắt buộc']"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <v-flex class="px-0">
-                <v-text-field
-                  label="Tên loại giấy tờ"
-                  v-model="fileTemplateNoCreate"
                   box
                   clearable
                   :rules="[v => !!v || 'Tên loại giấy tờ là bắt buộc']"
@@ -205,12 +205,12 @@
           sortable: false
         },
         {
-          text: 'Mã giấy tờ',
+          text: 'Tên giấy tờ',
           align: 'center',
           sortable: false
         },
         {
-          text: 'Tên giấy tờ',
+          text: 'Mã giấy tờ',
           align: 'center',
           sortable: false
         },
@@ -266,7 +266,7 @@
         if (x) {
           let param = {
             headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              groupId: 0,
               'Accept': 'application/json',
               'Content-Type': 'application/x-www-form-urlencoded'
             }
@@ -289,7 +289,7 @@
           vm.loadingAction = true
           let param = {
             headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              groupId: 0,
               'Accept': 'application/json',
               'Content-Type': 'application/x-www-form-urlencoded'
             }
@@ -320,7 +320,7 @@
           vm.loadingAction = true
           let param = {
             headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              groupId: 0,
               'Accept': 'application/json',
               'Content-Type': 'application/x-www-form-urlencoded'
             }

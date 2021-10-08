@@ -626,12 +626,14 @@
         vm.activeAll = newQuery.hasOwnProperty('all') && newQuery['all']
         vm.getCountAll()
         // 
-        axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
-          let userData = response.data
-          vm.$store.commit('setUserLogin', userData)
-        })
-        .catch(function(error) {
-        })
+        if (window.themeDisplay.isSignedIn()) {
+          axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
+            let userData = response.data
+            vm.$store.commit('setUserLogin', userData)
+          })
+          .catch(function(error) {
+          })
+        }
       })
       // 
       
