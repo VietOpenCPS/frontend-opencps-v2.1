@@ -866,6 +866,11 @@ export default {
       vm.activePdfEditor = activePdfEditor
     } catch (error) {
     }
+    try {
+      // check bắt buộc với tp eform
+      vm.requiredEform = requiredEform
+    } catch (error) {
+    }
   },
   computed: {
     loading () {
@@ -1181,6 +1186,11 @@ export default {
           template['editForm'] = true
           template['daKhai'] = false
           template['passRequired'] = false
+          dossierFiles.forEach(dossierFile => {
+            if (template.partNo === dossierFile.dossierPartNo) {
+              template['passRequired'] = true
+            }
+          })
           var itemFind = dossierFiles.find(file => {
             return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && file.eForm && !file.removed && file.fileSize !== 0
           })
@@ -1188,12 +1198,9 @@ export default {
             template['daKhai'] = true
             template['hasForm'] = true
             template['referenceUid'] = itemFind['referenceUid']
+          } else {
+            template['passRequired'] = false
           }
-          dossierFiles.forEach(dossierFile => {
-            if (template.partNo === dossierFile.dossierPartNo) {
-              template['passRequired'] = true
-            }
-          })
         })
       } else {
         dossierTemplates.forEach(template => {
@@ -1529,21 +1536,27 @@ export default {
       data['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
       if (data.partType !== 3) {
         vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
-          vm.dossierTemplateItemsFilter[index]['passRequired'] = true
           vm.progressUploadPart = ''
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
             vm.recountFileTemplates()
           })
+          if (vm.dossierTemplateItemsFilter[index]['hasForm'] && vm.requiredEform) {
+            return
+          }
+          vm.dossierTemplateItemsFilter[index]['passRequired'] = true
         }).catch(function (data) {
+          vm.progressUploadPart = ''
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+            vm.dossierFilesItems = result
+            vm.recountFileTemplates()
+          })
+          if (vm.dossierTemplateItemsFilter[index]['hasForm'] && vm.requiredEform) {
+            return
+          }
           if (data.length > 0) {
             vm.dossierTemplateItemsFilter[index]['passRequired'] = true
           }
-          vm.progressUploadPart = ''
-          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
-            vm.dossierFilesItems = result
-            vm.recountFileTemplates()
-          })
         })
       } else {
         if (window.$('input[id="file' + data.partNo + '"]')[0].files.length === 0) {
@@ -1724,6 +1737,9 @@ export default {
                     vm.dossierTemplateItemsFilter[index]['passRequired'] = false
                   }
                 } else {
+                  vm.dossierTemplateItemsFilter[index]['passRequired'] = false
+                }
+                if (vm.dossierTemplateItemsFilter[index]['hasForm'] && vm.requiredEform) {
                   vm.dossierTemplateItemsFilter[index]['passRequired'] = false
                 }
               })
