@@ -280,7 +280,7 @@
                 <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :data_rolegroup="roleGroupPhanCong" :detailDossier="thongTinChiTietHoSo" :data_uyquyen="reAsignUsers" :type="type_assign"></phan-cong>
                 <tai-lieu-ket-qua :esignType="typeEsign" :preCondition="preCondition" ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
                 <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
-                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
+                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :dataSource="sourcePaymentFee" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
                 <!-- thanh toán điện tử -->
                 <thanh-toan-dien-tu ref="epayment" v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
                 <ky-duyet :style="dataEsign['signatureType'] === '' ? 'display:none' : ''" ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo"
@@ -847,6 +847,7 @@ export default {
     'phan-cong-lai': PhanCongLai
   },
   data: () => ({
+    sourcePaymentFee: {},
     loadingActionProcess: false,
     votingVersion: 1,
     confirmGuiHoSoTrucTuyen: false,
@@ -1792,12 +1793,12 @@ export default {
             vm.createFiles = [result.createFiles]
           }
           vm.showTaoTaiLieuKetQua = true
-          if (result.hasOwnProperty('signatureType') && result.signatureType === 'plugin') {
+          if (result.hasOwnProperty('signatureType') && (result.signatureType === 'plugin' || result.signatureType === 'pluginAndHSM' || result.signatureType === 'hsm')) {
             vm.typeEsign = result.signatureType
             vm.preCondition = result.preCondition
           }
         }
-        if (result.hasOwnProperty('eSignature') && result.eSignature && result.signatureType !== 'plugin') {
+        if (result.hasOwnProperty('eSignature') && result.eSignature && result.signatureType !== 'plugin' && result.signatureType !== 'pluginAndHSM' && result.signatureType !== 'hsm') {
           isPopup = true
           vm.showKyPheDuyetTaiLieu = true
           vm.dataEsign = result
@@ -1847,6 +1848,16 @@ export default {
             })
           } else {
             isPopup = true
+            try {
+              if (result.hasOwnProperty('paymentFee') && result.paymentFee) {
+                vm.sourcePaymentFee = ''
+                let configs = JSON.parse(result.paymentFee)
+                vm.sourcePaymentFee = configs.hasOwnProperty('source') ? configs['source'] : {}
+              } else {
+                vm.sourcePaymentFee = {}
+              }
+            } catch (error) {
+            }
             vm.showThuPhi = true
             vm.paymentsOriginal = result.payment
             let dataJson = ''

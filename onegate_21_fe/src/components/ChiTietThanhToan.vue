@@ -16,7 +16,7 @@
                   <v-subheader class="pl-0 text-right">Tên phí, lệ phí: </v-subheader>
                 </v-flex>
                 <v-flex xs12 md10>
-                  <p class="mt-1 mb-0">{{payments.paymentFee}}</p>
+                  <p class="mt-2 mb-0">{{payments.paymentFee}}</p>
                 </v-flex>
                 <v-flex xs12 sm2>
                   <v-subheader class="pl-0 text-right">Lệ phí: </v-subheader>

@@ -151,7 +151,7 @@
                   required
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12 sm4 class="px-0 pr-3">
+              <v-flex xs12 sm3 class="px-0 pr-3">
                 <v-text-field
                   label="Số hiệu giấy tờ"
                   v-model="fileNo"
@@ -161,7 +161,7 @@
                   required
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12 sm4 class="px-0 pr-3">
+              <v-flex xs12 sm3 class="px-0 pr-3">
                 <v-text-field
                   label="Ngày cấp"
                   v-model="createDate"
@@ -173,7 +173,17 @@
                   required
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12 sm4 class="pr-0">
+              <v-flex xs12 sm3 class="px-0 pr-3">
+                <v-text-field
+                  label="Ngày hết hạn"
+                  v-model="expireDate"
+                  placeholder="dd/mm/yyyy, ddmmyyyy"
+                  @blur="formatExpireDate"
+                  box
+                  clearable
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm3 class="pr-0">
                 <v-autocomplete
                   :items="statusList"
                   v-model="statusCreate"
@@ -216,7 +226,6 @@
                   required
                 ></v-text-field>
               </v-flex>
-              
               
               <v-flex xs12 class="mt-2">
                 <div v-if="fileNameView" class="pb-3" @click="viewDocument(documentSelect)">
@@ -309,8 +318,8 @@
       applicantNameCreate: '',
       applicantIdNoCreate: '',
       govAgencyCreate: '',
-      govAgencyCreate: '',
       createDate: '',
+      expireDate: '',
       showDetail: false,
       fileTemplateList: [],
       statusCreate: '',
@@ -620,7 +629,9 @@
         vm.govAgencyCreate = item.govAgencyName ? item.govAgencyName : ''
         vm.applicantNameCreate = item.applicantName ? item.applicantName : ''
         vm.applicantIdNoCreate = item.applicantIdNo ? item.applicantIdNo : ''
+        
         vm.createDate = item.issueDate ? String(item.issueDate).split(" ")[0] : ''
+        vm.expireDate = item.expireDate ? String(item.expireDate).split(" ")[0] : ''
         vm.fileName = item.fileName
         vm.fileNo = item.fileNo
         vm.showDetail = true
@@ -694,7 +705,7 @@
               dataCreateFile.append('file', vm.fileUpdate)
               dataCreateFile.append('govAgencyName', vm.govAgencyCreate)
               dataCreateFile.append('issueDate', vm.createDate)
-              dataCreateFile.append('expireDate', '')
+              dataCreateFile.append('expireDate', vm.expireDate)
               dataCreateFile.append('desciption', '')
               
               axios.post(url, dataCreateFile, param).then(result1 => {
@@ -742,7 +753,7 @@
             dataCreateFile.append('fileEntryId', vm.fileEntryESign)
             dataCreateFile.append('govAgencyName', vm.govAgencyCreate)
             dataCreateFile.append('issueDate', vm.createDate)
-            dataCreateFile.append('expireDate', '')
+            dataCreateFile.append('expireDate', vm.expireDate)
             dataCreateFile.append('desciption', '')
             dataCreateFile.append('file', '')
             
@@ -795,7 +806,7 @@
             dataPost.append('applicantIdNo', vm.applicantIdNoCreate)
             dataPost.append('govAgencyName', vm.govAgencyCreate)
             dataPost.append('issueDate', vm.createDate)
-            dataPost.append('expireDate', '')
+            dataPost.append('expireDate', vm.expireDate)
             dataPost.append('desciption', '')
             if (vm.updateFile) {
               dataPost.append('file', vm.fileUpdate)
@@ -840,7 +851,7 @@
           dataPost.append('applicantIdNo', vm.documentSelect.applicantIdNo)
           dataPost.append('govAgencyName', vm.govAgencyCreate)
           dataPost.append('issueDate', vm.createDate)
-          dataPost.append('expireDate', '')
+          dataPost.append('expireDate', vm.expireDate)
           dataPost.append('desciption', '')
           dataPost.append('file', '')
           dataPost.append('fileEntryId', vm.fileEntryESign)
@@ -911,6 +922,19 @@
           vm.createDate = date.slice(0,2) + '/' + date.slice(2,4) + '/' + date.slice(4,8)
         } else {
           vm.createDate = ''
+        }     
+      },
+      formatExpireDate () {
+        let vm = this
+        let lengthDate = String(vm.expireDate).trim().length
+        let splitDate = String(vm.expireDate).split('/')
+        if (lengthDate && lengthDate > 4 && splitDate.length === 3 && splitDate[2]) {
+          vm.expireDate = vm.translateDate(vm.expireDate)
+        } else if (lengthDate && lengthDate === 8) {
+          let date = String(vm.expireDate)
+          vm.expireDate = date.slice(0,2) + '/' + date.slice(2,4) + '/' + date.slice(4,8)
+        } else {
+          vm.expireDate = ''
         }     
       },
       getStatus (val) {

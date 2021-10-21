@@ -192,7 +192,7 @@
           <div :style="isNotarization ? 'display: none' : 'position: relative;'">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
-                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :detailDossier="thongTinChiTietHoSo" :viaPortal="viaPortalDetail"></thu-phi>
+                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :dataSource="sourcePaymentFee" :detailDossier="thongTinChiTietHoSo" :viaPortal="viaPortalDetail"></thu-phi>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
@@ -859,7 +859,8 @@ export default {
     showGuiHoSoConfig: false,
     showGuiHoSo: false,
     showCounterFee: false,
-    rememberApplicant: false
+    rememberApplicant: false,
+    sourcePaymentFee: {}
   }),
   computed: {
     loading () {
@@ -1134,6 +1135,17 @@ export default {
                     vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
                     vm.durationPhase = resAction && resAction.receiving && resAction.receiving.hasOwnProperty('durationPhase') ? resAction.receiving.durationPhase : ''
                     if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
+                      try {
+                        if (resAction.hasOwnProperty('paymentFee') && resAction.paymentFee) {
+                          vm.sourcePaymentFee = ''
+                          let configs = JSON.parse(resAction.paymentFee)
+                          vm.sourcePaymentFee = configs.hasOwnProperty('source') ? configs['source'] : {}
+                          console.log('sourcePaymentFee', vm.sourcePaymentFee)
+                        } else {
+                          vm.sourcePaymentFee = {}
+                        }
+                      } catch (error) {
+                      }
                       vm.showThuPhi = true
                       vm.paymentsOriginal = resAction.payment
                       let dataJson = ''
@@ -1484,6 +1496,7 @@ export default {
                   paymentsOut = {
                     requestPayment: vm.payments['requestPayment'],
                     paymentNote: vm.payments['paymentNote'],
+                    paymentFee: vm.payments['paymentFee'],
                     advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
                     feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
                     serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),

@@ -16,38 +16,57 @@
                 <v-subheader class="pl-0 text-right">Tên phí, lệ phí: </v-subheader>
               </v-flex>
               <v-flex xs12 md10>
-                <v-text-field
-                  v-model="data_payment.paymentFee"
-                  v-if="data_payment.editable === 1 || data_payment.editable === 2 || data_payment.editable === 3"
-                ></v-text-field>
-                <p class="mt-1 mb-0" v-else>{{data_payment.paymentFee}}</p>
+                <v-flex v-if="!getDataSource('paymentFee')">
+                  <v-text-field
+                    v-model="data_payment.paymentFee"
+                    v-if="data_payment.editable === 1 || data_payment.editable === 2 || data_payment.editable === 3"
+                  ></v-text-field>
+                  <p class="mt-1 mb-0" v-else>{{data_payment.paymentFee}}</p>
+                </v-flex>
+                <v-flex v-else>
+                  <v-combobox @change="changeFee" v-if="data_payment.editable === 1 || data_payment.editable === 2 || data_payment.editable === 3" 
+                  v-model="data_payment.paymentFee" :items="getDataSource('paymentFee')"></v-combobox>
+                  <p class="mt-1 mb-0" v-else>{{data_payment.paymentFee}}</p>
+                </v-flex>
               </v-flex>
               <v-flex xs12 sm2>
                 <v-subheader class="pl-0 text-right">Lệ phí: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3>
-                <v-text-field
-                  @keyup="changeFee"
-                  v-model="data_payment.feeAmount"
-                  v-money="money"
-                  suffix="vnđ"
-                  v-if="data_payment.editable === 1 || data_payment.editable === 3"
-                ></v-text-field>
-                <p class="mt-1 mb-0" v-else>{{currency(data_payment.feeAmount.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</p>
+                <v-flex v-if="!getDataSource('feeAmount')">
+                  <v-text-field
+                    @keyup="changeFee"
+                    v-model="data_payment.feeAmount"
+                    v-if="data_payment.editable === 1 || data_payment.editable === 3"
+                  ></v-text-field>
+                  <p class="mt-1 mb-0" v-else>{{currency(data_payment.feeAmount.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</p>
+                </v-flex>
+                <v-flex v-else>
+                  <v-combobox @change="changeFee" v-if="data_payment.editable === 1 || data_payment.editable === 3"
+                  v-model="data_payment.feeAmount" :items="getDataSource('feeAmount')"></v-combobox>
+                  <p class="mt-1 mb-0" v-else>{{currency(data_payment.feeAmount.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</p>
+                </v-flex>
               </v-flex>
               <!--  -->
               <v-flex xs12 sm2 class="pt-1">
                 <v-subheader class="pl-0 text-right">Phí: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3 class="pt-1">
-                <v-text-field
-                  @keyup="changeFee"
-                  v-model="data_payment.serviceAmount"
-                  v-money="money"
-                  suffix="vnđ"
-                  v-if="data_payment.editable === 2 || data_payment.editable === 3"
-                ></v-text-field>
-                <p class="mt-1 mb-0" v-else>{{currency(data_payment.serviceAmount.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</p>
+                <v-flex v-if="!getDataSource('serviceAmount')">
+                  <v-text-field
+                    @keyup="changeFee"
+                    v-model="data_payment.serviceAmount"
+                    v-money="money"
+                    suffix="vnđ"
+                    v-if="data_payment.editable === 2 || data_payment.editable === 3"
+                  ></v-text-field>
+                  <p class="mt-1 mb-0" v-else>{{currency(data_payment.serviceAmount.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</p>
+                </v-flex>
+                <v-flex v-else>
+                  <v-combobox @change="changeFee" v-if="data_payment.editable === 2 || data_payment.editable === 3"
+                  v-model="data_payment.serviceAmount" :items="getDataSource('serviceAmount')" ></v-combobox>
+                  <p class="mt-1 mb-0" v-else>{{currency(data_payment.serviceAmount.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</p>
+                </v-flex>
               </v-flex>
               <!--  -->
               <v-flex xs12 sm2></v-flex>
@@ -220,6 +239,10 @@ export default {
     detailDossier: {
       type: Object,
       default: () => {}
+    },
+    dataSource: {
+      type: Object,
+      default: () => {}
     }
   },
   model: {
@@ -323,42 +346,43 @@ export default {
   methods: {
     changeFee () {
       var vm = this
-      // console.log('changeFee')
-      let val = vm.data_payment
-      let feeAmount = val.feeAmount ? Number(val.feeAmount.toString().replace(/\./g, '')) : 0
-      if (val.requestPayment === 1) {
-        // let advanceAmount = Number(val.advanceAmount.toString().replace(/\./g, ''))
-        let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
-        vm.feeTong = feeAmount + serviceAmount
-        vm.totalFee = feeAmount + serviceAmount
-        // console.log('changeFee', vm.feeTong, vm.totalFee)
-      } else if (val.requestPayment === 2) {
-        let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
-        let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.toString().replace(/\./g, '')) : 0
-        if ((vm.viaPortal === 2 || vm.viaPortal === '2') && shipAmount !== 0) {
-          vm.totalFee = feeAmount + serviceAmount + shipAmount
-        } else {
-          vm.totalFee = feeAmount + serviceAmount
-        }
-      } else {
-        let advanceAmount = Number(val.advanceAmount.toString().replace(/\./g, ''))
-        let serviceAmount = Number(val.serviceAmount.toString().replace(/\./g, ''))
-        let shipAmount = Number(val.shipAmount.toString().replace(/\./g, ''))
-        if ((vm.viaPortal === 2 || vm.viaPortal === '2') && shipAmount !== 0) {
-          vm.feeTong = feeAmount + serviceAmount + shipAmount
-          vm.totalFee = feeAmount + serviceAmount + shipAmount - advanceAmount
-        } else {
+      setTimeout(function () {
+        let val = vm.data_payment
+        let feeAmount = val.feeAmount ? Number(val.feeAmount.toString().replace(/\./g, '')) : 0
+        if (val.requestPayment === 1) {
+          // let advanceAmount = Number(val.advanceAmount.toString().replace(/\./g, ''))
+          let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
           vm.feeTong = feeAmount + serviceAmount
-          vm.totalFee = feeAmount + serviceAmount - advanceAmount
+          vm.totalFee = feeAmount + serviceAmount
+          // console.log('changeFee', vm.feeTong, vm.totalFee)
+        } else if (val.requestPayment === 2) {
+          let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
+          let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.toString().replace(/\./g, '')) : 0
+          if ((vm.viaPortal === 2 || vm.viaPortal === '2') && shipAmount !== 0) {
+            vm.totalFee = feeAmount + serviceAmount + shipAmount
+          } else {
+            vm.totalFee = feeAmount + serviceAmount
+          }
+        } else {
+          let advanceAmount = Number(val.advanceAmount.toString().replace(/\./g, ''))
+          let serviceAmount = Number(val.serviceAmount.toString().replace(/\./g, ''))
+          let shipAmount = Number(val.shipAmount.toString().replace(/\./g, ''))
+          if ((vm.viaPortal === 2 || vm.viaPortal === '2') && shipAmount !== 0) {
+            vm.feeTong = feeAmount + serviceAmount + shipAmount
+            vm.totalFee = feeAmount + serviceAmount + shipAmount - advanceAmount
+          } else {
+            vm.feeTong = feeAmount + serviceAmount
+            vm.totalFee = feeAmount + serviceAmount - advanceAmount
+          }
         }
-      }
-      if (vm.showCounterFee) {
-        vm.feeTong = vm.feeTong*val.counter
-        vm.totalFee = vm.totalFee*val.counter
-      }
-      if (vm.totalFee < 0) {
-        vm.totalFee = 0
-      }
+        if (vm.showCounterFee) {
+          vm.feeTong = vm.feeTong*val.counter
+          vm.totalFee = vm.totalFee*val.counter
+        }
+        if (vm.totalFee < 0) {
+          vm.totalFee = 0
+        }
+      }, 200)
     },
     viewFile () {
       let vm = this
@@ -386,6 +410,15 @@ export default {
         return moneyCur.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
       }
       return ''
+    },
+    getDataSource (key) {
+      let vm = this
+      let data = vm.dataSource
+      if (!data || Object.keys(data).length == 0) {
+        return false
+      }
+      let source = data[key] ? data[key] : ''
+      return source
     },
     goBack () {
       window.history.back()

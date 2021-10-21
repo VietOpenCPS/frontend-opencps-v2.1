@@ -147,9 +147,9 @@ export const store = new Vuex.Store({
             params: {
               year: year,
               month: 0,
-              domain: 'total',
-              agency: 'total',
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupBy: 2,
+              groupId: window.themeDisplay.getScopeGroupId(),
+              system: 'allSystemTotal'
             }
           }
           param.params['govAgencyCode'] = param.params['agency']
@@ -232,60 +232,86 @@ export const store = new Vuex.Store({
             },
             params: {
               year: filter.year,
-              month: filter.month,
-              group: filter.group,
-              agency: filter['agency'],
+              month: !filter.hasOwnProperty('month') ? '1,2,3,4,5,6,7,8,9,10,11,12' : filter.month,
+              // group: filter.group,
+              // agency: filter['agency'],
+              groupBy: filter['report'] ? 1 : 2,
               groupId: window.themeDisplay.getScopeGroupId()
             }
           }
-          if (filter['system'] !== 'total') {
-            param.params['system'] = filter['system']
+          if (filter['system'] == 1) {
+            if (filter['domainCode'] === 'total') {
+              param.params['excludeSystem'] = 'internal,allSystemTotal,internalSystemTotal'
+              param.params['domainCode'] = 'total'
+            } else {
+              param.params['excludeSystem'] = 'internal,allSystemTotal,externalSystemTotal,internalSystemTotal,allSystem'
+            }
           }
-          if (filter['report']) {
-            param.params['domain'] = 'total'
+          if (filter['system'] == 0) {
+            if (filter['typeDossier'] == true) {
+              param.params['system'] = 'internalSystemTotal'
+            } else {
+              param.params['system'] = 'internal'
+            }
           }
-          if (filter['report'] === 'linemonth') {
-            param.params['domain'] = ''
+          if (filter['system'] === 'total' && !filter['domainCode'] && filter.hasOwnProperty('month')) {
+            param.params['excludeSystem'] = 'internal,allSystemTotal,externalSystemTotal,internalSystemTotal'
           }
+          if (filter['system'] === 'total' && filter['domainCode'] === 'total' && filter.hasOwnProperty('month')) {
+            param.params['system'] = 'allSystemTotal'
+          }
+          if (filter['system'] === 'total' && !filter['domainCode'] && !filter.hasOwnProperty('month')) {
+            param.params['system'] = 'allSystem'
+          }
+          // if (filter['system'] !== 'total') {
+          //   param.params['system'] = filter['system']
+          // }
+          // if (filter['report']) {
+          //   param.params['domain'] = 'total'
+          // }
+          // if (filter['report'] === 'linemonth') {
+          //   param.params['domain'] = ''
+          // }
           // truyền params theo api sửa lại
-          param.params['govAgencyCode'] = param.params['agency']
-          param.params['domainCode'] = param.params['domain']
-          if (param.params['govAgencyCode'] === 'total' && param.params['domainCode'] === '') {
-            param.params['groupBy'] = 2
-          }
-          if (param.params['govAgencyCode'] === '' && param.params['domainCode'] === 'total') {
-            param.params['groupBy'] = 1
-          }
+          // param.params['govAgencyCode'] = param.params['agency']
+          // param.params['domainCode'] = param.params['domain']
+          // if (param.params['govAgencyCode'] === 'total' && param.params['domainCode'] === '') {
+          //   param.params['groupBy'] = 2
+          // }
+          // if (param.params['govAgencyCode'] === '' && param.params['domainCode'] === 'total') {
+          //   param.params['groupBy'] = 1
+          // }
           // 
           let urlStatistic = '/o/statistic/dossier/report'
-          try {
-            if (urlApiConfig && groupIdConfig) {
-              urlStatistic = urlApiConfig
-              param.params = {
-                year: filter.year,
-                month: filter.month,
-                govAgencyCode: filter['agency'],
-                groupBy: 1,
-                groupId: groupIdConfig
-              }
-              if (filter['report']) {
-                param.params['domainCode'] = 'total'
-              }
-              if (filter['report'] === 'linemonth') {
-                param.params['domainCode'] = ''
-              }
+          // try {
+          //   if (urlApiConfig && groupIdConfig) {
+          //     urlStatistic = urlApiConfig
+          //     param.params = {
+          //       year: filter.year,
+          //       month: filter.month,
+          //       govAgencyCode: filter['agency'],
+          //       groupBy: 1,
+          //       groupId: groupIdConfig
+          //     }
+          //     if (filter['report']) {
+          //       param.params['domainCode'] = 'total'
+          //     }
+          //     if (filter['report'] === 'linemonth') {
+          //       param.params['domainCode'] = ''
+          //     }
 
-              // truyền params theo api sửa lại
-              if (param.params['govAgencyCode'] === 'total' && param.params['domainCode'] === '') {
-                param.params['groupBy'] = 2
-              }
-              if (param.params['govAgencyCode'] === '' && param.params['domainCode'] === 'total') {
-                param.params['groupBy'] = 1
-              }
-              // 
-            }
-          } catch (error) {
-          }
+          //     // truyền params theo api sửa lại
+          //     if (param.params['govAgencyCode'] === 'total' && param.params['domainCode'] === '') {
+          //       param.params['groupBy'] = 2
+          //     }
+          //     if (param.params['govAgencyCode'] === '' && param.params['domainCode'] === 'total') {
+          //       param.params['groupBy'] = 1
+          //       param.params['domainCode'] = 'total'
+          //     }
+          //     // 
+          //   }
+          // } catch (error) {
+          // }
           axios.get(urlStatistic, param).then(function (response) {
             let serializable = response.data
             // Khởi tạo group cha với fix trường hợp group cha không có dữ liệu, group con có dữ liệu
@@ -1077,10 +1103,12 @@ export const store = new Vuex.Store({
             }
           }
           let textPost = {
-            fromDate: data.fromReceiveDate ? data.fromReceiveDate : '',
-            toDate: data.toReceiveDate ? data.toReceiveDate : '',
+            // fromDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            // toDate: data.toReceiveDate ? data.toReceiveDate : '',
             type: data.type ? data.type : '',
-            domainCode: data.domainCode ? data.domainCode : ''
+            domainCode: data.domainCode ? data.domainCode : '',
+            month: 0,
+            year: (new Date()).getFullYear()
           }
           let dataPost = new URLSearchParams()
           dataPost.append('method', 'GET')

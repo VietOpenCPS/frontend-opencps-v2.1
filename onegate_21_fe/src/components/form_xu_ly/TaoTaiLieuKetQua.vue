@@ -6,6 +6,10 @@
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div> Kết quả xử lý
+          <v-btn style="position: absolute;right: 55px;bottom: 2px;" :readonly="loadingHsm" :disabled="loadingHsm" class="mr-2" color="primary" v-if="esignType === 'hsm' || esignType === 'pluginAndHSM'" @click.stop="kySoHsmAll">
+            <v-icon size="22" color="white">drive_file_rename_outline</v-icon> &nbsp;
+            Ký duyệt tất cả giấy tờ
+          </v-btn>
         </div>
         <v-card>
           <div class="form_alpaca" style="position: relative;" v-for="(item, index) in createFiles" v-bind:key="item.partNo + 'cr'">
@@ -50,7 +54,7 @@
                         </v-btn> -->
                         <v-menu @click.native.stop right offset-y 
                           transition="slide-x-transition" title="Ký số tài liệu đính kèm" 
-                          v-if="esignType === 'plugin' && itemFileView.fileType.toLowerCase() === 'pdf' && !typeSignPlugin">
+                          v-if="(esignType === 'plugin' || esignType === 'pluginAndHSM') && itemFileView.fileType.toLowerCase() === 'pdf' && !typeSignPlugin">
                           <v-btn slot="activator" flat icon color="indigo">
                             <v-icon size="18">fa fa-pencil-square-o</v-icon>
                           </v-btn>
@@ -73,12 +77,21 @@
                           </v-list>
                         </v-menu>
                         <v-tooltip top>
-                          <v-btn v-if="esignType === 'plugin' && itemFileView.fileType.toLowerCase() === 'pdf' && typeSignPlugin" flat icon color="indigo"
+                          <v-btn v-if="(esignType === 'plugin' || esignType === 'pluginAndHSM') && itemFileView.fileType.toLowerCase() === 'pdf' && typeSignPlugin" flat icon color="indigo"
                             slot="activator" @click.stop="signAction(itemFileView, index2, '', typeSignPlugin)"
                           >
                             <v-icon size="18">fa fa-pencil-square-o</v-icon>
                           </v-btn>
                           <span>Ký duyệt, đóng dấu</span>
+                        </v-tooltip>
+                        <!--  -->
+                        <v-tooltip top>
+                          <v-btn :readonly="loadingHsm" :disabled="loadingHsm" v-if="(esignType === 'hsm' || esignType === 'pluginAndHSM') && itemFileView.fileType.toLowerCase() === 'pdf'" flat icon color="green"
+                            slot="activator" @click.stop="signHsm(itemFileView, index2, '')"
+                          >
+                            <v-icon size="22">drive_file_rename_outline</v-icon>
+                          </v-btn>
+                          <span>Ký số HSM</span>
                         </v-tooltip>
                       </div>
                     </div>
@@ -440,7 +453,8 @@
       doNotSign: false,
       fileEditor: '',
       typeSignPlugin: '',
-      requiredSignPlugin: false
+      requiredSignPlugin: false,
+      loadingHsm: false
     }),
     computed: {
       loading () {
@@ -1482,6 +1496,50 @@
           vgca_sign_copy(json_prms, signFileCallBack)
         }
           
+      },
+      signHsm (item, index, arr) {
+        let vm = this
+        vm.loadingHsm = true
+        let filter = {
+          token: localStorage.getItem('jwt_token'),
+          dossierId: vm.detailDossier.dossierId,
+          dossierFileIds: item ? item.dossierFileId.toString() : arr
+        }
+        console.log("filterKySo", filter)
+        vm.$store.dispatch('kySoHsm', filter).then(resFile => {
+          toastr.success('Ký số thành công')
+          vm.loadingHsm = false
+        }).catch(function () {
+          toastr.error('Ký số thất bại')
+          vm.loadingHsm = false
+        })
+      },
+      kySoHsmAll () {
+        let vm = this
+        let fileSign = vm.dossierFilesItems.filter(function (item) {
+          return item.fileType.toLowerCase() === 'pdf'
+        })
+        let fileKs = []
+        fileSign.forEach(function (item) {
+          let hasKQ = vm.createFiles.find(file => {
+            return item.dossierPartNo === file.partNo
+          })
+          if (hasKQ) {
+            fileKs.push(item)
+          }
+        })
+        console.log('fileSign55555', fileKs)
+        if (fileKs.length) {
+          let x = confirm('Bạn có chắc chắn thực hiện ký duyệt tất cả giấy tờ?')
+          if (x) {
+            let arrIds = fileKs.map(function(item) {
+              return item['dossierFileId']
+            }).toString()
+            vm.signHsm('', '', arrIds)
+          }
+        } else {
+          toastr.error('Không có giấy tờ nào')
+        }
       },
       deleteSingleFile (item, index, indexPart) {
         var vm = this

@@ -5,6 +5,13 @@
         <div class="background-triangle-big">
           <span>QUẢN LÝ THÔNG TIN CÔNG DÂN, CƠ QUAN TỔ CHỨC, DOANH NGHIỆP</span>
         </div>
+        <div class="layout row wrap header_tools row-blue mx-1">
+          <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+            <v-btn color="blue darken-3" dark class="my-0 mx-0 btn-border-left" @click="huongDanSuDung">
+              Hướng dẫn sử dụng
+            </v-btn>
+          </div>
+        </div>
       </div>
       
       <v-card-text class="px-0 pt-0">
@@ -120,7 +127,7 @@
                   <v-btn @click="documentManage(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon size="22">fas fa fa-folder-open</v-icon>
                   </v-btn>
-                  <span>Kho tài liệu</span>
+                  <span>Kho giấy tờ</span>
                 </v-tooltip>
               </td>
             </tr>
@@ -253,6 +260,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogHDSD" max-width="1200" transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>HƯỚNG DẪN SỬ DỤNG</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogHDSD = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <iframe id="dialogPDFPreview" :src="urlFileHdsdKhoDienTu" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -322,6 +342,8 @@ export default {
     menuBirthDate: false,
     toDateFormatted: null,
     dialog_editApplicant: false,
+    urlFileHdsdKhoDienTu: '',
+    dialogHDSD: false,
     valid: true,
     applicantEdit: '',
     ngayCap: null,
@@ -388,6 +410,14 @@ export default {
     },
   },
   methods: {
+    huongDanSuDung () {
+      let vm = this
+      try {
+        vm.urlFileHdsdKhoDienTu = urlFileHdsdKhoDienTu
+      } catch (error) {
+      }
+      vm.dialogHDSD = true
+    },
     getApplicantList () {
       let vm = this
       let url = '/o/rest/v2/applicants'

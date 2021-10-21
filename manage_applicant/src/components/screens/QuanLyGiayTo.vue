@@ -4,7 +4,10 @@
       <div class="row-header no__hidden_class" id="top-header">
         <div class="background-triangle-big">
           <span v-if="!showDetail">QUẢN LÝ TÀI LIỆU CÔNG DÂN, CƠ QUAN TỔ CHỨC, DOANH NGHIỆP</span>
-          <span v-else>CẬP NHẬT, SỐ HÓA TÀI LIỆU</span>
+          <span v-else>
+            <span v-if="typeCreate === 'create'">THÊM MỚI, SỐ HÓA TÀI LIỆU</span>
+            <span v-else>CẬP NHẬT, SỐ HÓA TÀI LIỆU</span>
+          </span>
         </div>
         <div class="layout row wrap header_tools row-blue">
           <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
@@ -56,7 +59,7 @@
             <v-autocomplete
               :items="fileTemplateList"
               v-model="fileTemplateNo"
-              label="Chọn loại tài liệu"
+              label="Chọn loại giấy tờ"
               item-text="name"
               item-value="fileTemplateNo"
               :hide-selected="true"
@@ -80,7 +83,7 @@
           </v-flex>
           <v-flex xs12 sm6 class="px-0 pr-2">
             <v-text-field
-              label="Tìm theo tên tài liệu"
+              label="Tìm theo tên giấy tờ"
               v-model="keySearch"
               @keyup.enter="changeFilterSearch"
               append-icon="search"
@@ -93,7 +96,7 @@
           </v-flex>
           <v-flex xs12 sm6 class="">
             <v-text-field
-              label="Tìm theo mã tài liệu"
+              label="Tìm theo mã giấy tờ"
               v-model="fileNoSearch"
               @keyup.enter="changeFilterSearch"
               append-icon="search"
@@ -107,7 +110,7 @@
         </v-layout>
         <v-flex style="width: 100%;height:32px">
           <v-btn class="mx-0 my-0 right" color="primary" dark @click.native="showCreatedocument">
-            <v-icon size="18">add</v-icon> &nbsp; Thêm tài liệu
+            <v-icon size="18">add</v-icon> &nbsp; Thêm giấy tờ
           </v-btn>
         </v-flex>
         <v-data-table
@@ -169,7 +172,7 @@
                   <v-btn @click="viewDocument(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon size="22">visibility</v-icon>
                   </v-btn>
-                  <span>Xem tài liệu</span>
+                  <span>Xem giấy tờ</span>
                 </v-tooltip>
                 <v-tooltip top v-if="!loadingTable && props.item.fileEntryId" class="mr-2">
                   <v-btn @click="downloadDocument(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
@@ -181,14 +184,14 @@
                   <v-btn @click="showEditDocument(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon size="22">edit</v-icon>
                   </v-btn>
-                  <span>Số hóa, cập nhật tài liệu</span>
+                  <span>Số hóa, cập nhật giấy tờ</span>
                 </v-tooltip>
               </td>
             </tr>
           </template>
           <template slot="no-data">
             <div class="text-xs-center mt-2">
-              Không có tài liệu
+              Không có giấy tờ
             </div>
           </template>
         </v-data-table>
@@ -196,7 +199,7 @@
         <div class="my-2" v-if="totalDocument > numberPerPage">
           <div class="text-xs-right layout wrap" style="position: relative;">
             <div class="flex pagging-table"> 
-              <tiny-pagination :total="totalDocument" :page="documentPage" :numberPerPage="numberPerPage" nameRecord="tài liệu" custom-class="custom-tiny-class" 
+              <tiny-pagination :total="totalDocument" :page="documentPage" :numberPerPage="numberPerPage" nameRecord="giấy tờ" custom-class="custom-tiny-class" 
                 @tiny:change-page="changePage" ></tiny-pagination> 
             </div>
           </div>
@@ -205,21 +208,63 @@
       <v-card-text class="py-1 px-0" v-else>
         <v-form ref="form" v-model="valid" lazy-validation class="px-0 grid-list">
           <v-layout row wrap class="px-0 py-3">
-            <v-flex xs12 sm6 class="pr-2 pl-0">
+            <v-flex xs12 class="px-0">
               <v-autocomplete
                 :items="fileTemplateList"
                 v-model="fileTemplateNoCreate"
-                label="Loại tài liệu"
+                label="Loại giấy tờ"
                 item-text="name"
                 item-value="fileTemplateNo"
                 return-object
                 :hide-selected="true"
                 box
-                :rules="[v => !!v || 'Loại tài liệu là bắt buộc']"
+                :rules="[v => !!v || 'Loại giấy tờ là bắt buộc']"
                 required
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 sm6 class="pr-0">
+            <v-flex xs12 class="px-0">
+              <v-text-field
+                label="Tên giấy tờ"
+                v-model="fileName"
+                box
+                clearable
+                :rules="[v => !!v || 'Tên giấy tờ là bắt buộc']"
+                required
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm3 class="px-0 pr-3">
+              <v-text-field
+                label="Số hiệu giấy tờ"
+                v-model="fileNo"
+                box
+                clearable
+                :rules="[v => !!v || 'Số hiệu giấy tờ là bắt buộc']"
+                required
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm3 class="px-0 pr-3">
+              <v-text-field
+                label="Ngày cấp"
+                v-model="createDate"
+                placeholder="dd/mm/yyyy, ddmmyyyy"
+                @blur="formatDate"
+                box
+                clearable
+                :rules="[v => !!v || 'Ngày cấp là bắt buộc']"
+                required
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm3 class="px-0 pr-3">
+              <v-text-field
+                label="Ngày hết hạn"
+                v-model="expireDate"
+                placeholder="dd/mm/yyyy, ddmmyyyy"
+                @blur="formatExpireDate"
+                box
+                clearable
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm3 class="px-0">
               <v-autocomplete
                 :items="statusList"
                 v-model="statusCreate"
@@ -234,25 +279,36 @@
             </v-flex>
             <v-flex xs12 class="px-0">
               <v-text-field
-                label="Tên tài liệu"
-                v-model="fileName"
+                label="Đơn vị cấp"
+                v-model="govAgencyCreate"
                 box
                 clearable
-                :rules="[v => !!v || 'Tên tài liệu là bắt buộc']"
+                :rules="[v => !!v || 'Đơn vị cấp là bắt buộc']"
                 required
               ></v-text-field>
             </v-flex>
-            <v-flex xs12 class="px-0">
+            <v-flex xs12 sm6 class="px-0 pr-3">
               <v-text-field
-                label="Mã tài liệu"
-                v-model="fileNo"
+                label="Số cmnd/cccd, MST doanh nghiệp, tổ chức"
+                v-model="applicantIdNoCreate"
                 box
                 clearable
-                :rules="[v => !!v || 'Mã tài liệu là bắt buộc']"
+                :rules="[v => !!v || 'Thông tin bắt buộc']"
                 required
+                
               ></v-text-field>
             </v-flex>
-
+            <v-flex xs12 sm6 class="px-0">
+              <v-text-field
+                label="Chủ sở hữu"
+                v-model="applicantNameCreate"
+                box
+                clearable
+                :rules="[v => !!v || 'Chủ sở hữu giấy tờ là bắt buộc']"
+                required
+                
+              ></v-text-field>
+            </v-flex>
             <v-flex xs12 class="mt-2">
               <div v-if="fileNameView" class="pb-3" @click="viewDocument(documentSelect)">
                 <v-icon size="18" color="red">fa fa-file-pdf-o</v-icon>
@@ -261,11 +317,11 @@
               <input type="file" id="documentFile" @input="uploadDocumentFile($event)" style="display:none">
               <v-btn block color="primary" class="mx-0 px-0 mr-4 d-inline-block" dark @click.native="uploadFile()" style="width: 175px">
                 <v-icon size="16">fas fa fa-upload</v-icon> &nbsp; &nbsp;
-                Tải lên tài liệu
+                Tải lên giấy tờ
               </v-btn>
               <v-btn block color="primary" class="mx-0 px-0 d-inline-block" dark @click.native="vgsignCopy('https://kiemthu-mt-gov-vn-9001.fds.vn')" style="width: 230px">
                 <v-icon size="16">border_color</v-icon> &nbsp; &nbsp;
-                Tải lên và ký duyệt tài liệu
+                Tải lên và ký duyệt giấy tờ
               </v-btn>
               <div v-if="fileTemplateNoCreate && fileTemplateNoCreate.fileType">
                 <span style="color:red">(*) </span>
@@ -285,11 +341,11 @@
             @click.native="createDocument"
           >
             <v-icon>save</v-icon> &nbsp;
-            <span>Thêm tài liệu</span> 
+            <span>Thêm giấy tờ</span> 
           </v-btn>
           <v-btn v-else :disabled="loadingAction" class="mr-0" color="primary" @click.native="updateDocument">
             <v-icon>save</v-icon> &nbsp;
-            <span>Cập nhật tài liệu</span> 
+            <span>Cập nhật giấy tờ</span> 
           </v-btn>
         </v-flex>
       </v-card-text>
@@ -297,7 +353,7 @@
     <v-dialog v-model="dialogPDF" max-width="1200" transition="fade-transition">
       <v-card>
         <v-toolbar flat dark color="primary">
-          <v-toolbar-title>Tài liệu đính kèm</v-toolbar-title>
+          <v-toolbar-title>Giấy tờ đính kèm</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="dialogPDF = false">
             <v-icon>close</v-icon>
@@ -361,6 +417,11 @@ export default {
     fileTemplateNo: '',
     fileName: '',
     fileNo: '',
+    createDate: '',
+    expireDate: '',
+    govAgencyCreate: '',
+    applicantIdNoCreate: '',
+    applicantNameCreate: '',
     fileUpdate: '',
     fileNameUpdate: '',
     fileNoSearch: '',
@@ -380,12 +441,12 @@ export default {
         sortable: false
       },
       {
-        text: 'Tên tài liệu',
+        text: 'Tên giấy tờ',
         align: 'center',
         sortable: false
       },
       {
-        text: 'Mã tài liệu',
+        text: 'Số hiệu giấy tờ',
         align: 'center',
         sortable: false
       },
@@ -447,6 +508,12 @@ export default {
   mounted () {
   },
   watch: {
+    fileTemplateNoCreate (val) {
+      let vm = this
+      if (val && vm.typeCreate === 'create') {
+        vm.fileName = val.name
+      }
+    }
   },
   methods: {
     vgsignCopy() {
@@ -474,7 +541,7 @@ export default {
           }
           console.log('dataSigned', dataSigned)
           toastr.clear()
-          toastr.success('Tài liệu đã được ký duyệt')
+          toastr.success('Giấy tờ đã được ký duyệt')
           vm.dialogViewFileSign = true
         } else {
           if (received_msg.Message) {
@@ -627,9 +694,8 @@ export default {
       vm.statusCreate = ''
       vm.fileName = ''
       vm.fileNo = ''
-      // vm.dialog_createDocument = true
-      vm.$refs.form.reset()
-      vm.$refs.form.resetValidation()
+      vm.applicantIdNoCreate = vm.applicantInfos.applicantIdNo
+      vm.applicantNameCreate = vm.applicantInfos.applicantName
     },
     createDocument () {
       let vm = this
@@ -660,53 +726,37 @@ export default {
                 'Content-Type': 'application/x-www-form-urlencoded'
               }
             }
-            if (vm.isDvc) {
-              let dataPost = new FormData()
-              dataPost.append('method', 'POST')
-              dataPost.append('url', '/applicantdatas')
-              dataPost.append('data', JSON.stringify(filter))
-              dataPost.append('file', vm.fileUpdate)
-              
-              axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
-                vm.loadingAction = false
-                toastr.success('Thêm mới tài liệu thành công')
-                vm.dialog_createDocument = false
-                setTimeout(function () {
-                  vm.getApplicantDocument()
-                }, 200)
-              }).catch(xhr => {
-                toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
-              })
-            } else {
-              let dataCreateFile = new FormData()
-              let url = '/o/rest/v2/applicantdatas'
-              dataCreateFile.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-              dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 0)
-              dataCreateFile.append('fileNo', vm.fileNo)
-              dataCreateFile.append('fileName', vm.fileName)
-              dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
-              dataCreateFile.append('file', vm.fileUpdate)
-              dataPost.append('govAgencyName', '')
-              dataPost.append('issueDate', '')
-              dataPost.append('expireDate', '')
-              dataPost.append('desciption', '')
-              
-              axios.post(url, dataCreateFile, param).then(result1 => {
-                vm.loadingAction = false
-                toastr.success('Thêm mới tài liệu thành công')
-                vm.dialog_createDocument = false
-                setTimeout(function () {
-                  vm.getApplicantDocument()
-                }, 200)
-              }).catch(xhr => {
-                vm.loadingAction = false
-                toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
-              })
-            }
+            
+            let dataCreateFile = new FormData()
+            let url = '/o/rest/v2/applicantdatas'
+            dataCreateFile.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
+            dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 0)
+            dataCreateFile.append('fileNo', vm.fileNo)
+            dataCreateFile.append('fileName', vm.fileName)
+            dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
+            dataCreateFile.append('applicantName', vm.applicantInfos.applicantName)
+            dataCreateFile.append('file', vm.fileUpdate)
+            dataCreateFile.append('govAgencyName', vm.govAgencyCreate)
+            dataCreateFile.append('issueDate', vm.createDate)
+            dataCreateFile.append('expireDate', vm.expireDate)
+            dataCreateFile.append('desciption', '')
+            
+            axios.post(url, dataCreateFile, param).then(result1 => {
+              vm.loadingAction = false
+              toastr.success('Thêm mới giấy tờ thành công')
+              vm.dialog_createDocument = false
+              vm.showDetail = false
+              setTimeout(function () {
+                vm.getApplicantDocument()
+              }, 200)
+            }).catch(xhr => {
+              vm.loadingAction = false
+              toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
+            })
             
           } else {
             toastr.clear()
-            toastr.error('Vui lòng đính kèm tài liệu')
+            toastr.error('Vui lòng đính kèm giấy tờ')
           }
         }
       } else {
@@ -739,16 +789,18 @@ export default {
           dataCreateFile.append('fileNo', vm.fileNo)
           dataCreateFile.append('fileName', vm.fileName)
           dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
+          dataCreateFile.append('applicantName', vm.applicantInfos.applicantName)
           dataCreateFile.append('fileEntryId', vm.fileEntryESign)
-          dataPost.append('govAgencyName', '')
-          dataPost.append('issueDate', '')
-          dataPost.append('expireDate', '')
-          dataPost.append('desciption', '')
+          dataCreateFile.append('govAgencyName', vm.govAgencyCreate)
+          dataCreateFile.append('issueDate', vm.createDate)
+          dataCreateFile.append('expireDate', vm.expireDate)
+          dataCreateFile.append('desciption', '')
           
           axios.post(url, dataCreateFile, param).then(result1 => {
             vm.loadingAction = false
-            toastr.success('Thêm mới tài liệu thành công')
+            toastr.success('Thêm mới giấy tờ thành công')
             vm.dialog_createDocument = false
+            vm.showDetail = false
             setTimeout(function () {
               vm.getApplicantDocument()
             }, 200)
@@ -759,7 +811,7 @@ export default {
           
         } else {
           toastr.clear()
-          toastr.error('Vui lòng đính kèm tài liệu')
+          toastr.error('Vui lòng đính kèm giấy tờ')
         }
       }
     },
@@ -791,57 +843,36 @@ export default {
               'Content-Type': 'application/x-www-form-urlencoded'
             }
           }
-          if (vm.isDvc) {
-            let dataPost = new FormData()
-            dataPost.append('method', 'PUT')
-            dataPost.append('url', '/applicantdatas/' + vm.documentSelect.applicantDataId)
-            dataPost.append('data', JSON.stringify(filter))
-            if (vm.updateFile) {
-              dataPost.append('file', vm.fileUpdate)
-            } else {
-              dataPost.append('file', '')
-            }
-
-            axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
-              vm.loadingAction = false
-              toastr.success('Cập nhật tài liệu thành công')
-              vm.dialog_createDocument = false
-              setTimeout(function () {
-                vm.getApplicantDocument()
-              }, 200)
-            }).catch(xhr => {
-              vm.loadingAction = false
-              toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
-            })
+          
+          let dataPost = new FormData()
+          let url = '/o/rest/v2/applicantdatas/' + vm.documentSelect.applicantDataId
+          dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
+          dataPost.append('status', vm.statusCreate ? vm.statusCreate : 0)
+          dataPost.append('fileNo', vm.fileNo)
+          dataPost.append('fileName', vm.fileName)
+          dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
+          dataPost.append('applicantName', vm.applicantInfos.applicantName)
+          dataPost.append('govAgencyName', vm.govAgencyCreate)
+          dataPost.append('issueDate', vm.createDate)
+          dataPost.append('expireDate', vm.expireDate)
+          dataPost.append('desciption', '')
+          if (vm.updateFile) {
+            dataPost.append('file', vm.fileUpdate)
           } else {
-            let dataPost = new FormData()
-            let url = '/o/rest/v2/applicantdatas/' + vm.documentSelect.applicantDataId
-            dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-            dataPost.append('status', vm.statusCreate ? vm.statusCreate : 0)
-            dataPost.append('fileNo', vm.fileNo)
-            dataPost.append('fileName', vm.fileName)
-            dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
-            dataPost.append('govAgencyName', '')
-            dataPost.append('issueDate', '')
-            dataPost.append('expireDate', '')
-            dataPost.append('desciption', '')
-            if (vm.updateFile) {
-              dataPost.append('file', vm.fileUpdate)
-            } else {
-              dataPost.append('file', '')
-            } 
-            axios.put(url, dataPost, param).then(result1 => {
-              vm.loadingAction = false
-              toastr.success('Cập nhật tài liệu thành công')
-              vm.dialog_createDocument = false
-              setTimeout(function () {
-                vm.getApplicantDocument()
-              }, 200)
-            }).catch(xhr => {
-              vm.loadingAction = false
-              toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
-            })
-          }
+            dataPost.append('file', '')
+          } 
+          axios.put(url, dataPost, param).then(result1 => {
+            vm.loadingAction = false
+            toastr.success('Cập nhật giấy tờ thành công')
+            vm.dialog_createDocument = false
+            vm.showDetail = false
+            setTimeout(function () {
+              vm.getApplicantDocument()
+            }, 200)
+          }).catch(xhr => {
+            vm.loadingAction = false
+            toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
+          })
           
         }
       } else {
@@ -873,6 +904,7 @@ export default {
         dataPost.append('fileNo', vm.fileNo)
         dataPost.append('fileName', vm.fileName)
         dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
+        dataPost.append('applicantName', vm.applicantInfos.applicantName)
         dataPost.append('fileEntryId', vm.fileEntryESign)
         dataPost.append('govAgencyName', '')
         dataPost.append('issueDate', '')
@@ -881,7 +913,7 @@ export default {
 
         axios.put(url, dataPost, param).then(result1 => {
           vm.loadingAction = false
-          toastr.success('Cập nhật tài liệu thành công')
+          toastr.success('Cập nhật giấy tờ thành công')
           vm.dialog_createDocument = false
           vm.showDetail = false
           setTimeout(function () {
@@ -964,6 +996,11 @@ export default {
       vm.statusCreate = item.status
       vm.fileName = item.fileName
       vm.fileNo = item.fileNo
+      vm.applicantIdNoCreate = vm.applicantInfos.applicantIdNo
+      vm.applicantNameCreate = vm.applicantInfos.applicantName
+      vm.createDate = item.issueDate ? item.issueDate : ''
+      vm.expireDate = item.expireDate ? item.expireDate : ''
+      vm.govAgencyCreate = item.govAgencyName ? item.govAgencyName : ''
       // vm.dialog_createDocument = true
       vm.showDetail = true
     },
@@ -983,12 +1020,12 @@ export default {
         } else {
           passed = false
           toastr.clear()
-          toastr.error('Tài liệu tải lên dung lượng tối đa là ' + fileSizeAllow + 'MB')
+          toastr.error('Giấy tờ tải lên dung lượng tối đa là ' + fileSizeAllow + 'MB')
         }
       } else {
         passed = false
         toastr.clear()
-        toastr.error('Tài liệu tải lên chỉ chấp nhận các định dạng ' + vm.fileTemplateNoCreate.fileType)
+        toastr.error('Giấy tờ tải lên chỉ chấp nhận các định dạng ' + vm.fileTemplateNoCreate.fileType)
       }
       return passed
     },
@@ -1088,6 +1125,32 @@ export default {
       } else if (String(val) === '3') {
         return 'Hủy'
       }
+    },
+    formatDate () {
+      let vm = this
+      let lengthDate = String(vm.createDate).trim().length
+      let splitDate = String(vm.createDate).split('/')
+      if (lengthDate && lengthDate > 4 && splitDate.length === 3 && splitDate[2]) {
+        vm.createDate = vm.translateDate(vm.createDate)
+      } else if (lengthDate && lengthDate === 8) {
+        let date = String(vm.createDate)
+        vm.createDate = date.slice(0,2) + '/' + date.slice(2,4) + '/' + date.slice(4,8)
+      } else {
+        vm.createDate = ''
+      }     
+    },
+    formatExpireDate () {
+      let vm = this
+      let lengthDate = String(vm.expireDate).trim().length
+      let splitDate = String(vm.expireDate).split('/')
+      if (lengthDate && lengthDate > 4 && splitDate.length === 3 && splitDate[2]) {
+        vm.expireDate = vm.translateDate(vm.expireDate)
+      } else if (lengthDate && lengthDate === 8) {
+        let date = String(vm.expireDate)
+        vm.expireDate = date.slice(0,2) + '/' + date.slice(2,4) + '/' + date.slice(4,8)
+      } else {
+        vm.expireDate = ''
+      }     
     },
     goBack () {
       let vm = this

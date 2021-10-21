@@ -657,7 +657,7 @@
             <v-icon size="20">save</v-icon>&nbsp; Đồng ý
           </v-btn>
           <v-btn class="white--text" color="red"  @click="dialog_selectAgency = false" :disabled="loadingProcess">
-            <v-icon size="20">clear</v-icon>&nbsp; Thoát
+            <v-icon class="white--text" size="20">clear</v-icon>&nbsp; Thoát
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -1335,9 +1335,12 @@ export default {
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
       let codeDvcqg = vm.serviceInfoSelected.hasOwnProperty('serviceCodeDVCQG') && vm.serviceInfoSelected.serviceCodeDVCQG ? vm.serviceInfoSelected.serviceCodeDVCQG : ''
+      let urlR = window.location.href.split("?")[0].trim()
+      let pathEndChar = urlR.charAt(urlR.length-1)
+      let path = pathEndChar === '/' ? window.location.href.split("?")[0] : window.location.href.split("?")[0] + '/'
       let filter = {
         state: '',
-        redirectURL: codeDvcqg ? window.location.href.split("?")[0] + '/' + vm.serviceInfoSelected.serviceInfoId + '?code=' +  codeDvcqg + '&serviceCreate=' + vm.serviceSelected.serviceConfigId : window.location.href.split("?")[0] + '/' + vm.serviceInfoSelected.serviceInfoId + '?serviceCreate=' + vm.serviceSelected.serviceConfigId
+        redirectURL: codeDvcqg ? path + vm.serviceInfoSelected.serviceInfoId + '?code=' +  codeDvcqg + '&serviceCreate=' + vm.serviceSelected.serviceConfigId : path + vm.serviceInfoSelected.serviceInfoId + '?serviceCreate=' + vm.serviceSelected.serviceConfigId
       }
       setTimeout (function () {
         if (!vm.isSigned) {
@@ -1600,6 +1603,10 @@ export default {
     },
     showSelectGov (serviceInfo, govList, guide) {
       let vm = this
+      // if (!window.themeDisplay.isSignedIn() && !guide) {
+      //   vm.dialogVerifycation = true
+      //   return
+      // }
       vm.showChonDichVu = false
       vm.serviceInfoSelected = serviceInfo
       vm.govAgencyTiepNhanSelected = ''
@@ -1616,6 +1623,18 @@ export default {
         })
       } else {
         vm.luaChonXaPhuong = false
+      }
+      if (vm.serviceInfoSelected.administrationCode === 'VPT') {
+        vm.govAgencyListTiepNhanFilters.forEach(element => {
+          let isParent = vm.reportGroupList.filter(function (item) {
+            return item.itemCode === element.govAgencyCode
+          })
+          if (isParent && isParent.length) {
+            element['parentName'] = isParent[0]['parentItem']['itemName']
+            element['parentCode'] = isParent[0]['parentItem']['itemCode']
+          }
+        })
+        console.log('govAgencyListTiepNhanFilters', vm.govAgencyListTiepNhanFilters)
       }
       vm.dialog_selectAgency = true
     },

@@ -163,29 +163,29 @@
 
       <!-- filter navigation -->
       <v-layout wrap class="mt-4 ml-0" :class="String(index) !== '0' ? 'mb-4' : ''">
-        <v-flex xs12 >
-          <div v-if="!isMobile && year != 2019 && year != 2020" class="d-inline-block px-2" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
+        <v-flex xs12 layout wrap>
+          <!-- <div v-if="!isMobile && year != 2019 && year != 2020" class="d-inline-block px-2" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
             <v-btn @click="toNativeViewType(true)" :flat="chartView ? false : true" depressed small color="#0054a6"
              class="mr-2" :class="chartView ? 'white--text' : ''" style="height: 24px;">Đơn vị</v-btn>
             <v-btn @click="toNativeViewType(false)" :flat="chartView ? true : false" depressed small color="#0054a6" 
             :class="chartView ? '' : 'white--text'" style="height: 24px;">Lĩnh vực</v-btn>
-          </div>
+          </div> -->
 
-          <div v-if="!isMobile && year != 2019 && year != 2020" class="ml-3 d-inline-block" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
+          <div v-if="!isMobile && year != 2019 && year != 2020" class="ml-0 mr-3 d-inline-block" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
             <v-btn @click="changeSystem('total')" :flat="systemReport !== 'total' ? true : false" :class="systemReport === 'total' ? 'white--text' : ''" small color="#0054a6" depressed class="mr-2" style="height: 24px;">Tất cả các hệ thống</v-btn>
             <v-btn @click="changeSystem('0')" :flat="systemReport !== '0' ? true : false" :class="systemReport === '0' ? 'white--text' : ''" small depressed color="#0054a6" class="mr-2" title="Dịch vụ công và một cửa điện tử" style="height: 24px;">DVC-MCĐT</v-btn>
             <v-btn @click="changeSystem('1')" :flat="systemReport !== '1' ? true : false" :class="systemReport === '1' ? 'white--text' : ''" small depressed color="#0054a6" class="mr-2" style="height: 24px;">NSW</v-btn>
-            <v-btn @click="changeSystem('2')" :flat="systemReport !== '2' ? true : false" :class="systemReport === '2' ? 'white--text' : ''" small depressed color="#0054a6" class="" style="height: 24px;">Phần mềm nghiệp vụ</v-btn>
+            <!-- <v-btn @click="changeSystem('2')" :flat="systemReport !== '2' ? true : false" :class="systemReport === '2' ? 'white--text' : ''" small depressed color="#0054a6" class="" style="height: 24px;">Phần mềm nghiệp vụ</v-btn> -->
           </div>
 
           <div class="d-inline-block ml-0" v-if="isMobile && year != 2019 && year != 2020" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
             <v-btn @click="changeSystem('total')" :flat="systemReport !== 'total' ? true : false" :class="systemReport === 'total' ? 'white--text' : ''" small color="#0054a6" depressed class="mx-1 px-1" style="height: 24px;">Tất cả các hệ thống</v-btn>
             <v-btn @click="changeSystem('0')" :flat="systemReport !== '0' ? true : false" :class="systemReport === '0' ? 'white--text' : ''" small depressed color="#0054a6" class="mx-0 px-1" title="Dịch vụ công và một cửa điện tử" style="height: 24px;">DVC-MCĐT</v-btn>
             <v-btn @click="changeSystem('1')" :flat="systemReport !== '1' ? true : false" :class="systemReport === '1' ? 'white--text' : ''" small depressed color="#0054a6" class="mx-0 px-1" style="height: 24px;">NSW</v-btn>
-            <v-btn @click="changeSystem('2')" :flat="systemReport !== '2' ? true : false" :class="systemReport === '2' ? 'white--text' : ''" small depressed color="#0054a6" class="mx-0 px-1" style="height: 24px;">Phần mềm nghiệp vụ</v-btn>
+            <!-- <v-btn @click="changeSystem('2')" :flat="systemReport !== '2' ? true : false" :class="systemReport === '2' ? 'white--text' : ''" small depressed color="#0054a6" class="mx-0 px-1" style="height: 24px;">Phần mềm nghiệp vụ</v-btn> -->
           </div>
 
-          <v-layout v-if="!isMobile" wrap :class="!isMobile ? 'right date-filter' : ' left date-filter mt-2'">
+          <v-layout style="max-width: 300px;" v-if="!isMobile" wrap :class="!isMobile ? 'date-filter flex' : 'date-filter mt-2 flex'">
             <v-flex class="mr-2" :style="String(year) !== '0' ? 'max-width:125px' : 'max-width:155px'">
               <v-select
                 :items="years"
@@ -197,7 +197,7 @@
                 solo
                 flat
                 background-color="#fff"
-                style="border: 1px solid #0054a6; border-radius: 3px;height:36px"
+                style="border: 1px solid #0054a6; border-radius: 3px;height:38px"
                 hide-details
                 >
                 <template v-slot:selection="{ item, index }">
@@ -205,7 +205,7 @@
                 </template>
               </v-select>
             </v-flex>
-            <v-flex class="mr-2" style="width:125px">
+            <v-flex class="mr-2" style="max-width:125px">
               <v-select
                 :items="months"
                 v-model="month"
@@ -217,7 +217,7 @@
                 solo
                 flat
                 background-color="#fff"
-                style="border: 1px solid #0054a6; border-radius: 3px; height:36px"
+                style="border: 1px solid #0054a6; border-radius: 3px; height:38px"
                 hide-details
                 :disabled="String(year) === '0'"
                 >
@@ -243,15 +243,15 @@
           </v-layout>
           <!-- mobile -->
           <v-layout wrap class="mt-2" v-if="isMobile">
-            <v-flex style="max-width:140px">
+            <!-- <v-flex style="max-width:140px">
               <div class="d-inline-block px-0" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
                 <v-btn @click="toNativeViewType(true)" :flat="chartView ? false : true" depressed small color="#0054a6"
                 class="mr-1" :class="chartView ? 'white--text' : ''" style="height: 24px;">Đơn vị</v-btn>
                 <v-btn class="mx-0" @click="toNativeViewType(false)" :flat="chartView ? true : false" depressed small color="#0054a6" 
                 :class="chartView ? '' : 'white--text'" style="height: 24px;">Lĩnh vực</v-btn>
               </div>
-            </v-flex>
-            <v-flex style="width: calc(100% - 140px);">
+            </v-flex> -->
+            <v-flex>
               <v-layout wrap class="date-filter">
                 <v-flex class="mr-0" :style="String(year) !== '0' ? 'max-width:122px' : 'max-width:155px'">
                   <v-select
@@ -954,7 +954,8 @@ export default {
       }
     ],
     labelOfLine: [],
-    showTableTotal: false
+    showTableTotal: false,
+    allYear: false
   }),
   computed: {
     options () {
@@ -1042,6 +1043,13 @@ export default {
         } else {
           vm.systemReport = 'total'
         }
+        // 
+        if (currentQuerys.hasOwnProperty('allYear') && currentQuerys['allYear'] == 'true') {
+          vm.allYear = true
+        } else {
+          vm.allYear = false
+        }
+        // 
         vm.doStaticsReport()
         if (vm.isOnegate) {
           vm.$store.dispatch('getLevelListMC').then(function (result) {
@@ -1116,7 +1124,7 @@ export default {
             // 
             for (let key in agencyListsTotal) {
               let currentData = agencyListsTotal[key]
-              if (!currentData.domainName) {
+              if (currentData.domainName === 'total') {
                 vm.itemTotal = currentData
                 vm.showTableTotal = true
                 break
@@ -1141,7 +1149,7 @@ export default {
             let agencyListsTotal = result
             for (let key in agencyListsTotal) {
               let currentData = agencyListsTotal[key]
-              if (!currentData.domainName && !currentData.govAgencyName) {
+              if (currentData.domainName === 'total') {
                 vm.itemTotalAllYear = currentData
                 vm.showTableTotal = true
                 break
@@ -1156,7 +1164,7 @@ export default {
               let agencyListsTotal = result
               for (let key in agencyListsTotal) {
                 let currentData = agencyListsTotal[key]
-                if (!currentData.domainName && !currentData.govAgencyName) {
+                if (currentData.domainName === 'total') {
                   total2021 = currentData
                   break
                 }
@@ -1178,7 +1186,7 @@ export default {
             let agencyListsTotal = result
             for (let key in agencyListsTotal) {
               let currentData = agencyListsTotal[key]
-              if (!currentData.domainName && !currentData.govAgencyName) {
+              if (currentData.domainName === 'total') {
                 vm.itemTotalAllYear = currentData
                 vm.showTableTotal = true
                 break
@@ -1193,7 +1201,7 @@ export default {
               let agencyListsTotal = result
               for (let key in agencyListsTotal) {
                 let currentData = agencyListsTotal[key]
-                if (!currentData.domainName && !currentData.govAgencyName) {
+                if (currentData.domainName === 'total') {
                   total2021 = currentData
                   break
                 }
@@ -1255,6 +1263,11 @@ export default {
         vm.systemReport = currentQuerys.system || currentQuerys.system == '0' ? currentQuerys.system : 'total'
       } else {
         vm.systemReport = 'total'
+      }
+      if (currentQuerys.hasOwnProperty('allYear') && currentQuerys['allYear'] == 'true') {
+        vm.allYear = true
+      } else {
+        vm.allYear = false
       }
       vm.doStaticsReport()
     },
@@ -1395,30 +1408,31 @@ export default {
         group: vm.group,
         reporting: true,
         agency: vm.govAgencyCode,
-        report: vm.chartView ? false : 'linemonth'
+        report: vm.chartView,
+        system: vm.systemReport
       }
-      if (vm.systemReport !== '' && vm.systemReport !== null && vm.systemReport !== 'total') {
-        if (vm.systemReport == 0) {
-          filter['system'] = 'internal'
-        } else if (vm.systemReport == 1) {
-          filter['system'] = 'qlvt.mt.gov.vn'
-        }
-      }
+      // if (vm.systemReport !== '' && vm.systemReport !== null && vm.systemReport !== 'total') {
+      //   if (vm.systemReport == 0) {
+      //     filter['system'] = 'internal'
+      //   } else if (vm.systemReport == 1) {
+      //     filter['system'] = 'qlvt.mt.gov.vn'
+      //   }
+      // }
       let tempGov = vm.govAgencyCode
-      if (vm.chartView) {
-        filter.report = true
-        let currentQuerys = vm.$router.history.current.query
-        if (currentQuerys.hasOwnProperty('govAgencyCode')) {
-          vm.govAgencyCode = currentQuerys.govAgencyCode
-          tempGov = vm.govAgencyCode
-          if (tempGov !== '') {
-            filter.report = false
-          }
-        }
-      } else {
-        vm.govAgencyCode = ''
-        filter.agency = 'total'
-      }
+      // if (vm.chartView) {
+      //   filter.report = true
+      //   let currentQuerys = vm.$router.history.current.query
+      //   if (currentQuerys.hasOwnProperty('govAgencyCode')) {
+      //     vm.govAgencyCode = currentQuerys.govAgencyCode
+      //     tempGov = vm.govAgencyCode
+      //     if (tempGov !== '') {
+      //       filter.report = false
+      //     }
+      //   }
+      // } else {
+      //   vm.govAgencyCode = ''
+      //   filter.agency = 'total'
+      // }
       vm.reloadPie = false
       vm.reloadBar = true
 
@@ -1540,6 +1554,25 @@ export default {
           
           vm.reloadPie = true
         })
+        // số liệu trực tiếp, trực tuyến
+        let filter2 = {
+          year: vm.year,
+          month: vm.month,
+          group: vm.group,
+          reporting: true,
+          agency: vm.govAgencyCode,
+          report: vm.chartView,
+          system: vm.systemReport,
+          domainCode: 'total',
+          allYear: vm.allYear,
+          typeDossier: true
+        }
+        vm.$store.dispatch('getAgencyReportLists', filter2).then(function (result) {
+          console.log('TT-TT', result)
+          vm.onegateCount = result[0].onegateCount
+          vm.onlineCount = result[0].onlineCount
+        })
+        //  
       }
       
       // report line
@@ -1549,27 +1582,28 @@ export default {
             year: vm.year,
             group: vm.group,
             agency: tempGov,
-            report: vm.chartView ? true : 'linemonth'
+            report: vm.chartView,
+            system: vm.systemReport
           }
-          if (vm.systemReport !== '' && vm.systemReport !== null && vm.systemReport !== 'total') {
-            if (vm.systemReport == 0) {
-              filter['system'] = 'internal'
-            } else if (vm.systemReport == 1) {
-              filter['system'] = 'qlvt.mt.gov.vn'
-            }
-          }
-          if (!vm.chartView) {
-            filter.agency = 'total'
-            filter.report = 'linemonth'
-          } else {
-            if (tempGov !== '') {
-              filter.agency = tempGov
-              filter.report = false
-            } else {
-              filter.agency = ''
-              filter.report = true
-            }
-          }
+          // if (vm.systemReport !== '' && vm.systemReport !== null && vm.systemReport !== 'total') {
+          //   if (vm.systemReport == 0) {
+          //     filter['system'] = 'internal'
+          //   } else if (vm.systemReport == 1) {
+          //     filter['system'] = 'qlvt.mt.gov.vn'
+          //   }
+          // }
+          // if (!vm.chartView) {
+          //   filter.agency = 'total'
+          //   filter.report = 'linemonth'
+          // } else {
+          //   if (tempGov !== '') {
+          //     filter.agency = tempGov
+          //     filter.report = false
+          //   } else {
+          //     filter.agency = ''
+          //     filter.report = true
+          //   }
+          // }
           vm.reloadLine = true
           if (vm.isOnegate) {
             vm.$store.dispatch('getAgencyReportListsMC', filter).then(function (result) {
@@ -1609,6 +1643,8 @@ export default {
                 vm.doProcessReport1(dataReport1)
               }
             })
+            
+            
           }
         }, 200)
       } else {
@@ -1707,7 +1743,8 @@ export default {
           group: vm.group,
           reportGovName: vm.reportGovName,
           govAgencyCode: vm.govAgencyCode,
-          system: vm.systemReport
+          system: vm.systemReport,
+          allYear: true
         }
       })
     },
@@ -1749,21 +1786,37 @@ export default {
         } else {
           if (data[key].month > 0) {
             // labelsCustomMonth['' + data[key].month] = 'T ' + data[key].month
-            if (data[key].govAgencyName !== '' && String(data[key].domainName) === '') {
-              let agencyName = String(data[key].govAgencyName).normalize('NFD')
-              if (monthData[agencyName] !== null && monthData[agencyName] !== undefined) {
-                monthData[agencyName].push({
-                  month: data[key].month,
-                  total: data[key].receivedCount
-                })
-              } else {
-                monthData[agencyName] = []
-                monthData[agencyName].push({
-                  month: data[key].month,
-                  total: data[key].receivedCount
-                })
-              }
-            } else {
+            // if (data[key].govAgencyName !== '' && String(data[key].domainName) === '') {
+            //   let agencyName = String(data[key].govAgencyName).normalize('NFD')
+            //   if (monthData[agencyName] !== null && monthData[agencyName] !== undefined) {
+            //     monthData[agencyName].push({
+            //       month: data[key].month,
+            //       total: data[key].receivedCount
+            //     })
+            //   } else {
+            //     monthData[agencyName] = []
+            //     monthData[agencyName].push({
+            //       month: data[key].month,
+            //       total: data[key].receivedCount
+            //     })
+            //   }
+            // } else {
+            //   let domainName = String(data[key].domainName).normalize('NFD')
+            //   if (monthData[domainName] !== null && monthData[domainName] !== undefined) {
+            //     monthData[domainName].push({
+            //       month: data[key].month,
+            //       total: data[key].receivedCount
+            //     })
+            //   } else {
+            //     monthData[domainName] = []
+            //     monthData[domainName].push({
+            //       month: data[key].month,
+            //       total: data[key].receivedCount
+            //     })
+            //   }
+            // }
+            // Thống kê mới
+            if (data[key].govAgencyName === '' && String(data[key].domainName) !== '' && String(data[key].domainName) !== 'total') {
               let domainName = String(data[key].domainName).normalize('NFD')
               if (monthData[domainName] !== null && monthData[domainName] !== undefined) {
                 monthData[domainName].push({
@@ -1824,31 +1877,23 @@ export default {
       console.log('dataReport2', data)
       // data report_2
       for (let key in data) {
-        if (!data[key].govAgencyName && !data[key].domainName) {
-        } else {
-          // if (data[key].month > 0) {
-            // if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== undefined && currentQuerys['govAgencyCode'] !== '' && String(data[key].domainName) !== '') {
-            if (String(data[key].govAgencyName) === '' && String(data[key].domainName) !== '') {
-              labelsCustomMonth[data[key].domainName] = data[key].processingCount + data[key].waitingCount + data[key].releaseCount
-            } else {
-              labelsCustomMonth[data[key].govAgencyName] = data[key].processingCount + data[key].waitingCount + data[key].releaseCount
-            }
-            if (vm.year == 2020) {
-              if (data[key]['month'] == vm.month) {
-                processingCountData.push(data[key].processingCount)
-                waitingCountData.push(data[key].waitingCount)
-                releaseCountData.push(data[key].releaseCount)
-              }
-            } else {
+        if (!data[key].govAgencyName && data[key].domainName && data[key].domainName !== 'total') {          
+          labelsCustomMonth[data[key].domainName] = data[key].processingCount + data[key].waitingCount + data[key].releaseCount
+          if (vm.year == 2020) {
+            if (data[key]['month'] == vm.month) {
               processingCountData.push(data[key].processingCount)
               waitingCountData.push(data[key].waitingCount)
               releaseCountData.push(data[key].releaseCount)
             }
-          // }
+          } else {
+            processingCountData.push(data[key].processingCount)
+            waitingCountData.push(data[key].waitingCount)
+            releaseCountData.push(data[key].releaseCount)
+          }
         }
       }
       vm.labelOfLine = []
-      // console.log('labelsCustomMonth ---', labelsCustomMonth)
+      console.log('labelsCustomMonth ---', labelsCustomMonth)
       for (let key in labelsCustomMonth) {
         if (key === '') {
           vm.labelOfLine.push('Toàn bộ lĩnh vực')
@@ -1872,7 +1917,7 @@ export default {
         seriesChartBarData.push(datasetsCustom[key]['data'])
         colorDK.push(datasetsCustom[key]['borderColor'])
       }
-      // console.log('seriesChartBarData', seriesChartBarData)
+      console.log('seriesChartBarData', seriesChartBarData)
       vm.seriesChartBar = []
       vm.seriesChartBar = [{
         data: seriesChartBarData
@@ -2036,11 +2081,11 @@ export default {
       let labelAgency = []
       // Bind data report THÁNG
       for (let key in data) {
-        if (!data[key].govAgencyName && !data[key].domainName) {
-          vm.onegateCount = data[key].onegateCount
-          vm.onlineCount = data[key].onlineCount
-        } else {
-          if (!data[key].govAgencyName && String(data[key].domainName) !== '') {
+        // if (!data[key].govAgencyName && !data[key].domainName) {
+        //   vm.onegateCount = data[key].onegateCount
+        //   vm.onlineCount = data[key].onlineCount
+        // } else {
+          if (!data[key].govAgencyName && String(data[key].domainName) !== '' && String(data[key].domainName) !== 'total') {
             if (vm.year == 2020) {
               if (data[key]['month'] == vm.month) {
                 labelDomain.push(data[key].domainName)
@@ -2067,7 +2112,7 @@ export default {
             onlineCountData.push(data[key].onlineCount)
             onegateCountData.push(data[key].onegateCount)
           }
-        }
+        // }
       }
       // data report_3
       vm.seriesDossierTypeChart[0]['data'] = onegateCountData

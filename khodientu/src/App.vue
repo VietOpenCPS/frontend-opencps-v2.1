@@ -9,7 +9,7 @@
             <v-layout row>
               <v-flex style="max-width: 85px;">
                 <v-img class="mx-3 my-3"
-                  :src="activeTab === 1 ? '/documents/2832265/0/sohoa-icon1.png?t=3124231' : '/documents/2832265/0/sohoa-icon2.png'"
+                  :src="activeTab === 1 ? '/o/khodientu-theme/images/sohoa-icon1.png?t=3124231' : '/o/khodientu-theme/images/sohoa-icon2.png'"
                   height="50px"
                   width="50px"
                   contain
@@ -30,7 +30,7 @@
             <v-layout row>
               <v-flex style="max-width: 85px;">
                 <v-img class="mx-3 my-3"
-                  :src="activeTab === 2 ? '/documents/2832265/0/storage-icon1.png?t=93123123' : '/documents/2832265/0/storage-icon2.png'"
+                  :src="activeTab === 2 ? '/o/khodientu-theme/images/storage-icon1.png?t=93123123' : '/o/khodientu-theme/images/storage-icon2.png'"
                   height="50px"
                   width="50px"
                   contain
@@ -51,7 +51,7 @@
             <v-layout row>
               <v-flex style="max-width: 85px;">
                 <v-img class="mx-3 my-3"
-                  :src="activeTab === 3 ? '/documents/2832265/0/list-icon1.png?t=9312312' : '/documents/2832265/0/list-icon2.png'"
+                  :src="activeTab === 3 ? '/o/khodientu-theme/images/list-icon1.png?t=9312312' : '/o/khodientu-theme/images/list-icon2.png'"
                   height="50px"
                   width="45px"
                   contain
@@ -72,7 +72,7 @@
             <v-layout row>
               <v-flex style="max-width: 85px;">
                 <v-img class="mx-3 my-3"
-                  :src="activeTab === 4 ? '/documents/2832265/0/chart-icon1.png' : '/documents/2832265/0/chart-icon2.png'"
+                  :src="activeTab === 4 ? '/o/khodientu-theme/images/chart-icon1.png' : '/o/khodientu-theme/images/chart-icon2.png'"
                   height="50px"
                   width="50px"
                   contain
@@ -93,7 +93,7 @@
             <v-layout row>
               <v-flex style="max-width: 85px;">
                 <v-img class="mx-3 my-3"
-                  :src="activeTab === 4 ? '/documents/2832265/0/applicant-icon1.png' : '/documents/2832265/0/applicant-icon2.png'"
+                  :src="activeTab === 4 ? '/o/khodientu-theme/images/applicant-icon1.png' : '/o/khodientu-theme/images/applicant-icon2.png'"
                   height="50px"
                   width="50px"
                   contain

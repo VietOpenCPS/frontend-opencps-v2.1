@@ -152,7 +152,8 @@ export const store = new Vuex.Store({
     visibleDoAction: true,
     filterDateFromTo: ['fromReceiveDate','toReceiveDate','fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate'],
     dossierSelectedDoAction: [],
-    formActionGroup: ''
+    formActionGroup: '',
+    keywordSearch: ''
   },
   actions: {
     clearError ({commit}) {
@@ -4545,6 +4546,25 @@ export const store = new Vuex.Store({
         })
       })
     },
+    kySoHsm ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let dataUpdate = new URLSearchParams()
+        let url = '/o/rest/v2/defaultsignature/hsmsignature/' + filter['dossierId'] + '/dossier'
+        dataUpdate.append('token', filter['token'])
+        dataUpdate.append('dossierFileIds', filter['dossierFileIds'])
+        axios.put(url, dataUpdate, param).then(result1 => {
+          resolve(result1)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
     getNotarization ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let config = {
@@ -5726,6 +5746,9 @@ export const store = new Vuex.Store({
     setGroupIdSite (state, payload) {
       state.groupIdSite = payload
     },
+    setKeywordSearch (state, payload) {
+      state.keywordSearch = payload
+    },
   },
   getters: {
     groupIdSite (state) {
@@ -5954,5 +5977,8 @@ export const store = new Vuex.Store({
     getIsMobile (state) {
       return state.isMobile
     },
+    getKeywordSearch (state) {
+      return state.keywordSearch
+    }
   }
 })

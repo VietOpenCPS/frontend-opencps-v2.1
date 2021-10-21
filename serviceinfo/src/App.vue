@@ -215,6 +215,10 @@
     created () {
       var vm = this
       try {
+        vm.groupDonViCapXa = groupDonViCapXa
+      } catch (error) {
+      }
+      try {
         vm.hasCoQuanThucHien = hasCoQuanThucHien
       } catch (error) {
         vm.hasCoQuanThucHien = false
@@ -625,6 +629,15 @@
         vm.currentMethod = newQuery.hasOwnProperty('level') && String(newQuery.level) === '2' ? 'MC' : newQuery.hasOwnProperty('level') && String(newQuery.level === '3,4') ? 'DVC' : ''
         vm.activeAll = newQuery.hasOwnProperty('all') && newQuery['all']
         vm.getCountAll()
+        // 
+        if (vm.groupDonViCapXa) {
+          vm.$store.dispatch('getDictFromParent', {}).then(function (result) {
+            vm.reportGroupList = result.filter(function(item) {
+              return item.parentItem
+            })
+            console.log('reportGroupList', vm.reportGroupList)
+          })
+        }
         // 
         if (window.themeDisplay.isSignedIn()) {
           axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {

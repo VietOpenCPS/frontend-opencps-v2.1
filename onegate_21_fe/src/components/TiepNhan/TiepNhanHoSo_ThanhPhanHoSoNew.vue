@@ -1191,15 +1191,22 @@ export default {
               template['passRequired'] = true
             }
           })
-          var itemFind = dossierFiles.find(file => {
+          var itemFindEfom = dossierFiles.find(file => {
             return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && file.eForm && !file.removed && file.fileSize !== 0
           })
-          if (itemFind) {
+          var itemFindEfomAttack = dossierFiles.find(file => {
+            return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && !file.eForm && !file.removed && file.fileSize !== 0
+          })
+          if (itemFindEfom) {
             template['daKhai'] = true
             template['hasForm'] = true
-            template['referenceUid'] = itemFind['referenceUid']
+            template['referenceUid'] = itemFindEfom['referenceUid']
           } else {
-            template['passRequired'] = false
+            if (vm.requiredEform && itemFindEfomAttack && template['multiple']) {
+              template['passRequired'] = true
+            } else {
+              template['passRequired'] = false
+            }
           }
         })
       } else {
@@ -1541,7 +1548,7 @@ export default {
             vm.dossierFilesItems = result
             vm.recountFileTemplates()
           })
-          if (vm.dossierTemplateItemsFilter[index]['hasForm'] && vm.requiredEform) {
+          if (vm.dossierTemplateItemsFilter[index]['hasForm'] && vm.requiredEform && !vm.dossierTemplateItemsFilter[index]['multiple']) {
             return
           }
           vm.dossierTemplateItemsFilter[index]['passRequired'] = true
@@ -1551,7 +1558,7 @@ export default {
             vm.dossierFilesItems = result
             vm.recountFileTemplates()
           })
-          if (vm.dossierTemplateItemsFilter[index]['hasForm'] && vm.requiredEform) {
+          if (vm.dossierTemplateItemsFilter[index]['hasForm'] && vm.requiredEform && !vm.dossierTemplateItemsFilter[index]['multiple']) {
             return
           }
           if (data.length > 0) {
@@ -1739,7 +1746,7 @@ export default {
                 } else {
                   vm.dossierTemplateItemsFilter[index]['passRequired'] = false
                 }
-                if (vm.dossierTemplateItemsFilter[index]['hasForm'] && vm.requiredEform) {
+                if (vm.dossierTemplateItemsFilter[index]['hasForm'] && vm.requiredEform && !vm.dossierTemplateItemsFilter[index]['multiple']) {
                   vm.dossierTemplateItemsFilter[index]['passRequired'] = false
                 }
               })
@@ -2358,7 +2365,7 @@ export default {
       let hasFile = vm.dossierFilesApplicant.find(file => {
         return file.partNo === partNo
       })
-      console.log('hasFile', hasFile)
+      // console.log('hasFile', hasFile)
       if (hasFile && hasFile.hasOwnProperty('applicantDataModels') && hasFile.applicantDataModels) {
         let fileArr = Array.isArray(hasFile.applicantDataModels) ? hasFile.applicantDataModels : [hasFile.applicantDataModels]
         console.log('fileArrApplicant', fileArr)

@@ -112,9 +112,11 @@ export const store = new Vuex.Store({
             },
             params: {
               govAgencyCode: data.govAgencyCode,
-              fromDate: data.fromReceiveDate ? data.fromReceiveDate : '',
-              toDate: data.toReceiveDate ? data.toReceiveDate : '',
-              type: 23
+              // fromDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+              // toDate: data.toReceiveDate ? data.toReceiveDate : '',
+              type: 23,
+              month: 0,
+              year: (new Date()).getFullYear()
             }
           }
           axios.get(state.endPointApi + '/postal/vote/survey/statistic', param).then(result => {
