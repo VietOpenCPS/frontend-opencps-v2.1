@@ -265,8 +265,8 @@ export const store = new Vuex.Store({
         
         axios.post(url, dataPutUser, param).then(result1 => {
           resolve(result1)
-        }).catch(xhr => {
-          reject(xhr)
+        }).catch(err => {
+          reject(err.response)
         })
       })
     },
@@ -294,8 +294,8 @@ export const store = new Vuex.Store({
         dataPutUser.append('applicantIdDate', filter['applicantIdDate'])
         axios.put(url, dataPutUser, param).then(result1 => {
           resolve(result1)
-        }).catch(xhr => {
-          reject(xhr)
+        }).catch(err => {
+          reject(err.response)
         })
       })
     },

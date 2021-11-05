@@ -131,6 +131,12 @@
             <!--  -->
             <div v-if="isBank" class="ml-0 mt-2 px-2 py-1" style="border: 1px solid #004b9485;border-radius: 3px;">
               <div>
+                <v-card-text class="px-0 pb-1 pt-0" v-if="paymentProfile.hasOwnProperty('tkThuHuong')">
+                  <div>
+                    <p><span class="text-bold mr-3">Tên tài khoản thụ hưởng: </span><span>{{paymentProfile.tenTKThuHuong}}</span></p>
+                    <p><span class="text-bold mr-4">Số tài khoản thụ hưởng: </span><span>{{paymentProfile.tkThuHuong}}</span></p>
+                  </div>
+                </v-card-text>
                 <input type="file" id="paymentFile1" @change="uploadPaymentFile($event)" style="display:none">
                 <span class="text-bold" style="color: #004b94!important">Tải lên file báo thanh toán chuyển khoản (Định dạng: .png, .jpg, .jpeg)</span>
                 <v-progress-circular

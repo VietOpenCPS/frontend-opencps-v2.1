@@ -587,10 +587,16 @@ export default {
               vm.applicantLists = result['data']
             }).catch(function () {
             })
-          }).catch(function () {
+          }).catch(function (err) {
+            console.log('err', err)
             vm.loading = false
             toastr.clear()
-            toastr.error('Yêu cầu thực hiện thất bại')
+            if (err.description && String(err.description).indexOf('DuplicateApplicantIdException') >= 0) {
+              toastr.error('Yêu cầu thực hiện thất bại')
+            } else {
+              toastr.error('Số CMND/ CCCD/ MST đã tồn tại trên hệ thống')
+            }
+            
           })
         } else {
           vm.$store.dispatch('addUser', vm.applicantEdit).then(function () {
@@ -603,10 +609,15 @@ export default {
               vm.applicantLists = result['data']
             }).catch(function () {
             })
-          }).catch(function () {
+          }).catch(function (err) {
+            console.log('err', err)
             vm.loading = false
             toastr.clear()
-            toastr.error('Yêu cầu thực hiện thất bại')
+            if (err.description && String(err.description).indexOf('DuplicateApplicantIdException') >= 0) {
+              toastr.error('Yêu cầu thực hiện thất bại')
+            } else {
+              toastr.error('Số CMND/ CCCD/ MST đã tồn tại trên hệ thống')
+            }
           })
         }
       }

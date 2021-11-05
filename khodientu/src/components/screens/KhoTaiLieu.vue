@@ -162,6 +162,38 @@
         <v-card-text class="py-1 px-0">
           <v-form ref="form" v-model="valid" lazy-validation class="px-0 grid-list">
             <v-layout row wrap class="px-0 py-3">
+              <!-- <v-flex xs12 md6 class="px-0 pr-3">
+                <v-autocomplete
+                  :items="serviceInfoList"
+                  v-model="serviceInfoCreate"
+                  label="Chọn thủ tục hành chính"
+                  item-text="serviceName"
+                  item-value="serviceCode"
+                  return-object
+                  :hide-selected="true"
+                  box
+                  :rules="[v => !!v || 'Thủ tục là bắt buộc']"
+                  required
+                  @change="changeService"
+                  clearable
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 md6 class="px-0">
+                <v-autocomplete
+                  :items="optionList"
+                  v-model="optionCreate"
+                  label="Chọn trường hợp"
+                  item-text="optionName"
+                  item-value="templateNo"
+                  return-object
+                  :hide-selected="true"
+                  box
+                  :rules="[v => !!v || 'Trường hợp là bắt buộc']"
+                  required
+                  @change="changeOption"
+                  clearable
+                ></v-autocomplete>
+              </v-flex> -->
               <v-flex xs12 class="pr-0 pl-0">
                 <v-autocomplete
                   :items="fileTemplateList"
@@ -203,6 +235,8 @@
                   placeholder="dd/mm/yyyy, ddmmyyyy"
                   @blur="formatDate"
                   box
+                  :rules="[v => !!v || 'Ngày cấp là bắt buộc']"
+                  required
                   clearable
                 ></v-text-field>
               </v-flex>
@@ -225,8 +259,6 @@
                   item-value="value"
                   :hide-selected="true"
                   box
-                  :rules="[v => v !== '' && v !== null || 'Tình trạng là bắt buộc']"
-                  required
                 ></v-autocomplete>
               </v-flex>
               
@@ -235,6 +267,8 @@
                   label="Đơn vị cấp"
                   v-model="govAgencyCreate"
                   box
+                  :rules="[v => !!v || 'Đơn vị cấp là bắt buộc']"
+                  required
                   clearable
                 ></v-text-field>
               </v-flex>
@@ -354,7 +388,7 @@
       expireDate: '',
       showDetail: false,
       fileTemplateList: [],
-      statusCreate: '',
+      statusCreate: 1,
       fileTemplateNoCreate: '',
       fileName: '',
       fileNo: '',
@@ -752,17 +786,17 @@
         vm.typeCreate = 'create'
         vm.pathNameFileESign = ''
         vm.fileNameView = ''
-        vm.statusCreate = ''
         vm.fileName = ''
         vm.fileNo = ''
         vm.updateFile = false
         setTimeout(function () {
-          vm.$refs.form.reset()
+          // vm.$refs.form.reset()
           vm.$refs.form.resetValidation()
           if (vm.showApplicantInfo) {
             vm.applicantIdNoCreate = vm.applicantInfos.applicantIdNo
             vm.applicantNameCreate = vm.applicantInfos.applicantName
           }
+          vm.statusCreate = 1
         }, 200)
       },
       createDocument () {
@@ -800,6 +834,8 @@
               dataCreateFile.append('file', vm.fileUpdate)
               dataCreateFile.append('issueDate', vm.createDate)
               dataCreateFile.append('expireDate', vm.expireDate)
+              dataCreateFile.append('serviceCode', '')
+              dataCreateFile.append('templateNo', '')
               dataCreateFile.append('desciption', '')
               
               axios.post(url, dataCreateFile, param).then(result1 => {
@@ -848,6 +884,8 @@
             dataCreateFile.append('fileEntryId', vm.fileEntryESign)
             dataCreateFile.append('issueDate', vm.createDate)
             dataCreateFile.append('expireDate', vm.expireDate)
+            dataCreateFile.append('serviceCode', '')
+            dataCreateFile.append('templateNo', '')
             dataCreateFile.append('desciption', '')
             dataCreateFile.append('file', '')
                 
@@ -901,6 +939,8 @@
             dataPost.append('govAgencyName', vm.govAgencyCreate)
             dataPost.append('issueDate', vm.createDate)
             dataPost.append('expireDate', vm.expireDate)
+            dataPost.append('serviceCode', '')
+            dataPost.append('templateNo', '')
             dataPost.append('desciption', '')
             
             if (vm.updateFile) {
@@ -948,6 +988,8 @@
           dataPost.append('govAgencyName', vm.govAgencyCreate)
           dataPost.append('issueDate', vm.createDate)
           dataPost.append('expireDate', vm.expireDate)
+          dataPost.append('serviceCode', '')
+          dataPost.append('templateNo', '')
           dataPost.append('desciption', '')
           dataPost.append('file', '')
           axios.put(url, dataPost, param).then(result1 => {

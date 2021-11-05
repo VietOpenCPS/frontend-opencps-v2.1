@@ -860,7 +860,8 @@ export default {
     showGuiHoSo: false,
     showCounterFee: false,
     rememberApplicant: false,
-    sourcePaymentFee: {}
+    sourcePaymentFee: {},
+    urlHistoryUpdateDvc: ''
   }),
   computed: {
     loading () {
@@ -917,6 +918,10 @@ export default {
     try {
       // lưu trữ thông tin applicant khi Tiếp nhận và thêm mới
       vm.rememberApplicant = rememberApplicant
+    } catch (error) {
+    }
+    try {
+      vm.urlHistoryUpdateDvc = urlHistoryUpdateDvc
     } catch (error) {
     }
     vm.$nextTick(function () {
@@ -1344,7 +1349,11 @@ export default {
                 // cập nhật notify config
                 vm.updateMetaData()
                 vm.loadingAction = false
-                window.history.back()
+                if (vm.urlHistoryUpdateDvc) {
+                  window.location.href = vm.urlHistoryUpdateDvc + '/' + vm.dossierId
+                } else {
+                  window.history.back()
+                }
                 // vm.goBack()
               } else {
                 var initData = vm.$store.getters.loadingInitData

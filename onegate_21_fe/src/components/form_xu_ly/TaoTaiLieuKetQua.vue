@@ -8,7 +8,7 @@
           </div> Kết quả xử lý
           <v-btn style="position: absolute;right: 55px;bottom: 2px;" :readonly="loadingHsm" :disabled="loadingHsm" class="mr-2" color="primary" v-if="esignType === 'hsm' || esignType === 'pluginAndHSM'" @click.stop="kySoHsmAll">
             <v-icon size="22" color="white">drive_file_rename_outline</v-icon> &nbsp;
-            Ký duyệt tất cả giấy tờ
+            Đóng dấu tất cả giấy tờ
           </v-btn>
         </div>
         <v-card>
@@ -1530,7 +1530,7 @@
         })
         console.log('fileSign55555', fileKs)
         if (fileKs.length) {
-          let x = confirm('Bạn có chắc chắn thực hiện ký duyệt tất cả giấy tờ?')
+          let x = confirm('Bạn có chắc chắn thực hiện đóng dấu tất cả giấy tờ?')
           if (x) {
             let arrIds = fileKs.map(function(item) {
               return item['dossierFileId']

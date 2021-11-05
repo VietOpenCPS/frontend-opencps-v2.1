@@ -55,12 +55,39 @@
           </v-layout>
         </v-card-text>
         <v-layout wrap class="mt-0">
-          <v-flex xs12 sm6 class="px-0 pr-2">
+          <v-flex xs12 md6 class="px-0 pr-3">
             <v-autocomplete
-              :items="fileTemplateList"
+              :items="serviceInfoList"
+              v-model="serviceInfoSearch"
+              label="Chọn thủ tục hành chính"
+              item-text="serviceName"
+              item-value="serviceCode"
+              return-object
+              :hide-selected="true"
+              box
+              @change="changeService('search')"
+              clearable
+            ></v-autocomplete>
+          </v-flex>
+          <v-flex xs12 md6 class="px-0">
+            <v-autocomplete
+              :items="optionListSearch"
+              v-model="optionSearch"
+              label="Chọn trường hợp"
+              item-text="optionName"
+              item-value="templateNo"
+              return-object
+              :hide-selected="true"
+              box
+              clearable
+            ></v-autocomplete>
+          </v-flex>
+          <v-flex xs12 sm6 class="px-0 pr-3">
+            <v-autocomplete
+              :items="fileTemplateListSeach"
               v-model="fileTemplateNo"
               label="Chọn loại giấy tờ"
-              item-text="name"
+              item-text="partName"
               item-value="fileTemplateNo"
               :hide-selected="true"
               clearable
@@ -76,12 +103,11 @@
               item-text="text"
               item-value="value"
               :hide-selected="true"
-              clearable
               @change="changeFilterSearch"
               box
             ></v-autocomplete>
           </v-flex>
-          <v-flex xs12 sm6 class="px-0 pr-2">
+          <v-flex xs12 sm6 class="px-0 pr-3">
             <v-text-field
               label="Tìm theo tên giấy tờ"
               v-model="keySearch"
@@ -208,12 +234,40 @@
       <v-card-text class="py-1 px-0" v-else>
         <v-form ref="form" v-model="valid" lazy-validation class="px-0 grid-list">
           <v-layout row wrap class="px-0 py-3">
+            <v-flex xs12 md6 class="px-0 pr-3">
+              <v-autocomplete
+                :items="serviceInfoList"
+                v-model="serviceInfoCreate"
+                label="Chọn thủ tục hành chính"
+                item-text="serviceName"
+                item-value="serviceCode"
+                return-object
+                :hide-selected="true"
+                box
+                @change="changeService('create')"
+                clearable
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 md6 class="px-0">
+              <v-autocomplete
+                :items="optionList"
+                v-model="optionCreate"
+                label="Chọn trường hợp"
+                item-text="optionName"
+                item-value="templateNo"
+                return-object
+                :hide-selected="true"
+                box
+                @change="changeOption"
+                clearable
+              ></v-autocomplete>
+            </v-flex>
             <v-flex xs12 class="px-0">
               <v-autocomplete
                 :items="fileTemplateList"
                 v-model="fileTemplateNoCreate"
-                label="Loại giấy tờ"
-                item-text="name"
+                label="Chọn loại giấy tờ"
+                item-text="partName"
                 item-value="fileTemplateNo"
                 return-object
                 :hide-selected="true"
@@ -410,10 +464,18 @@ export default {
       {text: 'Hết hiệu lực', value: 2},
       {text: 'Hủy', value: 3}
     ],
-    status: '',
+    status: 1,
     statusCreate: '',
+    serviceInfoList: [],
+    serviceInfoCreate: '',
+    serviceInfoSearch: '',
+    optionList: [],
+    optionListSearch: [],
+    optionSearch: '',
+    optionCreate: '',
     fileTemplateNoCreate: '',
     fileTemplateList: [],
+    fileTemplateListSeach: [],
     fileTemplateNo: '',
     fileName: '',
     fileNo: '',
@@ -502,7 +564,8 @@ export default {
       } else {
         vm.getApplicantList()
       }
-      vm.getFileItems()
+      vm.getServiceInfoItems()
+      // vm.getFileItems()
     })
   },
   mounted () {
@@ -511,7 +574,7 @@ export default {
     fileTemplateNoCreate (val) {
       let vm = this
       if (val && vm.typeCreate === 'create') {
-        vm.fileName = val.name
+        vm.fileName = val.partName
       }
     }
   },
@@ -685,13 +748,107 @@ export default {
       }
       
     },
+    getServiceInfoItems () {
+      let vm = this
+      let filter = {
+      }
+      vm.$store.dispatch('getServiceInfoItems', filter).then(function (result) {
+        if (result.hasOwnProperty('data')) {
+          vm.serviceInfoList = result.data
+        } else {
+          vm.serviceInfoList = []
+        }
+        vm.optionList = []
+        vm.optionCreate = ''
+        vm.fileTemplateList = []
+        vm.fileTemplateNoCreate = ''
+      }).catch(function () {
+      })
+    },
+    changeService (type) {
+      let vm = this
+      setTimeout(function () {
+        if (type === 'create') {
+          if (vm.serviceInfoCreate) {
+            vm.optionList = vm.serviceInfoCreate.options
+          } else {
+            vm.optionList = []
+          }
+          vm.optionCreate = ''
+          vm.fileTemplateList = []
+          vm.fileTemplateNoCreate = ''
+          if (vm.optionList && vm.optionList.length === 1) {
+            vm.optionCreate = vm.optionList[0]
+          }
+          // 
+          if (vm.optionCreate) {
+            let filter = {
+              dossierTemplateNo: vm.optionCreate.templateNo
+            }
+            vm.$store.dispatch('getDossierPart', filter).then(function (result) {
+              if (result.hasOwnProperty('dossierParts')) {
+                vm.fileTemplateList = result.dossierParts
+                vm.fileTemplateNoCreate = ''
+              } else {
+                vm.fileTemplateList = []
+              }
+              if (vm.fileTemplateList && vm.fileTemplateList.length === 1) {
+                vm.fileTemplateNoCreate = vm.fileTemplateList[0]
+              }
+            }).catch(function () {
+            })
+          } else {
+            vm.fileTemplateList = []
+            vm.fileTemplateNoCreate = ''
+          }
+        } else {
+          if (vm.serviceInfoSearch) {
+            vm.optionListSearch = vm.serviceInfoSearch.options
+          } else {
+            vm.optionListSearch = []
+          }
+          vm.optionSearch = ''
+          vm.fileTemplateListSeach = []
+          vm.fileTemplateNo = ''
+          if (vm.optionListSearch && vm.optionListSearch.length === 1) {
+            vm.optionSearch = vm.optionListSearch[0]
+          }
+          // 
+          if (vm.optionSearch) {
+            let filter = {
+              dossierTemplateNo: vm.optionSearch.templateNo
+            }
+            vm.$store.dispatch('getDossierPart', filter).then(function (result) {
+              if (result.hasOwnProperty('dossierParts')) {
+                vm.fileTemplateListSeach = result.dossierParts
+                vm.fileTemplateNo = ''
+              } else {
+                vm.fileTemplateListSeach = []
+              }
+              if (vm.fileTemplateListSeach && vm.fileTemplateListSeach.length === 1) {
+                vm.fileTemplateNo = vm.fileTemplateListSeach[0]
+              }
+            }).catch(function () {
+            })
+          } else {
+            vm.fileTemplateListSeach = []
+            vm.fileTemplateNo = ''
+          }
+        }
+      }, 200)
+    },
+    changeOption () {
+      let vm = this
+      setTimeout(function () {
+      }, 200)
+    },
     showCreatedocument () {
       let vm = this
       vm.showDetail = true
       vm.typeCreate = 'create'
       vm.pathNameFileESign = ''
       vm.fileNameView = ''
-      vm.statusCreate = ''
+      vm.statusCreate = 1
       vm.fileName = ''
       vm.fileNo = ''
       vm.applicantIdNoCreate = vm.applicantInfos.applicantIdNo
@@ -714,7 +871,7 @@ export default {
             vm.loadingAction = true
             let filter = {
               fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
-              status: vm.statusCreate ? vm.statusCreate : 0,
+              status: vm.statusCreate ? vm.statusCreate : 1,
               fileNo: vm.fileNo,
               fileName: vm.fileName,
               applicantIdNo: vm.applicantInfos.applicantIdNo,
@@ -730,7 +887,7 @@ export default {
             let dataCreateFile = new FormData()
             let url = '/o/rest/v2/applicantdatas'
             dataCreateFile.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-            dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 0)
+            dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 1)
             dataCreateFile.append('fileNo', vm.fileNo)
             dataCreateFile.append('fileName', vm.fileName)
             dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
@@ -740,6 +897,8 @@ export default {
             dataCreateFile.append('issueDate', vm.createDate)
             dataCreateFile.append('expireDate', vm.expireDate)
             dataCreateFile.append('desciption', '')
+            dataCreateFile.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
+            dataCreateFile.append('templateNo', vm.optionCreate['templateNo'])
             
             axios.post(url, dataCreateFile, param).then(result1 => {
               vm.loadingAction = false
@@ -770,7 +929,7 @@ export default {
           vm.loadingAction = true
           let filter = {
             fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
-            status: vm.statusCreate ? vm.statusCreate : 0,
+            status: vm.statusCreate ? vm.statusCreate : 1,
             fileNo: vm.fileNo,
             fileName: vm.fileName,
             applicantIdNo: vm.applicantInfos.applicantIdNo,
@@ -785,7 +944,7 @@ export default {
           let dataCreateFile = new FormData()
           let url = '/o/rest/v2/applicantdatas'
           dataCreateFile.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-          dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 0)
+          dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 1)
           dataCreateFile.append('fileNo', vm.fileNo)
           dataCreateFile.append('fileName', vm.fileName)
           dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
@@ -795,6 +954,8 @@ export default {
           dataCreateFile.append('issueDate', vm.createDate)
           dataCreateFile.append('expireDate', vm.expireDate)
           dataCreateFile.append('desciption', '')
+          dataCreateFile.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
+          dataCreateFile.append('templateNo', vm.optionCreate['templateNo'])
           
           axios.post(url, dataCreateFile, param).then(result1 => {
             vm.loadingAction = false
@@ -831,7 +992,7 @@ export default {
           vm.loadingAction = true
           let filter = {
             fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
-            status: vm.statusCreate ? vm.statusCreate : 0,
+            status: vm.statusCreate ? vm.statusCreate : 1,
             fileNo: vm.fileNo,
             fileName: vm.fileName,
             applicantIdNo: vm.applicantInfos.applicantIdNo
@@ -847,7 +1008,7 @@ export default {
           let dataPost = new FormData()
           let url = '/o/rest/v2/applicantdatas/' + vm.documentSelect.applicantDataId
           dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-          dataPost.append('status', vm.statusCreate ? vm.statusCreate : 0)
+          dataPost.append('status', vm.statusCreate ? vm.statusCreate : 1)
           dataPost.append('fileNo', vm.fileNo)
           dataPost.append('fileName', vm.fileName)
           dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
@@ -856,6 +1017,8 @@ export default {
           dataPost.append('issueDate', vm.createDate)
           dataPost.append('expireDate', vm.expireDate)
           dataPost.append('desciption', '')
+          dataPost.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
+          dataPost.append('templateNo', vm.optionCreate['templateNo'])
           if (vm.updateFile) {
             dataPost.append('file', vm.fileUpdate)
           } else {
@@ -885,7 +1048,7 @@ export default {
         vm.loadingAction = true
         let filter = {
           fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
-          status: vm.statusCreate ? vm.statusCreate : 0,
+          status: vm.statusCreate ? vm.statusCreate : 1,
           fileNo: vm.fileNo,
           fileName: vm.fileName,
           applicantIdNo: vm.applicantInfos.applicantIdNo
@@ -900,7 +1063,7 @@ export default {
         let dataPost = new FormData()
         let url = '/o/rest/v2/applicantdatas/' + vm.documentSelect.applicantDataId
         dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-        dataPost.append('status', vm.statusCreate ? vm.statusCreate : 0)
+        dataPost.append('status', vm.statusCreate ? vm.statusCreate : 1)
         dataPost.append('fileNo', vm.fileNo)
         dataPost.append('fileName', vm.fileName)
         dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
@@ -910,6 +1073,8 @@ export default {
         dataPost.append('issueDate', '')
         dataPost.append('expireDate', '')
         dataPost.append('desciption', '')
+        dataPost.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
+        dataPost.append('templateNo', vm.optionCreate['templateNo'])
 
         axios.put(url, dataPost, param).then(result1 => {
           vm.loadingAction = false
@@ -989,7 +1154,13 @@ export default {
       )
       vm.documentSelect = item
       vm.typeCreate = 'update'
-      vm.fileNameView = item.fileName
+      vm.fileNameView = item.fileEntryId ? item.fileName : ''
+      if (!vm.fileTemplateList || vm.fileTemplateList.length == 0) {
+        vm.fileTemplateList = [{
+          partName: item.fileName,
+          fileTemplateNo: item.fileTemplateNo
+        }]
+      }
       vm.fileTemplateNoCreate = vm.fileTemplateList.filter(function (items) {
         return items.fileTemplateNo === item.fileTemplateNo
       })[0]

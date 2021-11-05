@@ -91,6 +91,8 @@
               <v-flex xs12 sm3 class="pt-1" v-if="showCounterFee">
                 <v-text-field
                   @keyup="changeFee"
+                  @change="changeFee"
+                  @input="changeFee"
                   v-model="data_payment.counter"
                   type="number"
                   v-if="data_payment.editable === 2 || data_payment.editable === 3"

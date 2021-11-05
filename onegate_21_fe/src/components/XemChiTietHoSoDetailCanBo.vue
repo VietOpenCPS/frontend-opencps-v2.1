@@ -1087,6 +1087,7 @@ export default {
     itemAction: '',
     hasDownloadAllFile: false,
     sendInvoice: false,
+    removeInvoice: false,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -1833,9 +1834,16 @@ export default {
         if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' && result.preCondition.indexOf('sendInvoiceVNPT=1') >= 0) {
           vm.sendInvoice = true
         }
+        if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' && result.preCondition.indexOf('destroyInvoiceVNPT=1') >= 0) {
+          vm.removeInvoice = true
+        } else {
+          vm.removeInvoice = false
+        }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
-          if (vm.originality == '1' && (result.payment.requestPayment == 3 || result.payment.requestPayment == 5) && vm.paymentDetail && vm.paymentDetail['paymentStatus'] != 3 && vm.paymentDetail['paymentStatus'] != 5) {
+          // nghiepvuhanghai
+          // if (vm.originality == '1' && (result.payment.requestPayment == 3 || result.payment.requestPayment == 5) && vm.paymentDetail && vm.paymentDetail['paymentStatus'] != 3 && vm.paymentDetail['paymentStatus'] != 5) {
+          if (vm.originality == '1' && (result.payment.requestPayment == 3 || result.payment.requestPayment == 5)) {
             isPopup = true
             vm.showThanhToanDienTu = true
             let filter = {
@@ -2631,58 +2639,75 @@ export default {
               if (filter['toUsers'] && filter['toUsers'].filter(function (item) {
                 return Number(item.assigned) > 0
               }).length > 0 ) {
-                vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-                  vm.getDetailDossier()
-                  if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
-                    vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
-                    })
-                  }
-                  if (filter['payment']) {
-                    vm.loadThanhToan()
-                  }
-                  vm.loadingAction = false
-                  vm.dialogActionProcess = false
-                  vm.loadingActionProcess = false
-                  vm.alertObj = {
-                    icon: 'check_circle',
-                    color: 'success',
-                    message: 'Thực hiện thành công!'
-                  }
-                  vm.btnStateVisible = false
-                  if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
-                    vm.rollbackable = result.rollbackable
-                  }
-                  if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
-                    vm.printDocument = true
-                  }
-                  if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
-                    vm.printInvoicefilePayment = true
-                    vm.printPay()
-                  }
-                  if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
-                    vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
-                  }
-                  vm.checkInput = 0
-                  vm.$store.commit('setCheckInput', 0)
-                  if (String(item.form) === 'ACTIONS') {
-                  } else {
-                    try {
-                      currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
-                      currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
-                    } catch (error) {
+                // A15
+                let callBack = function () {
+                  vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                    vm.getDetailDossier()
+                    if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
+                      vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+                      })
                     }
-                    vm.$router.push({
-                      path: vm.$router.history.current.path,
-                      query: currentQuery
-                    })
+                    if (filter['payment']) {
+                      vm.loadThanhToan()
+                    }
+                    vm.loadingAction = false
+                    vm.dialogActionProcess = false
+                    vm.loadingActionProcess = false
+                    vm.alertObj = {
+                      icon: 'check_circle',
+                      color: 'success',
+                      message: 'Thực hiện thành công!'
+                    }
+                    vm.btnStateVisible = false
+                    if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                      vm.rollbackable = result.rollbackable
+                    }
+                    if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                      vm.printDocument = true
+                    }
+                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                      vm.printInvoicefilePayment = true
+                      vm.printPay()
+                    }
+                    if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                      vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+                    }
+                    vm.checkInput = 0
+                    vm.$store.commit('setCheckInput', 0)
+                    if (String(item.form) === 'ACTIONS') {
+                    } else {
+                      try {
+                        currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                        currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                      } catch (error) {
+                      }
+                      vm.$router.push({
+                        path: vm.$router.history.current.path,
+                        query: currentQuery
+                      })
+                    }
+                    $('html, body').animate({
+                      scrollTop: 0
+                    }, 500, 'linear')
+                  }).catch(function (reject) {
+                    vm.loadingAction = false
+                    vm.loadingActionProcess = false
+                  })
+                }
+                if (vm.removeInvoice) {
+                  let filterDel = {
+                    dossierId: vm.thongTinChiTietHoSo['dossierId']
                   }
-                  $('html, body').animate({
-                    scrollTop: 0
-                  }, 500, 'linear')
-                }).catch(function (reject) {
-                  vm.loadingAction = false
-                  vm.loadingActionProcess = false
-                })
+                  vm.$store.dispatch('deleleBienLai', filterDel).then(function (result) {
+                    callBack()
+                  }).catch(function () {
+                    vm.loadingAction = false
+                    vm.loadingActionProcess = false
+                  })
+                } else {
+                  callBack()
+                }
+                
               } else {
                 toastr.success('Yêu cầu thực hiện thành công')
                 setTimeout (function () {
@@ -2816,58 +2841,74 @@ export default {
                   }
                 }
               } else {
-                vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-                  vm.getDetailDossier()
-                  if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
-                    vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
-                    })
-                  }
-                  if (filter['payment']) {
-                    vm.loadThanhToan()
-                  }
-                  vm.loadingAction = false
-                  vm.dialogActionProcess = false
-                  vm.loadingActionProcess = false
-                  vm.alertObj = {
-                    icon: 'check_circle',
-                    color: 'success',
-                    message: 'Thực hiện thành công!'
-                  }
-                  vm.btnStateVisible = false
-                  if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
-                    vm.rollbackable = result.rollbackable
-                  }
-                  if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
-                    vm.printDocument = true
-                  }
-                  if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
-                    vm.printInvoicefilePayment = true
-                    vm.printPay()
-                  }
-                  if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
-                    vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
-                  }
-                  vm.checkInput = 0
-                  vm.$store.commit('setCheckInput', 0)
-                  if (String(item.form) === 'ACTIONS') {
-                  } else {
-                    try {
-                      currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
-                      currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
-                    } catch (error) {
+                // A15
+                let callBackAction = function () {
+                  vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                    vm.getDetailDossier()
+                    if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
+                      vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+                      })
                     }
-                    vm.$router.push({
-                      path: vm.$router.history.current.path,
-                      query: currentQuery
-                    })
+                    if (filter['payment']) {
+                      vm.loadThanhToan()
+                    }
+                    vm.loadingAction = false
+                    vm.dialogActionProcess = false
+                    vm.loadingActionProcess = false
+                    vm.alertObj = {
+                      icon: 'check_circle',
+                      color: 'success',
+                      message: 'Thực hiện thành công!'
+                    }
+                    vm.btnStateVisible = false
+                    if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                      vm.rollbackable = result.rollbackable
+                    }
+                    if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                      vm.printDocument = true
+                    }
+                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                      vm.printInvoicefilePayment = true
+                      vm.printPay()
+                    }
+                    if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                      vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+                    }
+                    vm.checkInput = 0
+                    vm.$store.commit('setCheckInput', 0)
+                    if (String(item.form) === 'ACTIONS') {
+                    } else {
+                      try {
+                        currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                        currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                      } catch (error) {
+                      }
+                      vm.$router.push({
+                        path: vm.$router.history.current.path,
+                        query: currentQuery
+                      })
+                    }
+                    $('html, body').animate({
+                      scrollTop: 0
+                    }, 500, 'linear')
+                  }).catch(function (reject) {
+                    vm.loadingAction = false
+                    vm.loadingActionProcess = false
+                  })
+                }
+                if (vm.removeInvoice) {
+                  let filterDel = {
+                    dossierId: vm.thongTinChiTietHoSo['dossierId']
                   }
-                  $('html, body').animate({
-                    scrollTop: 0
-                  }, 500, 'linear')
-                }).catch(function (reject) {
-                  vm.loadingAction = false
-                  vm.loadingActionProcess = false
-                })
+                  vm.$store.dispatch('deleleBienLai', filterDel).then(function (result) {
+                    callBackAction()
+                  }).catch(function () {
+                    vm.loadingAction = false
+                    vm.loadingActionProcess = false
+                  })
+                } else {
+                  callBackAction()
+                }
               }
             }
             // 
@@ -2940,7 +2981,19 @@ export default {
                   dossierFiles: ''
                 }
                 vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
-                  doAction()
+                  if (vm.removeInvoice) {
+                    let filterDel = {
+                      dossierId: vm.thongTinChiTietHoSo['dossierId']
+                    }
+                    vm.$store.dispatch('deleleBienLai', filterDel).then(function (result) {
+                      doAction()
+                    }).catch(function () {
+                      vm.loadingAction = false
+                      vm.loadingActionProcess = false
+                    })
+                  } else {
+                    doAction()
+                  }
                 }).catch(function () {
                   toastr.error('Cập nhật tài liệu kết quả thất bại')
                   vm.loadingAction = false
@@ -3554,6 +3607,20 @@ export default {
         })
       }
       
+    },
+    deleteBienLai () {
+      let vm = this
+      let filter = {
+        dossierId: vm.thongTinChiTietHoSo.dossierId,
+        referenceUid: vm.thongTinChiTietHoSo.referenceUid
+      }
+      vm.loadingActionProcess = true
+      vm.$store.dispatch('deleleBienLai', filter).then(function (result) {
+        toastr.success('Hủy biên lai thành công')
+        vm.loadingActionProcess = false
+      }).catch(function(){
+        vm.loadingActionProcess = false
+      })
     },
     filterNextActionEnable (nextaction) {
       var isEnabale = false

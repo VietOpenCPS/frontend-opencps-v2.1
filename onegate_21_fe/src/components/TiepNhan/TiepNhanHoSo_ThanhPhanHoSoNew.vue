@@ -225,14 +225,14 @@
                         <v-icon color="white" v-else>save</v-icon>&nbsp;
                         Lưu lại
                       </v-btn>
-                      <v-btn color="primary" @click.stop="previewFormAlpaca(item, index)" v-if="item['editForm'] && item.daKhai && item.hasForm"
+                      <v-btn color="primary" @click.stop="previewFormAlpaca(item, index)" v-if="item['editForm'] && item.daKhai && item.hasForm && !item.embed"
                         :disabled="loadingApacal"
                       >
                         <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
                         <v-icon color="white" v-else>print</v-icon>&nbsp;
                         Xem
                       </v-btn>
-                      <v-btn color="primary" @click.stop="editFormAlpaca(item)" v-if="!item['editForm'] && item.hasForm && !onlyView">
+                      <v-btn color="primary" @click.stop="editFormAlpaca(item)" v-if="!item['editForm'] && item.hasForm && !onlyView && !item.embed">
                         <v-icon color="white">edit</v-icon>&nbsp;
                         Sửa
                       </v-btn>
@@ -342,12 +342,14 @@
               <v-tooltip top v-if="progressUploadPart !== item.partNo && item.hasForm">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item, 'viewform')">
                   <v-badge>
-                    <v-icon size="24" color="#004b94">edit</v-icon>
+                    <v-icon v-if="onlyView" size="24" color="#004b94">description</v-icon>
+                    <v-icon v-else size="24" color="#004b94">edit</v-icon>
                   </v-badge>
                 </v-btn>
-                <span>Xem bản khai</span>
+                <span v-if="onlyView">Xem bản khai</span>
+                <span v-else>Cập nhật bản khai</span>
               </v-tooltip>
-              <v-tooltip top v-if="progressUploadPart !== item.partNo && onlyView & item.hasForm">
+              <v-tooltip top v-if="progressUploadPart !== item.partNo && onlyView & item.hasForm && !nghiepvuhanghai">
                 <v-btn slot="activator" class="mx-1 my-0" fab dark small color="primary" @click="loadAlpcaFormClick(item)" style="height:25px;width:25px">
                   <v-icon style="font-size: 14px;">visibility</v-icon>
                 </v-btn>
@@ -390,7 +392,7 @@
                 </v-btn>
                 <span>Giấy tờ trong kho</span>
               </v-tooltip>
-              <v-tooltip class="pl-1 pt-1" top v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && checkSoHoa(item.partNo)">
+              <v-tooltip class="pl-1 pt-1" top v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && yeuCauSoHoa">
                 <v-btn :disabled="progress_sohoa" slot="activator" icon class="mx-0 my-0" @click="guiYeuCauSoHoa(item, index)">
                   <v-badge>
                     <v-icon size="20" color="#004b94">share</v-icon>
@@ -847,7 +849,9 @@ export default {
     indexFileSelect: '',
     fileEditor: '',
     statusApplicantData: '',
-    fileTemplateNoScope: ''
+    fileTemplateNoScope: '',
+    nghiepvuhanghai: false,
+    yeuCauSoHoa: false
   }),
   created () {
     let vm = this
@@ -869,6 +873,15 @@ export default {
     try {
       // check bắt buộc với tp eform
       vm.requiredEform = requiredEform
+    } catch (error) {
+    }
+    try {
+      // check bắt buộc với tp eform
+      vm.nghiepvuhanghai = nghiepvuhanghai
+    } catch (error) {
+    }
+    try {
+      vm.yeuCauSoHoa = yeuCauSoHoa
     } catch (error) {
     }
   },
@@ -1202,10 +1215,18 @@ export default {
             template['hasForm'] = true
             template['referenceUid'] = itemFindEfom['referenceUid']
           } else {
-            if (vm.requiredEform && itemFindEfomAttack && template['multiple']) {
-              template['passRequired'] = true
+            if (!vm.requiredEform) {
+              if (itemFindEfomAttack) {
+                template['passRequired'] = true
+              } else {
+                template['passRequired'] = false
+              }
             } else {
-              template['passRequired'] = false
+              if (itemFindEfomAttack && template['multiple']) {
+                template['passRequired'] = true
+              } else {
+                template['passRequired'] = false
+              }
             }
           }
         })
@@ -1468,11 +1489,11 @@ export default {
               // gen lại sau cập nhật
               vm.dossierTemplateItemsFilter[index].daKhai = true
               vm.showAlpacaJSFORM(vm.dossierTemplateItemsFilter[index])
+              vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+                vm.dossierFilesItems = resFiles
+              }).catch(reject => {
+              })
             }, 3000)
-            vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
-              vm.dossierFilesItems = resFiles
-            }).catch(reject => {
-            })
             
           }).catch(reject => {
             vm.loadingApacal = false
@@ -1494,12 +1515,12 @@ export default {
               // gen lại sau cập nhật
               console.log('dossierTemplateItemsFilter-1', vm.dossierTemplateItemsFilter[index])
               vm.showAlpacaJSFORM(vm.dossierTemplateItemsFilter[index])
+              vm.dossierTemplateItemsFilter[index]['passRequired'] = true
+              vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+                vm.dossierFilesItems = resFiles
+              }).catch(reject => {
+              })
             }, 3000)
-            vm.dossierTemplateItemsFilter[index]['passRequired'] = true
-            vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
-              vm.dossierFilesItems = resFiles
-            }).catch(reject => {
-            })
           }).catch(reject => {
             vm.loadingApacal = false
             toastr.clear()
@@ -2528,6 +2549,8 @@ export default {
 
       dataCreateFile.append('applicantName', vm.thongTinChuHoSo['applicantName'] ? vm.thongTinChuHoSo['applicantName'] : '')
       dataCreateFile.append('govAgencyName', vm.thongTinHoSo.govAgencyName)
+      dataCreateFile.append('serviceCode', vm.thongTinHoSo['serviceCode'])
+      dataCreateFile.append('templateNo', part.fileTemplateNo)
       dataCreateFile.append('issueDate', '')
       dataCreateFile.append('expireDate', '')
       dataCreateFile.append('desciption', '')

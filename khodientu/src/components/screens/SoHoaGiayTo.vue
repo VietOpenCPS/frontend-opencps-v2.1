@@ -192,8 +192,6 @@
                   item-value="value"
                   :hide-selected="true"
                   box
-                  :rules="[v => v !== '' && v !== null || 'Tình trạng là bắt buộc']"
-                  required
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-0 pr-0">
@@ -322,7 +320,7 @@
       expireDate: '',
       showDetail: false,
       fileTemplateList: [],
-      statusCreate: '',
+      statusCreate: 0,
       fileTemplateNoCreate: '',
       fileName: '',
       fileNo: '',
@@ -663,12 +661,12 @@
         vm.typeCreate = 'create'
         vm.pathNameFileESign = ''
         vm.fileNameView = ''
-        vm.statusCreate = 0
         vm.fileName = ''
         vm.fileNo = ''
         setTimeout(function () {
-          vm.$refs.form.reset()
+          // vm.$refs.form.reset()
           vm.$refs.form.resetValidation()
+          vm.statusCreate = 0
         }, 200)
       },
       createDocument () {
@@ -706,6 +704,8 @@
               dataCreateFile.append('govAgencyName', vm.govAgencyCreate)
               dataCreateFile.append('issueDate', vm.createDate)
               dataCreateFile.append('expireDate', vm.expireDate)
+              dataCreateFile.append('serviceCode', '')
+              dataCreateFile.append('templateNo', '')
               dataCreateFile.append('desciption', '')
               
               axios.post(url, dataCreateFile, param).then(result1 => {
@@ -754,6 +754,8 @@
             dataCreateFile.append('govAgencyName', vm.govAgencyCreate)
             dataCreateFile.append('issueDate', vm.createDate)
             dataCreateFile.append('expireDate', vm.expireDate)
+            dataCreateFile.append('serviceCode', '')
+            dataCreateFile.append('templateNo', '')
             dataCreateFile.append('desciption', '')
             dataCreateFile.append('file', '')
             
@@ -807,6 +809,8 @@
             dataPost.append('govAgencyName', vm.govAgencyCreate)
             dataPost.append('issueDate', vm.createDate)
             dataPost.append('expireDate', vm.expireDate)
+            dataPost.append('serviceCode', '')
+            dataPost.append('templateNo', '')
             dataPost.append('desciption', '')
             if (vm.updateFile) {
               dataPost.append('file', vm.fileUpdate)
@@ -852,6 +856,8 @@
           dataPost.append('govAgencyName', vm.govAgencyCreate)
           dataPost.append('issueDate', vm.createDate)
           dataPost.append('expireDate', vm.expireDate)
+          dataPost.append('serviceCode', '')
+          dataPost.append('templateNo', '')
           dataPost.append('desciption', '')
           dataPost.append('file', '')
           dataPost.append('fileEntryId', vm.fileEntryESign)
