@@ -114,6 +114,7 @@ export const store = new Vuex.Store({
               start: filter.start ? filter.start : 0,
               end: filter.end ? filter.end : 15,
               applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : '',
+              applicantName: filter.applicantName ? filter.applicantName : '',
               fileTemplateNo: filter.fileTemplateNo ? filter.fileTemplateNo : '',
               status: filter.status,
               keyword: filter.keywordSearch ? filter.keywordSearch : '',

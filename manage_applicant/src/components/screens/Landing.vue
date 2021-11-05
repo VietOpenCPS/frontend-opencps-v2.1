@@ -219,7 +219,10 @@
                 <v-text-field label="Số điện thoại" v-model="applicantEdit['contactTelNo']" box></v-text-field>
               </v-flex>
               <v-flex xs12 sm6>
-                <v-text-field label="Thư điện tử" v-model="applicantEdit['contactEmail']" box ></v-text-field>
+                <v-text-field label="Thư điện tử" v-model="applicantEdit['contactEmail']" box 
+                :rules="applicantEdit['contactEmail'] ? [rules.email] : []"
+                >
+                </v-text-field>
               </v-flex>
               <v-flex xs12 sm12>
                 <v-text-field label="Địa chỉ" v-model="applicantEdit['address']" box clearable></v-text-field>
@@ -350,7 +353,13 @@ export default {
     cityItems: [],
     districtItems: [],
     wardItems: [],
-    rolesUser: []
+    rolesUser: [],
+    rules: {
+      email: (value) => {
+        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
+      }
+    }
   }),
   computed: {
     

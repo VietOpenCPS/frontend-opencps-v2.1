@@ -277,9 +277,9 @@
                   label="Số cmnd/cccd, MST doanh nghiệp, tổ chức"
                   v-model="applicantIdNoCreate"
                   box
-                  clearable
                   :rules="[v => !!v || 'Thông tin bắt buộc']"
                   required
+                  :readonly="typeCreate === 'update'"
                 ></v-text-field>
               </v-flex> 
               <v-flex xs12 sm6 class="px-0 pr-0">
@@ -287,9 +287,9 @@
                   label="Chủ sở hữu"
                   v-model="applicantNameCreate"
                   box
-                  clearable
                   :rules="[v => !!v || 'Chủ sở hữu giấy tờ là bắt buộc']"
                   required
+                  :readonly="typeCreate === 'update'"
                 ></v-text-field>
               </v-flex>
               
@@ -936,6 +936,7 @@
             dataPost.append('fileNo', vm.fileNo)
             dataPost.append('fileName', vm.fileName)
             dataPost.append('applicantIdNo', vm.applicantIdNoCreate)
+            dataPost.append('applicantName', vm.applicantNameCreate)
             dataPost.append('govAgencyName', vm.govAgencyCreate)
             dataPost.append('issueDate', vm.createDate)
             dataPost.append('expireDate', vm.expireDate)

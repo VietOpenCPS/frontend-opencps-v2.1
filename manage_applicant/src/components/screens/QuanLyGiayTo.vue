@@ -1172,6 +1172,23 @@ export default {
       vm.createDate = item.issueDate ? item.issueDate : ''
       vm.expireDate = item.expireDate ? item.expireDate : ''
       vm.govAgencyCreate = item.govAgencyName ? item.govAgencyName : ''
+      try {
+        vm.serviceInfoCreate = vm.serviceInfoList.filter(function (items) {
+          return items.serviceCode === item.serviceCode
+        })[0]
+        if (vm.serviceInfoCreate) {
+          vm.optionList = vm.serviceInfoCreate.options
+        } else {
+          vm.optionList = []
+        }
+      } catch (error) {
+      }
+      try {
+        vm.optionCreate = vm.optionList.filter(function (items) {
+          return items.templateNo === item.templateNo
+        })[0]
+      } catch (error) {
+      }
       // vm.dialog_createDocument = true
       vm.showDetail = true
     },
