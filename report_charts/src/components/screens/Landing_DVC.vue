@@ -1097,6 +1097,7 @@ export default {
               let currentData = agencyListsTotal[key]
               if (!currentData.domainName) {
                 vm.itemTotal = currentData
+                vm.itemTotal['ontimePercentage'] = (((vm.itemTotal.betimesCount + vm.itemTotal.ontimeCount)/vm.itemTotal.releaseCount)*100).toFixed(0)
                 vm.showTableTotal = true
                 break
               }
@@ -1124,8 +1125,9 @@ export default {
             // 
             for (let key in agencyListsTotal) {
               let currentData = agencyListsTotal[key]
-              if (currentData.domainName === 'total') {
+              if (currentData.govAgencyName === 'total') {
                 vm.itemTotal = currentData
+                vm.itemTotal['ontimePercentage'] = (((vm.itemTotal.betimesCount + vm.itemTotal.ontimeCount)/vm.itemTotal.releaseCount)*100).toFixed(0)
                 vm.showTableTotal = true
                 break
               }
@@ -1186,7 +1188,7 @@ export default {
             let agencyListsTotal = result
             for (let key in agencyListsTotal) {
               let currentData = agencyListsTotal[key]
-              if (currentData.domainName === 'total') {
+              if (currentData.govAgencyName === 'total') {
                 vm.itemTotalAllYear = currentData
                 vm.showTableTotal = true
                 break
@@ -1201,7 +1203,7 @@ export default {
               let agencyListsTotal = result
               for (let key in agencyListsTotal) {
                 let currentData = agencyListsTotal[key]
-                if (currentData.domainName === 'total') {
+                if (currentData.govAgencyName === 'total') {
                   total2021 = currentData
                   break
                 }
@@ -1671,6 +1673,7 @@ export default {
             let currentData = agencyListsTotal[key]
             if (!currentData.domainName) {
               vm.itemTotal = currentData
+              vm.itemTotal['ontimePercentage'] = (((vm.itemTotal.betimesCount + vm.itemTotal.ontimeCount)/vm.itemTotal.releaseCount)*100).toFixed(0)
               vm.showTableTotal = true
               break
             }
@@ -1700,6 +1703,7 @@ export default {
             let currentData = agencyListsTotal[key]
             if (!currentData.domainName) {
               vm.itemTotal = currentData
+              vm.itemTotal['ontimePercentage'] = (((vm.itemTotal.betimesCount + vm.itemTotal.ontimeCount)/vm.itemTotal.releaseCount)*100).toFixed(0)
               vm.showTableTotal = true
               break
             }

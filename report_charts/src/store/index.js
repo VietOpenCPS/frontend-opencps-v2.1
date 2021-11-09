@@ -147,7 +147,7 @@ export const store = new Vuex.Store({
             params: {
               year: year,
               month: 0,
-              groupBy: 2,
+              groupBy: 1,
               groupId: window.themeDisplay.getScopeGroupId(),
               system: 'allSystemTotal'
             }
