@@ -150,13 +150,13 @@
                   multiple
                   style="display: none"
                   :id="'file' + item.partNo"
-                  @change="createFileEntry('', item, index)"
+                  @change="doActionGroupNew && thaoTacGop ? createFileEntry('', item, index) : onUploadSingleFile($event, item, index)"
                   >
                   <input v-else
                   type="file"
                   style="display: none"
                   :id="'file' + item.partNo"
-                  @change="createFileEntry('', item, index)"
+                  @change="doActionGroupNew && thaoTacGop ? createFileEntry('', item, index) : onUploadSingleFile($event, item, index)"
                   >
                   <v-progress-circular
                   :width="2"
@@ -462,7 +462,8 @@
       fileEditor: '',
       typeSignPlugin: '',
       requiredSignPlugin: false,
-      loadingHsm: false
+      loadingHsm: false,
+      doActionGroupNew: false
     }),
     computed: {
       loading () {
@@ -494,6 +495,10 @@
       let currentQuery = vm.$router.history.current.query
       if (currentQuery.hasOwnProperty('dossiers')) {
         vm.thaoTacGop = true
+      }
+      try{
+        vm.doActionGroupNew = doActionGroupNew
+      } catch {
       }
       vm.receiveMessage = function (event) {
         vm.saveAlpacaFormCallBack(event)

@@ -545,6 +545,31 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
+    },
+    optionCreate (val) {
+      let vm = this
+      setTimeout (function () {
+        if (vm.optionCreate) {
+          let filter = {
+            dossierTemplateNo: vm.optionCreate.templateNo
+          }
+          vm.$store.dispatch('getDossierPart', filter).then(function (result) {
+            if (result.hasOwnProperty('dossierParts')) {
+              vm.fileTemplateList = result.dossierParts
+              vm.fileTemplateNoCreate = ''
+            } else {
+              vm.fileTemplateList = []
+            }
+            if (vm.fileTemplateList && vm.fileTemplateList.length === 1) {
+              vm.fileTemplateNoCreate = vm.fileTemplateList[0]
+            }
+          }).catch(function () {
+          })
+        } else {
+          vm.fileTemplateList = []
+          vm.fileTemplateNoCreate = ''
+        }
+      }, 200)
     }
   },
   created () {
@@ -781,26 +806,26 @@ export default {
             vm.optionCreate = vm.optionList[0]
           }
           // 
-          if (vm.optionCreate) {
-            let filter = {
-              dossierTemplateNo: vm.optionCreate.templateNo
-            }
-            vm.$store.dispatch('getDossierPart', filter).then(function (result) {
-              if (result.hasOwnProperty('dossierParts')) {
-                vm.fileTemplateList = result.dossierParts
-                vm.fileTemplateNoCreate = ''
-              } else {
-                vm.fileTemplateList = []
-              }
-              if (vm.fileTemplateList && vm.fileTemplateList.length === 1) {
-                vm.fileTemplateNoCreate = vm.fileTemplateList[0]
-              }
-            }).catch(function () {
-            })
-          } else {
-            vm.fileTemplateList = []
-            vm.fileTemplateNoCreate = ''
-          }
+          // if (vm.optionCreate) {
+          //   let filter = {
+          //     dossierTemplateNo: vm.optionCreate.templateNo
+          //   }
+          //   vm.$store.dispatch('getDossierPart', filter).then(function (result) {
+          //     if (result.hasOwnProperty('dossierParts')) {
+          //       vm.fileTemplateList = result.dossierParts
+          //       vm.fileTemplateNoCreate = ''
+          //     } else {
+          //       vm.fileTemplateList = []
+          //     }
+          //     if (vm.fileTemplateList && vm.fileTemplateList.length === 1) {
+          //       vm.fileTemplateNoCreate = vm.fileTemplateList[0]
+          //     }
+          //   }).catch(function () {
+          //   })
+          // } else {
+          //   vm.fileTemplateList = []
+          //   vm.fileTemplateNoCreate = ''
+          // }
         } else {
           if (vm.serviceInfoSearch) {
             vm.optionListSearch = vm.serviceInfoSearch.options
