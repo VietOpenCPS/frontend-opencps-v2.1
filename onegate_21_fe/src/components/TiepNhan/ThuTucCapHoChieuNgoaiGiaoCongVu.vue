@@ -402,9 +402,8 @@
 
                     </div>
                 </v-flex>
-                <v-flex xs12 class="px-2 my-2">
-                    <label>Công hàm</label>
-                    <div style="display:flex; flex-wrap: wrap;align-items: center;">
+                <v-flex xs12 class="flex px-2 xs12 layout wrap mt-2 mb-3 pt-0 xs12">
+                    <!-- <div style="display:flex; flex-wrap: wrap;align-items: center;">
                         <div>
                             <v-text-field
                                 v-model="cong_ham_so_nuoc"
@@ -454,7 +453,75 @@
                             ></v-text-field>
                             <label for="">(Schengen)</label>
                         </div>
+                    </div> -->
+                    <!--  -->
+                    <div class="flex xs12" style="
+                        font-weight: bold;
+                    ">Công hàm</div>
+                    <div style="display:flex; flex-wrap: wrap;align-items: center;" class="mr-5">
+                        <div class="d-inline-block mr-4 mb-4" style="weight: 100px;">Nhập cảnh:</div>
+                        <div class="mr-3">
+                            <v-text-field
+                                v-model="soNuocNhapCanh"
+                                style="width: 100px;"
+                                solo
+                                type="number"
+                            ></v-text-field>
+                            <label for="">(Số nước xin)</label>
+                        </div>
+                        <div>
+                            <v-text-field
+                                v-model="cong_ham_nhap_canh"
+                                style="width: 100px;"
+                                solo
+                                type="number"
+                            ></v-text-field>
+                            <label for="">(Số người xin CH)</label>
+                        </div>
                     </div>
+                    <div style="display:flex; flex-wrap: wrap;align-items: center;" class="mr-5">
+                        <div class="d-inline-block mr-4 mb-4" style="weight: 100px;">Quá cảnh:</div>
+                        <div class="mr-3">
+                            <v-text-field
+                                v-model="soNuocQuaCanh"
+                                style="width: 100px;"
+                                solo
+                                type="number"
+                            ></v-text-field>
+                            <label for="">(Số nước xin)</label>
+                        </div>
+                        <div>
+                            <v-text-field
+                                v-model="cong_ham_qua_canh"
+                                style="width: 100px;"
+                                solo
+                                type="number"
+                            ></v-text-field>
+                            <label for="">(Số người xin CH)</label>
+                        </div>
+                    </div>
+                    <div style="display:flex; flex-wrap: wrap;align-items: center;">
+                        <div class="d-inline-block mr-4 mb-4" style="weight: 100px;">Schengen:</div>
+                        <div class="mr-3">
+                            <v-text-field
+                                v-model="soNuocSchengen"
+                                style="width: 100px;"
+                                solo
+                                type="number"
+                            ></v-text-field>
+                            <label for="">(Số nước xin)</label>
+                        </div>
+                        <div>
+                            <v-text-field
+                                v-model="cong_ham_schengen"
+                                style="width: 100px;"
+                                solo
+                                type="number"
+                            ></v-text-field>
+                            <label for="">(Số người xin CH)</label>
+                        </div>
+                    </div>
+                    <!--  -->
                 </v-flex>
                 <v-flex xs12 sm4  class="px-2 my-2">
                     <label for="">Dự thu lệ phí</label>
@@ -1363,6 +1430,9 @@ export default {
         dialogDanhSach: false,
         messengeCMT: '',
         soNuocKhongDuocMien: 0,
+        soNuocNhapCanh: 0,
+        soNuocQuaCanh: 0,
+        soNuocSchengen: 0,
         dateNgayKy: new Date().toISOString().substr(0, 10),
         dateNgayCapHCNG: new Date().toISOString().substr(0, 10),
         dateNgayCapHCCV: new Date().toISOString().substr(0, 10),
@@ -2028,8 +2098,16 @@ export default {
                 }
             }    
         },
+        listThanhVien () {
+            this.cong_ham_so_nguoi = this.listThanhVien.filter(e => e.cong_ham).length
+        },
         nuoc_di (val) {
-            // this.cong_ham_so_nuoc = this.nuoc_di.length
+            this.cong_ham_so_nuoc = this.nuoc_di.length
+            if (this.formCode === 'NEW') {
+                this.soNuocNhapCanh = this.nuoc_di.length
+                this.soNuocQuaCanh = this.nuoc_di.length
+                this.soNuocSchengen = this.nuoc_di.length
+            }
             this.genLePhi()
         },
         ho_chieu_hong (val){
@@ -2050,6 +2128,9 @@ export default {
         cong_ham_so_nuoc(){
             this.genLePhi()
         },
+        cong_ham_so_nguoi () {
+            this.genLePhi()
+        },
         cong_ham_schengen(){
             this.genLePhi()
         },
@@ -2058,8 +2139,16 @@ export default {
         },
         cong_ham_qua_canh(){
             this.genLePhi()
+        },
+        soNuocNhapCanh () {
+            this.genLePhi()
+        },
+        soNuocQuaCanh () {
+            this.genLePhi()
+        },
+        soNuocSchengen () {
+            this.genLePhi()
         }
-
     },
     methods: {
         getDetail(){
@@ -2096,6 +2185,11 @@ export default {
                 vm.ho_chieu_pho_thong_cu = metaData && metaData.Doan_HCTN.SoHCCu_PT ? parseInt(metaData.Doan_HCTN.SoHCCu_PT) : 0
                 vm.ho_chieu_cong_vu_moi = metaData && metaData.Doan_HCTN.SoHCCapMoi ? parseInt(metaData.Doan_HCTN.SoHCCapMoi) : 0
                 vm.cong_ham_so_nuoc = metaData && metaData.Doan_HCTN.SoNuocXinCH ? parseInt(metaData.Doan_HCTN.SoNuocXinCH) : 0
+                // 
+                vm.soNuocNhapCanh = metaData && metaData.Doan_HCTN.SoNuocNhapCanh ? parseInt(metaData.Doan_HCTN.SoNuocNhapCanh) : 0
+                vm.soNuocQuaCanh = metaData && metaData.Doan_HCTN.SoNuocQuaCanh ? parseInt(metaData.Doan_HCTN.SoNuocQuaCanh) : 0
+                vm.soNuocSchengen = metaData && metaData.Doan_HCTN.SoNuocSchengen ? parseInt(metaData.Doan_HCTN.SoNuocSchengen) : 0
+                // 
                 vm.ho_chieu_ngoai_giao_moi = metaData && metaData.Doan_HCTN.SoHCCapMoi_NG ? parseInt(metaData.Doan_HCTN.SoHCCapMoi_NG) : 0
                 vm.cong_ham_schengen = metaData && metaData.Doan_HCTN.SoNguoiMienCH ? parseInt(metaData.Doan_HCTN.SoNguoiMienCH) : 0
                 vm.cong_ham_nhap_canh = metaData && metaData.Doan_HCTN.SoCHNhapCanh ? parseInt(metaData.Doan_HCTN.SoCHNhapCanh) : 0
@@ -2991,8 +3085,8 @@ export default {
             for(let i=0;i<vm.nuoc_di.length;i++){
 
             }
-            // let so_nuoc = vm.cong_ham_so_nuoc != '' ? parseInt(vm.cong_ham_so_nuoc) : 0
-            let so_nuoc = vm.soNuocKhongDuocMien
+            let so_nuoc = vm.cong_ham_so_nuoc != '' ? parseInt(vm.cong_ham_so_nuoc) : 0
+            // let so_nuoc = vm.soNuocKhongDuocMien
             let so_schengen = vm.cong_ham_schengen != '' ? parseInt(vm.cong_ham_schengen) : 0
             let so_nhap_canh = vm.cong_ham_nhap_canh != '' ? parseInt(vm.cong_ham_nhap_canh) : 0
             let so_qua_canh = vm.cong_ham_qua_canh != '' ? parseInt(vm.cong_ham_qua_canh) : 0
@@ -3004,9 +3098,13 @@ export default {
             let lp_moi = (hcng_moi + hccv_moi)*giaLePhiMoi;
             let lp_gia_han = hc_gh * 80000;
             let lp_hong = (hc_hong + hc_mat) * 320000;
-            let lp_schengen = so_schengen * 10000;
-            let lp_nhap = so_nuoc * so_nhap_canh * 10000;
-            let lp_qua = so_nuoc * so_qua_canh * 10000;
+            // let lp_schengen = so_nuoc * so_schengen * 10000 * vm.cong_ham_so_nguoi;
+            // let lp_nhap = so_nuoc * so_nhap_canh * 10000 * vm.cong_ham_so_nguoi;
+            // let lp_qua = so_nuoc * so_qua_canh * 10000 * vm.cong_ham_so_nguoi;
+            let lp_schengen = vm.soNuocSchengen * so_schengen * 10000;
+            let lp_nhap = vm.soNuocNhapCanh * so_nhap_canh * 10000;
+            let lp_qua = vm.soNuocQuaCanh * so_qua_canh * 10000;
+            
             let so_cong_ham = so_schengen + so_nhap_canh + so_qua_canh
             let lp_cong_ham = lp_schengen + lp_nhap + lp_qua
             
@@ -3038,6 +3136,10 @@ export default {
             {
                 file_payment2[file_payment2.length] = {'partNo': 'empty','serviceName': 'empty', 'partName': 'empty', 'fileMark': 'empty', 'fileMarkName': 'empty', 'recordCount': 'empty', 'trang_thai': 'empty', 'don_gia': 'empty', 'thanh_tien': 'empty'}; 
             }
+            // -----
+            console.log('le_phi213123123123123', vm.cong_ham_so_nuoc, vm.cong_ham_so_nguoi)
+            console.log('le_phi213123123123123', le_phi)
+            // -----
             if(le_phi != '' && le_phi != null)
                 vm.le_phi_format = le_phi.toString()
            
@@ -3081,7 +3183,10 @@ export default {
                     "SoCHQuaCanh": vm.cong_ham_qua_canh.toString(),
                     "SoHCGH": vm.ho_chieu_gia_han.toString(),
                     "SoHCHong": vm.ho_chieu_hong.toString(),
-                    "SoHCMat": vm.ho_chieu_mat.toString()
+                    "SoHCMat": vm.ho_chieu_mat.toString(),
+                    "SoNuocNhapCanh": vm.soNuocNhapCanh.toString(),
+                    "SoNuocQuaCanh": vm.soNuocQuaCanh.toString(),
+                    "SoNuocSchengen": vm.soNuocSchengen.toString(),
                 };
                 vm.dossiers['metaData'] = JSON.stringify(hs)
             }

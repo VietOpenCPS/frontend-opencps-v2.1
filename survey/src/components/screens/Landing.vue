@@ -166,6 +166,25 @@
       </v-flex>
     </v-layout>
     <div v-if="surveyLayoutVersion === 2" style="border: 2px solid #e9e9e9;border-radius: 5px;">
+      <v-dialog
+        v-model="dialogLoading"
+        persistent
+        width="300"
+        v-if="loadingData"
+      >
+        <v-card
+          color="primary"
+          dark
+        >
+          <v-card-text>
+            <v-progress-linear
+              indeterminate
+              color="white"
+              class="mb-0"
+            ></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
       <v-tabs
         color="white"
         dark
@@ -301,7 +320,7 @@
 
                 <tbody v-for="(item,index) in statisticNltt" :key="index">
                   <tr>
-                    <td align="left" colspan="4"  class="px-2 text-bold">{{item.govAgencyName}}</td>
+                    <td align="left" colspan="4"  class="px-2 text-bold">{{item.domainName}}</td>
                   </tr>
                   
                   <tr v-for="(item2,index2) in item['votings']" :key="index2">
@@ -557,6 +576,8 @@ export default {
     ProgressBar
   },
   data: () => ({
+    dialogLoading: true,
+    loadingData: false,
     currentYear: (new Date()).getFullYear(),
     yearNltt: (new Date()).getFullYear(),
     yearQlnn: (new Date()).getFullYear(),
@@ -578,6 +599,7 @@ export default {
     statisticNltt: [],
     statisticQlnn: [],
     agencyList: [],
+    domainList: [],
     agency: '',
     loadingChangeAgency: false,
     votingResult: [],
@@ -616,6 +638,10 @@ export default {
     try {
       vm.agencyList = agencyList
       // vm.agency = vm.agencyList[0]
+    } catch (error) {
+    }
+    try {
+      vm.domainList = domainList
     } catch (error) {
     }
     vm.$nextTick(function () {
@@ -1007,17 +1033,19 @@ export default {
       let vm = this
       let data = {
         govAgencyCode: '',
-        fromReceiveDate: '01/01/' + year,
-        toReceiveDate: '31/12/' + year
+        fromReceiveDate: (new Date(year + '-01-01')).getTime(),
+        toReceiveDate: (new Date(year + '-12-31')).getTime()
       }
+      vm.loadingData = true
       vm.$store.dispatch('loadVotingResult', data).then(function(result) {
         let voteStatistic = []
+        vm.loadingData = false
         result.forEach(element => {
-          let indexSt = vm.agencyList.findIndex(function(gov) {
-            return gov.govAgencyCode == element.govAgencyCode
+          let indexSt = vm.domainList.findIndex(function(gov) {
+            return gov.domainCode == element.domainCode
           })
           if (indexSt >=0) {
-            element['govAgencyName'] = vm.agencyList[indexSt]['govAgencyName']
+            element['domainName'] = vm.domainList[indexSt]['domainName']
             voteStatistic.push(element)
           }
         })
@@ -1037,14 +1065,14 @@ export default {
           let statistic = []
           voteStatistic.forEach(element => {
             let indexSt = statistic.findIndex(function(st) {
-              return st.govAgencyCode == element.govAgencyCode
+              return st.domainCode == element.domainCode
             })
             if (indexSt >= 0) {
               statistic[indexSt]['votings'].push(element)
             } else {
               let itemSt = {
-                govAgencyCode: element.govAgencyCode,
-                govAgencyName: element.govAgencyName,
+                domainCode: element.domainCode,
+                domainName: element.domainName,
                 votings: [element]
               }
               statistic.push(itemSt)
@@ -1054,14 +1082,17 @@ export default {
         }
       }).catch(xhr => {
         vm.statisticNltt = []
+        vm.loadingData = false
       })
     },
     getResultQlnn (year) {
       let vm = this
+      vm.loadingData = true
       vm.$store.dispatch('loadVotingResultQlnn', {
         fromReceiveDate: '01/01/' + year,
         toReceiveDate: '31/12/' + year
       }).then(function(result) {
+        vm.loadingData = false
         let voteStatistic = []
         result.forEach(element => {
           let indexSt = vm.agencyList.findIndex(function(gov) {
@@ -1104,6 +1135,7 @@ export default {
         }
       }).catch(xhr => {
         vm.statisticQlnn = []
+        vm.loadingData = false
       })
     },
     validateCaptcha () {

@@ -5,24 +5,24 @@ module.exports = {
     config.module.rule('images').use('url-loader')
       .loader('file-loader') // replaces the url-loader
       .tap(options => Object.assign(options, {
-        name: '../../wars/opencps-store/src/main/webapp/js/cli/report_charts_motcua/app/images/[name].[ext]'
+        name: '../../wars/opencps-store/src/main/webapp/js/cli/report_charts_v3.0/app/images/[name].[ext]'
       }))
     config.module.rule('svg').use('file-loader')
       .tap(options => Object.assign(options, {
-        name: '../../wars/opencps-store/src/main/webapp/js/cli/report_charts_motcua/app/images/[name].[ext]'
+        name: '../../wars/opencps-store/src/main/webapp/js/cli/report_charts_v3.0/app/images/[name].[ext]'
       }))
   },
   css: {
     extract: {
-      filename: '../../wars/opencps-store/src/main/webapp/js/cli/report_charts_motcua/app/css/[name].css',
-      chunkFilename: '../../wars/opencps-store/src/main/webapp/js/cli/report_charts_motcua/app/css/[name].css'
+      filename: '../../wars/opencps-store/src/main/webapp/js/cli/report_charts_v3.0/app/css/[name].css',
+      chunkFilename: '../../wars/opencps-store/src/main/webapp/js/cli/report_charts_v3.0/app/css/[name].css'
     }
   },
   configureWebpack: {
     output: {
-      filename: '../../wars/opencps-store/src/main/webapp/js/cli/report_charts_motcua/app/js/[name].js',
-      chunkFilename: '../../wars/opencps-store/src/main/webapp/js/cli/report_charts_motcua/app/js/[name].js'
+      filename: '../../wars/opencps-store/src/main/webapp/js/cli/report_charts_v3.0/app/js/[name].js',
+      chunkFilename: '../../wars/opencps-store/src/main/webapp/js/cli/report_charts_v3.0/app/js/[name].js'
     }
   }
 }
-// report_charts_motcua_v3.,report_charts_motcua_motcu
+// report_charts_v3.,report_charts_motcua

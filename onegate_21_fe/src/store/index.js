@@ -152,7 +152,8 @@ export const store = new Vuex.Store({
     visibleDoAction: true,
     filterDateFromTo: ['fromReceiveDate','toReceiveDate','fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate'],
     dossierSelectedDoAction: [],
-    formActionGroup: ''
+    formActionGroup: '',
+    keywordSearch: ''
   },
   actions: {
     clearError ({commit}) {
@@ -3079,6 +3080,59 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    doActionGroup ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+          let formData = new URLSearchParams()
+          formData.append('payment', filter.payment?JSON.stringify(filter.payment):'')
+          formData.append('assignUsers', filter.toUsers?JSON.stringify(filter.toUsers):'')
+          formData.append('actionNote', filter.userNote?JSON.stringify(filter.userNote):'')
+          formData.append('payload', filter.payload?JSON.stringify(filter.payload):'')
+          // 
+          formData.append('dossierTemplateNo', filter.dossierTemplateNo)
+          formData.append('dossierPartNo', filter.dossierPartNo)
+          formData.append('fileTemplateNo', filter.fileTemplateNo)
+          formData.append('displayName', filter.displayName)
+          formData.append('fileType', filter.fileType)
+          formData.append('isSync', false)
+          formData.append('formData', '')
+          formData.append('removed', '')
+          formData.append('eForm', '')
+          formData.append('fileEntryId', filter.fileEntryId)
+          formData.append('dossierIds', filter.dossierIds)
+
+          // 
+          axios.post('/o/rest/v2/dossiers/actions/'+ filter.actionCode + '/groupDossier', formData, param).then(function (response) {
+            store.dispatch('getActiveGetCounter', !state.activeGetCounter)
+            let serializable = response.data
+            resolve(serializable)
+            if (filter.hasOwnProperty('originality') && filter.originality == 1 && filter.actionCode == 1300) {
+              let dataCustom
+              if (filter.hasOwnProperty('thongtinhoso')) {
+                let createDate = String(filter.thongtinhoso.createDate).split(" ")[0].replace(/\//g, "")
+                dataCustom = filter.thongtinhoso.dossierId + ';' + createDate + ';' + filter.thongtinhoso.applicantName + ';' + filter.thongtinhoso.applicantIdNo
+              }
+              let filterTracking = {
+                serviceCode: filter.hasOwnProperty('thongtinhoso') ? filter.thongtinhoso.serviceCode : '',
+                customData: dataCustom ? dataCustom : ''
+              }
+              store.dispatch('trackingBTTT', filterTracking)
+            }
+          }).catch(function (error) {
+            toastr.clear()
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
     deleteDossier ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -4147,6 +4201,7 @@ export const store = new Vuex.Store({
                   items[index] = Object.assign(items[index]['voteModel'], {choices: []})
                 }
               }
+              console.log('items vote', items)
               resolve(items)
             } else {
               resolve([])
@@ -4537,6 +4592,25 @@ export const store = new Vuex.Store({
         url = '/o/rest/v2/defaultsignature/vgca/' + filter['dossierId'] + '/dossierFiles'
         dataUpdate.append('fileEntries', filter['fileEntries'])
         dataUpdate.append('dossierFiles', filter['dossierFiles'])
+        axios.put(url, dataUpdate, param).then(result1 => {
+          resolve(result1)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
+    kySoHsm ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let dataUpdate = new URLSearchParams()
+        let url = '/o/rest/v2/defaultsignature/hsmsignature/' + filter['dossierId'] + '/dossier'
+        dataUpdate.append('token', filter['token'])
+        dataUpdate.append('dossierFileIds', filter['dossierFileIds'])
         axios.put(url, dataUpdate, param).then(result1 => {
           resolve(result1)
         }).catch(xhr => {
@@ -5071,6 +5145,28 @@ export const store = new Vuex.Store({
           dataPostEform.append('dossierIds', data.dossierIds)
           dataPostEform.append('file', data.file)
           let url = state.initData.dossierApi + '/files/' + data.dossierPartNo
+          axios.post(url, dataPostEform, options).then(function (response) {
+            resolve(response.data)
+          }).catch(function (xhr) {
+            reject(data)
+          })
+        } catch (e) {
+          console.log(e)
+          reject(data)
+        }
+      })
+    },
+    uploadFileThaoTacGop ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId
+          }
+        }
+        try {
+          let dataPostEform = new FormData()
+          dataPostEform.append('uploadfile', data.file)
+          let url = '/o/rest/v2/vgca/fileupload'
           axios.post(url, dataPostEform, options).then(function (response) {
             resolve(response.data)
           }).catch(function (xhr) {
@@ -5725,6 +5821,9 @@ export const store = new Vuex.Store({
     setGroupIdSite (state, payload) {
       state.groupIdSite = payload
     },
+    setKeywordSearch (state, payload) {
+      state.keywordSearch = payload
+    },
   },
   getters: {
     groupIdSite (state) {
@@ -5953,5 +6052,8 @@ export const store = new Vuex.Store({
     getIsMobile (state) {
       return state.isMobile
     },
+    getKeywordSearch (state) {
+      return state.keywordSearch
+    }
   }
 })

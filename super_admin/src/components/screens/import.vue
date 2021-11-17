@@ -182,7 +182,7 @@
       :vertical="false"
       color="#EF5350"
     >
-      Yêu cầu thực hiện thất bại
+      {{messError ? messError : 'Yêu cầu thực hiện thất bại'}}
       <v-btn
         icon
         @click="snackbarerror = false"
@@ -202,6 +202,7 @@
       return {
         snackbarerror: false,
         snackbarsuccess: false,
+        messError: '',
         responseXMLSuccess: '',
         importMessage: false,
         importLoading: false,
@@ -276,8 +277,14 @@
             vm.importLoading = false
             vm.importMessage = true
           })
-          .catch(function (response) {
+          .catch(function (error) {
             //handle error
+            vm.messError = ''
+            try {
+              let dataErr = error.response.data
+              vm.messError = dataErr.description ? dataErr.description : dataErr.message
+            } catch (err) {
+            }
             console.log(response)
             vm.importLoading = false
             vm.importMessage = false
@@ -303,9 +310,13 @@
             vm.importExcelLoading = false
         
           })
-          .catch(function (response) {
-            //handle error
-            console.log(response)
+          .catch(function (error) {
+            vm.messError = ''
+            try {
+              let dataErr = error.response.data
+              vm.messError = dataErr.description ? dataErr.description : dataErr.message
+            } catch (err) {
+            }
             vm.importExcelLoading = false
             vm.snackbarerror =  true
           })
@@ -330,10 +341,14 @@
             vm.importPhongBanLoading = false
         
           })
-          .catch(function (response) {
-            //handle error
-            console.log(response)
+          .catch(function (error) {
             vm.importPhongBanLoading = false
+            vm.messError = ''
+            try {
+              let dataErr = error.response.data
+              vm.messError = dataErr.description ? dataErr.description : dataErr.message
+            } catch (err) {
+            }
             vm.snackbarerror =  true
           })
         }

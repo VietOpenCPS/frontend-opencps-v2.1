@@ -1071,6 +1071,10 @@ export default {
     },
     showSelectGov (govList, guide) {
       let vm = this
+      // if (!window.themeDisplay.isSignedIn() && !guide) {
+      //   vm.dialogVerifycation = true
+      //   return
+      // }
       vm.govAgencyTiepNhanSelected = ''
       vm.selectGuide = guide ? true : false
       vm.govAgencyListTiepNhan = vm.serviceConfigs(govList)
@@ -1241,9 +1245,12 @@ export default {
       if (query.hasOwnProperty('MaTTHCDP') && query.MaTTHCDP) {
         codeDvcqg = query.MaTTHCDP
       }
+      let urlR = window.location.href.split("?")[0].trim()
+      let pathEndChar = urlR.charAt(urlR.length-1)
+      let path = pathEndChar === '/' ? window.location.href.split("?")[0] : window.location.href.split("?")[0] + '/'
       let filter = {
         state: '',
-        redirectURL: codeDvcqg ? window.location.href.split("?")[0] + '?code=' +  codeDvcqg + '&serviceCreate=' + vm.serviceSelected.serviceConfigId : window.location.href.split("?")[0] + '?serviceCreate=' + vm.serviceSelected.serviceConfigId
+        redirectURL: codeDvcqg ? path + '?code=' +  codeDvcqg + '&serviceCreate=' + vm.serviceSelected.serviceConfigId : path + '?serviceCreate=' + vm.serviceSelected.serviceConfigId
       }
       setTimeout (function () {
         if (!vm.isSigned) {

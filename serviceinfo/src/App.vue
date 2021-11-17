@@ -215,6 +215,10 @@
     created () {
       var vm = this
       try {
+        vm.groupDonViCapXa = groupDonViCapXa
+      } catch (error) {
+      }
+      try {
         vm.hasCoQuanThucHien = hasCoQuanThucHien
       } catch (error) {
         vm.hasCoQuanThucHien = false
@@ -626,12 +630,23 @@
         vm.activeAll = newQuery.hasOwnProperty('all') && newQuery['all']
         vm.getCountAll()
         // 
-        axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
-          let userData = response.data
-          vm.$store.commit('setUserLogin', userData)
-        })
-        .catch(function(error) {
-        })
+        if (vm.groupDonViCapXa) {
+          vm.$store.dispatch('getDictFromParent', {}).then(function (result) {
+            vm.reportGroupList = result.filter(function(item) {
+              return item.parentItem
+            })
+            console.log('reportGroupList', vm.reportGroupList)
+          })
+        }
+        // 
+        if (window.themeDisplay.isSignedIn()) {
+          axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
+            let userData = response.data
+            vm.$store.commit('setUserLogin', userData)
+          })
+          .catch(function(error) {
+          })
+        }
       })
       // 
       

@@ -6,6 +6,10 @@
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div> Kết quả xử lý
+          <v-btn style="position: absolute;right: 55px;bottom: 2px;" :readonly="loadingHsm" :disabled="loadingHsm" class="mr-2" color="primary" v-if="esignType === 'hsm' || esignType === 'pluginAndHSM'" @click.stop="kySoHsmAll">
+            <v-icon size="22" color="white">drive_file_rename_outline</v-icon> &nbsp;
+            Đóng dấu tất cả giấy tờ
+          </v-btn>
         </div>
         <v-card>
           <div class="form_alpaca" style="position: relative;" v-for="(item, index) in createFiles" v-bind:key="item.partNo + 'cr'">
@@ -50,7 +54,7 @@
                         </v-btn> -->
                         <v-menu @click.native.stop right offset-y 
                           transition="slide-x-transition" title="Ký số tài liệu đính kèm" 
-                          v-if="esignType === 'plugin' && itemFileView.fileType.toLowerCase() === 'pdf' && !typeSignPlugin">
+                          v-if="(esignType === 'plugin' || esignType === 'pluginAndHSM') && itemFileView.fileType.toLowerCase() === 'pdf' && !typeSignPlugin">
                           <v-btn slot="activator" flat icon color="indigo">
                             <v-icon size="18">fa fa-pencil-square-o</v-icon>
                           </v-btn>
@@ -73,12 +77,21 @@
                           </v-list>
                         </v-menu>
                         <v-tooltip top>
-                          <v-btn v-if="esignType === 'plugin' && itemFileView.fileType.toLowerCase() === 'pdf' && typeSignPlugin" flat icon color="indigo"
+                          <v-btn v-if="(esignType === 'plugin' || esignType === 'pluginAndHSM') && itemFileView.fileType.toLowerCase() === 'pdf' && typeSignPlugin" flat icon color="indigo"
                             slot="activator" @click.stop="signAction(itemFileView, index2, '', typeSignPlugin)"
                           >
                             <v-icon size="18">fa fa-pencil-square-o</v-icon>
                           </v-btn>
                           <span>Ký duyệt, đóng dấu</span>
+                        </v-tooltip>
+                        <!--  -->
+                        <v-tooltip top>
+                          <v-btn :readonly="loadingHsm" :disabled="loadingHsm" v-if="(esignType === 'hsm' || esignType === 'pluginAndHSM') && itemFileView.fileType.toLowerCase() === 'pdf'" flat icon color="green"
+                            slot="activator" @click.stop="signHsm(itemFileView, index2, '')"
+                          >
+                            <v-icon size="22">drive_file_rename_outline</v-icon>
+                          </v-btn>
+                          <span>Ký số HSM</span>
                         </v-tooltip>
                       </div>
                     </div>
@@ -137,13 +150,13 @@
                   multiple
                   style="display: none"
                   :id="'file' + item.partNo"
-                  @change="onUploadSingleFile($event, item, index)"
+                  @change="doActionGroupNew && thaoTacGop ? createFileEntry('', item, index) : onUploadSingleFile($event, item, index)"
                   >
                   <input v-else
                   type="file"
                   style="display: none"
                   :id="'file' + item.partNo"
-                  @change="onUploadSingleFile($event, item, index)"
+                  @change="doActionGroupNew && thaoTacGop ? createFileEntry('', item, index) : onUploadSingleFile($event, item, index)"
                   >
                   <v-progress-circular
                   :width="2"
@@ -168,6 +181,14 @@
                     </v-btn>
                     <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ lên</span>
                     <span v-else>Tải giấy tờ lên (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
+                  </v-tooltip>
+                  <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id && thaoTacGop">
+                    <v-btn slot="activator" icon class="mx-0 my-0 ml-2" @click.native="createFileEntry('https://kiemthu-mt-gov-vn-9001.fds.vn', item, index)">
+                      <v-badge>
+                        <v-icon size="20" color="orange">fa fa-pencil-square-o</v-icon>
+                      </v-badge>
+                    </v-btn>
+                    <span>Tải lên và ký duyệt giấy tờ</span>
                   </v-tooltip>
                   <!-- <v-menu @click.native.stop right offset-y
                     transition="slide-x-transition" title="Ký số tài liệu" 
@@ -440,7 +461,9 @@
       doNotSign: false,
       fileEditor: '',
       typeSignPlugin: '',
-      requiredSignPlugin: false
+      requiredSignPlugin: false,
+      loadingHsm: false,
+      doActionGroupNew: false
     }),
     computed: {
       loading () {
@@ -472,6 +495,10 @@
       let currentQuery = vm.$router.history.current.query
       if (currentQuery.hasOwnProperty('dossiers')) {
         vm.thaoTacGop = true
+      }
+      try{
+        vm.doActionGroupNew = doActionGroupNew
+      } catch {
       }
       vm.receiveMessage = function (event) {
         vm.saveAlpacaFormCallBack(event)
@@ -669,7 +696,8 @@
               submitDate: vm.detailDossier.submitDate,
               govAgencyCode: vm.detailDossier.govAgencyCode,
               govAgencyName: vm.detailDossier.govAgencyName,
-              dossierTemplateNo: vm.detailDossier.dossierTemplateNo
+              dossierTemplateNo: vm.detailDossier.dossierTemplateNo,
+              dossierId: vm.detailDossier.dossierId
             }
             let fileTemplateNo = ''
             try {
@@ -772,7 +800,8 @@
                 submitDate: vm.detailDossier.submitDate,
                 govAgencyCode: vm.detailDossier.govAgencyCode,
                 govAgencyName: vm.detailDossier.govAgencyName,
-                dossierTemplateNo: vm.detailDossier.dossierTemplateNo
+                dossierTemplateNo: vm.detailDossier.dossierTemplateNo,
+                dossierId: vm.detailDossier.dossierId
               }
               let fileTemplateNo = ''
               try {
@@ -1038,6 +1067,126 @@
         }
         
       },
+      createFileEntry (e, data, indexItem) {
+        let vm = this
+        if (e) {
+          let prms = {}
+          prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/vgca/fileupload'
+          prms['SessionId'] = ''
+          prms['FileName'] = ''
+          let signFileCallBack = function (rv) {
+            let received_msg = JSON.parse(rv)
+            if (received_msg.Status === 0) {
+              let dataSigned
+              try {
+                dataSigned = JSON.parse(received_msg.FileServer)
+                if (window.top.location.protocol === 'https:') {
+                  dataSigned.url = dataSigned.url.replace('http:', 'https:')
+                }
+                dataSigned.url = dataSigned.url.replace(':80/', '/')
+                let fileName = received_msg.FileName
+                try {
+                  fileName = received_msg.FileName.split("\\").pop()
+                } catch (error) {
+                }
+                let fileTemplateNo = ''
+                try {
+                  fileTemplateNo = data.templateFileNo ? data.templateFileNo : data.fileTemplateNo
+                } catch (error) {
+                }
+                let fileCreate = {
+                  displayName: fileName,
+                  fileType: '',
+                  fileSize: 10,
+                  isSync: false,
+                  file: '',
+                  dossierPartNo: data.partNo,
+                  dossierTemplateNo: vm.detailDossier.dossierTemplateNo,
+                  fileTemplateNo: fileTemplateNo,
+                  formData: '',
+                  referenceUid: '',
+                  modifiedDate: vm.getCurentDateTime(),
+                  createDate: (new Date()).getTime(),
+                  preview: dataSigned.url,
+                  fileEntryESign: dataSigned.fileEntryId
+                }
+                vm.dossierFilesItems = [fileCreate]
+                vm.createFiles[indexItem]['filesAttach'] = [fileCreate]
+              } catch (error) {
+              }
+              toastr.clear()
+              toastr.success('Giấy tờ đã được ký duyệt')
+            } else {
+              if (received_msg.Message) {
+                toastr.clear()
+                toastr.error(received_msg.Message)
+              } else {
+                toastr.clear()
+                toastr.error('Ký duyệt không thành công')
+              }
+            }
+          }
+          let json_prms = JSON.stringify(prms)
+          vgca_sign_approved(json_prms, signFileCallBack)
+        } else {
+          vm.dossierTemplatesItemSelect = data
+          vm.progressUploadPart = data.partNo
+          data['dossierId'] = vm.detailDossier.dossierId
+          data['dossierTemplateNo'] = vm.detailDossier.dossierTemplateNo
+          let files = $('input[id="file' + data.partNo + '"]')[0].files
+          let file = files[0]
+          let fileName = file['name']
+          if (file['name']) {
+            fileName = file['name'].replace(/\%/g, '')
+            fileName = fileName.replace(/\//g, '')
+            fileName = fileName.replace(/\\/g, '')
+          }
+          if (data.partType === 3) {
+            if (data['displayName']) {
+              fileName = data['displayName'].replace(/\%/g, '')
+              fileName = fileName.replace(/\//g, '')
+              fileName = fileName.replace(/\\/g, '')
+            }
+          }
+          let fileTemplateNo = ''
+          try {
+            fileTemplateNo = data.templateFileNo ? data.templateFileNo : data.fileTemplateNo
+          } catch (error) {
+          }
+          let fileCreate = {
+            displayName: fileName,
+            fileType: file.type,
+            fileSize: file.size,
+            isSync: false,
+            file: file,
+            dossierPartNo: data.partNo,
+            dossierTemplateNo: data.dossierTemplateNo,
+            fileTemplateNo: fileTemplateNo,
+            formData: '',
+            referenceUid: '',
+            modifiedDate: vm.getCurentDateTime(),
+            createDate: (new Date()).getTime(),
+            preview: '',
+            fileEntryESign: ''
+          }
+          vm.$store.dispatch('uploadFileThaoTacGop', fileCreate).then(res => {
+            vm.progressUploadPart = ''
+            let dataSigned = JSON.parse(res.FileServer)
+            console.log('dataSigned', dataSigned)
+            fileCreate.fileEntryESign = dataSigned.fileEntryId
+            if (window.top.location.protocol === 'https:') {
+              dataSigned.url = dataSigned.url.replace('http:', 'https:')
+            }
+            dataSigned.url = dataSigned.url.replace(':80/', '/')
+            fileCreate.preview = dataSigned.url
+            vm.dossierFilesItems = [fileCreate]
+            vm.createFiles[indexItem]['filesAttach'] = [fileCreate]
+          }).catch(reject => {
+            toastr.clear()
+            toastr.error('Tải lên không thành công')
+          })
+        }
+      },
       loadAlpcaForm (data) {
         var vm = this
         var fileFind = vm.dossierFilesItems.find(itemFile => {
@@ -1157,7 +1306,8 @@
             submitDate: vm.detailDossier.submitDate,
             govAgencyCode: vm.detailDossier.govAgencyCode,
             govAgencyName: vm.detailDossier.govAgencyName,
-            dossierTemplateNo: vm.detailDossier.dossierTemplateNo
+            dossierTemplateNo: vm.detailDossier.dossierTemplateNo,
+            dossierId: vm.detailDossier.dossierId
           }
           let fileTemplateNo = ''
           try {
@@ -1295,7 +1445,8 @@
                         submitDate: vm.detailDossier.submitDate,
                         govAgencyCode: vm.detailDossier.govAgencyCode,
                         govAgencyName: vm.detailDossier.govAgencyName,
-                        dossierTemplateNo: vm.detailDossier.dossierTemplateNo
+                        dossierTemplateNo: vm.detailDossier.dossierTemplateNo,
+                        dossierId: vm.detailDossier.dossierId
                       }
                       let fileTemplateNo = ''
                       try {
@@ -1479,6 +1630,50 @@
         }
           
       },
+      signHsm (item, index, arr) {
+        let vm = this
+        vm.loadingHsm = true
+        let filter = {
+          token: localStorage.getItem('jwt_token'),
+          dossierId: vm.detailDossier.dossierId,
+          dossierFileIds: item ? item.dossierFileId.toString() : arr
+        }
+        console.log("filterKySo", filter)
+        vm.$store.dispatch('kySoHsm', filter).then(resFile => {
+          toastr.success('Ký số thành công')
+          vm.loadingHsm = false
+        }).catch(function () {
+          toastr.error('Ký số thất bại')
+          vm.loadingHsm = false
+        })
+      },
+      kySoHsmAll () {
+        let vm = this
+        let fileSign = vm.dossierFilesItems.filter(function (item) {
+          return item.fileType.toLowerCase() === 'pdf'
+        })
+        let fileKs = []
+        fileSign.forEach(function (item) {
+          let hasKQ = vm.createFiles.find(file => {
+            return item.dossierPartNo === file.partNo
+          })
+          if (hasKQ) {
+            fileKs.push(item)
+          }
+        })
+        console.log('fileSign55555', fileKs)
+        if (fileKs.length) {
+          let x = confirm('Bạn có chắc chắn thực hiện đóng dấu tất cả giấy tờ?')
+          if (x) {
+            let arrIds = fileKs.map(function(item) {
+              return item['dossierFileId']
+            }).toString()
+            vm.signHsm('', '', arrIds)
+          }
+        } else {
+          toastr.error('Không có giấy tờ nào')
+        }
+      },
       deleteSingleFile (item, index, indexPart) {
         var vm = this
         let x = confirm('Bạn có muốn xóa?')
@@ -1557,14 +1752,19 @@
           vm.documentType = 'Tài liệu đính kèm'
           vm.dialogPDF = true
           data['dossierId'] = vm.detailDossier.dossierId
-          if (vm.esignType === 'plugin' && vm.dossierFilesItems[index]['isSigned']) {
+          if (vm.dossierFilesItems[index]['preview']) {
             vm.dialogPDFLoading = false
-            document.getElementById('dialogPDFPreview' + vm.id).src = vm.dossierFilesItems[index]['pdfSigned']
+            document.getElementById('dialogPDFPreview' + vm.id).src = vm.dossierFilesItems[index]['preview']
           } else {
-            vm.$store.dispatch('viewFile', data).then(result => {
+            if (vm.esignType === 'plugin' && vm.dossierFilesItems[index]['isSigned']) {
               vm.dialogPDFLoading = false
-              document.getElementById('dialogPDFPreview' + vm.id).src = result
-            })
+              document.getElementById('dialogPDFPreview' + vm.id).src = vm.dossierFilesItems[index]['pdfSigned']
+            } else {
+              vm.$store.dispatch('viewFile', data).then(result => {
+                vm.dialogPDFLoading = false
+                document.getElementById('dialogPDFPreview' + vm.id).src = result
+              })
+            }
           }
         }
       },
@@ -1791,7 +1991,7 @@
           }
         } else {
           return {
-            icon: 'attach_file',
+            icon: 'fas fa fa-paperclip',
             color: 'primary',
             size: 14
           }

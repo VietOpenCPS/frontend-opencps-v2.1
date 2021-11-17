@@ -147,12 +147,14 @@ export const store = new Vuex.Store({
             params: {
               year: year,
               month: 0,
-              domain: 'total',
-              agency: 'total',
-              system: 'total'
+              groupBy: 1,
+              groupId: window.themeDisplay.getScopeGroupId(),
+              system: 'allSystemTotal'
             }
           }
-          let urlStatistic = '/o/rest/statistics'
+          param.params['govAgencyCode'] = param.params['agency']
+          param.params['domainCode'] = param.params['domain']
+          let urlStatistic = '/o/statistic/dossier/report'
           try {
             if (urlApiConfig && groupIdConfig) {
               urlStatistic = urlApiConfig
@@ -198,10 +200,12 @@ export const store = new Vuex.Store({
             month: 0,
             domain: 'total',
             agency: 'total',
-            system: 'total'
+            groupId: window.themeDisplay.getScopeGroupId()
           }
+          textPost['govAgencyCode'] = textPost['agency']
+          textPost['domainCode'] = textPost['domain']
           dataPost.append('method', 'GET')
-          dataPost.append('url', '/statistics')
+          dataPost.append('url', '/statistic/dossier/report')
           dataPost.append('data', JSON.stringify(textPost))
           dataPost.append('serverCode', 'SERVER_DVC')
           axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
@@ -228,45 +232,86 @@ export const store = new Vuex.Store({
             },
             params: {
               year: filter.year,
-              month: filter.month,
-              group: filter.group,
-              agency: filter['agency'],
-              system: filter['system']
+              month: !filter.hasOwnProperty('month') ? '1,2,3,4,5,6,7,8,9,10,11,12' : filter.month,
+              // group: filter.group,
+              // agency: filter['agency'],
+              groupBy: filter['report'] ? 1 : 2,
+              groupId: window.themeDisplay.getScopeGroupId()
             }
           }
-          if (filter['report']) {
-            param.params['domain'] = 'total'
+          if (filter['system'] == 1) {
+            if (filter['domainCode'] === 'total') {
+              param.params['excludeSystem'] = 'internal,allSystemTotal,internalSystemTotal'
+              param.params['domainCode'] = 'total'
+            } else {
+              param.params['excludeSystem'] = 'internal,allSystemTotal,externalSystemTotal,internalSystemTotal,allSystem'
+            }
           }
-          if (filter['report'] === 'linemonth') {
-            param.params['domain'] = ''
+          if (filter['system'] == 0) {
+            if (filter['typeDossier'] == true) {
+              param.params['system'] = 'internalSystemTotal'
+            } else {
+              param.params['system'] = 'internal'
+            }
           }
-          let urlStatistic = '/o/rest/statistics'
-          try {
-            if (urlApiConfig && groupIdConfig) {
-              urlStatistic = urlApiConfig
-              param.params = {
-                year: filter.year,
-                month: filter.month,
-                govAgencyCode: filter['agency'],
-                groupBy: 1,
-                groupId: groupIdConfig
-              }
-              if (filter['report']) {
-                param.params['domainCode'] = 'total'
-              }
-              if (filter['report'] === 'linemonth') {
-                param.params['domainCode'] = ''
-              }
+          if (filter['system'] === 'total' && !filter['domainCode'] && filter.hasOwnProperty('month')) {
+            param.params['excludeSystem'] = 'internal,allSystemTotal,externalSystemTotal,internalSystemTotal'
+          }
+          if (filter['system'] === 'total' && filter['domainCode'] === 'total' && filter.hasOwnProperty('month')) {
+            param.params['system'] = 'allSystemTotal'
+          }
+          if (filter['system'] === 'total' && !filter['domainCode'] && !filter.hasOwnProperty('month')) {
+            param.params['system'] = 'allSystem'
+          }
+          // if (filter['system'] !== 'total') {
+          //   param.params['system'] = filter['system']
+          // }
+          // if (filter['report']) {
+          //   param.params['domain'] = 'total'
+          // }
+          // if (filter['report'] === 'linemonth') {
+          //   param.params['domain'] = ''
+          // }
+          // truyền params theo api sửa lại
+          // param.params['govAgencyCode'] = param.params['agency']
+          // param.params['domainCode'] = param.params['domain']
+          // if (param.params['govAgencyCode'] === 'total' && param.params['domainCode'] === '') {
+          //   param.params['groupBy'] = 2
+          // }
+          // if (param.params['govAgencyCode'] === '' && param.params['domainCode'] === 'total') {
+          //   param.params['groupBy'] = 1
+          // }
+          // 
+          let urlStatistic = '/o/statistic/dossier/report'
+          // try {
+          //   if (urlApiConfig && groupIdConfig) {
+          //     urlStatistic = urlApiConfig
+          //     param.params = {
+          //       year: filter.year,
+          //       month: filter.month,
+          //       govAgencyCode: filter['agency'],
+          //       groupBy: 1,
+          //       groupId: groupIdConfig
+          //     }
+          //     if (filter['report']) {
+          //       param.params['domainCode'] = 'total'
+          //     }
+          //     if (filter['report'] === 'linemonth') {
+          //       param.params['domainCode'] = ''
+          //     }
 
-              if (param.params['domain'] === 'total' && param.params['govAgencyCode'] !== 'total') {
-                param.params['groupBy'] = 1
-              }
-              if (param.params['domain'] !== 'total' && param.params['govAgencyCode'] === 'total') {
-                param.params['groupBy'] = 2
-              }
-            }
-          } catch (error) {
-          }
+          //     // truyền params theo api sửa lại
+          //     if (param.params['govAgencyCode'] === 'total' && param.params['domainCode'] === '') {
+          //       param.params['groupBy'] = 2
+          //     }
+          //     if (param.params['govAgencyCode'] === '' && param.params['domainCode'] === 'total') {
+          //       param.params['groupBy'] = 1
+          //       param.params['domainCode'] = 'total'
+          //     }
+          //     // 
+          //   }
+          // } catch (error) {
+          // }
           axios.get(urlStatistic, param).then(function (response) {
             let serializable = response.data
             // Khởi tạo group cha với fix trường hợp group cha không có dữ liệu, group con có dữ liệu
@@ -458,7 +503,10 @@ export const store = new Vuex.Store({
             month: filter.month,
             group: filter.group,
             agency: filter['agency'],
-            system: filter['system']
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+          if (filter['system'] !== 'total') {
+            params['system'] = filter['system']
           }
           if (filter['report']) {
             params['domain'] = 'total'
@@ -466,6 +514,16 @@ export const store = new Vuex.Store({
           if (filter['report'] === 'linemonth') {
             params['domain'] = ''
           }
+          // truyền params theo api sửa lại
+          params['govAgencyCode'] = paramm.params['agency']
+          params['domainCode'] = paramm.params['domain']
+          if (params['govAgencyCode'] === 'total' && params['domainCode'] === '') {
+            params['groupBy'] = 2
+          }
+          if (params['govAgencyCode'] === '' && params['domainCode'] === 'total') {
+            params['groupBy'] = 1
+          }
+          // 
           // 
           // let childsCode = []
           // if (state.groupConfig) {
@@ -475,7 +533,7 @@ export const store = new Vuex.Store({
           // }
           // 
           let dataPost = new URLSearchParams()
-          let url = '/statistics'
+          let url = '/statistic/dossier/report'
           // for (let index in params) {
           //   url += index + '=' + params[index] + '&'
           // }
@@ -1005,12 +1063,13 @@ export const store = new Vuex.Store({
             }
           }
           let textPost = {
-            fromReceiveDate: data.fromReceiveDate ? data.fromReceiveDate : '',
-            toReceiveDate: data.toReceiveDate ? data.toReceiveDate : ''
+            fromDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            toDate: data.toReceiveDate ? data.toReceiveDate : '',
+            type: data.type ? data.type : '',
           }
           let dataPost = new URLSearchParams()
           dataPost.append('method', 'GET')
-          dataPost.append('url', '/postal/vote/' + data.className + '/statistic/voteResult')
+          dataPost.append('url', '/postal/vote/' + data.className + '/statistic')
           dataPost.append('data', JSON.stringify(textPost))
           dataPost.append('serverCode', 'SERVER_DVC')
           axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
@@ -1023,6 +1082,49 @@ export const store = new Vuex.Store({
               } else {
                 items = items.filter(function (item) {
                   return item.govAgencyCode && item.voteCode
+                })
+              }
+              resolve(items)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    loadVotingResultNltt ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            // fromDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            // toDate: data.toReceiveDate ? data.toReceiveDate : '',
+            type: data.type ? data.type : '',
+            domainCode: data.domainCode ? data.domainCode : '',
+            month: 0,
+            year: (new Date()).getFullYear()
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/vote/' + data.className + '/statistic')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              if (data.domainCode) {
+                items = items.filter(function (item) {
+                  return item.domainCode && item.voteCode && item.domainCode === data.domainCode
+                })
+              } else {
+                items = items.filter(function (item) {
+                  return item.domainCode && item.voteCode
                 })
               }
               resolve(items)
@@ -1083,12 +1185,13 @@ export const store = new Vuex.Store({
             }
           }
           let textPost = {
-            fromReceiveDate: data.fromReceiveDate ? data.fromReceiveDate : '',
-            toReceiveDate: data.toReceiveDate ? data.toReceiveDate : ''
+            fromDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            toDate: data.toReceiveDate ? data.toReceiveDate : '',
+            type: 24
           }
           let dataPost = new URLSearchParams()
           dataPost.append('method', 'GET')
-          dataPost.append('url', '/postal/vote/survey/statistic/voteResult/serviceL34')
+          dataPost.append('url', '/postal/vote/dossier/statistic')
           dataPost.append('data', JSON.stringify(textPost))
           dataPost.append('serverCode', 'SERVER_DVC')
           axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {

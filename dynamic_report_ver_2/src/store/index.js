@@ -646,16 +646,20 @@ export const store = new Vuex.Store({
                   param.params['from' + keySearch] = filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp' ? dateCurrent.getTime() : new Date(dateCurrent).toLocaleDateString('vi-VN')
                   param.params['to' + keySearch] = filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp' ? dateCurrent.getTime() : new Date(dateCurrent).toLocaleDateString('vi-VN')
                 } else {
-                  let [day, month, year] = currentVal.split('/')
-                  if (day && month && year && filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp') {
-                    let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
-                    if (key === 'toDate') {
-                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T23:59`)).getTime()
-                    }
-                    param.params[key] = timeStampDate
-                  } else {
+                  try {
+                    let [day, month, year] = currentVal.split('/')
+                    if (day && month && year && filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp') {
+                      let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                      if (key === 'toDate') {
+                        timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T23:59`)).getTime()
+                      }
+                      param.params[key] = timeStampDate
+                    } else {
+                      param.params[key] = currentVal
+                    }   
+                  } catch (error) {
                     param.params[key] = currentVal
-                  }                  
+                  }             
                 }
               }
             }

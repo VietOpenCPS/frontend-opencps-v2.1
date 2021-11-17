@@ -208,8 +208,8 @@ export default {
       let vm = this
       vm.btnLoading = true
       vm.$store.dispatch('loadVotingResultDossier', {
-        fromReceiveDate: vm.fromReceiveDateFormatted,
-        toReceiveDate: vm.toReceiveDateFormatted,
+        fromReceiveDate: (new Date(vm.parseDate(vm.fromReceiveDateFormatted))).getTime(),
+        toReceiveDate: (new Date(vm.parseDate(vm.toReceiveDateFormatted))).getTime(),
         govAgencyCode: vm.govAgency ? vm.govAgency['govAgencyCode'] : ''
       }).then(function(result) {
         vm.btnLoading = false

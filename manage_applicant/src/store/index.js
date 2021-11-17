@@ -96,8 +96,8 @@ export const store = new Vuex.Store({
         
         axios.post(url, dataPutUser, param).then(result1 => {
           resolve(result1)
-        }).catch(xhr => {
-          reject(xhr)
+        }).catch(err => {
+          reject(err.response)
         })
       })
     },
@@ -125,8 +125,8 @@ export const store = new Vuex.Store({
         dataPutUser.append('applicantIdDate', filter['applicantIdDate'])
         axios.put(url, dataPutUser, param).then(result1 => {
           resolve(result1)
-        }).catch(xhr => {
-          reject(xhr)
+        }).catch(err => {
+          reject(err.response)
         })
       })
     },
@@ -364,6 +364,42 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getServiceInfoItems ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+            }
+          }
+          axios.get('/o/rest/v2/onegate/serviceconfigs/processes', param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getDossierPart ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+            }
+          }
+          axios.get('/o/rest/v2/dossiertemplates/' + filter.dossierTemplateNo, param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    }
   },
   mutations: {
     setLoading (state, payload) {

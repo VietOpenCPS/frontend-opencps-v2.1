@@ -9,7 +9,7 @@
             v-model="keyword"
             placeholder="Tìm kiếm theo tên hồ sơ, mã hồ sơ, tên thủ tục, chủ hồ sơ ..."
             solo
-            @change="keyword=String(keyword).trim()"
+            @change="changeKeyword"
             @keyup.enter="keywordEventChange"
           ></v-text-field>
         </div>
@@ -3333,6 +3333,11 @@ export default {
           alert('Bạn không có quyền thao tác với hồ sơ này')
         }
       }
+    },
+    changeKeyword () {
+      let vm = this
+      vm.keyword=String(vm.keyword).trim()
+      vm.$store.commit('setKeywordSearch', vm.keyword)
     },
     keywordEventChange (data) {
       let vm = this

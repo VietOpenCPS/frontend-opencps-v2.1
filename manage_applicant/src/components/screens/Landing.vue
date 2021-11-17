@@ -5,12 +5,19 @@
         <div class="background-triangle-big">
           <span>QUẢN LÝ THÔNG TIN CÔNG DÂN, CƠ QUAN TỔ CHỨC, DOANH NGHIỆP</span>
         </div>
+        <div class="layout row wrap header_tools row-blue mx-1">
+          <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+            <v-btn color="blue darken-3" dark class="my-0 mx-0 btn-border-left" @click="huongDanSuDung">
+              Hướng dẫn sử dụng
+            </v-btn>
+          </div>
+        </div>
       </div>
       
       <v-card-text class="px-0 pt-0">
         <v-layout wrap class="">
           <v-flex xs12 class="pr-2 mt-3">
-            <div class="text-bold d-inline-block mr-3" style="color: #903938;line-height: 24px;vertical-align: top;">Loại thông tin người dùng: </div>
+            <div class="text-bold d-inline-block mr-3" style="color: #004b94;line-height: 24px;vertical-align: top;">Đối tượng người dùng: </div>
             <v-radio-group class="pt-0 d-inline-block ml-3 mt-0" v-model="typeSearch" row @change="changeTypeSearch">
               <v-radio label="Công dân" :value="'citizen'"></v-radio>
               <v-radio label="Doanh nghiệp" :value="'business'"></v-radio>
@@ -46,11 +53,11 @@
               ></v-text-field>
           </v-flex>
         </v-layout>
-        <!-- <div style="text-align: right">
+        <div style="text-align: right">
           <v-btn color="blue darken-3" dark @click="addApplicant">
             <v-icon size="16">add</v-icon>&nbsp;Thêm mới
           </v-btn>
-        </div> -->
+        </div>
         <v-data-table
           :headers="applicantListHeader"
           :items="applicantLists"
@@ -100,27 +107,27 @@
                   <span>{{fullAddress(props.item['address'], props.item['cityName'], props.item['districtName'], props.item['wardName'])}}</span>
                 </div>
               </td>
-              <td class="text-xs-center" style="height:36px;width: 100px">
+              <td class="text-xs-center" style="height:36px;width: 150px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <v-tooltip top v-if="!loadingTable">
-                  <v-btn @click="showEditApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
-                    <v-icon>edit</v-icon>
+                  <v-btn @click="showEditApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 mr-3 my-0">
+                    <v-icon size="22">edit</v-icon>
                   </v-btn>
-                  <span>Sửa thông tin</span>
+                  <span>Cập nhật thông tin</span>
                 </v-tooltip>
                 <v-tooltip top v-if="!loadingTable && (getUser('Administrator') || getUser('Administrator_data')) && props.item['verification'] == 1">
-                  <v-btn @click="deleteApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
-                    <v-icon>delete</v-icon>
+                  <v-btn @click="deleteApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0 mr-3">
+                    <v-icon size="22">delete</v-icon>
                   </v-btn>
                   <span>Xóa</span>
                 </v-tooltip>
                 <v-tooltip top v-if="!loadingTable" class="ml-2">
                   <v-btn @click="documentManage(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
-                    <v-icon>fas fa fa-folder-open</v-icon>
+                    <v-icon size="22">fas fa fa-folder-open</v-icon>
                   </v-btn>
-                  <span>Quản lý tài liệu</span>
+                  <span>Kho giấy tờ</span>
                 </v-tooltip>
               </td>
             </tr>
@@ -212,7 +219,10 @@
                 <v-text-field label="Số điện thoại" v-model="applicantEdit['contactTelNo']" box></v-text-field>
               </v-flex>
               <v-flex xs12 sm6>
-                <v-text-field label="Thư điện tử" v-model="applicantEdit['contactEmail']" box ></v-text-field>
+                <v-text-field label="Thư điện tử" v-model="applicantEdit['contactEmail']" box 
+                :rules="applicantEdit['contactEmail'] ? [rules.email] : []"
+                >
+                </v-text-field>
               </v-flex>
               <v-flex xs12 sm12>
                 <v-text-field label="Địa chỉ" v-model="applicantEdit['address']" box clearable></v-text-field>
@@ -253,6 +263,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogHDSD" max-width="1200" transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>HƯỚNG DẪN SỬ DỤNG</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogHDSD = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <iframe id="dialogPDFPreview" :src="urlFileHdsdKhoDienTu" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -289,7 +312,7 @@ export default {
         sortable: false
       },
       {
-        text: 'Loại thông tin người dùng',
+        text: 'Đối tượng người dùng',
         align: 'center',
         sortable: false
       },
@@ -322,13 +345,21 @@ export default {
     menuBirthDate: false,
     toDateFormatted: null,
     dialog_editApplicant: false,
+    urlFileHdsdKhoDienTu: '',
+    dialogHDSD: false,
     valid: true,
     applicantEdit: '',
     ngayCap: null,
     cityItems: [],
     districtItems: [],
     wardItems: [],
-    rolesUser: []
+    rolesUser: [],
+    rules: {
+      email: (value) => {
+        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
+      }
+    }
   }),
   computed: {
     
@@ -388,6 +419,14 @@ export default {
     },
   },
   methods: {
+    huongDanSuDung () {
+      let vm = this
+      try {
+        vm.urlFileHdsdKhoDienTu = urlFileHdsdKhoDienTu
+      } catch (error) {
+      }
+      vm.dialogHDSD = true
+    },
     getApplicantList () {
       let vm = this
       let url = '/o/rest/v2/applicants'
@@ -630,10 +669,14 @@ export default {
               vm.applicantLists = result['data']
             }).catch(function () {
             })
-          }).catch(function () {
+          }).catch(function (err) {
             vm.loading = false
             toastr.clear()
-            toastr.error('Yêu cầu thực hiện thất bại')
+            if (err.description && String(err.description).indexOf('DuplicateApplicantIdException') >= 0) {
+              toastr.error('Yêu cầu thực hiện thất bại')
+            } else {
+              toastr.error('Số CMND/ CCCD/ MST đã tồn tại trên hệ thống')
+            }
           })
         } else {
           vm.$store.dispatch('addUser', vm.applicantEdit).then(function () {
@@ -646,10 +689,14 @@ export default {
               vm.applicantLists = result['data']
             }).catch(function () {
             })
-          }).catch(function () {
+          }).catch(function (err) {
             vm.loading = false
             toastr.clear()
-            toastr.error('Yêu cầu thực hiện thất bại')
+            if (err.description && String(err.description).indexOf('DuplicateApplicantIdException') >= 0) {
+              toastr.error('Yêu cầu thực hiện thất bại')
+            } else {
+              toastr.error('Số CMND/ CCCD/ MST đã tồn tại trên hệ thống')
+            }
           })
         }
       }

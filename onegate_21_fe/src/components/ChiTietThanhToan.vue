@@ -12,6 +12,12 @@
           <v-card class="">
             <v-card-text class="px-0 py-0">
               <v-layout wrap>
+                <v-flex xs12 md2>
+                  <v-subheader class="pl-0 text-right">Tên phí, lệ phí: </v-subheader>
+                </v-flex>
+                <v-flex xs12 md10>
+                  <p class="mt-2 mb-0">{{payments.paymentFee}}</p>
+                </v-flex>
                 <v-flex xs12 sm2>
                   <v-subheader class="pl-0 text-right">Lệ phí: </v-subheader>
                 </v-flex>
@@ -129,7 +135,12 @@
                   <v-flex xs12 v-if="payments['paymentMethod'] === 'KeyPayDVCQG'">
 
                   </v-flex>
-
+                  <v-flex xs12 sm12 class="ml-3 mb-3">
+                    <v-btn class="ml-3" color="primary" @click="printPay()">
+                      <v-icon>print</v-icon> &nbsp;
+                      In biên lai
+                    </v-btn>
+                  </v-flex>
                   <!-- end -->
                 </v-layout>
                 <!-- <v-layout wrap v-if="Number(payments.paymentStatus) < 5 && payments.hasOwnProperty('invoicePayload') && payments['invoicePayload'] == 'VNPT'">
@@ -203,11 +214,6 @@
                 </v-flex>
                 <!--  -->
                 <v-flex xs12 sm12 class="ml-3 mb-3">
-                  <!-- <v-btn color="primary" @click="tracuuhoadon()">
-                    <v-icon>search</v-icon> 
-                    Tra cứu hóa đơn
-                  </v-btn> -->
-                  <!-- <v-btn v-if="originality === 3" class="ml-3" color="primary" @click="printPay()"> -->
                   <v-btn class="ml-3" color="primary" @click="printPay()">
                     <v-icon>print</v-icon> &nbsp;
                     In biên lai

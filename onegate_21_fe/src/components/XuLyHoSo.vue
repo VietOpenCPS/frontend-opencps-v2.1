@@ -189,7 +189,7 @@ import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
 import TraKetQua from './form_xu_ly/TraKetQua.vue'
 import ThuPhi from './form_xu_ly/FeeDetail.vue'
-import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
+// import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
@@ -204,7 +204,7 @@ export default {
     'phan-cong': PhanCong,
     'tra-ket-qua': TraKetQua,
     'thu-phi': ThuPhi,
-    'ky-duyet': KyDuyet,
+    // 'ky-duyet': KyDuyet,
     'y-kien-can-bo': YkienCanBoThucHien,
     'tai-lieu-ket-qua': TaoTaiLieuKetQua,
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
@@ -292,7 +292,8 @@ export default {
     actionActiveTmp: [],
     gopThuPhi: true,
     changePaymentStatus: false,
-    createFiles: []
+    createFiles: [],
+    doActionGroupNew: false
   }),
   computed: {
     loading () {
@@ -322,6 +323,10 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
+      try{
+        vm.doActionGroupNew = doActionGroupNew
+      } catch {
+      }
       vm.btnIndex = -1
       let currentQuery = vm.$router.history.current.query
       console.log('currentQuery', currentQuery)
@@ -342,7 +347,6 @@ export default {
             vm.gopThuPhi = gopThuPhi
           }
         } catch {
-
         }
       }
       if (vm.dossierSelectedDoAction.length === 0) {
@@ -578,7 +582,39 @@ export default {
           }
         }
       }
-      if (vm.showTaoTaiLieuKetQua) {
+      // Sử dụng thao tác gộp all in 1 api
+      if (vm.doActionGroupNew) {
+        let idDossiers = vm.dossierSelected.map(obj =>{
+          return obj.dossierId
+        }).toString()
+        doAction = function () {
+          let file = ''
+          let createFileAttach = ''
+          try {
+            createFileAttach = vm.$refs.tailieuketqua ? vm.$refs.tailieuketqua.getCreateFileAttach() : ''
+          } catch (error) {
+          }
+          if (createFileAttach && createFileAttach.length > 0) {
+            if (createFileAttach[0]['filesAttach'] && createFileAttach[0]['filesAttach'].length > 0) {
+              file = createFileAttach[0]['filesAttach'][0]
+            }
+          }
+          let filter = {
+            actionCode: vm.actionActive.action,
+            actionUser: actionUser,
+            fileEntryId: file ? String(file['fileEntryESign']) : '',
+            dossierIds: idDossiers,
+            dossierTemplateNo: file ? file.dossierTemplateNo : '',
+            dossierPartNo: file ? file.dossierPartNo : '',
+            fileTemplateNo: file ? file.fileTemplateNo : '',
+            displayName: file ? file.displayName : '',
+            fileType: file.type ? file.type : 'application/pdf'
+          }
+          vm.postAction(filter)
+        }
+
+      }
+      if (vm.showTaoTaiLieuKetQua && !vm.doActionGroupNew) {
         let createFileAttach = vm.$refs.tailieuketqua.getCreateFileAttach()
         let arrFileAttach = []
         for (let key in createFileAttach) {
@@ -639,9 +675,7 @@ export default {
       if (vm.showFormBoSungThongTinNgan) {
         filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
       }
-      if (vm.showKyPheDuyetTaiLieu) {
-        let result = vm.$refs.kypheduyettailieu.doExport()
-      }
+      
       if (vm.showEditDate) {
         let date = vm.$refs.ngayhentra.getDateInput()
         console.log('dueDateEdit', date)
@@ -671,71 +705,106 @@ export default {
       if (vm.showYkienCanBoThucHien) {
         if (vm.validateAction) {
           vm.loadingActionProcess = true
-          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-            vm.countProcessed += 1
-            vm.dossierSelected[index]['statusAction'] = true
-            // console.log('countProcessed', vm.countProcessed)
-            // console.log('length', vm.dossierProcess.length)
-            if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
-              vm.dialog_statusAction = true
-            } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
+          if (!vm.doActionGroupNew) {
+            vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+              vm.countProcessed += 1
+              vm.dossierSelected[index]['statusAction'] = true
+              // console.log('countProcessed', vm.countProcessed)
+              // console.log('length', vm.dossierProcess.length)
+              if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
+                vm.dialog_statusAction = true
+              } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
+                vm.loadingActionProcess = false
+                vm.loadingAction = false
+                vm.btnStateVisible = false
+                setTimeout(function () {
+                  vm.goBack()
+                }, 500)
+              }
+              // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
+            }).catch(function (reject) {
+              vm.countProcessed += 1
+              vm.activeNotify = true
+              vm.dossierSelected[index]['statusAction'] = false
+              if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
+                vm.dialog_statusAction = true
+              } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
+                vm.loadingActionProcess = false
+                vm.loadingAction = false
+                vm.btnStateVisible = false
+                setTimeout(function () {
+                  vm.goBack()
+                }, 500)
+              }
+            })
+          } else {
+            vm.$store.dispatch('doActionGroup', filter).then(function (result) {
               vm.loadingActionProcess = false
               vm.loadingAction = false
               vm.btnStateVisible = false
               setTimeout(function () {
                 vm.goBack()
               }, 500)
-            }
-            // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
-          }).catch(function (reject) {
-            vm.countProcessed += 1
-            vm.activeNotify = true
-            vm.dossierSelected[index]['statusAction'] = false
-            if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
-              vm.dialog_statusAction = true
-            } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
-              vm.loadingActionProcess = false
-              vm.loadingAction = false
-              vm.btnStateVisible = false
-              setTimeout(function () {
-                vm.goBack()
-              }, 500)
-            }
-          })
+            }).catch(function (reject) {
+                vm.loadingActionProcess = false
+                vm.loadingAction = false
+                // vm.btnStateVisible = false
+                // setTimeout(function () {
+                //   vm.goBack()
+                // }, 500)
+            })
+          }
+          
         }
       } else {
         if (vm.validateAction) {
           vm.loadingActionProcess = true
-          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-            vm.countProcessed += 1
-            vm.dossierSelected[index]['statusAction'] = true
-            if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
-              vm.dialog_statusAction = true
-            } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
+          if (!vm.doActionGroupNew) {
+            vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+              vm.countProcessed += 1
+              vm.dossierSelected[index]['statusAction'] = true
+              if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
+                vm.dialog_statusAction = true
+              } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
+                vm.loadingActionProcess = false
+                vm.loadingAction = false
+                vm.btnStateVisible = false
+                setTimeout(function () {
+                  vm.goBack()
+                }, 500)
+              }
+            }).catch(function (reject) {
+              vm.countProcessed += 1
+              vm.activeNotify = true
+              vm.dossierSelected[index]['statusAction'] = false
+              if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
+                vm.dialog_statusAction = true
+              } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
+                vm.loadingActionProcess = false
+                vm.loadingAction = false
+                vm.btnStateVisible = false
+                setTimeout(function () {
+                  vm.goBack()
+                }, 500)
+              }
+            })
+          } else {
+            vm.$store.dispatch('doActionGroup', filter).then(function (result) {
               vm.loadingActionProcess = false
               vm.loadingAction = false
               vm.btnStateVisible = false
               setTimeout(function () {
                 vm.goBack()
               }, 500)
-            }
-            // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
-          }).catch(function (reject) {
-            vm.countProcessed += 1
-            vm.activeNotify = true
-            vm.dossierSelected[index]['statusAction'] = false
-            if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
-              vm.dialog_statusAction = true
-            } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
-              vm.loadingActionProcess = false
-              vm.loadingAction = false
-              vm.btnStateVisible = false
-              setTimeout(function () {
-                vm.goBack()
-              }, 500)
-            }
-            // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
-          })
+            }).catch(function (reject) {
+                vm.loadingActionProcess = false
+                vm.loadingAction = false
+                // vm.btnStateVisible = false
+                // setTimeout(function () {
+                //   vm.goBack()
+                // }, 500)
+            })
+          }
         }
       }
     },

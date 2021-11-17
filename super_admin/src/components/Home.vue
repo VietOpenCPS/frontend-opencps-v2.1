@@ -132,7 +132,7 @@
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
-      <div v-if="hasTrackingApi">
+      <div>
         <v-btn class="mx-0 my-0 white--text" color="#0b72ba"
           @click="theoDoiLog"
         >

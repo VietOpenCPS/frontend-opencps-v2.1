@@ -711,10 +711,11 @@ export default {
     submitAdvSearch () {
       let vm = this
       // vm.selectMultiplePage = []
-      console.log('fromReceiveDate', vm.fromReceiveDate, vm.toReceiveDate)
+      let keywordSearch = vm.$store.getters.getKeywordSearch
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
+      newQuery['keyword'] = keywordSearch
       newQuery['status'] = vm.status
       newQuery['substatus'] = vm.substatus
       newQuery['top'] = vm.top
@@ -741,7 +742,7 @@ export default {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
-      queryString += 'adv_renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+      queryString += ('adv_renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1)
       queryString = queryString.replace(/=__/g, '=')
       vm.$router.push({
         path: current.path + queryString
