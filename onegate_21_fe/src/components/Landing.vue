@@ -245,7 +245,7 @@
       </v-btn> -->
       <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
         v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
-        v-if="(String(item.form).indexOf('VIEW') < 0 && menuType !== 3 && !hideGroupAction) || (String(item.form).indexOf('VIEW') < 0 && menuType !== 3 && hideGroupAction && String(item.form) !== 'ACTIONS') "
+        v-if="showThaoTac(item)"
         :loading="loadingAction && indexBTN === indexAction"
         :disabled="loadingAction && indexBTN === indexAction"
       >
@@ -1217,6 +1217,9 @@ export default {
     employeeLoginInfomation () {
       return this.$store.getters.getEmployeeLogin
     },
+    userRoles () {
+      return this.$store.getters.getUser.role
+    }
   },
   created () {
     let vm = this
@@ -3465,6 +3468,30 @@ export default {
         return list
       }
       
+    },
+    showThaoTac (item) {
+      let vm = this
+      let value = false
+      if (
+        (String(item.form).indexOf('VIEW') < 0 && vm.menuType !== 3 && !vm.hideGroupAction) ||
+        (String(item.form).indexOf('VIEW') < 0 && vm.menuType !== 3 && vm.hideGroupAction && String(item.form) !== 'ACTIONS')
+      ) {
+        value = true
+      }
+      if (item.hasOwnProperty('isRole') && item.isRole) {
+        let roleAction = item.isRole.split(',')
+        for (let i = 0; i < roleAction.length; i++) {
+          let roleItem = roleAction[i]
+          let roleExits = vm.userRoles.find(item => item === roleItem)
+          if (roleExits) {
+            value = true
+            break;
+          } else {
+            value = false
+          }
+        }
+      }
+      return value
     },
     changeDate() {
       let vm = this

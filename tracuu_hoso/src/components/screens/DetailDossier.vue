@@ -305,8 +305,6 @@
   </div>
 </template>
 <script>
-  import router from '@/router'
-  import Vue from 'vue/dist/vue.min.js'
   import toastr from 'toastr'
   export default {
     props: ['index', 'detail'],
@@ -495,7 +493,7 @@
       },
       loadDossierDetailMotcua () {
         let vm = this
-        if (vm.two_system) {
+        if (vm.two_system && vm.dossierDetail) {
           vm.$store.dispatch('loadDetailDossierMC', vm.dossierDetail).then(function (result) {
             console.log('loadDetailDossierMC', result)
             vm.dossierDetailMotcua = result[0]
@@ -555,6 +553,9 @@
       },
       getPaymentInfo () {
         let vm = this
+        if (!vm.dossierDetail) {
+          return
+        }
         let scr = vm.getScr(vm.dossierDetail.referenceUid)
         let filter = {
           referenceUid: vm.dossierDetail.referenceUid,

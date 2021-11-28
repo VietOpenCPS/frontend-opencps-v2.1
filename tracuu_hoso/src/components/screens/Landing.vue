@@ -42,14 +42,21 @@
             <div v-else><span style="color: red">(*) </span> Nhập mã hồ sơ hoặc số CMND/ hộ chiếu để thực hiện tra cứu hồ sơ.</div>
           </v-flex>
           <v-flex xs12 :class="isMobile ? 'mb-2 right' : 'mb-2'">
+            <v-btn v-if="traCuuQlvt" class="mr-2 ml-0" color="primary" @click="traCuuHoSoVanTai"
+            :loading="loading"
+            :disabled="loading">
+              <v-icon>search</v-icon> &nbsp;
+              Hồ sơ Quản lý vận tải
+              <span slot="loader">Loading...</span>
+            </v-btn>
             <v-btn class="mr-2 ml-0" color="primary" @click="changeDataSearch"
             :loading="loading"
             :disabled="loading">
               <v-icon>search</v-icon> &nbsp;
-              Tìm kiếm
+              {{traCuuQlvt ? 'Hồ sơ DVC' : 'Tìm kiếm'}}
               <span slot="loader">Loading...</span>
             </v-btn>
-            <v-btn class="" outline color="#0072bc" @click.native="goBack">
+            <v-btn v-if="!traCuuQlvt" class="" outline color="#0072bc" @click.native="goBack">
               <v-icon>reply</v-icon> &nbsp;
               Quay lại
             </v-btn>
@@ -61,7 +68,7 @@
         </v-card>
       </v-flex>
 
-      <v-flex xs12 md9 :class="isMobile ? 'pt-1 mb-2' : 'pl-3 pt-1 mb-2'">
+      <v-flex v-if="!hoSoQlvt" xs12 md9 :class="isMobile ? 'pt-1 mb-2' : 'pl-3 pt-1 mb-2'">
         <v-card flat class="" v-if="!detail">
           <div class="" v-if="totalDossier > 0">
             <div class="px-2">Có <span class="text-bold" style="color:#0167d3">{{totalDossier}}</span> hồ sơ được tìm thấy</div>
@@ -149,6 +156,73 @@
         <v-card flat class="" v-else>
           <chi-tiet-ho-so :detail="dossierDetail"></chi-tiet-ho-so>
         </v-card>
+      </v-flex>
+      <v-flex v-if="hoSoQlvt" xs12 md9 :class="isMobile ? 'pt-1 mb-2' : 'pl-3 pt-1 mb-2'">
+        <div v-if="detailQlvt">
+          <v-layout class="wrap">
+            <v-flex :class="isMobile ? 'pb-2 pl-2' : 'pb-2'">
+              <h3 style="color:#0054a6"><span class="text-bold">Tên hồ sơ: </span>{{detailQlvt.TenTTHC}}</h3>
+            </v-flex>
+          </v-layout>
+          <v-card>
+            <v-card-text class="px-0 py-0">
+              <v-layout wrap class="px-2 py-2">
+                <v-flex xs12 sm4 class="pr-3">
+                  <div class="xs12 sm12 pb-1">
+                    <span class="pr-2">Mã hồ sơ: </span>
+                    <span class="pl-0 text-bold ">  {{detailQlvt.MaHoSo}} </span>
+                  </div>
+                  <div class="xs12 sm12 pb-1">
+                    <span class="pr-2">Chủ hồ sơ: </span>
+                    <span class="pl-0 text-bold"> {{detailQlvt.ChuHoSo}} </span>
+                  </div>
+                  <div class="xs12 sm12 pb-1">
+                    <span class="pr-2">Mã chủ hồ sơ : </span>
+                    <span class="pl-0 text-bold ">  {{detailQlvt.MaDoiTuong}} </span>
+                  </div>
+                  <!--  -->
+                  <div class="xs12 sm12 pb-1">
+                    <span class="pr-2">Đơn vị tiếp nhận: </span>
+                    <span class="pl-0 text-bold ">  {{detailQlvt.DonViXuLy}} </span>
+                  </div>
+                  <!--  -->
+                  
+                </v-flex>
+                <!--  -->
+                <v-flex xs12 sm4>
+                  <!--  -->
+                  <div class="xs12 sm12 pb-1">
+                    <span class="pr-2">Trạng thái: </span>
+                    <span class="pl-0 text-bold "> {{detailQlvt.TenTrangThaiHoSo}} </span>
+                  </div>
+                  <div class="xs12 sm12 pb-1">
+                    <span class="pr-2">Ngày gửi: </span>
+                    <span class="pl-0 text-bold"> {{detailQlvt.NgayGuiHoSo}} </span>
+                  </div>
+                  <!--  -->
+                  <div class="xs12 sm12 pb-1">
+                    <span class="pr-2">Ngày tiếp nhận: </span>
+                    <span class="pl-0 text-bold "> {{detailQlvt.NgayTiepNhan}}</span>
+                  </div>
+                  <!--  -->
+                  <div class="xs12 sm12 pb-1" v-if="detailQlvt.NgayHenTra">
+                    <span class="pr-2">Ngày hẹn trả: </span>
+                    <span class="pl-0 text-bold "> {{detailQlvt.NgayHenTra}}</span>
+                  </div>
+                  <div class="xs12 sm12 pb-1" v-if="detailQlvt.NgayKetThucXuLy">
+                    <span class="pr-2">Ngày hoàn thành: </span>
+                    <span class="pl-0 text-bold "> {{detailQlvt.NgayKetThucXuLy}}</span>
+                  </div>
+                </v-flex>
+              </v-layout>
+            </v-card-text>
+          </v-card>
+        </div>
+        <div v-else class="no-data" style="min-heiht: 350px; text-align: center; opacity: 0.7">
+          <img style="max-width: 500px;max-height:350px" src="/o/opencps-store/js/cli/tracuu_hoso/app/img/browser.svg" alt="" srcset=""><br>
+          <span>Không có hồ sơ nào được tìm thấy</span> <br>
+          <span>Vui lòng nhập thông tin tra cứu hồ sơ</span>
+        </div>
       </v-flex>
     </v-layout>
     <v-dialog v-model="dialogCheckPass" max-width="450">
@@ -270,7 +344,10 @@ export default {
       {text: 'Đã xử lý xong', value: 'releasing'},
       {text: 'Đã trả kết quả', value: 'done'}
     ],
-    status: null
+    status: null,
+    traCuuQlvt: false,
+    hoSoQlvt: false,
+    detailQlvt: ''
   }),
   computed: {
     originality () {
@@ -293,6 +370,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.traCuuQlvt = traCuuQlvt
+    } catch (error) {  
+    }
     try {
       vm.forEPayment = forEPayment
     } catch (error) {  
@@ -367,6 +448,7 @@ export default {
     },
     changeDataSearch () {
       let vm = this
+      vm.hoSoQlvt = false
       if (vm.dossierNoKey || vm.applicantIdNo) {
         setTimeout(function () {
           vm.dossierPage = 1
@@ -391,6 +473,30 @@ export default {
         }, 100)
       } else {
         toastr.error('Vui lòng nhập mã hồ sơ hoặc số CMND/ hộ chiếu để tra cứu')
+      }
+    },
+    traCuuHoSoVanTai () {
+      let vm = this
+      vm.hoSoQlvt = true
+      vm.detail = true
+      if (vm.dossierNoKey) {
+        vm.loading = true
+        let filter = {
+          dossierNo: vm.dossierNoKey
+        }
+        vm.$store.dispatch('traCuuHsQlvt', filter).then(function (result) {
+          vm.loading = false
+          if (result) {
+            vm.detailQlvt = result
+          } else {
+            vm.detailQlvt = ''
+          }
+        }).catch(function (reject) {
+          vm.loading = false
+          // toastr.error('Lỗi hệ thống')
+        })
+      } else {
+        toastr.error('Vui lòng nhập mã hồ sơ để tra cứu')
       }
     },
     changeStatus () {

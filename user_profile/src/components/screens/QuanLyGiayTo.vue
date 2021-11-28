@@ -16,7 +16,7 @@
       </div>
       <v-card-text class="px-0 pt-0 mt-3">
         <v-layout wrap class="mt-0">
-          <v-flex xs12 sm6 class="pr-2">
+          <!-- <v-flex xs12 sm6 class="pr-2">
             <v-autocomplete
               :items="fileTemplateList"
               v-model="fileTemplateNo"
@@ -41,7 +41,7 @@
               @change="changeFilterSearch"
               box
             ></v-autocomplete>
-          </v-flex>
+          </v-flex> -->
           <v-flex xs12 sm6 class="pr-2">
             <v-text-field
               label="Tìm theo tên tài liệu"
@@ -69,11 +69,11 @@
             ></v-text-field>
           </v-flex>
         </v-layout>
-        <v-flex style="width: 100%;height:32px">
+        <!-- <v-flex style="width: 100%;height:32px">
           <v-btn class="mx-0 my-0 right" color="primary" dark @click.native="showCreatedocument">
             <v-icon size="18">add</v-icon> &nbsp; Thêm tài liệu
           </v-btn>
-        </v-flex>
+        </v-flex> -->
         <v-data-table
           :headers="documentListHeader"
           :items="documentApplicantList"
@@ -149,12 +149,12 @@
                   </v-btn>
                   <span>Tải xuống</span>
                 </v-tooltip>
-                <v-tooltip top v-if="!loadingTable && props.item.status === 1" class="mr-2">
+                <!-- <v-tooltip top v-if="!loadingTable && props.item.status === 1" class="mr-2">
                   <v-btn @click="showEditDocument(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon>edit</v-icon>
                   </v-btn>
                   <span>Chỉnh sửa</span>
-                </v-tooltip>
+                </v-tooltip> -->
               </td>
             </tr>
           </template>
