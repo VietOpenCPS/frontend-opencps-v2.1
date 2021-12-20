@@ -301,9 +301,11 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          // test local
-          // axios.get('http://127.0.0.1:8081/api/users/' + data.confirmCode + '/forgot', param).then(function (response) {
-          axios.get('/o/rest/v2/users/' + data.confirmCode + '/forgot?j_captcha_response=' + data['j_captcha_response'], param).then(function (response) {
+          let url = '/o/rest/v2/users/' + data.confirmCode + '/forgot?j_captcha_response=' + data['j_captcha_response']
+          if (data.apiForgot) {
+            url = '/o/rest/v2/users/' + data.confirmCode + '/resetpasswordusingticket?j_captcha_response=' + data['j_captcha_response']
+          }
+          axios.get(url, param).then(function (response) {
             if (response['status'] !== undefined && response['status'] === 203) {
               toastr.clear()
               toastr.error('Nhập sai mã Captcha')
@@ -343,10 +345,10 @@ export const store = new Vuex.Store({
               resolve(response.data)
               toastr.clear()
               toastr.success('Xác thực thành công. Bạn vui lòng kiểm tra email hoặc số điện thoại để có mật khẩu mới')
-              setTimeout(function () {
-                let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
-                window.open(redirectURL, '_self')
-              }, 500)
+              // setTimeout(function () {
+              //   let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+              //   window.open(redirectURL, '_self')
+              // }, 500)
             }
           }).catch(function (errorRes) {
             let response = errorRes.response

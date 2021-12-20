@@ -178,7 +178,7 @@
             <v-card-actions class="pr-2 mr-1">
               <v-spacer></v-spacer>
               <v-btn color="red" dark @click.native="dialog_edit_payment = false">
-                <v-icon size="16" >undo</v-icon>&nbsp;
+                <v-icon size="16" >reply</v-icon>&nbsp;
                 Quay lại
                 <span slot="loader">Loading...</span>
               </v-btn>

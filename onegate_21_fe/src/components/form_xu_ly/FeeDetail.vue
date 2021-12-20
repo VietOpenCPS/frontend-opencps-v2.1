@@ -101,6 +101,8 @@
               </v-flex>
               <v-flex xs12 sm7></v-flex>
               <!--  -->
+              
+              <!--  -->
             </v-layout>
           </v-card-text>
           <v-card-text class="pt-0">

@@ -546,31 +546,31 @@ export default {
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
     },
-    optionCreate (val) {
-      let vm = this
-      setTimeout (function () {
-        if (vm.optionCreate) {
-          let filter = {
-            dossierTemplateNo: vm.optionCreate.templateNo
-          }
-          vm.$store.dispatch('getDossierPart', filter).then(function (result) {
-            if (result.hasOwnProperty('dossierParts')) {
-              vm.fileTemplateList = result.dossierParts
-              vm.fileTemplateNoCreate = ''
-            } else {
-              vm.fileTemplateList = []
-            }
-            if (vm.fileTemplateList && vm.fileTemplateList.length === 1) {
-              vm.fileTemplateNoCreate = vm.fileTemplateList[0]
-            }
-          }).catch(function () {
-          })
-        } else {
-          vm.fileTemplateList = []
-          vm.fileTemplateNoCreate = ''
-        }
-      }, 200)
-    }
+    // optionCreate (val) {
+    //   let vm = this
+    //   setTimeout (function () {
+    //     if (vm.optionCreate) {
+    //       let filter = {
+    //         dossierTemplateNo: vm.optionCreate.templateNo
+    //       }
+    //       vm.$store.dispatch('getDossierPart', filter).then(function (result) {
+    //         if (result.hasOwnProperty('dossierParts')) {
+    //           vm.fileTemplateList = result.dossierParts
+    //           vm.fileTemplateNoCreate = ''
+    //         } else {
+    //           vm.fileTemplateList = []
+    //         }
+    //         if (vm.fileTemplateList && vm.fileTemplateList.length === 1) {
+    //           vm.fileTemplateNoCreate = vm.fileTemplateList[0]
+    //         }
+    //       }).catch(function () {
+    //       })
+    //     } else {
+    //       vm.fileTemplateList = []
+    //       vm.fileTemplateNoCreate = ''
+    //     }
+    //   }, 200)
+    // }
   },
   created () {
     let vm = this
@@ -804,28 +804,27 @@ export default {
           vm.fileTemplateNoCreate = ''
           if (vm.optionList && vm.optionList.length === 1) {
             vm.optionCreate = vm.optionList[0]
+            if (vm.optionCreate) {
+              let filter = {
+                dossierTemplateNo: vm.optionCreate.templateNo
+              }
+              vm.$store.dispatch('getDossierPart', filter).then(function (result) {
+                if (result.hasOwnProperty('dossierParts')) {
+                  vm.fileTemplateList = result.dossierParts
+                  vm.fileTemplateNoCreate = ''
+                } else {
+                  vm.fileTemplateList = []
+                }
+                if (vm.fileTemplateList && vm.fileTemplateList.length === 1) {
+                  vm.fileTemplateNoCreate = vm.fileTemplateList[0]
+                }
+              }).catch(function () {
+              })
+            } else {
+              vm.fileTemplateList = []
+              vm.fileTemplateNoCreate = ''
+            }
           }
-          // 
-          // if (vm.optionCreate) {
-          //   let filter = {
-          //     dossierTemplateNo: vm.optionCreate.templateNo
-          //   }
-          //   vm.$store.dispatch('getDossierPart', filter).then(function (result) {
-          //     if (result.hasOwnProperty('dossierParts')) {
-          //       vm.fileTemplateList = result.dossierParts
-          //       vm.fileTemplateNoCreate = ''
-          //     } else {
-          //       vm.fileTemplateList = []
-          //     }
-          //     if (vm.fileTemplateList && vm.fileTemplateList.length === 1) {
-          //       vm.fileTemplateNoCreate = vm.fileTemplateList[0]
-          //     }
-          //   }).catch(function () {
-          //   })
-          // } else {
-          //   vm.fileTemplateList = []
-          //   vm.fileTemplateNoCreate = ''
-          // }
         } else {
           if (vm.serviceInfoSearch) {
             vm.optionListSearch = vm.serviceInfoSearch.options
@@ -864,7 +863,27 @@ export default {
     },
     changeOption () {
       let vm = this
-      setTimeout(function () {
+      setTimeout (function () {
+        if (vm.optionCreate) {
+          let filter = {
+            dossierTemplateNo: vm.optionCreate.templateNo
+          }
+          vm.$store.dispatch('getDossierPart', filter).then(function (result) {
+            if (result.hasOwnProperty('dossierParts')) {
+              vm.fileTemplateList = result.dossierParts
+              vm.fileTemplateNoCreate = ''
+            } else {
+              vm.fileTemplateList = []
+            }
+            if (vm.fileTemplateList && vm.fileTemplateList.length === 1) {
+              vm.fileTemplateNoCreate = vm.fileTemplateList[0]
+            }
+          }).catch(function () {
+          })
+        } else {
+          vm.fileTemplateList = []
+          vm.fileTemplateNoCreate = ''
+        }
       }, 200)
     },
     showCreatedocument () {
@@ -924,6 +943,7 @@ export default {
             dataCreateFile.append('desciption', '')
             dataCreateFile.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
             dataCreateFile.append('templateNo', vm.optionCreate['templateNo'])
+            dataCreateFile.append('dossierNo', '')
             
             axios.post(url, dataCreateFile, param).then(result1 => {
               vm.loadingAction = false
@@ -981,6 +1001,7 @@ export default {
           dataCreateFile.append('desciption', '')
           dataCreateFile.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
           dataCreateFile.append('templateNo', vm.optionCreate['templateNo'])
+          dataCreateFile.append('dossierNo', '')
           
           axios.post(url, dataCreateFile, param).then(result1 => {
             vm.loadingAction = false
@@ -1044,6 +1065,7 @@ export default {
           dataPost.append('desciption', '')
           dataPost.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
           dataPost.append('templateNo', vm.optionCreate['templateNo'])
+          dataPost.append('dossierNo', '')
           if (vm.updateFile) {
             dataPost.append('file', vm.fileUpdate)
           } else {
@@ -1100,6 +1122,7 @@ export default {
         dataPost.append('desciption', '')
         dataPost.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
         dataPost.append('templateNo', vm.optionCreate['templateNo'])
+        dataPost.append('dossierNo', '')
 
         axios.put(url, dataPost, param).then(result1 => {
           vm.loadingAction = false

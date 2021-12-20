@@ -546,8 +546,15 @@
                       justify-content: center;
                       position: absolute;
                       width: 100%;"
-                      @click="getHashStringFile"
                     >
+                      <div class="d-flex" style="position: absolute; bottom: 0px; width: 100%;">
+                        <v-btn small color="indigo" class="white--text" @click="getHashStringFile">
+                          <v-icon style="color: #fff !important">edit</v-icon> &nbsp;&nbsp; KÝ TOKEN
+                        </v-btn>
+                        <v-btn small color="red" class="white--text" @click="signSimCa(fileKySo, indexFileSelect)">
+                          <v-icon style="color: #fff !important">sim_card</v-icon> &nbsp;&nbsp; KÝ SIM CA
+                        </v-btn>
+                      </div>
                     </div>
                   </v-expand-transition>
                 </div>
@@ -585,6 +592,42 @@
             </v-flex>
           </v-layout>
         </v-card-text>
+      </v-card>
+    </v-dialog>
+    <!-- ký số điện tử -->
+    <v-dialog
+      v-model="dialogInputMobile"
+      max-width="350"
+      persistent
+    >
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title style="font-size: 14px">NHẬP SỐ SIM CA THỰC HIỆN KÝ SỐ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogInputMobile = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="px-0 pb-0">
+          <v-layout wrap>
+            <v-flex xs12 class="text-xs-center" style="cursor: pointer">
+              <v-text-field class="my-2 mb-0 mx-2" 
+                v-model="mobileCA"
+                box
+                placeholder="0868919191, 0972919191, ..."
+              ></v-text-field>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-0" style="width: 125px" color="primary" @click="submitSignSimCa()" :loading="loadingAction"
+          :disabled="loadingAction">
+            <v-icon>save</v-icon> &nbsp;
+            Đồng ý
+            <span slot="loader">Đang chờ ký số</span>
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
     <!--  -->
@@ -851,7 +894,10 @@ export default {
     statusApplicantData: '',
     fileTemplateNoScope: '',
     nghiepvuhanghai: false,
-    yeuCauSoHoa: false
+    yeuCauSoHoa: false,
+    mobileCA: '',
+    dialogInputMobile: false,
+    loadingAction: false
   }),
   created () {
     let vm = this
@@ -2726,6 +2772,60 @@ export default {
         })
       })
       
+    },
+    signSimCa (file, index) {
+      let vm = this
+      vm.dialogSignDigital = false
+      vm.dialogInputMobile = true
+    },
+    submitSignSimCa () {
+      let vm = this
+      if (vm.mobileCA) {
+        toastr.success('Yêu cầu đã được gửi. Vui lòng xác nhận ký số trên thiết bị.')
+        let dataInsertSignature = {
+          dossierId: vm.thongTinHoSo['dossierId'],
+          referenceUid: vm.fileKySo.referenceUid,
+          mobile: '84' + String(vm.mobileCA).substring(1)
+        }
+        vm.loadingAction = true
+        vm.$store.dispatch('signatureVtSimCa', dataInsertSignature).then(res => {
+          console.log('resSimCA', res)
+          vm.loadingAction = false
+          if (res.message == 'success' && res.status == '200' && res['signedFileName']) {
+            let dataUploadFile = {
+              signedFileName: res['signedFileName'] ? res['signedFileName'] : ''
+            }
+            vm.$store.dispatch('uploadSignatureVtCa', dataUploadFile).then(res => {
+              let dataSigned
+              try {
+                dataSigned = JSON.parse(res.FileServer)
+                let dataUpdateFile = {
+                  fileEntryIdStr: dataSigned ? dataSigned['fileEntryId'] : '',
+                  dossierFileIdStr: vm.fileKySo.dossierFileId
+                }
+                vm.$store.dispatch('updateSignatureVtCa', dataUpdateFile).then(res => {
+                  toastr.success('Thực hiện ký số thành công')
+                  vm.dialogInputMobile = false
+                  vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+                    vm.dossierFilesItems = resFiles
+                  }).catch(reject => {
+                  })
+                }).catch(function() {
+                  toastr.error('Lỗi trong quá trình cập nhật tài liệu ký số')
+                })
+              } catch (error) {
+              }
+            }).catch(function() {
+              toastr.error('Tải tài liệu ký số lên không thành công')
+            })
+          } else {
+            toastr.clear()
+            toastr.error('Thực hiện ký số thất bại. Vui lòng thử lại.')
+          }
+        }).catch(function () {
+          vm.loadingAction = false
+        })
+      }
     },
     showEditorPdf (file) {
       let vm = this

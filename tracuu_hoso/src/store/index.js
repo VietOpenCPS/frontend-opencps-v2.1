@@ -421,6 +421,37 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    traCuuHsQlvt ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let settings = {
+            "url": "/o/rest/v2/dossiers/proxy",
+            "method": "GET",
+            "headers": {
+              "groupId": state.initData.groupId,
+              "Accept": "application/json",
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            "data": {
+              "serverCode": "SERVER_QLVT",
+              "method": "GET",
+              "typeCode": "tracuuhoso",
+              "data": JSON.stringify({MaHoSo: filter.dossierNo})
+            }
+          };
+          
+          $.ajax(settings).done(function (response) {
+            if (response) {
+              resolve(response)
+            } else {
+              resolve('')
+            }
+          }).fail(function () {
+            reject('')
+          })
+        }).catch(function (){})
+      })
+    },
     getTokenMd5 ({commit, state}) {
       let date = (new Date()).getDate()
       let month = (new Date()).getMonth() + 1

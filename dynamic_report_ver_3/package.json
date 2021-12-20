@@ -1,0 +1,46 @@
+{
+  "name": "app_dynamic_report",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vue-cli-service serve",
+    "build": "vue-cli-service build src/main.js",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@inotom/vue-go-top": "^1.0.2",
+    "axios": "^0.18.0",
+    "file-saver-fixed": "^1.3.8",
+    "idempotent-babel-polyfill": "^7.0.0",
+    "json-mapper-json": "^1.3.0",
+    "json2csv": "^3.0.0",
+    "jstoxml": "^1.4.4",
+    "pdfjs": "^2.1.0",
+    "pdfjs-dist": "^2.0.943",
+    "pdfmake": "^0.1.53",
+    "roboto-fontface": "*",
+    "toastr": "^2.1.4",
+    "vue": "^2.5.9",
+    "vue-content-placeholders": "^0.2.1",
+    "vue-friendly-iframe": "^0.9.0",
+    "vue-router": "^3.0.1",
+    "vuetify": "^1.4.2",
+    "vuex": "^3.0.1",
+    "babel-plugin-transform-remove-console": "^6.9.4"
+  },
+  "devDependencies": {
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@vue/cli-plugin-babel": "^3.0.5",
+    "@vue/cli-plugin-eslint": "^3.0.5",
+    "@vue/cli-service": "^3.0.5",
+    "babel-eslint": "^10.0.1",
+    "babel-plugin-transform-imports": "^1.5.0",
+    "eslint": "^5.8.0",
+    "eslint-plugin-vue": "^5.0.0",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.1",
+    "vue-cli-plugin-vuetify": "^0.4.6",
+    "vue-template-compiler": "^2.5.21",
+    "vuetify-loader": "^1.0.5"
+  }
+}

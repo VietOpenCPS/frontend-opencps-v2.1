@@ -1341,8 +1341,8 @@ export default {
             tempData['vnpostalStatus'] = dichvuchuyenphathoso.vnpostalStatus
             tempData['vnpostalProfile'] = vnpostal
           }
+          vm.loadingAction = true
           setTimeout(function () {
-            vm.loadingAction = true
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               if (vm.formCode === 'UPDATE') {
@@ -1416,8 +1416,9 @@ export default {
               vm.loadingAction = false
               toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            }).catch(function () {
+              vm.loadingAction = false
             })
-            
           }, 500)
         }
       }

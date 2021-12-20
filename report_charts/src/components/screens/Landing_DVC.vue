@@ -1117,21 +1117,14 @@ export default {
           })
         } else {
           vm.$store.dispatch('getReportTotal', vm.year).then(function (result) {
-            let agencyListsTotal = result
             // số liệu thống kê 2020 theo số liệu import từ excel 
             if (vm.year == 2020) {
               agencyListsTotal = vm.dataImportExcel
             }
             // 
-            for (let key in agencyListsTotal) {
-              let currentData = agencyListsTotal[key]
-              if (currentData.govAgencyName === 'total') {
-                vm.itemTotal = currentData
-                vm.itemTotal['ontimePercentage'] = (((vm.itemTotal.betimesCount + vm.itemTotal.ontimeCount)/vm.itemTotal.releaseCount)*100).toFixed(0)
-                vm.showTableTotal = true
-                break
-              }
-            }
+            vm.itemTotal = result[0]
+            vm.itemTotal['ontimePercentage'] = (((vm.itemTotal.betimesCount + vm.itemTotal.ontimeCount)/vm.itemTotal.releaseCount)*100).toFixed(0)
+            vm.showTableTotal = true
             if (vm.itemTotal === '') {
               vm.showTableTotal = false
             }
@@ -1185,29 +1178,31 @@ export default {
           })
         } else {
           vm.$store.dispatch('getReportTotal', '0').then(function (result) {
-            let agencyListsTotal = result
-            for (let key in agencyListsTotal) {
-              let currentData = agencyListsTotal[key]
-              if (currentData.govAgencyName === 'total') {
-                vm.itemTotalAllYear = currentData
-                vm.showTableTotal = true
-                break
-              }
-            }
+            // let agencyListsTotal = result
+            // for (let key in agencyListsTotal) {
+            //   let currentData = agencyListsTotal[key]
+            //   if (currentData.govAgencyName === 'total') {
+            //     vm.itemTotalAllYear = currentData
+            //     vm.showTableTotal = true
+            //     break
+            //   }
+            // }
+            vm.itemTotalAllYear = result[0]
+            vm.showTableTotal = true
             if (vm.itemTotal === '') {
               vm.showTableTotal = false
             }
             // ghép số liệu các năm 2019+2020+2021
             vm.$store.dispatch('getReportTotal', 2021).then(function (result) {
-              let total2021 = ''
-              let agencyListsTotal = result
-              for (let key in agencyListsTotal) {
-                let currentData = agencyListsTotal[key]
-                if (currentData.govAgencyName === 'total') {
-                  total2021 = currentData
-                  break
-                }
-              }
+              let total2021 = result[0]
+              // let agencyListsTotal = result
+              // for (let key in agencyListsTotal) {
+              //   let currentData = agencyListsTotal[key]
+              //   if (currentData.govAgencyName === 'total') {
+              //     total2021 = currentData
+              //     break
+              //   }
+              // }
               let total2020 = vm.dataImportExcel.filter(function (item) {
                 return item.month == 0 && !item.domainCode
               })[0]
@@ -1571,8 +1566,14 @@ export default {
         }
         vm.$store.dispatch('getAgencyReportLists', filter2).then(function (result) {
           console.log('TT-TT', result)
-          vm.onegateCount = result[0].onegateCount
-          vm.onlineCount = result[0].onlineCount
+          let online = 0
+          let onegate = 0
+          result.forEach(element => {
+            online += Number(element['onlineCount'])
+            onegate += Number(element['onegateCount'])
+          });
+          vm.onegateCount = onegate
+          vm.onlineCount = online
         })
         //  
       }
@@ -2089,7 +2090,7 @@ export default {
         //   vm.onegateCount = data[key].onegateCount
         //   vm.onlineCount = data[key].onlineCount
         // } else {
-          if (!data[key].govAgencyName && String(data[key].domainName) !== '' && String(data[key].domainName) !== 'total') {
+          // if (!data[key].govAgencyName && String(data[key].domainName) !== '' && String(data[key].domainName) !== 'total') {
             if (vm.year == 2020) {
               if (data[key]['month'] == vm.month) {
                 labelDomain.push(data[key].domainName)
@@ -2097,15 +2098,15 @@ export default {
             } else {
               labelDomain.push(data[key].domainName)
             }
-          } else {
-            if (vm.year == 2020) {
-              if (data[key]['month'] == vm.month) {
-                labelAgency.push(data[key].govAgencyName)
-              }
-            } else {
-              labelAgency.push(data[key].govAgencyName)
-            }
-          }
+          // } else {
+          //   if (vm.year == 2020) {
+          //     if (data[key]['month'] == vm.month) {
+          //       labelAgency.push(data[key].govAgencyName)
+          //     }
+          //   } else {
+          //     labelAgency.push(data[key].govAgencyName)
+          //   }
+          // }
           // năm 2020 lấy số liệu từ file excel import
           if (vm.year == 2020) {
             if (data[key]['month'] == vm.month) {
@@ -2121,19 +2122,17 @@ export default {
       // data report_3
       vm.seriesDossierTypeChart[0]['data'] = onegateCountData
       vm.seriesDossierTypeChart[1]['data'] = onlineCountData
-      vm.dossierTypeChartOption.xaxis.categories = vm.chartView ? labelAgency : labelDomain
+      vm.dossierTypeChartOption.xaxis.categories = labelDomain
+      console.log('seriesDossierTypeChart', vm.seriesDossierTypeChart)
+      console.log('dossierTypeChartOption', vm.dossierTypeChartOption)
       try {
-        if (typeDossierChartXLabel) {
-          vm.dossierTypeChartOption.xaxis.labels = typeDossierChartXLabel
-        } else {
-          vm.dossierTypeChartOption.xaxis.labels = {
-            show: true,
-            rotate: vm.isMobile ? -60 : 0,
-            rotateAlways: false,
-            trim: false,
-            formatter: function(val) {
-              return vm.isMobile ? String(val).normalize().replace('Việt Nam', '') : val
-            }
+        vm.dossierTypeChartOption.xaxis.labels = {
+          show: true,
+          rotate: vm.isMobile ? -60 : 0,
+          rotateAlways: false,
+          trim: false,
+          formatter: function(val) {
+            return vm.isMobile ? String(val).normalize().replace('Việt Nam', '') : val
           }
         }
       } catch (error) {

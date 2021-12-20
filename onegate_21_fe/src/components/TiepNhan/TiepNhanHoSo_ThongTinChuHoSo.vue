@@ -23,6 +23,15 @@
                     </v-btn>
                   </v-flex>
                   <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '1' && traCuuLgspCongDan">
+                    <!-- <v-btn :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0 mr-3" color="primary" @click.stop="checkInfoAccount()">
+                      <v-icon v-if="!loadingSearchLgsp">how_to_reg</v-icon> 
+                      <v-progress-circular :size="24" v-if="loadingSearchLgsp"
+                        indeterminate
+                        color="white"
+                      ></v-progress-circular>&nbsp;
+                      <span v-if="!loadingSearchLgsp">Kiểm tra thông tin tài khoản</span>
+                      <span v-if="loadingSearchLgsp">Đang kiểm tra</span>
+                    </v-btn> -->
                     <v-btn :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
                       <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
                       <v-progress-circular :size="24" v-if="loadingSearchLgsp"
@@ -31,6 +40,17 @@
                       ></v-progress-circular>&nbsp;
                       <span v-if="!loadingSearchLgsp">Kiểm tra thông tin công dân</span>
                       <span v-if="loadingSearchLgsp">Đang kiểm tra thông tin công dân</span>
+                    </v-btn>
+                  </v-flex>
+                  <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '2' && traCuuLgspDoanhNghiep">
+                    <v-btn :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspDoanhNghiep()">
+                      <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
+                      <v-progress-circular :size="24" v-if="loadingSearchLgsp"
+                        indeterminate
+                        color="white"
+                      ></v-progress-circular>&nbsp;
+                      <span v-if="!loadingSearchLgsp">Kiểm tra thông tin doanh nghiệp</span>
+                      <span v-if="loadingSearchLgsp">Đang kiểm tra thông tin doanh nghiệp</span>
                     </v-btn>
                   </v-flex>
                   <v-layout wrap>
@@ -740,6 +760,55 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- tạo tk -->
+    <v-dialog v-model="dialog_create_acc" scrollable persistent max-width="700px">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title >Tạo tài khoản</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_create_acc = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-1">
+          <v-form ref="formCreateAcc" v-model="valid" class="py-3 px-0 grid-list">
+            <v-layout row wrap class="px-0 py-0">
+              <v-flex xs12>
+                <v-text-field :label="lgspType === 'business' ? 'Mã số thuế doanh nghiệp' : 'Số CCCD hoặc số CMND'" v-model="applicantIdNoCreateAcc"
+                 box clearable :rules="lgspType === 'business' ? [rules.required] : [rules.required, rules.credit]"></v-text-field>
+              </v-flex>
+              <v-flex xs12>
+                <v-text-field label="Họ và tên" v-model="applicantNameCreateAcc" :rules="[rules.required]"
+                 box clearable></v-text-field>
+              </v-flex>
+              <v-flex xs12>
+                <v-text-field label="Số điện thoại" v-model="applicantTelNoCreateAcc" :rules="[rules.required]"
+                 box clearable></v-text-field>
+              </v-flex>
+              <v-flex xs12>
+                <v-text-field label="Thư điện tử" v-model="applicantEmailCreateAcc"
+                 box clearable></v-text-field>
+              </v-flex>
+              
+              <v-flex xs12 class="text-right">
+                <v-btn color="primary"
+                  @click="createAccount"
+                  :loading="loadingSearchLgsp"
+                  :disabled="loadingSearchLgsp"
+                  class="mx-0 my-0"
+                >
+                  <v-icon size="20">add</v-icon>
+                  &nbsp;
+                  Tạo tài khoản
+                  <span slot="loader">Loading...</span>
+                </v-btn>
+              </v-flex>
+              
+            </v-layout>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <!-- tra cứu LGSP -->
     <v-dialog v-model="dialog_searchLgsp" scrollable persistent max-width="700px">
       <v-card>
@@ -1157,6 +1226,12 @@ export default {
     loadingTable: false,
     hasOrganization: false,
     traCuuLgsp: false,
+    statusAccount: '',
+    applicantIdNoCreateAcc: '',
+    applicantNameCreateAcc: '',
+    applicantEmailCreateAcc: '',
+    applicantTelNoCreateAcc: '',
+    dialog_create_acc: false,
     dialog_searchLgsp: false,
     loadingSearchLgsp: false,
     loadingUpdateLgsp: false,
@@ -1168,6 +1243,7 @@ export default {
     applicantLgspInfomation: '',
     defaultCityCode: false,
     traCuuLgspCongDan: false,
+    traCuuLgspDoanhNghiep: false,
     lgspType: 'business',
     warningLgsp: false,
     messageLgsp: '',
@@ -1209,6 +1285,10 @@ export default {
     let vm = this
     try {
       vm.traCuuLgspCongDan = traCuuLgspCongDan
+    } catch (error) {
+    }
+    try {
+      vm.traCuuLgspDoanhNghiep = traCuuLgspDoanhNghiep
     } catch (error) {
     }
     try {
@@ -2178,6 +2258,56 @@ export default {
       vm.thongTinChuHoSo['applicantName'] = ''
 
     },
+    checkInfoAccount () {
+      let vm = this
+      vm.loadingSearchLgsp = true
+      if (vm.thongTinChuHoSo['applicantIdNo']) {
+        let filter = {
+          maSoCaNhan: vm.thongTinChuHoSo['applicantIdNo']
+        }
+        vm.$store.dispatch('getStatusAccount', filter).then(result => {
+          console.log('resultCheck', result)
+          vm.statusAccount = result.status
+          vm.loadingSearchLgsp = false
+          if (vm.statusAccount === 'AccountExist') {
+            toastr.success('Đã có tài khoản trên hệ thống')
+          } else {
+            let x = confirm('Chưa có tài khoản trên hệ thống. Bạn có muốn tạo tài khoản?')
+            if (x) {
+              vm.showDialogCreateAcc()
+            }
+          }
+        }).catch(function () {
+
+        })
+      }
+    },
+    showDialogCreateAcc () {
+      let vm = this
+      vm.dialog_create_acc = true
+      vm.applicantIdNoCreateAcc = vm.thongTinChuHoSo.applicantIdNo
+      vm.applicantNameCreateAcc = vm.thongTinChuHoSo.applicantName
+      vm.applicantEmailCreateAcc = vm.thongTinChuHoSo.contactEmail
+      vm.applicantTelNoCreateAcc = vm.thongTinChuHoSo.contactTelNo
+    },
+    createAccount () {
+      let vm = this
+      let filter = {
+        'hoVaTen': vm.applicantNameCreateAcc,
+        'maSoCaNhan': vm.applicantIdNoCreateAcc,
+        'ngaySinh': '1990-12-13T04:01:36.920Z',
+        'soDienThoai': vm.applicantTelNoCreateAcc,
+        'thuDienTu': vm.applicantEmailCreateAcc,
+        'status': vm.statusAccount,
+        'id': '',
+        'applicantIdType': vm.thongTinChuHoSo.userType == '2' ? 'business' : 'citizen'
+      }
+      vm.$store.dispatch('createAccountCaNhan', filter).then(result => {
+        console.log('result', result)
+        toastr.success('Tạo tài khoản thành công')
+        vm.dialog_create_acc = false
+      })
+    },
     showDialogSearchLgspDoanhNghiep () {
       let vm = this
       vm.lgspType = 'business'
@@ -2208,13 +2338,23 @@ export default {
       }
       if (vm.applicantIdNoLgsp.trim()) {
         vm.loadingSearchLgsp = true
-        vm.$store.dispatch('searchLgspDoanhNghiep', filter).then(result => {
-          vm.loadingSearchLgsp = false
-          vm.applicantLgspInfomation = result
-        }).catch(xhr => {
-          vm.loadingSearchLgsp = false
-          vm.applicantLgspInfomation = false
-        })
+        if (vm.traCuuLgspDoanhNghiep) {
+          vm.$store.dispatch('searchLgspDoanhNghiepVer2', filter).then(result => {
+            vm.loadingSearchLgsp = false
+            vm.applicantLgspInfomation = result
+          }).catch(xhr => {
+            vm.loadingSearchLgsp = false
+            vm.applicantLgspInfomation = false
+          })
+        } else {
+          vm.$store.dispatch('searchLgspDoanhNghiep', filter).then(result => {
+            vm.loadingSearchLgsp = false
+            vm.applicantLgspInfomation = result
+          }).catch(xhr => {
+            vm.loadingSearchLgsp = false
+            vm.applicantLgspInfomation = false
+          })
+        }
       } else {
         vm.applicantLgspInfomation = false
       }
