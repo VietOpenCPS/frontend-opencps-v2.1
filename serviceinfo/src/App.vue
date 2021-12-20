@@ -172,7 +172,8 @@
       domainCapHuyen: [],
       domainCapXa: [],
       thuTucTinh: false,
-      hasTagServiceInfo: false
+      hasTagServiceInfo: false,
+      notAgency: false
     }),
     components: {
       GoTop
@@ -215,6 +216,10 @@
     created () {
       var vm = this
       try {
+        vm.notAgency = notAgency
+      } catch (error) {
+      }
+      try {
         vm.groupDonViCapXa = groupDonViCapXa
       } catch (error) {
       }
@@ -236,6 +241,37 @@
         let newQuery = current.query
         if (newQuery.hasOwnProperty('setAgency')) {
           vm.setAgency = true
+        }
+        if (vm.notAgency) {
+          vm.menuServiceInfos = [
+            {
+              id: 1,
+              name: 'Lĩnh vực',
+              mappingName: 'domainName',
+              mappingCode: 'domainCode',
+              mappingCount: 'count',
+              children: [],
+              icon: 'domain'
+            },
+            {
+              id: 2,
+              name: 'Mức độ',
+              mappingName: 'levelName',
+              mappingCode: 'level',
+              mappingCount: 'count',
+              children: [],
+              icon: 'sort'
+            },
+            {
+              id: 3,
+              name: 'Tất cả thủ tục',
+              mappingName: 'all',
+              mappingCode: 'all',
+              mappingCount: 'count',
+              children: [],
+              icon: 'select_all'
+            }
+          ]
         }
         if (vm.hasCoQuanThucHien) {
           vm.menuServiceInfos = [
@@ -465,61 +501,65 @@
           }).catch(function(error) {
           })
         }
-        vm.$store.dispatch('getGovAgency').then(function (result) {
-          vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
-          // vm.menuServiceInfos[0].children = result
-          vm.$set(vm.menuServiceInfos, 0, {
-              id: 1,
-              name: 'Cơ quan quản lý',
-              mappingName: 'administrationName',
-              mappingCode: 'administrationCode',
-              mappingCount: 'count',
-              children: result,
-              icon: 'account_balance'
-            }
-          )
-          vm.$store.commit('setAgencyList', result)
-          // console.log('run app',  current)
-          if ((vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) ||
-          (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
-          ) {
-            vm.currentAgency = vm.govAgencyList[0].administrationCode
-            let queryString = '?'
-            newQuery['page'] = 1
-            newQuery['agency'] = vm.govAgencyList[0].administrationCode
-            for (let key in newQuery) {
-              if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
-                queryString += key + '=' + newQuery[key] + '&'
-              }
-            }
-            let sortLevel = false
-            try {
-              if (sortLevelConfig !== undefined) {
-                sortLevel = true
-              }
-            } catch (error) {
-            }
-
-            if (!sortLevel) {
-              vm.$router.push({
-                path: vm.pathRouter + queryString,
-                query: {
-                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-                }
-              })
-            } else {
-              vm.$router.push({
-                path: '/thu-tuc-hanh-chinh?page=1',
-                query: {
-                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-                }
-              })
-            }
-
-          } else {
+        if (!vm.notAgency) {
+          vm.$store.dispatch('getGovAgency').then(function (result) {
             vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
-          }
-        })
+            // vm.menuServiceInfos[0].children = result
+            vm.$set(vm.menuServiceInfos, 0, {
+                id: 1,
+                name: 'Cơ quan quản lý',
+                mappingName: 'administrationName',
+                mappingCode: 'administrationCode',
+                mappingCount: 'count',
+                children: result,
+                icon: 'account_balance'
+              }
+            )
+            vm.$store.commit('setAgencyList', result)
+            // console.log('run app',  current)
+            if ((vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) ||
+            (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
+            ) {
+              vm.currentAgency = vm.govAgencyList[0].administrationCode
+              let queryString = '?'
+              newQuery['page'] = 1
+              newQuery['agency'] = vm.govAgencyList[0].administrationCode
+              for (let key in newQuery) {
+                if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+                  queryString += key + '=' + newQuery[key] + '&'
+                }
+              }
+              let sortLevel = false
+              try {
+                if (sortLevelConfig !== undefined) {
+                  sortLevel = true
+                }
+              } catch (error) {
+              }
+
+              if (!sortLevel) {
+                vm.$router.push({
+                  path: vm.pathRouter + queryString,
+                  query: {
+                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                  }
+                })
+              } else {
+                vm.$router.push({
+                  path: '/thu-tuc-hanh-chinh?page=1',
+                  query: {
+                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                  }
+                })
+              }
+
+            } else {
+              vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
+            }
+          })
+        } else {
+          vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
+        }
         // 
         if (vm.hasCoQuanThucHien) {
           vm.$store.dispatch('getGovAgencyThucHien').then(function (result) {
@@ -555,6 +595,17 @@
                 icon: 'domain'
               }
             )
+          } else if (vm.notAgency) {
+            vm.$set(vm.menuServiceInfos, 0, {
+                id: 1,
+                name: 'Lĩnh vực',
+                mappingName: 'domainName',
+                mappingCode: 'domainCode',
+                mappingCount: 'count',
+                children: result,
+                icon: 'domain'
+              }
+            )
           } else {
             // vm.menuServiceInfos[1].children = result
             vm.$set(vm.menuServiceInfos, 1, {
@@ -570,6 +621,36 @@
           }
           vm.$store.commit('setDomainList', result)
           vm.currentDomain = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
+          let queryString = '?'
+          newQuery['page'] = 1
+          for (let key in newQuery) {
+            if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+              queryString += key + '=' + newQuery[key] + '&'
+            }
+          }
+          let sortLevel = false
+          try {
+            if (sortLevelConfig !== undefined) {
+              sortLevel = true
+            }
+          } catch (error) {
+          }
+
+          if (!sortLevel) {
+            vm.$router.push({
+              path: vm.pathRouter + queryString,
+              query: {
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              }
+            })
+          } else {
+            vm.$router.push({
+              path: '/thu-tuc-hanh-chinh?page=1',
+              query: {
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              }
+            })
+          }
         })
         // 
         if (vm.thuTucTinh) {
@@ -602,6 +683,17 @@
             // vm.menuServiceInfos[3].children = result
             vm.$set(vm.menuServiceInfos, 3, {
                 id: 4,
+                name: 'Mức độ',
+                mappingName: 'levelName',
+                mappingCode: 'level',
+                mappingCount: 'count',
+                children: result,
+                icon: 'sort'
+              }
+            )
+          } else if (vm.notAgency) {
+            vm.$set(vm.menuServiceInfos, 1, {
+                id: 2,
                 name: 'Mức độ',
                 mappingName: 'levelName',
                 mappingCode: 'level',
@@ -730,6 +822,18 @@
           } else if (index >= 3 && index < vm.menuServiceInfos.length - 1) {
             vm.filterTag(item1)
           } else if (index === vm.menuServiceInfos.length - 1) {
+            vm.filterAll()
+          } else if (index === 99) {
+            vm.filterAgencyAndDomain(item1, item2)
+          }
+        } else if (vm.notAgency) {
+          if (index === 0) {
+            vm.filterDomain(item1)
+          } else if (index === 1) {
+            vm.filterLevel(item1)
+          } else if (index === 2) {
+            vm.filterMethod(item1)
+          } else if (index === 3) {
             vm.filterAll()
           } else if (index === 99) {
             vm.filterAgencyAndDomain(item1, item2)

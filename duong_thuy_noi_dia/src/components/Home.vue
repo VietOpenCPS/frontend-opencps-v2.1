@@ -121,7 +121,9 @@ export default {
         }
         if (allLoad) {
           vm.$store.getters.roleFilterStatus(filter).then(function (result) {
-            vm.roleFilterStatus = result
+            vm.roleFilterStatus = result.filter(function (item) {
+              return item.hasOwnProperty('index')
+            })
             if (vm.type === 'ke_hoach') {
               setTimeout(() => {
                 filterleft.doKeHoachFilterCount()

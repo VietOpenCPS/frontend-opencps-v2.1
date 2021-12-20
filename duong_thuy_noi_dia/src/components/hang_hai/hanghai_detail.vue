@@ -3,37 +3,37 @@
     <v-btn flat style="margin-right: 110px;" class=" primary--text my-0 pr-3 btn-top-panel" v-on:click.native="backtolist('ke_hoach')"
     v-if="isThuTuc && isKeHoach && !isKeToan"
     >
-					<v-icon class="mr-2 primary--text">undo</v-icon>
+					<v-icon class="mr-2 primary--text">reply</v-icon>
 				Kế hoạch
     </v-btn>
     <v-btn flat class=" primary--text my-0 pr-3 btn-top-panel" v-on:click.native="backtolist('ke_hoach')"
     v-if="!isThuTuc && isKeHoach && !isKeToan"
     >
-					<v-icon class="mr-2 primary--text">undo</v-icon>
+					<v-icon class="mr-2 primary--text">reply</v-icon>
 				Kế hoạch
     </v-btn>
     <v-btn flat class=" primary--text my-0 pr-3 btn-top-panel" v-on:click.native="backtolist('thu_tuc')"
       v-if="isThuTuc && isKeHoach && !isKeToan"
     >
-					<v-icon class="mr-2 primary--text">undo</v-icon>
+					<v-icon class="mr-2 primary--text">reply</v-icon>
 				Thủ tục
     </v-btn>
     <v-btn flat class=" primary--text my-0 pr-3 btn-top-panel" v-on:click.native="backtolist('thu_tuc')"
       v-if="isThuTuc && !isKeHoach && !isKeToan"
     >
-					<v-icon class="mr-2 primary--text">undo</v-icon>
+					<v-icon class="mr-2 primary--text">reply</v-icon>
 				Thủ tục
     </v-btn>
     <v-btn flat class=" primary--text my-0 pr-3 btn-top-panel" v-on:click.native="backtolist('else_type')"
       v-if="!isThuTuc && !isKeHoach && !isKeToan"
     >
-					<v-icon class="mr-2 primary--text">undo</v-icon>
+					<v-icon class="mr-2 primary--text">reply</v-icon>
 				Quay lại
     </v-btn>
      <v-btn flat class=" primary--text my-0 pr-3 btn-top-panel" v-on:click.native="backtolist('ke_toan')"
       v-if="isKeToan"
     >
-					<v-icon class="mr-2 primary--text">undo</v-icon>
+					<v-icon class="mr-2 primary--text">reply</v-icon>
 				Quay lại
     </v-btn>
     <div v-if="loading1">
@@ -48,7 +48,7 @@
         <v-expansion-panel-content v-bind:value="true">
         <div slot="header" class="text-bold primary--text">THÔNG TIN CHUNG</div>
         
-        <v-layout wrap class="px-4 pb-2">
+        <v-layout wrap class="px-4 py-2">
           <div class="flex xs12 sm4">
             <div class="editable-wrap">
               <div class="layout wrap">

@@ -943,6 +943,7 @@ export default {
             dataCreateFile.append('desciption', '')
             dataCreateFile.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
             dataCreateFile.append('templateNo', vm.optionCreate['templateNo'])
+            dataCreateFile.append('dossierNo', '')
             
             axios.post(url, dataCreateFile, param).then(result1 => {
               vm.loadingAction = false
@@ -1000,6 +1001,7 @@ export default {
           dataCreateFile.append('desciption', '')
           dataCreateFile.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
           dataCreateFile.append('templateNo', vm.optionCreate['templateNo'])
+          dataCreateFile.append('dossierNo', '')
           
           axios.post(url, dataCreateFile, param).then(result1 => {
             vm.loadingAction = false
@@ -1063,6 +1065,7 @@ export default {
           dataPost.append('desciption', '')
           dataPost.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
           dataPost.append('templateNo', vm.optionCreate['templateNo'])
+          dataPost.append('dossierNo', '')
           if (vm.updateFile) {
             dataPost.append('file', vm.fileUpdate)
           } else {
@@ -1119,6 +1122,7 @@ export default {
         dataPost.append('desciption', '')
         dataPost.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
         dataPost.append('templateNo', vm.optionCreate['templateNo'])
+        dataPost.append('dossierNo', '')
 
         axios.put(url, dataPost, param).then(result1 => {
           vm.loadingAction = false

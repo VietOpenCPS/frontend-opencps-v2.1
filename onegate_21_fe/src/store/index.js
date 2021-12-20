@@ -5274,6 +5274,24 @@ export const store = new Vuex.Store({
         })
       })
     },
+    signatureVtSimCa ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        let dataPost = new URLSearchParams()
+        let url = '/o/rest/v2/signature/' + filter.dossierId + '/signSimCA/' + filter.referenceUid + '/' + filter.mobile
+        axios.post(url, dataPost, param).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
     trackingBTTT ({commit, state}, filter) {
       console.log('trackDVC', filter.serviceCode, filter.customData)
       try {
@@ -5415,6 +5433,41 @@ export const store = new Vuex.Store({
         })
       })
     },
+    searchLgspDoanhNghiepVer2({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {}
+        }
+        let dataInput = {
+          "type": "ChiTietDoanhNghiep",
+          "msdn": filter.applicantIdNo
+        }
+        axios({
+          method: 'POST',
+          url: '/o/rest/v2/qldc/doanhnghiep',
+          headers: config.headers,
+          params: config.params,
+          data: dataInput
+        }).then(function (response) {
+          let serializable = response.data
+          console.log('serializableDn', serializable)
+          let dataCitizen = ''
+          if (serializable && serializable.hasOwnProperty('Data') && serializable["Data"] && serializable["Data"]['MainInformation']) {
+            let data = Object.assign(serializable["Data"]['HOAdress'], serializable["Data"]['MainInformation'])
+            dataCitizen = Object.assign(data, serializable["Data"]['Representatives'][0])
+            resolve(dataCitizen)
+          } else {
+            reject('')
+          }
+        }).catch(function (error) {
+          let dataReject = error.response.data
+          reject(dataReject)
+        })
+      })
+    },
     searchLgspCongDan({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let config = {
@@ -5509,6 +5562,44 @@ export const store = new Vuex.Store({
         }).catch(function (error) {
           console.log(error)
           reject(error)
+        })
+      })
+    },
+    getStatusAccount ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        let url = '/o/rest/v2/userSSO/maSoCaNhan/' + filter.maSoCaNhan
+        axios.get(url, param).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          console.log(error)
+          reject(error)
+        })
+      })
+    },
+    createAccountCaNhan ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        var settings = {
+          "url": '/o/rest/v2/userSSO/createAccount',
+          "method": "POST",
+          "timeout": 0,
+          "headers": {
+            "groupId": window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            "Token": window.Liferay ? window.Liferay.authToken : '',
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          "data": filter
+        };
+        
+        $.ajax(settings).done(function (response) {
+          console.log(response);
+          resolve(response)
         })
       })
     },

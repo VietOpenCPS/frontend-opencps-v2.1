@@ -81,7 +81,7 @@
 
         </v-list-group> 
 
-        <v-list-group :value="true" v-if="isThuTuc">
+        <v-list-group :value="true" v-if="isThuTuc && document_type_code != 18">
           <v-list-tile slot="activator"
           :to="{
             path: '/danh-sach-ho-so/' + type + '/' + document_type_code + '/' + 0,

@@ -30,7 +30,7 @@
           </div>
         </div> 
       </div>
-      <v-layout wrap class="white py-2">
+      <v-layout wrap class="white py-2" v-if="!notAgency">
         <v-flex :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2" v-if="!setAgency">
           <v-autocomplete
             class="select-border"
@@ -74,6 +74,38 @@
           ></v-autocomplete>
         </v-flex>
         <v-flex :class="setAgency ? 'xs12 sm6' : (hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4')" class="px-2">
+          <v-autocomplete
+            class="select-border"
+            :items="levelList"
+            v-model="levelSelected"
+            placeholder="Chọn mức độ"
+            item-text="levelName"
+            item-value="level"
+            :hide-selected="true"
+            @change="changeLevel"
+            clearable
+            box
+          >
+          </v-autocomplete>
+        </v-flex>
+
+      </v-layout>
+      <v-layout wrap class="white py-2" v-if="notAgency">
+        <v-flex class="xs12 sm6 px-2">
+          <v-autocomplete
+            class="select-border"
+            :items="domainListCurrent"
+            v-model="domainSelected"
+            placeholder="Chọn lĩnh vực"
+            item-text="domainName"
+            item-value="domainCode"
+            :hide-selected="true"
+            clearable
+            @change="changeDomain"
+            box
+          ></v-autocomplete>
+        </v-flex>
+        <v-flex class="xs12 sm6 px-2">
           <v-autocomplete
             class="select-border"
             :items="levelList"
@@ -809,7 +841,8 @@ export default {
     luaChonXaPhuong: false,
     useJwt: false,
     showChonDichVu: false,
-    dialog_selectOption: false
+    dialog_selectOption: false,
+    notAgency: false
   }),
   computed: {
     govAgencyList () {
@@ -834,6 +867,10 @@ export default {
   created () {
     let vm = this
     // 
+    try {
+      vm.notAgency = notAgency
+    } catch (error) {
+    }
     try {
       vm.formToKhai = toKhaiTrucTuyen ? true : false 
     } catch (error) {

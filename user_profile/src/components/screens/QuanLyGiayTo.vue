@@ -424,6 +424,7 @@ export default {
       dataPost.append('method', 'GET')
       dataPost.append('url', '/applicantdatas')
       dataPost.append('data', JSON.stringify(textPost))
+      dataPost.append('serverCode', 'SERVER_MOTCUA')
       vm.loadingTable = true
       axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) { 
         if (response['data'].hasOwnProperty('data')) {
@@ -523,7 +524,7 @@ export default {
           dataPost.append('url', '/applicantdatas')
           dataPost.append('data', JSON.stringify(filter))
           dataPost.append('file', vm.fileUpdate)
-          
+          dataPost.append('serverCode', 'SERVER_MOTCUA')
           axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
             vm.loadingAction = false
             toastr.success('Thêm mới tài liệu thành công')
@@ -569,6 +570,7 @@ export default {
         dataPost.append('method', 'PUT')
         dataPost.append('url', '/applicantdatas/' + vm.documentSelect.applicantDataId)
         dataPost.append('data', JSON.stringify(filter))
+        dataPost.append('serverCode', 'SERVER_MOTCUA')
         if (vm.updateFile) {
           dataPost.append('file', vm.fileUpdate)
         } else {

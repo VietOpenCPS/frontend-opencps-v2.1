@@ -707,6 +707,7 @@
               dataCreateFile.append('serviceCode', '')
               dataCreateFile.append('templateNo', '')
               dataCreateFile.append('desciption', '')
+              dataCreateFile.append('dossierNo', '')
               
               axios.post(url, dataCreateFile, param).then(result1 => {
                 vm.loadingAction = false
@@ -758,6 +759,7 @@
             dataCreateFile.append('templateNo', '')
             dataCreateFile.append('desciption', '')
             dataCreateFile.append('file', '')
+            dataCreateFile.append('dossierNo', '')
             
             axios.post(url, dataCreateFile, param).then(result1 => {
               vm.loadingAction = false
