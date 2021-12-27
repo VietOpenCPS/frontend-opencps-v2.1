@@ -23,23 +23,273 @@ export const store = new Vuex.Store({
     clearError ({commit}) {
       commit('clearError')
     },
+    loadDataTugboat ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          params: {
+            categoryId: 'DM_VMA_TUGBOAT'
+          }
+        }
+        for (var key in data) {
+          param.params[key] = data[key]
+        }
+        store.dispatch('loadInitResource').then(function (result) {
+          if (data.hasOwnProperty('portOfAuthority') && !data['portOfAuthority'] || data.hasOwnProperty('portofAuthority') && !data['portofAuthority']) {
+            param.params['portOfAuthority'] = state.maritimeCode
+            param.params['portofAuthority'] = state.maritimeCode
+          }
+          if (data.hasOwnProperty('maritimeCode') && !data['maritimeCode']) {
+            param.params['maritimeCode'] = state.maritimeCode
+          }
+          axios.get(state.initData.getDetailDmCategories, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    loadDanhSachTauBien ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let urlRequest = data.url
+          let query = {}
+          for (var key in data) {
+            if (key !== 'url') {
+              query[key] = data[key]
+            }
+          }
+          // let param = {
+          //   params: query
+          // }
+          // if (data['getShip']) {
+          //   param['timeout'] = 35000
+          // }
+          // axios.get(urlRequest, param).then(function (response) {
+          //   let serializable = response.data
+          //   resolve(serializable)
+          // }).catch(function (error) {
+          //   console.log(error)
+          //   reject(error)
+          // })
+          let assign = true
+          if (data['assign'] === false) {
+            assign = data['assign']
+            delete data['assign']
+          }
+          $.ajax({
+            url: urlRequest,
+            type: 'GET',
+            dataType: 'json',
+            data: query,
+            assign: assign,
+            timeout: 35000,
+            success: function (result) {
+              resolve(result)
+            },
+            error: function (xhr) {
+              reject(xhr)
+            }
+          })
+        })
+      })
+    },
+    canhbaotinhphi ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            params: filter
+          }
+          axios.get(state.initData.canhbaotinhphiURL, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    checkHistoryTempDebitnote ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          params: {}
+        }
+        for (var key in data) {
+          param.params[key] = data[key]
+        }
+        store.dispatch('loadInitResource').then(function (result) {
+          console.log("state.initData: ", state.initData);
+          axios.get(state.initData['checkHistoryTempDebitnoteURL'], param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    loadDataItems ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        // let param = {
+        //   params: {}
+        // }
+        // for (var key in data) {
+        //   param.params[key] = data[key]
+        // }
+        let assign = true
+        if (data['assign'] === false) {
+          assign = data['assign']
+          delete data['assign']
+        }
+        store.dispatch('loadInitResource').then(function (result) {
+          // axios.get(state.initData.getDataItems, param).then(function (response) {
+          //   let serializable = response.data['data']
+          //   resolve(serializable)
+          // }).catch(function (error) {
+          //   console.log(error)
+          //   reject(error)
+          // })
+          $.ajax({
+            url: state.initData.getDataItems,
+            type: 'GET',
+            dataType: 'json',
+            data: data,
+            assign: assign,
+            success: function (result) {
+              resolve(result['data'])
+            },
+            error: function (xhr) {
+              reject(xhr)
+            }
+          })
+        })
+      })
+    },
+    loadDataDm ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        // let param = {
+        //   params: {}
+        // }
+        // for (var key in data) {
+        //   param.params[key] = data[key]
+        // }
+        store.dispatch('loadInitResource').then(function (result) {
+          if (data.hasOwnProperty('portOfAuthority') && !data['portOfAuthority'] || data.hasOwnProperty('portofAuthority') && !data['portofAuthority']) {
+            // param.params['portOfAuthority'] = state.maritimeCode
+            // param.params['portofAuthority'] = state.maritimeCode
+            data['portOfAuthority'] = state.maritimeCode
+            data['portofAuthority'] = state.maritimeCode
+          }
+          if (data.hasOwnProperty('maritimeCode') && !data['maritimeCode']) {
+            // param.params['maritimeCode'] = state.maritimeCode
+            data['maritimeCode'] = state.maritimeCode
+          }
+          let assign = true
+          if (data['assign'] === false) {
+            assign = data['assign']
+            delete data['assign']
+          }
+          $.ajax({
+            url: state.initData.getDetailDmCategories,
+            type: 'GET',
+            dataType: 'json',
+            data: data,
+            assign: assign,
+            success: function (result) {
+              resolve(result['data'])
+            },
+            error: function (xhr) {
+              reject(xhr)
+            }
+          })
+          // axios.get(state.initData.getDetailDmCategories, param).then(function (response) {
+          //   let serializable = response.data['data']
+          //   resolve(serializable)
+          // }).catch(function (error) {
+          //   console.log(error)
+          //   reject(error)
+          // })
+        })
+      })
+    },
+    // loadInitResource ({commit, state}) {
+    //   if (state.initData == null) {
+    //     return new Promise((resolve, reject) => {
+    //       let param = {}
+    //       let orginURL = window.location.href
+    //       let coma = window.location.href.lastIndexOf('#/')
+    //       if (coma > 0) {
+    //         orginURL = window.location.href.substr(0, coma)
+    //       }
+    //       axios.get(orginURL + support.renderURLInit, param).then(function (response) {
+    //         let serializable = response.data
+    //         commit('setInitData', serializable)
+    //         resolve(serializable)
+    //       }).catch(function (error) {
+    //         console.log(error)
+    //         reject(error)
+    //         commit('setInitData', {abc: 123})
+    //       })
+    //     })
+    //   } else {
+    //     return new Promise((resolve, reject) => {
+    //       resolve(state.initData)
+    //     })
+    //   }
+    // },
     loadInitResource ({commit, state}) {
       if (state.initData == null) {
-        return new Promise((resolve, reject) => {
+        return new Promise(function (resolve, reject) {
           let param = {}
           let orginURL = window.location.href
           let coma = window.location.href.lastIndexOf('#/')
           if (coma > 0) {
             orginURL = window.location.href.substr(0, coma)
           }
-          axios.get(orginURL + support.renderURLInit, param).then(function (response) {
-            let serializable = response.data
-            commit('setInitData', serializable)
-            resolve(serializable)
-          }).catch(function (error) {
-            console.log(error)
-            reject(error)
-            commit('setInitData', {abc: 123})
+          var url1 = new Promise(function (resolve, reject) {
+            axios.get(orginURL + support.renderURLInit, param).then(function (response) {
+              let serializable = response.data
+              resolve(serializable)
+            }).catch(function (error) {
+              console.log(error)
+              reject(error)
+            })
+          })
+          var url2 = new Promise(function (resolve, reject) {
+            axios.get(orginURL + support.renderURLInit2, param).then(function (response) {
+              let serializable = response.data
+              if (serializable && serializable['user']) {
+                let user = serializable['user']
+                commit('setMaritimeCode', user['maritimeCode'])
+              } else {
+                commit('setMaritimeCode', '')
+              }
+              resolve(serializable)
+            }).catch(function (error) {
+              console.log(error)
+              reject(error)
+            })
+          })
+          var url3 = new Promise(function (resolve, reject) {
+            axios.get(orginURL + support.renderURLInit3, param).then(function (response) {
+              let serializable = response.data
+              resolve(serializable)
+            }).catch(function (error) {
+              console.log(error)
+              reject(error)
+            })
+          })
+          Promise.all([url1, url2, url3]).then(function (results) {
+            var data = Object.assign(results[0], results[1], results[2])
+            commit('setInitData', data)
+            resolve(data)
+          }).catch(function (xhr) {
+            commit('setInitData', null)
+            reject(null)
           })
         })
       } else {
@@ -301,6 +551,9 @@ export const store = new Vuex.Store({
     setLoadingSubmit (state, payload) {
       state.loadingSubmit = payload
     },
+    setMaritimeCode (state, payload) {
+      state.maritimeCode = payload
+    },
     setError (state, payload) {
       state.error = payload
     },
@@ -321,6 +574,9 @@ export const store = new Vuex.Store({
     loading (state) {
       return state.loading
     },
+    maritimeCode (state) {
+      return state['maritimeCode']
+    },
     loadingTable (state) {
       return state.loadingTable
     },
@@ -328,7 +584,11 @@ export const store = new Vuex.Store({
       return state.loadingSubmit
     },
     loadingInitData (state) {
-      return state.initData
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          resolve(result)
+        })
+      })
     },
     error (state) {
       return state.error

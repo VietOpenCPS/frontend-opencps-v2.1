@@ -4339,6 +4339,7 @@
     <!-- BỔ SUNG 2 DVC VÀO CẢNG (18); RỜI CẢNG (19) -->
     <!-- START VC 18 -->
     <div v-else-if="documentTypeCode === '18' && type === 'ke_hoach'">
+      
       <v-tabs class="grey-opencps-panel-group-button" v-model="activeTab" @input="changeTabs" :scrollable="false" v-if="requestState === 11 || requestState === 27">
         <v-tabs-slider color="primary"></v-tabs-slider>
         <v-tab :key="1" href="#tab1" >
@@ -4350,13 +4351,20 @@
         <v-tab :key="3" href="#tab3" >
           Thông báo hướng dẫn DN bổ sung
         </v-tab>
+        <v-tab :key="4" href="#tab4" >
+          Dừng thủ tục điện tử để làm giấy
+        </v-tab>
+        <v-tab :key="5" href="#tab5" >
+          Hủy hồ sơ
+        </v-tab>
+
         <v-tabs-items>
           <v-tab-item id="tab1" reverse-transition="fade-transition" transition="fade-transition">
             <v-card flat>
               <v-card-text>
                   Bạn có muốn tiếp tục xử lý?
                   <v-card-actions>
-                    <v-btn color="primary" v-on:click.native="callActionKeHoachAllInOneURL(detail, 1985, -1, 12, true, 1, false)"
+                    <v-btn color="primary" v-on:click.native="callActionKeHoachAllInOneURL(detail, 1985, -1, 14, true, 1, false)"
                       :loading="loading_process_btn"
                       :disabled="loading_process_btn"
                     >
@@ -4415,6 +4423,46 @@
               </v-card-text>
             </v-card>
           </v-tab-item>
+          <v-tab-item id="tab4" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card flat>
+              <v-card-text>
+                  Bạn có muốn tiếp tục xử lý?
+                  <v-card-actions>
+                    <v-btn color="primary" v-on:click.native="callActionKeHoachAllInOneURL(detail, 1985, -1, 25, true, 1, false)"
+                      :loading="loading_process_btn"
+                      :disabled="loading_process_btn"
+                    >
+                      Xác nhận
+                      <span slot="loader">Loading...</span>
+                    </v-btn>
+                  </v-card-actions>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item id="tab5" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card flat>
+              <v-card-text>
+                <v-form v-model="valid" :ref="activeTab">
+                  Nhập lý do <span class="red--text text--darken-3">*</span>:
+                  <v-text-field
+                    v-model="ykienReject"
+                    textarea
+                    :rules="[v => !!v || 'lý do bắt buộc phải nhập']"
+                    required
+                  ></v-text-field>
+                  <v-card-actions>
+                    <v-btn color="primary" v-on:click.native="callActionKeHoachAllInOneURL(detail, 1985, -1, 10, true, 0, true)"
+                      :loading="loading_process_btn"
+                      :disabled="loading_process_btn || !valid"
+                    >
+                      Xác nhận
+                      <span slot="loader">Loading...</span>
+                    </v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
         </v-tabs-items>
       </v-tabs>
       <v-tabs class="grey-opencps-panel-group-button" v-model="activeTab" @input="changeTabs" :scrollable="false" v-if="requestState === 14">
@@ -4433,7 +4481,7 @@
                     textarea
                     :rules="[v => !!v || 'lý do bắt buộc phải nhập']"
                     required
-                  ></v-text-field> 
+                  ></v-text-field>
                   <v-card-actions>
                     <v-btn color="primary" v-on:click.native="callActionKeHoachAllInOneURL(detail, 1985, -1, 13, true, 0, true)"
                       :loading="loading_process_btn"
@@ -4494,7 +4542,7 @@
                     required
                   ></v-text-field> 
                   <v-card-actions>
-                    <v-btn color="primary" v-on:click.native="callActionThuTucAllInOneURL(detail, 1985, -1, 13, true, 0, true)"
+                    <v-btn color="primary" v-on:click.native="callActionThuTucAllInOneURL(detail, 1985, -1, 27, true, 0, true)"
                       :loading="loading_process_btn"
                       :disabled="loading_process_btn || !valid"
                     >
@@ -4626,6 +4674,343 @@
       </v-tabs>
     </div>
     <!-- END VC 18 -->
+    <!-- START VC 19 -->
+    <div v-else-if="documentTypeCode === '19' && type === 'ke_hoach'">
+      <v-tabs class="grey-opencps-panel-group-button" v-model="activeTab" @input="changeTabs" :scrollable="false" v-if="requestState === 11 || requestState === 27">
+        <v-tabs-slider color="primary"></v-tabs-slider>
+        <v-tab :key="1" href="#tab1" >
+          Thông báo chấp thuận
+        </v-tab>
+        <v-tab :key="2" href="#tab2" >
+          Thông báo từ chối
+        </v-tab>
+        <v-tab :key="3" href="#tab3" >
+          Thông báo hướng dẫn DN bổ sung
+        </v-tab>
+        <v-tab :key="4" href="#tab4" >
+          Dừng thủ tục điện tử để làm giấy
+        </v-tab>
+        <v-tab :key="5" href="#tab5" >
+          Hủy hồ sơ
+        </v-tab>
+
+        <v-tabs-items>
+          <v-tab-item id="tab1" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card flat>
+              <v-card-text>
+                  Bạn có muốn tiếp tục xử lý?
+                  <v-card-actions>
+                    <v-btn color="primary" v-on:click.native="callActionKeHoachAllInOneURL(detail, 1985, -1, 12, true, 1, false)"
+                      :loading="loading_process_btn"
+                      :disabled="loading_process_btn"
+                    >
+                      Xác nhận
+                      <span slot="loader">Loading...</span>
+                    </v-btn>
+                  </v-card-actions>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item id="tab2" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card flat>
+              <v-card-text>
+                <v-form v-model="valid" :ref="activeTab">
+                  Nhập lý do <span class="red--text text--darken-3">*</span>:
+                  <v-text-field
+                    v-model="ykienReject"
+                    textarea
+                    :rules="[v => !!v || 'lý do bắt buộc phải nhập']"
+                    required
+                  ></v-text-field> 
+                  <v-card-actions>
+                    <v-btn color="primary" v-on:click.native="callActionKeHoachAllInOneURL(detail, 1985, -1, 13, true, 0, true)"
+                      :loading="loading_process_btn"
+                      :disabled="loading_process_btn || !valid"
+                    >
+                      Xác nhận
+                      <span slot="loader">Loading...</span>
+                    </v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item id="tab3" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card flat>
+              <v-card-text>
+                <v-form v-model="valid" :ref="activeTab">
+                  Nhập lý do <span class="red--text text--darken-3">*</span>:
+                  <v-text-field
+                    v-model="ykienReject"
+                    textarea
+                    :rules="[v => !!v || 'lý do bắt buộc phải nhập']"
+                    required
+                  ></v-text-field>
+                  <v-card-actions>
+                    <v-btn color="primary" v-on:click.native="callActionKeHoachAllInOneURL(detail, 1985, -1, 27, true, 0, true)"
+                      :loading="loading_process_btn"
+                      :disabled="loading_process_btn || !valid"
+                    >
+                      Xác nhận
+                      <span slot="loader">Loading...</span>
+                    </v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item id="tab4" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card flat>
+              <v-card-text>
+                  Bạn có muốn tiếp tục xử lý?
+                  <v-card-actions>
+                    <v-btn color="primary" v-on:click.native="callActionKeHoachAllInOneURL(detail, 1985, -1, 25, true, 1, false)"
+                      :loading="loading_process_btn"
+                      :disabled="loading_process_btn"
+                    >
+                      Xác nhận
+                      <span slot="loader">Loading...</span>
+                    </v-btn>
+                  </v-card-actions>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item id="tab5" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card flat>
+              <v-card-text>
+                <v-form v-model="valid" :ref="activeTab">
+                  Nhập lý do <span class="red--text text--darken-3">*</span>:
+                  <v-text-field
+                    v-model="ykienReject"
+                    textarea
+                    :rules="[v => !!v || 'lý do bắt buộc phải nhập']"
+                    required
+                  ></v-text-field>
+                  <v-card-actions>
+                    <v-btn color="primary" v-on:click.native="callActionKeHoachAllInOneURL(detail, 1985, -1, 10, true, 0, true)"
+                      :loading="loading_process_btn"
+                      :disabled="loading_process_btn || !valid"
+                    >
+                      Xác nhận
+                      <span slot="loader">Loading...</span>
+                    </v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+        </v-tabs-items>
+      </v-tabs>
+      <v-tabs class="grey-opencps-panel-group-button" v-model="activeTab" @input="changeTabs" :scrollable="false" v-if="requestState === 14">
+        <v-tabs-slider color="primary"></v-tabs-slider>
+        <v-tab :key="1" href="#tab1" >
+          Thông báo từ chối
+        </v-tab>
+        <v-tabs-items>
+          <v-tab-item id="tab1" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card flat>
+              <v-card-text>
+                <v-form v-model="valid" :ref="activeTab">
+                  Nhập lý do <span class="red--text text--darken-3">*</span>:
+                  <v-text-field
+                    v-model="ykienReject"
+                    textarea
+                    :rules="[v => !!v || 'lý do bắt buộc phải nhập']"
+                    required
+                  ></v-text-field> 
+                  <v-card-actions>
+                    <v-btn color="primary" v-on:click.native="callActionKeHoachAllInOneURL(detail, 1985, -1, 13, true, 0, true)"
+                      :loading="loading_process_btn"
+                      :disabled="loading_process_btn || !valid"
+                    >
+                      Xác nhận
+                      <span slot="loader">Loading...</span>
+                    </v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+        </v-tabs-items>
+      </v-tabs>
+    </div>
+
+    <div v-else-if="documentTypeCode === '19' && type === 'thu_tuc'">
+      <v-tabs class="grey-opencps-panel-group-button" v-model="activeTab" @input="changeTabs"  :scrollable="false" v-if="documentStatusCodeUse === 18 || documentStatusCodeUse === 13" >
+        <v-tabs-slider color="primary"></v-tabs-slider>
+        <v-tab :key="1" href="#tab1" >
+          Thông báo chấp nhận hồ sơ
+        </v-tab>
+        <v-tab :key="2" href="#tab2" >
+          Thông báo hướng dẫn DN bổ sung
+        </v-tab>
+        <v-tab :key="3" href="#tab3" >
+          Dừng thủ tục điện tử để làm giấy
+        </v-tab>
+        <v-tab :key="4" href="#tab4" >
+          Hủy hồ sơ
+        </v-tab>
+        <v-tabs-items>
+          <v-tab-item id="tab1" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card flat>
+              <v-card-text>
+                  Bạn có muốn tiếp tục xử lý?
+                  <v-card-actions>
+                    <v-btn color="primary" v-on:click.native="callActionThuTucAllInOneURL(detail, 1985, -1, 12, true, 0, false)"
+                      :loading="loading_process_btn"
+                      :disabled="loading_process_btn"
+                    >
+                      Xác nhận
+                      <span slot="loader">Loading...</span>
+                    </v-btn>
+                  </v-card-actions>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item id="tab2" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card flat>
+              <v-card-text>
+                <v-form v-model="valid" :ref="activeTab">
+                  Nhập lý do <span class="red--text text--darken-3">*</span>:
+                  <v-text-field
+                    v-model="ykienReject"
+                    textarea
+                    :rules="[v => !!v || 'lý do bắt buộc phải nhập']"
+                    required
+                  ></v-text-field> 
+                  <v-card-actions>
+                    <v-btn color="primary" v-on:click.native="callActionThuTucAllInOneURL(detail, 1985, -1, 27, true, 0, true)"
+                      :loading="loading_process_btn"
+                      :disabled="loading_process_btn || !valid"
+                    >
+                      Xác nhận
+                      <span slot="loader">Loading...</span>
+                    </v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item id="tab3" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card flat>
+              <v-card-text>
+                <v-form v-model="valid" :ref="activeTab">
+                  Nhập lý do <span class="red--text text--darken-3">*</span>:
+                  <v-text-field
+                    v-model="ykienReject"
+                    textarea
+                    :rules="[v => !!v || 'lý do bắt buộc phải nhập']"
+                    required
+                  ></v-text-field>
+                  <v-card-actions>
+                    <v-btn color="primary" v-on:click.native="callActionThuTucAllInOneURL(detail, 1985, -1, 25, true, 0, true)"
+                      :loading="loading_process_btn"
+                      :disabled="loading_process_btn || !valid"
+                    >
+                      Xác nhận
+                      <span slot="loader">Loading...</span>
+                    </v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item id="tab4" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card flat>
+              <v-card-text>
+                <v-form v-model="valid" :ref="activeTab">
+                  Nhập lý do <span class="red--text text--darken-3">*</span>:
+                  <v-text-field
+                    v-model="ykienReject"
+                    textarea
+                    :rules="[v => !!v || 'lý do bắt buộc phải nhập']"
+                    required
+                  ></v-text-field>
+                  <v-card-actions>
+                    <v-btn color="primary" v-on:click.native="callActionThuTucAllInOneURL(detail, 1985, 22, 10, true, 0, true)"
+                      :loading="loading_process_btn"
+                      :disabled="loading_process_btn || !valid"
+                    >
+                      Xác nhận
+                      <span slot="loader">Loading...</span>
+                    </v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+        </v-tabs-items>
+      </v-tabs>
+
+      <v-tabs class="grey-opencps-panel-group-button" v-model="activeTab" @input="changeTabs"  :scrollable="false" v-if="documentStatusCodeUse === 19" >
+        <v-tabs-slider color="primary"></v-tabs-slider>
+        <v-tab :key="1" href="#tab1" >
+          Thông báo hướng dẫn DN bổ sung
+        </v-tab>
+        <v-tabs-items>
+          <v-tab-item id="tab1" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card flat>
+              <v-card-text>
+                <v-form v-model="valid" :ref="activeTab">
+                  Nhập lý do <span class="red--text text--darken-3">*</span>:
+                  <v-text-field
+                    v-model="ykienReject"
+                    textarea
+                    :rules="[v => !!v || 'lý do bắt buộc phải nhập']"
+                    required
+                  ></v-text-field> 
+                  <v-card-actions>
+                    <v-btn color="primary" v-on:click.native="callActionThuTucAllInOneURL(detail, 1985, -1, 13, true, 0, true)"
+                      :loading="loading_process_btn"
+                      :disabled="loading_process_btn || !valid"
+                    >
+                      Xác nhận
+                      <span slot="loader">Loading...</span>
+                    </v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+        </v-tabs-items>
+      </v-tabs>
+
+      <!-- 3. Chờ phê duyệt hoàn thành thủ tục -->
+      <v-tabs class="grey-opencps-panel-group-button" v-model="activeTab" @input="changeTabs"  :scrollable="false" v-if="documentStatusCodeUse === 12 || documentStatusCodeUse === 20 || documentStatusCodeUse === 120" >
+        <v-tabs-slider color="primary"></v-tabs-slider>
+        <v-tab :key="1" href="#tab1" >
+          Dừng thủ tục điện tử để làm giấy
+        </v-tab>
+        <v-tabs-items>
+          
+          <v-tab-item id="tab1" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card flat>
+              <v-card-text>
+                <v-form v-model="valid" :ref="activeTab">
+                  Nhập lý do <span class="red--text text--darken-3">*</span>:
+                  <v-text-field
+                    v-model="ykienReject"
+                    textarea
+                    :rules="[v => !!v || 'lý do bắt buộc phải nhập']"
+                    required
+                  ></v-text-field>
+                  <v-card-actions>
+                    <v-btn color="primary" v-on:click.native="callActionThuTucAllInOneURL(detail, 1985, -1, 25, true, 0, true)"
+                      :loading="loading_process_btn"
+                      :disabled="loading_process_btn || !valid"
+                    >
+                      Xác nhận
+                      <span slot="loader">Loading...</span>
+                    </v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+        </v-tabs-items>
+      </v-tabs>
+    </div>
+    <!-- END VC 19 -->
 
   </div>
 </template>
