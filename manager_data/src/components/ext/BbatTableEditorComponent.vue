@@ -4,6 +4,18 @@
     <v-layout v-if="detailForm !== null && detailForm.length > 0" row wrap style="
       margin-bottom: 100px;
     ">
+      <!-- Mã thủ tục DVCQG -->
+      <v-text-field v-if="tableName === 'opencps_serviceinfo'"
+        v-model="serviceCodeDVCQG"
+        :maxlength="75"
+        :counter="75"
+        box 
+        clearable
+        class="xs12 pt-1 mr-2 pl-1"
+      >
+        <template slot="label">Mã thủ tục DVCQG</template>
+      </v-text-field>
+      <!--  -->
       <v-flex v-for="(item, index) in detailForm" v-bind:key="index" :class="item['class']">
         <v-subheader class="px-0" v-if="item.type === 'ricktext'">{{item['label']}}</v-subheader>
         <trumbowyg v-if="item.type === 'ricktext'" v-model="data[item.model]" :config="config" @tbw-blur="formatDataInput(item)" @tbw-change="validateMaxlength(item)"></trumbowyg>
@@ -103,17 +115,6 @@
         >
           <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
         </v-text-field>
-        <!-- Mã thủ tục DVCQG -->
-        <v-text-field v-if="item.type === 'text-fields'"
-          v-model="serviceCodeDVCQG"
-          :maxlength="75"
-          :counter="75"
-          box 
-          clearable
-        >
-          <template slot="label">Mã thủ tục DVCQG</template>
-        </v-text-field>
-        <!--  -->
         <v-textarea :class="item['class_component']" v-if="item.type === 'textarea'"
           v-model="data[item.model]"
           :rules="processRules(item.rules, item)"
@@ -239,11 +240,11 @@
           <v-icon>reply</v-icon> &nbsp;
           Quay lại
         </v-btn>
-        <v-btn v-if="(!tableConfig.hasOwnProperty('flagHtml') || (tableConfig.hasOwnProperty('flagHtml') && tableConfig['flagHtml']) ) && String(id) === '0'" color="teal darken-3" class="mr-0" dark
+        <!-- <v-btn v-if="(!tableConfig.hasOwnProperty('flagHtml') || (tableConfig.hasOwnProperty('flagHtml') && tableConfig['flagHtml']) ) && String(id) === '0'" color="teal darken-3" class="mr-0" dark
           :loading="loading"
           :disabled="loading"
           v-on:click.native="saveToData('cmd_ide')"
-        >Ghi lại và thêm mới</v-btn>
+        >Ghi lại và thêm mới</v-btn> -->
         <v-btn color="blue darken-3" class="mr-0" dark v-on:click.native="saveToData('cmd')"
           :loading="loading"
           :disabled="loading"
@@ -695,9 +696,16 @@
         return this.data.email ? this.data.email : this.data.contactEmail
       }
     },
+    watch: {
+      '$route': function (newRoute, oldRoute) {
+        let vm = this
+        let currentQuery = newRoute.query
+        if (currentQuery.hasOwnProperty('serviceCodeDvcqg')) {
+          vm.serviceCodeDVCQG = currentQuery.serviceCodeDvcqg
+        }
+      },
+    },
     created() {
-      console.log('created')
-      
       var vm = this
       vm.$nextTick(function() {
         let currentQuery = vm.$router.history.current.query
@@ -833,13 +841,26 @@
       },
       saveToData (cmdText) {
         let vm = this
+        let activeServiceInfo = true
         if (vm.isConnected) {
           vm.isConnected = false
+        }
+        try {
+          if (vm.tableName == 'opencps_serviceinfo') {
+            activeServiceInfo = vm.data['public_']
+          }
+        } catch (error) {
         }
         if (vm.$refs.form.validate()) {
           vm.loading = true
           let current = vm.$router.history.current
           let newQuery = current.query
+          try {
+            if (vm.tableName == 'opencps_serviceinfo' && vm.id == 0) {
+              vm.data['serviceCodeDVCQG'] = vm.serviceCodeDVCQG
+            }
+          } catch (error) {
+          }
           let dataPOST = Object.assign({}, vm.data)
           delete dataPOST['expandoBridge']
           delete dataPOST['modelAttributes']
@@ -908,6 +929,15 @@
               if (vm.pullCounter === 0) {
                 vm.pullOk = true
               }
+            }
+            if (vm.tableName == 'opencps_serviceinfo' && vm.id != 0) {
+              let postData = {
+                serviceInfoId: vm.id,
+                serviceCodeDVCQG: vm.serviceCodeDVCQG,
+                public: activeServiceInfo
+              }
+              vm.$store.dispatch('updateServiceInfo', postData).then(function (data) {
+              })
             }
           }).catch(function (error) {
           })

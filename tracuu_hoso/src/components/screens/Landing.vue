@@ -9,6 +9,7 @@
           {{!qrscan ? 'TRA CỨU HỒ SƠ' : 'THÔNG TIN HỒ SƠ'}}
         </div>
         <v-card v-if="!qrscan" flat color="#ffffff" class="px-2 py-2">
+          <!-- <selfie-image-box @filterByApplicantIdNo="filterByApplicantIdNo"></selfie-image-box> -->
           <v-flex xs12 class="mb-1">
             <v-text-field
               label="Mã số hồ sơ"
@@ -155,6 +156,12 @@
         </v-card>
         <v-card flat class="" v-else>
           <chi-tiet-ho-so :detail="dossierDetail"></chi-tiet-ho-so>
+          <v-layout wrap align-center justify-end class="mt-3">
+            <v-btn color="primary" class="mx-2" @click.native="detail = false">
+              <v-icon>reply</v-icon>
+              <span class="px-2">Quay lại</span>
+            </v-btn>
+          </v-layout>
         </v-card>
       </v-flex>
       <v-flex v-if="hoSoQlvt" xs12 md9 :class="isMobile ? 'pt-1 mb-2' : 'pl-3 pt-1 mb-2'">
@@ -276,6 +283,7 @@ import $ from 'jquery'
 import toastr from 'toastr'
 import TinyPagination from './Pagination.vue'
 import ChiTietHoSo from './DetailDossier'
+import SelfieImageBox from './SelfieImageBox'
 Vue.use(toastr)
 
 toastr.options = {
@@ -286,7 +294,8 @@ export default {
   props: [],
   components: {
     'tiny-pagination': TinyPagination,
-    'chi-tiet-ho-so': ChiTietHoSo
+    'chi-tiet-ho-so': ChiTietHoSo,
+    SelfieImageBox
   },
   data: () => ({
     dossierList: [],
@@ -367,6 +376,11 @@ export default {
     if (vm.isMobile) {
       $('section#content').css('padding-left', '0px')
     }
+    let cameraBox = document.getElementsByClassName('camera-selfie-box')[0];
+    cameraBox.style.height = ""+ cameraBox.offsetWidth*3/4 + "px"
+    
+    let canvas = document.getElementById('canvasDup');
+    canvas.style.height = "" + canvas.offsetWidth * 3 / 4 + "px";
   },
   created () {
     let vm = this
@@ -395,6 +409,12 @@ export default {
         }
       } catch (error) {
       }
+
+      let cameraBox = document.getElementsByClassName('camera-selfie-box')[0];
+      cameraBox.style.height = ""+ cameraBox.offsetWidth*3/4 + "px"
+      
+      let canvas = document.getElementById('canvasDup');
+      canvas.style.height = "" + canvas.offsetWidth * 3 / 4 + "px";
     })
   },
   updated () {
@@ -432,7 +452,8 @@ export default {
         page: vm.dossierPage,
         dossierNo: vm.dossierNoKey,
         applicantIdNo: vm.applicantIdNo,
-        status: vm.status
+        status: vm.status,
+        order: true
       }
       if (vm.dossierNoKey || vm.applicantIdNo) {
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
@@ -445,6 +466,11 @@ export default {
       } else {
         vm.loading = false
       }
+    },
+    filterByApplicantIdNo(applicantIdNo) {
+      let vm = this
+      vm.applicantIdNo = applicantIdNo
+      vm.changeDataSearch()
     },
     changeDataSearch () {
       let vm = this
@@ -459,6 +485,7 @@ export default {
           newQuery['dossierNo'] = vm.dossierNoKey
           newQuery['applicantIdNo'] = vm.applicantIdNo
           newQuery['status'] = vm.status
+          newQuery['order'] = true
           for (let key in newQuery) {
             if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
               queryString += key + '=' + newQuery[key] + '&'

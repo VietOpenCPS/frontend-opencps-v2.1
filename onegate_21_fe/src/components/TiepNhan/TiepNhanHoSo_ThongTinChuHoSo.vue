@@ -23,7 +23,10 @@
                     </v-btn>
                   </v-flex>
                   <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '1' && traCuuLgspCongDan">
-                    <!-- <v-btn :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0 mr-3" color="primary" @click.stop="checkInfoAccount()">
+                    <v-btn class="mx-0 mr-3" v-if="traCuuAI" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" color="primary" @click="showDialogAISearch()">
+                      <span>Tra cứu AI</span>
+                    </v-btn>
+                    <v-btn v-if="checkAccSso" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0 mr-3" color="primary" @click.stop="checkInfoAccount()">
                       <v-icon v-if="!loadingSearchLgsp">how_to_reg</v-icon> 
                       <v-progress-circular :size="24" v-if="loadingSearchLgsp"
                         indeterminate
@@ -31,7 +34,7 @@
                       ></v-progress-circular>&nbsp;
                       <span v-if="!loadingSearchLgsp">Kiểm tra thông tin tài khoản</span>
                       <span v-if="loadingSearchLgsp">Đang kiểm tra</span>
-                    </v-btn> -->
+                    </v-btn>
                     <v-btn :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
                       <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
                       <v-progress-circular :size="24" v-if="loadingSearchLgsp"
@@ -43,6 +46,15 @@
                     </v-btn>
                   </v-flex>
                   <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '2' && traCuuLgspDoanhNghiep">
+                    <v-btn v-if="checkAccSso" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0 mr-3" color="primary" @click.stop="checkInfoAccount()">
+                      <v-icon v-if="!loadingSearchLgsp">how_to_reg</v-icon> 
+                      <v-progress-circular :size="24" v-if="loadingSearchLgsp"
+                        indeterminate
+                        color="white"
+                      ></v-progress-circular>&nbsp;
+                      <span v-if="!loadingSearchLgsp">Kiểm tra thông tin tài khoản</span>
+                      <span v-if="loadingSearchLgsp">Đang kiểm tra</span>
+                    </v-btn>
                     <v-btn :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspDoanhNghiep()">
                       <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
                       <v-progress-circular :size="24" v-if="loadingSearchLgsp"
@@ -53,6 +65,296 @@
                       <span v-if="loadingSearchLgsp">Đang kiểm tra thông tin doanh nghiệp</span>
                     </v-btn>
                   </v-flex>
+                  <v-dialog v-model="dialog_aiSearch" persistent max-width="680">
+                    <v-toolbar dark color="primary">
+                      <v-toolbar-title>Chụp ảnh khuôn mặt</v-toolbar-title>
+                      <v-spacer></v-spacer>
+                      <v-btn icon dark @click="closeDialogAiSearch">
+                        <v-icon>close</v-icon>
+                      </v-btn>
+                    </v-toolbar>
+                    <v-card>
+                      <div class="camera-box-login">
+                        <video v-show="!hasPhoto" ref="camera" :width="680" :height="510" autoplay ></video>
+                        <canvas v-show="hasPhoto" id="photoTaken" ref="canvas" :width="680" :height="510" ></canvas>
+                        <div class="camera-shot" style="text-align: center;">
+                          <v-btn fab class="btn-50px" @click="takePhoto" v-show="!hasPhoto">
+                            <v-icon>camera_alt</v-icon>
+                          </v-btn>
+                          <v-btn fab class="btn-50px" @click="turnOnCamera" v-show="hasPhoto">
+                            <v-icon>replay</v-icon>
+                          </v-btn>
+                        </div>
+                      </div>
+                    </v-card>
+                  </v-dialog>
+
+                  <v-dialog v-model="dialog_identifyConfirm" width="400">
+                    <v-card>
+                      <v-card-text class="text-center">Tài khoản công dân chưa thực hiện định danh điện tử.</v-card-text>
+                      <v-layout align-center justify-center>
+                        <v-btn color="error" @click.native="dialog_identifyConfirm = false">
+                          <span class="px-2">Đóng</span>
+                        </v-btn>
+                        <v-btn color="primary" style="margin-left:15px;" @click="showDialogAiIdentify">
+                          <span class="px-2">Định danh điện tử</span>
+                        </v-btn>
+                      </v-layout>
+                    </v-card>
+                  </v-dialog>
+
+                  <v-dialog v-model="dialog_aiIdentify" width="1000">
+                    <v-toolbar dark color="primary">
+                      <v-toolbar-title class="body-1">Định danh điện tử</v-toolbar-title>
+                      <v-spacer></v-spacer>
+                      <v-btn icon dark @click="endIdentifyProcess">
+                        <v-icon>close</v-icon>
+                      </v-btn>
+                    </v-toolbar>
+                    <v-card>
+                      <v-stepper alt-labels v-model="step">
+                        <v-stepper-header>
+                          <v-stepper-step :complete="step > 1" step="1"
+                            >Chụp CMND/ CCCD mặt trước</v-stepper-step
+                          >
+
+                          <v-divider></v-divider>
+
+                          <v-stepper-step :complete="step > 2" step="2"
+                            >Chụp CMND/ CCCD mặt sau</v-stepper-step
+                          >
+
+                          <v-divider></v-divider>
+                          <v-stepper-step :complete="step > 3" step="3"
+                            >Xác thực khuôn mặt</v-stepper-step
+                          >
+                        </v-stepper-header>
+
+                        <v-stepper-items>
+                          <v-stepper-content step="1">
+                            <v-toolbar flat color="#fff">
+                              <v-layout column justify-center text-center>
+                                <v-toolbar-title>Chụp CMND/ CCCD mặt trước</v-toolbar-title>
+                                <p style="color: red">
+                                  * Xin vui lòng đặt giấy tờ nằm vừa khung chữ nhật, chụp đủ sáng
+                                  và rõ nét, không bị cắt góc
+                                </p>
+                              </v-layout>
+                            </v-toolbar>
+                            <v-layout row wrap class="mt-4">
+                              <v-flex xs6 sm4>
+                                <v-card elevation="0">
+                                  <attached-front-image ref="attachedFrontImage" :type="'image'"  @loadFrontData="loadFrontData" @changeLoading="changeLoading" @clearFrontData="clearFrontData"
+                                  ></attached-front-image>
+                                </v-card>
+                              </v-flex>
+                              <v-spacer></v-spacer>
+                              <v-flex xs6 sm7>
+                                <v-flex style="height:280px;">
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Họ và tên</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['name']" :loading="loadingDialogInfo" disabled
+                                      ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Số CMND/ CCCD</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['id']" :loading="loadingDialogInfo" disabled
+                                      ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Ngày sinh</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['birthday']" :loading="loadingDialogInfo" disabled
+                                      ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Nơi thường trú</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['address']" :loading="loadingDialogInfo" disabled
+                                      ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Nơi cấp</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['issue_by']" disabled
+                                      ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Ngày cấp</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['issue_date']" disabled
+                                      ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                </v-flex>
+                                <v-flex>
+                                  <v-layout align-center justify-end class="mt-3">
+                                    <v-btn color="primary" :disabled="disabled" @click="nextStep" >
+                                      <v-icon>check</v-icon>
+                                      <span class="px-2">Tiếp tục</span>
+                                    </v-btn>
+                                  </v-layout>
+                                </v-flex>
+                              </v-flex>
+                            </v-layout>
+                          </v-stepper-content>
+
+                          <v-stepper-content step="2">
+                            <v-toolbar flat color="#fff">
+                              <v-layout column justify-center text-center>
+                                <v-toolbar-title>Chụp CMND/ CCCD mặt sau</v-toolbar-title>
+                                <p style="color: red">
+                                  * Xin vui lòng đặt giấy tờ nằm vừa khung chữ nhật, chụp đủ sáng
+                                  và rõ nét, không bị cắt góc
+                                </p>
+                              </v-layout>
+                            </v-toolbar>
+                            <v-layout row wrap class="mt-4">
+                              <v-flex xs6 sm4>
+                                <v-card elevation="0">
+                                  <attached-back-image ref="attachedBackImage" :type="'image'" @loadBackData="loadBackData" @changeLoading="changeLoading" @clearBackData="clearBackData"
+                                  ></attached-back-image>
+                                </v-card>
+                              </v-flex>
+                              <v-spacer></v-spacer>
+                              <v-flex xs6 sm7>
+                                <v-flex style="height:280px;">
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Họ và tên</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field  v-model="user['name']" disabled
+                                      ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Số CMND/ CCCD</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['id']" disabled></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Ngày sinh</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['birthday']" disabled
+                                      ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Nơi thường trú</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['address']" disabled
+                                      ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Nơi cấp</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['issue_by']" disabled :loading="loadingDialogInfo" ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Ngày cấp</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['issue_date']" :loading="loadingDialogInfo" disabled
+                                      ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                </v-flex>
+                                <v-flex> 
+                                  <v-layout align-center justify-end class="mt-3">
+                                    <v-btn color="primary" @click="previousStep" >
+                                      <v-icon>reply</v-icon>
+                                      <span class="px-2">Quay lại</span>
+                                    </v-btn>
+                                    <v-btn color="primary" :disabled="disabled" @click="nextStep" >
+                                      <v-icon>check</v-icon>
+                                      <span class="px-2">Tiếp tục</span>
+                                    </v-btn>
+                                  </v-layout>
+                                </v-flex>
+                              </v-flex>
+                            </v-layout>
+                          </v-stepper-content>
+
+                          <v-stepper-content step="3">
+                            <v-toolbar flat color="#fff">
+                              <v-layout column justify-center text-center>
+                                <v-toolbar-title>Xác thực khuôn mặt</v-toolbar-title>
+                                <p style="color: red">
+                                  * Xin vui lòng điều chỉnh sao cho khuôn mặt nằm trong khung
+                                  hình
+                                </p>
+                              </v-layout>
+                            </v-toolbar>
+                            <v-layout row wrap class="mt-4">
+                              <v-flex xs6 sm4>
+                                <v-card elevation="0">
+                                  <attached-selfie-image ref="attachedSelfieImage" :type="'image'" :userData="user" @loadSelfieData="loadSelfieData" @clearSelfieData="clearSelfieData"
+                                    @updateUserInfomation="updateUserInfomation"
+                                  ></attached-selfie-image>
+                                </v-card>
+                              </v-flex>
+                              <v-spacer></v-spacer>
+                              <v-flex xs6 sm7>
+                                <v-flex style="height:280px;">
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Họ và tên</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['name']" disabled ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Số CMND/ CCCD</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['id']" disabled></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Ngày sinh</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['birthday']" disabled ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Nơi thường trú</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['address']" disabled ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Nơi cấp</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['issue_by']" disabled ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                  <v-layout row align-center>
+                                    <v-flex sm4>Ngày cấp</v-flex>
+                                    <v-flex sm8>
+                                      <v-text-field v-model="user['issue_date']" disabled ></v-text-field>
+                                    </v-flex>
+                                  </v-layout>
+                                </v-flex>
+                                <v-flex>
+                                  <v-layout align-center justify-end class="mt-3">
+                                    <v-btn color="primary" @click="endIdentifyProcess" >
+                                      <span class="px-2">Kết thúc</span>
+                                    </v-btn>
+                                  </v-layout>
+                                </v-flex>
+                              </v-flex>
+                            </v-layout>
+                          </v-stepper-content>
+                        </v-stepper-items>
+                      </v-stepper>
+                    </v-card>
+                  </v-dialog>
                   <v-layout wrap>
                     <v-flex xs12 v-if="originality == '3' && thongTinChuHoSo.userType == '1' && traCuuLgspCongDan && warningLgsp" class="mb-2">
                       <v-alert
@@ -1006,17 +1308,27 @@ import axios from 'axios'
 import Suggestions from 'v-suggestions'
 import toastr from 'toastr'
 import TinyPagination from '../../components/pagging/opencps_pagination'
+import AttachedBackImage from "../ext/AttachedBackImage.vue"
+import AttachedFrontImage from "../ext/AttachedFrontImage.vue"
+import AttachedSelfieImage from "../ext/AttachedSelfieImage.vue"
 toastr.options = {
   'closeButton': true,
-  'timeOut': '5000'
+  'timeOut': '5000',
+  'positionClass': 'toast-top-center'
 }
 export default {
   components: {
     'suggestions': Suggestions,
-    'tiny-pagination': TinyPagination
+    'tiny-pagination': TinyPagination,
+    AttachedBackImage,
+    AttachedFrontImage,
+    AttachedSelfieImage,
   },
   props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode', 'applicantIdRequired', 'detailDossier'],
   data: () => ({
+    dialog_aiIdentify: false,
+    step: 1,
+    user: [],
     validateSameApplicantIdNo: false,
     sameApplicantIdNo: '',
     checkDelegateIdNo: false,
@@ -1142,6 +1454,12 @@ export default {
     titleEdit: 'Thông tin công dân, tổ chức, doanh nghiệp',
     applicantEdit: '',
     dialog_editApplicant: false,
+    dialog_aiSearch: false,
+    isCameraOpen: false,
+    hasPhoto: false,
+    disabled: true,
+    loadingDialogInfo: false,
+    dialog_identifyConfirm: false,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       cmndHoChieu: (value) => {
@@ -1244,6 +1562,8 @@ export default {
     defaultCityCode: false,
     traCuuLgspCongDan: false,
     traCuuLgspDoanhNghiep: false,
+    traCuuAI: false,
+    checkAccSso: false,
     lgspType: 'business',
     warningLgsp: false,
     messageLgsp: '',
@@ -1289,6 +1609,14 @@ export default {
     }
     try {
       vm.traCuuLgspDoanhNghiep = traCuuLgspDoanhNghiep
+    } catch (error) {
+    }
+    try {
+      vm.checkAccSso = checkAccSso
+    } catch (error) {
+    }
+    try {
+      vm.traCuuAI = truCuuAi
     } catch (error) {
     }
     try {
@@ -2256,6 +2584,10 @@ export default {
       vm.thongTinChuHoSo['contactName'] = ''
       vm.thongTinChuHoSo['address'] = ''
       vm.thongTinChuHoSo['applicantName'] = ''
+      if (vm.formCode === "NEW" && vm.defaultCityCode) {
+        vm.thongTinChuHoSo['cityCode'] = vm.defaultCityCode ? vm.defaultCityCode : ''
+        vm.thongTinChuHoSo['cityName'] = defaultCityName ? defaultCityName : ''
+      }
 
     },
     checkInfoAccount () {
@@ -2263,7 +2595,8 @@ export default {
       vm.loadingSearchLgsp = true
       if (vm.thongTinChuHoSo['applicantIdNo']) {
         let filter = {
-          maSoCaNhan: vm.thongTinChuHoSo['applicantIdNo']
+          maSoCaNhan: vm.thongTinChuHoSo['applicantIdNo'],
+          type: vm.thongTinChuHoSo.userType == '2' ? 'business' : 'citizen'
         }
         vm.$store.dispatch('getStatusAccount', filter).then(result => {
           console.log('resultCheck', result)
@@ -2277,8 +2610,8 @@ export default {
               vm.showDialogCreateAcc()
             }
           }
-        }).catch(function () {
-
+        }).catch(function (err) {
+          console.log(err)
         })
       }
     },
@@ -2294,7 +2627,6 @@ export default {
       let vm = this
       let filter = {
         'hoVaTen': vm.applicantNameCreateAcc,
-        'maSoCaNhan': vm.applicantIdNoCreateAcc,
         'ngaySinh': '1990-12-13T04:01:36.920Z',
         'soDienThoai': vm.applicantTelNoCreateAcc,
         'thuDienTu': vm.applicantEmailCreateAcc,
@@ -2302,10 +2634,24 @@ export default {
         'id': '',
         'applicantIdType': vm.thongTinChuHoSo.userType == '2' ? 'business' : 'citizen'
       }
+      if (vm.thongTinChuHoSo.userType == '2') {
+        filter['maSoDoanhNghiep'] = vm.applicantIdNoCreateAcc
+      } else {
+        filter['maSoCaNhan'] = vm.applicantIdNoCreateAcc
+      }
+      vm.loadingSearchLgsp = true
       vm.$store.dispatch('createAccountCaNhan', filter).then(result => {
-        console.log('result', result)
-        toastr.success('Tạo tài khoản thành công')
         vm.dialog_create_acc = false
+        vm.loadingSearchLgsp = false
+        toastr.success('Tạo tài khoản thành công')
+      }).catch(function (err) {
+        if (err.status == 200) {
+          vm.dialog_create_acc = false
+          toastr.success('Tạo tài khoản thành công')
+        } else {
+          toastr.error('Tạo tài khoản thất bại')
+        }
+        vm.loadingSearchLgsp = false
       })
     },
     showDialogSearchLgspDoanhNghiep () {
@@ -2580,6 +2926,317 @@ export default {
       str = str.replace(/Đ/g, 'D')
       str = str.toLocaleLowerCase().replace(/\s/g, '')
       return str
+    },
+    showDialogAISearch() {
+      this.turnOnCamera()
+    },
+    takePhoto() {
+      const context = this.$refs.canvas.getContext("2d");
+      context.drawImage(this.$refs.camera, 0, 0, 680, 510);
+      let tracks = this.$refs.camera.srcObject.getTracks();
+      this.hasPhoto = true
+
+      tracks.forEach(track => {
+        track.stop();
+      });
+
+      const image_live = document.getElementById("photoTaken").toDataURL("image/jpeg")
+        .replace( "data:image/jpeg;base64,", "")
+      let data = {
+        image_live: image_live
+      }
+      let vm = this
+      this.$store.dispatch("aiSearch", data)
+        .then(function (result) {
+          let response = result.data;
+          if (response.code == '1') {
+            vm.thongTinChuHoSo.applicantIdNo = response.applicantIdNo
+            vm.thongTinChuHoSo.applicantName = response.applicantName
+            vm.thongTinChuHoSo.address = response.address
+            vm.thongTinChuHoSo.cityCode = response.cityCode
+            vm.thongTinChuHoSo.districtCode = response.districtCode
+            vm.thongTinChuHoSo.wardCode = response.wardCode
+            if (response.contactTelNo != undefined && response.contactTelNo != "") {
+              vm.thongTinChuHoSo.contactTelNo  = response.contactTelNo
+            }
+            vm.thongTinChuHoSo.userType = '1'
+            //ward
+            try {
+              if (vm.thongTinChuHoSo.wardCode.startsWith('0')) {
+                vm.thongTinChuHoSo.wardCode = response.wardCode
+              } else {
+                vm.thongTinChuHoSo.wardCode = parseInt(response.wardCode)
+              }
+            } catch {
+              vm.thongTinChuHoSo.wardCode = parseInt(response.wardCode)
+            }
+            //city
+            try {
+              if (vm.thongTinChuHoSo.cityCode.startsWith('0')) {
+                vm.thongTinChuHoSo.cityCode = response.cityCode
+              } else {
+                vm.thongTinChuHoSo.cityCode = parseInt(response.cityCode)
+              }
+            } catch {
+              vm.thongTinChuHoSo.cityCode = parseInt(response.cityCode)
+            }
+            //district
+            try {
+              if (vm.thongTinChuHoSo.districtCode.startsWith('0')) {
+                vm.thongTinChuHoSo.districtCode = response.districtCode
+              } else {
+                vm.thongTinChuHoSo.districtCode = parseInt(response.districtCode)
+              }
+            } catch {
+              vm.thongTinChuHoSo.districtCode = parseInt(response.districtCode)
+            }
+            let filterDistrict = {
+              collectionCode: 'ADMINISTRATIVE_REGION',
+              level: 1,
+              parent: vm.thongTinChuHoSo.cityCode
+            }
+            vm.$store.dispatch('loadDictItems', filterDistrict).then(function (result) {
+              vm.districts = result.data
+            })
+            let filterWard = {
+              collectionCode: 'ADMINISTRATIVE_REGION',
+              level: 2,
+              parent: vm.thongTinChuHoSo.districtCode
+            }
+            vm.$store.dispatch('loadDictItems', filterWard).then(function (result) {
+              vm.wards = result.data
+            })
+            setTimeout(function() {
+              vm.dialog_aiSearch = false
+            }, 1000)
+            toastr.clear()
+            toastr.success("Nhận diện khuôn mặt thành công")
+          } else if (response.code == '2') {
+            vm.dialog_identifyConfirm = true
+          } else {
+            toastr.clear()
+            toastr.error(response.message)
+          }
+        }).catch((error) => {
+          toastr.clear()
+          toastr.error("Nhận diện khuôn mặt thất bại. Vui lòng thử lại")
+        })
+    },
+    turnOnCamera() {
+      return new Promise((resolve, reject)=>{
+        const constraints = (window.constraints = {
+          audio: false,
+          video: true,
+        });
+
+        navigator.mediaDevices
+          .getUserMedia(constraints)
+          .then((stream) => {
+            this.dialog_aiSearch = true
+            this.$refs.camera.srcObject = stream
+            this.isCameraOpen = true
+            this.hasPhoto = false
+            resolve('')
+          })
+          .catch((error) => {
+            this.isCameraOpen = false
+            alert("Trình duyệt không hỗ trợ hoặc thiết bị không có camera.")
+            reject(error)
+          });
+      })
+    },
+    closeDialogAiSearch() {
+      let vm = this
+      vm.dialog_aiSearch = false;
+      let tracks = vm.$refs.camera.srcObject.getTracks();
+
+      tracks.forEach(track => {
+        track.stop();
+      });
+    },
+    showDialogAiIdentify () {
+      this.dialog_identifyConfirm = false
+      this.dialog_aiSearch = false
+      this.dialog_aiIdentify = true
+    },
+    changeLoading() {
+      let vm = this;
+      vm.loadingDialogInfo = true;
+    },
+    nextStep() {
+      this.disabled = true;
+      this.step++;
+      this.checkEnableNextStep()
+    },
+    previousStep() {
+      this.disabled = false;
+      this.step--;
+    },
+    loadFrontData(data) {
+      let vm = this;
+      let temp = data.information;
+      vm.user["name"] = temp.name;
+      vm.user["id"] = temp.id;
+      vm.user["birthday"] = temp.birthday;
+      vm.user["address"] = temp.address;
+      vm.user["front_image"] = data.front_image;
+      vm.user["wardCode"] = temp.ward_code
+      vm.user["wardName"] = temp.ward
+      vm.user["districtCode"] = temp.district_code
+      vm.user["districtName"] = temp.district
+      vm.user["cityCode"] = temp.province_code
+      vm.user["cityName"] = temp.province
+      vm.loadingDialogInfo = false;
+      vm.disabled = false;
+    },
+    changeLoading() {
+      let vm = this;
+      vm.loadingDialogInfo = true;
+    },
+    clearFrontData() {
+      let vm = this;
+      vm.user["name"] = "";
+      vm.user["id"] = "";
+      vm.user["birthday"] = "";
+      vm.user["address"] = "";
+      vm.user["front_image"] = "";
+      this.disabled = true;
+      this.loadingDialogInfo = false;
+    },
+    loadBackData(data) {
+      let vm = this;
+      let temp = data.information;
+      vm.user["issue_by"] = temp.issue_by;
+      vm.user["issue_date"] = temp.issue_date;
+      vm.user["back_image"] = data.back_image;
+      vm.loadingDialogInfo = false;
+      vm.disabled = false;
+    },
+    loadSelfieData(data) {
+      let vm = this;
+      vm.disabled = false;
+      vm.user["ekycId"] = data.user_id;
+      vm.user["live_image"] = data.live_image;
+    },
+    clearBackData() {
+      let vm = this;
+      vm.user["issue_by"] = "";
+      vm.user["issue_date"] = "";
+      vm.user["back_image"] = "";
+      this.disabled = true;
+      this.loadingDialogInfo = false;
+    },
+    clearSelfieData() {
+      let vm = this;
+      vm.disabled = true;
+      vm.user["live_image"] = "";
+    },
+    endIdentifyProcess() {
+      let vm = this;
+      vm.user["name"]       = "";
+      vm.user["id"]         = "";
+      vm.user["birthday"]   = "";
+      vm.user["address"]    = "";
+      vm.user["front_image"] = "";
+      vm.user["issue_by"]   = "";
+      vm.user["issue_date"] = "";
+      vm.user["back_image"] = "";
+      vm.user["live_image"] = "";
+      vm.loadingDialogInfo = false;
+      vm.dialog_aiIdentify = false
+      vm.step = 1
+      vm.$refs.attachedFrontImage.deleteImageWhenClosePopup()
+      vm.$refs.attachedBackImage.deleteImageWhenClosePopup()
+      vm.$refs.attachedSelfieImage.deleteImageWhenClosePopup()
+    },
+    updateUserInfomation(data) {
+      let vm = this
+      vm.thongTinChuHoSo.applicantIdNo = data.applicantIdNo
+      vm.thongTinChuHoSo.applicantName = data.applicantName
+      vm.thongTinChuHoSo.address = data.address
+      vm.thongTinChuHoSo.cityCode = data.cityCode
+      vm.thongTinChuHoSo.districtCode = data.districtCode
+      vm.thongTinChuHoSo.wardCode = data.wardCode
+      if (data.contactTelNo != undefined && data.contactTelNo != "") {
+        vm.thongTinChuHoSo.contactTelNo  = data.contactTelNo
+      }
+      vm.thongTinChuHoSo.userType = '1'
+      //ward
+      try {
+        if (vm.thongTinChuHoSo.wardCode.startsWith('0')) {
+          vm.thongTinChuHoSo.wardCode = data.wardCode
+        } else {
+          vm.thongTinChuHoSo.wardCode = parseInt(data.wardCode)
+        }
+      } catch {
+        vm.thongTinChuHoSo.wardCode = parseInt(data.wardCode)
+      }
+      //city
+      try {
+        if (vm.thongTinChuHoSo.cityCode.startsWith('0')) {
+          vm.thongTinChuHoSo.cityCode = data.cityCode
+        } else {
+          vm.thongTinChuHoSo.cityCode = parseInt(data.cityCode)
+        }
+      } catch {
+          vm.thongTinChuHoSo.cityCode = parseInt(data.cityCode)
+      }
+      //district
+      try {
+        if (vm.thongTinChuHoSo.districtCode.startsWith('0')) {
+          vm.thongTinChuHoSo.districtCode = data.districtCode
+        } else {
+          vm.thongTinChuHoSo.districtCode = parseInt(data.districtCode)
+        }
+      } catch {
+        vm.thongTinChuHoSo.districtCode = parseInt(data.districtCode)
+      }
+      let filterDistrict = {
+        collectionCode: 'ADMINISTRATIVE_REGION',
+        level: 1,
+        parent: vm.thongTinChuHoSo.cityCode
+      }
+      vm.$store.dispatch('loadDictItems', filterDistrict).then(function (result) {
+        vm.districts = result.data
+      })
+      let filterWard = {
+        collectionCode: 'ADMINISTRATIVE_REGION',
+        level: 2,
+        parent: vm.thongTinChuHoSo.districtCode
+      }
+      vm.$store.dispatch('loadDictItems', filterWard).then(function (result) {
+        vm.wards = result.data
+      })
+      setTimeout(function() {
+        vm.dialog_aiSearch = false
+      }, 1000)
+    },
+    checkEnableNextStep() {
+        let vm = this
+        if(vm.step == 1) {
+            if (vm.user["front_image"] != "" && vm.user["front_image"] != undefined &&
+                vm.user["name"]        != "" && vm.user["name"]        != undefined &&
+                vm.user["id"]          != "" && vm.user["id"]          != undefined &&
+                vm.user["address"]     != "" && vm.user["address"]     != undefined &&
+                vm.user["birthday"]    != "" && vm.user["birthday"]    != undefined 
+            ) {
+                vm.disabled = false
+            }
+        }
+        if(vm.step == 2) {
+            if (vm.user["back_image"] != "" && vm.user["back_image"] != undefined &&
+                vm.user["issue_by"]   != "" && vm.user["issue_by"]   != undefined &&
+                vm.user["issue_date"] != "" && vm.user["issue_date"] != undefined 
+            ) {
+                vm.disabled = false
+            }
+        }
+        if(vm.step == 3) {
+            if (vm.user["live_image"] != "" && vm.user["live_image"] != undefined) 
+            {
+                vm.disabled = false
+            }
+        }
     }
   }
 }

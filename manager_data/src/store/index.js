@@ -56,7 +56,25 @@ export const store = new Vuex.Store({
             icon: 'filter_4',
             link: '/table/opencps_serviceconfig',
             code: 'opencps_serviceconfig',
-            text: 'Dịch vụ công'
+            text: 'Dịch vụ công một cửa'
+          },
+          {
+            icon: 'filter_5',
+            link: '/table/opencps_serviceconfig_dvc',
+            code: 'opencps_serviceconfig_dvc',
+            text: 'Dịch vụ công cổng DVC'
+          },
+          {
+            icon: 'filter_6',
+            link: '/table/opencps_stepconfig',
+            code: 'opencps_stepconfig',
+            text: 'Bước xử lý'
+          },
+          {
+            icon: 'filter_7',
+            link: '/table/opencps_actionconfig',
+            code: 'opencps_actionconfig',
+            text: 'Thao tác xử lý'
           }
         ]
       },
@@ -627,6 +645,30 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDossierTemplateDvc ({state}) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let params = {
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/dossiertemplates')
+          dataPost.append('data', JSON.stringify(params))
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable.data)
+            }
+          }).catch(function (error) {
+          })
+        })
+      })
+    },
     getServiceProcesses ({state}) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -642,6 +684,30 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+          })
+        })
+      })
+    },
+    getServiceProcessesDvc ({state}) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let params = {
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/serviceprocesses')
+          dataPost.append('data', JSON.stringify(params))
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable.data)
+            }
+          }).catch(function (error) {
           })
         })
       })
@@ -1662,6 +1728,65 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDomainDvc ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let params = {
+            agency: data.agencyCode,
+            sort: 'siblingSearch'
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/serviceinfos/statistics/domains')
+          dataPost.append('data', JSON.stringify(params))
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+          })
+        })
+      })
+    },
+    getServiceInfoDvc ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let params = {
+            sort: 'siblingSearch',
+            administration: data.administration ? data.administration : '',
+            domain: data.domain ? data.domain : ''
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/serviceinfos')
+          dataPost.append('data', JSON.stringify(params))
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+          })
+        })
+      })
+    },
     getServiceConfigDetail ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -1676,6 +1801,28 @@ export const store = new Vuex.Store({
             let serializable = response.data
             resolve(serializable)
           }).catch(function (xhr) {
+          })
+        })
+      })
+    },
+    getServiceConfigDetailCongDvc ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let params = {
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/serviceconfigs/' + data.serviceConfigId)
+          dataPost.append('data', JSON.stringify(params))
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
           })
         })
       })
@@ -1714,6 +1861,48 @@ export const store = new Vuex.Store({
               reject(error)
             })
           }
+        })
+      })
+    },
+    createServiceConfigDvc ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let dataPost = new URLSearchParams()
+          let urlPost = ''
+          if (data.type === 'add') {
+            urlPost = '/serviceconfigs'
+          } else {
+            urlPost = '/serviceconfigs/' + data.serviceConfigId
+          }
+          let dataAdd = {
+            serviceInfoId: data.serviceInfoId ? data.serviceInfoId : '',
+            govAgencyCode: data.govAgencyCode ? data.govAgencyCode : '',
+            serviceInstruction: data.serviceInstruction ? data.serviceInstruction : '',
+            serviceLevel: data.serviceLevel,
+            serviceUrl: data.serviceUrl,
+            forCitizen: data.forCitizen,
+            forBusiness: data.forBusiness,
+            postalService: data.postalService,
+            registration: data.registration,
+            receptionReport: data.receptionReport
+          }
+          if (data.type === 'add') {
+            dataPost.append('method', 'POST')
+          } else {
+            dataPost.append('method', 'PUT')
+          }
+          dataPost.append('url', urlPost)
+          dataPost.append('data', JSON.stringify(dataAdd))
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
+            resolve(response.data)
+          }).catch(xhr => {
+            reject(xhr)
+          })
         })
       })
     },
@@ -1768,6 +1957,49 @@ export const store = new Vuex.Store({
               reject(error)
             })
           }
+        })
+      })
+    },
+    createServiceProcessOptionDvc ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let dataPost = new URLSearchParams()
+          let urlPost = ''
+          if (data.type === 'add') {
+            urlPost = '/serviceconfigs/' + data.serviceConfigId + '/processes'
+          } else {
+            urlPost = '/serviceconfigs/' + data.serviceConfigId + '/processes/' + data.processOptionId
+          }
+          let dataAdd = {
+            optionName: data.optionName,
+            seqOrder: data.seqOrder,
+            autoSelect: data.autoSelect,
+            instructionNote: data.instructionNote,
+            submissionNote: data.submissionNote,
+            dossierTemplateId: data.dossierTemplateId,
+            serviceProcessId: data.serviceProcessId,
+            postalService: data.postalService,
+            registerBookCode: data.registerBookCode,
+            sampleCount: data.sampleCount
+          }
+          if (data.type === 'add') {
+            dataPost.append('method', 'POST')
+          } else {
+            dataPost.append('method', 'PUT')
+          }
+          dataPost.append('url', urlPost)
+          dataPost.append('data', JSON.stringify(dataAdd))
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
+            resolve(response.data)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+          // 
         })
       })
     },
@@ -2501,40 +2733,6 @@ export const store = new Vuex.Store({
       })
     },
     downLoadExcelRevesionLog ({state}, filter) {
-      // return new Promise((resolve, reject) => {
-      //   let options = {
-      //     headers: {
-      //       'groupId': state.groupId,
-      //       'Content-Type': 'x-www-form-urlencoded',
-      //       'Accept': 'application/json'
-      //     },
-      //     responseType: 'blob'
-      //   }
-      //   let params = new URLSearchParams()
-      //   params.append('data', dataReq.data)
-      //   axios.post(state.endPointApi + '/statistics/dossiers/export',
-      //     params, options)
-      //     .then(function (response) {
-      //       console.log(response)
-      //       var fileNames = response.headers['content-disposition']
-      //       var fileName = fileNames.split('filename=')[1] || dataReq.fileName
-      //       fileName = fileName.split('"').join('')
-      //       var a = document.createElement('a')
-      //       document.body.appendChild(a)
-      //       a.style = 'display: none'
-      //       var url = window.URL.createObjectURL(response.data)
-      //       a.href = url
-      //       a.download = fileName
-      //       a.click()
-      //       window.URL.revokeObjectURL(url)
-      //       resolve(response.data)
-      //     }).catch(function (error) {
-      //       console.log(error)
-      //       reject(error)
-      //     })
-
-          
-      // })
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -2562,6 +2760,27 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
+        })
+      })
+    },
+    updateServiceInfo ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          var dataPost = new URLSearchParams()
+          dataPost.append('serviceCodeDVCQG', data.serviceCodeDVCQG ? data.serviceCodeDVCQG : '')
+          dataPost.append('active', data.public)
+          axios.put(state.endPointApi + '/serviceinfos/' + data.serviceInfoId, dataPost, options).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+          })
+
         })
       })
     },

@@ -35,7 +35,15 @@
     <!-- Tìm kiếm nâng cao -->
     <tim-kiem-nang-cao :menuInfo="trangThaiHoSoList[index]" ref="advSearch" v-if="advSearchShow"></tim-kiem-nang-cao>
     <!--  -->
-    <div class="menu_header_list py-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
+    <v-layout v-show="aiSearching">
+      <v-flex sm24 xs24>
+        <v-card elevation="0" class="px-5 py-3">
+          <selfie-image-box ref="selfieImageBox" @filterByApplicantIdNo="filterByApplicantIdNo"></selfie-image-box>
+        </v-card>
+      </v-flex>
+    </v-layout>
+    <div class="menu_header_list py-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'
+    v-show="!aiSearching || (aiSearching && aiSearchComplete)">
       <v-layout wrap v-if="originality !== 1 && trangThaiHoSoList">
         <v-flex v-if="!trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && !hiddenFilterDomain" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
           <v-autocomplete
@@ -161,7 +169,7 @@
         </v-flex>
       </v-layout>
       <div class="py-1 px-1" style="background: #ffffff;border-top: 1px solid lightgrey;"
-        v-if="dossierCounting !== null && dossierCounting !== undefined && dossierCounting.length > 0 && dossierCountingShow"
+        v-if="dossierCounting !== null && dossierCounting !== undefined && dossierCounting.length > 0 && dossierCountingShow && !aiSearching"
       >
         <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index"
          @click="changeAdvFilterDataChips(item)" :color="item.key === status || item.key === top ? 'orange' : ''"
@@ -265,6 +273,7 @@
         class="table-landing table-bordered"
         no-data-text="Không có hồ sơ nào"
         hide-actions
+        v-show="!aiSearching || (aiSearching && aiSearchComplete)"
       >
       <!--  -->
       <template slot="headers" slot-scope="props">
@@ -421,7 +430,7 @@
         </tr>
       </template>
     </v-data-table>
-    <div class="text-xs-right layout wrap" style="position: relative;">
+    <div class="text-xs-right layout wrap" style="position: relative;" v-show="!aiSearching || (aiSearching && aiSearchComplete)">
       <div class="flex pagging-table px-2" :class="isMobile ? 'mt-2' : ''"> 
         <!-- <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" :numberPerPage="limitRecord" :showLimit="showLimit ? showLimit : false" custom-class="custom-tiny-class" 
           :limits="limits" @tiny:change-page="paggingData" ></tiny-pagination>  -->
@@ -948,6 +957,7 @@ import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import support from '../store/support.json'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import AdvSearch from './TimKiemNangCao'
+import SelfieImageBox from './ext/SelfieImageBox.vue'
 
 export default {
   props: ['index'],
@@ -957,7 +967,8 @@ export default {
     'y-kien-can-bo': YkienCanBoThucHien,
     'template-rendering': TemplateRendering,
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
-    'tim-kiem-nang-cao': AdvSearch
+    'tim-kiem-nang-cao': AdvSearch,
+    SelfieImageBox
   },
   data: () => ({
     dossierSelect: '',
@@ -1118,6 +1129,9 @@ export default {
       {stepName: 'Rút hồ sơ', stepCode: '410'},
       {stepName: 'Từ chối', stepCode: '420'}
     ],
+    aiSearchComplete: false,
+    aiSearching: false,
+    applicantIdNo: '',
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       cmndHoChieu: (value) => {
@@ -1245,7 +1259,12 @@ export default {
       } else {
         vm.hosoDatasPage = 1
       }
-
+      // Add_AI
+      if (query.hasOwnProperty('applicantIdNo')) {
+        vm.aiSearching = true
+        vm.aiSearchComplete = true
+      }
+      // 
       if (vm.activePrintBienNhan) {
         vm.itemAction = {
           title: 'In phiếu biên nhận',
@@ -1365,6 +1384,20 @@ export default {
             }
             console.log('vm.doActionGroup updated', vm.doActionGroup)
             vm.$store.commit('setLoadingDynamicBtn', false)
+            // Add_AI
+            // if (vm.trangThaiHoSoList[vm.index]['id'] == 'tra_cuu_ai') {
+            if (vm.trangThaiHoSoList[vm.index]['menuGroup'] === 'tra_cuu_ai') {
+              vm.aiSearching = true
+            } else if (currentQuery.hasOwnProperty('applicantIdNo')) {
+              vm.aiSearching = true
+              vm.aiSearchComplete = true
+            } else {
+              vm.aiSearching = false
+              vm.aiSearchComplete = false
+              vm.applicantIdNo = ''
+              vm.$refs.selfieImageBox.deleteImage()
+            }
+            // 
           }).catch(function (){})
         }, 200)
       }
@@ -1402,6 +1435,19 @@ export default {
       if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hiddenFilterDomain') && vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain) {
         vm.hiddenFilterDomain = vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain
       }
+      // Add_AI
+      if (vm.trangThaiHoSoList[vm.index]['id'] == 'tra_cuu_ai') {
+        vm.aiSearching = true
+      } else if (currentQuery.hasOwnProperty('applicantIdNo')) {
+        vm.aiSearching = true
+        vm.aiSearchComplete = true
+      } else {
+        vm.aiSearching = false
+        vm.aiSearchComplete = false
+        vm.applicantIdNo = ''
+        vm.$refs.selfieImageBox.deleteImage()
+      }
+      // 
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
         vm.$store.commit('setLoadingDynamicBtn', true)
@@ -1994,6 +2040,9 @@ export default {
             documentNo: currentQuery.hasOwnProperty('documentNo') ? currentQuery.documentNo : vm.documentNo,
             donvigui: currentQuery.hasOwnProperty('donvigui') ? currentQuery.donvigui : '',
             donvinhan: currentQuery.hasOwnProperty('donvinhan') ? currentQuery.donvinhan : '',
+            // Add_AI 
+            applicantIdNo: currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '',
+            // 
             sort: vm.sortValue
           }
         } else {
@@ -2035,6 +2084,9 @@ export default {
             documentNo: currentQuery.hasOwnProperty('documentNo') ? currentQuery.documentNo : vm.documentNo,
             donvigui: currentQuery.hasOwnProperty('donvigui') ? currentQuery.donvigui : '',
             donvinhan: currentQuery.hasOwnProperty('donvinhan') ? currentQuery.donvinhan : '',
+            // Add_AI
+            applicantIdNo: currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '',
+            // 
             sort: vm.sortValue
           }
         }
@@ -3365,6 +3417,9 @@ export default {
       newQuery['keyword'] = String(vm.keyword).trim()
       newQuery['status'] = vm.status
       newQuery['top'] = vm.top
+      // Add_AI
+      newQuery['applicantIdNo'] = String(vm.applicantIdNo)
+      // 
       for (let key in newQuery) {
         if (key === 'page') {
           queryString += key + '=1&'
@@ -3378,6 +3433,14 @@ export default {
         path: current.path + queryString
       })
     },
+    // Add_AI
+    filterByApplicantIdNo(applicantIdNo) {
+      let vm = this
+      vm.applicantIdNo = applicantIdNo
+      vm.doRedirectFilter()
+      vm.aiSearchComplete = true
+    },
+    // 
     changeAdvFilterDataChips (item) {
       let vm = this
       if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming' || item.key === 'overtime') {
