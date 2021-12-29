@@ -985,6 +985,21 @@ export default {
     vm.$nextTick(function () {
     })
   },
+  beforeDestroy() {
+    let vm = this
+  	window.removeEventListener('message', vm.receiveMessage)
+    window.addEventListener('message', vm.resetMessage)
+    console.log('beforeDestroy')
+  },
+  destroyed () {
+    try {
+      let vm = this
+  	  window.removeEventListener('message', vm.receiveMessage)
+      window.addEventListener('message', vm.resetMessage)
+      console.log('destroy')
+    } catch (error) {
+    }
+  },
   watch: {
     applicantBussinessExit (val) {
       let vm = this
@@ -1510,14 +1525,22 @@ export default {
     saveAlpacaFormCallBack (data) {
       let vm = this
       console.log('dataTBTV', data)
-      let dataOutPut = data.data ? JSON.parse(data.data) : ''
+      let dataOutPut = ''
+      try {
+        dataOutPut = data.data ? JSON.parse(data.data) : ''
+      } catch (error) {
+        dataOutPut = ''
+      }
       console.log('data_output new_eform_2', dataOutPut)
-      if (dataOutPut.hasOwnProperty('tp') && dataOutPut.tp) {
+      if (dataOutPut && dataOutPut.hasOwnProperty('tp') && dataOutPut.tp) {
         let fileFind = vm.dossierFilesItems.find(itemFile => {
           // return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm && itemFile.fileSize!==0
           return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm
         })
         console.log('fileFind', vm.dossierFilesItems, fileFind)
+        if (vm.loadingApacal) {
+          return
+        }
         if (fileFind) {
           console.log('item put 5555', fileFind)
           fileFind['dossierId'] = vm.thongTinHoSo.dossierId
@@ -1539,7 +1562,7 @@ export default {
                 vm.dossierFilesItems = resFiles
               }).catch(reject => {
               })
-            }, 3000)
+            }, 1000)
             
           }).catch(reject => {
             vm.loadingApacal = false
@@ -1566,7 +1589,7 @@ export default {
                 vm.dossierFilesItems = resFiles
               }).catch(reject => {
               })
-            }, 3000)
+            }, 1000)
           }).catch(reject => {
             vm.loadingApacal = false
             toastr.clear()
@@ -2926,6 +2949,9 @@ export default {
         vm.showViewerPdfEditor = false
       }
       
+    },
+    resetMessage () {
+      return
     }
   }
 }

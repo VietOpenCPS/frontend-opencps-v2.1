@@ -5574,7 +5574,7 @@ export const store = new Vuex.Store({
             Token: window.Liferay ? window.Liferay.authToken : ''
           }
         }
-        let url = '/o/rest/v2/userSSO/' + filter.maSoCaNhan + '/applicantIdNo/' + filter.type
+        let url = '/o/rest/v2/userSSO/' + filter.maSoCaNhan + '/applicantIdNo'
         axios.get(url, param).then(function (response) {
           let serializable = response.data
           resolve(serializable)
@@ -5738,7 +5738,22 @@ export const store = new Vuex.Store({
           reject('error')
         })
       })
-    }
+    },
+    deleleBienLai ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId,
+            "Content-Type": "application/x-www-form-urlencoded"
+          }
+        }
+        axios.delete('/o/rest/v2/postal/cancelInv?dossierId=' + filter.dossierId, param).then(function (response) {
+          resolve(response)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
     // ----End---------
   },
   mutations: {
