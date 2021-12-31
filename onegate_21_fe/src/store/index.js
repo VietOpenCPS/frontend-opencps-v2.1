@@ -5698,6 +5698,7 @@ export const store = new Vuex.Store({
         let url = '/o/rest/v2/eKYC/saveEkycApplicant'
         let data = new URLSearchParams();
         data.append("ekycId", postData.ekycId)
+        data.append("selfieImage", postData.live_image)
         data.append("applicantName", postData.name)
         data.append("applicantIdNo", postData.id)
         data.append("birthday", postData.birthday)

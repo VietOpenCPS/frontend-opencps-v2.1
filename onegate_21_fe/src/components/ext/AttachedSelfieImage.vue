@@ -251,7 +251,8 @@ export default {
             cityCode: vm.userData["cityCode"],
             cityName: vm.userData["cityName"],
             issue_by: vm.userData["issue_by"],
-            issue_date: vm.userData["issue_date"]
+            issue_date: vm.userData["issue_date"],
+            live_image: data.live_image
           }
           vm.$store.dispatch("saveEkycApplicant", saveData).then(function (result) {
             let response = result.data
