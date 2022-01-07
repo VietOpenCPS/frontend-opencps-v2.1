@@ -99,9 +99,18 @@
                 ></v-text-field>
                 <p class="mt-1 mb-0" v-else>{{data_payment.counter}}</p>
               </v-flex>
-              <v-flex xs12 sm7></v-flex>
-              <!--  -->
-              
+              <v-flex xs12 sm2></v-flex>
+              <!-- Cập nhật hình thức thanh toán -->
+              <v-flex xs12></v-flex>
+              <v-flex xs12 md2 v-if="getDataSource('paymentMethod') && data_payment.requestPayment == 5 && (data_payment.editable === 1 || data_payment.editable === 2 || data_payment.editable === 3)">
+                <v-subheader class="pl-0 text-right">Hình thức thanh toán: </v-subheader>
+              </v-flex>
+              <v-flex xs12 md3 v-if="getDataSource('paymentMethod') && data_payment.requestPayment == 5 && (data_payment.editable === 1 || data_payment.editable === 2 || data_payment.editable === 3)">
+                <v-flex>
+                  <v-autocomplete item-text="name" @change="changeFee"
+                  v-model="data_payment.paymentMethod" :items="getDataSource('paymentMethod')"></v-autocomplete>
+                </v-flex>
+              </v-flex>
               <!--  -->
             </v-layout>
           </v-card-text>

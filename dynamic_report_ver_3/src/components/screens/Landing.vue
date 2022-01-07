@@ -1727,7 +1727,7 @@ export default {
 
                   if (currentConfig.hasOwnProperty('calculator')) {
                     let calu = currentConfig['calculator'].replace(/dataInput/g, 'dossierObj')
-                    if (isNaN(eval(calu))) {
+                    if (isNaN(eval(calu)) || vm.itemsReportsConfig[keyVal]['value'] == 'note') {
                       ddStr = eval(calu)
                     } else {
                       ddStr = Math.round(eval(calu))
@@ -2218,7 +2218,7 @@ export default {
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
                   var dataInputXXTT = resultDataTotal[keyXXTT]
                   let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
-                  if (isNaN(eval(calu))) {
+                  if (isNaN(eval(calu)) || currentConfigXXTT['value'] === 'note') {
                     dataTextXXTT = eval(calu)
                   } else {
                     dataTextXXTT = Math.round(eval(calu))
@@ -2244,7 +2244,7 @@ export default {
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
                   var dataInputXXTT = resultDataTotal[keyXXTT]
                   let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
-                  if (isNaN(eval(calu))) {
+                  if (isNaN(eval(calu)) || currentConfigXXTT['value'] === 'note') {
                     dataTextXXTT = eval(calu)
                   } else {
                     dataTextXXTT = Math.round(eval(calu))

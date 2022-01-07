@@ -2274,6 +2274,9 @@ export default {
           shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
           paymentFee: vm.payments['paymentFee']
         }
+        if (vm.payments['paymentMethod']) {
+          paymentsOut['paymentMethod'] = vm.payments['paymentMethod']
+        }
       }
       if (vm.showThuPhi) {
         if (vm.payments && vm.payments.hasOwnProperty('counter')) {
@@ -2287,10 +2290,12 @@ export default {
             counter: vm.payments.counter,
             paymentFee: vm.payments['paymentFee']
           }
+          if (vm.payments['paymentMethod']) {
+            dataNote['paymentMethod'] = vm.payments['paymentMethod']
+          }
           paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
           paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
           paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
-          console.log('dataNote99999', dataNote)
           paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
         }
         filter['payment'] = paymentsOut
@@ -2575,6 +2580,9 @@ export default {
                     shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
                     paymentFee: vm.payments['paymentFee']
                   }
+                  if (vm.payments['paymentMethod']) {
+                    paymentsOut['paymentMethod'] = vm.payments['paymentMethod']
+                  }
                   if (vm.payments && vm.payments.hasOwnProperty('counter')) {
                     let dataNote = {
                       requestPayment: vm.payments['requestPayment'],
@@ -2586,10 +2594,12 @@ export default {
                       counter: vm.payments.counter,
                       paymentFee: vm.payments['paymentFee']
                     }
+                    if (vm.payments['paymentMethod']) {
+                      dataNote['paymentMethod'] = vm.payments['paymentMethod']
+                    }
                     paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
                     paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
                     paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
-                    console.log('dataNote99999', dataNote)
                     paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
                   }
                   resultAction['payment'] = paymentsOut
@@ -3516,6 +3526,9 @@ export default {
             shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
             paymentFee: vm.payments['paymentFee']
           }
+          if (vm.payments['paymentMethod']) {
+            paymentsOut['paymentMethod'] = vm.payments['paymentMethod']
+          }
           if (vm.payments && vm.payments.hasOwnProperty('counter')) {
             let dataNote = {
               requestPayment: vm.payments['requestPayment'],
@@ -3527,10 +3540,12 @@ export default {
               counter: vm.payments.counter,
               paymentFee: vm.payments['paymentFee']
             }
+            if (vm.payments['paymentMethod']) {
+              dataNote['paymentMethod'] = vm.payments['paymentMethod']
+            }
             paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
             paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
             paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
-            console.log('dataNote99999111', dataNote)
             paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
           }
           resultAction['payment'] = paymentsOut

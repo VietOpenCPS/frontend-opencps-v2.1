@@ -2774,6 +2774,7 @@ export const store = new Vuex.Store({
           }
           var dataPost = new URLSearchParams()
           dataPost.append('serviceCodeDVCQG', data.serviceCodeDVCQG ? data.serviceCodeDVCQG : '')
+          dataPost.append('maxLevel', data.maxLevel ? data.maxLevel : 2)
           dataPost.append('active', data.public)
           axios.put(state.endPointApi + '/serviceinfos/' + data.serviceInfoId, dataPost, options).then(function (response) {
             resolve(response.data)

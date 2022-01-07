@@ -106,7 +106,7 @@
           v-model="data[item.model]"
           :rules="processRules(item.rules, item)"
           :placeholder="item['placeholder']"
-          :disabled="item['disabled']"
+          :disabled="item['disabled'] || !allowUpdateServiceCode"
           :maxlength="getMaxLength(item)"
           :counter="getMaxLength(item)"
           @blur="formatDataInput(item)"
@@ -494,7 +494,7 @@
           </v-btn>
           <v-btn color="blue darken-3" dark @click="changeEmail()">
             <v-icon>save</v-icon>&nbsp;
-            Cập nhập
+            Cập nhật
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -678,7 +678,8 @@
         },
         loadingPdf: false,
         viewFormInput: true,
-        dialogEform: false
+        dialogEform: false,
+        allowUpdateServiceCode: true
       }
     },
     computed: {
@@ -706,11 +707,25 @@
       },
     },
     created() {
-      var vm = this
+      let vm = this
       vm.$nextTick(function() {
         let currentQuery = vm.$router.history.current.query
         if (currentQuery.hasOwnProperty('serviceCodeDvcqg')) {
           vm.serviceCodeDVCQG = currentQuery.serviceCodeDvcqg
+        }
+        if (vm.tableName == 'opencps_serviceinfo' && currentQuery.hasOwnProperty('serviceCode')) {
+          let serviceCode = currentQuery.serviceCode
+          axios.get('/o/rest/v2/dossiers?start=0&end=1&service='+serviceCode).then((res)=>{
+            let data = []
+            try {
+              data = res.data ? res.data.data : []
+            } catch (error) {
+            }
+            if (data.length) {
+              vm.allowUpdateServiceCode = false
+            }
+          }).catch( ()=>{
+          })
         }
         if (vm.tableConfig !== null && vm.tableConfig !== undefined) {
           if (vm.tableConfig['detailColumns'] !== '') {
@@ -764,8 +779,6 @@
             vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
             if (dataObj.respone === 'tableConfig' && vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
               vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')
-              console.log('load tableConfig')
-              console.log('2',vm.detailForm)
               vm.processDataSource()
             }
             textPost = {
@@ -794,7 +807,6 @@
                     vm.data = {}
                   } else {
                     vm.data = vm.dataSocket[dataObj.respone][0]
-                    console.log('data1', vm.data)
                   }
                   vm.processDataSourceVerify()
                 } else {
@@ -842,12 +854,14 @@
       saveToData (cmdText) {
         let vm = this
         let activeServiceInfo = true
+        let maxLevel = ''
         if (vm.isConnected) {
           vm.isConnected = false
         }
         try {
           if (vm.tableName == 'opencps_serviceinfo') {
             activeServiceInfo = vm.data['public_']
+            maxLevel = vm.data['maxLevel']
           }
         } catch (error) {
         }
@@ -934,7 +948,8 @@
               let postData = {
                 serviceInfoId: vm.id,
                 serviceCodeDVCQG: vm.serviceCodeDVCQG,
-                public: activeServiceInfo
+                public: activeServiceInfo,
+                maxLevel: maxLevel
               }
               vm.$store.dispatch('updateServiceInfo', postData).then(function (data) {
               })
