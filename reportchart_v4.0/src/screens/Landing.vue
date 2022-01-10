@@ -1361,7 +1361,8 @@ export default {
             if (key === 'SBN') {
               vm.listDonViSBN = totalScore.concat(response.data.data)
             } else if (key === 'QUAN_HUYEN') {
-              vm.listDoiTuong = response.data.hasOwnProperty('data') ? totalScore.concat(response.data.data) : []
+              // vm.listDoiTuong = response.data.hasOwnProperty('data') ? totalScore.concat(response.data.data) : []
+              vm.listDoiTuong = response.data.hasOwnProperty('data') ? response.data.data : []
               vm.listDonViHuyen = response.data.hasOwnProperty('data') ? totalScore.concat(response.data.data) : []
             } else {
               vm.listDonViXa = response.data.hasOwnProperty('data') ? totalScore.concat(response.data.data) : []

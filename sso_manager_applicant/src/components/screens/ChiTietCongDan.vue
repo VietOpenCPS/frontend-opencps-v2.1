@@ -10,6 +10,15 @@
                 <div class="layout row wrap header_tools row-blue mx-1">
                   <div class="flex text-right" style="margin-left: auto;">
                     <v-btn
+                        class="mx-0 mr-2"
+                        small
+                        color="primary"
+                        @click="goBack()"
+                    >
+                        <v-icon size="18">reply</v-icon>&nbsp;
+                        <span>Quay lại</span>
+                    </v-btn>
+                    <v-btn
                         class="mx-0"
                         small
                         color="primary"
@@ -83,20 +92,26 @@
                           <v-btn color="primary" v-if="!thongTinCongDan['danhTinhDienTu'][0]" small class="mt-3 mx-3 text-white" @click="showCreateAcc()">
                               Tạo tài khoản
                           </v-btn>
-                          <v-btn v-if="thongTinCongDan['danhTinhDienTu'][0] && thongTinCongDan['danhTinhDienTu'][0]['tinhTrangSuDungTaiKhoan']['maMuc'] == 1" color="primary" small class="mt-3 mx-3 text-white" @click="activeAccount()">
+                          <v-btn v-if="thongTinCongDan['danhTinhDienTu'][0] && thongTinCongDan['danhTinhDienTu'][0]['tinhTrangSuDungTaiKhoan']['maMuc'] == 1" color="primary" small class="mt-3 mx-3 text-white" @click="showChangeStatusAcc('active')">
                               Kích hoạt tài khoản
                           </v-btn>
-                          <v-btn v-if="thongTinCongDan['danhTinhDienTu'][0] && thongTinCongDan['danhTinhDienTu'][0]['tinhTrangSuDungTaiKhoan']['maMuc'] == 2" color="primary" small class="mt-3 mx-3 text-white" @click="blockAccount()">
+                          <v-btn v-if="thongTinCongDan['danhTinhDienTu'][0] && thongTinCongDan['danhTinhDienTu'][0]['tinhTrangSuDungTaiKhoan']['maMuc'] == 2" color="primary" small class="mt-3 mx-3 text-white" @click="showChangeStatusAcc('block')">
                               Khóa tài khoản
                           </v-btn>
-                          <v-btn v-if="thongTinCongDan['danhTinhDienTu'][0] && thongTinCongDan['danhTinhDienTu'][0]['tinhTrangSuDungTaiKhoan']['maMuc'] == 3" color="primary" small class="mt-3 mx-3 text-white" @click="unBlockAccount()">
+                          <v-btn v-if="thongTinCongDan['danhTinhDienTu'][0] && thongTinCongDan['danhTinhDienTu'][0]['tinhTrangSuDungTaiKhoan']['maMuc'] == 3" color="primary" small class="mt-3 mx-3 text-white" @click="showChangeStatusAcc('unlock')">
                               Mở khóa tài khoản
+                          </v-btn>
+                          <v-btn v-if="thongTinCongDan['danhTinhDienTu'][0] && thongTinCongDan['danhTinhDienTu'][0]['tinhTrangSuDungTaiKhoan']['maMuc'] == 4" color="primary" small class="mt-3 mx-3 text-white" @click="showChangeStatusAcc('restore')">
+                              Khôi phục tài khoản
+                          </v-btn>
+                          <v-btn color="primary" v-if="thongTinCongDan['danhTinhDienTu'][0] && thongTinCongDan['danhTinhDienTu'][0]['tinhTrangSuDungTaiKhoan']['maMuc'] == 3" small class="mt-3 mx-3 text-white" @click="showChangeStatusAcc('delete')">
+                            Xóa tài khoản
                           </v-btn>
                       </div>
                       <div class="d-flex justify-space-between w-full pb-2 " v-if="thongTinCongDan && thongTinCongDan['danhTinhDienTu'][0]">
-                        <v-btn color="primary" v-if="thongTinCongDan['danhTinhDienTu'][0]['tinhTrangSuDungTaiKhoan']['maMuc'] == 3" small class="mt-3 mx-3 text-white" @click="deleteAccount()">
-                          Xóa tài khoản
-                        </v-btn>
+                        <!-- <v-btn color="primary" small class="mt-3 mx-3 text-white">
+                            In phiếu
+                        </v-btn> -->
                       </div>
                   </div>
               </v-card>
@@ -120,7 +135,7 @@
                   dark
                   @click="dialogCreateAcc = false"
                 >
-                  <v-icon>mdi-close</v-icon>
+                  <v-icon>clear</v-icon>
                 </v-btn>
               </v-toolbar-items>
             </v-toolbar>
@@ -184,7 +199,7 @@
                   dark
                   @click="dialogChangePass = false"
                 >
-                  <v-icon>mdi-close</v-icon>
+                  <v-icon>clear</v-icon>
                 </v-btn>
               </v-toolbar-items>
             </v-toolbar>
@@ -221,6 +236,68 @@
                 Thoát
               </v-btn>
               <v-btn class="mr-2" color="primary" :loading="loadingAction" :disabled="loadingAction" @click.native="submitChangePass">
+                <v-icon left>
+                  save
+                </v-icon>
+                <span>Xác nhận</span>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog
+          max-width="650"
+          v-model="dialogNoteAction"
+          persistent
+        >
+          <v-card>
+            <v-toolbar
+              dark
+              color="primary"
+            >
+              <v-toolbar-title >{{titleAction}}</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-toolbar-items>
+                <v-btn
+                  icon
+                  dark
+                  @click="dialogNoteAction = false"
+                >
+                  <v-icon>clear</v-icon>
+                </v-btn>
+              </v-toolbar-items>
+            </v-toolbar>
+            <v-card-text class="mt-2">
+              <v-form
+                ref="formActionAccount"
+                v-model="validFormActionAccount"
+                lazy-validation
+              >
+                  <v-layout wrap>
+                    <v-flex xs12 class="mb-2">
+                      <div class="text-label mb-2">
+                        <span>Nhập nội dung</span>
+                        <!-- <span class="red--text"> (*)</span> -->
+                      </div>
+                      <v-textarea
+                        class="input-form"
+                        v-model="noteAction"
+                        solo
+                        dense
+                        hide-details="auto"
+                      ></v-textarea>
+                    </v-flex>
+                  </v-layout>
+              </v-form>
+            </v-card-text>
+
+            <v-card-actions class="justify-end">
+              <v-btn color="red" class="white--text mr-2" :loading="loadingAction" :disabled="loadingAction" @click="dialogNoteAction = false">
+                <v-icon left>
+                  clear
+                </v-icon>
+                Thoát
+              </v-btn>
+              <v-btn class="mr-2" color="primary" :loading="loadingAction" :disabled="loadingAction" @click.native="submitChangeStatusAcc">
                 <v-icon left>
                   save
                 </v-icon>
@@ -375,6 +452,16 @@ export default {
         required: [
           v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc'
         ],
+        validFormActionAccount: true,
+        dialogNoteAction: false,
+        titleAction: '',
+        noteAction: '',
+        actionStatusAcc: ''
+      }
+    },
+    watch: {
+      dialogNoteAction (val) {
+        this.noteAction = ''
       }
     },
     created () {
@@ -442,6 +529,40 @@ export default {
           })
         }
       },
+      showChangeStatusAcc (action) {
+        let vm = this
+        vm.actionStatusAcc = action
+        if (action === 'block') {
+          vm.titleAction = 'LÝ DO KHÓA TÀI KHOẢN'
+        } else if (action === 'active') {
+          vm.titleAction = 'NỘI DUNG KÍCH HOẠT TÀI KHOẢN'
+        } else if (action === 'unlock') {
+          vm.titleAction = 'NỘI DUNG MỞ KHÓA TÀI KHOẢN'
+        } else if (action === 'delete') {
+          vm.titleAction = 'LÝ DO XÓA TÀI KHOẢN'
+        } else if (action === 'restore') {
+          vm.titleAction = 'NỘI DUNG KHÔI PHỤC TÀI KHOẢN'
+        } 
+        vm.noteAction = ''
+        vm.dialogNoteAction = true
+        vm.$refs.validFormActionAccount.resetValidation()
+      },
+      submitChangeStatusAcc () {
+        let vm = this
+        if (vm.$refs.formActionAccount.validate()) {
+          if (vm.actionStatusAcc === 'block') {
+            vm.blockAccount()
+          } else if (vm.actionStatusAcc === 'delete') {
+            vm.deleteAccount()
+          } else if (vm.actionStatusAcc === 'active') {
+            vm.activeAccount()
+          } else if (vm.actionStatusAcc === 'unlock') {
+            vm.unLockAccount()
+          } else if (vm.actionStatusAcc === 'restore') {
+            vm.restoreAccount()
+          }
+        }
+      },
       createAccount () {
         let vm = this
         if (vm.$refs.formCreateAcc.validate()) {
@@ -471,7 +592,8 @@ export default {
         let filter = {
           data: {
             "tenDinhDanh": vm.thongTinCongDan['danhTinhDienTu'][0]['tenDinhDanh'],
-            "type": "canhan"
+            "type": "canhan",
+            "activityNote": vm.noteAction
           }
         }
         vm.loadingAction = true
@@ -481,6 +603,7 @@ export default {
           toastr.remove()
           toastr.success('Kích hoạt tài khoản thành công')
           vm.getThongTinCongDan()
+          vm.dialogNoteAction = false
         }).catch(function () {
           vm.loadingAction = false
           toastr.remove()
@@ -492,7 +615,8 @@ export default {
         let filter = {
           data: {
             "tenDinhDanh": vm.thongTinCongDan['danhTinhDienTu'][0]['tenDinhDanh'],
-            "type": "canhan"
+            "type": "canhan",
+            "activityNote": vm.noteAction
           }
         }
         vm.loadingAction = true
@@ -502,6 +626,7 @@ export default {
           toastr.remove()
           toastr.success('Khóa tài khoản thành công')
           vm.getThongTinCongDan()
+          vm.dialogNoteAction = false
         }).catch(function () {
           vm.loadingAction = false
           toastr.remove()
@@ -513,7 +638,8 @@ export default {
         let filter = {
           data: {
             "tenDinhDanh": vm.thongTinCongDan['danhTinhDienTu'][0]['tenDinhDanh'],
-            "type": "canhan"
+            "type": "canhan",
+            "activityNote": vm.noteAction
           }
         }
         vm.loadingAction = true
@@ -522,10 +648,33 @@ export default {
           toastr.remove()
           toastr.success('Mở khóa tài khoản thành công')
           vm.getThongTinCongDan()
+          vm.dialogNoteAction = false
         }).catch(function () {
           vm.loadingAction = false
           toastr.remove()
           toastr.error('Mở khóa tài khoản không thành công')
+        })
+      },
+      restoreAccount () {
+        let vm = this
+        let filter = {
+          data: {
+            "tenDinhDanh": vm.thongTinCongDan['danhTinhDienTu'][0]['tenDinhDanh'],
+            "type": "canhan",
+            "activityNote": vm.noteAction
+          }
+        }
+        vm.loadingAction = true
+        vm.$store.dispatch('restoreCaNhan', filter).then(function (response) {
+          vm.loadingAction = false
+          toastr.remove()
+          toastr.success('Khôi phục tài khoản thành công')
+          vm.getThongTinCongDan()
+          vm.dialogNoteAction = false
+        }).catch(function () {
+          vm.loadingAction = false
+          toastr.remove()
+          toastr.error('Khôi phục tài khoản không thành công')
         })
       },
       deleteAccount () {
@@ -542,7 +691,8 @@ export default {
               let filter = {
                 data: {
                   "tenDinhDanh": vm.thongTinCongDan['danhTinhDienTu'][0]['tenDinhDanh'],
-                  "type": "canhan"
+                  "type": "canhan",
+                  "activityNote": vm.noteAction
                 }
               }
               vm.loadingAction = true
@@ -552,6 +702,7 @@ export default {
                 toastr.remove()
                 toastr.success('Xóa tài khoản thành công')
                 vm.getThongTinCongDan()
+                vm.dialogNoteAction = false
               }).catch(function () {
                 vm.loadingAction = false
                 toastr.remove()
@@ -564,6 +715,9 @@ export default {
       dateLocale (dateInput) {
         let date = new Date(dateInput)
         return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+      },
+      goBack () {
+        window.history.back()
       }
     }
 }

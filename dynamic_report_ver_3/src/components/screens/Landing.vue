@@ -1580,7 +1580,7 @@ export default {
             } else {
               let dossierRawItem = {}
               if ((!dataReportCurrent.hasOwnProperty('dossierId') && !vm.reportType.startsWith('REPORT_STATISTIC')) || 
-                (vm.reportType.startsWith('REPORT_STATISTIC') && !dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']])
+                (vm.reportType.startsWith('REPORT_STATISTIC') && vm.itemsReports[vm.index]['filterConfig']['sumKey'] && !dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']])
               ) {
                 dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
                 dossierRawItem[textGroup] = dataReportCurrent[textGroup]
