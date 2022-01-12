@@ -12,6 +12,14 @@
         </div>
         <v-form lazy-validation ref="formAddCaNhan" v-model="validFormAdd">
           <v-layout wrap class="py-2">
+              <v-flex xs12 class="py-0 mb-2 pr-3">
+                <label>Trạng thái thông tin <span class="red--text">(*)</span></label>
+                <v-switch color="primary" class="mt-2" v-model="trangThaiDuLieu">
+                  <template slot="label">
+                    <span class="ml-2" style="color: black">{{trangThaiDuLieu ? 'ĐANG SỬ DỤNG' : 'ĐÁNH DẤU XÓA'}}</span>
+                  </template>
+                </v-switch>
+              </v-flex>
               <v-flex xs12 md6 class="py-0 mb-2 pr-3">
                   <label>Họ tên <span class="red--text">(*)</span></label>
                   <v-text-field
@@ -484,6 +492,7 @@ export default {
         required: [
           v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc'
         ],
+        trangThaiDuLieu: true
       }
     },
     created () {
@@ -805,6 +814,10 @@ export default {
           "maMuc": vm.tonGiaoCreate.maMuc,
           "tenMuc": vm.tonGiaoCreate.tenMuc
         }
+        vm.thongTinCongDan.trangThaiDuLieu = {
+          "maMuc": vm.trangThaiDuLieu ? '2' : '1',
+          "tenMuc": vm.trangThaiDuLieu ? 'Đang sử dụng' : 'Đánh dấu xóa'
+        }
         console.log('thongTinCongDanOutput', vm.thongTinCongDan)
       },
       formatInputData () {
@@ -822,6 +835,7 @@ export default {
         vm.noiOHienTaiQuanHuyen = vm.thongTinCongDan.noiOHienTai.quanHuyen
         vm.noiOHienTaiPhuongXa = vm.thongTinCongDan.noiOHienTai.phuongXa
         vm.noiOHienTaiCuThe = vm.thongTinCongDan.noiOHienTai.soNhaChiTiet
+        vm.trangThaiDuLieu = vm.thongTinCongDan.trangThaiDuLieu.maMuc == '2' ? true : false 
       },
       formatBirthDate () {
         let vm = this

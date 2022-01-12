@@ -12,6 +12,17 @@
       </div>
       <v-form lazy-validation ref="formAddCaNhan" v-model="validFormAdd">
           <v-layout wrap class="py-2">
+            <v-flex xs12 class="py-0 mb-2 pr-3">
+              <label>
+                Trạng thái thông tin <span class="red--text">(*)</span>
+              </label>
+              <v-switch color="primary" class="mt-2" v-model="trangThaiDuLieu">
+                <template slot="label">
+                  <span class="ml-2" style="color: black">{{trangThaiDuLieu ? 'ĐANG SỬ DỤNG' : 'ĐÁNH DẤU XÓA'}}</span>
+                </template>
+              </v-switch>
+              
+            </v-flex>
             <v-flex xs12 md6 class="py-0 mb-2 pr-3">
                 <label>Tên tổ chức, doanh nghiệp <span class="red--text">(*)</span></label>
                 <v-text-field
@@ -285,6 +296,7 @@ export default {
         required: [
           v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc'
         ],
+        trangThaiDuLieu: true
       }
     },
     created () {
@@ -538,6 +550,10 @@ export default {
           },
           "soNhaChiTiet": vm.diaChiHoatDongCuThe
         }
+        vm.thongTinDoanhNghiep.trangThaiDuLieu = {
+          "maMuc": vm.trangThaiDuLieu ? '2' : '1',
+          "tenMuc": vm.trangThaiDuLieu ? 'Đang sử dụng' : 'Đánh dấu xóa'
+        }
         console.log('thongTinCongDanOutput', vm.thongTinDoanhNghiep)
       },
       formatInputData () {
@@ -546,6 +562,7 @@ export default {
         vm.thuongTruTinhThanh = vm.thongTinDoanhNghiep.diaChiHoatDong.tinhThanh
         vm.thuongTruQuanHuyen = vm.thongTinDoanhNghiep.diaChiHoatDong.quanHuyen
         vm.thuongTruPhuongXa = vm.thongTinDoanhNghiep.diaChiHoatDong.phuongXa
+        vm.trangThaiDuLieu = vm.thongTinDoanhNghiep.trangThaiDuLieu.maMuc == '2' ? true : false 
       },
       formatBirthDate () {
         let vm = this

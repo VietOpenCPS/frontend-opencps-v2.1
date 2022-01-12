@@ -106,7 +106,7 @@
           v-model="data[item.model]"
           :rules="processRules(item.rules, item)"
           :placeholder="item['placeholder']"
-          :disabled="item['disabled'] || !allowUpdateServiceCode"
+          :disabled="item['disabled'] || (tableName === 'opencps_serviceinfo' && item.model === 'serviceCode')"
           :maxlength="getMaxLength(item)"
           :counter="getMaxLength(item)"
           @blur="formatDataInput(item)"
@@ -713,20 +713,20 @@
         if (currentQuery.hasOwnProperty('serviceCodeDvcqg')) {
           vm.serviceCodeDVCQG = currentQuery.serviceCodeDvcqg
         }
-        if (vm.tableName == 'opencps_serviceinfo' && currentQuery.hasOwnProperty('serviceCode')) {
-          let serviceCode = currentQuery.serviceCode
-          axios.get('/o/rest/v2/dossiers?start=0&end=1&service='+serviceCode).then((res)=>{
-            let data = []
-            try {
-              data = res.data ? res.data.data : []
-            } catch (error) {
-            }
-            if (data.length) {
-              vm.allowUpdateServiceCode = false
-            }
-          }).catch( ()=>{
-          })
-        }
+        // if (vm.tableName == 'opencps_serviceinfo' && currentQuery.hasOwnProperty('serviceCode')) {
+        //   let serviceCode = currentQuery.serviceCode
+        //   axios.get('/o/rest/v2/dossiers?start=0&end=1&service='+serviceCode).then((res)=>{
+        //     let data = []
+        //     try {
+        //       data = res.data ? res.data.data : []
+        //     } catch (error) {
+        //     }
+        //     if (data.length) {
+        //       vm.allowUpdateServiceCode = false
+        //     }
+        //   }).catch( ()=>{
+        //   })
+        // }
         if (vm.tableConfig !== null && vm.tableConfig !== undefined) {
           if (vm.tableConfig['detailColumns'] !== '') {
             vm.detailForm = eval('( ' + vm.tableConfig['detailColumns'] + ' )')

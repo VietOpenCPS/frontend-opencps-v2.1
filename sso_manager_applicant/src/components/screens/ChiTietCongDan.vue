@@ -31,6 +31,22 @@
                 </div>
               </div>
               <div>
+                <div class="my-3" v-if="thongTinCongDan['trangThaiDuLieu']['maMuc'] == 2">
+                  <v-icon
+                    color="green darken-2"
+                  >
+                    verified
+                  </v-icon>
+                  <span class="ml-2" style="color: #388E3C; text-transform: uppercase;font-weight: bold;">{{thongTinCongDan['trangThaiDuLieu']['tenMuc']}}</span>
+                </div>
+                <div class="my-3" v-if="thongTinCongDan['trangThaiDuLieu']['maMuc'] == 1">
+                  <v-icon
+                    color="red darken-2"
+                  >
+                    do_disturb
+                  </v-icon>
+                  <span class="ml-2" style="color: #D32F2F; text-transform: uppercase;font-weight: bold;">{{thongTinCongDan['trangThaiDuLieu']['tenMuc']}}</span>
+                </div>
                 <table :dense="true" class="cong-dan-info"  style="border-bottom: thin solid rgba(0, 0, 0, 0.12);">
                   <template>
                     <tbody>
@@ -68,7 +84,11 @@
               </div>
           </v-flex>
           <v-flex xs12 md4 class="mt-0">
-              <v-card class="pt-4" style="border: 1px solid #dedede;border-radius: 5px;">
+              <v-card flat class="pt-4" style="
+              border: 1px solid rgb(222, 222, 222);
+              border-bottom-left-radius: 5px;
+              border-bottom-right-radius: 5px;
+              border-top: none;">
                   <div style="text-align: center;">
                       <img class="mb-4" style="width: 226px; height: 226px;" src="/o/hau-giang-theme/images/avt.png">
                       <h4 class="title-page" style="font-size: 16px;font-weight: bold;color: #903938">{{thongTinCongDan['hoVaTen']}}</h4>
@@ -77,11 +97,18 @@
                           <v-flex xs7 class="mb-2">
                             <span style="font-weight: bold">{{thongTinCongDan['maSoCaNhan']}}</span>
                           </v-flex>
-                          <v-flex xs5>Trạng thái:</v-flex>
-                          <v-flex xs7>
-                            <span style="font-weight: bold">
+                          <v-flex style="max-width: 100px;" class="pt-2">Trạng thái: </v-flex>
+                          <v-flex >
+                            <span class="font-weight-bold">
                               {{thongTinCongDan && thongTinCongDan['danhTinhDienTu'][0] && thongTinCongDan['danhTinhDienTu'][0]['tinhTrangSuDungTaiKhoan']['tenMuc'] ? thongTinCongDan['danhTinhDienTu'][0]['tinhTrangSuDungTaiKhoan']['tenMuc'] : 'Chưa tạo tài khoản'}}
                             </span>
+
+                            <v-tooltip top >
+                              <v-btn @click="viewLog()" color="primary" slot="activator" flat icon class="mx-0 ml-2">
+                                <v-icon size="22">history</v-icon>
+                              </v-btn>
+                              <span>Lịch sử thay đổi</span>
+                            </v-tooltip>
                           </v-flex>
                       </v-layout>
                       <div class="d-flex justify-space-between w-full pb-2" v-if="thongTinCongDan">
@@ -109,9 +136,9 @@
                           </v-btn>
                       </div>
                       <div class="d-flex justify-space-between w-full pb-2 " v-if="thongTinCongDan && thongTinCongDan['danhTinhDienTu'][0]">
-                        <!-- <v-btn color="primary" small class="mt-3 mx-3 text-white">
-                            In phiếu
-                        </v-btn> -->
+                        <v-btn color="primary" @click="printPhieu()" small class="mt-3 mx-3 text-white">
+                            In phiếu cấp tài khoản
+                        </v-btn>
                       </div>
                   </div>
               </v-card>
@@ -122,7 +149,7 @@
           v-model="dialogCreateAcc"
           persistent
         >
-          <v-card>
+          <v-card flat>
             <v-toolbar
               dark
               color="primary"
@@ -186,7 +213,7 @@
           v-model="dialogChangePass"
           persistent
         >
-          <v-card>
+          <v-card flat>
             <v-toolbar
               dark
               color="primary"
@@ -249,7 +276,7 @@
           v-model="dialogNoteAction"
           persistent
         >
-          <v-card>
+          <v-card flat>
             <v-toolbar
               dark
               color="primary"
@@ -306,6 +333,198 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+
+        <v-dialog
+          max-width="900"
+          v-model="dialogStatusAccLog"
+          persistent
+        >
+          <v-card flat>
+            <v-toolbar
+              dark
+              color="primary"
+            >
+              <v-toolbar-title >Lịch sử thay đổi trạng thái tài khoản</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-toolbar-items>
+                <v-btn
+                  icon
+                  dark
+                  @click="dialogStatusAccLog = false"
+                >
+                  <v-icon>clear</v-icon>
+                </v-btn>
+              </v-toolbar-items>
+            </v-toolbar>
+            <v-card-text class="mt-2">
+
+              <v-data-table
+                :headers="headersLog"
+                :items="logItems"
+                hide-actions
+                class="table-landing table-bordered mt-2"
+                style="border-left: 1px solid #dedede"
+              >
+                <template slot="items" slot-scope="props">
+                  <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
+                    <td class="text-xs-center" style="width:50px;height:36px">
+                      <div>
+                        <span>{{ props.index + 1 }}</span>
+                      </div>
+                    </td>
+                    <td class="text-xs-left">
+                      <div :style="getLogActionName(props.item.activityCode)['color']">
+                          {{ getLogActionName(props.item.activityCode)['name'] }}
+                      </div>
+                    </td>
+                    <td class="text-xs-left">
+                      <div>
+                        <span>{{ props.item.activityNote}}</span>
+                      </div>
+                    </td>
+                    <td class="text-xs-left">
+                      <div class="font-weight-bold">
+                        {{ props.item.createdBy.fullName }}
+                      </div>
+                      <div v-if="props.item.createdBy.email">
+                        {{ props.item.createdBy.email }}
+                      </div>
+                    </td>
+                    <td class="text-xs-left">
+                      <div>
+                        <span>{{ dateLocaleTime(props.item.createdDate) }}</span>
+                      </div>
+                    </td>
+                    
+                    <td class="text-xs-center" style="height:36px;width: 90px">
+                      <v-tooltip top>
+                        <v-btn @click="editLog(props.item)" color="green" slot="activator" flat icon class="mx-0 mr-3 my-0">
+                          <v-icon size="22">edit</v-icon>
+                        </v-btn>
+                        <span>Sửa nội dung</span>
+                      </v-tooltip>
+                    </td>
+                  </tr>
+                </template>
+                <template slot="no-data">
+                  <div class="text-xs-center mt-2">
+                    Không có lịch sử
+                  </div>
+                </template>
+              </v-data-table>
+            </v-card-text>
+
+            <v-card-actions class="justify-end">
+              <v-btn color="red" class="white--text mr-2" :loading="loadingAction" :disabled="loadingAction" @click="dialogStatusAccLog = false">
+                <v-icon left>
+                  clear
+                </v-icon>
+                Thoát
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+        <v-dialog
+          max-width="650"
+          v-model="dialogChangeLog"
+          persistent
+        >
+          <v-card flat>
+            <v-toolbar
+              dark
+              color="primary"
+            >
+              <v-toolbar-title >Cập nhật nội dung</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-toolbar-items>
+                <v-btn
+                  icon
+                  dark
+                  @click="dialogChangeLog = false"
+                >
+                  <v-icon>clear</v-icon>
+                </v-btn>
+              </v-toolbar-items>
+            </v-toolbar>
+            <v-card-text class="mt-2">
+              <v-form
+                ref="formChangeLog"
+                v-model="validFormChangeLog"
+                lazy-validation
+              >
+                  <v-layout wrap>
+                    <v-flex xs12 class="mb-2">
+                      <v-textarea
+                        class="input-form"
+                        v-model="logChange"
+                        solo
+                        dense
+                        hide-details="auto"
+                      ></v-textarea>
+                    </v-flex>
+                  </v-layout>
+              </v-form>
+            </v-card-text>
+            <v-card-actions class="justify-end">
+              <!-- <v-btn color="red" class="white--text mr-2" :loading="loadingAction" :disabled="loadingAction" @click="dialogChangeLog = false">
+                <v-icon left>
+                  clear
+                </v-icon>
+                Thoát
+              </v-btn> -->
+              <v-btn class="mr-2" color="primary" :loading="loadingAction" :disabled="loadingAction" @click.native="submitChangeLog">
+                <v-icon left>
+                  save
+                </v-icon>
+                <span>Xác nhận</span>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+        <v-dialog
+          max-width="900"
+          v-model="dialogPrint"
+          persistent
+        >
+          <v-card flat>
+            <v-toolbar
+              dark
+              color="primary"
+            >
+              <v-toolbar-title >Phiếu cấp tài khoản</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-toolbar-items>
+                <v-btn
+                  icon
+                  dark
+                  @click="dialogPrint = false"
+                >
+                  <v-icon>clear</v-icon>
+                </v-btn>
+              </v-toolbar-items>
+            </v-toolbar>
+            <v-card-text class="mt-2">
+              <div id="printPhieu_1" v-html="contentPrint"></div>
+            </v-card-text>
+            <v-card-actions class="justify-end">
+              <v-btn color="red" class="white--text mr-2" @click="dialogPrint = false">
+                <v-icon left>
+                  clear
+                </v-icon>
+                Thoát
+              </v-btn>
+              <v-btn class="mr-2" color="primary" @click.native="submitPrint">
+                <v-icon left>
+                  mdi-printer
+                </v-icon>
+                <span>In phiếu</span>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
     </div>
 </template>
 
@@ -456,7 +675,47 @@ export default {
         dialogNoteAction: false,
         titleAction: '',
         noteAction: '',
-        actionStatusAcc: ''
+        actionStatusAcc: '',
+        dialogStatusAccLog: false,
+        headersLog: [
+            {
+                sortable: false,
+                text: 'STT',
+                align: 'center',
+            },
+            {
+                sortable: false,
+                text: 'Thao tác',
+                align: 'left'
+            },
+            {
+                sortable: false,
+                text: 'Nội dung',
+                align: 'left'
+            },
+            {
+                sortable: false,
+                text: 'Người thao tác',
+                align: 'left'
+            },
+            {
+                sortable: false,
+                text: 'Thời gian thao tác',
+                align: 'left'
+            },
+            {
+                sortable: false,
+                text: 'Thao tác',
+                align: 'center'
+            }
+        ],
+        logItems: [],
+        logUpdate: '',
+        dialogChangeLog: false,
+        logChange: '',
+        validFormChangeLog: true,
+        dialogPrint: false,
+        contentPrint: ''
       }
     },
     watch: {
@@ -718,6 +977,110 @@ export default {
       },
       goBack () {
         window.history.back()
+      },
+      dateLocaleTime (dateInput) {
+        let date = new Date(dateInput)
+        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')} `
+      },
+      goBack () {
+        window.history.back()
+      },
+      viewLog () {
+        let vm = this
+        if (vm.loadingData) {
+          return
+        }
+        vm.loadingData = true
+        let filter = {
+          data: {
+            className: 'com.fds.flex.core.data.entity.T_Model.DanhTinhDienTu',
+            classPK: vm.thongTinCongDan['danhTinhDienTu'][0]['maDinhDanh'],
+            page: 0,
+            size: 100
+          }
+          
+        }
+        vm.$store.dispatch('getLogChangeStatusAcc', filter).then(function (response) {
+          vm.loadingData = false
+          vm.logItems = response.content.reverse()
+          vm.dialogStatusAccLog = true
+        }).catch(function () {
+          vm.loadingData = false
+        })
+      },
+      editLog (item) {
+        let vm = this
+        vm.logUpdate = item
+        vm.logChange = item.activityNote
+        vm.dialogChangeLog = true
+      },
+      getLogActionName (code) {
+        switch(code) {
+          case 'LOCK_ACCOUNT':
+              return {name: 'Khóa tài khoản', color: 'color: red'}
+          case 'DELETE_ACCOUNT':
+              return {name: 'Xóa tài khoản', color: 'color: red'}
+          case 'UNLOCK_ACCOUNT':
+              return {name: 'Mở khóa tài khoản', color: 'color: green'}
+          case 'ACTIVE_ACCOUNT':
+              return {name: 'Kích hoạt tài khoản', color: 'color: green'}
+          case 'RESTORE_ACCOUNT':
+              return {name: 'Khôi phục tài khoản', color: 'color: green'}
+          case 'CREATE_ACCOUNT':
+              return {name: 'Tạo tài khoản', color: 'color: green'}
+          default:
+              return {name: code, color: 'color: black'}  
+        }
+      },
+      submitChangeLog () {
+        let vm = this
+        let filter = {
+          "uuid": vm.logUpdate['uuid'],
+          data: {
+            "activityNote": vm.logChange
+          }
+        }
+        vm.loadingAction = true
+        vm.$store.dispatch('updateLog', filter).then(function (response) {
+          vm.loadingAction = false
+          toastr.remove()
+          toastr.success('Cập nhật thành công')
+          vm.viewLog()
+          vm.dialogChangeLog = false
+        }).catch(function () {
+          vm.loadingAction = false
+          toastr.remove()
+          toastr.error('Cập nhật không thành công')
+        })
+      },
+      printPhieu () {
+        let vm = this
+        let filter = {
+          "madinhdanh": vm.thongTinCongDan['danhTinhDienTu'][0]['maDinhDanh']
+        }
+        vm.loadingAction = true
+        vm.$store.dispatch('printPhieu', filter).then(function (response) {
+          vm.contentPrint = response.content
+          vm.loadingAction = false
+          if (vm.contentPrint) {
+            vm.dialogPrint = true
+          } else {
+            toastr.remove()
+            toastr.error('Không có phiếu in')
+          }
+        }).catch(function () {
+          vm.loadingAction = false
+        })
+      },
+      submitPrint() {
+        var printContents = document.getElementById("printPhieu_1").innerHTML
+        var a = window.open()
+        a.document.write(printContents)
+        a.document.close()
+        a.print()
+
+        // var element = document.getElementById('printPhieu_1')
+        // html2pdf(element)
       }
     }
 }

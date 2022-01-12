@@ -333,6 +333,66 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getLogChangeStatusAcc ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          method: 'get',
+          url: state.apiSso + '/v1/admin/activity/filter',
+          headers: { 
+            'Accept': 'application/json', 
+            'Content-Type': 'application/json'
+          },
+          data: {},
+          params: filter.data
+        }
+        axios(config).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
+    updateLog ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let dataPost = JSON.stringify(filter.data)
+        let config = {
+          method: 'post',
+          url: state.apiSso + '/v1/admin/activity/' + filter.uuid,
+          headers: { 
+            'Accept': 'application/json', 
+            'Content-Type': 'application/json'
+          },
+          data : dataPost
+        }
+        axios(config).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          reject(error.response)
+        })
+      })
+    },
+    printPhieu ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let dataPost = JSON.stringify({})
+        let config = {
+          method: 'post',
+          url: state.apiSso + '/v1/datasharing/idp/account/' + filter.madinhdanh + '/printcontent',
+          headers: { 
+            // 'Accept': 'application/json', 
+            'Content-Type': 'application/json'
+          },
+          data : dataPost
+        }
+        axios(config).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          reject(error.response)
+        })
+      })
+    },
   },
   mutations: {
     setLoading (state, payload) {
