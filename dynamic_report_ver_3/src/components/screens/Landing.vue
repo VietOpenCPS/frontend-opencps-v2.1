@@ -117,7 +117,7 @@
           </v-autocomplete>
         </v-flex>
         <v-flex xs12 class="px-3 mb-3">
-          <div class="d-inline-block left" v-if="!itemsReports[index]['filterConfig']['version']">
+          <div class="d-inline-block left" v-if="!itemsReports[index]['filterConfig']['version'] && !itemsReports[index]['filterConfig']['backendVer2']">
             <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> 
               <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
             </v-btn>
@@ -135,7 +135,7 @@
             </v-btn>
             <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
           </div>
-          <div class="d-inline-block left" v-if="itemsReports[index]['filterConfig']['version']">
+          <div class="d-inline-block left" v-if="itemsReports[index]['filterConfig']['version'] || itemsReports[index]['filterConfig']['backendVer2']">
             <v-btn dark color="blue darken-3" v-on:click.native="createReport()"> 
               <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
             </v-btn>

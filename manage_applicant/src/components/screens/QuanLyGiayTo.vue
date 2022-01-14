@@ -80,6 +80,7 @@
               :hide-selected="true"
               box
               clearable
+              @change="changeOptionSearch"
             ></v-autocomplete>
           </v-flex>
           <v-flex xs12 sm6 class="px-0 pr-3">
@@ -877,6 +878,31 @@ export default {
             }
             if (vm.fileTemplateList && vm.fileTemplateList.length === 1) {
               vm.fileTemplateNoCreate = vm.fileTemplateList[0]
+            }
+          }).catch(function () {
+          })
+        } else {
+          vm.fileTemplateList = []
+          vm.fileTemplateNoCreate = ''
+        }
+      }, 200)
+    },
+    changeOptionSearch () {
+      let vm = this
+      setTimeout (function () {
+        if (vm.optionSearch) {
+          let filter = {
+            dossierTemplateNo: vm.optionSearch.templateNo
+          }
+          vm.$store.dispatch('getDossierPart', filter).then(function (result) {
+            if (result.hasOwnProperty('dossierParts')) {
+              vm.fileTemplateListSeach = result.dossierParts
+              vm.fileTemplateNo = ''
+            } else {
+              vm.fileTemplateListSeach = []
+            }
+            if (vm.fileTemplateListSeach && vm.fileTemplateListSeach.length === 1) {
+              vm.fileTemplateNo = vm.fileTemplateListSeach[0]
             }
           }).catch(function () {
           })

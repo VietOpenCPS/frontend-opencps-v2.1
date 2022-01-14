@@ -30,7 +30,7 @@
             </div>
           </v-flex>
 
-          <!-- <v-flex xs12 md6 class="pr-2 input-group--text-field-box mt-1">
+          <v-flex v-if="!advanceSearch" xs12 md4 class="pr-2 input-group--text-field-box mt-1">
             <v-text-field
                 label="Tìm theo từ khóa"
                 v-model="keywordSearch"
@@ -42,10 +42,10 @@
                 @click:clear="clearKeyword()"
                 @click:append="getDanhMuc()"
               ></v-text-field>
-          </v-flex> -->
-          <v-flex xs12 md4 class="pr-2 input-group--text-field-box mt-1">
+          </v-flex>
+          <v-flex v-if="advanceSearch" xs12 md4 class="pr-2 input-group--text-field-box mt-1">
             <v-text-field
-                :label="typeSearch === 'citizen' ? 'Họ tên' : 'Tên tổ chức, doanh nghiệp'"
+                :label="typeSearch === 'citizen' ? 'Họ tên công dân' : 'Tên tổ chức, doanh nghiệp'"
                 v-model="applicantNameSearch"
                 box
                 clear-icon="clear"
@@ -766,6 +766,18 @@ export default {
     showAdvanceSearch () {
       let vm = this
       vm.advanceSearch = !vm.advanceSearch
+      if (vm.advanceSearch) {
+        vm.keywordSearch = ''
+      } else {
+        vm.applicantNameSearch = ''
+        vm.applicantIdSearch = ''
+        vm.contactSearch = ''
+        vm.emailSearch = ''
+
+        vm.thuongTruPhuongXa = ''
+        vm.thuongTruQuanHuyen = ''
+        vm.thuongTruTinhThanh = ''
+      }
     },
     getDanhMucTinhThanh () {
       let vm = this
