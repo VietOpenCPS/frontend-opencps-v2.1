@@ -2257,6 +2257,8 @@ export default {
       "11",
       "13",
       "15",
+      "18",
+      "19",
       5,
       7,
       9,
@@ -2265,6 +2267,7 @@ export default {
       15,
       2,
       3,
+      18,19
     ],
     loadingDelete: false,
     flagStateOfShipName: "",
