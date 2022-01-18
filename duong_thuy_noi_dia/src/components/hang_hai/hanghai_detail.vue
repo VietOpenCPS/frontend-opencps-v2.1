@@ -124,7 +124,7 @@
               <div class="layout wrap">
                 <div class="labelClass flex text-bold xs12 sm4"> Tàu đến/rời: </div>
                 <div class="labelClass flex xs12 sm8">
-                  <span v-if="detail_model.documentTypeCode === '15' || detail_model.documentTypeCode === 'XC' || detail_model.documentTypeCode === '5' || detail_model.documentTypeCode === '17' || detail_model.documentTypeCode === '9' || detail_model.documentTypeCode === '11' || detail_model.documentTypeCode === '13'">
+                  <span v-if="detail_model.documentTypeCode === '15' || detail_model.documentTypeCode === 'XC' || detail_model.documentTypeCode === '5' || detail_model.documentTypeCode === '17' || detail_model.documentTypeCode === '9' || detail_model.documentTypeCode === '11' || detail_model.documentTypeCode === '13' || detail_model.documentTypeCode === '19'">
                     Rời
                   </span>
                   <span v-else>
