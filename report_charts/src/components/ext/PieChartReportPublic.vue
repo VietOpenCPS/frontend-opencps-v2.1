@@ -49,7 +49,7 @@ export default {
       extends: VueChartJs.Pie,
       mounted () {
         this.renderChart({
-          labels: ['Đang xử lý còn hạn', 'Đang xử lý quá hạn', 'Đang bổ sung điều kiện', 'Đã giải quyết sớm hạn', 'Đã giải quyết đúng hạn', 'Đã giải quyết quá hạn', 'Rút không giải quyết'],
+          labels: ['Đang xử lý còn hạn', 'Đang xử lý quá hạn', 'Đang bổ sung điều kiện', 'Đã giải quyết sớm hạn', 'Đã giải quyết đúng hạn', 'Đã giải quyết quá hạn', 'Rút, từ chối giải quyết'],
           datasets: [
             {
               backgroundColor: [
@@ -68,7 +68,7 @@ export default {
                 vm.item.betimesCount,
                 vm.item.ontimeCount,
                 vm.item.overtimeCount,
-                vm.item.cancelledCount 
+                vm.item.cancelledCount + vm.item.unresolvedCount 
               ]
             }
           ]

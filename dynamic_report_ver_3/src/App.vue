@@ -216,7 +216,8 @@
       yearList: '',
       dialog_chotsolieu: false,
       isAdmin: false,
-      isSigned: window.themeDisplay.isSignedIn()
+      isSigned: window.themeDisplay.isSignedIn(),
+      resourceConfig: ''
     }),
     computed: {
       itemsReports () {
@@ -320,7 +321,7 @@
           }
         } catch (error) {
         }
-        let doGetReport = function () {
+        let doGetConfigs = function () {
           if (vm.$route.query.hasOwnProperty('doreport')) {
             vm.hiddenAside = true
           } else {
@@ -366,7 +367,62 @@
                 }
               }
             }
+            // 
+            console.log('resourceConfig9999', vm.resourceConfig)
+            console.log('itemsReports99999', vm.itemsReports)
+            if (vm.resourceConfig) {
+              let groupIdSite = window.themeDisplay.getScopeGroupId()
+              let configsSite = vm.resourceConfig.filter(function (item) {
+                return item.groupId == groupIdSite
+              })
+              if (configsSite && configsSite[0]) {
+                for (let index = 0; index < vm.itemsReports.length; index++) {
+                  if (vm.itemsReports[index]['filterConfig']['groupIds'] && vm.itemsReports[index]['filterConfig']['groupIds'] === 'resourceConfig') {
+                    vm.itemsReports[index]['filterConfig']['groupIds'] = configsSite[0]['groupIds']
+                  }
+                  for (let index2 = 0; index2 < vm.itemsReports[index]['filterConfig']['filters'].length; index2++) {
+                    let item = vm.itemsReports[index]['filterConfig']['filters'][index2]
+                    if (item.hasOwnProperty('mappingSourceConfig') && item.mappingSourceConfig) {
+                      vm.itemsReports[index]['filterConfig']['filters'][index2]['source'] = configsSite[0][item.mappingSourceConfig]
+                    }
+                  }
+                }
+              }
+              console.log('itemsReports88888', vm.itemsReports)
+            }
+            // 
           })
+        }
+        let doGetReport = function () {
+          // 
+          try {
+            let param = {
+              headers: {
+                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+                Token: window.Liferay ? window.Liferay.authToken : ''
+              }
+            }
+            
+            let dataGet = {}
+            let dataPost = new URLSearchParams()
+            dataPost.append('method', 'GET')
+            dataPost.append('serverCode', 'SERVER_DVC')
+            dataPost.append('url', '/serverconfigs/CONFIG_RESOURCE_BAOCAO')
+            dataPost.append('data', JSON.stringify(dataGet))
+            axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+              let serializable = response.data
+              let configs = JSON.parse(serializable.configs)
+              vm.resourceConfig = configs['resource']
+              doGetConfigs()
+            }).catch(function (xhr) {
+              vm.resourceConfig = ''
+              doGetConfigs()
+            })
+          } catch (error) {
+            vm.resourceConfig = ''
+            doGetConfigs()
+          }
+          //
         }
         if (vm.reportTypeMappingRole) {
           let roles = ''
@@ -481,7 +537,30 @@
             vm.isAdmin = true
           }
         })
-      }
+      },
+      getResourceConfigs () {
+        let vm = this
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        
+        let dataGet = {}
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('serverCode', 'SERVER_DVC')
+        dataPost.append('url', '/serverconfigs/CONFIG_RESOURCE_BAOCAO')
+        dataPost.append('data', JSON.stringify(dataGet))
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+          let serializable = response.data
+          let configs = JSON.parse(serializable.configs)
+          vm.resourceConfig = configs['resource']
+
+        }).catch(function (xhr) {
+        })
+      },
     }
   }
 </script>

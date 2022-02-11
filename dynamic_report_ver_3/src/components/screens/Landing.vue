@@ -861,7 +861,7 @@ export default {
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
             vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
             // 
-            if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+            if (vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy']) {
               if (vm.groupByVal === 'domainCode') {
                 vm.filters = vm.filters.filter(function (item) {
                   return item.key !== 'serviceCode' && item.key !== 'govAgencyCode'
@@ -1014,7 +1014,7 @@ export default {
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
-        if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+        if (vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy']) {
           if (vm.groupByVal === 'domainCode') {
             vm.filters = vm.filters.filter(function (item) {
               return item.key !== 'serviceCode' && item.key !== 'govAgencyCode'
@@ -1196,7 +1196,7 @@ export default {
     groupByVal (val) {
       let vm = this
       console.log('valGroupBy', val)
-      if (val && vm.itemsReports[vm.index]['filterConfig']['version']) {
+      if (val && vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy']) {
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
           vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
         }
@@ -1418,9 +1418,11 @@ export default {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
           }
         } else {
+          // notex2
           currentVal = ''
           for (let keySource in vm.filters[key]['source']) {
-            if (currentVal === '' || currentVal === '0') {
+            // if (currentVal === '' || currentVal === '0') {
+            if (currentVal === '0') {
               currentVal = vm.filters[key]['source'][keySource]['name']
               break
             }
@@ -1543,6 +1545,11 @@ export default {
             vm.dossierList = result
           }
           vm.pagination.totalItems = vm.dossierList.length
+          if (vm.dossierList && vm.dossierList.length === 0) {
+            vm.isShowLoading = false
+            vm.showErrorData = true
+            return
+          }
           //
           vm.showErrorData = false
           let dossierRaw = {}

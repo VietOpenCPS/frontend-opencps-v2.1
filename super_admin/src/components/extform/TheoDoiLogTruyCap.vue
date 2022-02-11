@@ -15,7 +15,7 @@
       </v-toolbar>
     </v-card>
     <v-layout wrap class="px-3 py-3" style="background-color: #ececec;">
-      <v-flex xs12 sm12 class="px-2 mb-3">
+      <v-flex xs12 sm6 class="px-2 mb-3">
         <div>
           <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Danh sách API:</div>
           <v-autocomplete
@@ -42,7 +42,7 @@
           </v-autocomplete>
         </div>
       </v-flex>
-      <!-- <v-flex xs12 sm6 class="px-2 mb-3">
+      <v-flex xs12 sm6 class="px-2 mb-3">
         <div class="d-inline-block text-bold pt-2" style="font-weight:450;width: 130px;">Mã hồ sơ:</div>
         <v-text-field
           v-model="dossierNo"
@@ -56,7 +56,7 @@
           min-height="32"
           clearable
         ></v-text-field>
-      </v-flex> -->
+      </v-flex>
       <v-flex xs12 sm6 class="px-2">
         <div class="layout wrap">
           <div class="d-inline-block text-bold pt-2" style="font-weight:450;width: 130px;">Từ ngày:</div>
@@ -157,6 +157,14 @@
               </content-placeholders>
               <div v-else>
                 <span>{{ dossierPage * numberPerPage - numberPerPage + props.index + 1 }}</span>
+              </div>
+            </td>
+            <td class="text-xs-left" style="height:36px;border-right: 1px solid #dedede">
+              <content-placeholders v-if="loadingTable">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{props.item.dossierNo}}</span>
               </div>
             </td>
             <td class="text-xs-left" style="height:36px;border-right: 1px solid #dedede">
@@ -282,6 +290,11 @@ export default {
       {
         text: 'STT',
         align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Mã hồ sơ',
+        align: 'left',
         sortable: false
       },
       {

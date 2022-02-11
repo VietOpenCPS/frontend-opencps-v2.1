@@ -106,7 +106,7 @@
           v-model="data[item.model]"
           :rules="processRules(item.rules, item)"
           :placeholder="item['placeholder']"
-          :disabled="item['disabled'] || (tableName === 'opencps_serviceinfo' && item.model === 'serviceCode')"
+          :disabled="item['disabled'] || (id != 0 && tableName === 'opencps_serviceinfo' && item.model === 'serviceCode')"
           :maxlength="getMaxLength(item)"
           :counter="getMaxLength(item)"
           @blur="formatDataInput(item)"

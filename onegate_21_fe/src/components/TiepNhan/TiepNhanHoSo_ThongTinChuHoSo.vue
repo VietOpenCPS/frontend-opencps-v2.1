@@ -2619,8 +2619,8 @@ export default {
     },
     checkInfoAccount () {
       let vm = this
-      vm.loadingCheckAcc = true
       if (vm.thongTinChuHoSo['applicantIdNo']) {
+        vm.loadingCheckAcc = true
         let filter = {
           maSoCaNhan: vm.thongTinChuHoSo['applicantIdNo'],
           type: vm.thongTinChuHoSo.userType == '2' ? 'business' : 'citizen'
@@ -2648,6 +2648,8 @@ export default {
         }).catch(function (err) {
           console.log(err)
         })
+      } else {
+        vm.loadingCheckAcc = false
       }
     },
     showDialogCreateAcc (type) {

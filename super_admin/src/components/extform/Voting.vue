@@ -59,57 +59,60 @@
             Thêm câu hỏi
           </v-btn>
           <div class="px-2 py-2">
-            <div class="mb-2" v-if="Array.isArray(votingItems) && votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" style="position:relative">
-              <!-- <div class="text-bold" v-else>
-                {{index + 1}}.&nbsp; {{ item.subject }}
-              </div> -->
-              <v-layout wrap class="text-bold">
-                <div class="flex px-3 py-1" style="height:26px;max-width:80px;background-color: #034687;transform: skew(-25deg)">
-                  <span class="d-block white--text" style="transform: skew(25deg)">Câu {{index + 1}} : </span>
-                </div>
-                <!-- <div v-html="item.subject" class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687" v-if="String(item.subject).indexOf('/>') > 0 || String(item.subject).indexOf('<br') > 0">
+            <div v-if="Array.isArray(votingItems) && votingItems.length > 0">
+              <div class="mb-2"  v-for="(item, index) in votingItems" :key="index" style="position:relative">
+                <!-- <div class="text-bold" v-else>
+                  {{index + 1}}.&nbsp; {{ item.subject }}
                 </div> -->
-                <div v-html="lastestVersion !== 2 ? item.subject : item.title" class="flex pl-3 pr-2 pt-0" style="max-width:calc(100% - 100px);color:#034687">
+                <v-layout wrap class="text-bold">
+                  <div class="flex px-3 py-1" style="height:26px;max-width:80px;background-color: #034687;transform: skew(-25deg)">
+                    <span class="d-block white--text" style="transform: skew(25deg)">Câu {{index + 1}} : </span>
+                  </div>
+                  <!-- <div v-html="item.subject" class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687" v-if="String(item.subject).indexOf('/>') > 0 || String(item.subject).indexOf('<br') > 0">
+                  </div> -->
+                  <div v-html="lastestVersion !== 2 ? item.subject : item.title" class="flex pl-3 pr-2 pt-0" style="max-width:calc(100% - 100px);color:#034687">
+                  </div>
+                </v-layout>
+                <div v-if="lastestVersion !== 2" style="position:absolute;right:0px;top:-5px" :style="Array.isArray(item.choices) && item.choices.length > 1  ? 'width:50px' : 'width:85px'">
+                  <v-tooltip top>
+                    <v-btn slot="activator" class="mx-0 my-1" icon ripple @click="editVotings(item)">
+                      <v-icon color="blue lighten-1">edit</v-icon>
+                    </v-btn>
+                    <span>Sửa</span>
+                  </v-tooltip>
+                  <v-tooltip top>
+                    <v-btn slot="activator" class="mx-0 my-1" icon ripple @click="deleteVotings(item)">
+                      <v-icon color="red lighten-1">delete</v-icon>
+                    </v-btn>
+                    <span>Xóa</span>
+                  </v-tooltip>
                 </div>
-              </v-layout>
-              <div v-if="lastestVersion !== 2" style="position:absolute;right:0px;top:-5px" :style="Array.isArray(item.choices) && item.choices.length > 1  ? 'width:50px' : 'width:85px'">
-                <v-tooltip top>
-                  <v-btn slot="activator" class="mx-0 my-1" icon ripple @click="editVotings(item)">
-                    <v-icon color="blue lighten-1">edit</v-icon>
-                  </v-btn>
-                  <span>Sửa</span>
-                </v-tooltip>
-                <v-tooltip top>
-                  <v-btn slot="activator" class="mx-0 my-1" icon ripple @click="deleteVotings(item)">
-                    <v-icon color="red lighten-1">delete</v-icon>
-                  </v-btn>
-                  <span>Xóa</span>
-                </v-tooltip>
+                <div v-if="lastestVersion === 2" style="position:absolute;right:0px;top:-5px" :style="Array.isArray(item.lstChoiceDetailModels) && item.lstChoiceDetailModels.length > 1  ? 'width:50px' : 'width:85px'">
+                  <v-tooltip top>
+                    <v-btn slot="activator" class="mx-0 my-1" icon ripple @click="editVotings(item)">
+                      <v-icon color="blue lighten-1">edit</v-icon>
+                    </v-btn>
+                    <span>Sửa</span>
+                  </v-tooltip>
+                  <v-tooltip top>
+                    <v-btn slot="activator" class="mx-0 my-1" icon ripple @click="deleteVotings(item)">
+                      <v-icon color="red lighten-1">delete</v-icon>
+                    </v-btn>
+                    <span>Xóa</span>
+                  </v-tooltip>
+                </div>
+                <v-radio-group v-if="lastestVersion !== 2" class="ml-3 mt-2" column :style="Array.isArray(item.choices) && item.choices.length > 1 ? 'width:calc(100% - 50px)' : 'width:calc(100% - 85px)'">
+                  <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" readonly></v-radio>
+                </v-radio-group>
+                <v-radio-group v-if="lastestVersion === 2" class="ml-3 mt-2" column :style="Array.isArray(item.lstChoiceDetailModels) && item.lstChoiceDetailModels.length > 1 ? 'width:calc(100% - 50px)' : 'width:calc(100% - 85px)'">
+                  <v-radio v-for="(item1, index1) in item.lstChoiceDetailModels" v-bind:key="index1" :label="item1['subject']" :value="index1 + 1" readonly></v-radio>
+                </v-radio-group>
+                <v-divider
+                  v-if="Array.isArray(votingItems) && index + 1 < votingItems.length"
+                ></v-divider>
               </div>
-              <div v-if="lastestVersion === 2" style="position:absolute;right:0px;top:-5px" :style="Array.isArray(item.lstChoiceDetailModels) && item.lstChoiceDetailModels.length > 1  ? 'width:50px' : 'width:85px'">
-                <v-tooltip top>
-                  <v-btn slot="activator" class="mx-0 my-1" icon ripple @click="editVotings(item)">
-                    <v-icon color="blue lighten-1">edit</v-icon>
-                  </v-btn>
-                  <span>Sửa</span>
-                </v-tooltip>
-                <v-tooltip top>
-                  <v-btn slot="activator" class="mx-0 my-1" icon ripple @click="deleteVotings(item)">
-                    <v-icon color="red lighten-1">delete</v-icon>
-                  </v-btn>
-                  <span>Xóa</span>
-                </v-tooltip>
-              </div>
-              <v-radio-group v-if="lastestVersion !== 2" class="ml-3 mt-2" column :style="Array.isArray(item.choices) && item.choices.length > 1 ? 'width:calc(100% - 50px)' : 'width:calc(100% - 85px)'">
-                <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" readonly></v-radio>
-              </v-radio-group>
-              <v-radio-group v-if="lastestVersion === 2" class="ml-3 mt-2" column :style="Array.isArray(item.lstChoiceDetailModels) && item.lstChoiceDetailModels.length > 1 ? 'width:calc(100% - 50px)' : 'width:calc(100% - 85px)'">
-                <v-radio v-for="(item1, index1) in item.lstChoiceDetailModels" v-bind:key="index1" :label="item1['subject']" :value="index1 + 1" readonly></v-radio>
-              </v-radio-group>
-              <v-divider
-                v-if="Array.isArray(votingItems) && index + 1 < votingItems.length"
-              ></v-divider>
             </div>
+            
             <div v-if="Array.isArray(votingItems) && votingItems.length === 0" class="">
               <v-alert outline color="warning" icon="priority_high" :value="true">
                 Không có câu hỏi
@@ -601,27 +604,38 @@
         if (vm.lastestVersion !== 2) {
           vm.$store.dispatch('getVotingList', filter).then(function (result) {
             vm.loading = false
-            vm.votingItems = Array.isArray(result.data) ? result.data : [result.data]
+            if (result.data) {
+              vm.votingItems = Array.isArray(result.data) ? result.data : [result.data]
+            } else {
+              vm.votingItems = []
+            }
           }).catch(reject => {
             vm.loading = false
+            vm.votingItems = []
             console.log(reject)
           })
         } else {
           vm.$store.dispatch('getVotingListVer2', filter).then(function (result) {
             vm.loading = false
-            let items = Array.isArray(result.data) ? result.data : [result.data]
-            let lengthQuestion = items.length
-            for (let index = 0; index < lengthQuestion; index++) {
-              if (items[index]['lstChoiceDetailModels']) {
-                let listChoice = Array.isArray(items[index]['lstChoiceDetailModels']) ? items[index]['lstChoiceDetailModels'] : [items[index]['lstChoiceDetailModels']]
-                items[index] = Object.assign(items[index]['voteModel'], {lstChoiceDetailModels: listChoice})
-              } else {
-                items[index] = Object.assign(items[index]['voteModel'], {lstChoiceDetailModels: []})
+            if (result.data) {
+              let items = Array.isArray(result.data) ? result.data : [result.data]
+              let lengthQuestion = items.length
+              for (let index = 0; index < lengthQuestion; index++) {
+                if (items[index]['lstChoiceDetailModels']) {
+                  let listChoice = Array.isArray(items[index]['lstChoiceDetailModels']) ? items[index]['lstChoiceDetailModels'] : [items[index]['lstChoiceDetailModels']]
+                  items[index] = Object.assign(items[index]['voteModel'], {lstChoiceDetailModels: listChoice})
+                } else {
+                  items[index] = Object.assign(items[index]['voteModel'], {lstChoiceDetailModels: []})
+                }
               }
+              vm.votingItems = items
+            } else {
+              vm.votingItems = []
             }
-            vm.votingItems = items
+            
           }).catch(reject => {
             vm.loading = false
+            vm.votingItems = []
             console.log(reject)
           })
         }
@@ -648,10 +662,12 @@
         // vm.votingCode = ''
         vm.answer = ''
         vm.choicesCurrent = []
-        vm.$refs.formAddQuestion.reset()
         vm.status = 1
         vm.statusChoice = 1
         vm.dialog_addQuestion = true
+        setTimeout(function () {
+          vm.$refs.formAddQuestion.reset()
+        }, 200)
       },
       addChoices () {
         let vm = this

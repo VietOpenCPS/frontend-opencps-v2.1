@@ -209,7 +209,7 @@ export const store = new Vuex.Store({
               }
               for (let key in dynamicReportsFilterSharing) {
                 let current = dynamicReportsFilterSharing[key]
-                console.log('keyDynamicReports', current['filterConfig'])
+                // console.log('keyDynamicReports', current['filterConfig'])
                 try {
                   let checkfilterConfig = eval('( ' + current['filterConfig'] + ' )')
                 } catch (error) {
@@ -439,7 +439,7 @@ export const store = new Vuex.Store({
             }
           }
           let govAgency = filter['govAgency']
-          let agencyLists = filter['agencyLists']
+          let agencyLists = filter['agencyLists'] ? filter['agencyLists'] : []
           let agencyListsGet = agencyLists.filter(function (item) {
             return String(item['value']) !== '0'
           })
