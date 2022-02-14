@@ -73,7 +73,8 @@ export const store = new Vuex.Store({
               end: filter.page * 10,
               dossierNo: filter.dossierNo ? filter.dossierNo : '',
               applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : '',
-              status: filter.status ? filter.status : ''
+              status: filter.status ? filter.status : '',
+              order: filter.order ? true : false
             }
           }
           axios.get(state.endPointApi + '/dossiers', param).then(function (response) {
@@ -461,6 +462,26 @@ export const store = new Vuex.Store({
       let currentDate = (new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`)).getTime()
       let token = md5('opencps' + currentDate)
       commit('setMd5Token', token)
+    },
+    getApplicantIdNoByImage ({commit, state}, postData) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let url = '/o/rest/v2/eKYC/getApplicantIdNoByImage'
+        let data = new URLSearchParams();
+        data.append("image_live", postData.image_live)
+        axios.post(url, data, param).then(response => {
+          resolve(response)
+        }).catch(errorRes => {
+          let response = errorRes.message
+          toastr.clear()
+          toastr.error(response)
+          reject('error')
+        })
+      })
     }
   },
   mutations: {

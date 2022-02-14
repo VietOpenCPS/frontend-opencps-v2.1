@@ -2,9 +2,6 @@
   <div style="margin: 0 auto;">
     <v-card class="mb-3 mt-2">
       <v-toolbar color="blue darken-3" dark height="40">
-        <v-btn dark icon>
-          <v-icon>api</v-icon>
-        </v-btn>
         <v-toolbar-title class="ml-0">
           <span @click="openServiceConfig" class="mr-2">
             <a href="javascript:;" class="" style="color: white;text-decoration: none;font-size: 16px;">Dịch vụ công</a>
@@ -20,7 +17,7 @@
         </v-btn>
       </v-toolbar>
     </v-card>
-    <v-card class="py-0 px-0">
+    <v-card class="py-0 px-2">
       <div>
         <v-flex xs12>
           <span class="text-bold" style="color: #073b76">Tên dịch vụ công:</span>

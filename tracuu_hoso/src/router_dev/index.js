@@ -4,9 +4,10 @@ import NotFound from '@/components/NotFound'
 import Landing from '@/components/screens/Landing'
 import ThanhToan from '@/components/screens/ThanhToanThanhCong'
 import DetailForward from '@/components/blacklist/DetailForward'
-
+import TraCuuAI from '@/components/screens/TraCuuAI'
 const routes = [
   { path: '/', name: 'Landing', component: Landing, props: false },
+  { path: '/tra-cuu-ai', component: TraCuuAI, props: false},
   { path: '/thanh-toan-truc-tuyen', name: 'ThanhToan', component: ThanhToan, props: false },
   {
     path: '/danh-sach-ho-so/:index',

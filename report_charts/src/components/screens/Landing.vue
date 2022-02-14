@@ -109,15 +109,23 @@
               <div class="numbers align-space-between" style="margin: 5px 0px;overflow: hidden;">
                 <div class="tiepnhan" style="width: 50%; text-align: center; float: left;">
                   <div class="mb-2">
-                    <div style="text-transform: uppercase; margin-bottom: 5px;">Tổng giải quyết</div><span id="da_tiep_nhan" style="font-size: 24px;font-weight: 700;">{{itemTotal['processCount']}}</span></div>
+                    <div style="text-transform: uppercase; margin-bottom: 5px;">Tổng giải quyết</div>
+                    <span id="da_tiep_nhan" style="font-size: 24px;font-weight: 700;">{{itemTotal['processCount']}}</span>
+                  </div>
                   <div class="mb-2">
-                    <div style="text-transform: uppercase; margin-bottom: 5px;">Đã giải quyết</div><span id="da_tiep_nhan" style="font-size: 24px; font-weight: 700;">{{itemTotal['releaseCount']}}</span></div>
+                    <div style="text-transform: uppercase; margin-bottom: 5px;">Đã giải quyết</div>
+                    <span id="da_tiep_nhan" style="font-size: 24px; font-weight: 700;">{{itemTotal['releaseCount'] + itemTotal['cancelledCount'] + itemTotal['unresolvedCount']}}</span>
+                  </div>
                 </div>
                 <div class="giaiquyet" style="width: 50%; text-align: center; float: left;">
                   <div class="mb-2">
-                    <div style="text-transform: uppercase; margin-bottom: 5px;">Nhận Trong kỳ</div><span id="da_tiep_nhan" style="font-size: 24px; font-weight: 700;">{{itemTotal['receivedCount']}}</span></div>
+                    <div style="text-transform: uppercase; margin-bottom: 5px;">Nhận Trong kỳ</div>
+                    <span id="da_tiep_nhan" style="font-size: 24px; font-weight: 700;">{{itemTotal['receivedCount']}}</span>
+                  </div>
                   <div class="mb-2">
-                    <div style="text-transform: uppercase; margin-bottom: 5px;">Đang giải quyết</div><span id="da_tiep_nhan" style="font-size: 24px; font-weight: 700;">{{itemTotal['processingCount']}}</span></div>
+                    <div style="text-transform: uppercase; margin-bottom: 5px;">Đang giải quyết</div>
+                    <span id="da_tiep_nhan" style="font-size: 24px; font-weight: 700;">{{itemTotal['processingCount'] + itemTotal['waitingCount']}}</span>
+                  </div>
                 </div>
               </div>
               <div class="mb-2 text-center"><div style="text-transform: uppercase; margin-bottom: 5px;">Tỉ lệ sớm và đúng hạn</div><span id="da_tiep_nhan" style="font-size: 36px;font-weight: 700;color: rgb(253, 180, 75);">{{Math.round(itemTotal['ontimePercentage'])}} %</span></div>

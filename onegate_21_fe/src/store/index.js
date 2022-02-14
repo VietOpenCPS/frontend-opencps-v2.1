@@ -353,7 +353,8 @@ export const store = new Vuex.Store({
             month: filter.month ? filter.month : 0,
             day: filter.day ? filter.day : 0,
             dossierNo: filter.dossierNo ? filter.dossierNo : '',
-            paymentStatus: filter.paymentStatus ? filter.paymentStatus : ''
+            paymentStatus: filter.paymentStatus ? filter.paymentStatus : '',
+            applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : '',
           }
           if (filter.queryParams.indexOf('top=') < 0) {
             paramSearch.top = filter.top ? filter.top : ''
@@ -5573,7 +5574,7 @@ export const store = new Vuex.Store({
             Token: window.Liferay ? window.Liferay.authToken : ''
           }
         }
-        let url = '/o/rest/v2/userSSO/maSoCaNhan/' + filter.maSoCaNhan
+        let url = '/o/rest/v2/userSSO/' + filter.maSoCaNhan + '/applicantIdNo'
         axios.get(url, param).then(function (response) {
           let serializable = response.data
           resolve(serializable)
@@ -5585,10 +5586,9 @@ export const store = new Vuex.Store({
     },
     createAccountCaNhan ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
-        var settings = {
+        let settings = {
           "url": '/o/rest/v2/userSSO/createAccount',
           "method": "POST",
-          "timeout": 0,
           "headers": {
             "groupId": window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
             "Token": window.Liferay ? window.Liferay.authToken : '',
@@ -5598,8 +5598,160 @@ export const store = new Vuex.Store({
         };
         
         $.ajax(settings).done(function (response) {
-          console.log(response);
           resolve(response)
+        }).fail(function (err) {
+          reject(err)
+        })
+      })
+    },
+    aiSearch ({commit, state}, postData) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let url = '/o/rest/v2/eKYC/ekycSearch'
+        let data = new URLSearchParams();
+        data.append("image_live", postData.image_live)
+        axios.post(url, data, param).then(response => {
+          resolve(response)
+        }).catch(errorRes => {
+          let response = errorRes.message
+          toastr.clear()
+          toastr.error(response)
+          reject('error')
+        })
+      })
+    },
+    postFrontID ({commit, state}, postData) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let url = '/o/rest/v2/eKYC/IDCardInformation'
+        let data = new URLSearchParams();
+        data.append("image_front", postData.image_front)
+        axios.post(url, data, param).then(response => {
+          resolve(response)
+        }).catch(errorRes => {
+          let response = errorRes.message
+          console.log(response)
+          toastr.clear()
+          toastr.error(response)
+          reject('error')
+        })
+      })
+    },
+    postBackID ({commit, state}, postData) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let url = '/o/rest/v2/eKYC/IDCardInformation'
+        let data = new URLSearchParams();
+        data.append("image_front", postData.image_back)
+        axios.post(url, data, param).then(response => {
+          resolve(response)
+        }).catch(errorRes => {
+          let response = errorRes.message
+          console.log(response)
+          toastr.clear()
+          toastr.error(response)
+          reject('error')
+        })
+      })
+    },
+    postSelfieImage ({commit, state}, postData) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let url = '/o/rest/v2/eKYC/selfieImageCheck'
+        let data = new URLSearchParams();
+        data.append("image_front", postData.front_image)
+        data.append("image_live", postData.live_image)
+        axios.post(url, data, param).then(response => {
+          resolve(response)
+        }).catch(errorRes => {
+          let response = errorRes.message
+          console.log(response)
+          toastr.clear()
+          toastr.error(response)
+          reject('error')
+        })
+      })
+    },
+    saveEkycApplicant ({commit, state}, postData) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let url = '/o/rest/v2/eKYC/saveEkycApplicant'
+        let data = new URLSearchParams();
+        data.append("ekycId", postData.ekycId)
+        data.append("selfieImage", postData.live_image)
+        data.append("applicantName", postData.name)
+        data.append("applicantIdNo", postData.id)
+        data.append("birthday", postData.birthday)
+        data.append("address", postData.address)
+        data.append("wardCode", postData.wardCode)
+        data.append("wardName", postData.wardName)
+        data.append("districtCode", postData.districtCode)
+        data.append("districtName", postData.districtName)
+        data.append("cityCode", postData.cityCode)
+        data.append("cityName", postData.cityName)
+        data.append("applicantIdDate", postData.issue_date)
+        axios.post(url, data, param).then(response => {
+          resolve(response)
+        }).catch(errorRes => {
+          let response = errorRes.message
+          toastr.clear()
+          toastr.error(response)
+          reject('error')
+        })
+      })
+    },
+    getApplicantIdNoByImage ({commit, state}, postData) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let url = '/o/rest/v2/eKYC/getApplicantIdNoByImage'
+        let data = new URLSearchParams();
+        data.append("image_live", postData.image_live)
+        axios.post(url, data, param).then(response => {
+          resolve(response)
+        }).catch(errorRes => {
+          let response = errorRes.message
+          toastr.clear()
+          toastr.error(response)
+          reject('error')
+        })
+      })
+    },
+    deleleBienLai ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId,
+            "Content-Type": "application/x-www-form-urlencoded"
+          }
+        }
+        axios.delete('/o/rest/v2/postal/cancelInv?dossierId=' + filter.dossierId, param).then(function (response) {
+          resolve(response)
+        }).catch(function (xhr) {
+          reject(xhr)
         })
       })
     },

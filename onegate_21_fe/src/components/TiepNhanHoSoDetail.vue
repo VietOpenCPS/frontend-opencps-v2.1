@@ -1275,6 +1275,9 @@ export default {
     },
     luuHoSo (type) {
       var vm = this
+      if (vm.loadingAction) {
+        return
+      }
       let currentQuery = vm.$router.history.current.query
       // console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
@@ -1408,6 +1411,8 @@ export default {
                       }
                     })
                     vm.tiepNhanState = false
+                  }).catch(function () {
+                    vm.loadingAction = false
                   })
                 }
               }
@@ -1426,6 +1431,9 @@ export default {
     tiepNhanHoSo (type) {
       let vm = this
       // console.log('luu Ho So--------------------')
+      if (vm.loadingAction) {
+        return
+      }
       let currentQuery = vm.$router.history.current.query
       vm.$store.commit('setPrintPH', false)
       let thongtinchunghoso = this.$refs.thongtinchunghoso ? this.$refs.thongtinchunghoso.getthongtinchunghoso() : {}
@@ -1607,6 +1615,8 @@ export default {
               toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
               vm.updateMetaData()
+            }).catch(function() {
+              vm.loadingAction = false
             })
           }
 

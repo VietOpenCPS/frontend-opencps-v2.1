@@ -6,7 +6,10 @@
           <span>QUẢN LÝ THÔNG TIN CÔNG DÂN, CƠ QUAN TỔ CHỨC, DOANH NGHIỆP</span>
         </div>
         <div class="layout row wrap header_tools row-blue mx-1">
-          <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+          <div class="flex xs6 text-right" style="margin-left: auto;">
+            <v-btn color="orange darken-3" dark class="my-0 mx-0 btn-border-left mr-3" @click="viewKhoGiayTo">
+              Kho giấy tờ chung
+            </v-btn>
             <v-btn color="blue darken-3" dark class="my-0 mx-0 btn-border-left" @click="huongDanSuDung">
               Hướng dẫn sử dụng
             </v-btn>
@@ -601,6 +604,16 @@ export default {
       vm.$store.commit('setApplicantInfos', item)
       vm.$router.push({
         path: '/' + item.applicantIdNo + '/quan-ly-giay-to',
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
+    },
+    viewKhoGiayTo () {
+      let vm = this
+      vm.$store.commit('setApplicantInfos', '')
+      vm.$router.push({
+        path: '/0/quan-ly-giay-to',
         query: {
           renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
         }

@@ -272,6 +272,7 @@
           saveUrl: this.pickItem['upload_api'] + '/' + this.pk,
           removeUrl: this.pickItem['remove_api'] + '/' + this.pk,
         }
+        console.log('pathUpload', this.path)
       }
 
       this.className = this.pickItem['class_name']
@@ -297,6 +298,7 @@
         let vm = this
         args.currentRequest.setRequestHeader('Token', vm.getAuthToken())
         args.currentRequest.setRequestHeader('groupId', vm.getScopeGroupId())
+        console.log('addHeaders', vm.getAuthToken(), vm.getScopeGroupId())
       },
       loadFileTemplate () {
         let vm = this
@@ -350,6 +352,7 @@
       onSuccess: function() {
         setTimeout(() => {
           document.getElementById('dropArea').querySelectorAll(".e-upload-success").forEach(e => e.parentNode.removeChild(e))
+          document.getElementById('dropArea').querySelectorAll(".e-upload .e-upload-files").forEach(e => e.parentNode.removeChild(e))
           this.loadFileTemplate()
         }, 2000)
       },
@@ -446,8 +449,22 @@
         })
       },
       onFileSelect (arr) {
-        console.log(arr)
+        console.log('onFileSelect', arr)
         let vm = this
+        let param = {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        let dataPost = new FormData()
+        dataPost.append('UploadFiles', arr.filesData[0].rawFile)
+        axios.post(vm.path.saveUrl, dataPost, param).then(function (result) {
+          toastr.success('Thực hiện thành công')
+          vm.onSuccess()
+        }).catch(xhr => {
+          toastr.error('Thực hiện thất bại')
+        })
         if(vm.code === 'opencps_deliverabletype'){
           if(vm.pickItem.fileTemplateId !== 1 && vm.pickItem.fileTemplateId !== 0) {
             const file = arr.filesData[0].rawFile

@@ -608,7 +608,7 @@ export default {
       let current = vm.$router.history.current
       let newQuery = current.query
       vm.$router.push({
-        path: '/table/opencps_serviceinfo/editor/' + item.serviceInfoId + '?serviceCodeDvcqg=' + item.serviceCodeDVCQG
+        path: '/table/opencps_serviceinfo/editor/' + item.serviceInfoId + '?serviceCodeDvcqg=' + item.serviceCodeDVCQG + '&serviceCode=' + item.serviceCode
       })
     },
     deleteServiceinfo (item) {
@@ -654,18 +654,16 @@ export default {
               headers: {
                 'groupId': window.themeDisplay.getScopeGroupId(),
                 'Accept': 'application/json',
-                'Content-Type': 'application/json',
+                'Content-Type': "application/x-www-form-urlencoded",
                 'Token': window.Liferay !== undefined ? window.Liferay.authToken : ''
               }
             }
-            let dataPostdossier = {
-              'serviceCode': item.serviceCode,
-              'domainCode': item.domainCode,
-              'administrationCode': item.administrationCode,
-              'maxLevel': item.maxLevel,
-              'serverNo': 'SERVER_DVC'
-            }
-            axios.post('/o/rest/v2/serviceinfos/sync', JSON.stringify(dataPostdossier), options).then(function (response) {
+            let dataPostdossier = new URLSearchParams()
+            dataPostdossier.append('type', 'serviceInfo')
+            dataPostdossier.append('serviceCode', item.serviceCode)
+            dataPostdossier.append('fromServerNo', "")
+            dataPostdossier.append('toServerNo', "SERVER_DVC")
+            axios.post('/o/rest/v2/backupDatas/exportProcess', dataPostdossier, options).then(function (response) {
               vm.loading = false
               toastr.success('Thủ tục đã được đồng bộ sang cổng Dịch vụ công')
             }).catch(function () {

@@ -209,7 +209,7 @@ export const store = new Vuex.Store({
               }
               for (let key in dynamicReportsFilterSharing) {
                 let current = dynamicReportsFilterSharing[key]
-                console.log('keyDynamicReports', current['filterConfig'])
+                // console.log('keyDynamicReports', current['filterConfig'])
                 try {
                   let checkfilterConfig = eval('( ' + current['filterConfig'] + ' )')
                 } catch (error) {
@@ -439,7 +439,7 @@ export const store = new Vuex.Store({
             }
           }
           let govAgency = filter['govAgency']
-          let agencyLists = filter['agencyLists']
+          let agencyLists = filter['agencyLists'] ? filter['agencyLists'] : []
           let agencyListsGet = agencyLists.filter(function (item) {
             return String(item['value']) !== '0'
           })
@@ -1205,7 +1205,7 @@ export const store = new Vuex.Store({
             let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
               let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).getTime() : currentVal
-              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13 && !isNaN(dateStr)) {
+              if ((dateStr !== 'Invalid Date' && String(currentVal).length === 13 && !isNaN(dateStr)) || (new Date(currentVal)).getFullYear() < 2000) {
                 param.params[key] = dateStr
               } else {
                 if (String(key).indexOf('DateExtend') > 0) {
@@ -1802,7 +1802,7 @@ export const store = new Vuex.Store({
             let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
               let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).getTime() : currentVal
-              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13 && !isNaN(dateStr)) {
+              if ((dateStr !== 'Invalid Date' && String(currentVal).length === 13 && !isNaN(dateStr)) || (new Date(currentVal)).getFullYear() < 2000 ) {
                 param.params[key] = dateStr
               } else {
                 if (String(key).indexOf('DateExtend') > 0) {

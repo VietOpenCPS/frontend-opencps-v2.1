@@ -16,10 +16,20 @@
                 box
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 sm6 class="">
+            <v-flex xs12 sm3 class="pr-3">
               <v-text-field
                 label="Số hiệu giấy tờ"
                 v-model="dataSearch['fileNoSearch']"
+                @keyup.enter="changeFilterSearch"
+                box
+                clear-icon="clear"
+                clearable
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm3 class="">
+              <v-text-field
+                label="Mã hồ sơ"
+                v-model="dataSearch['dossierNo']"
                 @keyup.enter="changeFilterSearch"
                 box
                 clear-icon="clear"
@@ -126,7 +136,8 @@
           status: '',
           keywordSearch: '',
           fileNoSearch: '',
-          name: ''
+          name: '',
+          dossierNo: ''
         },
         isDvc: false,
         disableInput: false
@@ -168,7 +179,8 @@
           status: '',
           keywordSearch: '',
           fileNoSearch: '',
-          name: ''
+          name: '',
+          dossierNo: ''
         },
         vm.$emit('trigger-cancel', vm.dataSearch)
       },

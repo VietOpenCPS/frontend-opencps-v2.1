@@ -94,6 +94,14 @@
                   <span>{{props.item.hasOwnProperty('createDate') ? props.item.createDate : ''}}</span>
                 </div>
               </td>
+              <td class="text-xs-left py-2" style="height:36px">
+                <content-placeholders v-if="loadingTable">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.hasOwnProperty('dossierNo') ? props.item.dossierNo : ''}}</span>
+                </div>
+              </td>
               <td class="text-xs-left py-2" style="height:36px;">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
@@ -452,6 +460,11 @@
           sortable: false
         },
         {
+          text: 'Mã hồ sơ',
+          align: 'center',
+          sortable: false
+        },
+        {
           text: 'Chủ sở hữu',
           align: 'center',
           sortable: false
@@ -617,7 +630,8 @@
           status: dataSearch ? dataSearch.status : '',
           fileNoSearch: dataSearch ? dataSearch.fileNoSearch : '',
           applicantName: dataSearch ? dataSearch.applicantName : '',
-          applicantDataType: ''
+          applicantDataType: '',
+          keyword: dataSearch ? dataSearch.dossierNo : '',
         }
         let currentQuery = vm.$router.history.current.query
         if (currentQuery.hasOwnProperty('applicantIdNo') && currentQuery.applicantIdNo) {

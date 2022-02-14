@@ -26,24 +26,6 @@
               ></apexchart>
             </v-flex>
             <v-flex sm6 xs12>
-              <!-- <v-layout wrap class="run-down">
-                <v-flex md6 xs12 text-center>
-                  <span style="color:#1976d2;">{{statistics.receivedCount}}</span>
-                  <p>Tổng số đã tiếp nhận</p>
-                </v-flex>
-                <v-flex md6 xs12 text-center>
-                  <span style="color:#1976d2;">{{thongKeHauGiang ? statistics.releaseInAPeriodCount : statistics.releaseCount}}</span>
-                  <p>Tổng số hoàn thành</p>
-                </v-flex>
-                <v-flex md6 xs12 text-center>
-                  <span style="color:#1976d2;">{{thongKeHauGiang ? processingTotal : statistics.processingCount}}</span>
-                  <p>Tổng số đang xử lý</p>
-                </v-flex>
-                <v-flex md6 xs12 text-center>
-                  <span style="color:#1976d2;">{{statistics.overtimeCount}}</span>
-                  <p>Trễ hạn</p>
-                </v-flex>
-              </v-layout> -->
               <v-layout wrap class="run-down">
                 <v-flex md6 xs12 text-center>
                   <span style="color:#1976d2;">{{statisticSum.receivedCount}}</span>
@@ -54,7 +36,7 @@
                   <p>Tổng số hoàn thành</p>
                 </v-flex>
                 <v-flex md6 xs12 text-center>
-                  <span style="color:#1976d2;">{{thongKeHauGiang ? processingTotal : statisticSum.processingCount}}</span>
+                  <span style="color:#1976d2;">{{thongKeHauGiang ? statisticSum.processingInAPeriodCount : statisticSum.processingCount}}</span>
                   <p>Tổng số đang xử lý</p>
                 </v-flex>
                 <v-flex md6 xs12 text-center>
@@ -197,7 +179,7 @@
                       <p>Hoàn thành</p>
                     </v-flex>
                     <v-flex s12 text-center>
-                      <span style="color:#1976d2;">{{thongKeHauGiang ? processingSBN : statisticTotalSBN.processingCount}}</span>
+                      <span style="color:#1976d2;">{{thongKeHauGiang ? statisticTotalSBN.processingInAPeriodCount : statisticTotalSBN.processingCount}}</span>
                       <p>Đang xử lý</p>
                     </v-flex>
                   </v-layout>
@@ -255,7 +237,7 @@
                       <p>Hoàn thành</p>
                     </v-flex>
                     <v-flex s12 text-center>
-                      <span style="color:#1976d2;">{{thongKeHauGiang ? processingQuanHuyen : statisticTotalQuanHuyen.processingCount}}</span>
+                      <span style="color:#1976d2;">{{thongKeHauGiang ? statisticTotalQuanHuyen.processingInAPeriodCount : statisticTotalQuanHuyen.processingCount}}</span>
                       <p>Đang xử lý</p>
                     </v-flex>
                   </v-layout>
@@ -314,7 +296,7 @@
                         <p>Hoàn thành</p>
                       </v-flex>
                       <v-flex s12 text-center>
-                        <span style="color:#1976d2;">{{thongKeHauGiang ? processingXaPhuong : statisticTotalXaPhuong.processingCount}}</span>
+                        <span style="color:#1976d2;">{{thongKeHauGiang ? statisticTotalXaPhuong.processingInAPeriodCount : statisticTotalXaPhuong.processingCount}}</span>
                         <p>Đang xử lý</p>
                       </v-flex>
                     </v-layout>
@@ -1163,7 +1145,7 @@ export default {
     processingQuanHuyen: 0,
     processingXaPhuong: 0,
     widthBarChart: '100%',
-    showStatisticDomainMonth: true
+    showStatisticDomainMonth: false
   }),
   computed: {
     yearList() {
@@ -1379,7 +1361,8 @@ export default {
             if (key === 'SBN') {
               vm.listDonViSBN = totalScore.concat(response.data.data)
             } else if (key === 'QUAN_HUYEN') {
-              vm.listDoiTuong = response.data.hasOwnProperty('data') ? totalScore.concat(response.data.data) : []
+              // vm.listDoiTuong = response.data.hasOwnProperty('data') ? totalScore.concat(response.data.data) : []
+              vm.listDoiTuong = response.data.hasOwnProperty('data') ? response.data.data : []
               vm.listDonViHuyen = response.data.hasOwnProperty('data') ? totalScore.concat(response.data.data) : []
             } else {
               vm.listDonViXa = response.data.hasOwnProperty('data') ? totalScore.concat(response.data.data) : []
@@ -1401,7 +1384,7 @@ export default {
       let vm = this;
       let originUrl = window.location.origin;
       let config = {
-        url: originUrl + "/o/rest/statistics",
+        url: originUrl + "/o/statistic/report",
         headers: {
           groupId: window.themeDisplay.getScopeGroupId(),
           Accept: "application/json"
@@ -1445,7 +1428,7 @@ export default {
       vm.getLabelPieChartConfig()
       let originUrl = window.location.origin;
       let config = {
-        url: originUrl + "/o/rest/statistics",
+        url: originUrl + "/o/statistic/report",
         headers: {
           groupId: window.themeDisplay.getScopeGroupId(),
           Accept: "application/json"
@@ -1496,13 +1479,15 @@ export default {
               
               if (vm.thongKeHauGiang) {
                 vm.statisticTotalSBN = response.data.data[0]
-                vm.processingSBN = vm.statisticTotalSBN.processingCount + vm.statisticTotalSBN.waitingCount
-                // if (vm.thongKeHauGiang) {
-                //   vm.processingSBN = vm.statisticTotalSBN.processingInAPeriodCount
-                // }
+                // vm.processingSBN = vm.statisticTotalSBN.processingCount + vm.statisticTotalSBN.waitingCount
+                // vm.statisticalSBN = [
+                //   response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
+                //   response.data.data[0].overtimeCount
+                // ]
+
                 vm.statisticalSBN = [
-                  response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
-                  response.data.data[0].overtimeCount
+                  response.data.data[0].ontimeInAPeriodCount + response.data.data[0].betimeInAPeriodCount,
+                  response.data.data[0].overtimeInAPeriodCount
                 ]
               }
             } else {
@@ -1519,7 +1504,7 @@ export default {
       vm.getLabelPieChartConfig();
       let originUrl = window.location.origin;
       let config = {
-        url: originUrl + "/o/rest/statistics",
+        url: originUrl + "/o/statistic/report",
         headers: {
           groupId: window.themeDisplay.getScopeGroupId(),
           Accept: "application/json"
@@ -1570,14 +1555,17 @@ export default {
               
               if (vm.thongKeHauGiang) {
                 vm.statisticTotalQuanHuyen = response.data.data[0]
-                vm.processingQuanHuyen = vm.statisticTotalQuanHuyen.processingCount + vm.statisticTotalQuanHuyen.waitingCount
-                // if (vm.thongKeHauGiang) {
-                //   vm.processingQuanHuyen = vm.statisticTotalQuanHuyen.processingInAPeriodCount
-                // }
+                // vm.processingQuanHuyen = vm.statisticTotalQuanHuyen.processingCount + vm.statisticTotalQuanHuyen.waitingCount
+                // vm.statisticalQUAN_HUYEN = [
+                //   response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
+                //   response.data.data[0].overtimeCount
+                // ]
+
                 vm.statisticalQUAN_HUYEN = [
-                  response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
-                  response.data.data[0].overtimeCount
+                  response.data.data[0].ontimeInAPeriodCount + response.data.data[0].betimeInAPeriodCount,
+                  response.data.data[0].overtimeInAPeriodCount
                 ]
+                
               }
             } else {
               vm.statisticTotalQuanHuyen = vm.statistics
@@ -1593,7 +1581,7 @@ export default {
       vm.getLabelPieChartConfig();
       let originUrl = window.location.origin;
       let config = {
-        url: originUrl + "/o/rest/statistics",
+        url: originUrl + "/o/statistic/report",
         headers: {
           groupId: window.themeDisplay.getScopeGroupId(),
           Accept: "application/json"
@@ -1644,14 +1632,17 @@ export default {
               
               if (vm.thongKeHauGiang) {
                 vm.statisticTotalXaPhuong = response.data.data[0]
-                vm.processingXaPhuong = vm.statisticTotalXaPhuong.processingCount + vm.statisticTotalXaPhuong.waitingCount
-                // if (vm.thongKeHauGiang) {
-                //   vm.processingXaPhuong = vm.statisticTotalXaPhuong.processingInAPeriodCount
-                // }
+                // vm.processingXaPhuong = vm.statisticTotalXaPhuong.processingCount + vm.statisticTotalXaPhuong.waitingCount
+                // vm.statisticalXA_PHUONG = [
+                //   response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
+                //   response.data.data[0].overtimeCount
+                // ]
+
                 vm.statisticalXA_PHUONG = [
-                  response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
-                  response.data.data[0].overtimeCount
+                  response.data.data[0].ontimeInAPeriodCount + response.data.data[0].betimeInAPeriodCount,
+                  response.data.data[0].overtimeInAPeriodCount
                 ]
+                
               }
             } else {
               vm.statisticTotalXaPhuong = vm.statistics
@@ -1670,7 +1661,7 @@ export default {
         vm.groupCode = "XA_PHUONG"
         vm.quanhuyenSelected = itemQH
         config = {
-          url: originUrl + "/o/rest/statistics",
+          url: originUrl + "/o/statistic/report",
           headers: {
             groupId: window.themeDisplay.getScopeGroupId(),
             Accept: "application/json"
@@ -1685,7 +1676,7 @@ export default {
         };
       } else {
         config = {
-          url: originUrl + "/o/rest/statistics",
+          url: originUrl + "/o/statistic/report",
           headers: {
             groupId: window.themeDisplay.getScopeGroupId(),
             Accept: "application/json"
@@ -1775,7 +1766,7 @@ export default {
       vm.isLoading = true
       let originUrl = window.location.origin
       let config =  {
-        url: originUrl + "/o/rest/statistics",
+        url: originUrl + "/o/statistic/report",
         headers: {
           groupId: window.themeDisplay.getScopeGroupId(),
           Accept: "application/json"
@@ -1897,7 +1888,7 @@ export default {
         arrAction.push(
           new Promise((resolve, reject) => {
             let config = {
-              url: "/o/rest/statistics",
+              url: "/o/statistic/report",
               headers: {
                 groupId: window.themeDisplay.getScopeGroupId(),
                 Accept: "application/json"
@@ -1938,17 +1929,28 @@ export default {
         sumReport.receivedCount = results[0]['receivedCount'] + results[1]['receivedCount'] + results[2]['receivedCount']
         sumReport.releaseCount = results[0]['releaseCount'] + results[1]['releaseCount'] + results[2]['releaseCount']
         sumReport.releaseInAPeriodCount = results[0]['releaseInAPeriodCount'] + results[1]['releaseInAPeriodCount'] + results[2]['releaseInAPeriodCount']
-        // sumReport.processingCount = results[0]['processingInAPeriodCount'] +results[1]['processingInAPeriodCount'] + results[2]['processingInAPeriodCount']
+        sumReport.processingInAPeriodCount = results[0]['processingInAPeriodCount'] +results[1]['processingInAPeriodCount'] + results[2]['processingInAPeriodCount']
         sumReport.processingCount = results[0]['processingCount'] +results[1]['processingCount'] + results[2]['processingCount'] + results[0]['waitingCount'] +results[1]['waitingCount'] + results[2]['waitingCount']
         sumReport.betimesCount = results[0]['betimesCount'] +results[1]['betimesCount'] + results[2]['betimesCount']
         sumReport.ontimeCount = results[0]['ontimeCount'] +results[1]['ontimeCount'] + results[2]['ontimeCount']
         sumReport.overtimeCount = results[0]['overtimeCount'] +results[1]['overtimeCount'] + results[2]['overtimeCount']
-        vm.processingTotal = sumReport.processingCount
+        sumReport.betimeInAPeriodCount = results[0]['betimeInAPeriodCount'] +results[1]['betimeInAPeriodCount'] + results[2]['betimeInAPeriodCount']
+        sumReport.ontimeInAPeriodCount = results[0]['ontimeInAPeriodCount'] +results[1]['ontimeInAPeriodCount'] + results[2]['ontimeInAPeriodCount']
+        sumReport.overtimeInAPeriodCount = results[0]['overtimeInAPeriodCount'] +results[1]['overtimeInAPeriodCount'] + results[2]['overtimeInAPeriodCount']
+
         vm.statisticSum = sumReport
-        vm.statisticalYear = [
-          sumReport.ontimeCount + sumReport.betimesCount,
-          sumReport.overtimeCount
-        ]
+        if (vm.thongKeHauGiang) {
+          vm.statisticalYear = [
+            sumReport.ontimeInAPeriodCount + sumReport.betimeInAPeriodCount,
+            sumReport.overtimeInAPeriodCount
+          ]
+        } else {
+          vm.statisticalYear = [
+            sumReport.ontimeCount + sumReport.betimesCount,
+            sumReport.overtimeCount
+          ]
+        }
+        
       }).catch(xhr => {
       })
     }

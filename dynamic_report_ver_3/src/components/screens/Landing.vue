@@ -117,7 +117,7 @@
           </v-autocomplete>
         </v-flex>
         <v-flex xs12 class="px-3 mb-3">
-          <div class="d-inline-block left" v-if="!itemsReports[index]['filterConfig']['version']">
+          <div class="d-inline-block left" v-if="!itemsReports[index]['filterConfig']['version'] && !itemsReports[index]['filterConfig']['backendVer2']">
             <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> 
               <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
             </v-btn>
@@ -135,7 +135,7 @@
             </v-btn>
             <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
           </div>
-          <div class="d-inline-block left" v-if="itemsReports[index]['filterConfig']['version']">
+          <div class="d-inline-block left" v-if="itemsReports[index]['filterConfig']['version'] || itemsReports[index]['filterConfig']['backendVer2']">
             <v-btn dark color="blue darken-3" v-on:click.native="createReport()"> 
               <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
             </v-btn>
@@ -861,7 +861,7 @@ export default {
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
             vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
             // 
-            if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+            if (vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy']) {
               if (vm.groupByVal === 'domainCode') {
                 vm.filters = vm.filters.filter(function (item) {
                   return item.key !== 'serviceCode' && item.key !== 'govAgencyCode'
@@ -1014,7 +1014,7 @@ export default {
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
-        if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+        if (vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy']) {
           if (vm.groupByVal === 'domainCode') {
             vm.filters = vm.filters.filter(function (item) {
               return item.key !== 'serviceCode' && item.key !== 'govAgencyCode'
@@ -1196,7 +1196,7 @@ export default {
     groupByVal (val) {
       let vm = this
       console.log('valGroupBy', val)
-      if (val && vm.itemsReports[vm.index]['filterConfig']['version']) {
+      if (val && vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy']) {
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
           vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
         }
@@ -1418,9 +1418,11 @@ export default {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
           }
         } else {
+          // notex2
           currentVal = ''
           for (let keySource in vm.filters[key]['source']) {
-            if (currentVal === '' || currentVal === '0') {
+            // if (currentVal === '' || currentVal === '0') {
+            if (currentVal === '0') {
               currentVal = vm.filters[key]['source'][keySource]['name']
               break
             }
@@ -1543,6 +1545,11 @@ export default {
             vm.dossierList = result
           }
           vm.pagination.totalItems = vm.dossierList.length
+          if (vm.dossierList && vm.dossierList.length === 0) {
+            vm.isShowLoading = false
+            vm.showErrorData = true
+            return
+          }
           //
           vm.showErrorData = false
           let dossierRaw = {}
@@ -1580,7 +1587,7 @@ export default {
             } else {
               let dossierRawItem = {}
               if ((!dataReportCurrent.hasOwnProperty('dossierId') && !vm.reportType.startsWith('REPORT_STATISTIC')) || 
-                (vm.reportType.startsWith('REPORT_STATISTIC') && !dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']])
+                (vm.reportType.startsWith('REPORT_STATISTIC') && vm.itemsReports[vm.index]['filterConfig']['sumKey'] && !dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']])
               ) {
                 dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
                 dossierRawItem[textGroup] = dataReportCurrent[textGroup]
@@ -1727,7 +1734,7 @@ export default {
 
                   if (currentConfig.hasOwnProperty('calculator')) {
                     let calu = currentConfig['calculator'].replace(/dataInput/g, 'dossierObj')
-                    if (isNaN(eval(calu))) {
+                    if (isNaN(eval(calu)) || vm.itemsReportsConfig[keyVal]['value'] == 'note') {
                       ddStr = eval(calu)
                     } else {
                       ddStr = Math.round(eval(calu))
@@ -2218,7 +2225,7 @@ export default {
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
                   var dataInputXXTT = resultDataTotal[keyXXTT]
                   let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
-                  if (isNaN(eval(calu))) {
+                  if (isNaN(eval(calu)) || currentConfigXXTT['value'] === 'note') {
                     dataTextXXTT = eval(calu)
                   } else {
                     dataTextXXTT = Math.round(eval(calu))
@@ -2244,7 +2251,7 @@ export default {
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
                   var dataInputXXTT = resultDataTotal[keyXXTT]
                   let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
-                  if (isNaN(eval(calu))) {
+                  if (isNaN(eval(calu)) || currentConfigXXTT['value'] === 'note') {
                     dataTextXXTT = eval(calu)
                   } else {
                     dataTextXXTT = Math.round(eval(calu))

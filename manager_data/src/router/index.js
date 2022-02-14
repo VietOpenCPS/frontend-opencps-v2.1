@@ -5,9 +5,14 @@ import NotFound from '@/components/NotFound'
 import TableEditor from '@/components/screens/TableEditor'
 import TableEditorForm from '@/components/screens/TableEditorForm.vue'
 import DichVuCong from '@/components/extform/DichVuCong.vue'
+import DichVuCongCongDVC from '@/components/extform/DichVuCongCongDVC.vue'
 import ChiTietDichVuCong from '@/components/extform/ChiTietDichVuCong.vue'
+import ChiTietDichVuCongCongDvc from '@/components/extform/ChiTietDichVuCongCongDvc.vue'
 import QuyTrinhThucHienDvc from '@/components/extform/QuyTrinhThucHienDvc.vue'
+import QuyTrinhThucHienDvcCongDvc from '@/components/extform/QuyTrinhThucHienDvcCongDvc.vue'
 import ChiTietQuyTrinhThucHienDvc from '@/components/extform/ChiTietQuyTrinhThucHienDvc.vue'
+import ChiTietQuyTrinhThucHienDvcCongDvc from '@/components/extform/ChiTietQuyTrinhThucHienDvcCongDvc.vue'
+
 import ThuTucHanhChinh from '@/components/extform/ThuTucHanhChinh.vue'
 import QuyTrinhThuTuc from '@/components/extform/QuyTrinhThuTuc.vue'
 import DinhKemThuTuc from '@/components/extform/DinhKemThuTuc.vue'
@@ -48,9 +53,27 @@ const routes = [
         }
       },
       {
+        path: '/table/opencps_serviceconfig_dvc',
+        name: 'DichVuCongCongDVC',
+        component: DichVuCongCongDVC,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
         path: '/table/opencps_serviceconfig/editor/:id',
         name: 'ChiTietDichVuCong',
         component: ChiTietDichVuCong,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_serviceconfig_dvc/editor/:id',
+        name: 'ChiTietDichVuCongCongDvc',
+        component: ChiTietDichVuCongCongDvc,
         props: true,
         meta: {
           requiresAuth: true
@@ -65,16 +88,35 @@ const routes = [
           requiresAuth: true
         }
       },
-      // {
-      //   path: '/table/opencps_processoption/editor/:id',
-      //   name: 'ChiTietQuyTrinhThucHienDvc',
-      //   component: ChiTietQuyTrinhThucHienDvc,
-      //   props: true,
-      //   meta: {
-      //     requiresAuth: true
-      //   }
-      // },
-
+      {
+        path: '/table/opencps_processoption_dvc',
+        name: 'QuyTrinhThucHienDvcCongDvc',
+        component: QuyTrinhThucHienDvcCongDvc,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      // 
+      {
+        path: '/table/opencps_processoption/editor/:id',
+        name: 'ChiTietQuyTrinhThucHienDvc',
+        component: ChiTietQuyTrinhThucHienDvc,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_processoption_dvc/editor/:id',
+        name: 'ChiTietQuyTrinhThucHienDvcCongDvc',
+        component: ChiTietQuyTrinhThucHienDvcCongDvc,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      // 
       {
         path: '/table/opencps_serviceinfo',
         name: 'ThuTucHanhChinh',

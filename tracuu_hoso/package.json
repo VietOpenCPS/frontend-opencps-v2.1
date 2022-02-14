@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@syncfusion/ej2-vue-inputs": "^19.3.53",
     "axios": "^0.18.1",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "idempotent-babel-polyfill": "^7.0.0",

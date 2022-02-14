@@ -1,10 +1,7 @@
 <template>
   <div style="margin: 0 auto;">
-    <v-card class="mb-3 mt-2">
+    <v-card class="mb-3 mt-0">
       <v-toolbar color="blue darken-3" dark height="40">
-        <v-btn dark icon>
-          <v-icon>api</v-icon>
-        </v-btn>
         <v-toolbar-title class="ml-0">
           <span @click="openServiceConfig" class="mr-2">
             <a href="javascript:;" class="" style="color: white;text-decoration: none;font-size: 16px;">Dịch vụ công</a>
@@ -20,7 +17,7 @@
         </v-btn>
       </v-toolbar>
     </v-card>
-    <v-card class="py-0 px-0">
+    <v-card class="py-0 px-2">
       <v-flex xs12 class="mb-3">
         <span class="text-bold" style="color: #073b76">Tên dịch vụ công:</span>
         <span> {{serviceConfigName}}</span>
@@ -161,6 +158,10 @@
             margin-left: -268px !important;
             height: 70px
           ">
+            <v-btn color="red darken-3" class="mr-2" dark v-on:click.native="backToList">
+              <v-icon>reply</v-icon>&nbsp;
+              Quay lại
+            </v-btn>
             <v-btn color="blue darken-3" dark
               v-if="id === 0 || id === '0'"
               :loading="loading"
@@ -178,10 +179,6 @@
             >
               <v-icon>save</v-icon>&nbsp;
               Cập nhật
-            </v-btn>
-            <v-btn color="red darken-3" class="mr-0" dark v-on:click.native="backToList">
-              <v-icon>reply</v-icon>&nbsp;
-              Quay lại
             </v-btn>
           </v-flex>
         </v-form>

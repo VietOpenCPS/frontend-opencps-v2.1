@@ -19,7 +19,7 @@
         </div>
       </div>
       <v-card-text class="px-0 pt-0" v-if="!showDetail">
-        <v-card-text class="py-0 px-0">
+        <v-card-text class="py-0 px-0" v-if="index != 0">
           <v-layout wrap class="px-0 py-3">
             <v-flex xs12 sm5 class="pr-2">
               <div class="xs12 sm12 pb-1 mb-1">
@@ -54,7 +54,7 @@
             
           </v-layout>
         </v-card-text>
-        <v-layout wrap class="mt-0">
+        <v-layout wrap class="mt-2">
           <v-flex xs12 md6 class="px-0 pr-3">
             <v-autocomplete
               :items="serviceInfoList"
@@ -80,6 +80,7 @@
               :hide-selected="true"
               box
               clearable
+              @change="changeOptionSearch"
             ></v-autocomplete>
           </v-flex>
           <v-flex xs12 sm6 class="px-0 pr-3">
@@ -120,10 +121,23 @@
               @click:append="changeFilterSearch"
             ></v-text-field>
           </v-flex>
-          <v-flex xs12 sm6 class="">
+          <v-flex xs12 sm3 class="pr-2">
             <v-text-field
               label="Tìm theo mã giấy tờ"
               v-model="fileNoSearch"
+              @keyup.enter="changeFilterSearch"
+              append-icon="search"
+              box
+              clear-icon="clear"
+              clearable
+              @click:clear="changeFilterSearch"
+              @click:append="changeFilterSearch"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs12 sm3 class="">
+            <v-text-field
+              label="Tìm theo mã hồ sơ"
+              v-model="dossierNoSearch"
               @keyup.enter="changeFilterSearch"
               append-icon="search"
               box
@@ -170,6 +184,14 @@
                 </content-placeholders>
                 <div v-else>
                   <span>{{props.item.hasOwnProperty('fileNo') ? props.item.fileNo : ''}}</span>
+                </div>
+              </td>
+              <td class="text-xs-left" style="height:36px;min-width:150px">
+                <content-placeholders v-if="loadingTable">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.hasOwnProperty('dossierNo') ? props.item.dossierNo : ''}}</span>
                 </div>
               </td>
               <td class="text-xs-left" style="height:36px; min-width:150px">
@@ -487,6 +509,7 @@ export default {
     fileUpdate: '',
     fileNameUpdate: '',
     fileNoSearch: '',
+    dossierNoSearch: '',
     keySearch: '',
     dialog_createDocument: false,
     showDetail: false,
@@ -509,6 +532,11 @@ export default {
       },
       {
         text: 'Số hiệu giấy tờ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Mã hồ sơ',
         align: 'center',
         sortable: false
       },
@@ -582,12 +610,16 @@ export default {
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
       let applicant = vm.$store.getters.getApplicantInfos
-      if (applicant) {
-        vm.applicantInfos = applicant
-        vm.getApplicantType(vm.applicantInfos)
-        vm.getApplicantDocument()
+      if (vm.index != 0) {
+        if (applicant) {
+          vm.applicantInfos = applicant
+          vm.getApplicantType(vm.applicantInfos)
+          vm.getApplicantDocument()
+        } else {
+          vm.getApplicantList()
+        }
       } else {
-        vm.getApplicantList()
+        vm.getApplicantDocument()
       }
       vm.getServiceInfoItems()
       // vm.getFileItems()
@@ -682,10 +714,10 @@ export default {
       let filter = {
         start: vm.documentPage * vm.numberPerPage - vm.numberPerPage,
         end: vm.documentPage * vm.numberPerPage,
-        applicantIdNo: vm.applicantInfos.applicantIdNo,
+        applicantIdNo: vm.index != 0 ? vm.applicantInfos.applicantIdNo : '',
         fileTemplateNo: vm.fileTemplateNo,
         status: vm.status,
-        keywordSearch: vm.keySearch,
+        keywordSearch: vm.dossierNoSearch ? vm.dossierNoSearch : vm.keySearch,
         fileNoSearch: vm.fileNoSearch,
         applicantDataType: ''
       }
@@ -886,6 +918,31 @@ export default {
         }
       }, 200)
     },
+    changeOptionSearch () {
+      let vm = this
+      setTimeout (function () {
+        if (vm.optionSearch) {
+          let filter = {
+            dossierTemplateNo: vm.optionSearch.templateNo
+          }
+          vm.$store.dispatch('getDossierPart', filter).then(function (result) {
+            if (result.hasOwnProperty('dossierParts')) {
+              vm.fileTemplateListSeach = result.dossierParts
+              vm.fileTemplateNo = ''
+            } else {
+              vm.fileTemplateListSeach = []
+            }
+            if (vm.fileTemplateListSeach && vm.fileTemplateListSeach.length === 1) {
+              vm.fileTemplateNo = vm.fileTemplateListSeach[0]
+            }
+          }).catch(function () {
+          })
+        } else {
+          vm.fileTemplateList = []
+          vm.fileTemplateNoCreate = ''
+        }
+      }, 200)
+    },
     showCreatedocument () {
       let vm = this
       vm.showDetail = true
@@ -895,8 +952,8 @@ export default {
       vm.statusCreate = 1
       vm.fileName = ''
       vm.fileNo = ''
-      vm.applicantIdNoCreate = vm.applicantInfos.applicantIdNo
-      vm.applicantNameCreate = vm.applicantInfos.applicantName
+      vm.applicantIdNoCreate = vm.index != 0 ? vm.applicantInfos.applicantIdNo : ''
+      vm.applicantNameCreate = vm.index != 0 ? vm.applicantInfos.applicantName : ''
     },
     createDocument () {
       let vm = this
@@ -918,7 +975,7 @@ export default {
               status: vm.statusCreate ? vm.statusCreate : 1,
               fileNo: vm.fileNo,
               fileName: vm.fileName,
-              applicantIdNo: vm.applicantInfos.applicantIdNo,
+              applicantIdNo: vm.index != 0 ? vm.applicantInfos.applicantIdNo : vm.applicantIdNoCreate,
             }
             let param = {
               headers: {
@@ -934,8 +991,8 @@ export default {
             dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 1)
             dataCreateFile.append('fileNo', vm.fileNo)
             dataCreateFile.append('fileName', vm.fileName)
-            dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
-            dataCreateFile.append('applicantName', vm.applicantInfos.applicantName)
+            dataCreateFile.append('applicantIdNo', vm.index != 0 ? vm.applicantInfos.applicantIdNo : vm.applicantIdNoCreate)
+            dataCreateFile.append('applicantName', vm.index != 0 ? vm.applicantInfos.applicantName : vm.applicantNameCreate)
             dataCreateFile.append('file', vm.fileUpdate)
             dataCreateFile.append('govAgencyName', vm.govAgencyCreate)
             dataCreateFile.append('issueDate', vm.createDate)
@@ -992,8 +1049,8 @@ export default {
           dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 1)
           dataCreateFile.append('fileNo', vm.fileNo)
           dataCreateFile.append('fileName', vm.fileName)
-          dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
-          dataCreateFile.append('applicantName', vm.applicantInfos.applicantName)
+          dataCreateFile.append('applicantIdNo', vm.index != 0 ? vm.applicantInfos.applicantIdNo : vm.applicantIdNoCreate)
+          dataCreateFile.append('applicantName', vm.index != 0 ? vm.applicantInfos.applicantName : vm.applicantNameCreate)
           dataCreateFile.append('fileEntryId', vm.fileEntryESign)
           dataCreateFile.append('govAgencyName', vm.govAgencyCreate)
           dataCreateFile.append('issueDate', vm.createDate)
@@ -1041,7 +1098,7 @@ export default {
             status: vm.statusCreate ? vm.statusCreate : 1,
             fileNo: vm.fileNo,
             fileName: vm.fileName,
-            applicantIdNo: vm.applicantInfos.applicantIdNo
+            applicantIdNo: vm.index != 0 ? vm.applicantInfos.applicantIdNo : vm.applicantIdNoCreate
           }
           let param = {
             headers: {
@@ -1057,8 +1114,8 @@ export default {
           dataPost.append('status', vm.statusCreate ? vm.statusCreate : 1)
           dataPost.append('fileNo', vm.fileNo)
           dataPost.append('fileName', vm.fileName)
-          dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
-          dataPost.append('applicantName', vm.applicantInfos.applicantName)
+          dataPost.append('applicantIdNo', vm.index != 0 ? vm.applicantInfos.applicantIdNo : vm.applicantIdNoCreate)
+          dataPost.append('applicantName', vm.index != 0 ? vm.applicantInfos.applicantName : vm.applicantNameCreate)
           dataPost.append('govAgencyName', vm.govAgencyCreate)
           dataPost.append('issueDate', vm.createDate)
           dataPost.append('expireDate', vm.expireDate)
@@ -1098,7 +1155,7 @@ export default {
           status: vm.statusCreate ? vm.statusCreate : 1,
           fileNo: vm.fileNo,
           fileName: vm.fileName,
-          applicantIdNo: vm.applicantInfos.applicantIdNo
+          applicantIdNo: vm.index != 0 ? vm.applicantInfos.applicantIdNo : vm.applicantIdNoCreate
         }
         let param = {
           headers: {
@@ -1113,8 +1170,8 @@ export default {
         dataPost.append('status', vm.statusCreate ? vm.statusCreate : 1)
         dataPost.append('fileNo', vm.fileNo)
         dataPost.append('fileName', vm.fileName)
-        dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
-        dataPost.append('applicantName', vm.applicantInfos.applicantName)
+        dataPost.append('applicantIdNo', vm.index != 0 ? vm.applicantInfos.applicantIdNo : vm.applicantIdNoCreate)
+        dataPost.append('applicantName', vm.index != 0 ? vm.applicantInfos.applicantName : vm.applicantNameCreate)
         dataPost.append('fileEntryId', vm.fileEntryESign)
         dataPost.append('govAgencyName', '')
         dataPost.append('issueDate', '')
@@ -1215,8 +1272,8 @@ export default {
       vm.statusCreate = item.status
       vm.fileName = item.fileName
       vm.fileNo = item.fileNo
-      vm.applicantIdNoCreate = vm.applicantInfos.applicantIdNo
-      vm.applicantNameCreate = vm.applicantInfos.applicantName
+      vm.applicantIdNoCreate = vm.index != 0 ? vm.applicantInfos.applicantIdNo : item.applicantIdNo
+      vm.applicantNameCreate = vm.index != 0 ? vm.applicantInfos.applicantName : item.applicantName
       vm.createDate = item.issueDate ? item.issueDate : ''
       vm.expireDate = item.expireDate ? item.expireDate : ''
       vm.govAgencyCreate = item.govAgencyName ? item.govAgencyName : ''
