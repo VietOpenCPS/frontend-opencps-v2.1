@@ -54,7 +54,7 @@
             
           </v-layout>
         </v-card-text>
-        <v-layout wrap class="mt-0">
+        <v-layout wrap class="mt-2">
           <v-flex xs12 md6 class="px-0 pr-3">
             <v-autocomplete
               :items="serviceInfoList"
@@ -121,10 +121,23 @@
               @click:append="changeFilterSearch"
             ></v-text-field>
           </v-flex>
-          <v-flex xs12 sm6 class="">
+          <v-flex xs12 sm3 class="pr-2">
             <v-text-field
               label="Tìm theo mã giấy tờ"
               v-model="fileNoSearch"
+              @keyup.enter="changeFilterSearch"
+              append-icon="search"
+              box
+              clear-icon="clear"
+              clearable
+              @click:clear="changeFilterSearch"
+              @click:append="changeFilterSearch"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs12 sm3 class="">
+            <v-text-field
+              label="Tìm theo mã hồ sơ"
+              v-model="dossierNoSearch"
               @keyup.enter="changeFilterSearch"
               append-icon="search"
               box
@@ -171,6 +184,14 @@
                 </content-placeholders>
                 <div v-else>
                   <span>{{props.item.hasOwnProperty('fileNo') ? props.item.fileNo : ''}}</span>
+                </div>
+              </td>
+              <td class="text-xs-left" style="height:36px;min-width:150px">
+                <content-placeholders v-if="loadingTable">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.hasOwnProperty('dossierNo') ? props.item.dossierNo : ''}}</span>
                 </div>
               </td>
               <td class="text-xs-left" style="height:36px; min-width:150px">
@@ -488,6 +509,7 @@ export default {
     fileUpdate: '',
     fileNameUpdate: '',
     fileNoSearch: '',
+    dossierNoSearch: '',
     keySearch: '',
     dialog_createDocument: false,
     showDetail: false,
@@ -510,6 +532,11 @@ export default {
       },
       {
         text: 'Số hiệu giấy tờ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Mã hồ sơ',
         align: 'center',
         sortable: false
       },
@@ -690,7 +717,7 @@ export default {
         applicantIdNo: vm.index != 0 ? vm.applicantInfos.applicantIdNo : '',
         fileTemplateNo: vm.fileTemplateNo,
         status: vm.status,
-        keywordSearch: vm.keySearch,
+        keywordSearch: vm.dossierNoSearch ? vm.dossierNoSearch : vm.keySearch,
         fileNoSearch: vm.fileNoSearch,
         applicantDataType: ''
       }
@@ -1245,8 +1272,8 @@ export default {
       vm.statusCreate = item.status
       vm.fileName = item.fileName
       vm.fileNo = item.fileNo
-      vm.applicantIdNoCreate = vm.applicantInfos.applicantIdNo
-      vm.applicantNameCreate = vm.applicantInfos.applicantName
+      vm.applicantIdNoCreate = vm.index != 0 ? vm.applicantInfos.applicantIdNo : item.applicantIdNo
+      vm.applicantNameCreate = vm.index != 0 ? vm.applicantInfos.applicantName : item.applicantName
       vm.createDate = item.issueDate ? item.issueDate : ''
       vm.expireDate = item.expireDate ? item.expireDate : ''
       vm.govAgencyCreate = item.govAgencyName ? item.govAgencyName : ''
