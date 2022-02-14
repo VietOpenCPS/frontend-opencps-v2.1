@@ -15,8 +15,37 @@
         :no-data-text="'Không tìm thấy hồ sơ ' + supportData.langUI[type]"
         :no-results-text="'Không tìm thấy hồ sơ ' + supportData.langUI[type]"
       >
+        <template slot="headers" slot-scope="props">
+          <tr>
+            <th v-if="stateBoss" style="border-right: 1px solid #ccc;">
+              <v-checkbox
+              class="cb-small"
+              v-model="selectAllItem"
+              primary
+              hide-details
+              @change="toggleAllTable"
+              ></v-checkbox>
+            </th>
+            <th
+              v-for="header in props.headers"
+              :key="header.text"
+              >
+              {{ header.text }}
+            </th>
+          </tr>
+        </template>
         <template slot="items" slot-scope="props">
-          <td class="text-xs-left" v-if="type === 'ke_hoach'" :class='{
+          
+          <th v-if="stateBoss" style="border-right: 1px solid #ccc;">
+            <v-checkbox
+              class="cb-small"
+              v-model="selectedTable" :value="props.item"
+              primary
+              hide-details
+            ></v-checkbox>
+          </th>
+
+          <td class="text-xs-center" v-if="type === 'ke_hoach'" :class='{
             "wd-label-color-tim": props.item.requestState === 14 || props.item.requestState === 114,
             "wd-label-color-light-green": props.item.requestState === 12,
             "wd-label-color-red": props.item.requestState === 13 || props.item.requestState === 16,
@@ -25,7 +54,7 @@
             }'>
             {{ loadHomeDataTablePage * 15 - 15 + props.index + 1 }}
           </td>
-          <td class="text-xs-left" v-else :class='{
+          <td class="text-xs-center" v-else :class='{
               "wd-label-color-tim": props.item.documentStatusCode === 20 || props.item.documentStatusCode === 120,
               "wd-label-color-light-green": props.item.documentStatusCode === 18,
               "wd-label-color-red": props.item.documentStatusCode === 10,
@@ -33,7 +62,7 @@
               "wd-bg-color-yellow": props.item.documentStatusCode === 13
               }'>
               {{ loadHomeDataTablePage * 15 - 15 + props.index + 1 }}
-            </td>
+          </td>
 
           <td v-if="type === 'ke_hoach'" class="text-xs-center" :class='{
               "wd-label-color-tim": props.item.requestState === 14 || props.item.requestState === 114,
@@ -49,7 +78,7 @@
               <v-icon size="16" v-if="props.item.ghichu.length > 0" slot="activator" color="primary">info</v-icon>
               <span v-if="props.item.ghichu.length > 0">{{props.item.ghichu}}</span>
             </v-tooltip>
-            </td>
+          </td>
             <td v-else-if="type === 'thu_tuc'" class="text-xs-center" :class='{
               "wd-label-color-tim": props.item.documentStatusCode === 20 || props.item.documentStatusCode === 120,
               "wd-label-color-light-green": props.item.documentStatusCode === 18,
@@ -309,6 +338,7 @@
             {{props.item.createdDate | moment("DD/MM/YYYY | HH:mm")}}
           </a>
           </td>
+          
           <td v-if="type !== 'ke_hoach'" class="text-xs-center" :class='{
             "wd-label-color-tim": props.item.documentStatusCode === 20 || props.item.documentStatusCode === 120,
             "wd-label-color-light-green": props.item.documentStatusCode === 18,
@@ -371,7 +401,7 @@
           </td>
           <td class="text-xs-center">{{props.item.debitnotenumber}}</td>
           <td class="text-xs-center"> {{props.item.reportdate | moment("DD/MM/YYYY | HH:mm")}}</td>
-          <td class="text-xs-center red--text">{{props.item.totalpayment | money}}</td>
+          <td class="text-xs-center red--text">{{props.item['comments']}}</td>
         </template>
       </v-data-table>
       <div class="text-xs-right layout wrap" style="position: relative;">
@@ -381,7 +411,53 @@
         </div>
       </div>
     </v-flex>
+    
+    <!-- <v-flex>
+      <content-placeholders v-if="loading">
+        <content-placeholders-img />
+        <content-placeholders-heading />
+      </content-placeholders>
 
+      <v-data-table
+        v-else
+        :headers="headersPayment"
+        :items="loadHomeDataTablePayment.data"
+        class="table-bordered danhSachHoSoTable__class"
+        hide-actions
+        :no-data-text="'Không tìm thấy phiếu thanh toán'"
+        :no-results-text="'Không tìm thấy phiếu thanh toán'"
+      >
+        <template slot="items" slot-scope="props">
+          <td class="text-xs-left">
+            {{ loadHomeDataTablePagePayment * 15 - 15 + props.index + 1 }}
+          </td>
+          <td class="text-xs-center">
+          {{props.item.documentName}} <br/>
+          <small v-if="props.item.paymenttype > 0" style="
+              color: #0e70bc;
+          ">( {{paymentTypeData[props.item.paymenttype]}} {{paymentMarkDelete[props.item.markasdeleted]}})</small>
+          </td>
+          <td class="text-xs-center">
+          {{props.item.tenTau}}
+          </td>
+          <td class="text-xs-center">
+          {{props.item.hoHieu}}
+          </td>
+          <td class="text-xs-center">
+          {{props.item.imo}}
+          </td>
+          <td class="text-xs-center">
+          {{supportData.data_state[props.item.quocTich]}}
+          </td>
+          <td class="text-xs-center">
+          {{props.item.daiLy}}
+          </td>
+          <td class="text-xs-center">{{props.item.debitnotenumber}}</td>
+          <td class="text-xs-center"> {{props.item.reportdate | moment("DD/MM/YYYY | HH:mm")}}</td>
+          <td class="text-xs-center red--text">{{props.item.totalpayment | money}}</td>
+        </template>
+      </v-data-table>
+    </v-flex> -->
   </v-layout>
 
 </template>
@@ -397,24 +473,29 @@ export default {
   },
   data: () => ({
     loading: true,
+    selectedTable: [],
     supportData: supportData,
     loadHomeDataTable: {},
     loadHomeDataTablePage: 1,
     headers: [],
     payment: false,
+    selectAllItem: false,
     loadHomeDataTablePayment: {},
     loadHomeDataTablePagePayment: 1,
     headersPayment: [],
     paymentTypeData: {},
-    paymentMarkDelete: {}
+    paymentMarkDelete: {},
+    stateBoss: false
   }),
   beforeCreate () {
     var vm = this
     vm.$nextTick(function () {
       if (vm.type === 'lanh_dao' || vm.type === 'van_thu') {
         vm.headers = vm.supportData.headers_boss
+        vm.stateBoss = true
       } else {
         vm.headers = vm.supportData.headers
+        vm.stateBoss = false
       }
       if (vm.type !== 'ke_toan') {
         vm.headersPayment = vm.supportData.headersPaymentView
@@ -430,8 +511,8 @@ export default {
     vm.$nextTick(function () {
       if (!vm.loadHomeDataTable.hasOwnProperty('data')) {
         let query = vm.$router.history.current.query
-        if (query.hasOwnProperty('page') && query['page'] !== 1) {
-          vm.loadHomeDataTablePage = query['page']
+        if (query && query.hasOwnProperty('page') && query['page'] !== 1) {
+          vm.loadHomeDataTablePage = parseInt(query['page']) || 1
         } else {
           vm.loadHomeDataTablePage = 1
         }
@@ -446,7 +527,8 @@ export default {
             positionCode: query.positionCode,
             imo: query.imo,
             stateCode: query.stateCode,
-            maritimeCode: query.maritimeCode,
+            // maritimeCode: query.maritimeCode,
+            maritimeCode: query['maritimeCode'],
             maritimeCodeNext: query.maritimeCodeNext,
             timeShip: query.timeShip,
             timeSend: query.timeSend,
@@ -481,8 +563,10 @@ export default {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let query = newRoute.query
-      if (query.hasOwnProperty('page')) {
-        vm.loadHomeDataTablePage = query['page']
+      if (query && query.hasOwnProperty('page') && query['page']) {
+        vm.loadHomeDataTablePage = parseInt(query['page']) || 1
+      } else {
+        vm.loadHomeDataTablePage = 1
       }
       let param = null
       if (query.hasOwnProperty('adv') && (query['adv'] === true || query['adv'] === 'true')) {
@@ -573,6 +657,13 @@ export default {
     }
   },
   methods: {
+    toggleAllTable () {
+      if (this.selectedTable.length) {
+        this.selectedTable = []
+      } else {
+        this.selectedTable = this.loadHomeDataTable['data'] ? this.loadHomeDataTable.data.slice() : []
+      }
+    },
     paggingData (config) {
       let vm = this
       let current = vm.$router.history.current
