@@ -19,7 +19,7 @@
         </div>
       </div>
       <v-card-text class="px-0 pt-0" v-if="!showDetail">
-        <v-card-text class="py-0 px-0">
+        <v-card-text class="py-0 px-0" v-if="index != 0">
           <v-layout wrap class="px-0 py-3">
             <v-flex xs12 sm5 class="pr-2">
               <div class="xs12 sm12 pb-1 mb-1">
@@ -583,12 +583,16 @@ export default {
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
       let applicant = vm.$store.getters.getApplicantInfos
-      if (applicant) {
-        vm.applicantInfos = applicant
-        vm.getApplicantType(vm.applicantInfos)
-        vm.getApplicantDocument()
+      if (vm.index != 0) {
+        if (applicant) {
+          vm.applicantInfos = applicant
+          vm.getApplicantType(vm.applicantInfos)
+          vm.getApplicantDocument()
+        } else {
+          vm.getApplicantList()
+        }
       } else {
-        vm.getApplicantList()
+        vm.getApplicantDocument()
       }
       vm.getServiceInfoItems()
       // vm.getFileItems()
@@ -683,7 +687,7 @@ export default {
       let filter = {
         start: vm.documentPage * vm.numberPerPage - vm.numberPerPage,
         end: vm.documentPage * vm.numberPerPage,
-        applicantIdNo: vm.applicantInfos.applicantIdNo,
+        applicantIdNo: vm.index != 0 ? vm.applicantInfos.applicantIdNo : '',
         fileTemplateNo: vm.fileTemplateNo,
         status: vm.status,
         keywordSearch: vm.keySearch,
@@ -921,8 +925,8 @@ export default {
       vm.statusCreate = 1
       vm.fileName = ''
       vm.fileNo = ''
-      vm.applicantIdNoCreate = vm.applicantInfos.applicantIdNo
-      vm.applicantNameCreate = vm.applicantInfos.applicantName
+      vm.applicantIdNoCreate = vm.index != 0 ? vm.applicantInfos.applicantIdNo : ''
+      vm.applicantNameCreate = vm.index != 0 ? vm.applicantInfos.applicantName : ''
     },
     createDocument () {
       let vm = this
@@ -944,7 +948,7 @@ export default {
               status: vm.statusCreate ? vm.statusCreate : 1,
               fileNo: vm.fileNo,
               fileName: vm.fileName,
-              applicantIdNo: vm.applicantInfos.applicantIdNo,
+              applicantIdNo: vm.index != 0 ? vm.applicantInfos.applicantIdNo : vm.applicantIdNoCreate,
             }
             let param = {
               headers: {
@@ -960,8 +964,8 @@ export default {
             dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 1)
             dataCreateFile.append('fileNo', vm.fileNo)
             dataCreateFile.append('fileName', vm.fileName)
-            dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
-            dataCreateFile.append('applicantName', vm.applicantInfos.applicantName)
+            dataCreateFile.append('applicantIdNo', vm.index != 0 ? vm.applicantInfos.applicantIdNo : vm.applicantIdNoCreate)
+            dataCreateFile.append('applicantName', vm.index != 0 ? vm.applicantInfos.applicantName : vm.applicantNameCreate)
             dataCreateFile.append('file', vm.fileUpdate)
             dataCreateFile.append('govAgencyName', vm.govAgencyCreate)
             dataCreateFile.append('issueDate', vm.createDate)
@@ -1018,8 +1022,8 @@ export default {
           dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 1)
           dataCreateFile.append('fileNo', vm.fileNo)
           dataCreateFile.append('fileName', vm.fileName)
-          dataCreateFile.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
-          dataCreateFile.append('applicantName', vm.applicantInfos.applicantName)
+          dataCreateFile.append('applicantIdNo', vm.index != 0 ? vm.applicantInfos.applicantIdNo : vm.applicantIdNoCreate)
+          dataCreateFile.append('applicantName', vm.index != 0 ? vm.applicantInfos.applicantName : vm.applicantNameCreate)
           dataCreateFile.append('fileEntryId', vm.fileEntryESign)
           dataCreateFile.append('govAgencyName', vm.govAgencyCreate)
           dataCreateFile.append('issueDate', vm.createDate)
@@ -1067,7 +1071,7 @@ export default {
             status: vm.statusCreate ? vm.statusCreate : 1,
             fileNo: vm.fileNo,
             fileName: vm.fileName,
-            applicantIdNo: vm.applicantInfos.applicantIdNo
+            applicantIdNo: vm.index != 0 ? vm.applicantInfos.applicantIdNo : vm.applicantIdNoCreate
           }
           let param = {
             headers: {
@@ -1083,8 +1087,8 @@ export default {
           dataPost.append('status', vm.statusCreate ? vm.statusCreate : 1)
           dataPost.append('fileNo', vm.fileNo)
           dataPost.append('fileName', vm.fileName)
-          dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
-          dataPost.append('applicantName', vm.applicantInfos.applicantName)
+          dataPost.append('applicantIdNo', vm.index != 0 ? vm.applicantInfos.applicantIdNo : vm.applicantIdNoCreate)
+          dataPost.append('applicantName', vm.index != 0 ? vm.applicantInfos.applicantName : vm.applicantNameCreate)
           dataPost.append('govAgencyName', vm.govAgencyCreate)
           dataPost.append('issueDate', vm.createDate)
           dataPost.append('expireDate', vm.expireDate)
@@ -1124,7 +1128,7 @@ export default {
           status: vm.statusCreate ? vm.statusCreate : 1,
           fileNo: vm.fileNo,
           fileName: vm.fileName,
-          applicantIdNo: vm.applicantInfos.applicantIdNo
+          applicantIdNo: vm.index != 0 ? vm.applicantInfos.applicantIdNo : vm.applicantIdNoCreate
         }
         let param = {
           headers: {
@@ -1139,8 +1143,8 @@ export default {
         dataPost.append('status', vm.statusCreate ? vm.statusCreate : 1)
         dataPost.append('fileNo', vm.fileNo)
         dataPost.append('fileName', vm.fileName)
-        dataPost.append('applicantIdNo', vm.applicantInfos.applicantIdNo)
-        dataPost.append('applicantName', vm.applicantInfos.applicantName)
+        dataPost.append('applicantIdNo', vm.index != 0 ? vm.applicantInfos.applicantIdNo : vm.applicantIdNoCreate)
+        dataPost.append('applicantName', vm.index != 0 ? vm.applicantInfos.applicantName : vm.applicantNameCreate)
         dataPost.append('fileEntryId', vm.fileEntryESign)
         dataPost.append('govAgencyName', '')
         dataPost.append('issueDate', '')
