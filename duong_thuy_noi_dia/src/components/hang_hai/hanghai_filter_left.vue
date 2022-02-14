@@ -211,6 +211,41 @@
         </v-list-tile-action>
 
       </v-list-tile>
+      <v-list-tile class="text-bold" :class="{'active--left--filter': activeIndex === 2}" @click="toDsNghiepVu('DanhSachTauDiChuyen', 2)">
+
+        <v-list-tile-action> 
+          <v-icon color="primary">description</v-icon>
+        </v-list-tile-action>
+
+        <v-list-tile-content> 
+          <v-list-tile-title> Lệnh điều động </v-list-tile-title>
+        </v-list-tile-content>
+
+        <v-list-tile-action> 
+          <v-btn icon class="mx-0 my-0 grey lighten-2">
+            <v-icon>search</v-icon>
+          </v-btn>
+        </v-list-tile-action>
+
+      </v-list-tile>
+
+      <v-list-tile class="text-bold" :class="{'active--left--filter': activeIndex === 3}" @click="toDsNghiepVu('DanhSachTauRoiCang', 3)">
+
+        <v-list-tile-action> 
+          <v-icon color="primary">description</v-icon>
+        </v-list-tile-action>
+
+        <v-list-tile-content> 
+          <v-list-tile-title> Giấy phép vào, rời cảng biển </v-list-tile-title>
+        </v-list-tile-content>
+
+        <v-list-tile-action> 
+          <v-btn icon class="mx-0 my-0 grey lighten-2">
+            <v-icon>search</v-icon>
+          </v-btn>
+        </v-list-tile-action>
+
+      </v-list-tile>
     </div>
     <div class="flex xs12" v-else-if="type === 'van_thu'">
       <v-list-tile class="text-bold" @click="toReloadListData('van_thu')">
@@ -281,6 +316,13 @@ export default {
       if (query.hasOwnProperty('daKy') && query.daKy) {
         vm.activeIndex = 1
       }
+      let detailPage = document.URL;
+      if(String(detailPage).indexOf("DanhSachTauDiChuyen") > 0){
+        vm.activeIndex = 2
+      } else if(String(detailPage).indexOf("DanhSachTauRoiCang") > 0) {
+        vm.activeIndex = 3
+      }
+      
     })
   },
   watch: {
@@ -295,6 +337,15 @@ export default {
     }
   },
   methods: {
+    toDsNghiepVu (code, activeIndex) {
+      router.push({
+        path: '/danh-sach-ho-so/lanh_dao/0/0/' + code,
+        query: {
+          'page': 1
+        }
+      })
+      this.activeIndex = activeIndex
+    },
     toReloadListData (typeData) {
       let vm = this
       vm.activeIndex = 0
@@ -318,6 +369,25 @@ export default {
           'maBanKhai': vm.maBanKhai,
           'callSign': vm.callSign,
           'daKy': true,
+          'page': 1
+        }
+      })
+    },
+    toReloadListDataLDD (typeData) {
+      let vm = this
+      vm.activeIndex = 2
+      router.push({path: '/danh-sach-ho-so/' + typeData + '/0/0/' + 'LenhDieuDong',
+        query: {
+          'renew': Math.floor(Math.random() * (10 - 1 + 1)) + 1,
+          'page': 1
+        }
+      })
+    },
+    toReloadListDataGPVRCB (typeData) {
+      let vm = this
+      vm.activeIndex = 3
+      router.push({path: '/danh-sach-ho-so/' + typeData + '/0/0/' + 'DanhSachTauRoiCang',
+        query: {
           'page': 1
         }
       })

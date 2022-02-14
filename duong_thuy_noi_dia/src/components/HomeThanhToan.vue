@@ -17,60 +17,74 @@
         </v-flex>
         <v-flex xs12 class="px-0 mt-4">
             <v-select
-              label="Tàu đến/rời:"
+              placeholder="Tàu đến/rời:"
+              class="pb-1 pt-2"
               v-model="positionCode"
               autocomplete
               :items="positionCodes"
               item-text="name"
               item-value="code"
+              clearable
             ></v-select>
           </v-flex>
           <v-flex xs12 class="pl-0">
             <v-text-field
-              label="Tên tàu:"
+              class="py-1"
+              placeholder="Tên tàu:"
               v-model="shipName"
+              clearable
             ></v-text-field>
           </v-flex>
           <v-flex xs12 class="pl-0">
             <v-text-field
-              label="Hô hiệu:"
+              class="py-1"
+              placeholder="Hô hiệu:"
               v-model="callSign"
+              clearable
             ></v-text-field>
           </v-flex>
           <v-flex xs12 class="pl-0">
             <v-text-field
-              label="IMO:"
+            class="py-1"
+              placeholder="IMO:"
               v-model="imo"
+              clearable
             ></v-text-field>
           </v-flex>
           <v-flex xs12 class="pl-0">
           <v-select
-            label="Quốc tịch:"
+          class="py-1"
+            placeholder="Quốc tịch:"
               v-model="stateCode"
               autocomplete
               :items="stateCodes"
               item-text="name"
               item-value="code"
+              clearable
             ></v-select>
             </v-flex>
             <v-flex xs12 class="pl-0">
           <v-select
-          label="Khu vực cảng:"
+          class="py-1"
+          placeholder="Khu vực cảng:"
               v-model="maritimeCode"
               autocomplete
               :items="maritimeCodes"
               item-text="name"
               item-value="code"
+              clearable
             ></v-select>
             </v-flex>
           <v-flex xs12 class="pl-0">
             <v-select
-            label="Cảng tiếp theo:"
+            class="py-1"
+            placeholder="Cảng tiếp theo:"
               v-model="maritimeCodeNext"
               autocomplete
               :items="maritimeCodesTiepTheos"
               item-text="name"
               item-value="code"
+              clearable
             ></v-select>
           </v-flex>
 		</div>
@@ -152,7 +166,7 @@ export default {
     callSign: '',
     getFilterADVDataAPI: getFilterADVDataAPI,
     cang_vu_label: '',
-    isAdv: true,
+    isAdv: false,
     paymentMarkDelete: paymentMarkDeleteData,
     paymentTypeData: paymentTypeData,
     offsetTop: 0,

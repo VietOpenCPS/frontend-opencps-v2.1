@@ -23,13 +23,18 @@
 
         </div>
 
-        <div class="flex pr-3 w-100-xs" style="display: flex;display: -webkit-flex;">
-          
-          <v-text-field 
+        <div
+          class="flex pr-3 w-100-xs"
+          style="display: flex; display: -webkit-flex; height: 35px;"
+        >
+
+          <v-text-field
             append-icon="search"
             v-on:keyup.native="filterByKeyWordOBJ"
-            v-model="keywordsSearch" solo placeholder="Tìm kiếm theo từ khoá mã bản khai, số phiếu"></v-text-field>
-
+            v-model="keywordsSearch"
+            solo
+            placeholder="Tìm kiếm theo từ khoá mã bản khai, số phiếu"
+          ></v-text-field>
         </div>
 
       </div>

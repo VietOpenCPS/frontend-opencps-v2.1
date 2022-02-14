@@ -11,7 +11,7 @@ import MessageType from '@/components/MessageType.vue'
 import DetailHoSoAction from '@/components/DetailHoSoAction.vue'
 import MessageTypeAction from '@/components/MessageTypeAction.vue'
 import NoPermission from '@/components/NoPermission.vue'
-
+import HomeDataTableQLTB from '@/components/Home_data_quanly_tau_bien.vue'
 Vue.use(Router)
 
 export default new Router({
@@ -24,7 +24,12 @@ export default new Router({
           path: '/danh-sach-ho-so/:type/:documentTypeCode/:documentStatusCode',
           component: HomeDataTable,
           props: true
-        }
+        },
+        {
+          path: '/danh-sach-ho-so/:type/:documentTypeCode/:documentStatusCode/:code',
+          component: HomeDataTableQLTB,
+          props: true
+        },
       ],
       props: true
     },
@@ -79,5 +84,6 @@ export default new Router({
       ],
       props: true
     }
+    
   ]
 })
