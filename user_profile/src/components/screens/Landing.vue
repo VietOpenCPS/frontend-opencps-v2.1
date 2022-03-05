@@ -891,7 +891,8 @@
         applicantIdDate: true,
         contactEmail: true,
         contactTelNo: false
-      }
+      },
+      changePassSso: false
     }),
     watch: {
       ngayCap(val) {
@@ -941,6 +942,10 @@
         if (rulesConfig) {
           vm.rules = Object.assign({}, vm.rules, rulesConfig)
         }
+      } catch (error) {
+      }
+      try {
+        vm.changePassSso = changePassSso
       } catch (error) {
       }
       try {
@@ -1286,6 +1291,13 @@
           let data = {
             oldPassword : vm.oldPassWord,
             newPassword : vm.newPassWord
+          }
+          if (vm.changePassSso) {
+            data = {
+              oldPassword : vm.oldPassWord,
+              newPassword : vm.newPassWord,
+              type: "dvc-sso"
+            }
           }
           vm.changePassWordFail = false
           vm.$store.dispatch('changePass', data).then(function (data) {

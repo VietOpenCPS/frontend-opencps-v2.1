@@ -1827,10 +1827,10 @@ export const store = new Vuex.Store({
             }
           }
           let govAgency = filter['govAgency']
-          let agencyLists = filter['agencyLists']
-          let agencyListsGet = agencyLists.filter(function (item) {
+          let agencyLists = filter['agencyLists'] ? filter['agencyLists'] : []
+          let agencyListsGet = agencyLists ? agencyLists.filter(function (item) {
             return String(item['value']) !== '0'
-          })
+          }) : []
           let requestURL = ''
           requestURL = filter['api']
           if (agencyLists.length === 0) {

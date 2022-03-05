@@ -3610,16 +3610,18 @@ export default {
           vm.dialogPDFLoading = false
         })
       } else {
-        vm.$store.dispatch('printPayVnpt', filter).then(function (result) {
-          vm.dialogPDFLoading = false
-          vm.titleDialogPdf = 'Biên lai thanh toán'
-          vm.dialogPDF = true
-          setTimeout(function () {
-            document.getElementById('dialogPDFPreviewXl').src = result
-          }, 200)
-        }).catch(function(){
-          vm.dialogPDFLoading = false
-        })
+        setTimeout(function () {
+          vm.$store.dispatch('printPayVnpt', filter).then(function (result) {
+            vm.dialogPDFLoading = false
+            vm.titleDialogPdf = 'Biên lai thanh toán'
+            vm.dialogPDF = true
+            setTimeout(function () {
+              document.getElementById('dialogPDFPreviewXl').src = result
+            }, 200)
+          }).catch(function(){
+            vm.dialogPDFLoading = false
+          })
+        }, 3000)
       }
       
     },

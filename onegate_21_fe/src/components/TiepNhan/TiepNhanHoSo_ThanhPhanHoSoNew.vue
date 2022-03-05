@@ -113,7 +113,7 @@
                       <v-icon size="14" color="primary">fas fa fa-download</v-icon>
                     </v-btn>
 
-                    <v-btn class="my-0" title="Ký số điện tử" v-if="originality === 1 && showKySo && itemFileView.fileType.toLowerCase() === 'pdf'" flat icon color="indigo"
+                    <v-btn class="my-0" title="Ký số giấy tờ đính kèm" v-if="originality === 1 && showKySo && itemFileView.fileType.toLowerCase() === 'pdf'" flat icon color="indigo"
                       @click.stop="showSelectDigitalSign(itemFileView, index)"
                     >
                       <v-icon size="18">fa fa-pencil-square-o</v-icon>
@@ -142,7 +142,7 @@
                       <span>Ghi chú trên giấy tờ</span>
                     </v-tooltip>
                     <!--  -->
-                    <v-btn title="Ký số điện tử" class="my-0" v-if="originality === 1 && showKySo && itemFileView.fileType.toLowerCase() === 'pdf'" flat icon color="indigo"
+                    <v-btn title="Ký số giấy tờ đính kèm" class="my-0" v-if="originality === 1 && showKySo && itemFileView.fileType.toLowerCase() === 'pdf'" flat icon color="indigo"
                       @click.stop="showSelectDigitalSign(itemFileView, index)"
                     >
                       <v-icon size="18">fa fa-pencil-square-o</v-icon>
@@ -325,6 +325,13 @@
               :id="'file' + item.partNo"
               @change="onUploadSingleFile($event, item, index)"
               >
+              <input
+              type="file"
+              style="display: none"
+              :id="'fileSavis' + item.partNo"
+              @change="changeFileSavis($event, item, index)"
+              accept=".pdf,application/pdf"
+              >
               <v-tooltip top v-if="item.partType === 3 && originality === 3 && !onlyView">
                 <v-btn slot="activator" @click="addFileOther(item)" icon class="mx-0 my-0">
                   <v-icon size="16" class="mx-0" color="primary">add</v-icon>
@@ -365,6 +372,16 @@
                 <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ lên</span>
                 <span v-else>Tải giấy tờ lên (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
               </v-tooltip>
+              <!--  -->
+              <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView && !khoTaiLieuCongDan && kySoSavis">
+                <v-btn slot="activator" icon class="mx-0 my-0 ml-2" @click="pickFileSavis(item)">
+                  <v-badge>
+                    <v-icon size="24" color="#004b94">fa-pencil-square-o</v-icon>
+                  </v-badge>
+                </v-btn>
+                <span>Tải lên và ký số giấy tờ</span>
+              </v-tooltip>
+              <!--  -->
               <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && !onlyView && !khoTaiLieuCongDan">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="showFilesApplicant(item.partNo)">
                   <v-badge>
@@ -590,6 +607,12 @@
               </v-hover>
               
             </v-flex>
+            <!--  -->
+            <v-flex xs12 class="text-xs-center mt-3" style="cursor: pointer" @click="kySoPdfUrlSavis(fileKySo, indexFileSelect)">
+              <img class="mb-2" src="/o/opencps-store/js/cli/dvc/app/image/logo-savis.svg" alt="trevor" style="background: #fff;height: 30px;"><br>
+              <span class="text-bold" style="font-size: 14px;color: #d7181f;">KÝ SỐ SAVIS</span>
+            </v-flex>
+            <!--  -->
           </v-layout>
         </v-card-text>
       </v-card>
@@ -701,6 +724,96 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <!--  -->
+    <!-- ký số điện tử -->
+    <v-dialog
+      v-model="dialogSelectCa"
+      max-width="450"
+      persistent
+    >
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title style="font-size: 14px">Lựa chọn chứng thư số</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogSelectCa = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="px-0 pb-0">
+          <v-layout wrap>
+            <v-flex class="px-3 py-2" v-for="(item, index) in listCaSavis" :key="index" xs12 style="cursor: pointer, border-bottom: 1px solid #dedede"
+              @click="submitSignSavis(item)"
+            >
+              <p style="cursor: pointer !important;">{{index+1}}. {{item.subjectDn.split("CN=")[1].split(",")[0]}}</p>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+    <v-dialog
+      v-model="dialogSelectAnhChuKySo"
+      max-width="450"
+      persistent
+    >
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title style="font-size: 14px">Tải lên ảnh hiển thị trên chữ ký</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <!-- <v-btn icon dark @click.native="dialogSelectAnhChuKySo = false">
+            <v-icon>close</v-icon>
+          </v-btn> -->
+        </v-toolbar>
+        <v-card-text class="px-0 pb-0">
+          <v-layout wrap>
+            <v-flex class="px-3 py-2" xs12 style="cursor: pointer, border-bottom: 1px solid #dedede"
+            >
+              <!-- <input
+                type="file"
+                id="fileAnhChuKySavis"
+                @input="changeFileAnhChuKySavis()"
+              > -->
+              <input type="file" accept="image/*" id="fileAnhChuKySavis" @input="changeFileAnhChuKySavis($event)" style="display:none">
+              <v-btn outline  flat color="primary" class="mx-0 px-0 d-inline-block" @click.native="selectAnhHienThiKySo()" style="width: 100%">
+                <v-icon size="16">fas fa fa-upload</v-icon> &nbsp; &nbsp;
+                Tải lên
+              </v-btn>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="red darken-3" flat="flat" @click.native="cancelFileAnhChuKySavis">
+            Bỏ qua
+          </v-btn>
+          <!-- <v-btn color="primary" flat="flat" @click.native="addOtherTemplate" :loading="loadingAddOther">
+            Đồng ý
+            <span slot="loader">Loading...</span>
+          </v-btn> -->
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+     <v-dialog
+        v-model="processingSavis"
+        persistent
+        width="300"
+      >
+        <v-card
+          color="primary"
+          dark
+        >
+          <v-card-text>
+            <span>{{mssProcessingSavis}}</span>
+            
+            <v-progress-linear
+              indeterminate
+              color="white"
+              class="mb-0"
+            ></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
   </div>
 </template>
 
@@ -748,6 +861,15 @@ export default {
     'kho-tai-lieu': KhoTaiLieu,
   },
   data: () => ({
+    fileKySoSavis: '',
+    fileImageSignPdf: '',
+    dialogSelectCa: false,
+    listCaSavis: [],
+    dialogSelectAnhChuKySo: false,
+    hasAnhChuKySo: false,
+    processingSavis: false,
+    mssProcessingSavis: '',
+    signSavisPdfUrl: false,
     activePdfEditor: false,
     showViewerPdfEditor: false,
     dialog_editor_pdf: false,
@@ -897,12 +1019,17 @@ export default {
     yeuCauSoHoa: false,
     mobileCA: '',
     dialogInputMobile: false,
-    loadingAction: false
+    loadingAction: false,
+    kySoSavis: false
   }),
   created () {
     let vm = this
     vm.receiveMessage = function (event) {
       vm.saveAlpacaFormCallBack(event)
+    }
+    try {
+      vm.kySoSavis = kySoSavis
+    } catch (error) {
     }
     try {
       vm.khoTaiLieuCongDan = khoTaiLieuCongDan
@@ -1664,6 +1791,317 @@ export default {
         vm.stateView = true
         vm.dialogAddOtherTemp = true
       }
+    },
+    kySoPdfUrlSavis (item, index) {
+      let vm = this
+      vm.signSavisPdfUrl = item
+      vm.dialogSignDigital = false
+      document.getElementById('fileAnhChuKySavis').value = ''
+      vm.dialogSelectAnhChuKySo = true
+    },
+    pickFileSavis (item) {
+      let vm = this
+      vm.signSavisPdfUrl = false
+      vm.stateAddFileOther = false
+      document.getElementById('fileSavis' + item.partNo).value = ''
+      document.getElementById('fileSavis' + item.partNo).click()
+    },
+    changeFileSavis (e, data, index) {
+      var vm = this
+      vm.dossierTemplatesItemSelect = data
+      data['dossierId'] = vm.thongTinHoSo.dossierId
+      data['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
+      if (data.partType !== 3) {
+        let files = $('input[id="fileSavis' + data.partNo + '"]')[0].files
+        let file = files[0]
+        let fileName = file['name']
+        if (file['name']) {
+          fileName = file['name'].replace(/\%/g, '')
+          fileName = fileName.replace(/\//g, '')
+          fileName = fileName.replace(/\\/g, '')
+        }
+        let fileType = file.type
+        vm.fileKySoSavis = {
+          file: file,
+          fileName: fileName,
+          fileType: fileType
+        }
+        console.log('fileKySoSavis', vm.fileKySoSavis)
+        
+        if (fileType == 'application/pdf') {
+          document.getElementById('fileAnhChuKySavis').value = ''
+          vm.dialogSelectAnhChuKySo = true
+        } else {
+          vm.getCertSavis()
+        }
+
+        // document.getElementById('fileAnhChuKySavis').value = ''
+        // document.getElementById('fileAnhChuKySavis').click()
+      } else {
+        if (window.$('input[id="fileSavis' + data.partNo + '"]')[0].files.length === 0) {
+          vm.progressUploadPart = ''
+          return
+        }
+        vm.partView = data.partNo
+        vm.stateView = true
+        vm.dialogAddOtherTemp = true
+      }
+    },
+    selectAnhHienThiKySo () {
+      document.getElementById('fileAnhChuKySavis').click()
+    },
+    changeFileAnhChuKySavis () {
+      let vm = this
+      let files = $('input[id="fileAnhChuKySavis"]')[0].files
+      let file = files[0]
+      let fileName = file['name']
+      if (file['name']) {
+        fileName = file['name'].replace(/\%/g, '')
+        fileName = fileName.replace(/\//g, '')
+        fileName = fileName.replace(/\\/g, '')
+      }
+      vm.fileImageSignPdf = {
+        file: file,
+        fileName: fileName
+      }
+      vm.hasAnhChuKySo = true
+      vm.dialogSelectAnhChuKySo = false
+      vm.getCertSavis()
+    },
+    getCertSavis () {
+      let vm = this
+      let param = {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+      let url = 'http://127.0.0.1:14423/api/v1/certs'
+      vm.mssProcessingSavis = 'Đang lấy danh sách chứng thư số'
+      vm.processingSavis = true
+      axios.get(url, param).then(result1 => {
+        vm.processingSavis = false
+        try {
+          vm.listCaSavis = result1.data.data.filter(function(item) {
+            return item.crlDistributionPoint != null
+          })
+        } catch (error) {
+          vm.listCaSavis = []
+        }
+        if (vm.listCaSavis && vm.listCaSavis.length) {
+          vm.dialogSelectCa = true
+        } else {
+          toastr.error('Không có chứng thư số. Vui lòng cắm token ký số')
+          vm.processingSavis = false
+        }
+      }).catch(xhr => {
+        toastr.error('Lấy chứng thư số không thành công. Vui lòng cài đặt Signing Software và cắm token ký số')
+        vm.processingSavis = false
+      })  
+    },
+    cancelFileAnhChuKySavis () {
+      let vm = this
+      vm.hasAnhChuKySo = false
+      vm.dialogSelectAnhChuKySo = false
+      vm.getCertSavis()
+    },
+    submitSignSavis (item) {
+      let vm = this
+      if (vm.signSavisPdfUrl) {
+        vm.kySavisUrlPdf(item)
+      } else {
+        vm.kySavisUploadPdf(item)
+      }
+    },
+    kySavisUrlPdf (cert) {
+      let vm = this
+      let fileUrl = window.location.origin + '/o/rest/v2/dossiers/' + vm.thongTinHoSo['dossierId'] + '/files/' + vm.signSavisPdfUrl['referenceUid'] + '/preview.pdf'
+      let param = {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+      let form = new FormData()
+      let url = 'http://127.0.0.1:14423/api/v1/sign/pdf'
+      form.append("serial", cert.serial)
+      form.append("file", "");
+      form.append("fileUrl", fileUrl);
+      form.append("isVisible", vm.hasAnhChuKySo);
+      form.append("page", "1");
+      form.append("llx", "150");
+      form.append("lly", "792");
+      form.append("urx", "0");
+      form.append("ury", "750");
+      form.append("detectString", "");
+      form.append("detail", "1,6");
+      form.append("reason", "");
+      form.append("location", "");
+      form.append("contactInfo", "");
+      if (vm.hasAnhChuKySo) {
+        form.append("image", vm.fileImageSignPdf.file, vm.fileImageSignPdf.fileName);
+      } else {
+        form.append("image", "");
+      }
+      vm.dialogSelectCa = false
+      vm.mssProcessingSavis = 'Đang thực hiện ký số'
+      vm.processingSavis = true
+      axios.post(url, form, param).then(result1 => {
+        console.log('result-savis', result1)
+        let fileBase64 = ''
+        if (result1.data.code == 200) {
+          fileBase64 = result1.data.data
+          // 
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId(),
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('fileName', vm.signSavisPdfUrl.displayName)
+          dataPost.append('fileBase64', fileBase64)
+          dataPost.append('dossierFileId', vm.signSavisPdfUrl.dossierFileId)
+          
+          let url = '/o/rest/v2/signature/' + vm.thongTinHoSo.dossierId + '/savis'
+          axios.post(url, dataPost, param).then(function (response) {
+            let signFileName = response.data.signFileName
+            // updateFileKy
+            let param = {
+              headers: {
+                groupId: window.themeDisplay.getScopeGroupId(),
+                Token: window.Liferay ? window.Liferay.authToken : ''
+              }
+            }
+            let dataPost = new URLSearchParams()
+            dataPost.append('signFileName', signFileName)
+            dataPost.append('dossierPartNo', vm.dossierTemplatesItemSelect.partNo)
+            dataPost.append('dossierTemplateNo', vm.thongTinHoSo.dossierTemplateNo)
+            dataPost.append('dossierFileId', vm.signSavisPdfUrl.dossierFileId)
+            let url = '/o/rest/v2/defaultsignature/'+ vm.thongTinHoSo.dossierId +'/savis/fileupload'
+            axios.post(url, dataPost, param).then(function (response) {
+              toastr.success('Ký số thành công')
+              vm.progressUploadPart = ''
+              vm.processingSavis = false
+              vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+                vm.dossierFilesItems = resFiles
+              }).catch(reject => {
+              })
+            }).catch(function (error) {
+              vm.progressUploadPart = ''
+              toastr.error('Ký số thất bại')
+              vm.processingSavis = false
+            })
+            // 
+          }).catch(function (error) {
+            toastr.error('Ký số thất bại')
+            vm.processingSavis = false
+          })
+        } else {
+          toastr.error('Ký số thất bại')
+          vm.processingSavis = false
+        }
+      }).catch(xhr => {
+        toastr.error('Ký số thất bại')
+        vm.processingSavis = false
+      })
+    },
+    kySavisUploadPdf (cert) {
+      let vm = this
+      let param = {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data; boundary=<calculated when request is sent>'
+        }
+      }
+      let form = new FormData()
+      let url = ''
+      form.append("serial", cert.serial)
+      if (vm.fileKySoSavis.fileType == 'application/pdf') {
+        url = 'http://127.0.0.1:14423/api/v1/sign/pdf'
+        form.append("file", vm.fileKySoSavis.file, vm.fileKySoSavis.fileName);
+        form.append("fileUrl", "");
+        form.append("isVisible", vm.hasAnhChuKySo);
+        form.append("page", "1");
+        form.append("llx", "150");
+        form.append("lly", "792");
+        form.append("urx", "0");
+        form.append("ury", "750");
+        form.append("detectString", "");
+        form.append("detail", "1,6");
+        form.append("reason", "");
+        form.append("location", "");
+        form.append("contactInfo", "");
+        if (vm.hasAnhChuKySo) {
+          form.append("image", vm.fileImageSignPdf.file, vm.fileImageSignPdf.fileName);
+        } else {
+          form.append("image", "");
+        }
+      } else {
+        url = 'http://127.0.0.1:14423/api/v1/sign/binary'
+        form.append("file", vm.fileKySoSavis.file, vm.fileKySoSavis.fileName);
+        form.append("fileUrl", "");
+      }
+      vm.dialogSelectCa = false
+      vm.mssProcessingSavis = 'Đang thực hiện ký số'
+      vm.processingSavis = true
+      axios.post(url, form, param).then(result1 => {
+        console.log('result-savis', result1)
+        let fileBase64 = ''
+        if (result1.data.code == 200) {
+          fileBase64 = result1.data.data
+          // 
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId(),
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('fileName', vm.fileKySoSavis.fileName)
+          dataPost.append('fileBase64', fileBase64)
+          let url = '/o/rest/v2/signature/' + vm.thongTinHoSo.dossierId + '/savis'
+          axios.post(url, dataPost, param).then(function (response) {
+            // 
+            let signFileName = response.data.signFileName
+            let param = {
+              headers: {
+                groupId: window.themeDisplay.getScopeGroupId(),
+                Token: window.Liferay ? window.Liferay.authToken : ''
+              }
+            }
+            let dataPost = new URLSearchParams()
+            dataPost.append('signFileName', signFileName)
+            dataPost.append('dossierPartNo', vm.dossierTemplatesItemSelect.partNo)
+            dataPost.append('dossierTemplateNo', vm.thongTinHoSo.dossierTemplateNo)
+            let url = '/o/rest/v2/defaultsignature/'+ vm.thongTinHoSo.dossierId +'/savis/fileupload'
+            axios.post(url, dataPost, param).then(function (response) {
+              toastr.success('Tải lên và ký số thành công')
+              vm.progressUploadPart = ''
+              vm.processingSavis = false
+              vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+                vm.dossierFilesItems = resFiles
+              }).catch(reject => {
+              })
+            }).catch(function () {
+              toastr.error('Ký số thất bại')
+              vm.processingSavis = false
+            })
+            // 
+          }).catch(function (error) {
+            toastr.error('Ký số thất bại')
+            vm.processingSavis = false
+          })
+        } else {
+          toastr.error('Ký số thất bại')
+          vm.progressUploadPart = ''
+          vm.processingSavis = false
+        }
+      }).catch(xhr => {
+        toastr.error('Ký số thất bại')
+        vm.progressUploadPart = ''
+        vm.processingSavis = false
+      })
     },
     loadAlpcaForm (data) {
       let vm = this
@@ -2724,6 +3162,8 @@ export default {
       let vm = this
       if (VtPluginSocket) {
         VtPluginSocket.initPlugin()
+      } else {
+        toastr.error('Máy chưa cài đặt Viettel-CA SignPlugin')
       }
       async function getCertRunSign() {
         VtPluginSocket.getCert()

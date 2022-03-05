@@ -5293,6 +5293,26 @@ export const store = new Vuex.Store({
         })
       })
     },
+    updateFileKySoVgca ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId(),
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('fileEntryIdStr', filter.fileEntryIdStr)
+        dataPost.append('dossierFileIdStr', filter.dossierFileIdStr)
+        let url = '/o/rest/v2/defaultsignature/vgca/updateListDossierFile'
+        axios.put(url, dataPost, param).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
     trackingBTTT ({commit, state}, filter) {
       console.log('trackDVC', filter.serviceCode, filter.customData)
       try {
@@ -5755,6 +5775,25 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getFileYeuCauKySo ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          },
+          params: filter.paramsInput
+        }
+        let url = '/o/rest/v2/dossiers/listfile'
+        axios.get(url, param).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          console.log(error)
+          reject(error)
+        })
+      })
+    }
     // ----End---------
   },
   mutations: {

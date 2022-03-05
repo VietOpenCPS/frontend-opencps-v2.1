@@ -163,6 +163,9 @@ export const store = new Vuex.Store({
         var dataPutUser = new URLSearchParams()
         dataPutUser.append('oldPassword', filter.oldPassword)
         dataPutUser.append('newPassword', filter.newPassword)
+        if (filter.hasOwnProperty('type')) {
+          dataPutUser.append('type', filter.type)
+        }
         axios.post(url, dataPutUser, param).then(result1 => {
           resolve(result1.data)
         }).catch(xhr => {

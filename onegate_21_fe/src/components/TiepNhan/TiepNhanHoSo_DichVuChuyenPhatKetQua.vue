@@ -295,10 +295,13 @@ export default {
       // vm.dichVuChuyenPhatKetQua.postalCityCode = val.cityCode
       // vm.dichVuChuyenPhatKetQua.postalDistrictCode = val.districtCode
       // vm.dichVuChuyenPhatKetQua.postalWardCode = val.wardCode
-      /*
-      vm.dichVuChuyenPhatKetQua.postalAddress = val.address
-      vm.dichVuChuyenPhatKetQua.postalTelNo = val.contactTelNo
-      */
+      try {
+        if (vm.detailDossier.dossierStatus) {
+          vm.dichVuChuyenPhatKetQua.postalAddress = val.address
+          vm.dichVuChuyenPhatKetQua.postalTelNo = val.contactTelNo
+        }
+      } catch (error) {
+      }
       // var filter = {
       //   collectionCode: 'VNPOST_CITY_CODE',
       //   level: 0,
