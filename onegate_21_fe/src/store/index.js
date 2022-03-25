@@ -5503,6 +5503,7 @@ export const store = new Vuex.Store({
         } catch (error) {
         }
         let dataInput = ''
+        let urlTraCuu = '/o/rest/v2/qldc'
         if (systemLgsp === 'DongThap') {
           dataInput = {
             "MaYeuCau" : (new Date()).getTime(),
@@ -5515,7 +5516,7 @@ export const store = new Vuex.Store({
             "NgayThangNamSinh" : filter.birthDate,
             "MaCanBo" : "vhcgiang@dongthap.gov.vn"
           }
-        } else if (systemLgsp === '' || systemLgsp === 'HauGiang') {
+        } else if (systemLgsp === 'HauGiang') {
           dataInput = {
             "MaYeuCau" : (new Date()).getTime(),
             "MaTichHop" : "003",
@@ -5524,6 +5525,18 @@ export const store = new Vuex.Store({
             "MaDVC" : filter.MaDVC,
             "HoVaTen" : filter.applicantName,
             "type" : "XacThucThongTinCongDan",
+            "NgayThangNamSinh" : filter.birthDate,
+          }
+        } else if (systemLgsp === 'BO-GTVT') {
+          urlTraCuu = "/o/rest/v2/qldc/dvcqg"
+          dataInput = {
+            "MaYeuCau" : (new Date()).getTime(),
+            "MaTichHop" : "037",
+            "StaffEmail" : filter.StaffEmail,
+            "GovAgencyCode": filter.GovAgencyCode,
+            "MaDVC" : filter.MaDVC,
+            "HoVaTen" : filter.applicantName,
+            "type" : "TraCuuThongTinCongDan",
             "NgayThangNamSinh" : filter.birthDate,
           }
         }
@@ -5535,7 +5548,7 @@ export const store = new Vuex.Store({
         }
         axios({
           method: 'POST',
-          url: '/o/rest/v2/qldc',
+          url: urlTraCuu,
           headers: config.headers,
           params: config.params,
           data: dataInput
@@ -5554,9 +5567,18 @@ export const store = new Vuex.Store({
               }
               resolve(dataCitizen)
             }
-          } else if (systemLgsp === '' || systemLgsp === 'HauGiang') {
+          } else if (systemLgsp === 'HauGiang') {
             if (serializable && serializable.hasOwnProperty('Body') && serializable["Body"].hasOwnProperty('XacThucThongTinCongDanResponse')) {
               dataCitizen = serializable["Body"]["XacThucThongTinCongDanResponse"]
+              resolve(dataCitizen)
+            } else {
+              reject('')
+            }
+          } else if (systemLgsp === 'BO-GTVT') {
+            if (serializable && serializable.hasOwnProperty('Body') && serializable["Body"].hasOwnProperty('CongdanCollection') && serializable["Body"]["CongdanCollection"]) {
+              dataCitizen = {
+                SoLuongCongDan: 1
+              }
               resolve(dataCitizen)
             } else {
               reject('')

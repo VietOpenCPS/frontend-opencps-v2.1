@@ -5,6 +5,16 @@
         <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Thông tin chung hồ sơ</div>
         <v-card v-if="!mauCongVan">
           <v-card-text class="py-0">
+            <v-btn v-if="thongTinChiTietHoSo.applicantIdType === 'citizen'" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: 0px;position: absolute;right: 0' : 'margin-top: 0px;position: absolute;right: 0'"
+             class="mx-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
+              <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
+              <v-progress-circular :size="24" v-if="loadingSearchLgsp"
+                indeterminate
+                color="white"
+              ></v-progress-circular>&nbsp;
+              <span v-if="!loadingSearchLgsp">Kiểm tra thông tin công dân</span>
+              <span v-if="loadingSearchLgsp">Đang kiểm tra thông tin công dân</span>
+            </v-btn>
             <v-layout wrap class="px-2 py-2">
               <v-flex xs12 v-if="showOptionName && metaData && metaData.hasOwnProperty('optionName') && metaData['optionName']">
                 <div class="xs12 sm12 pb-1">
@@ -367,6 +377,91 @@
         </v-card>
       </v-expansion-panel-content>
     </v-expansion-panel>
+    <!-- tra cứu LGSP -->
+    <v-dialog v-model="dialog_searchLgsp" scrollable persistent max-width="700px">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Tra cứu CSDL Quốc Gia về dân cư</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="closeSearchLgsp">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-1">
+          <v-form ref="formLgsp" v-model="valid" class="py-3 px-0 grid-list">
+            <v-layout row wrap class="px-0 py-0">
+              <v-flex xs12>
+                <v-text-field label="Số CCCD hoặc số CMND" :rules="[rules.required]" v-model="applicantIdNoLgsp" box clearable></v-text-field>
+              </v-flex>
+              <v-flex xs12 >
+                <v-text-field label="Họ và tên" v-model="applicantNameLgsp" :rules="[rules.required]" box clearable></v-text-field>
+              </v-flex>
+              <v-flex xs12>
+                <v-menu
+                  ref="menuApplicantIdDate"
+                  :close-on-content-click="false"
+                  v-model="menuApplicantIdDate"
+                  :nudge-right="40"
+                  lazy
+                  transition="scale-transition"
+                  offset-y
+                  full-width
+                  max-width="290px"
+                  min-width="290px"
+                >
+                  <v-text-field
+                    label="Ngày sinh"
+                    :rules="[rules.required]"
+                    box
+                    slot="activator"
+                    v-model="applicantBirthDate"
+                    append-icon="event"
+                    @blur="ngaysinh = parseDate(applicantBirthDate)"
+                    placeholder="dd/mm/yyyy"
+                    mask="##/##/####"
+                  ></v-text-field>
+                  <v-date-picker min="1900-01-01" :max="getMaxdate()" ref="picker"
+                  :first-day-of-week="1" locale="vi" v-model="ngaysinh" no-title @input="menuApplicantIdDate = false"></v-date-picker>
+                </v-menu>
+              </v-flex>
+              
+              <v-flex xs12 class="text-right">
+                <v-btn color="primary"
+                  @click="searchLgspCongDan"
+                  :loading="loadingSearchLgsp"
+                  :disabled="loadingSearchLgsp"
+                  class="mx-0 my-0"
+                >
+                  <v-icon size="20">search</v-icon>
+                  &nbsp;
+                  Tra cứu
+                  <span slot="loader">Đang tải...</span>
+                </v-btn>
+              </v-flex>
+              
+            </v-layout>
+          </v-form>
+          <div>
+            <div class="mx-1 flex mb-3">
+              <v-alert outline :color="lgspAlertColor" icon="warning" :value="true">
+                {{messageLgsp}}
+              </v-alert>
+            </div>
+            <v-flex xs12 class="text-right my-2">
+              <v-btn color="red"
+                @click="closeSearchLgsp"
+                class="mx-0 my-0 white--text"
+              >
+                <v-icon size="20" class="white--text">clear</v-icon>
+                &nbsp;
+                Đóng
+              </v-btn>
+            </v-flex>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <!--  -->
   </div>
 </template>
 
@@ -397,6 +492,12 @@
             vm.groupDossierName = resultDossier['dossierName']
           })
         }
+      },
+      ngaysinh (val) {
+        this.applicantBirthDate = this.formatDate(val)
+      },
+      menuApplicantIdDate (val) {
+        val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
       }
     },
     components: {},
@@ -407,7 +508,21 @@
       groupDossierName: '',
       showContactDetail: false,
       xacthuc_BNG: false,
-      showOptionName: false
+      showOptionName: false,
+      applicantIdNoLgsp: '',
+      applicantNameLgsp: '',
+      applicantBirthDate: null,
+      ngaysinh: null,
+      menuApplicantIdDate: false,
+      applicantLgspInfomation: '',
+      warningLgsp: false,
+      messageLgsp: 'Tra cứu cơ sở dữ liệu dân cư',
+      lgspAlertColor: 'primary',
+      traCuuLgspCongDan: false,
+      dialog_searchLgsp: false,
+      rules: {
+        required: (value) => !!value || 'Thông tin bắt buộc'
+      }
     }),
     computed: {
       loading() {
@@ -416,12 +531,19 @@
       originality() {
         var vm = this
         return vm.getOriginality()
-      }
+      },
+      userLoginInfomation () {
+        return this.$store.getters.getUserLogin
+      },
     },
     created() {
       var vm = this
       try {
         vm.showOptionName = showOptionName
+      } catch (error) {
+      }
+      try {
+        vm.traCuuLgspCongDan = traCuuLgspCongDan
       } catch (error) {
       }
       vm.thongTinChiTietHoSo = vm.detailDossier
@@ -517,7 +639,107 @@
         });
 
         return formatter.format(parseFloat(str))
-      }
+      },
+      showDialogSearchLgspCongDan () {
+        let vm = this
+        vm.applicantIdNoLgsp = vm.thongTinChiTietHoSo.applicantIdNo
+        vm.applicantNameLgsp = vm.thongTinChiTietHoSo.applicantName
+        vm.applicantLgspInfomation = ''
+        vm.dialog_searchLgsp = true
+      },
+      searchLgspCongDan (event) {
+        let vm = this
+        if (String(vm.applicantIdNoLgsp).trim() && String(vm.applicantNameLgsp).trim() && vm.applicantBirthDate && String(vm.applicantBirthDate).length === 8) {
+          let dateInput = ''
+          if (String(vm.applicantBirthDate).indexOf('/') > 0) {
+            let date = String(vm.applicantBirthDate).split('/')
+            dateInput = date[2] + '-' + date[1] + '-' + date[0]
+          } else {
+            dateInput = String(vm.applicantBirthDate).substring(4,8) + '-' + String(vm.applicantBirthDate).substring(2,4) + '-' + String(vm.applicantBirthDate).substring(0,2)
+          }
+          let filter = {
+            applicantIdNo: String(vm.applicantIdNoLgsp).trim(),
+            applicantName: vm.convertString(String(vm.applicantNameLgsp).trim()).toUpperCase(),
+            birthDate: dateInput,
+            StaffEmail : vm.userLoginInfomation && vm.userLoginInfomation.hasOwnProperty('employeeEmail') ? vm.userLoginInfomation.employeeEmail : '',
+            GovAgencyCode: vm.thongTinChiTietHoSo ? vm.thongTinChiTietHoSo.govAgencyCode : '',
+            MaDVC: vm.thongTinChiTietHoSo ? vm.thongTinChiTietHoSo.serviceCode : ''
+          }
+          vm.loadingSearchLgsp = true
+          vm.$store.dispatch('searchLgspCongDan', filter).then(result => {
+            vm.loadingSearchLgsp = false
+            vm.applicantLgspInfomation = result
+            vm.warningLgsp = false
+            if (vm.applicantLgspInfomation && vm.applicantLgspInfomation.hasOwnProperty('SoLuongCongDan') && String(vm.applicantLgspInfomation["SoLuongCongDan"]) != '0') {
+              vm.lgspAlertColor = 'green'
+              vm.warningLgsp = true
+              vm.messageLgsp = 'Số CCCD/ CMND: "' + vm.applicantIdNoLgsp + '", họ tên: "' + vm.applicantNameLgsp + '" có thông tin trên CSDL quốc gia về dân cư'
+              // vm.dialog_searchLgsp = false
+            } else {
+              // vm.dialog_searchLgsp = true
+              vm.lgspAlertColor = 'red'
+              vm.warningLgsp = true
+              vm.messageLgsp = 'Số CCCD/ CMND: "' + vm.applicantIdNoLgsp + '", họ tên: "' + vm.applicantNameLgsp + '" không có thông tin trên CSDL quốc gia về dân cư'
+            }
+          }).catch(function (result) {
+            vm.lgspAlertColor = 'red'
+            vm.loadingSearchLgsp = false
+            vm.applicantLgspInfomation = false
+            vm.warningLgsp = true
+            vm.messageLgsp = 'Không truy cập được CSDL dân cư'
+          })
+        } else {
+          toastr.error('Vui lòng nhập đầy đủ số CCCD/ CMND, họ tên và ngày sinh để tra cứu')
+        }
+      },
+      closeSearchLgsp () {
+        let vm = this
+        vm.dialog_searchLgsp = false
+      },
+      formatDate(date) {
+        if (!date) return null
+        const [year, month, day] = date.split('-')
+        return `${day}/${month}/${year}`
+      },
+      getMaxdate () {
+        let date = new Date()
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+      },
+      parseDateInput (dateInput) {
+        if (dateInput) {
+          let date = ''
+          if (isNaN(dateInput)) {
+            date = new Date(dateInput)
+          } else {
+            date = new Date(Number(dateInput))
+          }
+          let dateFormated = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+          return dateFormated
+        }
+      },
+      parseDate(date) {
+        if (!date) return null
+        const [day, month, year] = date.split('/')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      },
+      convertString(str) {
+        str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
+        str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
+        str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i')
+        str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
+        str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
+        str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
+        str = str.replace(/đ/g, 'd')
+        str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, 'A')
+        str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, 'E')
+        str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, 'I')
+        str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, 'O')
+        str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
+        str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
+        str = str.replace(/Đ/g, 'D')
+        str = str.toLocaleLowerCase().replace(/\s/g, '')
+        return str
+      },
     },
     filters: {
       dateTimeView(arg) {

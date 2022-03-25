@@ -1157,15 +1157,6 @@
                  box clearable></v-text-field>
               </v-flex>
               <v-flex xs12 v-if="lgspType === 'citizen'">
-                <!-- <v-text-field
-                  box
-                  label="Ngày tháng năm sinh"
-                  :rules="[rules.required]"
-                  v-model="applicantBirthDate"
-                  placeholder="dd/mm/yyyy"
-                  mask="##/##/####"
-                  clearable
-                ></v-text-field> -->
                 <v-menu
                   ref="menuApplicantIdDate"
                   :close-on-content-click="false"
@@ -2794,10 +2785,6 @@ export default {
         vm.$store.dispatch('searchLgspCongDan', filter).then(result => {
           vm.loadingSearchLgsp = false
           vm.applicantLgspInfomation = result
-          // let birthDate = result['NgayThangNamSinh'] ? result['NgayThangNamSinh'] : ''
-          // if (birthDate) {
-          //   vm.applicantLgspInfomation['NgayThangNamSinh'] = birthDate.slice(6,8) + '/' + birthDate.slice(4,6) + '/' + birthDate.slice(0,4)
-          // }
           vm.warningLgsp = false
           if (vm.applicantLgspInfomation && vm.applicantLgspInfomation.hasOwnProperty('SoLuongCongDan') && String(vm.applicantLgspInfomation["SoLuongCongDan"]) != '0') {
             vm.lgspAlertColor = 'green'

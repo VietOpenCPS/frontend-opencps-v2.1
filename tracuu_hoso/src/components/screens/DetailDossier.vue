@@ -253,6 +253,7 @@
                 </v-layout>
               </v-card-text>
               <div class="text-xs-left mt-2 mb-3 ml-0">
+                <!-- thanh toán keypay -->
                 <v-chip v-if="getEPaymentProfile(paymentInfo.epaymentProfile)" color="orange" text-color="white"
                   @click.native="toKeyPay(getEPaymentProfile(paymentInfo.epaymentProfile).keypayUrl)"
                 >
@@ -261,6 +262,16 @@
                   </v-avatar>
                   <span class="py-2" style="cursor: pointer">Thanh toán trực tuyến</span>
                 </v-chip>
+                <!-- thanh toán paymentPlatform -->
+                <v-chip class="mb-2 ml-3" v-if="getEPaymentProfile(paymentInfo.epaymentProfile) && getEPaymentProfile(paymentInfo.epaymentProfile).hasOwnProperty('ppkpdvcqg')" color="#cb7755" text-color="white"
+                  @click.native="toKeyPayDvcqg('ppkpdvcqg')"
+                >
+                  <v-avatar style="cursor: pointer" >
+                    <img src="/o/opencps-store/js/cli/dvc/app/image/logo-ppkp.png" alt="trevor" style="background: #fff">
+                  </v-avatar>
+                  <span class="py-2" style="cursor: pointer">Thanh toán qua Cổng DVCQG</span>
+                </v-chip>
+                <!--  -->
               </div>
             </v-card>
             
@@ -550,6 +561,16 @@
       toKeyPay (item) {
         let vm = this
         window.open(item, '_self')
+      },
+      toKeyPayDvcqg () {
+        let vm = this
+        let filter = {
+          dossierId: vm.dossierDetail.dossierId
+        }
+        vm.$store.dispatch('toKeypayDvcqg', filter).then(result => {
+          window.open(result, '_self')
+        }).catch(function() {
+        })
       },
       getPaymentInfo () {
         let vm = this

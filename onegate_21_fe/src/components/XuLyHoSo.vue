@@ -749,21 +749,39 @@ export default {
               }
             })
           } else {
-            vm.$store.dispatch('doActionGroup', filter).then(function (result) {
-              vm.loadingActionProcess = false
-              vm.loadingAction = false
-              vm.btnStateVisible = false
-              setTimeout(function () {
-                vm.goBack()
-              }, 500)
-            }).catch(function (reject) {
+            if (vm.showTaoTaiLieuKetQua && vm.chiTietAction.signatureType == 'plugin' && vm.kySoThaoTacGop) {
+              let dataFileKySo = vm.$refs.tailieuketqua.mappingFileSignedUpdate
+              let dataUpdateFile = {
+                fileEntryIdStr: dataFileKySo.fileEntries,
+                dossierFileIdStr: dataFileKySo.dossierFiles
+              }
+              vm.$store.dispatch('updateFileKySoVgca', dataUpdateFile).then(res => {
+                vm.$store.dispatch('doActionGroup', filter).then(function (result) {
+                  vm.loadingActionProcess = false
+                  vm.loadingAction = false
+                  vm.btnStateVisible = false
+                  setTimeout(function () {
+                    vm.goBack()
+                  }, 500)
+                }).catch(function (reject) {
+                    vm.loadingActionProcess = false
+                    vm.loadingAction = false
+                })
+              }).catch(function() {
+              })
+            } else {
+              vm.$store.dispatch('doActionGroup', filter).then(function (result) {
                 vm.loadingActionProcess = false
                 vm.loadingAction = false
-                // vm.btnStateVisible = false
-                // setTimeout(function () {
-                //   vm.goBack()
-                // }, 500)
-            })
+                vm.btnStateVisible = false
+                setTimeout(function () {
+                  vm.goBack()
+                }, 500)
+              }).catch(function (reject) {
+                  vm.loadingActionProcess = false
+                  vm.loadingAction = false
+              })
+            }
           }
           
         }

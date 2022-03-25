@@ -11,6 +11,7 @@ export const store = new Vuex.Store({
     snackbarsocket: false,
     refreshSocket: 0,
     initData: {},
+    userLogin: '',
     tocken: '',
     loginUser: [
       {
@@ -2681,6 +2682,107 @@ export const store = new Vuex.Store({
         })
       })
     },
+    searchLgspCongDan({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {}
+        }
+        let systemLgsp = ''
+        try {
+          systemLgsp = systemLgspConfig
+        } catch (error) {
+        }
+        let dataInput = ''
+        let urlTraCuu = '/o/rest/v2/qldc'
+        if (systemLgsp === 'DongThap') {
+          dataInput = {
+            "MaYeuCau" : (new Date()).getTime(),
+            "MaTichHop" : "003",
+            "StaffEmail" : filter.StaffEmail,
+            "GovAgencyCode": filter.GovAgencyCode,
+            "MaDVC" : "G18-YT04",
+            "HoVaTen" : filter.applicantName,
+            "type" : "XacThucThongTinCongDan",
+            "NgayThangNamSinh" : filter.birthDate,
+            "MaCanBo" : "vhcgiang@dongthap.gov.vn"
+          }
+        } else if (systemLgsp === 'HauGiang') {
+          dataInput = {
+            "MaYeuCau" : (new Date()).getTime(),
+            "MaTichHop" : "003",
+            "StaffEmail" : filter.StaffEmail,
+            "GovAgencyCode": filter.GovAgencyCode,
+            "MaDVC" : filter.MaDVC,
+            "HoVaTen" : filter.applicantName,
+            "type" : "XacThucThongTinCongDan",
+            "NgayThangNamSinh" : filter.birthDate,
+          }
+        } else if (systemLgsp === 'BO-GTVT') {
+          urlTraCuu = "/o/rest/v2/qldc/dvcqg"
+          dataInput = {
+            "MaYeuCau" : (new Date()).getTime(),
+            "MaTichHop" : "037",
+            "StaffEmail" : filter.StaffEmail,
+            "GovAgencyCode": filter.GovAgencyCode,
+            "MaDVC" : filter.MaDVC,
+            "HoVaTen" : filter.applicantName,
+            "type" : "TraCuuThongTinCongDan",
+            "NgayThangNamSinh" : filter.birthDate,
+          }
+        }
+        
+        if (String(filter.applicantIdNo).length === 9) {
+          dataInput['SoCMND'] = filter.applicantIdNo
+        } else {
+          dataInput['SoDinhDanh'] = filter.applicantIdNo
+        }
+        axios({
+          method: 'POST',
+          url: urlTraCuu,
+          headers: config.headers,
+          params: config.params,
+          data: dataInput
+        }).then(function (response) {
+          let serializable = response.data
+          let dataCitizen = ''
+          if (systemLgsp === 'DongThap') {
+            if (serializable && serializable.hasOwnProperty('data') && String(serializable.data) == 'true') {
+              dataCitizen = {
+                SoLuongCongDan: 1
+              }
+              resolve(dataCitizen)
+            } else {
+              dataCitizen = {
+                SoLuongCongDan: 0
+              }
+              resolve(dataCitizen)
+            }
+          } else if (systemLgsp === 'HauGiang') {
+            if (serializable && serializable.hasOwnProperty('Body') && serializable["Body"].hasOwnProperty('XacThucThongTinCongDanResponse')) {
+              dataCitizen = serializable["Body"]["XacThucThongTinCongDanResponse"]
+              resolve(dataCitizen)
+            } else {
+              reject('')
+            }
+          } else if (systemLgsp === 'BO-GTVT') {
+            if (serializable && serializable.hasOwnProperty('Body') && serializable["Body"].hasOwnProperty('CongdanCollection') && serializable["Body"]["CongdanCollection"]) {
+              dataCitizen = {
+                SoLuongCongDan: 1
+              }
+              resolve(dataCitizen)
+            } else {
+              reject('')
+            }
+          }
+        }).catch(function (error) {
+          let dataReject = error.response.data
+          reject(dataReject)
+        })
+      })
+    },
   },
   mutations: {
     SOCKET_ONOPEN (state, event)  {
@@ -2803,7 +2905,10 @@ export const store = new Vuex.Store({
     },
     setisConnected (state, payload) {
       state.isConnected = payload
-    }
+    },
+    setUserLogin (state, payload) {
+      state.userLogin = payload
+    },
   },
   getters: {
     getlistTableMenu (state) {
@@ -2850,6 +2955,9 @@ export const store = new Vuex.Store({
     },
     getproblem (state) {
       return state.problem
-    }
+    },
+    getUserLogin (state) {
+      return state.userLogin
+    },
   }
 })

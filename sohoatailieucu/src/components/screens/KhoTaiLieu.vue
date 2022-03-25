@@ -44,13 +44,12 @@
         </v-checkbox>
         <v-checkbox
           class="mt-0 d-inline-block"
-          label="Đã ký số"
           v-model="daKy"
           :value="true"
           @change="changeFilterStatus($event)"
         >
           <template slot="label">
-            <span style="color:black !important">Chưa ký số</span>
+            <span style="color:black !important">Đã ký số</span>
           </template>
         </v-checkbox>
       </div>
@@ -560,6 +559,7 @@
             }
             vm.$store.dispatch('updateFileKySoVgca', dataUpdateFile).then(res => {
               toastr.success('Ký số thành công')
+              vm.getDanhSachGiayToSoHoa(vm.dataInputSearch, 'reset')
             }).catch(function() {
               toastr.error('Ký số thất bại')
             })
@@ -606,8 +606,13 @@
         vm.documentPage = config.page
         vm.getDanhSachGiayToSoHoa(vm.dataInputSearch)
       },
-      getDanhSachGiayToSoHoa (dataSearch) {
+      getDanhSachGiayToSoHoa (dataSearch, reset) {
         let vm = this
+        if (reset) {
+          vm.documentPage = 1
+          vm.selected = []
+          vm.selectMultiplePage = []
+        }
         let filter = {
           start: vm.documentPage * vm.numberPerPage - vm.numberPerPage,
           end: vm.documentPage * vm.numberPerPage,

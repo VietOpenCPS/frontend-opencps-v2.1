@@ -75,7 +75,13 @@ export const store = new Vuex.Store({
             link: '/table/opencps_actionconfig',
             code: 'opencps_actionconfig',
             text: 'Thao tác xử lý'
-          }
+          },
+          {
+            icon: 'filter_8',
+            link: '/table/opencps_employee',
+            code: 'opencps_employee',
+            text: 'Quản lý nhân sự'
+          },
         ]
       },
     ],
