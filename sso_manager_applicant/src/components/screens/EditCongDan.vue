@@ -575,7 +575,9 @@ export default {
             vm.loading = false
             toastr.remove()
             toastr.success('Thêm mới thành công')
-            window.history.back()
+            // window.history.back()
+            let data = result.resp
+            vm.$router.push({ path: '/thong-tin-ca-nhan/' + data.primKey })
           }).catch(function (response) {
             vm.loading = false
             toastr.remove()

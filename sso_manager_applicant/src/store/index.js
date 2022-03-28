@@ -15,7 +15,7 @@ export const store = new Vuex.Store({
     isMobile: false,
     userLogin: '',
     applicantInfos: '',
-    apiSso: 'http://119.17.200.66:8378' 
+    apiSso: 'https://apigateway.haugiang.gov.vn' 
   },
   actions: {
     loadInitResource ({commit, state}) {

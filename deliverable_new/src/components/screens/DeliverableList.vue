@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row-header no__hidden_class">
-      <div class="background-triangle-big"> <span>{{items ? String(items[index]['typeName']) : ''}}</span> </div>
+      <div class="background-triangle-big"> <span>{{typeNameTitle}}</span> </div>
 
       <div class="layout row wrap header_tools row-blue">
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
@@ -38,114 +38,6 @@
         <div class="adv_search px-2 my-2 mx-2" style="background: #eeeeee">
           <div class="searchAdvanced-content py-2">
             <v-layout wrap>
-              <!-- <v-flex xs12 sm6 class="mb-2 px-2">
-                <div>
-                  <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Số/ ký hiệu:</div>
-                  <v-text-field
-                    v-model="deliverableKey"
-                    class="search-input-appbar input-search d-inline-block"
-                    style="width: calc(100% - 150px);"
-                    single-lines
-                    hide-details
-                    solo
-                    flat
-                    height="32"
-                    min-height="32"
-                    clearable
-                    @keyup.enter="filterDeliverable"
-                  ></v-text-field>
-                </div>
-              </v-flex>
-              <v-flex xs12 sm6 class="mb-2 px-2">
-                <div>
-                  <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Ngày ban hành:</div>
-                  <v-menu
-                    class="d-inline-block"
-                    style="width: calc(100% - 150px);"
-                    ref="menuDate"
-                    :close-on-content-click="false"
-                    v-model="menuDate"
-                    :nudge-right="40"
-                    lazy
-                    transition="fade-transition"
-                    offset-y
-                    full-width
-                    max-width="290px"
-                    min-width="290px"
-                  >
-                    <v-text-field
-                      class="search-input-appbar input-search d-inline-block"
-                      slot="activator"
-                      append-icon="event"
-                      single-lines
-                      hide-details
-                      solo
-                      flat
-                      height="32"
-                      min-height="32"
-                      v-model="issueDate"
-                      @blur="issueDatePiecker = parseDate(issueDate)"
-                      clearable
-                      @keyup.enter="filterDeliverable"
-                    ></v-text-field>
-                    <v-date-picker ref="picker" min="1950-01-01" :first-day-of-week="1" locale="vi"
-                    v-model="issueDatePiecker" no-title @input="changeIssueDate"></v-date-picker>
-                  </v-menu>
-                </div>
-              </v-flex>
-              <v-flex xs12 sm6 class="mb-2 px-2">
-                <div>
-                  <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Đơn vị được cấp:</div>
-                  <v-text-field
-                    v-model="applicantName"
-                    class="search-input-appbar input-search d-inline-block"
-                    style="width: calc(100% - 150px);"
-                    single-lines
-                    hide-details
-                    solo
-                    flat
-                    height="32"
-                    min-height="32"
-                    clearable
-                    @keyup.enter="filterDeliverable"
-                  ></v-text-field>
-                </div>
-              </v-flex>
-              <v-flex xs12 sm6 class="mb-2 px-2">
-                <div>
-                  <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Đơn vị cử đến:</div>
-                  <v-text-field
-                    v-model="donvicu_data"
-                    class="search-input-appbar input-search d-inline-block"
-                    style="width: calc(100% - 150px);"
-                    single-lines
-                    hide-details
-                    solo
-                    flat
-                    height="32"
-                    min-height="32"
-                    clearable
-                    @keyup.enter="filterDeliverable"
-                  ></v-text-field>
-                </div>
-              </v-flex>
-              <v-flex xs12 class="mb-2 px-2">
-                <div>
-                  <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">Trích yếu:</div>
-                  <v-textarea
-                    v-model="trichyeu_data"
-                    class="search-input-appbar input-search d-inline-block"
-                    style="width: calc(100% - 150px);"
-                    single-lines
-                    hide-details
-                    solo
-                    flat
-                    rows="3"
-                    clearable
-                    @keyup.enter.native="filterDeliverable"
-                  ></v-textarea>
-                </div>
-              </v-flex> -->
               <v-flex v-for="(item, indexTool) in filters" v-if="item.display" v-bind:key="indexTool" :class="item.class" class="mb-2 px-2">
                 <div>
                   <div class="d-inline-block text-bold" style="font-weight:450;width: 150px;">{{item.fieldLabel}}:</div>
@@ -239,7 +131,6 @@
                   </v-menu> -->
                 </div>
               </v-flex>
-              
             </v-layout>
             
             <v-flex class="xs12 mx-2">
@@ -265,7 +156,6 @@
         <v-icon>get_app</v-icon> &nbsp;
         {{downloadFileTemplate.lable}}
       </v-btn>
-      <!--  -->
       <!-- import -->
       <v-btn color="primary" class="white--text"
         v-if="importDeliverable"
@@ -285,6 +175,93 @@
         <v-icon>import_export</v-icon>&nbsp;
         Export&nbsp;{{String(loaiDuLieu).toLowerCase()}}
       </v-btn>
+      <!-- import -->
+      <v-btn color="primary" class="white--text mr-2"
+        v-if="hasReport"
+        :loading="loadingReport"
+        :disabled="loadingReport"
+        @click="viewReport">
+        Thống kê
+      </v-btn>
+      <!--  -->
+      <div class="" v-if="viewFilterBaoCao && paramsReport">
+        <div class="adv_search px-2 my-2 mx-2 py-2" style="background: #eeeeee">
+          <div class="searchAdvanced-content py-2">
+            <v-layout wrap>
+              <v-flex v-for="(item, indexTool) in paramsReport" v-bind:key="indexTool" :class="item.class" class="mb-2 px-2">
+                <div>
+                  <div class="d-inline-block text-bold pr-3" style="font-weight:450;width: 150px;">{{item.fieldLabel}}:</div>
+                  <v-text-field
+                    v-if="item.fieldType === 'string'"
+                    v-model="dataFilterBaoCao[item.fieldName]"
+                    class="search-input-appbar input-search d-inline-block"
+                    style="width: calc(100% - 150px);"
+                    single-lines
+                    hide-details
+                    solo
+                    flat
+                    height="32"
+                    min-height="32"
+                    clearable
+                    @keyup.enter="submitViewThongKe"
+                  ></v-text-field>
+                  <v-textarea
+                    v-if="item['fieldType'] === 'textarea'"
+                    v-model="dataFilterBaoCao[item.fieldName]"
+                    class="search-input-appbar input-search d-inline-block"
+                    style="width: calc(100% - 150px);"
+                    single-lines
+                    hide-details
+                    solo
+                    flat
+                    rows="3"
+                    clearable
+                    @keyup.enter="submitViewThongKe"
+                  ></v-textarea>
+                  <v-autocomplete
+                    v-if="item['fieldType'] === 'select'"
+                    class="select-search d-inline-block"
+                    :items="item['source']"
+                    v-model="dataFilterBaoCao[item.fieldName]"
+                    :label="item['label']"
+                    item-value="value"
+                    item-text="name"
+                    :clearable="item['clearable']"
+                    hide-details
+                    solo
+                    flat
+                    height="32"
+                    min-height="32"
+                    style="width: calc(100% - 150px);"
+                  ></v-autocomplete>
+                  <datetime-picker
+                    v-if="item.fieldType === 'date'"
+                    v-model="dataFilterBaoCao[item.fieldName]" 
+                    :item="item" 
+                    :data-value="dataFilterBaoCao[item.fieldName]"
+                    :classTextField="'search-input-appbar input-search d-inline-block'"
+                    :classMenu="'d-inline-block'"
+                    @changeDate="changeDateReport($event, item.fieldName)"
+                    >
+                    
+                  </datetime-picker>
+                </div>
+              </v-flex>
+            </v-layout>
+            
+            <v-flex class="xs12 mx-2">
+              <v-btn color="red darken-3" class="mx-0 mb-0 mr-3" dark v-on:click.native="backToList">
+                <v-icon style="color: #fff !important">reply</v-icon> &nbsp;
+                Quay lại
+              </v-btn>
+              <v-btn class="mx-0 mb-0" color="primary" dark @click.native="submitViewThongKe">
+                <v-icon size="18">save</v-icon> &nbsp; Đồng ý
+              </v-btn>
+            </v-flex>
+          </div>
+        </div>
+      </div>
+      <!--  -->
       <JsonExcel
           class="btn btn-default btn-export"
           :data="json_data"
@@ -294,7 +271,43 @@
         Export Excel
       </JsonExcel>
     </div>
+    <!--  -->
     <v-data-table
+      v-if="viewFilterBaoCao"
+      :headers="headersReport"
+      :items="dataReportList"
+      class="table-landing table-bordered"
+      hide-actions
+      >
+      <template slot="items" slot-scope="props">
+      <tr>
+          <td class="pt-1" v-for="(itemHeader, indexHeader) in headersReport" v-bind:key="indexHeader + '_' + props.item['_id']"
+          :class="itemHeader['class_column']"
+          >
+            <div v-if="itemHeader.type === 'currency'">
+              <span>
+                {{currency(props.item[itemHeader.value])}}
+              </span>
+            </div>
+            <div v-else>
+                <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item" :layout_view="itemHeader.layout_view"></template-rendering>
+                <span v-else>
+                {{ props.item[itemHeader.value] }}
+                </span>
+            </div>
+            
+          </td>
+      </tr>
+      </template>
+      <template slot="no-data">
+      <div class="text-xs-center mt-2">
+          Không có dữ liệu
+      </div>
+      </template>
+    </v-data-table>
+    <!--  -->
+    <v-data-table
+        v-if="!viewFilterBaoCao"
         :headers="headers"
         :items="hosoDatas"
         class="table-landing table-bordered"
@@ -396,7 +409,7 @@
         </div>
       </template>
     </v-data-table>
-    <div v-if="!loadingTable" class="text-xs-right layout wrap" style="position: relative;border-top: 1px solid lightgrey;">
+    <div v-if="!loadingTable && !viewFilterBaoCao" class="text-xs-right layout wrap" style="position: relative;border-top: 1px solid lightgrey;">
       <div class="flex pagging-table px-2"> 
         <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" custom-class="custom-tiny-class" 
           @tiny:change-page="paggingData" ></tiny-pagination>
@@ -515,8 +528,15 @@
         issueDatePiecker: '',
         filterData: {},
         menusss: false,
+        hasReport: false,
+        typeNameTitle: "",
+        headersReport: "",
+        dataReportList: [],
+        dataFilterBaoCao: {},
+        viewFilterBaoCao: false,
         loadingTable: false,
         dialogPDFLoading: false,
+        loadingReport: false,
         loadingImport: false,
         dialogPDFList: false,
         dialogMortgage: false,
@@ -562,7 +582,8 @@
         },
         importDeliverable: true,
         exportDeliverable: true,
-        urlRedirectDossier: ''
+        urlRedirectDossier: '',
+        paramsReport: '',
       }
     },
     created () {
@@ -570,6 +591,7 @@
       vm.$nextTick(function () {
         vm.$store.dispatch('getDeliverableTypes').then(function (result) {
           setTimeout(() => {
+            vm.typeNameTitle = vm.items[vm.index]['typeName']
             if (vm.items[vm.index]['dataConfig'] !== '') {
               vm.filters = eval('( ' + vm.items[vm.index]['dataConfig'] + ' )')
             }
@@ -593,6 +615,16 @@
                 vm.loaiDuLieu = tableConfig.loaiDuLieu
               } else {
                 vm.loaiDuLieu = "giấy phép"
+              }
+              try {
+                let tableConfig = JSON.parse(vm.items[vm.index]['tableConfig'])
+                vm.hasReport = tableConfig.hasOwnProperty('report')
+                vm.paramsReport = tableConfig.hasOwnProperty('report') ? tableConfig.report.view.form : ''
+                vm.headersReport = tableConfig.hasOwnProperty('report') ? tableConfig.report.view.table : ''
+              } catch (error) {
+                vm.hasReport = false
+                vm.paramsReport = ''
+                vm.headersReport = ''
               }
               if (tableConfig.hasOwnProperty('importDeliverable') && !tableConfig.importDeliverable) {
                 vm.importDeliverable = false
@@ -632,8 +664,15 @@
       })
     },
     watch: {
+      items () {
+        var vm = this
+        if (vm.items.length > 0) {
+          vm.$store.commit('setUserPermission', vm.items[vm.index]['moderator'])
+        }
+      },
       '$route': function (newRoute, oldRoute) {
         let vm = this
+        vm.typeNameTitle = vm.items[vm.index]['typeName']
         let currentQuery = newRoute.query
         if (currentQuery.hasOwnProperty('keyword')) {
           vm.deliverableKey = currentQuery['keyword']
@@ -650,9 +689,54 @@
         vm.donvicu = ''
         vm.trichyeu = ''
         vm.deliverableCode = ''
-        // vm.filterDeliverable('keyword')
         vm.filterDeliverable()
+
+        // init config
+        vm.headerExport = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')['headers']
+        try{
+          let tableConfig = JSON.parse(vm.items[vm.index]['tableConfig'])
+          vm.downloadFileTemplate = tableConfig['downloadFileTemplate'] ? tableConfig['downloadFileTemplate'] : {url: '', lable: ''}
+        }
+        catch (err) {
+          vm.downloadFileTemplate = {url: '', lable: ''}
+        }
+        try {
+          let tableConfig = JSON.parse(vm.items[vm.index]['tableConfig'])
+          vm.hasReport = tableConfig.hasOwnProperty('report')
+          vm.paramsReport = tableConfig.hasOwnProperty('report') ? tableConfig.report.view.form : ''
+          vm.headersReport = tableConfig.hasOwnProperty('report') ? tableConfig.report.view.table : ''
+        } catch (error) {
+          vm.hasReport = false
+          vm.paramsReport = ''
+          vm.headersReport = ''
+        }
+        vm.headers = vm.headerExport.filter(function (item) {
+          return !item.hasOwnProperty('show') || (item.hasOwnProperty('show') && item.show)
+        })
+        vm.headerExportRemoveAction = vm.headerExport.filter(function (item) {
+          return item.value !== 'action'
+        })
+        for(let i=0; i< vm.headerExportRemoveAction.length ;i++){
+          vm.json_fields[vm.headerExportRemoveAction[i]['text']] =  vm.headerExportRemoveAction[i]['value']
+        }
+        let tableConfig = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')
+        if (tableConfig.hasOwnProperty('loaiDuLieu') && tableConfig.loaiDuLieu) {
+          vm.loaiDuLieu = tableConfig.loaiDuLieu
+        } else {
+          vm.loaiDuLieu = "giấy phép"
+        }
+        if (tableConfig.hasOwnProperty('importDeliverable') && !tableConfig.importDeliverable) {
+          vm.importDeliverable = false
+        }
+        if (tableConfig.hasOwnProperty('exportDeliverable') && !tableConfig.exportDeliverable) {
+          vm.exportDeliverable = false
+        }
+        if (tableConfig.hasOwnProperty('urlRedirectDossier') && tableConfig.urlRedirectDossier) {
+          vm.urlRedirectDossier = tableConfig.urlRedirectDossier
+        }
+        // 
       },
+      
       index (val) {
         var vm = this
         // set permissionUser
@@ -667,7 +751,7 @@
         }
         if (vm.items[val]['tableConfig'] !== '') {
           vm.hosoDatasPage = 1
-          console.log('ưqe',vm.items[vm.index]['tableConfig'])
+          // console.log('ưqe',vm.items[vm.index]['tableConfig'])
           vm.headerExport = eval('( ' + vm.items[val]['tableConfig'] + ' )')['headers']
           try{
             let tableConfig = JSON.parse(vm.items[vm.index]['tableConfig'])
@@ -676,7 +760,16 @@
           catch (err) {
             vm.downloadFileTemplate = {url: '', lable: ''}
           }
-      
+          try {
+            let tableConfig = JSON.parse(vm.items[vm.index]['tableConfig'])
+            vm.hasReport = tableConfig.hasOwnProperty('report')
+            vm.paramsReport = tableConfig.hasOwnProperty('report') ? tableConfig.report.view.form : ''
+            vm.headersReport = tableConfig.hasOwnProperty('report') ? tableConfig.report.view.table : ''
+          } catch (error) {
+            vm.hasReport = false
+            vm.paramsReport = ''
+            vm.headersReport = ''
+          }
           vm.headers = vm.headerExport.filter(function (item) {
             return !item.hasOwnProperty('show') || (item.hasOwnProperty('show') && item.show)
           })
@@ -684,9 +777,7 @@
             return item.value !== 'action'
           })
           for(let i=0; i< vm.headerExportRemoveAction.length ;i++){
-            // if(vm.headerExportRemoveAction[i]['text'] !== 'STT'){
-              vm.json_fields[vm.headerExportRemoveAction[i]['text']] =  vm.headerExportRemoveAction[i]['value']
-            // }
+            vm.json_fields[vm.headerExportRemoveAction[i]['text']] =  vm.headerExportRemoveAction[i]['value']
           }
           let tableConfig = eval('( ' + vm.items[val]['tableConfig'] + ' )')
           if (tableConfig.hasOwnProperty('loaiDuLieu') && tableConfig.loaiDuLieu) {
@@ -713,14 +804,6 @@
             vm.loadingTable = false
           }, 100)
         }
-      },
-      items () {
-        var vm = this
-        // set permissionUser
-        if (vm.items.length > 0) {
-          vm.$store.commit('setUserPermission', vm.items[vm.index]['moderator'])
-        }
-        // 
       },
       advSearchItems: {
         handler: function (val, oldVal) {
@@ -752,8 +835,11 @@
       }
     },
     computed: {
+      // items () {
+      //   return this.$store.getters.getDeliverableTypes
+      // },
       items () {
-        return this.$store.getters.getDeliverableTypes
+        return this.$store.getters.getDeliverableTypesFilter
       },
       userPermission () {
         return this.$store.getters.getUserPermission
@@ -1213,14 +1299,13 @@
         const [day, month, year] = date.split('/')
         return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
       },
-      reloadPickerChange(key){
-        console.log(key)
+      reloadPickerChange(key) {
       },
-      changeDate(event, key){
-        console.log(event)
-        // let date = new Date(event)
-        // const [year, month, day] = date.toISOString().substr(0, 10).split('-')
+      changeDate(event, key) {
         this.filterData[key] = event
+      },
+      changeDateReport(event, key) {
+        this.dataFilterBaoCao[key] = event
       },
       async fetchDataExcel(){
         let vm = this
@@ -1290,10 +1375,44 @@
         link.click()
       },
       currency (value) {
-        if (value) {
+        if (value !== 0 && value !== '') {
           return String(value).replace(/\B(?=(\d{3})+(?!\d))/g, '.')
         }
-        return ''
+        return value
+      },
+      viewReport () {
+        let vm = this
+        vm.viewFilterBaoCao = !vm.viewFilterBaoCao
+      },
+      backToList () {
+        let vm = this
+        vm.viewFilterBaoCao = false
+      },
+      submitViewThongKe () {
+        let vm = this
+        let searchParams = {}
+        for(let key in vm.dataFilterBaoCao){
+          if (vm.dataFilterBaoCao[key]){
+            let params = vm.paramsReport.find(item => item.fieldName === key)
+            if (params && params.fieldType === 'date') {
+              searchParams[key] = vm.dataFilterBaoCao[key] ? (new Date(vm.parseDate(vm.dataFilterBaoCao[key]))).getTime() : ''
+            } else {
+              searchParams[key] = typeof vm.dataFilterBaoCao[key] === 'string' ? vm.dataFilterBaoCao[key].trim() : vm.dataFilterBaoCao[key]
+            }
+          }
+        }
+        let filter = {
+          data: JSON.stringify({key: searchParams})
+        }
+        console.log('filter', filter)
+        vm.loadingTable = true
+        vm.$store.dispatch('getReport', filter).then(function (result) {
+          vm.dataReportList = result.hasOwnProperty('data') ? result['data'] : []
+          vm.loadingTable = false
+        }).catch(function (reject) {
+          vm.loadingTable = false
+          vm.dataReportList = []
+        })
       }
     }
   }

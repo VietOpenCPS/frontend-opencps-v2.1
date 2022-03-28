@@ -1,11 +1,29 @@
 <template>
   <v-app id="app_deliverable">
     <v-navigation-drawer app clipped floating width="316">
+      <v-text-field
+        v-model="keywordFilter"
+        class="search-input-appbar input-search d-inline-block"
+        style="width: 100%;
+          border: 1px solid #dedede;
+          border-radius: 3px;"
+        single-lines
+        hide-details
+        solo
+        flat
+        height="32"
+        min-height="32"
+        clearable
+        @keyup.enter="filterDeliverableType"
+        @input="filterDeliverableType"
+        placeholder="Nhập từ khóa tìm kiếm"
+        autofocus
+      ></v-text-field>
       <v-list dense>
         <v-list-tile
           v-for="(item, indexItem) in items"
           :key="indexItem"
-          :to="'/danh-sach-giay-to/' + indexItem"
+          @click="menuSelect(indexItem)"
         >
           <v-list-tile-action>
             <v-icon v-if="String(indexItem) === String(index)" color="blue darken-3">description</v-icon>
@@ -13,7 +31,7 @@
           </v-list-tile-action>
 
           <v-list-tile-content>
-            <v-list-tile-title :title="item.typeName">{{ item.typeName }}</v-list-tile-title>
+            <v-list-tile-title :title="item.typeName" :style="String(indexItem) === String(index) ? 'color: #658a04 !important' : ''">{{ item.typeName }}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -76,18 +94,24 @@
     data: () => ({
       dialog: false,
       drawer: null,
-      dataSocket: {}
+      dataSocket: {},
+      keywordFilter: '',
+      functionTimeOut: null
     }),
     created () {
       let vm = this
       vm.$nextTick(function () {
         let params = vm.$router.history.current.params
         vm.index = params['index']
+        vm.keywordFilter = ''
       })
     },
     computed: {
+      // items () {
+      //   return this.$store.getters.getDeliverableTypes
+      // },
       items () {
-        return this.$store.getters.getDeliverableTypes
+        return this.$store.getters.getDeliverableTypesFilter
       },
       snackbarerror: {
         // getter
@@ -124,6 +148,32 @@
       }
     },
     methods: {
+      filterDeliverableType () {
+        let vm = this
+        let keyword = String(vm.keywordFilter).toLowerCase().replace(/\n/g, "").trim()
+        let listViewFull = vm.$store.getters.getDeliverableTypes
+        let listViewFilter = listViewFull.filter(function (item) {
+          return String(item.typeName).toLowerCase().replace(/\n/g, "").indexOf(keyword) >= 0
+        })
+        if (vm.functionTimeOut) {
+          clearTimeout(vm.functionTimeOut)
+        }
+        vm.functionTimeOut = setTimeout(function () {
+          if (keyword && keyword.length >= 3) {
+            if (listViewFilter && listViewFilter.length) {
+              vm.$store.commit('setDeliverableTypesFilter', listViewFilter)
+            } else {
+              vm.$store.commit('setDeliverableTypesFilter', listViewFull)
+            }
+          } else {
+            vm.$store.commit('setDeliverableTypesFilter', listViewFull)
+          }
+        }, 500)
+      },
+      menuSelect (index) {
+        let vm = this
+        vm.$router.push('/danh-sach-giay-to/' + index + '?t=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1)
+      },
       redirectFilter(val) {
         this.$router.push(val + '?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1)
       },

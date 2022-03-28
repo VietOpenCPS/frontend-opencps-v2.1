@@ -18,6 +18,16 @@
                         <v-icon size="18">reply</v-icon>&nbsp;
                         <span>Quay lại</span>
                     </v-btn>
+                    <!-- <v-btn
+                        v-if="!daCapChungThu"
+                        class="mx-0 mr-3"
+                        small
+                        color="primary"
+                        @click="createChungThuSo()"
+                    >
+                        <v-icon size="18">mdi-plus</v-icon>&nbsp;
+                        <span>Cấp chứng thư số</span>
+                    </v-btn> -->
                     <v-btn
                         class="mx-0"
                         small
@@ -715,7 +725,8 @@ export default {
         logChange: '',
         validFormChangeLog: true,
         dialogPrint: false,
-        contentPrint: ''
+        contentPrint: '',
+        daCapChungThu: false
       }
     },
     watch: {
@@ -1081,6 +1092,36 @@ export default {
 
         // var element = document.getElementById('printPhieu_1')
         // html2pdf(element)
+      },
+      createChungThuSo () {
+        let vm = this
+        let date = ''
+        let maSoCaNhan = String(vm.thongTinCongDan.maSoCaNhan)
+        try {
+          let month = (new Date(vm.thongTinCongDan.ngaySinh)).getMonth() + 1
+          date = (new Date(vm.thongTinCongDan.ngaySinh)).getDate() + '-' + month + '-' + (new Date(vm.thongTinCongDan.ngaySinh)).getFullYear()
+        } catch (error) {
+        }
+        let filter = {
+          data: {
+            "fullName": vm.thongTinCongDan.hoVaTen, 
+            "dob": date,
+            "identityNo": maSoCaNhan.length == 9 ? "CMND:" + maSoCaNhan : "CCCD:" + maSoCaNhan,
+            "issueDate": "",
+            "issuePlace": "",
+            "permanentAddress": "",
+            "nation": "VN",
+            "state": "",
+            "email": vm.thongTinCongDan['danhBaLienLac']['thuDienTu'],
+            "phone": vm.thongTinCongDan['danhBaLienLac']['soDienThoai'],
+            "organization": "TrustCA"
+          }
+        }
+        vm.$store.dispatch('createChungThuSo', filter).then(function (result) {
+          
+        }).catch(function (response) {
+          
+        })
       }
     }
 }

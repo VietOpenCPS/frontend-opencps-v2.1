@@ -290,3 +290,20 @@ body .notification_wrap > div:last-child {
 #react-root span {
     background: transparent;
 }
+/*  */
+.v-text-field.v-text-field--solo:not(.v-text-field--solo-flat)>.v-input__control>.v-input__slot {
+    box-shadow: none;
+    border: 1px solid #b3aeae;
+  }
+  .error--text>.v-input__control>.v-input__slot {
+    border: 1px solid #ef9d9d !important;
+  }
+  .cong-dan-info td{
+      border-bottom: 0px!important;
+  }
+  .cong-dan-info table{
+      border-top: none!important;
+  }
+  .td-highlight{
+      background-color: #F9F4F1;
+  }
