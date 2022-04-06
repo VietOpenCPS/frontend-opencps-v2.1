@@ -5,10 +5,12 @@ import TiepNhanHoSoDetail from '@/components/blacklist/TiepNhanHoSoDetail'
 import HoanThienBoSungHoSoDetail from '@/components/blacklist/HoanThienBoSungHoSoDetail'
 import DetailForward from '@/components/blacklist/DetailForward'
 import NotFound from '@/components/NotFound'
+import DanhSachMauGiayPhep from '@/components/screens/DanhSachMauGiayPhep'
 import DeliverableList from '@/components/screens/DeliverableList'
 import DeliverableEditor from '@/components/screens/DeliverableEditor'
 
 const routes = [
+  { path: '/', name: 'DanhSachMauGiayPhep', component: DanhSachMauGiayPhep, props: true },
   { path: '/danh-sach-giay-to/:index', name: 'DeliverableList', component: DeliverableList, props: true },
   { path: '/danh-sach-giay-to/:index/editor/:id', name: 'DeliverableEditor', component: DeliverableEditor, props: true },
   { path: '/danh-sach-ho-so/:index', name: 'Landing', component: Landing, props: true },

@@ -1822,7 +1822,7 @@ export default {
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           vm.dataExportExcel = docDString
           vm.docDefinition = JSON.parse(docDString)
-          // console.log('vm.docDefinition', vm.docDefinition)
+          console.log('vm.docDefinition', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           // create blob
           // check showTable
@@ -2295,7 +2295,7 @@ export default {
           vm.dataExportExcel = docDString
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
-          // console.log('docDefinition-render-pdf', vm.docDefinition)
+          console.log('docDefinition-render-pdf', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           // create blob
           // check showTable

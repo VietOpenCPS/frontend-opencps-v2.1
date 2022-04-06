@@ -477,7 +477,7 @@ export const store = new Vuex.Store({
           dataPost.append('method', 'GET')
           dataPost.append('url', '/fileitems')
           dataPost.append('data', JSON.stringify(textPost))
-
+          dataPost.append('serverCode', 'SERVER_MOTCUA')
           axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
             resolve(response.data)
           }, error => {
@@ -499,7 +499,7 @@ export const store = new Vuex.Store({
         dataPost.append('url', '/applicantdatas/' + filter.applicantDataId + '/preview')
         dataPost.append('dataType', 'binary')
         dataPost.append('data', '')
-        
+        dataPost.append('serverCode', 'SERVER_MOTCUA')        
         axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
           let url = window.URL.createObjectURL(response.data)
           resolve(url)

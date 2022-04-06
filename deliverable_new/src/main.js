@@ -72,9 +72,19 @@ new Vue({
     vm.$nextTick(function() {
       vm.$store.dispatch('loadInitResource')
       if (window.location.href.endsWith('#/')) {
-        vm.$router.push('/danh-sach-giay-to/0')
+        vm.$router.push('/')
       }
       vm.$store.dispatch('getDeliverableTypes')
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId()
+        }
+      }
+      axios.get('/o/v1/opencps/site/name', param).then(function (response) {
+        let serializable = response.data
+        vm.$store.commit('setsiteName', serializable)
+      }).catch(function (error) {
+      })
     })
   },
   render: function (h) { return h(App) }

@@ -16,6 +16,7 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    siteName: '',
     userPermission: false,
     groupId: window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0,
     snackbarerror: false,
@@ -405,7 +406,7 @@ export const store = new Vuex.Store({
     getReport ({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
         var settings = {
-          "url": "/o/statistic/deliverable/report",
+          "url": "/o/statistic/deliverable/report?typeCode=" + filter.typeCode,
           "method": "POST",
           "headers": {
             "groupId": 0,
@@ -478,6 +479,9 @@ export const store = new Vuex.Store({
     setDeliverableTypesFilter (state, payload) {
       return state.deliverableTypesFilter = payload
     },
+    setsiteName (state, payload) {
+      state.siteName = payload
+    },
   },
   getters: {
     getUser (state) {
@@ -518,6 +522,9 @@ export const store = new Vuex.Store({
     },
     getActiveBindFormData (state) {
       return state.activeBindFormData
-    }
+    },
+    getsiteName (state) {
+      return state.siteName
+    },
   }
 })

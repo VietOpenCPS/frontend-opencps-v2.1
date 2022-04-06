@@ -36,7 +36,7 @@
           <v-expansion-panel-content hide-actions>
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
-                <div class="mr-2" @click="item.hasForm ? loadAlpcaFormClick(item, index) : ''" style="min-width: 20px; display: flex;">
+                <div class="mr-2" @click.stop="item.hasForm ? loadAlpcaFormClick(item, index) : ''" style="min-width: 20px; display: flex;">
                   <div v-if="render && originality === 3 && (formCodeInput === 'NEW' || formCodeInput === 'NEW_GROUP')" @click='$event.stopPropagation()' class="header__tphs check-template mr-2" style="width: 20px;margin-left: -15px;">
                     <v-checkbox class="my-0 py-0" v-model="item['hasTemplate']" @change="changeHasTemplate(index, item)"></v-checkbox>
                   </div>

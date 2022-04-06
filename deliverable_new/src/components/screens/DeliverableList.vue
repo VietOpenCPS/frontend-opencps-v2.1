@@ -20,22 +20,25 @@
             autofocus
           ></v-text-field> -->
         </div>
-        <div class="flex text-right" style="margin-left: auto;max-width: 115px;">
-          <v-tooltip top>
-            <v-btn  slot="activator" icon class="my-0 mx-0 mr-2 px-0" v-on:click.native="menusss = !menusss">
+        <div class="flex text-right" style="margin-left: auto;max-width: 260px;">
+          <v-btn color="blue darken-3" dark class="my-0 mr-3" v-on:click.native="goBack()">
+            <v-icon style="color: #fff !important">reply</v-icon> &nbsp; Quay lại
+          </v-btn>
+          <v-btn color="blue darken-3" dark class="my-0 mx-0" v-on:click.native="menusss = !menusss">
+            <v-icon style="color: #fff !important">fas fa fa-filter</v-icon> &nbsp; Lọc danh sách
+          </v-btn>
+          <!-- <v-tooltip top>
+            <v-btn  slot="activator" icon class="my-0 mx-0 px-0" v-on:click.native="menusss = !menusss">
               <v-icon size="20">fas fa fa-filter</v-icon>
             </v-btn>
             <span>Tìm kiếm nâng cao</span>
-          </v-tooltip>
-          <!-- <v-btn color="blue darken-3" dark class="my-0 mx-2" v-on:click.native="menusss = !menusss">
-            <v-icon size="16">search</v-icon>&nbsp; Tìm kiếm
-          </v-btn> -->
+          </v-tooltip> -->
         </div>
       </div> 
     </div>
     <div class="" v-if="menusss">
       <v-layout wrap>
-        <div class="adv_search px-2 my-2 mx-2" style="background: #eeeeee">
+        <div class="adv_search px-2 my-2 mx-0" style="background: #eeeeee">
           <div class="searchAdvanced-content py-2">
             <v-layout wrap>
               <v-flex v-for="(item, indexTool) in filters" v-if="item.display" v-bind:key="indexTool" :class="item.class" class="mb-2 px-2">
@@ -143,7 +146,7 @@
 
       </v-layout>
     </div>
-    <div style="text-align: right;" v-if="getUser('QUAN_LY_GIAY_PHEP') || userPermission">
+    <div style="text-align: right;" class="mt-2" v-if="getUser('QUAN_LY_GIAY_PHEP') || userPermission">
       <v-btn color="blue darken-3" dark
         :to="'/danh-sach-giay-to/' + index + '/editor/0'"
       >
@@ -175,17 +178,26 @@
         <v-icon>import_export</v-icon>&nbsp;
         Export&nbsp;{{String(loaiDuLieu).toLowerCase()}}
       </v-btn>
+      <!--  -->
+      <v-btn color="primary"
+        @click="exportPdfDanhSachGiayPhep"
+        :loading="loadingImport"
+        :disabled="loadingImport"
+      >
+        <v-icon>fa fa-file-pdf-o</v-icon>&nbsp;
+        Xuất PDF
+      </v-btn>
       <!-- import -->
-      <v-btn color="primary" class="white--text mr-2"
+      <v-btn color="primary" class="white--text mr-0"
         v-if="hasReport"
         :loading="loadingReport"
         :disabled="loadingReport"
         @click="viewReport">
-        Thống kê
+        Báo cáo
       </v-btn>
       <!--  -->
       <div class="" v-if="viewFilterBaoCao && paramsReport">
-        <div class="adv_search px-2 my-2 mx-2 py-2" style="background: #eeeeee">
+        <div class="adv_search px-2 my-2 mx-0 py-2" style="background: #eeeeee">
           <div class="searchAdvanced-content py-2">
             <v-layout wrap>
               <v-flex v-for="(item, indexTool) in paramsReport" v-bind:key="indexTool" :class="item.class" class="mb-2 px-2">
@@ -249,13 +261,13 @@
               </v-flex>
             </v-layout>
             
-            <v-flex class="xs12 mx-2">
+            <v-flex class="xs12 mx-0">
               <v-btn color="red darken-3" class="mx-0 mb-0 mr-3" dark v-on:click.native="backToList">
                 <v-icon style="color: #fff !important">reply</v-icon> &nbsp;
                 Quay lại
               </v-btn>
               <v-btn class="mx-0 mb-0" color="primary" dark @click.native="submitViewThongKe">
-                <v-icon size="18">save</v-icon> &nbsp; Đồng ý
+                <v-icon size="18">save</v-icon> &nbsp; Tạo báo cáo
               </v-btn>
             </v-flex>
           </div>
@@ -272,12 +284,22 @@
       </JsonExcel>
     </div>
     <!--  -->
+    <v-flex class="xs12 mx-0" v-if="hasReport && viewFilterBaoCao && dataReportList && dataReportList.length">
+      <v-btn color="primary" class="right"
+        @click="exportPdfThongKe"
+      >
+        <v-icon>fa fa-file-pdf-o</v-icon>&nbsp;
+        In báo cáo
+      </v-btn>
+    </v-flex>
+    <!-- import -->
     <v-data-table
       v-if="viewFilterBaoCao"
       :headers="headersReport"
       :items="dataReportList"
       class="table-landing table-bordered"
       hide-actions
+      style="border-left: 1px solid #dedede;"
       >
       <template slot="items" slot-scope="props">
       <tr>
@@ -312,6 +334,7 @@
         :items="hosoDatas"
         class="table-landing table-bordered"
         hide-actions
+        style="border-left: 1px solid #dedede;"
       >
       <template slot="items" slot-scope="props">
         <tr>
@@ -507,6 +530,9 @@
 </template>
 
 <script>
+  import pdfMake from 'pdfmake/build/pdfmake'
+  import pdfFonts from 'pdfmake/build/vfs_fonts'
+  pdfMake.vfs = pdfFonts.pdfMake.vfs
   import { TinyPagination } from '@/components'
   import TemplateRendering from './template_rendering.vue'
   import DatetimePicker from '../ext/DatetimePicker.vue'
@@ -911,7 +937,7 @@
         // })
         // ----Xem chi tiết hồ sơ
         if (item.hasOwnProperty('dossierId') && item.dossierId && item.dossierId !== '0' && vm.urlRedirectDossier) {
-          let url = vm.urlRedirectDossier + '/' + item.dossierId
+          let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web') + "#" + vm.urlRedirectDossier + '/' + item.dossierId
           window.open(url, "_blank")
         }
         if(item.hasOwnProperty('dossierId') && item.dossierId && item.dossierId === '0') {
@@ -1388,6 +1414,9 @@
         let vm = this
         vm.viewFilterBaoCao = false
       },
+      goBack () {
+        window.history.back()
+      },
       submitViewThongKe () {
         let vm = this
         let searchParams = {}
@@ -1402,7 +1431,8 @@
           }
         }
         let filter = {
-          data: JSON.stringify({key: searchParams})
+          data: JSON.stringify({key: searchParams}),
+          typeCode: vm.items[vm.index]['typeCode']
         }
         console.log('filter', filter)
         vm.loadingTable = true
@@ -1413,7 +1443,292 @@
           vm.loadingTable = false
           vm.dataReportList = []
         })
-      }
+      },
+      exportPdfDanhSachGiayPhep () {
+        let vm = this
+        let tableBody = []
+        let widthsPdf = []
+        let headersTablePdf = []
+        for (let index in vm.headerExportRemoveAction) {
+          let item = vm.headerExportRemoveAction[index]
+          if (item.hasOwnProperty('widthColumPdf') && item.widthColumPdf) {
+              widthsPdf.push(Number(item.widthColumPdf))
+          } else {
+              widthsPdf.push("*")
+          }
+          headersTablePdf.push(
+              { text: item.text, style: 'headerTitle'}
+          )
+        }
+        tableBody.push(headersTablePdf)
+        vm.loadingImport = true
+        vm.filterExport = Object.assign(vm.filterExport, {export: true})
+        vm.$store.dispatch('searchDeliverables', vm.filterExport).then(function (result) {
+          vm.loadingImport = false
+          let data = result.data
+          let dataExport = []
+          console.log('headerExport', vm.headerExportRemoveAction)
+          console.log('json_fields', vm.json_fields)
+          for (let i=0;i<data.length;i++) {
+            let item = {}
+            let indexFields = 0
+            for (let key in vm.json_fields) {
+              let valueTemplate
+              if (vm.headerExportRemoveAction[indexFields].hasOwnProperty('layoutViewExport') && vm.headerExportRemoveAction[indexFields].layoutViewExport) {
+                let str = vm.headerExportRemoveAction[indexFields]['layoutViewExport'].replace('itemData', JSON.stringify(data[i]))
+                valueTemplate = eval(str)
+              }
+              item[key]=valueTemplate ? valueTemplate : data[i][vm.json_fields[key]]
+              if (vm.headerExportRemoveAction[indexFields]['value'] === 'counter') {
+                item[key] = i + 1
+              }
+              indexFields += 1
+            }
+            let itemRows = []
+            for (let key in item) {
+              itemRows.push({text: item[key], alignment: 'left', style:'tdTitle'} )
+            }
+            dataExport.push(itemRows)
+          }
+          tableBody = tableBody.concat(dataExport)
+          // console.log("tableBody", tableBody)
+          // console.log("widthsPdf", widthsPdf)
+          let loaiGiayPhep = String(vm.typeNameTitle).toUpperCase()
+          let siteName = vm.$store.getters.getsiteName
+          var docDefinition = {
+            pageOrientation: 'landscape',
+            content: [
+                  {
+                      columns: [
+                          {
+                              width: 300,
+                              style: "title",
+                              text: [
+                                  {text: "UBND TỈNH ĐỒNG THÁP\n"},
+                                  {text: siteName + "\n"}
+                              ]
+                          },
+                          {
+                              width: 100,
+                              style: "title",
+                              text: ''
+                          },
+                          {
+                              width: 300,
+                              style: "title",
+                              text: [
+                                  {text: "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM\n"},
+                                  {text: "Độc lập - Tự do - Hạnh phúc\n"},
+                                  {text: "-------------------------------------------\n"},
+                                  {text: "Đồng Tháp, ngày " + new Date().getDate() + " tháng " + (new Date().getMonth() + 1) +" năm " + new Date().getFullYear(), style: "ngayThangNam"}
+                              ]
+                          }
+                      ]
+                  },
+                  {
+                  text: [
+                    {text: loaiGiayPhep + '\n'}
+                  ], 
+                  margin: [0, 20],
+                  style: 'headerTitle'
+                  },
+              {
+                style: 'tableExample',
+                table: {
+                  widths: widthsPdf,
+                  body: tableBody
+                }
+              }
+            ],
+            styles: {
+                  ngayThangNam: {
+                  fontSize: 10,
+                  italics: true,
+                  bold: false,
+                  alignment: 'center'
+                  },
+                  headerTitle: {
+                      alignment: 'center',
+                      bold: true,
+                      fontSize: 11,
+                      margin: [0, 4, 0, 4]
+                  },
+                  tdTitle: {
+                      fontSize: 11,
+                      margin: [0, 1, 0, 1]
+                  },
+                  borderHeader: {
+                      alignment: 'left'
+                  },
+                  title: {
+                  bold: true,
+                  alignment: 'center'
+                  },
+                  titleSub: {
+                      fontSize: 10,
+                      italics: true,
+                      alignment: 'center'
+                  },
+                  tdStyle: {
+                  fontSize: 10
+                  },
+                  tableExample: {
+                  width: "100%" 
+                  }
+              },
+            defaultStyle: {
+            },
+            patterns: {
+              stripe45d: {
+                boundingBox: [1, 1, 4, 4],
+                xStep: 3,
+                yStep: 3,
+                pattern: '1 w 0 1 m 4 5 l s 2 0 m 5 3 l s'
+              }
+            }
+          };
+          pdfMake.createPdf(docDefinition).download()
+        }).catch(function (reject) {
+          vm.loadingImport = false
+        })
+      },
+      exportPdfThongKe () {
+        let vm = this
+        let tableBody = []
+        let widthsPdf = []
+        let headersTablePdf = []
+        for (let index in vm.headersReport) {
+          let item = vm.headersReport[index]
+          if (item.hasOwnProperty('widthColumPdf') && item.widthColumPdf) {
+            widthsPdf.push(Number(item.widthColumPdf))
+          } else {
+            widthsPdf.push("*")
+          }
+          headersTablePdf.push(
+            { text: item.text, style: 'headerTitle'}
+          )
+        }
+        tableBody.push(headersTablePdf)
+
+        let data = vm.dataReportList
+        let dataExport = []
+        for (let i=0;i<data.length;i++) {
+          let itemRows = []
+          for (let key in vm.headersReport) {
+            let valueTemplate = ''
+            if (vm.headersReport[key]['type'] == 'currency') {
+              try {
+                valueTemplate = vm.currency(data[i][vm.headersReport[key]['value']])
+              } catch (error) {
+              }
+            } else {
+              valueTemplate = data[i][vm.headersReport[key]['value']]
+            }
+            if (vm.headersReport[key]['value'] === 'counter') {
+              valueTemplate = i + 1
+            }
+            itemRows.push({text: valueTemplate, alignment: 'left', style:'tdTitle'} )
+          }
+          dataExport.push(itemRows)
+        }
+        tableBody = tableBody.concat(dataExport)
+        console.log('tableBodyReport', tableBody)
+        let loaiGiayPhep = String(vm.typeNameTitle).toUpperCase()
+        let siteName = vm.$store.getters.getsiteName
+        var docDefinition = {
+          pageOrientation: 'landscape',
+          content: [
+                {
+                    columns: [
+                        {
+                            width: 300,
+                            style: "title",
+                            text: [
+                                {text: "UBND TỈNH ĐỒNG THÁP\n"},
+                                {text: siteName + "\n"}
+                            ]
+                        },
+                        {
+                            width: 100,
+                            style: "title",
+                            text: ''
+                        },
+                        {
+                            width: 300,
+                            style: "title",
+                            text: [
+                                {text: "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM\n"},
+                                {text: "Độc lập - Tự do - Hạnh phúc\n"},
+                                {text: "-------------------------------------------\n"},
+                                {text: "Đồng Tháp, ngày " + new Date().getDate() + " tháng " + (new Date().getMonth() + 1) +" năm " + new Date().getFullYear(), style: "ngayThangNam"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                text: [
+                  {text: loaiGiayPhep + '\n'}
+                ], 
+                margin: [0, 20],
+                style: 'headerTitle'
+                },
+            {
+              style: 'tableExample',
+              table: {
+                widths: widthsPdf,
+                body: tableBody
+              }
+            }
+          ],
+          styles: {
+                ngayThangNam: {
+                fontSize: 10,
+                italics: true,
+                bold: false,
+                alignment: 'center'
+                },
+                headerTitle: {
+                    alignment: 'center',
+                    bold: true,
+                    fontSize: 11,
+                    margin: [0, 4, 0, 4]
+                },
+                tdTitle: {
+                    fontSize: 11,
+                    margin: [0, 1, 0, 1]
+                },
+                borderHeader: {
+                    alignment: 'left'
+                },
+                title: {
+                bold: true,
+                alignment: 'center'
+                },
+                titleSub: {
+                    fontSize: 10,
+                    italics: true,
+                    alignment: 'center'
+                },
+                tdStyle: {
+                fontSize: 10
+                },
+                tableExample: {
+                width: "100%" 
+                }
+            },
+          defaultStyle: {
+          },
+          patterns: {
+            stripe45d: {
+              boundingBox: [1, 1, 4, 4],
+              xStep: 3,
+              yStep: 3,
+              pattern: '1 w 0 1 m 4 5 l s 2 0 m 5 3 l s'
+            }
+          }
+        };
+        pdfMake.createPdf(docDefinition).download()
+      },
     }
   }
 </script>
