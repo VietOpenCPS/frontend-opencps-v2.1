@@ -215,8 +215,8 @@
       </content-placeholders>
       <!--  -->
       <v-radio-group class="mt-1" v-model="dichVuChuyenPhatKetQua.viaPostal" row @change="changeViaPostal($event)">
-        <v-radio label="Nhận kết quả trực tiếp" :value="1" ></v-radio>
-        <v-radio label="Nhận kết quả tại nhà" :value="2"></v-radio>
+        <v-radio label="Trả kết quả trực tiếp" :value="1" ></v-radio>
+        <v-radio label="Trả kết quả tại nhà" :value="2"></v-radio>
         <!-- <v-radio label="Nhận trực tuyến" :value="9"></v-radio> -->
       </v-radio-group>
       <!--  -->

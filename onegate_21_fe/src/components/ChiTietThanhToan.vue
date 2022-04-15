@@ -433,15 +433,41 @@ export default {
           // }).catch(function (error) {
           //   vm.dialogPDFLoading = false
           // })
-          vm.dialogPDFLoading = false
-          vm.dialogPDF = false
-          let url = '/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice'
-          window.open(url, "_blank")
-        } else {
-          vm.$store.dispatch('printPay', filter).then(function (result) {
+          
+          if (vm.dossierDetail.dossierNo == "000.00.16.G04-220324-0020" || vm.dossierDetail.dossierNo == "000.00.16.G04-220405-0008") {
+            let pathDoc = ""
+            if (vm.originality == 1) {
+              pathDoc = "/documents/35166/8809240/"
+            } else {
+              pathDoc = "/documents/51883/12174847/"
+            }
+            let urlSrc = pathDoc + vm.dossierDetail.dossierNo + ".pdf"
             vm.dialogPDFLoading = false
-            document.getElementById('dialogPaymentPreview').src = result
-          }).catch(function(){})
+            document.getElementById('dialogPaymentPreview').src = urlSrc
+          } else {
+            vm.dialogPDFLoading = false
+            vm.dialogPDF = false
+            let url = '/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice'
+            window.open(url, "_blank")
+          }
+        } else {
+          if (vm.dossierDetail.dossierNo == "000.00.16.G04-220324-0020" || vm.dossierDetail.dossierNo == "000.00.16.G04-220405-0008") {
+            let pathDoc = ""
+            if (vm.originality == 1) {
+              pathDoc = "/documents/35166/8809240/"
+            } else {
+              pathDoc = "/documents/51883/12174847/"
+            }
+            let urlSrc = pathDoc + vm.dossierDetail.dossierNo + ".pdf"
+            vm.dialogPDFLoading = false
+            document.getElementById('dialogPaymentPreview').src = urlSrc
+          } else {
+            vm.$store.dispatch('printPay', filter).then(function (result) {
+              vm.dialogPDFLoading = false
+              document.getElementById('dialogPaymentPreview').src = result
+            }).catch(function(){})
+          }
+          
         }
       }
       

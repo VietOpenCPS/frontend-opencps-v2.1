@@ -2105,7 +2105,7 @@ export default {
       form.append("serial", cert.serial)
       form.append("file", "");
       form.append("fileUrl", fileUrl);
-      form.append("isVisible", vm.hasAnhChuKySo);
+      form.append("isVisible", true);
       form.append("page", "1");
       form.append("llx", "150");
       form.append("lly", "792");
@@ -2119,7 +2119,10 @@ export default {
       if (vm.hasAnhChuKySo) {
         form.append("image", vm.fileImageSignPdf.file, vm.fileImageSignPdf.fileName);
       } else {
-        form.append("image", "");
+        let fileFix = new File([
+          new Blob(["/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAQDAwQDAwQEAwQFBAQFBgoHBgYGBg0JCggKDw0QEA8NDw4RExgUERIXEg4PFRwVFxkZGxsbEBQdHx0aHxgaGxr/2wBDAQQFBQYFBgwHBwwaEQ8RGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhr/wAARCABkAGQDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAj/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AL+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//Z"])
+        ], "fileAnh");
+        form.append("image", fileFix, "fileAnh")
       }
       vm.dialogSelectCa = false
       vm.mssProcessingSavis = 'Đang thực hiện ký số'

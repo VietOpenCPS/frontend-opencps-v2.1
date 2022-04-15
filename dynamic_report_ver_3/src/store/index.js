@@ -523,7 +523,7 @@ export const store = new Vuex.Store({
               if (String(govAgency) === 'all') {
                 param['headers']['groupId'] = 0
               } else {
-                param['headers']['groupId'] = govAgency
+                param['headers']['groupId'] = govAgency && !isNaN(Number(govAgency)) ? govAgency : window.themeDisplay.getScopeGroupId()
               }
               param['params']['v'] = Math.random()
               axios.post(requestURL, {}, param).then(function (response) {

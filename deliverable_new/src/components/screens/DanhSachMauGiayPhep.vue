@@ -41,7 +41,7 @@
                   <span>{{ pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1 }}</span>
               </div>
               </td>
-              <td class="text-xs-left" style="height:36px" @click="showDanhSachGiayPhep(props.index)">
+              <td class="text-xs-left" style="height:36px" @click="showDanhSachGiayPhep(props.item)">
                 <content-placeholders v-if="loadingTable">
                     <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -53,7 +53,7 @@
                 <content-placeholders v-if="loadingTable">
                     <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-btn  v-if="!loadingTable" @click="showDanhSachGiayPhep(props.index)" color="green" flat class="mx-0 mr-3 my-0"
+                <v-btn  v-if="!loadingTable" @click="showDanhSachGiayPhep(props.item)" color="green" flat class="mx-0 mr-3 my-0"
                   style="font-size: 13px !important"
                 >
                   Danh sách giấy phép
@@ -175,8 +175,10 @@
             vm.pagination.page = 1
         }
       },
-      showDanhSachGiayPhep (index) {
+      showDanhSachGiayPhep (item) {
         let vm = this
+        let listViewFull = vm.$store.getters.getDeliverableTypes
+        let index = listViewFull.findIndex(item2 => item2.typeCode === item.typeCode)
         vm.$router.push('/danh-sach-giay-to/' + index + '?t=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1)
       },
     }

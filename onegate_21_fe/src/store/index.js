@@ -2124,7 +2124,7 @@ export const store = new Vuex.Store({
           let control = window.$('div[id="formAlpaca' + data.dossierPartNo + id + '"]').alpaca('get')
           let formData = control.getValue()
           let field = window.$('div[id="formAlpaca' + data.dossierPartNo + id + '"]').alpaca('get').childrenByPropertyId
-          if (field) {
+          if (field && (!data.hasOwnProperty('required') || (data.hasOwnProperty('required') && !data['required']))) {
             for (let prop in field) {
               if (field[prop].isRequired() && field[prop].getValue() === '') {
                 toastr.clear()
@@ -5527,14 +5527,14 @@ export const store = new Vuex.Store({
             "type" : "XacThucThongTinCongDan",
             "NgayThangNamSinh" : filter.birthDate,
           }
-        } else if (systemLgsp === 'BO-GTVT') {
+        } else if (systemLgsp === 'BO-GTVT' || systemLgsp === 'BO-XAYDUNG') {
           urlTraCuu = "/o/rest/v2/qldc/dvcqg"
           dataInput = {
             "MaYeuCau" : (new Date()).getTime(),
             "MaTichHop" : "037",
             "StaffEmail" : filter.StaffEmail,
             "GovAgencyCode": filter.GovAgencyCode,
-            "MaDVC" : filter.MaDVC,
+            "MaDVC" : "",
             "HoVaTen" : filter.applicantName,
             "type" : "TraCuuThongTinCongDan",
             "NgayThangNamSinh" : filter.birthDate,

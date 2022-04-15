@@ -2539,6 +2539,7 @@ export default {
                       })
                       if (fileFind) {
                         fileFind['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+                        fileFind['required'] = false
                         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
                           counterSave += 1
                           if (counterSave === lengthFiles) {
