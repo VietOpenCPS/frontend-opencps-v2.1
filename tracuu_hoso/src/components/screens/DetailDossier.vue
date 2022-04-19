@@ -136,23 +136,18 @@
 
                 <v-flex xs12 class="px-2" v-if="votingVersion === 3 && dossierDetail['dossierStatus'] === 'done'">
                   <div class="my-2">(*)  Đánh giá mức độ hài lòng của bạn về giải quyết hồ sơ thủ tục hành chính</div>
-                  <v-radio-group v-model="votingResult" row class="mt-2 mb-3" @change="guiDanhGia()">
-                    <v-radio :value="3">
-                      <div style="text-align: justify;" :style="votingResult ===  3 ? 'color:#903938' : 'color:black'" slot="label">
-                        Rất hài lòng
-                      </div>
-                    </v-radio>
-                    <v-radio :value="2">
-                      <div style="text-align: justify;" :style="votingResult ===  2 ? 'color:#903938' : 'color:black'" slot="label">
-                        Hài lòng
-                      </div>
-                    </v-radio>
-                    <v-radio :value="1">
-                      <div style="text-align: justify;" :style="votingResult ===  1 ? 'color:#903938' : 'color:black'" slot="label">
-                        Không hài lòng
-                      </div>
-                    </v-radio>
-                  </v-radio-group>
+                  <v-btn class="mr-3" outline color="#4caf50" :loading="loadingVoting"
+                    :disabled="loadingVoting" @click="guiDanhGia(3)" v-if="votingResult === 3 || !votingResult">
+                    <v-icon style="color: #4caf50 !important">thumb_up_alt</v-icon>&nbsp;RẤT HÀI LÒNG
+                  </v-btn>
+                  <v-btn class="mr-3" outline color="indigo" :loading="loadingVoting"
+                    :disabled="loadingVoting" @click="guiDanhGia(2)" v-if="votingResult === 2 || !votingResult">
+                    <v-icon style="color: #3f51b5 !important">thumb_up_alt</v-icon>&nbsp; HÀI LÒNG
+                  </v-btn>
+                  <v-btn outline color="red" :loading="loadingVoting"
+                    :disabled="loadingVoting" @click="guiDanhGia(1)" v-if="votingResult === 1 || !votingResult">
+                    <v-icon style="color: red !important">thumb_down_alt</v-icon>&nbsp; KHÔNG HÀI LÒNG
+                  </v-btn>
                 </v-flex>
               </v-card-text>
             </v-card>
@@ -338,6 +333,7 @@
 </template>
 <script>
   import toastr from 'toastr'
+  import axios from 'axios'
   export default {
     props: ['index', 'detail'],
     components: {
@@ -533,10 +529,9 @@
         let vm = this
         if (vm.two_system && vm.dossierDetail) {
           vm.$store.dispatch('loadDetailDossierMC', vm.dossierDetail).then(function (result) {
-            console.log('loadDetailDossierMC', result)
             vm.dossierDetailMotcua = result[0]
 
-            if (vm.dossierDetailMotcua.metaData && vm.dossierDetailMotcua.status === 'done') {
+            if (vm.dossierDetailMotcua.metaData && vm.dossierDetailMotcua.dossierStatus === 'done') {
               try {
                 let datameta = JSON.parse(vm.dossierDetailMotcua.metaData)
                 vm.votingResult = datameta.hasOwnProperty('hailong') ? Number(datameta.hailong) : null
@@ -666,23 +661,35 @@
         let vm = this
         vm.isMobile = window.innerWidth < 1024
       },
-      guiDanhGia () {
+      guiDanhGia (vote) {
         let vm = this
-        let metaData = vm.dossierDetailMotcua.metaData ? JSON.parse(vm.dossierDetailMotcua.metaData) : {}
-        let data = Object.assign(metaData, {hailong: vm.votingResult})
-        let textPost = {
-          data: JSON.stringify(data)
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            Token: Liferay.authToken,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
         }
-        let dataPost = new URLSearchParams()
-        dataPost.append('method', 'PUT')
-        dataPost.append('url', '/dossiers/' + vm.dossierDetail.referenceUid + '/metadata')
-        dataPost.append('data', JSON.stringify(textPost))
-        dataPost.append('serverCode', vm.dossierDetail.serverNo)
-        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
-          toastr.success('Gửi đánh giá thành công')
-        }).catch(xhr => {
-          
-        })
+        if (!vm.votingResult) {
+          let metaData = vm.dossierDetailMotcua.metaData ? JSON.parse(vm.dossierDetailMotcua.metaData) : {}
+          let data = Object.assign(metaData, {hailong: vote})
+          let textPost = {
+            data: JSON.stringify(data)
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'PUT')
+          dataPost.append('url', '/dossiers/' + vm.dossierDetail.referenceUid + '/metadata')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_' + vm.dossierDetail['govAgencyCode'])
+          vm.loadingVoting = true
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+            toastr.success('Gửi đánh giá thành công')
+            vm.votingResult = vote
+            vm.loadingVoting = false
+          }).catch(xhr => {
+            vm.loadingVoting = false
+          })
+        }
       }
     },
     filters: {

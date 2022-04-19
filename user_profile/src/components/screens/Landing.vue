@@ -892,7 +892,8 @@
         contactEmail: true,
         contactTelNo: false
       },
-      changePassSso: false
+      changePassSso: false,
+      tokenKeyCloak: ''
     }),
     watch: {
       ngayCap(val) {
@@ -1109,6 +1110,7 @@
           }
         })
       })
+      vm.getTokenKeyCloak()
     },
     mounted () {
       let vm = this
@@ -1575,6 +1577,53 @@
             toastr.success('Cập nhật thành công')
           }, 100)
         }
+      },
+      getTokenKeyCloak () {
+        let settings = {
+          "url": '/o/rest/v2/userSSO/token',
+          "method": "POST",
+          "headers": {
+            'Content-Type': 'application/json',
+            'Token': window.Liferay !== undefined ? window.Liferay.authToken : '',
+            'dataType': 'text',
+          },
+          "data": {}
+        };
+        
+        $.ajax(settings).done(function (response) {
+          let serializable = response.responseText
+          vm.tokenKeyCloak = serializable
+          vm.getUserInfoKeyCloak()
+        }).fail(function (response) {
+          let serializable = response.responseText
+          vm.tokenKeyCloak = serializable
+          vm.getUserInfoKeyCloak()
+        })
+      },
+      getUserInfoKeyCloak () {
+        let vm = this
+        let param = {
+          headers: {
+            "Content-Type": "application/json",
+            "secret": "1hZ64frE9A6088oIgUUgPYJ6zp7+HXat",
+            "Token": vm.tokenKeyCloak,
+            "Authorization": "Bearer " + vm.tokenKeyCloak
+          },
+          params: {}
+        }
+        axios.get("https://apigateway.haugiang.gov.vn/v1/datasharing/account/profile", param).then(function (response) {
+          let serializable = response.data
+          console.log('infoUser', serializable)
+          // try {
+          //   if (data['type'] == 'T_CaNhan') {
+          //     applicantIdNo = data.caNhan.maSoCaNhan
+          //   } else if (data['type'] == 'T_DonViKinhDoanh') {
+          //     applicantIdNo = data.donViKinhDoanh.maSoDoanhNghiep
+          //   }
+          // } catch (error) {
+          // }
+        }, error => {
+        })
       }
     }
   }
