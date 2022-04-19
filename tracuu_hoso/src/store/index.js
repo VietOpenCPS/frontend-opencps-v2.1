@@ -508,6 +508,25 @@ export const store = new Vuex.Store({
         })
       })
     },
+    putMetaData({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': ''
+          }
+        }
+        let dataPostdossier = new URLSearchParams()
+        dataPostdossier.append('data',filter.data)
+        axios.put('/o/rest/v2/dossiers/'+filter.id+'/metadata', dataPostdossier, options).then(function (response) {
+          resolve(response)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
   },
   mutations: {
     setLoading (state, payload) {

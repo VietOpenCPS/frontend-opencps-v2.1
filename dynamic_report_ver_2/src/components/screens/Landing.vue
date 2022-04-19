@@ -1945,7 +1945,7 @@ export default {
       console.log('itemsReports', vm.itemsReports[vm.index])
       let dispatchUse = vm.api.indexOf('/o/statistic/dossier') >= 0 ? 'getAgencyReportLists' : 'getAgencyReportListsOld'
       vm.$store.dispatch(dispatchUse, filter).then(function (result) {
-        console.log('result123123123123', result)
+        // console.log('result',result)
         if (result !== null) {
           // set dossierList
           vm.dossierList = result

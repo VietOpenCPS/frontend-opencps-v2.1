@@ -20,7 +20,7 @@
           <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
           <v-tab key="2" ripple class="mx-2"> Tiến trình thụ lý </v-tab>
           <v-tab key="3" ripple class="mx-2" v-if="paymentInfo"> Thanh toán trực tuyến</v-tab>
-          <v-tab key="4" ripple class="mx-2" @click="loadVoting()" v-if="dossierDetail['dossierStatus'] === 'done'">
+          <v-tab key="4" ripple class="mx-2" @click="loadVoting()" v-if="dossierDetail['dossierStatus'] === 'done' && votingVersion !== 3">
              Đánh giá hài lòng
           </v-tab>
           <v-tab-item key="1">
@@ -133,6 +133,27 @@
                     <!--  -->
                   </v-flex>
                 </v-layout>
+
+                <v-flex xs12 class="px-2" v-if="votingVersion === 3 && dossierDetail['dossierStatus'] === 'done'">
+                  <div class="my-2">(*)  Đánh giá mức độ hài lòng của bạn về giải quyết hồ sơ thủ tục hành chính</div>
+                  <v-radio-group v-model="votingResult" row class="mt-2 mb-3" @change="guiDanhGia()">
+                    <v-radio :value="3">
+                      <div style="text-align: justify;" :style="votingResult ===  3 ? 'color:#903938' : 'color:black'" slot="label">
+                        Rất hài lòng
+                      </div>
+                    </v-radio>
+                    <v-radio :value="2">
+                      <div style="text-align: justify;" :style="votingResult ===  2 ? 'color:#903938' : 'color:black'" slot="label">
+                        Hài lòng
+                      </div>
+                    </v-radio>
+                    <v-radio :value="1">
+                      <div style="text-align: justify;" :style="votingResult ===  1 ? 'color:#903938' : 'color:black'" slot="label">
+                        Không hài lòng
+                      </div>
+                    </v-radio>
+                  </v-radio-group>
+                </v-flex>
               </v-card-text>
             </v-card>
           </v-tab-item>
@@ -322,6 +343,8 @@
     components: {
     },
     data: () => ({
+      votingVersion: '',
+      votingResult: null,
       loading: false,
       xacthuc_BNG: false,
       loadingAction: false,
@@ -424,6 +447,10 @@
     created () {
       let vm = this
       try {
+        vm.votingVersion = votingVersion
+      } catch (error) {
+      }
+      try {
         vm.configDongThap = configDongThap
       } catch (error) {
       }
@@ -508,6 +535,14 @@
           vm.$store.dispatch('loadDetailDossierMC', vm.dossierDetail).then(function (result) {
             console.log('loadDetailDossierMC', result)
             vm.dossierDetailMotcua = result[0]
+
+            if (vm.dossierDetailMotcua.metaData && vm.dossierDetailMotcua.status === 'done') {
+              try {
+                let datameta = JSON.parse(vm.dossierDetailMotcua.metaData)
+                vm.votingResult = datameta.hasOwnProperty('hailong') ? Number(datameta.hailong) : null
+              } catch (error) {
+              }
+            }
           }).catch(function (reject) {
           })
         }
@@ -631,6 +666,24 @@
         let vm = this
         vm.isMobile = window.innerWidth < 1024
       },
+      guiDanhGia () {
+        let vm = this
+        let metaData = vm.dossierDetailMotcua.metaData ? JSON.parse(vm.dossierDetailMotcua.metaData) : {}
+        let data = Object.assign(metaData, {hailong: vm.votingResult})
+        let textPost = {
+          data: JSON.stringify(data)
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'PUT')
+        dataPost.append('url', '/dossiers/' + vm.dossierDetail.referenceUid + '/metadata')
+        dataPost.append('data', JSON.stringify(textPost))
+        dataPost.append('serverCode', vm.dossierDetail.serverNo)
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+          toastr.success('Gửi đánh giá thành công')
+        }).catch(xhr => {
+          
+        })
+      }
     },
     filters: {
       dateTimeView (arg) {

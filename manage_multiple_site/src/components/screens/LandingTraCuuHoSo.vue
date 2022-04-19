@@ -602,7 +602,7 @@
       serviceFilter: '',
       donviSelect: '',
       groupIdDonVi: '',
-      capCoQuanThucHien: '',
+      capCoQuanThucHien: 'SBN',
       validFormSearch: false,
       administrationList: [],
       listDoiTuong: [],
@@ -718,6 +718,7 @@
           class: 'ketqua_column'
         }
       ],
+      restartPage: false
     }),
     components: {
       'tiny-pagination': TinyPagination
@@ -773,17 +774,48 @@
         vm.getDomains()
         vm.getServiceInfo()
       }
-      
+      // 
+      try {
+        let paramsSearch = window.location.href.split("?")[1]
+        if (paramsSearch) {
+          let jsonParams = decodeURI(paramsSearch)
+          .replace('?', '')
+          .split('&')
+          .map(param => param.split('='))
+          .reduce((values, [ key, value ]) => {
+            values[ key ] = value
+            return values
+          }, {})
+          vm.capCoQuanThucHien = jsonParams.hasOwnProperty('capCoQuanThucHien') ? jsonParams.capCoQuanThucHien : ''
+          vm.groupIdDonVi = jsonParams.hasOwnProperty('groupId') ? jsonParams.groupId : ''
+          vm.dossierPage = jsonParams.hasOwnProperty('dossierPage') ? jsonParams.dossierPage : 1
+          vm.govAgencyFilter = jsonParams.hasOwnProperty('agency') ? jsonParams.agency : ''
+          vm.domainFilter = jsonParams.hasOwnProperty('domain') ? jsonParams.domain : ''
+          vm.serviceFilter = jsonParams.hasOwnProperty('service') ? jsonParams.service : ''
+          vm.dossierNoKey = jsonParams.hasOwnProperty('dossierNo') ? jsonParams.dossierNo : ''
+          vm.statusFilter = jsonParams.hasOwnProperty('status') ? jsonParams.status : ''
+          vm.fromReceiveDateFormatted = jsonParams.hasOwnProperty('fromReceiveDate') ? jsonParams.fromReceiveDate : ''
+          vm.toReceiveDateFormatted = jsonParams.hasOwnProperty('toReceiveDate') ? jsonParams.toReceiveDate : ''
+          vm.fromReleaseDateFormatted = jsonParams.hasOwnProperty('fromReleaseDate') ? jsonParams.fromReleaseDate : ''
+          vm.toReleaseDateFormatted = jsonParams.hasOwnProperty('toReleaseDate') ? jsonParams.toReleaseDate : ''
+          vm.keywordSearch = jsonParams.hasOwnProperty('keyword') ? jsonParams.keyword : ''
+          console.log('capCoQuanThucHien5555', vm.capCoQuanThucHien)
+          vm.getDossiers()
+        }
+      } catch (error) {
+      }
+      // 
     },
     watch: {
       capCoQuanThucHien (val) {
         let vm = this
         vm.govAgencyList = []
+        console.log('capCoQuanThucHien', val)
         if (!vm.donViHuyen) {
-          vm.govAgencyFilter = ''
-          vm.domainFilter = ''
-          vm.serviceFilter = ''
-          vm.quanhuyenSelected = ''
+          // vm.govAgencyFilter = ''
+          // vm.domainFilter = ''
+          // vm.serviceFilter = ''
+          // vm.quanhuyenSelected = ''
           if(val){
             if (val !== 'XA_PHUONG') {
               vm.getAgencys(val)
@@ -876,9 +908,14 @@
         vm.$store.dispatch('getServiceAdminisTration', {}).then(
           res => {
             vm.administrationList = sortCode(res)
-            vm.capCoQuanThucHien = 'SBN'
-            vm.getAgencys('SBN')
-            vm.getAgencys('QUAN_HUYEN')
+            if (!vm.capCoQuanThucHien) {
+              vm.capCoQuanThucHien = 'SBN'
+            }
+            if (vm.capCoQuanThucHien === 'SBN') {
+              vm.getAgencys('SBN')
+            } else {
+              vm.getAgencys('QUAN_HUYEN')
+            }
           }
         ).catch(()=>{})
       },
@@ -1069,12 +1106,24 @@
           toReleaseDate: vm.toReleaseDateFormatted ? vm.toReleaseDateFormatted : '',
           keyword: vm.keywordSearch ? vm.keywordSearch : ''
         }
+        vm.redirectUrl = ""
         if (!vm.boNganh) {
           vm.$store.dispatch('getDossiers', params).then(res => {
             vm.loadingTable = false
             vm.totalDossierSearch = res.total
             if (res.data) {
               vm.dossierList = res.data
+
+              // 
+              try {
+                params = Object.assign(params, {dossierPage: vm.dossierPage, capCoQuanThucHien: vm.capCoQuanThucHien})
+                let urlParams = Object.keys(params).map(function(k) {
+                  return encodeURIComponent(k) + '=' + encodeURIComponent(params[k])
+                }).join('&')
+                vm.redirectUrl = window.location.origin + window.location.pathname + '#/?' + urlParams
+              } catch (error) {
+              }
+              // 
             } else {
               vm.dossierList = []
               vm.totalDossierSearch = 0
@@ -1198,7 +1247,8 @@
             pathName = pathNameConfig
           } catch (error) {
           }
-          window.location.href = pathName + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + data.dossierId + '?groupIdSiteMng=' + data.groupId
+          window.location.href = pathName + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + data.dossierId + '?groupIdSiteMng=' + data.groupId +
+          '&redirectUrl=' + vm.redirectUrl
         }
         
       },

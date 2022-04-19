@@ -602,6 +602,28 @@
                   >Gửi đánh giá</v-btn>
                 </div>
               </div>
+              <div class="px-2 py-2" v-if="votingVersion === 3">
+                <div class="mx-3">
+                  <div class="my-2">(*)  Đánh giá mức độ hài lòng của bạn về giải quyết hồ sơ thủ tục hành chính</div>
+                  <v-radio-group v-model="votingResult" row class="mt-2" @change="guiDanhGia()">
+                    <v-radio :value="3">
+                      <div style="text-align: justify;" :style="votingResult ===  3 ? 'color:#903938' : 'color:black'" slot="label">
+                        Rất hài lòng
+                      </div>
+                    </v-radio>
+                    <v-radio :value="2">
+                      <div style="text-align: justify;" :style="votingResult ===  2 ? 'color:#903938' : 'color:black'" slot="label">
+                        Hài lòng
+                      </div>
+                    </v-radio>
+                    <v-radio :value="1">
+                      <div style="text-align: justify;" :style="votingResult ===  1 ? 'color:#903938' : 'color:black'" slot="label">
+                        Không hài lòng
+                      </div>
+                    </v-radio>
+                  </v-radio-group>
+                </div>
+              </div>
             </v-tab-item>
             <v-tab-item value="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition"
               v-if="(originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || originality === 3"
@@ -800,6 +822,7 @@
 
 import $ from 'jquery'
 import toastr from 'toastr'
+import axios from 'axios'
 // import '../store/jquery-comments'
 import Comment from './Comment.vue'
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
@@ -847,6 +870,7 @@ export default {
     'phan-cong-lai': PhanCongLai
   },
   data: () => ({
+    votingResult: null,
     sourcePaymentFee: {},
     loadingActionProcess: false,
     votingVersion: 1,
@@ -1394,6 +1418,7 @@ export default {
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'done') {
           vm.activeTab2 = 'tabs-1b'
           vm.loadVoting()
+          vm.getDetailDossierMotCua()
         }
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'new') {
           vm.activeTab2 = 'tabs-3b'
@@ -1456,7 +1481,13 @@ export default {
       }
     },
     goBack () {
-      window.history.back()
+      let vm = this
+      let currentQuery = vm.$router.history.current.query
+      if (currentQuery.hasOwnProperty('groupIdSiteMng') && currentQuery.hasOwnProperty('redirectUrl')) {
+        window.location.href = decodeURIComponent(window.location.href.split("redirectUrl=")[1])
+      } else {
+        window.history.back()
+      }
     },
     viewFile (data) {
       var vm = this
@@ -3429,15 +3460,17 @@ export default {
         }).catch(function (reject) {
         })
       } else {
-        let filter = {
-          className: 'dossier',
-          dossierDetail: vm.thongTinChiTietHoSo
+        if (vm.votingVersion !== 3) {
+          let filter = {
+            className: 'dossier',
+            dossierDetail: vm.thongTinChiTietHoSo
+          }
+          vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
+            vm.votingItems = result
+            console.log('votingItems', vm.votingItems)
+          }).catch(function (reject) {
+          })
         }
-        vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
-          vm.votingItems = result
-          console.log('votingItems', vm.votingItems)
-        }).catch(function (reject) {
-        })
       }
       
     },
@@ -3884,6 +3917,59 @@ export default {
             document.getElementById('viTriLuuTru').src = result
           })
         }
+      })
+    },
+    guiDanhGia () {
+      let vm = this
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId(),
+          Token: Liferay.authToken,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+      let metaData = vm.thongTinChiTietHoSo.metaData ? JSON.parse(vm.thongTinChiTietHoSo.metaData) : {}
+      let data = Object.assign(metaData, {hailong: vm.votingResult})
+      let textPost = {
+        data: JSON.stringify(data)
+      }
+      let dataPost = new URLSearchParams()
+      dataPost.append('method', 'PUT')
+      dataPost.append('url', '/dossiers/' + vm.thongTinChiTietHoSo.referenceUid + '/metadata')
+      dataPost.append('data', JSON.stringify(textPost))
+      dataPost.append('serverCode', vm.thongTinChiTietHoSo.serverNo)
+      axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+        toastr.success('Gửi đánh giá thành công')
+      }).catch(xhr => {
+        
+      })
+    },
+    getDetailDossierMotCua () {
+      let vm = this
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId(),
+          Token: Liferay.authToken,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+      let textPost = {}
+      let dataPost = new URLSearchParams()
+      dataPost.append('method', 'GET')
+      dataPost.append('url', '/dossiers/' + vm.thongTinChiTietHoSo.referenceUid)
+      dataPost.append('data', JSON.stringify(textPost))
+      dataPost.append('serverCode', vm.thongTinChiTietHoSo.serverNo)
+      axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+        let dossier = result.data
+        if (dossier.metaData) {
+          try {
+            let datameta = JSON.parse(dossier.metaData)
+            vm.votingResult = datameta.hasOwnProperty('hailong') ? Number(datameta.hailong) : null
+          } catch (error) {
+          }
+        }
+      }).catch(xhr => {
+        
       })
     }
   },

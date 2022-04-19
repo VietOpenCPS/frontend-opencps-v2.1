@@ -1,6 +1,10 @@
 <template>
   <div style="max-width: 1300px; margin: 0 auto">
     <v-layout wrap>
+      <div class="flex xs12 text-right mx-2" style="
+          color: #903938;
+          font-style: italic;
+      ">{{dateTimeSync}}</div>
       <v-flex xs12 md6 class="statistic-total-year pa-2">
         <div class="pa-2 v-sheet theme--light" style="border: 1px solid #dedede;">
           <div class="row-header" style="height: 38px; overflow: hidden;background: #fff">
@@ -1162,6 +1166,7 @@ export default {
   },
   created() {
     let vm = this
+    vm.dateTimeSync = "Số liệu tính đến 03h00 ngày " + vm.getCurrentDate()
     //
     try {
       if (window.innerWidth <= 768) {
@@ -1953,6 +1958,11 @@ export default {
         
       }).catch(xhr => {
       })
+    },
+    getCurrentDate () {
+      let vm = this
+      let date1 = new Date()
+      return `${date1.getDate().toString().padStart(2, '0')}/${(date1.getMonth() + 1).toString().padStart(2, '0')}/${date1.getFullYear()}`
     }
   }
 };

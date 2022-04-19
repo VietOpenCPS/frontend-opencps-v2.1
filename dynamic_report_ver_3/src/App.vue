@@ -383,7 +383,13 @@
                   for (let index2 = 0; index2 < vm.itemsReports[index]['filterConfig']['filters'].length; index2++) {
                     let item = vm.itemsReports[index]['filterConfig']['filters'][index2]
                     if (item.hasOwnProperty('mappingSourceConfig') && item.mappingSourceConfig) {
-                      vm.itemsReports[index]['filterConfig']['filters'][index2]['source'] = configsSite[0][item.mappingSourceConfig]
+                      if (vm.itemsReports[index]['filterConfig']['api'].indexOf("type=31")) {
+                        vm.itemsReports[index]['filterConfig']['filters'][index2]['source'] = configsSite[0][item.mappingSourceConfig].filter(function (arg) {
+                          return arg.value
+                        })
+                      } else {
+                        vm.itemsReports[index]['filterConfig']['filters'][index2]['source'] = configsSite[0][item.mappingSourceConfig]
+                      }
                     }
                   }
                 }

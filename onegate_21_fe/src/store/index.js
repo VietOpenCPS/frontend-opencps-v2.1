@@ -5574,11 +5574,10 @@ export const store = new Vuex.Store({
             } else {
               reject('')
             }
-          } else if (systemLgsp === 'BO-GTVT') {
+          } else if (systemLgsp === 'BO-GTVT' || systemLgsp === 'BO-XAYDUNG') {
             if (serializable && serializable.hasOwnProperty('Body') && serializable["Body"].hasOwnProperty('CongdanCollection') && serializable["Body"]["CongdanCollection"]) {
-              dataCitizen = {
-                SoLuongCongDan: 1
-              }
+              let data = serializable["Body"]["CongdanCollection"]["CongDan"]
+              dataCitizen = Object.assign(data, { SoLuongCongDan: 1 })
               resolve(dataCitizen)
             } else {
               reject('')

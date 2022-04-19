@@ -578,6 +578,7 @@ export default {
     'thong-tin-ho-so': ThongTinHoSo
   },
   data: () => ({
+    govAgencyCodeCurrentSite: '',
     dialogConfigColumn: false,
     showHTML: false,
     columnLength: 0,
@@ -763,6 +764,7 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       console.log('run new ver_23')
+      vm.getAllSite()
       try {
         vm.exportWordReport = exportWordReport
       } catch (error) {
@@ -1536,6 +1538,9 @@ export default {
       }
       // console.log('vm.groupIdList-88888', vm.groupIdList)
       // console.log('vm.groupIdList-99999', vm.agencyLists)
+      if (vm.api.indexOf("type=31") && vm.govAgency === 'site' && !vm.data['govAgencyCode']) {
+        vm.data['govAgencyCode'] = vm.govAgencyCodeCurrentSite
+      }
       let dispatchUse = vm.itemsReports[vm.index]['filterConfig']['version'] || vm.itemsReports[vm.index]['filterConfig']['typeDate'] === 'timestamp' ? 'getDossiers' : 'getAgencyReportListsOld'
       vm.$store.dispatch(dispatchUse, filter).then(function (result) {
         // console.log('result',result)
@@ -1899,7 +1904,7 @@ export default {
                 indexCountTotal += 1
                 dataRow = []
                 let dataToExportCSVItem = []
-                let dossierObj = dossiersArray[keyDossier]
+                var dossierObj5 = dossiersArray[keyDossier]
                 dataToExportCSVItem.push(indexStt)
                 if (!vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt')) {
                   dataRow.push({
@@ -1919,15 +1924,15 @@ export default {
                     let currentConfig = vm.itemsReportsConfig[keyVal]
 
                     if (currentConfig.hasOwnProperty('calculator')) {
-                      let calu = currentConfig['calculator'].replace(/dataInput/g, 'dossierObj')
+                      let calu = currentConfig['calculator'].replace(/dataInput/g, 'dossierObj5')
                       if (isNaN(eval(calu)) || vm.itemsReportsConfig[keyVal]['value'] == 'note') {
                         ddStr = eval(calu)
                       } else {
                         ddStr = Math.round(eval(calu))
                       }
                     } else {
-                      if (dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== undefined && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== null && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== '') {
-                        ddStr = dossierObj[vm.itemsReportsConfig[keyVal]['value']]
+                      if (dossierObj5[vm.itemsReportsConfig[keyVal]['value']] !== undefined && dossierObj5[vm.itemsReportsConfig[keyVal]['value']] !== null && dossierObj5[vm.itemsReportsConfig[keyVal]['value']] !== '') {
+                        ddStr = dossierObj5[vm.itemsReportsConfig[keyVal]['value']]
                       }
                     }
                     dataToExportCSVItem.push(ddStr)
@@ -2186,6 +2191,12 @@ export default {
             ids.push(filter['agencyLists'][index]['value'])
           }
           filter.data['listGroupId'] = ids.toString()
+        } else {
+          if (filter.hasOwnProperty('govAgency') && filter.govAgency !== 'site') {
+            filter.data['listGroupId'] = String(filter.govAgency)
+          } else if (filter.govAgency === 'site') {
+            // filter.data['listGroupId'] = window.themeDisplay.getScopeGroupId()
+          }
         }
       } catch (error) {
         console.log('error-listGroupId')
@@ -3058,6 +3069,37 @@ export default {
           }
         }
       }, 100)
+    },
+    getAllSite () {
+      let vm = this
+      let param = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+          Token: window.Liferay ? window.Liferay.authToken : ''
+        }
+      }
+      let dataPost = new URLSearchParams()
+      dataPost.append('method', 'GET')
+      dataPost.append('serverCode', 'SERVER_DVC')
+      dataPost.append('url', '/serverconfigs/GROUP_ID_SITE_MOTCUA')
+      dataPost.append('data', JSON.stringify({}))
+      axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+        let serializable = response.data
+        let configs = JSON.parse(serializable.configs)
+        console.log('configs', vm.configs)
+        let agencySiteList = configs['groupIds']
+        try {
+          vm.govAgencyCodeCurrentSite = agencySiteList.filter(function(item) {
+            return item.value == window.themeDisplay.getScopeGroupId()
+          })[0]['code']
+          console.log('govAgencyCodeCurrentSite', vm.govAgencyCodeCurrentSite)
+        } catch (error) {
+        } 
+      }).catch(function (xhr) {
+      })
+    },
+    looseJsonParse(obj) {
+      return Function('"use strict";return (' + obj + ')')()
     }
   }
 }

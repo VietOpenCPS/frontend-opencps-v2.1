@@ -168,8 +168,15 @@
                     </v-tooltip>
                     <!--  -->
                     <v-btn title="Ký số giấy tờ đính kèm" class="my-0" flat icon color="indigo"
-                      v-if="originality === 1 && showKySo && itemFileView.fileType.toLowerCase() === 'pdf' && !kySoVnptSmartCa" 
+                      v-if="originality === 1 && showKySo && itemFileView.fileType.toLowerCase() === 'pdf' && !kySoSavis && !kySoVnptSmartCa" 
                       @click.stop="showSelectDigitalSign(itemFileView, index)"
+                    >
+                      <v-icon size="18">fa fa-pencil-square-o</v-icon>
+                    </v-btn>
+                    <!--  -->
+                    <v-btn title="Ký số giấy tờ đính kèm" class="my-0" flat icon color="indigo"
+                      v-if="originality === 1 && showKySo && itemFileView.fileType.toLowerCase() === 'pdf' && kySoSavis" 
+                      @click.stop="kySoPdfUrlSavis(itemFileView, index)"
                     >
                       <v-icon size="18">fa fa-pencil-square-o</v-icon>
                     </v-btn>
@@ -1972,6 +1979,8 @@ export default {
     },
     kySoPdfUrlSavis (item, index) {
       let vm = this
+      vm.fileKySo = item
+      vm.indexFileSelect = index
       vm.signSavisPdfUrl = item
       vm.dialogSignDigital = false
       document.getElementById('fileAnhChuKySavis').value = ''

@@ -1302,6 +1302,15 @@
                 Đồng bộ thông tin
               </v-btn> -->
               <v-btn color="primary"
+                @click="addApplicantLgsp"
+                class="mx-0 my-0 mr-2"
+                v-if="applicantLgspInfomation && lgspType === 'citizen' && (systemLgsp ==='BO-GTVT' || systemLgsp ==='BO-XAYDUNG')"
+              >
+                <v-icon size="20">save_alt</v-icon>
+                &nbsp;
+                Lấy thông tin
+              </v-btn>
+              <v-btn color="primary"
                 @click="closeSearchLgsp"
                 class="mx-0 my-0 white--text"
               >
@@ -1585,7 +1594,8 @@ export default {
     warningLgsp: false,
     messageLgsp: '',
     lgspAlertColor: 'primary',
-    userSsoInfo: ''
+    userSsoInfo: '',
+    systemLgsp: ''
   }),
   computed: {
     loading () {
@@ -1621,6 +1631,11 @@ export default {
   },
   created () {
     let vm = this
+    vm.systemLgsp = ''
+    try {
+      vm.systemLgsp = systemLgspConfig
+    } catch (error) {
+    }
     try {
       vm.traCuuLgspCongDan = traCuuLgspCongDan
     } catch (error) {
@@ -2802,7 +2817,8 @@ export default {
           vm.loadingSearchLgsp = false
           vm.applicantLgspInfomation = false
           vm.warningLgsp = true
-          vm.messageLgsp = 'Không truy cập được CSDL dân cư'
+          vm.messageLgsp = "Số CCCD/ CMND: " + String(vm.thongTinChuHoSo.applicantIdNo).trim() + ", họ tên: " + String(vm.thongTinChuHoSo.applicantName).trim() + " không có thông tin trên CSDL quốc gia về dân cư"
+          
           if (result.hasOwnProperty('errorCode')) {
             let errorCode = result.errorCode
             switch(errorCode) {
@@ -2813,7 +2829,7 @@ export default {
                 vm.messageLgsp = "Tài khoản cán bộ không có quyền thao tác";
                 break;
               default:
-                vm.messageLgsp = 'Không truy cập được CSDL dân cư';
+                vm.messageLgsp = "Số CCCD/ CMND: " + String(vm.thongTinChuHoSo.applicantIdNo).trim() + ", họ tên: " + String(vm.thongTinChuHoSo.applicantName).trim() + " không có thông tin trên CSDL quốc gia về dân cư"
             }
           }
         })
@@ -2838,7 +2854,56 @@ export default {
       }
       if (vm.lgspType === 'citizen') {
         vm.thongTinChuHoSo['applicantIdNo'] = vm.applicantLgspInfomation.SoDinhDanh ? vm.applicantLgspInfomation.SoDinhDanh : vm.applicantLgspInfomation.SoCMND
-        vm.thongTinChuHoSo['applicantName'] = vm.applicantLgspInfomation.HoVaTen
+        vm.thongTinChuHoSo['applicantName'] = vm.applicantLgspInfomation.HoVaTen.Ten
+        vm.thongTinChuHoSo['address'] = vm.applicantLgspInfomation.ThuongTru.ChiTiet
+        vm.thongTinChuHoSo['cityCode'] = Number(vm.applicantLgspInfomation.ThuongTru.MaTinhThanh)
+        vm.thongTinChuHoSo['districtCode'] = Number(vm.applicantLgspInfomation.ThuongTru.MaQuanHuyen)
+        vm.thongTinChuHoSo['wardCode'] = Number(vm.applicantLgspInfomation.ThuongTru.MaPhuongXa)
+
+        try {
+          vm.thongTinChuHoSo.cityName = vm.citys.filter(function (item) {
+            return item['itemCode'] == vm.thongTinChuHoSo['cityCode']
+          })[0]['itemName']
+        } catch (error) {
+          vm.thongTinChuHoSo.cityName = ''
+        }
+        vm.$store.commit('setCityVal', vm.thongTinChuHoSo['cityCode'])
+        vm.$store.commit('setDistrictVal', vm.thongTinChuHoSo['districtCode'])
+        vm.$store.commit('setWardVal', vm.thongTinChuHoSo['wardCode'])
+        let filter = {
+          collectionCode: 'ADMINISTRATIVE_REGION',
+          level: 1,
+          parent: vm.thongTinChuHoSo['cityCode']
+        }
+
+        vm.$store.getters.getDictItems(filter).then(function (result) {
+            vm.districts = result.data
+            vm.wards = []
+            // 
+            try {
+              vm.thongTinChuHoSo.districtName = vm.districts.filter(function (item) {
+                return item['itemCode'] == vm.thongTinChuHoSo['cityCode']
+              })[0]['itemName']
+            } catch (error) {
+              vm.thongTinChuHoSo.districtName = ''
+            }
+            let filter = {
+              collectionCode: 'ADMINISTRATIVE_REGION',
+              level: 1,
+              parent: vm.thongTinChuHoSo['districtCode']
+            }
+            
+            vm.$store.getters.getDictItems(filter).then(function (result) {
+              vm.wards = result.data
+              try {
+                vm.thongTinChuHoSo.wardName = vm.wards.filter(function (item) {
+                  return item['itemCode'] == vm.thongTinChuHoSo['wardCode']
+                })[0]['itemName']
+              } catch (error) {
+                vm.thongTinChuHoSo.wardName = ''
+              }
+            })
+        })
       }
       vm.dialog_searchLgsp = false
     },
