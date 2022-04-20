@@ -863,6 +863,18 @@ export default {
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
             vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
             // 
+            if (vm.itemsReports[vm.index]['filterConfig']['domainOrService']) {
+              if (vm.groupByVal === 'domainCode') {
+                vm.filters = vm.filters.filter(function (item) {
+                  return item.key !== 'serviceCode'
+                })
+              }
+              if (vm.groupByVal === 'serviceCode') {
+                vm.filters = vm.filters.filter(function (item) {
+                  return item.key !== 'domainCode'
+                })
+              }
+            }
             if (vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy']) {
               if (vm.groupByVal === 'domainCode') {
                 vm.filters = vm.filters.filter(function (item) {
@@ -1016,6 +1028,18 @@ export default {
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+        if (vm.itemsReports[vm.index]['filterConfig']['domainOrService']) {
+          if (vm.groupByVal === 'domainCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'serviceCode'
+            })
+          }
+          if (vm.groupByVal === 'serviceCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'domainCode'
+            })
+          }
+        }
         if (vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy']) {
           if (vm.groupByVal === 'domainCode') {
             vm.filters = vm.filters.filter(function (item) {
@@ -1197,20 +1221,33 @@ export default {
     },
     groupByVal (val) {
       let vm = this
-      console.log('valGroupBy', val)
-      if (val && vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy']) {
+      if ((val &&vm.itemsReports[vm.index]['filterConfig']['domainOrService']) || (val && vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy'])) {
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
           vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
         }
-        if (vm.groupByVal === 'domainCode') {
-          vm.filters = vm.filters.filter(function (item) {
-            return item.key !== 'serviceCode' && item.key !== 'govAgencyCode'
-          })
+        if (val && vm.itemsReports[vm.index]['filterConfig']['domainOrService']) {
+          if (vm.groupByVal === 'domainCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'serviceCode'
+            })
+          }
+          if (vm.groupByVal === 'serviceCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'domainCode'
+            })
+          }
         }
-        if (vm.groupByVal === 'serviceCode') {
-          vm.filters = vm.filters.filter(function (item) {
-            return item.key !== 'domainCode' && item.key !== 'govAgencyCode'
-          })
+        if (val && vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy']) {
+          if (vm.groupByVal === 'domainCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'serviceCode' && item.key !== 'govAgencyCode'
+            })
+          }
+          if (vm.groupByVal === 'serviceCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'domainCode' && item.key !== 'govAgencyCode'
+            })
+          }
         }
         for (let key in vm.filters) {
           if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {

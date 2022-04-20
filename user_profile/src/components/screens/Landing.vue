@@ -844,7 +844,7 @@
         required: (value) => !!value || 'Thông tin bắt buộc',
         passWord: (value) => {
           const pattern = /^((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])([0-9a-zA-Z@$!%*#?&]{8,}))$/
-          return pattern.test(value) || 'Ít nhất 8 ký tự và có chữ hoa, chữ thường, ký tự đặc biệt @$!%*#?&'
+          return pattern.test(value) || 'Ít nhất 8 ký tự và có chữ hoa, chữ thường, chữ số, ký tự đặc biệt @$!%*#?&'
         },
         telNo: (value) => {
           const pattern = /^([0-9]{0,})$/
@@ -893,7 +893,9 @@
         contactTelNo: false
       },
       changePassSso: false,
-      tokenKeyCloak: ''
+      taiKhoanKeycloak: false,
+      tokenKeyCloak: '',
+      domainKeycloak: ''
     }),
     watch: {
       ngayCap(val) {
@@ -943,6 +945,14 @@
         if (rulesConfig) {
           vm.rules = Object.assign({}, vm.rules, rulesConfig)
         }
+      } catch (error) {
+      }
+      try {
+        vm.taiKhoanKeycloak = taiKhoanKeycloak
+      } catch (error) {
+      }
+      try {
+        vm.domainKeycloak = domainKeycloak
       } catch (error) {
       }
       try {
@@ -1301,19 +1311,38 @@
               type: "dvc-sso"
             }
           }
-          vm.changePassWordFail = false
-          vm.$store.dispatch('changePass', data).then(function (data) {
-            vm.loading = false
-            // if (String(data) === 'false') {
-            //   vm.changePassWordFail = true
-            // } else {
+          if (!vm.taiKhoanKeycloak) {
+            vm.changePassWordFail = false
+            vm.$store.dispatch('changePass', data).then(function (data) {
+              vm.loading = false
+              // if (String(data) === 'false') {
+              //   vm.changePassWordFail = true
+              // } else {
+                vm.snackbarsuccess = true
+                toastr.success('Đổi mật khẩu thành công')
+                vm.state = 0
+              // }
+            }).catch(function () {
+              vm.doActionChangePass(data)
+            })
+          } else {
+            let dataKeycloak = {
+              oldPassword : vm.oldPassWord,
+              newPassword : vm.newPassWord,
+              tenDangNhap: '',
+              token: vm.tokenKeyCloak,
+              domainKeycloak: vm.domainKeycloak
+            }
+            vm.$store.dispatch('changePassKeycloak', dataKeycloak).then(function (data) {
+              vm.loading = false
               vm.snackbarsuccess = true
               toastr.success('Đổi mật khẩu thành công')
               vm.state = 0
-            // }
-          }).catch(function () {
-            vm.doActionChangePass(data)
-          })
+            }).catch(function () {
+              toastr.success('Đổi mật khẩu thất bại')
+            })
+          }
+          
         }
       },
       doActionChangePass (data) {
@@ -1579,6 +1608,7 @@
         }
       },
       getTokenKeyCloak () {
+        let vm = this
         let settings = {
           "url": '/o/rest/v2/userSSO/token',
           "method": "POST",
@@ -1611,7 +1641,7 @@
           },
           params: {}
         }
-        axios.get("https://apigateway.haugiang.gov.vn/v1/datasharing/account/profile", param).then(function (response) {
+        axios.get("http://119.17.200.66:8378/v1/datasharing/account/profile", param).then(function (response) {
           let serializable = response.data
           console.log('infoUser', serializable)
           // try {

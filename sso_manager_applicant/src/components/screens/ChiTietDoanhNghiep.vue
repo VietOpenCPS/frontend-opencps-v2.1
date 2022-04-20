@@ -750,7 +750,23 @@ export default {
       },
       showCreateAcc () {
         let vm = this
-        vm.passwordCreate = ''
+        var characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        var alpha = "abcdefghijklmnopqrstuvwxyz";
+        var numbers = "0123456789";
+        var symbols = "@$!%*#?&";
+        var allChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+
+        var result = '';
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+        result += alpha.charAt(Math.floor(Math.random() * alpha.length));
+        result += numbers.charAt(Math.floor(Math.random() * numbers.length));
+        result += symbols.charAt(Math.floor(Math.random() * symbols.length));
+        for (let index = 0; index < 4; index++) {
+          result += allChar.charAt(Math.floor(Math.random() * allChar.length));
+        }
+        result = result.split('').sort(function(){return 0.5-Math.random()}).join('')
+
+        vm.passwordCreate = result
         vm.dialogCreateAcc = true
       },
       createAccount () {
