@@ -176,24 +176,27 @@ export const store = new Vuex.Store({
     },
     changePassKeycloak ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            "Content-Type": "application/json",
+        let settings = {
+          "url": "http://119.17.200.66:8378/v1/datasharing/account/changepwd",
+          "method": "POST",
+          "headers": {
             "secret": "1hZ64frE9A6088oIgUUgPYJ6zp7+HXat",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + filter.token
-          }
-        }
-        var url = "http://119.17.200.66:8378/v1/datasharing/account/changepwd"
-        var dataPutUser = new URLSearchParams()
-        dataPutUser.append('matKhauHienTai', filter.oldPassword)
-        dataPutUser.append('matKhauMoi', filter.newPassword)
-        dataPutUser.append('tenDangNhap', filter.tenDangNhap)
-
-        axios.post(url, dataPutUser, param).then(result1 => {
-          resolve(result1)
-        }).catch(xhr => {
-          reject(xhr)
+          },
+          "data": JSON.stringify({
+            "matKhauHienTai": filter.oldPassword,
+            "matKhauMoi": filter.newPassword,
+            "tenDangNhap": filter.tenDangNhap
+          }),
+        };
+        
+        $.ajax(settings).done(function (response) {
+          resolve(response);
+        }).fail(function () {
+          reject("")
         })
+
       })
     },
     putUser ({commit, state}, filter) {

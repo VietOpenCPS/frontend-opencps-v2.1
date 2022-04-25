@@ -35,7 +35,7 @@
                       <span v-if="!loadingCheckAcc">Kiểm tra thông tin tài khoản</span>
                       <span v-if="loadingCheckAcc">Đang kiểm tra</span>
                     </v-btn>
-                    <v-btn :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
+                    <v-btn v-if="quyenTraCuuLgsp === 'always' || quyenTraCuuLgsp == 1" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
                       <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
                       <v-progress-circular :size="24" v-if="loadingSearchLgsp"
                         indeterminate
@@ -1304,7 +1304,7 @@
               <v-btn color="primary"
                 @click="addApplicantLgsp"
                 class="mx-0 my-0 mr-2"
-                v-if="applicantLgspInfomation && lgspType === 'citizen' && (systemLgsp ==='BO-GTVT' || systemLgsp ==='BO-XAYDUNG')"
+                v-if="applicantLgspInfomation && lgspType === 'citizen'"
               >
                 <v-icon size="20">save_alt</v-icon>
                 &nbsp;
@@ -1595,7 +1595,7 @@ export default {
     messageLgsp: '',
     lgspAlertColor: 'primary',
     userSsoInfo: '',
-    systemLgsp: ''
+    quyenTraCuuLgsp: 'always'
   }),
   computed: {
     loading () {
@@ -1631,11 +1631,6 @@ export default {
   },
   created () {
     let vm = this
-    vm.systemLgsp = ''
-    try {
-      vm.systemLgsp = systemLgspConfig
-    } catch (error) {
-    }
     try {
       vm.traCuuLgspCongDan = traCuuLgspCongDan
     } catch (error) {
@@ -1947,6 +1942,14 @@ export default {
         }, 200)
       })
       vm.$refs.formChuHoSo.resetValidation()
+      // 
+      if (vm.traCuuLgspCongDan) {
+        vm.$store.dispatch('checkRoleSearchLgsp', {serviceCode: data.serviceCode}).then(result => {
+          vm.quyenTraCuuLgsp = result.hasOwnProperty('status') ? result.status : 'always'
+        }).catch(xhr => {
+          vm.quyenTraCuuLgsp = 'always'
+        })
+      }
     },
     onChangeCity (data, editDelegate) {
       let vm = this

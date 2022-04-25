@@ -5,8 +5,8 @@
         <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Thông tin chung hồ sơ</div>
         <v-card v-if="!mauCongVan">
           <v-card-text class="py-0">
-            <v-btn v-if="thongTinChiTietHoSo.applicantIdType === 'citizen'" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: 0px;position: absolute;right: 0' : 'margin-top: 0px;position: absolute;right: 0'"
-             class="mx-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
+            <v-btn v-if="thongTinChiTietHoSo.applicantIdType === 'citizen' && traCuuLgspCongDan && (quyenTraCuuLgsp == 'always' || quyenTraCuuLgsp == 1)" :style="loadingSearchLgsp ? 'pointer-events: none' : ''"
+             class="mx-0 ml-2 mt-2 mb-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
               <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
               <v-progress-circular :size="24" v-if="loadingSearchLgsp"
                 indeterminate
@@ -492,6 +492,14 @@
             vm.groupDossierName = resultDossier['dossierName']
           })
         }
+        // 
+        if (vm.traCuuLgspCongDan && vm.thongTinChiTietHoSo.applicantIdType === 'citizen') {
+          vm.$store.dispatch('checkRoleSearchLgsp', {serviceCode: vm.thongTinChiTietHoSo.serviceCode}).then(result => {
+            vm.quyenTraCuuLgsp = result.hasOwnProperty('status') ? result.status : 'always'
+          }).catch(xhr => {
+            vm.quyenTraCuuLgsp = 'always'
+          })
+        }
       },
       ngaysinh (val) {
         this.applicantBirthDate = this.formatDate(val)
@@ -502,7 +510,7 @@
     },
     components: {},
     data: () => ({
-      thongTinChiTietHoSo: {},
+      thongTinChiTietHoSo: "",
       metaData: '',
       groupDossierNo: '',
       groupDossierName: '',
@@ -522,7 +530,8 @@
       dialog_searchLgsp: false,
       rules: {
         required: (value) => !!value || 'Thông tin bắt buộc'
-      }
+      },
+      quyenTraCuuLgsp: 'always'
     }),
     computed: {
       loading() {

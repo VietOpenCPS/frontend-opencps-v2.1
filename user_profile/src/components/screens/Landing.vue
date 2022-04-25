@@ -521,7 +521,7 @@
                 <a href="javascript:;" style="
                       text-decoration: none;
                       border-bottom: 1px dashed;
-                    ">{{user['applicantContactEmail']}}</a>
+                    ">{{taiKhoanKeycloak ? user['applicantIdNo'] : user['applicantContactEmail']}}</a>
               </div>
               <div class="text-xs-center label__user_profile">
                 {{user['applicantAddress']}}
@@ -675,6 +675,18 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialogExitApp" persistent max-width="390">
+      <v-card>
+        <v-card-title class="headline text-xs-center">ĐỔI MẬT KHẨU THÀNH CÔNG</v-card-title>
+        <v-card-text class="mt-2">VUI LÒNG ĐĂNG NHẬP LẠI VỚI MẬT KHẨU MỚI</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" flat @click="logoutApp">Đồng ý</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!--  -->
   </div>
 </template>
 
@@ -697,6 +709,7 @@
       AttachImage
     },
     data: () => ({
+      dialogExitApp: false,
       hasDocumentStorage: false,
       notifyConfig: false,
       sendSms: false,
@@ -1120,7 +1133,6 @@
           }
         })
       })
-      vm.getTokenKeyCloak()
     },
     mounted () {
       let vm = this
@@ -1289,11 +1301,13 @@
         if (vm.state === 0) {
           vm.state = 1
           vm.stateLabel = 'Thông tin tài khoản'
+          vm.oldPassWord = ''
+          vm.newPassword = ''
+          vm.newPassWordConfirm = ''
+          vm.$refs.form.resetValidation()
         } else {
           vm.state = 0
           vm.stateLabel = 'Đổi mật khẩu'
-          vm.$refs.form.reset()
-          vm.$refs.form.resetValidation()
         }
       },
       doChangePassWord () {
@@ -1326,20 +1340,45 @@
               vm.doActionChangePass(data)
             })
           } else {
-            let dataKeycloak = {
-              oldPassword : vm.oldPassWord,
-              newPassword : vm.newPassWord,
-              tenDangNhap: '',
-              token: vm.tokenKeyCloak,
-              domainKeycloak: vm.domainKeycloak
-            }
-            vm.$store.dispatch('changePassKeycloak', dataKeycloak).then(function (data) {
+            let settings = {
+              "url": "http://119.17.200.66:8378/flex/oauth2/token",
+              "method": "POST",
+              "headers": {
+                "secret": "1hZ64frE9A6088oIgUUgPYJ6zp7+HXat",
+                "Content-Type": "application/x-www-form-urlencoded"
+              },
+              "data": {
+                "username": vm.user['applicantIdNo'],
+                "password": String(vm.oldPassWord).trim(),
+                "app": "dvc-mobile"
+              }
+            };
+
+            $.ajax(settings).done(function (response) {
+              vm.tokenKeyCloak = response.access_token
+              let dataKeycloak = {
+                oldPassword : vm.oldPassWord,
+                newPassword : vm.newPassWord,
+                tenDangNhap: vm.user['applicantIdNo'],
+                token: vm.tokenKeyCloak
+              }
+              vm.$store.dispatch('changePassKeycloak', dataKeycloak).then(function (data) {
+                vm.loading = false
+                vm.snackbarsuccess = true
+                if (data && data.hasOwnProperty('changed_password') && data.changed_password == true) {
+                  toastr.success('Đổi mật khẩu thành công')
+                  vm.state = 0
+                  vm.stateLabel = 'Đổi mật khẩu'
+                } else {
+                  toastr.error('Đổi mật khẩu thất bại')
+                }
+              }).catch(function () {
+                vm.loading = false
+                toastr.error('Đổi mật khẩu thất bại')
+              })
+            }).fail(function (jqXHR, textStatus) {
               vm.loading = false
-              vm.snackbarsuccess = true
-              toastr.success('Đổi mật khẩu thành công')
-              vm.state = 0
-            }).catch(function () {
-              toastr.success('Đổi mật khẩu thất bại')
+              toastr.error('Mật khẩu cũ không chính xác. Vui lòng kiểm tra lại.')
             })
           }
           
@@ -1607,52 +1646,18 @@
           }, 100)
         }
       },
-      getTokenKeyCloak () {
+      logoutApp () {
         let vm = this
         let settings = {
-          "url": '/o/rest/v2/userSSO/token',
-          "method": "POST",
+          "url": 'http://119.17.200.66:8378/flex/oauth2/logout_endpoint',
+          "method": "GET",
           "headers": {
-            'Content-Type': 'application/json',
-            'Token': window.Liferay !== undefined ? window.Liferay.authToken : '',
-            'dataType': 'text',
-          },
-          "data": {}
+            'Content-Type': 'application/json'
+          }
         };
         
         $.ajax(settings).done(function (response) {
-          let serializable = response.responseText
-          vm.tokenKeyCloak = serializable
-          vm.getUserInfoKeyCloak()
         }).fail(function (response) {
-          let serializable = response.responseText
-          vm.tokenKeyCloak = serializable
-          vm.getUserInfoKeyCloak()
-        })
-      },
-      getUserInfoKeyCloak () {
-        let vm = this
-        let param = {
-          headers: {
-            "Content-Type": "application/json",
-            "secret": "1hZ64frE9A6088oIgUUgPYJ6zp7+HXat",
-            "Token": vm.tokenKeyCloak,
-            "Authorization": "Bearer " + vm.tokenKeyCloak
-          },
-          params: {}
-        }
-        axios.get("http://119.17.200.66:8378/v1/datasharing/account/profile", param).then(function (response) {
-          let serializable = response.data
-          console.log('infoUser', serializable)
-          // try {
-          //   if (data['type'] == 'T_CaNhan') {
-          //     applicantIdNo = data.caNhan.maSoCaNhan
-          //   } else if (data['type'] == 'T_DonViKinhDoanh') {
-          //     applicantIdNo = data.donViKinhDoanh.maSoDoanhNghiep
-          //   }
-          // } catch (error) {
-          // }
-        }, error => {
         })
       }
     }

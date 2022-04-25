@@ -406,7 +406,7 @@ export const store = new Vuex.Store({
     getReport ({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
         var settings = {
-          "url": "/o/statistic/deliverable/report?typeCode=" + filter.typeCode,
+          "url": "/o/rest/v2/deliverable/report?typeCode=" + filter.typeCode,
           "method": "POST",
           "headers": {
             "groupId": 0,

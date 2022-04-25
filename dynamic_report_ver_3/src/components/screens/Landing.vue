@@ -1450,7 +1450,7 @@ export default {
             if (vm.filters[key]['type'] === 'select') {
               for (let keySource in vm.filters[key]['source']) {
                 if (String(vm.filters[key]['source'][keySource]['value']) === String(currentVal)) {
-                  currentVal = vm.filters[key]['source'][keySource]['name']
+                  currentVal = vm.filters[key]['source'][keySource].hasOwnProperty('nameViewPdf') ? vm.filters[key]['source'][keySource]['nameViewPdf'] : vm.filters[key]['source'][keySource]['name']
                 }
               }
             }
@@ -1462,7 +1462,7 @@ export default {
           for (let keySource in vm.filters[key]['source']) {
             // if (currentVal === '' || currentVal === '0') {
             if (currentVal === '0') {
-              currentVal = vm.filters[key]['source'][keySource]['name']
+              currentVal = vm.filters[key]['source'][keySource].hasOwnProperty('nameViewPdf') ? vm.filters[key]['source'][keySource]['nameViewPdf'] : vm.filters[key]['source'][keySource]['name']
               break
             }
           }
@@ -2125,7 +2125,7 @@ export default {
             if (vm.filters[key]['type'] === 'select') {
               for (let keySource in vm.filters[key]['source']) {
                 if (String(vm.filters[key]['source'][keySource]['value']) === String(currentVal)) {
-                  currentVal = vm.filters[key]['source'][keySource]['name']
+                  currentVal = vm.filters[key]['source'][keySource].hasOwnProperty('nameViewPdf') ? vm.filters[key]['source'][keySource]['nameViewPdf'] : vm.filters[key]['source'][keySource]['name']
                 }
               }
             }
@@ -2136,7 +2136,7 @@ export default {
           for (let keySource in vm.filters[key]['source']) {
             // if (currentVal === '' || currentVal === '0') {
             if (currentVal === '0') {
-              currentVal = vm.filters[key]['source'][keySource]['name']
+              currentVal = vm.filters[key]['source'][keySource].hasOwnProperty('nameViewPdf') ? vm.filters[key]['source'][keySource]['nameViewPdf'] : vm.filters[key]['source'][keySource]['name']
               break
             }
           }

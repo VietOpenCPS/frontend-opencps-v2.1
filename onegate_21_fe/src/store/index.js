@@ -5503,42 +5503,16 @@ export const store = new Vuex.Store({
         } catch (error) {
         }
         let dataInput = ''
-        let urlTraCuu = '/o/rest/v2/qldc'
-        if (systemLgsp === 'DongThap') {
-          dataInput = {
-            "MaYeuCau" : (new Date()).getTime(),
-            "MaTichHop" : "003",
-            "StaffEmail" : filter.StaffEmail,
-            "GovAgencyCode": filter.GovAgencyCode,
-            "MaDVC" : "G18-YT04",
-            "HoVaTen" : filter.applicantName,
-            "type" : "XacThucThongTinCongDan",
-            "NgayThangNamSinh" : filter.birthDate,
-            "MaCanBo" : "vhcgiang@dongthap.gov.vn"
-          }
-        } else if (systemLgsp === 'HauGiang') {
-          dataInput = {
-            "MaYeuCau" : (new Date()).getTime(),
-            "MaTichHop" : "003",
-            "StaffEmail" : filter.StaffEmail,
-            "GovAgencyCode": filter.GovAgencyCode,
-            "MaDVC" : filter.MaDVC,
-            "HoVaTen" : filter.applicantName,
-            "type" : "XacThucThongTinCongDan",
-            "NgayThangNamSinh" : filter.birthDate,
-          }
-        } else if (systemLgsp === 'BO-GTVT' || systemLgsp === 'BO-XAYDUNG') {
-          urlTraCuu = "/o/rest/v2/qldc/dvcqg"
-          dataInput = {
-            "MaYeuCau" : (new Date()).getTime(),
-            "MaTichHop" : "037",
-            "StaffEmail" : filter.StaffEmail,
-            "GovAgencyCode": filter.GovAgencyCode,
-            "MaDVC" : "",
-            "HoVaTen" : filter.applicantName,
-            "type" : "TraCuuThongTinCongDan",
-            "NgayThangNamSinh" : filter.birthDate,
-          }
+        let urlTraCuu = "/o/rest/v2/qldc/dvcqg"
+        dataInput = {
+          "MaYeuCau" : (new Date()).getTime(),
+          "MaTichHop" : "037",
+          "StaffEmail" : filter.StaffEmail,
+          "GovAgencyCode": filter.GovAgencyCode,
+          "MaDVC" : "",
+          "HoVaTen" : filter.applicantName,
+          "type" : "TraCuuThongTinCongDan",
+          "NgayThangNamSinh" : filter.birthDate,
         }
         
         if (String(filter.applicantIdNo).length === 9) {
@@ -5555,37 +5529,33 @@ export const store = new Vuex.Store({
         }).then(function (response) {
           let serializable = response.data
           let dataCitizen = ''
-          if (systemLgsp === 'DongThap') {
-            if (serializable && serializable.hasOwnProperty('data') && String(serializable.data) == 'true') {
-              dataCitizen = {
-                SoLuongCongDan: 1
-              }
-              resolve(dataCitizen)
-            } else {
-              dataCitizen = {
-                SoLuongCongDan: 0
-              }
-              resolve(dataCitizen)
-            }
-          } else if (systemLgsp === 'HauGiang') {
-            if (serializable && serializable.hasOwnProperty('Body') && serializable["Body"].hasOwnProperty('XacThucThongTinCongDanResponse')) {
-              dataCitizen = serializable["Body"]["XacThucThongTinCongDanResponse"]
-              resolve(dataCitizen)
-            } else {
-              reject('')
-            }
-          } else if (systemLgsp === 'BO-GTVT' || systemLgsp === 'BO-XAYDUNG') {
-            if (serializable && serializable.hasOwnProperty('Body') && serializable["Body"].hasOwnProperty('CongdanCollection') && serializable["Body"]["CongdanCollection"]) {
-              let data = serializable["Body"]["CongdanCollection"]["CongDan"]
-              dataCitizen = Object.assign(data, { SoLuongCongDan: 1 })
-              resolve(dataCitizen)
-            } else {
-              reject('')
-            }
+          if (serializable && serializable.hasOwnProperty('Body') && serializable["Body"].hasOwnProperty('CongdanCollection') && serializable["Body"]["CongdanCollection"]) {
+            let data = serializable["Body"]["CongdanCollection"]["CongDan"]
+            dataCitizen = Object.assign(data, { SoLuongCongDan: 1 })
+            resolve(dataCitizen)
+          } else {
+            reject('')
           }
         }).catch(function (error) {
           let dataReject = error.response.data
           reject(dataReject)
+        })
+      })
+    },
+    checkRoleSearchLgsp ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        let url = '/o/rest/v2/qldc/role/employee?serviceCode=' + filter.serviceCode
+        axios.get(url, param).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          reject(error)
         })
       })
     },
