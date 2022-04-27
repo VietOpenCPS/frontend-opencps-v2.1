@@ -177,7 +177,7 @@ export const store = new Vuex.Store({
     changePassKeycloak ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let settings = {
-          "url": "http://119.17.200.66:8378/v1/datasharing/account/changepwd",
+          "url": "https://apigateway.haugiang.gov.vn/v1/datasharing/account/changepwd",
           "method": "POST",
           "headers": {
             "secret": "1hZ64frE9A6088oIgUUgPYJ6zp7+HXat",
@@ -189,6 +189,54 @@ export const store = new Vuex.Store({
             "matKhauMoi": filter.newPassword,
             "tenDangNhap": filter.tenDangNhap
           }),
+        };
+        
+        $.ajax(settings).done(function (response) {
+          resolve(response);
+        }).fail(function () {
+          reject("")
+        })
+
+      })
+    },
+    getCodeVerify ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let settings = {
+          "url": "https://apigateway.haugiang.gov.vn/base/auth/random",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "data": JSON.stringify({
+            "tenDinhDanh": filter.tenDinhDanh
+          }),
+        };
+        
+        $.ajax(settings).done(function (response) {
+          try {
+            let data = response.resp.doiTuongXacThuc
+            resolve(data);
+          } catch (error) {
+            reject("")
+          }
+        }).fail(function () {
+          reject("")
+        })
+
+      })
+    },
+    resetPassWordKeycloak ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let settings = {
+          "url": "https://apigateway.haugiang.gov.vn/base/auth/resetpwd/code",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "data": JSON.stringify({
+            "tenDinhDanh": filter.tenDinhDanh,
+            "maXacThuc": filter.maXacThuc
+          })
         };
         
         $.ajax(settings).done(function (response) {

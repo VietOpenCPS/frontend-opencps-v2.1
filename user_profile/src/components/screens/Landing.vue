@@ -545,8 +545,11 @@
                 </v-flex>
               </v-layout>
               <v-layout row wrap>
-                <v-flex xs12 class="mx-3">
+                <v-flex :class="taiKhoanKeycloak ? 'px-2 xs6' : 'mx-2 xs12'">
                   <v-btn block color="blue darken-3" dark v-on:click.native="showChangePass">{{stateLabel}}</v-btn>
+                </v-flex>
+                <v-flex xs6 class="" v-if="taiKhoanKeycloak">
+                  <v-btn block color="blue darken-3" dark v-on:click.native="showResetPass">Cấp lại mật khẩu</v-btn>
                 </v-flex>
               </v-layout>
             </v-card-text>
@@ -687,6 +690,55 @@
       </v-card>
     </v-dialog>
     <!--  -->
+    <v-dialog v-model="verifyResetPass" max-width="450">
+      <v-card class="px-0">
+        <v-card-title color="primary" class="headline">XÁC THỰC CẤP LẠI MẬT KHẨU</v-card-title>
+        <v-divider class="my-0"></v-divider>
+        <v-card-text class="pt-4">
+          <v-form ref="formReset" v-model="valid" lazy-validation class="">
+            <v-layout wrap>
+              <v-flex class="">
+                <v-text-field
+                  box
+                  label="Mã xác thực"
+                  v-model="codeVerifyReset"
+                  height="42"
+                  :rules="[v => !!v || 'Mã xác thực là bắt buộc']"
+                  required
+                  @keyup.enter="submitVerifyReset"
+                  autofocus
+                ></v-text-field>
+              </v-flex>
+              <v-flex class="" style="width: 100px; max-width: 100px">
+                <v-btn color="blue darken-3" :loading="loading" :disabled="loading" v-on:click.native="sendCode" class="mx-0 right" dark>
+                  <v-icon>refresh</v-icon>&nbsp; Gửi mã
+                </v-btn>
+              </v-flex>
+            </v-layout>
+            
+            <v-flex xs12 class="text-xs-left text-xs-center mt-2">
+              <v-btn class="ml-1 my-0 white--text" color="primary"
+                :loading="loading"
+                :disabled="loading"
+                @click="verifyResetPass = false"
+              >
+                <v-icon class="" style="color: #fff !important">reply</v-icon>&nbsp;
+                Thoát
+              </v-btn>
+              <v-btn class="ml-2 mr-1 my-0" color="primary"
+                :loading="loading"
+                :disabled="loading"
+                @click="resetPassWord"
+              >
+                <v-icon style="color: #fff !important">save</v-icon>&nbsp;
+                Xác nhận
+              </v-btn>
+            </v-flex>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <!--  -->
   </div>
 </template>
 
@@ -709,6 +761,8 @@
       AttachImage
     },
     data: () => ({
+      verifyResetPass: false,
+      codeVerifyReset: '',
       dialogExitApp: false,
       hasDocumentStorage: false,
       notifyConfig: false,
@@ -1150,6 +1204,38 @@
       }
     },
     methods: {
+      sendCode () {
+        let vm = this
+        vm.loading = true
+        let filter = {
+          tenDinhDanh: vm.user['applicantIdNo']
+        }
+        vm.$store.dispatch('getCodeVerify', filter).then(function (result) {
+          vm.loading = false
+          toastr.success("Mã xác thực đã được gửi đến tin nhắn và email của bạn")
+        }).catch(function () {
+          vm.loading = false
+          toastr.error("Lỗi xác thực")
+        })
+      },
+      resetPassWord () {
+        let vm = this
+        vm.loading = true
+        if (vm.codeVerifyReset) {
+          let filter = {
+            tenDinhDanh: vm.user['applicantIdNo'],
+            maXacThuc: vm.codeVerifyReset
+          }
+          vm.$store.dispatch('resetPassWordKeycloak', filter).then(function (result) {
+            vm.loading = false
+            toastr.success("Mật khẩu mới đã được gửi đến tin nhắn và email của bạn")
+            vm.verifyResetPass = false
+          }).catch(function () {
+            vm.loading = false
+            toastr.error('Lỗi hệ thống')
+          })
+        }
+      },
       getInfo (info) {
         let vm = this
         try {
@@ -1310,6 +1396,12 @@
           vm.stateLabel = 'Đổi mật khẩu'
         }
       },
+      showResetPass () {
+        let vm = this
+        vm.verifyResetPass = true
+        vm.codeVerifyReset = ''
+        vm.$refs.formResetvm.resetValidation()
+      },
       doChangePassWord () {
         let vm = this
         if (vm.$refs.form.validate()) {
@@ -1341,7 +1433,7 @@
             })
           } else {
             let settings = {
-              "url": "http://119.17.200.66:8378/flex/oauth2/token",
+              "url": "https://apigateway.haugiang.gov.vn/flex/oauth2/token",
               "method": "POST",
               "headers": {
                 "secret": "1hZ64frE9A6088oIgUUgPYJ6zp7+HXat",
@@ -1649,7 +1741,7 @@
       logoutApp () {
         let vm = this
         let settings = {
-          "url": 'http://119.17.200.66:8378/flex/oauth2/logout_endpoint',
+          "url": 'https://apigateway.haugiang.gov.vn/flex/oauth2/logout_endpoint',
           "method": "GET",
           "headers": {
             'Content-Type': 'application/json'

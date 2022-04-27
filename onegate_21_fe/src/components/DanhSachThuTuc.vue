@@ -834,7 +834,7 @@
         try {
           console.log('trackDVC serviceCode', serviceCode)
           if (_govaq) {
-            _govaq.push(['trackDVC', serviceCode, '-1', ''])
+            _govaq.push(['trackDVC', serviceCode, '1', ''])
           }
         } catch (error) { 
         }
