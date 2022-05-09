@@ -820,6 +820,7 @@ export const store = new Vuex.Store({
         dataPost.append('displayName', filter.fileName ? filter.fileName : '')
         dataPost.append('fileType', filter.fileType ? filter.fileType : '')
         dataPost.append('fileEntryId', filter.fileEntryId ? filter.fileEntryId : '')
+        dataPost.append('dossierNo', '')
 
         axios.post(state.initData.dossierApi + '/' + filter.dossierId + '/files/applicantdata', dataPost, param).then(function (response) {
           resolve(response)

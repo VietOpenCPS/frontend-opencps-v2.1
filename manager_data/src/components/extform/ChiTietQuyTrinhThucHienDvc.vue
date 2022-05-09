@@ -390,7 +390,7 @@ export default {
       let vm = this
       let param = {
         headers: {
-          groupId: window.themeDisplay.getScopeGroupId()
+          'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
         },
         params: {
         }

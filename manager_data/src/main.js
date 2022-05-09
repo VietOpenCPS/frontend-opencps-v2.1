@@ -56,8 +56,10 @@ Vue.use(VueCodemirror, {
 Vue.mixin({
   methods: {
     getScopeGroupId: function () {
+      let vm = this
       if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
-        return window.themeDisplay.getScopeGroupId()
+        let idGroup = vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId()
+        return idGroup
       } else {
         return 0
       }

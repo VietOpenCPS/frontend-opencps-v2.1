@@ -1281,7 +1281,7 @@ export default {
       vm.govAgencyCreate = item.govAgencyName ? item.govAgencyName : ''
       try {
         vm.serviceInfoCreate = vm.serviceInfoList.filter(function (items) {
-          return items.serviceCode === item.serviceCode
+          return String(items.serviceCode) === String(item.serviceCode)
         })[0]
         if (vm.serviceInfoCreate) {
           vm.optionList = vm.serviceInfoCreate.options

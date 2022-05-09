@@ -1,5 +1,6 @@
 <template>
   <div style="margin: 0 auto;">
+    <vue-confirm-dialog></vue-confirm-dialog>
     <v-card class="mb-3 mt-0">
       <v-toolbar color="blue darken-3" dark height="40">
         <v-toolbar-title class="ml-0">
@@ -253,7 +254,7 @@
                             <span>{{props.item.serviceLevel}}</span>
                         </div>
                     </td>
-                    <td class="text-xs-center px-2 py-2" style="width:290px;height:36px;border-right: 1px solid #dedede">
+                    <td class="text-xs-center px-2 py-2" style="width:330px;height:36px;border-right: 1px solid #dedede">
                         <content-placeholders v-if="loadingTable">
                             <content-placeholders-text :lines="1" />
                         </content-placeholders>
@@ -269,6 +270,12 @@
                                     <v-icon>delete</v-icon>
                                 </v-btn>
                                 <span>Xóa dịch vụ công</span>
+                            </v-tooltip>
+                            <v-tooltip v-if="agencyListManager" top class="mx-2">
+                                <v-btn :disabled="loading" @click="showCloneDonVi(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
+                                    <v-icon>input</v-icon>
+                                </v-btn>
+                                <span>Đồng bộ sang đơn vị khác</span>
                             </v-tooltip>
                             <v-btn color="green darken-3" dark small class=""
                               @click="updateServiceProcessOption(props.item)"
@@ -291,7 +298,52 @@
         </div>
       </div>
     </v-card>
-    
+    <v-dialog v-model="dialog_cloneServiceinfo" scrollable persistent max-width="700px">
+      <v-card>
+        <v-card-title class="headline pb-2">
+          <span>Đồng bộ dịch vụ công: {{oldDvcName}}</span>
+        </v-card-title>
+        <v-card-text class="pt-3">
+          <v-form ref="formCloneServiceProcess" v-model="validForm" lazy-validation>
+            <v-layout wrap class="py-1 align-center row-list-style">
+              <v-flex xs12 class="my-2">
+                <div>
+                  <div class="my-2">Đồng bộ đến đơn vị:</div>
+                  <v-autocomplete
+                    placeholder="Chọn đơn vị"
+                    :items="agencyListManager"
+                    v-model="toAgency"
+                    item-text="text"
+                    item-value="value"
+                    hide-details
+                    hide-no-data
+                    return-object
+                    box
+                    :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                    :required="true"
+                  ></v-autocomplete>
+                </div>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+        <v-card-actions class="px-3">
+          <v-spacer></v-spacer>
+          <v-btn color="red darken-3" class="mr-0" dark v-on:click="dialog_cloneServiceinfo = false">
+            <v-icon class="white--text">clear</v-icon>&nbsp;
+            Hủy
+          </v-btn>
+          <v-btn color="blue darken-3" dark
+            :loading="loading"
+            :disabled="loading"
+            @click="cloneThuTucSangDonVi"
+          >
+            <v-icon>save</v-icon>&nbsp;
+            <span>Đồng bộ</span>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -300,12 +352,20 @@ import Vue from 'vue'
 import toastr from 'toastr'
 import axios from "axios"
 import TinyPagination from './Pagination.vue'
+import VueConfirmDialog from 'vue-confirm-dialog'
+Vue.use(VueConfirmDialog)
+Vue.component('vue-confirm-dialog', VueConfirmDialog.default)
 
 export default {
   components: {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    validForm: false,
+    toAgency: '',
+    dialog_cloneServiceinfo: false,
+    dichVuCongSelect: '',
+    oldDvcName: '',
     exportLoading: false,
     validFormSearch: false,
     isDvc: false,
@@ -423,7 +483,15 @@ export default {
     ]
   }),
   computed: {
-    
+    agencyListManager() {
+      return this.$store.getters.getAgencyListManager
+    },
+    agencyManager () {
+      return this.$store.getters.agencyManager
+    },
+    agencyCurrentSite () {
+      return this.$store.getters.getCurrentSite
+    }
   },
   created() {
     let vm = this
@@ -490,11 +558,63 @@ export default {
     }
   },
   methods: {
+    showCloneDonVi (item) {
+      let vm = this
+      vm.dialog_cloneServiceinfo = true
+      vm.dichVuCongSelect = item
+      vm.oldDvcName = item.serviceName
+    },
+    cloneThuTucSangDonVi () {
+      let vm = this
+      if (vm.$refs.formCloneServiceProcess.validate()) {
+        vm.$confirm({
+          title: 'ĐỒNG BỘ DỊCH VỤ CÔNG',
+          message: 'Bạn có chắc chắn đồng bộ dịch vụ công này',
+          button: {
+            yes: 'Có',
+            no: 'Không'
+          },
+          callback: confirm => {
+            if (confirm == true) {
+              vm.loading = true
+              let options = {
+                headers: {
+                  'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
+                  'Accept': 'application/json',
+                  'Content-Type': "application/x-www-form-urlencoded",
+                  'Token': window.Liferay !== undefined ? window.Liferay.authToken : ''
+                }
+              }
+              let dataPostdossier = new URLSearchParams()
+              dataPostdossier.append('type', 'serviceConfig')
+              dataPostdossier.append('serviceConfigId', vm.dichVuCongSelect.serviceConfigId)
+              if (vm.agencyManager) {
+                dataPostdossier.append('fromServerNo', vm.agencyManager['serveNo'])
+              } else if (vm.agencyCurrentSite) {
+                dataPostdossier.append('fromServerNo', vm.agencyCurrentSite['serveNo'])
+              } else {
+                dataPostdossier.append('fromServerNo', "")
+              }
+              dataPostdossier.append('toServerNo', vm.toAgency['serveNo'])
+              axios.post('/o/rest/v2/backupDatas/exportProcess', dataPostdossier, options).then(function (response) {
+                vm.loading = false
+                vm.dialog_cloneServiceinfo = false
+                toastr.success('Dịch vụ công đã được đồng bộ')
+              }).catch(function () {
+                vm.loading = false
+                toastr.error('Đồng bộ thất bại')
+              })
+            }
+          }
+        })
+      }
+      
+    },
     exportTableData() {
       let vm = this
       let options = {
         headers: {
-          'groupId': window.themeDisplay.getScopeGroupId(),
+          'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
           'Token': window.Liferay !== undefined ? window.Liferay.authToken : '',
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json'
@@ -645,7 +765,7 @@ export default {
       vm.loadingTable = true
       let param = {
         headers: {
-          groupId: window.themeDisplay.getScopeGroupId()
+          'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
         },
         params: {
           start: vm.serviceconfigPage * vm.numberPerPage - vm.numberPerPage,
@@ -691,7 +811,7 @@ export default {
       let vm = this
       let param = {
         headers: {
-          groupId: window.themeDisplay.getScopeGroupId()
+          'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
         }
       }
       let x = confirm('Bạn có chắc chắn xóa dịch vụ công này')

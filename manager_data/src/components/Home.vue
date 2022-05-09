@@ -67,6 +67,35 @@
       </v-list>
     </v-navigation-drawer>
     <v-container fluid class="px-0">
+      <div class="adv_search my-0 px-2" style="background: #eeeeee" v-if="agencyList && tableName !== 'opencps_serviceconfig_dvc'">
+        <div class="searchAdvanced-content py-3">
+          <v-layout wrap>
+            <v-flex xs12 class="mb-3 px-2">
+              <div>
+                <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">ĐƠN VỊ:</div>
+                <v-autocomplete
+                  placeholder="Chọn đơn vị"
+                  class="select-search d-inline-block"
+                  style="width: calc(100% - 130px)"
+                  :items="agencyList"
+                  v-model="agencyFilter"
+                  item-text="text"
+                  item-value="code"
+                  hide-details
+                  hide-no-data
+                  solo
+                  flat
+                  height="32"
+                  min-height="32"
+                  return-object
+                  @change="changeAgency"
+                  clearable
+                ></v-autocomplete>
+              </div>
+            </v-flex>
+          </v-layout>
+        </div>
+      </div>
       <router-view></router-view>
     </v-container>
     <v-snackbar
@@ -117,13 +146,19 @@
   </v-app>
 </template>
 <script>
+  import axios from 'axios'
+  import $ from 'jquery'
   export default {
     data: () => ({
       dialog: false,
       drawer: null,
       dataSocket: {},
       scopeAdmin: false,
-      hasTrackingApi: false
+      hasTrackingApi: false,
+      agencyList: '',
+      agencyFilter: '',
+      siteTrungTam: false,
+      agencyListConfig: ''
     }),
     props: {
       tableName: String
@@ -131,6 +166,14 @@
     created () {
       let vm = this
       vm.$nextTick(function () {
+        try {
+          vm.siteTrungTam = siteTrungTam
+        } catch (error) {
+        }
+        try {
+          vm.agencyListConfig = agencyListConfig
+        } catch (error) {
+        }
         try {
           let isAdmin = vm.getUser('Administrator')
           if (scopeAdminConfig && !isAdmin) {
@@ -142,6 +185,8 @@
           vm.hasTrackingApi = hasTrackingApi
         } catch (error) {
         }
+        
+        vm.getAgencyConfigs()
       })
     },
     computed: {
@@ -191,6 +236,73 @@
       }
     },
     methods: {
+      changeAgency () {
+        let vm = this
+        setTimeout(function () {
+          vm.$store.commit('setAgencyManager',vm.agencyFilter ? vm.agencyFilter : '')
+          vm.$store.commit('setGroupIdAgencyManager',vm.agencyFilter ? vm.agencyFilter['value'] : '')
+          axios.defaults.headers.common['groupId'] = vm.agencyFilter ? vm.agencyFilter['value'] : ''
+          console.log('groupIdAgencyManager', vm.agencyFilter ? vm.agencyFilter['value'] : '')
+          try {
+            if ($('a[aria-current="page"]').length) {
+              let pathR = $('a[aria-current="page"]')[0]['hash'].replace('#','')
+              vm.$router.push({
+                path: pathR
+              })
+            } else {
+              let pathR = $('.v-list__group__items a')[0]['hash'].replace('#','')
+              vm.$router.push({
+                path: pathR
+              })
+            }
+          } catch (error) {
+          }
+        }, 200)
+      },
+      getAgencyConfigs () {
+        let vm = this
+        vm.agencyList = ''
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        
+        let dataGet = {}
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('serverCode', 'SERVER_DVC')
+        dataPost.append('url', '/serverconfigs/GROUP_ID_SITE_MOTCUA')
+        dataPost.append('data', JSON.stringify(dataGet))
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+          let serializable = response.data
+          let configs = JSON.parse(serializable.configs)
+          let agency = configs['groupIds']
+          try {
+            let agencyCurrentSite = agency.filter(function (item) {
+              return item.value == window.themeDisplay.getScopeGroupId()
+            })[0]
+            vm.$store.commit('setCurrentSite', agencyCurrentSite)
+          } catch (error) {
+            vm.$store.commit('setCurrentSite', '')
+          }
+          if (vm.siteTrungTam) {
+            vm.agencyList = agency
+          } else {
+            let idSite = window.themeDisplay.getScopeGroupId()
+            if (configs.hasOwnProperty(idSite)) {
+              if (configs['idSite'] === 'all' || !configs['idSite']) {
+                vm.agencyList = agency
+              } else {
+                vm.agencyList = configs['idSite']
+              }
+            }
+          }
+          vm.$store.commit('setAgencyListManager', vm.agencyList)
+        }).catch(function (xhr) {
+        })
+      },
       getUser (roleItem) {
         let vm = this
         let roles = vm.userRoles

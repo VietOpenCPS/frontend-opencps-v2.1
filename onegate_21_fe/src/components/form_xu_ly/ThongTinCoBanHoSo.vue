@@ -5,7 +5,7 @@
         <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Thông tin chung hồ sơ</div>
         <v-card v-if="!mauCongVan">
           <v-card-text class="py-0">
-            <v-btn v-if="thongTinChiTietHoSo.applicantIdType === 'citizen' && traCuuLgspCongDan && (quyenTraCuuLgsp == 'always' || quyenTraCuuLgsp == 1)" :style="loadingSearchLgsp ? 'pointer-events: none' : ''"
+            <v-btn v-if="originality == 3 && thongTinChiTietHoSo.applicantIdType === 'citizen' && traCuuLgspCongDan && (quyenTraCuuLgsp == 'always' || quyenTraCuuLgsp == 1)" :style="loadingSearchLgsp ? 'pointer-events: none' : ''"
              class="mx-0 ml-2 mt-2 mb-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
               <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
               <v-progress-circular :size="24" v-if="loadingSearchLgsp"

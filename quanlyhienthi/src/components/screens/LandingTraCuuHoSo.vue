@@ -269,7 +269,7 @@ export default {
         } catch (error) {
         }
       }
-      if (!vm.agencyFilter || vm.agencyFilter.length === 0) {
+      if (!vm.agencyFilter || vm.agencyFilter.length === 0 || !vm.statusFilter) {
         return
       }
       vm.dossierList = []

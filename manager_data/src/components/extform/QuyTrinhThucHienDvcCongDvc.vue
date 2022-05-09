@@ -281,7 +281,7 @@ export default {
       vm.loadingTable = true
       let param = {
         headers: {
-          groupId: window.themeDisplay.getScopeGroupId()
+          'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
         }
       }
       let params = {
@@ -333,7 +333,7 @@ export default {
       if (x) {
         let param = {
           headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
+            'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
           }
         }
         let params = {

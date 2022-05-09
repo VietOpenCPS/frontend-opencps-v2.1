@@ -338,7 +338,7 @@ export default {
       vm.loadingTable = true
       let param = {
         headers: {
-          groupId: window.themeDisplay.getScopeGroupId()
+          'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
         },
         params: {
           api: vm.api,
@@ -365,7 +365,7 @@ export default {
       let vm = this
       let param = {
         headers: {
-          groupId: window.themeDisplay.getScopeGroupId()
+          'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
         }
       }
       axios.get('/o/rest/v2/socket/web/apiManagers', param).then(function (response) {

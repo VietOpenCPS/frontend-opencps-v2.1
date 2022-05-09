@@ -281,7 +281,7 @@ export default {
       vm.loadingTable = true
       let param = {
         headers: {
-          groupId: window.themeDisplay.getScopeGroupId()
+          'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
         },
         params: {
           start: vm.serviceProcessOptionPage * vm.numberPerPage - vm.numberPerPage,
@@ -326,7 +326,7 @@ export default {
       let vm = this
       let param = {
         headers: {
-          groupId: window.themeDisplay.getScopeGroupId()
+          'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
         }
       }
       let x = confirm('Bạn có chắc chắn xóa quy trình thực hiện này')

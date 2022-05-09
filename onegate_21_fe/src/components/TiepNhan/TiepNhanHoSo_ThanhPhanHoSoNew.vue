@@ -109,7 +109,7 @@
                       {{'TÀI LIỆU KHAI TRỰC TUYẾN'}} - 
                       <i>{{itemFileView.modifiedDate}}</i>
                     </span>
-                    <v-btn icon ripple v-on:click.stop="downloadSingleFile(itemFileView)" class="mx-0 my-0">
+                    <v-btn title="Tải xuống" icon ripple v-on:click.stop="downloadSingleFile(itemFileView)" class="mx-0 my-0">
                       <v-icon size="14" color="primary">fas fa fa-download</v-icon>
                     </v-btn>
 
@@ -143,6 +143,14 @@
                         </v-list-tile>
                       </v-list>
                     </v-menu>
+                    <!--  -->
+                    <v-btn title="Lưu giấy tờ vào kho" class="my-0" flat icon color="indigo"
+                      v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && yeuCauSoHoa" 
+                      @click.stop="showAddStorage(item, itemFileView)"
+                    >
+                      <v-icon size="21" style="color: green">bookmark</v-icon>
+                    </v-btn>
+                    <!--  -->
                   </div>
                   <div v-if="!itemFileView.eForm" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
                     <span v-on:click.stop="viewFile2(itemFileView, index)" class="ml-1" style="cursor: pointer;">
@@ -153,10 +161,10 @@
                       {{itemFileView.displayName}} - 
                       <i>{{itemFileView.modifiedDate}}</i>
                     </span>
-                    <v-btn icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView && checkInput !== 1">
+                    <v-btn title="Xóa" icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView && checkInput !== 1">
                       <v-icon style="color: red">delete_outline</v-icon>
                     </v-btn>
-                    <v-btn icon ripple v-on:click.stop="downloadSingleFile(itemFileView)" class="mx-0 my-0">
+                    <v-btn title="Tải xuống" icon ripple v-on:click.stop="downloadSingleFile(itemFileView)" class="mx-0 my-0">
                       <v-icon size="14" color="primary">fas fa fa-download</v-icon>
                     </v-btn>
                     <!--  -->
@@ -212,6 +220,19 @@
                         </v-list-tile>
                       </v-list>
                     </v-menu>
+                    <!--  -->
+                    <v-btn title="Lưu giấy tờ vào kho" class="my-0" flat icon color="indigo"
+                      v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && yeuCauSoHoa" 
+                      @click.stop="showAddStorage(item, itemFileView)"
+                    >
+                      <v-icon size="21" style="color: green">bookmark</v-icon>
+                    </v-btn>
+                    <!-- <v-btn title="Đã lưu vào kho" class="my-0" flat icon color="green"
+                      v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && yeuCauSoHoa && giayToDaLuu.indexOf(itemFileView.dossierFileId) == -1" 
+                    >
+                      <v-icon size="18">task_alt</v-icon>
+                    </v-btn> -->
+                    <!--  -->
                   </div>
                 </div>
                 <div v-if="dossierFilesApplicant && dossierFilesApplicant.length" class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" 
@@ -473,14 +494,14 @@
                 </v-btn>
                 <span>Giấy tờ trong kho</span>
               </v-tooltip>
-              <v-tooltip class="pl-1 pt-1" top v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && yeuCauSoHoa">
+              <!-- <v-tooltip class="pl-1 pt-1" top v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && yeuCauSoHoa">
                 <v-btn :disabled="progress_sohoa" slot="activator" icon class="mx-0 my-0" @click="guiYeuCauSoHoa(item, index)">
                   <v-badge>
                     <v-icon size="20" color="#004b94">share</v-icon>
                   </v-badge>
                 </v-btn>
                 <span>Yêu cầu số hóa</span>
-              </v-tooltip>
+              </v-tooltip> -->
               <!-- end -->
 
             </v-flex>
@@ -988,6 +1009,66 @@
       </v-card>
     </v-dialog>
     <!--  -->
+    <v-dialog v-model="dialog_add_giayto" scrollable persistent max-width="900px">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Lưu giấy tờ vào kho kết quả TTHC</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_add_giayto = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-1">
+          <v-form ref="form" v-model="validFormStorage" lazy-validation class="py-3 px-0 grid-list">
+            <v-layout row wrap class="px-0 py-3">
+              <v-flex xs12>
+                <v-text-field label="Tên giấy tờ" v-model="tenGiayToStorage" box></v-text-field>
+              </v-flex>
+              <v-flex xs12>
+                <v-text-field label="Số hiệu giấy tờ" v-model="soHieuGiayToStorage" box></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 class="px-0 pr-3">
+                <v-text-field
+                  label="Ngày cấp"
+                  v-model="createDateStorage"
+                  placeholder="dd/mm/yyyy, ddmmyyyy"
+                  @blur="formatDate"
+                  box
+                  clearable
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 class="px-0 pr-3">
+                <v-text-field
+                  label="Ngày hết hạn"
+                  v-model="expireDateStorage"
+                  placeholder="dd/mm/yyyy, ddmmyyyy"
+                  @blur="formatExpireDate"
+                  box
+                  clearable
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-2" color="primary" @click.native="dialog_add_giayto = false"
+            :loading="progress_sohoa"
+            :disabled="progress_sohoa"
+          >
+            <v-icon>clear</v-icon> &nbsp;
+            Thoát
+          </v-btn>
+          <v-btn class="mr-3" color="primary" @click.native="addApplicantData"
+            :loading="progress_sohoa"
+            :disabled="progress_sohoa"
+          >
+            <v-icon>save</v-icon> &nbsp;
+            Đồng ý
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -1035,6 +1116,15 @@ export default {
     'kho-tai-lieu': KhoTaiLieu,
   },
   data: () => ({
+    dialog_add_giayto: false,
+    validFormStorage: true,
+    partKhoGiayTo: '',
+    fileKhoGiayTo: '',
+    tenGiayToStorage: '',
+    soHieuGiayToStorage: '',
+    createDateStorage: '',
+    expireDateStorage: '',
+    giayToDaLuu: '',
     access_token_vnpt: '',
     userSignSmartVnpt: '',
     tranId_vnpt: '',
@@ -1347,6 +1437,85 @@ export default {
     }
   },
   methods: {
+    formatDate () {
+      let vm = this
+      let lengthDate = String(vm.createDateStorage).trim().length
+      let splitDate = String(vm.createDateStorage).split('/')
+      if (lengthDate && lengthDate > 4 && splitDate.length === 3 && splitDate[2]) {
+        vm.createDateStorage = vm.translateDate(vm.createDateStorage)
+      } else if (lengthDate && lengthDate === 8) {
+        let date = String(vm.createDateStorage)
+        vm.createDateStorage = date.slice(0,2) + '/' + date.slice(2,4) + '/' + date.slice(4,8)
+      } else {
+        vm.createDateStorage = ''
+      }     
+    },
+    formatExpireDate () {
+      let vm = this
+      let lengthDate = String(vm.expireDateStorage).trim().length
+      let splitDate = String(vm.expireDateStorage).split('/')
+      if (lengthDate && lengthDate > 4 && splitDate.length === 3 && splitDate[2]) {
+        vm.expireDateStorage = vm.translateDate(vm.expireDateStorage)
+      } else if (lengthDate && lengthDate === 8) {
+        let date = String(vm.expireDateStorage)
+        vm.expireDateStorage = date.slice(0,2) + '/' + date.slice(2,4) + '/' + date.slice(4,8)
+      } else {
+        vm.expireDateStorage = ''
+      }     
+    },
+    translateDate (date) {
+      if (!date) return null
+      const [day, month, year] = date.split('/')
+      return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`
+    },
+    showAddStorage (part, file) {
+      let vm = this
+      vm.soHieuGiayToStorage = ''
+      vm.createDateStorage = ''
+      vm.expireDateStorage = ''
+      vm.dialog_add_giayto = true
+      vm.partKhoGiayTo = part
+      vm.fileKhoGiayTo = file
+      vm.tenGiayToStorage = part.partName
+    },
+    addApplicantData () {
+      let vm = this
+      vm.progress_sohoa = true
+      let param = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+          'Accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+      let dataCreateFile = new FormData()
+      let url = '/o/rest/v2/applicantdatas'
+      dataCreateFile.append('fileTemplateNo', vm.partKhoGiayTo.fileTemplateNo)
+      dataCreateFile.append('status', 1)
+      dataCreateFile.append('fileNo', vm.soHieuGiayToStorage)
+      dataCreateFile.append('fileName', vm.partKhoGiayTo.partName)
+      dataCreateFile.append('applicantIdNo', vm.applicantId)
+      dataCreateFile.append('file', '')
+      dataCreateFile.append('fileEntryId', vm.fileKhoGiayTo.hasOwnProperty('fileEntryId') ? vm.fileKhoGiayTo.fileEntryId : '')
+      dataCreateFile.append('applicantName', vm.thongTinChuHoSo['applicantName'] ? vm.thongTinChuHoSo['applicantName'] : '')
+      dataCreateFile.append('govAgencyName', vm.thongTinHoSo.govAgencyName)
+      dataCreateFile.append('serviceCode', vm.thongTinHoSo['serviceCode'])
+      dataCreateFile.append('templateNo', vm.partKhoGiayTo.fileTemplateNo)
+      dataCreateFile.append('issueDate', vm.createDateStorage)
+      dataCreateFile.append('expireDate', vm.expireDateStorage)
+      dataCreateFile.append('desciption', '')
+      dataCreateFile.append('dossierNo', '')
+      
+      axios.post(url, dataCreateFile, param).then(result1 => {
+        vm.progress_sohoa = false
+        vm.dialog_add_giayto = false
+        toastr.success('Lưu giấy tờ vào kho thành công')
+        let fileLuu = vm.fileKhoGiayTo + ','
+        vm.giayToDaLuu += fileLuu
+      }).catch(xhr => {
+        vm.progress_sohoa = false
+      })
+    },
     showValid () {
       var vm = this
       let result = {
@@ -3148,11 +3317,14 @@ export default {
     },
     attachFileFromStorage (data) {
       let vm = this
+      var originUrl = 'http://' + window.location.hostname;
+      var originUrl2 = 'https://' + window.location.hostname;
+      let filePath = data.filePath.replace(originUrl,"").replace(originUrl2,"")
       let filter = {
         dossierId: vm.thongTinHoSo.dossierId,
         dossierTemplateNo: vm.thongTinHoSo.dossierTemplateNo,
         partNo: vm.dossierPartAttach.partNo,
-        filePath: data.filePath,
+        filePath: filePath,
         fileName: data.fileName,
         fileType: data.fileExtension,
         fileEntryId: data.fileEntryId,
@@ -3251,6 +3423,7 @@ export default {
       dataCreateFile.append('issueDate', '')
       dataCreateFile.append('expireDate', '')
       dataCreateFile.append('desciption', '')
+      dataCreateFile.append('dossierNo', '')
       
       axios.post(url, dataCreateFile, param).then(result1 => {
         vm.progress_sohoa = false

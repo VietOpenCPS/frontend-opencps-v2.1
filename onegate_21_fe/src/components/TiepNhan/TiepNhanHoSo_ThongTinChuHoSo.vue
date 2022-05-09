@@ -35,7 +35,7 @@
                       <span v-if="!loadingCheckAcc">Kiểm tra thông tin tài khoản</span>
                       <span v-if="loadingCheckAcc">Đang kiểm tra</span>
                     </v-btn>
-                    <v-btn v-if="quyenTraCuuLgsp === 'always' || quyenTraCuuLgsp == 1" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
+                    <v-btn v-if="quyenTraCuuLgsp === 'always' || quyenTraCuuLgsp == 1 || quyenTraCuuLgsp == 2" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
                       <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
                       <v-progress-circular :size="24" v-if="loadingSearchLgsp"
                         indeterminate
