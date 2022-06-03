@@ -871,7 +871,8 @@
             } else {
               vm.$store.dispatch('getServiceConfigDetail', item).then(result => {
                 if (result.hasOwnProperty('serviceUrl') && result.serviceUrl) {
-                  window.location.href = result.serviceUrl
+                  // window.location.href = result.serviceUrl
+                  window.open(result.serviceUrl, "_blank")
                 }
               }).catch(function(){})
             }
@@ -933,7 +934,7 @@
       createDossier (data) {
         let vm = this
         if (vm.serviceConfigSelect.serviceUrl) {
-          window.location.href = vm.serviceConfigSelect
+          window.open(vm.serviceConfigSelect.serviceUrl, "_blank")
         } else {
           vm.trackingBTTT(data.serviceCode)
           vm.$store.dispatch('postDossier', data).then(function (result) {

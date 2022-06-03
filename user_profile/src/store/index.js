@@ -123,6 +123,23 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getApplicantInfo ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/applicants/applicantIdNo/' + filter.applicantIdNo, param).then(function (response) {
+            let seriable = response.data
+            resolve(seriable)
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
     loadDictItems ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {

@@ -29,6 +29,17 @@
                         <span>Cấp chứng thư số</span>
                     </v-btn> -->
                     <v-btn
+                        class="mx-0 mr-2"
+                        small
+                        color="primary"
+                        v-if="quyenTraCuuLgsp == 1 || quyenTraCuuLgsp == 2"
+                        @click="checkCsdldc()"
+                        :loading="loadingSearchLgsp" :disabled="loadingSearchLgsp"
+                    >
+                        <v-icon size="18">check</v-icon>&nbsp;
+                        <span>Kiểm tra thông tin CSDL dân cư</span>
+                    </v-btn>
+                    <v-btn
                         class="mx-0"
                         small
                         color="primary"
@@ -100,7 +111,7 @@
               border-bottom-right-radius: 5px;
               border-top: none;">
                   <div style="text-align: center;">
-                      <img class="mb-4" style="width: 226px; height: 226px;" src="/o/hau-giang-theme/images/avt.png">
+                      <img class="mb-4" style="width: 226px; height: 226px;" src="/o/hau-giang-theme/images/avt.png?t=98312312323">
                       <h4 class="title-page" style="font-size: 16px;font-weight: bold;color: #903938">{{thongTinCongDan['hoVaTen']}}</h4>
                       <v-layout class="mt-4" wrap style="width: 350px;">
                           <v-flex xs5>Số CMND/ CCCD:</v-flex>
@@ -126,7 +137,8 @@
                             color="primary" small class="mt-3 mx-3 text-white" @click="showChangePass()">
                             Đổi mật khẩu
                           </v-btn>
-                          <v-btn color="primary" v-if="!thongTinCongDan['danhTinhDienTu'][0]" small class="mt-3 mx-3 text-white" @click="showCreateAcc()">
+                          <v-btn color="primary" v-if="!thongTinCongDan['danhTinhDienTu'][0]" small class="mt-3 mx-3 text-white"
+                           @click="showCreateAcc()" :loading="loadingSearchLgsp" :disabled="loadingSearchLgsp">
                               Tạo tài khoản
                           </v-btn>
                           <v-btn v-if="thongTinCongDan['danhTinhDienTu'][0] && thongTinCongDan['danhTinhDienTu'][0]['tinhTrangSuDungTaiKhoan']['maMuc'] == 1" color="primary" small class="mt-3 mx-3 text-white" @click="showChangeStatusAcc('active')">
@@ -535,11 +547,70 @@
           </v-card>
         </v-dialog>
 
+        <v-dialog v-model="dialog_searchLgsp" scrollable persistent max-width="700px">
+          <v-card>
+            <v-toolbar dark color="primary">
+              <v-toolbar-title>Thông tin công dân trên CSDL Quốc gia</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-btn icon dark @click.native="dialog_searchLgsp = false">
+                <v-icon>close</v-icon>
+              </v-btn>
+            </v-toolbar>
+            <v-card-text class="py-1">
+              <div>
+                <table v-if="applicantLgspInfomation" class="datatable table my-3" style="border-top: 1px solid #dedede;">
+                  <tbody>
+                    <tr>
+                      <td width="200" class="pt-2"><span class="text-bold">Họ và tên công dân</span></td>
+                      <td class="pt-2"><span>{{applicantLgspInfomation.HoVaTen['Ten']}}</span></td>
+                    </tr>
+                    <tr>
+                      <td width="200" class="pt-2"><span class="text-bold">Số căn cước công dân</span></td>
+                      <td class="pt-2"><span>{{applicantLgspInfomation.SoDinhDanh}}</span></td>
+                    </tr>
+                    <tr>
+                      <td width="200" class="pt-2"><span class="text-bold">Số chứng minh nhân dân</span></td>
+                      <td class="pt-2"><span>{{applicantLgspInfomation.SoCMND}}</span></td>
+                    </tr>
+                    <tr>
+                      <td width="200" class="pt-2"><span class="text-bold">Ngày sinh</span></td>
+                      <td class="pt-2"><span>{{dateLocale(thongTinCongDan.ngaySinh)}}</span></td>
+                    </tr>
+                    <tr>
+                      <td width="200" class="pt-2"><span class="text-bold">Giới tính</span></td>
+                      <td class="pt-2"><span>{{applicantLgspInfomation.GioiTinh == '1' ? 'Nam' : (applicantLgspInfomation.GioiTinh == '2' ? 'Nữ' : 'Chưa có thông tin')}}</span></td>
+                    </tr>
+                    <tr>
+                      <td width="200" class="pt-2"><span class="text-bold">Tình trạng hôn nhân</span></td>
+                      <td class="pt-2"><span>{{applicantLgspInfomation.TinhTrangHonNhan == '2' ? 'Đã kết hôn' : 'Độc thân'}}</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div v-else class="mx-1 flex my-4">
+                  <v-alert outline color="red" icon="warning" :value="true">
+                    Thông tin công dân không có trên CSDL quốc gia về dân cư
+                  </v-alert>
+                </div>
+                <v-flex xs12 class="text-right my-2">
+                  <v-btn color="primary"
+                    @click="dialog_searchLgsp = false"
+                    class="mx-0 my-0 white--text"
+                  >
+                    <v-icon size="20" class="white--text">clear</v-icon>
+                    &nbsp;
+                    Đóng
+                  </v-btn>
+                </v-flex>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-dialog>
     </div>
 </template>
 
 <script>
 import Vue from 'vue'
+import axios from 'axios'
 // import Pagination from './Pagination.vue'
 import toastr from 'toastr'
 toastr.options = {
@@ -562,56 +633,56 @@ export default {
         loadingAction: false,
         loadingData: false,
         headers: [
-            {
-                sortable: false,
-                text: 'STT',
-                align: 'center',
-                value: 'index'
-            },
-            {
-                sortable: false,
-                text: 'Loại giấy tờ',
-                align: 'left',
-                value: 'cmnd'
-            },
-            {
-                sortable: false,
-                text: 'Số giấy tờ',
-                align: 'left',
-                value: 'fullname'
-            },
-            {
-                sortable: false,
-                text: 'Ngày cấp',
-                align: 'left',
-                value: 'contact'
-            },
-            {
-                sortable: false,
-                text: 'Nơi cấp',
-                align: 'left',
-                value: 'status'
-            },
-            {
-                sortable: false,
-                text: 'Thao tác',
-                align: 'center',
-                value: 'action'
-            },
+          {
+              sortable: false,
+              text: 'STT',
+              align: 'center',
+              value: 'index'
+          },
+          {
+              sortable: false,
+              text: 'Loại giấy tờ',
+              align: 'left',
+              value: 'cmnd'
+          },
+          {
+              sortable: false,
+              text: 'Số giấy tờ',
+              align: 'left',
+              value: 'fullname'
+          },
+          {
+              sortable: false,
+              text: 'Ngày cấp',
+              align: 'left',
+              value: 'contact'
+          },
+          {
+              sortable: false,
+              text: 'Nơi cấp',
+              align: 'left',
+              value: 'status'
+          },
+          {
+              sortable: false,
+              text: 'Thao tác',
+              align: 'center',
+              value: 'action'
+          },
         ],
         items: [
-            {
-                cmnd: 'CMND',
-                fullname: '029922398',
-                contact: '11/12/2020',
-                status: 'Hà Nội',
-            },
-            {
-                cmnd: 'CMND',
-                fullname: '029922398',
-                contact: '11/12/2020',
-                status: 'Hà Nội',
-            }
+          {
+              cmnd: 'CMND',
+              fullname: '029922398',
+              contact: '11/12/2020',
+              status: 'Hà Nội',
+          },
+          {
+              cmnd: 'CMND',
+              fullname: '029922398',
+              contact: '11/12/2020',
+              status: 'Hà Nội',
+          }
         ],
         page: 0,
         itemsPerPage: 10,
@@ -620,56 +691,56 @@ export default {
         daCapTaiKhoan: false,
         pageCount: 10,
         thongTin:  [
-            {
-                lable: 'Họ tên',
-                value: 'hoVaTen'
-            },
-            {
-                lable: 'Ngày sinh',
-                value: 'ngaySinh',
-                type: 'date'
-            },
-            {
-                lable: 'Giới tính',
-                value: 'gioiTinh',
-                type: 'danhmuc'
-            },
-            {
-                lable: 'Dân tộc',
-                value: 'danToc',
-                type: 'danhmuc'
-            },
-            {
-                lable: 'Quốc gia',
-                value: 'quocTich',
-                type: 'danhmuc'
-            },
-            {
-                lable: 'CMND/CCCD',
-                value: 'maSoCaNhan'
-            },
-            {
-                lable: 'Số điện thoại',
-                value: 'sdt'
-            },
-            {
-                lable: 'Email',
-                value: 'email'
-            },
-            {
-                lable: 'Địa chỉ thường trú',
-                value: 'diaChiThuongTru',
-                type: 'address'
-            },
-            {
-                lable: 'Nơi ở hiện tại',
-                value: 'noiOHienTai',
-                type: 'address'
-            },
-            // {
-            //     lable: 'Giấy tờ tùy thân',
-            //     value: 'action'
-            // }
+          {
+              lable: 'Họ tên',
+              value: 'hoVaTen'
+          },
+          {
+              lable: 'Ngày sinh',
+              value: 'ngaySinh',
+              type: 'date'
+          },
+          {
+              lable: 'Giới tính',
+              value: 'gioiTinh',
+              type: 'danhmuc'
+          },
+          {
+              lable: 'Dân tộc',
+              value: 'danToc',
+              type: 'danhmuc'
+          },
+          {
+              lable: 'Quốc gia',
+              value: 'quocTich',
+              type: 'danhmuc'
+          },
+          {
+              lable: 'CMND/CCCD',
+              value: 'maSoCaNhan'
+          },
+          {
+              lable: 'Số điện thoại',
+              value: 'sdt'
+          },
+          {
+              lable: 'Email',
+              value: 'email'
+          },
+          {
+              lable: 'Địa chỉ thường trú',
+              value: 'diaChiThuongTru',
+              type: 'address'
+          },
+          {
+              lable: 'Nơi ở hiện tại',
+              value: 'noiOHienTai',
+              type: 'address'
+          },
+          // {
+          //     lable: 'Giấy tờ tùy thân',
+          //     value: 'action'
+          // }
         
         ],
         thongTinCongDan: '',
@@ -688,36 +759,36 @@ export default {
         actionStatusAcc: '',
         dialogStatusAccLog: false,
         headersLog: [
-            {
-                sortable: false,
-                text: 'STT',
-                align: 'center',
-            },
-            {
-                sortable: false,
-                text: 'Thao tác',
-                align: 'left'
-            },
-            {
-                sortable: false,
-                text: 'Nội dung',
-                align: 'left'
-            },
-            {
-                sortable: false,
-                text: 'Người thao tác',
-                align: 'left'
-            },
-            {
-                sortable: false,
-                text: 'Thời gian thao tác',
-                align: 'left'
-            },
-            {
-                sortable: false,
-                text: 'Thao tác',
-                align: 'center'
-            }
+          {
+              sortable: false,
+              text: 'STT',
+              align: 'center',
+          },
+          {
+              sortable: false,
+              text: 'Thao tác',
+              align: 'left'
+          },
+          {
+              sortable: false,
+              text: 'Nội dung',
+              align: 'left'
+          },
+          {
+              sortable: false,
+              text: 'Người thao tác',
+              align: 'left'
+          },
+          {
+              sortable: false,
+              text: 'Thời gian thao tác',
+              align: 'left'
+          },
+          {
+              sortable: false,
+              text: 'Thao tác',
+              align: 'center'
+          }
         ],
         logItems: [],
         logUpdate: '',
@@ -726,7 +797,12 @@ export default {
         validFormChangeLog: true,
         dialogPrint: false,
         contentPrint: '',
-        daCapChungThu: false
+        daCapChungThu: false,
+        loadingSearchLgsp: false,
+        dialog_searchLgsp: false,
+        applicantLgspInfomation: '',
+        quyenTraCuuLgsp: false,
+        userLoginInfomation: ''
       }
     },
     watch: {
@@ -738,6 +814,24 @@ export default {
       let vm = this
       vm.$store.commit('SET_INDEXTAB', 1)
       vm.getThongTinCongDan()
+      let param = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+          Token: window.Liferay ? window.Liferay.authToken : ''
+        }
+      }
+      let url = '/o/rest/v2/qldc/role/employee'
+      axios.get(url, param).then(function (response) {
+        let serializable = response.data
+        vm.quyenTraCuuLgsp = serializable.hasOwnProperty('status') ? serializable.status : ''
+      }).catch(function () {
+        vm.quyenTraCuuLgsp = ''
+      })
+      axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId(), param).then(function(response) {
+        vm.userLoginInfomation = response.data
+      })
+      .catch(function(error) {
+      })
     },
     methods: {
       getStatus(status) {
@@ -766,26 +860,92 @@ export default {
           vm.loadingData = false
         })
       },
+      checkCsdldc () {
+        let vm = this
+        let filter = {
+          applicantIdNo: String(vm.thongTinCongDan.maSoCaNhan).trim(),
+          applicantName: vm.convertString((String(vm.thongTinCongDan.hoVaTen).trim())).toUpperCase(),
+          birthDate: vm.dateTraCuuLgsp(vm.thongTinCongDan.ngaySinh),
+          StaffEmail : vm.userLoginInfomation && vm.userLoginInfomation.hasOwnProperty('employeeEmail') ? vm.userLoginInfomation.employeeEmail : ''
+        }
+        vm.loadingSearchLgsp = true
+        vm.$store.dispatch('searchLgspCongDan', filter).then(result => {
+          vm.dialog_searchLgsp = true
+          vm.loadingSearchLgsp = false
+          vm.applicantLgspInfomation = result
+        }).catch(function (result) {
+          vm.dialog_searchLgsp = true
+          vm.applicantLgspInfomation = ''
+          vm.loadingSearchLgsp = false
+        })
+      },
       showCreateAcc () {
         let vm = this
-        var characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        var alpha = "abcdefghijklmnopqrstuvwxyz";
-        var numbers = "0123456789";
-        var symbols = "@$!%*#?&";
-        var allChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+        let createFnc = function () {
+          var characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+          var alpha = "abcdefghijklmnopqrstuvwxyz";
+          var numbers = "0123456789";
+          var symbols = "@$!%*#?&";
+          var allChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 
-        var result = '';
-        result += characters.charAt(Math.floor(Math.random() * characters.length));
-        result += alpha.charAt(Math.floor(Math.random() * alpha.length));
-        result += numbers.charAt(Math.floor(Math.random() * numbers.length));
-        result += symbols.charAt(Math.floor(Math.random() * symbols.length));
-        for (let index = 0; index < 4; index++) {
-            result += allChar.charAt(Math.floor(Math.random() * allChar.length));
+          var result = '';
+          result += characters.charAt(Math.floor(Math.random() * characters.length));
+          result += alpha.charAt(Math.floor(Math.random() * alpha.length));
+          result += numbers.charAt(Math.floor(Math.random() * numbers.length));
+          result += symbols.charAt(Math.floor(Math.random() * symbols.length));
+          for (let index = 0; index < 4; index++) {
+              result += allChar.charAt(Math.floor(Math.random() * allChar.length));
+          }
+          result = result.split('').sort(function(){return 0.5-Math.random()}).join('')
+          vm.passwordCreate = vm.thongTinCongDan['danhBaLienLac']['soDienThoai'] ? String(vm.thongTinCongDan['danhBaLienLac']['soDienThoai']).trim() : result
+          vm.dialogCreateAcc = true
         }
-        result = result.split('').sort(function(){return 0.5-Math.random()}).join('')
-
-        vm.passwordCreate = result
-        vm.dialogCreateAcc = true
+        if (vm.quyenTraCuuLgsp == 1 || vm.quyenTraCuuLgsp == 2) {
+          let filter = {
+            applicantIdNo: String(vm.thongTinCongDan.maSoCaNhan).trim(),
+            applicantName: vm.convertString((String(vm.thongTinCongDan.hoVaTen).trim())).toUpperCase(),
+            birthDate: vm.dateTraCuuLgsp(vm.thongTinCongDan.ngaySinh),
+            StaffEmail : vm.userLoginInfomation && vm.userLoginInfomation.hasOwnProperty('employeeEmail') ? vm.userLoginInfomation.employeeEmail : ''
+          }
+          vm.loadingSearchLgsp = true
+          vm.$store.dispatch('searchLgspCongDan', filter).then(result => {
+            vm.loadingSearchLgsp = false
+            if (result == '') {
+                vm.$confirm({
+                title: 'Thông tin công dân không có trên CSDL dân cư',
+                message: 'Bạn có tiếp tục tạo tài khoản?',
+                button: {
+                  yes: 'Có',
+                  no: 'Không'
+                },
+                callback: confirm => {
+                  if (confirm == true) {
+                    createFnc()
+                  }
+                }
+              })
+            } else {
+              createFnc()
+            }
+          }).catch(function (result) {
+            vm.loadingSearchLgsp = false
+            vm.$confirm({
+              title: 'Thông tin công dân không có trên CSDL dân cư',
+              message: 'Bạn có tiếp tục tạo tài khoản?',
+              button: {
+                yes: 'Có',
+                no: 'Không'
+              },
+              callback: confirm => {
+                if (confirm == true) {
+                  createFnc()
+                }
+              }
+            })
+          })
+        } else {
+          createFnc()
+        }
       },
       showChangePass () {
         let vm = this
@@ -1002,6 +1162,10 @@ export default {
         let date = new Date(dateInput)
         return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
       },
+      dateTraCuuLgsp (dateInput) {
+        let date = new Date(dateInput)
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+      },
       goBack () {
         window.history.back()
       },
@@ -1138,7 +1302,25 @@ export default {
         }).catch(function (response) {
           
         })
-      }
+      },
+      convertString(str) {
+        str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
+        str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
+        str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i')
+        str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
+        str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
+        str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
+        str = str.replace(/đ/g, 'd')
+        str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, 'A')
+        str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, 'E')
+        str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, 'I')
+        str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, 'O')
+        str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
+        str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
+        str = str.replace(/Đ/g, 'D')
+        str = str.toLocaleLowerCase().replace(/\s/g, '')
+        return str
+      },
     }
 }
 </script>

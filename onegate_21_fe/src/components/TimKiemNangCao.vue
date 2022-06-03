@@ -587,12 +587,17 @@ export default {
     ],
     top: '',
     register: '',
-    documentNo: ''
+    documentNo: '',
+    agencyItemsConfigAllMenu: ''
   }),
   computed: {
   },
   created () {
     let vm = this
+    try {
+      vm.agencyItemsConfigAllMenu = agencyItemsConfigAllMenu
+    } catch (error) {
+    }
     vm.getSearchItems()
     console.log('menuInfo', vm.menuInfo)
     vm.searchAdvanceConfig = vm.menuInfo.tableConfig.hasOwnProperty('searchAdvanceConfig') && vm.menuInfo.tableConfig.searchAdvanceConfig ? JSON.parse(vm.menuInfo.tableConfig.searchAdvanceConfig) : {}
@@ -659,10 +664,11 @@ export default {
         vm.$store.dispatch('getAgencyLists').then(function (result) {
           if (vm.searchAdvanceConfigDefault.agency.hasOwnProperty('source') && vm.searchAdvanceConfigDefault.agency.source) {
             vm.agencyItems = vm.searchAdvanceConfigDefault.agency.source
+          } else if (vm.agencyItemsConfigAllMenu) {
+            vm.agencyItems = vm.agencyItemsConfigAllMenu
           } else {
             vm.agencyItems = result
           }
-          
         }).catch(function (){})
       }
       if (!vm.domainItems || vm.domainItems.length === 0) {

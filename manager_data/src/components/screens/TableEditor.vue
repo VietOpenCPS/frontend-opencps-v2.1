@@ -318,7 +318,7 @@
                 dataPostdossier.append('fromServerNo', vm.agencyManager ? vm.agencyManager['serveNo'] : vm.agencyCurrentSite['serveNo'])
                 dataPostdossier.append('toServerNo', vm.toAgency['serveNo'])
                 vm.titleAction = 'ĐANG ĐỒNG BỘ'
-                axios.post('/o/rest/v2/backupDatas/exportProcess', dataPostdossier, options).then(function (response) {
+                axios.post('/o/rest/v2/backupDatas/syncMasterDataMC', dataPostdossier, options).then(function (response) {
                   vm.loading = false
                   vm.dialogLoadingSync = false
                   vm.dialog_cloneTemp = false
@@ -368,7 +368,7 @@
                 dataPostdossier.append('fromServerNo', vm.agencyManager ? vm.agencyManager['serveNo'] : vm.agencyCurrentSite['serveNo'])
                 dataPostdossier.append('toServerNo', vm.toAgency['serveNo'])
                 vm.titleAction = 'ĐANG ĐỒNG BỘ'
-                axios.post('/o/rest/v2/backupDatas/exportProcess', dataPostdossier, options).then(function (response) {
+                axios.post('/o/rest/v2/backupDatas/syncMasterDataMC', dataPostdossier, options).then(function (response) {
                   vm.loading = false
                   vm.dialogLoadingSync = false
                   vm.dialog_cloneTemp = false
@@ -419,7 +419,7 @@
                 dataPostdossier.append('fromServerNo', vm.agencyManager ? vm.agencyManager['serveNo'] : vm.agencyCurrentSite['serveNo'])
                 dataPostdossier.append('toServerNo', vm.toAgency['serveNo'])
                 vm.titleAction = 'ĐANG ĐỒNG BỘ'
-                axios.post('/o/rest/v2/backupDatas/exportProcess', dataPostdossier, options).then(function (response) {
+                axios.post('/o/rest/v2/backupDatas/syncMasterDataMC', dataPostdossier, options).then(function (response) {
                   vm.loading = false
                   vm.dialogLoadingSync = false
                   vm.dialog_cloneTemp = false
@@ -457,21 +457,24 @@
                     'Token': window.Liferay !== undefined ? window.Liferay.authToken : ''
                   }
                 }
+                let urlApi = "/o/rest/v2/backupDatas/syncMasterDataDVC"
                 let dataPostdossier = new URLSearchParams()
                 dataPostdossier.append('type', 'processes')
                 dataPostdossier.append('processNo', vm.quyTrinhSaoChep)
                 dataPostdossier.append('toProcessNo', vm.processNo)
                 if (vm.otherSite) {
+                  urlApi = "/o/rest/v2/backupDatas/syncMasterDataMC"
                   let site = vm.agencyManager ? vm.agencyManager['serveNo'] : vm.agencyCurrentSite['serveNo']
                   dataPostdossier.append('fromServerNo', site)
                   dataPostdossier.append('toServerNo', vm.toAgency['serveNo'])
                 } else {
+                  urlApi = "/o/rest/v2/backupDatas/syncMasterDataMC"
                   dataPostdossier.append('fromServerNo', "")
                   dataPostdossier.append('toServerNo', "")
                 }
                 
                 vm.titleAction = 'ĐANG THỰC HIỆN'
-                axios.post('/o/rest/v2/backupDatas/exportProcess', dataPostdossier, options).then(function (response) {
+                axios.post(urlApi, dataPostdossier, options).then(function (response) {
                   vm.loading = false
                   vm.dialogLoadingSync = false
                   toastr.success('Thực hiện thành công')
@@ -514,7 +517,7 @@
               dataPostdossier.append('fromServerNo', "")
               dataPostdossier.append('toServerNo', "SERVER_DVC")
               vm.titleAction = 'ĐANG ĐỒNG BỘ'
-              axios.post('/o/rest/v2/backupDatas/exportProcess', dataPostdossier, options).then(function (response) {
+              axios.post('/o/rest/v2/backupDatas/syncMasterDataDVC', dataPostdossier, options).then(function (response) {
                 vm.loading = false
                 vm.dialogLoadingSync = false
                 toastr.success('Mẫu hồ sơ đã được đồng bộ sang cổng Dịch vụ công')

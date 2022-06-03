@@ -6,10 +6,60 @@
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div>
-          <span>{{paymentProfile.paymentFee}}</span>
+          <span>Phí, lệ phí thủ tục hành chính</span>
         </div>
         <v-card>
-          <v-card-text class="px-4 pb-1">
+          <v-data-table
+            v-if="feeList && feeList.length"
+            :headers="headers"
+            :items="feeList"
+            hide-actions
+            class="elevation-1"
+            style="border-bottom: 1px solid #dedede;border-left: 1px solid #dedede;"
+          >
+            <template slot="items" slot-scope="props">
+              <td width="50" class="text-xs-center pt-2"> {{ props.index + 1 }}</td>
+              <td class="text-xs-left py-1">
+                <div>
+                  <p class="mt-1 mb-0">{{props.item && props.item.paymentFee ? props.item.paymentFee : ''}}</p>
+                </div>
+              </td>
+              <td class="px-3 py-1" style="width: 170px">
+                <div>
+                  <p class="mt-1 mb-0">{{props.item && props.item.feeAmount ? currency(props.item.feeAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; </p>
+                </div>
+              </td>
+              <td class="px-3 py-1" style="width: 170px">
+                <div>
+                  <p class="mt-1 mb-0">{{props.item && props.item.serviceAmount ? currency(props.item.serviceAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; </p>
+                </div>
+              </td>
+              <td width="170" class="text-xs-left px-2 py-1" style="font-weight: bold;">
+                <div style="padding-top:7px">
+                  <span>{{props.item && props.item.paymentAmount ? currency(props.item.paymentAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; </span>
+                </div>
+              </td>
+            </template>
+            <template slot="footer" >
+              <td :colspan="4" class="text-xs-center" style="border-right: 1px solid #dedede;">
+                <span>TỔNG TIỀN</span>
+              </td>
+              <td class="px-2 text-xs-left" style="border-right: 1px solid #dedede;font-weight: bold;">
+                <span>{{paymentProfile && paymentProfile.paymentAmount ? currency(paymentProfile.paymentAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; vnđ</span>
+              </td>
+            </template>
+          </v-data-table>
+          <v-layout wrap style="position: relative" class="my-2">
+            <v-flex style="width:145px;max-width: 145px;" class="my-0 py-0">
+              <v-subheader class="pl-0 text-right">Ghi chú: </v-subheader>
+            </v-flex>
+            <v-flex>
+              <p class="my-0 py-1">
+                {{paymentNote}}
+              </p>
+            </v-flex>
+          </v-layout>
+          <!-- <v-card-text class="px-4 pb-1">
             <v-layout wrap>
               <v-flex xs12 sm2>
                 <v-subheader class="pl-0 text-right">Lệ phí: </v-subheader>
@@ -33,9 +83,9 @@
                 </p>
               </v-flex>
             </v-layout>
-          </v-card-text>
+          </v-card-text> -->
           <v-card-text class="px-4 pt-0">
-            <v-layout wrap>
+            <!-- <v-layout wrap>
               <v-flex xs12 sm2>
                 <v-subheader class="pl-0 text-right"><span class="text-bold">Tổng: </span></v-subheader>
               </v-flex>
@@ -56,16 +106,17 @@
                 <span>{{currency(totalFee)}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <v-flex xs12 sm1></v-flex>
-            </v-layout>
+            </v-layout> -->
 
-            <v-layout wrap style="position: relative">
+            <!-- <v-layout wrap style="position: relative">
               <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
               <v-flex style="width:calc(100% - 80px)">
                 <p class="px-2 my-0 py-1">
                   {{paymentNote}} &nbsp;&nbsp;
                 </p>
               </v-flex>
-            </v-layout>
+            </v-layout> -->
+            
             <!-- epayment -->
             <p class="mb-0"><span class="red--text">* </span>&nbsp;Lựa chọn hình thức thanh toán:</p>
             <div class="text-xs-left mt-2 mb-3 ml-0">
@@ -301,7 +352,35 @@ export default {
     ipAddress:'',
     loadingPay: false,
     thanhToanChuyenKhoan: true,
-    paymentNote: ''
+    paymentNote: '',
+    feeList: [],
+    headers: [
+      {
+        text: 'STT',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Tên phí, lệ phí',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Lệ phí',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Phí',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Thành tiền',
+        align: 'center',
+        sortable: false
+      }
+    ]
   }),
   directives: {money: VMoney},
   created () {
@@ -339,6 +418,22 @@ export default {
         try {
           vm.paymentNote = JSON.parse(val['paymentNote'])['paymentNote']
         } catch (error) {
+        }
+        // 
+        if (vm.paymentProfile.hasOwnProperty('groupPaymentFile') && vm.paymentProfile.groupPaymentFile) {
+          vm.feeList = JSON.parse(vm.paymentProfile.groupPaymentFile)
+        } else {
+          let item = {
+            requestPayment: vm.paymentProfile['requestPayment'],
+            advanceAmount: vm.paymentProfile['advanceAmount'],
+            feeAmount: vm.paymentProfile['feeAmount'],
+            serviceAmount: vm.paymentProfile['serviceAmount'],
+            shipAmount: vm.paymentProfile['shipAmount'],
+            counter: vm.paymentProfile.hasOwnProperty('counter') ? vm.paymentProfile['counter'] : '',
+            paymentFee: vm.paymentProfile['paymentFee'],
+            paymentAmount: vm.paymentProfile['paymentAmount']
+          }
+          vm.feeList = [item]
         }
         //
         if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && vm.paymentProfile.epaymentProfile) {

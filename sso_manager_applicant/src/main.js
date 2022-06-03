@@ -38,7 +38,7 @@ axios.interceptors.response.use((response) => {
     })
   }
   if (error.response) {
-    return parseError(error.response.data)
+    return Promise.reject(error)
   } else {
     return Promise.reject(error)
   }
@@ -72,6 +72,8 @@ axios.interceptors.response.use((response) => {
 Vue.config.productionTip = true
 
 Vue.mixin({
+  data: () => ({
+  }),
   methods: {
     getScopeGroupId: function () {
       if (window.themeDisplay !== null && window.themeDisplay !== undefined) {

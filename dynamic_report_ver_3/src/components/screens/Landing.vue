@@ -1764,7 +1764,7 @@ export default {
             docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
             docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
             vm.dataExportExcel = docDString
-            // console.log('docDString-777777', docDString)
+            console.log('docDString-777777', docDString)
             vm.docDefinition = JSON.parse(docDString)
             // console.log('vm.docDefinition', vm.docDefinition)
             let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
@@ -2049,6 +2049,7 @@ export default {
             docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
             docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
             vm.dataExportExcel = docDString
+            console.log('docDString-88888', docDString)
             vm.docDefinition = JSON.parse(docDString)
             console.log('vm.docDefinition', vm.docDefinition)
             let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
@@ -2542,11 +2543,11 @@ export default {
           }
           vm.showCSVDownload = true
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
-          // console.log('docDString,dataExportExcelStatistic', docDString)
+          console.log('docDString,dataExportExcelStatistic', docDString)
           vm.dataExportExcel = docDString
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
-          console.log('docDefinition-render-pdf', vm.docDefinition)
+          // console.log('docDefinition-render-pdf', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           // create blob
           // check showTable
@@ -2928,7 +2929,7 @@ export default {
         data: vm.data,
         api: vm.api,
         proxyApi: vm.proxyApi,
-        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xlsx'
+        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xls'
       }
       if (n) {
         filter.start = vm.sttQuyen * counterPage - counterPage

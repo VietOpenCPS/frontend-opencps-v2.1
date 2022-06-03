@@ -280,7 +280,8 @@
                 <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :data_rolegroup="roleGroupPhanCong" :detailDossier="thongTinChiTietHoSo" :data_uyquyen="reAsignUsers" :type="type_assign"></phan-cong>
                 <tai-lieu-ket-qua :esignType="typeEsign" :preCondition="preCondition" ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
                 <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
-                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :dataSource="sourcePaymentFee" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
+                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :splitBienLai="splitBienLai" :dataSource="sourcePaymentFee" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
+                <danh-sach-bien-lai v-if="removeInvoiceGroupPayment" ref="danhsachbienlai" :payments="paymentDetail"></danh-sach-bien-lai>
                 <!-- thanh toán điện tử -->
                 <thanh-toan-dien-tu ref="epayment" v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
                 <ky-duyet :style="dataEsign['signatureType'] === '' ? 'display:none' : ''" ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo"
@@ -823,7 +824,8 @@ import Comment from './Comment.vue'
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
 import TraKetQua from './form_xu_ly/TraKetQua.vue'
-import ThuPhi from './form_xu_ly/FeeDetail.vue'
+import ThuPhi from './form_xu_ly/FeeDetail2.vue'
+import DanhSachBienLai from './form_xu_ly/DanhSachBienLai.vue'
 import ChiTietThanhToan from './ChiTietThanhToan.vue'
 import ThucHienThanhToanDienTu from './form_xu_ly/ThucHienThanhToanDienTu.vue'
 import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
@@ -862,10 +864,12 @@ export default {
     'ngay-gia-han': ExtendDateEdit,
     'chi-tiet-thanh-toan': ChiTietThanhToan,
     'ho-so-lien-thong': HoSoLienThong,
-    'phan-cong-lai': PhanCongLai
+    'phan-cong-lai': PhanCongLai,
+    'danh-sach-bien-lai': DanhSachBienLai
   },
   data: () => ({
     votingResult: null,
+    splitBienLai: false,
     sourcePaymentFee: {},
     loadingActionProcess: false,
     votingVersion: 1,
@@ -1107,6 +1111,7 @@ export default {
     hasDownloadAllFile: false,
     sendInvoice: false,
     removeInvoice: false,
+    removeInvoiceGroupPayment: false,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -1860,10 +1865,18 @@ export default {
         if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' && result.preCondition.indexOf('sendInvoiceVNPT=1') >= 0) {
           vm.sendInvoice = true
         }
-        if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' && result.preCondition.indexOf('destroyInvoiceVNPT=1') >= 0) {
+        if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' 
+          && result.preCondition.indexOf('destroyInvoiceVNPT=1') >= 0 && !vm.paymentDetail['groupPaymentFile']) {
           vm.removeInvoice = true
         } else {
           vm.removeInvoice = false
+        }
+        if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' 
+          && result.preCondition.indexOf('destroyInvoiceVNPT=1') >= 0 && vm.paymentDetail['groupPaymentFile']) {
+          isPopup = true
+          vm.removeInvoiceGroupPayment = true
+        } else {
+          vm.removeInvoiceGroupPayment = false
         }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
@@ -1886,6 +1899,7 @@ export default {
               if (result.hasOwnProperty('paymentFee') && result.paymentFee) {
                 vm.sourcePaymentFee = ''
                 let configs = JSON.parse(result.paymentFee)
+                vm.splitBienLai = configs.hasOwnProperty('isGroupPaymentFile') ? true : false
                 vm.sourcePaymentFee = configs.hasOwnProperty('source') ? configs['source'] : {}
               } else {
                 vm.sourcePaymentFee = {}
@@ -2241,6 +2255,10 @@ export default {
     // Hàm xử lý Actions
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
+      if (vm.removeInvoiceGroupPayment) {
+        vm.proccessRemoveBienLaiGroupPayment()
+        return
+      }
       if (vm.loadingActionProcess) {
         return
       }
@@ -2303,6 +2321,9 @@ export default {
         if (vm.payments['paymentMethod']) {
           paymentsOut['paymentMethod'] = vm.payments['paymentMethod']
         }
+        if (vm.payments['groupPaymentFile']) {
+          paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
+        }
       }
       if (vm.showThuPhi) {
         if (vm.payments && vm.payments.hasOwnProperty('counter')) {
@@ -2318,6 +2339,9 @@ export default {
           }
           if (vm.payments['paymentMethod']) {
             dataNote['paymentMethod'] = vm.payments['paymentMethod']
+          }
+          if (vm.payments['groupPaymentFile']) {
+            paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
           }
           paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
           paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
@@ -2471,6 +2495,9 @@ export default {
       }
       vm.dossierId = dossierItem.dossierId
       let currentQuery = vm.$router.history.current.query
+      // 
+      console.log('THONGTINACTION', filter)
+      // 
       vm.loadingActionProcess = true
       // case confirm Thao tác từ trang danh sách hồ sơ
       if (isConfirm) {
@@ -2610,6 +2637,9 @@ export default {
                   if (vm.payments['paymentMethod']) {
                     paymentsOut['paymentMethod'] = vm.payments['paymentMethod']
                   }
+                  if (vm.payments['groupPaymentFile']) {
+                    paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
+                  }
                   if (vm.payments && vm.payments.hasOwnProperty('counter')) {
                     let dataNote = {
                       requestPayment: vm.payments['requestPayment'],
@@ -2702,7 +2732,7 @@ export default {
                     if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                       vm.printDocument = true
                     }
-                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
                       vm.printInvoicefilePayment = true
                       vm.printPay()
                     }
@@ -2832,7 +2862,7 @@ export default {
                         if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                           vm.printDocument = true
                         }
-                        if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                        if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
                           vm.printInvoicefilePayment = true
                           vm.printPay()
                         }
@@ -2904,7 +2934,7 @@ export default {
                     if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                       vm.printDocument = true
                     }
-                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
                       vm.printInvoicefilePayment = true
                       vm.printPay()
                     }
@@ -2982,7 +3012,7 @@ export default {
                   if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                     vm.printDocument = true
                   }
-                  if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                  if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
                     vm.printInvoicefilePayment = true
                     vm.printPay()
                   }
@@ -3260,6 +3290,7 @@ export default {
       }).catch(function () {
         vm.loadingNextAction = false
       })
+      vm.loadThanhToan()
       vm.$store.dispatch('loadPlugins', {
         dossierId: vm.thongTinChiTietHoSo.dossierId
       }).then(results => {
@@ -3555,6 +3586,9 @@ export default {
             shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
             paymentFee: vm.payments['paymentFee']
           }
+          if (vm.payments['groupPaymentFile']) {
+            paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
+          }
           if (vm.payments['paymentMethod']) {
             paymentsOut['paymentMethod'] = vm.payments['paymentMethod']
           }
@@ -3626,8 +3660,8 @@ export default {
         dossierId: vm.thongTinChiTietHoSo.dossierId,
         referenceUid: vm.thongTinChiTietHoSo.referenceUid
       }
-      vm.dialogPDFLoading = true
       if (!vm.sendInvoice) {
+        vm.dialogPDFLoading = true
         vm.$store.dispatch('printPay', filter).then(function (result) {
           vm.dialogPDFLoading = false
           vm.titleDialogPdf = 'Biên lai thanh toán'
@@ -3639,6 +3673,7 @@ export default {
           vm.dialogPDFLoading = false
         })
       } else {
+        vm.dialogPDFLoading = true
         setTimeout(function () {
           vm.$store.dispatch('printPayVnpt', filter).then(function (result) {
             vm.dialogPDFLoading = false
@@ -3667,6 +3702,37 @@ export default {
       }).catch(function(){
         vm.loadingActionProcess = false
       })
+    },
+    proccessRemoveBienLaiGroupPayment () {
+      let vm = this
+      let bienLaiXoa = vm.$refs.danhsachbienlai.getBienLaiXoa()
+      console.log('bienLaiXoa', bienLaiXoa)
+      if (!bienLaiXoa || bienLaiXoa.length == 0) {
+        vm.loadingActionProcess = false
+        toastr.error('Vui lòng chọn biên lai để thực hiện hủy')
+        return
+      }
+      let x = confirm('Bạn có chắc chắn thực hiện hủy biên lai?')
+      if (x) {
+        let arrAction = []
+        vm.loadingActionProcess = true
+        for (var index in bienLaiXoa) {
+          bienLaiXoa[index]['dossierId'] = vm.id
+          arrAction.push(vm.$store.dispatch('xoaBienLaiTach', bienLaiXoa[index]))
+        }
+        Promise.all(arrAction).then(results => {
+          vm.loadingActionProcess = true
+          let filter = {
+            dossierId: vm.thongTinChiTietHoSo.dossierId,
+            actionCode: vm.resultDialogPick.actionCode
+          }
+          vm.doActionSpecial(filter)
+        }).catch(xhr => {
+          vm.loadingActionProcess = true
+          toastr.error('Hủy biên lai không thành công')
+        })
+      }
+      
     },
     filterNextActionEnable (nextaction) {
       var isEnabale = false

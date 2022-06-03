@@ -721,7 +721,8 @@
                     }
                   } catch (error) {
                   }
-                  window.location.href = urlRedirect
+                  window.open(urlRedirect, "_blank")
+                  // window.location.href = urlRedirect
                 }
               }).catch(function(){})
             }
@@ -807,7 +808,8 @@
             }
           } catch (error) {
           }
-          window.location.href = urlRedirect
+          // window.location.href = urlRedirect
+          window.open(urlRedirect, "_blank")
         } else {
           vm.trackingBTTT(data.serviceCode)
           vm.$store.dispatch('postDossier', data).then(function (result) {

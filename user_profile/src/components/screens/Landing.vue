@@ -105,10 +105,18 @@
                 </v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('GioiTinh') >= 0">
-                <v-autocomplete v-model="user['applicantProfile']['GioiTinh']" :items="sexItems" label="Giới tính" item-text="itemName" item-value="itemCode" :hide-selected="true" box ></v-autocomplete>
+                <v-autocomplete v-model="user['applicantProfile']['gioiTinh']" :items="sexItems"
+                 label="Giới tính" item-text="tenMuc" item-value="maMuc" :hide-selected="true" box 
+                 return-object
+                >
+                </v-autocomplete>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('QuocTich') >= 0">
-                <v-text-field v-model="user['applicantProfile']['QuocTich']" label="Quốc tịch" box></v-text-field>
+                <v-autocomplete v-model="user['applicantProfile']['quocTich']" :items="quocTichItems"
+                 label="Quốc tịch" item-text="tenMuc" item-value="maMuc" :hide-selected="true" box 
+                 return-object
+                >
+                </v-autocomplete>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('NgayThangNamSinh') >= 0">
                 <!-- <v-text-field v-model="user['applicantProfile']['NgayThangNamSinh']" label="Ngày sinh" box></v-text-field> -->
@@ -127,9 +135,9 @@
                   <v-text-field
                     slot="activator"
                     box append-icon="event"
-                    v-model="user['applicantProfile']['NgayThangNamSinh']"
+                    v-model="user['applicantProfile']['ngaySinh']"
                     label="Ngày sinh"
-                    @blur="ngaySinh = parseDate(user['applicantProfile']['NgayThangNamSinh'])"
+                    @blur="ngaySinh = parseDate(user['applicantProfile']['ngaySinh'])"
                   ></v-text-field>
                   <v-date-picker ref="picker" min="1950-01-01" :max="getMaxdate()" :first-day-of-week="1" locale="vi"
                   v-model="ngaySinh" no-title @input="changeBirthDate2"></v-date-picker>
@@ -235,13 +243,18 @@
                 </v-text-field>
               </v-flex>
               <v-flex xs12 sm4>
-                <v-autocomplete :items="cityItems" label="Tỉnh/thành phố" v-model="user['applicantCityCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeCity($event, 'districtItems', 'wardItems')"></v-autocomplete>
+                <v-autocomplete :items="cityItems" label="Tỉnh/thành phố" v-model="user['applicantCityCode']"
+                 item-text="itemName" item-value="itemCode" :hide-selected="true" box :value-comparator="(a, b)=> {return a == b}"
+                  @change="onChangeCity($event, 'districtItems', 'wardItems')"></v-autocomplete>
               </v-flex>
               <v-flex xs12 sm4>
-                <v-autocomplete :items="districtItems" label="Quận/huyện" v-model="user['applicantDistrictCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeDistrict($event, 'wardItems')"></v-autocomplete>
+                <v-autocomplete :items="districtItems" label="Quận/huyện" v-model="user['applicantDistrictCode']"
+                 item-text="itemName" item-value="itemCode" :hide-selected="true" :value-comparator="(a, b)=> {return a == b}"
+                  box @change="onChangeDistrict($event, 'wardItems')"></v-autocomplete>
               </v-flex>
               <v-flex xs12 sm4>
-                <v-autocomplete label="Xã/phường" :items="wardItems" v-model="user['applicantWardCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box></v-autocomplete>
+                <v-autocomplete label="Xã/phường" :items="wardItems" v-model="user['applicantWardCode']" :value-comparator="(a, b)=> {return a == b}"
+                 item-text="itemName" item-value="itemCode" :hide-selected="true" box></v-autocomplete>
               </v-flex>
               <!-- Nơi đăng ký khai sinh -->
               <v-flex xs12 sm12 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('NoiDangKyKhaiSinhAddress') >= 0">
@@ -262,16 +275,22 @@
               </v-flex>
               <!-- Nơi ở hiện tại -->
               <v-flex xs12 sm12 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('NoiOHienTaiAddress') >= 0">
-                <v-text-field label="Nơi ở hiện tại" v-model="user['applicantProfile']['NoiOHienTaiAddress']" box clearable></v-text-field>
+                <v-text-field label="Nơi ở hiện tại" v-model="user['applicantProfile']['noiOHienTai']['soNhaChiTiet']" box clearable></v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('NoiOHienTaiAddress') >= 0">
-                <v-autocomplete :items="cityItems" label="Tỉnh/thành phố" v-model="user['applicantProfile']['NoiOHienTaiCityCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeCity($event, 'NoiOHienTaidistrictItems', 'NoiOHienTaiwardItems')"></v-autocomplete>
+                <v-autocomplete :items="cityItemsDanhMuc" label="Tỉnh/thành phố" v-model="user['applicantProfile']['noiOHienTai']['tinhThanh']" item-text="tenMuc" item-value="maMuc" :hide-selected="true" box 
+                @change="onChangeCity($event, 'NoiOHienTaidistrictItems', 'NoiOHienTaiwardItems')" return-object
+                :value-comparator="(a, b)=> {return a == b}"
+                ></v-autocomplete>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('NoiOHienTaiAddress') >= 0">
-                <v-autocomplete :items="NoiOHienTaidistrictItems" label="Quận/huyện" v-model="user['applicantProfile']['NoiOHienTaiDistrictCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeDistrict($event, 'NoiOHienTaiwardItems')"></v-autocomplete>
+                <v-autocomplete :items="NoiOHienTaidistrictItems" label="Quận/huyện" v-model="user['applicantProfile']['noiOHienTai']['quanHuyen']" item-text="tenMuc" item-value="maMuc" :hide-selected="true" box
+                 @change="onChangeDistrict($event, 'NoiOHienTaiwardItems')" return-object :value-comparator="(a, b)=> {return a == b}"></v-autocomplete>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('NoiOHienTaiAddress') >= 0">
-                <v-autocomplete label="Xã/phường" :items="NoiOHienTaiwardItems" v-model="user['applicantProfile']['NoiOHienTaiWardCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box></v-autocomplete>
+                <v-autocomplete label="Xã/phường" :items="NoiOHienTaiwardItems" v-model="user['applicantProfile']['noiOHienTai']['phuongXa']"
+                 item-text="tenMuc" item-value="maMuc" :hide-selected="true" box  return-object :value-comparator="(a, b)=> {return a == b}"
+                ></v-autocomplete>
               </v-flex>
               <!--  -->
               <v-flex xs12 sm4 v-if="xacthuc_credit">
@@ -282,10 +301,18 @@
               </v-flex>
               <!--  -->
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('TonGiao') >= 0">
-                <v-text-field label="Tôn giáo" v-model="user['applicantProfile']['TonGiao']" box clearable></v-text-field>
+                <v-autocomplete v-model="user['applicantProfile']['tonGiao']" :items="tonGiaoItems"
+                 label="Tôn giáo" item-text="tenMuc" item-value="maMuc" :hide-selected="true" box 
+                 return-object
+                >
+                </v-autocomplete>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('DanToc') >= 0">
-                <v-text-field label="Dân tộc" v-model="user['applicantProfile']['DanToc']" box clearable></v-text-field>
+                <v-autocomplete v-model="user['applicantProfile']['danToc']" :items="danTocItems"
+                 label="Dân tộc" item-text="tenMuc" item-value="maMuc" :hide-selected="true" box 
+                 return-object
+                >
+                </v-autocomplete>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('NhomMau') >= 0">
                 <v-autocomplete v-model="user['applicantProfile']['NhomMau']" :items="bloodGroups" label="Nhóm máu" item-text="itemName" item-value="itemCode" :hide-selected="true" box ></v-autocomplete>
@@ -804,6 +831,7 @@
       ngaySinh: null,
       toggle_exclusive: 0,
       cityItems: [],
+      cityItemsDanhMuc: [],
       districtItems: [],
       wardItems: [],
       NoiDangKyKhaiSinhdistrictItems: [],
@@ -819,18 +847,21 @@
       },
       sexItems: [
         {
-          itemCode: '0',
-          itemName: 'Chưa xác định'
+          maMuc: '0',
+          tenMuc: 'Chưa xác định'
         },
         {
-          itemCode: '1',
-          itemName: 'Nam'
+          maMuc: '1',
+          tenMuc: 'Nam'
         },
         {
-          itemCode: '2',
-          itemName: 'Nữ'
+          maMuc: '2',
+          tenMuc: 'Nữ'
         }
       ],
+      quocTichItems: [],
+      tonGiaoItems: [],
+      danTocItems: [],
       bloodGroups: [
         {
           itemCode: '00',
@@ -972,7 +1003,7 @@
       ngaySinh(val) {
         this.toDateFormatted = this.formatDate(val)
         if (this.user['applicantType'] === 'citizen') {
-          this.user['applicantProfile']['NgayThangNamSinh'] = this.toDateFormatted
+          this.user['applicantProfile']['ngaySinh'] = this.toDateFormatted
         } else if (this.user['applicantType'] === 'business') {
           this.user['applicantProfile']['Founding_Date'] = this.toDateFormatted
         }
@@ -1051,46 +1082,6 @@
           vm.user = data
           window.callbackzalo = vm.callbackzalo
           vm.getServerConfig()
-          if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
-            vm.item['upload_api'] = '/o/v1/opencps/users/upload/opencps_employee/org.opencps.usermgt.model.Employee'
-            vm.item['class_name'] = 'org.opencps.usermgt.model.Employee'
-            vm.getServerConfigAll()
-          }
-          if (vm.user['applicantCityCode'] && vm.user['applicantCityCode'].indexOf('0') !== 0) {
-            vm.user['applicantCityCode'] = Number(vm.user['applicantCityCode'])
-          }
-          if (vm.user['applicantDistrictCode'] && vm.user['applicantDistrictCode'].indexOf('0') !== 0) {
-            vm.user['applicantDistrictCode'] = Number(vm.user['applicantDistrictCode'])
-          }
-          if (vm.user['applicantWardCode'] && vm.user['applicantWardCode'].indexOf('0') !== 0) {
-            vm.user['applicantWardCode'] = Number(vm.user['applicantWardCode'])
-          }
-          let filterCity = {
-            collectionCode: 'ADMINISTRATIVE_REGION',
-            level: 0,
-            parent: 0
-          }
-          vm.$store.dispatch('loadDictItems', filterCity).then(function (result) {
-            vm.cityItems = result.data
-          })
-          if (vm.user['applicantDistrictCode']) {
-            vm.$store.dispatch('loadDictItems', {
-              collectionCode: 'ADMINISTRATIVE_REGION',
-              level: 1,
-              parent: vm.user['applicantCityCode']
-            }).then(function (resultDistricts) {
-              vm.districtItems = resultDistricts.data
-            })
-          }
-          if (vm.user['applicantWardCode']) {
-            vm.$store.dispatch('loadDictItems', {
-              collectionCode: 'ADMINISTRATIVE_REGION',
-              level: 1,
-              parent: vm.user['applicantDistrictCode']
-            }).then(function (resultWards) {
-              vm.wardItems = resultWards.data
-            })
-          }
           if (vm.user['className'] === 'org.opencps.usermgt.model.Applicant') {
             vm.user['applicantIdDate'] = vm.parseDateInput(vm.user['applicantIdDate'])
             let filter = {
@@ -1102,88 +1093,155 @@
               vm.totalFileList = result.total
               vm.filePage = currentQuery.hasOwnProperty('page') && currentQuery.page ? currentQuery.page : 1
             })
+            // 
+            let filter2 = {
+              applicantIdNo: vm.user['applicantIdNo']
+            }
+            vm.$store.dispatch('getApplicantInfo', filter2).then(function(result) {
+              // 
+              try {
+                vm.user['applicantProfile'] = JSON.parse(result.profile)
+              } catch (error) {
+              }
+              // if (vm.user['applicantProfile'] && vm.user['applicantProfile']['NoiDangKyKhaiSinhCityCode']) {
+              //   vm.$store.dispatch('loadDictItems', {
+              //     collectionCode: 'ADMINISTRATIVE_REGION',
+              //     level: 1,
+              //     parent: vm.user['applicantProfile']['NoiDangKyKhaiSinhCityCode']
+              //   }).then(function (resultDistricts) {
+              //     vm.NoiDangKyKhaiSinhdistrictItems = resultDistricts.data
+              //   })
+              // }
+              // if (vm.user['applicantProfile'] && vm.user['applicantProfile']['NoiDangKyKhaiSinhDistrictCode']) {
+              //   vm.$store.dispatch('loadDictItems', {
+              //     collectionCode: 'ADMINISTRATIVE_REGION',
+              //     level: 1,
+              //     parent: vm.user['applicantProfile']['NoiDangKyKhaiSinhDistrictCode']
+              //   }).then(function (resultWards) {
+              //     vm.NoiDangKyKhaiSinhwardItems = resultWards.data
+              //   })
+              // }
+              // // 
+              if (vm.user['applicantProfile'] && vm.user['applicantProfile']['noiOHienTai'] && vm.user['applicantProfile']['noiOHienTai']['tinhThanh']['maMuc']) {
+                vm.$store.dispatch('loadDictItems', {
+                  collectionCode: 'ADMINISTRATIVE_REGION',
+                  level: 1,
+                  parent: vm.user['applicantProfile']['noiOHienTai']['tinhThanh']['maMuc']
+                }).then(function (resultDistricts) {
+                  let arrDist = []
+                  for (var i = 0; i < resultDistricts.data.length; i++) {
+                    let item = {maMuc: resultDistricts.data[i]['itemCode'], tenMuc: resultDistricts.data[i]['itemName']}
+                    arrDist.push(item)
+                  }
+                  vm.NoiOHienTaidistrictItems = arrDist
+                })
+              }
+              if (vm.user['applicantProfile'] && vm.user['applicantProfile']['noiOHienTai'] && vm.user['applicantProfile']['noiOHienTai']['quanHuyen']['maMuc']) {
+                vm.$store.dispatch('loadDictItems', {
+                  collectionCode: 'ADMINISTRATIVE_REGION',
+                  level: 1,
+                  parent: vm.user['applicantProfile']['noiOHienTai']['quanHuyen']['maMuc']
+                }).then(function (resultWards) {
+                  let arrDist = []
+                  for (var i = 0; i < resultWards.data.length; i++) {
+                    let item = {maMuc: resultWards.data[i]['itemCode'], tenMuc: resultWards.data[i]['itemName']}
+                    arrDist.push(item)
+                  }
+                  vm.NoiOHienTaiwardItems = arrDist
+                })
+              }
+              // 
+              if (vm.user['applicantCityCode'] && vm.user['applicantCityCode'].indexOf('0') !== 0) {
+                vm.user['applicantCityCode'] = Number(vm.user['applicantCityCode'])
+              }
+              if (vm.user['applicantDistrictCode'] && vm.user['applicantDistrictCode'].indexOf('0') !== 0) {
+                vm.user['applicantDistrictCode'] = Number(vm.user['applicantDistrictCode'])
+              }
+              if (vm.user['applicantWardCode'] && vm.user['applicantWardCode'].indexOf('0') !== 0) {
+                vm.user['applicantWardCode'] = Number(vm.user['applicantWardCode'])
+              }
+              let filterCity = {
+                collectionCode: 'ADMINISTRATIVE_REGION',
+                level: 0,
+                parent: 0
+              }
+              vm.$store.dispatch('loadDictItems', filterCity).then(function (result) {
+                vm.cityItems = result.data
+                let arrDist = []
+                for (var i = 0; i < result.data.length; i++) {
+                  let item = {maMuc: result.data[i]['itemCode'], tenMuc: result.data[i]['itemName']}
+                  arrDist.push(item)
+                }
+                vm.cityItemsDanhMuc = arrDist
+              })
+              if (vm.user['applicantDistrictCode']) {
+                vm.$store.dispatch('loadDictItems', {
+                  collectionCode: 'ADMINISTRATIVE_REGION',
+                  level: 1,
+                  parent: vm.user['applicantCityCode']
+                }).then(function (resultDistricts) {
+                  vm.districtItems = resultDistricts.data
+                })
+              }
+              if (vm.user['applicantWardCode']) {
+                vm.$store.dispatch('loadDictItems', {
+                  collectionCode: 'ADMINISTRATIVE_REGION',
+                  level: 1,
+                  parent: vm.user['applicantDistrictCode']
+                }).then(function (resultWards) {
+                  vm.wardItems = resultWards.data
+                })
+              }
+              // 
+              let  applicantTypeTemp = vm.user['applicantProfile']
+              vm.indentifyNoFileUrl = applicantTypeTemp.indentifyNoFileUrl
+              // profileConfig cấu hình fragment
+              try {
+                if (vm.user['applicantType'] === 'citizen') {
+                  vm.profileConfig = profileConfigCitizen ? profileConfigCitizen : ''
+                } else if (vm.user['applicantType'] === 'business') {
+                  vm.profileConfig = profileConfigBusiness ? profileConfigBusiness : ''
+                }
+              } catch (error) {
+              }
+              // Tự động đồng bộ thông tin Cổng DVC Quốc gia
+              // if (currentQuery.hasOwnProperty('sync') && currentQuery.sync) {
+              //   vm.checkVNConect()
+              // }
+              let searchParams = window.location.href.split("?")
+              if (searchParams[1]) {
+                let dataDVCQG = decodeURIComponent(String(vm.getSearchParams(searchParams[1], "data")))
+                // console.log('dataDVCQG', dataDVCQG)
+                if (dataDVCQG) {
+                  let dataObj = JSON.parse(atob(dataDVCQG))
+                  if (dataObj && dataObj.hasOwnProperty('userId') && String(dataObj.userId) === '0') {
+                    vm.mapping = true
+                    vm.dataMapping = dataObj
+                    vm.doMappingDvcqg()
+                  }
+                }
+              }
+              // 
+              if (vm.notifyConfig) {
+                try {
+                  let storageConfig = localStorage.getItem("notifyConfig" + vm.user['userId'])
+                  if (storageConfig) {
+                    let configs = JSON.parse(storageConfig)
+                    vm.sendSms = configs.sendSms
+                    vm.sendMail = configs.sendMail
+                    vm.sendNotify = configs.sendNotify
+                  }
+                } catch (error) {
+                }
+              }
+            })
+            // 
           }
           if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
             vm.user['employeeBirthDate'] = vm.parseDateInput(vm.user['employeeBirthDate'])
-          }
-          // 
-          if (vm.user['applicantProfile'] && vm.user['applicantProfile']['NoiDangKyKhaiSinhCityCode']) {
-            vm.$store.dispatch('loadDictItems', {
-              collectionCode: 'ADMINISTRATIVE_REGION',
-              level: 1,
-              parent: vm.user['applicantProfile']['NoiDangKyKhaiSinhCityCode']
-            }).then(function (resultDistricts) {
-              vm.NoiDangKyKhaiSinhdistrictItems = resultDistricts.data
-            })
-          }
-          if (vm.user['applicantProfile'] && vm.user['applicantProfile']['NoiDangKyKhaiSinhDistrictCode']) {
-            vm.$store.dispatch('loadDictItems', {
-              collectionCode: 'ADMINISTRATIVE_REGION',
-              level: 1,
-              parent: vm.user['applicantProfile']['NoiDangKyKhaiSinhDistrictCode']
-            }).then(function (resultWards) {
-              vm.NoiDangKyKhaiSinhwardItems = resultWards.data
-            })
-          }
-          // 
-          if (vm.user['applicantProfile'] && vm.user['applicantProfile']['NoiOHienTaiCityCode']) {
-            vm.$store.dispatch('loadDictItems', {
-              collectionCode: 'ADMINISTRATIVE_REGION',
-              level: 1,
-              parent: vm.user['applicantProfile']['NoiOHienTaiCityCode']
-            }).then(function (resultDistricts) {
-              vm.NoiOHienTaidistrictItems = resultDistricts.data
-            })
-          }
-          if (vm.user['applicantProfile'] && vm.user['applicantProfile']['NoiOHienTaiDistrictCode']) {
-            vm.$store.dispatch('loadDictItems', {
-              collectionCode: 'ADMINISTRATIVE_REGION',
-              level: 1,
-              parent: vm.user['applicantProfile']['NoiOHienTaiDistrictCode']
-            }).then(function (resultWards) {
-              vm.NoiOHienTaiwardItems = resultWards.data
-            })
-          }
-          let  applicantTypeTemp = vm.user['applicantProfile']
-          vm.indentifyNoFileUrl = applicantTypeTemp.indentifyNoFileUrl
-          // profileConfig cấu hình fragment
-          try {
-            if (vm.user['applicantType'] === 'citizen') {
-              vm.profileConfig = profileConfigCitizen ? profileConfigCitizen : ''
-            } else if (vm.user['applicantType'] === 'business') {
-              vm.profileConfig = profileConfigBusiness ? profileConfigBusiness : ''
-            }
-          } catch (error) {
-          }
-          // Tự động đồng bộ thông tin Cổng DVC Quốc gia
-          // if (currentQuery.hasOwnProperty('sync') && currentQuery.sync) {
-          //   vm.checkVNConect()
-          // }
-          let searchParams = window.location.href.split("?")
-          if (searchParams[1]) {
-            let dataDVCQG = decodeURIComponent(String(vm.getSearchParams(searchParams[1], "data")))
-            // console.log('dataDVCQG', dataDVCQG)
-            if (dataDVCQG) {
-              let dataObj = JSON.parse(atob(dataDVCQG))
-              if (dataObj && dataObj.hasOwnProperty('userId') && String(dataObj.userId) === '0') {
-                vm.mapping = true
-                vm.dataMapping = dataObj
-                vm.doMappingDvcqg()
-              }
-            }
-          }
-          // 
-          if (vm.notifyConfig) {
-            try {
-              let storageConfig = localStorage.getItem("notifyConfig" + vm.user['userId'])
-              if (storageConfig) {
-                let configs = JSON.parse(storageConfig)
-                vm.sendSms = configs.sendSms
-                vm.sendMail = configs.sendMail
-                vm.sendNotify = configs.sendNotify
-              }
-            } catch (error) {
-            }
+            vm.item['upload_api'] = '/o/v1/opencps/users/upload/opencps_employee/org.opencps.usermgt.model.Employee'
+            vm.item['class_name'] = 'org.opencps.usermgt.model.Employee'
+            vm.getServerConfigAll()
           }
         })
       })
@@ -1263,7 +1321,7 @@
         let vm = this
         vm.menuBirthDate2 = false
         if (vm.user['applicantType'] === 'citizen') {
-          vm.user['applicantProfile']['NgayThangNamSinh'] = vm.formatDate(vm.ngaySinh)
+          vm.user['applicantProfile']['ngaySinh'] = vm.formatDate(vm.ngaySinh)
         } else {
           vm.user['applicantProfile']['Founding_Date'] = vm.formatDate(vm.ngaySinh)
         }        
@@ -1273,19 +1331,24 @@
         let filter = {
           collectionCode: 'ADMINISTRATIVE_REGION',
           level: 1,
-          parent: data
+          parent: data['maMuc']
         }
-        if (districts === 'NoiDangKyKhaiSinhdistrictItems') {
-          vm.user['applicantProfile']['NoiDangKyKhaiSinhCityName'] = vm.cityItems.filter(function (item) {
-            return item['itemCode'] === data
-          })[0]['itemName']
-        } else if (districts === 'NoiOHienTaidistrictItems') {
-          vm.user['applicantProfile']['NoiOHienTaiCityName'] = vm.cityItems.filter(function (item) {
-            return item['itemCode'] === data
-          })[0]['itemName']
-        }
+        // if (districts === 'NoiDangKyKhaiSinhdistrictItems') {
+        //   vm.user['applicantProfile']['NoiDangKyKhaiSinhCityName'] = vm.cityItems.filter(function (item) {
+        //     return item['itemCode'] === data
+        //   })[0]['itemName']
+        // } else if (districts === 'NoiOHienTaidistrictItems') {
+        //   vm.user['applicantProfile']['NoiOHienTaiCityName'] = vm.cityItems.filter(function (item) {
+        //     return item['itemCode'] === data
+        //   })[0]['itemName']
+        // }
         vm.$store.dispatch('loadDictItems', filter).then(function (result) {
-          vm[districts] = result.data
+          let arrDist = []
+          for (var i = 0; i < result.data.length; i++) {
+            let item = {maMuc: result.data[i]['itemCode'], tenMuc: result.data[i]['itemName']}
+            arrDist.push(item)
+          }
+          vm[districts] = arrDist
           vm[wards] = []
         })
       },
@@ -1294,32 +1357,37 @@
         let filter = {
           collectionCode: 'ADMINISTRATIVE_REGION',
           level: 1,
-          parent: data
+          parent: data['maMuc']
         }
-        if (wards === 'NoiDangKyKhaiSinhwardItems') {
-          vm.user['applicantProfile']['NoiDangKyKhaiSinhDistrictName'] = vm.NoiDangKyKhaiSinhdistrictItems.filter(function (item) {
-            return item['itemCode'] === data
-          })[0]['itemName']
-        } else if (wards === 'NoiOHienTaiwardItems') {
-          vm.user['applicantProfile']['NoiOHienTaiDistrictName'] = vm.NoiOHienTaidistrictItems.filter(function (item) {
-            return item['itemCode'] === data
-          })[0]['itemName']
-        }
+        // if (wards === 'NoiDangKyKhaiSinhwardItems') {
+        //   vm.user['applicantProfile']['NoiDangKyKhaiSinhDistrictName'] = vm.NoiDangKyKhaiSinhdistrictItems.filter(function (item) {
+        //     return item['itemCode'] === data
+        //   })[0]['itemName']
+        // } else if (wards === 'NoiOHienTaiwardItems') {
+        //   vm.user['applicantProfile']['NoiOHienTaiDistrictName'] = vm.NoiOHienTaidistrictItems.filter(function (item) {
+        //     return item['itemCode'] === data
+        //   })[0]['itemName']
+        // }
         vm.$store.dispatch('loadDictItems', filter).then(function (result) {
-          vm[wards] = result.data
+          let arrDist = []
+          for (var i = 0; i < result.data.length; i++) {
+            let item = {maMuc: result.data[i]['itemCode'], tenMuc: result.data[i]['itemName']}
+            arrDist.push(item)
+          }
+          vm[wards] = arrDist
         })
       },
       onChangeWard (data, wards) {
         var vm = this
-        if (wards === 'NoiDangKyKhaiSinhwardItems') {
-          vm.user['applicantProfile']['NoiDangKyKhaiSinhWardName'] = vm.NoiDangKyKhaiSinhwardItems.filter(function (item) {
-            return item['itemCode'] === data
-          })[0]['itemName']
-        } else if (wards === 'NoiOHienTaiwardItems') {
-          vm.user['applicantProfile']['NoiOHienTaiWardName'] = vm.NoiOHienTaiwardItems.filter(function (item) {
-            return item['itemCode'] === data
-          })[0]['itemName']
-        }
+        // if (wards === 'NoiDangKyKhaiSinhwardItems') {
+        //   vm.user['applicantProfile']['NoiDangKyKhaiSinhWardName'] = vm.NoiDangKyKhaiSinhwardItems.filter(function (item) {
+        //     return item['itemCode'] === data
+        //   })[0]['itemName']
+        // } else if (wards === 'NoiOHienTaiwardItems') {
+        //   vm.user['applicantProfile']['NoiOHienTaiWardName'] = vm.NoiOHienTaiwardItems.filter(function (item) {
+        //     return item['itemCode'] === data
+        //   })[0]['itemName']
+        // }
       },
       submitUserProfile () {
         let vm = this

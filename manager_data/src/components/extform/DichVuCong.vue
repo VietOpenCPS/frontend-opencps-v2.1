@@ -596,7 +596,7 @@ export default {
                 dataPostdossier.append('fromServerNo', "")
               }
               dataPostdossier.append('toServerNo', vm.toAgency['serveNo'])
-              axios.post('/o/rest/v2/backupDatas/exportProcess', dataPostdossier, options).then(function (response) {
+              axios.post('/o/rest/v2/backupDatas/syncMasterDataMC', dataPostdossier, options).then(function (response) {
                 vm.loading = false
                 vm.dialog_cloneServiceinfo = false
                 toastr.success('Dịch vụ công đã được đồng bộ')

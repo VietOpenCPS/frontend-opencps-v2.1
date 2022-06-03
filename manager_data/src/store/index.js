@@ -2912,6 +2912,11 @@ export const store = new Vuex.Store({
         state.loginUser = payload
       }
     },
+    setListTableMenuFollowRole (state, payload) {
+      if (payload) {
+        state.listTableMenu = payload
+      }
+    },
     setproblem (state, payload) {
       state.problem = payload
     },

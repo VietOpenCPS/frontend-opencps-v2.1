@@ -401,10 +401,7 @@
 <script>
 
 import Vue from 'vue'
-import $ from 'jquery'
 import toastr from 'toastr'
-import axios from 'axios'
-import support from '../../store/support.json'
 import TinyPagination from './Pagination.vue'
 Vue.use(toastr)
 export default {

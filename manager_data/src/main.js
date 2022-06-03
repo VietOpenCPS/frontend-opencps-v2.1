@@ -15,6 +15,7 @@ import 'codemirror/mode/javascript/javascript.js'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import { UploaderPlugin } from '@syncfusion/ej2-vue-inputs'
 import axios from 'axios'
+import $ from 'jquery'
 
 Vue.use(UploaderPlugin)
 Vue.use(VueContentPlaceholders)
@@ -43,6 +44,7 @@ let portalURLSock = portalURL.indexOf(':') > 0 ? portalURL.substr(0, portalURL.i
 
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 axios.defaults.headers.common['groupId'] = groupId
+$.ajaxSetup({headers:{"Token":Liferay.authToken,"groupId":themeDisplay.getScopeGroupId()},global:true});
 
 Vue.config.productionTip = true
 
@@ -120,70 +122,88 @@ new Vue({
           console.log('dataSet123', dataSet)
           vm.$store.commit('setloginUser', dataSet)
          }
-
-         dataPost = new URLSearchParams();
-         textPost = {
-           'type': 'admin',
-           'cmd': 'get',
-           'responeType': 'menu',
-           'code': 'opencps_adminconfig',
-           'respone': 'listTableMenu',
-           'start': -1,
-           'end': -1              
-         }
-         dataPost.append('text', JSON.stringify(textPost))
-         axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
-           let dataObj = response.data
-           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-           if (dataObj.respone === 'listTableMenu') {
-             vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
-           }  
-         }).catch(function (error) {
-         })
+        // 
+        let paramGetRole = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/users/login', paramGetRole).then(function (response) {
+          let serializable = response.data
+          if (serializable && serializable.length > 0) {
+            let roles = []
+            for (let key in serializable) {
+              if (serializable[key]['role']) {
+                roles.push(serializable[key]['role'])
+              }
+            }
+            let roleExits = roles.findIndex(item => String(item).indexOf("GLOBAL_QUAN_TRI_NHAN_SU") >= 0)
+            if (roleExits >= 0) {
+              let menuTableEmployee =  [
+                {
+                  icon: 'keyboard_arrow_up',
+                  'icon-alt': 'keyboard_arrow_down',
+                  text: 'Nghiệp vụ',
+                  model: true,
+                  children: [
+                    {
+                      icon: 'filter_1',
+                      link: '/table/opencps_employee',
+                      code: 'opencps_employee',
+                      text: 'Quản lý nhân sự'
+                    }
+                  ]
+                }
+              ]
+              vm.$store.commit('setListTableMenuFollowRole', menuTableEmployee)
+            }
+          }
+        }).catch(function (error) {
+        })
+        // 
+        //  dataPost = new URLSearchParams();
+        //  textPost = {
+        //    'type': 'admin',
+        //    'cmd': 'get',
+        //    'responeType': 'menu',
+        //    'code': 'opencps_adminconfig',
+        //    'respone': 'listTableMenu',
+        //    'start': -1,
+        //    'end': -1              
+        //  }
+        //  dataPost.append('text', JSON.stringify(textPost))
+        //  axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+        //    let dataObj = response.data
+        //    vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+        //    if (dataObj.respone === 'listTableMenu') {
+        //      vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
+        //    }  
+        //  }).catch(function (error) {
+        //  })
        }).catch(function (error) {
-         dataPost = new URLSearchParams();
-         textPost = {
-           'type': 'admin',
-           'cmd': 'get',
-           'responeType': 'menu',
-           'code': 'opencps_adminconfig',
-           'respone': 'listTableMenu',
-           'start': -1,
-           'end': -1              
-         }
-         dataPost.append('text', JSON.stringify(textPost))
-         axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
-           let dataObj = response.data
-           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-           if (dataObj.respone === 'listTableMenu') {
-             vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
-           }  
-         }).catch(function (error) {
-         })
+        //  dataPost = new URLSearchParams();
+        //  textPost = {
+        //    'type': 'admin',
+        //    'cmd': 'get',
+        //    'responeType': 'menu',
+        //    'code': 'opencps_adminconfig',
+        //    'respone': 'listTableMenu',
+        //    'start': -1,
+        //    'end': -1              
+        //  }
+        //  dataPost.append('text', JSON.stringify(textPost))
+        //  axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+        //    let dataObj = response.data
+        //    vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+        //    if (dataObj.respone === 'listTableMenu') {
+        //      vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
+        //    }  
+        //  }).catch(function (error) {
+        //  })
        })
-      //  
-        // let dataPost1 = new URLSearchParams()
-        // let textPost1 = {
-        //   'type': 'admin',
-        //   'cmd': 'get',
-        //   'responeType': 'menu',
-        //   'code': 'opencps_adminconfig',
-        //   'respone': 'listTableMenu',
-        //   'start': -1,
-        //   'end': -1
-        // }
-        // dataPost1.append('text', JSON.stringify(textPost1))
-        // axios.post('/o/rest/v2/socket/web', dataPost1, {}).then(function (response) {
-        //   let dataObj = response.data
-        //   vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-        //   if (dataObj.respone === 'listTableMenu') {
-        //     vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
-        //   }  
-        // }).catch(function (error) {
-        // })
         
        if (window.location.href.endsWith('#/')) {
-         vm.$router.push('/table/opencps_serviceinfo')
+         vm.$router.push('/table/opencps_employee')
        }
       }, 300)
     })

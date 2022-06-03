@@ -192,7 +192,7 @@
           <div :style="isNotarization ? 'display: none' : 'position: relative;'">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
-                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :dataSource="sourcePaymentFee" :detailDossier="thongTinChiTietHoSo" :viaPortal="viaPortalDetail"></thu-phi>
+                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :splitBienLai="splitBienLai" :dataSource="sourcePaymentFee" :detailDossier="thongTinChiTietHoSo" :viaPortal="viaPortalDetail"></thu-phi>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
@@ -620,7 +620,7 @@ import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
 import TaiLieuChungThuc from './TiepNhan/TaiLieuChungThuc.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
-import LePhi from './form_xu_ly/FeeDetail.vue'
+import LePhi from './form_xu_ly/FeeDetail2.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
 import DichVuChuyenPhatHoSo from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatHoSo.vue'
 // import ThongTinCongVan from './TiepNhan/TiepNhanHoSo_ThongTinCongVan.vue'
@@ -645,6 +645,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    splitBienLai: false,
     fixDescriptionDt: false,
     valid_tenHoSo: false,
     // add new template
@@ -1144,6 +1145,7 @@ export default {
                         if (resAction.hasOwnProperty('paymentFee') && resAction.paymentFee) {
                           vm.sourcePaymentFee = ''
                           let configs = JSON.parse(resAction.paymentFee)
+                          vm.splitBienLai = configs.hasOwnProperty('isGroupPaymentFile') ? true : false
                           vm.sourcePaymentFee = configs.hasOwnProperty('source') ? configs['source'] : {}
                           console.log('sourcePaymentFee', vm.sourcePaymentFee)
                         } else {
@@ -1519,6 +1521,9 @@ export default {
                     feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
                     serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
                     shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+                  }
+                  if (vm.payments['groupPaymentFile']) {
+                    paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
                   }
                   if (vm.payments && vm.payments.hasOwnProperty('counter')) {
                     let dataNote = ''

@@ -5,7 +5,7 @@
         <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Thông tin chung hồ sơ</div>
         <v-card v-if="!mauCongVan">
           <v-card-text class="py-0">
-            <v-btn v-if="originality == 3 && thongTinChiTietHoSo.applicantIdType === 'citizen' && traCuuLgspCongDan && (quyenTraCuuLgsp == 'always' || quyenTraCuuLgsp == 1)" :style="loadingSearchLgsp ? 'pointer-events: none' : ''"
+            <v-btn v-if="originality == 3 && thongTinChiTietHoSo.applicantIdType === 'citizen' && traCuuLgspCongDan && (quyenTraCuuLgsp == 'always' || quyenTraCuuLgsp == 1 || quyenTraCuuLgsp == 2)" :style="loadingSearchLgsp ? 'pointer-events: none' : ''"
              class="mx-0 ml-2 mt-2 mb-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
               <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
               <v-progress-circular :size="24" v-if="loadingSearchLgsp"
@@ -190,12 +190,12 @@
                 </div>
                 <div class="xs12 sm12 pb-1" style="color:#0b72ba" 
                   v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
-                  thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
+                  String(thongTinChiTietHoSo.dossierNote).indexOf('<br/>') < 0 &&String(thongTinChiTietHoSo.dossierNote).indexOf('</br>') < 0">
                   Ghi chú:
                 </div>
                 <div class="xs12 sm12 pb-1 overHidden" 
                   v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
-                  thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0&&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
+                  String(thongTinChiTietHoSo.dossierNote).indexOf('<br/>') < 0&&String(thongTinChiTietHoSo.dossierNote).indexOf('</br>') < 0">
                   <v-tooltip top>
                     <span slot="activator" class="text-bold ">{{thongTinChiTietHoSo.dossierNote}} </span>
                     <span class="pl-0"> {{thongTinChiTietHoSo.dossierNote}} </span>
@@ -211,7 +211,7 @@
                 </div>
                 <div class="xs12 sm12 pb-1" style="color:#0b72ba" 
                   v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
-                  thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
+                  String(thongTinChiTietHoSo.dossierNote).indexOf('<br/>') < 0 &&String(thongTinChiTietHoSo.dossierNote).indexOf('</br>') < 0">
                   Ghi chú:
                 </div>
                 <!-- brief note -->
@@ -226,10 +226,10 @@
               <v-flex xs12 sm4 v-else style="word-break: break-word;">
                 <div class="xs12 sm12 pb-1" style="color:#0b72ba" 
                   v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
-                  thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
+                  String(thongTinChiTietHoSo.dossierNote).indexOf('<br/>') < 0 &&String(thongTinChiTietHoSo.dossierNote).indexOf('</br>') < 0">
                   Ghi chú:
                 </div>
-                <div class="xs12 sm12 pb-1 overHidden" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
+                <div class="xs12 sm12 pb-1 overHidden" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&String(thongTinChiTietHoSo.dossierNote).indexOf('<br/>') < 0 &&String(thongTinChiTietHoSo.dossierNote).indexOf('</br>') < 0">
                   <v-tooltip top>
                     <span slot="activator" class="text-bold ">{{thongTinChiTietHoSo.dossierNote}} </span>
                     <span class="pl-0"> {{thongTinChiTietHoSo.dossierNote}} </span>
@@ -693,9 +693,23 @@
           }).catch(function (result) {
             vm.lgspAlertColor = 'red'
             vm.loadingSearchLgsp = false
-            vm.applicantLgspInfomation = false
+            vm.applicantLgspInfomation = ''
             vm.warningLgsp = true
-            vm.messageLgsp = 'Không truy cập được CSDL dân cư'
+            vm.messageLgsp = "Số CCCD/ CMND: " + String(vm.applicantIdNoLgsp).trim() + ", họ tên: " + String(vm.applicantNameLgsp).trim() + " không có thông tin trên CSDL quốc gia về dân cư"
+            
+            if (result.hasOwnProperty('errorCode')) {
+              let errorCode = result.errorCode
+              switch(errorCode) {
+                case "004":
+                  vm.messageLgsp = "Thủ tục chưa được cấp phép khai thác CSDL dân cư";
+                  break;
+                case "005":
+                  vm.messageLgsp = "Tài khoản cán bộ không có quyền thao tác";
+                  break;
+                default:
+                  vm.messageLgsp = "Số CCCD/ CMND: " + String(vm.applicantNameLgsp).trim() + ", họ tên: " + String(vm.applicantNameLgsp).trim() + " không có thông tin trên CSDL quốc gia về dân cư"
+              }
+            }
           })
         } else {
           toastr.error('Vui lòng nhập đầy đủ số CCCD/ CMND, họ tên và ngày sinh để tra cứu')

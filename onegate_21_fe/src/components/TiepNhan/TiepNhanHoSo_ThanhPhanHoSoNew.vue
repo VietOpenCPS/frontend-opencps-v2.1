@@ -113,15 +113,28 @@
                       <v-icon size="14" color="primary">fas fa fa-download</v-icon>
                     </v-btn>
 
-                    <v-btn class="my-0" title="Ký số giấy tờ đính kèm" flat icon color="indigo"
-                      v-if="originality === 1 && showKySo && itemFileView.fileType.toLowerCase() === 'pdf'" 
+                    <v-btn class="my-0" title="Ký số giấy tờ" flat icon color="indigo"
+                      v-if="originality === 1 && !onlyView && showKySo && !kySoSavis && String(itemFileView.fileType).toLowerCase() === 'pdf'" 
                       @click.stop="showSelectDigitalSign(itemFileView, index)"
                     >
                       <v-icon size="18">fa fa-pencil-square-o</v-icon>
                     </v-btn>
+                    <!--  -->
+                    <v-btn title="Ký số giấy tờ" class="my-0" flat icon color="indigo"
+                      v-if="originality === 1 && !onlyView && showKySo && String(itemFileView.fileType).toLowerCase() === 'pdf' && itemFileView.signCheck != 1 && kySoSavis" 
+                      @click.stop="kySoPdfUrlSavis(itemFileView, index)"
+                    >
+                      <v-icon size="18">fa fa-pencil-square-o</v-icon>
+                    </v-btn>
+                    <v-btn title="Giấy tờ đã được ký số" class="my-0" flat icon color="green"
+                      v-if="originality === 1 && showKySo && String(itemFileView.fileType).toLowerCase() === 'pdf' && itemFileView.signCheck == 1 && kySoSavis" 
+                    >
+                      <v-icon style="color: green !important" size="18">verified</v-icon>
+                    </v-btn>
+
                     <v-menu @click.native.stop right offset-y 
                       transition="slide-x-transition" title="Ký số tài liệu đính kèm" 
-                      v-if="originality === 3 && showKySoMotCua && itemFileView.fileType.toLowerCase() === 'pdf'">
+                      v-if="originality === 3 && showKySoMotCua && String(itemFileView.fileType).toLowerCase() === 'pdf'">
                       <v-btn slot="activator" flat icon color="indigo">
                         <v-icon size="18">fa fa-pencil-square-o</v-icon>
                       </v-btn>
@@ -168,7 +181,7 @@
                       <v-icon size="14" color="primary">fas fa fa-download</v-icon>
                     </v-btn>
                     <!--  -->
-                    <v-tooltip top v-if="originality === 3 && activePdfEditor && itemFileView['fileType'].toLocaleLowerCase() === 'pdf'">
+                    <v-tooltip top v-if="originality === 3 && activePdfEditor && String(itemFileView['fileType']).toLocaleLowerCase() === 'pdf'">
                       <v-btn slot="activator" icon ripple v-on:click.stop="showEditorPdf(itemFileView)" class="mx-0 my-0">
                         <v-icon size="14" color="primary">chat</v-icon>
                       </v-btn>
@@ -176,21 +189,26 @@
                     </v-tooltip>
                     <!--  -->
                     <v-btn title="Ký số giấy tờ đính kèm" class="my-0" flat icon color="indigo"
-                      v-if="originality === 1 && showKySo && itemFileView.fileType.toLowerCase() === 'pdf' && !kySoSavis && !kySoVnptSmartCa" 
+                      v-if="originality === 1 && !onlyView && showKySo && String(itemFileView.fileType).toLowerCase() === 'pdf' && !kySoSavis && !kySoVnptSmartCa" 
                       @click.stop="showSelectDigitalSign(itemFileView, index)"
                     >
                       <v-icon size="18">fa fa-pencil-square-o</v-icon>
                     </v-btn>
                     <!--  -->
                     <v-btn title="Ký số giấy tờ đính kèm" class="my-0" flat icon color="indigo"
-                      v-if="originality === 1 && showKySo && itemFileView.fileType.toLowerCase() === 'pdf' && kySoSavis" 
+                      v-if="originality === 1 && !onlyView && showKySo && String(itemFileView.fileType).toLowerCase() === 'pdf' && itemFileView.signCheck != 1 && kySoSavis" 
                       @click.stop="kySoPdfUrlSavis(itemFileView, index)"
                     >
                       <v-icon size="18">fa fa-pencil-square-o</v-icon>
                     </v-btn>
+                    <v-btn title="Giấy tờ đã được ký số" class="my-0" flat icon color="green"
+                      v-if="originality === 1 && showKySo && String(itemFileView.fileType).toLowerCase() === 'pdf' && itemFileView.signCheck == 1 && kySoSavis" 
+                    >
+                      <v-icon style="color: green !important" size="18">verified</v-icon>
+                    </v-btn>
                     <!--  -->
                     <v-btn title="Ký số VNPT Smart CA" class="my-0" flat icon color="indigo"
-                      v-if="originality === 1 && kySoVnptSmartCa && itemFileView.fileType.toLowerCase() === 'pdf'" 
+                      v-if="originality === 1 && kySoVnptSmartCa && String(itemFileView.fileType).toLowerCase() === 'pdf'" 
                       @click.stop="showXacThucVnptSmartCa(itemFileView, index)"
                     >
                       <v-icon size="18">fa fa-pencil-square-o</v-icon>
@@ -198,7 +216,7 @@
                     <!--  -->
                     <v-menu @click.native.stop right offset-y 
                       transition="slide-x-transition" title="Ký số tài liệu đính kèm" 
-                      v-if="originality === 3 && showKySoMotCua && itemFileView.fileType.toLowerCase() === 'pdf'">
+                      v-if="originality === 3 && showKySoMotCua && String(itemFileView.fileType).toLowerCase() === 'pdf'">
                       <v-btn slot="activator" flat icon color="indigo">
                         <v-icon size="18">fa fa-pencil-square-o</v-icon>
                       </v-btn>
@@ -693,10 +711,10 @@
               
             </v-flex>
             <!--  -->
-            <v-flex xs12 class="text-xs-center mt-3" style="cursor: pointer" @click="kySoPdfUrlSavis(fileKySo, indexFileSelect)">
+            <!-- <v-flex xs12 class="text-xs-center mt-3" style="cursor: pointer" @click="kySoPdfUrlSavis(fileKySo, indexFileSelect)">
               <img class="mb-2" src="/o/opencps-store/js/cli/dvc/app/image/logo-savis.svg" alt="trevor" style="background: #fff;height: 30px;"><br>
               <span class="text-bold" style="font-size: 14px;color: #d7181f;">KÝ SỐ SAVIS</span>
-            </v-flex>
+            </v-flex> -->
             <!--  -->
           </v-layout>
         </v-card-text>
@@ -2342,10 +2360,7 @@ export default {
               toastr.success('Ký số thành công')
               vm.progressUploadPart = ''
               vm.processingSavis = false
-              vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
-                vm.dossierFilesItems = resFiles
-              }).catch(reject => {
-              })
+              vm.updateSignCheck(vm.fileKySo.dossierFileId)
             }).catch(function (error) {
               vm.progressUploadPart = ''
               toastr.error('Ký số thất bại')
@@ -2380,7 +2395,7 @@ export default {
         url = 'http://127.0.0.1:14423/api/v1/sign/pdf'
         form.append("file", vm.fileKySoSavis.file, vm.fileKySoSavis.fileName);
         form.append("fileUrl", "");
-        form.append("isVisible", vm.hasAnhChuKySo);
+        form.append("isVisible", true);
         form.append("page", "1");
         form.append("llx", "150");
         form.append("lly", "792");
@@ -2394,7 +2409,10 @@ export default {
         if (vm.hasAnhChuKySo) {
           form.append("image", vm.fileImageSignPdf.file, vm.fileImageSignPdf.fileName);
         } else {
-          form.append("image", "");
+          let fileFix = new File([
+            new Blob(["/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAQDAwQDAwQEAwQFBAQFBgoHBgYGBg0JCggKDw0QEA8NDw4RExgUERIXEg4PFRwVFxkZGxsbEBQdHx0aHxgaGxr/2wBDAQQFBQYFBgwHBwwaEQ8RGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhr/wAARCABkAGQDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAj/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AL+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//Z"])
+          ], "fileAnh");
+          form.append("image", fileFix, "fileAnh")
         }
       } else {
         url = 'http://127.0.0.1:14423/api/v1/sign/binary'
@@ -2438,10 +2456,10 @@ export default {
               toastr.success('Tải lên và ký số thành công')
               vm.progressUploadPart = ''
               vm.processingSavis = false
-              vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
-                vm.dossierFilesItems = resFiles
-              }).catch(reject => {
-              })
+              try {
+                vm.updateSignCheck(response.data.dossierFileId)
+              } catch (error) {
+              }
             }).catch(function () {
               toastr.error('Ký số thất bại')
               vm.processingSavis = false
@@ -3351,25 +3369,25 @@ export default {
       let typeExcel = 'xls,xlsx'
       let typeImage = 'png,jpg,jpeg'
       if (type) {
-        if (typeDoc.indexOf(type.toLowerCase()) >= 0) {
+        if (typeDoc.indexOf(String(type).toLowerCase()) >= 0) {
           return {
             icon: 'fas fa fa-file-word-o',
             color: 'blue',
             size: 14
           }
-        } else if (typeExcel.indexOf(type.toLowerCase()) >= 0) {
+        } else if (typeExcel.indexOf(String(type).toLowerCase()) >= 0) {
           return {
             icon: 'fas fa fa-file-excel-o',
             color: 'green',
             size: 14
           }
-        } else if (type.toLowerCase() === 'pdf') {
+        } else if (String(type).toLowerCase() === 'pdf') {
           return {
             icon: 'fa fa-file-pdf-o',
             color: 'red',
             size: 14
           }
-        } else if (typeImage.indexOf(type.toLowerCase()) >= 0) {
+        } else if (typeImage.indexOf(String(type).toLowerCase()) >= 0) {
           return {
             icon: 'fas fa fa-file-image-o',
             color: 'primary',
@@ -3896,6 +3914,27 @@ export default {
         })
       }).catch(function () {
         toastr.error('Lỗi cập nhật tài liệu')
+      })
+    },
+    updateSignCheck (fileId) {
+      let vm = this
+      let options = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId(),
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }
+      axios.post('/o/rest/v2/dossiers/' + fileId + '/signCheck/1', {}, options).then(function (response) {
+        vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+          vm.dossierFilesItems = resFiles
+        }).catch(reject => {
+        })
+      }).catch(function() {
+        vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+          vm.dossierFilesItems = resFiles
+        }).catch(reject => {
+        })
       })
     }
   }

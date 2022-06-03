@@ -385,7 +385,7 @@
                     </v-flex>
                     <v-flex xs12 sm2 style="position:relative">
                       <v-text-field
-                        v-if="originality === 1 || originality === '1'"
+                        v-if="originality == 1 && !disableEditApplicant"
                         v-model="thongTinChuHoSo.applicantIdNo"
                         @input="changeApplicantInfos"
                         :disabled="loadingVerify"
@@ -393,6 +393,7 @@
                         required
                         @change="thongTinChuHoSo.applicantIdNo=String(thongTinChuHoSo.applicantIdNo).trim()"
                       ></v-text-field>
+                      <p class="pl-0 pt-2" v-if="originality == 1 && disableEditApplicant"> {{thongTinChuHoSo.applicantIdNo}}</p>
                       <suggestions
                         v-if="originality === 3 || originality === '3'"
                         v-model="thongTinChuHoSo.applicantIdNo"
@@ -429,7 +430,7 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-text-field
-                        v-else
+                        v-if="!loading && (originality == 3 || (originality == 1 && !disableEditApplicant))"
                         v-model="thongTinChuHoSo.applicantName"
                         @input="changeApplicantInfos"
                         @change="thongTinChuHoSo.applicantName=String(thongTinChuHoSo.applicantName).trim()"
@@ -437,6 +438,7 @@
                         :rules="requiredOptions['applicantName'] ? [rules.required,rules.varchar500] : ''"
                         :required="requiredOptions['applicantName']"
                       ></v-text-field>
+                      <p class="pl-0 pt-2" v-if="originality == 1 && disableEditApplicant"> {{thongTinChuHoSo.applicantName}}</p>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -1304,7 +1306,7 @@
               <v-btn color="primary"
                 @click="addApplicantLgsp"
                 class="mx-0 my-0 mr-2"
-                v-if="applicantLgspInfomation && lgspType === 'citizen'"
+                v-if="applicantLgspInfomation && !applicantLgspInfomation.hasOwnProperty('stringData') && lgspType === 'citizen'"
               >
                 <v-icon size="20">save_alt</v-icon>
                 &nbsp;
@@ -1595,7 +1597,8 @@ export default {
     messageLgsp: '',
     lgspAlertColor: 'primary',
     userSsoInfo: '',
-    quyenTraCuuLgsp: 'always'
+    quyenTraCuuLgsp: 'always',
+    disableEditApplicant: false
   }),
   computed: {
     loading () {
@@ -1631,6 +1634,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.disableEditApplicant = disableEditApplicant
+    } catch (error) {
+    }
     try {
       vm.traCuuLgspCongDan = traCuuLgspCongDan
     } catch (error) {
@@ -2820,7 +2827,7 @@ export default {
           vm.loadingSearchLgsp = false
           vm.applicantLgspInfomation = false
           vm.warningLgsp = true
-          vm.messageLgsp = "Số CCCD/ CMND: " + String(vm.thongTinChuHoSo.applicantIdNo).trim() + ", họ tên: " + String(vm.thongTinChuHoSo.applicantName).trim() + " không có thông tin trên CSDL quốc gia về dân cư"
+          vm.messageLgsp = "Số CCCD/ CMND: " + String(vm.applicantIdNoLgsp).trim() + ", họ tên: " + String(vm.applicantNameLgsp).trim() + " không có thông tin trên CSDL quốc gia về dân cư"
           
           if (result.hasOwnProperty('errorCode')) {
             let errorCode = result.errorCode
@@ -2832,7 +2839,7 @@ export default {
                 vm.messageLgsp = "Tài khoản cán bộ không có quyền thao tác";
                 break;
               default:
-                vm.messageLgsp = "Số CCCD/ CMND: " + String(vm.thongTinChuHoSo.applicantIdNo).trim() + ", họ tên: " + String(vm.thongTinChuHoSo.applicantName).trim() + " không có thông tin trên CSDL quốc gia về dân cư"
+                vm.messageLgsp = "Số CCCD/ CMND: " + String(vm.applicantNameLgsp).trim() + ", họ tên: " + String(vm.applicantNameLgsp).trim() + " không có thông tin trên CSDL quốc gia về dân cư"
             }
           }
         })

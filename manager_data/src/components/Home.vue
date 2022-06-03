@@ -240,8 +240,9 @@
         let vm = this
         setTimeout(function () {
           vm.$store.commit('setAgencyManager',vm.agencyFilter ? vm.agencyFilter : '')
-          vm.$store.commit('setGroupIdAgencyManager',vm.agencyFilter ? vm.agencyFilter['value'] : '')
-          axios.defaults.headers.common['groupId'] = vm.agencyFilter ? vm.agencyFilter['value'] : ''
+          vm.$store.commit('setGroupIdAgencyManager',vm.agencyFilter ? vm.agencyFilter['value'] : window.themeDisplay.getScopeGroupId())
+          axios.defaults.headers.common['groupId'] = vm.agencyFilter ? vm.agencyFilter['value'] : window.themeDisplay.getScopeGroupId()
+          $.ajaxSetup({headers:{"Token":Liferay.authToken,"groupId":vm.agencyFilter ? vm.agencyFilter['value'] : window.themeDisplay.getScopeGroupId()},global:true});
           console.log('groupIdAgencyManager', vm.agencyFilter ? vm.agencyFilter['value'] : '')
           try {
             if ($('a[aria-current="page"]').length) {
@@ -292,10 +293,10 @@
           } else {
             let idSite = window.themeDisplay.getScopeGroupId()
             if (configs.hasOwnProperty(idSite)) {
-              if (configs['idSite'] === 'all' || !configs['idSite']) {
+              if (configs[idSite] === 'all' || !configs[idSite]) {
                 vm.agencyList = agency
               } else {
-                vm.agencyList = configs['idSite']
+                vm.agencyList = configs[idSite]
               }
             }
           }

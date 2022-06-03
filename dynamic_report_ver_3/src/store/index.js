@@ -427,6 +427,9 @@ export const store = new Vuex.Store({
                   let [day, month, year] = currentVal.split('/')
                   if (day && month && year && filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp') {
                     let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                    if (key === 'fromDate') {
+                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T00:00`)).getTime()
+                    }
                     if (key === 'toDate') {
                       timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T23:59`)).getTime()
                     }
@@ -651,6 +654,9 @@ export const store = new Vuex.Store({
                     let [day, month, year] = currentVal.split('/')
                     if (day && month && year && filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp') {
                       let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                      if (key === 'fromDate') {
+                        timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T00:00`)).getTime()
+                      }
                       if (key === 'toDate') {
                         timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T23:59`)).getTime()
                       }
@@ -1218,6 +1224,9 @@ export const store = new Vuex.Store({
                   let [day, month, year] = currentVal.split('/')
                   if (day && month && year && filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp') {
                     let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                    if (key === 'fromDate') {
+                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T00:00`)).getTime()
+                    }
                     if (key === 'toDate') {
                       timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T23:59`)).getTime()
                     }
@@ -1412,6 +1421,9 @@ export const store = new Vuex.Store({
                   let [day, month, year] = currentVal.split('/')
                   if (day && month && year) {
                     let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                    if (key === 'fromDate') {
+                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T00:00`)).getTime()
+                    }
                     if (key === 'toDate') {
                       timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T23:59`)).getTime()
                     }
@@ -1815,6 +1827,9 @@ export const store = new Vuex.Store({
                   let [day, month, year] = currentVal.split('/')
                   if (day && month && year) {
                     let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                    if (key === 'fromDate') {
+                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T00:00`)).getTime()
+                    }
                     if (key === 'toDate') {
                       timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T23:59`)).getTime()
                     }

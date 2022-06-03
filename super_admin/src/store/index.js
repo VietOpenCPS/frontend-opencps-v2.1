@@ -2491,7 +2491,7 @@ export const store = new Vuex.Store({
             },
             params: filter
           }
-          axios.get('/o/rest/statistics', param).then(function (result) {
+          axios.get('/o/statistic/report/dvcqg', param).then(function (result) {
             if (result.data) {
               resolve(result.data)
             } else {

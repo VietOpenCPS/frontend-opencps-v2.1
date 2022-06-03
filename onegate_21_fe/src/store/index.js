@@ -3414,8 +3414,49 @@ export const store = new Vuex.Store({
             let file = window.URL.createObjectURL(serializable)
             resolve(file)
           }).catch(function (error) {
-            toastr.clear()
-            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    printPayBienLaiTach ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            responseType: 'blob'
+          }
+          let formData = new URLSearchParams()
+          formData.append('dossierId', filter.dossierId)
+          formData.append('tranId', filter.tranId)
+          axios.post('/o/rest/v2/postal/downloadInvInGroupPayment', formData, param).then(function (response) {
+            let serializable = response.data
+            let file = window.URL.createObjectURL(serializable)
+            resolve(file)
+          }).catch(function (error) {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    xoaBienLaiTach ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+          let formData = new URLSearchParams()
+          formData.append('dossierId', filter.dossierId)
+          formData.append('tranId', filter.tranId)
+          axios.post('/o/rest/v2/postal/cancelInvInGroupPayment', formData, param).then(function (response) {
+            resolve(response)
+          }).catch(function (error) {
             reject(error)
           })
         }).catch(function (){})
@@ -5498,11 +5539,6 @@ export const store = new Vuex.Store({
           },
           params: {}
         }
-        let systemLgsp = ''
-        try {
-          systemLgsp = systemLgspConfig
-        } catch (error) {
-        }
         let dataInput = ''
         let urlTraCuu = "/o/rest/v2/qldc/dvcqg"
         dataInput = {
@@ -5533,6 +5569,9 @@ export const store = new Vuex.Store({
           if (serializable && serializable.hasOwnProperty('Body') && serializable["Body"].hasOwnProperty('CongdanCollection') && serializable["Body"]["CongdanCollection"]) {
             let data = serializable["Body"]["CongdanCollection"]["CongDan"]
             dataCitizen = Object.assign(data, { SoLuongCongDan: 1 })
+            resolve(dataCitizen)
+          } else if (serializable && JSON.stringify(serializable).indexOf('ns1:CongDan') > 0) {
+            dataCitizen = Object.assign({ SoLuongCongDan: 1 , stringData: JSON.stringify(serializable)})
             resolve(dataCitizen)
           } else {
             reject('')

@@ -41,9 +41,7 @@ article, .glass::before {
   .glass, .glass::before {
     transition: transform 0.5s ease-out;
   }
-  .glass::before {
-    background-image: url('http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/bg-home.jpg');
-  }
+
 
   body .v-navigation-drawer--fixed {
     position: absolute;
@@ -292,7 +290,7 @@ body .notification_wrap > div:last-child {
 }
 /*  */
 .v-text-field.v-text-field--solo:not(.v-text-field--solo-flat)>.v-input__control>.v-input__slot {
-    box-shadow: none;
+    box-shadow: none !important;
     border: 1px solid #b3aeae;
   }
   .error--text>.v-input__control>.v-input__slot {

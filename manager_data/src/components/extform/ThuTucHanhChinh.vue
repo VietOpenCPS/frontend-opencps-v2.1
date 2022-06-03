@@ -787,7 +787,7 @@ export default {
               dataPostdossier.append('fromServerNo', "")
             }
             dataPostdossier.append('toServerNo', "SERVER_DVC")
-            axios.post('/o/rest/v2/backupDatas/exportProcess', dataPostdossier, options).then(function (response) {
+            axios.post('/o/rest/v2/backupDatas/syncMasterDataDVC', dataPostdossier, options).then(function (response) {
               vm.loading = false
               toastr.success('Thủ tục đã được đồng bộ sang cổng Dịch vụ công')
             }).catch(function () {
@@ -830,7 +830,7 @@ export default {
                 dataPostdossier.append('fromServerNo', "")
               }
               dataPostdossier.append('toServerNo', vm.toAgency['serveNo'])
-              axios.post('/o/rest/v2/backupDatas/exportProcess', dataPostdossier, options).then(function (response) {
+              axios.post('/o/rest/v2/backupDatas/syncMasterDataMC', dataPostdossier, options).then(function (response) {
                 vm.loading = false
                 vm.dialog_cloneServiceinfo = false
                 toastr.success('Thủ tục đã được đồng bộ')

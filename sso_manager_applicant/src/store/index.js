@@ -15,7 +15,8 @@ export const store = new Vuex.Store({
     isMobile: false,
     userLogin: '',
     applicantInfos: '',
-    apiSso: 'https://apigateway.haugiang.gov.vn' 
+    apiSso: 'https://apigateway.haugiang.gov.vn'
+    // apiSso: "http://119.17.200.66:8378" 
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -76,7 +77,12 @@ export const store = new Vuex.Store({
           let serializable = response.data
           resolve(serializable)
         }).catch(function (error) {
-          reject(error.response)
+          let data = ''
+          try {
+            data = error.response['status']
+          } catch (error1) {
+          }
+          reject(data)
         })
       })
     },
@@ -96,7 +102,12 @@ export const store = new Vuex.Store({
           let serializable = response.data
           resolve(serializable)
         }).catch(function (error) {
-          reject(error)
+          let data = ''
+          try {
+            data = error.response['status']
+          } catch (error1) {
+          }
+          reject(data)
         })
       })
     },
@@ -390,6 +401,133 @@ export const store = new Vuex.Store({
           resolve(serializable)
         }).catch(function (error) {
           reject(error.response)
+        })
+      })
+    },
+    searchLgspCongDan({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {}
+        }
+        let dataInput = ''
+        let urlTraCuu = "/o/rest/v2/qldc/dvcqg"
+        dataInput = {
+          "MaYeuCau" : (new Date()).getTime(),
+          "MaTichHop" : "037",
+          "StaffEmail" : filter.StaffEmail,
+          "GovAgencyCode": 'SLDTBXH',
+          "MaDVC" : "",
+          "HoVaTen" : filter.applicantName,
+          "type" : "TraCuuThongTinCongDan",
+          "NgayThangNamSinh" : filter.birthDate,
+        }
+        
+        if (String(filter.applicantIdNo).length === 9) {
+          dataInput['SoCMND'] = filter.applicantIdNo
+        } else {
+          dataInput['SoDinhDanh'] = filter.applicantIdNo
+        }
+        axios({
+          method: 'POST',
+          url: urlTraCuu,
+          headers: config.headers,
+          params: config.params,
+          data: dataInput
+        }).then(function (response) {
+          let serializable = response.data
+          if (serializable && serializable.hasOwnProperty('Body') && serializable["Body"].hasOwnProperty('CongdanCollection') && serializable["Body"]["CongdanCollection"]) {
+            let data = serializable["Body"]["CongdanCollection"]["CongDan"]
+            resolve(data)
+          } else {
+            resolve('')
+          }
+        }).catch(function () {
+          reject('')
+        })
+      })
+    },
+    searchLgspDoanhNghiep({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {}
+        }
+        let dataInput = {
+          "type": "ChiTietDoanhNghiep",
+          "msdn": filter.applicantIdNo
+        }
+        axios({
+          method: 'POST',
+          url: '/o/rest/v2/qldc/doanhnghiep',
+          headers: config.headers,
+          params: config.params,
+          data: dataInput
+        }).then(function (response) {
+          let serializable = response.data
+          console.log('serializableDn', serializable)
+          let dataCitizen = ''
+          if (serializable && serializable.hasOwnProperty('Data') && serializable["Data"] && serializable["Data"]['MainInformation']) {
+            let data = Object.assign(serializable["Data"]['HOAdress'], serializable["Data"]['MainInformation'])
+            dataCitizen = Object.assign(data, serializable["Data"]['Representatives'][0])
+            resolve(dataCitizen)
+          } else {
+            resolve('')
+          }
+        }).catch(function () {
+          reject('')
+        })
+      })
+    },
+    searchApplicantCongDvc({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {}
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/applicants/applicantIdNo/' + filter.applicantIdNo)
+        dataPost.append('data', JSON.stringify({}))
+        dataPost.append('serverCode', 'SERVER_DVC')
+        axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+          if (result.data) {
+            resolve(result.data)
+          } else {
+            resolve('')
+          }
+        }).catch(xhr => {
+          reject('')
+        })
+      })
+    },
+    updateApplicantCongDvc({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {}
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'PUT')
+        dataPost.append('url', '/applicants/' + filter.applicantId)
+        dataPost.append('data', JSON.stringify(filter.data))
+        dataPost.append('serverCode', 'SERVER_DVC')
+        axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+          if (result.data) {
+            resolve(result.data)
+          } else {
+            resolve('')
+          }
+        }).catch(xhr => {
+          reject('')
         })
       })
     },

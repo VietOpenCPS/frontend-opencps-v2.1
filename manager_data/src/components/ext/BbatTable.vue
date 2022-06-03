@@ -456,7 +456,14 @@
           'respone': 'tableConfig'
         }
         dataPost.append('text', JSON.stringify(textPost))
-        axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+        let options = {
+          headers: {
+            'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
+            'Token': window.Liferay !== undefined ? window.Liferay.authToken : ''
+          }
+        }
+        console.log('optionsHeader1', options)
+        axios.post('/o/rest/v2/socket/web', dataPost, options).then(function (response) {
           let dataObj = response.data
           vm.tableConfigExport = dataObj
           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
@@ -546,7 +553,7 @@
               }
               dataPost = new URLSearchParams();
               dataPost.append('text', JSON.stringify(textPost))
-              axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+              axios.post('/o/rest/v2/socket/web', dataPost, options).then(function (response) {
                 let dataObj = response.data
                 vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
                   if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['tableData'] !== null && vm.dataSocket['tableData'] !== undefined && (dataObj.respone === 'tableData' || dataObj.respone === 'tableConfig')) {
@@ -572,7 +579,7 @@
               }
               dataPost = new URLSearchParams();
               dataPost.append('text', JSON.stringify(textPost))
-              axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+              axios.post('/o/rest/v2/socket/web', dataPost, options).then(function (response) {
                 let dataObj = response.data
                 vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
                 if (dataObj.respone === 'pageTotalCounter') {
@@ -751,7 +758,13 @@
 
         let dataPost = new URLSearchParams();
         dataPost.append('text', JSON.stringify(textPost))
-        axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+        let options = {
+          headers: {
+            'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
+            'Token': window.Liferay !== undefined ? window.Liferay.authToken : ''
+          }
+        } 
+        axios.post('/o/rest/v2/socket/web', dataPost, options).then(function (response) {
           let dataObj = response.data
           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
             if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['tableData'] !== null && vm.dataSocket['tableData'] !== undefined && (dataObj.respone === 'tableData' || dataObj.respone === 'tableConfig')) {
@@ -832,7 +845,13 @@
           }
           dataPost = new URLSearchParams();
           dataPost.append('text', JSON.stringify(textPost))
-          axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+          let options = {
+            headers: {
+              'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
+              'Token': window.Liferay !== undefined ? window.Liferay.authToken : ''
+            }
+          }
+          axios.post('/o/rest/v2/socket/web', dataPost, options).then(function (response) {
             let dataObj = response.data
             vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
             if (dataObj['cmd'] !== 'get') {
