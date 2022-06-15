@@ -493,7 +493,7 @@
           })
         }
         // 
-        if (vm.traCuuLgspCongDan && vm.thongTinChiTietHoSo.applicantIdType === 'citizen') {
+        if (vm.traCuuLgspCongDan && vm.thongTinChiTietHoSo.applicantIdType === 'citizen' && vm.originality == 3) {
           vm.$store.dispatch('checkRoleSearchLgsp', {serviceCode: vm.thongTinChiTietHoSo.serviceCode}).then(result => {
             vm.quyenTraCuuLgsp = result.hasOwnProperty('status') ? result.status : 'always'
           }).catch(xhr => {

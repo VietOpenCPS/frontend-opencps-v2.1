@@ -1306,7 +1306,7 @@
               <v-btn color="primary"
                 @click="addApplicantLgsp"
                 class="mx-0 my-0 mr-2"
-                v-if="applicantLgspInfomation && !applicantLgspInfomation.hasOwnProperty('stringData') && lgspType === 'citizen'"
+                v-if="applicantLgspInfomation && lgspType === 'citizen'"
               >
                 <v-icon size="20">save_alt</v-icon>
                 &nbsp;

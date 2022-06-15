@@ -53,7 +53,9 @@ export const store = new Vuex.Store({
               tenGiayTo: filter.tenGiayTo ? filter.tenGiayTo : '',
               maThuTuc: filter.maThuTuc ? filter.maThuTuc : '',
               keyword: filter.keyword ? filter.keyword : '',
-              isKyso: filter.isKyso
+              isKyso: filter.isKyso,
+              govAgencyCode: filter.donViCap,
+              namKyVanBan: filter.nam
             }
           }
           axios.get('/o/rest/v2/applicantdatas/listExcelData', param).then(function (response) {

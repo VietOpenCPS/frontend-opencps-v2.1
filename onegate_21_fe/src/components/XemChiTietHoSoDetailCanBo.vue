@@ -111,7 +111,8 @@
               LIÊN THÔNG
             </v-btn>
           </v-tab>
-          <v-tab :key="5" href="#tabs-5" @click="loadDossierActions()" v-if="originality !== 1">
+          <v-tab :key="5" href="#tabs-5" @click="loadDossierActions()" 
+            v-if="originality == 3 || (viewTienTrinhDvc && thongTinChiTietHoSo.dossierStatus !== 'new' && thongTinChiTietHoSo.dossierStatus !== 'receiving')">
             <v-btn flat class="px-0 py-0 mx-0 my-0">
               TIẾN TRÌNH XỬ LÝ
             </v-btn>
@@ -280,7 +281,7 @@
                 <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :data_rolegroup="roleGroupPhanCong" :detailDossier="thongTinChiTietHoSo" :data_uyquyen="reAsignUsers" :type="type_assign"></phan-cong>
                 <tai-lieu-ket-qua :esignType="typeEsign" :preCondition="preCondition" ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
                 <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
-                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :splitBienLai="splitBienLai" :dataSource="sourcePaymentFee" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
+                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :paymentDetail="paymentDetail" :splitBienLai="splitBienLai" :dataSource="sourcePaymentFee" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
                 <danh-sach-bien-lai v-if="removeInvoiceGroupPayment" ref="danhsachbienlai" :payments="paymentDetail"></danh-sach-bien-lai>
                 <!-- thanh toán điện tử -->
                 <thanh-toan-dien-tu ref="epayment" v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
@@ -405,8 +406,9 @@
                 </v-card-text>
               </v-card>
             </v-tab-item>
-            <v-tab-item value="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
-              <v-flex xs12 style="height:42px" v-if="!sequencyDossierImport">
+            <v-tab-item value="tabs-5" v-if="originality == 3 || (viewTienTrinhDvc && thongTinChiTietHoSo.dossierStatus !== 'new' && thongTinChiTietHoSo.dossierStatus !== 'receiving')"
+             :key="5" reverse-transition="fade-transition" transition="fade-transition">
+              <v-flex xs12 style="height:42px" v-if="!sequencyDossierImport && originality == 3">
                 <v-radio-group class="absolute__btn pt-1" style="width: 350px" v-model="typeTienTrinh" row @change="changeTypeTienTrinh($event)">
                   <v-radio label="Xem dạng bảng" :value="1" ></v-radio>
                   <v-radio label="Xem dạng biểu đồ" :value="2"></v-radio>
@@ -875,6 +877,7 @@ export default {
     votingVersion: 1,
     confirmGuiHoSoTrucTuyen: false,
     viTriLuuTru: false,
+    viewTienTrinhDvc: false,
     docLuuTru: [],
     validTraoDoi: false,
     isMobile: false,
@@ -1239,6 +1242,10 @@ export default {
       vm.confirmGuiHoSoTrucTuyen = confirmGuiHoSoTrucTuyen
     } catch (error) {
     }
+    try {
+      vm.viewTienTrinhDvc = viewTienTrinhDvc
+    } catch (error) {
+    }
     window.toastr = toastr
     vm.$nextTick(function () {
       $('#m-navigation').css('display', 'none')
@@ -1527,13 +1534,25 @@ export default {
       })
     },
     loadDossierActions (data) {
-      var vm = this
+      let vm = this
       let submissionNote = ''
       try {
         submissionNote = vm.thongTinChiTietHoSo['submissionNote'] ? JSON.parse(vm.thongTinChiTietHoSo['submissionNote']) : ''
       } catch (error) {
       }
-      if (submissionNote && submissionNote.hasOwnProperty('dossierImport') && submissionNote.dossierImport) {
+      if (vm.originality == 1 && vm.viewTienTrinhDvc && submissionNote) {
+        let resultTemp = submissionNote.data
+        for (var i = 0; i < resultTemp.length; i++) {
+          if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+            if (!Array.isArray(resultTemp[i]['actions'])) {
+              let arrActionsTemp = []
+              arrActionsTemp.push(resultTemp[i]['actions'])
+              resultTemp[i]['actions'] = arrActionsTemp
+            }
+          }
+        }
+        vm.dossierActions = resultTemp
+      } else if (submissionNote && submissionNote.hasOwnProperty('dossierImport') && submissionNote.dossierImport) {
         vm.sequencyDossierImport = true
         vm.dossierImportActions = submissionNote['data']
       } else {
@@ -2256,7 +2275,7 @@ export default {
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
       if (vm.removeInvoiceGroupPayment) {
-        vm.proccessRemoveBienLaiGroupPayment()
+        vm.proccessRemoveBienLaiGroupPayment(result)
         return
       }
       if (vm.loadingActionProcess) {
@@ -2326,7 +2345,7 @@ export default {
         }
       }
       if (vm.showThuPhi) {
-        if (vm.payments && vm.payments.hasOwnProperty('counter')) {
+        if (vm.payments && vm.payments.hasOwnProperty('counter') && vm.payments.counter) {
           let dataNote = {
             requestPayment: vm.payments['requestPayment'],
             paymentNote: vm.payments['paymentNote'],
@@ -2640,7 +2659,7 @@ export default {
                   if (vm.payments['groupPaymentFile']) {
                     paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
                   }
-                  if (vm.payments && vm.payments.hasOwnProperty('counter')) {
+                  if (vm.payments && vm.payments.hasOwnProperty('counter') && vm.payments.counter) {
                     let dataNote = {
                       requestPayment: vm.payments['requestPayment'],
                       paymentNote: vm.payments['paymentNote'],
@@ -3592,7 +3611,7 @@ export default {
           if (vm.payments['paymentMethod']) {
             paymentsOut['paymentMethod'] = vm.payments['paymentMethod']
           }
-          if (vm.payments && vm.payments.hasOwnProperty('counter')) {
+          if (vm.payments && vm.payments.hasOwnProperty('counter') && vm.payments.counter) {
             let dataNote = {
               requestPayment: vm.payments['requestPayment'],
               paymentNote: vm.payments['paymentNote'],
@@ -3703,8 +3722,9 @@ export default {
         vm.loadingActionProcess = false
       })
     },
-    proccessRemoveBienLaiGroupPayment () {
+    proccessRemoveBienLaiGroupPayment (data) {
       let vm = this
+      console.log('proccessRemoveBienLaiGroupPayment', data, vm.payments)
       let bienLaiXoa = vm.$refs.danhsachbienlai.getBienLaiXoa()
       console.log('bienLaiXoa', bienLaiXoa)
       if (!bienLaiXoa || bienLaiXoa.length == 0) {

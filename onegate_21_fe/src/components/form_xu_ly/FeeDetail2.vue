@@ -95,7 +95,7 @@
                     <span>{{currency(props.item.feeTong.toString().replace(/\./g, ''))}} &nbsp;&nbsp; </span>
                   </div>
                 </td>
-                <td v-if="splitBienLai && data_payment.requestPayment != 3 && data_payment.requestPayment != 5 && !props.item.hasOwnProperty('invoiceFileEntryId')" width="120" class="text-xs-center py-1">
+                <td v-if="splitBienLai && paymentDetail.paymentStatus != 5 && !props.item.hasOwnProperty('invoiceFileEntryId')" width="120" class="text-xs-center py-1">
                   <v-tooltip top>
                     <v-btn v-if="props.index !== 0" slot="activator" width="50" height="32" color="red" dense small dark @click="xoaBienLai(props.index)">
                       <v-icon style="color: #fff !important">delete</v-icon>
@@ -114,7 +114,7 @@
                 <td :colspan="showCounterFee ? 5 : 4" class="text-xs-center" style="border-right: 1px solid #dedede;">
                   <span style="font-size: 14px;">TỔNG TIỀN</span>
                 </td>
-                <td :colspan="splitBienLai && data_payment.requestPayment != 3 && data_payment.requestPayment != 5 ? 2 : 1" class="px-2 text-xs-left" style="border-right: 1px solid #dedede;font-weight: bold;">
+                <td :colspan="splitBienLai && paymentDetail.paymentStatus != 5 ? 2 : 1" class="px-2 text-xs-left" style="border-right: 1px solid #dedede;font-weight: bold;">
                   <span>{{currency(totalFeeAll.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
                 </td>
               </template>
@@ -207,6 +207,10 @@
 import {VMoney} from 'v-money'
 export default {
   props: {
+    paymentDetail: {
+      type: Object,
+      default: () => {}
+    },
     payments: {
       type: Object,
       default: () => {}
@@ -259,7 +263,7 @@ export default {
         sortable: false
       }
     ],
-    feeList: [],
+    feeList: '',
     showCounterFee: false,
     data_payment: {},
     money: {
@@ -300,6 +304,7 @@ export default {
       }
       vm.feeList = [item]
     }
+    console.log('feeLisst', vm.feeList)
     vm.showCounterFee = vm.payments.hasOwnProperty('counter')
     if (vm.showCounterFee) {
       vm.headers = [
@@ -335,7 +340,7 @@ export default {
         }
       ]
     }
-    if (vm.splitBienLai && vm.data_payment.requestPayment != 3 && vm.data_payment.requestPayment != 5) {
+    if (vm.splitBienLai && vm.paymentDetail.paymentStatus != 5) {
       vm.headers.push({
         text: 'Thao tác',
         align: 'center',
@@ -510,6 +515,8 @@ export default {
             vm.feeList[index].totalFee = 0
           }
           vm.totalFeeAll += vm.feeList[index].totalFee
+          // 
+          vm.payments.counter = vm.feeList[0].counter
           // 
 
         }

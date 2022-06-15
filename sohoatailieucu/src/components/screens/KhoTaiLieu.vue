@@ -4,29 +4,29 @@
     <v-card class="px-3 py-3" style="width: 100%; background: #ffffff;border-radius: 12px;box-shadow: 0 6px 10px -4px rgb(0 0 0 / 15%)">
       <div class="headline mb-3" style="font-size: 20px!important;">DANH SÁCH GIẤY TỜ SỐ HÓA</div>
       <v-btn color="#0072bc" small class="mx-0 white--text" @click.stop="showTimKiem" style="position: absolute; right: 17px; top: 15px;">
-        <v-icon size="20">
+        <v-icon size="20" style="color: #fff !important">
           filter_list
         </v-icon> &nbsp;
         Lọc danh sách
       </v-btn>
       <v-card-text class="px-0 pb-0" v-if="showAdvanceSearch">
-        <tim-kiem ref="timkiem"  v-on:trigger-search="searchGiayToSoHoa" v-on:trigger-cancel="cancelSearchGiayToSoHoa"></tim-kiem>
+        <tim-kiem ref="timkiem" :donVi="donViCapConfig"  v-on:trigger-search="searchGiayToSoHoa" v-on:trigger-cancel="cancelSearchGiayToSoHoa"></tim-kiem>
       </v-card-text>
 
       <v-btn color="orange" small class="mx-0 white--text mr-2" @click.stop="downloadTemplate">
-        <v-icon size="16">
+        <v-icon size="16" style="color: #fff !important">
           fas fa fa-file-excel-o
         </v-icon> &nbsp;
         Tải mẫu import
       </v-btn>
-      <v-btn color="#0072bc" small class="mx-2 white--text" :loading="processingImport" :disabled="processingImport" @click.stop="pickFileImport">
-        <v-icon size="20">
+      <v-btn color="#0072bc" small class="mx-2 white--text" :loading="processingImport" :disabled="processingImport" @click.stop="chonDonViImport">
+        <v-icon size="20" style="color: #fff !important">
           post_add
         </v-icon> &nbsp;
         Import danh sách giấy tờ
       </v-btn>
       <v-btn color="#0072bc" small class="mx-0 white--text ml-2" :loading="processingSigning" :disabled="processingSigning" @click.stop="signDocument">
-        <v-icon size="20">
+        <v-icon size="20" style="color: #fff !important">
           drive_file_rename_outline
         </v-icon> &nbsp;
         Ký số giấy tờ
@@ -132,7 +132,7 @@
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
               <div v-else>
-                <span style="word-break: break-word;">{{props.item.hasOwnProperty('tenFile') ? props.item.tenFile : ''}}</span>
+                <span style="word-break: break-word;">{{props.item.hasOwnProperty('tenFile') ? props.item.tenFileFull : ''}}</span>
               </div>
             </td>
             <td class="text-xs-left py-2" style="height:36px">
@@ -141,6 +141,14 @@
               </content-placeholders>
               <div v-else>
                 <span>{{props.item.hasOwnProperty('createDate') ? props.item.createDate : ''}}</span>
+              </div>
+            </td>
+            <td class="text-xs-left py-2" style="height:36px">
+              <content-placeholders v-if="loadingTable">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{props.item.hasOwnProperty('ngayKyVanBan') && props.item.ngayKyVanBan ? formatNgayKy(props.item.ngayKyVanBan) : ''}}</span>
               </div>
             </td>
             <td class="text-xs-left py-2" style="height:36px">
@@ -177,28 +185,28 @@
                 </span>
               </div>
             </td>
-            <td class="text-center py-2" style="height:36px;min-width:50px">
+            <td class="text-center py-2" style="height:36px;min-width:150px">
               <content-placeholders v-if="loadingTable">
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
-              <v-tooltip top class="">
+              <v-tooltip top class="mr-2">
                 <v-btn @click="viewDocument(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
                   <v-icon size="22">visibility</v-icon>
                 </v-btn>
                 <span>Xem giấy tờ</span>
               </v-tooltip>
-              <!-- <v-tooltip top v-if="!loadingTable" class="mr-2">
+              <v-tooltip top v-if="!loadingTable" class="mr-2">
                 <v-btn @click="showEditDocument(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
                   <v-icon size="22">edit</v-icon>
                 </v-btn>
-                <span>Cập nhật giấy tờ</span>
-              </v-tooltip> -->
-              <!-- <v-tooltip top v-if="!loadingTable" class="mr-2">
-                <v-btn @click="showEditDocument(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
-                  <v-icon size="22">drive_file_rename_outline</v-icon>
+                <span>Cập nhật</span>
+              </v-tooltip>
+              <v-tooltip top v-if="!loadingTable" class="mr-2">
+                <v-btn @click="deleteDocument(props.item)" color="red" slot="activator" flat icon class="mx-0 my-0">
+                  <v-icon size="22">delete</v-icon>
                 </v-btn>
-                <span>Ký số</span>
-              </v-tooltip> -->
+                <span>Xóa</span>
+              </v-tooltip>
             </td>
           </tr>
         </template>
@@ -245,6 +253,197 @@
         </iframe>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogChonDonVi" scrollable persistent max-width="700px">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Chọn đơn vị </v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogChonDonVi = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-form ref="formSelect" v-model="validFormSelectGov" lazy-validation>
+            <v-autocomplete
+              class="mt-3"
+              placeholder="Chọn đơn vị"
+              :items="donViCapConfig"
+              v-model="donViCap"
+              item-text="name"
+              item-value="value"
+              clearable
+              return-object
+              required
+              :rules="[v => !!v || 'Vui lòng chọn đơn vị cấp']"
+            ></v-autocomplete>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="submitSelectGov">
+            <v-icon size="20">save</v-icon>&nbsp; Đồng ý
+          </v-btn>
+          <v-btn class="white--text" color="red"  @click="dialogChonDonVi = false">
+            <v-icon class="white--text" size="20" style="color: #fff !important">clear</v-icon>&nbsp; Thoát
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialogDanhSachLoi" scrollable persistent max-width="900px">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Danh sách các giấy tờ import lỗi</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogDanhSachLoi = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-data-table
+            :headers="headersErr"
+            :items="listErrorImport"
+            hide-actions
+            class="table-landing table-bordered"
+            style="border-left: 1px solid #dedede"
+          >
+            <template slot="items" slot-scope="props">
+              <tr>
+                <td class="text-xs-left" style="min-width: 100px;">
+                  <div>
+                    <span>{{props.item.row}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left">
+                  <div>
+                    <span>{{props.item.mess}}</span>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
+        </v-card-text>
+        <v-card-actions class="mx-2">
+          <v-spacer></v-spacer>
+          <v-btn class="white--text" color="red"  @click="dialogDanhSachLoi = false">
+            <v-icon class="white--text" size="20"  style="color: #fff !important">clear</v-icon>&nbsp; Thoát
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialogUpdateDocument" scrollable persistent max-width="900px">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title v-if="typeUpdate == 'add'">Thêm mới giấy tờ</v-toolbar-title>
+          <v-toolbar-title v-if="typeUpdate == 'update'">Cập nhật giấy tờ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogUpdateDocument = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-1 px-0">
+          <v-form ref="formUpdateDocument" v-model="validUpdateDocument" lazy-validation class="px-0 grid-list">
+            <v-layout row wrap class="px-3 py-3">
+              <v-flex xs12 class="px-0">
+                <v-text-field
+                  label="Tên giấy tờ"
+                  v-model="tenGiayToCreate"
+                  box
+                  clearable
+                  :rules="[v => !!v || 'Tên giấy tờ là bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 class="px-0 pr-3">
+                <v-text-field
+                  label="Tên file giấy tờ"
+                  v-model="tenFileCreate"
+                  box
+                  clearable
+                  :rules="[v => !!v || 'Tên file giấy tờ là bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 class="px-0">
+                <v-text-field
+                  label="Số hiệu giấy tờ"
+                  v-model="soHieuVanBanCreate"
+                  box
+                  clearable
+                  :rules="[v => !!v || 'Số hiệu giấy tờ là bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 class="px-0 pr-3">
+                <v-text-field
+                  label="Mã thủ tục"
+                  v-model="maThuTucCreate"
+                  box
+                  clearable
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 class="px-0">
+                <v-text-field
+                  label="Mã hồ sơ"
+                  v-model="maHoSoCreate"
+                  box
+                  clearable
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 class="px-0 pr-3">
+                <v-text-field
+                  label="Đơn vị cấp"
+                  v-model="dovViCapCreate"
+                  box
+                  readonly
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 class="px-0">
+                <v-text-field
+                  label="Ngày ký giấy tờ"
+                  v-model="ngayKyVanBanCreate"
+                  placeholder="dd/mm/yyyy, ddmmyyyy"
+                  @blur="formatDate"
+                  box
+                  clearable
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 class="px-0 pr-3">
+                <v-text-field
+                  label="Số cmnd/cccd, MST doanh nghiệp, tổ chức"
+                  v-model="applicantIdNoCreate"
+                  box
+                  clearable
+                  :rules="[v => !!v || 'Thông tin bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 class="px-0">
+                <v-text-field
+                  label="Chủ sở hữu"
+                  v-model="applicantNameCreate"
+                  box
+                  clearable
+                  :rules="[v => !!v || 'Chủ sở hữu giấy tờ là bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+        <v-card-actions class="mx-0 px-3">
+          <v-spacer></v-spacer>
+          <v-btn class="white--text mr-2" color="red" style="color: #fff !important"  @click="dialogUpdateDocument = false" :loading="processing" :disabled="processing">
+            <v-icon class="white--text" size="20"  style="color: #fff !important">clear</v-icon>&nbsp; Thoát
+          </v-btn>
+          <v-btn v-if="typeUpdate == 'add'" color="primary" @click="submitCreateDocument" :loading="processing" :disabled="processing">
+            <v-icon size="20">save</v-icon>&nbsp; Thêm mới
+          </v-btn>
+          <v-btn v-if="typeUpdate == 'update'" color="primary" @click="submitUpdateDocument" :loading="processing" :disabled="processing">
+            <v-icon size="20">save</v-icon>&nbsp; Cập nhật
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <div style="display:none">
       <a id="downloadFile" :href="srcDownload" download></a>
     </div>
@@ -274,11 +473,10 @@
     data: () => ({
       daKy: true,
       chuaKy: true,
+      processing: false,
       processingImport: false,
       processingSigning: false,
       valid: false,
-      applicantNameCreate: '',
-      applicantIdNoCreate: '',
       govAgencyCreate: '',
       createDate: '',
       expireDate: '',
@@ -345,6 +543,11 @@
           sortable: false
         },
         {
+          text: 'Ngày ký văn bản',
+          align: 'center',
+          sortable: false
+        },
+        {
           text: 'Mã hồ sơ',
           align: 'center',
           sortable: false
@@ -378,7 +581,37 @@
         dossierFiles: '',
         fileEntries: ''
       },
-      uriConfig: ''
+      uriConfig: '',
+      donViCapConfig: '',
+      donViCap: '',
+      dialogChonDonVi: false,
+      validFormSelectGov: false,
+      dialogDanhSachLoi: false,
+      headersErr: [
+        {
+          text: 'Giấy tờ lỗi',
+          align: 'left',
+          sortable: false
+        },
+        {
+          text: 'Mô tả lỗi',
+          align: 'left',
+          sortable: false
+        }
+      ],
+      validUpdateDocument: false,
+      dialogUpdateDocument: false,
+      giayToUpdate: '',
+      tenGiayToCreate: '',
+      tenFileCreate: '',
+      soHieuVanBanCreate: '',
+      maThuTucCreate: '',
+      maHoSoCreate: '',
+      dovViCapCreate: '',
+      ngayKyVanBanCreate: '',
+      applicantIdNoCreate: '',
+      applicantNameCreate: '',
+      typeUpdate: 'create'
     }),
     computed: {
     },
@@ -459,36 +692,89 @@
           toastr.error('Chưa có mẫu import')
         }
       },
+      chonDonViImport () {
+        let vm = this
+        vm.donViCap = ''
+        vm.dialogChonDonVi = true
+      },
+      submitSelectGov () {
+        let vm = this
+        if (vm.$refs.formSelect.validate()) {
+          vm.dialogChonDonVi = false
+          vm.pickFileImport()
+        }
+      },
       pickFileImport () {
         document.getElementById('fileImport').value = ''
         document.getElementById('fileImport').click()
       },
       uploadFileImport () {
         let vm = this
-        let files = $('#fileImport')[0].files
-        let file = files[0]
-        let param = {
-          headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
-          },
-          params: {}
-        }
-        let dataPost = new FormData()
-        dataPost.append("file", file)
-        dataPost.append("sheetAt", 0)
-        dataPost.append("startCol", 0)
-        dataPost.append("endCol", 9)
-        dataPost.append("startRow", 1)
-        dataPost.append("endRow", 500)
-        dataPost.append("table", "opencps_excel_data")
-        vm.processingImport = true
-        axios.post('/o/rest/v2/applicantdatas/excelData', dataPost, param).then(function (response) {
-          vm.processingImport = false
-          toastr.success('Import thành công')
-        }).catch(xhr => {
-          vm.processingImport = false
-          toastr.error('Import thất bại')
-        })
+        vm.$confirm(
+          {
+            message: 'Thực hiện import giấy tờ số hóa: ' + vm.donViCap['name'],
+            button: {
+              no: 'Hủy',
+              yes: 'Đồng ý'
+            },
+            callback: confirm => {
+              if (confirm) {
+                let files = $('#fileImport')[0].files
+                let file = files[0]
+                let param = {
+                  headers: {
+                    groupId: window.themeDisplay.getScopeGroupId()
+                  },
+                  params: {}
+                }
+                let dataPost = new FormData()
+                dataPost.append("file", file)
+                dataPost.append("sheetAt", 0)
+                dataPost.append("startCol", 0)
+                dataPost.append("endCol", 9)
+                dataPost.append("startRow", 1)
+                dataPost.append("endRow", 500)
+                dataPost.append("table", "opencps_excel_data")
+                dataPost.append("govAgencyCode", vm.donViCap['value'])
+                vm.processingImport = true
+                axios.post('/o/rest/v2/applicantdatas/importExcelData', dataPost, param).then(function (response) {
+                  vm.processingImport = false
+                  toastr.success('Import thành công')
+                  if (response && response.data) {
+                    let dataRes = response.data
+                    let listArr = []
+                    dataRes.forEach(element => {
+                      try {
+                        let item = {
+                          row: '',
+                          mess: ''
+                        }
+                        for (var i in element) {
+                          item.row = 'Hàng ' + element[i]['_cellLocation'].substring(1)
+                          item.mess += (element[i]['_error'] + '; ')
+                        }
+                        item.mess = item.mess.substring(0, item.mess.length - 2)
+                        listArr.push(item)
+                      } catch (error) {
+                      }
+                    })
+                    vm.listErrorImport = listArr
+                  }
+                  if (vm.listErrorImport && vm.listErrorImport.length) {
+                    setTimeout(function () {
+                      vm.dialogDanhSachLoi = true
+                    }, 300)
+                  }
+                }).catch(xhr => {
+                  vm.processingImport = false
+                  toastr.error('Import thất bại')
+                })
+              } else {
+                document.getElementById('fileImport').value = ''
+              }
+            }
+          }
+        )
       },
       showTimKiem () {
         this.showAdvanceSearch = true
@@ -506,6 +792,7 @@
           let serializable = response.data
           console.log('uriConfig', JSON.parse(serializable.configs)['uri'])
           vm.uriConfig = JSON.parse(serializable.configs)['uri']
+          vm.donViCapConfig = JSON.parse(serializable.configs)['donViCap']
           if (vm.uriConfig) {
             vm.getDanhSachGiayToSoHoa()
           }
@@ -571,7 +858,7 @@
           let prms = {
             "FileID": element.excelDataId,
             "FileName": element.tenGiayTo,
-            "URL": element.tenFile
+            "URL": element.tenFileFull
           }
           fileArr.push(prms)
         });
@@ -620,7 +907,9 @@
           soHieuVanBan: dataSearch ? dataSearch.soHieuVanBanSearch : '',
           tenGiayTo: dataSearch ? dataSearch.tenFileSearch : '',
           maThuTuc: dataSearch ? dataSearch.maThuTucSearch : '',
-          keyword: dataSearch ? dataSearch.keywordSearch : ''
+          keyword: dataSearch ? dataSearch.keywordSearch : '',
+          donViCap: dataSearch ? dataSearch.donViCap : '',
+          nam: dataSearch ? dataSearch.nam : ''
         }
         if ((vm.daKy && !vm.chuaKy) || (!vm.daKy && vm.chuaKy)) {
           if (vm.daKy) {
@@ -635,7 +924,7 @@
         vm.$store.dispatch('getApplicantDocument', filter).then(function (result) {
           if (result.hasOwnProperty('data')) {
             vm.documentApplicantList = Array.from(result.data, function (e) {
-              return Object.assign(e, {tenFile: vm.uriConfig + e.tenFile})
+              return Object.assign(e, {tenFileFull: vm.uriConfig + e.tenFile})
             })
           } else {
             vm.documentApplicantList = []
@@ -692,35 +981,61 @@
       viewDocument (item) {
         let vm = this
         vm.dialogPDF = true
-        document.getElementById('dialogPDFPreview').src = item.tenFile
+        document.getElementById('dialogPDFPreview').src = item.tenFileFull
       },
       showEditDocument (item) {
         let vm = this
-        vm.updateFile = false
-        $('html, body').animate({
-            scrollTop: $('#top-header').offset().top,
-          },
-          100,
-          'linear'
-        )
-        vm.documentSelect = item
-        vm.typeCreate = 'update'
-        vm.fileNameView = item.fileName
-        try {
-          vm.fileTemplateNoCreate = vm.fileTemplateList.filter(function (items) {
-            return items.fileTemplateNo === item.fileTemplateNo
-          })[0]
-        } catch (error) {
+        vm.typeUpdate = 'update'
+        vm.giayToUpdate = item
+        vm.tenGiayToCreate = item.tenGiayTo
+        vm.tenFileCreate = item.tenFile
+        vm.soHieuVanBanCreate = item.soHieuVanBan
+        vm.maThuTucCreate = item.maThuTuc
+        vm.dovViCapCreate = item.donViCap
+        vm.maHoSoCreate = item.maHoSo
+        vm.ngayKyVanBanCreate = item.ngayKyVanBan ? String(item.ngayKyVanBan).slice(6,8) + '/' + String(item.ngayKyVanBan).slice(4,6)  + '/' + String(item.ngayKyVanBan).slice(0,4) : ''
+        vm.applicantNameCreate = item.caNhanDuocCap
+        vm.applicantIdNoCreate = item.canCuoc
+        vm.dialogUpdateDocument = true
+        vm.$refs.formUpdateDocument.resetValidation()
+      },
+      submitUpdateDocument () {
+        let vm = this
+        if (vm.$refs.formUpdateDocument.validate()) {
+          let data = new URLSearchParams()
+          let dateNgayKy = vm.ngayKyVanBanCreate ? String(vm.ngayKyVanBanCreate).split('/') : ''
+          data.append('soHieuVanBan', vm.soHieuVanBanCreate)
+          data.append('ngayKyVanBan', dateNgayKy ? dateNgayKy[2] + dateNgayKy[1] + dateNgayKy[0] : '')
+          data.append('donViCap', vm.giayToUpdate.donViCap)
+          data.append('maThuTuc', vm.maThuTucCreate)
+          data.append('ngayHetHieuLuc', vm.giayToUpdate.ngayHetHieuLuc)
+          data.append('caNhanDuocCap', vm.applicantNameCreate)
+          data.append('canCuoc', vm.applicantIdNoCreate)
+          data.append('maHoSo', vm.maHoSoCreate)
+          data.append('tenFile', vm.tenFileCreate)
+          data.append('isKyso', vm.giayToUpdate.isKyso)
+          data.append('govAgencyCode', vm.giayToUpdate.govAgencyCode)
+          data.append('tenGiayTo', vm.tenGiayToCreate)
+          data.append('excelDataId', vm.giayToUpdate.excelDataId)
+
+          vm.processing = true
+          let url = '/o/rest/v2/applicantdatas/excelData/' + vm.giayToUpdate.excelDataId
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+          axios.put(url, data, param).then(function (response) {
+            vm.processing = false
+            toastr.success('Cập nhật giấy tờ thành công')
+            vm.dialogUpdateDocument = false
+          }).catch(function (error) {
+            vm.processing = false
+            toastr.error('Cập nhật giấy tờ thất bại')
+          });
         }
-        vm.statusCreate = item.status
-        vm.fileName = item.fileName
-        vm.fileNo = item.fileNo
-        vm.govAgencyCreate = item.govAgencyName ? item.govAgencyName : ''
-        vm.applicantNameCreate = item.applicantName ? item.applicantName : ''
-        vm.applicantIdNoCreate = item.applicantIdNo ? item.applicantIdNo : ''
-        vm.createDate = item.issueDate ? String(item.issueDate).split(" ")[0] : ''
-        vm.expireDate = item.expireDate ? String(item.expireDate).split(" ")[0] : ''
-        vm.showDetail = true
       },
       showCreatedocument () {
         let vm = this
@@ -992,17 +1307,53 @@
         let json_prms = JSON.stringify(prms)
         vgca_sign_approved(json_prms, signFileCallBack)
       },
+      deleteDocument (item) {
+        let vm = this
+        vm.$confirm(
+          {
+            message: 'Bạn có chắc chắn xóa giấy tờ này?',
+            button: {
+              no: 'Hủy',
+              yes: 'Đồng ý'
+            },
+            callback: confirm => {
+              if (confirm) {
+                let data = JSON.stringify(item.excelDataId);
+                let config = {
+                  method: 'delete',
+                  url: '/o/rest/v2/applicantdatas/excelData',
+                  headers: { 
+                    groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                  },
+                  data : data
+                };
+
+                axios(config)
+                .then(function (response) {
+                  toastr.success('Xóa giấy tờ thành công')
+                  vm.getDanhSachGiayToSoHoa()
+                })
+                .catch(function (error) {
+                  toastr.error('Xóa giấy tờ thất bại')
+                })
+              }
+            }
+          }
+        )
+      },
       formatDate () {
         let vm = this
-        let lengthDate = String(vm.createDate).trim().length
-        let splitDate = String(vm.createDate).split('/')
+        let lengthDate = String(vm.ngayKyVanBanCreate).trim().length
+        let splitDate = String(vm.ngayKyVanBanCreate).split('/')
         if (lengthDate && lengthDate > 4 && splitDate.length === 3 && splitDate[2]) {
-          vm.createDate = vm.translateDate(vm.createDate)
+          vm.ngayKyVanBanCreate = vm.translateDate(vm.ngayKyVanBanCreate)
         } else if (lengthDate && lengthDate === 8) {
-          let date = String(vm.createDate)
-          vm.createDate = date.slice(0,2) + '/' + date.slice(2,4) + '/' + date.slice(4,8)
+          let date = String(vm.ngayKyVanBanCreate)
+          vm.ngayKyVanBanCreate = date.slice(0,2) + '/' + date.slice(2,4) + '/' + date.slice(4,8)
         } else {
-          vm.createDate = ''
+          vm.ngayKyVanBanCreate = ''
         }     
       },
       formatExpireDate () {
@@ -1017,6 +1368,10 @@
         } else {
           vm.expireDate = ''
         }     
+      },
+      formatNgayKy (ngayKy) {
+        let splitDate = String(ngayKy)
+        return splitDate.slice(6,8) + '/' + splitDate.slice(4,6) + '/' + splitDate.slice(0,4)
       },
       getStatus (val) {
         if (String(val) === '0') {

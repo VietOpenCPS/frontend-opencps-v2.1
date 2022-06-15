@@ -1167,6 +1167,7 @@ export default {
                       } catch (error) {
                       }
                       vm.payments = dataJson ? dataJson : resAction.payment
+                      console.log('paymentInput', vm.payments)
                     }
                     // call initData thong tin chung ho so
                     if (vm.$refs.thongtinchunghoso) {
@@ -1525,14 +1526,26 @@ export default {
                   if (vm.payments['groupPaymentFile']) {
                     paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
                   }
-                  if (vm.payments && vm.payments.hasOwnProperty('counter')) {
-                    let dataNote = ''
-                    try {
-                      dataNote = JSON.parse(vm.paymentsOriginal['paymentNote'])
-                      dataNote.paymentNote = vm.payments['paymentNote']
-                      dataNote.counter = vm.payments['counter']
-                    } catch (error) {
+                  if (vm.payments && vm.payments.hasOwnProperty('counter') && vm.payments.counter) {
+                    let dataNote = {
+                      requestPayment: vm.payments['requestPayment'],
+                      paymentNote: vm.payments['paymentNote'],
+                      advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                      feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                      serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                      shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
+                      counter: vm.payments.counter,
+                      paymentFee: vm.payments['paymentFee']
                     }
+                    // 
+                    // let dataNote = ''
+                    // try {
+                    //   dataNote = JSON.parse(vm.paymentsOriginal['paymentNote'])
+                    //   dataNote.paymentNote = vm.payments['paymentNote']
+                    //   dataNote.counter = vm.payments['counter']
+                    // } catch (error) {
+                    // }
+                    // 
                     paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
                     paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
                     paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
@@ -1543,6 +1556,7 @@ export default {
                     paymentsOut.feeAmount = dataNotarization.feeTotal
                   }
                 }
+                console.log('paymentOut', vm.payments, paymentsOut)
                 var payloadDate = {
                   'dueDate': vm.editableDate && tempData.dueDate ? tempData.dueDate : vm.dueDateEdit,
                   'receiveDate': vm.receiveDateEdit

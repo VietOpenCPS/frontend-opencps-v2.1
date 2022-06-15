@@ -5570,8 +5570,9 @@ export const store = new Vuex.Store({
             let data = serializable["Body"]["CongdanCollection"]["CongDan"]
             dataCitizen = Object.assign(data, { SoLuongCongDan: 1 })
             resolve(dataCitizen)
-          } else if (serializable && JSON.stringify(serializable).indexOf('ns1:CongDan') > 0) {
-            dataCitizen = Object.assign({ SoLuongCongDan: 1 , stringData: JSON.stringify(serializable)})
+          } else if (serializable && serializable.hasOwnProperty('Envelope') && serializable["Envelope"]["Body"].hasOwnProperty('CongdanCollection') && serializable["Envelope"]["Body"]["CongdanCollection"]) {
+            let data = serializable["Envelope"]["Body"]["CongdanCollection"]["CongDan"]
+            dataCitizen = Object.assign(data, { SoLuongCongDan: 1 })
             resolve(dataCitizen)
           } else {
             reject('')

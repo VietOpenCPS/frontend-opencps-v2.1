@@ -14,6 +14,29 @@
               ></v-text-field>
             </v-flex> -->
             <v-flex xs12 sm6 class="pr-3">
+              <v-autocomplete
+                :items="donVi"
+                v-model="dataSearch['donViCap']"
+                label="Đơn vị cấp"
+                item-text="name"
+                item-value="value"
+                :hide-selected="true"
+                clearable
+                @change="changeFilterSearch"
+                box
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm6 class="px-0">
+              <v-text-field
+                label="Năm cấp"
+                v-model="dataSearch['nam']"
+                @keyup.enter="changeFilterSearch"
+                box
+                clear-icon="clear"
+                clearable
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 class="pr-3">
               <v-text-field
                 label="Số hiệu giấy tờ"
                 v-model="dataSearch['soHieuVanBanSearch']"
@@ -78,10 +101,12 @@
 <script>
   export default {
     name: 'Search',
-    props: ['form'],
+    props: ['form', 'donVi'],
     data () {
       return {
         dataSearch: {
+          donViCap: '',
+          nam: '',
           soHieuVanBanSearch: '',
           tenFileSearch: '',
           dossierNoSearch: '',

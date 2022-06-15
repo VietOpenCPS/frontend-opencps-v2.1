@@ -1122,6 +1122,37 @@
               //   })
               // }
               // // 
+              // 
+              vm.$store.dispatch('loadDictItems', {
+                collectionCode: 'DAN_TOC'
+              }).then(function (result) {
+                let arrDist = []
+                for (var i = 0; i < result.data.length; i++) {
+                  let item = {maMuc: result.data[i]['itemCode'], tenMuc: result.data[i]['itemName']}
+                  arrDist.push(item)
+                }
+                vm.danTocItems = arrDist
+              })
+              vm.$store.dispatch('loadDictItems', {
+                collectionCode: 'QUOC_GIA'
+              }).then(function (result) {
+                let arrDist = []
+                for (var i = 0; i < result.data.length; i++) {
+                  let item = {maMuc: result.data[i]['itemCode'], tenMuc: result.data[i]['itemName']}
+                  arrDist.push(item)
+                }
+                vm.quocTichItems = arrDist
+              })
+              vm.$store.dispatch('loadDictItems', {
+                collectionCode: 'TON_GIAO'
+              }).then(function (result) {
+                let arrDist = []
+                for (var i = 0; i < result.data.length; i++) {
+                  let item = {maMuc: result.data[i]['itemCode'], tenMuc: result.data[i]['itemName']}
+                  arrDist.push(item)
+                }
+                vm.tonGiaoItems = arrDist
+              })
               if (vm.user['applicantProfile'] && vm.user['applicantProfile']['noiOHienTai'] && vm.user['applicantProfile']['noiOHienTai']['tinhThanh']['maMuc']) {
                 vm.$store.dispatch('loadDictItems', {
                   collectionCode: 'ADMINISTRATIVE_REGION',
