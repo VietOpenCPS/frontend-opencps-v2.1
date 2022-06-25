@@ -13,7 +13,13 @@
         <tim-kiem ref="timkiem" :donVi="donViCapConfig"  v-on:trigger-search="searchGiayToSoHoa" v-on:trigger-cancel="cancelSearchGiayToSoHoa"></tim-kiem>
       </v-card-text>
 
-      <v-btn color="orange" small class="mx-0 white--text mr-2" @click.stop="downloadTemplate">
+      <v-btn color="red" small class="mx-0 white--text mr-2" @click.stop="deleteMultiDocument">
+        <v-icon size="16" style="color: #fff !important">
+          delete
+        </v-icon> &nbsp;
+        Xóa giấy tờ
+      </v-btn>
+      <v-btn color="orange" small class="mx-2 white--text" @click.stop="downloadTemplate">
         <v-icon size="16" style="color: #fff !important">
           fas fa fa-file-excel-o
         </v-icon> &nbsp;
@@ -413,8 +419,6 @@
                   v-model="applicantIdNoCreate"
                   box
                   clearable
-                  :rules="[v => !!v || 'Thông tin bắt buộc']"
-                  required
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 sm6 class="px-0">
@@ -799,6 +803,50 @@
         }).catch(function (error) {
           console.log(error)
         })
+      },
+      deleteMultiDocument () {
+        let vm = this
+        if (vm.selectedDocument && vm.selectedDocument.length) {
+          vm.$confirm(
+            {
+              message: 'Tổng số ' + vm.selectedDocument.length + ' giấy tờ sẽ bị xóa',
+              button: {
+                no: 'Thoát',
+                yes: 'Đồng ý'
+              },
+              callback: confirm => {
+                if (confirm) {
+                  let deleteIds = []
+                  for (let key in vm.selectedDocument) {
+                    deleteIds.push(vm.selectedDocument[key]['excelDataId'])
+                  }
+                  let data = deleteIds.toString()
+                  let config = {
+                    method: 'delete',
+                    url: '/o/rest/v2/applicantdatas/excelData',
+                    headers: { 
+                      groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+                      'Accept': 'application/json',
+                      'Content-Type': 'application/json'
+                    },
+                    data : data
+                  };
+
+                  axios(config)
+                  .then(function (response) {
+                    toastr.success('Xóa giấy tờ thành công')
+                    vm.getDanhSachGiayToSoHoa()
+                  })
+                  .catch(function (error) {
+                    toastr.error('Xóa giấy tờ thất bại')
+                  })
+                }
+              }
+            }
+          )
+        } else {
+          toastr.error("Chưa có giấy tờ nào được chọn")
+        }
       },
       signDocument () {
         let vm = this
@@ -1372,6 +1420,11 @@
       formatNgayKy (ngayKy) {
         let splitDate = String(ngayKy)
         return splitDate.slice(6,8) + '/' + splitDate.slice(4,6) + '/' + splitDate.slice(0,4)
+      },
+      translateDate (date) {
+        if (!date) return null
+        const [day, month, year] = date.split('/')
+        return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`
       },
       getStatus (val) {
         if (String(val) === '0') {

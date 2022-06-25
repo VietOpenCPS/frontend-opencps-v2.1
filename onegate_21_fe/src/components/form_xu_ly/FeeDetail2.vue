@@ -30,6 +30,7 @@
                     <v-text-field
                       v-model="props.item.paymentFee"
                       v-if="data_payment.editable === 1 || data_payment.editable === 2 || data_payment.editable === 3"
+                      @input="changeTenPhi"
                     ></v-text-field>
                     <p class="mt-1 mb-0" v-else>{{props.item.paymentFee}}</p>
                   </div>
@@ -524,8 +525,19 @@ export default {
         if (vm.splitBienLai && vm.feeList && vm.feeList.length > 1) {
           vm.payments.groupPaymentFile = JSON.stringify(listGroupPayment)
         }
+        if (vm.feeList && vm.feeList.length == 1) {
+          vm.payments.paymentFee = vm.feeList[0]['paymentFee']
+        }
         console.log('ThongTinThanhToan', vm.payments)
       }, 200)
+    },
+    changeTenPhi (ten) {
+      let vm = this
+      setTimeout(function () {
+        if (vm.feeList && vm.feeList.length == 1) {
+          vm.payments.paymentFee = vm.feeList[0]['paymentFee']
+        }
+      }, 100)
     },
     changeMethod () {
       let vm = this

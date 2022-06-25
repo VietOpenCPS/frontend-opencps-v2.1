@@ -471,6 +471,16 @@
                       </span>
                     </div>
                   </td>
+                  <td class="text-xs-left" v-if="hasVoting && hasVoting.length">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>
+                        <span>{{formatDanhGia(props.item.metaData)}}</span>
+                      </span>
+                    </div>
+                  </td>
                 </tr>
               </template>
             </v-data-table>
@@ -720,7 +730,8 @@ export default {
     headerRenderHtmlTable: [],
     widthRenderHtmlTable: [],
     statisticVotingDossiers: false,
-    loadingGetDossier: false
+    loadingGetDossier: false,
+    hasVoting: []
   }),
   computed: {
     itemsReports () {
@@ -2672,6 +2683,86 @@ export default {
     },
     viewListHoSo (item, first) {
       let vm = this
+      vm.hasVoting = []
+      try {s
+        vm.hasVoting = vm.filters.filter(function (item1) {
+          return item1.key !== 'rate'
+        })
+        if (vm.hasVoting.length) {
+          vm.headers = [
+            {
+              text: 'STT',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Mã hồ sơ',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Chủ hồ sơ',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Ngày tiếp nhận',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Ngày hẹn trả',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Trạng thái',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Đánh giá hài lòng',
+              align: 'center',
+              sortable: false
+            }
+          ]
+        } else {
+          vm.headers = [
+            {
+              text: 'STT',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Mã hồ sơ',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Chủ hồ sơ',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Ngày tiếp nhận',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Ngày hẹn trả',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Trạng thái',
+              align: 'center',
+              sortable: false
+            }
+          ]
+        }
+      } catch (error) {
+        
+      }
       vm.targetFilter = item
       if (first) {
         vm.pagination.page = 1
@@ -3138,6 +3229,25 @@ export default {
     },
     looseJsonParse(obj) {
       return Function('"use strict";return (' + obj + ')')()
+    },
+    formatDanhGia (data) {
+      try {
+        let meta = JSON.parse(data)
+        if (meta.hasOwnProperty('hailong')) {
+          let hailong = meta['hailong']
+          if (hailong == 3) {
+            return 'Rất hài lòng'
+          } else if (hailong == 2) {
+            return 'Hài lòng'
+          } else if (hailong == 1) {
+            return 'Không hài lòng'
+          }
+        } else {
+          return ''
+        }
+      } catch (error) {
+        return ''
+      }
     }
   }
 }

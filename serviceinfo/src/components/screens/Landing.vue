@@ -936,6 +936,7 @@ export default {
         if (params && params.MaTTHCDP && params.vnconnect == '1') {
           let url = window.location.origin + window.location.pathname + "#/thu-tuc-hanh-chinh" + window.location.search
           window.location.href = url
+          return
         }
       }
       vm.makeImageCap()
@@ -965,8 +966,9 @@ export default {
               let path = vm.confirmEnding(window.location.href.split('?')[0], '/')
               console.log('path', path)
               let url = path ? window.location.href.split('?')[0] + serviceCodeLocal + '?' + window.location.href.split('?')[1] : window.location.href.split('?')[0] + '/' + serviceCodeLocal + '?' + window.location.href.split('?')[1]
-              console.log('url', url)
-              window.location.href = url
+              setTimeout(function () {
+                window.location.href = url
+              }, 200)
             } else {
               // case khác serviceCode
               if (currentQuery.hasOwnProperty('vnconnect') && String(currentQuery['vnconnect']) === '1' && !window.themeDisplay.isSignedIn()) {

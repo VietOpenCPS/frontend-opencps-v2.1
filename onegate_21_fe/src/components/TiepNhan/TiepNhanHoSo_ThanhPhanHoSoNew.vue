@@ -1087,6 +1087,42 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!--  -->
+    <v-dialog
+      v-model="dialogTaiSavis"
+      max-width="550"
+      persistent
+    >
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title style="font-size: 14px"> CÔNG CỤ KÝ SỐ CHƯA ĐƯỢC CÀI ĐẶT</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogTaiSavis = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="px-0 pb-0">
+          <v-layout wrap>
+            <v-flex xs12 class="mt-2" style="font-size: 14px;">
+              <p class="mx-3">
+                Vui lòng cài đặt công cụ ký số Savis phiên bản mới nhất.
+              </p>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions class="">
+          <v-spacer></v-spacer>
+          <v-btn class="mr-2 white--text" style="width: 125px" color="primary" @click="downloadSavisMsi()" >
+            <v-icon size="14" style="color: #ffffff !important">fas fa fa-download</v-icon> &nbsp;
+            Tải bản cài đặt
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+    <div style="display:none">
+      <a id="downloadCaiDatSavis" :href="srcDownloadSavis" download></a>
+    </div>
   </div>
 </template>
 
@@ -1158,6 +1194,8 @@ export default {
     processingSavis: false,
     mssProcessingSavis: '',
     signSavisPdfUrl: false,
+    srcDownloadSavis: '',
+    dialogTaiSavis: false,
     activePdfEditor: false,
     showViewerPdfEditor: false,
     dialog_editor_pdf: false,
@@ -1325,6 +1363,10 @@ export default {
     }
     try {
       vm.kySoSavis = kySoSavis
+    } catch (error) {
+    }
+    try {
+      vm.srcDownloadSavis = srcDownloadSavis
     } catch (error) {
     }
     try {
@@ -2269,7 +2311,8 @@ export default {
           vm.processingSavis = false
         }
       }).catch(xhr => {
-        toastr.error('Lấy chứng thư số không thành công. Vui lòng cài đặt Signing Software và cắm token ký số')
+        toastr.error('Lấy chứng thư số không thành công')
+        vm.dialogTaiSavis = true
         vm.processingSavis = false
       })  
     },
@@ -3936,6 +3979,11 @@ export default {
         }).catch(reject => {
         })
       })
+    },
+    downloadSavisMsi () {
+      let vm = this
+      vm.dialogTaiSavis = false
+      document.getElementById('downloadCaiDatSavis').click()
     }
   }
 }
