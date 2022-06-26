@@ -22,10 +22,14 @@
               </div>
               <div class="flex sm6 md7 lg8" style="align-self: center;">
                 <div class="title-banner-2" style="">
-                  <span>QUẦY cảnh sát hành chính </span>
+                  <span>{{gateName}}</span>
                 </div>
               </div>
-              
+              <div class="wrap-btn-edit">
+                <v-btn title="Sửa tên quầy" class="btn-screen px-0" @click.stop="showUpdateGate" flat icon color="#940404">
+                  <v-icon size="28">edit</v-icon>
+                </v-btn>
+              </div>
             </div>
           </header>
         </div>
@@ -81,7 +85,7 @@
         </v-container>
         <v-dialog v-model="dialogSuccess" persistent max-width="700px">
           <v-card>
-            <v-toolbar flat dark color="#940404">
+            <v-toolbar height="48" flat dark color="#940404">
               <v-toolbar-title style="width: 100%;text-transform: uppercase;">Đánh giá cán bộ thành công</v-toolbar-title>
             </v-toolbar>
             <v-card-text>
@@ -93,22 +97,57 @@
             </v-card-text>
           </v-card>
         </v-dialog>
+        <v-dialog v-model="dialogUpdate" persistent max-width="500px">
+          <v-card>
+            <v-toolbar height="48" flat dark color="#940404">
+              <v-toolbar-title>Cập nhật tên quầy</v-toolbar-title>
+            </v-toolbar>
+            <v-card-text>
+              <v-text-field
+                label="Tên quầy"
+                v-model="gateNameEdit"
+                box
+                clearable
+                color="#940404"
+              ></v-text-field>
+            </v-card-text>
+            <v-card-actions class="mx-0 px-3">
+              <v-spacer></v-spacer>
+              <v-btn class="white--text mr-2" color="red" style="color: #fff !important"  @click="dialogUpdate = false" :loading="loading" :disabled="loading">
+                <v-icon class="white--text" size="20"  style="color: #fff !important">clear</v-icon>&nbsp; Thoát
+              </v-btn>
+              <v-btn style="color: #fff !important" color="#940404" @click="submitUpdate" :loading="loading" :disabled="loading">
+                <v-icon size="20">save</v-icon>&nbsp; Cập nhật
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </div>
     </v-content>
   </v-app>
 </template>
 
 <script>
+  import Vue from 'vue'
   import axios from 'axios'
+  import toastr from 'toastr'
+  Vue.use(toastr)
+  toastr.options = {
+    'positionClass': 'toast-top-center',
+    'timeOut': '5000'
+  }
   export default {
     data: () => ({
+      gateName: 'Quầy cảnh sát hành chính',
+      gateNameEdit: '',
       dialogSuccess: false,
       fullScreen: false,
       loading: false,
       isMobile: false,
       employeeInfo: '',
       employeeAvatar: '/o/hau-giang-theme/images/avatar-default.png',
-      countDown: 0
+      countDown: 0,
+      dialogUpdate: false
     }),
     beforeDestroy () {
       if (typeof window !== 'undefined') {
@@ -211,6 +250,37 @@
           vm.loading = false
         })
       },
+      showUpdateGate () {
+        let vm = this
+        vm.gateNameEdit = vm.gateName
+        vm.dialogUpdate = true
+      },
+      submitUpdate () {
+        let vm = this
+        let data = JSON.stringify({
+          "title_vote": vm.gateNameEdit
+        })
+        vm.loading = true
+        let config = {
+          method: 'post',
+          url: '/o/rest/v2/votings/rateEmployee',
+          headers: { 
+            'Content-Type': 'application/json'
+          },
+          data : data
+        }
+
+        axios(config)
+        .then(function (response) {
+          vm.loading = false
+          vm.dialogUpdate = false
+          vm.gateName = vm.gateNameEdit
+        })
+        .catch(function (error) {
+          toastr.error('Cập nhật không thành công')
+          vm.loading = false
+        })
+      },
       changeScreen () {
         let vm = this
         if (vm.fullScreen) {
@@ -251,8 +321,10 @@
     right: 10px;
     top: 78px;
   }
-  .btn-screen {
-    
+  .wrap-btn-edit {
+    position: absolute;
+    right: 10px;
+    top: 15px;
   }
   header#banner, nav#navigation, footer#footer, .yhy-append-wrap {
     display: none !important;
