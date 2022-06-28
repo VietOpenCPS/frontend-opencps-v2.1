@@ -2195,6 +2195,9 @@ export default {
       if (vm.api.indexOf('/o/statistic/dossier') >= 0) {
         filter.formatDate = 'timestamp'
       }
+      if (vm.itemsReports[vm.index]['filterConfig']['formatDate']) {
+        filter.formatDate = vm.itemsReports[vm.index]['filterConfig']['formatDate']
+      }
       let check =  true
       for (let key in vm.filterGroup) {
         if (key === vm.groupIdListSelected) {
@@ -2247,7 +2250,20 @@ export default {
             // filter.data['listGroupId'] = window.themeDisplay.getScopeGroupId()
           }
         }
+
+        if (filter.api.indexOf('/o/rest/v2/votings/reportVE') >= 0) {
+          if (filter.data['listGroupId']) {
+            let codeGovAgency = filter.agencyLists.filter(function (item) {
+              return item.value == filter.data['listGroupId']
+            })[0]['code']
+            console.log('codeGovAgency123', codeGovAgency)
+            filter.data.listGov = codeGovAgency ? codeGovAgency : ''
+          } else {
+            filter.data.listGov = ""
+          }
+        }
       } catch (error) {
+        filter.data.listGov = ""
         console.log('error-listGroupId')
       }
       let dispatchUse = vm.api.indexOf('/o/statistic/dossier') >= 0 ? 'getAgencyReportLists' : 'getAgencyReportListsOld'
@@ -2325,7 +2341,7 @@ export default {
               }
             })
           }
-          // console.log('resultData555', resultData)
+          
           let resultDataTotal = [resultData.find(function(obj) {
             if (subKey !== null && subKey !== undefined && subKey !== '') {
               if ((obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) && obj[subKey] === '') {
@@ -2340,7 +2356,8 @@ export default {
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('notSumkey')) {
             resultDataTotal = resultData
           }
-        //  console.log('resultDataTotal666', resultDataTotal)
+         console.log('resultDataTotal4444', resultDataTotal)
+         console.log('resultData111', resultData)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -2396,6 +2413,7 @@ export default {
             }
           }
           let dataToExportCSV = []
+          console.log('resultData3333', resultData)
           for (let key in resultData) {
             let dataInput = resultData[key]            
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
@@ -2506,6 +2524,7 @@ export default {
             }
             // console.log('dataRowTotal 555', dataRowTotal)
           } else {
+            console.log('resultDataTotal55555', resultDataTotal)
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
               for (let keyMappingXXTT in vm.itemsReportsConfig) {
@@ -2522,7 +2541,16 @@ export default {
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
-                dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? '0' : parseInt(dataTextXXTT) + ' '
+                // Sum tổng các hàng báo cáo STATISTIC_
+                if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumRow') && vm.itemsReports[vm.index]['filterConfig']['sumRow']) {
+                  if (isNaN(parseInt(dataRowTotal[indexTotalXXTT]['text']))) {
+                    dataRowTotal[indexTotalXXTT]['text'] = 0
+                  }
+                  dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? parseInt(dataRowTotal[indexTotalXXTT]['text']) : parseInt(dataRowTotal[indexTotalXXTT]['text']) + parseInt(dataTextXXTT)
+                } else {
+                  dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? '0' : parseInt(dataTextXXTT) + ' '
+                }
+                //
                 if (currentConfigXXTT['value'] === 'note' || currentConfigXXTT.hasOwnProperty('notSum')) {
                   dataRowTotal[indexTotalXXTT]['text'] = ' '
                 }
@@ -2531,7 +2559,14 @@ export default {
             }
             console.log('dataRowTotal 666', dataRowTotal)
           }
-          vm.dataReportXX += JSON.stringify(dataRowTotal)
+          // Không cộng tổng STATISTIC_
+          if (!vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumRow') || (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumRow') && vm.itemsReports[vm.index]['filterConfig']['sumRow'])) {
+            vm.dataReportXX += JSON.stringify(dataRowTotal)
+          } else {
+            vm.dataReportXX = vm.dataReportXX.substring(0, vm.dataReportXX.length - 1)
+          }
+          // 
+          
           // console.log('vm.dataReportXX 1231', vm.dataReportXX)
           let itemTotal = []
           for (let keyTotalCSV in dataRowTotal) {

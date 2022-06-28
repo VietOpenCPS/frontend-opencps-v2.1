@@ -11,27 +11,29 @@
           </v-btn>
         </div>
         <div id="header-app" >
-          <header id="banner-voting">
-            <div class="container layout wrap" style=""> 
-              <div class="flex layout wrap sm6 md5 lg4" style="padding-top: 10px;">
-                <img class="logo-banner" src="/o/hau-giang-theme/images/quoc_huy.svg">
-                <div  class="flex">
-                  <div class="title-banner">TRUNG TÂM HÀNH CHÍNH CÔNG</div>
-                  <div class="title-banner">TỈNH HẬU GIANG</div>
-                </div>
-              </div>
-              <div class="flex sm6 md7 lg8" style="align-self: center;">
-                <div class="title-banner-2" style="">
-                  <span>{{gateName}}</span>
-                </div>
-              </div>
-              <div class="wrap-btn-edit">
+          <v-hover>
+            <header id="banner-voting" slot-scope="{ hover }">
+              <div id="wrap-btn-edit" v-if="hover">
                 <v-btn title="Sửa tên quầy" class="btn-screen px-0" @click.stop="showUpdateGate" flat icon color="#940404">
                   <v-icon size="28">edit</v-icon>
                 </v-btn>
               </div>
-            </div>
-          </header>
+              <div class="container layout wrap" style=""> 
+                <div class="banner-left flex layout wrap xs12 md6 lg5" style="padding-top: 10px;">
+                  <img class="logo-banner" src="/o/hau-giang-theme/images/quoc_huy.svg">
+                  <div  class="flex">
+                    <div class="title-banner">TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG</div>
+                    <div class="title-banner">TỈNH HẬU GIANG</div>
+                  </div>
+                </div>
+                <div class="banner-right flex xs12 md6 lg7" style="align-self: center;">
+                  <div class="title-banner-2" style="">
+                    <span>{{gateName}}</span>
+                  </div>
+                </div>
+              </div>
+            </header>
+          </v-hover>
         </div>
         <v-container
           id="wrap-content"
@@ -40,13 +42,13 @@
         >
           
           <div class="layout wrap">
-            <div class="flex col-left sm6 md5 lg4">
+            <div class="flex col-left sm6 md5 lg5">
               <img :src="employeeAvatar" alt="">
               <div class="name-emp">
                 {{employeeInfo.employeeFullName ? employeeInfo.employeeFullName : employeeInfo.userName}}
               </div>
             </div>
-            <div class="flex col-right sm6 md7 lg8">
+            <div class="flex col-right sm6 md7 lg7">
               <div class="title-voting">
                 Xin vui lòng đánh giá chất lượng dịch vụ?
               </div>
@@ -86,7 +88,7 @@
         <v-dialog v-model="dialogSuccess" persistent max-width="700px">
           <v-card>
             <v-toolbar height="48" flat dark color="#940404">
-              <v-toolbar-title style="width: 100%;text-transform: uppercase;">Đánh giá cán bộ thành công</v-toolbar-title>
+              <v-toolbar-title style="width: 100%;text-align: center;">Đánh giá cán bộ thành công</v-toolbar-title>
             </v-toolbar>
             <v-card-text>
               <p class="text-success" style="text-align: justify">- Cảm ơn quý khách đã tham gia đánh giá cán bộ.</p>
@@ -116,8 +118,8 @@
               <v-btn class="white--text mr-2" color="red" style="color: #fff !important"  @click="dialogUpdate = false" :loading="loading" :disabled="loading">
                 <v-icon class="white--text" size="20"  style="color: #fff !important">clear</v-icon>&nbsp; Thoát
               </v-btn>
-              <v-btn style="color: #fff !important" color="#940404" @click="submitUpdate" :loading="loading" :disabled="loading">
-                <v-icon size="20">save</v-icon>&nbsp; Cập nhật
+              <v-btn style="color: #fff !important" color="#940404" @click="submitUpdateTitle" :loading="loading" :disabled="loading">
+                <v-icon size="20" style="color: #fff !important">save</v-icon>&nbsp; Cập nhật
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -138,7 +140,7 @@
   }
   export default {
     data: () => ({
-      gateName: 'Quầy cảnh sát hành chính',
+      gateName: '',
       gateNameEdit: '',
       dialogSuccess: false,
       fullScreen: false,
@@ -147,7 +149,8 @@
       employeeInfo: '',
       employeeAvatar: '/o/hau-giang-theme/images/avatar-default.png',
       countDown: 0,
-      dialogUpdate: false
+      dialogUpdate: false,
+      govAgency: ''
     }),
     beforeDestroy () {
       if (typeof window !== 'undefined') {
@@ -174,7 +177,7 @@
       setInterval(function () {
         // location.reload()
         vm.getEmployee()
-      }, 1*60*1000)
+      }, 3*60*1000)
     },
     methods: {
       onResize () {
@@ -186,10 +189,10 @@
         let vm = this
         let param = {
           headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
           }
         }
-        let userId = window.themeDisplay.getUserId()
+        let userId = window.themeDisplay ? window.themeDisplay.getUserId() : ''
         if (userId) {
           axios.get('/o/v1/opencps/users/' + userId, param).then(function (response) {
             vm.employeeInfo = response.data
@@ -206,36 +209,70 @@
               }
             }).catch(function (xhr) {
             })
+            vm.getEmpProfile(vm.employeeInfo.employeeEmail)
+            if (vm.employeeInfo.hasOwnProperty('scope') && vm.employeeInfo.scope) {
+              let agency = vm.employeeInfo.scope.split(',')[0]
+              vm.getGovAgency(agency)
+            }
           })
         }
       },
+      getEmpProfile (email) {
+        let vm = this
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/employees/' + email + '/profile', param).then(function (response) {
+          try {
+            let data = response.data
+            let empData = data.employeeData ? JSON.parse(data.employeeData) : ''
+            if (empData.hasOwnProperty('title_vote')) {
+              vm.gateName = empData.title_vote
+            }
+          } catch (error) {
+          }
+        }).catch(function (xhr) {
+        })
+      },
+      getGovAgency (itemCode) {
+        let vm = this
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems/' + itemCode, param).then(function (response) {
+          vm.govAgency = response.data
+        }).catch(function (xhr) {
+        })
+      },
       submitVoting (vote) {
         let vm = this
-        let data = JSON.stringify({
-          "dossierNo": "",
-          "govAgencyCode": "",
-          "govAgencyName": "",
-          "employeeEmail": vm.employeeInfo ? vm.employeeInfo.employeeEmail : '',
-          "employeeName": vm.employeeInfo ? vm.employeeInfo.employeeFullName : '',
-          "votingName": vote.name,
-          "votingValue": vote.value,
-          "groupId": window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
-        })
         vm.loading = true
-        let config = {
-          method: 'post',
-          url: '/o/rest/v2/votings/rateEmployee',
-          headers: { 
-            'Content-Type': 'application/json'
+        let settings = {
+          "url": "/o/rest/v2/votings/rateEmployee",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/x-www-form-urlencoded"
           },
-          data : data
+          "data": {
+            "dossierNo": "",
+            "govAgencyCode": vm.govAgency ? vm.govAgency.itemCode : '',
+            "govAgencyName": vm.govAgency ? vm.govAgency.itemName : '',
+            "employeeEmail": vm.employeeInfo ? vm.employeeInfo.employeeEmail : '',
+            "employeeName": vm.employeeInfo ? vm.employeeInfo.employeeFullName : '',
+            "votingName": vote.name,
+            "votingValue": vote.value,
+            "groupId": window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
         }
 
-        axios(config)
-        .then(function (response) {
+        $.ajax(settings).done(function (response) {
           vm.loading = false
           vm.dialogSuccess = true
-          vm.countDown = 30
+          vm.countDown = 60
           var downloadTimer = setInterval(function(){
             if(vm.countDown <= 0){
               clearInterval(downloadTimer)
@@ -244,9 +281,8 @@
           }, 1000)
           setTimeout (function () {
             vm.dialogSuccess = false
-          }, 30000)
-        })
-        .catch(function (error) {
+          }, 60000)
+        }).fail(function () {
           vm.loading = false
         })
       },
@@ -255,28 +291,27 @@
         vm.gateNameEdit = vm.gateName
         vm.dialogUpdate = true
       },
-      submitUpdate () {
+      submitUpdateTitle () {
         let vm = this
-        let data = JSON.stringify({
-          "title_vote": vm.gateNameEdit
-        })
         vm.loading = true
         let config = {
-          method: 'post',
-          url: '/o/rest/v2/votings/rateEmployee',
-          headers: { 
-            'Content-Type': 'application/json'
-          },
-          data : data
+          headers: {
+            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
         }
-
-        axios(config)
-        .then(function (response) {
+        let dataPost = new URLSearchParams()
+        dataPost.append('employeeData', JSON.stringify(
+          {
+            "title_vote": vm.gateNameEdit
+          }
+        ))
+        axios.put('/o/rest/v2/employees/' + vm.employeeInfo['classPK'] + '/employeeData', dataPost, config).then(function (result) {
           vm.loading = false
           vm.dialogUpdate = false
           vm.gateName = vm.gateNameEdit
-        })
-        .catch(function (error) {
+        }).catch(xhr => {
           toastr.error('Cập nhật không thành công')
           vm.loading = false
         })
@@ -320,8 +355,9 @@
     position: absolute;
     right: 10px;
     top: 78px;
+    z-index: 500;
   }
-  .wrap-btn-edit {
+  #wrap-btn-edit {
     position: absolute;
     right: 10px;
     top: 15px;
@@ -338,6 +374,9 @@
     background: transparent;
     box-shadow: 0px 4px 4px rgb(0 0 0 / 25%);
     padding: 0;
+  }
+  #banner-voting {
+    position: relative
   }
   #banner-voting .container {
     height: 72px;
@@ -428,7 +467,8 @@
   .wrap-login {
     background: url(/o/hau-giang-theme/images/bg-trongdong.png) no-repeat center;
     background-size: cover;
-    height: 100vh;
+    min-height: 100vh;
+    height: auto;
     width: 100%;
     position: relative;
   }
@@ -495,7 +535,12 @@
   .input-text  .v-input__slot {
     box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 8%), 0px 2px 2px 0px rgb(0 0 0 / 0%), 0px 1px 5px 0px rgb(0 0 0 / 7%) !important;
   }
-  @media (max-width: 767px) {
+  @media (max-width: 900px) {
+    .title-banner-2 {
+      margin-top: 20px;
+    }
+  }
+  @media (max-width: 600px) {
     #app_voting_canbo .title-banner {
       font-size: 16px !important;
     }
@@ -504,6 +549,25 @@
     }
     .btn-vote {
       width: 280px;
+    }
+    .wrap-btn-screen {
+      right: 0px !important;
+      top: 120px !important;
+    }
+  }
+  @media (max-width: 376px) {
+    #banner-voting .container {
+      padding-right: 0px !important;
+    }
+    #app_voting_canbo .title-banner {
+      font-size: 14px!important;
+    }
+    #app_voting_canbo .title-banner-2 {
+      margin-top: 16px!important;
+    }
+    .col-left img {
+      width: 200px;
+      height: 250px;
     }
   }
 </style>

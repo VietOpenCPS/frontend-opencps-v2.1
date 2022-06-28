@@ -871,6 +871,7 @@ export default {
   },
   data: () => ({
     votingResult: null,
+    dossierDetailMotcua: '',
     splitBienLai: false,
     sourcePaymentFee: {},
     loadingActionProcess: false,
@@ -1059,8 +1060,10 @@ export default {
         align: 'center',
         sortable: false,
         class: 'traodoitructuyen_column'
-      }],
-      filterDossierActionItems: [{
+      }
+    ],
+    filterDossierActionItems: [
+      {
         text: 'Tất cả',
         value: ''
       }, {
@@ -4025,8 +4028,49 @@ export default {
           toastr.success('Gửi đánh giá thành công')
           vm.loadVoting = false
           vm.votingResult = vote
+          vm.danhGiaCanBo(vote)
         }).catch(xhr => {
           vm.loadVoting = false
+        })
+      }
+    },
+    danhGiaCanBo (vote) {
+      let vm = this
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId(),
+          Token: Liferay.authToken,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+      let metaData = vm.dossierDetailMotcua.metaData ? JSON.parse(vm.dossierDetailMotcua.metaData) : {}
+      if (metaData.hasOwnProperty('EmployeeEmail')) {
+        let nameVote = ''
+        if (vote == 3) {
+          nameVote = 'Rất hài lòng'
+        } else if (vote == 2) {
+          nameVote = 'Hài lòng'
+        } else {
+          nameVote = 'Không hài lòng'
+        }
+        let voteEmp = {
+          "dossierNo": vm.dossierDetailMotcua.dossierNo,
+          "govAgencyCode": vm.dossierDetailMotcua.govAgencyCode,
+          "govAgencyName": vm.dossierDetailMotcua.govAgencyName,
+          "employeeEmail": metaData.EmployeeEmail,
+          "employeeName": metaData.EmployeeName,
+          "votingName": nameVote,
+          "votingValue": vote,
+          "groupId": vm.dossierDetailMotcua.groupId
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'POST')
+        dataPost.append('url', '/votings/rateEmployee')
+        dataPost.append('data', JSON.stringify(voteEmp))
+        dataPost.append('serverCode', 'SERVER_' + vm.thongTinChiTietHoSo['govAgencyCode'])
+
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+        }).catch(xhr => {
         })
       }
     },
@@ -4047,6 +4091,7 @@ export default {
       dataPost.append('serverCode', vm.thongTinChiTietHoSo.serverNo)
       axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
         let dossier = result.data
+        vm.dossierDetailMotcua = dossier
         if (dossier.metaData) {
           try {
             let datameta = JSON.parse(dossier.metaData)

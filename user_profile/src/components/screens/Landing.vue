@@ -448,15 +448,15 @@
               </v-flex>
               <v-flex xs12 sm4>
                 <v-text-field v-model="user['employeeNo']" box>
-                  <template slot="label">Contact code <span class="red--text darken-3">*</span></template>
+                  <template slot="label">Mã cán bộ <span class="red--text darken-3">*</span></template>
                 </v-text-field>
               </v-flex>
-              <v-flex xs12 sm4>
-                <v-text-field label="Địa điểm ký số" value="Hà Nội" box></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm4>
+              <!-- <v-flex xs12 sm4>
                 <v-text-field label="Chức danh ký số" v-model="user['title']" box></v-text-field>
-              </v-flex>
+              </v-flex> -->
+              <!-- <v-flex xs8>
+                <v-text-field label="Tên quầy đánh giá" value="" box></v-text-field>
+              </v-flex> -->
               <!--  -->
               <v-flex xs12 class="px-0" v-if="serverProtocolFilter.length > 0">
                 <v-layout wrap>

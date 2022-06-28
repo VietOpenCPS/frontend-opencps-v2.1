@@ -636,6 +636,7 @@ export const store = new Vuex.Store({
             params: {
             }
           }
+          console.log('filterStore', filter)
           for (let key in filter['data']) {
             let currentVal = Array.isArray(filter['data'][key]) ? filter['data'][key].toString() : filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
@@ -669,6 +670,9 @@ export const store = new Vuex.Store({
                   }             
                 }
               }
+            }
+            if (key == 'listGov' && !currentVal) {
+              param.params[key] = ""
             }
           }
           let govAgency = filter['govAgency']
