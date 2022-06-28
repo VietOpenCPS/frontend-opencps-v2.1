@@ -3108,7 +3108,11 @@ export default {
             vm.filters[key]['value'] = ''
             vm.data[vm.filters[key]['key']] = ''
             vm.filters[key]['groupId'] = vm.filterGroup[item.key]
-            console.log('filter dataSource', vm.filters[key])
+            try {
+              vm.filters[key]['code'] = item.hasOwnProperty('code') ? item.code : ''
+            } catch (error) {
+            }
+            console.log('filterDataSource', vm.filters[key])
             vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
               vm.filters[key]['source'] = result
               if (vm.filters[key]['appendItem']) {
@@ -3128,6 +3132,14 @@ export default {
             vm.filters[key]['value'] = ''
             vm.data[vm.filters[key]['key']] = ''
             vm.filters[key]['groupId'] = vm.govAgency
+            console.log('filterDataSource123', vm.filters[key])
+            try {
+              vm.filters[key]['code'] = vm.agencyLists.find(function(item) {
+                return item.value == vm.govAgency
+              })['code']
+            } catch (error) {
+              vm.filters[key]['code'] = ''
+            }
             vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
               vm.filters[key]['source'] = result
               if (vm.filters[key]['appendItem']) {

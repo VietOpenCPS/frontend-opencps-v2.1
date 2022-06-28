@@ -19,14 +19,14 @@
                 </v-btn>
               </div>
               <div class="container layout wrap" style=""> 
-                <div class="banner-left flex layout wrap xs12 md6 lg5" style="padding-top: 10px;">
+                <div class="banner-left flex layout wrap xs12 md6 lg6" style="padding-top: 10px;">
                   <img class="logo-banner" src="/o/hau-giang-theme/images/quoc_huy.svg">
                   <div  class="flex">
                     <div class="title-banner">TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG</div>
                     <div class="title-banner">TỈNH HẬU GIANG</div>
                   </div>
                 </div>
-                <div class="banner-right flex xs12 md6 lg7" style="align-self: center;">
+                <div class="banner-right flex xs12 md6 lg6" style="align-self: center;">
                   <div class="title-banner-2" style="">
                     <span>{{gateName}}</span>
                   </div>
@@ -214,6 +214,8 @@
               let agency = vm.employeeInfo.scope.split(',')[0]
               vm.getGovAgency(agency)
             }
+          }).catch(function () {
+            window.location.href = "/c/portal/logout"
           })
         }
       },
@@ -398,7 +400,7 @@
     font-family: "Roboto";
     font-style: normal;
     font-weight: bold;
-    font-size: 18px;
+    font-size: 24px;
     line-height: 26px;
     color: #940404;
     text-transform: uppercase;
@@ -410,11 +412,11 @@
     line-height: 26px;
     color: #940404;
     text-transform: uppercase;
-    font-size: 20px;
+    font-size: 24px;
     text-align: center;
   }
   #wrap-content {
-    padding-top: 50px !important;
+    padding-top: 12vh !important;
   }
   .col-left {
     width: 300px;
@@ -429,40 +431,43 @@
         /* border: 1px solid red; */
   }
   .btn-vote {
-    width: 300px;
-    margin-bottom: 20px !important;
+    width: 400px;
+    margin-bottom: 40px !important;
     border-radius: 10px !important;
-    font-size: 22px !important;
-    height: 64px !important;
+    font-size: 24px !important;
+    height: 80px !important;
     box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 5px 0px rgb(0 0 0 / 20%), 0px 5px 5px 0px rgb(0 0 0 / 22%) !important;
   }
   .title-voting {
-    min-height: 64px !important;
-    font-size: 24px;
+    min-height: 80px !important;
+    font-size: 26px;
     font-weight: 400;
     color: #fff;
     background: #940404!important;
-    padding: 10px;
+    padding: 20px;
     border-radius: 15px;
     max-width: 600px;
     margin: 0 auto;
-    margin-bottom: 30px;
+    margin-bottom: 60px;
   }
   .col-left img {
-    width: 250px;
-    height: 330px;
+    width: 300px;
+    height: 400px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   }
   .col-left .name-emp {
     max-width: 300px;
     margin: 0 auto;
-    margin-top: 15px;
-    font-size: 22px;
+    margin-top: 25px;
+    font-size: 24px;
     font-weight: 400;
     color: #fff;
     background: #940404!important;
     padding: 10px;
     border-radius: 10px;
+    min-height: 72px;
+    padding-top: 15px;
+    text-transform: uppercase;
   }
   .wrap-login {
     background: url(/o/hau-giang-theme/images/bg-trongdong.png) no-repeat center;
@@ -535,9 +540,17 @@
   .input-text  .v-input__slot {
     box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 8%), 0px 2px 2px 0px rgb(0 0 0 / 0%), 0px 1px 5px 0px rgb(0 0 0 / 7%) !important;
   }
-  @media (max-width: 900px) {
+  @media (max-width: 1000px) {
     .title-banner-2 {
-      margin-top: 20px;
+      margin-top: 40px;
+    }
+  }
+  @media (max-width: 900px) {
+    .btn-vote {
+      width: 350px;
+    }
+    #wrap-content {
+      padding-top: 15vh !important
     }
   }
   @media (max-width: 600px) {
@@ -553,6 +566,9 @@
     .wrap-btn-screen {
       right: 0px !important;
       top: 120px !important;
+    }
+    #wrap-content {
+      padding-top: 50px !important
     }
   }
   @media (max-width: 376px) {

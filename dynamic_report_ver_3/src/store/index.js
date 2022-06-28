@@ -1068,7 +1068,34 @@ export const store = new Vuex.Store({
             },
             params: {}
           }
-          if (!filter.hasOwnProperty('typeSource') && (!filter.hasOwnProperty('groupId') || (filter.hasOwnProperty('groupId') && filter.groupId === 'site'))) {
+          if (filter.hasOwnProperty('target') && filter.target == 'canbodanhgia' && filter.hasOwnProperty('groupId') && String(filter.groupId) !== '0' && String(filter.groupId) !== '' && String(filter.groupId) !== 'site') {
+            // lấy theo groupId
+            console.log('filterDataSource5', filter)
+            param.headers.groupId = filter.groupId
+            filter.api = filter.apiTemp.replace(/#govcode#/g, filter.code)
+            axios.get(filter.api, param).then(function (result) {
+              if (result.data) {
+                let dataMapping = []
+                let dataOutput = result.data.data
+                if (filter.hasOwnProperty('valueMapping') && filter.valueMapping) {
+                  for (let index in dataOutput) {
+                    let x = {
+                      value: filter.hasOwnProperty('valueMappingChild') ? dataOutput[index][filter.valueMapping][filter.valueMappingChild] : dataOutput[index][filter.valueMapping],
+                      name: dataOutput[index][filter.nameMapping]
+                    }
+                    dataMapping.push(x)
+                  }
+                } else {
+                  dataMapping = dataOutput
+                }
+                resolve(dataMapping)
+              } else {
+                resolve([])
+              }
+            }).catch(function(xhr) {
+              reject(xhr)
+            })
+          } else if (!filter.hasOwnProperty('typeSource') && (!filter.hasOwnProperty('groupId') || (filter.hasOwnProperty('groupId') && filter.groupId === 'site'))) {
             axios.get(filter.api, param).then(function (result) {
               if (result.data) {
                 let dataMapping = []
@@ -1169,6 +1196,31 @@ export const store = new Vuex.Store({
               }
             }).catch(function (error) {
               reject([])
+            })
+          } else if (!filter.hasOwnProperty('typeSource') && filter.hasOwnProperty('groupId') && String(filter.groupId) !== '0' && String(filter.groupId) !== '' && String(filter.groupId) !== 'site') {
+            // lấy theo groupId
+            param.headers.groupId = filter.groupId
+            axios.get(filter.api, param).then(function (result) {
+              if (result.data) {
+                let dataMapping = []
+                let dataOutput = result.data.data
+                if (filter.hasOwnProperty('valueMapping') && filter.valueMapping) {
+                  for (let index in dataOutput) {
+                    let x = {
+                      value: filter.hasOwnProperty('valueMappingChild') ? dataOutput[index][filter.valueMapping][filter.valueMappingChild] : dataOutput[index][filter.valueMapping],
+                      name: dataOutput[index][filter.nameMapping]
+                    }
+                    dataMapping.push(x)
+                  }
+                } else {
+                  dataMapping = dataOutput
+                }
+                resolve(dataMapping)
+              } else {
+                resolve([])
+              }
+            }).catch(function(xhr) {
+              reject(xhr)
             })
           } else if (!filter.hasOwnProperty('typeSource') && filter.hasOwnProperty('groupId') && String(filter.groupId) !== '0' && String(filter.groupId) !== '' && String(filter.groupId) !== 'site') {
             // lấy theo groupId
