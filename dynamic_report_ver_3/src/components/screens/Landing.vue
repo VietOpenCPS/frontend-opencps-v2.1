@@ -118,8 +118,13 @@
         </v-flex>
         <v-flex xs12 class="px-3 mb-3">
           <div class="d-inline-block left" v-if="!itemsReports[index]['filterConfig']['version'] && !itemsReports[index]['filterConfig']['backendVer2']">
-            <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> 
+            <v-btn v-if="itemsReports[index]['filterConfig']['tableDanhGia']" dark color="blue darken-3" class="mr-3 my-0" v-on:click.native="doPrintReportFix(true)">
               <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
+            </v-btn>
+            <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> 
+              <v-icon>print</v-icon> &nbsp; 
+              <span v-if="itemsReports[index]['filterConfig']['tableDanhGia']">Xuất Pdf</span>
+              <span v-else>Tạo báo cáo</span>
             </v-btn>
             <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
               <v-icon>print</v-icon> &nbsp; In báo cáo
@@ -213,9 +218,66 @@
       </div>
       <!-- table bao cao -->
       <div>
-        <div v-if="!itemsReports[index]['filterConfig']['showTable'] && !showHTML && !itemsReports[index]['filterConfig']['version']">
+        <div v-if="!itemsReports[index]['filterConfig']['showTable'] && !showHTML && !showTableVoting && !itemsReports[index]['filterConfig']['version']">
           <vue-friendly-iframe v-if="showGuilds" :src="'/documents/' + groupId + '/0/hdsd.pdf'"></vue-friendly-iframe>
           <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' && !showGuilds" :src="pdfBlob"></vue-friendly-iframe>
+        </div>
+        <div v-if="showTableVoting && !showErrorData && !isShowLoading">
+          <table class="my-2" hide-default-footer>
+            <thead>
+              <tr>
+                <th rowspan="2" class="text-center px-2 py-2" style="border: 1px solid #b5b5b5;">
+                  <span>STT</span>
+                </th>
+                <th rowspan="2" class="text-center px-2 py-2" style="border: 1px solid #b5b5b5;">
+                  <span>Tên cán bộ</span>
+                </th>
+                <th width="80" rowspan="2" class="text-center px-2 py-2" style="border: 1px solid #b5b5b5;">
+                  <span>Số lượt đánh giá</span>
+                </th>
+                <th class="py-2 text-center" colspan="3" style="border: 1px solid #b5b5b5;">
+                  <span>Chất lượng đánh giá</span>
+                </th>
+              </tr>
+
+              <tr>
+                <th width="" class="text-center px-2 py-2" style="border: 1px solid #b5b5b5;">
+                  <span>Rất hài lòng</span>
+                </th>
+                <th width="" class="text-center px-2 py-2" style="border: 1px solid #b5b5b5;">
+                  <span>Hài lòng</span>
+                </th>
+                <th width="" class="text-center px-2 py-2" style="border: 1px solid #b5b5b5;">
+                  <span>Không hài lòng</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody v-if="loadingTable">
+              <content-placeholders class="my-2">
+                <content-placeholders-text :lines="5" />
+              </content-placeholders>
+            </tbody>
+            <tbody v-if="!loadingTable && dataTableVottingList.length > 0">
+              <tr v-for="(item,index) in dataTableVottingList" :key="index">
+                <td align="center" class="px-2 py-2" style="border: 1px solid #b5b5b5;">{{index + 1}}</td>
+                <td align="left" class="px-2 py-2" style="padding: 8px 10px;border: 1px solid #b5b5b5;">
+                  {{item.employeeName}}
+                </td>
+                <td align="center" class="px-2 py-2" style="padding: 8px 10px;border: 1px solid #b5b5b5;">
+                  <a title="Xem chi tiết" href="javascript:;" @click.stop="viewChiTietDanhGia(item, '')">{{item.sumCount}}</a>
+                </td>
+                <td align="center" class="px-2 py-2" style="padding: 8px 10px;border: 1px solid #b5b5b5;">
+                  <a title="Xem chi tiết" href="javascript:;" @click.stop="viewChiTietDanhGia(item, 3)">{{item.veryHappyCount}} ({{item.percentVeryHappy}}%)</a>
+                </td>
+                <td align="center" class="px-2 py-2" style="padding: 8px 10px;border: 1px solid #b5b5b5;">
+                  <a title="Xem chi tiết" href="javascript:;" @click.stop="viewChiTietDanhGia(item, 2)">{{item.happyCount}} ({{item.percentHappy}}%)</a>
+                </td>
+                <td align="center" class="px-2 py-2" style="padding: 8px 10px;border: 1px solid #b5b5b5;">
+                  <a title="Xem chi tiết" href="javascript:;" @click.stop="viewChiTietDanhGia(item, 1)">{{item.unHappyCount}} ({{item.percentUnHappy}}%)</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div v-if="itemsReports[index]['filterConfig']['showTable'] && isRender && !showErrorData && !isShowLoading">
           <v-data-table
@@ -731,7 +793,9 @@ export default {
     widthRenderHtmlTable: [],
     statisticVotingDossiers: false,
     loadingGetDossier: false,
-    hasVoting: []
+    hasVoting: [],
+    showTableVoting: false,
+    govCodeSelected: ''
   }),
   computed: {
     itemsReports () {
@@ -780,6 +844,7 @@ export default {
         vm.exportWordReport = exportWordReport
       } catch (error) {
       }
+      let currentQuery = vm.$router.history.current.query
       let query = vm.$router.history.current.query
       let param = {
         headers: {
@@ -957,12 +1022,30 @@ export default {
         if (query.hasOwnProperty('doreport')) {
           vm.doCreateReport(false)
         }
+        // 
+        // voting
+        if (currentQuery.hasOwnProperty('employeeEmail')) {
+          vm.changeGovAgency()
+          vm.govAgency = currentQuery.hasOwnProperty('govId') ? Number(currentQuery['govId']) : ''
+          vm.data['employeeEmail'] = currentQuery['employeeEmail']
+          vm.data['fromDate'] = currentQuery['fromDate']
+          vm.data['toDate'] = currentQuery['toDate']
+          vm.data['listRate'] = currentQuery.hasOwnProperty('listRate') ? currentQuery.listRate : '3,2,1'
+          setTimeout(function () {
+            vm.doCreateReport(false)
+          }, 300)
+        }
+        // 
+        // 
       }, 1000)
     })
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
+      let currentQuery = newRoute.query
+      vm.showTableVoting = false
+      vm.dataTableVottingList = []
       vm.listTongHop = []
       vm.totalCount = 0
       vm.showHTML = false
@@ -1120,6 +1203,20 @@ export default {
           vm.showConfig = true
         }, 200)
       }
+      // 
+      // voting
+      if (currentQuery.hasOwnProperty('employeeEmail')) {
+        vm.changeGovAgency()
+        vm.govAgency = currentQuery.hasOwnProperty('govId') ? Number(currentQuery['govId']) : ''
+        vm.data['employeeEmail'] = currentQuery['employeeEmail']
+        vm.data['fromDate'] = currentQuery['fromDate']
+        vm.data['toDate'] = currentQuery['toDate']
+        vm.data['listRate'] = currentQuery.hasOwnProperty('listRate') ? currentQuery.listRate : '3,2,1'
+        setTimeout(function () {
+          vm.doCreateReport(false)
+        }, 500)
+      }
+      // 
     },
     itemsReports () {
       let vm = this
@@ -2107,7 +2204,7 @@ export default {
         }
       })
     },
-    doPrintReportFix () {
+    doPrintReportFix (returnTable) {
       let vm = this
       vm.dataRowRenderHtmlTable = []
       vm.isRender = false
@@ -2268,6 +2365,21 @@ export default {
       }
       let dispatchUse = vm.api.indexOf('/o/statistic/dossier') >= 0 ? 'getAgencyReportLists' : 'getAgencyReportListsOld'
       vm.$store.dispatch(dispatchUse, filter).then(function (result) {
+        vm.showTableVoting = false
+        if (returnTable) {
+          vm.showTableVoting = true
+          if (result !== null) {
+            vm.isShowLoading = false
+            vm.dataTableVottingList = result
+            vm.showErrorData = false
+            console.log('dataTableVottingList', vm.dataTableVottingList)
+          } else {
+            vm.dataTableVottingList = []
+            vm.isShowLoading = false
+            vm.showErrorData = true
+          }
+          return
+        } 
         // console.log('result',result)
         if (result !== null) {
           // set dossierList
@@ -3125,16 +3237,25 @@ export default {
     },
     changeGovAgency () {
       let vm = this
+      let currentQuery = vm.$router.history.current.query
       vm.groupIdListSelected = ''
       setTimeout(()=>{
         for (let key in vm.filters) {
           if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
             vm.filters[key]['value'] = ''
             vm.data[vm.filters[key]['key']] = ''
+            // emp voting
+            if (currentQuery.hasOwnProperty('employeeEmail')) {
+              vm.data['employeeEmail'] = currentQuery.employeeEmail
+            }
+            // 
             vm.filters[key]['groupId'] = vm.govAgency
             console.log('filterDataSource123', vm.filters[key])
             try {
               vm.filters[key]['code'] = vm.agencyLists.find(function(item) {
+                return item.value == vm.govAgency
+              })['code']
+              vm.govCodeSelected = vm.agencyLists.find(function(item) {
                 return item.value == vm.govAgency
               })['code']
             } catch (error) {
@@ -3295,6 +3416,17 @@ export default {
       } catch (error) {
         return ''
       }
+    },
+    viewChiTietDanhGia (item, rate) {
+      let vm = this
+      let i = Number(vm.index) + 1
+      vm.$router.push({
+        path: "/bao-cao/" + i + "?govCode=" + vm.govCodeSelected + "&govId=" + vm.govAgency + "&employeeEmail=" + item.employeeEmail + "&listRate=" + rate +
+        "&fromDate=" + vm.data['fromDate'] + "&toDate=" + vm.data['toDate']
+      })
+      // let url = window.location.origin + window.location.pathname + "#/bao-cao/" + i + "?govCode=" + vm.govCodeSelected + "&govId=" + vm.govAgency + "&employeeEmail=" + item.employeeEmail + "&listRate=" + rate +
+      //   "&fromDate=" + vm.data['fromDate'] + "&toDate=" + vm.data['toDate']
+      // window.open(url, '_blank').focus();
     }
   }
 }

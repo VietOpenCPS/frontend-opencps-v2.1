@@ -460,7 +460,7 @@
     margin: 0 auto;
     margin-top: 25px;
     font-size: 24px;
-    font-weight: 400;
+    font-weight: 600;
     color: #fff;
     background: #940404!important;
     padding: 10px;
