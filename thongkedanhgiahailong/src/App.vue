@@ -40,15 +40,15 @@
         </div>
         <v-layout wrap style="width: 400px;margin: 20px auto;">
           <v-flex style="max-width:120px" class="mr-3">
-            <v-icon style="color: #00c784 !important">square</v-icon> &nbsp;&nbsp;
+            <v-icon style="color: #8bc34a !important">square</v-icon> &nbsp;&nbsp;
             <span>Rất hài lòng</span>
           </v-flex>
           <v-flex style="max-width:120px" class="mr-3">
-            <v-icon style="color: #feb019 !important">square</v-icon> &nbsp;&nbsp;
+            <v-icon style="color: #2196f3 !important">square</v-icon> &nbsp;&nbsp;
             <span>Hài lòng</span>
           </v-flex>
           <v-flex style="max-width:150px" class="mr-3">
-            <v-icon style="color: #908d89 !important">square</v-icon> &nbsp;&nbsp;
+            <v-icon style="color: #CE7A58 !important">square</v-icon> &nbsp;&nbsp;
             <span>Không hài lòng</span>
           </v-flex>
         </v-layout>
@@ -111,7 +111,7 @@
         }
       ],
       groupSelected: '',
-      widthChart: "100%",
+      widthChart: "600",
       chartOptionsColumn: {
         chart: {
           type: 'bar',
@@ -160,7 +160,7 @@
             }
           }
         },
-        colors: ['#00c784','#feb019','#908d89']
+        colors: ['#8bc34a','#2196f3','#CE7A58']
       },
       seriesColumn: [
         {
@@ -252,7 +252,9 @@
           .then(function (response) {
             vm.dataVoting = response.data
             if (vm.dataVoting.length) {
-              vm.widthChart = 150*vm.dataVoting.length
+              if (vm.dataVoting.length > 4) {
+                vm.widthChart = 150*vm.dataVoting.length
+              }
               vm.dataVoting = vm.dataVoting.sort(function (a, b) {
                 if (a.unHappyCount > b.unHappyCount) {
                   return -1
@@ -342,7 +344,7 @@
                     }
                   }
                 },
-                colors: ['#00c784','#feb019','#908d89']
+                colors: ['#8bc34a','#2196f3','#CE7A58']
               }
             }
           })
@@ -433,7 +435,7 @@
               }
             }
           },
-          colors: ['#00c784','#feb019','#908d89']
+          colors: ['#8bc34a','#2196f3','#CE7A58']
         }
         vm.dataVoting = []
       }

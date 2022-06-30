@@ -19,14 +19,14 @@
                 </v-btn>
               </div>
               <div class="container layout wrap" style=""> 
-                <div class="banner-left flex layout wrap xs12 md6 lg6" style="padding-top: 10px;">
+                <div class="banner-left flex layout wrap xs12 md5 lg6" style="padding-top: 10px;">
                   <img class="logo-banner" src="/o/hau-giang-theme/images/quoc_huy.svg">
                   <div  class="flex">
                     <div class="title-banner">TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG</div>
                     <div class="title-banner">TỈNH HẬU GIANG</div>
                   </div>
                 </div>
-                <div class="banner-right flex xs12 md6 lg6" style="align-self: center;">
+                <div class="banner-right flex xs12 md7 lg6" style="align-self: center;">
                   <div class="title-banner-2" style="">
                     <span>{{gateName}}</span>
                   </div>
@@ -50,11 +50,11 @@
             </div>
             <div class="flex col-right sm6 md7 lg7">
               <div class="title-voting">
-                Xin vui lòng đánh giá chất lượng dịch vụ?
+                Xin vui lòng đánh giá chất lượng dịch vụ
               </div>
               <div>
                 <div>
-                  <v-btn class="my-0 white--text btn-vote" color="#940404"
+                  <v-btn class="my-0 white--text btn-vote" color="#8bc34a"
                     :loading="loading"
                     :disabled="loading"
                     @click.stop="submitVoting({name: 'Rất hài lòng', value: 3})"
@@ -63,7 +63,7 @@
                   </v-btn>
                 </div>
                 <div>
-                  <v-btn class="my-0 white--text btn-vote" color="#940404"
+                  <v-btn class="my-0 white--text btn-vote" color="#2196f3"
                     :loading="loading"
                     :disabled="loading"
                     @click.stop="submitVoting({name: 'Hài lòng', value: 2})"
@@ -72,7 +72,7 @@
                   </v-btn>
                 </div>
                 <div>
-                  <v-btn class="my-0 white--text btn-vote" color="#940404"
+                  <v-btn class="my-0 white--text btn-vote" color="#CE7A58"
                     :loading="loading"
                     :disabled="loading"
                     @click.stop="submitVoting({name: 'Không hài lòng', value: 1})"
@@ -383,6 +383,7 @@
   #banner-voting .container {
     height: 72px;
     padding: 0;
+    padding-left: 5px !important;
   }
   #banner-voting .container a {
     text-decoration: none;
@@ -400,7 +401,7 @@
     font-family: "Roboto";
     font-style: normal;
     font-weight: bold;
-    font-size: 24px;
+    font-size: 20px;
     line-height: 26px;
     color: #940404;
     text-transform: uppercase;
@@ -432,23 +433,25 @@
   }
   .btn-vote {
     width: 400px;
-    margin-bottom: 40px !important;
+    margin-bottom: 45px !important;
     border-radius: 10px !important;
     font-size: 24px !important;
     height: 80px !important;
     box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 5px 0px rgb(0 0 0 / 20%), 0px 5px 5px 0px rgb(0 0 0 / 22%) !important;
   }
   .title-voting {
-    min-height: 80px !important;
-    font-size: 26px;
-    font-weight: 400;
-    color: #fff;
-    background: #940404!important;
-    padding: 20px;
+    min-height: 80px!important;
+    font-size: 28px;
+    font-weight: 700;
+    color: #940404!important;
+    padding-bottom: 20px;
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-left: 0px;
     border-radius: 15px;
-    max-width: 600px;
     margin: 0 auto;
-    margin-bottom: 60px;
+    text-transform: uppercase;
+    margin-bottom: 40px
   }
   .col-left img {
     width: 300px;
@@ -458,11 +461,10 @@
   .col-left .name-emp {
     max-width: 300px;
     margin: 0 auto;
-    margin-top: 25px;
-    font-size: 24px;
-    font-weight: 600;
-    color: #fff;
-    background: #940404!important;
+    margin-top: 15px;
+    font-size: 26px;
+    font-weight: 700;
+    color: #940404!important;
     padding: 10px;
     border-radius: 10px;
     min-height: 72px;
