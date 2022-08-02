@@ -150,6 +150,16 @@ export const store = new Vuex.Store({
     },
     getDynamicReports ({commit, state}, reportTypeFilter) {
       return new Promise((resolve, reject) => {
+        let sortReport = function (reportList) {
+          function compare(a, b) {
+            if (a.order < b.order)
+              return -1
+            if (a.order > b.order)
+              return 1
+            return 0
+          }
+          return reportList.sort(compare)
+        }
         let reportType = ''
         if (reportTypeFilter !== undefined && reportTypeFilter !== null) {
           reportType = reportTypeFilter
@@ -167,9 +177,24 @@ export const store = new Vuex.Store({
             let body = AdminConfig.getDynamicReports
             axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
               let serializable = response.data
+              // 
+              let reportList = serializable['getDynamicReports']
+              let counterReport = reportList.length
+              for (let key in reportList) {
+                let orderMenu = counterReport
+                try {
+                  let stt = eval('( ' + reportList[key]['userConfig'] + ' )')['order']
+                  orderMenu = stt ? stt : counterReport
+                } catch (error) {
+                }
+                reportList[key]['order'] = orderMenu
+              }
+              reportList = sortReport(reportList)
+              // 
+
               let itemsReportsData = []
               let indexKey = 0
-              let dynamicReportsFilterSharing = serializable['getDynamicReports'].filter(function (item) {
+              let dynamicReportsFilterSharing = reportList.filter(function (item) {
                 return String(item.sharing) !== '9'
               })
               try {
@@ -230,7 +255,8 @@ export const store = new Vuex.Store({
                   'dynamicReportId' : current['dynamicReportId'],
                   'reportCode' : current['reportCode'],
                   'reportName' : current['reportName'],
-                  'sharing' : current['sharing']
+                  'sharing' : current['sharing'],
+                  'order': current['order']
                 })
                 indexKey = indexKey + 1
               }
@@ -256,6 +282,7 @@ export const store = new Vuex.Store({
             })
           })
         } else {
+          console.log("state.siteName456", state.siteName)
           let options = {
             headers: {
               'groupId': state.groupId,
@@ -267,9 +294,23 @@ export const store = new Vuex.Store({
           let body = AdminConfig.getDynamicReports
           axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
             let serializable = response.data
+            // 
+            let reportList = serializable['getDynamicReports']
+            let counterReport = reportList.length
+            for (let key in reportList) {
+              let orderMenu = counterReport
+              try {
+                let stt = eval('( ' + reportList[key]['userConfig'] + ' )')['order']
+                orderMenu = stt ? stt : counterReport
+              } catch (error) {
+              }
+              reportList[key]['order'] = orderMenu
+            }
+            reportList = sortReport(reportList)
+            // 
             let itemsReportsData = []
             let indexKey = 0
-            let dynamicReportsFilterSharing = serializable['getDynamicReports'].filter(function (item) {
+            let dynamicReportsFilterSharing = reportList.filter(function (item) {
               return String(item.sharing) !== '9'
             })
             try {
@@ -329,7 +370,8 @@ export const store = new Vuex.Store({
                 'dynamicReportId' : current['dynamicReportId'],
                 'reportCode' : current['reportCode'],
                 'reportName' : current['reportName'],
-                'sharing' : current['sharing']
+                'sharing' : current['sharing'],
+                'order': current['order']
               })
               indexKey = indexKey + 1
             }

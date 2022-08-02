@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
 import $ from 'jquery'
+import md5 from 'md5'
 // 
 
 Vue.use(toastr)
@@ -20,7 +21,8 @@ export const store = new Vuex.Store({
     },
     endPointApi: '/o/rest/v2',
     dossierDetail: '',
-    secretCode: ''
+    secretCode: '',
+    md5Token: ''
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -60,16 +62,19 @@ export const store = new Vuex.Store({
     loadingDataHoSo ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
+          store.dispatch('getTokenMd5')
           let param = {
             headers: {
-              groupId: state.initData.groupId
+              groupId: state.initData.groupId,
+              authenKey: state.md5Token
             },
             params: {
               start: filter.page * 10 - 10,
               end: filter.page * 10,
               dossierNo: filter.dossierNo ? filter.dossierNo : '',
               applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : '',
-              status: filter.status ? filter.status : ''
+              status: filter.status ? filter.status : '',
+              order: filter.order ? true : false
             }
           }
           axios.get(state.endPointApi + '/dossiers', param).then(function (response) {
@@ -417,6 +422,111 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    traCuuHsQlvt ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let settings = {
+            "url": "/o/rest/v2/dossiers/proxy",
+            "method": "GET",
+            "headers": {
+              "groupId": state.initData.groupId,
+              "Accept": "application/json",
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            "data": {
+              "serverCode": "SERVER_QLVT",
+              "method": "GET",
+              "typeCode": "tracuuhoso",
+              "data": JSON.stringify({MaHoSo: filter.dossierNo})
+            }
+          };
+          
+          $.ajax(settings).done(function (response) {
+            if (response) {
+              resolve(response)
+            } else {
+              resolve('')
+            }
+          }).fail(function () {
+            reject('')
+          })
+        }).catch(function (){})
+      })
+    },
+    getTokenMd5 ({commit, state}) {
+      let date = (new Date()).getDate()
+      let month = (new Date()).getMonth() + 1
+      let year = (new Date()).getFullYear()
+      let hours = (new Date()).getHours()
+      let minutes = (new Date()).getMinutes()
+      let currentDate = (new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`)).getTime()
+      let token = md5('opencps' + currentDate)
+      commit('setMd5Token', token)
+    },
+    getApplicantIdNoByImage ({commit, state}, postData) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let url = '/o/rest/v2/eKYC/getApplicantIdNoByImage'
+        let data = new URLSearchParams();
+        data.append("image_live", postData.image_live)
+        axios.post(url, data, param).then(response => {
+          resolve(response)
+        }).catch(errorRes => {
+          let response = errorRes.message
+          toastr.clear()
+          toastr.error(response)
+          reject('error')
+        })
+      })
+    },
+    toKeypayDvcqg ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let url = '/o/pgi/ppdvcqg/inittransaction'
+        let dataPost = new URLSearchParams()
+        dataPost.append('dossierId', filter.dossierId)
+        
+        axios.post(url, dataPost, param).then(response => {
+          if (response.data && ((response.data.hasOwnProperty('error') && response.data.error == '0') || (response.data.hasOwnProperty('MaLoi') && response.data.MaLoi == '00'))) {
+            resolve(response.data.UrlThanhToan)
+          } else if (response.data && ((response.data.hasOwnProperty('error') && response.data.error != '0') || (response.data.hasOwnProperty('MaLoi') && response.data.MaLoi != '00'))) {
+            toastr.error(response.data.hasOwnProperty('msg') ? response.data.msg : 'Yêu cầu thực hiện thất bại')
+            reject(response)
+          } else {
+            reject(response)
+          }
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
+    putMetaData({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': ''
+          }
+        }
+        let dataPostdossier = new URLSearchParams()
+        dataPostdossier.append('data',filter.data)
+        axios.put('/o/rest/v2/dossiers/'+filter.id+'/metadata', dataPostdossier, options).then(function (response) {
+          resolve(response)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
   },
   mutations: {
     setLoading (state, payload) {
@@ -430,6 +540,9 @@ export const store = new Vuex.Store({
     },
     setScretCode (state, payload) {
       state.secretCode = payload
+    },
+    setMd5Token (state, payload) {
+      state.md5Token = payload
     },
   },
   getters: {

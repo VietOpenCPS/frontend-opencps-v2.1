@@ -20,7 +20,7 @@
           <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
           <v-tab key="2" ripple class="mx-2"> Tiến trình thụ lý </v-tab>
           <v-tab key="3" ripple class="mx-2" v-if="paymentInfo"> Thanh toán trực tuyến</v-tab>
-          <v-tab key="4" ripple class="mx-2" @click="loadVoting()" v-if="dossierDetail['dossierStatus'] === 'done'">
+          <v-tab key="4" ripple class="mx-2" @click="loadVoting()" v-if="dossierDetail['dossierStatus'] === 'done' && votingVersion !== 3">
              Đánh giá hài lòng
           </v-tab>
           <v-tab-item key="1">
@@ -133,6 +133,22 @@
                     <!--  -->
                   </v-flex>
                 </v-layout>
+
+                <v-flex xs12 class="px-2" v-if="votingVersion === 3 && dossierDetail['dossierStatus'] === 'done'">
+                  <div class="my-2">(*)  Đánh giá mức độ hài lòng của bạn về giải quyết hồ sơ thủ tục hành chính</div>
+                  <v-btn class="mr-3" outline color="#4caf50" :loading="loadingVoting"
+                    :disabled="loadingVoting" @click="guiDanhGia(3)" v-if="votingResult === 3 || !votingResult">
+                    <v-icon style="color: #4caf50 !important">thumb_up_alt</v-icon>&nbsp;RẤT HÀI LÒNG
+                  </v-btn>
+                  <v-btn class="mr-3" outline color="indigo" :loading="loadingVoting"
+                    :disabled="loadingVoting" @click="guiDanhGia(2)" v-if="votingResult === 2 || !votingResult">
+                    <v-icon style="color: #3f51b5 !important">thumb_up_alt</v-icon>&nbsp; HÀI LÒNG
+                  </v-btn>
+                  <v-btn outline color="red" :loading="loadingVoting"
+                    :disabled="loadingVoting" @click="guiDanhGia(1)" v-if="votingResult === 1 || !votingResult">
+                    <v-icon style="color: red !important">thumb_down_alt</v-icon>&nbsp; KHÔNG HÀI LÒNG
+                  </v-btn>
+                </v-flex>
               </v-card-text>
             </v-card>
           </v-tab-item>
@@ -209,26 +225,26 @@
             </v-card>
           </v-tab-item>
           <v-tab-item key="3" v-if="paymentInfo">
-            <v-card class="px-2 py-2" style="border: 1px solid #dedede;border-top: none;">
+            <v-card class="px-3 py-2" style="border: 1px solid #dedede;border-top: none;">
               <v-card-text class="px-0 py-0">
                 <v-layout wrap>
                   <v-flex xs12 sm2 style="height: 32px;">
-                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;">Lệ phí: </v-subheader>
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;color: black;">Lệ phí: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
-                    <p class="mt-1 mb-0">{{currency(Number(paymentInfo.feeAmount))}} &nbsp;&nbsp; vnđ</p>
+                    <p class="mt-2 mb-0">{{currency(Number(paymentInfo.feeAmount))}} &nbsp;&nbsp; vnđ</p>
                   </v-flex>
                   <v-flex xs12 sm2 style="height: 32px;">
-                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;">Phí: </v-subheader>
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;color: black;">Phí: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
-                    <p class="mt-1 mb-0">{{currency(Number(paymentInfo.serviceAmount))}} &nbsp;&nbsp; vnđ</p>
+                    <p class="mt-2 mb-0">{{currency(Number(paymentInfo.serviceAmount))}} &nbsp;&nbsp; vnđ</p>
                   </v-flex>
                   <v-flex xs12 sm2 v-if="paymentInfo.shipAmount !== 0" style="height: 32px;">
-                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;">Phí chuyển phát: </v-subheader>
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;color: black;">Phí chuyển phát: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
-                    <p class="mt-1 mb-0" v-if="paymentInfo.shipAmount !== 0">
+                    <p class="mt-2 mb-0" v-if="paymentInfo.shipAmount !== 0">
                       {{currency(Number(paymentInfo.shipAmount))}} &nbsp;&nbsp; vnđ
                     </p>
                   </v-flex>
@@ -237,14 +253,14 @@
               <v-card-text class="px-0 py-0">
                 <v-layout wrap>
                   <v-flex xs12 sm2 style="height: 32px;">
-                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;"><span class="text-bold">Tổng: </span></v-subheader>
+                    <v-subheader class="pl-0 text-right" style="height: 32px;font-family: Roboto;font-size: 13px;color: black;"><span class="text-bold">Tổng: </span></v-subheader>
                   </v-flex>
                   <v-flex xs12 sm3 style="padding-top:7px">
                     <span>{{currency(Number(paymentInfo.paymentAmount))}} &nbsp;&nbsp; vnđ</span>
                   </v-flex>
                 </v-layout>
                 <v-layout wrap v-if="paymentInfo.paymentNote">
-                  <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
+                  <v-flex style="width:70px;color: black;" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
                   <v-flex style="width:calc(100% - 80px)">
                     <p class="px-2 my-0 py-1">
                       {{paymentInfo.paymentNote}} &nbsp;&nbsp;
@@ -253,6 +269,7 @@
                 </v-layout>
               </v-card-text>
               <div class="text-xs-left mt-2 mb-3 ml-0">
+                <!-- thanh toán keypay -->
                 <v-chip v-if="getEPaymentProfile(paymentInfo.epaymentProfile)" color="orange" text-color="white"
                   @click.native="toKeyPay(getEPaymentProfile(paymentInfo.epaymentProfile).keypayUrl)"
                 >
@@ -261,6 +278,16 @@
                   </v-avatar>
                   <span class="py-2" style="cursor: pointer">Thanh toán trực tuyến</span>
                 </v-chip>
+                <!-- thanh toán paymentPlatform -->
+                <v-chip class="mb-2 ml-3" v-if="getEPaymentProfile(paymentInfo.epaymentProfile) && getEPaymentProfile(paymentInfo.epaymentProfile).hasOwnProperty('ppkpdvcqg')" color="#cb7755" text-color="white"
+                  @click.native="toKeyPayDvcqg('ppkpdvcqg')"
+                >
+                  <v-avatar style="cursor: pointer" >
+                    <img src="/o/opencps-store/js/cli/dvc/app/image/logo-ppkp.png" alt="trevor" style="background: #fff">
+                  </v-avatar>
+                  <span class="py-2" style="cursor: pointer">Thanh toán qua Cổng DVCQG</span>
+                </v-chip>
+                <!--  -->
               </div>
             </v-card>
             
@@ -305,14 +332,15 @@
   </div>
 </template>
 <script>
-  import router from '@/router'
-  import Vue from 'vue/dist/vue.min.js'
   import toastr from 'toastr'
+  import axios from 'axios'
   export default {
     props: ['index', 'detail'],
     components: {
     },
     data: () => ({
+      votingVersion: '',
+      votingResult: null,
       loading: false,
       xacthuc_BNG: false,
       loadingAction: false,
@@ -415,6 +443,10 @@
     created () {
       let vm = this
       try {
+        vm.votingVersion = votingVersion
+      } catch (error) {
+      }
+      try {
         vm.configDongThap = configDongThap
       } catch (error) {
       }
@@ -495,10 +527,17 @@
       },
       loadDossierDetailMotcua () {
         let vm = this
-        if (vm.two_system) {
+        if (vm.two_system && vm.dossierDetail) {
           vm.$store.dispatch('loadDetailDossierMC', vm.dossierDetail).then(function (result) {
-            console.log('loadDetailDossierMC', result)
             vm.dossierDetailMotcua = result[0]
+
+            if (vm.dossierDetailMotcua.metaData && vm.dossierDetailMotcua.dossierStatus === 'done') {
+              try {
+                let datameta = JSON.parse(vm.dossierDetailMotcua.metaData)
+                vm.votingResult = datameta.hasOwnProperty('hailong') ? Number(datameta.hailong) : null
+              } catch (error) {
+              }
+            }
           }).catch(function (reject) {
           })
         }
@@ -553,8 +592,21 @@
         let vm = this
         window.open(item, '_self')
       },
+      toKeyPayDvcqg () {
+        let vm = this
+        let filter = {
+          dossierId: vm.dossierDetail.dossierId
+        }
+        vm.$store.dispatch('toKeypayDvcqg', filter).then(result => {
+          window.open(result, '_self')
+        }).catch(function() {
+        })
+      },
       getPaymentInfo () {
         let vm = this
+        if (!vm.dossierDetail) {
+          return
+        }
         let scr = vm.getScr(vm.dossierDetail.referenceUid)
         let filter = {
           referenceUid: vm.dossierDetail.referenceUid,
@@ -609,6 +661,77 @@
         let vm = this
         vm.isMobile = window.innerWidth < 1024
       },
+      guiDanhGia (vote) {
+        let vm = this
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            Token: Liferay.authToken,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        if (!vm.votingResult) {
+          let metaData = vm.dossierDetailMotcua.metaData ? JSON.parse(vm.dossierDetailMotcua.metaData) : {}
+          let data = Object.assign(metaData, {hailong: vote})
+          let textPost = {
+            data: JSON.stringify(data)
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'PUT')
+          dataPost.append('url', '/dossiers/' + vm.dossierDetail.referenceUid + '/metadata')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_' + vm.dossierDetail['govAgencyCode'])
+          vm.loadingVoting = true
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+            toastr.success('Gửi đánh giá thành công')
+            vm.votingResult = vote
+            vm.loadingVoting = false
+            vm.danhGiaCanBo(vote)
+          }).catch(xhr => {
+            vm.loadingVoting = false
+          })
+        }
+      },
+      danhGiaCanBo (vote) {
+        let vm = this
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            Token: Liferay.authToken,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let metaData = vm.dossierDetailMotcua.metaData ? JSON.parse(vm.dossierDetailMotcua.metaData) : {}
+        if (metaData.hasOwnProperty('EmployeeEmail')) {
+          let nameVote = ''
+          if (vote == 3) {
+            nameVote = 'Rất hài lòng'
+          } else if (vote == 2) {
+            nameVote = 'Hài lòng'
+          } else {
+            nameVote = 'Không hài lòng'
+          }
+          let voteEmp = {
+            "dossierNo": vm.dossierDetailMotcua.dossierNo,
+            "govAgencyCode": vm.dossierDetailMotcua.govAgencyCode,
+            "govAgencyName": vm.dossierDetailMotcua.govAgencyName,
+            "employeeEmail": metaData.EmployeeEmail,
+            "employeeName": metaData.EmployeeName,
+            "votingName": nameVote,
+            "votingValue": vote,
+            "groupId": vm.dossierDetailMotcua.groupId
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/votings/rateEmployee')
+          dataPost.append('data', JSON.stringify(voteEmp))
+          dataPost.append('serverCode', 'SERVER_' + vm.dossierDetail['govAgencyCode'])
+
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+          }).catch(xhr => {
+          })
+        }
+      }
     },
     filters: {
       dateTimeView (arg) {

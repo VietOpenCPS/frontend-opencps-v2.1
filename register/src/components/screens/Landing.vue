@@ -60,7 +60,7 @@
                 <div v-if="!validBussinessInfos && hasCheckBussiness" class="mb-2">
                   <v-alert
                     :value="true"
-                    color="error"
+                    color="warning"
                     icon="warning"
                     outline
                     class="px-2 py-2"
@@ -358,6 +358,7 @@ export default {
     bussinessInfomation: '',
     validBussinessInfos: true,
     messageCheckApplicant: '',
+    onlyWarring: true,
     ruleContent: '',
     fileCMNDName: '',
     fileCMND: '',
@@ -415,7 +416,8 @@ export default {
       applicantIdDate: true,
       contactEmail: true,
       contactTelNo: false
-    }
+    },
+    traCuuLgspDoanhNghiep: false
   }),
   computed: {
     isMobile () {
@@ -449,6 +451,10 @@ export default {
         vm.hasCheckBussiness = hasCheckBussiness
       } catch (error) {
       }
+      try {
+        vm.traCuuLgspDoanhNghiep = traCuuLgspDoanhNghiep
+      } catch (error) {
+      }
       let current = vm.$router.history.current
       let currentQuery = current.query
       vm.getDieuKhoan()
@@ -478,6 +484,10 @@ export default {
       if (hasOrganizationConfig === true) {
         vm.hasOrganization = true
       }
+    } catch (error) {
+    }
+    try {
+      vm.onlyWarring = onlyWarring !== undefined ? onlyWarring : true
     } catch (error) {
     }
     let elements = document.querySelectorAll('[autocomplete="off"]');
@@ -530,7 +540,7 @@ export default {
       console.log('dataForm', dataForm)
       if (vm.$refs.form.validate() && vm.agreeRules) {
         let passValid = true
-        if (vm.applicantType === '2' && vm.hasCheckBussiness && vm.bussinessInfomation && vm.applicantName.toLocaleLowerCase().trim() !== vm.bussinessInfomation['NAME'].toLocaleLowerCase().trim()) {
+        if (vm.applicantType === '2' && vm.hasCheckBussiness && !vm.onlyWarring && vm.bussinessInfomation && vm.applicantName.toLocaleLowerCase().trim() !== vm.bussinessInfomation['NAME'].toLocaleLowerCase().trim()) {
           passValid = false
           if (vm.applicantName.toLocaleLowerCase().trim() !== vm.bussinessInfomation['NAME'].toLocaleLowerCase().trim()) {
             vm.messageCheckApplicant = 'Vui lòng nhập tên tổ chức, doanh nghiệp đúng với tên đăng ký kinh doanh'
@@ -619,35 +629,66 @@ export default {
         let filter = {
           applicantIdNo: vm.applicantIdNo
         }
-        // vm.loadingVerify = true
-        vm.$store.dispatch('checkApplicantInfos', filter).then(result => {
-          // vm.loadingVerify = false
-          if (result && result.hasOwnProperty('ENTERPRISE_GDT_CODE') && result.ENTERPRISE_GDT_CODE) {
-            vm.bussinessInfomation = result
-            vm.validBussinessInfos = true
-            vm.bussinessExits = true
-            vm.applicantName = result.NAME
-            vm.applicantIdDateFormatted = result.FOUNDING_DATE
-            if (result.hasOwnProperty('ENTERPRISE_STATUS_ID') && result.ENTERPRISE_STATUS_ID === 'ACT') {
-              vm.bussinessStatus = true
+        if (vm.traCuuLgspDoanhNghiep) {
+          vm.$store.dispatch('checkApplicantInfosLgsp', filter).then(result => {
+            // vm.loadingVerify = false
+            if (result && result.hasOwnProperty('ENTERPRISE_GDT_CODE') && result.ENTERPRISE_GDT_CODE) {
+              vm.bussinessInfomation = result
+              vm.validBussinessInfos = true
+              vm.bussinessExits = true
+              vm.applicantName = result.NAME
+              vm.applicantIdDateFormatted = vm.parseDateLocal(result.FOUNDING_DATE)
+              vm.bussinessInfomation['FOUNDING_DATE'] = vm.applicantIdDateFormatted
+              if (result.hasOwnProperty('ENTERPRISE_STATUS_ID') && result.ENTERPRISE_STATUS_ID === 'ACT') {
+                vm.bussinessStatus = true
+              } else {
+                vm.bussinessStatus = false
+                vm.validBussinessInfos = false
+                vm.messageCheckApplicant = 'Doanh nghiệp mã số thuế ' + vm.applicantIdNo + ' không còn hoạt động. Vui lòng kiểm tra lại'
+              }
             } else {
-              vm.bussinessStatus = false
               vm.validBussinessInfos = false
-              vm.messageCheckApplicant = 'Doanh nghiệp mã số thuế ' + vm.applicantIdNo + ' không còn hoạt động. Vui lòng kiểm tra lại'
+              vm.bussinessExits = false
+              vm.applicantName = ''
+              vm.applicantIdDateFormatted = null
+              vm.messageCheckApplicant = 'Mã số ĐKKD, mã số thuế ' + vm.applicantIdNo + ' không có trên CSDL quốc gia về đăng ký doanh	nghiệp'
             }
-          } else {
+          }).catch(function () {
             vm.validBussinessInfos = false
             vm.bussinessExits = false
+            vm.bussinessStatus = false
             vm.applicantName = ''
-            vm.applicantIdDateFormatted = null
-            vm.messageCheckApplicant = 'Mã số ĐKKD, mã số thuế ' + vm.applicantIdNo + ' không có trên CSDL quốc gia về đăng ký doanh	nghiệp'
-          }
-        }).catch(function () {
-          vm.validBussinessInfos = false
-          vm.bussinessExits = false
-          vm.bussinessStatus = false
-          vm.applicantName = ''
-        })
+          })
+        } else {
+          vm.$store.dispatch('checkApplicantInfos', filter).then(result => {
+            // vm.loadingVerify = false
+            if (result && result.hasOwnProperty('ENTERPRISE_GDT_CODE') && result.ENTERPRISE_GDT_CODE) {
+              vm.bussinessInfomation = result
+              vm.validBussinessInfos = true
+              vm.bussinessExits = true
+              vm.applicantName = result.NAME
+              vm.applicantIdDateFormatted = result.FOUNDING_DATE
+              if (result.hasOwnProperty('ENTERPRISE_STATUS_ID') && result.ENTERPRISE_STATUS_ID === 'ACT') {
+                vm.bussinessStatus = true
+              } else {
+                vm.bussinessStatus = false
+                vm.validBussinessInfos = false
+                vm.messageCheckApplicant = 'Doanh nghiệp mã số thuế ' + vm.applicantIdNo + ' không còn hoạt động. Vui lòng kiểm tra lại'
+              }
+            } else {
+              vm.validBussinessInfos = false
+              vm.bussinessExits = false
+              vm.applicantName = ''
+              vm.applicantIdDateFormatted = null
+              vm.messageCheckApplicant = 'Mã số ĐKKD, mã số thuế ' + vm.applicantIdNo + ' không có trên CSDL quốc gia về đăng ký doanh	nghiệp'
+            }
+          }).catch(function () {
+            vm.validBussinessInfos = false
+            vm.bussinessExits = false
+            vm.bussinessStatus = false
+            vm.applicantName = ''
+          })
+        }
       }
     },
     showApplicantInfos () {
@@ -716,7 +757,11 @@ export default {
           vm.fileCMNDName = files[0].name
         }
       }
-    }
+    },
+    parseDateLocal (dateInp) {
+      let date = new Date(dateInp)
+      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+    },
   }
 }
 </script>

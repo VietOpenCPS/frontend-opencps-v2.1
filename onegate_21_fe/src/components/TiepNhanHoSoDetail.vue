@@ -48,8 +48,8 @@
             </v-expansion-panel>
           </div>
           <!--  -->
-          <thong-tin-chu-ho-so v-if="!mauCongVan" ref="thongtinchuhoso" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="isNotarization ? true : false" :applicantIdRequired="applicantIdRequired"></thong-tin-chu-ho-so>
-          <!-- <thong-tin-chu-ho-so-cong-van v-if="mauCongVan" ref="thongtinchuhosocongvan" :mauCongVan="mauCongVan"></thong-tin-chu-ho-so-cong-van> -->
+          <thong-tin-chu-ho-so v-if="!mauCongVan" ref="thongtinchuhoso" :detailDossier="thongTinChiTietHoSo" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="isNotarization ? true : false" :applicantIdRequired="applicantIdRequired"></thong-tin-chu-ho-so>
+          
           <!--  -->
           <div v-if="!isNotarization">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -192,7 +192,7 @@
           <div :style="isNotarization ? 'display: none' : 'position: relative;'">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
-                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :detailDossier="thongTinChiTietHoSo" :viaPortal="viaPortalDetail"></thu-phi>
+                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :splitBienLai="splitBienLai" :dataSource="sourcePaymentFee" :detailDossier="thongTinChiTietHoSo" :viaPortal="viaPortalDetail"></thu-phi>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
@@ -620,7 +620,7 @@ import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
 import TaiLieuChungThuc from './TiepNhan/TaiLieuChungThuc.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
-import LePhi from './form_xu_ly/FeeDetail.vue'
+import LePhi from './form_xu_ly/FeeDetail2.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
 import DichVuChuyenPhatHoSo from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatHoSo.vue'
 // import ThongTinCongVan from './TiepNhan/TiepNhanHoSo_ThongTinCongVan.vue'
@@ -645,6 +645,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    splitBienLai: false,
     fixDescriptionDt: false,
     valid_tenHoSo: false,
     // add new template
@@ -674,6 +675,7 @@ export default {
     dueDateEdit: '',
     durationPhase: '',
     viaPortalDetail: 0,
+    showOptionName: false,
     showThuPhi: false,
     inputTypes: [1, 3],
     // inputTypes: [1, 3, 6],
@@ -857,7 +859,10 @@ export default {
     applicantIdRequired :true,
     showGuiHoSoConfig: false,
     showGuiHoSo: false,
-    showCounterFee: false
+    showCounterFee: false,
+    rememberApplicant: false,
+    sourcePaymentFee: {},
+    urlHistoryUpdateDvc: ''
   }),
   computed: {
     loading () {
@@ -900,11 +905,24 @@ export default {
     } catch (error) {
     }
     try {
+      vm.showOptionName = showOptionName
+    } catch (error) {
+    }
+    try {
       vm.fromViaPostalConfig = fromViaPostalConfig
     } catch (error) {
     }
     try {
       vm.showCounterFee = showCounterFee
+    } catch (error) {
+    }
+    try {
+      // lưu trữ thông tin applicant khi Tiếp nhận và thêm mới
+      vm.rememberApplicant = rememberApplicant
+    } catch (error) {
+    }
+    try {
+      vm.urlHistoryUpdateDvc = urlHistoryUpdateDvc
     } catch (error) {
     }
     vm.$nextTick(function () {
@@ -1123,6 +1141,18 @@ export default {
                     vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
                     vm.durationPhase = resAction && resAction.receiving && resAction.receiving.hasOwnProperty('durationPhase') ? resAction.receiving.durationPhase : ''
                     if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
+                      try {
+                        if (resAction.hasOwnProperty('paymentFee') && resAction.paymentFee) {
+                          vm.sourcePaymentFee = ''
+                          let configs = JSON.parse(resAction.paymentFee)
+                          vm.splitBienLai = configs.hasOwnProperty('isGroupPaymentFile') ? true : false
+                          vm.sourcePaymentFee = configs.hasOwnProperty('source') ? configs['source'] : {}
+                          console.log('sourcePaymentFee', vm.sourcePaymentFee)
+                        } else {
+                          vm.sourcePaymentFee = {}
+                        }
+                      } catch (error) {
+                      }
                       vm.showThuPhi = true
                       vm.paymentsOriginal = resAction.payment
                       let dataJson = ''
@@ -1137,11 +1167,26 @@ export default {
                       } catch (error) {
                       }
                       vm.payments = dataJson ? dataJson : resAction.payment
+                      console.log('paymentInput', vm.payments)
                     }
                     // call initData thong tin chung ho so
                     if (vm.$refs.thongtinchunghoso) {
                       vm.$refs.thongtinchunghoso.initData(result)
                     }
+                    // call initData thong tin cong van
+                    if (currentQuery.hasOwnProperty('rememberApplicant') && currentQuery.rememberApplicant && vm.rememberApplicant && vm.$refs.thongtinchuhoso) {
+                      let dataApplicant = ''
+                      try {
+                        if ( typeof(Storage) !== 'undefined') {
+                          dataApplicant = JSON.parse(sessionStorage.getItem('rememberApplicant'))
+                        }
+                      } catch (error) {
+                      }
+                      if (dataApplicant) {
+                        vm.$refs.thongtinchuhoso.initData(dataApplicant)
+                      }
+                    }
+                    // 
                     // call initData thong tin cong van
                     if (vm.$refs.thongtincongvan) {
                       vm.$refs.thongtincongvan.initData(result)
@@ -1233,6 +1278,10 @@ export default {
     },
     luuHoSo (type) {
       var vm = this
+      if (vm.loadingAction) {
+        return
+      }
+      let currentQuery = vm.$router.history.current.query
       // console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
       let thongtinchunghoso = this.$refs.thongtinchunghoso ? this.$refs.thongtinchunghoso.getthongtinchunghoso() : {}
@@ -1265,7 +1314,7 @@ export default {
           let dossierTemplates = thanhphanhoso
           let listAction = []
           let listDossierMark = []
-          if (dossierFiles) {
+          if (dossierFiles && vm.formCode !== 'UPDATE') {
             dossierFiles.forEach(function (value, index) {
               if (value.eForm) {
                 value['dossierId'] = vm.dossierId
@@ -1281,6 +1330,7 @@ export default {
           tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
           tempData['originality'] = vm.originality
           tempData['dossierName'] = vm.briefNote
+          
           // console.log('data put dossier -->', tempData)
           if (dichvuchuyenphathoso) {
             let vnpostal = {
@@ -1297,13 +1347,19 @@ export default {
             tempData['vnpostalStatus'] = dichvuchuyenphathoso.vnpostalStatus
             tempData['vnpostalProfile'] = vnpostal
           }
+          vm.loadingAction = true
           setTimeout(function () {
-            vm.loadingAction = true
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               if (vm.formCode === 'UPDATE') {
+                // cập nhật notify config
+                vm.updateMetaData()
                 vm.loadingAction = false
-                window.history.back()
+                if (vm.urlHistoryUpdateDvc) {
+                  window.location.href = vm.urlHistoryUpdateDvc + '/' + vm.dossierId
+                } else {
+                  window.history.back()
+                }
                 // vm.goBack()
               } else {
                 var initData = vm.$store.getters.loadingInitData
@@ -1331,6 +1387,8 @@ export default {
                   if (x) {
                     vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
                       vm.loadingAction = false
+                      // cập nhật notify config
+                      vm.updateMetaData()
                       vm.$router.push({
                         path: '/danh-sach-ho-so/' + vm.index,
                         query: {
@@ -1346,6 +1404,8 @@ export default {
                 } else {
                   vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
                     vm.loadingAction = false
+                    // cập nhật notify config
+                    vm.updateMetaData()
                     let currentQuery = vm.$router.history.current.query
                     vm.$router.push({
                       path: '/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId,
@@ -1354,16 +1414,19 @@ export default {
                       }
                     })
                     vm.tiepNhanState = false
+                  }).catch(function () {
+                    vm.loadingAction = false
                   })
                 }
               }
+              
             }).catch(function (xhr) {
               vm.loadingAction = false
               toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            }).catch(function () {
+              vm.loadingAction = false
             })
-            // cập nhật notify config
-            vm.updateMetaData()
           }, 500)
         }
       }
@@ -1371,6 +1434,10 @@ export default {
     tiepNhanHoSo (type) {
       let vm = this
       // console.log('luu Ho So--------------------')
+      if (vm.loadingAction) {
+        return
+      }
+      let currentQuery = vm.$router.history.current.query
       vm.$store.commit('setPrintPH', false)
       let thongtinchunghoso = this.$refs.thongtinchunghoso ? this.$refs.thongtinchunghoso.getthongtinchunghoso() : {}
       let thongtinchuhoso = this.$refs.thongtinchuhoso ? this.$refs.thongtinchuhoso.getThongTinChuHoSo() : {}
@@ -1425,12 +1492,22 @@ export default {
           tempData['dossierName'] = vm.briefNote
           tempData['originality'] = vm.originality
           tempData['fromViaPostal'] = vm.fromViaPostal ? 1 : 0
-
+          
+          console.log('tempData_PUT', tempData)
           let doAction = function () {
-            vm.$store.dispatch('putDossier', tempData).then(function (result) {
+            vm.$store.dispatch('putDossier', tempData).then(function (resultDossier) {
               vm.loadingAction = false
               if (vm.formCode === 'UPDATE') {
-                window.history.back()
+                if (vm.originality === 3) {
+                  window.history.back()
+                } else {
+                  vm.$router.push({
+                    path: '/danh-sach-ho-so/0/chi-tiet-ho-so/' + vm.dossierId + queryString,
+                    query: {
+                      renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                    }
+                  })
+                }
               } else {
                 var initData = vm.$store.getters.loadingInitData
                 let actionUser = initData.user.userName ? initData.user.userName : ''
@@ -1440,19 +1517,35 @@ export default {
                   paymentsOut = {
                     requestPayment: vm.payments['requestPayment'],
                     paymentNote: vm.payments['paymentNote'],
+                    paymentFee: vm.payments['paymentFee'],
                     advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
                     feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
                     serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
                     shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
                   }
-                  if (vm.payments && vm.payments.hasOwnProperty('counter')) {
-                    let dataNote = ''
-                    try {
-                      dataNote = JSON.parse(vm.paymentsOriginal['paymentNote'])
-                      dataNote.paymentNote = vm.payments['paymentNote']
-                      dataNote.counter = vm.payments['counter']
-                    } catch (error) {
+                  if (vm.payments['groupPaymentFile']) {
+                    paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
+                  }
+                  if (vm.payments && vm.payments.hasOwnProperty('counter') && vm.payments.counter) {
+                    let dataNote = {
+                      requestPayment: vm.payments['requestPayment'],
+                      paymentNote: vm.payments['paymentNote'],
+                      advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                      feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                      serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                      shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
+                      counter: vm.payments.counter,
+                      paymentFee: vm.payments['paymentFee']
                     }
+                    // 
+                    // let dataNote = ''
+                    // try {
+                    //   dataNote = JSON.parse(vm.paymentsOriginal['paymentNote'])
+                    //   dataNote.paymentNote = vm.payments['paymentNote']
+                    //   dataNote.counter = vm.payments['counter']
+                    // } catch (error) {
+                    // }
+                    // 
                     paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
                     paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
                     paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
@@ -1463,6 +1556,7 @@ export default {
                     paymentsOut.feeAmount = dataNotarization.feeTotal
                   }
                 }
+                console.log('paymentOut', vm.payments, paymentsOut)
                 var payloadDate = {
                   'dueDate': vm.editableDate && tempData.dueDate ? tempData.dueDate : vm.dueDateEdit,
                   'receiveDate': vm.receiveDateEdit
@@ -1494,10 +1588,20 @@ export default {
                   if (!type) {
                     vm.goBack()
                     vm.tiepNhanState = false
+                    if ( typeof(Storage) !== 'undefined') {
+                      sessionStorage.removeItem('rememberApplicant')
+                    }
                   } else {
                     // tạo hồ sơ mới
                     let current = vm.$router.history.current
                     let newQuery = current.query
+                    if (vm.rememberApplicant && tempData['userType'] == '2') {
+                      newQuery['rememberApplicant'] = true
+                      if ( typeof(Storage) !== 'undefined') {
+                        console.log('rememberApplicant123123', resultDossier)
+                        sessionStorage.setItem('rememberApplicant', JSON.stringify(resultDossier))
+                      }
+                    }
                     let dataCreateDossier = vm.$store.getters.getDataCreateDossier
                     vm.loadingAction = true
                     vm.$store.dispatch('postDossier', dataCreateDossier).then(function (result) {
@@ -1529,8 +1633,10 @@ export default {
               vm.loadingAction = false
               toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+              vm.updateMetaData()
+            }).catch(function() {
+              vm.loadingAction = false
             })
-            vm.updateMetaData()
           }
 
           if (!vm.mauCongVan) {
@@ -1576,10 +1682,7 @@ export default {
         }
       } else {
         toastr.error('Dữ liệu không hợp lệ')
-        console.log(validThongtinchuhoso)
         vm.applicantIdRequired = validThongtinchuhoso['applicantIdRequired']
-        console.log(validThongtinchuhoso['applicantIdRequired'])
-       
       }
     },
     tiepNhanCongVan (type, isDraf) {
@@ -1774,6 +1877,9 @@ export default {
           // console.log('data put dossier -->', tempData)
           tempData['dossierId'] = vm.dossierId
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
+            // 
+            vm.updateMetaData()
+            // 
             let dataPostAction = {
               dossierId: vm.dossierId,
               actionCode: 7100,
@@ -1787,8 +1893,7 @@ export default {
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
             })
           })
-          // 
-          vm.updateMetaData()
+          
         }).catch(reject => {
         })
       }
@@ -1840,6 +1945,9 @@ export default {
       vm.$store.dispatch('postDossier', dataCreateGroup).then(function (result) {
         tempData['dossierId'] = result.dossierId
         vm.$store.dispatch('putDossier', tempData).then(function (result) {
+          // 
+          vm.updateMetaData()
+          // 
           vm.loadingAction = false
           vm.$router.push({
             path: '/danh-sach-ho-so/0/nhom-ho-so/' + vm.formCode + '/' + result.dossierId,
@@ -1847,11 +1955,13 @@ export default {
           })
         }).catch(rejectXhr => {
           vm.loadingAction = false
+          // 
+          vm.updateMetaData()
+          // 
           toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại')
         })
-        // 
-        vm.updateMetaData()
+        
       })
     },
     // 
@@ -1945,15 +2055,38 @@ export default {
     },
     updateMetaData () {
       let vm = this
-      if (vm.originality !== 3 || !vm.notifyConfig) {
-        return
+      let currentQuery = vm.$router.history.current.query
+      if (vm.originality == 1 && vm.notifyConfig && !vm.showOptionName) {
+        let filter = {
+          dossierId: vm.dossierId,
+          smsNotify: vm.smsNotify,
+          emailNotify: vm.emailNotify
+        }
+        vm.$store.dispatch('updateMetaData', filter).then(result => {})
       }
-      let filter = {
-        dossierId: vm.dossierId,
-        smsNotify: vm.smsNotify,
-        emailNotify: vm.emailNotify
+      if (vm.showOptionName) {
+        let optionName = ''
+        if (currentQuery.hasOwnProperty('optionName') && currentQuery['optionName']) {
+          optionName = currentQuery['optionName']
+        }
+        if (vm.originality == 1 && vm.notifyConfig) {
+          let filter = {
+            dossierId: vm.dossierId,
+            smsNotify: vm.smsNotify,
+            emailNotify: vm.emailNotify,
+            optionName: optionName
+          }
+          vm.$store.dispatch('updateMetaData', filter).then(result => {})
+        } else {
+          let filter = {
+            dossierId: vm.dossierId,
+            optionName: optionName
+          }
+          vm.$store.dispatch('updateMetaData', filter).then(result => {})
+        }
+        
       }
-      vm.$store.dispatch('updateMetaData', filter).then(result => {})
+      
     },
     showHDTT () {
       let vm = this

@@ -143,9 +143,33 @@ export const store = new Vuex.Store({
             headers: {
               groupId: state.initData.groupId,
               Accept: 'application/json'
+            },
+            params: {
+              year: year,
+              month: 0,
+              groupBy: 2,
+              groupId: window.themeDisplay.getScopeGroupId(),
+              system: year == 0 ? 'allSystemTotal' : 'yearSum'
             }
           }
-          axios.get('/o/rest/statistics?year=' + year + '&month=0&domain=total&agency=total&system=total', param).then(function (response) {
+          param.params['govAgencyCode'] = param.params['agency']
+          param.params['domainCode'] = param.params['domain']
+          let urlStatistic = '/o/statistic/dossier/report'
+          try {
+            if (urlApiConfig && groupIdConfig) {
+              urlStatistic = urlApiConfig
+              param.params = {
+                year: year,
+                month: 0,
+                domainCode: 'total',
+                govAgencyCode: 'total',
+                groupBy: 2,
+                groupId: groupIdConfig
+              }
+            }
+          } catch (error) {
+          }
+          axios.get(urlStatistic, param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -176,10 +200,12 @@ export const store = new Vuex.Store({
             month: 0,
             domain: 'total',
             agency: 'total',
-            system: 'total'
+            groupId: window.themeDisplay.getScopeGroupId()
           }
+          textPost['govAgencyCode'] = textPost['agency']
+          textPost['domainCode'] = textPost['domain']
           dataPost.append('method', 'GET')
-          dataPost.append('url', '/statistics')
+          dataPost.append('url', '/statistic/dossier/report')
           dataPost.append('data', JSON.stringify(textPost))
           dataPost.append('serverCode', 'SERVER_DVC')
           axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
@@ -206,27 +232,41 @@ export const store = new Vuex.Store({
             },
             params: {
               year: filter.year,
-              month: filter.month,
-              group: filter.group,
-              agency: filter['agency'],
-              system: filter['system']
+              month: !filter.hasOwnProperty('month') ? '1,2,3,4,5,6,7,8,9,10,11,12' : filter.month,
+              // group: filter.group,
+              // agency: filter['agency'],
+              groupBy: 2,
+              groupId: window.themeDisplay.getScopeGroupId()
             }
           }
-          if (filter['report']) {
-            param.params['domain'] = 'total'
+          if (filter['system'] == 1) {
+            if (filter['domainCode'] === 'total') {
+              param.params['system'] = 'externalSystem'
+              // param.params['domainCode'] = 'total'
+            } else {
+              param.params['system'] = 'externalSystem'
+              // param.params['excludeSystem'] = 'internal,allSystemTotal,externalSystemTotal,internalSystemTotal,allSystem'
+            }
           }
-          if (filter['report'] === 'linemonth') {
-            param.params['domain'] = ''
+          if (filter['system'] == 0) {
+            if (filter['typeDossier'] == true) {
+              param.params['system'] = 'internal'
+            } else {
+              param.params['system'] = 'internal'
+            }
+          }
+          if (filter['system'] === 'total' && !filter['domainCode'] && filter.hasOwnProperty('month')) {
+            param.params['system'] = 'allSystem'
+          }
+          if (filter['system'] === 'total' && filter['domainCode'] === 'total' && filter.hasOwnProperty('month')) {
+            param.params['system'] = 'allSystem'
+          }
+          if (filter['system'] === 'total' && !filter['domainCode'] && !filter.hasOwnProperty('month')) {
+            param.params['system'] = 'allSystem'
           }
           // 
-          // let childsCode = []
-          // if (state.groupConfig) {
-          //   for (let key in state.groupConfig) {
-          //     childsCode = childsCode.concat(state.groupConfig[key][1].split(','))
-          //   }
-          // }
-          // 
-          axios.get('/o/rest/statistics', param).then(function (response) {
+          let urlStatistic = '/o/statistic/dossier/report'
+          axios.get(urlStatistic, param).then(function (response) {
             let serializable = response.data
             // Khởi tạo group cha với fix trường hợp group cha không có dữ liệu, group con có dữ liệu
             let childsCode = []
@@ -417,7 +457,10 @@ export const store = new Vuex.Store({
             month: filter.month,
             group: filter.group,
             agency: filter['agency'],
-            system: filter['system']
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+          if (filter['system'] !== 'total') {
+            params['system'] = filter['system']
           }
           if (filter['report']) {
             params['domain'] = 'total'
@@ -425,6 +468,16 @@ export const store = new Vuex.Store({
           if (filter['report'] === 'linemonth') {
             params['domain'] = ''
           }
+          // truyền params theo api sửa lại
+          params['govAgencyCode'] = paramm.params['agency']
+          params['domainCode'] = paramm.params['domain']
+          if (params['govAgencyCode'] === 'total' && params['domainCode'] === '') {
+            params['groupBy'] = 2
+          }
+          if (params['govAgencyCode'] === '' && params['domainCode'] === 'total') {
+            params['groupBy'] = 2
+          }
+          // 
           // 
           // let childsCode = []
           // if (state.groupConfig) {
@@ -434,7 +487,7 @@ export const store = new Vuex.Store({
           // }
           // 
           let dataPost = new URLSearchParams()
-          let url = '/statistics'
+          let url = '/statistic/dossier/report'
           // for (let index in params) {
           //   url += index + '=' + params[index] + '&'
           // }
@@ -882,7 +935,267 @@ export const store = new Vuex.Store({
           })
         })
       })
-    }
+    },
+    submitVotingMC ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            className: data.className,
+            classPk: data.classPk,
+            selected: data.voted,
+            votingCode: '',
+            overwrite: true
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            toastr.success('Cập nhật đánh giá thành công')
+            resolve(result.data)
+          }).catch(xhr => {
+            toastr.clear()
+            toastr.error('Cập nhật đánh giá thất bại')
+            reject(xhr)
+          })
+        }).catch(function (){})
+      })
+    },
+    loadVotingNew ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/vote/' + data.className)
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              items = items.filter(function(item) {
+                return item.voteModel && item.voteModel['status'] == 1
+              })
+              let lengthQuestion = items.length
+              for (let index = 0; index < lengthQuestion; index++) {
+                if (items[index]['lstChoiceDetailModels']) {
+                  let listChoice = Array.isArray(items[index]['lstChoiceDetailModels']) ? items[index]['lstChoiceDetailModels'] : [items[index]['lstChoiceDetailModels']]
+                  items[index] = Object.assign(items[index]['voteModel'], {choices: listChoice})
+                } else {
+                  items[index] = Object.assign(items[index]['voteModel'], {choices: []})
+                }
+              }
+              resolve(items)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+
+        })
+      })
+    },
+    loadVotingResult ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            fromDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            toDate: data.toReceiveDate ? data.toReceiveDate : '',
+            type: data.type ? data.type : '',
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/vote/' + data.className + '/statistic')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              if (data.govAgencyCode) {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode && item.govAgencyCode === data.govAgencyCode
+                })
+              } else {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode
+                })
+              }
+              resolve(items)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    loadVotingResultNltt ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            // fromDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            // toDate: data.toReceiveDate ? data.toReceiveDate : '',
+            type: data.type ? data.type : '',
+            domainCode: data.domainCode ? data.domainCode : '',
+            month: 0,
+            year: (new Date()).getFullYear()
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/vote/' + data.className + '/statistic')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              if (data.domainCode) {
+                items = items.filter(function (item) {
+                  return item.domainCode && item.voteCode && item.domainCode === data.domainCode
+                })
+              } else {
+                items = items.filter(function (item) {
+                  return item.domainCode && item.voteCode
+                })
+              }
+              resolve(items)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    loadVotingResultGov ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            fromReceiveDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            toReceiveDate: data.toReceiveDate ? data.toReceiveDate : ''
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/vote/' + data.className + '/statistic/voteResultGov')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              if (data.govAgencyCode) {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode && item.govAgencyCode === data.govAgencyCode
+                })
+              } else {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode
+                })
+              }
+              resolve(items)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    loadVotingResultDossier ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            fromDate: data.fromReceiveDate ? data.fromReceiveDate : '',
+            toDate: data.toReceiveDate ? data.toReceiveDate : '',
+            type: 24
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/vote/dossier/statistic')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            if (result.data.data) {
+              let items = Array.isArray(result.data.data) ? result.data.data : [result.data.data]
+              if (data.govAgencyCode) {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode && item.govAgencyCode === data.govAgencyCode
+                })
+              } else {
+                items = items.filter(function (item) {
+                  return item.govAgencyCode && item.voteCode
+                })
+              }
+              resolve(items)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    submitVotingNew ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay.getScopeGroupId()
+            }
+          }
+          let textPost = {
+            govAgencyCode: data.govAgencyCode,
+            govAgencyName: data.govAgencyName
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/vote/' + data.className + '/question/' + data.voteId + '/choice/' + data.voteChoiceId + '/gov')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', 'SERVER_DVC')
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            resolve(result)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+
+        })
+      })
+    },
   },
   mutations: {
     setInitData (state, payload) {

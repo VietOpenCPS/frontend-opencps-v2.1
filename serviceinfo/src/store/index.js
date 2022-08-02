@@ -147,6 +147,30 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getCountTagCode ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let paramGet = {
+            start: 0,
+            end: 1,
+            tagCode: data.tagCode,
+            // active: 'true'
+          }
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: paramGet
+          }
+          axios.get(state.endPoint + '/serviceinfos', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
     getServiceLists ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -157,13 +181,11 @@ export const store = new Vuex.Store({
             agency: filter.agency ? filter.agency : '',
             keyword: filter.keyword ? filter.keyword.replace(/[!@#$%^&*(),?":{}|<>]/g, '') : '',
             level: filter.level ? filter.level : 0,
-            domain: filter.domain ? filter.domain : ''
+            domain: filter.domain ? filter.domain : '',
+            tagCode: filter.tagCode ? filter.tagCode : '',
+            // active: 'true'
           }
-          // if (filter.domain) {
-          //   paramGet.sort = "siblingSearch"
-          // } else {
-          //   paramGet.sort = "siblingDomain"
-          // }
+          console.log('paramGet555', paramGet)
           if (filter.domain) {
             paramGet.sort = "siblingSearch"
           }
@@ -197,6 +219,7 @@ export const store = new Vuex.Store({
             start: 0,
             end: 1,
             keyword: filter.keyword ? filter.keyword.replace(/[!@#$%^&*(),?":{}|<>]/g, '') : '',
+            // active: 'true'
           }
           let param = {
             headers: {
@@ -424,6 +447,27 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
+        })
+      })
+    },
+    getServiceOpionByProcess ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          params: {
+          }
+        }
+        axios.get('/o/rest/v2/serviceconfigs/' + filter.serviceConfigId + '/processes', param).then(function (response) {
+          let serializable = response.data
+          if (serializable.data) {
+            resolve(serializable.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (error) {
+          reject([])
         })
       })
     },

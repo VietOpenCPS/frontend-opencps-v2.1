@@ -587,12 +587,17 @@ export default {
     ],
     top: '',
     register: '',
-    documentNo: ''
+    documentNo: '',
+    agencyItemsConfigAllMenu: ''
   }),
   computed: {
   },
   created () {
     let vm = this
+    try {
+      vm.agencyItemsConfigAllMenu = agencyItemsConfigAllMenu
+    } catch (error) {
+    }
     vm.getSearchItems()
     console.log('menuInfo', vm.menuInfo)
     vm.searchAdvanceConfig = vm.menuInfo.tableConfig.hasOwnProperty('searchAdvanceConfig') && vm.menuInfo.tableConfig.searchAdvanceConfig ? JSON.parse(vm.menuInfo.tableConfig.searchAdvanceConfig) : {}
@@ -659,10 +664,11 @@ export default {
         vm.$store.dispatch('getAgencyLists').then(function (result) {
           if (vm.searchAdvanceConfigDefault.agency.hasOwnProperty('source') && vm.searchAdvanceConfigDefault.agency.source) {
             vm.agencyItems = vm.searchAdvanceConfigDefault.agency.source
+          } else if (vm.agencyItemsConfigAllMenu) {
+            vm.agencyItems = vm.agencyItemsConfigAllMenu
           } else {
             vm.agencyItems = result
           }
-          
         }).catch(function (){})
       }
       if (!vm.domainItems || vm.domainItems.length === 0) {
@@ -711,10 +717,11 @@ export default {
     submitAdvSearch () {
       let vm = this
       // vm.selectMultiplePage = []
-      console.log('fromReceiveDate', vm.fromReceiveDate, vm.toReceiveDate)
+      let keywordSearch = vm.$store.getters.getKeywordSearch
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
+      newQuery['keyword'] = keywordSearch
       newQuery['status'] = vm.status
       newQuery['substatus'] = vm.substatus
       newQuery['top'] = vm.top
@@ -741,7 +748,7 @@ export default {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
-      queryString += 'adv_renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+      queryString += ('adv_renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1)
       queryString = queryString.replace(/=__/g, '=')
       vm.$router.push({
         path: current.path + queryString

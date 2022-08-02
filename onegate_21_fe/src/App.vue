@@ -1,7 +1,7 @@
 <template>
   <v-app class="onegate__fe" style="border: 1px solid #dedede;">
     <v-navigation-drawer app clipped floating width="240"
-      :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !isMobile"
+      :class='{"detail_state": detailState !== 0}' v-if="!groupIdSite && trangThaiHoSoList.length !== 0 && !isMobile"
     >
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="7" />
@@ -48,7 +48,7 @@
         </v-list-group>
       </v-list>
     </v-navigation-drawer>
-    <div v-if="trangThaiHoSoList.length !== 0 && isMobile" id="m-navigation">
+    <div v-if="!groupIdSite && trangThaiHoSoList.length !== 0 && isMobile" id="m-navigation">
       <div class="row-header mb-0 py-2" style="background-color: #070f52">
         <div class="ml-2 white--text"> <span>QUẢN LÝ HỒ SƠ</span> </div>
       </div>
@@ -101,7 +101,7 @@
     </div>
     <v-content>
       <router-view v-if="isSigned"></router-view>
-      <v-alert class="mx-3" v-if="!loading && trangThaiHoSoList.length === 0 && isSigned" outline color="warning" icon="priority_high" :value="true">
+      <v-alert class="mx-3" v-if="!loading && !groupIdSite && trangThaiHoSoList.length === 0 && isSigned" outline color="warning" icon="priority_high" :value="true">
         Bạn không có quyền thao tác!
       </v-alert>
       <v-layout class="mt-4" wrap style="max-width:500px;margin: 0 auto" v-if="!isSigned">
@@ -170,11 +170,18 @@
       },
       isMobile () {
         return this.$store.getters.getIsMobile
+      },
+      groupIdSite () {
+        return this.$store.getters.groupIdSite
       }
     },
     created () {
       let vm = this
       let isMobile = window.innerWidth < 1264
+      let currentQuery = vm.$router.history.current.query
+      if (currentQuery.hasOwnProperty('groupIdSiteMng') && currentQuery.groupIdSiteMng) {
+        vm.$store.commit('setGroupIdSite', currentQuery.groupIdSiteMng)
+      }
       vm.$store.commit('setIsMobile', isMobile)
       axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
         let userData = response.data
@@ -249,6 +256,9 @@
         vm.$store.commit('setIsMobile', isMobile)
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
+        if (currentQuery.hasOwnProperty('groupIdSiteMng') && currentQuery.groupIdSiteMng) {
+          vm.$store.commit('setGroupIdSite', currentQuery.groupIdSiteMng)
+        }
         if (currentQuery.hasOwnProperty('step')) {
           vm.currentStep = String(currentQuery.step)
           console.log('currentStep', String(currentQuery.step))

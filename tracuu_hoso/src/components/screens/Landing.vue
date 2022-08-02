@@ -2,10 +2,14 @@
   <div>
     <v-layout row wrap :class="isMobile ? 'pt-0' : 'pt-2'">
       <v-flex xs12 md3>
-        <div id="titlePortlet" style="font-size: 20px;font-weight: 500;color:#0054a6" :class="isMobile ? 'px-2 text-xs-center' : 'px-2'">
+        <div v-if="forEPayment" id="titlePortlet" style="font-size: 20px;font-weight: 500;color:#0054a6" :class="isMobile ? 'px-2 text-xs-center' : 'px-2'">
+          THANH TOÁN TRỰC TUYẾN
+        </div>
+        <div v-else id="titlePortlet" style="font-size: 20px;font-weight: 500;color:#0054a6" :class="isMobile ? 'px-2 text-xs-center' : 'px-2'">
           {{!qrscan ? 'TRA CỨU HỒ SƠ' : 'THÔNG TIN HỒ SƠ'}}
         </div>
         <v-card v-if="!qrscan" flat color="#ffffff" class="px-2 py-2">
+          <!-- <selfie-image-box @filterByApplicantIdNo="filterByApplicantIdNo"></selfie-image-box> -->
           <v-flex xs12 class="mb-1">
             <v-text-field
               label="Mã số hồ sơ"
@@ -35,17 +39,25 @@
             ></v-autocomplete>
           </v-flex> -->
           <v-flex xs12 class="mb-1">
-            <div><span style="color: red">(*) </span> Nhập mã hồ sơ hoặc số CMND/ hộ chiếu để thực hiện tra cứu hồ sơ.</div>
+            <div v-if="forEPayment"><span style="color: red">(*) </span> Nhập mã hồ sơ hoặc số CMND/ hộ chiếu để thực hiện thanh toán trực tuyến.</div>
+            <div v-else><span style="color: red">(*) </span> Nhập mã hồ sơ hoặc số CMND/ hộ chiếu để thực hiện tra cứu hồ sơ.</div>
           </v-flex>
           <v-flex xs12 :class="isMobile ? 'mb-2 right' : 'mb-2'">
+            <v-btn v-if="traCuuQlvt" class="mr-2 ml-0" color="primary" @click="traCuuHoSoVanTai"
+            :loading="loading"
+            :disabled="loading">
+              <v-icon>search</v-icon> &nbsp;
+              Hồ sơ Quản lý vận tải
+              <span slot="loader">Loading...</span>
+            </v-btn>
             <v-btn class="mr-2 ml-0" color="primary" @click="changeDataSearch"
             :loading="loading"
             :disabled="loading">
               <v-icon>search</v-icon> &nbsp;
-              Tìm kiếm
+              {{traCuuQlvt ? 'Hồ sơ DVC' : 'Tìm kiếm'}}
               <span slot="loader">Loading...</span>
             </v-btn>
-            <v-btn class="" outline color="#0072bc" @click.native="goBack">
+            <v-btn v-if="!traCuuQlvt" class="" outline color="#0072bc" @click.native="goBack">
               <v-icon>reply</v-icon> &nbsp;
               Quay lại
             </v-btn>
@@ -57,7 +69,7 @@
         </v-card>
       </v-flex>
 
-      <v-flex xs12 md9 :class="isMobile ? 'pt-1 mb-2' : 'pl-3 pt-1 mb-2'">
+      <v-flex v-if="!hoSoQlvt" xs12 md9 :class="isMobile ? 'pt-1 mb-2' : 'pl-3 pt-1 mb-2'">
         <v-card flat class="" v-if="!detail">
           <div class="" v-if="totalDossier > 0">
             <div class="px-2">Có <span class="text-bold" style="color:#0167d3">{{totalDossier}}</span> hồ sơ được tìm thấy</div>
@@ -144,7 +156,80 @@
         </v-card>
         <v-card flat class="" v-else>
           <chi-tiet-ho-so :detail="dossierDetail"></chi-tiet-ho-so>
+          <v-layout wrap align-center justify-end class="mt-3">
+            <v-btn color="primary" class="mx-2" @click.native="detail = false">
+              <v-icon>reply</v-icon>
+              <span class="px-2">Quay lại</span>
+            </v-btn>
+          </v-layout>
         </v-card>
+      </v-flex>
+      <v-flex v-if="hoSoQlvt" xs12 md9 :class="isMobile ? 'pt-1 mb-2' : 'pl-3 pt-1 mb-2'">
+        <div v-if="detailQlvt">
+          <v-layout class="wrap">
+            <v-flex :class="isMobile ? 'pb-2 pl-2' : 'pb-2'">
+              <h3 style="color:#0054a6"><span class="text-bold">Tên hồ sơ: </span>{{detailQlvt.TenTTHC}}</h3>
+            </v-flex>
+          </v-layout>
+          <v-card>
+            <v-card-text class="px-0 py-0">
+              <v-layout wrap class="px-2 py-2">
+                <v-flex xs12 sm4 class="pr-3">
+                  <div class="xs12 sm12 pb-1">
+                    <span class="pr-2">Mã hồ sơ: </span>
+                    <span class="pl-0 text-bold ">  {{detailQlvt.MaHoSo}} </span>
+                  </div>
+                  <div class="xs12 sm12 pb-1">
+                    <span class="pr-2">Chủ hồ sơ: </span>
+                    <span class="pl-0 text-bold"> {{detailQlvt.ChuHoSo}} </span>
+                  </div>
+                  <div class="xs12 sm12 pb-1">
+                    <span class="pr-2">Mã chủ hồ sơ : </span>
+                    <span class="pl-0 text-bold ">  {{detailQlvt.MaDoiTuong}} </span>
+                  </div>
+                  <!--  -->
+                  <div class="xs12 sm12 pb-1">
+                    <span class="pr-2">Đơn vị tiếp nhận: </span>
+                    <span class="pl-0 text-bold ">  {{detailQlvt.DonViXuLy}} </span>
+                  </div>
+                  <!--  -->
+                  
+                </v-flex>
+                <!--  -->
+                <v-flex xs12 sm4>
+                  <!--  -->
+                  <div class="xs12 sm12 pb-1">
+                    <span class="pr-2">Trạng thái: </span>
+                    <span class="pl-0 text-bold "> {{detailQlvt.TenTrangThaiHoSo}} </span>
+                  </div>
+                  <div class="xs12 sm12 pb-1">
+                    <span class="pr-2">Ngày gửi: </span>
+                    <span class="pl-0 text-bold"> {{detailQlvt.NgayGuiHoSo}} </span>
+                  </div>
+                  <!--  -->
+                  <div class="xs12 sm12 pb-1">
+                    <span class="pr-2">Ngày tiếp nhận: </span>
+                    <span class="pl-0 text-bold "> {{detailQlvt.NgayTiepNhan}}</span>
+                  </div>
+                  <!--  -->
+                  <div class="xs12 sm12 pb-1" v-if="detailQlvt.NgayHenTra">
+                    <span class="pr-2">Ngày hẹn trả: </span>
+                    <span class="pl-0 text-bold "> {{detailQlvt.NgayHenTra}}</span>
+                  </div>
+                  <div class="xs12 sm12 pb-1" v-if="detailQlvt.NgayKetThucXuLy">
+                    <span class="pr-2">Ngày hoàn thành: </span>
+                    <span class="pl-0 text-bold "> {{detailQlvt.NgayKetThucXuLy}}</span>
+                  </div>
+                </v-flex>
+              </v-layout>
+            </v-card-text>
+          </v-card>
+        </div>
+        <div v-else class="no-data" style="min-heiht: 350px; text-align: center; opacity: 0.7">
+          <img style="max-width: 500px;max-height:350px" src="/o/opencps-store/js/cli/tracuu_hoso/app/img/browser.svg" alt="" srcset=""><br>
+          <span>Không có hồ sơ nào được tìm thấy</span> <br>
+          <span>Vui lòng nhập thông tin tra cứu hồ sơ</span>
+        </div>
       </v-flex>
     </v-layout>
     <v-dialog v-model="dialogCheckPass" max-width="450">
@@ -198,6 +283,7 @@ import $ from 'jquery'
 import toastr from 'toastr'
 import TinyPagination from './Pagination.vue'
 import ChiTietHoSo from './DetailDossier'
+import SelfieImageBox from './SelfieImageBox'
 Vue.use(toastr)
 
 toastr.options = {
@@ -208,7 +294,8 @@ export default {
   props: [],
   components: {
     'tiny-pagination': TinyPagination,
-    'chi-tiet-ho-so': ChiTietHoSo
+    'chi-tiet-ho-so': ChiTietHoSo,
+    SelfieImageBox
   },
   data: () => ({
     dossierList: [],
@@ -223,6 +310,7 @@ export default {
     valid: false,
     secretKey: '',
     dialogCheckPass: false,
+    forEPayment: false,
     headers: [
       {
         text: 'STT',
@@ -265,7 +353,10 @@ export default {
       {text: 'Đã xử lý xong', value: 'releasing'},
       {text: 'Đã trả kết quả', value: 'done'}
     ],
-    status: null
+    status: null,
+    traCuuQlvt: false,
+    hoSoQlvt: false,
+    detailQlvt: ''
   }),
   computed: {
     originality () {
@@ -285,9 +376,22 @@ export default {
     if (vm.isMobile) {
       $('section#content').css('padding-left', '0px')
     }
+    let cameraBox = document.getElementsByClassName('camera-selfie-box')[0];
+    cameraBox.style.height = ""+ cameraBox.offsetWidth*3/4 + "px"
+    
+    let canvas = document.getElementById('canvasDup');
+    canvas.style.height = "" + canvas.offsetWidth * 3 / 4 + "px";
   },
   created () {
-    var vm = this
+    let vm = this
+    try {
+      vm.traCuuQlvt = traCuuQlvt
+    } catch (error) {  
+    }
+    try {
+      vm.forEPayment = forEPayment
+    } catch (error) {  
+    }
     vm.$nextTick(function () {
       var vm = this
       let current = vm.$router.history.current
@@ -305,6 +409,12 @@ export default {
         }
       } catch (error) {
       }
+
+      let cameraBox = document.getElementsByClassName('camera-selfie-box')[0];
+      cameraBox.style.height = ""+ cameraBox.offsetWidth*3/4 + "px"
+      
+      let canvas = document.getElementById('canvasDup');
+      canvas.style.height = "" + canvas.offsetWidth * 3 / 4 + "px";
     })
   },
   updated () {
@@ -342,7 +452,8 @@ export default {
         page: vm.dossierPage,
         dossierNo: vm.dossierNoKey,
         applicantIdNo: vm.applicantIdNo,
-        status: vm.status
+        status: vm.status,
+        order: true
       }
       if (vm.dossierNoKey || vm.applicantIdNo) {
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
@@ -356,8 +467,14 @@ export default {
         vm.loading = false
       }
     },
+    filterByApplicantIdNo(applicantIdNo) {
+      let vm = this
+      vm.applicantIdNo = applicantIdNo
+      vm.changeDataSearch()
+    },
     changeDataSearch () {
       let vm = this
+      vm.hoSoQlvt = false
       if (vm.dossierNoKey || vm.applicantIdNo) {
         setTimeout(function () {
           vm.dossierPage = 1
@@ -368,6 +485,7 @@ export default {
           newQuery['dossierNo'] = vm.dossierNoKey
           newQuery['applicantIdNo'] = vm.applicantIdNo
           newQuery['status'] = vm.status
+          newQuery['order'] = true
           for (let key in newQuery) {
             if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
               queryString += key + '=' + newQuery[key] + '&'
@@ -382,6 +500,30 @@ export default {
         }, 100)
       } else {
         toastr.error('Vui lòng nhập mã hồ sơ hoặc số CMND/ hộ chiếu để tra cứu')
+      }
+    },
+    traCuuHoSoVanTai () {
+      let vm = this
+      vm.hoSoQlvt = true
+      vm.detail = true
+      if (vm.dossierNoKey) {
+        vm.loading = true
+        let filter = {
+          dossierNo: vm.dossierNoKey
+        }
+        vm.$store.dispatch('traCuuHsQlvt', filter).then(function (result) {
+          vm.loading = false
+          if (result) {
+            vm.detailQlvt = result
+          } else {
+            vm.detailQlvt = ''
+          }
+        }).catch(function (reject) {
+          vm.loading = false
+          // toastr.error('Lỗi hệ thống')
+        })
+      } else {
+        toastr.error('Vui lòng nhập mã hồ sơ để tra cứu')
       }
     },
     changeStatus () {

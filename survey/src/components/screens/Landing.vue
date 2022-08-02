@@ -1,6 +1,6 @@
 <template>
   <div :class="!isMobile ? 'pt-3' : 'pt-0'" style="max-width:1300px;height: 100%; background-color: #ffff;" >
-    <v-layout row wrap>
+    <v-layout row wrap v-if="surveyLayoutVersion !== 2">
       <v-flex xs12 md9 v-if="votingItems.length > 0">
         <v-layout row wrap>
           <v-flex xs12 sm12 class="mb-4 px-2" v-if="!isMobile">
@@ -26,22 +26,28 @@
                   <span class="d-block white--text" style="transform: skew(25deg)">Chỉ số {{index + 1}} : </span>
                 </div>
                 <div class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687">
-                  {{ item.subject }}
+                  {{ ksBgt ? item.title : item.subject }}
                 </div>
               </v-layout>
               <div class="text-bold px-2" v-if="isMobile">
                 <div class="" style="text-align: justify;color:#034687">
-                  Chỉ số {{index + 1}}: {{ item.subject }}
+                  Chỉ số {{index + 1}}: {{ ksBgt ? item.title : item.subject }}
                 </div>
               </div>
               <div :class="!isMobile ? 'ml-4' : 'ml-2'">
-                <div v-if="ksBgt && (index === 4 || index === 5 || index === 7 || index === 8)" class="mt-2">
+                <!-- <div v-if="ksBgt && (index === 4 || index === 5 || index === 7 || index === 8)" class="mt-2">
                   <span style="color: red">(*) </span> <i>Chỉ số giành cho cơ quan quản lý đánh giá</i>
                 </div>
                 <v-radio-group v-model="item.selected" column class="mt-1">
                   <v-radio :disabled="ksBgt && (index === 4 || index === 5 || index === 7 || index === 8)" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
-                    <div v-if="ksBgt && (index === 4 || index === 5 || index === 7 || index === 8)" style="text-align: justify; opacity: 0.7; color: black" slot="label">{{itemChoise}}</div>
-                    <div v-else style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{itemChoise}}</div>
+                    <div v-if="ksBgt && (index === 4 || index === 5 || index === 7 || index === 8)" style="text-align: justify; opacity: 0.7; color: black" slot="label">{{itemChoise.subject}}</div>
+                    <div v-else style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{ksBgt ? itemChoise.subject : itemChoise}}</div>
+                  </v-radio>
+                </v-radio-group> -->
+
+                <v-radio-group v-model="item.selected" column class="mt-1">
+                  <v-radio :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                    <div style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{ksBgt ? itemChoise.subject : itemChoise}}</div>
                   </v-radio>
                 </v-radio-group>
               </div>
@@ -111,7 +117,6 @@
                   v-model="agency"
                   item-text="govAgencyName"
                   item-value="govAgencyCode"
-                  @change="changeAgency()"
                   hide-details
                   hide-no-data
                   solo
@@ -128,7 +133,7 @@
                 ></v-progress-circular>
               </div>
               <div v-else>
-                <v-flex xs12 v-for="(item, index) in votingItems" :key="index" class="white--text mt-2">
+                <v-flex v-if="!ksBgt" xs12 v-for="(item, index) in votingItems" :key="index" class="white--text mt-2">
                   <v-layout row justify-center v-if="!ksBgt">
                     <v-flex xs7 class="text-xs-center">
                       <span>Chỉ số {{index + 1}}: </span>
@@ -138,37 +143,258 @@
                   <v-layout row justify-center v-else>
                     <v-flex xs7 class="text-xs-center">
                       <span>Chỉ số {{index + 1}}: </span>
-                      <span v-if="index === 4 || index === 5 || index === 7 || index === 8" style="color:#6dcff6">2 / 2 điểm</span>
-                      <span v-else style="color:#6dcff6">{{item.answersCount ? item.averageScore + ' / 2 điểm' : 'Chưa có đánh giá'}}</span>
+                      <span style="color:#6dcff6">{{item.answersCount ? item.averageScore + ' / 2 điểm' : 'Chưa có đánh giá'}}</span>
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
+                <v-flex v-if="ksBgt" xs12 v-for="(item, index) in votingResult" :key="index" class="white--text mt-2">
+                  <v-layout row justify-center>
+                    <v-flex xs7 class="text-xs-center">
+                      <span>Chỉ số {{index + 1}}: </span>
+                      <!-- <span v-if="index === 4 || index === 5 || index === 7 || index === 8" style="color:#6dcff6">2 / 2 điểm</span> -->
+                      <span style="color:#6dcff6">{{item.point ? item.point + ' điểm' : 'Chưa có đánh giá'}}</span>
                     </v-flex>
                   </v-layout>
                 </v-flex>
               </div>
             </v-card-text>
           </v-card>
-          
-          <!-- Thống kê chi tiết các chỉ số. Sử dụng sau -->
-          <!-- <v-card v-for="(item, index) in votingItems" :key="index" color="#0072bc" flat class="px-2 py-2 mt-4" style="border-radius: 7px;">
-            <v-card-text class="px-2 py-1 pr-0">
-              <div class="text-xs-center white--text text-bold">Kết quả đánh giá Chỉ số {{index + 1}}</div>
-              <div class="text-xs-center white--text" >Năm {{(new Date()).getFullYear()}}</div>
-              <div class="mt-3" v-for="(item1, index1) in item['answerPercent']" :key="index1">
-                <v-layout wrap class="mb-2">
-                  <div class="flex white--text" style="width:70px">{{item1.name}} : </div>
-                  <progress-bar class="flex pt-1" size="13" :spacing="1" bar-transition="all 1s ease"
-                  :val="Number(item1.percent)" 
-                  bg-color="#e0e0e0" bar-color="#6dcff6" text-fg-color="#fff" style="z-index:10000;width: calc(100% - 120px)">
-                  </progress-bar>
-                  <div style="width:50px;color:#6dcff6" class="flex pl-2 text-bold">{{item1.percent}} % </div>
-                </v-layout>
-              </div>
-            </v-card-text>
-          </v-card> -->
+        
         </div>
       </v-flex>
       <v-flex xs12 sm1>
       </v-flex>
     </v-layout>
+    <div v-if="surveyLayoutVersion === 2" style="border: 2px solid #e9e9e9;border-radius: 5px;">
+      <v-dialog
+        v-model="dialogLoading"
+        persistent
+        width="300"
+        v-if="loadingData"
+      >
+        <v-card
+          color="primary"
+          dark
+        >
+          <v-card-text>
+            <v-progress-linear
+              indeterminate
+              color="white"
+              class="mb-0"
+            ></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+      <v-tabs
+        color="white"
+        dark
+        icons-and-text
+      >
+        <v-tabs-slider color="blue"></v-tabs-slider>
+    
+        <v-tab href="#tab-1" class="ml-3 mr-4 black--text" >
+          <span style="font-size: 16px">THỰC HIỆN ĐÁNH GIÁ</span>
+          <v-icon class="black--text" size=26>done_all</v-icon>
+        </v-tab>
+    
+        <v-tab href="#tab-2" class="black--text" @click="getResultNltt(currentYear)">
+          <span style="font-size: 16px">KẾT QUẢ ĐÁNH GIÁ CỦA NLTT</span>
+          <v-icon class="black--text" size=26>ballot</v-icon>
+        </v-tab>
+
+        <v-tab href="#tab-3" style="max-width: 350px;" class="black--text" @click="getResultQlnn(currentYear)">
+          <span style="font-size: 16px">KẾT QUẢ ĐÁNH GIÁ CỦA CƠ QUAN QLNN</span>
+          <v-icon class="black--text" size=26>ballot</v-icon>
+        </v-tab>
+    
+        <v-tab-item
+          value="tab-1"
+        >
+          <v-card flat>
+            <v-card-text class="mt-2">
+              <v-layout row wrap class="ml-2">
+                <v-flex xs12 sm12>
+                  <div v-for="(item, index) in votingItems" style="margin-bottom: 5px;" :key="index">
+                    <v-layout wrap class="text-bold" v-if="!isMobile">
+                      <div class="flex px-3 py-1" style="height:26px;max-width:87px;background-color: #034687;transform: skew(-25deg)">
+                        <span class="d-block white--text" style="transform: skew(25deg)">Chỉ số {{index + 1}} : </span>
+                      </div>
+                      <div class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687">
+                        {{ item.title}}
+                      </div>
+                    </v-layout>
+                    <div class="text-bold px-2" v-if="isMobile">
+                      <div class="" style="text-align: justify;color:#034687">
+                        Chỉ số {{index + 1}}: {{ item.title }}
+                      </div>
+                    </div>
+                    <div :class="!isMobile ? 'ml-4' : 'ml-2'">
+                      <v-radio-group v-model="item.selected" column class="mt-1">
+                        <v-radio :disabled="item.processTime" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                          <div v-if="item.processTime" style="text-align: justify; opacity: 0.7; color: black" slot="label">{{itemChoise.subject}}</div>
+                          <div v-else style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{itemChoise.subject}}</div>
+                        </v-radio>
+                      </v-radio-group>
+                    </div>
+                </div>
+                <v-flex xs12 sm12 class="mx-2 my-3" v-if="showCaptcha">
+                  <div style="max-width: 400px;background: #dedede;margin: 0 auto;" class="pb-2">
+                    <v-flex xs12 class="py-2" style="
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    ">
+                      <div id="captcha" class="d-inline-block text-xs-center" style="padding-top: 15px;background: #fff;border-radius: 5px;"></div>
+                      <v-btn class="right ml-3 mx-0 my-0" title="refresh" flat icon v-on:click.native="createCaptcha">
+                        <v-icon color="primary" size="32">refresh</v-icon>
+                      </v-btn>
+                    </v-flex>
+                    <v-text-field
+                      class="mx-3"
+                      single-lines
+                      hide-details
+                      solo
+                      flat
+                      height="36"
+                      min-height="36"
+                      clearable
+                      v-model="captchaValue"
+                      placeholder="Nhập mã captcha"
+                    ></v-text-field>
+                  </div>
+                  
+                </v-flex>
+                <v-flex xs12 sm12 :class="!isMobile ? 'text-xs-left mt-2' : 'text-xs-left my-2 px-2'">
+                  <v-btn class="white--text" @click="showFormVerify" color="#004C98" :loading="btnLoading" :disabled="btnLoading">
+                    <v-icon>save</v-icon>&nbsp;
+                    Gửi đánh giá
+                  </v-btn>
+                </v-flex>
+              </v-flex>
+            </v-layout>
+            </v-card-text>
+          </v-card>
+        </v-tab-item>
+
+        <v-tab-item
+          value="tab-2"
+        >
+          <v-card flat>
+            <v-card-text class="reportTable">
+              <v-layout wrap>
+                <v-flex xs12 md8>
+                  <p class="mb-3" style="font-size: 14px;font-weight: bold;color: #0054a6;">TỔNG HỢP KẾT QUẢ ĐÁNH GIÁ GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH CỦA NGƯỜI LÀM THỦ TỤC NĂM {{yearNltt}}</p>
+                </v-flex>
+                <v-flex xs12 md4>
+                  <v-select
+                    style="width: 150px"
+                    :items="yearList"
+                    item-value="value"
+                    item-text="name"
+                    v-model="yearNltt"
+                    class="right"
+                    @change="changeYear('nltt')"
+                  ></v-select>
+                </v-flex>
+              </v-layout>
+              <table class="my-2" hide-default-footer>
+                <thead>
+                  <tr>
+                    <th class="text-center px-2">
+                      <span>STT</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Chỉ số đánh giá</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Tiêu chí đánh giá</span>
+                    </th>
+                    <th class="text-center px-2 py-1">
+                      <span>Lượt đánh giá</span>
+                    </th>
+                    <th class="text-center px-2 py-1">
+                      <span>Điểm trung bình</span>
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody v-for="(item,index) in statisticNltt" :key="index">
+                  <tr>
+                    <td align="left" colspan="4"  class="px-2 text-bold">{{item.domainName}}</td>
+                  </tr>
+                  
+                  <tr v-for="(item2,index2) in item['votings']" :key="index2">
+                    <td align="center" class="px-2">{{index2 + 1}}</td>
+                    <td align="left"  class="px-2">Chỉ số {{index2 + 1}}</td>
+                    <td align="left"  class="px-2">{{item2.title}}</td>
+                    <td align="center"  class="px-2">{{item2.countVoteResult}}</td>
+                    <td align="center"  class="px-2">{{Number(item2.countVoteResult ? (item2.point/item2.countVoteResult).toFixed(2) : 0)}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </v-card-text>
+          </v-card>
+        </v-tab-item>
+
+        <v-tab-item
+          value="tab-3"
+        >
+          <v-card flat>
+            <v-card-text class="reportTable">
+              <v-layout wrap>
+                <v-flex xs12 md8>
+                  <p class="mb-3" style="font-size: 14px;font-weight: bold;color: #0054a6;">TỔNG HỢP KẾT QUẢ ĐÁNH GIÁ GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH CỦA CƠ QUAN QUẢN LÝ NHÀ NƯỚC NĂM {{yearQlnn}}</p>
+                </v-flex>
+                <v-flex xs12 md4>
+                  <v-select
+                    style="width: 150px"
+                    :items="yearList"
+                    item-value="value"
+                    item-text="name"
+                    v-model="yearQlnn"
+                    class="right"
+                    @change="changeYear('qlnn')"
+                  ></v-select>
+                </v-flex>
+              </v-layout>
+              
+              <table class="my-2" hide-default-footer>
+                <thead>
+                  <tr>
+                    <th class="text-center px-2">
+                      <span>STT</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Chỉ số đánh giá</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Tiêu chí đánh giá</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Số điểm</span>
+                    </th>
+                    
+                  </tr>
+                </thead>
+
+                <tbody v-for="(item,index) in statisticQlnn" :key="index">
+                  <tr>
+                    <td align="left" colspan="5"  class="px-2 text-bold">{{item.govAgencyName}}</td>
+                  </tr>
+                  
+                  <tr v-for="(item2,index2) in item['votings']" :key="index2">
+                    <td align="center" class="px-2">{{index2 + 1}}</td>
+                    <td align="left"  class="px-2">Chỉ số {{index2 + 1}}</td>
+                    <td align="left"  class="px-2">{{item2.title}}</td>
+                    <td align="center"  class="px-2">{{item2.point}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </v-card-text>
+          </v-card>
+        </v-tab-item>
+      </v-tabs>
+    </div>
     <v-dialog v-model="dialogVerify" persistent max-width="500">
       <v-card>
         <v-card-title class="headline">
@@ -236,7 +462,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialog_voting_result" fullscreen hide-overlay transition="dialog-bottom-transition">
+    <v-dialog v-if="!ksBgt" v-model="dialog_voting_result" fullscreen hide-overlay transition="dialog-bottom-transition">
       <v-card>
         <v-toolbar dark color="primary">
           <v-toolbar-title class="pl-5">Kết quả đánh giá</v-toolbar-title>
@@ -350,6 +576,11 @@ export default {
     ProgressBar
   },
   data: () => ({
+    dialogLoading: true,
+    loadingData: false,
+    currentYear: (new Date()).getFullYear(),
+    yearNltt: (new Date()).getFullYear(),
+    yearQlnn: (new Date()).getFullYear(),
     votingItems: [],
     btnLoading: false,
     showCaptcha: false,
@@ -364,9 +595,15 @@ export default {
     dossierNo: '',
     dialogVerify: false,
     ksBgt: false,
+    surveyLayoutVersion: 1,
+    statisticNltt: [],
+    statisticQlnn: [],
     agencyList: [],
+    domainList: [],
     agency: '',
-    loadingChangeAgency: false
+    loadingChangeAgency: false,
+    votingResult: [],
+    statisticDossier: []
   }),
   computed: {
     loading () {
@@ -374,34 +611,74 @@ export default {
     },
     isMobile () {
       return this.$store.getters.getIsMobile
+    },
+    yearList() {
+      let arr = [];
+      let year = new Date().getFullYear();
+      for (let i = 0; i <= 3; i++) {
+        arr.push({ name: "Năm " + (year - i), value: year - i });
+      }
+      return arr;
     }
   },
   created () {
     var vm = this
+    try {
+      vm.agencyLists = agencyList
+    } catch (error) {
+    }
+    try {
+      vm.surveyLayoutVersion = surveyLayoutVersion ? surveyLayoutVersion : 1
+    } catch (error) {
+    }
     try {
       vm.ksBgt = ksBgt
     } catch (error) {
     }
     try {
       vm.agencyList = agencyList
-      vm.agency = vm.agencyList[0]
+      // vm.agency = vm.agencyList[0]
+    } catch (error) {
+    }
+    try {
+      vm.domainList = domainList
     } catch (error) {
     }
     vm.$nextTick(function () {
-      vm.$store.dispatch('loadVoting', {
-        className: 'survey',
-        classPk: 0
-      }).then(result => {
-        vm.votingItems = result
-        vm.totalAnswer = 0
-        for (let i = 0; i < vm.votingItems.length; i++) {
-          vm.totalAnswer += Number(vm.votingItems[i]['answersCount'])
-          vm.getPercentItem(vm.votingItems[i], i)
-        }
-        // vm.getPercentTotal(vm.votingItems)
-        console.log(vm.votingItems)
-      }).catch(xhr => {
-      })
+      if (vm.ksBgt) {
+        vm.$store.dispatch('loadVotingNew', {
+          className: 'survey'
+        }).then(function(result) {
+          vm.votingItems = result
+          let sortVote = function (voteList) {
+            function compare(a, b) {
+              if (a.voteCode < b.voteCode)
+                return -1
+              if (a.voteCode > b.voteCode)
+                return 1
+              return 0
+            }
+            return voteList.sort(compare)
+          }
+          vm.votingItems = sortVote(vm.votingItems)
+        }).catch(xhr => {
+        })
+        vm.getCounter()
+      } else {
+        vm.$store.dispatch('loadVoting', {
+          className: 'survey',
+          classPk: 0
+        }).then(result => {
+          vm.votingItems = result
+          vm.totalAnswer = 0
+          for (let i = 0; i < vm.votingItems.length; i++) {
+            vm.totalAnswer += Number(vm.votingItems[i]['answersCount'])
+            vm.getPercentItem(vm.votingItems[i], i)
+          }
+        }).catch(xhr => {
+        })
+      }
+      
     })
   },
   watch: {
@@ -418,8 +695,9 @@ export default {
     showFormVerify () {
       let vm = this
       let valid = false
+      console.log('votingItems', vm.votingItems)
       for (let key in vm.votingItems) {
-        if (String(vm.votingItems[key]['selected']) !== '0') {
+        if (vm.votingItems[key]['selected'] && String(vm.votingItems[key]['selected']) !== '0') {
           valid = true
         }
       }
@@ -456,7 +734,11 @@ export default {
       vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
         if (String(result.dossierNo) === String(vm.dossierNo)) {
           if (String(result.applicantIdNo) === String(vm.applicantIdNo)) {
-            vm.doVottingResultSubmit()
+            if (vm.ksBgt) {
+              vm.doVottingResultSubmitNew()
+            } else {
+              vm.doVottingResultSubmit()
+            }
           } else {
             toastr.error('Hồ sơ ' + vm.dossierNo + ' không phải hồ sơ quý khách đã đăng ký. Quý khách vui lòng kiểm tra lại.')
           }
@@ -467,7 +749,20 @@ export default {
         toastr.error('Hồ sơ ' + vm.dossierNo + ' không tồn tại. Quý khách vui lòng kiểm tra lại.')
       })
     },
-    doVottingResultSubmit: function () {
+    increCounter () {
+      let vm = this
+      let data = {
+        dossierNo: vm.dossierNo
+      }
+      vm.$store.dispatch('increCounter', data).then(function (result) {})
+    },
+    getCounter () {
+      let vm = this
+      vm.$store.dispatch('getCounter',{}).then(function (result) {
+        vm.totalAnswer = result
+      })
+    },
+    doVottingResultSubmit () {
       var vm = this
       vm.btnLoading = true
       let arrAction = []
@@ -475,10 +770,10 @@ export default {
       for (var key in vm.votingItems) {
         vm.votingItems[key]['className'] = 'survey' 
         vm.votingItems[key]['classPk'] = 0
-        if (String(vm.votingItems[key]['selected']) !== '0') {
+        if (vm.votingItems[key]['selected'] && String(vm.votingItems[key]['selected']) !== '0') {
           valid = true
           if (vm.ksBgt) {
-            if (key === 0 || key === 1 || key === 2 || key === 3 || key === 6) {
+            if (key == 0 || key == 1 || key == 2 || key == 3 || key == 6) {
               arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
             }
           } else {
@@ -504,6 +799,55 @@ export default {
               vm.getPercentItem(vm.votingItems[i], i)
             }
             // vm.getPercentTotal(vm.votingItems)
+          }).catch( function () {
+          })
+        }).catch(xhr => {
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          vm.btnLoading = false
+        })
+      } else {
+        vm.btnLoading = false
+        toastr.error('Bạn chưa chọn đánh giá nào')
+      }
+      
+    },
+    doVottingResultSubmitNew () {
+      var vm = this
+      vm.btnLoading = true
+      let arrAction = []
+      let valid = false
+      for (var key in vm.votingItems) {
+        vm.votingItems[key]['className'] = 'survey'
+        if (vm.votingItems[key]['selected'] && !vm.votingItems[key]) {
+          valid = true
+          let indexChoice = vm.votingItems[key]['selected'] - 1
+          arrAction.push(vm.$store.dispatch('submitVotingNew', Object.assign(vm.votingItems[key]['choices'][indexChoice], {dossierNo: vm.dossierNo})))
+        }
+      }
+      if (valid) {
+        Promise.all(arrAction).then(results => {
+          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          vm.increCounter()
+          vm.dialogVerify = false
+          vm.createCaptcha()
+          vm.captchaValue = ''
+          vm.btnLoading = false
+          vm.$store.dispatch('loadVotingNew', {
+            className: 'survey'
+          }).then(result => {
+            vm.votingItems = result
+            let sortVote = function (voteList) {
+              function compare(a, b) {
+                if (a.voteCode < b.voteCode)
+                  return -1
+                if (a.voteCode > b.voteCode)
+                  return 1
+                return 0
+              }
+              return voteList.sort(compare)
+            }
+            vm.votingItems = sortVote(vm.votingItems)
+            vm.getResultNltt(vm.currentYear)
           }).catch( function () {
           })
         }).catch(xhr => {
@@ -649,8 +993,151 @@ export default {
       let vm = this
       vm.loadingChangeAgency = true
       setTimeout(function () {
-        vm.loadingChangeAgency = false
+        vm.$store.dispatch('loadVotingResult', {
+          govAgencyCode: vm.agency ? vm.agency['govAgencyCode'] : ''
+        }).then(result => {
+          vm.votingResult = []
+          vm.votingItems.forEach(element => {
+            let itemPoint = element
+            if (result && result.length > 0) {
+              let kq = result.filter(function (item) {
+                return item.voteCode == element.voteCode
+              })
+              if (kq && kq.length > 0) {
+                itemPoint['point'] = kq[0]['point']
+              } else {
+                itemPoint['point'] = 0
+              }
+            } else {
+              itemPoint['point'] = 0
+            }
+            vm.votingResult.push(itemPoint)
+          })
+          vm.loadingChangeAgency = false
+        }).catch(xhr => {
+          vm.loadingChangeAgency = false
+        })
       }, 500)
+    },
+    changeYear(target) {
+      let vm = this
+      setTimeout(function () {
+        if (target === 'nltt') {
+          vm.getResultNltt(vm.yearNltt)
+        } else if (target === 'qlnn') {
+          vm.getResultQlnn(vm.yearQlnn)
+        }
+      }, 100)
+    },
+    getResultNltt (year) {
+      let vm = this
+      let data = {
+        govAgencyCode: '',
+        fromReceiveDate: (new Date(year + '-01-01')).getTime(),
+        toReceiveDate: (new Date(year + '-12-31')).getTime(),
+        year: year
+      }
+      vm.loadingData = true
+      vm.$store.dispatch('loadVotingResult', data).then(function(result) {
+        let voteStatistic = []
+        vm.loadingData = false
+        result.forEach(element => {
+          let indexSt = vm.domainList.findIndex(function(gov) {
+            return gov.domainCode == element.domainCode
+          })
+          if (indexSt >=0) {
+            element['domainName'] = vm.domainList[indexSt]['domainName']
+            voteStatistic.push(element)
+          }
+        })
+
+        let sortVote = function (voteList) {
+          function compare(a, b) {
+            if (a.voteCode < b.voteCode)
+              return -1
+            if (a.voteCode > b.voteCode)
+              return 1
+            return 0
+          }
+          return voteList.sort(compare)
+        }
+        voteStatistic = sortVote(voteStatistic)
+        if (voteStatistic && voteStatistic.length) {
+          let statistic = []
+          voteStatistic.forEach(element => {
+            let indexSt = statistic.findIndex(function(st) {
+              return st.domainCode == element.domainCode
+            })
+            if (indexSt >= 0) {
+              statistic[indexSt]['votings'].push(element)
+            } else {
+              let itemSt = {
+                domainCode: element.domainCode,
+                domainName: element.domainName,
+                votings: [element]
+              }
+              statistic.push(itemSt)
+            }
+          })
+          vm.statisticNltt = statistic
+        }
+      }).catch(xhr => {
+        vm.statisticNltt = []
+        vm.loadingData = false
+      })
+    },
+    getResultQlnn (year) {
+      let vm = this
+      vm.loadingData = true
+      vm.$store.dispatch('loadVotingResultQlnn', {
+        fromReceiveDate: '01/01/' + year,
+        toReceiveDate: '31/12/' + year
+      }).then(function(result) {
+        vm.loadingData = false
+        let voteStatistic = []
+        result.forEach(element => {
+          let indexSt = vm.agencyList.findIndex(function(gov) {
+            return gov.govAgencyCode == element.govAgencyCode
+          })
+          if (indexSt >=0) {
+            element['govAgencyName'] = vm.agencyList[indexSt]['govAgencyName']
+            voteStatistic.push(element)
+          }
+        })
+        let sortVote = function (voteList) {
+          function compare(a, b) {
+            if (a.voteCode < b.voteCode)
+              return -1
+            if (a.voteCode > b.voteCode)
+              return 1
+            return 0
+          }
+          return voteList.sort(compare)
+        }
+        voteStatistic = sortVote(voteStatistic)
+        if (voteStatistic && voteStatistic.length) {
+          let statistic = []
+          voteStatistic.forEach(element => {
+            let indexSt = statistic.findIndex(function(st) {
+              return st.govAgencyCode == element.govAgencyCode
+            })
+            if (indexSt >= 0) {
+              statistic[indexSt]['votings'].push(element)
+            } else {
+              let itemSt = {
+                govAgencyCode: element.govAgencyCode,
+                govAgencyName: element.govAgencyName,
+                votings: [element]
+              }
+              statistic.push(itemSt)
+            }
+          })
+          vm.statisticQlnn = statistic
+        }
+      }).catch(xhr => {
+        vm.statisticQlnn = []
+        vm.loadingData = false
+      })
     },
     validateCaptcha () {
       let vm = this

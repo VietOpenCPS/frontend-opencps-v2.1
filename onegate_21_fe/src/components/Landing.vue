@@ -9,7 +9,7 @@
             v-model="keyword"
             placeholder="Tìm kiếm theo tên hồ sơ, mã hồ sơ, tên thủ tục, chủ hồ sơ ..."
             solo
-            @change="keyword=String(keyword).trim()"
+            @change="changeKeyword"
             @keyup.enter="keywordEventChange"
           ></v-text-field>
         </div>
@@ -35,7 +35,15 @@
     <!-- Tìm kiếm nâng cao -->
     <tim-kiem-nang-cao :menuInfo="trangThaiHoSoList[index]" ref="advSearch" v-if="advSearchShow"></tim-kiem-nang-cao>
     <!--  -->
-    <div class="menu_header_list py-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
+    <v-layout v-show="aiSearching">
+      <v-flex sm24 xs24>
+        <v-card elevation="0" class="px-5 py-3">
+          <selfie-image-box ref="selfieImageBox" @filterByApplicantIdNo="filterByApplicantIdNo"></selfie-image-box>
+        </v-card>
+      </v-flex>
+    </v-layout>
+    <div class="menu_header_list py-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'
+    v-show="!aiSearching || (aiSearching && aiSearchComplete)">
       <v-layout wrap v-if="originality !== 1 && trangThaiHoSoList">
         <v-flex v-if="!trangThaiHoSoList[index]['tableConfig'].hasOwnProperty('searchCongVan') && !hiddenFilterDomain" xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
           <v-autocomplete
@@ -92,7 +100,6 @@
             item-value="serviceConfigId"
             return-object
             hide-no-data
-            :hide-selected="true"
             @change="changeServiceConfigs"
             clearable
             box
@@ -109,7 +116,6 @@
             item-value="processOptionId"
             return-object
             hide-no-data
-            :hide-selected="true"
             @change="changeDichVuConfigs"
             box
           ></v-autocomplete>
@@ -163,7 +169,7 @@
         </v-flex>
       </v-layout>
       <div class="py-1 px-1" style="background: #ffffff;border-top: 1px solid lightgrey;"
-        v-if="dossierCounting !== null && dossierCounting !== undefined && dossierCounting.length > 0 && dossierCountingShow"
+        v-if="dossierCounting !== null && dossierCounting !== undefined && dossierCounting.length > 0 && dossierCountingShow && !aiSearching"
       >
         <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index"
          @click="changeAdvFilterDataChips(item)" :color="item.key === status || item.key === top ? 'orange' : ''"
@@ -204,7 +210,7 @@
       <v-menu bottom v-if="getUser('Administrator_data')" style="position:relative !important">
         <v-btn slot="activator" color="red" dark>Go to &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
         <v-list>
-          <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_DONE'}, 0, true)" >
+          <!-- <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_DONE'}, 0, true)" >
             <v-list-tile-title>Hoàn thành</v-list-tile-title>
           </v-list-tile>
           <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_CANCEL'}, 0, true)">
@@ -212,7 +218,12 @@
           </v-list-tile>
           <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_DENY'}, 0, true)">
             <v-list-tile-title>Từ chối</v-list-tile-title>
+          </v-list-tile> -->
+
+          <v-list-tile v-for="(item, index) in stepCodeForGoTo" v-bind:key="index" @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_STEP', stepCode: item.stepCode, stepName: item.stepName}, 0, true)" >
+            <v-list-tile-title>{{item.stepName}}</v-list-tile-title>
           </v-list-tile>
+          
         </v-list>
       </v-menu>
       
@@ -242,7 +253,7 @@
       </v-btn> -->
       <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
         v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
-        v-if="(String(item.form).indexOf('VIEW') < 0 && menuType !== 3 && !hideGroupAction) || (String(item.form).indexOf('VIEW') < 0 && menuType !== 3 && hideGroupAction && String(item.form) !== 'ACTIONS') "
+        v-if="showThaoTac(item)"
         :loading="loadingAction && indexBTN === indexAction"
         :disabled="loadingAction && indexBTN === indexAction"
       >
@@ -262,6 +273,7 @@
         class="table-landing table-bordered"
         no-data-text="Không có hồ sơ nào"
         hide-actions
+        v-show="!aiSearching || (aiSearching && aiSearchComplete)"
       >
       <!--  -->
       <template slot="headers" slot-scope="props">
@@ -418,7 +430,7 @@
         </tr>
       </template>
     </v-data-table>
-    <div class="text-xs-right layout wrap" style="position: relative;">
+    <div class="text-xs-right layout wrap" style="position: relative;" v-show="!aiSearching || (aiSearching && aiSearchComplete)">
       <div class="flex pagging-table px-2" :class="isMobile ? 'mt-2' : ''"> 
         <!-- <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" :numberPerPage="limitRecord" :showLimit="showLimit ? showLimit : false" custom-class="custom-tiny-class" 
           :limits="limits" @tiny:change-page="paggingData" ></tiny-pagination>  -->
@@ -465,7 +477,6 @@
                   item-value="processOptionId"
                   return-object
                   hide-no-data
-                  :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
                   :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn']"
                   @change="changeDichVuConfigs"
@@ -673,7 +684,6 @@
                   item-value="processOptionId"
                   return-object
                   hide-no-data
-                  :hide-selected="true"
                   :rules="[v => !!v || 'Trường hợp bắt buộc phải chọn.']"
                   required
                 ></v-autocomplete>
@@ -947,6 +957,7 @@ import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import support from '../store/support.json'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import AdvSearch from './TimKiemNangCao'
+import SelfieImageBox from './ext/SelfieImageBox.vue'
 
 export default {
   props: ['index'],
@@ -956,7 +967,8 @@ export default {
     'y-kien-can-bo': YkienCanBoThucHien,
     'template-rendering': TemplateRendering,
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
-    'tim-kiem-nang-cao': AdvSearch
+    'tim-kiem-nang-cao': AdvSearch,
+    SelfieImageBox
   },
   data: () => ({
     dossierSelect: '',
@@ -1111,6 +1123,15 @@ export default {
     hiddenFilterDomain: false,
     focusSelect: 0,
     srcDownloadIframe: '',
+    showOptionName: false,
+    stepCodeForGoTo: [
+      {stepName: 'Hoàn thành', stepCode: '400'},
+      {stepName: 'Rút hồ sơ', stepCode: '410'},
+      {stepName: 'Từ chối', stepCode: '420'}
+    ],
+    aiSearchComplete: false,
+    aiSearching: false,
+    applicantIdNo: '',
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       cmndHoChieu: (value) => {
@@ -1210,9 +1231,16 @@ export default {
     employeeLoginInfomation () {
       return this.$store.getters.getEmployeeLogin
     },
+    userRoles () {
+      return this.$store.getters.getUser.role
+    }
   },
   created () {
     let vm = this
+    try {
+      vm.showOptionName = showOptionName
+    } catch (error) {
+    }
     vm.selectMultiplePage = []
     vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
     vm.$nextTick(function () {
@@ -1231,7 +1259,12 @@ export default {
       } else {
         vm.hosoDatasPage = 1
       }
-
+      // Add_AI
+      if (query.hasOwnProperty('applicantIdNo')) {
+        vm.aiSearching = true
+        vm.aiSearchComplete = true
+      }
+      // 
       if (vm.activePrintBienNhan) {
         vm.itemAction = {
           title: 'In phiếu biên nhận',
@@ -1253,6 +1286,11 @@ export default {
         }
       } catch (error) {
       }
+      try {
+        if (stepCodeForGoTo) {
+          vm.stepCodeForGoTo = stepCodeForGoTo
+        }
+      } catch (error) {}
     })
   },
   updated () {
@@ -1346,6 +1384,20 @@ export default {
             }
             console.log('vm.doActionGroup updated', vm.doActionGroup)
             vm.$store.commit('setLoadingDynamicBtn', false)
+            // Add_AI
+            // if (vm.trangThaiHoSoList[vm.index]['id'] == 'tra_cuu_ai') {
+            if (vm.trangThaiHoSoList[vm.index]['menuGroup'] === 'tra_cuu_ai') {
+              vm.aiSearching = true
+            } else if (currentQuery.hasOwnProperty('applicantIdNo')) {
+              vm.aiSearching = true
+              vm.aiSearchComplete = true
+            } else {
+              vm.aiSearching = false
+              vm.aiSearchComplete = false
+              vm.applicantIdNo = ''
+              vm.$refs.selfieImageBox.deleteImage()
+            }
+            // 
           }).catch(function (){})
         }, 200)
       }
@@ -1383,6 +1435,19 @@ export default {
       if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hiddenFilterDomain') && vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain) {
         vm.hiddenFilterDomain = vm.trangThaiHoSoList[vm.index]['tableConfig'].hiddenFilterDomain
       }
+      // Add_AI
+      if (vm.trangThaiHoSoList[vm.index]['id'] == 'tra_cuu_ai') {
+        vm.aiSearching = true
+      } else if (currentQuery.hasOwnProperty('applicantIdNo')) {
+        vm.aiSearching = true
+        vm.aiSearchComplete = true
+      } else {
+        vm.aiSearching = false
+        vm.aiSearchComplete = false
+        vm.applicantIdNo = ''
+        vm.$refs.selfieImageBox.deleteImage()
+      }
+      // 
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
         vm.$store.commit('setLoadingDynamicBtn', true)
@@ -1975,6 +2040,9 @@ export default {
             documentNo: currentQuery.hasOwnProperty('documentNo') ? currentQuery.documentNo : vm.documentNo,
             donvigui: currentQuery.hasOwnProperty('donvigui') ? currentQuery.donvigui : '',
             donvinhan: currentQuery.hasOwnProperty('donvinhan') ? currentQuery.donvinhan : '',
+            // Add_AI 
+            applicantIdNo: currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '',
+            // 
             sort: vm.sortValue
           }
         } else {
@@ -2016,6 +2084,9 @@ export default {
             documentNo: currentQuery.hasOwnProperty('documentNo') ? currentQuery.documentNo : vm.documentNo,
             donvigui: currentQuery.hasOwnProperty('donvigui') ? currentQuery.donvigui : '',
             donvinhan: currentQuery.hasOwnProperty('donvinhan') ? currentQuery.donvinhan : '',
+            // Add_AI
+            applicantIdNo: currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '',
+            // 
             sort: vm.sortValue
           }
         }
@@ -2081,6 +2152,9 @@ export default {
               }
             } else {
               vm.dossierCounting = []
+            }
+            if (vm.getUser('Administrator_data') && (!vm.dossierCounting || vm.dossierCounting.length == 0)) {
+              vm.dossierCounting = [{key: 'deleted', title: 'Hồ sơ đã xóa', count: 0}]
             }
             vm.dossierCountingShow = true
           }).catch(function (){})
@@ -2503,34 +2577,14 @@ export default {
           vm.doUndoDossier(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'RESTORE_DOSSIER') {
           vm.doRestoreDossier(dossierItem, item, index, isGroup)
-        } else if (String(item.form) === 'GOTO_DONE') {
+        } else if (String(item.form) === 'GOTO_STEP') {
           if (!dossierItem) {
             alert('Chọn hồ sơ để thực hiện')
             return
           }
           let result = {
-            stepCode: 400,
-            stepName: 'hoàn thành'
-          }
-          vm.gotoStep(dossierItem, result)
-        } else if (String(item.form) === 'GOTO_CANCEL') {
-          if (!dossierItem) {
-            alert('Chọn hồ sơ để thực hiện')
-            return
-          }
-          let result = {
-            stepCode: 410,
-            stepName: 'rút'
-          }
-          vm.gotoStep(dossierItem, result)
-        } else if (String(item.form) === 'GOTO_DENY') {
-          if (!dossierItem) {
-            alert('Chọn hồ sơ để thực hiện')
-            return
-          }
-          let result = {
-            stepCode: 420,
-            stepName: 'từ chối'
+            stepCode: item.stepCode,
+            stepName: item.stepName
           }
           vm.gotoStep(dossierItem, result)
         }
@@ -3019,6 +3073,10 @@ export default {
             query_redirect = Object.assign(query_redirect, {formActionGroup: JSON.stringify(vm.itemAction)})
             console.log('query_redirect_Landing', query_redirect)
           }
+          if (vm.itemAction['form'] === 'NEW' && vm.showOptionName) {
+            query_redirect = Object.assign(query_redirect, {optionName: vm.dichVuSelected['optionName']})
+            console.log('query_redirect_Landing', query_redirect)
+          }
           vm.$store.dispatch('postDossier', data).then(function (result) {
             vm.loadingAction = false
             vm.indexAction = -1
@@ -3293,22 +3351,36 @@ export default {
       let vm = this
       let currentQuery = vm.$router.history.current.query
       if (item.permission) {
-        if (item['originality'] === 9) {
-          if (vm.trangThaiHoSoList[vm.index]['id'].indexOf('CV_DI') !== -1) {
-            vm.$router.push({
-              path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV_DI/' + item.dossierId,
-              query: vm.$router.history.current.query
-            })
-          } else {
-            vm.$router.push({
-              path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV/' + item.dossierId,
-              query: vm.$router.history.current.query
-            })
-          }
-          
+        // check với hồ sơ trực tuyến BNG
+        if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('updateDossierDoAction') && vm.originality === 3
+          && item.dossierStatus === 'receiving' && item.online
+        ) {
+          currentQuery['template_no'] = item.dossierTemplateNo
+          currentQuery['serviceCode'] = item.serviceCode
+          currentQuery['updateDossierDoAction'] = vm.trangThaiHoSoList[vm.index]['tableConfig']['updateDossierDoAction']
+          vm.$router.push({
+            path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + item.dossierId + '/UPDATE',
+            query: currentQuery
+          })
         } else {
-          vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+          if (item['originality'] === 9) {
+            if (vm.trangThaiHoSoList[vm.index]['id'].indexOf('CV_DI') !== -1) {
+              vm.$router.push({
+                path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV_DI/' + item.dossierId,
+                query: vm.$router.history.current.query
+              })
+            } else {
+              vm.$router.push({
+                path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/NEW_GROUP_CV/' + item.dossierId,
+                query: vm.$router.history.current.query
+              })
+            }
+            
+          } else {
+            vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+          }
         }
+        
       } else {
         if (item['originality'] === 1) {
           vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
@@ -3316,6 +3388,11 @@ export default {
           alert('Bạn không có quyền thao tác với hồ sơ này')
         }
       }
+    },
+    changeKeyword () {
+      let vm = this
+      vm.keyword=String(vm.keyword).trim()
+      vm.$store.commit('setKeywordSearch', vm.keyword)
     },
     keywordEventChange (data) {
       let vm = this
@@ -3340,6 +3417,9 @@ export default {
       newQuery['keyword'] = String(vm.keyword).trim()
       newQuery['status'] = vm.status
       newQuery['top'] = vm.top
+      // Add_AI
+      newQuery['applicantIdNo'] = String(vm.applicantIdNo)
+      // 
       for (let key in newQuery) {
         if (key === 'page') {
           queryString += key + '=1&'
@@ -3353,6 +3433,14 @@ export default {
         path: current.path + queryString
       })
     },
+    // Add_AI
+    filterByApplicantIdNo(applicantIdNo) {
+      let vm = this
+      vm.applicantIdNo = applicantIdNo
+      vm.doRedirectFilter()
+      vm.aiSearchComplete = true
+    },
+    // 
     changeAdvFilterDataChips (item) {
       let vm = this
       if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming' || item.key === 'overtime') {
@@ -3443,6 +3531,30 @@ export default {
         return list
       }
       
+    },
+    showThaoTac (item) {
+      let vm = this
+      let value = false
+      if (
+        (String(item.form).indexOf('VIEW') < 0 && vm.menuType !== 3 && !vm.hideGroupAction) ||
+        (String(item.form).indexOf('VIEW') < 0 && vm.menuType !== 3 && vm.hideGroupAction && String(item.form) !== 'ACTIONS')
+      ) {
+        value = true
+      }
+      if (item.hasOwnProperty('isRole') && item.isRole) {
+        let roleAction = item.isRole.split(',')
+        for (let i = 0; i < roleAction.length; i++) {
+          let roleItem = roleAction[i]
+          let roleExits = vm.userRoles.find(item => item === roleItem)
+          if (roleExits) {
+            value = true
+            break;
+          } else {
+            value = false
+          }
+        }
+      }
+      return value
     },
     changeDate() {
       let vm = this

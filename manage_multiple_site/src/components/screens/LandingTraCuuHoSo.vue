@@ -246,10 +246,25 @@
                 </v-flex>
                 <v-flex xs12 sm6 class="mb-2 px-2">
                   <div>
-                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Mã hồ sơ :</div>
+                    <!-- <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Mã hồ sơ :</div>
                     <v-text-field
                       placeholder="Nhập mã hồ sơ"
                       v-model="dossierNoKey"
+                      class="search-input-appbar input-search d-inline-block"
+                      style="width: calc(100% - 200px);"
+                      single-lines
+                      hide-details
+                      solo
+                      flat
+                      height="32"
+                      min-height="32"
+                      clearable
+                    ></v-text-field> -->
+
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Từ khóa :</div>
+                    <v-text-field
+                      placeholder="Nhập từ khóa tìm kiếm"
+                      v-model="keywordSearch"
                       class="search-input-appbar input-search d-inline-block"
                       style="width: calc(100% - 200px);"
                       single-lines
@@ -376,7 +391,7 @@
         </template>
       </v-data-table>
       <!--  -->
-      <div class="my-2">
+      <div class="my-2" v-if="dossierList.length > 0">
         <div class="text-xs-right layout wrap" style="position: relative;">
           <div class="flex pagging-table"> 
             <tiny-pagination :total="totalDossierSearch" :page="dossierPage" :numberPerPage="limitRecord" nameRecord="hồ sơ" custom-class="custom-tiny-class" 
@@ -587,7 +602,7 @@
       serviceFilter: '',
       donviSelect: '',
       groupIdDonVi: '',
-      capCoQuanThucHien: '',
+      capCoQuanThucHien: 'SBN',
       validFormSearch: false,
       administrationList: [],
       listDoiTuong: [],
@@ -596,6 +611,7 @@
       govAgencyList: [],
       govAgencyFilter: '',
       dossierNoKey: '',
+      keywordSearch: '',
       dossierList: [],
       limitRecord: 20,
       numberPerPage: 20,
@@ -619,6 +635,7 @@
       menuDate6: false,
       toReleaseDate: '',
       toReleaseDateFormatted: '',
+      xuLyHoSo: false,
       dossierListHeader: [
         {
           text: 'STT',
@@ -701,6 +718,7 @@
           class: 'ketqua_column'
         }
       ],
+      restartPage: false
     }),
     components: {
       'tiny-pagination': TinyPagination
@@ -721,6 +739,10 @@
       let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
+      try {
+        vm.xuLyHoSo = xuLyHoSo
+      } catch (error) {
+      }
       try {
         vm.donViHuyen = donViHuyen
         // sử dụng cho các đơn vị huyện quản lý hồ sơ cấp xã
@@ -752,20 +774,55 @@
         vm.getDomains()
         vm.getServiceInfo()
       }
-      
+      // 
+      try {
+        let paramsSearch = window.location.href.split("?")[1]
+        if (paramsSearch) {
+          let jsonParams = decodeURI(paramsSearch)
+          .replace('?', '')
+          .split('&')
+          .map(param => param.split('='))
+          .reduce((values, [ key, value ]) => {
+            values[ key ] = value
+            return values
+          }, {})
+          vm.capCoQuanThucHien = jsonParams.hasOwnProperty('capCoQuanThucHien') ? jsonParams.capCoQuanThucHien : ''
+          vm.groupIdDonVi = jsonParams.hasOwnProperty('groupId') ? jsonParams.groupId : ''
+          vm.dossierPage = jsonParams.hasOwnProperty('dossierPage') ? jsonParams.dossierPage : 1
+          vm.govAgencyFilter = jsonParams.hasOwnProperty('agency') ? jsonParams.agency : ''
+          vm.domainFilter = jsonParams.hasOwnProperty('domain') ? jsonParams.domain : ''
+          vm.serviceFilter = jsonParams.hasOwnProperty('service') ? jsonParams.service : ''
+          vm.dossierNoKey = jsonParams.hasOwnProperty('dossierNo') ? jsonParams.dossierNo : ''
+          vm.statusFilter = jsonParams.hasOwnProperty('status') ? jsonParams.status : ''
+          vm.fromReceiveDateFormatted = jsonParams.hasOwnProperty('fromReceiveDate') ? jsonParams.fromReceiveDate : ''
+          vm.toReceiveDateFormatted = jsonParams.hasOwnProperty('toReceiveDate') ? jsonParams.toReceiveDate : ''
+          vm.fromReleaseDateFormatted = jsonParams.hasOwnProperty('fromReleaseDate') ? jsonParams.fromReleaseDate : ''
+          vm.toReleaseDateFormatted = jsonParams.hasOwnProperty('toReleaseDate') ? jsonParams.toReleaseDate : ''
+          vm.keywordSearch = jsonParams.hasOwnProperty('keyword') ? jsonParams.keyword : ''
+          console.log('capCoQuanThucHien5555', vm.capCoQuanThucHien)
+          vm.getDossiers()
+        }
+      } catch (error) {
+      }
+      // 
     },
     watch: {
       capCoQuanThucHien (val) {
         let vm = this
+        vm.govAgencyList = []
+        console.log('capCoQuanThucHien', val)
         if (!vm.donViHuyen) {
-          vm.govAgencyFilter = ''
-          vm.domainFilter = ''
-          vm.serviceFilter = ''
-          vm.quanhuyenSelected = ''
+          // vm.govAgencyFilter = ''
+          // vm.domainFilter = ''
+          // vm.serviceFilter = ''
+          // vm.quanhuyenSelected = ''
           if(val){
-            vm.getAgencys(val)
+            if (val !== 'XA_PHUONG') {
+              vm.getAgencys(val)
+            }
             if (val === 'XA_PHUONG') {
               vm.getDictcollectionsQuanHuyen()
+              vm.govAgencyList = []
             }
             if (val === 'QUAN_HUYEN' || val === 'XA_PHUONG') {
               vm.getDomains(val === 'QUAN_HUYEN' ? 'CAP_HUYEN' : 'CAP_XA')
@@ -780,14 +837,17 @@
 
       govAgencyFilter (val) {
         let vm = this
+        console.log('val-govAgencyFilter', val)
         if (!vm.boNganh) {
           if (!vm.donViHuyen) {
             if (val) {
-              if (vm.agencySiteList.length > 0) {
+              if (vm.agencySiteList.length > 0 && vm.capCoQuanThucHien !== 'XA_PHUONG') {
                 try {
+                  console.log('val-agencySiteList', vm.agencySiteList)
                   vm.groupIdDonVi = vm.agencySiteList.filter(function (item) {
-                    return item.itemCode === val
+                    return item.itemCode === val || item.code === val
                   })[0]['value']
+                  console.log('val-groupIdDonVi', vm.groupIdDonVi)
                   vm.getStatusList()
                 } catch (error) {
                 }
@@ -848,9 +908,14 @@
         vm.$store.dispatch('getServiceAdminisTration', {}).then(
           res => {
             vm.administrationList = sortCode(res)
-            vm.capCoQuanThucHien = 'SBN'
-            vm.getAgencys('SBN')
-            vm.getAgencys('QUAN_HUYEN')
+            if (!vm.capCoQuanThucHien) {
+              vm.capCoQuanThucHien = 'SBN'
+            }
+            if (vm.capCoQuanThucHien === 'SBN') {
+              vm.getAgencys('SBN')
+            } else {
+              vm.getAgencys('QUAN_HUYEN')
+            }
           }
         ).catch(()=>{})
       },
@@ -875,6 +940,16 @@
           }) 
         } else {
           vm.quanhuyenSelected = parentFilter
+          if (vm.capCoQuanThucHien === 'XA_PHUONG' && parentFilter) {
+            try {
+              vm.groupIdDonVi = vm.agencySiteList.filter(function (item) {
+                return item.parent === parentFilter.itemCode || item.parent === parentFilter.itemCode
+              })[0]['value']
+              console.log('val-groupIdDonVi123', vm.groupIdDonVi)
+              vm.getStatusList()
+            } catch (error) {
+            }
+          }
           vm.$store.dispatch('getAgencysFromParent', data).then(
             res => {
               vm.govAgencyList = res
@@ -1023,19 +1098,32 @@
           agency: vm.govAgencyFilter ? vm.govAgencyFilter : '',
           domain: vm.domainFilter ? vm.domainFilter : '',
           service: vm.serviceFilter ? vm.serviceFilter : '',
-          dossierNo: vm.dossierNoKey,
+          dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
           status: vm.statusFilter,
           fromReceiveDate: vm.fromReceiveDateFormatted ? vm.fromReceiveDateFormatted : '',
           toReceiveDate: vm.toReceiveDateFormatted ? vm.toReceiveDateFormatted : '',
           fromReleaseDate: vm.fromReleaseDateFormatted ? vm.fromReleaseDateFormatted : '',
-          toReleaseDate: vm.toReleaseDateFormatted ? vm.toReleaseDateFormatted : ''
+          toReleaseDate: vm.toReleaseDateFormatted ? vm.toReleaseDateFormatted : '',
+          keyword: vm.keywordSearch ? vm.keywordSearch : ''
         }
+        vm.redirectUrl = ""
         if (!vm.boNganh) {
           vm.$store.dispatch('getDossiers', params).then(res => {
             vm.loadingTable = false
             vm.totalDossierSearch = res.total
             if (res.data) {
               vm.dossierList = res.data
+
+              // 
+              try {
+                params = Object.assign(params, {dossierPage: vm.dossierPage, capCoQuanThucHien: vm.capCoQuanThucHien})
+                let urlParams = Object.keys(params).map(function(k) {
+                  return encodeURIComponent(k) + '=' + encodeURIComponent(params[k])
+                }).join('&')
+                vm.redirectUrl = window.location.origin + window.location.pathname + '#/?' + urlParams
+              } catch (error) {
+              }
+              // 
             } else {
               vm.dossierList = []
               vm.totalDossierSearch = 0
@@ -1148,10 +1236,21 @@
       },
       viewDetailDossier (data) {
         let vm = this
-        vm.getDetailDossier(data)
-        setTimeout(function() {
-          vm.dialogDetailDossier = true
-        }, 100)
+        if (!vm.xuLyHoSo) {
+          vm.getDetailDossier(data)
+          setTimeout(function() {
+            vm.dialogDetailDossier = true
+          }, 100)
+        } else {
+          let pathName = window.location.origin + window.location.pathname
+          try {
+            pathName = pathNameConfig
+          } catch (error) {
+          }
+          window.location.href = pathName + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + data.dossierId + '?groupIdSiteMng=' + data.groupId +
+          '&redirectUrl=' + vm.redirectUrl
+        }
+        
       },
       durationText(durationUnit, durationCount) {
         let durationText

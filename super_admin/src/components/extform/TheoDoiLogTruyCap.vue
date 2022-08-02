@@ -15,7 +15,7 @@
       </v-toolbar>
     </v-card>
     <v-layout wrap class="px-3 py-3" style="background-color: #ececec;">
-      <v-flex xs12 sm12 class="px-2 mb-3">
+      <v-flex xs12 sm6 class="px-2 mb-3">
         <div>
           <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Danh sách API:</div>
           <v-autocomplete
@@ -42,7 +42,7 @@
           </v-autocomplete>
         </div>
       </v-flex>
-      <!-- <v-flex xs12 sm6 class="px-2 mb-3">
+      <v-flex xs12 sm6 class="px-2 mb-3">
         <div class="d-inline-block text-bold pt-2" style="font-weight:450;width: 130px;">Mã hồ sơ:</div>
         <v-text-field
           v-model="dossierNo"
@@ -56,7 +56,7 @@
           min-height="32"
           clearable
         ></v-text-field>
-      </v-flex> -->
+      </v-flex>
       <v-flex xs12 sm6 class="px-2">
         <div class="layout wrap">
           <div class="d-inline-block text-bold pt-2" style="font-weight:450;width: 130px;">Từ ngày:</div>
@@ -119,12 +119,34 @@
         </div>
       </v-flex>
       <v-flex class="xs12 mx-2 mt-2">
-        <v-btn class="mx-0 mb-0" color="blue darken-3" dark @click.native="searchSyncDossier">
+        <v-btn class="mx-0 mb-0" color="blue darken-3" dark @click.native="searchSyncDossier"
+          :loading="loadingTable"
+          :disabled="loadingTable"
+        >
           <v-icon size="18">search</v-icon> &nbsp; Tìm kiếm
         </v-btn>
       </v-flex>
     </v-layout>
     <div>
+      <v-layout wrap class="white py-2" v-if="dossierList.length">
+        <downloadExcel
+          class="btn btn-default btn-export"
+          :data="json_data"
+          style="display: none"
+        >
+          Export Excel
+        </downloadExcel>
+        <v-flex class="xs12">
+          <v-btn color="blue darken-3 white--text right mx-0"
+            @click="exportExcel"
+            :loading="loading"
+            :disabled="loading"
+          >
+            <v-icon>import_export</v-icon>&nbsp;
+            Xuất excel
+          </v-btn>
+        </v-flex>
+      </v-layout>
       <v-data-table
         :headers="dossierListHeader"
         :items="dossierList"
@@ -157,6 +179,14 @@
               </content-placeholders>
               <div v-else>
                 <span>{{ dossierPage * numberPerPage - numberPerPage + props.index + 1 }}</span>
+              </div>
+            </td>
+            <td class="text-xs-left" style="height:36px;border-right: 1px solid #dedede">
+              <content-placeholders v-if="loadingTable">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{props.item.dossierNo}}</span>
               </div>
             </td>
             <td class="text-xs-left" style="height:36px;border-right: 1px solid #dedede">
@@ -208,7 +238,7 @@
       </div>
     </div>
 
-    <v-dialog v-model="dialog_dataInfo" scrollable persistent max-width="1000px">
+    <v-dialog v-model="dialog_dataInfo" scrollable persistent max-width="1300px">
       <v-card>
         <v-toolbar dark color="blue" class="px-3">
           <v-toolbar-title>Dữ liệu đồng bộ</v-toolbar-title>
@@ -218,12 +248,16 @@
           </v-btn>
         </v-toolbar>
         <v-card-text class="py-1" >
-          <v-layout wrap class="py-1 align-center">
-            <v-flex xs12 sm6 class="px-2 data-request" style="height: 350px;">
-              <v-jsoneditor class="content-data" ref="editorData" v-model="dataRequest" :options="options" :plus="true" height="100%">
+          <v-layout wrap class="py-1">
+            <v-flex xs12 sm6 class="px-2 data-request" style="border: 1px solid #dedede;border-radius: 5px;padding-top: 10px;">
+              <p style="font-weight: bold;">Dữ liệu gửi:</p>
+              <!-- <vue-json-pretty :path="'res'" :data="dataRequest" > </vue-json-pretty> -->
+              <div style="word-break: break-all;">{{dataRequest}}</div>
             </v-flex>
-            <v-flex xs12 sm6 class="px-2 data-response" style="height: 350px;">
-              <v-jsoneditor class="content-data" ref="editorData" v-model="dataResponse" :options="options" :plus="true" height="100%">
+            <v-flex xs12 sm6 class="px-2 data-response" style="border: 1px solid #dedede;border-radius: 5px;padding-top: 10px;">
+              <p style="font-weight: bold;">Dữ liệu nhận:</p>
+              <div style="word-break: break-all;">{{dataResponse}}</div>
+              <!-- <vue-json-pretty :path="'res'" :data="dataResponse" > </vue-json-pretty> -->
             </v-flex>
           </v-layout>
         </v-card-text>
@@ -243,15 +277,17 @@
 import Vue from 'vue'
 import axios from "axios"
 import TinyPagination from './Pagination.vue'
-import VJsoneditor from 'v-jsoneditor'
-
-Vue.use(VJsoneditor)
+import VueJsonPretty from 'vue-json-pretty'
+import JsonExcel from 'vue-json-excel'
+import 'vue-json-pretty/lib/styles.css'
 export default {
   components: {
+    VueJsonPretty,
     'tiny-pagination': TinyPagination,
-    VJsoneditor
+    'downloadExcel': JsonExcel
   },
   data: () => ({
+    json_data : [],
     fromDate: '',
     toDate: '',
     loading: false,
@@ -279,6 +315,11 @@ export default {
       {
         text: 'STT',
         align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Mã hồ sơ',
+        align: 'left',
         sortable: false
       },
       {
@@ -319,18 +360,16 @@ export default {
     showData (item) {
       let vm = this
       try {
-        vm.dataRequest = JSON.parse(item.bodyRequest)
+        vm.dataRequest = item.bodyRequest
       } catch (error) {
         vm.dataRequest = {}
       }
       try {
-        vm.dataResponse = JSON.parse(item.bodyResponse)
+        vm.dataResponse = item.bodyResponse
       } catch (error) {
         vm.dataResponse = {}
       }
       vm.dialog_dataInfo = true
-      $('.data-request .jsoneditor-menu').html('<div class="px-2 py-2">Dữ liệu gửi</div>')
-      $('.data-response .jsoneditor-menu').html('<div class="px-2 py-2">Dữ liệu nhận</div>')
     },
     searchSyncDossier () {
       let vm = this
@@ -381,6 +420,46 @@ export default {
       }).catch(function (error) {
         
       })
+    },
+    exportExcel () {
+      let vm = this
+      vm.loading = true
+      let serviceInfoMapping = []
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId()
+        },
+        params: {
+          api: vm.api,
+          dossierNo: vm.dossierNo,
+          fromDate: vm.fromReceiveDateFormatted,
+          toDate: vm.toReceiveDateFormatted,
+          start: 0,
+          end: 1000
+        }
+      }
+      axios.get('/o/rest/v2/socket/web/log-report', param).then(function (response) {
+        let dataPush = []
+        let serializable = response.data
+        let dataInput = serializable['data']
+        for (let i = 0; i < dataInput.length; i++) {
+          let item = {
+            "STT": i + 1,
+            "Mã hồ sơ": dataInput[i]['dossierNo'],
+            "API": dataInput[i]['api'],
+            "Thời gian truy cập": vm.currentDateFormat(dataInput[i]['createDate']),
+            "Trạng thái": dataInput[i]['stateSync'] == 1 ? 'Thành công' : 'Thất bại'
+          }
+          dataPush.push(item)
+        }
+        serviceInfoMapping = serviceInfoMapping.concat(dataPush)
+        vm.loading = false
+        vm.json_data = serviceInfoMapping
+        setTimeout(() => {
+          $('.btn-export').click()
+        }, 100)
+      })
+      
     },
     changePage (config) {
       let vm = this

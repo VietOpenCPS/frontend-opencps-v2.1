@@ -6,10 +6,60 @@
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div>
-          <span>{{paymentProfile.paymentFee}}</span>
+          <span>Phí, lệ phí thủ tục hành chính</span>
         </div>
         <v-card>
-          <v-card-text class="px-4 pb-1">
+          <v-data-table
+            v-if="feeList && feeList.length"
+            :headers="headers"
+            :items="feeList"
+            hide-actions
+            class="elevation-1"
+            style="border-bottom: 1px solid #dedede;border-left: 1px solid #dedede;"
+          >
+            <template slot="items" slot-scope="props">
+              <td width="50" class="text-xs-center pt-2"> {{ props.index + 1 }}</td>
+              <td class="text-xs-left py-1">
+                <div>
+                  <p class="mt-1 mb-0">{{props.item && props.item.paymentFee ? props.item.paymentFee : ''}}</p>
+                </div>
+              </td>
+              <td class="px-3 py-1" style="width: 170px">
+                <div>
+                  <p class="mt-1 mb-0">{{props.item && props.item.feeAmount ? currency(props.item.feeAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; </p>
+                </div>
+              </td>
+              <td class="px-3 py-1" style="width: 170px">
+                <div>
+                  <p class="mt-1 mb-0">{{props.item && props.item.serviceAmount ? currency(props.item.serviceAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; </p>
+                </div>
+              </td>
+              <td width="170" class="text-xs-left px-2 py-1" style="font-weight: bold;">
+                <div style="padding-top:7px">
+                  <span>{{props.item && props.item.paymentAmount ? currency(props.item.paymentAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; </span>
+                </div>
+              </td>
+            </template>
+            <template slot="footer" >
+              <td :colspan="4" class="text-xs-center" style="border-right: 1px solid #dedede;">
+                <span>TỔNG TIỀN</span>
+              </td>
+              <td class="px-2 text-xs-left" style="border-right: 1px solid #dedede;font-weight: bold;">
+                <span>{{paymentProfile && paymentProfile.paymentAmount ? currency(paymentProfile.paymentAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; vnđ</span>
+              </td>
+            </template>
+          </v-data-table>
+          <v-layout wrap style="position: relative" class="my-2">
+            <v-flex style="width:145px;max-width: 145px;" class="my-0 py-0">
+              <v-subheader class="pl-0 text-right">Ghi chú: </v-subheader>
+            </v-flex>
+            <v-flex>
+              <p class="my-0 py-1">
+                {{paymentNote}}
+              </p>
+            </v-flex>
+          </v-layout>
+          <!-- <v-card-text class="px-4 pb-1">
             <v-layout wrap>
               <v-flex xs12 sm2>
                 <v-subheader class="pl-0 text-right">Lệ phí: </v-subheader>
@@ -33,9 +83,9 @@
                 </p>
               </v-flex>
             </v-layout>
-          </v-card-text>
+          </v-card-text> -->
           <v-card-text class="px-4 pt-0">
-            <v-layout wrap>
+            <!-- <v-layout wrap>
               <v-flex xs12 sm2>
                 <v-subheader class="pl-0 text-right"><span class="text-bold">Tổng: </span></v-subheader>
               </v-flex>
@@ -56,16 +106,17 @@
                 <span>{{currency(totalFee)}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <v-flex xs12 sm1></v-flex>
-            </v-layout>
+            </v-layout> -->
 
-            <v-layout wrap style="position: relative">
+            <!-- <v-layout wrap style="position: relative">
               <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
               <v-flex style="width:calc(100% - 80px)">
                 <p class="px-2 my-0 py-1">
                   {{paymentNote}} &nbsp;&nbsp;
                 </p>
               </v-flex>
-            </v-layout>
+            </v-layout> -->
+            
             <!-- epayment -->
             <p class="mb-0"><span class="red--text">* </span>&nbsp;Lựa chọn hình thức thanh toán:</p>
             <div class="text-xs-left mt-2 mb-3 ml-0">
@@ -87,7 +138,7 @@
                 <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán qua Cổng hỗ trợ thanh toán quốc gia</span>
               </v-chip>
 
-              <v-chip class="mb-2" v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('keypayUrl') && getEPaymentProfile(paymentProfile.epaymentProfile)['keypayUrl']
+              <v-chip class="mb-2" v-if="thanhToanKeypay && getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('keypayUrl') && getEPaymentProfile(paymentProfile.epaymentProfile)['keypayUrl']
                 && !getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('kpdvcqg')" color="orange" text-color="white"
                 :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 2 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
                 @click.native="toKeyPay(getEPaymentProfile(paymentProfile.epaymentProfile).keypayUrl)"
@@ -109,12 +160,12 @@
                 <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán qua Cổng DVCQG</span>
               </v-chip>
 
-              <v-chip class="mb-2" v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('ppkpdvcqg')" color="orange" text-color="white"
+              <v-chip class="mb-2" v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('ppkpdvcqg')" color="#cb7755" text-color="white"
                 :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 4 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
                  @click.native="toKeyPayDvcqg('ppkpdvcqg')"
               >
                 <v-avatar :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'" >
-                  <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
+                  <img src="/o/opencps-store/js/cli/dvc/app/image/logo-ppkp.png" alt="trevor" style="background: #fff">
                 </v-avatar>
                 <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán qua Cổng DVCQG</span>
               </v-chip>
@@ -131,6 +182,12 @@
             <!--  -->
             <div v-if="isBank" class="ml-0 mt-2 px-2 py-1" style="border: 1px solid #004b9485;border-radius: 3px;">
               <div>
+                <v-card-text class="px-0 pb-1 pt-0" v-if="paymentProfile.hasOwnProperty('tkThuHuong')">
+                  <div>
+                    <p><span class="text-bold mr-3">Tên tài khoản thụ hưởng: </span><span>{{paymentProfile.tenTKThuHuong}}</span></p>
+                    <p><span class="text-bold mr-4">Số tài khoản thụ hưởng: </span><span>{{paymentProfile.tkThuHuong}}</span></p>
+                  </div>
+                </v-card-text>
                 <input type="file" id="paymentFile1" @change="uploadPaymentFile($event)" style="display:none">
                 <span class="text-bold" style="color: #004b94!important">Tải lên file báo thanh toán chuyển khoản (Định dạng: .png, .jpg, .jpeg)</span>
                 <v-progress-circular
@@ -295,13 +352,46 @@ export default {
     ipAddress:'',
     loadingPay: false,
     thanhToanChuyenKhoan: true,
-    paymentNote: ''
+    paymentNote: '',
+    feeList: [],
+    headers: [
+      {
+        text: 'STT',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Tên phí, lệ phí',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Lệ phí',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Phí',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Thành tiền',
+        align: 'center',
+        sortable: false
+      }
+    ],
+    thanhToanKeypay: true
   }),
   directives: {money: VMoney},
   created () {
     var vm = this
     try {
       vm.thanhToanChuyenKhoan = thanhToanChuyenKhoan
+    } catch (error) {
+    }
+    try {
+      vm.thanhToanKeypay = thanhToanKeypay
     } catch (error) {
     }
     if (vm.detailDossier.hasOwnProperty('dossierId')) {
@@ -334,15 +424,37 @@ export default {
           vm.paymentNote = JSON.parse(val['paymentNote'])['paymentNote']
         } catch (error) {
         }
+        // 
+        if (vm.paymentProfile.hasOwnProperty('groupPaymentFile') && vm.paymentProfile.groupPaymentFile) {
+          vm.feeList = JSON.parse(vm.paymentProfile.groupPaymentFile)
+        } else {
+          let item = {
+            requestPayment: vm.paymentProfile['requestPayment'],
+            advanceAmount: vm.paymentProfile['advanceAmount'],
+            feeAmount: vm.paymentProfile['feeAmount'],
+            serviceAmount: vm.paymentProfile['serviceAmount'],
+            shipAmount: vm.paymentProfile['shipAmount'],
+            counter: vm.paymentProfile.hasOwnProperty('counter') ? vm.paymentProfile['counter'] : '',
+            paymentFee: vm.paymentProfile['paymentFee'],
+            paymentAmount: vm.paymentProfile['paymentAmount']
+          }
+          vm.feeList = [item]
+        }
         //
         if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && vm.paymentProfile.epaymentProfile) {
           let paymentConfigInfo = vm.getEPaymentProfile(vm.paymentProfile.epaymentProfile)
           if (paymentConfigInfo && paymentConfigInfo.hasOwnProperty('isPaygov') && paymentConfigInfo['isPaygov']) {
             vm.showPayGov = true
-            $.getJSON('https://api.ipify.org?format=jsonp&callback=?', function(data) {
-              vm.ipAddress = data && data.hasOwnProperty('ip') ? data.ip : ''
-              console.log('ipAddress', vm.ipAddress)
-            })
+            let ssl = window.location.protocol
+            if (ssl == 'http:') {
+              $.getJSON('http://ipinfo.io', function(data){
+                vm.ipAddress = data && data.hasOwnProperty('ip') ? data.ip : ''
+              })
+            } else if (ssl == 'https:') {
+              $.getJSON('https://api.ipify.org?format=jsonp&callback=?', function(data) {
+                vm.ipAddress = data && data.hasOwnProperty('ip') ? data.ip : ''
+              })
+            }
           } else {
             vm.showPayGov = false
           }
@@ -375,6 +487,7 @@ export default {
           paymentMethod: vm.isBank ? 'Chuyển khoản' : 'Keypay'
         }
         vm.$store.commit('setPaymentProfile', vm.data_payment)
+        console.log('vm.data_payment3123123', vm.data_payment)
         // }
       }
     },
@@ -386,6 +499,7 @@ export default {
           vm.paymentFile = result
           vm.data_payment['paymentFile'] = vm.paymentFile
           vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : 'Keypay'
+          console.log('vm.data_payment555555', vm.data_payment)
           vm.$store.commit('setPaymentProfile', vm.data_payment)
         })
       }
@@ -416,6 +530,7 @@ export default {
         vm.progressUploadPart = false
         vm.paymentFile = result
         vm.data_payment['paymentFile'] = vm.paymentFile
+        vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : 'Keypay'
         vm.$store.commit('setPaymentProfile', vm.data_payment)
         vm.$store.dispatch('getPaymentFiles', data).then(result => {
           vm.paymentFile = result

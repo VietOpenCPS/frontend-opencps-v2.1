@@ -871,7 +871,8 @@
             } else {
               vm.$store.dispatch('getServiceConfigDetail', item).then(result => {
                 if (result.hasOwnProperty('serviceUrl') && result.serviceUrl) {
-                  window.location.href = result.serviceUrl
+                  // window.location.href = result.serviceUrl
+                  window.open(result.serviceUrl, "_blank")
                 }
               }).catch(function(){})
             }
@@ -933,7 +934,7 @@
       createDossier (data) {
         let vm = this
         if (vm.serviceConfigSelect.serviceUrl) {
-          window.location.href = vm.serviceConfigSelect
+          window.open(vm.serviceConfigSelect.serviceUrl, "_blank")
         } else {
           vm.trackingBTTT(data.serviceCode)
           vm.$store.dispatch('postDossier', data).then(function (result) {
@@ -1075,8 +1076,15 @@
       },
       getDomains(agencyCode) {
         let vm = this
+        let agency = agencyCode
+        if (vm.capCoQuanThucHien === 'QUAN_HUYEN') {
+          agency = 'CAP_HUYEN'
+        }
+        if (vm.capCoQuanThucHien === 'XA_PHUONG') {
+          agency = 'CAP_XA'
+        }
         let data = {
-          agency: agencyCode ? agencyCode : ''
+          agency: agency
         }
         vm.$store.dispatch('getDomains', data).then(
           res => {
@@ -1117,7 +1125,7 @@
         try {
           console.log('trackDVC serviceCode', serviceCode)
           if (_govaq) {
-            _govaq.push(['trackDVC', serviceCode, '-1', ''])
+            _govaq.push(['trackDVC', serviceCode, '1', ''])
           }
         } catch (error) { 
         }

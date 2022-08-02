@@ -516,3 +516,86 @@ body .v-dialog .v-toolbar .v-toolbar__content {
     height: 40px !important;
     background-color: #0054A6;
 }
+
+/* style tra cứu AI */
+
+.icon--white .v-icon {
+    color: white !important;
+}
+.camera-box {
+    height: 280px;
+    overflow: auto;
+    position: relative;
+    border: 1px dashed #949494;
+    text-align: center;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.camera-selfie-box {
+    height: 180px;
+    width: 240px;
+    overflow: auto;
+    position: relative;
+    border: 1px dashed #949494;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.camera-box-login {
+    height: 510px;
+    overflow: auto;
+    position: relative;
+    text-align: center;
+    overflow: hidden;
+}
+.camera-box--big {
+    height: 100%;
+    overflow: auto;
+    position: relative;
+    text-align: center;
+    overflow: hidden;
+}
+.camera-box video, .camera-box canvas {
+    height: 100%;
+}
+
+.e-file-select-wrap {
+    display: none !important;
+}
+#upload-front-image, #upload-back-image, #upload-selfie-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+.v-stepper .v-toolbar__content {
+    background-color: #fff !important;
+}
+.v-stepper nav.v-toolbar.elevation-0.theme--light{
+    background: transparent !important;
+}
+.v-stepper .v-card.v-sheet.theme--light {
+    background: transparent !important;
+}
+.v-stepper__step {
+    padding: 16px !important;
+}
+.v-stepper__label {
+    text-align: center !important;
+}
+.v-stepper--alt-labels .v-stepper__header .v-divider {
+    margin-top: 28px !important;
+}
+.v-stepper input:disabled {
+    color: rgba(0,0,0,0.87) !important;
+}
+.camera-shot {
+    position: absolute;
+    bottom: 20px;
+    z-index: 100;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.btn-50px {
+    height: 50px !important;
+}

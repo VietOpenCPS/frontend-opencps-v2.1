@@ -11,6 +11,7 @@ export const store = new Vuex.Store({
     snackbarsocket: false,
     refreshSocket: 0,
     initData: {},
+    userLogin: '',
     tocken: '',
     loginUser: [
       {
@@ -89,7 +90,7 @@ export const store = new Vuex.Store({
             text: 'Đồng bộ danh mục lĩnh vực'
           },
           {
-            icon: 'api',
+            icon: 'filter',
             link: '/table/opencps_tracking/api',
             code: 'tracking',
             text: 'Quản lý danh mục API'
@@ -607,6 +608,77 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getAgencys ({commit,state}, data) {
+      return new Promise((resolve, reject)=>{
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          },
+          params: {
+          }
+        }
+        if (data.parent) {
+          param.params = {
+            parent: data.parent
+          }
+        }
+        console.log('data', data)
+        axios.get('/o/rest/v2/dictcollections/REPORT_GROUP/dictgroups/' + data.administration + '/dictitems', param).then(function (response) {
+          let serializable = response.data
+          resolve(serializable.data)
+        }).catch(function (error) {
+          console.log(error)
+          reject(error)
+        })
+      })     
+    },
+    getAgencysFromParent ({commit,state}, data) {
+      return new Promise((resolve, reject)=>{
+        let param = {
+          headers: {
+            groupId: data.hasOwnProperty('groupIdTrungTam') ? data.groupIdTrungTam :  window.themeDisplay.getScopeGroupId()
+          },
+          params: {
+          }
+        }
+        if (data.parent) {
+          param.params = {
+            parent: data.parent
+          }
+        }
+        console.log('data', data)
+        axios.get('/o/rest/v2/dictcollections/REPORT_GROUP/dictitems', param).then(function (response) {
+          let serializable = response.data
+          resolve(serializable.data)
+        }).catch(function (error) {
+          console.log(error)
+          reject(error)
+        })
+      })     
+    },
+    getAdministration ({state}) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            }
+          }
+          axios.get(state.endPointApi +'/serviceinfos/statistics/agencies?sort=siblingSearch', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
     REGISTER_GOVAGENCY ({state}) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -671,6 +743,43 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    getServiceProcesses ({state}) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get(state.endPointApi + '/serviceprocesses', param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable.data)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getServiceAdminisTration ({commit,state}, data) {
+      return new Promise((resolve, reject)=>{
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          },
+          params: {
+          }
+        }
+        axios.get('/o/rest/v2/dictcollections/REPORT_GROUP/dictgroups', param).then(function (response) {
+          let serializable = response.data
+          resolve(serializable.data)
+        }).catch(function (error) {
+          console.log(error)
+          reject(error)
+        })  
+      })     
     },
     getEmployee ({commit, state}) {
       return new Promise((resolve, reject) => {
@@ -1379,6 +1488,26 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getVotingListVer2 ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get(state.endPointApi + '/postal/vote/' + filter.className, param).then(function (response) {
+            let seriable = response.data
+            if (seriable) {
+              resolve(seriable)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
     updateVotings ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -1412,6 +1541,112 @@ export const store = new Vuex.Store({
         })
       })
     },
+    updateVotingsNew ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          var dataPostVoting = new URLSearchParams()
+          dataPostVoting.append('className', data.className ? data.className : '')
+          dataPostVoting.append('voteCode', data.voteCode ? data.voteCode : '')
+          dataPostVoting.append('title', data.title ? data.title : '')
+          dataPostVoting.append('description', data.description ? data.description : '')
+          dataPostVoting.append('status', data.status ? data.status : 0)
+          if (data.className === 'survey') {
+            dataPostVoting.append('processTime', data.processTime)
+          }
+          if (data.type === 'add') {
+            axios.post(state.endPointApi + '/postal/vote/' + data.className + '/question', dataPostVoting, options).then(function (response) {
+              if (data.choiceItems && data.choiceItems.length > 0) {
+                let count = 0
+                let lengthChoice = data.choiceItems.length
+                for (let index in data.choiceItems) {
+                  let dataChoice = Object.assign(data.choiceItems[index], {className: data.className,voteId: response.data.voteId})
+                  store.dispatch('createChoices', dataChoice).then(function () {
+                    count+=1
+                    if (count === lengthChoice) {
+                      resolve(response.data)
+                    }
+                  }).catch(function () {
+                    count+=1
+                    if (count === lengthChoice) {
+                      resolve(response.data)
+                    }
+                  })
+                }
+              } else {
+                resolve(response.data)
+              }
+            }).catch(function (error) {
+              reject(error)
+            })
+          } else {
+            axios.put(state.endPointApi + '/postal/vote/' + data.className + '/question/' + data.votingId, dataPostVoting, options).then(function (response) {
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+              commit('setsnackbarerror', true)
+            })
+          }
+        })
+      })
+    },
+    createChoices ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          var dataPostVoting = new URLSearchParams()
+          dataPostVoting.append('className', data.className ? data.className : '')
+          dataPostVoting.append('voteId', data.voteId ? data.voteId : '')
+          dataPostVoting.append('subject', data.subject ? data.subject : '')
+          dataPostVoting.append('sibling', data.sibling ? data.sibling : 1)
+          dataPostVoting.append('status', data.status ? data.status : 1),
+          dataPostVoting.append('votePoint', data.votePoint !== '' ? data.votePoint : '')
+          
+          axios.post(state.endPointApi + '/postal/vote/'+ data.className + '/choice', dataPostVoting, options).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+          })
+        
+        })
+      })
+    },
+    updateChoices ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          var dataPostVoting = new URLSearchParams()
+          dataPostVoting.append('voteId', data.voteId ? data.voteId : '')
+          dataPostVoting.append('subject', data.subject ? data.subject : '')
+          dataPostVoting.append('sibling', data.sibling ? data.sibling : 1)
+          dataPostVoting.append('votePoint', data.votePoint !== '' ? data.votePoint : '')
+          dataPostVoting.append('status', data.status !== '' ? data.status : '')
+
+          axios.put(state.endPointApi + '/postal/vote/' + data.className + '/choice/' + data.voteChoiceId, dataPostVoting, options).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            commit('setsnackbarerror', true)
+          })
+          
+        })
+      })
+    },
     deleteVotings ({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -1422,6 +1657,42 @@ export const store = new Vuex.Store({
             }
           }
           axios.delete(state.endPointApi + '/postal/votings/' + filter.votingId).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    deleteVotingsNew ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          axios.delete(state.endPointApi + '/postal/vote/'+ filter.className +'/question/' + filter.votingId).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    deleteChoiceNew ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          axios.delete(state.endPointApi + '/postal/vote/' + filter.className + '/choice/' + filter.voteChoiceId).then(function (response) {
             resolve(response.data)
           }).catch(function (error) {
             reject(error)
@@ -1478,6 +1749,142 @@ export const store = new Vuex.Store({
           }).catch(function (xhr) {
             console.log(xhr)
           })
+        })
+      })
+    },
+    getServiceInfo ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              sort: 'siblingSearch',
+              administration: data.administration ? data.administration : '',
+              domain: data.domain ? data.domain : ''
+            }
+          }
+          axios.get(state.endPointApi + '/serviceinfos', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
+        })
+      })
+    },
+    getServiceConfigDetail ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+            }
+          }
+          axios.get(state.endPointApi + '/serviceconfigs/' + data.serviceConfigId, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (xhr) {
+          })
+        })
+      })
+    },
+    createServiceConfig ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          
+          let dataPostServiceConfig = new URLSearchParams()
+          dataPostServiceConfig.append('serviceInfoId', data.serviceInfoId ? data.serviceInfoId : '')
+          dataPostServiceConfig.append('govAgencyCode', data.govAgencyCode ? data.govAgencyCode : '')
+          dataPostServiceConfig.append('serviceInstruction', data.serviceInstruction ? data.serviceInstruction : '')
+          dataPostServiceConfig.append('serviceLevel', data.serviceLevel)
+          dataPostServiceConfig.append('serviceUrl', data.serviceUrl)
+          dataPostServiceConfig.append('forCitizen', data.forCitizen)
+          dataPostServiceConfig.append('forBusiness', data.forBusiness)
+          dataPostServiceConfig.append('postalService', data.postalService)
+          dataPostServiceConfig.append('registration', data.registration)
+          dataPostServiceConfig.append('receptionReport', data.receptionReport)
+          if (data.type === 'add') {
+            axios.post(state.endPointApi + '/serviceconfigs', dataPostServiceConfig, options).then(function (response) {
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+            })
+          } else {
+            axios.put(state.endPointApi + '/serviceconfigs/' + data.serviceConfigId, dataPostServiceConfig, options).then(function (response) {
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+            })
+          }
+        })
+      })
+    },
+    getServiceProcessOptionDetail ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+            }
+          }
+          axios.get(state.endPointApi + '/serviceconfigs/' + data.serviceConfigId + '/processes/' + data.processOptionId, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (xhr) {
+          })
+        })
+      })
+    },
+    createServiceProcessOption ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          let dataPostServiceConfig = new URLSearchParams()
+          dataPostServiceConfig.append('optionName', data.optionName)
+          dataPostServiceConfig.append('seqOrder', data.seqOrder)
+          dataPostServiceConfig.append('autoSelect', data.autoSelect)
+          dataPostServiceConfig.append('instructionNote', data.instructionNote)
+          dataPostServiceConfig.append('submissionNote', data.submissionNote)
+          dataPostServiceConfig.append('dossierTemplateId', data.dossierTemplateId)
+          dataPostServiceConfig.append('serviceProcessId', data.serviceProcessId)
+          dataPostServiceConfig.append('postalService', data.postalService)
+          dataPostServiceConfig.append('registerBookCode', data.registerBookCode)
+          dataPostServiceConfig.append('sampleCount', data.sampleCount)
+          if (data.type === 'add') {
+            axios.post(state.endPointApi + '/serviceconfigs/' + data.serviceConfigId + '/processes', dataPostServiceConfig, options).then(function (response) {
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+            })
+          } else {
+            axios.put(state.endPointApi + '/serviceconfigs/' + data.serviceConfigId + '/processes/' + data.processOptionId, dataPostServiceConfig, options).then(function (response) {
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+            })
+          }
         })
       })
     },
@@ -2084,7 +2491,7 @@ export const store = new Vuex.Store({
             },
             params: filter
           }
-          axios.get('/o/rest/statistics', param).then(function (result) {
+          axios.get('/o/statistic/report/dvcqg', param).then(function (result) {
             if (result.data) {
               resolve(result.data)
             } else {
@@ -2275,6 +2682,107 @@ export const store = new Vuex.Store({
         })
       })
     },
+    searchLgspCongDan({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {}
+        }
+        let systemLgsp = ''
+        try {
+          systemLgsp = systemLgspConfig
+        } catch (error) {
+        }
+        let dataInput = ''
+        let urlTraCuu = '/o/rest/v2/qldc'
+        if (systemLgsp === 'DongThap') {
+          dataInput = {
+            "MaYeuCau" : (new Date()).getTime(),
+            "MaTichHop" : "003",
+            "StaffEmail" : filter.StaffEmail,
+            "GovAgencyCode": filter.GovAgencyCode,
+            "MaDVC" : "G18-YT04",
+            "HoVaTen" : filter.applicantName,
+            "type" : "XacThucThongTinCongDan",
+            "NgayThangNamSinh" : filter.birthDate,
+            "MaCanBo" : "vhcgiang@dongthap.gov.vn"
+          }
+        } else if (systemLgsp === 'HauGiang') {
+          dataInput = {
+            "MaYeuCau" : (new Date()).getTime(),
+            "MaTichHop" : "003",
+            "StaffEmail" : filter.StaffEmail,
+            "GovAgencyCode": filter.GovAgencyCode,
+            "MaDVC" : filter.MaDVC,
+            "HoVaTen" : filter.applicantName,
+            "type" : "XacThucThongTinCongDan",
+            "NgayThangNamSinh" : filter.birthDate,
+          }
+        } else if (systemLgsp === 'BO-GTVT') {
+          urlTraCuu = "/o/rest/v2/qldc/dvcqg"
+          dataInput = {
+            "MaYeuCau" : (new Date()).getTime(),
+            "MaTichHop" : "037",
+            "StaffEmail" : filter.StaffEmail,
+            "GovAgencyCode": filter.GovAgencyCode,
+            "MaDVC" : filter.MaDVC,
+            "HoVaTen" : filter.applicantName,
+            "type" : "TraCuuThongTinCongDan",
+            "NgayThangNamSinh" : filter.birthDate,
+          }
+        }
+        
+        if (String(filter.applicantIdNo).length === 9) {
+          dataInput['SoCMND'] = filter.applicantIdNo
+        } else {
+          dataInput['SoDinhDanh'] = filter.applicantIdNo
+        }
+        axios({
+          method: 'POST',
+          url: urlTraCuu,
+          headers: config.headers,
+          params: config.params,
+          data: dataInput
+        }).then(function (response) {
+          let serializable = response.data
+          let dataCitizen = ''
+          if (systemLgsp === 'DongThap') {
+            if (serializable && serializable.hasOwnProperty('data') && String(serializable.data) == 'true') {
+              dataCitizen = {
+                SoLuongCongDan: 1
+              }
+              resolve(dataCitizen)
+            } else {
+              dataCitizen = {
+                SoLuongCongDan: 0
+              }
+              resolve(dataCitizen)
+            }
+          } else if (systemLgsp === 'HauGiang') {
+            if (serializable && serializable.hasOwnProperty('Body') && serializable["Body"].hasOwnProperty('XacThucThongTinCongDanResponse')) {
+              dataCitizen = serializable["Body"]["XacThucThongTinCongDanResponse"]
+              resolve(dataCitizen)
+            } else {
+              reject('')
+            }
+          } else if (systemLgsp === 'BO-GTVT') {
+            if (serializable && serializable.hasOwnProperty('Body') && serializable["Body"].hasOwnProperty('CongdanCollection') && serializable["Body"]["CongdanCollection"]) {
+              dataCitizen = {
+                SoLuongCongDan: 1
+              }
+              resolve(dataCitizen)
+            } else {
+              reject('')
+            }
+          }
+        }).catch(function (error) {
+          let dataReject = error.response.data
+          reject(dataReject)
+        })
+      })
+    },
   },
   mutations: {
     SOCKET_ONOPEN (state, event)  {
@@ -2397,7 +2905,10 @@ export const store = new Vuex.Store({
     },
     setisConnected (state, payload) {
       state.isConnected = payload
-    }
+    },
+    setUserLogin (state, payload) {
+      state.userLogin = payload
+    },
   },
   getters: {
     getlistTableMenu (state) {
@@ -2444,6 +2955,9 @@ export const store = new Vuex.Store({
     },
     getproblem (state) {
       return state.problem
-    }
+    },
+    getUserLogin (state) {
+      return state.userLogin
+    },
   }
 })

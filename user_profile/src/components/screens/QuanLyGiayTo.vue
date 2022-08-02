@@ -16,7 +16,7 @@
       </div>
       <v-card-text class="px-0 pt-0 mt-3">
         <v-layout wrap class="mt-0">
-          <v-flex xs12 sm6 class="pr-2">
+          <!-- <v-flex xs12 sm6 class="pr-2">
             <v-autocomplete
               :items="fileTemplateList"
               v-model="fileTemplateNo"
@@ -41,7 +41,7 @@
               @change="changeFilterSearch"
               box
             ></v-autocomplete>
-          </v-flex>
+          </v-flex> -->
           <v-flex xs12 sm6 class="pr-2">
             <v-text-field
               label="Tìm theo tên tài liệu"
@@ -133,7 +133,7 @@
                   </span>
                 </div>
               </td>
-              <td class="text-xs-center" style="height:36px;width: 150px">
+              <td class="text-xs-center" style="height:36px;width: 190px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -141,7 +141,7 @@
                   <v-btn @click="viewDocument(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon>visibility</v-icon>
                   </v-btn>
-                  <span>Xem trước</span>
+                  <span>Xem</span>
                 </v-tooltip>
                 <v-tooltip top v-if="!loadingTable" class="mr-2">
                   <v-btn @click="downloadDocument(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
@@ -149,11 +149,17 @@
                   </v-btn>
                   <span>Tải xuống</span>
                 </v-tooltip>
-                <v-tooltip top v-if="!loadingTable && props.item.status === 1" class="mr-2">
+                <v-tooltip top v-if="!loadingTable && props.item.status == 0" class="mr-2">
                   <v-btn @click="showEditDocument(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon>edit</v-icon>
                   </v-btn>
                   <span>Chỉnh sửa</span>
+                </v-tooltip>
+                <v-tooltip top v-if="!loadingTable && props.item.status == 0">
+                  <v-btn @click="deleteDocument(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0 mr-3">
+                    <v-icon size="22">delete</v-icon>
+                  </v-btn>
+                  <span>Xóa</span>
                 </v-tooltip>
               </td>
             </tr>
@@ -415,8 +421,8 @@ export default {
         applicantIdNo: vm.index,
         fileTemplateNo: vm.fileTemplateNo,
         status: vm.status,
-        keywordSearch: vm.keySearch,
-        fileNoSearch: vm.fileNoSearch,
+        keyword: vm.keySearch,
+        fileNo: vm.fileNoSearch,
         applicantDataType: ''
       }
       let dataPost = new URLSearchParams()
@@ -424,6 +430,7 @@ export default {
       dataPost.append('method', 'GET')
       dataPost.append('url', '/applicantdatas')
       dataPost.append('data', JSON.stringify(textPost))
+      dataPost.append('serverCode', 'SERVER_MOTCUA')
       vm.loadingTable = true
       axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) { 
         if (response['data'].hasOwnProperty('data')) {
@@ -510,6 +517,14 @@ export default {
             fileNo: vm.fileNo,
             fileName: vm.fileName,
             applicantIdNo: vm.index,
+            applicantName: vm.applicantInfos.applicantName,
+            govAgencyName: "",
+            issueDate: "",
+            expireDate: "",
+            desciption: "",
+            serviceCode: "",
+            templateNo: "",
+            dossierNo: ""
           }
           let param = {
             headers: {
@@ -523,7 +538,7 @@ export default {
           dataPost.append('url', '/applicantdatas')
           dataPost.append('data', JSON.stringify(filter))
           dataPost.append('file', vm.fileUpdate)
-          
+          dataPost.append('serverCode', 'SERVER_MOTCUA')
           axios.post('/o/rest/v2/proxy/multipart', dataPost, param).then(response => {
             vm.loadingAction = false
             toastr.success('Thêm mới tài liệu thành công')
@@ -556,7 +571,15 @@ export default {
           fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
           fileNo: vm.fileNo,
           fileName: vm.fileName,
-          applicantIdNo: vm.applicantInfos.applicantIdNo
+          applicantIdNo: vm.applicantInfos.applicantIdNo,
+          applicantName: vm.applicantInfos.applicantName,
+          govAgencyName: "",
+          issueDate: "",
+          expireDate: "",
+          desciption: "",
+          serviceCode: "",
+          templateNo: "",
+          dossierNo: ""
         }
         let param = {
           headers: {
@@ -569,6 +592,7 @@ export default {
         dataPost.append('method', 'PUT')
         dataPost.append('url', '/applicantdatas/' + vm.documentSelect.applicantDataId)
         dataPost.append('data', JSON.stringify(filter))
+        dataPost.append('serverCode', 'SERVER_MOTCUA')
         if (vm.updateFile) {
           dataPost.append('file', vm.fileUpdate)
         } else {
@@ -652,6 +676,28 @@ export default {
       vm.fileNo = item.fileNo
       vm.dialog_createDocument = true
     },
+    deleteDocument (item) {
+      let vm = this
+      let x = confirm('Bạn có chắc chắn xóa tài liệu này?')
+      if (x) {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'DELETE')
+        dataPost.append('url', '/applicantdatas/' + item.applicantDataId)
+        dataPost.append('data', JSON.stringify({}))
+        dataPost.append('serverCode', 'SERVER_MOTCUA')
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) { 
+          toastr.success('Xóa tài liệu thành công')
+          vm.getApplicantDocument()
+        }, error => {
+          toastr.error('Xóa tài liệu thất bại')
+        })
+      }
+    },
     validFileUpload (file) {
       let vm = this
       let passed = true
@@ -732,12 +778,14 @@ export default {
       }
     },
     getStatus (val) {
-      if (String(val) === '1') {
+      if (String(val) === '0') {
+        return 'Yêu cầu số hóa'
+      } else if (String(val) === '1') {
         return 'Có hiệu lực'
       } else if (String(val) === '2') {
         return 'Hết hiệu lực'
-      } else {
-        return 'Chưa duyệt'
+      } else if (String(val) === '3') {
+        return 'Hủy'
       }
     },
     goBack () {

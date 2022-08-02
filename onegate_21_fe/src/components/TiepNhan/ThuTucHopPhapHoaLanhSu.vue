@@ -9,9 +9,10 @@
                             v-model="eFormCode"
                             solo
                             @keyup.enter="getDataEform()"
+                            :disabled="formCode==='UPDATE'"
                         ></v-text-field>
                     </div>
-                    <v-btn small color="primary" @click="getDataEform()" class="ml-2 mt-0" style="height: 32px;">
+                    <v-btn small color="primary" @click="getDataEform()" :disabled="formCode==='UPDATE'" class="ml-2 mt-0" style="height: 32px;">
                         <v-icon>save_alt</v-icon>&nbsp; Lấy dữ liệu
                     </v-btn>
                 </div>
@@ -143,26 +144,26 @@
                             >
                             </v-checkbox> 
                         </td>
-                        <td>{{props.item.ten_giay_to}}</td>
-                        <td>{{props.item.loai_giay_to}}</td>
-                        <td>{{props.item.ten_nguoi_duoc_cap}}</td>
-                        <td>{{props.item.so_ban}}</td>
-                        <td>{{props.item.so_hieu_giay_to}}</td>
-                        <td>{{props.item.co_quan_cap}}</td>
-                        <td>{{props.item.nguoi_ky}}</td>
-                        <td>{{props.item.chuc_danh_ky}}</td>
-                        <td>{{props.item.ngay_ky}}</td>
+                        <td class="py-2">{{props.item.ten_giay_to}}</td>
+                        <td class="py-2">{{props.item.loai_giay_to}}</td>
+                        <td class="py-2">{{props.item.ten_nguoi_duoc_cap}}</td>
+                        <td class="text-xs-center py-2">{{props.item.so_ban}}</td>
+                        <td class="py-2">{{props.item.so_hieu_giay_to}}</td>
+                        <td class="py-2">{{props.item.co_quan_cap}}</td>
+                        <td class="py-2">{{props.item.nguoi_ky}}</td>
+                        <td class="py-2">{{props.item.chuc_danh_ky}}</td>
+                        <td class="py-2">{{props.item.ngay_ky}}</td>
                         <td>
                             <v-btn flat icon color="primary" @click="openDialogUpdateGiayTo(props.index,props.item)">
                                 <v-icon>create</v-icon>
                             </v-btn>
                         </td>
-                        <td>
+                        <td v-if="formCode !== 'UPDATE'">
                             <v-btn flat icon color="primary" @click="openDialogCopyGiayTo(props.index,props.item)">
                                 <v-icon>file_copy</v-icon>
                             </v-btn>
                         </td>
-                        <td>
+                        <td v-if="formCode !== 'UPDATE'">
                             <v-btn flat icon color="#F44336" @click="deleteGiayTo(props.index)">
                                 <v-icon>delete</v-icon>
                             </v-btn>
@@ -178,48 +179,61 @@
                 <strong>Thành phần hồ sơ kèm theo</strong>
             </v-flex>
             <v-flex xs12  class="px-2 my-2">
-                    <v-data-table
-                        :headers="headerThanhPhanHoSo"
-                        :items="dossierMarkArr"
-                        hide-actions
-                        no-data-text="Không có thành phần hồ sơ nào"
-                        class="table_vuejs"
-                        style="border-left: 0.5px solid #dedede;"
-                        
-                    >
-                        <template slot="items" slot-scope="props">
-                        <tr v-if="(props.item.dossierPartNo != 'TP01' && props.item.dossierPartNo != 'TP03') && props.item.partType === 1">
-                                <td>          
-                                    <v-checkbox
-                                        v-model="selected"
-                                        primary
-                                        hide-details
-                                        :value="props.item"
-                                        @change="toggleCheckbox(props.item, props.index)">
-                                    ></v-checkbox>
-                                </td>
-                                <td>{{ props.item.partName }}</td>
-                                <td>                            
-                                    <v-select
-                                        v-model="props.item.fileMark"
-                                        :items="fileMarks"
-                                        item-text="name"
-                                        item-value="value"
-                                        solo
-                                        @change="changeThanhPhan(props.item,props.index)"
-                                    >
-                                    </v-select>
-                                </td>
-                                <td>
-                                    <v-text-field
-                                        solo
-                                        v-model="props.item.recordCount"
-                                        @change="changeThanhPhan(props.item,props.index)"
-                                    ></v-text-field>
-                                </td>
-                        </tr>
-                        </template>
-                    </v-data-table>
+                <v-data-table
+                    :headers="headerThanhPhanHoSo"
+                    :items="dossierMarkArr"
+                    hide-actions
+                    no-data-text="Không có thành phần hồ sơ nào"
+                    class="table_vuejs"
+                    style="border-left: 0.5px solid #dedede;"
+                    
+                >
+                    <template slot="items" slot-scope="props">
+                    <tr v-if="(props.item.dossierPartNo != 'TP01') && props.item.partType === 1">
+                        <td>          
+                            <v-checkbox
+                                v-model="selected"
+                                primary
+                                hide-details
+                                :value="props.item"
+                                @change="toggleCheckbox(props.item, props.index)"
+                            >
+                            </v-checkbox>
+                        </td>
+                        <td>
+                            <p>{{ props.item.partName }}</p>
+                            <p class="mt-0" v-for="(itemFileView, index) in dossierFileAttach" :key="index" v-if="doAction && props.item.dossierPartNo === itemFileView.dossierPartNo" >
+                                <span v-on:click.stop="viewFile2(itemFileView, index)" class="ml-1" style="cursor: pointer;">
+                                    <v-icon class="mr-1" v-if="itemFileView.fileSize !== 0" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
+                                        :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
+                                        {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
+                                    </v-icon>
+                                    {{itemFileView.displayName}} - 
+                                    <i>{{itemFileView.modifiedDate}}</i>
+                                </span>
+                            </p>
+                        </td>
+                        <td>                            
+                            <v-select
+                                v-model="props.item.fileMark"
+                                :items="fileMarks"
+                                item-text="name"
+                                item-value="value"
+                                solo
+                                @change="changeThanhPhan(props.item,props.index)"
+                            >
+                            </v-select>
+                        </td>
+                        <td>
+                            <v-text-field
+                                solo
+                                v-model="props.item.recordCount"
+                                @change="changeThanhPhan(props.item,props.index)"
+                            ></v-text-field>
+                        </td>
+                    </tr>
+                    </template>
+                </v-data-table>
             </v-flex>
             <v-flex xs12 class="px-2">
                 <v-checkbox
@@ -254,7 +268,6 @@
                     clearable
                     return-object
                     hide-no-data
-
                     solo
                 ></v-autocomplete>
             </v-flex>
@@ -297,7 +310,7 @@
             <v-flex xs12  class="px-2 ">
                 <label for="">Ghi chú</label>
                 <v-textarea
-                    v-model="dossiers.dossierNote"
+                    v-model="dossiers.briefNote"
                     name="input-7-1" 
                     solo   
                 ></v-textarea>
@@ -638,6 +651,34 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
+            <v-card>
+                <v-toolbar dark color="primary">
+                <v-toolbar-title>
+                    <span>Tài liệu đính kèm</span>
+                </v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon dark @click.native="dialogPDF = false">
+                    <v-icon>close</v-icon>
+                </v-btn>
+                </v-toolbar>
+                <div v-if="dialogPDFLoading" style="
+                    min-height: 600px;
+                    text-align: center;
+                    margin: auto;
+                    padding: 25%;
+                ">
+                <v-progress-circular
+                    :size="100"
+                    :width="1"
+                    color="primary"
+                    indeterminate
+                ></v-progress-circular>
+                </div>
+                <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+                </iframe>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 <script>
@@ -658,6 +699,8 @@ export default {
         eFormCode: '',
         eFormCodeArr: [],
         updateStratus: false,
+        dialogPDF: false,
+        dialogPDFLoading: false,
         dialogPhongTO: false,
         dialogGiayTo: false,
         dialogTimKiemConDau: false,
@@ -761,10 +804,10 @@ export default {
             {
                 text: 'Chọn',
                 align: 'center',
-                sorttable: false,
+                sortable: false,
             },
           {
-            text: 'Tên thành phần',
+            text: 'Thành phần hồ sơ',
             align: 'center',
             sortable: false
           },
@@ -980,7 +1023,7 @@ export default {
             "postalTelNo": "",
             "sampleCount": 1,
             "dueDate": '',
-            "dossierNote": '',
+            "briefNote": '',
             "Doan_HCTN": '',
             "dossierFilePayment": '',
             "metaData": '{}'
@@ -989,15 +1032,22 @@ export default {
         tongSoBanTG: 0,
         auth: 'false',
         ngay_cap_cmnd: '',
+        doAction: false,
+        dossierFileAttach: []
     }),
     created () {
         let vm = this
         vm.$nextTick( ()=>{
             let currentQuery = vm.$router.history.current.query
+            if (currentQuery.hasOwnProperty('updateDossierDoAction') && currentQuery.updateDossierDoAction) {
+                vm.doAction = currentQuery.updateDossierDoAction
+            }
             vm.dossierTemplateNo = currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
             vm.eFormCode = currentQuery.hasOwnProperty('eformCode') && currentQuery.eformCode ? currentQuery.eformCode : ''
             if(vm.formCode==='UPDATE'){
                 vm.getDetail()
+                let lengthHeader = vm.headerGiayTo.length
+                vm.headerGiayTo.splice(lengthHeader - 2, 2)
             } else {
                 vm.dossiers['metaData'] = JSON.stringify({"newFormTemplate": "true", "dossierFileCustom": [],  'totalRecord': 0, 'ma_to_khai':[], 'durationCountMeta': 2, })
                 vm.getThanhPhan()
@@ -1024,8 +1074,6 @@ export default {
         dossiers: {
             deep: true,
             handler:  (val, oldVal) => {
-                console.log(val)
-                console.log(oldVal)
                 // val['applicantIdNo'] = val.delegateIdNo
                 // val['address'] = val.delegateAddress
                 // val['cityCode'] = val.delegateCityCode
@@ -1034,8 +1082,6 @@ export default {
                 // val['contactTelNo'] = val.delegateTelNo
                 // val['contactEmail'] = val.delegateEmail
                 $('#dossiers_hidden').val(JSON.stringify(val))
-                console.log(val['applicantIdNo'],val.delegateIdNo)
-                console.log($('#dossiers_hidden').val(JSON.stringify(val)))
             }
         },
         dossierFileArr: {
@@ -1049,9 +1095,24 @@ export default {
         },
         dossierMarkArr: {
             deep: true,
-            handler:  (val, oldVal) => {
-                let arr = val.filter(e => e.recordCount) 
-                arr.push({"dossierPartNo":"TP01","fileMark":3,"partName":"Tờ khai hợp pháp hoá lãnh sự, chứng nhận lãnh sự","partType":1,"fileCheck":0,"fileComment":"","recordCount":1})
+            handler (val, oldVal) {
+                let arr = val.filter(e => e.recordCount)
+                let temp = this.dossierParts.filter(function (item) {
+                    return item.partNo === 'TP01'
+                })
+                if (temp && temp.length > 0) {
+                    let part = {
+                        "dossierPartNo": temp[0]['partNo'],
+                        "fileMark": 3,
+                        "partName": temp[0]['partName'],
+                        "partType":1,
+                        "fileCheck":0,
+                        "fileComment":"",
+                        "recordCount":1
+                    }
+                    arr.push(part)
+                }
+                
                 $('#dossierMarkArr_hidden').val(JSON.stringify(arr))
             }
         },
@@ -1090,8 +1151,6 @@ export default {
                       }
                       vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
                     }
-
-                    // vm.dossierFileArr[i]['eform'] = 'true'
                 }
             }
             let dataOut = vm.dossierFileArr.filter(function (item) {
@@ -1200,27 +1259,37 @@ export default {
         changeDeNghiChungNhan(){
             let vm = this
             if(vm.de_nghi_chung_nhan){
-                let temp = {
-                        dossierPartNo: 'TP03',
-                        fileMark: 3,
-                        partName: 'Giấy tờ, tài liệu đề nghị chứng nhận lãnh sự',
-                        partType: 1,
-                        fileCheck: 0,
-                        fileComment: '',
-                        recordCount: 1
-                }
-                let check = true
-                for(let i = 0 ; i<vm.dossierMarkArr.length;i++){
-                    if(vm.dossierMarkArr[i]['dossierPartNo'] === 'TP03'){
-                        vm.$set(vm.dossierMarkArr, i, temp)
-                        check = false
+                // let temp = {
+                //     dossierPartNo: 'TP03',
+                //     fileMark: 3,
+                //     partName: 'Giấy tờ, tài liệu đề nghị chứng nhận lãnh sự',
+                //     partType: 1,
+                //     fileCheck: 0,
+                //     fileComment: '',
+                //     recordCount: 1
+                // }
+                let temp = vm.dossierParts.filter(function (item) {
+                    return item.partNo === 'TP03'
+                })
+                let check = vm.dossierMarkArr.filter(function (item) {
+                    return item.dossierPartNo === 'TP03'
+                })
+                if (!check || check.length === 0) {
+                    if (temp && temp.length > 0) {
+                        let part = {
+                            "dossierPartNo": temp[0]['partNo'],
+                            "fileMark": 3,
+                            "partName": temp[0]['partName'],
+                            "partType":1,
+                            "fileCheck":0,
+                            "fileComment":"",
+                            "recordCount":1
+                        }
+                        vm.dossierMarkArr.push(part)
                     }
                 }
-                if(check){
-                    vm.dossierMarkArr.push(temp)
-                }
             } else {
-                 vm.dossierMarkArr = vm.dossierMarkArr.filter(e=>e.dossierPartNo !== 'TP03')
+                vm.dossierMarkArr = vm.dossierMarkArr.filter(e=>e.dossierPartNo !== 'TP03')
             }
         },
         computeDate () {
@@ -1264,21 +1333,27 @@ export default {
                 headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
             }
             axios.request(config).then(res => {
-                let metaData = JSON.parse(res.data.metaData)
-                if(metaData.dossierFileCustom)
-                {   
+                let metaData = ''
+                try {
+                    metaData = JSON.parse(res.data.metaData)
+                } catch (error) {
+                }
+                if(metaData.dossierFileCustom) {   
                     vm.dossierFileCustom = metaData.dossierFileCustom
                 }
-                if(metaData.ma_to_khai){
+                if(metaData && metaData.ma_to_khai){
                     vm.eFormCodeArr = metaData.ma_to_khai
+                    vm.eFormCode = metaData.ma_to_khai
                 }
                 vm.dossiers = res.data
                 vm.dossiers['bookingName'] = res.data['applicantName']
                 vm.delegateCityCode = vm.dossiers.delegateCityCode
                 vm.delegateDistrictCode = vm.dossiers.delegateDistrictCode
                 vm.delegateWardCode = vm.dossiers.delegateWardCode
-                vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
-                vm.crurentHours = vm.dossiers.dueDate.substring(10)
+                if (vm.dossiers && vm.dossiers.dueDate) {
+                    vm.dateDueDate = vm.parseDate(vm.dossiers.dueDate.substr(0, 10))
+                    vm.crurentHours = vm.dossiers.dueDate.substring(10)
+                }
                 vm.viaPostal = vm.dossiers.viaPostal === 2 ?  true : false
                
                 vm.getThanhPhan()
@@ -1293,18 +1368,22 @@ export default {
             }
             axios.request(config).then(res => {
                 let data = res.data.data
-                if(data.length){
+                if (data.length) {
+                    vm.dossierFileAttach = data.filter(function (item) {
+                        return !item.eForm
+                    })
                     for(let i =0; i<data.length; i++){
                         let tg = {
                             partNo: data[i]['dossierPartNo'],
                             formData: data[i]['formData'],
-                            eform: 'true',
+                            eform: data[i]['eForm'],
                             referenceUid: data[i]['referenceUid']
                         }
                         vm.dossierFileArr.push(tg)
-                        if(data[i]['dossierPartNo'] === 'TP01'){
+                        if(data[i]['dossierPartNo'] === 'TP01' && data[i]['eForm']){
                             let formData = JSON.parse(data[i]['formData'])
                             vm.listGiayTo = formData.list_giay_to
+                            console.log('listGiayTo-1', vm.listGiayTo)
                             vm.checkCKCD()
                             vm.de_nghi_chung_nhan = formData.de_nghi_chung_nhan
                             vm.changeDeNghiChungNhan()
@@ -1320,10 +1399,11 @@ export default {
                             vm.tongSoBanTG = vm.tongSoBan
                             vm.computeDate()
                             vm.genLePhi()
+                            console.log('listGiayTo-2', vm.listGiayTo)
                         }
                     }
                 }
-            }).catch(err => {})       
+            }).catch(err => {})
         },
         getDelegateCity(){
             let vm = this
@@ -1360,7 +1440,7 @@ export default {
                 let vm = this
                 let tg = JSON.parse(vm.dossiers['metaData'])
                 let file_bien_nhan = tg['dossierFileCustom']
-
+                console.log('metaData changeThanhPhan', tg)
                 for(let i=0; i< vm.dossierFileArr.length; i++){
                     if(vm.dossierFileArr[i]['partNo'] === item.dossierPartNo){
                         let tp = {'partNo': item.dossierPartNo, 'partName': item.partName, 'fileMark': item['fileMark'],'recordCount': item.recordCount}
@@ -1382,6 +1462,7 @@ export default {
                 tg['totalRecord'] = totalRecord
                 tg['dossierFileCustom'] = file_bien_nhan
                 vm.dossiers['metaData'] = JSON.stringify(tg)
+                console.log('metaData2 changeThanhPhan', JSON.stringify(tg))
             },200)
         },
         getQuocGia(){
@@ -1413,9 +1494,11 @@ export default {
             axios.request(config).then(res => {
                 vm.dossierParts = res.data.dossierParts
                 if(vm.formCode === 'UPDATE') {
+                    let file_bien_nhan = new Array()
+                    let j = 0
                     for (let i=0; i<vm.dossierParts.length; i++){
                         let check = vm.dossierFileCustom.find(e=> e.partNo === vm.dossierParts[i]['partNo'])
-                        if(check){
+                        if (check) {
                             let temp = {
                                 dossierPartNo: vm.dossierParts[i]['partNo'],
                                 fileMark: check.fileMark,
@@ -1427,8 +1510,7 @@ export default {
                             }
                             vm.selected.push(temp)
                             vm.dossierMarkArr.push(temp)
-                        }
-                        else {
+                        } else {
                             vm.dossierMarkArr.push({
                                 dossierPartNo: vm.dossierParts[i]['partNo'],
                                 fileMark: vm.dossierParts[i]['fileMark'],
@@ -1438,6 +1520,15 @@ export default {
                                 fileComment: '',
                                 recordCount: ''
                             })
+                        }
+                        if (vm.doAction) {
+                            if((vm.dossierParts[i]['partNo'] === 'TP01' || vm.dossierParts[i]['partNo'] === 'TP03') && vm.dossierParts[i].partType === 1){
+                                file_bien_nhan[j] = {'partNo': vm.dossierParts[i]['partNo'], 'partName': vm.dossierParts[i]['partName'], 'fileMark': vm.dossierParts[i]['fileMark'], 'recordCount': 1}
+                                j++
+                            }
+                            let tg2 = vm.dossiers['metaData'] ? JSON.parse(vm.dossiers['metaData']) : {}
+                            tg2['dossierFileCustom'] = file_bien_nhan
+                            vm.dossiers['metaData'] = JSON.stringify(tg2)
                         }
                     }
                 } else {
@@ -1554,178 +1645,157 @@ export default {
         },
         getDataEform() {
             let vm = this
-            let checkEformCode = vm.eFormCodeArr.find(e => e === vm.eFormCode)
-            if(checkEformCode){
-                vm.eFormCode = ''
-                toastr.error('Không hợp lệ. Mã tờ khai đã được lấy dữ liệu')
-            } else {
-                let config = {
-                    url: '/o/rest/v2/serverconfigs/SERVER_EFORM_DATA_DVC/protocols/API_CONNECT?eFormNo=' + vm.eFormCode,
-                    headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
-                }
-                axios.request(config).then(res => {
-                    if(Object.keys(res.data).length !== 0 && res.data.constructor === Object){
-                        if(Array.isArray(res.data.list_giay_to) && res.data.list_giay_to.length){
-                            vm.eFormCodeArr.push(vm.eFormCode)
-                            let metaData = JSON.parse(vm.dossiers['metaData'])
-                            metaData['ma_to_khai'].push(vm.eFormCode)
-                            vm.dossiers['metaData'] = JSON.stringify(metaData)
-                            vm.eFormCode = ''
-                            if(res.data.auth) {
-                                vm.auth = res.data.auth
-                            }
-                            
-                            // if(res.data.bookingName) {
-                            //     vm.dossiers.delegateName = res.data.bookingName
-                            //     vm.dossiers.applicantName = res.data.bookingName
-                            // }
-                            // if(res.data.so_cmnd) {
-                            // vm.dossiers.delegateIdNo = res.data.so_cmnd
-                            // }
-                            // if(res.data.dien_thoai) {
-                            //     vm.dossiers.delegateTelNo = res.data.dien_thoai
-                            // }
-                            // if(res.data.email) {
-                            //     vm.dossiers.delegateEmail = res.data.email
-                            // }
-                            // if(res.data.dia_chi) {
-                            //     vm.dossiers.delegateAddress = res.data.dia_chi.length < 100 ? res.data.dia_chi : ''
-                            //     vm.dossiers.address = res.data.dia_chi.length < 100 ? res.data.dia_chi : ''
-                            // }
-                        if(!vm.dossiers.delegateName){
-                                if(res.data.delegateName) {
-                                    vm.dossiers.delegateName = res.data.delegateName
+            if (vm.formCode !== 'UPDATE') {
+                let checkEformCode = vm.eFormCodeArr.find(e => e === vm.eFormCode)
+                if (checkEformCode) {
+                    vm.eFormCode = ''
+                    toastr.error('Không hợp lệ. Mã tờ khai đã được lấy dữ liệu')
+                } else {
+                    let config = {
+                        url: '/o/rest/v2/serverconfigs/SERVER_EFORM_DATA_DVC/protocols/API_CONNECT?eFormNo=' + vm.eFormCode,
+                        headers: {'groupId' : Liferay.ThemeDisplay.getScopeGroupId()},
+                    }
+                    axios.request(config).then(res => {
+                        if (Object.keys(res.data).length !== 0 && res.data.constructor === Object) {
+                            if (Array.isArray(res.data.list_giay_to) && res.data.list_giay_to.length) {
+                                vm.eFormCodeArr.push(vm.eFormCode)
+                                let metaData = JSON.parse(vm.dossiers['metaData'])
+                                metaData['ma_to_khai'].push(vm.eFormCode)
+                                vm.dossiers['metaData'] = JSON.stringify(metaData)
+                                vm.eFormCode = ''
+                                if (res.data.auth) {
+                                    vm.auth = res.data.auth
                                 }
-                            }
-                            if(!vm.dossiers.delegateIdNo){
-                                if(res.data.delegateIdNo) {
-                                    vm.dossiers.delegateIdNo = res.data.delegateIdNo
+                                
+                                // if(res.data.bookingName) {
+                                //     vm.dossiers.delegateName = res.data.bookingName
+                                //     vm.dossiers.applicantName = res.data.bookingName
+                                // }
+                                // if(res.data.so_cmnd) {
+                                // vm.dossiers.delegateIdNo = res.data.so_cmnd
+                                // }
+                                // if(res.data.dien_thoai) {
+                                //     vm.dossiers.delegateTelNo = res.data.dien_thoai
+                                // }
+                                // if(res.data.email) {
+                                //     vm.dossiers.delegateEmail = res.data.email
+                                // }
+                                // if(res.data.dia_chi) {
+                                //     vm.dossiers.delegateAddress = res.data.dia_chi.length < 100 ? res.data.dia_chi : ''
+                                //     vm.dossiers.address = res.data.dia_chi.length < 100 ? res.data.dia_chi : ''
+                                // }
+                            if(!vm.dossiers.delegateName){
+                                    if(res.data.delegateName) {
+                                        vm.dossiers.delegateName = res.data.delegateName
+                                    }
                                 }
-                            }
-                            if(!vm.dossiers.delegateTelNo){
-                                if(res.data.delegateTelNo) {
-                                    vm.dossiers.delegateTelNo = res.data.delegateTelNo
+                                if(!vm.dossiers.delegateIdNo){
+                                    if(res.data.delegateIdNo) {
+                                        vm.dossiers.delegateIdNo = res.data.delegateIdNo
+                                    }
                                 }
-                            }
-                            if(!vm.dossiers.delegateAddress){
-                                if(res.data.delegateAddress ){
-                                    vm.dossiers.delegateAddress = res.data.delegateAddress.length < 100 ? res.data.delegateAddress : ''
-                                } 
-                            }
-                            if(!vm.dossiers.delegateEmail){
-                                if(res.data.delegateEmail ){
-                                    vm.dossiers.delegateEmail = res.data.delegateEmail
-                                } 
-                            }
-                            if(!vm.dossiers.applicantName){
-                                if(res.data.delegateName) {
-                                    vm.dossiers.applicantName = res.data.delegateName
+                                if(!vm.dossiers.delegateTelNo){
+                                    if(res.data.delegateTelNo) {
+                                        vm.dossiers.delegateTelNo = res.data.delegateTelNo
+                                    }
                                 }
-                            }
-                            if(!vm.dossiers.applicantIdNo){
-                                if(res.data.applicantIdNo) {
-                                    vm.dossiers.applicantIdNo = res.data.applicantIdNo
+                                if(!vm.dossiers.delegateAddress){
+                                    if(res.data.delegateAddress ){
+                                        vm.dossiers.delegateAddress = res.data.delegateAddress.length < 100 ? res.data.delegateAddress : ''
+                                    } 
                                 }
-                            }
-                            if(!vm.dossiers.contactTelNo){
-                                if(res.data.contactTelNo) {
-                                    vm.dossiers.contactTelNo = res.data.contactTelNo
+                                if(!vm.dossiers.delegateEmail){
+                                    if(res.data.delegateEmail ){
+                                        vm.dossiers.delegateEmail = res.data.delegateEmail
+                                    } 
                                 }
-                            }
-                            if(!vm.dossiers.contactEmail){
-                                if(res.data.contactEmail) {
-                                    vm.dossiers.contactEmail = res.data.contactEmail
+                                if(!vm.dossiers.applicantName){
+                                    if(res.data.delegateName) {
+                                        vm.dossiers.applicantName = res.data.delegateName
+                                    }
                                 }
-                            }
-                            if(!vm.dossiers.contactName){
-                                if(res.data.delegateName) {
-                                    vm.dossiers.contactName = res.data.delegateName
+                                if(!vm.dossiers.applicantIdNo){
+                                    if(res.data.applicantIdNo) {
+                                        vm.dossiers.applicantIdNo = res.data.applicantIdNo
+                                    }
                                 }
+                                if(!vm.dossiers.contactTelNo){
+                                    if(res.data.contactTelNo) {
+                                        vm.dossiers.contactTelNo = res.data.contactTelNo
+                                    }
+                                }
+                                if(!vm.dossiers.contactEmail){
+                                    if(res.data.contactEmail) {
+                                        vm.dossiers.contactEmail = res.data.contactEmail
+                                    }
+                                }
+                                if(!vm.dossiers.contactName){
+                                    if(res.data.delegateName) {
+                                        vm.dossiers.contactName = res.data.delegateName
+                                    }
+                                }
+                                if(!vm.dossiers.address){
+                                    if(res.data.address ){
+                                        vm.dossiers.address = res.data.address.length < 100 ? res.data.address : ''
+                                    } 
+                                }
+                                if(!vm.dossiers.bookingName){
+                                    if(res.data.delegateName ){
+                                        vm.dossiers.bookingName = res.data.delegateName
+                                    } 
+                                }
+                                if(res.data.su_dung_tai_nuoc_ma) {
+                                    vm.su_dung_tai_nuoc_ma = res.data.su_dung_tai_nuoc_ma
+                                }
+                                if(res.data.de_nghi_chung_nhan) {
+                                    // vm.de_nghi_chung_nhan = res.data.de_nghi_chung_nhan
+                                    // vm.changeDeNghiChungNhan()
+                                }
+                                vm.viaPostal = res.data.viaPostal ? true : false
+                                if(res.data.ma_muc_dich) {
+                                    vm.muc_dich = vm.listMucDichSuDung.find(e=>e.MA === res.data.ma_muc_dich)
+                                }
+                                if(res.data.ngay_cap_cmnd) {
+                                    vm.ngay_cap_cmnd = res.data.ngay_cap_cmnd
+                                }
+                                
+                                if(res.data.list_giay_to) {
+                                    vm.fillTableGiayTo(res.data.list_giay_to)
+                                }
+                                vm.changeDossier()
                             }
-                            if(!vm.dossiers.address){
-                                if(res.data.address ){
-                                    vm.dossiers.address = res.data.address.length < 100 ? res.data.address : ''
-                                } 
-                            }
-                            if(!vm.dossiers.bookingName){
-                                if(res.data.delegateName ){
-                                    vm.dossiers.bookingName = res.data.delegateName
-                                } 
-                            }
-                            if(res.data.su_dung_tai_nuoc_ma) {
-                                vm.su_dung_tai_nuoc_ma = res.data.su_dung_tai_nuoc_ma
-                            }
-                            if(res.data.de_nghi_chung_nhan) {
-                                // vm.de_nghi_chung_nhan = res.data.de_nghi_chung_nhan
-                                // vm.changeDeNghiChungNhan()
-                            }
-                            vm.viaPostal = res.data.viaPostal ? true : false
-                            if(res.data.ma_muc_dich) {
-                                vm.muc_dich = vm.listMucDichSuDung.find(e=>e.MA === res.data.ma_muc_dich)
-                            }
-                            if(res.data.ngay_cap_cmnd) {
-                                vm.ngay_cap_cmnd = res.data.ngay_cap_cmnd
-                            }
-                            
-                            if(res.data.list_giay_to) {
-                                vm.fillTableGiayTo(res.data.list_giay_to)
-                            }
-                            vm.changeDossier()
                         }
-                    }
-                    else {
-                        toastr.error('Mã tờ khai không hợp lệ')  
-                    }
-                }).catch(err => {
-                    toastr.error('Mã tờ khai không tìm thấy') 
-                })
-                // 
-                let filterGetDetailEform = {
-                    eFormNo: vm.eFormCode
-                }
-                vm.$store.dispatch('getThongTinToKhai', filterGetDetailEform).then(function (response) {
-                    console.log('eformInfomation', response)
-                    if (response && response.hasOwnProperty('eFormId') && response.hasOwnProperty('secret')) {
-                        let filterGetFileEform = {
-                            eFormId: response.eFormId,
-                            secret: response.secret
+                        else {
+                            toastr.error('Mã tờ khai không hợp lệ')  
                         }
-                        vm.$store.dispatch('getFileToKhai', filterGetFileEform).then(function (responseFile) {
-                            console.log('fileEntryId', responseFile)
-                            let partNoEform = response.fileTemplateNo.split('_')[0]
-                            let fileEform = [{fileEntryId: responseFile ? responseFile : 0, partNo: partNoEform, eform: false, displayName: 'Tờ khai - ' +  response.eFormNo}]
-                            vm.dossierFileArr = vm.dossierFileArr.concat(fileEform)
-                        }).catch(function (reject) {
-                        })
+                    }).catch(err => {
+                        toastr.error('Mã tờ khai không tìm thấy') 
+                    })
+                    // 
+                    let filterGetDetailEform = {
+                        eFormNo: vm.eFormCode
                     }
-                }).catch({})
+                    vm.$store.dispatch('getThongTinToKhai', filterGetDetailEform).then(function (response) {
+                        console.log('eformInfomation', response)
+                        if (response && response.hasOwnProperty('eFormId') && response.hasOwnProperty('secret')) {
+                            let filterGetFileEform = {
+                                eFormId: response.eFormId,
+                                secret: response.secret
+                            }
+                            vm.$store.dispatch('getFileToKhai', filterGetFileEform).then(function (responseFile) {
+                                console.log('fileEntryId', responseFile)
+                                let partNoEform = response.fileTemplateNo.split('_')[0]
+                                let fileEform = [{fileEntryId: responseFile ? responseFile : 0, partNo: partNoEform, eform: false, displayName: 'Tờ khai - ' +  response.eFormNo}]
+                                vm.dossierFileArr = vm.dossierFileArr.concat(fileEform)
+                            }).catch(function (reject) {
+                            })
+                        }
+                    }).catch({})
+                }
             }
-            
         },
         fillTableGiayTo (data) {
-            let vm = this
-          
-            // let gt = {
-            //     ten_giay_to: data.ten_giay_to,
-            //     ma_ten_giay_to: data.ma_ten_giay_to,
-            //     ma_loai_giay_to:  data.ma_loai_giay_to,
-            //     loai_giay_to: data.loai_giay_to,
-            //     so_ban: data.so_ban,
-            //     loai_cong_viec: data.loai_cong_viec,
-            //     so_hieu_giay_to: data.so_hieu_giay_to,
-            //     ten_nguoi_duoc_cap: data.ten_nguoi_duoc_cap,
-            //     co_quan_cap: data.co_quan_cap,
-            //     ma_co_quan_cap: data.ma_co_quan_cap,
-            //     nguoi_ky: data.nguoi_ky,
-            //     ma_nguoi_ky: data.ma_nguoi_ky,
-            //     chuc_danh_ky: data.chuc_danh_ky,
-            //     ma_chuc_vu: data.ma_chuc_vu,
-            //     ngay_ky: data.ngay_ky,
-            //     ma_con_dau: data.ma_con_dau,
-            //     ma_chu_ky: data.ma_chu_ky,
-            //     kiem_tra: 1,
-            // }
-
+            let vm = this            
             vm.listGiayTo = data
             vm.checkCKCD()
             vm.tongSoBan = 0
@@ -1833,40 +1903,6 @@ export default {
                 vm.listChuKy = vm.sortDate (arrChuKy, 'CK_NGAY_HL')
                 vm.loadingImage = false
             }).catch(err => {})
-            // let data = {
-            //     CHU_KY: [
-            //         {
-            //             CK_CHUC_DANH: 'Phó Hiệu trưởng',
-            //             CK_GHI_CHU: '',
-            //             strChuKy: `https://scontent-hkt1-1.xx.fbcdn.net/v/t1.0-9/83560216_2827598057470043_4398724110518723501_n.jpg?_nc_cat=102&_nc_sid=8024bb&_nc_ohc=MyytmLxn_SkAX_7NTQF&_nc_ht=scontent-hkt1-1.xx&oh=b3027bea2885a2cac1a26707f3942c41&oe=5F250B8B`,
-            //             CK_MA_CAN_BO: '9fb20e67afb743a9bd3c96500c7aff82',
-            //             CK_MA_CK: 'ba16b3d4286b449e854bc837e5776cd2',
-            //             CK_MA_CO_QUAN: '01',
-            //             CK_MA_DON_VI_XL: '1',
-            //             CK_NGAY_HL: '2013-08-31 00:00:00.0',
-            //             CK_PHIEN_BAN: 1,
-            //             CK_TEN_CAN_BO: 'Lê Văn'
-            //         }
-            //     ],
-            //     CON_DAU: [
-            //         {
-            //         CD_DONG_BO: true,
-            //         CD_GHI_CHU: '',
-            //         strConDau: `https://scontent-hkt1-1.xx.fbcdn.net/v/t1.0-9/106129297_2827598070803375_2684170447443855793_n.jpg?_nc_cat=106&_nc_sid=8024bb&_nc_ohc=tquhJOGgdC4AX8rkq1n&_nc_ht=scontent-hkt1-1.xx&oh=a61e5c4a6c36eea82444a5c1bc3c63a5&oe=5F256D5A`,
-            //         CD_MA_CAN_BO: '',
-            //         CD_MA_CON_DAU: '4d8d2ea84d2e41689756009c2a6b6e57',
-            //         CD_MA_CQ: '661a5e7826254b58b872fa4f9c965ef8',
-            //         CD_MA_DON_VI: 'HCM',
-            //         CD_NGAY_HL: "2013-08-31 00:00:00.0",
-            //         CD_PHIEN_BAN: 1,
-            //         CD_TEN_CAN_BO: "",
-            //         }
-            //     ]
-            // }
-            //     let arrConDau = data.CON_DAU
-            //     let arrChuKy = data.CHU_KY
-            //     vm.listConDau = vm.sortDate(arrConDau, 'CD_NGAY_HL')
-            //     vm.listChuKy = vm.sortDate (arrChuKy, 'CK_NGAY_HL')
         },
         checkedConDau (item) {
             let vm = this
@@ -1942,6 +1978,7 @@ export default {
                     
                 }  
                 if(vm.update_giayto === 'add') {
+                    console.log('LIST GIAYTO', vm.listGiayTo)
                     vm.listGiayTo.push(gt) 
                     vm.checkCKCD()
                     vm.$refs.formGiayTo.reset()
@@ -2011,8 +2048,32 @@ export default {
 
                 // Gen le phi
                 vm.genLePhi()
-                
-
+                // update dossierFile
+                if (vm.formCode === 'UPDATE') {
+                    let fileFind = vm.dossierFileArr.find(itemFile => {
+                        return itemFile.partNo === 'TP01' && (itemFile.eForm || itemFile.eform)
+                    })
+                    if (fileFind) {
+                        let dataUpdate = {
+                            dossierId: vm.id,
+                            tp: 'TP01',
+                            referenceUid: fileFind['referenceUid'],
+                            formData: JSON.parse(fileFind['formData'])
+                        }
+                        vm.$store.dispatch('putAlpacaFormCallBack', dataUpdate).then(resData => {
+                        }).catch(reject => {
+                        })
+                    } 
+                    // else {
+                    //     let dataUpdate = Object.assign(fileFind['formData'], {
+                    //         dossierId: vm.id,
+                    //         tp: 'TP01'
+                    //     }) 
+                    //     vm.$store.dispatch('postEformCallBack', dataUpdate).then(resPostEform => {
+                    //     }).catch(reject => {
+                    //     })
+                    // }
+                }
             }
         },
         genLePhi () {
@@ -2048,9 +2109,9 @@ export default {
                 }
             }
             tg2['totalRecord'] = totalRecord
-            tg2['dossierFileCustom'] =file_bien_nhan2;
-            tg2['dossierFilePayment'] =file_payment2;
-            vm.dossiers['metaData'] = JSON.stringify(tg2);
+            tg2['dossierFileCustom'] =file_bien_nhan2
+            tg2['dossierFilePayment'] =file_payment2
+            vm.dossiers['metaData'] = JSON.stringify(tg2)
             let le_phi = 30000*tong_so;
             vm.le_phi_format = le_phi
             vm.payment = {"requestPayment":1,"paymentNote":"","advanceAmount":0,"feeAmount":le_phi,"serviceAmount": 0,"shipAmount":0}
@@ -2266,63 +2327,68 @@ export default {
         },
         deleteGiayTo(index) {
             let vm = this
-            vm.listGiayTo.splice(index,1)
-            vm.checkCKCD()
-            // Count Sl giay to
-            vm.tongSoBan = 0
-            vm.listGiayTo.forEach(e=>{
-                vm.tongSoBan+=parseInt(e['so_ban'])
-            })
-            vm.computeDate()
-            // 
-            for (let i=0; i<vm.dossierFileArr.length; i++){
-                if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
-                    let arr = []
-                    vm.listGiayTo.forEach(e=>{
-                        let obj = Object.assign({}, e)
-                        // delete obj['anh_chu_ky']
-                        // delete obj['anh_con_dau']
-                        arr.push(obj)
-                    }) 
-                    let arrNuocSD = ''
-                    for(let i = 0; i<vm.su_dung_tai_nuoc_ma.length; i++) {
-                        let find = vm.listQuocGia.find(e=>e.MA === vm.su_dung_tai_nuoc_ma[i])
-                            if(find){
-                                if(arrNuocSD === '') {
-                                    arrNuocSD+=find.TEN
-                                } else {
-                                    arrNuocSD+= ', ' + find.TEN
-                                }
-                                
-                            }
-                    }
-                    let formData = {
-                        ho_ten_yeu_cau: vm.dossiers.delegateName,
-                        so_cmnd: vm.dossiers.delegateIdNo,
-                        dien_thoai: vm.dossiers.delegateTelNo,
-                        email: vm.dossiers.delegateEmail,
-                        dia_chi: vm.dossiers.delegateAddress,
-                        de_nghi_chung_nhan: vm.de_nghi_chung_nhan ? true : false,
-                        list_giay_to : arr,
-                        tong_so: vm.tongSoBan,
-                        su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
-                        su_dung_tai_nuoc: arrNuocSD,
-                        ma_muc_dich: vm.muc_dich ? vm.muc_dich.MA : '',
-                        muc_dich: vm.muc_dich ? vm.muc_dich.TEN : '',
-                        ngay_cap_cmnd: vm.ngay_cap_cmnd
-                    }
-                    console.log('1111111111111',formData)
-                    vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
-                    vm.dossierFileArr[i]['eform'] = 'true'
+            let x = confirm('Bạn có chắc chắn xóa giấy tờ này?')
+            if (x) {
+                vm.listGiayTo.splice(index,1)
+                if (vm.listGiayTo.length === 0) {
+                    vm.eFormCodeArr = []
                 }
-            }
-            let dataOut = vm.dossierFileArr.filter(function (item) {
-                return item.formData || (!item.formData && item.fileEntryId)
-            })
-            $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
+                vm.checkCKCD()
+                // Count Sl giay to
+                vm.tongSoBan = 0
+                vm.listGiayTo.forEach(e=>{
+                    vm.tongSoBan+=parseInt(e['so_ban'])
+                })
+                vm.computeDate()
+                // 
+                for (let i=0; i<vm.dossierFileArr.length; i++){
+                    if(vm.dossierFileArr[i]['partNo'] == 'TP01' && !vm.dossierFileArr[i].hasOwnProperty('fileEntryId') && !vm.dossierFileArr[i]['fileEntryId']){
+                        let arr = []
+                        vm.listGiayTo.forEach(e=>{
+                            let obj = Object.assign({}, e)
+                            // delete obj['anh_chu_ky']
+                            // delete obj['anh_con_dau']
+                            arr.push(obj)
+                        }) 
+                        let arrNuocSD = ''
+                        for(let i = 0; i<vm.su_dung_tai_nuoc_ma.length; i++) {
+                            let find = vm.listQuocGia.find(e=>e.MA === vm.su_dung_tai_nuoc_ma[i])
+                                if(find){
+                                    if(arrNuocSD === '') {
+                                        arrNuocSD+=find.TEN
+                                    } else {
+                                        arrNuocSD+= ', ' + find.TEN
+                                    }
+                                    
+                                }
+                        }
+                        let formData = {
+                            ho_ten_yeu_cau: vm.dossiers.delegateName,
+                            so_cmnd: vm.dossiers.delegateIdNo,
+                            dien_thoai: vm.dossiers.delegateTelNo,
+                            email: vm.dossiers.delegateEmail,
+                            dia_chi: vm.dossiers.delegateAddress,
+                            de_nghi_chung_nhan: vm.de_nghi_chung_nhan ? true : false,
+                            list_giay_to : arr,
+                            tong_so: vm.tongSoBan,
+                            su_dung_tai_nuoc_ma: vm.su_dung_tai_nuoc_ma,
+                            su_dung_tai_nuoc: arrNuocSD,
+                            ma_muc_dich: vm.muc_dich ? vm.muc_dich.MA : '',
+                            muc_dich: vm.muc_dich ? vm.muc_dich.TEN : '',
+                            ngay_cap_cmnd: vm.ngay_cap_cmnd
+                        }
+                        vm.dossierFileArr[i]['formData'] = JSON.stringify(formData)
+                        // vm.dossierFileArr[i]['eform'] = 'true'
+                    }
+                }
+                let dataOut = vm.dossierFileArr.filter(function (item) {
+                    return item.formData || (!item.formData && item.fileEntryId)
+                })
+                $('#dossierFileArr_hidden').val(JSON.stringify(dataOut))
 
-            // Gen le phi
-            vm.genLePhi()
+                // Gen le phi
+                vm.genLePhi()
+            }
         },
         toggleCheckbox (item, index){
             let vm = this
@@ -2364,7 +2430,6 @@ export default {
                 tg['dossierFileCustom'] = file_bien_nhan
                 vm.dossiers['metaData'] = JSON.stringify(tg)
             } else {
-                            // let check = true
                 let tg = JSON.parse(vm.dossiers['metaData'])
                 let file_bien_nhan = tg['dossierFileCustom']
                 for(let i=0; i< vm.dossierFileArr.length; i++){
@@ -2689,6 +2754,69 @@ export default {
             console.log('16')
             $('#dossiers_hidden').val(JSON.stringify(vm.dossiers))
             console.log('17')
+        },
+        viewFile2 (data, index) {
+            let vm = this
+            if (data.fileSize === 0) {
+                return
+            }
+            if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt' || data.fileType === 'mp3' || data.fileType === 'mp4') {
+                let url = '/o/rest/v2/dossiers/' + vm.id + '/files/' + data.referenceUid
+                window.location.assign(url)
+            } else {
+                data['dossierId'] = vm.id
+                if (data.referenceUid) {
+                    vm.dialogPDFLoading = true
+                    vm.dialogPDF = true
+                    vm.$store.dispatch('viewFile', data).then(result => {
+                        vm.dialogPDFLoading = false
+                        document.getElementById('dialogPDFPreview' + vm.id).src = result
+                    })
+                } else {
+                    toastr.clear()
+                    toastr.error('File dữ liệu không tồn tại')
+                }
+            }
+        },
+        getDocumentTypeIcon (type) {
+            let typeDoc = 'doc,docx'
+            let typeExcel = 'xls,xlsx'
+            let typeImage = 'png,jpg,jpeg'
+            if (type) {
+                if (typeDoc.indexOf(type.toLowerCase()) >= 0) {
+                return {
+                    icon: 'fas fa fa-file-word-o',
+                    color: 'blue',
+                    size: 14
+                }
+                } else if (typeExcel.indexOf(type.toLowerCase()) >= 0) {
+                return {
+                    icon: 'fas fa fa-file-excel-o',
+                    color: 'green',
+                    size: 14
+                }
+                } else if (type.toLowerCase() === 'pdf') {
+                return {
+                    icon: 'fa fa-file-pdf-o',
+                    color: 'red',
+                    size: 14
+                }
+                } else if (typeImage.indexOf(type.toLowerCase()) >= 0) {
+                return {
+                    icon: 'fas fa fa-file-image-o',
+                    color: 'primary',
+                    size: 14
+                }
+                } else {
+                return {
+                    icon: 'fas fa fa-paperclip',
+                    color: '',
+                    size: 14
+                }
+                }
+            } else {
+                return ''
+            }
         }
     }
 }

@@ -7,7 +7,7 @@
         </div>
       </nav>
       <v-flex xs12>
-        <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
+        <v-form v-if="!daGui" ref="form" v-model="valid" lazy-validation class="px-3 pt-3" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
           <v-flex xs12>
             <p>Vui lòng nhập Email để được cấp lại mật khẩu</p>
           </v-flex>
@@ -34,6 +34,9 @@
             </v-btn>
           </div>
         </v-form>
+        <div v-if="daGui" class="pa-3" style="border: 1px solid #dedede">
+          Yêu cầu thực hiện thành công. Vui lòng thực hiện theo hướng dẫn đã được gửi về email.
+        </div>
       </v-flex>
     </v-layout>
   </div>
@@ -53,12 +56,18 @@ export default {
   data: () => ({
     loading: false,
     valid: false,
-    confirmCode: ''
+    confirmCode: '',
+    apiForgot: '',
+    daGui: false
   }),
   computed: {
   },
   created () {
     var vm = this
+    try {
+      vm.apiForgot = apiForgot
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       var vm = this
       $('body').addClass('body_login')
@@ -80,16 +89,21 @@ export default {
       let currentParams = vm.$router.history.current.params
       let dataForm = {
         confirmCode: vm.confirmCode,
-        j_captcha_response: vm.$refs.captcha.j_captcha_response
+        j_captcha_response: vm.$refs.captcha.j_captcha_response,
+        apiForgot: vm.apiForgot
       }
       if (vm.$refs.form.validate()) {
         vm.loading = true
         let filter = dataForm
         vm.$store.dispatch('confirmForgotPASS', filter).then(function (result) {
           vm.loading = false
-          vm.$router.push({
-            path: '/xac-thuc-cap-lai-mat-khau?active_user_id=' + vm.confirmCode
-          })
+          if (vm.apiForgot) {
+            vm.daGui = true
+          } else {
+            vm.$router.push({
+              path: '/xac-thuc-cap-lai-mat-khau?active_user_id=' + vm.confirmCode
+            })
+          }
         }).catch(function (reject) {
           vm.loading = false
           vm.$refs.captcha.makeImageCap()

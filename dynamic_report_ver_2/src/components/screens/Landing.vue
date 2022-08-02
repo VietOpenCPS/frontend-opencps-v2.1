@@ -124,7 +124,7 @@
             <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
               <v-icon>print</v-icon> &nbsp; In báo cáo
             </v-btn>
-            <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="downloadExcel()">
+            <v-btn v-if="!itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="itemsReports[index]['filterConfig']['version'] ? downloadExcel() : doCreateReport(true)">
               <v-icon size="16px">fas fa fa-file-excel-o</v-icon> &nbsp; Tải xuống Excel
             </v-btn>
             <v-btn v-if="!itemsReports[index]['filterConfig']['showTable'] && exportWordReport" dark color="blue darken-3" class="my-0" v-on:click.native="doCreateReport(true, 'word')">
@@ -1475,7 +1475,7 @@ export default {
         data: vm.data,
         api: vm.api,
         proxyApi: vm.proxyApi,
-        formatDate: vm.itemsReports[vm.index]['filterConfig']['version'] ? 'timestamp' : 'date'
+        formatDate: vm.itemsReports[vm.index]['filterConfig']['version'] || vm.itemsReports[vm.index]['filterConfig']['typeDate'] === 'timestamp' ? 'timestamp' : 'date'
       }
       let check =  true
       console.log('groupIdListSelected 555', vm.groupIdListSelected)
@@ -1503,13 +1503,13 @@ export default {
         vm.dialogPDF = true
         vm.loadingPdfVer2 = true
       }
-      let dispatchUse = vm.itemsReports[vm.index]['filterConfig']['version'] ? 'getDossiers' : 'getAgencyReportListsOld'
+      let dispatchUse = vm.itemsReports[vm.index]['filterConfig']['version'] || vm.itemsReports[vm.index]['filterConfig']['typeDate'] === 'timestamp' ? 'getDossiers' : 'getAgencyReportListsOld'
       vm.$store.dispatch(dispatchUse, filter).then(function (result) {
         // console.log('result',result)
         if (result !== null && result !== undefined) {
           // set dossierList
           let dataReport
-          if (vm.itemsReports[vm.index]['filterConfig']['version']) {
+          if (vm.itemsReports[vm.index]['filterConfig']['version'] || vm.itemsReports[vm.index]['filterConfig']['typeDate'] === 'timestamp') {
             dataReport = result.data
             vm.dossierList = result.data
           } else {
@@ -1610,7 +1610,7 @@ export default {
             style: 'tdStyle'
           })
           for (let keyMapping in vm.itemsReportsConfig) {
-            if (vm.itemsReportsConfig[keyMapping]['value'] === 'note') {
+            if (vm.itemsReportsConfig[keyMapping]['value'] === 'note' || vm.itemsReportsConfig[keyMapping].hasOwnProperty('notSum')) {
               dataRowTotal.push({
                 text: '', 
                 alignment: 'center',
@@ -1701,7 +1701,7 @@ export default {
 
                   if (currentConfig.hasOwnProperty('calculator')) {
                     let calu = currentConfig['calculator'].replace(/dataInput/g, 'dossierObj')
-                    if (isNaN(eval(calu))) {
+                    if (isNaN(eval(calu)) || vm.itemsReportsConfig[keyVal]['value'] === 'note') {
                       ddStr = eval(calu)
                     } else {
                       ddStr = Math.round(eval(calu))
@@ -1725,7 +1725,7 @@ export default {
                     if (dataRowTotal[indexRow]['type'] === 'currency') {
                       dataRowTotal[indexRow]['text'] = vm.currency(dataRowTotal[indexRow]['text'])
                     }
-                    if (vm.itemsReportsConfig[keyVal]['value'] === 'note') {
+                    if (vm.itemsReportsConfig[keyVal]['value'] === 'note' || vm.itemsReportsConfig[keyVal].hasOwnProperty('notSum')) {
                       dataRowTotal[indexRow]['text'] = ''
                     }
                     dataRowAverageTotal[indexRow]['text'] = dataRowTotal[indexRow]['text']
@@ -1757,7 +1757,7 @@ export default {
               dataRowAverageTotal[indexTotalAverage]['text'] = String(average).indexOf('.') > 0 ? average.toFixed(1) : average
             }
           }
-          if (vm.reportType.startsWith('REPORT_STATISTIC')) {
+          if (vm.reportType.startsWith('REPORT_STATISTIC') && !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenTotalRow')) {
             if (vm.itemsReportsConfig[dataRowTotal.length - 2]['value'] === 'ontimePercentage') {
               dataRowTotal[dataRowTotal.length - 1]['text'] = Math.round(dataRowTotal[dataRowTotal.length - 1]['text']/indexCountTotal)
             }
@@ -1896,6 +1896,21 @@ export default {
         vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
       }
       vm.isShowLoading = true
+      try {
+        if (vm.api.indexOf('groupBy=serviceCode') >= 0 && vm.data['domainCode'] && !vm.data['serviceCode']) {
+          let dataSource = vm.filters.filter(function (item) {
+            return item['key'] === 'serviceCode'
+          })[0]
+          console.log('dataSource', dataSource['source'])
+          let serviceCode = []
+          for (let i = 0; i < dataSource['source'].length; i++) {
+            serviceCode.push(dataSource['source'][i]['value'])
+          }
+          console.log('serviceCode', serviceCode)
+          vm.data['serviceCode'] = serviceCode.toString()
+        }
+      } catch (error) {
+      }
       let filter = {
         document: vm.reportType,
         data: vm.data,
@@ -1951,7 +1966,7 @@ export default {
             style: 'tdStyle'
           })
           for (let keyMapping in vm.itemsReportsConfig) {
-            if (vm.itemsReportsConfig[keyMapping]['value'] === 'note') {
+            if (vm.itemsReportsConfig[keyMapping]['value'] === 'note' || vm.itemsReportsConfig[keyMapping].hasOwnProperty('notSum')) {
               dataRowTotal.push({
                 text: '', 
                 alignment: 'center',
@@ -2122,7 +2137,7 @@ export default {
                 }
                 dataToExportCSVItem.push(dataText)
                 dataRow.push({
-                  text: currentConfig['value'] === 'note' ? ' ' : (dataText === ' ' ? ' 0 ' : dataText), 
+                  text: currentConfig['value'] === 'note' || currentConfig.hasOwnProperty('notSum') ? ' ' : (dataText === ' ' ? ' 0 ' : dataText), 
                   alignment: alignmentConfig,
                   style: 'tdStyle'
                 })
@@ -2131,7 +2146,7 @@ export default {
                   if (dataRowTotal[indexTotal] !== null && dataRowTotal[indexTotal] !== undefined) {
                     if (currentConfig['value'] === 'ontimePercentage') {
                       dataRowTotal[indexTotal]['text'] = parseInt(dataText)
-                    } else if (currentConfig['value'] === 'note') {
+                    } else if (currentConfig['value'] === 'note' || currentConfig.hasOwnProperty('notSum')) {
                       dataRowTotal[indexTotal]['text'] = ' '
                     } else if (isNaN(dataText)) {
                       // dataRowTotal[indexTotal]['text'] = ' '
@@ -2166,7 +2181,7 @@ export default {
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
                   var dataInputXXTT = resultDataTotal[keyXXTT]
                   let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
-                  if (isNaN(eval(calu))) {
+                  if (isNaN(eval(calu)) || currentConfigXXTT['value'] === 'note') {
                     dataTextXXTT = eval(calu)
                   } else {
                     dataTextXXTT = Math.round(eval(calu))
@@ -2175,7 +2190,7 @@ export default {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
                 dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? '0 '  : parseInt(dataTextXXTT) + ' '
-                if (currentConfigXXTT['value'] === 'note') {
+                if (currentConfigXXTT['value'] === 'note' || currentConfigXXTT.hasOwnProperty('notSum')) {
                   dataRowTotal[indexTotalXXTT]['text'] = ' '
                 }
                 indexTotalXXTT = indexTotalXXTT + 1
@@ -2192,7 +2207,7 @@ export default {
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
                   var dataInputXXTT = resultDataTotal[keyXXTT]
                   let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
-                  if (isNaN(eval(calu))) {
+                  if (isNaN(eval(calu)) || currentConfigXXTT['value'] === 'note') {
                     dataTextXXTT = eval(calu)
                   } else {
                     dataTextXXTT = Math.round(eval(calu))
@@ -2201,7 +2216,7 @@ export default {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
                 dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? '0' : parseInt(dataTextXXTT) + ' '
-                if (currentConfigXXTT['value'] === 'note') {
+                if (currentConfigXXTT['value'] === 'note' || currentConfigXXTT.hasOwnProperty('notSum')) {
                   dataRowTotal[indexTotalXXTT]['text'] = ' '
                 }
                 indexTotalXXTT = indexTotalXXTT + 1
@@ -2292,6 +2307,7 @@ export default {
     },
     createReport () {
       let vm = this
+      vm.targetFilter = ''
       try {
         vm.headerTongHop[0]['text'] = vm.groupBy.filter(function (item) {
           return item.key === vm.groupByVal
@@ -2315,7 +2331,7 @@ export default {
         data: vm.data,
         api: vm.api,
         proxyApi: vm.proxyApi,
-        formatDate: vm.itemsReports[vm.index]['filterConfig']['version'] ? 'timestamp' : 'date'
+        formatDate: vm.itemsReports[vm.index]['filterConfig']['version'] || vm.itemsReports[vm.index]['filterConfig']['typeDate'] === 'timestamp' ? 'timestamp' : 'date'
       }
       let check =  true
       console.log('groupIdListSelected 555', vm.groupIdListSelected)
@@ -2371,7 +2387,7 @@ export default {
         proxyApi: vm.proxyApi,
         start: vm.pagination.page * vm.pagination.rowsPerPage - vm.pagination.rowsPerPage,
         end: vm.pagination.page * vm.pagination.rowsPerPage,
-        formatDate: vm.itemsReports[vm.index]['filterConfig']['version'] ? 'timestamp' : 'date'
+        formatDate: vm.itemsReports[vm.index]['filterConfig']['version'] || vm.itemsReports[vm.index]['filterConfig']['typeDate'] === 'timestamp' ? 'timestamp' : 'date'
       }
       let check =  true
       console.log('groupIdListSelected 555', vm.groupIdListSelected)
@@ -2603,7 +2619,7 @@ export default {
         vm.data[vm.groupByVal] = item[vm.groupByVal]
       }
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
-      vm.api = vm.itemsReports[vm.index]['filterConfig']['apiExportExcel']
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['apiExportExcel'] ? vm.itemsReports[vm.index]['filterConfig']['apiExportExcel'] : vm.itemsReports[vm.index]['filterConfig']['api']
       // build data
       let filter = {
         document: vm.reportType,
@@ -2694,6 +2710,7 @@ export default {
         for(let i in vm.filterGroup){
           vm.filterGroup[i] = null
         }
+        vm.data[vm.groupByVal] = ''
       }, 300)
     },
     viewHTML () {
@@ -2772,8 +2789,12 @@ export default {
           if (indexChildren) {
             console.log('filters', vm.filters)
             console.log('data', vm.data)
+            let keySearch = item['key']
+            if (item.hasOwnProperty('keySearch')) {
+              keySearch = item['keySearch']
+            }
             vm.filters[indexChildren]['api'] = vm.filters[indexChildren]['api'].split('?')[0]
-            vm.filters[indexChildren]['api'] += '?' + item['key'] + '=' + vm.data[item['key']].toString()
+            vm.filters[indexChildren]['api'] += '?' + keySearch + '=' + vm.data[item['key']].toString()
             vm.$store.dispatch('loadDataSource', vm.filters[indexChildren]).then(function(result) {
               vm.filters[indexChildren]['source'] = result
               if (vm.filters[indexChildren]['appendItem']) {

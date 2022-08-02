@@ -111,7 +111,8 @@
               LIÊN THÔNG
             </v-btn>
           </v-tab>
-          <v-tab :key="5" href="#tabs-5" @click="loadDossierActions()" v-if="originality !== 1">
+          <v-tab :key="5" href="#tabs-5" @click="loadDossierActions()" 
+            v-if="originality == 3 || (viewTienTrinhDvc && thongTinChiTietHoSo.dossierStatus !== 'new' && thongTinChiTietHoSo.dossierStatus !== 'receiving')">
             <v-btn flat class="px-0 py-0 mx-0 my-0">
               TIẾN TRÌNH XỬ LÝ
             </v-btn>
@@ -278,9 +279,10 @@
                 </v-expansion-panel>
                 <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
                 <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :data_rolegroup="roleGroupPhanCong" :detailDossier="thongTinChiTietHoSo" :data_uyquyen="reAsignUsers" :type="type_assign"></phan-cong>
-                <tai-lieu-ket-qua :esignType="typeEsign" ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
+                <tai-lieu-ket-qua :esignType="typeEsign" :preCondition="preCondition" ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
                 <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
-                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
+                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :paymentDetail="paymentDetail" :splitBienLai="splitBienLai" :dataSource="sourcePaymentFee" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
+                <danh-sach-bien-lai v-if="removeInvoiceGroupPayment" ref="danhsachbienlai" :payments="paymentDetail"></danh-sach-bien-lai>
                 <!-- thanh toán điện tử -->
                 <thanh-toan-dien-tu ref="epayment" v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
                 <ky-duyet :style="dataEsign['signatureType'] === '' ? 'display:none' : ''" ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo"
@@ -319,7 +321,7 @@
                   :disabled="dialogPDFLoading"
                 >
                   <v-icon>print</v-icon> &nbsp;
-                  In biên lai
+                  In biên lai điện tử
                   <span slot="loader">Loading...</span>
                 </v-btn>
               </div>
@@ -404,8 +406,9 @@
                 </v-card-text>
               </v-card>
             </v-tab-item>
-            <v-tab-item value="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
-              <v-flex xs12 style="height:42px" v-if="!sequencyDossierImport">
+            <v-tab-item value="tabs-5" v-if="originality == 3 || (viewTienTrinhDvc && thongTinChiTietHoSo.dossierStatus !== 'new' && thongTinChiTietHoSo.dossierStatus !== 'receiving')"
+             :key="5" reverse-transition="fade-transition" transition="fade-transition">
+              <v-flex xs12 style="height:42px" v-if="!sequencyDossierImport && originality == 3">
                 <v-radio-group class="absolute__btn pt-1" style="width: 350px" v-model="typeTienTrinh" row @change="changeTypeTienTrinh($event)">
                   <v-radio label="Xem dạng bảng" :value="1" ></v-radio>
                   <v-radio label="Xem dạng biểu đồ" :value="2"></v-radio>
@@ -463,7 +466,10 @@
                   <td class="text-xs-left">{{props.item.durationCount|getThoiHanQuyDinh}}</td>
                   <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
                   <td class="text-xs-left">
-                    <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
+                    <div v-if="props.item.assignUsers.length === 1 && props.item.actions.length === 1 && props.item.actions[0]['actionCode'] == '4100' && props.item.assignUsers[0]['userName'].indexOf('Admin') >= 0">
+                      {{props.item.actions[0]['actionUser']}}
+                    </div>
+                    <div v-else v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
                       {{itemUser.userName}} <br>
                     </div>
                   </td>
@@ -549,20 +555,40 @@
           <v-tabs-items v-model="activeTab2" reverse-transition="fade-transition" transition="fade-transition">
             <v-tab-item v-if="originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done'"
             value="tabs-1b" :key="1" reverse-transition="fade-transition" transition="fade-transition">
-              <div class="px-2 py-2">
+              <div class="px-2 py-2" v-if="votingVersion === 1">
                 <div v-if="votingItems && votingItems.length > 0">
                   <div v-for="(item, index) in votingItems" :key="index" >
                     <div class="text-bold">
-                      {{index + 1}}.&nbsp; {{ item.subject }}
+                      {{index + 1}}.&nbsp; {{ item.title }}
                     </div>
                     <v-radio-group class="ml-3 mt-2" v-model="item.selected" column>
-                      <v-radio class="ml-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" :disabled="originality === 3"></v-radio>
+                      <v-radio class="ml-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1.subject" :value="index1 + 1" :disabled="originality === 3"></v-radio>
                     </v-radio-group>
-                    <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
-                      <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
-                        <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
-                      </v-flex>
-                    </v-layout> -->
+                  </div>
+                </div>
+                
+                <div v-if="!votingItems || (votingItems && votingItems.length === 0)" class="mx-3">
+                  <v-alert outline color="warning" icon="priority_high" :value="true">
+                    Không có đánh giá
+                  </v-alert>
+                </div>
+                <div class="ml-3 mt-4" v-if="votingItems && votingItems.length > 0 && originality === 1">
+                  <v-btn color="primary"
+                    :loading="loadingVoting"
+                    :disabled="loadingVoting"
+                    @click="doVottingResultSubmitNew"
+                  >Gửi đánh giá</v-btn>
+                </div>
+              </div>
+              <div class="px-2 py-2" v-if="votingVersion === 2">
+                <div v-if="votingItems && votingItems.length > 0">
+                  <div v-for="(item, index) in votingItems" :key="index" >
+                    <div class="text-bold">
+                      {{index + 1}}.&nbsp; {{ item.title }}
+                    </div>
+                    <v-radio-group class="ml-3 mt-2" v-model="item.selected" column>
+                      <v-radio class="ml-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1.subject" :value="index1 + 1" :disabled="originality === 3"></v-radio>
+                    </v-radio-group>
                   </div>
                 </div>
                 
@@ -577,6 +603,23 @@
                     :disabled="loadingVoting"
                     @click="submitVoting"
                   >Gửi đánh giá</v-btn>
+                </div>
+              </div>
+              <div class="px-2 py-2" v-if="votingVersion === 3">
+                <div class="mx-3">
+                  <div class="my-2">(*)  Đánh giá mức độ hài lòng của bạn về giải quyết hồ sơ thủ tục hành chính</div>
+                  <v-btn class="mr-3" outline color="#4caf50" :loading="loadingVoting"
+                    :disabled="loadingVoting" @click="guiDanhGia(3)" v-if="votingResult === 3 || !votingResult">
+                    <v-icon style="color: #4caf50 !important">thumb_up_alt</v-icon>&nbsp; RẤT HÀI LÒNG
+                  </v-btn>
+                  <v-btn class="mr-3" outline color="indigo" :loading="loadingVoting"
+                    :disabled="loadingVoting" @click="guiDanhGia(2)" v-if="votingResult === 2 || !votingResult">
+                    <v-icon style="color: #3f51b5 !important">thumb_up_alt</v-icon>&nbsp; HÀI LÒNG
+                  </v-btn>
+                  <v-btn  outline color="red" :loading="loadingVoting"
+                    :disabled="loadingVoting" @click="guiDanhGia(1)" v-if="votingResult === 1 || !votingResult">
+                    <v-icon style="color: red !important">thumb_down_alt</v-icon>&nbsp; KHÔNG HÀI LÒNG
+                  </v-btn>
                 </div>
               </div>
             </v-tab-item>
@@ -777,12 +820,14 @@
 
 import $ from 'jquery'
 import toastr from 'toastr'
+import axios from 'axios'
 // import '../store/jquery-comments'
 import Comment from './Comment.vue'
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
 import TraKetQua from './form_xu_ly/TraKetQua.vue'
-import ThuPhi from './form_xu_ly/FeeDetail.vue'
+import ThuPhi from './form_xu_ly/FeeDetail2.vue'
+import DanhSachBienLai from './form_xu_ly/DanhSachBienLai.vue'
 import ChiTietThanhToan from './ChiTietThanhToan.vue'
 import ThucHienThanhToanDienTu from './form_xu_ly/ThucHienThanhToanDienTu.vue'
 import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
@@ -821,11 +866,19 @@ export default {
     'ngay-gia-han': ExtendDateEdit,
     'chi-tiet-thanh-toan': ChiTietThanhToan,
     'ho-so-lien-thong': HoSoLienThong,
-    'phan-cong-lai': PhanCongLai
+    'phan-cong-lai': PhanCongLai,
+    'danh-sach-bien-lai': DanhSachBienLai
   },
   data: () => ({
+    votingResult: null,
+    dossierDetailMotcua: '',
+    splitBienLai: false,
+    sourcePaymentFee: {},
+    loadingActionProcess: false,
+    votingVersion: 1,
     confirmGuiHoSoTrucTuyen: false,
     viTriLuuTru: false,
+    viewTienTrinhDvc: false,
     docLuuTru: [],
     validTraoDoi: false,
     isMobile: false,
@@ -888,6 +941,7 @@ export default {
       {fileName: 'Tài liệu ký duyệt 002', time: '21/08/2019 10:10:13',url: 'http://103.101.163.17:8080/documents/35166/0/testKS.pdf', fileSigned: false}
     ],
     typeEsign: '',
+    preCondition: '',
     showTraKetQua: false,
     showThanhPhanLienThong: false,
     showThuPhi: false,
@@ -1006,8 +1060,10 @@ export default {
         align: 'center',
         sortable: false,
         class: 'traodoitructuyen_column'
-      }],
-      filterDossierActionItems: [{
+      }
+    ],
+    filterDossierActionItems: [
+      {
         text: 'Tất cả',
         value: ''
       }, {
@@ -1059,6 +1115,9 @@ export default {
     srcDownloadIframe: '',
     itemAction: '',
     hasDownloadAllFile: false,
+    sendInvoice: false,
+    removeInvoice: false,
+    removeInvoiceGroupPayment: false,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -1167,6 +1226,10 @@ export default {
   created () {
     let vm = this
     try {
+      vm.votingVersion = votingVersion
+    } catch (error) {
+    }
+    try {
       vm.hasPreviewSync = hasPreviewSync
     } catch (error) {
     }
@@ -1182,11 +1245,15 @@ export default {
       vm.confirmGuiHoSoTrucTuyen = confirmGuiHoSoTrucTuyen
     } catch (error) {
     }
+    try {
+      vm.viewTienTrinhDvc = viewTienTrinhDvc
+    } catch (error) {
+    }
     window.toastr = toastr
     vm.$nextTick(function () {
       $('#m-navigation').css('display', 'none')
       // console.log('meunconfig created', vm.menuConfigs, vm.index)
-      if (vm.menuConfigs && vm.menuConfigs[vm.index]['hasViewText']) {
+      if (vm.menuConfigs && vm.menuConfigs[vm.index] && vm.menuConfigs[vm.index]['hasViewText']) {
         vm.viewScript = true
         vm.loadingForm = true
         let filter = {
@@ -1339,6 +1406,14 @@ export default {
               vm.btnStepsDynamics = vm.btnStepsDynamics.filter(function (item) {
                 return !item.hasOwnProperty('roleCode') || (item.hasOwnProperty('roleCode') && vm.getUser(item.roleCode))
               })
+              // bỏ thao tác sửa hồ sơ tk trung tâm
+              let currentQuery = vm.$router.history.current.query
+              if (currentQuery.hasOwnProperty('groupIdSiteMng')) {
+                vm.btnStepsDynamics = vm.btnStepsDynamics.filter(function (item) {
+                  return item.form !== 'UPDATE'
+                })
+              }
+              // 
             }
             if (vm.btnStepsDynamics.filter(function(item) {
               return item.form !== 'UPDATE'
@@ -1353,6 +1428,7 @@ export default {
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'done') {
           vm.activeTab2 = 'tabs-1b'
           vm.loadVoting()
+          vm.getDetailDossierMotCua()
         }
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'new') {
           vm.activeTab2 = 'tabs-3b'
@@ -1415,7 +1491,13 @@ export default {
       }
     },
     goBack () {
-      window.history.back()
+      let vm = this
+      let currentQuery = vm.$router.history.current.query
+      if (currentQuery.hasOwnProperty('groupIdSiteMng') && currentQuery.hasOwnProperty('redirectUrl')) {
+        window.location.href = decodeURIComponent(window.location.href.split("redirectUrl=")[1])
+      } else {
+        window.history.back()
+      }
     },
     viewFile (data) {
       var vm = this
@@ -1455,13 +1537,25 @@ export default {
       })
     },
     loadDossierActions (data) {
-      var vm = this
+      let vm = this
       let submissionNote = ''
       try {
         submissionNote = vm.thongTinChiTietHoSo['submissionNote'] ? JSON.parse(vm.thongTinChiTietHoSo['submissionNote']) : ''
       } catch (error) {
       }
-      if (submissionNote && submissionNote.hasOwnProperty('dossierImport') && submissionNote.dossierImport) {
+      if (vm.originality == 1 && vm.viewTienTrinhDvc && submissionNote) {
+        let resultTemp = submissionNote.data
+        for (var i = 0; i < resultTemp.length; i++) {
+          if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+            if (!Array.isArray(resultTemp[i]['actions'])) {
+              let arrActionsTemp = []
+              arrActionsTemp.push(resultTemp[i]['actions'])
+              resultTemp[i]['actions'] = arrActionsTemp
+            }
+          }
+        }
+        vm.dossierActions = resultTemp
+      } else if (submissionNote && submissionNote.hasOwnProperty('dossierImport') && submissionNote.dossierImport) {
         vm.sequencyDossierImport = true
         vm.dossierImportActions = submissionNote['data']
       } else {
@@ -1753,11 +1847,12 @@ export default {
             vm.createFiles = [result.createFiles]
           }
           vm.showTaoTaiLieuKetQua = true
-          if (result.hasOwnProperty('signatureType') && result.signatureType === 'plugin') {
+          if (result.hasOwnProperty('signatureType') && (result.signatureType === 'plugin' || result.signatureType === 'pluginAndHSM' || result.signatureType === 'hsm')) {
             vm.typeEsign = result.signatureType
+            vm.preCondition = result.preCondition
           }
         }
-        if (result.hasOwnProperty('eSignature') && result.eSignature && result.signatureType !== 'plugin') {
+        if (result.hasOwnProperty('eSignature') && result.eSignature && result.signatureType !== 'plugin' && result.signatureType !== 'pluginAndHSM' && result.signatureType !== 'hsm') {
           isPopup = true
           vm.showKyPheDuyetTaiLieu = true
           vm.dataEsign = result
@@ -1789,9 +1884,27 @@ export default {
           isPopup = true
           vm.showPostalService = true
         }
+        if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' && result.preCondition.indexOf('sendInvoiceVNPT=1') >= 0) {
+          vm.sendInvoice = true
+        }
+        if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' 
+          && result.preCondition.indexOf('destroyInvoiceVNPT=1') >= 0 && !vm.paymentDetail['groupPaymentFile']) {
+          vm.removeInvoice = true
+        } else {
+          vm.removeInvoice = false
+        }
+        if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' 
+          && result.preCondition.indexOf('destroyInvoiceVNPT=1') >= 0 && vm.paymentDetail['groupPaymentFile']) {
+          isPopup = true
+          vm.removeInvoiceGroupPayment = true
+        } else {
+          vm.removeInvoiceGroupPayment = false
+        }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
-          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3')) {
+          // nghiepvuhanghai
+          // if (vm.originality == '1' && (result.payment.requestPayment == 3 || result.payment.requestPayment == 5) && vm.paymentDetail && vm.paymentDetail['paymentStatus'] != 3 && vm.paymentDetail['paymentStatus'] != 5) {
+          if (vm.originality == '1' && (result.payment.requestPayment == 3 || result.payment.requestPayment == 5)) {
             isPopup = true
             vm.showThanhToanDienTu = true
             let filter = {
@@ -1804,6 +1917,17 @@ export default {
             })
           } else {
             isPopup = true
+            try {
+              if (result.hasOwnProperty('paymentFee') && result.paymentFee) {
+                vm.sourcePaymentFee = ''
+                let configs = JSON.parse(result.paymentFee)
+                vm.splitBienLai = configs.hasOwnProperty('isGroupPaymentFile') ? true : false
+                vm.sourcePaymentFee = configs.hasOwnProperty('source') ? configs['source'] : {}
+              } else {
+                vm.sourcePaymentFee = {}
+              }
+            } catch (error) {
+            }
             vm.showThuPhi = true
             vm.paymentsOriginal = result.payment
             let dataJson = ''
@@ -2153,6 +2277,13 @@ export default {
     // Hàm xử lý Actions
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
+      if (vm.removeInvoiceGroupPayment) {
+        vm.proccessRemoveBienLaiGroupPayment(result)
+        return
+      }
+      if (vm.loadingActionProcess) {
+        return
+      }
       var validPhanCong = true
       var validYKien = true
       var validTreHan = true
@@ -2206,18 +2337,41 @@ export default {
           advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
           feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
           serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-          shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+          shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
+          paymentFee: vm.payments['paymentFee']
+        }
+        if (vm.payments['paymentMethod']) {
+          paymentsOut['paymentMethod'] = vm.payments['paymentMethod']
+        }
+        if (vm.payments['groupPaymentFile']) {
+          paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
         }
       }
       if (vm.showThuPhi) {
-        if (vm.payments && vm.payments.hasOwnProperty('counter')) {
-          let dataNote = paymentsOut
+        if (vm.payments && vm.payments.hasOwnProperty('counter') && vm.payments.counter) {
+          let dataNote = {
+            requestPayment: vm.payments['requestPayment'],
+            paymentNote: vm.payments['paymentNote'],
+            advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+            feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+            serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+            shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
+            counter: vm.payments.counter,
+            paymentFee: vm.payments['paymentFee']
+          }
+          if (vm.payments['paymentMethod']) {
+            dataNote['paymentMethod'] = vm.payments['paymentMethod']
+          }
+          if (vm.payments['groupPaymentFile']) {
+            paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
+          }
           paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
           paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
           paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
           paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
         }
         filter['payment'] = paymentsOut
+        console.log('payment99999', filter['payment'])
         let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
         if (feeTotal === 0 && vm.originality === 3) {
           let x = confirm('Tổng phí còn phải nộp: 0 đồng. Bạn có muốn tiếp tục?')
@@ -2242,6 +2396,7 @@ export default {
             serviceAmount: paymentData.serviceAmount ? paymentData.serviceAmount : 0,
             shipAmount: paymentData.shipAmount ? paymentData.shipAmount : 0,
             paymentMethod: paymentData.paymentMethod ? paymentData.paymentMethod : 'Chuyển khoản',
+            paymentFee: paymentData.paymentFee ? paymentData.paymentFee : '',
           }
           let paymentsOut = filter['payment']
           // console.log('payment data check', paymentsOut)
@@ -2362,6 +2517,9 @@ export default {
       }
       vm.dossierId = dossierItem.dossierId
       let currentQuery = vm.$router.history.current.query
+      // 
+      console.log('THONGTINACTION', filter)
+      // 
       vm.loadingActionProcess = true
       // case confirm Thao tác từ trang danh sách hồ sơ
       if (isConfirm) {
@@ -2384,13 +2542,14 @@ export default {
             if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
               vm.printDocument = true
             }
+            try {
+              currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            } catch (error) {
+            }
             vm.$router.push({
               path: vm.$router.history.current.path,
-              query: {
-                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                q: currentQuery['q']
-              }
+              query: currentQuery
             })
           }).catch(function (reject) {
             vm.loadingAction = false
@@ -2455,6 +2614,7 @@ export default {
                       })
                       if (fileFind) {
                         fileFind['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+                        fileFind['required'] = false
                         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
                           counterSave += 1
                           if (counterSave === lengthFiles) {
@@ -2493,16 +2653,36 @@ export default {
                     advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
                     feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
                     serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-                    shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+                    shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
+                    paymentFee: vm.payments['paymentFee']
                   }
-                  if (vm.payments && vm.payments.hasOwnProperty('counter')) {
-                    let dataNote = paymentsOut
+                  if (vm.payments['paymentMethod']) {
+                    paymentsOut['paymentMethod'] = vm.payments['paymentMethod']
+                  }
+                  if (vm.payments['groupPaymentFile']) {
+                    paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
+                  }
+                  if (vm.payments && vm.payments.hasOwnProperty('counter') && vm.payments.counter) {
+                    let dataNote = {
+                      requestPayment: vm.payments['requestPayment'],
+                      paymentNote: vm.payments['paymentNote'],
+                      advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                      feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                      serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                      shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
+                      counter: vm.payments.counter,
+                      paymentFee: vm.payments['paymentFee']
+                    }
+                    if (vm.payments['paymentMethod']) {
+                      dataNote['paymentMethod'] = vm.payments['paymentMethod']
+                    }
                     paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
                     paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
                     paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
                     paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
                   }
                   resultAction['payment'] = paymentsOut
+                  console.log('payment99999', resultAction['payment'])
                   let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
                   if (feeTotal === 0 && vm.originality === 3) {
                     let x = confirm('Tổng phí còn phải nộp: 0 đồng. Bạn có muốn tiếp tục?')
@@ -2548,6 +2728,288 @@ export default {
               if (filter['toUsers'] && filter['toUsers'].filter(function (item) {
                 return Number(item.assigned) > 0
               }).length > 0 ) {
+                // A15
+                let callBack = function () {
+                  vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                    vm.getDetailDossier()
+                    if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
+                      vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+                      })
+                    }
+                    if (filter['payment']) {
+                      vm.loadThanhToan()
+                    }
+                    vm.loadingAction = false
+                    vm.dialogActionProcess = false
+                    vm.loadingActionProcess = false
+                    vm.alertObj = {
+                      icon: 'check_circle',
+                      color: 'success',
+                      message: 'Thực hiện thành công!'
+                    }
+                    vm.btnStateVisible = false
+                    if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                      vm.rollbackable = result.rollbackable
+                    }
+                    if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                      vm.printDocument = true
+                    }
+                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
+                      vm.printInvoicefilePayment = true
+                      vm.printPay()
+                    }
+                    if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                      vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+                    }
+                    vm.checkInput = 0
+                    vm.$store.commit('setCheckInput', 0)
+                    if (String(item.form) === 'ACTIONS') {
+                    } else {
+                      try {
+                        currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                        currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                      } catch (error) {
+                      }
+                      vm.$router.push({
+                        path: vm.$router.history.current.path,
+                        query: currentQuery
+                      })
+                    }
+                    $('html, body').animate({
+                      scrollTop: 0
+                    }, 500, 'linear')
+                  }).catch(function (reject) {
+                    vm.loadingAction = false
+                    vm.loadingActionProcess = false
+                  })
+                }
+                if (vm.removeInvoice) {
+                  let filterDel = {
+                    dossierId: vm.thongTinChiTietHoSo['dossierId']
+                  }
+                  vm.$store.dispatch('deleleBienLai', filterDel).then(function (result) {
+                    callBack()
+                  }).catch(function () {
+                    vm.loadingAction = false
+                    vm.loadingActionProcess = false
+                  })
+                } else {
+                  callBack()
+                }
+                
+              } else {
+                toastr.success('Yêu cầu thực hiện thành công')
+                setTimeout (function () {
+                  vm.goBack()
+                }, 300)
+              }
+              
+            }).catch(function (error) {
+            })
+          } else {
+            // ký số với plugin cài đặt
+            // check không sử dụng ký số trong quy trình có ký số
+            // let doNotSign = false
+            let requiredSign = false
+            if (vm.showTaoTaiLieuKetQua && vm.typeEsign === 'plugin') {
+              // doNotSign = vm.$refs.tailieuketqua.checkUseSign()
+              requiredSign = vm.$refs.tailieuketqua.checkRequiredSignPlugin()
+            }
+            // chia 2 trường hợp cấu hình Bắt buộc ký số và Không bắt buộc ký số (cấu hình preCondition)
+            if (requiredSign == true) {
+              if (result.signatureType === 'plugin' && vm.showTaoTaiLieuKetQua) {
+                console.log('file ký số', vm.createFileSignedSync)
+                let hasIsSigned = false
+                try {
+                  hasIsSigned = vm.createFileSignedSync['createFiles'].filter(function(item) {
+                    return item.isSigned
+                  })
+                } catch (error) {
+                }
+                let valid = true
+                // chia 2 trường hợp có tài liệu đã ký và chưa có tài liệu nào được ký
+                if (!vm.createFileSignedSync || !hasIsSigned || hasIsSigned.length === 0) {
+                  console.log('TH1')
+                  toastr.clear()
+                  toastr.error('Chưa có tài liệu nào được ký duyệt')
+                  vm.loadingAction = false
+                  vm.loadingActionProcess = false
+                } else {
+                  console.log('TH1.2')
+                  let fileChuaKy = []
+                  let files = vm.createFileSignedSync.createFiles
+                  var fileEntries = []
+                  let dossierFiles = []
+                  for (let index in files) {
+                    if (
+                      (!files[index]['isSigned'] && files[index]['fileSize'] && files[index]['fileType'].toLocaleLowerCase() === 'pdf' && !files[index]['eForm']) || 
+                      (!files[index]['isSigned'] && files[index]['eForm'] && files[index]['fileSize'] && files[index]['createFileDossierPartEform'])
+                    ) {
+                      fileChuaKy.push(files[index]['displayName'])
+                    } else {
+                      if (files[index]['fileSize'] && files[index]['isSigned']) {
+                        fileEntries.push(files[index]['fileEntryId'])
+                        dossierFiles.push(files[index]['dossierFileId'])
+                      }
+                    }
+                  }
+                  let doActionKySo = function () {
+                    let filterUpdateFile = {
+                      dossierId: vm.thongTinChiTietHoSo['dossierId'],
+                      fileEntries: fileEntries.toString(),
+                      dossierFiles: dossierFiles.toString()
+                    }
+                    vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
+                      vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                        vm.getDetailDossier()
+                        if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
+                          vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+                          })
+                        }
+                        if (filter['payment']) {
+                          vm.loadThanhToan()
+                        }
+                        vm.loadingAction = false
+                        vm.dialogActionProcess = false
+                        vm.loadingActionProcess = false
+                        vm.alertObj = {
+                          icon: 'check_circle',
+                          color: 'success',
+                          message: 'Thực hiện thành công!'
+                        }
+                        vm.btnStateVisible = false
+                        if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                          vm.rollbackable = result.rollbackable
+                        }
+                        if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                          vm.printDocument = true
+                        }
+                        if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
+                          vm.printInvoicefilePayment = true
+                          vm.printPay()
+                        }
+                        if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                          vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+                        }
+                        vm.checkInput = 0
+                        vm.$store.commit('setCheckInput', 0)
+                        if (String(item.form) === 'ACTIONS') {
+                        } else {
+                          try {
+                            currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                            currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                          } catch (error) {
+                          }
+                          vm.$router.push({
+                            path: vm.$router.history.current.path,
+                            query: currentQuery
+                          })
+                        }
+                        $('html, body').animate({
+                          scrollTop: 0
+                        }, 500, 'linear')
+                      }).catch(function (reject) {
+                        vm.loadingAction = false
+                        vm.loadingActionProcess = false
+                      })
+                    }).catch(function () {
+                      toastr.error('Cập nhật kết quả xử lý thất bại')
+                      vm.loadingAction = false
+                      vm.loadingActionProcess = false
+                    })
+                  }
+                  if (fileChuaKy.length > 0) {
+                    let x = confirm('Tài liệu "' + fileChuaKy.toString() + '" chưa được ký duyệt, bạn có muốn tiếp tục?')
+                    if (x) {
+                      doActionKySo()
+                    } else {
+                      vm.loadingActionProcess = false
+                    }
+                  } else {
+                    doActionKySo()
+                  }
+                }
+              } else {
+                // A15
+                let callBackAction = function () {
+                  vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                    vm.getDetailDossier()
+                    if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
+                      vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+                      })
+                    }
+                    if (filter['payment']) {
+                      vm.loadThanhToan()
+                    }
+                    vm.loadingAction = false
+                    vm.dialogActionProcess = false
+                    vm.loadingActionProcess = false
+                    vm.alertObj = {
+                      icon: 'check_circle',
+                      color: 'success',
+                      message: 'Thực hiện thành công!'
+                    }
+                    vm.btnStateVisible = false
+                    if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                      vm.rollbackable = result.rollbackable
+                    }
+                    if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                      vm.printDocument = true
+                    }
+                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
+                      vm.printInvoicefilePayment = true
+                      vm.printPay()
+                    }
+                    if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                      vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+                    }
+                    vm.checkInput = 0
+                    vm.$store.commit('setCheckInput', 0)
+                    if (String(item.form) === 'ACTIONS') {
+                    } else {
+                      try {
+                        currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                        currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                      } catch (error) {
+                      }
+                      vm.$router.push({
+                        path: vm.$router.history.current.path,
+                        query: currentQuery
+                      })
+                    }
+                    $('html, body').animate({
+                      scrollTop: 0
+                    }, 500, 'linear')
+                  }).catch(function (reject) {
+                    vm.loadingAction = false
+                    vm.loadingActionProcess = false
+                  })
+                }
+                if (vm.removeInvoice) {
+                  let filterDel = {
+                    dossierId: vm.thongTinChiTietHoSo['dossierId']
+                  }
+                  vm.$store.dispatch('deleleBienLai', filterDel).then(function (result) {
+                    callBackAction()
+                  }).catch(function () {
+                    vm.loadingAction = false
+                    vm.loadingActionProcess = false
+                  })
+                } else {
+                  callBackAction()
+                }
+              }
+            }
+            // 
+            if (requiredSign == false) {
+              let hasIsSigned = false
+              try {
+                hasIsSigned = vm.createFileSignedSync['createFiles'].filter(function(item) {
+                  return item.isSigned
+                })
+              } catch (error) {
+              }
+              let doAction = function () {
                 vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
                   vm.getDetailDossier()
                   if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
@@ -2572,7 +3034,7 @@ export default {
                   if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                     vm.printDocument = true
                   }
-                  if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                  if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
                     vm.printInvoicefilePayment = true
                     vm.printPay()
                   }
@@ -2583,13 +3045,14 @@ export default {
                   vm.$store.commit('setCheckInput', 0)
                   if (String(item.form) === 'ACTIONS') {
                   } else {
+                    try {
+                      currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                      currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                    } catch (error) {
+                    }
                     vm.$router.push({
                       path: vm.$router.history.current.path,
-                      query: {
-                        recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                        renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                        q: currentQuery['q']
-                      }
+                      query: currentQuery
                     })
                   }
                   $('html, body').animate({
@@ -2599,37 +3062,32 @@ export default {
                   vm.loadingAction = false
                   vm.loadingActionProcess = false
                 })
-              } else {
-                toastr.success('Yêu cầu thực hiện thành công')
-                setTimeout (function () {
-                  vm.goBack()
-                }, 300)
               }
-              
-            }).catch(function (error) {
-            })
-          } else {
-            // ký số với plugin cài đặt
-            // check không sử dụng ký số trong quy trình có ký số
-            let doNotSign = false
-            if (vm.showTaoTaiLieuKetQua && vm.typeEsign === 'plugin') {
-              doNotSign = vm.$refs.tailieuketqua.checkUseSign()
-            }
-            if (result.signatureType === 'plugin' && !doNotSign && vm.showTaoTaiLieuKetQua) {
-              console.log('file ký số', vm.createFileSignedSync)
-              let hasIsSigned = false
-              try {
-                hasIsSigned = vm.createFileSignedSync['createFiles'].filter(function(item) {
-                  return item.isSigned
-                })
-              } catch (error) {
-              }
-              let valid = true
               if (!vm.createFileSignedSync || !hasIsSigned || hasIsSigned.length === 0) {
-                toastr.clear()
-                toastr.error('Chưa có tài liệu nào được ký duyệt')
-                vm.loadingAction = false
-                vm.loadingActionProcess = false
+                let filterUpdateFile = {
+                  dossierId: vm.thongTinChiTietHoSo['dossierId'],
+                  fileEntries: '',
+                  dossierFiles: ''
+                }
+                vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
+                  if (vm.removeInvoice) {
+                    let filterDel = {
+                      dossierId: vm.thongTinChiTietHoSo['dossierId']
+                    }
+                    vm.$store.dispatch('deleleBienLai', filterDel).then(function (result) {
+                      doAction()
+                    }).catch(function () {
+                      vm.loadingAction = false
+                      vm.loadingActionProcess = false
+                    })
+                  } else {
+                    doAction()
+                  }
+                }).catch(function () {
+                  toastr.error('Cập nhật tài liệu kết quả thất bại')
+                  vm.loadingAction = false
+                  vm.loadingActionProcess = false
+                })
               } else {
                 let fileChuaKy = []
                 let files = vm.createFileSignedSync.createFiles
@@ -2648,135 +3106,20 @@ export default {
                     }
                   }
                 }
-                let doActionKySo = function () {
-                  console.log('fileEntries 12312', fileEntries, dossierFiles)
-                  let filterUpdateFile = {
-                    dossierId: vm.thongTinChiTietHoSo['dossierId'],
-                    fileEntries: fileEntries.toString(),
-                    dossierFiles: dossierFiles.toString()
-                  }
-                  vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
-                    // 1
-                    vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-                      vm.getDetailDossier()
-                      if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
-                        vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
-                        })
-                      }
-                      if (filter['payment']) {
-                        vm.loadThanhToan()
-                      }
-                      vm.loadingAction = false
-                      vm.dialogActionProcess = false
-                      vm.loadingActionProcess = false
-                      vm.alertObj = {
-                        icon: 'check_circle',
-                        color: 'success',
-                        message: 'Thực hiện thành công!'
-                      }
-                      vm.btnStateVisible = false
-                      if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
-                        vm.rollbackable = result.rollbackable
-                      }
-                      if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
-                        vm.printDocument = true
-                      }
-                      if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
-                        vm.printInvoicefilePayment = true
-                        vm.printPay()
-                      }
-                      if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
-                        vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
-                      }
-                      vm.checkInput = 0
-                      vm.$store.commit('setCheckInput', 0)
-                      if (String(item.form) === 'ACTIONS') {
-                      } else {
-                        vm.$router.push({
-                          path: vm.$router.history.current.path,
-                          query: {
-                            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                            q: currentQuery['q']
-                          }
-                        })
-                      }
-                      $('html, body').animate({
-                        scrollTop: 0
-                      }, 500, 'linear')
-                    }).catch(function (reject) {
-                      vm.loadingAction = false
-                      vm.loadingActionProcess = false
-                    })
-                  }).catch(function () {
-                    toastr.error('Cập nhật kết quả xử lý thất bại')
-                    vm.loadingAction = false
-                    vm.loadingActionProcess = false
-                  })
+
+                let filterUpdateFile = {
+                  dossierId: vm.thongTinChiTietHoSo['dossierId'],
+                  fileEntries: fileEntries.toString(),
+                  dossierFiles: dossierFiles.toString()
                 }
-                if (fileChuaKy.length > 0) {
-                  let x = confirm('Tài liệu "' + fileChuaKy.toString() + '" chưa được ký duyệt, bạn có muốn tiếp tục?')
-                  if (x) {
-                    doActionKySo()
-                  } else {
-                    vm.loadingActionProcess = false
-                  }
-                } else {
-                  doActionKySo()
-                }
+                vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
+                  doAction()
+                }).catch(function () {
+                  toastr.error('Cập nhật kết quả xử lý thất bại')
+                  vm.loadingAction = false
+                  vm.loadingActionProcess = false
+                })
               }
-            } else {
-              vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-                vm.getDetailDossier()
-                if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
-                  vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
-                  })
-                }
-                if (filter['payment']) {
-                  vm.loadThanhToan()
-                }
-                vm.loadingAction = false
-                vm.dialogActionProcess = false
-                vm.loadingActionProcess = false
-                vm.alertObj = {
-                  icon: 'check_circle',
-                  color: 'success',
-                  message: 'Thực hiện thành công!'
-                }
-                vm.btnStateVisible = false
-                if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
-                  vm.rollbackable = result.rollbackable
-                }
-                if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
-                  vm.printDocument = true
-                }
-                if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
-                  vm.printInvoicefilePayment = true
-                  vm.printPay()
-                }
-                if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
-                  vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
-                }
-                vm.checkInput = 0
-                vm.$store.commit('setCheckInput', 0)
-                if (String(item.form) === 'ACTIONS') {
-                } else {
-                  vm.$router.push({
-                    path: vm.$router.history.current.path,
-                    query: {
-                      recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                      renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                      q: currentQuery['q']
-                    }
-                  })
-                }
-                $('html, body').animate({
-                  scrollTop: 0
-                }, 500, 'linear')
-              }).catch(function (reject) {
-                vm.loadingAction = false
-                vm.loadingActionProcess = false
-              })
             }
             
           }
@@ -2889,13 +3232,14 @@ export default {
         }
         vm.checkInput = 0
         vm.$store.commit('setCheckInput', 0)
+        try {
+          currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        } catch (error) {
+        }
         vm.$router.push({
           path: vm.$router.history.current.path,
-          query: {
-            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            q: currentQuery['q']
-          }
+          query: currentQuery
         })
       }).catch(function (reject) {
         vm.loadingActionProcess = false
@@ -2968,6 +3312,7 @@ export default {
       }).catch(function () {
         vm.loadingNextAction = false
       })
+      vm.loadThanhToan()
       vm.$store.dispatch('loadPlugins', {
         dossierId: vm.thongTinChiTietHoSo.dossierId
       }).then(results => {
@@ -3150,29 +3495,32 @@ export default {
         console.log(reject)
       })
     },
-    // loadVoting () {
-    //   let vm = this
-    //   let filter = {
-    //     className: 'dossier',
-    //     classPk: vm.id
-    //   }
-    //   vm.$store.dispatch('loadVoting', filter).then(function (result) {
-    //     vm.votingItems = result
-    //     console.log('votingItems', vm.votingItems)
-    //   }).catch(function (reject) {
-    //   })
-    // },
     loadVoting () {
       let vm = this
-      let filter = {
-        className: 'dossier',
-        dossierDetail: vm.thongTinChiTietHoSo
+      if (vm.votingVersion === 1) {
+        let filter = {
+          className: 'dossier',
+          classPk: vm.id
+        }
+        vm.$store.dispatch('loadVoting', filter).then(function (result) {
+          vm.votingItems = result
+          console.log('votingItems', vm.votingItems)
+        }).catch(function (reject) {
+        })
+      } else {
+        if (vm.votingVersion !== 3) {
+          let filter = {
+            className: 'dossier',
+            dossierDetail: vm.thongTinChiTietHoSo
+          }
+          vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
+            vm.votingItems = result
+            console.log('votingItems', vm.votingItems)
+          }).catch(function (reject) {
+          })
+        }
       }
-      vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
-        vm.votingItems = result
-        console.log('votingItems', vm.votingItems)
-      }).catch(function (reject) {
-      })
+      
     },
     getPreAction () {
       let vm = this
@@ -3207,6 +3555,41 @@ export default {
         })
       }
     },
+    doVottingResultSubmitNew () {
+      var vm = this
+      vm.loadingVoting = true
+      let arrAction = []
+      let valid = false
+      for (var key in vm.votingItems) {
+        vm.votingItems[key]['className'] = 'dossier'
+        if (String(vm.votingItems[key]['selected']) !== '0') {
+          valid = true
+          let indexChoice = vm.votingItems[key]['selected'] - 1
+          arrAction.push(vm.$store.dispatch('submitVotingNew', Object.assign(vm.votingItems[key]['choices'][indexChoice], {dossierNo: vm.thongTinChiTietHoSo['dossierNo']})))
+        }
+      }
+      if (valid) {
+        Promise.all(arrAction).then(results => {
+          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          vm.increCounter()
+          vm.loadingVoting = false
+        }).catch(xhr => {
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          vm.loadingVoting = false
+        })
+      } else {
+        vm.loadingVoting = false
+        toastr.error('Bạn chưa chọn đánh giá nào')
+      }
+      
+    },
+    increCounter () {
+      let vm = this
+      let data = {
+        dossierNo: vm.thongTinChiTietHoSo['dossierNo']
+      }
+      vm.$store.dispatch('increCounter', data).then(function (result) {})
+    },
     doAction () {
       let vm = this
       let filter = {
@@ -3222,16 +3605,36 @@ export default {
             advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
             feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
             serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-            shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+            shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
+            paymentFee: vm.payments['paymentFee']
           }
-          if (vm.payments && vm.payments.hasOwnProperty('counter')) {
-            let dataNote = paymentsOut
+          if (vm.payments['groupPaymentFile']) {
+            paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
+          }
+          if (vm.payments['paymentMethod']) {
+            paymentsOut['paymentMethod'] = vm.payments['paymentMethod']
+          }
+          if (vm.payments && vm.payments.hasOwnProperty('counter') && vm.payments.counter) {
+            let dataNote = {
+              requestPayment: vm.payments['requestPayment'],
+              paymentNote: vm.payments['paymentNote'],
+              advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+              feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+              serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+              shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
+              counter: vm.payments.counter,
+              paymentFee: vm.payments['paymentFee']
+            }
+            if (vm.payments['paymentMethod']) {
+              dataNote['paymentMethod'] = vm.payments['paymentMethod']
+            }
             paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
             paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
             paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
             paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
           }
           resultAction['payment'] = paymentsOut
+          console.log('payment99999', resultAction['payment'])
         }
         if (vm.showYkienCanBoThucHien) {
           let result = vm.$refs.ykiencanbo.doExport()
@@ -3279,17 +3682,80 @@ export default {
         dossierId: vm.thongTinChiTietHoSo.dossierId,
         referenceUid: vm.thongTinChiTietHoSo.referenceUid
       }
-      vm.dialogPDFLoading = true
-      vm.$store.dispatch('printPay', filter).then(function (result) {
-        vm.dialogPDFLoading = false
-        vm.titleDialogPdf = 'Biên lai thanh toán'
-        vm.dialogPDF = true
+      if (!vm.sendInvoice) {
+        vm.dialogPDFLoading = true
+        vm.$store.dispatch('printPay', filter).then(function (result) {
+          vm.dialogPDFLoading = false
+          vm.titleDialogPdf = 'Biên lai thanh toán'
+          vm.dialogPDF = true
+          setTimeout(function () {
+            document.getElementById('dialogPDFPreviewXl').src = result
+          }, 200)
+        }).catch(function(){
+          vm.dialogPDFLoading = false
+        })
+      } else {
+        vm.dialogPDFLoading = true
         setTimeout(function () {
-          document.getElementById('dialogPDFPreviewXl').src = result
-        }, 200)
+          vm.$store.dispatch('printPayVnpt', filter).then(function (result) {
+            vm.dialogPDFLoading = false
+            vm.titleDialogPdf = 'Biên lai thanh toán'
+            vm.dialogPDF = true
+            setTimeout(function () {
+              document.getElementById('dialogPDFPreviewXl').src = result
+            }, 200)
+          }).catch(function(){
+            vm.dialogPDFLoading = false
+          })
+        }, 3000)
+      }
+      
+    },
+    deleteBienLai () {
+      let vm = this
+      let filter = {
+        dossierId: vm.thongTinChiTietHoSo.dossierId,
+        referenceUid: vm.thongTinChiTietHoSo.referenceUid
+      }
+      vm.loadingActionProcess = true
+      vm.$store.dispatch('deleleBienLai', filter).then(function (result) {
+        toastr.success('Hủy biên lai thành công')
+        vm.loadingActionProcess = false
       }).catch(function(){
-        vm.dialogPDFLoading = false
+        vm.loadingActionProcess = false
       })
+    },
+    proccessRemoveBienLaiGroupPayment (data) {
+      let vm = this
+      console.log('proccessRemoveBienLaiGroupPayment', data, vm.payments)
+      let bienLaiXoa = vm.$refs.danhsachbienlai.getBienLaiXoa()
+      console.log('bienLaiXoa', bienLaiXoa)
+      if (!bienLaiXoa || bienLaiXoa.length == 0) {
+        vm.loadingActionProcess = false
+        toastr.error('Vui lòng chọn biên lai để thực hiện hủy')
+        return
+      }
+      let x = confirm('Bạn có chắc chắn thực hiện hủy biên lai?')
+      if (x) {
+        let arrAction = []
+        vm.loadingActionProcess = true
+        for (var index in bienLaiXoa) {
+          bienLaiXoa[index]['dossierId'] = vm.id
+          arrAction.push(vm.$store.dispatch('xoaBienLaiTach', bienLaiXoa[index]))
+        }
+        Promise.all(arrAction).then(results => {
+          vm.loadingActionProcess = true
+          let filter = {
+            dossierId: vm.thongTinChiTietHoSo.dossierId,
+            actionCode: vm.resultDialogPick.actionCode
+          }
+          vm.doActionSpecial(filter)
+        }).catch(xhr => {
+          vm.loadingActionProcess = true
+          toastr.error('Hủy biên lai không thành công')
+        })
+      }
+      
     },
     filterNextActionEnable (nextaction) {
       var isEnabale = false
@@ -3535,6 +4001,106 @@ export default {
             document.getElementById('viTriLuuTru').src = result
           })
         }
+      })
+    },
+    guiDanhGia (vote) {
+      let vm = this
+      if (!vm.votingResult) {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            Token: Liferay.authToken,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let metaData = vm.thongTinChiTietHoSo.metaData ? JSON.parse(vm.thongTinChiTietHoSo.metaData) : {}
+        let data = Object.assign(metaData, {hailong: vote})
+        let textPost = {
+          data: JSON.stringify(data)
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'PUT')
+        dataPost.append('url', '/dossiers/' + vm.thongTinChiTietHoSo.referenceUid + '/metadata')
+        dataPost.append('data', JSON.stringify(textPost))
+        dataPost.append('serverCode', 'SERVER_' + vm.thongTinChiTietHoSo['govAgencyCode'])
+        vm.loadVoting = true
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+          toastr.success('Gửi đánh giá thành công')
+          vm.loadVoting = false
+          vm.votingResult = vote
+          vm.danhGiaCanBo(vote)
+        }).catch(xhr => {
+          vm.loadVoting = false
+        })
+      }
+    },
+    danhGiaCanBo (vote) {
+      let vm = this
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId(),
+          Token: Liferay.authToken,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+      let metaData = vm.dossierDetailMotcua.metaData ? JSON.parse(vm.dossierDetailMotcua.metaData) : {}
+      if (metaData.hasOwnProperty('EmployeeEmail')) {
+        let nameVote = ''
+        if (vote == 3) {
+          nameVote = 'Rất hài lòng'
+        } else if (vote == 2) {
+          nameVote = 'Hài lòng'
+        } else {
+          nameVote = 'Không hài lòng'
+        }
+        let voteEmp = {
+          "dossierNo": vm.dossierDetailMotcua.dossierNo,
+          "govAgencyCode": vm.dossierDetailMotcua.govAgencyCode,
+          "govAgencyName": vm.dossierDetailMotcua.govAgencyName,
+          "employeeEmail": metaData.EmployeeEmail,
+          "employeeName": metaData.EmployeeName,
+          "votingName": nameVote,
+          "votingValue": vote,
+          "groupId": vm.dossierDetailMotcua.groupId
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'POST')
+        dataPost.append('url', '/votings/rateEmployee')
+        dataPost.append('data', JSON.stringify(voteEmp))
+        dataPost.append('serverCode', 'SERVER_' + vm.thongTinChiTietHoSo['govAgencyCode'])
+
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+        }).catch(xhr => {
+        })
+      }
+    },
+    getDetailDossierMotCua () {
+      let vm = this
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId(),
+          Token: Liferay.authToken,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+      let textPost = {}
+      let dataPost = new URLSearchParams()
+      dataPost.append('method', 'GET')
+      dataPost.append('url', '/dossiers/' + vm.thongTinChiTietHoSo.referenceUid)
+      dataPost.append('data', JSON.stringify(textPost))
+      dataPost.append('serverCode', vm.thongTinChiTietHoSo.serverNo)
+      axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+        let dossier = result.data
+        vm.dossierDetailMotcua = dossier
+        if (dossier.metaData) {
+          try {
+            let datameta = JSON.parse(dossier.metaData)
+            vm.votingResult = datameta.hasOwnProperty('hailong') ? Number(datameta.hailong) : null
+          } catch (error) {
+          }
+        }
+      }).catch(xhr => {
+        
       })
     }
   },

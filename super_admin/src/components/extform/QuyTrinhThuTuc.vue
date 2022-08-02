@@ -57,6 +57,7 @@
                       :rules="[rules.required, rules.varchar75, rules.syntaxError]"
                       :maxlength="75"
                       :counter="75"
+                      @blur="formatDataInput()"
                       required
                     >
                       <template slot="label">Số hiệu quy trình <span class="red--text darken-3">*</span></template>
@@ -1321,6 +1322,8 @@
         esignatureTypeList: [
           { text: 'Sử dụng chữ ký số', value: 'digital' },
           { text: 'Sử dụng plugin ký số', value: 'plugin' },
+          { text: 'Sử dụng HSM', value: 'hsm' },
+          { text: 'Sử dụng plugin ký số và Hsm', value: 'pluginAndHSM' },
           { text: 'Sử dụng captcha', value: 'captcha' },
           { text: 'Nhập mật khẩu người dùng', value: 'password' },
           { text: 'Nhập mã pin', value: 'pin' }          
@@ -1328,7 +1331,14 @@
         validAddAction: false,
         //
         rules: {
-          required: value => !!value || 'Bắt buộc phải nhập.',
+          required: (val) => {
+            if(val){
+              val = String(val).trim()
+              return val ? true : 'Thông tin bắt buộc'
+            } else {
+              return true
+            }
+          },
           number: value => {
             const pattern = /^\d+$/
             return pattern.test(value) || 'Bắt buộc phải nhập kiểu số.'

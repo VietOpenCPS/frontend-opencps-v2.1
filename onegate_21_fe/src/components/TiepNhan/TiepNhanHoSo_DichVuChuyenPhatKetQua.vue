@@ -215,8 +215,8 @@
       </content-placeholders>
       <!--  -->
       <v-radio-group class="mt-1" v-model="dichVuChuyenPhatKetQua.viaPostal" row @change="changeViaPostal($event)">
-        <v-radio label="Nhận kết quả trực tiếp" :value="1" ></v-radio>
-        <v-radio label="Nhận kết quả tại nhà" :value="2"></v-radio>
+        <v-radio label="Trả kết quả trực tiếp" :value="1" ></v-radio>
+        <v-radio label="Trả kết quả tại nhà" :value="2"></v-radio>
         <!-- <v-radio label="Nhận trực tuyến" :value="9"></v-radio> -->
       </v-radio-group>
       <!--  -->
@@ -295,10 +295,13 @@ export default {
       // vm.dichVuChuyenPhatKetQua.postalCityCode = val.cityCode
       // vm.dichVuChuyenPhatKetQua.postalDistrictCode = val.districtCode
       // vm.dichVuChuyenPhatKetQua.postalWardCode = val.wardCode
-      /*
-      vm.dichVuChuyenPhatKetQua.postalAddress = val.address
-      vm.dichVuChuyenPhatKetQua.postalTelNo = val.contactTelNo
-      */
+      try {
+        if (vm.detailDossier.dossierStatus) {
+          vm.dichVuChuyenPhatKetQua.postalAddress = val.address
+          vm.dichVuChuyenPhatKetQua.postalTelNo = val.contactTelNo
+        }
+      } catch (error) {
+      }
       // var filter = {
       //   collectionCode: 'VNPOST_CITY_CODE',
       //   level: 0,
@@ -444,6 +447,7 @@ export default {
     },
     getFee () {
       let vm = this
+      let currentQuery = vm.$router.history.current.query
       if (vm.functionTimeOutGetFee) {
         clearTimeout(vm.functionTimeOutGetFee)
       }
@@ -453,7 +457,7 @@ export default {
           let url = '/o/rest/v2/postal/vnpostprice'
           let typeMethod = 'POST'
           let headers = {
-            groupId: window.themeDisplay.getScopeGroupId()
+            groupId: currentQuery.hasOwnProperty('groupIdSiteMng') && currentQuery.groupIdSiteMng ? currentQuery.groupIdSiteMng : window.themeDisplay.getScopeGroupId()
           }
           let dataUpdate = new URLSearchParams()
           dataUpdate.append("GovAgencyCode", vm.detailDossier.govAgencyCode)

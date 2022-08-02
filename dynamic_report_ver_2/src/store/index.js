@@ -427,7 +427,7 @@ export const store = new Vuex.Store({
                   if (day && month && year && filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp') {
                     let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
                     if (key === 'toDate') {
-                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} 23:59`)).getTime()
+                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T23:59`)).getTime()
                     }
                     param.params[key] = timeStampDate
                   } else {
@@ -646,16 +646,20 @@ export const store = new Vuex.Store({
                   param.params['from' + keySearch] = filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp' ? dateCurrent.getTime() : new Date(dateCurrent).toLocaleDateString('vi-VN')
                   param.params['to' + keySearch] = filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp' ? dateCurrent.getTime() : new Date(dateCurrent).toLocaleDateString('vi-VN')
                 } else {
-                  let [day, month, year] = currentVal.split('/')
-                  if (day && month && year && filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp') {
-                    let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
-                    if (key === 'toDate') {
-                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} 23:59`)).getTime()
-                    }
-                    param.params[key] = timeStampDate
-                  } else {
+                  try {
+                    let [day, month, year] = currentVal.split('/')
+                    if (day && month && year && filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp') {
+                      let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                      if (key === 'toDate') {
+                        timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T23:59`)).getTime()
+                      }
+                      param.params[key] = timeStampDate
+                    } else {
+                      param.params[key] = currentVal
+                    }   
+                  } catch (error) {
                     param.params[key] = currentVal
-                  }                  
+                  }             
                 }
               }
             }
@@ -1214,7 +1218,7 @@ export const store = new Vuex.Store({
                   if (day && month && year && filter.hasOwnProperty('formatDate') && filter.formatDate === 'timestamp') {
                     let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
                     if (key === 'toDate') {
-                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} 23:59`)).getTime()
+                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T23:59`)).getTime()
                     }
                     param.params[key] = timeStampDate
                   } else {
@@ -1408,9 +1412,13 @@ export const store = new Vuex.Store({
                   if (day && month && year) {
                     let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
                     if (key === 'toDate') {
-                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} 23:59`)).getTime()
+                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T23:59`)).getTime()
                     }
-                    param.params[key] = timeStampDate
+                    if (key === 'fromDate' || key === 'toDate') {
+                      param.params[key] = timeStampDate
+                    } else {
+                      param.params[key] = currentVal
+                    }
                   } else {
                     param.params[key] = currentVal
                   } 
@@ -1470,6 +1478,20 @@ export const store = new Vuex.Store({
             .then(axios.spread((...args) => {
               let myObject = []
               for (let i = 0; i < args.length; i++) {
+                // 
+                try {
+                  var fileName = filter.fileName
+                  var a = document.createElement('a')
+                  document.body.appendChild(a)
+                  a.style = 'display: none'
+                  var url = window.URL.createObjectURL(args[i]['data'])
+                  a.href = url
+                  a.download = fileName
+                  a.click()
+                  window.URL.revokeObjectURL(url)
+                } catch (error) {
+                }
+                // 
                 let dataOutput = args[i]['data'].hasOwnProperty('total') ? args[i]['data']['data'] : args[i]['data']
                 if (args[i]['data']['total'] > 0 || (!args[i]['data'].hasOwnProperty('total') && dataOutput)) {
                   myObject = myObject.concat(dataOutput)
@@ -1498,6 +1520,20 @@ export const store = new Vuex.Store({
             param['params']['v'] = Math.random()
             axios.post(requestURL, {}, param).then(function (response) {
               let serializable = response.data
+              // 
+              try {
+                var fileName = filter.fileName
+                var a = document.createElement('a')
+                document.body.appendChild(a)
+                a.style = 'display: none'
+                var url = window.URL.createObjectURL(response.data)
+                a.href = url
+                a.download = fileName
+                a.click()
+                window.URL.revokeObjectURL(url)
+              } catch (error) {
+              }
+              // 
               if (serializable.data) {
                 resolve(serializable)
               } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
@@ -1779,7 +1815,7 @@ export const store = new Vuex.Store({
                   if (day && month && year) {
                     let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
                     if (key === 'toDate') {
-                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} 23:59`)).getTime()
+                      timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T23:59`)).getTime()
                     }
                     param.params[key] = timeStampDate
                   } else {

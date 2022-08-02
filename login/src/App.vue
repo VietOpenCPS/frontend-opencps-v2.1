@@ -309,10 +309,15 @@ export default {
     colorBG: "009688",
     templateDefault: templateDefault,
     testData: [],
-    testDataSeen: []
+    testDataSeen: [],
+    setUrlRedirect: ''
   }),
   created() {
     let vm = this;
+    try {
+      vm.setUrlRedirect = setUrlRedirect
+    } catch (error) {
+    }
     vm.$nextTick(function() {
       vm.isSignedIn = window.themeDisplay.isSignedIn();
       vm.userNameLogin = window.themeDisplay.getUserName();
@@ -523,9 +528,17 @@ export default {
         state: ''
       }
       axios.post('/o/rest/v2/dvcqgsso/logout', data, param).then(function (response) {
-        window.location.href = "/c/portal/logout"
+        if (vm.setUrlRedirect) {
+          window.location.href = "/c/portal/logout?referer=" + vm.setUrlRedirect
+        } else {
+          window.location.href = "/c/portal/logout"
+        }
       }).catch(function (error) {
-        window.location.href = "/c/portal/logout"
+        if (vm.setUrlRedirect) {
+          window.location.href = "/c/portal/logout?referer=" + vm.setUrlRedirect
+        } else {
+          window.location.href = "/c/portal/logout"
+        }
       })
     },
     goToDangKyPage() {

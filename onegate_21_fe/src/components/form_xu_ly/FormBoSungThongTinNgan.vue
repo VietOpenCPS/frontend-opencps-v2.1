@@ -354,6 +354,7 @@
     },
     created () {
       var vm = this
+      let currentQuery = vm.$router.history.current.query
       vm.$nextTick(function () {
         let filter = {
           dossierId: vm.dossier_id,
@@ -373,7 +374,7 @@
                   let dataSourceSelect = []
                   let param = {
                     headers: {
-                      groupId: window.themeDisplay.getScopeGroupId()
+                      groupId:currentQuery.hasOwnProperty('groupIdSiteMng') && currentQuery.groupIdSiteMng ? currentQuery.groupIdSiteMng: window.themeDisplay.getScopeGroupId()
                     },
                     params: {}
                   }
@@ -445,9 +446,10 @@
       },
       getDataSource (api, index, paramInput) {
         let vm = this
+        let currentQuery = vm.$router.history.current.query
         let param = {
           headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
+            groupId: currentQuery.hasOwnProperty('groupIdSiteMng') && currentQuery.groupIdSiteMng ? currentQuery.groupIdSiteMng:window.themeDisplay.getScopeGroupId()
           },
           params: paramInput ? paramInput : {}
         }
