@@ -123,6 +123,23 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getApplicantInfo ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/applicants/applicantIdNo/' + filter.applicantIdNo, param).then(function (response) {
+            let seriable = response.data
+            resolve(seriable)
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
     loadDictItems ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -163,12 +180,88 @@ export const store = new Vuex.Store({
         var dataPutUser = new URLSearchParams()
         dataPutUser.append('oldPassword', filter.oldPassword)
         dataPutUser.append('newPassword', filter.newPassword)
+        if (filter.hasOwnProperty('type')) {
+          dataPutUser.append('type', filter.type)
+        }
         axios.post(url, dataPutUser, param).then(result1 => {
           resolve(result1.data)
         }).catch(xhr => {
           reject(xhr)
           commit('setsnackbarerror', true)
         })
+      })
+    },
+    changePassKeycloak ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let settings = {
+          "url": "https://apigateway.haugiang.gov.vn/v1/datasharing/account/changepwd",
+          "method": "POST",
+          "headers": {
+            "secret": "1hZ64frE9A6088oIgUUgPYJ6zp7+HXat",
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + filter.token
+          },
+          "data": JSON.stringify({
+            "matKhauHienTai": filter.oldPassword,
+            "matKhauMoi": filter.newPassword,
+            "tenDangNhap": filter.tenDangNhap
+          }),
+        };
+        
+        $.ajax(settings).done(function (response) {
+          resolve(response);
+        }).fail(function () {
+          reject("")
+        })
+
+      })
+    },
+    getCodeVerify ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let settings = {
+          "url": "https://apigateway.haugiang.gov.vn/base/auth/random",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "data": JSON.stringify({
+            "tenDinhDanh": filter.tenDinhDanh
+          }),
+        };
+        
+        $.ajax(settings).done(function (response) {
+          try {
+            let data = response.resp.doiTuongXacThuc
+            resolve(data);
+          } catch (error) {
+            reject("")
+          }
+        }).fail(function () {
+          reject("")
+        })
+
+      })
+    },
+    resetPassWordKeycloak ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let settings = {
+          "url": "https://apigateway.haugiang.gov.vn/base/auth/resetpwd/code",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "data": JSON.stringify({
+            "tenDinhDanh": filter.tenDinhDanh,
+            "maXacThuc": filter.maXacThuc
+          })
+        };
+        
+        $.ajax(settings).done(function (response) {
+          resolve(response);
+        }).fail(function () {
+          reject("")
+        })
+
       })
     },
     putUser ({commit, state}, filter) {
@@ -474,7 +567,7 @@ export const store = new Vuex.Store({
           dataPost.append('method', 'GET')
           dataPost.append('url', '/fileitems')
           dataPost.append('data', JSON.stringify(textPost))
-
+          dataPost.append('serverCode', 'SERVER_MOTCUA')
           axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
             resolve(response.data)
           }, error => {
@@ -496,7 +589,7 @@ export const store = new Vuex.Store({
         dataPost.append('url', '/applicantdatas/' + filter.applicantDataId + '/preview')
         dataPost.append('dataType', 'binary')
         dataPost.append('data', '')
-        
+        dataPost.append('serverCode', 'SERVER_MOTCUA')        
         axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
           let url = window.URL.createObjectURL(response.data)
           resolve(url)

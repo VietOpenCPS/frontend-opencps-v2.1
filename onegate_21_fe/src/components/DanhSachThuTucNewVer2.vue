@@ -703,7 +703,8 @@
                         }
                       } catch (error) {
                       }
-                      window.location.href = urlRedirect
+                      // window.location.href = urlRedirect
+                      window.open(urlRedirect, "_blank")
                     } else {
                       if (!vm.isOffLine) {
                         vm.trackingBTTT(resServiceInfo.serviceCode)
@@ -744,7 +745,8 @@
                         }
                       } catch (error) {
                       }
-                      window.location.href = urlRedirect
+                      // window.location.href = urlRedirect
+                      window.open(urlRedirect, "_blank")
                     } else {
                       if (!vm.isOffLine) {
                         vm.trackingBTTT(resServiceInfo.serviceCode)
@@ -779,7 +781,8 @@
                     }
                   } catch (error) {
                   }
-                  window.location.href = urlRedirect
+                  // window.location.href = urlRedirect
+                  window.open(urlRedirect, "_blank")
                 }
               }).catch(function(){})
             }
@@ -834,7 +837,8 @@
               }
             } catch (error) {
             }
-            window.location.href = urlRedirect
+            // window.location.href = urlRedirect
+            window.open(urlRedirect, "_blank")
           } else {
             if (!vm.isOffLine) {
               vm.trackingBTTT(resServiceInfo.serviceCode)
@@ -880,7 +884,8 @@
             }
           } catch (error) {
           }
-          window.location.href = urlRedirect
+          // window.location.href = urlRedirect
+          window.open(urlRedirect, "_blank")
         } else {
           vm.trackingBTTT(data.serviceCode)
           vm.$store.dispatch('postDossier', data).then(function (result) {
@@ -1092,7 +1097,7 @@
         try {
           console.log('trackDVC serviceCode', serviceCode)
           if (_govaq) {
-            _govaq.push(['trackDVC', serviceCode, '-1', ''])
+            _govaq.push(['trackDVC', serviceCode, '1', ''])
           }
         } catch (error) { 
         }

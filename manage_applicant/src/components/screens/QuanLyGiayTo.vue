@@ -1059,6 +1059,7 @@ export default {
           dataCreateFile.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
           dataCreateFile.append('templateNo', vm.optionCreate['templateNo'])
           dataCreateFile.append('dossierNo', '')
+          dataCreateFile.append('file', '')
           
           axios.post(url, dataCreateFile, param).then(result1 => {
             vm.loadingAction = false
@@ -1180,6 +1181,7 @@ export default {
         dataPost.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
         dataPost.append('templateNo', vm.optionCreate['templateNo'])
         dataPost.append('dossierNo', '')
+        dataPost.append('file', '')
 
         axios.put(url, dataPost, param).then(result1 => {
           vm.loadingAction = false
@@ -1279,7 +1281,7 @@ export default {
       vm.govAgencyCreate = item.govAgencyName ? item.govAgencyName : ''
       try {
         vm.serviceInfoCreate = vm.serviceInfoList.filter(function (items) {
-          return items.serviceCode === item.serviceCode
+          return String(items.serviceCode) === String(item.serviceCode)
         })[0]
         if (vm.serviceInfoCreate) {
           vm.optionList = vm.serviceInfoCreate.options
@@ -1359,7 +1361,7 @@ export default {
         if (vm.isDvc) {
           vm.$store.dispatch('getFileAttachProxy', filter).then(function (result) {
             let fileType = item.fileExtension.toLowerCase()
-            if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+            if (fileType === '' || fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
               fileType === 'tif' || fileType === 'tiff'
             ) {
               vm.dialogPDF = true

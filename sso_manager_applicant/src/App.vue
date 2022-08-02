@@ -30,6 +30,7 @@
 
     },
     created () {
+      let vm = this
     },
     watch: {
       '$route': function (newRoute, oldRoute) {

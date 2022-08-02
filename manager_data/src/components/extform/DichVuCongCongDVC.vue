@@ -494,7 +494,7 @@ export default {
       let vm = this
       let options = {
         headers: {
-          'groupId': window.themeDisplay.getScopeGroupId(),
+          'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
           'Token': window.Liferay !== undefined ? window.Liferay.authToken : '',
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json'
@@ -645,7 +645,7 @@ export default {
       vm.loadingTable = true
       let param = {
         headers: {
-          groupId: window.themeDisplay.getScopeGroupId()
+          'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
         }
       }
       let params = {
@@ -697,7 +697,7 @@ export default {
       if (x) {
         let param = {
           headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
+            'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
           }
         }
         let params = {

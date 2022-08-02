@@ -149,6 +149,7 @@ export default {
               ""
             ),
             front_image: vm.userData["front_image"],
+            card_id: vm.userData["id"]
           };
           vm.$store.dispatch("postSelfieImage", data).then(function (result) {
             let response = result.data;
@@ -231,6 +232,7 @@ export default {
       let data = {
         live_image: live_image,
         front_image: vm.userData["front_image"],
+        card_id: vm.userData["id"]
       };
       vm.$emit("changeLoading");
       vm.$store.dispatch("postSelfieImage", data).then(function (result) {

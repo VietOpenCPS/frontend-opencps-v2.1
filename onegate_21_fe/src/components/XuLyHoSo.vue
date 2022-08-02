@@ -98,7 +98,9 @@
       <v-layout wrap v-if="btnStateVisible">
         <form-bo-sung-thong-tin v-if="showFormBoSungThongTinNgan" ref="formBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
         <phan-cong v-if="showPhanCongNguoiThucHien" ref="phancong" v-model="assign_items" :type="type_assign" ></phan-cong>
-        <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" ref="tailieuketqua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
+        <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" ref="tailieuketqua" :chiTietAction="chiTietAction" :dossierSelected="dossierSelected"
+         :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles" :esignType="chiTietAction.signatureType">
+        </tai-lieu-ket-qua>
         <ngay-gia-han v-if="showExtendDateEdit" ref="ngaygiahan" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
         <ngay-hen-tra v-if="showEditDate" ref="ngayhentra" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
         <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
@@ -293,7 +295,9 @@ export default {
     gopThuPhi: true,
     changePaymentStatus: false,
     createFiles: [],
-    doActionGroupNew: false
+    doActionGroupNew: false,
+    chiTietAction: '',
+    kySoThaoTacGop: false
   }),
   computed: {
     loading () {
@@ -325,6 +329,10 @@ export default {
     vm.$nextTick(function () {
       try{
         vm.doActionGroupNew = doActionGroupNew
+      } catch {
+      }
+      try{
+        vm.kySoThaoTacGop = kySoThaoTacGop
       } catch {
       }
       vm.btnIndex = -1
@@ -407,6 +415,7 @@ export default {
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
         result.hasOwnProperty('payment') || result.hasOwnProperty('checkInput'))) {
+          vm.chiTietAction = result
         if (result.hasOwnProperty('userNote') && (result.userNote === 1 || result.userNote === '1' || result.userNote === 2 || result.userNote === '2')) {
           isPopup = true
           vm.showYkienCanBoThucHien = true
@@ -650,6 +659,8 @@ export default {
           validPhanCong = true
         } else {
           validPhanCong = false
+          toastr.clear()
+          toastr.error('Chưa chọn người phân công, thực hiện')
         }
       }
       var paymentsOut = null
@@ -738,21 +749,39 @@ export default {
               }
             })
           } else {
-            vm.$store.dispatch('doActionGroup', filter).then(function (result) {
-              vm.loadingActionProcess = false
-              vm.loadingAction = false
-              vm.btnStateVisible = false
-              setTimeout(function () {
-                vm.goBack()
-              }, 500)
-            }).catch(function (reject) {
+            if (vm.showTaoTaiLieuKetQua && vm.chiTietAction.signatureType == 'plugin' && vm.kySoThaoTacGop) {
+              let dataFileKySo = vm.$refs.tailieuketqua.mappingFileSignedUpdate
+              let dataUpdateFile = {
+                fileEntryIdStr: dataFileKySo.fileEntries,
+                dossierFileIdStr: dataFileKySo.dossierFiles
+              }
+              vm.$store.dispatch('updateFileKySoVgca', dataUpdateFile).then(res => {
+                vm.$store.dispatch('doActionGroup', filter).then(function (result) {
+                  vm.loadingActionProcess = false
+                  vm.loadingAction = false
+                  vm.btnStateVisible = false
+                  setTimeout(function () {
+                    vm.goBack()
+                  }, 500)
+                }).catch(function (reject) {
+                    vm.loadingActionProcess = false
+                    vm.loadingAction = false
+                })
+              }).catch(function() {
+              })
+            } else {
+              vm.$store.dispatch('doActionGroup', filter).then(function (result) {
                 vm.loadingActionProcess = false
                 vm.loadingAction = false
-                // vm.btnStateVisible = false
-                // setTimeout(function () {
-                //   vm.goBack()
-                // }, 500)
-            })
+                vm.btnStateVisible = false
+                setTimeout(function () {
+                  vm.goBack()
+                }, 500)
+              }).catch(function (reject) {
+                  vm.loadingActionProcess = false
+                  vm.loadingAction = false
+              })
+            }
           }
           
         }
@@ -789,21 +818,39 @@ export default {
               }
             })
           } else {
-            vm.$store.dispatch('doActionGroup', filter).then(function (result) {
-              vm.loadingActionProcess = false
-              vm.loadingAction = false
-              vm.btnStateVisible = false
-              setTimeout(function () {
-                vm.goBack()
-              }, 500)
-            }).catch(function (reject) {
+            if (vm.showTaoTaiLieuKetQua && vm.chiTietAction.signatureType == 'plugin' && vm.kySoThaoTacGop) {
+              let dataFileKySo = vm.$refs.tailieuketqua.mappingFileSignedUpdate
+              let dataUpdateFile = {
+                fileEntryIdStr: dataFileKySo.fileEntries,
+                dossierFileIdStr: dataFileKySo.dossierFiles
+              }
+              vm.$store.dispatch('updateFileKySoVgca', dataUpdateFile).then(res => {
+                vm.$store.dispatch('doActionGroup', filter).then(function (result) {
+                  vm.loadingActionProcess = false
+                  vm.loadingAction = false
+                  vm.btnStateVisible = false
+                  setTimeout(function () {
+                    vm.goBack()
+                  }, 500)
+                }).catch(function (reject) {
+                    vm.loadingActionProcess = false
+                    vm.loadingAction = false
+                })
+              }).catch(function() {
+              })
+            } else {
+              vm.$store.dispatch('doActionGroup', filter).then(function (result) {
                 vm.loadingActionProcess = false
                 vm.loadingAction = false
-                // vm.btnStateVisible = false
-                // setTimeout(function () {
-                //   vm.goBack()
-                // }, 500)
-            })
+                vm.btnStateVisible = false
+                setTimeout(function () {
+                  vm.goBack()
+                }, 500)
+              }).catch(function (reject) {
+                  vm.loadingActionProcess = false
+                  vm.loadingAction = false
+              })
+            }
           }
         }
       }

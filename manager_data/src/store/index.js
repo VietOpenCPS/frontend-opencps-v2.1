@@ -75,7 +75,13 @@ export const store = new Vuex.Store({
             link: '/table/opencps_actionconfig',
             code: 'opencps_actionconfig',
             text: 'Thao tác xử lý'
-          }
+          },
+          {
+            icon: 'filter_8',
+            link: '/table/opencps_employee',
+            code: 'opencps_employee',
+            text: 'Quản lý nhân sự'
+          },
         ]
       },
     ],
@@ -87,13 +93,17 @@ export const store = new Vuex.Store({
     processStepList: [],
     processActionList: [],
     processRoleList: [],
-    problem: true
+    problem: true,
+    groupIdAgencyManager: '',
+    agencyListManager: '',
+    agencyManager: '',
+    currentSite: ''
   },
   actions: {
     loadInitResource ({state}) {
       return new Promise((resolve) => {
         if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
-          state.initData['groupId'] = window.themeDisplay.getScopeGroupId()
+          state.initData['groupId'] = state.groupIdAgencyManager ? state.groupIdAgencyManager : window.themeDisplay.getScopeGroupId()
           state.initData['user'] = {
             'userName': window.themeDisplay.getUserName(),
             'userEmail': '',
@@ -114,7 +124,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            groupId: state.initData.groupId ? state.initData.groupId : window.themeDisplay.getScopeGroupId()
           }
         }
         axios.get(state.endPointApi + '/users/login', param).then(function (response) {
@@ -157,7 +167,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+              groupId: state.initData.groupId ? state.initData.groupId : window.themeDisplay.getScopeGroupId()
             },
             responseType: 'blob'
           }
@@ -513,7 +523,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject)=>{
         let param = {
           headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
+            groupId: state.initData.groupId ? state.initData.groupId : window.themeDisplay.getScopeGroupId()
           },
           params: {
           }
@@ -650,7 +660,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupId: state.initData.groupId ? state.initData.groupId : window.themeDisplay.getScopeGroupId()
             }
           }
           let params = {
@@ -693,7 +703,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupId: state.initData.groupId ? state.initData.groupId : window.themeDisplay.getScopeGroupId()
             }
           }
           let params = {
@@ -716,7 +726,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject)=>{
         let param = {
           headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
+            groupId: state.initData.groupId ? state.initData.groupId : window.themeDisplay.getScopeGroupId()
           },
           params: {
           }
@@ -1733,7 +1743,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupId: state.initData.groupId ? state.initData.groupId : window.themeDisplay.getScopeGroupId()
             }
           }
           let params = {
@@ -1762,7 +1772,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupId: state.initData.groupId ? state.initData.groupId : window.themeDisplay.getScopeGroupId()
             }
           }
           let params = {
@@ -1810,7 +1820,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupId: state.initData.groupId ? state.initData.groupId : window.themeDisplay.getScopeGroupId()
             }
           }
           let params = {
@@ -1869,7 +1879,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupId: state.initData.groupId ? state.initData.groupId : window.themeDisplay.getScopeGroupId()
             }
           }
           let dataPost = new URLSearchParams()
@@ -1965,7 +1975,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupId: state.initData.groupId ? state.initData.groupId : window.themeDisplay.getScopeGroupId()
             }
           }
           let dataPost = new URLSearchParams()
@@ -2832,7 +2842,7 @@ export const store = new Vuex.Store({
       }
       let options = {
         headers: {
-          'groupId': window.themeDisplay.getScopeGroupId(),
+          groupId: state.initData.groupId ? state.initData.groupId : window.themeDisplay.getScopeGroupId(),
           'Token': window.Liferay !== undefined ? window.Liferay.authToken : ''
         }
       }
@@ -2902,12 +2912,29 @@ export const store = new Vuex.Store({
         state.loginUser = payload
       }
     },
+    setListTableMenuFollowRole (state, payload) {
+      if (payload) {
+        state.listTableMenu = payload
+      }
+    },
     setproblem (state, payload) {
       state.problem = payload
     },
     setisConnected (state, payload) {
       state.isConnected = payload
-    }
+    },
+    setAgencyListManager (state, payload) {
+      state.agencyListManager = payload
+    },
+    setCurrentSite (state, payload) {
+      state.currentSite = payload
+    },
+    setGroupIdAgencyManager (state, payload) {
+      state.groupIdAgencyManager = payload
+    },
+    setAgencyManager (state, payload) {
+      state.agencyManager = payload
+    },
   },
   getters: {
     getlistTableMenu (state) {
@@ -2954,6 +2981,18 @@ export const store = new Vuex.Store({
     },
     getproblem (state) {
       return state.problem
+    },
+    groupIdAgencyManager (state) {
+      return state.groupIdAgencyManager
+    },
+    agencyManager (state) {
+      return state.agencyManager
+    },
+    getAgencyListManager (state) {
+      return state.agencyListManager
+    },
+    getCurrentSite (state) {
+      return state.currentSite
     }
   }
 })

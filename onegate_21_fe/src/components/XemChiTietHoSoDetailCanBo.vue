@@ -111,7 +111,8 @@
               LIÊN THÔNG
             </v-btn>
           </v-tab>
-          <v-tab :key="5" href="#tabs-5" @click="loadDossierActions()" v-if="originality !== 1">
+          <v-tab :key="5" href="#tabs-5" @click="loadDossierActions()" 
+            v-if="originality == 3 || (viewTienTrinhDvc && thongTinChiTietHoSo.dossierStatus !== 'new' && thongTinChiTietHoSo.dossierStatus !== 'receiving')">
             <v-btn flat class="px-0 py-0 mx-0 my-0">
               TIẾN TRÌNH XỬ LÝ
             </v-btn>
@@ -280,7 +281,8 @@
                 <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :data_rolegroup="roleGroupPhanCong" :detailDossier="thongTinChiTietHoSo" :data_uyquyen="reAsignUsers" :type="type_assign"></phan-cong>
                 <tai-lieu-ket-qua :esignType="typeEsign" :preCondition="preCondition" ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
                 <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
-                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :dataSource="sourcePaymentFee" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
+                <thu-phi ref="thongtinphi" v-if="showThuPhi" v-model="payments" :paymentDetail="paymentDetail" :splitBienLai="splitBienLai" :dataSource="sourcePaymentFee" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
+                <danh-sach-bien-lai v-if="removeInvoiceGroupPayment" ref="danhsachbienlai" :payments="paymentDetail"></danh-sach-bien-lai>
                 <!-- thanh toán điện tử -->
                 <thanh-toan-dien-tu ref="epayment" v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
                 <ky-duyet :style="dataEsign['signatureType'] === '' ? 'display:none' : ''" ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo"
@@ -404,8 +406,9 @@
                 </v-card-text>
               </v-card>
             </v-tab-item>
-            <v-tab-item value="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
-              <v-flex xs12 style="height:42px" v-if="!sequencyDossierImport">
+            <v-tab-item value="tabs-5" v-if="originality == 3 || (viewTienTrinhDvc && thongTinChiTietHoSo.dossierStatus !== 'new' && thongTinChiTietHoSo.dossierStatus !== 'receiving')"
+             :key="5" reverse-transition="fade-transition" transition="fade-transition">
+              <v-flex xs12 style="height:42px" v-if="!sequencyDossierImport && originality == 3">
                 <v-radio-group class="absolute__btn pt-1" style="width: 350px" v-model="typeTienTrinh" row @change="changeTypeTienTrinh($event)">
                   <v-radio label="Xem dạng bảng" :value="1" ></v-radio>
                   <v-radio label="Xem dạng biểu đồ" :value="2"></v-radio>
@@ -600,6 +603,23 @@
                     :disabled="loadingVoting"
                     @click="submitVoting"
                   >Gửi đánh giá</v-btn>
+                </div>
+              </div>
+              <div class="px-2 py-2" v-if="votingVersion === 3">
+                <div class="mx-3">
+                  <div class="my-2">(*)  Đánh giá mức độ hài lòng của bạn về giải quyết hồ sơ thủ tục hành chính</div>
+                  <v-btn class="mr-3" outline color="#4caf50" :loading="loadingVoting"
+                    :disabled="loadingVoting" @click="guiDanhGia(3)" v-if="votingResult === 3 || !votingResult">
+                    <v-icon style="color: #4caf50 !important">thumb_up_alt</v-icon>&nbsp; RẤT HÀI LÒNG
+                  </v-btn>
+                  <v-btn class="mr-3" outline color="indigo" :loading="loadingVoting"
+                    :disabled="loadingVoting" @click="guiDanhGia(2)" v-if="votingResult === 2 || !votingResult">
+                    <v-icon style="color: #3f51b5 !important">thumb_up_alt</v-icon>&nbsp; HÀI LÒNG
+                  </v-btn>
+                  <v-btn  outline color="red" :loading="loadingVoting"
+                    :disabled="loadingVoting" @click="guiDanhGia(1)" v-if="votingResult === 1 || !votingResult">
+                    <v-icon style="color: red !important">thumb_down_alt</v-icon>&nbsp; KHÔNG HÀI LÒNG
+                  </v-btn>
                 </div>
               </div>
             </v-tab-item>
@@ -800,12 +820,14 @@
 
 import $ from 'jquery'
 import toastr from 'toastr'
+import axios from 'axios'
 // import '../store/jquery-comments'
 import Comment from './Comment.vue'
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
 import TraKetQua from './form_xu_ly/TraKetQua.vue'
-import ThuPhi from './form_xu_ly/FeeDetail.vue'
+import ThuPhi from './form_xu_ly/FeeDetail2.vue'
+import DanhSachBienLai from './form_xu_ly/DanhSachBienLai.vue'
 import ChiTietThanhToan from './ChiTietThanhToan.vue'
 import ThucHienThanhToanDienTu from './form_xu_ly/ThucHienThanhToanDienTu.vue'
 import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
@@ -844,14 +866,19 @@ export default {
     'ngay-gia-han': ExtendDateEdit,
     'chi-tiet-thanh-toan': ChiTietThanhToan,
     'ho-so-lien-thong': HoSoLienThong,
-    'phan-cong-lai': PhanCongLai
+    'phan-cong-lai': PhanCongLai,
+    'danh-sach-bien-lai': DanhSachBienLai
   },
   data: () => ({
+    votingResult: null,
+    dossierDetailMotcua: '',
+    splitBienLai: false,
     sourcePaymentFee: {},
     loadingActionProcess: false,
     votingVersion: 1,
     confirmGuiHoSoTrucTuyen: false,
     viTriLuuTru: false,
+    viewTienTrinhDvc: false,
     docLuuTru: [],
     validTraoDoi: false,
     isMobile: false,
@@ -1033,8 +1060,10 @@ export default {
         align: 'center',
         sortable: false,
         class: 'traodoitructuyen_column'
-      }],
-      filterDossierActionItems: [{
+      }
+    ],
+    filterDossierActionItems: [
+      {
         text: 'Tất cả',
         value: ''
       }, {
@@ -1088,6 +1117,7 @@ export default {
     hasDownloadAllFile: false,
     sendInvoice: false,
     removeInvoice: false,
+    removeInvoiceGroupPayment: false,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -1213,6 +1243,10 @@ export default {
     }
     try {
       vm.confirmGuiHoSoTrucTuyen = confirmGuiHoSoTrucTuyen
+    } catch (error) {
+    }
+    try {
+      vm.viewTienTrinhDvc = viewTienTrinhDvc
     } catch (error) {
     }
     window.toastr = toastr
@@ -1394,6 +1428,7 @@ export default {
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'done') {
           vm.activeTab2 = 'tabs-1b'
           vm.loadVoting()
+          vm.getDetailDossierMotCua()
         }
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'new') {
           vm.activeTab2 = 'tabs-3b'
@@ -1456,7 +1491,13 @@ export default {
       }
     },
     goBack () {
-      window.history.back()
+      let vm = this
+      let currentQuery = vm.$router.history.current.query
+      if (currentQuery.hasOwnProperty('groupIdSiteMng') && currentQuery.hasOwnProperty('redirectUrl')) {
+        window.location.href = decodeURIComponent(window.location.href.split("redirectUrl=")[1])
+      } else {
+        window.history.back()
+      }
     },
     viewFile (data) {
       var vm = this
@@ -1496,13 +1537,25 @@ export default {
       })
     },
     loadDossierActions (data) {
-      var vm = this
+      let vm = this
       let submissionNote = ''
       try {
         submissionNote = vm.thongTinChiTietHoSo['submissionNote'] ? JSON.parse(vm.thongTinChiTietHoSo['submissionNote']) : ''
       } catch (error) {
       }
-      if (submissionNote && submissionNote.hasOwnProperty('dossierImport') && submissionNote.dossierImport) {
+      if (vm.originality == 1 && vm.viewTienTrinhDvc && submissionNote) {
+        let resultTemp = submissionNote.data
+        for (var i = 0; i < resultTemp.length; i++) {
+          if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+            if (!Array.isArray(resultTemp[i]['actions'])) {
+              let arrActionsTemp = []
+              arrActionsTemp.push(resultTemp[i]['actions'])
+              resultTemp[i]['actions'] = arrActionsTemp
+            }
+          }
+        }
+        vm.dossierActions = resultTemp
+      } else if (submissionNote && submissionNote.hasOwnProperty('dossierImport') && submissionNote.dossierImport) {
         vm.sequencyDossierImport = true
         vm.dossierImportActions = submissionNote['data']
       } else {
@@ -1834,10 +1887,18 @@ export default {
         if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' && result.preCondition.indexOf('sendInvoiceVNPT=1') >= 0) {
           vm.sendInvoice = true
         }
-        if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' && result.preCondition.indexOf('destroyInvoiceVNPT=1') >= 0) {
+        if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' 
+          && result.preCondition.indexOf('destroyInvoiceVNPT=1') >= 0 && !vm.paymentDetail['groupPaymentFile']) {
           vm.removeInvoice = true
         } else {
           vm.removeInvoice = false
+        }
+        if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' 
+          && result.preCondition.indexOf('destroyInvoiceVNPT=1') >= 0 && vm.paymentDetail['groupPaymentFile']) {
+          isPopup = true
+          vm.removeInvoiceGroupPayment = true
+        } else {
+          vm.removeInvoiceGroupPayment = false
         }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
@@ -1860,6 +1921,7 @@ export default {
               if (result.hasOwnProperty('paymentFee') && result.paymentFee) {
                 vm.sourcePaymentFee = ''
                 let configs = JSON.parse(result.paymentFee)
+                vm.splitBienLai = configs.hasOwnProperty('isGroupPaymentFile') ? true : false
                 vm.sourcePaymentFee = configs.hasOwnProperty('source') ? configs['source'] : {}
               } else {
                 vm.sourcePaymentFee = {}
@@ -2215,6 +2277,10 @@ export default {
     // Hàm xử lý Actions
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
+      if (vm.removeInvoiceGroupPayment) {
+        vm.proccessRemoveBienLaiGroupPayment(result)
+        return
+      }
       if (vm.loadingActionProcess) {
         return
       }
@@ -2277,9 +2343,12 @@ export default {
         if (vm.payments['paymentMethod']) {
           paymentsOut['paymentMethod'] = vm.payments['paymentMethod']
         }
+        if (vm.payments['groupPaymentFile']) {
+          paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
+        }
       }
       if (vm.showThuPhi) {
-        if (vm.payments && vm.payments.hasOwnProperty('counter')) {
+        if (vm.payments && vm.payments.hasOwnProperty('counter') && vm.payments.counter) {
           let dataNote = {
             requestPayment: vm.payments['requestPayment'],
             paymentNote: vm.payments['paymentNote'],
@@ -2292,6 +2361,9 @@ export default {
           }
           if (vm.payments['paymentMethod']) {
             dataNote['paymentMethod'] = vm.payments['paymentMethod']
+          }
+          if (vm.payments['groupPaymentFile']) {
+            paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
           }
           paymentsOut.feeAmount = paymentsOut.feeAmount*vm.payments.counter
           paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
@@ -2445,6 +2517,9 @@ export default {
       }
       vm.dossierId = dossierItem.dossierId
       let currentQuery = vm.$router.history.current.query
+      // 
+      console.log('THONGTINACTION', filter)
+      // 
       vm.loadingActionProcess = true
       // case confirm Thao tác từ trang danh sách hồ sơ
       if (isConfirm) {
@@ -2539,6 +2614,7 @@ export default {
                       })
                       if (fileFind) {
                         fileFind['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+                        fileFind['required'] = false
                         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
                           counterSave += 1
                           if (counterSave === lengthFiles) {
@@ -2583,7 +2659,10 @@ export default {
                   if (vm.payments['paymentMethod']) {
                     paymentsOut['paymentMethod'] = vm.payments['paymentMethod']
                   }
-                  if (vm.payments && vm.payments.hasOwnProperty('counter')) {
+                  if (vm.payments['groupPaymentFile']) {
+                    paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
+                  }
+                  if (vm.payments && vm.payments.hasOwnProperty('counter') && vm.payments.counter) {
                     let dataNote = {
                       requestPayment: vm.payments['requestPayment'],
                       paymentNote: vm.payments['paymentNote'],
@@ -2675,7 +2754,7 @@ export default {
                     if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                       vm.printDocument = true
                     }
-                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
                       vm.printInvoicefilePayment = true
                       vm.printPay()
                     }
@@ -2805,7 +2884,7 @@ export default {
                         if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                           vm.printDocument = true
                         }
-                        if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                        if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
                           vm.printInvoicefilePayment = true
                           vm.printPay()
                         }
@@ -2877,7 +2956,7 @@ export default {
                     if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                       vm.printDocument = true
                     }
-                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
                       vm.printInvoicefilePayment = true
                       vm.printPay()
                     }
@@ -2955,7 +3034,7 @@ export default {
                   if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                     vm.printDocument = true
                   }
-                  if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                  if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
                     vm.printInvoicefilePayment = true
                     vm.printPay()
                   }
@@ -3233,6 +3312,7 @@ export default {
       }).catch(function () {
         vm.loadingNextAction = false
       })
+      vm.loadThanhToan()
       vm.$store.dispatch('loadPlugins', {
         dossierId: vm.thongTinChiTietHoSo.dossierId
       }).then(results => {
@@ -3428,15 +3508,17 @@ export default {
         }).catch(function (reject) {
         })
       } else {
-        let filter = {
-          className: 'dossier',
-          dossierDetail: vm.thongTinChiTietHoSo
+        if (vm.votingVersion !== 3) {
+          let filter = {
+            className: 'dossier',
+            dossierDetail: vm.thongTinChiTietHoSo
+          }
+          vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
+            vm.votingItems = result
+            console.log('votingItems', vm.votingItems)
+          }).catch(function (reject) {
+          })
         }
-        vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
-          vm.votingItems = result
-          console.log('votingItems', vm.votingItems)
-        }).catch(function (reject) {
-        })
       }
       
     },
@@ -3526,10 +3608,13 @@ export default {
             shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, '')),
             paymentFee: vm.payments['paymentFee']
           }
+          if (vm.payments['groupPaymentFile']) {
+            paymentsOut['groupPaymentFile'] = vm.payments['groupPaymentFile']
+          }
           if (vm.payments['paymentMethod']) {
             paymentsOut['paymentMethod'] = vm.payments['paymentMethod']
           }
-          if (vm.payments && vm.payments.hasOwnProperty('counter')) {
+          if (vm.payments && vm.payments.hasOwnProperty('counter') && vm.payments.counter) {
             let dataNote = {
               requestPayment: vm.payments['requestPayment'],
               paymentNote: vm.payments['paymentNote'],
@@ -3597,8 +3682,8 @@ export default {
         dossierId: vm.thongTinChiTietHoSo.dossierId,
         referenceUid: vm.thongTinChiTietHoSo.referenceUid
       }
-      vm.dialogPDFLoading = true
       if (!vm.sendInvoice) {
+        vm.dialogPDFLoading = true
         vm.$store.dispatch('printPay', filter).then(function (result) {
           vm.dialogPDFLoading = false
           vm.titleDialogPdf = 'Biên lai thanh toán'
@@ -3610,16 +3695,19 @@ export default {
           vm.dialogPDFLoading = false
         })
       } else {
-        vm.$store.dispatch('printPayVnpt', filter).then(function (result) {
-          vm.dialogPDFLoading = false
-          vm.titleDialogPdf = 'Biên lai thanh toán'
-          vm.dialogPDF = true
-          setTimeout(function () {
-            document.getElementById('dialogPDFPreviewXl').src = result
-          }, 200)
-        }).catch(function(){
-          vm.dialogPDFLoading = false
-        })
+        vm.dialogPDFLoading = true
+        setTimeout(function () {
+          vm.$store.dispatch('printPayVnpt', filter).then(function (result) {
+            vm.dialogPDFLoading = false
+            vm.titleDialogPdf = 'Biên lai thanh toán'
+            vm.dialogPDF = true
+            setTimeout(function () {
+              document.getElementById('dialogPDFPreviewXl').src = result
+            }, 200)
+          }).catch(function(){
+            vm.dialogPDFLoading = false
+          })
+        }, 3000)
       }
       
     },
@@ -3636,6 +3724,38 @@ export default {
       }).catch(function(){
         vm.loadingActionProcess = false
       })
+    },
+    proccessRemoveBienLaiGroupPayment (data) {
+      let vm = this
+      console.log('proccessRemoveBienLaiGroupPayment', data, vm.payments)
+      let bienLaiXoa = vm.$refs.danhsachbienlai.getBienLaiXoa()
+      console.log('bienLaiXoa', bienLaiXoa)
+      if (!bienLaiXoa || bienLaiXoa.length == 0) {
+        vm.loadingActionProcess = false
+        toastr.error('Vui lòng chọn biên lai để thực hiện hủy')
+        return
+      }
+      let x = confirm('Bạn có chắc chắn thực hiện hủy biên lai?')
+      if (x) {
+        let arrAction = []
+        vm.loadingActionProcess = true
+        for (var index in bienLaiXoa) {
+          bienLaiXoa[index]['dossierId'] = vm.id
+          arrAction.push(vm.$store.dispatch('xoaBienLaiTach', bienLaiXoa[index]))
+        }
+        Promise.all(arrAction).then(results => {
+          vm.loadingActionProcess = true
+          let filter = {
+            dossierId: vm.thongTinChiTietHoSo.dossierId,
+            actionCode: vm.resultDialogPick.actionCode
+          }
+          vm.doActionSpecial(filter)
+        }).catch(xhr => {
+          vm.loadingActionProcess = true
+          toastr.error('Hủy biên lai không thành công')
+        })
+      }
+      
     },
     filterNextActionEnable (nextaction) {
       var isEnabale = false
@@ -3881,6 +4001,106 @@ export default {
             document.getElementById('viTriLuuTru').src = result
           })
         }
+      })
+    },
+    guiDanhGia (vote) {
+      let vm = this
+      if (!vm.votingResult) {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            Token: Liferay.authToken,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let metaData = vm.thongTinChiTietHoSo.metaData ? JSON.parse(vm.thongTinChiTietHoSo.metaData) : {}
+        let data = Object.assign(metaData, {hailong: vote})
+        let textPost = {
+          data: JSON.stringify(data)
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'PUT')
+        dataPost.append('url', '/dossiers/' + vm.thongTinChiTietHoSo.referenceUid + '/metadata')
+        dataPost.append('data', JSON.stringify(textPost))
+        dataPost.append('serverCode', 'SERVER_' + vm.thongTinChiTietHoSo['govAgencyCode'])
+        vm.loadVoting = true
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+          toastr.success('Gửi đánh giá thành công')
+          vm.loadVoting = false
+          vm.votingResult = vote
+          vm.danhGiaCanBo(vote)
+        }).catch(xhr => {
+          vm.loadVoting = false
+        })
+      }
+    },
+    danhGiaCanBo (vote) {
+      let vm = this
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId(),
+          Token: Liferay.authToken,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+      let metaData = vm.dossierDetailMotcua.metaData ? JSON.parse(vm.dossierDetailMotcua.metaData) : {}
+      if (metaData.hasOwnProperty('EmployeeEmail')) {
+        let nameVote = ''
+        if (vote == 3) {
+          nameVote = 'Rất hài lòng'
+        } else if (vote == 2) {
+          nameVote = 'Hài lòng'
+        } else {
+          nameVote = 'Không hài lòng'
+        }
+        let voteEmp = {
+          "dossierNo": vm.dossierDetailMotcua.dossierNo,
+          "govAgencyCode": vm.dossierDetailMotcua.govAgencyCode,
+          "govAgencyName": vm.dossierDetailMotcua.govAgencyName,
+          "employeeEmail": metaData.EmployeeEmail,
+          "employeeName": metaData.EmployeeName,
+          "votingName": nameVote,
+          "votingValue": vote,
+          "groupId": vm.dossierDetailMotcua.groupId
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'POST')
+        dataPost.append('url', '/votings/rateEmployee')
+        dataPost.append('data', JSON.stringify(voteEmp))
+        dataPost.append('serverCode', 'SERVER_' + vm.thongTinChiTietHoSo['govAgencyCode'])
+
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+        }).catch(xhr => {
+        })
+      }
+    },
+    getDetailDossierMotCua () {
+      let vm = this
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId(),
+          Token: Liferay.authToken,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+      let textPost = {}
+      let dataPost = new URLSearchParams()
+      dataPost.append('method', 'GET')
+      dataPost.append('url', '/dossiers/' + vm.thongTinChiTietHoSo.referenceUid)
+      dataPost.append('data', JSON.stringify(textPost))
+      dataPost.append('serverCode', vm.thongTinChiTietHoSo.serverNo)
+      axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
+        let dossier = result.data
+        vm.dossierDetailMotcua = dossier
+        if (dossier.metaData) {
+          try {
+            let datameta = JSON.parse(dossier.metaData)
+            vm.votingResult = datameta.hasOwnProperty('hailong') ? Number(datameta.hailong) : null
+          } catch (error) {
+          }
+        }
+      }).catch(xhr => {
+        
       })
     }
   },

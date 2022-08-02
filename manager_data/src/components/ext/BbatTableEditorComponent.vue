@@ -1463,7 +1463,7 @@
         vm.loadingPdf = true
         let options = {
           headers: {
-            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
             'Content-Type': 'application/x-www-form-urlencoded'
           },
           responseType: 'blob'

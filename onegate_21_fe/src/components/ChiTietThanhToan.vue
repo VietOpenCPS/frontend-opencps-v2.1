@@ -11,47 +11,63 @@
           </div>
           <v-card class="">
             <v-card-text class="px-0 py-0">
-              <v-layout wrap>
-                <v-flex xs12 md2>
-                  <v-subheader class="pl-0 text-right">Tên phí, lệ phí: </v-subheader>
+              <v-data-table
+                v-if="feeList && feeList.length"
+                :headers="headers"
+                :items="feeList"
+                hide-actions
+                class="elevation-1"
+                style="border-bottom: 1px solid #dedede;border-left: 1px solid #dedede;"
+              >
+                <template slot="items" slot-scope="props">
+                  <td width="50" class="text-xs-center pt-2"> {{ props.index + 1 }}</td>
+                  <td class="text-xs-left py-1">
+                    <div>
+                      <p class="mt-1 mb-0">{{props.item && props.item.paymentFee ? props.item.paymentFee : ''}}</p>
+                    </div>
+                  </td>
+                  <td class="px-3 py-1" style="width: 170px">
+                    <div>
+                      <p class="mt-1 mb-0">{{props.item && props.item.feeAmount ? currency(props.item.feeAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; </p>
+                    </div>
+                  </td>
+                  <td class="px-3 py-1" style="width: 170px">
+                    <div>
+                      <p class="mt-1 mb-0">{{props.item && props.item.serviceAmount ? currency(props.item.serviceAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; </p>
+                    </div>
+                  </td>
+                  <td width="170" class="text-xs-left px-2 py-1" style="font-weight: bold;">
+                    <div style="padding-top:7px">
+                      <span>{{props.item && props.item.paymentAmount ? currency(props.item.paymentAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; </span>
+                    </div>
+                  </td>
+                  <td v-if="payments.paymentStatus == 3 || payments.paymentStatus == 5" width="120" class="text-xs-center py-1">
+                    <v-btn v-if="feeList.length == 1" class="" color="primary" @click="printPay()">
+                      <v-icon>print</v-icon> &nbsp;
+                      In biên lai
+                    </v-btn>
+                    <v-btn v-else class="" color="primary" @click="printPayBienLaiTach(props.item)">
+                      <v-icon>print</v-icon> &nbsp;
+                      In biên lai
+                    </v-btn>
+                  </td>
+                </template>
+                <template slot="footer" >
+                  <td :colspan="4" class="text-xs-center" style="border-right: 1px solid #dedede;">
+                    <span>TỔNG TIỀN</span>
+                  </td>
+                  <td class="px-2 text-xs-left" style="border-right: 1px solid #dedede;font-weight: bold;">
+                    <span>{{payments && payments.paymentAmount ? currency(payments.paymentAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; vnđ</span>
+                  </td>
+                </template>
+              </v-data-table>
+              <v-layout wrap style="position: relative" class="my-2">
+                <v-flex style="width:145px;max-width: 145px;" class="my-0 py-0">
+                  <v-subheader class="pl-0 text-right">Ghi chú: </v-subheader>
                 </v-flex>
-                <v-flex xs12 md10>
-                  <p class="mt-2 mb-0">{{payments.paymentFee}}</p>
-                </v-flex>
-                <v-flex xs12 sm2>
-                  <v-subheader class="pl-0 text-right">Lệ phí: </v-subheader>
-                </v-flex>
-                <v-flex xs12 sm2>
-                  <p class="pt-2 mb-0">{{payments.feeAmount ? currency(payments.feeAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; vnđ</p>
-                </v-flex>
-                <v-flex xs12 sm2 class="pt-1">
-                  <v-subheader class="pl-0 text-right">Phí: </v-subheader>
-                </v-flex>
-                <v-flex xs12 sm3 class="pt-1">
-                  <p class="pt-2 mb-0">{{payments.serviceAmount ? currency(payments.serviceAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; vnđ</p>
-                </v-flex>
-                <v-flex xs12 sm3></v-flex>
-                <!--  -->
-                <v-flex xs12 sm2 v-if="(dossierDetail.viaPortal === 2 || dossierDetail.viaPortal === '2') && payments.shipAmount !== 0">
-                  <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
-                </v-flex>
-                <v-flex xs12 sm2 v-if="(dossierDetail.viaPortal === 2 || dossierDetail.viaPortal === '2') && payments.shipAmount !== 0">
-                  <p class="pt-2 mb-0">{{payments.shipAmount ? currency(payments.shipAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; vnđ</p>
-                </v-flex>
-                <v-flex xs12 sm8 v-if="(dossierDetail.viaPortal === 2 || dossierDetail.viaPortal === '2') && payments.shipAmount !== 0"></v-flex>
-                <!--  -->
-                <v-flex xs12 sm2>
-                  <v-subheader class="pl-0 text-right"><span class="text-bold">Tổng: </span></v-subheader>
-                </v-flex>
-                <v-flex xs12 sm3 style="padding-top:7px">
-                  <span>{{payments.paymentAmount ? currency(payments.paymentAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; vnđ</span>
-                </v-flex>
-                <v-flex xs12 sm7></v-flex>
-                <!--  -->
-                <v-flex style="width:100px" class="my-0 pl-3 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
-                <v-flex style="width:calc(100% - 100px)">
-                  <p class="px-2 my-0 py-1">
-                    {{paymentNote}} &nbsp;&nbsp;
+                <v-flex>
+                  <p class="my-0 py-1">
+                    {{paymentNote}}
                   </p>
                 </v-flex>
               </v-layout>
@@ -67,7 +83,7 @@
             </div>
             <span>Tình trạng thanh toán</span>
           </div>
-          <v-card class="">
+          <v-card class="py-2">
             <v-card-text class="px-0 py-0">
               <v-layout wrap>
                 <v-flex xs12 sm2>
@@ -135,22 +151,14 @@
                   <v-flex xs12 v-if="payments['paymentMethod'] === 'KeyPayDVCQG'">
 
                   </v-flex>
-                  <v-flex xs12 sm12 class="ml-3 mb-3">
+                  <!-- <v-flex xs12 sm12 class="ml-3 mb-3">
                     <v-btn class="ml-3" color="primary" @click="printPay()">
                       <v-icon>print</v-icon> &nbsp;
                       In biên lai
                     </v-btn>
-                  </v-flex>
+                  </v-flex> -->
                   <!-- end -->
                 </v-layout>
-                <!-- <v-layout wrap v-if="Number(payments.paymentStatus) < 5 && payments.hasOwnProperty('invoicePayload') && payments['invoicePayload'] == 'VNPT'">
-                  <v-flex xs12>
-                    <v-btn class="ml-3" color="primary" @click="printPay()">
-                      <v-icon>print</v-icon> &nbsp;
-                      In biên lai điện tử
-                    </v-btn>
-                  </v-flex>
-                </v-layout> -->
               </v-layout>
             </v-card-text>
           </v-card>
@@ -213,12 +221,12 @@
                   </v-layout>
                 </v-flex>
                 <!--  -->
-                <v-flex xs12 sm12 class="ml-3 mb-3">
+                <!-- <v-flex xs12 sm12 class="ml-3 mb-3">
                   <v-btn class="ml-3" color="primary" @click="printPay()">
                     <v-icon>print</v-icon> &nbsp;
                     In biên lai
                   </v-btn>
-                </v-flex>
+                </v-flex> -->
               </v-layout>
             </v-card-text>
           </v-card>
@@ -279,7 +287,35 @@ export default {
     transId: '',
     goodCode: '',
     doneVTpay: false,
-    paymentNote: ''
+    paymentNote: '',
+    feeList: [],
+    headers: [
+      {
+        text: 'STT',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Tên phí, lệ phí',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Lệ phí',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Phí',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Thành tiền',
+        align: 'center',
+        sortable: false
+      }
+    ]
   }),
   computed: {
     paymentFileName () {
@@ -307,6 +343,55 @@ export default {
     let vm = this
     vm.$nextTick(function () {
       vm.paymentNote = vm.payments['paymentNote']
+      if (vm.payments.paymentStatus == 5) {
+        vm.headers = [
+          {
+            text: 'STT',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Tên phí, lệ phí',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Lệ phí',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Phí',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Thành tiền',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Thao tác',
+            align: 'center',
+            sortable: false
+          }
+        ]
+      }
+      if (vm.payments.hasOwnProperty('groupPaymentFile') && vm.payments.groupPaymentFile) {
+        vm.feeList = JSON.parse(vm.payments.groupPaymentFile)
+      } else {
+        let item = {
+          requestPayment: vm.payments['requestPayment'],
+          advanceAmount: vm.payments['advanceAmount'],
+          feeAmount: vm.payments['feeAmount'],
+          serviceAmount: vm.payments['serviceAmount'],
+          shipAmount: vm.payments['shipAmount'],
+          counter: vm.payments.hasOwnProperty('counter') ? vm.payments['counter'] : '',
+          paymentFee: vm.payments['paymentFee'],
+          paymentAmount: vm.payments['paymentAmount']
+        }
+        vm.feeList = [item]
+      }
       try {
         vm.paymentNote = JSON.parse(vm.payments['paymentNote'])['paymentNote']
       } catch (error) {
@@ -324,6 +409,40 @@ export default {
       // if (!vm.paymentFile && val['paymentMethod'] === 'Chuyển khoản') {
       //   vm.payments.paymentMethod = 'Keypay'
       // }
+      if (val.paymentStatus == 5) {
+        vm.headers = [
+          {
+            text: 'STT',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Tên phí, lệ phí',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Lệ phí',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Phí',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Thành tiền',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Thao tác',
+            align: 'center',
+            sortable: false
+          }
+        ]
+      }
       vm.paymentNote = val['paymentNote']
       try {
         vm.paymentNote = JSON.parse(val['paymentNote'])['paymentNote']
@@ -344,7 +463,22 @@ export default {
         vm.$store.dispatch('getVtPayStatus', filter).then(result => {
           // vm.doneVTpay = true
         }).catch(function(){})
-
+      }
+      // 
+      if (vm.payments.hasOwnProperty('groupPaymentFile') && vm.payments.groupPaymentFile) {
+        vm.feeList = JSON.parse(vm.payments.groupPaymentFile)
+      } else {
+        let item = {
+          requestPayment: vm.payments['requestPayment'],
+          advanceAmount: vm.payments['advanceAmount'],
+          feeAmount: vm.payments['feeAmount'],
+          serviceAmount: vm.payments['serviceAmount'],
+          shipAmount: vm.payments['shipAmount'],
+          counter: vm.payments.hasOwnProperty('counter') ? vm.payments['counter'] : '',
+          paymentFee: vm.payments['paymentFee'],
+          paymentAmount: vm.payments['paymentAmount']
+        }
+        vm.feeList = [item]
       }
     }
   },
@@ -433,18 +567,57 @@ export default {
           // }).catch(function (error) {
           //   vm.dialogPDFLoading = false
           // })
-          vm.dialogPDFLoading = false
-          vm.dialogPDF = false
-          let url = '/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice'
-          window.open(url, "_blank")
-        } else {
-          vm.$store.dispatch('printPay', filter).then(function (result) {
+          
+          if (vm.dossierDetail.dossierNo == "000.00.16.G04-220324-0020" || vm.dossierDetail.dossierNo == "000.00.16.G04-220405-0008") {
+            let pathDoc = ""
+            if (vm.originality == 1) {
+              pathDoc = "/documents/35166/8809240/"
+            } else {
+              pathDoc = "/documents/51883/12174847/"
+            }
+            let urlSrc = pathDoc + vm.dossierDetail.dossierNo + ".pdf"
             vm.dialogPDFLoading = false
-            document.getElementById('dialogPaymentPreview').src = result
-          }).catch(function(){})
+            document.getElementById('dialogPaymentPreview').src = urlSrc
+          } else {
+            vm.dialogPDFLoading = false
+            vm.dialogPDF = false
+            let url = '/o/rest/v2/dossiers/'+ filter.dossierId + '/payments/' + filter.referenceUid + '/invoice'
+            window.open(url, "_blank")
+          }
+        } else {
+          if (vm.dossierDetail.dossierNo == "000.00.16.G04-220324-0020" || vm.dossierDetail.dossierNo == "000.00.16.G04-220405-0008") {
+            let pathDoc = ""
+            if (vm.originality == 1) {
+              pathDoc = "/documents/35166/8809240/"
+            } else {
+              pathDoc = "/documents/51883/12174847/"
+            }
+            let urlSrc = pathDoc + vm.dossierDetail.dossierNo + ".pdf"
+            vm.dialogPDFLoading = false
+            document.getElementById('dialogPaymentPreview').src = urlSrc
+          } else {
+            vm.$store.dispatch('printPay', filter).then(function (result) {
+              vm.dialogPDFLoading = false
+              document.getElementById('dialogPaymentPreview').src = result
+            }).catch(function(){})
+          }
+          
         }
       }
-      
+    },
+    printPayBienLaiTach (item) {
+      let vm = this
+      vm.activePrintPay = true
+      let filter = {
+        dossierId: vm.dossierDetail.dossierId,
+        tranId: item.tranId
+      }
+      vm.dialogPDFLoading = true
+      vm.dialogPDF = true
+      vm.$store.dispatch('printPayBienLaiTach', filter).then(function (result) {
+        vm.dialogPDFLoading = false
+        document.getElementById('dialogPaymentPreview').src = result
+      }).catch(function(){})
     },
     getEinvoiceNo (string) {
       if (string && string.indexOf('#') >= 0) {

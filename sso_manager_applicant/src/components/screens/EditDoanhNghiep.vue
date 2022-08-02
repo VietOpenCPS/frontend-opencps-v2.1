@@ -10,18 +10,41 @@
           </div>
         </div>
       </div>
-      <v-form lazy-validation ref="formAddCaNhan" v-model="validFormAdd">
+      <v-form lazy-validation ref="formAddCaNhan" v-model="validFormAdd" class="px-2">
           <v-layout wrap class="py-2">
             <v-flex xs12 class="py-0 mb-2 pr-3">
               <label>
                 Trạng thái thông tin <span class="red--text">(*)</span>
               </label>
-              <v-switch color="primary" class="mt-2" v-model="trangThaiDuLieu">
+              <v-switch color="primary" class="mt-0 ml-3 d-inline-block" v-model="trangThaiDuLieu">
                 <template slot="label">
                   <span class="ml-2" style="color: black">{{trangThaiDuLieu ? 'ĐANG SỬ DỤNG' : 'ĐÁNH DẤU XÓA'}}</span>
                 </template>
               </v-switch>
-              
+            </v-flex>
+            <v-flex xs12 v-if="!trangThaiDuLieu" cols="12" class="py-0 mb-2">
+              <label>Lý do đánh dấu xóa</label>
+              <v-text-field
+                class="input-form"
+                v-model="thongTinDoanhNghiep.activityNote"
+                solo
+                dense
+                clearable
+                max
+                hide-details="auto"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 class="py-0 mb-2 pr-3">
+              <v-btn
+                class="mx-0 mr-2"
+                small
+                color="primary"
+                @click="checkCsdlDoanhNghiep()"
+                :loading="loadingSearchLgsp" :disabled="loadingSearchLgsp"
+              >
+                <v-icon size="18">check</v-icon>&nbsp;
+                <span>Kiểm tra thông tin CSDL doanh nghiệp</span>
+              </v-btn>
             </v-flex>
             <v-flex xs12 md6 class="py-0 mb-2 pr-3">
                 <label>Tên tổ chức, doanh nghiệp <span class="red--text">(*)</span></label>
@@ -52,7 +75,7 @@
                 ></v-text-field>
             </v-flex>
             <v-flex xs12 md6 class="py-0 mb-2 pr-3">
-                <label>Tên viết tắt <span class="red--text">(*)</span></label>
+                <label>Tên viết tắt</label>
                 <v-text-field
                   class="input-form"
                   v-model="thongTinDoanhNghiep.tenVietTat"
@@ -61,12 +84,10 @@
                   clearable
                   max
                   hide-details="auto"
-                  :rules="required"
-                  required
                 ></v-text-field>
             </v-flex>
             <v-flex xs12 md6 class="py-0 mb-2">
-                <label>Tên tiếng anh <span class="red--text">(*)</span></label>
+                <label>Tên tiếng anh</label>
                 <v-text-field
                   class="input-form"
                   v-model="thongTinDoanhNghiep.tenTiengAnh"
@@ -75,8 +96,6 @@
                   clearable
                   max
                   hide-details="auto"
-                  :rules="required"
-                  required
                 ></v-text-field>
             </v-flex>
             <v-flex xs12 md6 class="py-0 mb-2 pr-3">
@@ -92,7 +111,7 @@
                 ></v-text-field>
             </v-flex>
             <v-flex xs12 md6 class="py-0">
-                <label>Điện thoại</label>
+                <label>Điện thoại <span class="red--text">(*)</span></label>
                 <v-text-field
                     class="input-form"
                     v-model="thongTinDoanhNghiep.danhBaLienLac['soDienThoai']"
@@ -101,6 +120,8 @@
                     clearable
                     max
                     hide-details="auto"
+                    :rules="required"
+                    required
                 ></v-text-field>
             </v-flex>
             <v-flex xs12 md6 class="py-0 mb-2 pr-3">
@@ -222,6 +243,70 @@
             </v-flex>
           </v-layout>
       </v-form>
+      <!--  -->
+      <v-dialog v-model="dialog_searchLgsp" scrollable persistent max-width="700px">
+        <v-card>
+          <v-toolbar dark color="primary">
+            <v-toolbar-title>Thông tin trên CSDL quốc gia về doanh nghiệp</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon dark @click.native="dialog_searchLgsp = false">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-card-text class="py-1">
+            <div>
+              <table v-if="applicantLgspInfomation" class="datatable table my-3" style="border-top: 1px solid #dedede;">
+                <tbody>
+                  <tr>
+                    <td width="200" class="pt-2"><span class="text-bold">Tên doanh nghiệp</span></td>
+                    <td class="pt-2"><span>{{applicantLgspInfomation.NAME}}</span></td>
+                  </tr>
+                  <tr>
+                    <td width="200" class="pt-2"><span class="text-bold">Mã số thuế</span></td>
+                    <td class="pt-2"><span>{{applicantLgspInfomation.ENTERPRISE_GDT_CODE}}</span></td>
+                  </tr>
+                  <tr>
+                    <td width="200" class="pt-2"><span class="text-bold">Người đại diện</span></td>
+                    <td class="pt-2"><span>{{applicantLgspInfomation.FULL_NAME}}</span></td>
+                  </tr>
+                  <tr>
+                    <td width="200" class="pt-2"><span class="text-bold">Địa chỉ</span></td>
+                    <td class="pt-2"><span>{{applicantLgspInfomation.AddressFullText}}</span></td>
+                  </tr>
+                  <tr>
+                    <td width="200" class="pt-2"><span class="text-bold">Ngày thành lập</span></td>
+                    <td class="pt-2"><span>{{dateLocale(applicantLgspInfomation.FOUNDING_DATE)}}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="pt-2"><span class="text-bold">Loại hình doanh nghiệp</span></td>
+                    <td class="pt-2"><span v-html="applicantLgspInfomation.ENTERPRISE_TYPE_NAME"></span></td>
+                  </tr>
+                  <tr>
+                    <td class="pt-2"><span class="text-bold">Tình trạng hoạt động</span></td>
+                    <td class="pt-2"><span>{{applicantLgspInfomation.ENTERPRISE_STATUS_NAME}}</span></td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+              <div v-else class="mx-1 flex my-4">
+                <v-alert outline color="red" icon="warning" :value="true">
+                  Không có thông tin trên CSDL quốc gia về doanh nghiệp
+                </v-alert>
+              </div>
+              <v-flex xs12 class="text-right my-2">
+                <v-btn color="primary"
+                  @click="dialog_searchLgsp = false"
+                  class="mx-0 my-0 white--text"
+                >
+                  <v-icon size="20" class="white--text">clear</v-icon>
+                  &nbsp;
+                  Đóng
+                </v-btn>
+              </v-flex>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </div>
 </template>
 
@@ -240,6 +325,9 @@ export default {
     props: ["id"],
     data() {
       return {
+        loadingSearchLgsp: false,
+        dialog_searchLgsp: false,
+        applicantLgspInfomation: '',
         loading: false,
         validFormAdd: false,
         typeAction: "add",
@@ -251,6 +339,7 @@ export default {
         itemsThuongTruPhuongXa: [],
         thuongTruPhuongXa: '',
         thongTinDoanhNghiep: {
+          activityNote: "",
           danhBaLienLac: {
             "soDienThoai": "",
             "soFax": "",
@@ -332,6 +421,27 @@ export default {
       }
     },
     methods: {
+      checkCsdlDoanhNghiep () {
+        let vm = this
+        if (vm.thongTinDoanhNghiep.maSoDoanhNghiep) {
+          let filter = {
+            applicantIdNo: String(vm.thongTinDoanhNghiep.maSoDoanhNghiep).trim()
+          }
+          vm.loadingSearchLgsp = true
+          vm.$store.dispatch('searchLgspDoanhNghiep', filter).then(result => {
+            vm.dialog_searchLgsp = true
+            vm.loadingSearchLgsp = false
+            vm.applicantLgspInfomation = result
+          }).catch(function (result) {
+            vm.dialog_searchLgsp = true
+            vm.applicantLgspInfomation = ''
+            vm.loadingSearchLgsp = false
+          })
+        } else {
+          toastr.remove()
+          toastr.error('Vui lòng nhập Mã số thuế tổ chức, doanh nghiệp để tra cứu')
+        }
+      },
       getThongTinCongDan () {
         let vm = this
         let filter = {

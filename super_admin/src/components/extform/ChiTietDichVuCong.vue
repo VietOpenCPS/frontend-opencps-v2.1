@@ -316,7 +316,7 @@ export default {
         vm.administration = currentQuery.hasOwnProperty('administration') && currentQuery.administration ? currentQuery.administration : ''
         vm.levelFilter = currentQuery.hasOwnProperty('level') && currentQuery.level ? Number(currentQuery.level) : ''
         if (vm.isDvc && !vm.boNganh) {
-          if (vm.govAgencyFilter) {
+          // if (vm.govAgencyFilter) {
             if (vm.administration && vm.administration === 'XA_PHUONG') {
               vm.getDomains('CAP_XA')
               vm.getServiceInfo('CAP_XA', vm.domainFilter)
@@ -324,7 +324,7 @@ export default {
               vm.getDomains(vm.govAgencyFilter)
               vm.getServiceInfo(vm.govAgencyFilter, vm.domainFilter)
             }
-          }
+          // }
         } else {
           vm.getDomains(vm.govAgencyFilter)
           vm.getServiceInfo(vm.govAgencyFilter, vm.domainFilter)

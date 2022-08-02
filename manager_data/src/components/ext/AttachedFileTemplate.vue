@@ -529,7 +529,7 @@
 
             axios.put('/o/rest/v2/serviceinfos/' + item.serviceInfoId + '/filetemplates/' + item.fileTemplateNo, formData, {
               headers: {
-                'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+                'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
                 'Content-Type': 'multipart/form-data'
               }
             }).then(function (response) {
@@ -566,7 +566,7 @@
 
             axios.put('/o/rest/v2/serviceinfos/' + item.serviceInfoId + '/filetemplates/' + item.fileTemplateNo, formData, {
               headers: {
-                'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+                'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
                 'Content-Type': 'multipart/form-data'
               }
             }).then(function (response) {
@@ -588,7 +588,7 @@
           formData.append('eFormNoPattern', item['EFormNoPattern'])
           axios.put('/o/rest/v2/serviceinfos/' + item.serviceInfoId + '/filetemplates/' + item.fileTemplateNo, formData, {
             headers: {
-              'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
               'Content-Type': 'multipart/form-data'
             }
           }).then(function (response) {

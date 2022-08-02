@@ -119,12 +119,34 @@
         </div>
       </v-flex>
       <v-flex class="xs12 mx-2 mt-2">
-        <v-btn class="mx-0 mb-0" color="blue darken-3" dark @click.native="searchSyncDossier">
+        <v-btn class="mx-0 mb-0" color="blue darken-3" dark @click.native="searchSyncDossier"
+          :loading="loadingTable"
+          :disabled="loadingTable"
+        >
           <v-icon size="18">search</v-icon> &nbsp; Tìm kiếm
         </v-btn>
       </v-flex>
     </v-layout>
     <div>
+      <v-layout wrap class="white py-2" v-if="dossierList.length">
+        <downloadExcel
+          class="btn btn-default btn-export"
+          :data="json_data"
+          style="display: none"
+        >
+          Export Excel
+        </downloadExcel>
+        <v-flex class="xs12">
+          <v-btn color="blue darken-3 white--text right mx-0"
+            @click="exportExcel"
+            :loading="loading"
+            :disabled="loading"
+          >
+            <v-icon>import_export</v-icon>&nbsp;
+            Xuất excel
+          </v-btn>
+        </v-flex>
+      </v-layout>
       <v-data-table
         :headers="dossierListHeader"
         :items="dossierList"
@@ -256,13 +278,16 @@ import Vue from 'vue'
 import axios from "axios"
 import TinyPagination from './Pagination.vue'
 import VueJsonPretty from 'vue-json-pretty'
+import JsonExcel from 'vue-json-excel'
 import 'vue-json-pretty/lib/styles.css'
 export default {
   components: {
     VueJsonPretty,
-    'tiny-pagination': TinyPagination
+    'tiny-pagination': TinyPagination,
+    'downloadExcel': JsonExcel
   },
   data: () => ({
+    json_data : [],
     fromDate: '',
     toDate: '',
     loading: false,
@@ -395,6 +420,46 @@ export default {
       }).catch(function (error) {
         
       })
+    },
+    exportExcel () {
+      let vm = this
+      vm.loading = true
+      let serviceInfoMapping = []
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId()
+        },
+        params: {
+          api: vm.api,
+          dossierNo: vm.dossierNo,
+          fromDate: vm.fromReceiveDateFormatted,
+          toDate: vm.toReceiveDateFormatted,
+          start: 0,
+          end: 1000
+        }
+      }
+      axios.get('/o/rest/v2/socket/web/log-report', param).then(function (response) {
+        let dataPush = []
+        let serializable = response.data
+        let dataInput = serializable['data']
+        for (let i = 0; i < dataInput.length; i++) {
+          let item = {
+            "STT": i + 1,
+            "Mã hồ sơ": dataInput[i]['dossierNo'],
+            "API": dataInput[i]['api'],
+            "Thời gian truy cập": vm.currentDateFormat(dataInput[i]['createDate']),
+            "Trạng thái": dataInput[i]['stateSync'] == 1 ? 'Thành công' : 'Thất bại'
+          }
+          dataPush.push(item)
+        }
+        serviceInfoMapping = serviceInfoMapping.concat(dataPush)
+        vm.loading = false
+        vm.json_data = serviceInfoMapping
+        setTimeout(() => {
+          $('.btn-export').click()
+        }, 100)
+      })
+      
     },
     changePage (config) {
       let vm = this

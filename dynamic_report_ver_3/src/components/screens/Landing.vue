@@ -118,8 +118,13 @@
         </v-flex>
         <v-flex xs12 class="px-3 mb-3">
           <div class="d-inline-block left" v-if="!itemsReports[index]['filterConfig']['version'] && !itemsReports[index]['filterConfig']['backendVer2']">
-            <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> 
+            <v-btn v-if="itemsReports[index]['filterConfig']['tableDanhGia']" dark color="blue darken-3" class="mr-3 my-0" v-on:click.native="doPrintReportFix(true)">
               <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo
+            </v-btn>
+            <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> 
+              <v-icon>print</v-icon> &nbsp; 
+              <span v-if="itemsReports[index]['filterConfig']['tableDanhGia']">Xuất Pdf</span>
+              <span v-else>Tạo báo cáo</span>
             </v-btn>
             <v-btn v-if="isRender && itemsReports[index]['filterConfig']['showTable']" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
               <v-icon>print</v-icon> &nbsp; In báo cáo
@@ -213,9 +218,70 @@
       </div>
       <!-- table bao cao -->
       <div>
-        <div v-if="!itemsReports[index]['filterConfig']['showTable'] && !showHTML && !itemsReports[index]['filterConfig']['version']">
+        <div v-if="!itemsReports[index]['filterConfig']['showTable'] && !showHTML && !showTableVoting && !itemsReports[index]['filterConfig']['version']">
           <vue-friendly-iframe v-if="showGuilds" :src="'/documents/' + groupId + '/0/hdsd.pdf'"></vue-friendly-iframe>
           <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' && !showGuilds" :src="pdfBlob"></vue-friendly-iframe>
+        </div>
+        <div v-if="showTableVoting && !showErrorData && !isShowLoading">
+          <table class="my-2" hide-default-footer>
+            <thead>
+              <tr>
+                <th rowspan="2" class="text-center px-2 py-2" style="border: 1px solid #b5b5b5;">
+                  <span>STT</span>
+                </th>
+                <th rowspan="2" class="text-center px-2 py-2" style="border: 1px solid #b5b5b5;">
+                  <span>Tên cán bộ</span>
+                </th>
+                <th width="80" rowspan="2" class="text-center px-2 py-2" style="border: 1px solid #b5b5b5;">
+                  <span>Số lượt đánh giá</span>
+                </th>
+                <th class="py-2 text-center" colspan="3" style="border: 1px solid #b5b5b5;">
+                  <span>Chất lượng đánh giá</span>
+                </th>
+              </tr>
+
+              <tr>
+                <th width="" class="text-center px-2 py-2" style="border: 1px solid #b5b5b5;">
+                  <span>Rất hài lòng</span>
+                </th>
+                <th width="" class="text-center px-2 py-2" style="border: 1px solid #b5b5b5;">
+                  <span>Hài lòng</span>
+                </th>
+                <th width="" class="text-center px-2 py-2" style="border: 1px solid #b5b5b5;">
+                  <span>Không hài lòng</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody v-if="loadingTable">
+              <content-placeholders class="my-2">
+                <content-placeholders-text :lines="5" />
+              </content-placeholders>
+            </tbody>
+            <tbody v-if="!loadingTable && dataTableVottingList.length > 0">
+              <tr v-for="(item,index) in dataTableVottingList" :key="index">
+                <td align="center" class="px-2 py-2" style="border: 1px solid #b5b5b5;">{{index + 1}}</td>
+                <td align="left" class="px-2 py-2" style="padding: 8px 10px;border: 1px solid #b5b5b5;">
+                  {{item.employeeName}}
+                </td>
+                <td align="center" class="px-2 py-2" style="padding: 8px 10px;border: 1px solid #b5b5b5;">
+                  <a class="chitiet" v-if="item.sumCount" title="Xem chi tiết" href="javascript:;" @click.stop="viewChiTietDanhGia(item, '3,2,1')">{{item.sumCount}}</a>
+                  <span v-else>{{item.sumCount}}</span>
+                </td>
+                <td align="center" class="px-2 py-2" style="padding: 8px 10px;border: 1px solid #b5b5b5;">
+                  <a class="chitiet" v-if="item.veryHappyCount" title="Xem chi tiết" href="javascript:;" @click.stop="viewChiTietDanhGia(item, 3)">{{item.veryHappyCount}} ({{item.percentVeryHappy}}%)</a>
+                  <span v-else>{{item.veryHappyCount}}</span>
+                </td>
+                <td align="center" class="px-2 py-2" style="padding: 8px 10px;border: 1px solid #b5b5b5;">
+                  <a class="chitiet" v-if="item.happyCount" title="Xem chi tiết" href="javascript:;" @click.stop="viewChiTietDanhGia(item, 2)">{{item.happyCount}} ({{item.percentHappy}}%)</a>
+                  <span v-else>{{item.happyCount}}</span>
+                </td>
+                <td align="center" class="px-2 py-2" style="padding: 8px 10px;border: 1px solid #b5b5b5;">
+                  <a class="chitiet" v-if="item.unHappyCount" title="Xem chi tiết" href="javascript:;" @click.stop="viewChiTietDanhGia(item, 1)">{{item.unHappyCount}} ({{item.percentUnHappy}}%)</a>
+                  <span v-else>{{item.unHappyCount}}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div v-if="itemsReports[index]['filterConfig']['showTable'] && isRender && !showErrorData && !isShowLoading">
           <v-data-table
@@ -471,6 +537,16 @@
                       </span>
                     </div>
                   </td>
+                  <td class="text-xs-left" v-if="hasVoting && hasVoting.length">
+                    <content-placeholders v-if="loading">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>
+                        <span>{{formatDanhGia(props.item.metaData)}}</span>
+                      </span>
+                    </div>
+                  </td>
                 </tr>
               </template>
             </v-data-table>
@@ -578,6 +654,7 @@ export default {
     'thong-tin-ho-so': ThongTinHoSo
   },
   data: () => ({
+    govAgencyCodeCurrentSite: '',
     dialogConfigColumn: false,
     showHTML: false,
     columnLength: 0,
@@ -719,7 +796,10 @@ export default {
     headerRenderHtmlTable: [],
     widthRenderHtmlTable: [],
     statisticVotingDossiers: false,
-    loadingGetDossier: false
+    loadingGetDossier: false,
+    hasVoting: [],
+    showTableVoting: false,
+    govCodeSelected: ''
   }),
   computed: {
     itemsReports () {
@@ -763,10 +843,12 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       console.log('run new ver_23')
+      vm.getAllSite()
       try {
         vm.exportWordReport = exportWordReport
       } catch (error) {
       }
+      let currentQuery = vm.$router.history.current.query
       let query = vm.$router.history.current.query
       let param = {
         headers: {
@@ -861,6 +943,18 @@ export default {
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
             vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
             // 
+            if (vm.itemsReports[vm.index]['filterConfig']['domainOrService']) {
+              if (vm.groupByVal === 'domainCode') {
+                vm.filters = vm.filters.filter(function (item) {
+                  return item.key !== 'serviceCode'
+                })
+              }
+              if (vm.groupByVal === 'serviceCode') {
+                vm.filters = vm.filters.filter(function (item) {
+                  return item.key !== 'domainCode'
+                })
+              }
+            }
             if (vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy']) {
               if (vm.groupByVal === 'domainCode') {
                 vm.filters = vm.filters.filter(function (item) {
@@ -894,7 +988,7 @@ export default {
               }
             }
             if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
-              vm.filters[key]['groupId'] = vm.govAgency
+              vm.filters[key]['groupId'] = vm.govAgency && !isNaN(Number(vm.govAgency)) ? vm.govAgency : window.themeDisplay.getScopeGroupId()
               if (!vm.filters[key]['source'] || vm.filters[key]['source'].length === 0) {
                 vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
                   vm.filters[key]['source'] = result
@@ -932,12 +1026,30 @@ export default {
         if (query.hasOwnProperty('doreport')) {
           vm.doCreateReport(false)
         }
+        // 
+        // voting
+        if (currentQuery.hasOwnProperty('employeeEmail')) {
+          vm.changeGovAgency()
+          vm.govAgency = currentQuery.hasOwnProperty('govId') ? Number(currentQuery['govId']) : ''
+          vm.data['employeeEmail'] = currentQuery['employeeEmail']
+          vm.data['fromDate'] = currentQuery['fromDate']
+          vm.data['toDate'] = currentQuery['toDate']
+          vm.data['listRate'] = currentQuery.hasOwnProperty('listRate') ? currentQuery.listRate : '3,2,1'
+          setTimeout(function () {
+            vm.doCreateReport(false)
+          }, 300)
+        }
+        // 
+        // 
       }, 1000)
     })
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
+      let currentQuery = newRoute.query
+      vm.showTableVoting = false
+      vm.dataTableVottingList = []
       vm.listTongHop = []
       vm.totalCount = 0
       vm.showHTML = false
@@ -1014,6 +1126,18 @@ export default {
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+        if (vm.itemsReports[vm.index]['filterConfig']['domainOrService']) {
+          if (vm.groupByVal === 'domainCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'serviceCode'
+            })
+          }
+          if (vm.groupByVal === 'serviceCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'domainCode'
+            })
+          }
+        }
         if (vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy']) {
           if (vm.groupByVal === 'domainCode') {
             vm.filters = vm.filters.filter(function (item) {
@@ -1054,7 +1178,7 @@ export default {
           
         }
         if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
-          vm.filters[key]['groupId'] = vm.govAgency
+          vm.filters[key]['groupId'] = vm.govAgency && !isNaN(Number(vm.govAgency)) ? vm.govAgency : window.themeDisplay.getScopeGroupId()
           if (!vm.filters[key]['source'] || vm.filters[key]['source'].length === 0) {
             vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
               vm.filters[key]['source'] = result
@@ -1083,6 +1207,20 @@ export default {
           vm.showConfig = true
         }, 200)
       }
+      // 
+      // voting
+      if (currentQuery.hasOwnProperty('employeeEmail')) {
+        vm.changeGovAgency()
+        vm.govAgency = currentQuery.hasOwnProperty('govId') ? Number(currentQuery['govId']) : ''
+        vm.data['employeeEmail'] = currentQuery['employeeEmail']
+        vm.data['fromDate'] = currentQuery['fromDate']
+        vm.data['toDate'] = currentQuery['toDate']
+        vm.data['listRate'] = currentQuery.hasOwnProperty('listRate') ? currentQuery.listRate : '3,2,1'
+        setTimeout(function () {
+          vm.doCreateReport(false)
+        }, 500)
+      }
+      // 
     },
     itemsReports () {
       let vm = this
@@ -1195,20 +1333,33 @@ export default {
     },
     groupByVal (val) {
       let vm = this
-      console.log('valGroupBy', val)
-      if (val && vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy']) {
+      if ((val &&vm.itemsReports[vm.index]['filterConfig']['domainOrService']) || (val && vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy'])) {
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
           vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
         }
-        if (vm.groupByVal === 'domainCode') {
-          vm.filters = vm.filters.filter(function (item) {
-            return item.key !== 'serviceCode' && item.key !== 'govAgencyCode'
-          })
+        if (val && vm.itemsReports[vm.index]['filterConfig']['domainOrService']) {
+          if (vm.groupByVal === 'domainCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'serviceCode'
+            })
+          }
+          if (vm.groupByVal === 'serviceCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'domainCode'
+            })
+          }
         }
-        if (vm.groupByVal === 'serviceCode') {
-          vm.filters = vm.filters.filter(function (item) {
-            return item.key !== 'domainCode' && item.key !== 'govAgencyCode'
-          })
+        if (val && vm.itemsReports[vm.index]['filterConfig']['version'] && !vm.itemsReports[vm.index]['filterConfig']['chonDonViGroupBy']) {
+          if (vm.groupByVal === 'domainCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'serviceCode' && item.key !== 'govAgencyCode'
+            })
+          }
+          if (vm.groupByVal === 'serviceCode') {
+            vm.filters = vm.filters.filter(function (item) {
+              return item.key !== 'domainCode' && item.key !== 'govAgencyCode'
+            })
+          }
         }
         for (let key in vm.filters) {
           if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
@@ -1411,7 +1562,7 @@ export default {
             if (vm.filters[key]['type'] === 'select') {
               for (let keySource in vm.filters[key]['source']) {
                 if (String(vm.filters[key]['source'][keySource]['value']) === String(currentVal)) {
-                  currentVal = vm.filters[key]['source'][keySource]['name']
+                  currentVal = vm.filters[key]['source'][keySource].hasOwnProperty('nameViewPdf') ? vm.filters[key]['source'][keySource]['nameViewPdf'] : vm.filters[key]['source'][keySource]['name']
                 }
               }
             }
@@ -1423,7 +1574,7 @@ export default {
           for (let keySource in vm.filters[key]['source']) {
             // if (currentVal === '' || currentVal === '0') {
             if (currentVal === '0') {
-              currentVal = vm.filters[key]['source'][keySource]['name']
+              currentVal = vm.filters[key]['source'][keySource].hasOwnProperty('nameViewPdf') ? vm.filters[key]['source'][keySource]['nameViewPdf'] : vm.filters[key]['source'][keySource]['name']
               break
             }
           }
@@ -1452,6 +1603,9 @@ export default {
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('proxyApi')) {
         vm.proxyApi = vm.itemsReports[vm.index]['filterConfig']['proxyApi']
+      }
+      if (vm.api.indexOf("type=31") && vm.groupByVal) {
+        vm.data['groupBy'] = vm.groupByVal
       }
       let widthsConfig = []
       widthsConfig.push(30)
@@ -1531,6 +1685,11 @@ export default {
         vm.dialogPDF = true
         vm.loadingPdfVer2 = true
       }
+      // console.log('vm.groupIdList-88888', vm.groupIdList)
+      // console.log('vm.groupIdList-99999', vm.agencyLists)
+      if (vm.api.indexOf("type=31") && vm.govAgency === 'site' && !vm.data['govAgencyCode']) {
+        vm.data['govAgencyCode'] = vm.govAgencyCodeCurrentSite
+      }
       let dispatchUse = vm.itemsReports[vm.index]['filterConfig']['version'] || vm.itemsReports[vm.index]['filterConfig']['typeDate'] === 'timestamp' ? 'getDossiers' : 'getAgencyReportListsOld'
       vm.$store.dispatch(dispatchUse, filter).then(function (result) {
         // console.log('result',result)
@@ -1538,11 +1697,21 @@ export default {
           // set dossierList
           let dataReport
           if (vm.itemsReports[vm.index]['filterConfig']['version'] || vm.itemsReports[vm.index]['filterConfig']['typeDate'] === 'timestamp') {
-            dataReport = result.data
-            vm.dossierList = result.data
+            if (result.data && result.data.hasOwnProperty('data')) {
+              dataReport = result.data.data
+              vm.dossierList = result.data.data
+            } else {
+              dataReport = result.data
+              vm.dossierList = result.data
+            }
           } else {
-            dataReport = result
-            vm.dossierList = result
+            if (result && result.hasOwnProperty('data')) {
+              dataReport = result.data
+              vm.dossierList = result.data
+            } else {
+              dataReport = result
+              vm.dossierList = result
+            }
           }
           vm.pagination.totalItems = vm.dossierList.length
           if (vm.dossierList && vm.dossierList.length === 0) {
@@ -1575,289 +1744,462 @@ export default {
             vm.itemsReports[vm.index]['filterConfig']['sumKey'] = vm.groupByVal
           }
           // 
-          for (let key in dataReport) {
-            dataReportCurrent = dataReport[key]
-            if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
-              if (dossierRaw[dataReportCurrent[vm.groupByVal]][codeGroup] === dataReportCurrent[codeGroup] && 
-                (!vm.itemsReports[vm.index]['filterConfig']['sumKey'] || (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumKey') && vm.itemsReports[vm.index]['filterConfig']['sumKey'] && dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']]))
-              ) {
-                dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
-                dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] = dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] + 1
-              }
-            } else {
-              let dossierRawItem = {}
-              if ((!dataReportCurrent.hasOwnProperty('dossierId') && !vm.reportType.startsWith('REPORT_STATISTIC')) || 
-                (vm.reportType.startsWith('REPORT_STATISTIC') && vm.itemsReports[vm.index]['filterConfig']['sumKey'] && !dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']])
-              ) {
-                dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
-                dossierRawItem[textGroup] = dataReportCurrent[textGroup]
-                dossierRawItem['totalChild'] = 0
-                dossierRawItem['dossiers'] = []
-                dossierRaw[dataReportCurrent[vm.groupByVal]] = dossierRawItem
-                dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] = dataReportCurrent[textGroup]
-                dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'] = []
-              } else {
-                dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
-                dossierRawItem[textGroup] = dataReportCurrent[textGroup]
-                dossierRawItem['totalChild'] = 1
-                dossierRawItem['dossiers'] = []
-                dossierRaw[dataReportCurrent[vm.groupByVal]] = dossierRawItem
-                dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] = dataReportCurrent[textGroup]
-                dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
-              }
-            }
-          }
-          
-          // 
-          vm.dataRowRenderHtmlTable = dossierRaw
-          console.log('dataRowRenderHtmlTable666', vm.dataRowRenderHtmlTable)
-          // 
-          let dataToExportCSV = []
-          let dataRaw = []
-          for (let key in dossierRaw) {
-            if (key && dossierRaw[key]['totalChild'] !== 0) {
-              dataRaw.push(dossierRaw[key])
-            }
-          }
-          dataRaw.reverse()
-          console.log('dossierRaw 47', dataRaw)
-          let dataRowTotal = []
-          let dataRowAverageTotal = [] /**Row tính trung bình cộng */
-          let totalText = 'Tổng cộng'
-          let totalAverageText = 'Trung bình'
-          if (vm.statisticVotingDossiers) {
-            totalAverageText = 'Điểm trung bình các chỉ số'
-          }
-          dataRowTotal.push({
-            text: totalText, 
-            colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? 2 : 1,
-            bold: true,
-            alignment: 'center',
-            style: 'tdStyle'
-          })
-          dataRowAverageTotal.push({
-            text: totalAverageText, 
-            colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? 2 : 1,
-            bold: true,
-            alignment: 'center',
-            style: 'tdStyle'
-          })
-          for (let keyMapping in vm.itemsReportsConfig) {
-            if (vm.itemsReportsConfig[keyMapping]['value'] === 'note' || vm.itemsReportsConfig[keyMapping].hasOwnProperty('notSum')) {
-              dataRowTotal.push({
-                text: '', 
-                alignment: 'center',
-                style: 'tdStyle'
-              })
-              dataRowAverageTotal.push({
-                text: '', 
-                alignment: 'center',
-                style: 'tdStyle'
-              })
-            }  else {
-              if (vm.itemsReportsConfig[keyMapping].hasOwnProperty('type') && vm.itemsReportsConfig[keyMapping].type === 'currency') {
-                dataRowTotal.push({
-                  text: 0, 
-                  alignment: 'center',
-                  style: 'tdStyle',
-                  type: 'currency'
-                })
-                dataRowAverageTotal.push({
-                  text: 0, 
-                  alignment: 'center',
-                  style: 'tdStyle',
-                  type: 'currency'
-                })
-              } else {
-                dataRowTotal.push({
-                  text: 0, 
-                  alignment: 'center',
-                  style: 'tdStyle'
-                })
-                dataRowAverageTotal.push({
-                  text: 0, 
-                  alignment: 'center',
-                  style: 'tdStyle'
-                })
-              }
-              
-            }
-          }
-          let indexNotShowGroup = 1
-          let indexCountTotal = 0
-          // console.log(vm.groupByValObj)
-          // console.log(vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup'))
-          for (let key in dataRaw) {
-            if (vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup')) {
-              if (dataRaw[key][vm.groupByVal] !== undefined && dataRaw[key][vm.groupByVal] !== null && dataRaw[key][vm.groupByVal] !== '') {
-                let csvGroup = []
-                csvGroup.push( dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ')
-                for (let colLengIndex in colLeng) {
-                  csvGroup.push('')
-                }
-                dataToExportCSV.push(csvGroup)
-                dataReportTotal += JSON.stringify([{
-                  colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? colLeng + 1 : colLeng,
-                  text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
-                  bold: true,
-                  style: 'tdStyle'
-                }]) + ','
-              }
-            }
+          if (vm.itemsReports[vm.index]['filterConfig']['levelGroup'] && vm.itemsReports[vm.index]['filterConfig']['levelGroup'] == 3) {
             
-           
-            let dossiersArray = dataRaw[key]['dossiers']
-            let indexStt = 1
-            let dataRow = []
-            for (let keyDossier in dossiersArray) {
-              indexCountTotal += 1
-              dataRow = []
-              let dataToExportCSVItem = []
-              let dossierObj = dossiersArray[keyDossier]
-              dataToExportCSVItem.push(indexStt)
-              if (!vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt')) {
-                dataRow.push({
-                  text: vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup') ? indexStt : indexNotShowGroup, 
+            let dataRowTotal = []
+            let totalText = 'Tổng cộng'
+            dataRowTotal.push({
+              text: totalText, 
+              colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? 2 : 1,
+              bold: true,
+              alignment: 'center',
+              style: 'tdStyle'
+            })
+            for (let keyMapping in vm.itemsReportsConfig) {
+              if (vm.itemsReportsConfig[keyMapping]['value'] === 'note' || vm.itemsReportsConfig[keyMapping].hasOwnProperty('notSum')) {
+                dataRowTotal.push({
+                  text: '', 
                   alignment: 'center',
                   style: 'tdStyle'
                 })
-              }
-              
-              for (let keyVal in vm.itemsReportsConfig) {
-                if (vm.itemsReportsConfig[keyVal].hasOwnProperty('selected') && vm.itemsReportsConfig[keyVal]['selected']) {
-                  let alignmentConfig = 'center'
-                  if (vm.itemsReportsConfig[keyVal].hasOwnProperty('align')) {
-                    alignmentConfig = vm.itemsReportsConfig[keyVal]['align']
-                  }
-                  let ddStr = ' '
-                  let currentConfig = vm.itemsReportsConfig[keyVal]
-
-                  if (currentConfig.hasOwnProperty('calculator')) {
-                    let calu = currentConfig['calculator'].replace(/dataInput/g, 'dossierObj')
-                    if (isNaN(eval(calu)) || vm.itemsReportsConfig[keyVal]['value'] == 'note') {
-                      ddStr = eval(calu)
-                    } else {
-                      ddStr = Math.round(eval(calu))
-                    }
-                  } else {
-                    if (dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== undefined && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== null && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== '') {
-                      ddStr = dossierObj[vm.itemsReportsConfig[keyVal]['value']]
-                    }
-                  }
-                  dataToExportCSVItem.push(ddStr)
-                  // convert value currency
-                  dataRow.push({
-                    text: currentConfig.hasOwnProperty('type') && currentConfig.type === 'currency' ? vm.currency(ddStr) : ddStr, 
-                    alignment: alignmentConfig,
+              }  else {
+                if (vm.itemsReportsConfig[keyMapping].hasOwnProperty('type') && vm.itemsReportsConfig[keyMapping].type === 'currency') {
+                  dataRowTotal.push({
+                    text: 0, 
+                    alignment: 'center',
+                    style: 'tdStyle',
+                    type: 'currency'
+                  })
+                } else {
+                  dataRowTotal.push({
+                    text: 0, 
+                    alignment: 'center',
                     style: 'tdStyle'
                   })
-                  // caculator count total
-                  if (vm.reportType.startsWith('REPORT_STATISTIC')) {
-                    let indexRow = dataRow.length - 1
-                    dataRowTotal[indexRow]['text'] = Number(dataRowTotal[indexRow]['text'].toString().replace(/\./g, '')) + Number(dataRow[indexRow]['text'].toString().replace(/\./g, ''))
-                    if (dataRowTotal[indexRow]['type'] === 'currency') {
-                      dataRowTotal[indexRow]['text'] = vm.currency(dataRowTotal[indexRow]['text'])
+                }
+                
+              }
+            }
+
+            let keyNameGroup1 = ''
+            let keyNameGroup2 = ''
+            if (vm.groupByVal === 'domainCode') {
+              keyNameGroup1 = 'govDomainFeeData'
+              keyNameGroup2 = 'domainFeeData'
+            }
+            if (vm.groupByVal === 'serviceCode') {
+              keyNameGroup1 = 'govServiceFeeData'
+              keyNameGroup2 = 'serviceFeeData'
+            }
+            for (let key = 0; key < dataReport.length; key++) {
+              let parent0 = dataReport[key]
+              dataReportTotal += JSON.stringify([{
+                colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? colLeng + 1 : colLeng,
+                text: parent0['govAgencyName'],
+                bold: true,
+                style: 'tdStyle'
+              }]) + ','
+              if (parent0[keyNameGroup1] && parent0[keyNameGroup1].length) {
+                for (let key1 = 0; key1 < parent0[keyNameGroup1].length; key1++) {
+                  let parent1 = parent0[keyNameGroup1][key1]
+                  dataReportTotal += JSON.stringify([{
+                    colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? colLeng + 1 : colLeng,
+                    text: parent1[textGroup],
+                    bold: false,
+                    style: 'tdStyle'
+                  }]) + ','
+                  if (parent1[keyNameGroup2] && parent1[keyNameGroup2].length) {
+                    let indexStt = 0
+                    for (let key2 = 0; key2 < parent1[keyNameGroup2].length; key2++) {
+                      let dataToExportCSVItem = []
+                      let dataRow = []
+                      let dossierObj = parent1[keyNameGroup2][key2]
+                      indexStt += 1
+                      dataRow.push({
+                        text: indexStt, 
+                        alignment: 'center',
+                        style: 'tdStyle'
+                      })
+
+                      for (let keyVal in vm.itemsReportsConfig) {
+                        if (vm.itemsReportsConfig[keyVal].hasOwnProperty('selected') && vm.itemsReportsConfig[keyVal]['selected']) {
+                          let alignmentConfig = 'center'
+                          if (vm.itemsReportsConfig[keyVal].hasOwnProperty('align')) {
+                            alignmentConfig = vm.itemsReportsConfig[keyVal]['align']
+                          }
+                          let ddStr = ' '
+                          let currentConfig = vm.itemsReportsConfig[keyVal]
+
+                          if (currentConfig.hasOwnProperty('calculator')) {
+                            let calu = currentConfig['calculator'].replace(/dataInput/g, 'dossierObj')
+                            if (isNaN(eval(calu)) || vm.itemsReportsConfig[keyVal]['value'] == 'note') {
+                              ddStr = eval(calu)
+                            } else {
+                              ddStr = Math.round(eval(calu))
+                            }
+                          } else {
+                            if (dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== undefined && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== null && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== '') {
+                              ddStr = dossierObj[vm.itemsReportsConfig[keyVal]['value']]
+                            }
+                          }
+                          dataToExportCSVItem.push(ddStr)
+                          // convert value currency
+                          dataRow.push({
+                            text: currentConfig.hasOwnProperty('type') && currentConfig.type === 'currency' ? vm.currency(ddStr) : ddStr, 
+                            alignment: alignmentConfig,
+                            style: 'tdStyle'
+                          })
+                          // caculator count total
+                          if (vm.reportType.startsWith('REPORT_STATISTIC')) {
+                            let indexRow = dataRow.length - 1
+                            dataRowTotal[indexRow]['text'] = Number(dataRowTotal[indexRow]['text'].toString().replace(/\./g, '')) + Number(dataRow[indexRow]['text'].toString().replace(/\./g, ''))
+                            if (dataRowTotal[indexRow]['type'] === 'currency') {
+                              dataRowTotal[indexRow]['text'] = vm.currency(dataRowTotal[indexRow]['text'])
+                            }
+                            if (vm.itemsReportsConfig[keyVal]['value'] === 'note' || vm.itemsReportsConfig[keyVal].hasOwnProperty('notSum')) {
+                              dataRowTotal[indexRow]['text'] = ''
+                            }
+                          }
+                          
+                          // 
+                        }
+                      }
+                      dataReportTotal += JSON.stringify(dataRow) + ','
                     }
-                    if (vm.itemsReportsConfig[keyVal]['value'] === 'note' || vm.itemsReportsConfig[keyVal].hasOwnProperty('notSum')) {
-                      dataRowTotal[indexRow]['text'] = ''
-                    }
-                    dataRowAverageTotal[indexRow]['text'] = dataRowTotal[indexRow]['text']
                   }
-                  
-                  // 
+                }
+              }              
+            }
+            
+            dataReportTotal += JSON.stringify(dataRowTotal)
+            vm.dataReportXX += dataReportTotal
+            docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
+            docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
+            vm.dataExportExcel = docDString
+            console.log('docDString-777777', docDString)
+            vm.docDefinition = JSON.parse(docDString)
+            // console.log('vm.docDefinition', vm.docDefinition)
+            let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
+            // create blob
+            // check showTable
+            if(vm.itemsReports[vm.index]['filterConfig']['version']){
+              pdfDocGenerator.getBlob((blob) => {
+                vm.pdfBlob = window.URL.createObjectURL(blob)
+                if (vm.pdfBlob) {
+                  vm.isRender = true
+                } else {
+                  vm.isRender = false
+                }
+              })
+              setTimeout(function () {
+                vm.loadingPdfVer2 = false
+              }, 300)
+            } else {
+              pdfDocGenerator.getBlob((blob) => {
+                vm.pdfBlob = window.URL.createObjectURL(blob)
+                vm.isShowLoading = false
+                if (vm.doExportExcel && !vm.doExportWord) {
+                  vm.$store.dispatch('getExcelReportFromServer', {
+                    data: docDString,
+                    fileName: 'baocaothongke' + '.xls'
+                  })
+                }
+                if (vm.doExportWord) {
+                  let docDStringJson = JSON.parse(docDString)
+                  let docDStringWord = Object.assign(docDStringJson, {reportType: "docx"})
+                  // console.log('docDString55552343', docDStringWord)
+                  vm.$store.dispatch('getExcelReportFromServer', {
+                    data: JSON.stringify(docDStringWord),
+                    fileName: 'baocaothongke' + '.docx'
+                  })
+                }
+              })
+            }
+          } else {
+            
+            for (let key in dataReport) {
+              dataReportCurrent = dataReport[key]
+              if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
+                if (dossierRaw[dataReportCurrent[vm.groupByVal]][codeGroup] === dataReportCurrent[codeGroup] && 
+                  (!vm.itemsReports[vm.index]['filterConfig']['sumKey'] || (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumKey') && vm.itemsReports[vm.index]['filterConfig']['sumKey'] && dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']]))
+                ) {
+                  dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
+                  dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] = dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] + 1
+                }
+              } else {
+                let dossierRawItem = {}
+                if ((!dataReportCurrent.hasOwnProperty('dossierId') && !vm.reportType.startsWith('REPORT_STATISTIC')) || 
+                  (vm.reportType.startsWith('REPORT_STATISTIC') && vm.itemsReports[vm.index]['filterConfig']['sumKey'] && !dataReportCurrent[vm.itemsReports[vm.index]['filterConfig']['sumKey']])
+                ) {
+                  dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
+                  dossierRawItem[textGroup] = dataReportCurrent[textGroup]
+                  dossierRawItem['totalChild'] = 0
+                  dossierRawItem['dossiers'] = []
+                  dossierRaw[dataReportCurrent[vm.groupByVal]] = dossierRawItem
+                  dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] = dataReportCurrent[textGroup]
+                  dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'] = []
+                } else {
+                  dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
+                  dossierRawItem[textGroup] = dataReportCurrent[textGroup]
+                  dossierRawItem['totalChild'] = 1
+                  dossierRawItem['dossiers'] = []
+                  dossierRaw[dataReportCurrent[vm.groupByVal]] = dossierRawItem
+                  dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] = dataReportCurrent[textGroup]
+                  dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
                 }
               }
-              dataReportTotal += JSON.stringify(dataRow) + ','
-              // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
-              indexStt = indexStt + 1
-              indexNotShowGroup = indexNotShowGroup + 1
-              dataToExportCSV.push(dataToExportCSVItem)
-              // 
-              
             }
-          }
-          dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
-          vm.dataReportXX += dataReportTotal
+            // 
+            vm.dataRowRenderHtmlTable = dossierRaw
+            console.log('dataRowRenderHtmlTable666', vm.dataRowRenderHtmlTable)
+            // 
+            let dataToExportCSV = []
+            let dataRaw = []
+            for (let key in dossierRaw) {
+              if (key && dossierRaw[key]['totalChild'] !== 0) {
+                dataRaw.push(dossierRaw[key])
+              }
+            }
+            dataRaw.reverse()
+            console.log('dossierRaw 47', dataRaw)
+            let dataRowTotal = []
+            let dataRowAverageTotal = [] /**Row tính trung bình cộng */
+            let totalText = 'Tổng cộng'
+            let totalAverageText = 'Trung bình'
+            if (vm.statisticVotingDossiers) {
+              totalAverageText = 'Điểm trung bình các chỉ số'
+            }
+            dataRowTotal.push({
+              text: totalText, 
+              colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? 2 : 1,
+              bold: true,
+              alignment: 'center',
+              style: 'tdStyle'
+            })
+            dataRowAverageTotal.push({
+              text: totalAverageText, 
+              colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? 2 : 1,
+              bold: true,
+              alignment: 'center',
+              style: 'tdStyle'
+            })
+            for (let keyMapping in vm.itemsReportsConfig) {
+              if (vm.itemsReportsConfig[keyMapping]['value'] === 'note' || vm.itemsReportsConfig[keyMapping].hasOwnProperty('notSum')) {
+                dataRowTotal.push({
+                  text: '', 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+                dataRowAverageTotal.push({
+                  text: '', 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+              }  else {
+                if (vm.itemsReportsConfig[keyMapping].hasOwnProperty('type') && vm.itemsReportsConfig[keyMapping].type === 'currency') {
+                  dataRowTotal.push({
+                    text: 0, 
+                    alignment: 'center',
+                    style: 'tdStyle',
+                    type: 'currency'
+                  })
+                  dataRowAverageTotal.push({
+                    text: 0, 
+                    alignment: 'center',
+                    style: 'tdStyle',
+                    type: 'currency'
+                  })
+                } else {
+                  dataRowTotal.push({
+                    text: 0, 
+                    alignment: 'center',
+                    style: 'tdStyle'
+                  })
+                  dataRowAverageTotal.push({
+                    text: 0, 
+                    alignment: 'center',
+                    style: 'tdStyle'
+                  })
+                }
+                
+              }
+            }
+            let indexNotShowGroup = 1
+            let indexCountTotal = 0
+            console.log("vm.groupByValObj", vm.groupByValObj)
+            // console.log(vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup'))
+            for (let key in dataRaw) {
+              if (vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup')) {
+                if (dataRaw[key][vm.groupByVal] !== undefined && dataRaw[key][vm.groupByVal] !== null && dataRaw[key][vm.groupByVal] !== '') {
+                  let csvGroup = []
+                  csvGroup.push( dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ')
+                  for (let colLengIndex in colLeng) {
+                    csvGroup.push('')
+                  }
+                  dataToExportCSV.push(csvGroup)
+                  dataReportTotal += JSON.stringify([{
+                    colSpan: !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt') ? colLeng + 1 : colLeng,
+                    text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
+                    bold: true,
+                    style: 'tdStyle'
+                  }]) + ','
+                }
+              }
 
-          // console.log('itemsReportsConfig', vm.itemsReportsConfig)
-          // console.log('dataRowTotal 777===', dataRowTotal)
-          // console.log('percentTotal 555', dataRowTotal[dataRowTotal.length - 1]['text'], indexCountTotal, Math.round(dataRowTotal[dataRowTotal.length - 1]['text']/indexCountTotal))
-          let totalScoreVoting = 0
-          for (let indexTotalAverage in dataRowAverageTotal) {
-            if (!isNaN(dataRowAverageTotal[indexTotalAverage]['text']) && dataRowAverageTotal[indexTotalAverage]['text']) {
-              totalScoreVoting += dataRowAverageTotal[indexTotalAverage]['text']
-              let average = dataRowAverageTotal[indexTotalAverage]['text']/indexCountTotal
-              dataRowAverageTotal[indexTotalAverage]['text'] = String(average).indexOf('.') > 0 ? average.toFixed(1) : average
+              let dossiersArray = dataRaw[key]['dossiers']
+              let indexStt = 1
+              let dataRow = []
+              for (let keyDossier in dossiersArray) {
+                indexCountTotal += 1
+                dataRow = []
+                let dataToExportCSVItem = []
+                var dossierObj5 = dossiersArray[keyDossier]
+                dataToExportCSVItem.push(indexStt)
+                if (!vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenStt')) {
+                  dataRow.push({
+                    text: vm.groupByValObj && Object.keys(vm.groupByValObj).length > 0 && vm.groupByValObj.constructor === Object && !vm.groupByValObj.hasOwnProperty('showGroup') ? indexStt : indexNotShowGroup, 
+                    alignment: 'center',
+                    style: 'tdStyle'
+                  })
+                }
+                
+                for (let keyVal in vm.itemsReportsConfig) {
+                  if (vm.itemsReportsConfig[keyVal].hasOwnProperty('selected') && vm.itemsReportsConfig[keyVal]['selected']) {
+                    let alignmentConfig = 'center'
+                    if (vm.itemsReportsConfig[keyVal].hasOwnProperty('align')) {
+                      alignmentConfig = vm.itemsReportsConfig[keyVal]['align']
+                    }
+                    let ddStr = ' '
+                    let currentConfig = vm.itemsReportsConfig[keyVal]
+
+                    if (currentConfig.hasOwnProperty('calculator')) {
+                      let calu = currentConfig['calculator'].replace(/dataInput/g, 'dossierObj5')
+                      if (isNaN(eval(calu)) || vm.itemsReportsConfig[keyVal]['value'] == 'note') {
+                        ddStr = eval(calu)
+                      } else {
+                        ddStr = Math.round(eval(calu))
+                      }
+                    } else {
+                      if (dossierObj5[vm.itemsReportsConfig[keyVal]['value']] !== undefined && dossierObj5[vm.itemsReportsConfig[keyVal]['value']] !== null && dossierObj5[vm.itemsReportsConfig[keyVal]['value']] !== '') {
+                        ddStr = dossierObj5[vm.itemsReportsConfig[keyVal]['value']]
+                      }
+                    }
+                    dataToExportCSVItem.push(ddStr)
+                    // convert value currency
+                    dataRow.push({
+                      text: currentConfig.hasOwnProperty('type') && currentConfig.type === 'currency' ? vm.currency(ddStr) : ddStr, 
+                      alignment: alignmentConfig,
+                      style: 'tdStyle'
+                    })
+                    // caculator count total
+                    if (vm.reportType.startsWith('REPORT_STATISTIC')) {
+                      let indexRow = dataRow.length - 1
+                      dataRowTotal[indexRow]['text'] = Number(dataRowTotal[indexRow]['text'].toString().replace(/\./g, '')) + Number(dataRow[indexRow]['text'].toString().replace(/\./g, ''))
+                      if (dataRowTotal[indexRow]['type'] === 'currency') {
+                        dataRowTotal[indexRow]['text'] = vm.currency(dataRowTotal[indexRow]['text'])
+                      }
+                      if (vm.itemsReportsConfig[keyVal]['value'] === 'note' || vm.itemsReportsConfig[keyVal].hasOwnProperty('notSum')) {
+                        dataRowTotal[indexRow]['text'] = ''
+                      }
+                      dataRowAverageTotal[indexRow]['text'] = dataRowTotal[indexRow]['text']
+                    }
+                    
+                    // 
+                  }
+                }
+                dataReportTotal += JSON.stringify(dataRow) + ','
+                // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
+                indexStt = indexStt + 1
+                indexNotShowGroup = indexNotShowGroup + 1
+                dataToExportCSV.push(dataToExportCSVItem)
+                // 
+                
+              }
             }
-          }
-          if (vm.reportType.startsWith('REPORT_STATISTIC') && !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenTotalRow')) {
-            if (vm.itemsReportsConfig[dataRowTotal.length - 2]['value'] === 'ontimePercentage') {
-              dataRowTotal[dataRowTotal.length - 1]['text'] = Math.round(dataRowTotal[dataRowTotal.length - 1]['text']/indexCountTotal)
+            dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
+            vm.dataReportXX += dataReportTotal
+
+            // console.log('itemsReportsConfig', vm.itemsReportsConfig)
+            // console.log('dataRowTotal 777===', dataRowTotal)
+            // console.log('percentTotal 555', dataRowTotal[dataRowTotal.length - 1]['text'], indexCountTotal, Math.round(dataRowTotal[dataRowTotal.length - 1]['text']/indexCountTotal))
+            let totalScoreVoting = 0
+            for (let indexTotalAverage in dataRowAverageTotal) {
+              if (!isNaN(dataRowAverageTotal[indexTotalAverage]['text']) && dataRowAverageTotal[indexTotalAverage]['text']) {
+                totalScoreVoting += dataRowAverageTotal[indexTotalAverage]['text']
+                let average = dataRowAverageTotal[indexTotalAverage]['text']/indexCountTotal
+                dataRowAverageTotal[indexTotalAverage]['text'] = String(average).indexOf('.') > 0 ? average.toFixed(1) : average
+              }
             }
-            vm.dataReportXX += ',' + JSON.stringify(dataRowTotal)
-          }
-          if (vm.statisticVotingDossiers) {
-            vm.dataReportXX += ',' + JSON.stringify(dataRowAverageTotal)
-          }
-          // console.log('dataReportXX11ZZ', vm.dataReportXX)
-          
-          vm.csvExport = []
-          vm.csvExport = dataToExportCSV
-          vm.fields = []
-          vm.fields.push('STT')
-          for (let excelKey in vm.itemsReportsConfig) {
-            if (vm.itemsReportsConfig[excelKey]['selected']) {
-              let stringColumn = vm.itemsReportsConfig[excelKey]['value']
-              if (vm.itemsReportsConfig[excelKey]['text'] !== '') {
-                stringColumn = vm.itemsReportsConfig[excelKey]['text']
+            if (vm.reportType.startsWith('REPORT_STATISTIC') && !vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('hiddenTotalRow')) {
+              if (vm.itemsReportsConfig[dataRowTotal.length - 2]['value'] === 'ontimePercentage') {
+                dataRowTotal[dataRowTotal.length - 1]['text'] = Math.round(dataRowTotal[dataRowTotal.length - 1]['text']/indexCountTotal)
               }
-              vm.fields.push(stringColumn)
+              vm.dataReportXX += ',' + JSON.stringify(dataRowTotal)
             }
-          }
-          vm.showCSVDownload = true
-          if (vm.statisticVotingDossiers) {
-            docDString = docDString.replace(/\[\$totalScoreVoting\$\]/g, totalScoreVoting)
-          }
-          docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
-          docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
-          vm.dataExportExcel = docDString
-          vm.docDefinition = JSON.parse(docDString)
-          // console.log('vm.docDefinition', vm.docDefinition)
-          let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
-          // create blob
-          // check showTable
-          if(vm.itemsReports[vm.index]['filterConfig']['version']){
-            pdfDocGenerator.getBlob((blob) => {
-              vm.pdfBlob = window.URL.createObjectURL(blob)
-              if (vm.pdfBlob) {
-                vm.isRender = true
-              } else {
-                vm.isRender = false
+            if (vm.statisticVotingDossiers) {
+              vm.dataReportXX += ',' + JSON.stringify(dataRowAverageTotal)
+            }
+            // console.log('dataReportXX11ZZ', vm.dataReportXX)
+            
+            vm.csvExport = []
+            vm.csvExport = dataToExportCSV
+            vm.fields = []
+            vm.fields.push('STT')
+            for (let excelKey in vm.itemsReportsConfig) {
+              if (vm.itemsReportsConfig[excelKey]['selected']) {
+                let stringColumn = vm.itemsReportsConfig[excelKey]['value']
+                if (vm.itemsReportsConfig[excelKey]['text'] !== '') {
+                  stringColumn = vm.itemsReportsConfig[excelKey]['text']
+                }
+                vm.fields.push(stringColumn)
               }
-            })
-            setTimeout(function () {
-              vm.loadingPdfVer2 = false
-            }, 300)
-          } else {
-            pdfDocGenerator.getBlob((blob) => {
-              vm.pdfBlob = window.URL.createObjectURL(blob)
-              vm.isShowLoading = false
-              if (vm.doExportExcel && !vm.doExportWord) {
-                vm.$store.dispatch('getExcelReportFromServer', {
-                  data: docDString,
-                  fileName: 'baocaothongke' + '.xls'
-                })
-              }
-              if (vm.doExportWord) {
-                let docDStringJson = JSON.parse(docDString)
-                let docDStringWord = Object.assign(docDStringJson, {reportType: "docx"})
-                // console.log('docDString55552343', docDStringWord)
-                vm.$store.dispatch('getExcelReportFromServer', {
-                  data: JSON.stringify(docDStringWord),
-                  fileName: 'baocaothongke' + '.docx'
-                })
-              }
-            })
+            }
+            vm.showCSVDownload = true
+            if (vm.statisticVotingDossiers) {
+              docDString = docDString.replace(/\[\$totalScoreVoting\$\]/g, totalScoreVoting)
+            }
+            docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
+            docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
+            vm.dataExportExcel = docDString
+            console.log('docDString-88888', docDString)
+            vm.docDefinition = JSON.parse(docDString)
+            console.log('vm.docDefinition', vm.docDefinition)
+            let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
+            // create blob
+            // check showTable
+            if(vm.itemsReports[vm.index]['filterConfig']['version']){
+              pdfDocGenerator.getBlob((blob) => {
+                vm.pdfBlob = window.URL.createObjectURL(blob)
+                if (vm.pdfBlob) {
+                  vm.isRender = true
+                } else {
+                  vm.isRender = false
+                }
+              })
+              setTimeout(function () {
+                vm.loadingPdfVer2 = false
+              }, 300)
+            } else {
+              pdfDocGenerator.getBlob((blob) => {
+                vm.pdfBlob = window.URL.createObjectURL(blob)
+                vm.isShowLoading = false
+                if (vm.doExportExcel && !vm.doExportWord) {
+                  vm.$store.dispatch('getExcelReportFromServer', {
+                    data: docDString,
+                    fileName: 'baocaothongke' + '.xls'
+                  })
+                }
+                if (vm.doExportWord) {
+                  let docDStringJson = JSON.parse(docDString)
+                  let docDStringWord = Object.assign(docDStringJson, {reportType: "docx"})
+                  // console.log('docDString55552343', docDStringWord)
+                  vm.$store.dispatch('getExcelReportFromServer', {
+                    data: JSON.stringify(docDStringWord),
+                    fileName: 'baocaothongke' + '.docx'
+                  })
+                }
+              })
+            }
           }
         } else {
           // vm.agencyLists = []
@@ -1866,7 +2208,7 @@ export default {
         }
       })
     },
-    doPrintReportFix () {
+    doPrintReportFix (returnTable) {
       let vm = this
       vm.dataRowRenderHtmlTable = []
       vm.isRender = false
@@ -1896,7 +2238,7 @@ export default {
             if (vm.filters[key]['type'] === 'select') {
               for (let keySource in vm.filters[key]['source']) {
                 if (String(vm.filters[key]['source'][keySource]['value']) === String(currentVal)) {
-                  currentVal = vm.filters[key]['source'][keySource]['name']
+                  currentVal = vm.filters[key]['source'][keySource].hasOwnProperty('nameViewPdf') ? vm.filters[key]['source'][keySource]['nameViewPdf'] : vm.filters[key]['source'][keySource]['name']
                 }
               }
             }
@@ -1907,7 +2249,7 @@ export default {
           for (let keySource in vm.filters[key]['source']) {
             // if (currentVal === '' || currentVal === '0') {
             if (currentVal === '0') {
-              currentVal = vm.filters[key]['source'][keySource]['name']
+              currentVal = vm.filters[key]['source'][keySource].hasOwnProperty('nameViewPdf') ? vm.filters[key]['source'][keySource]['nameViewPdf'] : vm.filters[key]['source'][keySource]['name']
               break
             }
           }
@@ -1954,6 +2296,9 @@ export default {
       if (vm.api.indexOf('/o/statistic/dossier') >= 0) {
         filter.formatDate = 'timestamp'
       }
+      if (vm.itemsReports[vm.index]['filterConfig']['formatDate']) {
+        filter.formatDate = vm.itemsReports[vm.index]['filterConfig']['formatDate']
+      }
       let check =  true
       for (let key in vm.filterGroup) {
         if (key === vm.groupIdListSelected) {
@@ -1987,8 +2332,65 @@ export default {
       let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
       
       // console.log('itemsReports', vm.itemsReports[vm.index])
+      console.log('vm.groupIdList-88888', vm.groupIdList)
+      console.log('vm.groupIdList-99999', vm.agencyLists)
+      console.log('filter-99999', filter)
+      try {
+        if (filter.hasOwnProperty('govAgency') && filter.govAgency === "allAgency") {
+          filter.data['listGroupId'] = "null"
+        } else if (filter.hasOwnProperty('govAgency') && (filter.govAgency === "allSBN" || filter.govAgency === "allQuanHuyen" || filter.govAgency === "allXaPhuong")) {
+          let ids = []
+          for (let index = 0; index < filter['agencyLists'].length; index++) {
+            ids.push(filter['agencyLists'][index]['value'])
+          }
+          filter.data['listGroupId'] = ids.toString()
+        } else {
+          if (filter.hasOwnProperty('govAgency') && filter.govAgency !== 'site') {
+            filter.data['listGroupId'] = String(filter.govAgency)
+          } else if (filter.govAgency === 'site') {
+            // filter.data['listGroupId'] = window.themeDisplay.getScopeGroupId()
+          }
+        }
+
+        if (filter.api.indexOf('/o/rest/v2/votings/reportVE') >= 0) {
+          if (filter.data['listGroupId']) {
+            let codeGovAgency = filter.agencyLists.filter(function (item) {
+              return item.value == filter.data['listGroupId']
+            })[0]['code']
+            console.log('codeGovAgency123', codeGovAgency)
+            filter.data.listGov = codeGovAgency ? codeGovAgency : ''
+          } else {
+            filter.data.listGov = ""
+          }
+        }
+      } catch (error) {
+        filter.data.listGov = ""
+        console.log('error-listGroupId')
+      }
+      if (filter.api.indexOf('/o/rest/v2/votings/reportVE') >= 0 && vm.doExportExcel) {
+        filter['fileName'] = vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xlsx'
+        filter['exportVoting'] = true
+        vm.isShowLoading = false
+      } else {
+        filter['exportVoting'] = false
+      }
       let dispatchUse = vm.api.indexOf('/o/statistic/dossier') >= 0 ? 'getAgencyReportLists' : 'getAgencyReportListsOld'
       vm.$store.dispatch(dispatchUse, filter).then(function (result) {
+        vm.showTableVoting = false
+        if (returnTable) {
+          vm.showTableVoting = true
+          if (result !== null) {
+            vm.isShowLoading = false
+            vm.dataTableVottingList = result
+            vm.showErrorData = false
+            console.log('dataTableVottingList', vm.dataTableVottingList)
+          } else {
+            vm.dataTableVottingList = []
+            vm.isShowLoading = false
+            vm.showErrorData = true
+          }
+          return
+        } 
         // console.log('result',result)
         if (result !== null) {
           // set dossierList
@@ -2062,7 +2464,7 @@ export default {
               }
             })
           }
-          // console.log('resultData555', resultData)
+          
           let resultDataTotal = [resultData.find(function(obj) {
             if (subKey !== null && subKey !== undefined && subKey !== '') {
               if ((obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) && obj[subKey] === '') {
@@ -2077,7 +2479,8 @@ export default {
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('notSumkey')) {
             resultDataTotal = resultData
           }
-        //  console.log('resultDataTotal666', resultDataTotal)
+         console.log('resultDataTotal4444', resultDataTotal)
+         console.log('resultData111', resultData)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -2133,6 +2536,7 @@ export default {
             }
           }
           let dataToExportCSV = []
+          console.log('resultData3333', resultData)
           for (let key in resultData) {
             let dataInput = resultData[key]            
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
@@ -2243,6 +2647,7 @@ export default {
             }
             // console.log('dataRowTotal 555', dataRowTotal)
           } else {
+            console.log('resultDataTotal55555', resultDataTotal)
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
               for (let keyMappingXXTT in vm.itemsReportsConfig) {
@@ -2259,7 +2664,16 @@ export default {
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
-                dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? '0' : parseInt(dataTextXXTT) + ' '
+                // Sum tổng các hàng báo cáo STATISTIC_
+                if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumRow') && vm.itemsReports[vm.index]['filterConfig']['sumRow']) {
+                  if (isNaN(parseInt(dataRowTotal[indexTotalXXTT]['text']))) {
+                    dataRowTotal[indexTotalXXTT]['text'] = 0
+                  }
+                  dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? parseInt(dataRowTotal[indexTotalXXTT]['text']) : parseInt(dataRowTotal[indexTotalXXTT]['text']) + parseInt(dataTextXXTT)
+                } else {
+                  dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? '0' : parseInt(dataTextXXTT) + ' '
+                }
+                //
                 if (currentConfigXXTT['value'] === 'note' || currentConfigXXTT.hasOwnProperty('notSum')) {
                   dataRowTotal[indexTotalXXTT]['text'] = ' '
                 }
@@ -2268,7 +2682,14 @@ export default {
             }
             console.log('dataRowTotal 666', dataRowTotal)
           }
-          vm.dataReportXX += JSON.stringify(dataRowTotal)
+          // Không cộng tổng STATISTIC_
+          if (!vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumRow') || (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumRow') && vm.itemsReports[vm.index]['filterConfig']['sumRow'])) {
+            vm.dataReportXX += JSON.stringify(dataRowTotal)
+          } else {
+            vm.dataReportXX = vm.dataReportXX.substring(0, vm.dataReportXX.length - 1)
+          }
+          // 
+          
           // console.log('vm.dataReportXX 1231', vm.dataReportXX)
           let itemTotal = []
           for (let keyTotalCSV in dataRowTotal) {
@@ -2291,7 +2712,7 @@ export default {
           }
           vm.showCSVDownload = true
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
-          // console.log('docDString,dataExportExcelStatistic', docDString)
+          console.log('docDString,dataExportExcelStatistic', docDString)
           vm.dataExportExcel = docDString
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
@@ -2420,6 +2841,86 @@ export default {
     },
     viewListHoSo (item, first) {
       let vm = this
+      vm.hasVoting = []
+      try {s
+        vm.hasVoting = vm.filters.filter(function (item1) {
+          return item1.key !== 'rate'
+        })
+        if (vm.hasVoting.length) {
+          vm.headers = [
+            {
+              text: 'STT',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Mã hồ sơ',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Chủ hồ sơ',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Ngày tiếp nhận',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Ngày hẹn trả',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Trạng thái',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Đánh giá hài lòng',
+              align: 'center',
+              sortable: false
+            }
+          ]
+        } else {
+          vm.headers = [
+            {
+              text: 'STT',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Mã hồ sơ',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Chủ hồ sơ',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Ngày tiếp nhận',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Ngày hẹn trả',
+              align: 'center',
+              sortable: false
+            },
+            {
+              text: 'Trạng thái',
+              align: 'center',
+              sortable: false
+            }
+          ]
+        }
+      } catch (error) {
+        
+      }
       vm.targetFilter = item
       if (first) {
         vm.pagination.page = 1
@@ -2677,7 +3178,7 @@ export default {
         data: vm.data,
         api: vm.api,
         proxyApi: vm.proxyApi,
-        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xlsx'
+        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xls'
       }
       if (n) {
         filter.start = vm.sttQuyen * counterPage - counterPage
@@ -2703,11 +3204,36 @@ export default {
         vm.loadingGetDossier = false
       })
     },
+    downloadExcelVoting (item) {
+      let vm = this
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['apiExportExcel'] ? vm.itemsReports[vm.index]['filterConfig']['apiExportExcel'] : vm.itemsReports[vm.index]['filterConfig']['api']
+      // build data
+      let filter = {
+        document: vm.reportType,
+        data: vm.data,
+        api: vm.api,
+        proxyApi: vm.proxyApi,
+        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xls'
+      }
+      for (let key in vm.filterGroup) {
+        if(key === vm.groupIdListSelected) {
+          let exits = vm.groupIdList.find(item => item.key === key)
+          filter['govAgency'] = vm.filterGroup[key]
+          filter['agencyLists'] = exits ? exits.value : []
+          check = false
+          break
+        }
+      }
+      vm.$store.dispatch('exportExcel', filter).then(function (result) {
+        
+      })
+    },
     exportExcel () {
       let vm = this
       console.log('sadsadas',vm.dataExportExcel)
       vm.$store.dispatch('getExcelReportFromServer', {
-        groupId: vm.govAgency ? vm.govAgency : window.themeDisplay.getScopeGroupId(),
+        groupId: vm.govAgency && !isNaN(Number(vm.govAgency)) ? vm.govAgency : window.themeDisplay.getScopeGroupId(),
         data: vm.dataExportExcel,
         fileName: 'baocaothongke' + '.xls'
       })
@@ -2730,7 +3256,11 @@ export default {
             vm.filters[key]['value'] = ''
             vm.data[vm.filters[key]['key']] = ''
             vm.filters[key]['groupId'] = vm.filterGroup[item.key]
-            console.log('filter dataSource', vm.filters[key])
+            try {
+              vm.filters[key]['code'] = item.hasOwnProperty('code') ? item.code : ''
+            } catch (error) {
+            }
+            console.log('filterDataSource', vm.filters[key])
             vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
               vm.filters[key]['source'] = result
               if (vm.filters[key]['appendItem']) {
@@ -2743,13 +3273,30 @@ export default {
     },
     changeGovAgency () {
       let vm = this
+      let currentQuery = vm.$router.history.current.query
       vm.groupIdListSelected = ''
       setTimeout(()=>{
         for (let key in vm.filters) {
           if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
             vm.filters[key]['value'] = ''
             vm.data[vm.filters[key]['key']] = ''
+            // emp voting
+            if (currentQuery.hasOwnProperty('employeeEmail')) {
+              vm.data['employeeEmail'] = currentQuery.employeeEmail
+            }
+            // 
             vm.filters[key]['groupId'] = vm.govAgency
+            console.log('filterDataSource123', vm.filters[key])
+            try {
+              vm.filters[key]['code'] = vm.agencyLists.find(function(item) {
+                return item.value == vm.govAgency
+              })['code']
+              vm.govCodeSelected = vm.agencyLists.find(function(item) {
+                return item.value == vm.govAgency
+              })['code']
+            } catch (error) {
+              vm.filters[key]['code'] = ''
+            }
             vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
               vm.filters[key]['source'] = result
               if (vm.filters[key]['appendItem']) {
@@ -2855,7 +3402,437 @@ export default {
           }
         }
       }, 100)
-    }
+    },
+    getAllSite () {
+      let vm = this
+      let param = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+          Token: window.Liferay ? window.Liferay.authToken : ''
+        }
+      }
+      let dataPost = new URLSearchParams()
+      dataPost.append('method', 'GET')
+      dataPost.append('serverCode', 'SERVER_DVC')
+      dataPost.append('url', '/serverconfigs/GROUP_ID_SITE_MOTCUA')
+      dataPost.append('data', JSON.stringify({}))
+      axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+        let serializable = response.data
+        let configs = JSON.parse(serializable.configs)
+        console.log('configs', vm.configs)
+        let agencySiteList = configs['groupIds']
+        try {
+          vm.govAgencyCodeCurrentSite = agencySiteList.filter(function(item) {
+            return item.value == window.themeDisplay.getScopeGroupId()
+          })[0]['code']
+          console.log('govAgencyCodeCurrentSite', vm.govAgencyCodeCurrentSite)
+        } catch (error) {
+        } 
+      }).catch(function (xhr) {
+      })
+    },
+    looseJsonParse(obj) {
+      return Function('"use strict";return (' + obj + ')')()
+    },
+    formatDanhGia (data) {
+      try {
+        let meta = JSON.parse(data)
+        if (meta.hasOwnProperty('hailong')) {
+          let hailong = meta['hailong']
+          if (hailong == 3) {
+            return 'Rất hài lòng'
+          } else if (hailong == 2) {
+            return 'Hài lòng'
+          } else if (hailong == 1) {
+            return 'Không hài lòng'
+          }
+        } else {
+          return ''
+        }
+      } catch (error) {
+        return ''
+      }
+    },
+    viewChiTietDanhGia (item, rate) {
+      let vm = this
+      let i = Number(vm.index) + 1
+      // vm.$router.push({
+      //   path: "/bao-cao/" + i + "?govCode=" + vm.govCodeSelected + "&govId=" + vm.govAgency + "&employeeEmail=" + item.employeeEmail + "&listRate=" + rate +
+      //   "&fromDate=" + vm.data['fromDate'] + "&toDate=" + vm.data['toDate']
+      // })
+      // let url = window.location.origin + window.location.pathname + "#/bao-cao/" + i + "?govCode=" + vm.govCodeSelected + "&govId=" + vm.govAgency + "&employeeEmail=" + item.employeeEmail + "&listRate=" + rate +
+      //   "&fromDate=" + vm.data['fromDate'] + "&toDate=" + vm.data['toDate']
+      // window.open(url, '_blank').focus();
+
+      vm.doPrintReportVoting(item, Number(vm.index) + 1, rate)
+    },
+    doPrintReportVoting (item, indexIn, rate) {
+      let vm = this
+      let itemsReportsConfig = vm.itemsReports[indexIn]['filterConfig']['reportConfig']
+      let filters = vm.itemsReports[indexIn]['filterConfig']['filters']
+      let agencyLists = []
+      let dataReportXX = ''
+      let docDefinition = {}
+      let docDString = {}
+      docDString = JSON.stringify(vm.reportConfigStatic[indexIn]['docDefinition'])
+      // console.log('userData', vm.userData)
+      let titleGov = vm.userData.hasOwnProperty('govAgencyName') && vm.userData.govAgencyName ? vm.userData.govAgencyName : vm.itemsReports[indexIn]['filterConfig']['govAgencyName']
+      if (!titleGov) {
+        titleGov = vm.$store.getters.siteName
+      }
+      docDString = docDString.replace(/\[\$siteName\$\]/g, String(titleGov).toUpperCase())
+      for (let key in filters) {
+        let find = filters[key]['key']
+        let currentVal = vm.data[filters[key]['key']]
+        if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
+          let dateStr = String(currentVal).indexOf('/') <= 0 ? new Date(currentVal).toLocaleDateString('vi-VN') : currentVal
+          if (dateStr !== 'Invalid Date'&& String(currentVal).length === 13) {
+            docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), dateStr)
+          } else {
+            if (filters[key]['type'] === 'select') {
+              for (let keySource in filters[key]['source']) {
+                if (String(filters[key]['source'][keySource]['value']) === String(currentVal)) {
+                  currentVal = filters[key]['source'][keySource].hasOwnProperty('nameViewPdf') ? filters[key]['source'][keySource]['nameViewPdf'] : filters[key]['source'][keySource]['name']
+                }
+              }
+            }
+            docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
+          }
+        } else {
+          currentVal = ''
+          for (let keySource in filters[key]['source']) {
+            // if (currentVal === '' || currentVal === '0') {
+            if (currentVal === '0') {
+              currentVal = filters[key]['source'][keySource].hasOwnProperty('nameViewPdf') ? filters[key]['source'][keySource]['nameViewPdf'] : filters[key]['source'][keySource]['name']
+              break
+            }
+          }
+          docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
+        }
+      }
+      if(vm.itemsReports[indexIn]['filterConfig']['showTable']){
+        agencyLists = vm.itemsReports[indexIn]['filterConfig']['groupIdsAdmin']
+      } else {
+        agencyLists = vm.itemsReports[indexIn]['filterConfig']['groupIds']
+      }
+      for (let key in agencyLists) {
+        if (String(agencyLists[key]['value']) === String(vm.govAgency)) {
+          docDString = docDString.replace(/\[\$groupIds\$\]/g, String(agencyLists[key]['text']).toUpperCase())
+          break
+        }
+      }
+      let filter = {
+        agencyLists: agencyLists,
+        api: "/o/rest/v2/votings/reportVE?type=3",
+        data: {
+          fromDate: vm.data['fromDate'],
+          listGov: "STTTT",
+          toDate: vm.data['toDate'],
+          employeeEmail: item.employeeEmail,
+          listRate: rate
+        },
+        document: "STATISTIC_99_VER_3",
+        formatDate: "timestamp",
+        govAgency: vm.govAgency
+      }
+      if (filter['govAgency']) {
+        for (let key in agencyLists) {
+          if (String(agencyLists[key]['value']) === String(filter['govAgency'])) {
+            docDString = docDString.replace(/\[\$groupIds\$\]/g, String(agencyLists[key]['text']).toUpperCase())
+            break
+          }
+        }
+      }
+      // 
+      let pdfBlob = null
+      let sumKey = vm.itemsReports[indexIn]['filterConfig']['sumKey']
+      let selection = vm.itemsReports[indexIn]['filterConfig']['selection']
+      let merge = vm.itemsReports[indexIn]['filterConfig']['merge']
+      let sort = vm.itemsReports[indexIn]['filterConfig']['sort']
+      let subKey = vm.itemsReports[indexIn]['filterConfig']['subKey']
+      try {
+        if (filter.hasOwnProperty('govAgency') && filter.govAgency === "allAgency") {
+          filter.data['listGroupId'] = "null"
+        } else if (filter.hasOwnProperty('govAgency') && (filter.govAgency === "allSBN" || filter.govAgency === "allQuanHuyen" || filter.govAgency === "allXaPhuong")) {
+          let ids = []
+          for (let index = 0; index < filter['agencyLists'].length; index++) {
+            ids.push(filter['agencyLists'][index]['value'])
+          }
+          filter.data['listGroupId'] = ids.toString()
+        } else {
+          if (filter.hasOwnProperty('govAgency') && filter.govAgency !== 'site') {
+            filter.data['listGroupId'] = String(filter.govAgency)
+          } else if (filter.govAgency === 'site') {
+            // filter.data['listGroupId'] = window.themeDisplay.getScopeGroupId()
+          }
+        }
+
+        if (filter.api.indexOf('/o/rest/v2/votings/reportVE') >= 0) {
+          if (filter.data['listGroupId']) {
+            let codeGovAgency = filter.agencyLists.filter(function (item) {
+              return item.value == filter.data['listGroupId']
+            })[0]['code']
+            console.log('codeGovAgency123', codeGovAgency)
+            filter.data.listGov = codeGovAgency ? codeGovAgency : ''
+          } else {
+            filter.data.listGov = ""
+          }
+        }
+      } catch (error) {
+        filter.data.listGov = ""
+        console.log('error-listGroupId')
+      }
+      let dispatchUse = 'getAgencyReportListsOld'
+      vm.$store.dispatch(dispatchUse, filter).then(function (result) {
+        let index = 1
+        let dataRowTotal = []
+        let totalText = 'Tổng số'
+        if (sumKey === 'month') {
+          totalText = 'Cả năm'
+        }
+        dataRowTotal.push({
+          text: totalText, 
+          colSpan: 2,
+          bold: true,
+          alignment: 'center',
+          style: 'tdStyle'
+        })
+        for (let keyMapping in itemsReportsConfig) {
+          if (itemsReportsConfig[keyMapping]['value'] === 'note' || itemsReportsConfig[keyMapping].hasOwnProperty('notSum')) {
+            dataRowTotal.push({
+              text: '', 
+              alignment: 'center',
+              style: 'tdStyle'
+            })
+          }  else {
+            dataRowTotal.push({
+              text: 0, 
+              alignment: 'center',
+              style: 'tdStyle'
+            })
+          }
+        }
+        // TODO
+        let resultData = result
+        let  resultDataTotal = resultData
+        console.log('resultDataTotal4444', resultDataTotal)
+        console.log('resultData111', resultData)
+        let resultDataVari = {}
+        for (let key in resultData) {
+          let keyVari = ''
+          for (let keysd in merge) {
+            keyVari += resultData[key][merge[keysd]] + '_'
+          }
+          if (resultDataVari[keyVari] === undefined || resultDataVari[keyVari] === null || resultDataVari[keyVari] === '') {
+            resultDataVari[keyVari] = resultData[key]
+          } else {
+            for (let kkey in resultDataVari[keyVari]) {
+              if (resultDataVari[keyVari][kkey] !== '' && resultDataVari[keyVari][kkey] !== undefined && resultDataVari[keyVari][kkey] !== null) {
+                if (String(parseInt(resultDataVari[keyVari][kkey])) === 'NaN') {
+                  resultDataVari[keyVari][kkey] = resultData[key][kkey]
+                } else if (kkey === 'ontimePercentage') {
+                  resultDataVari[keyVari][kkey] = parseInt(resultData[key][kkey])
+                } else if (kkey === 'month' || kkey === 'year') {
+                  resultDataVari[keyVari][kkey] = parseInt(resultData[key][kkey])
+                } else {
+                  resultDataVari[keyVari][kkey] = parseInt(resultData[key][kkey]) + parseInt(resultDataVari[keyVari][kkey])
+                }
+              }
+            }
+          }
+        }
+        resultData = []
+        for (let key in resultDataVari) {
+          if (key !== undefined && !key.startsWith('undefined')) {
+            resultData.push(resultDataVari[key])
+          }
+        }
+        if (sort !== '' && sort !== undefined && sort !== null) {
+          resultData = vm.sortByKey(resultData, sort)
+        }
+        if (subKey !== null && subKey !== undefined && subKey !== '') {
+          let arraySubKey = {}
+          for (let key in resultData) {
+            if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
+              (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && resultData[key][sumKey] !== '0')) {
+              if (arraySubKey[resultData[key][sumKey]] !== undefined && arraySubKey[resultData[key][sumKey]] !== null) {
+                arraySubKey[resultData[key][sumKey]].push(resultData[key])
+              } else {
+                arraySubKey[resultData[key][sumKey]] = []
+                arraySubKey[resultData[key][sumKey]].push(resultData[key])
+              }
+            }
+          }
+          resultData = []
+          for (let keySUBARRAY in arraySubKey) {
+            let subKeySortData = vm.sortByKey(arraySubKey[keySUBARRAY], subKey)
+            for (let keyData in subKeySortData) {
+              resultData.push(subKeySortData[keyData])
+            }
+          }
+        }
+        let dataToExportCSV = []
+        console.log('resultData3333', resultData)
+        for (let key in resultData) {
+          let dataInput = resultData[key]            
+          if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
+              (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0')) {
+            let dataRow = []
+            let dataToExportCSVItem = []
+            if (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] !== '') {
+              dataToExportCSVItem.push('')
+              dataRow.push({
+                text: '', 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            } else {
+              dataToExportCSVItem.push(index)
+              dataRow.push({
+                text: index, 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            }
+            let indexTotal = 1
+            for (let keyMapping in itemsReportsConfig) {
+              let currentConfig = itemsReportsConfig[keyMapping]
+              let dataText = ' '
+              let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
+              if (currentConfig.hasOwnProperty('calculator')) {
+                if (isNaN(eval(currentConfig['calculator']))) {
+                  dataText = eval(currentConfig['calculator'])
+                } else {
+                  dataText = Math.round(eval(currentConfig['calculator']))
+                }
+              } else {
+                // console.log('resultData[key]', resultData[key], currentConfig['value'] )
+                if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
+                  if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
+                    dataText =  ' - ' + resultData[key][currentConfig['subValue']] + ' '
+                  } else {
+                    dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
+                  }
+                }
+              }
+              let alignmentConfig = 'center'
+              if (currentConfig.hasOwnProperty('align')) {
+                alignmentConfig = currentConfig['align']
+              }
+              dataToExportCSVItem.push(dataText)
+              dataRow.push({
+                text: currentConfig['value'] === 'note' || currentConfig.hasOwnProperty('notSum') ? ' ' : (dataText === ' ' ? ' 0 ' : dataText), 
+                alignment: alignmentConfig,
+                style: 'tdStyle'
+              })
+
+              if (vm.govAgency === 0) {
+                if (dataRowTotal[indexTotal] !== null && dataRowTotal[indexTotal] !== undefined) {
+                  if (currentConfig['value'] === 'ontimePercentage') {
+                    dataRowTotal[indexTotal]['text'] = parseInt(dataText)
+                  } else if (currentConfig['value'] === 'note' || currentConfig.hasOwnProperty('notSum')) {
+                    dataRowTotal[indexTotal]['text'] = ' '
+                  } else if (isNaN(dataText)) {
+                    // dataRowTotal[indexTotal]['text'] = ' '
+                    dataRowTotal[indexTotal]['text'] = ' 0 '
+                  } else {
+                    dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(dataText)
+                  }
+                }
+              }
+              indexTotal = indexTotal + 1
+            }
+            if (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] !== '') {
+              
+            } else {
+              index = index + 1
+            }
+            
+            dataReportXX += JSON.stringify(dataRow) + ','
+            dataToExportCSV.push(dataToExportCSVItem)
+          }
+        }
+        if (agencyLists.length > 0 && vm.govAgency === 0) {
+          // console.log('resultDataTotal777', resultDataTotal)
+          for (let keyXXTT in resultDataTotal) {
+            let indexTotalXXTT = 1
+            for (let keyMappingXXTT in itemsReportsConfig) {
+              let dataTextXXTT = ''
+              let currentConfigXXTT = itemsReportsConfig[keyMappingXXTT]
+              // console.log('currentConfigXXTT777', currentConfigXXTT)
+              if (currentConfigXXTT.hasOwnProperty('calculator')) {
+                var dataInputXXTT = resultDataTotal[keyXXTT]
+                let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
+                if (isNaN(eval(calu)) || currentConfigXXTT['value'] === 'note') {
+                  dataTextXXTT = eval(calu)
+                } else {
+                  dataTextXXTT = Math.round(eval(calu))
+                }
+              } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
+                dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
+              }
+              dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? '0 '  : parseInt(dataTextXXTT) + ' '
+              if (currentConfigXXTT['value'] === 'note' || currentConfigXXTT.hasOwnProperty('notSum')) {
+                dataRowTotal[indexTotalXXTT]['text'] = ' '
+              }
+              indexTotalXXTT = indexTotalXXTT + 1
+            }
+            break
+          }
+        } else {
+          console.log('resultDataTotal55555', resultDataTotal)
+          for (let keyXXTT in resultDataTotal) {
+            let indexTotalXXTT = 1
+            for (let keyMappingXXTT in itemsReportsConfig) {
+              let dataTextXXTT = ''
+              let currentConfigXXTT = itemsReportsConfig[keyMappingXXTT]
+              if (currentConfigXXTT.hasOwnProperty('calculator')) {
+                var dataInputXXTT = resultDataTotal[keyXXTT]
+                let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
+                if (isNaN(eval(calu)) || currentConfigXXTT['value'] === 'note') {
+                  dataTextXXTT = eval(calu)
+                } else {
+                  dataTextXXTT = Math.round(eval(calu))
+                }
+              } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
+                dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
+              }
+              // Sum tổng các hàng báo cáo STATISTIC_
+              if (vm.itemsReports[indexIn]['filterConfig'].hasOwnProperty('sumRow') && vm.itemsReports[indexIn]['filterConfig']['sumRow']) {
+                if (isNaN(parseInt(dataRowTotal[indexTotalXXTT]['text']))) {
+                  dataRowTotal[indexTotalXXTT]['text'] = 0
+                }
+                dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? parseInt(dataRowTotal[indexTotalXXTT]['text']) : parseInt(dataRowTotal[indexTotalXXTT]['text']) + parseInt(dataTextXXTT)
+              } else {
+                dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? '0' : parseInt(dataTextXXTT) + ' '
+              }
+              //
+              if (currentConfigXXTT['value'] === 'note' || currentConfigXXTT.hasOwnProperty('notSum')) {
+                dataRowTotal[indexTotalXXTT]['text'] = ' '
+              }
+              indexTotalXXTT = indexTotalXXTT + 1
+            }
+          }
+          console.log('dataRowTotal 666', dataRowTotal)
+        }
+        // Không cộng tổng STATISTIC_
+        // if (!vm.itemsReports[index]['filterConfig'].hasOwnProperty('sumRow') || (vm.itemsReports[index]['filterConfig'].hasOwnProperty('sumRow') && vm.itemsReports[index]['filterConfig']['sumRow'])) {
+        //   dataReportXX += JSON.stringify(dataRowTotal)
+        // } else {
+          dataReportXX = dataReportXX.substring(0, dataReportXX.length - 1)
+        // }
+        // 
+        docDString = docDString.replace(/"\[\$report\$\]"/g, dataReportXX)
+        console.log('docDString,dataExportExcelStatistic', docDString)
+        docDefinition = JSON.parse(docDString)
+        vm.dialogPDF = true
+        let pdfDocGenerator = pdfMake.createPdf(docDefinition)
+        pdfDocGenerator.getBlob((blob) => {
+          pdfBlob = window.URL.createObjectURL(blob)
+          vm.pdfBlob = pdfBlob
+        })
+      })
+    },
   }
 }
 </script>

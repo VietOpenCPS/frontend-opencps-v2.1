@@ -390,7 +390,7 @@ export default {
       let vm = this
       let param = {
         headers: {
-          groupId: window.themeDisplay.getScopeGroupId()
+          'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
         },
         params: {
         }
@@ -401,7 +401,7 @@ export default {
         if (response && response.data.hasOwnProperty('data')) {
           processOptionList = response['data']['data']
           processOptionFilter = processOptionList.filter(function (item) {
-            return item.processOptionId = vm.id
+            return item.processOptionId == vm.id
           })[0]
           vm.seqOrder = processOptionFilter.seqOrder
           vm.optionName = processOptionFilter.optionName

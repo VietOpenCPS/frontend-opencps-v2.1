@@ -16,6 +16,7 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    siteName: '',
     userPermission: false,
     groupId: window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0,
     snackbarerror: false,
@@ -43,6 +44,7 @@ export const store = new Vuex.Store({
     endPointApi: '/o/rest/v2',
     // endPointApi: 'http://127.0.0.1:8081/api',
     getDeliverableTypes: [],
+    deliverableTypesFilter: [],
     getContentFile: '',
     getContentFileSimple: [],
     changeFormData: '',
@@ -190,9 +192,11 @@ export const store = new Vuex.Store({
         let body = DeliverableTypes.getDeliverableTypes
         axios.post('/o/v1/opencps/deliverable', body, options).then(function (response) {
           state.getDeliverableTypes = response.data['getDeliverableTypes']
+          state.deliverableTypesFilter = response.data['getDeliverableTypes']
           resolve(response.data['getDeliverableTypes'])
         }).catch(function () {
           state.getDeliverableTypes = []
+          state.deliverableTypesFilter = []
           commit('setsnackbarerror', true)
           reject(state.getDeliverableTypes)
         })
@@ -398,7 +402,28 @@ export const store = new Vuex.Store({
           reject('default')
         })
       })
-    }
+    },
+    getReport ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        var settings = {
+          "url": "/o/rest/v2/deliverable/report?typeCode=" + filter.typeCode,
+          "method": "POST",
+          "headers": {
+            "groupId": 0,
+            "Content-Type": "application/json"
+          },
+          "data": filter.data,
+        };
+        
+        $.ajax(settings).done(function (response) {
+          if (response.hasOwnProperty('data')) {
+            resolve(response)
+          } else {
+            resolve("")
+          }
+        });
+      })
+    },
   },
   mutations: {
     SOCKET_ONOPEN (state, event)  {
@@ -450,7 +475,13 @@ export const store = new Vuex.Store({
     },
     setActiveBindFormData (state, payload) {
       state.activeBindFormData = payload
-    }
+    },
+    setDeliverableTypesFilter (state, payload) {
+      return state.deliverableTypesFilter = payload
+    },
+    setsiteName (state, payload) {
+      state.siteName = payload
+    },
   },
   getters: {
     getUser (state) {
@@ -467,6 +498,9 @@ export const store = new Vuex.Store({
     },
     getDeliverableTypes (state) {
       return state.getDeliverableTypes
+    },
+    getDeliverableTypesFilter (state) {
+      return state.deliverableTypesFilter
     },
     getContentFile (state) {
       return state.getContentFile
@@ -488,6 +522,9 @@ export const store = new Vuex.Store({
     },
     getActiveBindFormData (state) {
       return state.activeBindFormData
-    }
+    },
+    getsiteName (state) {
+      return state.siteName
+    },
   }
 })

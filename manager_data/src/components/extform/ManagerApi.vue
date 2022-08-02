@@ -481,7 +481,7 @@ export default {
       vm.loadingTable = true
       let param = {
         headers: {
-          groupId: window.themeDisplay.getScopeGroupId()
+          'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
         },
         params: {
           start: vm.apiPage * vm.numberPerPage - vm.numberPerPage,
@@ -508,7 +508,7 @@ export default {
         let vm = this
         let param = {
             headers: {
-                groupId: window.themeDisplay.getScopeGroupId()
+                'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
             }
         }
         axios.get('/o/rest/v2/jobpos', param).then(function (response) {
@@ -532,7 +532,7 @@ export default {
         if (vm.$refs.formUpdateApi.validate()) {
             let param = {
                 headers: {
-                    groupId: window.themeDisplay.getScopeGroupId()
+                    'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
                 }
             }
             let dataAddApi = new URLSearchParams()
@@ -577,7 +577,7 @@ export default {
         let vm = this
         let param = {
             headers: {
-                groupId: window.themeDisplay.getScopeGroupId()
+                'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
             }
         }
         let x = confirm('Bạn có chắc chắn xóa API này')
@@ -600,7 +600,7 @@ export default {
         let vm = this
         let param = {
             headers: {
-                groupId: window.themeDisplay.getScopeGroupId()
+                'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
             },
             params: {
                 apiCode: vm.apiSelected['apiCode']
@@ -625,7 +625,7 @@ export default {
         if (vm.apiRole) {
             let param = {
                 headers: {
-                    groupId: window.themeDisplay.getScopeGroupId()
+                    'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
                 }
             }
             let dataAddRole = new URLSearchParams()
@@ -649,7 +649,7 @@ export default {
         let vm = this
         let param = {
             headers: {
-                groupId: window.themeDisplay.getScopeGroupId()
+                'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
             }
         }
         let x = confirm('Bạn có chắc chắn xóa quyền truy cập này')

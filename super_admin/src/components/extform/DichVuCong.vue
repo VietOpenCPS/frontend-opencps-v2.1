@@ -54,7 +54,7 @@
                   </v-flex>
                   <v-flex xs12 v-if="isDvc" :class="isDvc ? 'mb-2 px-2' : 'my-2 px-2'">
                     <div>
-                      <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Đơn vị thực hiện<span style="color: red" > (*)</span>:</div>
+                      <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Đơn vị thực hiện:</div>
                       <v-autocomplete
                         placeholder="Chọn đơn vị thực hiện"
                         class="select-search d-inline-block"
@@ -70,15 +70,13 @@
                         height="32"
                         min-height="32"
                         clearable
-                        required
-                        :rules="[v => !!v || 'Chọn đơn vị thực hiện']"
                       >
                       </v-autocomplete>
                     </div>
                   </v-flex>
                   <v-flex xs12 :class="!isDvc ? 'my-2 px-2' : 'mb-2 px-2'">
                     <div>
-                      <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Lĩnh vực<span style="color: red"> (*)</span></div>
+                      <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Lĩnh vực</div>
                       <v-autocomplete
                         placeholder="Chọn lĩnh vực"
                         class="select-search d-inline-block"
@@ -444,10 +442,11 @@ export default {
     }
     vm.$nextTick(() => {
       vm.getServiceConfigList()
+      vm.getDomains()
       if (!vm.boNganh && vm.isDvc) {
         vm.getServiceAdminisTration()
       } else {
-        vm.getDomains()
+        // vm.getDomains()
         // vm.getServiceInfo()
       }
     })
@@ -634,13 +633,13 @@ export default {
           })
         }
       } else {
-        if (vm.isDvc) {
-          toastr.error('Vui lòng chọn đơn vị thực hiện để thêm mới');
-        } else {
+        // if (vm.isDvc) {
+        //   toastr.error('Vui lòng chọn đơn vị thực hiện để thêm mới');
+        // } else {
           vm.$router.push({
             path: '/table/opencps_serviceconfig/editor/0?govAgencyCode=' + vm.govAgencyFilter + '&domainCode=' + vm.domainFilter + '&serviceCode=' + vm.serviceFilter + '&level=' + vm.levelFilter,
           })
-        }
+        // }
       }
     },
     getServiceConfigList (reset) {

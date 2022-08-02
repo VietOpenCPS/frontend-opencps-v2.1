@@ -6,9 +6,17 @@
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div> Kết quả xử lý
-          <v-btn style="position: absolute;right: 55px;bottom: 2px;" :readonly="loadingHsm" :disabled="loadingHsm" class="mr-2" color="primary" v-if="esignType === 'hsm' || esignType === 'pluginAndHSM'" @click.stop="kySoHsmAll">
+          <v-btn :style="esignType === 'pluginAndHSM' ? 'position: absolute;right: 115px;bottom: 2px;' : 'position: absolute;right: 55px;bottom: 2px;'" :readonly="loadingHsm" :disabled="loadingHsm" class="mr-2" color="primary" v-if="esignType === 'hsm' || esignType === 'pluginAndHSM'" @click.stop="kySoHsmAll">
             <v-icon size="22" color="white">drive_file_rename_outline</v-icon> &nbsp;
             Đóng dấu tất cả giấy tờ
+          </v-btn>
+
+          <v-btn style="color: #fff !important;position: absolute;right: 55px;bottom: 2px;" 
+            :readonly="loadingHsm" :disabled="loadingHsm" class="mr-2" color="orange" 
+            v-if="(esignType === 'plugin' || esignType === 'pluginAndHSM') && thaoTacGop && kySoThaoTacGop" @click.stop="getDanhSachFileThaoTacGop"
+          >
+            <v-icon size="22" style="color: #fff !important;" color="white">drive_file_rename_outline</v-icon> &nbsp;
+            Ký số giấy tờ đã có
           </v-btn>
         </div>
         <v-card>
@@ -30,6 +38,13 @@
                     </div>
                     <div v-for="(itemFileView, index2) in dossierFilesItems" :key="index2 + 'cr'" v-if="item.partNo + id === itemFileView.dossierPartNo + id && itemFileView.fileSize">
                       <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 25px; font-size: 12px;">
+                        <!-- <v-checkbox
+                            v-model="selectedFileKySo[index2]['selected']"
+                            primary
+                            hide-details
+                            @click.stop="toggleCheckboxKySo(index2)"
+                            style="max-width: 30px;  margin-top: 0;  padding-top: 0;"
+                        ></v-checkbox> -->
                         <span v-on:click.stop="viewFile2(itemFileView, index2)" class="ml-3" style="cursor: pointer;">
                           <v-icon class="mr-1" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
                             :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
@@ -144,7 +159,7 @@
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
               <v-layout row wrap v-else>
-                <v-flex :style="esignType === 'plugin' ? 'width: 120px' : 'width: 100px'">
+                <v-flex :style="(esignType === 'plugin' || esignType === 'pluginAndHSM') ? 'width: 120px' : 'width: 100px'">
                   <input v-if="item['multiple']"
                   type="file"
                   multiple
@@ -182,7 +197,7 @@
                     <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ lên</span>
                     <span v-else>Tải giấy tờ lên (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
                   </v-tooltip>
-                  <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id && thaoTacGop">
+                  <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id && thaoTacGop && (esignType === 'plugin' || esignType === 'pluginAndHSM')">
                     <v-btn slot="activator" icon class="mx-0 my-0 ml-2" @click.native="createFileEntry('https://kiemthu-mt-gov-vn-9001.fds.vn', item, index)">
                       <v-badge>
                         <v-icon size="20" color="orange">fa fa-pencil-square-o</v-icon>
@@ -414,7 +429,9 @@
       preCondition: {
         type: String,
         default: () => ''
-      }
+      },
+      chiTietAction: '',
+      dossierSelected: []
     },
     components: {
       'ho-so-nhom': HoSoTrongNhom
@@ -463,7 +480,14 @@
       typeSignPlugin: '',
       requiredSignPlugin: false,
       loadingHsm: false,
-      doActionGroupNew: false
+      doActionGroupNew: false,
+      selectedFileKySo: [],
+      filesKySoGop: [],
+      kySoThaoTacGop: false,
+      mappingFileSignedUpdate: {
+        dossierFiles: '',
+        fileEntries: ''
+      }
     }),
     computed: {
       loading () {
@@ -498,6 +522,10 @@
       }
       try{
         vm.doActionGroupNew = doActionGroupNew
+      } catch {
+      }
+      try{
+        vm.kySoThaoTacGop = kySoThaoTacGop
       } catch {
       }
       vm.receiveMessage = function (event) {
@@ -575,6 +603,16 @@
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
+      },
+      dossierFilesItems (val) {
+        // let vm = this
+        // let fileKq = vm.dossierFilesItems.filter(function (item) {
+        //   return item.dossierPartType == 2 && item.fileType == 'pdf'
+
+        // })
+        // vm.selectedFileKySo = Array.from(fileKq, function (e) {
+        //   return Object.assign(e, {selected: true})
+        // })
       }
     },
     mounted () {
@@ -677,7 +715,6 @@
           }
           /* eslint-disable */
           if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
-            console.log('eformEmbed', item)
             item.embed = true
             vm.active = false
             vm.active = true
@@ -704,6 +741,11 @@
               fileTemplateNo = item.fileTemplateNo ? item.fileTemplateNo : item.templateFileNo
             } catch (error) {
             }
+            // check theo formCode cấu hình
+            if (eformScript && eformScript.hasOwnProperty('formCode') && eformScript.formCode) {
+              fileTemplateNo = eformScript.formCode
+            }
+            //
             let urlEmbed = eformScript.eformEmbed + '/' + fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
             for (let key in paramsEmbed) {
               urlEmbed += ('&' + key + '=' + paramsEmbed[key])
@@ -782,7 +824,6 @@
             }
             /* eslint-disable */
             if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
-              console.log('eformEmbed2', item)
               item.embed = true
               vm.active = false
               vm.active = true
@@ -808,6 +849,11 @@
                 fileTemplateNo = item.templateFileNo ? item.templateFileNo : item.fileTemplateNo
               } catch (error) {
               }
+              // check theo formCode cấu hình
+              if (eformScript && eformScript.hasOwnProperty('formCode') && eformScript.formCode) {
+                fileTemplateNo = eformScript.formCode
+              }
+              //
               let urlEmbed = eformScript.eformEmbed + '/' + fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
               for (let key in paramsEmbed) {
                 urlEmbed += ('&' + key + '=' + paramsEmbed[key])
@@ -1290,7 +1336,6 @@
         }
         /* eslint-disable */
         if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
-          console.log('eformEmbed3', item)
           vm.createFiles[index].embed = true
           let deliverableType = item.deliverableType ? item.deliverableType : ''
           let paramsEmbed = {
@@ -1314,6 +1359,11 @@
             fileTemplateNo = item.fileTemplateNo ? item.fileTemplateNo : item.templateFileNo
           } catch (error) {
           }
+          // check theo formCode cấu hình
+          if (eformScript && eformScript.hasOwnProperty('formCode') && eformScript.formCode) {
+            fileTemplateNo = eformScript.formCode
+          }
+          //
           let urlEmbed = eformScript.eformEmbed + '/' + fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
           for (let key in paramsEmbed) {
             urlEmbed += ('&' + key + '=' + paramsEmbed[key])
@@ -1453,6 +1503,11 @@
                         fileTemplateNo = item.fileTemplateNo ? item.fileTemplateNo : item.templateFileNo
                       } catch (error) {
                       }
+                      // check theo formCode cấu hình
+                      if (eformScript && eformScript.hasOwnProperty('formCode') && eformScript.formCode) {
+                        fileTemplateNo = eformScript.formCode
+                      }
+                      //
                       let urlEmbed = eformScript.eformEmbed + '/' + fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
                       for (let key in paramsEmbed) {
                         urlEmbed += ('&' + key + '=' + paramsEmbed[key])
@@ -1907,6 +1962,202 @@
         }
         console.log('fileSignedSync', createFileSigned)
         vm.$store.commit('setCreateFileSigned', createFileSigned)
+      },
+      toggleCheckboxKySo (index) {
+        let vm = this
+      },
+      getDanhSachFileThaoTacGop () {
+        let vm = this
+        let currentQuery = vm.$router.history.current.query
+        let fileTemplateNo = Array.from(vm.createFiles, function (item) {
+          return item.templateFileNo
+        })
+        let arrDossierId = []
+        if (vm.dossierSelected.length === 0) {
+          if (currentQuery.hasOwnProperty('dossiers')) {
+            let arrDossierIdTemp = currentQuery.dossiers.split(',')
+            arrDossierId = arrDossierIdTemp
+          }
+        } else {
+          arrDossierId = Array.from(vm.dossierSelected, function (item) {
+            return item.dossierId
+          })
+        }
+        
+        let filter = {
+          paramsInput: {
+            dossierIds: arrDossierId.toString(),
+            fileTemplateNo: fileTemplateNo.toString()
+          }
+        }
+        vm.filesKySoGop = []
+        console.log('fileTemplateNoKySoGop', filter)
+        vm.$store.dispatch('getFileYeuCauKySo', filter).then(function (result) {
+          if (result && result.data) {
+            vm.filesKySoGop = result.data.filter(function (item) {
+              return item.dossierPartType == 2 && item.fileType == 'pdf' && item.fileSize
+            })
+            console.log('filesKySoGop', vm.filesKySoGop)
+            if (vm.filesKySoGop && vm.filesKySoGop.length) {
+              let dossierChuaCoGiayTo = []
+              vm.dossierSelected.forEach(element => {
+                let exits = vm.filesKySoGop.find(function(item) {
+                  return item.dossierId == element.dossierId
+                })
+                if (!exits) {
+                  dossierChuaCoGiayTo.push(element.dossierNo)
+                }
+              });
+              if (dossierChuaCoGiayTo && dossierChuaCoGiayTo.length) {
+                let x = confirm('Hồ sơ: ' + dossierChuaCoGiayTo.toString() + ' không có giấy tờ để ký duyệt')
+                if (x) {
+                  let y = confirm('Tổng số ' + vm.filesKySoGop.length + ' giấy tờ sẽ được ký duyệt')
+                  if (y) {
+                    vm.kySoGop()
+                  }
+                }
+              } else {
+                let y = confirm('Tổng số ' + vm.filesKySoGop.length + ' giấy tờ sẽ được ký duyệt')
+                if (y) {
+                  vm.kySoGop()
+                }
+              }
+              
+            } else {
+              toastr.error('Không có giấy tờ để ký duyệt')
+            }
+          } else {
+            toastr.error('Không có giấy tờ để ký duyệt')
+          }
+        })
+      },
+      kySoGop () {
+        let vm = this
+        let signFileCallBack = function (rv) {
+          let received_msg = JSON.parse(rv)
+          console.log('received_msg_kysogop', received_msg)
+          if (received_msg.Status == 0 && received_msg.Message && received_msg.Files) {
+            let dataFiles = received_msg.Files
+            let dossierFiles = []
+            let fileEntries = []
+            dataFiles.forEach(element => {
+              let signed = JSON.parse(element.FileSignedURL)
+              let fileEntryId = signed['fileEntryId']
+              let dossierFileId = element['FileID']
+              dossierFiles.push(dossierFileId)
+              fileEntries.push(fileEntryId)
+            });
+            vm.mappingFileSignedUpdate.dossierFiles = dossierFiles.toString()
+            vm.mappingFileSignedUpdate.fileEntries = fileEntries.toString()
+            toastr.success('Ký số thành công')
+          }
+        }
+        if (vm.filesKySoGop && vm.filesKySoGop.length) {
+          let fileArr = []
+          vm.filesKySoGop.forEach((element, index) => {
+            let prms = {
+              "FileID": element.dossierFileId,
+              "FileName": element.displayName,
+              "URL": window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + element['dossierId'] + '/files/' + element['referenceUid'] + '/preview.pdf'
+            }
+            fileArr.push(prms)
+          });
+          let paramsInput = {
+            "FileUploadHandler": window.themeDisplay.getPortalURL() + '/o/rest/v2/vgca/fileupload',
+            "SessionId": "",
+            "Files": fileArr
+          }
+          console.log('paramsInput123123', paramsInput)
+          let json_prms = JSON.stringify(paramsInput)
+          vgca_sign_files(json_prms, signFileCallBack)
+        } else {
+          toastr.error('Không có giấy tờ nào')
+        }
+      },
+      showDanhSachKySo () {
+        let vm = this
+        // console.log('selectedFileKySo', vm.selectedFileKySo)
+        let signFileCallBack = function (rv) {
+          let received_msg = JSON.parse(rv)
+          console.log('received_msg_kydanhsach', received_msg)
+          // --------------
+
+          if (received_msg.Status == 0 && received_msg.Files) {
+            let dataFiles = received_msg.Files
+            dataFiles.forEach(element => {
+              if (element.Status == 0) {
+                let dataSigned
+                try {
+                  dataSigned = JSON.parse(element.FileSignedURL)
+                } catch (error) {
+                }
+                if (dataSigned) {
+                  if (window.location.protocol === 'https:' && dataSigned.url.indexOf('http:') === 0) {
+                    dataSigned.url = dataSigned.url.replace('http', 'https')
+                  }
+                  dataSigned.url = dataSigned.url.replace(':80/', '/')
+                }
+
+                // 
+                let indexDossierFile = vm.dossierFilesItems.findIndex(item => item.dossierFileId == element.FileID)
+                vm.dossierFilesItems[indexDossierFile].isSigned = true
+                vm.dossierFilesItems[indexDossierFile].pdfSigned = dataSigned ? dataSigned.url : ''
+                vm.dossierFilesItems[indexDossierFile].fileEntryId = dataSigned ? dataSigned.fileEntryId : ''
+              }
+              // console.log('vm.dossierFilesItems', vm.dossierFilesItems)
+              // lọc file gán với createFiles
+              let createFileItems = []
+              if (vm.dossierFilesItems.length > 0) {
+                for (let i = 0; i < vm.dossierFilesItems.length; i++) {
+                  let hasCreate = vm.createFiles.filter(function (item) {
+                    return String(item.partNo) === String(vm.dossierFilesItems[i]['dossierPartNo'])
+                  })
+                  if (hasCreate && hasCreate.length > 0) {
+                    vm.dossierFilesItems[i] = Object.assign(vm.dossierFilesItems[i], {createFileDossierPartEform: hasCreate[0]['eForm']})
+                    createFileItems.push(vm.dossierFilesItems[i])
+                  }
+                }
+              }
+              let createFileSigned = {
+                dossierId: vm.detailDossier['dossierId'],
+                createFiles: createFileItems
+              }
+              vm.$store.commit('setCreateFileSigned', createFileSigned)
+              console.log('createFileSigned', createFileSigned)
+            });
+            toastr.success('Ký số thành công')
+          }     
+          // --------------
+        }
+        let hasFile = vm.selectedFileKySo.find(function (item) {
+          return item.selected == true
+        })
+        if (hasFile) {
+          let fileArr = []
+          let fileKq = vm.dossierFilesItems.filter(function (item) {
+            return item.dossierPartType == 2 && item.fileType == 'pdf'
+          })
+          fileKq.forEach((element, index) => {
+            if (vm.selectedFileKySo[index]) {
+              let prms = {
+                "FileID": element.dossierFileId,
+                "FileName": element.displayName,
+                "URL": window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.detailDossier['dossierId'] + '/files/' + element['referenceUid'] + '/preview.pdf'
+              }
+              fileArr.push(prms)
+            }
+          });
+          let paramsInput = {
+            "FileUploadHandler": window.themeDisplay.getPortalURL() + '/o/rest/v2/vgca/fileupload',
+            "SessionId": "",
+            "Files": fileArr
+          }
+          console.log('paramsInput', paramsInput)
+          let json_prms = JSON.stringify(paramsInput)
+          vgca_sign_files(json_prms, signFileCallBack)
+        } else {
+          toastr.error('Chưa có giấy tờ nào được chọn')
+        }
       },
       addFileToDossier () {
         let vm = this

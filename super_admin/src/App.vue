@@ -9,7 +9,7 @@
 
 <script>
   import GoTop from '@inotom/vue-go-top'
-
+  import axios from 'axios'
   export default {
     data: () => ({}),
     components: {
@@ -22,6 +22,15 @@
       drawer () {
         return this.$store.getters.drawer
       }
+    },
+    created () {
+      let vm = this
+      axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
+        let userData = response.data
+        vm.$store.commit('setUserLogin', userData)
+      })
+      .catch(function(error) {
+      })
     }
   }
 </script>

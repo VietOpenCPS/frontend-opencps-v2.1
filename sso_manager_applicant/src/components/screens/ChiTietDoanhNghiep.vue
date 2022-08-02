@@ -19,6 +19,16 @@
                           <span>Quay lại</span>
                       </v-btn>
                       <v-btn
+                          class="mx-0 mr-2"
+                          small
+                          color="primary"
+                          @click="checkCsdlDoanhNghiep()"
+                          :loading="loadingSearchLgsp" :disabled="loadingSearchLgsp"
+                      >
+                          <v-icon size="18">check</v-icon>&nbsp;
+                          <span>Kiểm tra thông tin CSDL doanh nghiệp</span>
+                      </v-btn>
+                      <v-btn
                           class="mx-0"
                           small
                           color="primary"
@@ -46,6 +56,7 @@
                         do_disturb
                       </v-icon>
                       <span class="ml-2" style="color: #D32F2F; text-transform: uppercase;font-weight: bold;">{{thongTinCongDan['trangThaiDuLieu']['tenMuc']}}</span>
+                      <span class="ml-2" style="color: #D32F2F;">(Lý do: {{thongTinCongDan['activityNote']}})</span>
                     </div>
                     <table :dense="true" class="cong-dan-info"  style="border-bottom: thin solid rgba(0, 0, 0, 0.12);">
                         <tbody>
@@ -90,7 +101,7 @@
                 border-bottom-right-radius: 5px;
                 border-top: none;">
                     <div class="" style="text-align: center;">
-                        <img class="mb-4" style="width: 226px; height: 226px;" src="/o/hau-giang-theme/images/avt.png">
+                        <img class="mb-4" style="width: 226px; height: 226px;" src="/o/hau-giang-theme/images/avt.png?t=98312312323">
                         <h4 class="title-page" style="font-size: 16px;font-weight: bold;color: #903938">{{thongTinCongDan['tenGoi']}}</h4>
                         <v-layout class="mt-4" wrap style="width: 350px;">
                             <v-flex xs5>Mã tổ chức, doanh nghiệp:</v-flex>
@@ -115,7 +126,8 @@
                              color="primary" small class="mt-3 mx-3 text-white" @click="showChangePass()">
                               Đổi mật khẩu
                             </v-btn>
-                            <v-btn color="primary" v-if="!thongTinCongDan['danhTinhDienTu'][0]" small class="mt-3 mx-3 text-white" @click="showCreateAcc()">
+                            <v-btn color="primary" v-if="!thongTinCongDan['danhTinhDienTu'][0]" small class="mt-3 mx-3 text-white" 
+                            @click="showCreateAcc()" :loading="loadingSearchLgsp" :disabled="loadingSearchLgsp">
                                 Tạo tài khoản
                             </v-btn>
                             <v-btn v-if="thongTinCongDan['danhTinhDienTu'][0] && thongTinCongDan['danhTinhDienTu'][0]['tinhTrangSuDungTaiKhoan']['maMuc'] == 1" color="primary" small class="mt-3 mx-3 text-white" @click="showChangeStatusAcc('active')">
@@ -238,7 +250,7 @@
                   <v-layout wrap>
                     <v-flex xs12 class="mb-2">
                       <div class="text-label mb-2">
-                        <span>Mật khẩu mới</span>
+                        <span>Mật khẩu mới (Ít nhất 8 ký tự, gồm chữ và số)</span>
                         <span class="red--text"> (*)</span>
                       </div>
                       <v-text-field
@@ -246,7 +258,7 @@
                         v-model="passwordChange"
                         solo
                         dense
-                        :rules="required"
+                        :rules="requiredPassword"
                         required
                         hide-details="auto"
                       ></v-text-field>
@@ -524,6 +536,69 @@
           </v-card>
         </v-dialog>
 
+        <v-dialog v-model="dialog_searchLgsp" scrollable persistent max-width="700px">
+          <v-card>
+            <v-toolbar dark color="primary">
+              <v-toolbar-title>Thông tin trên CSDL quốc gia về doanh nghiệp</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-btn icon dark @click.native="dialog_searchLgsp = false">
+                <v-icon>close</v-icon>
+              </v-btn>
+            </v-toolbar>
+            <v-card-text class="py-1">
+              <div>
+                <table v-if="applicantLgspInfomation" class="datatable table my-3" style="border-top: 1px solid #dedede;">
+                  <tbody>
+                    <tr>
+                      <td width="200" class="pt-2"><span class="text-bold">Tên doanh nghiệp</span></td>
+                      <td class="pt-2"><span>{{applicantLgspInfomation.NAME}}</span></td>
+                    </tr>
+                    <tr>
+                      <td width="200" class="pt-2"><span class="text-bold">Mã số thuế</span></td>
+                      <td class="pt-2"><span>{{applicantLgspInfomation.ENTERPRISE_GDT_CODE}}</span></td>
+                    </tr>
+                    <tr>
+                      <td width="200" class="pt-2"><span class="text-bold">Người đại diện</span></td>
+                      <td class="pt-2"><span>{{applicantLgspInfomation.FULL_NAME}}</span></td>
+                    </tr>
+                    <tr>
+                      <td width="200" class="pt-2"><span class="text-bold">Địa chỉ</span></td>
+                      <td class="pt-2"><span>{{applicantLgspInfomation.AddressFullText}}</span></td>
+                    </tr>
+                    <tr>
+                      <td width="200" class="pt-2"><span class="text-bold">Ngày thành lập</span></td>
+                      <td class="pt-2"><span>{{dateLocale(applicantLgspInfomation.FOUNDING_DATE)}}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="pt-2"><span class="text-bold">Loại hình doanh nghiệp</span></td>
+                      <td class="pt-2"><span v-html="applicantLgspInfomation.ENTERPRISE_TYPE_NAME"></span></td>
+                    </tr>
+                    <tr>
+                      <td class="pt-2"><span class="text-bold">Tình trạng hoạt động</span></td>
+                      <td class="pt-2"><span>{{applicantLgspInfomation.ENTERPRISE_STATUS_NAME}}</span></td>
+                    </tr>
+                    
+                  </tbody>
+                </table>
+                <div v-else class="mx-1 flex my-4">
+                  <v-alert outline color="red" icon="warning" :value="true">
+                    Không có thông tin trên CSDL quốc gia về doanh nghiệp
+                  </v-alert>
+                </div>
+                <v-flex xs12 class="text-right my-2">
+                  <v-btn color="primary"
+                    @click="dialog_searchLgsp = false"
+                    class="mx-0 my-0 white--text"
+                  >
+                    <v-icon size="20" class="white--text">clear</v-icon>
+                    &nbsp;
+                    Đóng
+                  </v-btn>
+                </v-flex>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -657,6 +732,16 @@ export default {
         required: [
         v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc'
         ],
+        requiredPassword: [
+           (value) => {
+            const pattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
+            if (value) {
+              return pattern.test(value) || 'Mật khẩu ít nhất 8 ký tự, có chữ và số'
+            } else {
+              return 'Mật khẩu là bắt buộc'
+            }
+          }
+        ],
         validFormActionAccount: true,
         dialogNoteAction: false,
         titleAction: '',
@@ -708,7 +793,10 @@ export default {
         logChange: '',
         validFormChangeLog: true,
         dialogPrint: false,
-        contentPrint: ''
+        contentPrint: '',
+        loadingSearchLgsp: false,
+        dialog_searchLgsp: false,
+        applicantLgspInfomation: '',
       }
     },
     watch: {
@@ -748,10 +836,82 @@ export default {
           vm.loadingData = false
         })
       },
-      showCreateAcc () {
+      checkCsdlDoanhNghiep () {
         let vm = this
-        vm.passwordCreate = ''
-        vm.dialogCreateAcc = true
+        let filter = {
+          applicantIdNo: String(vm.thongTinCongDan.maSoDoanhNghiep).trim()
+        }
+        vm.loadingSearchLgsp = true
+        vm.$store.dispatch('searchLgspDoanhNghiep', filter).then(result => {
+          vm.dialog_searchLgsp = true
+          vm.loadingSearchLgsp = false
+          vm.applicantLgspInfomation = result
+        }).catch(function (result) {
+          vm.dialog_searchLgsp = true
+          vm.applicantLgspInfomation = ''
+          vm.loadingSearchLgsp = false
+        })
+      },
+      showCreateAcc () {
+        let vm = this;
+        let createFnc = function () {
+          var characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+          var alpha = "abcdefghijklmnopqrstuvwxyz";
+          var numbers = "0123456789";
+          var symbols = "@$!%*#?&";
+          var allChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+
+          var result = '';
+          result += characters.charAt(Math.floor(Math.random() * characters.length));
+          result += alpha.charAt(Math.floor(Math.random() * alpha.length));
+          result += numbers.charAt(Math.floor(Math.random() * numbers.length));
+          result += symbols.charAt(Math.floor(Math.random() * symbols.length));
+          for (let index = 0; index < 4; index++) {
+            result += allChar.charAt(Math.floor(Math.random() * allChar.length));
+          }
+          result = result.split('').sort(function(){return 0.5-Math.random()}).join('')
+          vm.passwordCreate = vm.thongTinCongDan['danhBaLienLac']['soDienThoai'] ? String(vm.thongTinCongDan['danhBaLienLac']['soDienThoai']).trim() : result
+          vm.dialogCreateAcc = true
+        }
+        vm.loadingSearchLgsp = true
+        let filter = {
+          applicantIdNo: String(vm.thongTinCongDan.maSoDoanhNghiep).trim()
+        }
+        vm.$store.dispatch('searchLgspDoanhNghiep', filter).then(result => {
+          vm.loadingSearchLgsp = false
+          if (result == '') {
+              vm.$confirm({
+              title: 'Thông tin doanh nghiệp không có trên CSDL Quốc gia về doanh nghiệp',
+              message: 'Bạn có tiếp tục tạo tài khoản?',
+              button: {
+                yes: 'Có',
+                no: 'Không'
+              },
+              callback: confirm => {
+                if (confirm == true) {
+                  createFnc()
+                }
+              }
+            })
+          } else {
+            createFnc()
+          }
+        }).catch(function () {
+          vm.loadingSearchLgsp = false
+          vm.$confirm({
+            title: 'Thông tin doanh nghiệp không có trên CSDL Quốc gia về doanh nghiệp',
+            message: 'Bạn có tiếp tục tạo tài khoản?',
+            button: {
+              yes: 'Có',
+              no: 'Không'
+            },
+            callback: confirm => {
+              if (confirm == true) {
+                createFnc()
+              }
+            }
+          })
+        })
       },
       createAccount () {
         let vm = this
@@ -825,7 +985,7 @@ export default {
           toastr.error('Khóa tài khoản không thành công')
         })
       },
-      unBlockAccount () {
+      unLockAccount () {
         let vm = this
         let filter = {
           data: {

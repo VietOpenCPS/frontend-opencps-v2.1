@@ -115,7 +115,8 @@
                 </v-layout>
                 
                 <v-flex class="xs12 mx-2">
-                  <v-btn :loading="loadingTable" :style="loadingTable ? 'pointer-events: none' : ''" class="mx-0 mb-0" color="blue darken-3" dark @click.native="getServiceInfoList('reset')">
+                  <v-btn :loading="loadingTable" :style="loadingTable ? 'pointer-events: none' : ''"
+                     class="mx-0 mb-0" color="blue darken-3" dark @click.native="getServiceInfoList('reset')">
                     <v-icon size="18">search</v-icon> &nbsp; Tìm kiếm
                   </v-btn>
                   <v-btn color="blue darken-3 right" dark
@@ -212,7 +213,7 @@
                             <span>{{props.item.maxLevel}}</span>
                         </div>
                     </td>
-                    <td class="text-xs-center px-2 py-2" style="width:180px;height:36px;border-right: 1px solid #dedede">
+                    <td class="text-xs-center px-2 py-2" style="width:220px;height:36px;border-right: 1px solid #dedede">
                         <content-placeholders v-if="loadingTable">
                             <content-placeholders-text :lines="1" />
                         </content-placeholders>
@@ -222,6 +223,12 @@
                                     <v-icon>sync</v-icon>
                                 </v-btn>
                                 <span>Đồng bộ sang Cổng dịch vụ công</span>
+                            </v-tooltip>
+                            <v-tooltip v-if="agencyListManager" top class="mx-2">
+                                <v-btn :disabled="loading" @click="showCloneDonVi(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
+                                    <v-icon>input</v-icon>
+                                </v-btn>
+                                <span>Đồng bộ sang đơn vị khác</span>
                             </v-tooltip>
                             <v-tooltip top class="mx-2">
                                 <v-btn :disabled="loading" @click="editServiceinfo(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
@@ -251,7 +258,52 @@
         </div>
       </div>
     </v-card>
-    
+    <v-dialog v-model="dialog_cloneServiceinfo" scrollable persistent max-width="700px">
+      <v-card>
+        <v-card-title class="headline pb-2">
+          <span>Đồng bộ thủ tục: {{oldServiceName}}</span>
+        </v-card-title>
+        <v-card-text class="pt-3">
+          <v-form ref="formCloneServiceProcess" v-model="validForm" lazy-validation>
+            <v-layout wrap class="py-1 align-center row-list-style">
+              <v-flex xs12 class="my-2">
+                <div>
+                  <div class="my-2">Đồng bộ đến đơn vị:</div>
+                  <v-autocomplete
+                    placeholder="Chọn đơn vị"
+                    :items="agencyListManager"
+                    v-model="toAgency"
+                    item-text="text"
+                    item-value="value"
+                    hide-details
+                    hide-no-data
+                    return-object
+                    box
+                    :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                    :required="true"
+                  ></v-autocomplete>
+                </div>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+        <v-card-actions class="px-3">
+          <v-spacer></v-spacer>
+          <v-btn color="red darken-3" class="mr-0" dark v-on:click="dialog_cloneServiceinfo = false">
+            <v-icon class="white--text">clear</v-icon>&nbsp;
+            Hủy
+          </v-btn>
+          <v-btn color="blue darken-3" dark
+            :loading="loading"
+            :disabled="loading"
+            @click="cloneThuTucSangDonVi"
+          >
+            <v-icon>save</v-icon>&nbsp;
+            <span>Đồng bộ</span>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -269,6 +321,11 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    dialog_cloneServiceinfo: false,
+    oldServiceName: '',
+    validForm: false,
+    toAgency: '',
+    serviceInfoSelect: '',
 		showMaDvcqg: false,
     exportExcel: false,
     exportLoading: false,
@@ -398,7 +455,15 @@ export default {
     ]
   }),
   computed: {
-    
+    agencyListManager() {
+      return this.$store.getters.getAgencyListManager
+    },
+    agencyManager () {
+      return this.$store.getters.agencyManager
+    },
+    agencyCurrentSite () {
+      return this.$store.getters.getCurrentSite
+    }
   },
   created() {
     let vm = this
@@ -459,14 +524,60 @@ export default {
       if (val && vm.isDvc) {
         vm.getDomains(val)
       }
-    }
+    },
+    '$route': function (newRoute, oldRoute) {
+      let vm = this
+      let currentQuery = newRoute.query
+      let dataPost = new URLSearchParams()
+      let textPost = {
+        'type': 'admin',
+        'cmd': 'get',
+        'config': 'true',
+        'code': 'opencps_serviceinfo',
+        'respone': 'tableConfig'
+      }
+      dataPost.append('text', JSON.stringify(textPost))
+      axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+        let dataObj = response.data.hasOwnProperty('tableConfig') ? response.data['tableConfig'] : ''
+        if (dataObj && dataObj['detailColumns']) {
+          try {
+            let detailColumns = JSON.parse(dataObj['detailColumns'])
+            for (let i=0; i<detailColumns.length; i++){
+              if (detailColumns[i]['showMaDvcqg']) {
+                vm.showMaDvcqg = true
+                vm.serviceInfoListHeader.splice(2, 0, {
+                  text: 'Mã trên DVCQG',
+                  align: 'center',
+                  sortable: false
+                })
+              }
+              if (detailColumns[i]['exportExcel']){
+                vm.exportExcel = true
+              }
+            }
+          } catch (err) {
+          }
+        }
+        if (vm.isDvc) {
+          vm.getAdministration()
+        }
+        vm.getServiceInfoList()
+        vm.getDomains()
+      }).catch(function () {
+        if (vm.isDvc) {
+          vm.getAdministration()
+        }
+        vm.getServiceInfoList()
+        vm.getDomains()
+      })
+    },
   },
   methods: {
     exportTableData() {
       let vm = this
       let options = {
         headers: {
-          'groupId': window.themeDisplay.getScopeGroupId(),
+          'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
           'Token': window.Liferay !== undefined ? window.Liferay.authToken : '',
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json'
@@ -568,9 +679,10 @@ export default {
         vm.serviceinfoPage = 1
       }
       vm.loadingTable = true
+      let groupIdSite = vm.$store.getters.groupIdAgencyManager
       let param = {
         headers: {
-          groupId: window.themeDisplay.getScopeGroupId()
+          'groupId': groupIdSite ? groupIdSite : window.themeDisplay.getScopeGroupId(),
         },
         params: {
           start: vm.serviceinfoPage * vm.numberPerPage - vm.numberPerPage,
@@ -624,7 +736,7 @@ export default {
           if (confirm == true) {
             let param = {
               headers: {
-                groupId: window.themeDisplay.getScopeGroupId()
+                'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
               }
             }
 
@@ -637,6 +749,12 @@ export default {
           }
         }
       })
+    },
+    showCloneDonVi (item) {
+      let vm = this
+      vm.dialog_cloneServiceinfo = true
+      vm.serviceInfoSelect = item
+      vm.oldServiceName = item.serviceName
     },
     cloneThuTuc (item) {
       let vm = this
@@ -652,7 +770,7 @@ export default {
             vm.loading = true
             let options = {
               headers: {
-                'groupId': window.themeDisplay.getScopeGroupId(),
+                'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
                 'Accept': 'application/json',
                 'Content-Type': "application/x-www-form-urlencoded",
                 'Token': window.Liferay !== undefined ? window.Liferay.authToken : ''
@@ -661,9 +779,15 @@ export default {
             let dataPostdossier = new URLSearchParams()
             dataPostdossier.append('type', 'serviceInfo')
             dataPostdossier.append('serviceCode', item.serviceCode)
-            dataPostdossier.append('fromServerNo', "")
+            if (vm.agencyManager) {
+              dataPostdossier.append('fromServerNo', vm.agencyManager['serveNo'])
+            } else if (vm.agencyCurrentSite) {
+              dataPostdossier.append('fromServerNo', vm.agencyCurrentSite['serveNo'])
+            } else {
+              dataPostdossier.append('fromServerNo', "")
+            }
             dataPostdossier.append('toServerNo', "SERVER_DVC")
-            axios.post('/o/rest/v2/backupDatas/exportProcess', dataPostdossier, options).then(function (response) {
+            axios.post('/o/rest/v2/backupDatas/syncMasterDataDVC', dataPostdossier, options).then(function (response) {
               vm.loading = false
               toastr.success('Thủ tục đã được đồng bộ sang cổng Dịch vụ công')
             }).catch(function () {
@@ -673,6 +797,52 @@ export default {
           }
         }
       })
+    },
+    cloneThuTucSangDonVi () {
+      let vm = this
+      if (vm.$refs.formCloneServiceProcess.validate()) {
+        vm.$confirm({
+          title: 'ĐỒNG BỘ THỦ TỤC HÀNH CHÍNH',
+          message: 'Bạn có chắc chắn đồng bộ thủ tục này',
+          button: {
+            yes: 'Có',
+            no: 'Không'
+          },
+          callback: confirm => {
+            if (confirm == true) {
+              vm.loading = true
+              let options = {
+                headers: {
+                  'groupId': vm.$store.getters.groupIdAgencyManager ? vm.$store.getters.groupIdAgencyManager : window.themeDisplay.getScopeGroupId(),
+                  'Accept': 'application/json',
+                  'Content-Type': "application/x-www-form-urlencoded",
+                  'Token': window.Liferay !== undefined ? window.Liferay.authToken : ''
+                }
+              }
+              let dataPostdossier = new URLSearchParams()
+              dataPostdossier.append('type', 'serviceInfo')
+              dataPostdossier.append('serviceCode', vm.serviceInfoSelect.serviceCode)
+              if (vm.agencyManager) {
+                dataPostdossier.append('fromServerNo', vm.agencyManager['serveNo'])
+              } else if (vm.agencyCurrentSite) {
+                dataPostdossier.append('fromServerNo', vm.agencyCurrentSite['serveNo'])
+              } else {
+                dataPostdossier.append('fromServerNo', "")
+              }
+              dataPostdossier.append('toServerNo', vm.toAgency['serveNo'])
+              axios.post('/o/rest/v2/backupDatas/syncMasterDataMC', dataPostdossier, options).then(function (response) {
+                vm.loading = false
+                vm.dialog_cloneServiceinfo = false
+                toastr.success('Thủ tục đã được đồng bộ')
+              }).catch(function () {
+                vm.loading = false
+                toastr.error('Đồng bộ thất bại')
+              })
+            }
+          }
+        })
+      }
+      
     },
     updateServiceProcessOption (item) {
       let vm = this

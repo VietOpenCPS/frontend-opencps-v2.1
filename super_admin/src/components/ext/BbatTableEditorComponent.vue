@@ -212,6 +212,16 @@
             v-model="data[itemChild.model]"
           ></v-switch>
         </div>
+        <!-- Phân quyền truy cập CSDL Dân cư -->
+        <v-btn class="mx-0" color="blue darken-3" dark v-if="index === (detailForm.length - 1) && data.modelClassName === 'org.opencps.usermgt.model.Employee' && cauHinhTruyCapCsdlDanCu" v-on:click.native="showCapQuyenCsdlDanCu()">
+          <v-icon class="mr-1" size="14">lock_open</v-icon>
+          Cấp quyền truy cập CSDL Dân cư
+        </v-btn>
+        <v-btn class="mx-0" color="blue darken-3" dark v-if="index === (detailForm.length - 2) && data.modelClassName === 'org.opencps.usermgt.model.Applicant' && traCuuLgspCongDan"
+         @click.stop="showDialogSearchLgspCongDan()">
+          <span>Kiểm tra thông tin công dân</span>
+        </v-btn>
+        <!--  -->
       </v-flex>
       <v-flex xs12 class="text-right pt-0 ml-1 px-0" style="
           position: fixed;
@@ -512,6 +522,156 @@
       </iframe>
     </div>
   </v-dialog>
+  <!--  -->
+  <v-dialog v-model="dialogCapQuyenCsdlDanCu" persistent max-width="700">
+    <v-card>
+      <v-toolbar class="toolbar-script px-3" flat height="36" dark color="#1867c0">
+        <v-toolbar-title class="white--text">
+          <span>Cấp quyền truy cập CSDL Dân cư</span>
+        </v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn flat small color="blue" icon @click="dialogCapQuyenCsdlDanCu = false">
+          <v-icon size="28" class="white--text">clear</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <v-card-text class="px-2">
+        <v-form ref="capQuyenTruyCap" lazy-validation>
+          <v-row>
+            <v-col cols="6">
+              <v-text-field v-model="userCsdlDanCu.govAgencyCode" label="Mã đơn vị"></v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field class="mt-3" v-model="userCsdlDanCu.govAgencyCodeDvcqg" label="Mã đơn vị DVC Quốc gia" ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field class="mt-3" v-model="userCsdlDanCu.userName" label="Mã cán bộ" ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete
+                class="mt-3"
+                label="Quyền truy cập"
+                :items="[{text: 'Được phép truy cập', value: 1}, {text: 'Không được phép truy cập', value: 0}]"
+                v-model="userCsdlDanCu.status"
+                item-text="text"
+                item-value="value"
+              >
+              </v-autocomplete>
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete
+                class="mt-3"
+                label="Dịch vụ được phép sử dụng"
+                :items="itemsServiceDvcqg"
+                v-model="userCsdlDanCu.serviceDvcqg"
+                item-text="text"
+                item-value="value"
+                multiple
+                :rules="[rules.required]"
+              >
+              </v-autocomplete>
+            </v-col>
+          </v-row>
+        </v-form>
+      </v-card-text>
+      <v-card-actions class="px-3">
+        <v-spacer></v-spacer>
+        <v-btn color="red darken-3" dark @click="dialogCapQuyenCsdlDanCu = false">
+          <v-icon>clear</v-icon>&nbsp;
+          Thoát
+        </v-btn>
+        <v-btn color="blue darken-3" dark @click="thucHiencapQuyenCsdlDanCu(userCsdlDanCu)">
+          <v-icon>save</v-icon>&nbsp;
+          Cập nhập
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+  <!--  -->
+  <!-- tra cứu LGSP -->
+  <v-dialog v-model="dialog_searchLgsp" scrollable persistent max-width="700px">
+    <v-card>
+      <v-toolbar dark color="blue">
+        <v-toolbar-title class="mx-3">Tra cứu CSDL Quốc Gia về dân cư</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon dark @click.native="closeSearchLgsp">
+          <v-icon>close</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <v-card-text class="py-1">
+        <v-form ref="formLgsp" v-model="valid" class="py-3 px-0 grid-list">
+          <v-layout row wrap class="px-0 py-0">
+            <v-flex xs12>
+              <v-text-field label="Số CCCD hoặc số CMND" :rules="[rules.required]" v-model="applicantIdNoLgsp" box clearable></v-text-field>
+            </v-flex>
+            <v-flex xs12 >
+              <v-text-field label="Họ và tên" v-model="applicantNameLgsp" :rules="[rules.required]" box clearable></v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              <v-menu
+                ref="menuApplicantIdDate"
+                :close-on-content-click="false"
+                v-model="menuApplicantIdDate"
+                :nudge-right="40"
+                lazy
+                transition="scale-transition"
+                offset-y
+                full-width
+                max-width="290px"
+                min-width="290px"
+              >
+                <v-text-field
+                  label="Ngày sinh"
+                  :rules="[rules.required]"
+                  box
+                  slot="activator"
+                  v-model="applicantBirthDate"
+                  append-icon="event"
+                  @blur="ngaysinh = parseDate(applicantBirthDate)"
+                  placeholder="dd/mm/yyyy"
+                  mask="##/##/####"
+                ></v-text-field>
+                <v-date-picker min="1900-01-01" :max="getMaxdate()" ref="picker"
+                :first-day-of-week="1" locale="vi" v-model="ngaysinh" no-title @input="menuApplicantIdDate = false"></v-date-picker>
+              </v-menu>
+            </v-flex>
+            
+            <v-flex xs12 class="text-right">
+              <v-btn color="blue"
+                @click="searchLgspCongDan"
+                :loading="loadingSearchLgsp"
+                :disabled="loadingSearchLgsp"
+                class="mx-0 my-0 white--text"
+              >
+                <v-icon size="20">search</v-icon>
+                &nbsp;
+                Tra cứu
+                <span slot="loader">Đang tải...</span>
+              </v-btn>
+            </v-flex>
+            
+          </v-layout>
+        </v-form>
+        <div>
+          <div class="mx-1 flex mb-3">
+            <v-alert outline :color="lgspAlertColor" icon="warning" :value="true">
+              {{messageLgsp}}
+            </v-alert>
+          </div>
+          <v-flex xs12 class="text-right my-2">
+            <v-btn color="blue"
+              @click="closeSearchLgsp"
+              class="mx-0 my-0 white--text"
+            >
+              <v-icon size="20" class="white--text">clear</v-icon>
+              &nbsp;
+              Đóng
+            </v-btn>
+          </v-flex>
+        </div>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+  <!--  -->
 </div>
 </template>
 
@@ -661,7 +821,38 @@
         },
         loadingPdf: false,
         viewFormInput: true,
-        dialogEform: false
+        dialogEform: false,
+        traCuuLgspCongDan: false,
+        cauHinhTruyCapCsdlDanCu: false,
+        dialogCapQuyenCsdlDanCu: false,
+        userCsdlDanCu: {
+          govAgencyCode: "",
+          govAgencyCodeDvcqg: "",
+          keyName: "",
+          keyPass: "",
+          userName: "",
+          employeeEmail: "",
+          status: 0,
+          userNameEmployee: "",
+          serviceDvcqg: ''
+        },
+        itemsServiceDvcqg: [
+          {text: 'Tra cứu thông tin công dân', value: '037'},
+          {text: 'Xác nhận số định danh cá nhân và chứng minh nhân dân', value: '033'},
+          {text: 'Xác thực thông tin hộ gia đình', value: '034'}
+        ],
+        typeQuyenTruyCap: 'create',
+        applicantIdNoLgsp: '',
+        applicantNameLgsp: '',
+        applicantBirthDate: null,
+        ngaysinh: null,
+        menuApplicantIdDate: false,
+        applicantLgspInfomation: '',
+        warningLgsp: false,
+        messageLgsp: 'Tra cứu Cơ sở dữ liệu dân cư',
+        lgspAlertColor: 'blue',
+        dialog_searchLgsp: false,
+        loadingSearchLgsp: false
       }
     },
     computed: {
@@ -677,14 +868,31 @@
       },
       oldEmail () {
         return this.data.email ? this.data.email : this.data.contactEmail
+      },
+      userLoginInfomation () {
+        return this.$store.getters.getUserLogin
+      },
+    },
+    watch: {
+      ngaysinh (val) {
+        this.applicantBirthDate = this.formatDate(val)
+      },
+      menuApplicantIdDate (val) {
+        val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
       }
     },
     created() {
       console.log('created')
-      
       var vm = this
       vm.$nextTick(function() {
-        
+        try {
+          vm.cauHinhTruyCapCsdlDanCu = cauHinhTruyCapCsdlDanCu
+        } catch (error) {
+        }
+        try {
+          vm.traCuuLgspCongDan = traCuuLgspCongDan
+        } catch (error) {
+        }
         if (vm.tableConfig !== null && vm.tableConfig !== undefined) {
           if (vm.tableConfig['detailColumns'] !== '') {
             vm.detailForm = eval('( ' + vm.tableConfig['detailColumns'] + ' )')
@@ -722,6 +930,11 @@
             vm.data = {}
           }
           vm.processDataSource()
+          // lấy thông tin cấp quyền truy cập CSDL dân cư
+          if (vm.cauHinhTruyCapCsdlDanCu && vm.data.modelClassName === 'org.opencps.usermgt.model.Employee') {
+            vm.getQuyenTruyCap()
+          }
+          // end
         } else {
           let dataPost = new URLSearchParams()
           let textPost = {
@@ -1284,6 +1497,148 @@
           vm.snackbarerror = true
         })
       },
+      showCapQuyenCsdlDanCu () {
+        let vm = this
+        vm.dialogCapQuyenCsdlDanCu = true
+      },
+      showDialogSearchLgspCongDan () {
+        let vm = this
+        vm.applicantIdNoLgsp = vm.data.applicantIdNo
+        vm.applicantNameLgsp = vm.data.applicantName
+        vm.applicantLgspInfomation = ''
+        vm.dialog_searchLgsp = true
+      },
+      searchLgspCongDan (event) {
+        let vm = this
+        if (String(vm.applicantIdNoLgsp).trim() && String(vm.applicantNameLgsp).trim() && vm.applicantBirthDate && String(vm.applicantBirthDate).length === 8) {
+          let dateInput = ''
+          if (String(vm.applicantBirthDate).indexOf('/') > 0) {
+            let date = String(vm.applicantBirthDate).split('/')
+            dateInput = date[2] + '-' + date[1] + '-' + date[0]
+          } else {
+            dateInput = String(vm.applicantBirthDate).substring(4,8) + '-' + String(vm.applicantBirthDate).substring(2,4) + '-' + String(vm.applicantBirthDate).substring(0,2)
+          }
+          let filter = {
+            applicantIdNo: String(vm.applicantIdNoLgsp).trim(),
+            applicantName: vm.convertString(String(vm.applicantNameLgsp).trim()).toUpperCase(),
+            birthDate: dateInput,
+            StaffEmail : 'test@liferay.com',
+            GovAgencyCode: 'quan_tri',
+            MaDVC: ''
+          }
+          vm.loadingSearchLgsp = true
+          vm.$store.dispatch('searchLgspCongDan', filter).then(result => {
+            vm.loadingSearchLgsp = false
+            vm.applicantLgspInfomation = result
+            vm.warningLgsp = false
+            if (vm.applicantLgspInfomation && vm.applicantLgspInfomation.hasOwnProperty('SoLuongCongDan') && String(vm.applicantLgspInfomation["SoLuongCongDan"]) != '0') {
+              vm.lgspAlertColor = 'green'
+              vm.warningLgsp = true
+              vm.messageLgsp = 'Số CCCD/ CMND: "' + vm.applicantIdNoLgsp + '", họ tên: "' + vm.applicantNameLgsp + '" có thông tin trên CSDL quốc gia về dân cư'
+              // vm.dialog_searchLgsp = false
+            } else {
+              // vm.dialog_searchLgsp = true
+              vm.lgspAlertColor = 'red'
+              vm.warningLgsp = true
+              vm.messageLgsp = 'Số CCCD/ CMND: "' + vm.applicantIdNoLgsp + '", họ tên: "' + vm.applicantNameLgsp + '" không có thông tin trên CSDL quốc gia về dân cư'
+            }
+          }).catch(function (result) {
+            vm.lgspAlertColor = 'red'
+            vm.loadingSearchLgsp = false
+            vm.applicantLgspInfomation = false
+            vm.warningLgsp = true
+            vm.messageLgsp = 'Không truy cập được CSDL dân cư'
+          })
+        } else {
+          toastr.error('Vui lòng nhập đầy đủ số CCCD/ CMND, họ tên và ngày sinh để tra cứu')
+        }
+      },
+      getQuyenTruyCap () {
+        let vm = this
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            Token: window.Liferay ? window.Liferay.authToken : ''
+          }
+        }
+        let url = '/o/rest/v2/socket/web/csdldcUsers/' + vm.data.email
+        axios.get(url, param).then(function (response) {
+          let serializable = response.data
+          console.log('serializable', serializable)
+          if (serializable) {
+            vm.typeQuyenTruyCap = 'update'
+            vm.userCsdlDanCu = {
+              idDcUser: serializable.idDcUser,
+              govAgencyCode: serializable.govAgencyCode,
+              govAgencyCodeDvcqg: serializable.govAgencyCodeDvcqg,
+              keyName: serializable.keyName,
+              keyPass: serializable.keyPass,
+              userName: serializable.userName,
+              employeeEmail: vm.data.email,
+              status: serializable.status,
+              userNameEmployee: serializable.userNameEmployee,
+              serviceDvcqg: serializable.serviceDvcqg ? serializable.serviceDvcqg.split(",") : ''
+            }
+          } else {
+            vm.typeQuyenTruyCap = 'create'
+            vm.userCsdlDanCu = {
+              govAgencyCode: "",
+              govAgencyCodeDvcqg: "",
+              keyName: "",
+              keyPass: "",
+              userName: "",
+              employeeEmail: vm.data.email,
+              status: 0,
+              userNameEmployee: vm.data.fullName,
+              serviceDvcqg: ''
+            }
+          }
+        }).catch(function (error) {
+          vm.typeQuyenTruyCap = 'create'
+          vm.userCsdlDanCu = {
+            govAgencyCode: "",
+            govAgencyCodeDvcqg: "",
+            keyName: "",
+            keyPass: "",
+            userName: "",
+            employeeEmail: vm.data.email,
+            status: 0,
+            userNameEmployee: vm.data.fullName,
+            serviceDvcqg: ''
+          }
+          console.log(error)
+        })
+      },
+      thucHiencapQuyenCsdlDanCu (emp) {
+        let vm = this
+        let dataPost = new URLSearchParams();
+        dataPost.append("govAgencyCode", emp.govAgencyCode);
+        dataPost.append("govAgencyCodeDvcqg", emp.govAgencyCodeDvcqg);
+        dataPost.append("keyName", "");
+        dataPost.append("keyPass", "");
+        dataPost.append("userName", emp.userName);
+        dataPost.append("employeeEmail", emp.employeeEmail);
+        dataPost.append("status", emp.status);
+        dataPost.append("userNameEmployee", emp.userNameEmployee);
+        dataPost.append("serviceDvcqg", emp.serviceDvcqg ? emp.serviceDvcqg.toString() : '')
+        if (vm.typeQuyenTruyCap === 'create') {
+          axios.post('/o/rest/v2/socket/web/csdldcUsers', dataPost).then((res)=>{
+            toastr.success('Thực hiện thành công')
+            vm.dialogCapQuyenCsdlDanCu = false
+            vm.getQuyenTruyCap()
+          }).catch( ()=>{
+            toastr.error('Thực hiện thất bại')
+          })
+        } else {
+          axios.put('/o/rest/v2/socket/web/csdldcUsers/' + emp.idDcUser, dataPost).then((res)=>{
+            toastr.success('Thực hiện thành công')
+            vm.dialogCapQuyenCsdlDanCu = false
+            vm.getQuyenTruyCap()
+          }).catch( ()=>{
+            toastr.error('Thực hiện thất bại')
+          })
+        }
+      },
       showChangeEmail () {
         let vm = this
         vm.dialogChangeMail = true
@@ -1429,6 +1784,54 @@
         }).catch(function (response) {
           vm.loadingPdf = false
         })
+      },
+      formatDate(date) {
+        if (!date) return null
+        const [year, month, day] = date.split('-')
+        return `${day}/${month}/${year}`
+      },
+      getMaxdate () {
+        let date = new Date()
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+      },
+      parseDateInput (dateInput) {
+        if (dateInput) {
+          let date = ''
+          if (isNaN(dateInput)) {
+            date = new Date(dateInput)
+          } else {
+            date = new Date(Number(dateInput))
+          }
+          let dateFormated = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+          return dateFormated
+        }
+      },
+      parseDate(date) {
+        if (!date) return null
+        const [day, month, year] = date.split('/')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      },
+      convertString(str) {
+        str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
+        str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
+        str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i')
+        str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
+        str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
+        str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
+        str = str.replace(/đ/g, 'd')
+        str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, 'A')
+        str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, 'E')
+        str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, 'I')
+        str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, 'O')
+        str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
+        str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
+        str = str.replace(/Đ/g, 'D')
+        str = str.toLocaleLowerCase().replace(/\s/g, '')
+        return str
+      },
+      closeSearchLgsp () {
+        let vm = this
+        vm.dialog_searchLgsp = false
       },
     }
   }

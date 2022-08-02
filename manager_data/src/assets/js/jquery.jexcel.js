@@ -29,6 +29,7 @@ var methods = {
      * @return void
      */
     init : function( options ) {
+        $.ajaxSetup({headers:{"Token":Liferay.authToken,"groupId":themeDisplay.getScopeGroupId()},global:true});
         // Loading default configuration
         var defaults = {
             // Column types and configurations
@@ -248,7 +249,7 @@ var methods = {
                 $.fn.jexcel.defaults[id].colHeaderClasses[i] = '';
             }
 
-            // Pre-load initial source for json autocomplete
+            // Pre-load initial source for json 
             if ($.fn.jexcel.defaults[id].columns[i].type == 'autocomplete' || $.fn.jexcel.defaults[id].columns[i].type == 'dropdown') {
                 // if remote content
                 if ($.fn.jexcel.defaults[id].columns[i].url) {
