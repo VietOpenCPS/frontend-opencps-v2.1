@@ -1934,7 +1934,6 @@ export default {
         }
         /* eslint-disable */
         if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
-          // console.log('eformEmbed', eformScript)
           console.log('chuHoSoA2', vm.thongTinChuHoSo)
           item.embed = true
           let deliverableType = item.deliverableType ? item.deliverableType : ''
@@ -1973,7 +1972,13 @@ export default {
           if (vm.onlyView) {
             paramsEmbed['view_mode'] = 'view'
           }
-          let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
+          let fileTemplateNoEmbed = item.fileTemplateNo
+          // check theo formCode cấu hình
+          if (eformScript && eformScript.hasOwnProperty('formCode') && eformScript.formCode) {
+            fileTemplateNoEmbed = eformScript.formCode
+          }
+          // 
+          let urlEmbed = eformScript.eformEmbed + '/' + fileTemplateNoEmbed + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
           for (let key in paramsEmbed) {
             urlEmbed += ('&' + key + '=' + paramsEmbed[key])
           }
@@ -2605,7 +2610,6 @@ export default {
       console.log('eformScript', eformScript)
       /* eslint-disable */
       if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
-        // console.log('eformEmbed', eformScript)
         console.log('chuHoSoA1', vm.thongTinChuHoSo)
         item.embed = true
         let deliverableType = item.deliverableType ? item.deliverableType : ''
@@ -2644,7 +2648,13 @@ export default {
         if (vm.onlyView) {
           paramsEmbed['view_mode'] = 'view'
         }
-        let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
+        let fileTemplateNoEmbed = item.fileTemplateNo
+        // check theo formCode cấu hình
+        if (eformScript && eformScript.hasOwnProperty('formCode') && eformScript.formCode) {
+          fileTemplateNoEmbed = eformScript.formCode
+        }
+        //
+        let urlEmbed = eformScript.eformEmbed + '/' + fileTemplateNoEmbed + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
         for (let key in paramsEmbed) {
           urlEmbed += ('&' + key + '=' + paramsEmbed[key])
         }

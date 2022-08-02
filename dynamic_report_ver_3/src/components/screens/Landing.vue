@@ -264,7 +264,7 @@
                   {{item.employeeName}}
                 </td>
                 <td align="center" class="px-2 py-2" style="padding: 8px 10px;border: 1px solid #b5b5b5;">
-                  <a class="chitiet" v-if="item.sumCount" title="Xem chi tiết" href="javascript:;" @click.stop="viewChiTietDanhGia(item, '')">{{item.sumCount}}</a>
+                  <a class="chitiet" v-if="item.sumCount" title="Xem chi tiết" href="javascript:;" @click.stop="viewChiTietDanhGia(item, '3,2,1')">{{item.sumCount}}</a>
                   <span v-else>{{item.sumCount}}</span>
                 </td>
                 <td align="center" class="px-2 py-2" style="padding: 8px 10px;border: 1px solid #b5b5b5;">
@@ -2367,6 +2367,13 @@ export default {
         filter.data.listGov = ""
         console.log('error-listGroupId')
       }
+      if (filter.api.indexOf('/o/rest/v2/votings/reportVE') >= 0 && vm.doExportExcel) {
+        filter['fileName'] = vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xlsx'
+        filter['exportVoting'] = true
+        vm.isShowLoading = false
+      } else {
+        filter['exportVoting'] = false
+      }
       let dispatchUse = vm.api.indexOf('/o/statistic/dossier') >= 0 ? 'getAgencyReportLists' : 'getAgencyReportListsOld'
       vm.$store.dispatch(dispatchUse, filter).then(function (result) {
         vm.showTableVoting = false
@@ -3197,6 +3204,31 @@ export default {
         vm.loadingGetDossier = false
       })
     },
+    downloadExcelVoting (item) {
+      let vm = this
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['apiExportExcel'] ? vm.itemsReports[vm.index]['filterConfig']['apiExportExcel'] : vm.itemsReports[vm.index]['filterConfig']['api']
+      // build data
+      let filter = {
+        document: vm.reportType,
+        data: vm.data,
+        api: vm.api,
+        proxyApi: vm.proxyApi,
+        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xls'
+      }
+      for (let key in vm.filterGroup) {
+        if(key === vm.groupIdListSelected) {
+          let exits = vm.groupIdList.find(item => item.key === key)
+          filter['govAgency'] = vm.filterGroup[key]
+          filter['agencyLists'] = exits ? exits.value : []
+          check = false
+          break
+        }
+      }
+      vm.$store.dispatch('exportExcel', filter).then(function (result) {
+        
+      })
+    },
     exportExcel () {
       let vm = this
       console.log('sadsadas',vm.dataExportExcel)
@@ -3434,17 +3466,17 @@ export default {
 
       vm.doPrintReportVoting(item, Number(vm.index) + 1, rate)
     },
-    doPrintReportVoting (item, index, rate) {
+    doPrintReportVoting (item, indexIn, rate) {
       let vm = this
-      let itemsReportsConfig = vm.itemsReports[index]['filterConfig']['reportConfig']
-      let filters = vm.itemsReports[index]['filterConfig']['filters']
+      let itemsReportsConfig = vm.itemsReports[indexIn]['filterConfig']['reportConfig']
+      let filters = vm.itemsReports[indexIn]['filterConfig']['filters']
       let agencyLists = []
       let dataReportXX = ''
       let docDefinition = {}
       let docDString = {}
-      docDString = JSON.stringify(vm.reportConfigStatic[index]['docDefinition'])
+      docDString = JSON.stringify(vm.reportConfigStatic[indexIn]['docDefinition'])
       // console.log('userData', vm.userData)
-      let titleGov = vm.userData.hasOwnProperty('govAgencyName') && vm.userData.govAgencyName ? vm.userData.govAgencyName : vm.itemsReports[index]['filterConfig']['govAgencyName']
+      let titleGov = vm.userData.hasOwnProperty('govAgencyName') && vm.userData.govAgencyName ? vm.userData.govAgencyName : vm.itemsReports[indexIn]['filterConfig']['govAgencyName']
       if (!titleGov) {
         titleGov = vm.$store.getters.siteName
       }
@@ -3478,10 +3510,10 @@ export default {
           docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
         }
       }
-      if(vm.itemsReports[index]['filterConfig']['showTable']){
-        agencyLists = vm.itemsReports[index]['filterConfig']['groupIdsAdmin']
+      if(vm.itemsReports[indexIn]['filterConfig']['showTable']){
+        agencyLists = vm.itemsReports[indexIn]['filterConfig']['groupIdsAdmin']
       } else {
-        agencyLists = vm.itemsReports[index]['filterConfig']['groupIds']
+        agencyLists = vm.itemsReports[indexIn]['filterConfig']['groupIds']
       }
       for (let key in agencyLists) {
         if (String(agencyLists[key]['value']) === String(vm.govAgency)) {
@@ -3513,11 +3545,11 @@ export default {
       }
       // 
       let pdfBlob = null
-      let sumKey = vm.itemsReports[index]['filterConfig']['sumKey']
-      let selection = vm.itemsReports[index]['filterConfig']['selection']
-      let merge = vm.itemsReports[index]['filterConfig']['merge']
-      let sort = vm.itemsReports[index]['filterConfig']['sort']
-      let subKey = vm.itemsReports[index]['filterConfig']['subKey']
+      let sumKey = vm.itemsReports[indexIn]['filterConfig']['sumKey']
+      let selection = vm.itemsReports[indexIn]['filterConfig']['selection']
+      let merge = vm.itemsReports[indexIn]['filterConfig']['merge']
+      let sort = vm.itemsReports[indexIn]['filterConfig']['sort']
+      let subKey = vm.itemsReports[indexIn]['filterConfig']['subKey']
       try {
         if (filter.hasOwnProperty('govAgency') && filter.govAgency === "allAgency") {
           filter.data['listGroupId'] = "null"
@@ -3747,7 +3779,6 @@ export default {
             }
             break
           }
-          // console.log('dataRowTotal 555', dataRowTotal)
         } else {
           console.log('resultDataTotal55555', resultDataTotal)
           for (let keyXXTT in resultDataTotal) {
@@ -3767,7 +3798,7 @@ export default {
                 dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
               }
               // Sum tổng các hàng báo cáo STATISTIC_
-              if (vm.itemsReports[index]['filterConfig'].hasOwnProperty('sumRow') && vm.itemsReports[index]['filterConfig']['sumRow']) {
+              if (vm.itemsReports[indexIn]['filterConfig'].hasOwnProperty('sumRow') && vm.itemsReports[indexIn]['filterConfig']['sumRow']) {
                 if (isNaN(parseInt(dataRowTotal[indexTotalXXTT]['text']))) {
                   dataRowTotal[indexTotalXXTT]['text'] = 0
                 }

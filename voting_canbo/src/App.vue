@@ -210,10 +210,6 @@
             }).catch(function (xhr) {
             })
             vm.getEmpProfile(vm.employeeInfo.employeeEmail)
-            if (vm.employeeInfo.hasOwnProperty('scope') && vm.employeeInfo.scope) {
-              let agency = vm.employeeInfo.scope.split(',')[0]
-              vm.getGovAgency(agency)
-            }
           }).catch(function () {
             window.location.href = "/c/portal/logout"
           })
@@ -227,6 +223,16 @@
           }
         }
         axios.get('/o/rest/v2/employees/' + email + '/profile', param).then(function (response) {
+          if (vm.employeeInfo.hasOwnProperty('scope') && vm.employeeInfo.scope) {
+            let agency = vm.employeeInfo.scope.split(',')[0]
+            vm.getGovAgency(agency)
+          } else {
+            let emp = response.data
+            if (emp.hasOwnProperty('scope') && emp.scope) {
+              let agency = emp.scope.split(',')[0]
+              vm.getGovAgency(agency)
+            }
+          }
           try {
             let data = response.data
             let empData = data.employeeData ? JSON.parse(data.employeeData) : ''

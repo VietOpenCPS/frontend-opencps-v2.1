@@ -88,8 +88,7 @@ export const store = new Vuex.Store({
           }
         }
         let dataPost = new URLSearchParams()
-        dataPost.append('fileEntryIdStr', filter.fileEntryIdStr)
-        dataPost.append('excelDataIdStr', filter.excelDataIdStr)
+        dataPost.append('fileEntryExcelDataMapping', filter.fileEntryExcelDataMapping)
         let url = '/o/rest/v2/defaultsignature/vgca/sohoa/updateFile'
         axios.put(url, dataPost, param).then(function (response) {
           let serializable = response.data

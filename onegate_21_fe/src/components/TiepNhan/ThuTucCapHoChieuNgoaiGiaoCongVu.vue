@@ -1419,11 +1419,11 @@ export default {
         dialogPDF: false,
         dialogPDFLoading: false,
         loadingCheckHc: false,
-        menu: true,
-        menu2: true,
-        menu3: true,
-        menu4: true,
-        menu5: true,
+        menu: false,
+        menu2: false,
+        menu3: false,
+        menu4: false,
+        menu5: false,
         menu6: false,
         checkCMT: false,
         errorNgayCapCMT: false,
@@ -3091,13 +3091,13 @@ export default {
             let so_nhap_canh = vm.cong_ham_nhap_canh != '' ? parseInt(vm.cong_ham_nhap_canh) : 0
             let so_qua_canh = vm.cong_ham_qua_canh != '' ? parseInt(vm.cong_ham_qua_canh) : 0
             
-            let giaLePhiMoi = 160000
+            let giaLePhiMoi = 200000
             if(vm.serviceCode === 'BNG-270820'){
                 giaLePhiMoi = 80000
             }
             let lp_moi = (hcng_moi + hccv_moi)*giaLePhiMoi;
-            let lp_gia_han = hc_gh * 80000;
-            let lp_hong = (hc_hong + hc_mat) * 320000;
+            let lp_gia_han = hc_gh * 100000;
+            let lp_hong = (hc_hong + hc_mat) * 400000;
             // let lp_schengen = so_nuoc * so_schengen * 10000 * vm.cong_ham_so_nguoi;
             // let lp_nhap = so_nuoc * so_nhap_canh * 10000 * vm.cong_ham_so_nguoi;
             // let lp_qua = so_nuoc * so_qua_canh * 10000 * vm.cong_ham_so_nguoi;
@@ -3111,9 +3111,9 @@ export default {
             let le_phi = lp_moi + lp_gia_han + lp_hong + lp_schengen + lp_nhap + lp_qua;
             
             let file_payment2 = new Array();
-            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 160000, 'thanh_tien': lp_moi};
-            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 80000, 'thanh_tien': lp_gia_han};
-            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 320000, 'thanh_tien': lp_hong};
+            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 200000, 'thanh_tien': lp_moi};
+            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_gia_han};
+            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 400000, 'thanh_tien': lp_hong};
             file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp công hàm đề nghị cấp thị thực', 'partName': 'Công hàm', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_cong_ham, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_cong_ham};
 
             // if(lp_moi > 0)

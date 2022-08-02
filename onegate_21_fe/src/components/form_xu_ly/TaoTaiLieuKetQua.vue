@@ -715,7 +715,6 @@
           }
           /* eslint-disable */
           if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
-            console.log('eformEmbed', item)
             item.embed = true
             vm.active = false
             vm.active = true
@@ -742,6 +741,11 @@
               fileTemplateNo = item.fileTemplateNo ? item.fileTemplateNo : item.templateFileNo
             } catch (error) {
             }
+            // check theo formCode cấu hình
+            if (eformScript && eformScript.hasOwnProperty('formCode') && eformScript.formCode) {
+              fileTemplateNo = eformScript.formCode
+            }
+            //
             let urlEmbed = eformScript.eformEmbed + '/' + fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
             for (let key in paramsEmbed) {
               urlEmbed += ('&' + key + '=' + paramsEmbed[key])
@@ -820,7 +824,6 @@
             }
             /* eslint-disable */
             if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
-              console.log('eformEmbed2', item)
               item.embed = true
               vm.active = false
               vm.active = true
@@ -846,6 +849,11 @@
                 fileTemplateNo = item.templateFileNo ? item.templateFileNo : item.fileTemplateNo
               } catch (error) {
               }
+              // check theo formCode cấu hình
+              if (eformScript && eformScript.hasOwnProperty('formCode') && eformScript.formCode) {
+                fileTemplateNo = eformScript.formCode
+              }
+              //
               let urlEmbed = eformScript.eformEmbed + '/' + fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
               for (let key in paramsEmbed) {
                 urlEmbed += ('&' + key + '=' + paramsEmbed[key])
@@ -1328,7 +1336,6 @@
         }
         /* eslint-disable */
         if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
-          console.log('eformEmbed3', item)
           vm.createFiles[index].embed = true
           let deliverableType = item.deliverableType ? item.deliverableType : ''
           let paramsEmbed = {
@@ -1352,6 +1359,11 @@
             fileTemplateNo = item.fileTemplateNo ? item.fileTemplateNo : item.templateFileNo
           } catch (error) {
           }
+          // check theo formCode cấu hình
+          if (eformScript && eformScript.hasOwnProperty('formCode') && eformScript.formCode) {
+            fileTemplateNo = eformScript.formCode
+          }
+          //
           let urlEmbed = eformScript.eformEmbed + '/' + fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
           for (let key in paramsEmbed) {
             urlEmbed += ('&' + key + '=' + paramsEmbed[key])
@@ -1491,6 +1503,11 @@
                         fileTemplateNo = item.fileTemplateNo ? item.fileTemplateNo : item.templateFileNo
                       } catch (error) {
                       }
+                      // check theo formCode cấu hình
+                      if (eformScript && eformScript.hasOwnProperty('formCode') && eformScript.formCode) {
+                        fileTemplateNo = eformScript.formCode
+                      }
+                      //
                       let urlEmbed = eformScript.eformEmbed + '/' + fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
                       for (let key in paramsEmbed) {
                         urlEmbed += ('&' + key + '=' + paramsEmbed[key])

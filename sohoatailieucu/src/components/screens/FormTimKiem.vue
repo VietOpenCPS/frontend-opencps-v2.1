@@ -80,13 +80,13 @@
         </v-row>
         <v-flex class="text-right">
           <v-btn color="red" small class="mr-3 ml-0 white--text" @click="cancelSearch">
-              <v-icon size="20">
+              <v-icon style="color: #fff !important" size="20">
               clear
               </v-icon> &nbsp;
               Thoát
           </v-btn>
-          <v-btn color="#0072bc" small class="mx-0 white--text" @click="changeFilterSearch">
-              <v-icon size="20">
+          <v-btn color="primary" small class="mx-0 white--text" @click="changeFilterSearch">
+              <v-icon style="color: #fff !important" size="20">
               search
               </v-icon> &nbsp;
               Tìm kiếm

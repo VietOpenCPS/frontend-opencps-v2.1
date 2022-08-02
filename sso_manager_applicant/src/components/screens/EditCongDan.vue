@@ -20,6 +20,18 @@
                 </template>
               </v-switch>
             </v-flex>
+            <v-flex xs12 v-if="!trangThaiDuLieu" cols="12" class="py-0 mb-2">
+              <label>Lý do đánh dấu xóa</label>
+              <v-text-field
+                class="input-form"
+                v-model="thongTinCongDan.activityNote"
+                solo
+                dense
+                clearable
+                max
+                hide-details="auto"
+              ></v-text-field>
+            </v-flex>
             <v-flex xs12 class="py-0 mb-2 pr-3" v-if="quyenTraCuuLgsp == 1 || quyenTraCuuLgsp == 2">
               <v-btn
                 class="mx-0 mr-2"
@@ -47,7 +59,7 @@
                 ></v-text-field>
             </v-flex>
             <v-flex xs12 md6 class="py-0">
-                <label>CMND/CCCD <span class="red--text">(*)</span></label>
+                <label>CMND/CCCD <span class="red--text">(*)</span> <i> (Gồm 9 đến 12 ký tự)</i></label>
                 <v-text-field
                   class="input-form"
                   v-model="thongTinCongDan.maSoCaNhan"
@@ -56,7 +68,7 @@
                   clearable
                   max
                   hide-details="auto"
-                  :rules="required"
+                  :rules="requiredCredit"
                   required
                 ></v-text-field>
             </v-flex>
@@ -574,10 +586,23 @@ export default {
             "maSoDinhDanh": "",
             "tenNhaCungCap": "",
             "tinhTrang": ""
-          }
+          },
+          activityNote: ""
         },
         required: [
           v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc'
+        ],
+        requiredCredit: [
+          (value) => {
+            return String(value).trim().length >=9 && String(value).trim().length <= 12 || 'Số CMND/CCCD gồm 9 đến 12 ký tự'
+          },
+          (value) => {
+            if(String(value).trim()){
+              return true
+            } else {
+              return 'Thông tin bắt buộc'
+            }  
+          }
         ],
         trangThaiDuLieu: true
       }

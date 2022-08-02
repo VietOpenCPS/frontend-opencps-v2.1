@@ -35,7 +35,7 @@
                       <span v-if="!loadingCheckAcc">Kiểm tra thông tin tài khoản</span>
                       <span v-if="loadingCheckAcc">Đang kiểm tra</span>
                     </v-btn>
-                    <v-btn v-if="quyenTraCuuLgsp === 'always' || quyenTraCuuLgsp == 1 || quyenTraCuuLgsp == 2" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
+                    <v-btn v-if="quyenTraCuuLgsp && serviceCheckCsdldc == '037'" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
                       <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
                       <v-progress-circular :size="24" v-if="loadingSearchLgsp"
                         indeterminate
@@ -1597,7 +1597,8 @@ export default {
     messageLgsp: '',
     lgspAlertColor: 'primary',
     userSsoInfo: '',
-    quyenTraCuuLgsp: 'always',
+    quyenTraCuuLgsp: false,
+    serviceCheckCsdldc: '',
     disableEditApplicant: false
   }),
   computed: {
@@ -1951,10 +1952,29 @@ export default {
       vm.$refs.formChuHoSo.resetValidation()
       // 
       if (vm.traCuuLgspCongDan) {
-        vm.$store.dispatch('checkRoleSearchLgsp', {serviceCode: data.serviceCode}).then(result => {
-          vm.quyenTraCuuLgsp = result.hasOwnProperty('status') ? result.status : 'always'
+        let checkThuTucTraCuuCsdl = false
+        let dataCheckRole = {serviceCode: data.serviceCode}
+        try {
+          checkThuTucTraCuuCsdl = checkThuTucTraCuuCsdlConfig
+        } catch (error) {
+        }
+        if (checkThuTucTraCuuCsdl) {
+          dataCheckRole = {
+            serviceCode: data.serviceCode,
+            isServiceCode: checkThuTucTraCuuCsdl
+          }
+        }
+        console.log('datacheckRoleSearchLgsp', dataCheckRole)
+        vm.$store.dispatch('checkRoleSearchLgsp', dataCheckRole).then(result => {
+          vm.quyenTraCuuLgsp = true
+          if (result.hasOwnProperty('serviceCode')) {
+            vm.quyenTraCuuLgsp = result.serviceCode
+          }
+          if (result.hasOwnProperty('serviceDvcqg')) {
+            vm.serviceCheckCsdldc = result.serviceDvcqg
+          }
         }).catch(xhr => {
-          vm.quyenTraCuuLgsp = 'always'
+          vm.quyenTraCuuLgsp = false
         })
       }
     },

@@ -11,7 +11,7 @@
               <v-select
                 v-model="groupSelected"
                 :items="listGroup"
-                style="width: 350px; display:inline-block; margin: 0 10px;"
+                style="width: 300px; display:inline-block; margin: 0 10px;"
                 item-text="text"
                 item-value="code"
                 @change="getStatisticVoting"
@@ -19,7 +19,7 @@
               <v-select
                 v-model="monthSelected"
                 :items="monthList"
-                style="width: 150px; display:inline-block; margin: 0 10px;"
+                style="width: 120px; display:inline-block; margin: 0 10px;"
                 item-text="name"
                 item-value="value"
                 @change="getStatisticVoting"
@@ -27,16 +27,75 @@
               <v-select
                 v-model="yearSelected"
                 :items="yearList"
-                style="width: 150px; display:inline-block; margin: 0 10px;"
+                style="width: 120px; display:inline-block; margin: 0 10px;"
                 item-text="name"
                 item-value="value"
                 @change="getStatisticVoting"
               ></v-select>
             </v-flex>
+            <v-flex class="">
+              <v-menu
+                ref="menuDate1"
+                v-model="menuDate1"
+                :close-on-content-click="true"
+                transition="scale-transition"
+                offset-y
+                full-width
+              >
+                <v-text-field
+                  placeholder="Từ ngày"
+                  slot="activator"
+                  class="search-input-appbar input-search"
+                  v-model="fromReceiveDateFormatted"
+                  persistent-hint
+                  append-icon="event"
+                  @blur="fromReceiveDate = parseDate(fromReceiveDateFormatted)"
+                  hide-details
+                  flat
+                  height="32"
+                  min-height="32"
+                  append-outer-icon="remove"
+                  readonly
+                >
+                  <template slot='append-outer'>
+                    <v-icon color="primary">remove</v-icon>
+                  </template>
+                </v-text-field>
+                <v-date-picker :max="toReceiveDateFormatted ? getMinMax(toReceiveDateFormatted) : currentDate()" v-model="fromReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate('1')"></v-date-picker>
+              </v-menu>
+            </v-flex>
+            <v-flex class="pl-2">
+              <v-menu
+                ref="menuDate2"
+                v-model="menuDate2"
+                :close-on-content-click="true"
+                transition="scale-transition"
+                offset-y
+                full-width
+              >
+
+                <v-text-field
+                slot="activator"
+                placeholder="Đến ngày"
+                class="search-input-appbar input-search"
+                v-model="toReceiveDateFormatted"
+                persistent-hint
+                append-icon="event"
+                @blur="toReceiveDate = parseDate(toReceiveDateFormatted)"
+                hide-details
+                flat
+                height="32"
+                min-height="32"
+                readonly
+                ></v-text-field>
+                <v-date-picker :min="fromReceiveDateFormatted ? getMinMax(fromReceiveDateFormatted) : null"
+                :max="currentDate()"  v-model="toReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate('2')"></v-date-picker>
+              </v-menu>
+            </v-flex>
           </v-layout>
         </div>
         <div>
-          <apexchart class="colum-chart" type="bar" :width="widthChart" height="600" :options="chartOptionsColumn" :series="seriesColumn"></apexchart>
+          <apexchart class="colum-chart" type="bar" height="600" :options="chartOptionsColumn" :series="seriesColumn"></apexchart>
         </div>
         <v-layout wrap style="width: 400px;margin: 20px auto;">
           <v-flex style="max-width:120px" class="mr-3">
@@ -68,6 +127,12 @@
   }
   export default {
     data: () => ({
+      menuDate1: false,
+      menuDate2: false,
+      fromReceiveDate: '',
+      fromReceiveDateFormatted: '',
+      toReceiveDate: '',
+      toReceiveDateFormatted: '',
       listGroup: [
         {
           "code": "STNMT,SXD,SCT,SGDDT,SGTVT,SKHDT,SKHCN,SLDTBXH,SNV,SNNPTNT,STC,STTTT,STP,SVHTTDL,SYT,BQLKKT,BQLKCN,VPT,CAT",
@@ -111,10 +176,11 @@
         }
       ],
       groupSelected: '',
-      widthChart: "600",
+      widthChart: "100%",
       chartOptionsColumn: {
         chart: {
           type: 'bar',
+          width: '100%',
           toolbar: {
             show: false
           }
@@ -154,10 +220,12 @@
           opacity: 1
         },
         tooltip: {
-          y: {
-            formatter: function (val) {
-              return val
-            }
+          custom: function({series, seriesIndex, dataPointIndex, w}) {
+            var data = w.globals.initialSeries[seriesIndex].data[dataPointIndex]
+            return '<div class="wrap-tooltip-chart">' +
+              '<div class="header-tooltip-chart">'+ data.x +'</div>' +
+              '<div class="content-tooltip-chart">' + data.title + ': <span class="count-text">' + data.y + '% (' + data.count +' lượt)</span></div>' +
+            '</div>'
           }
         },
         colors: ['#8bc34a','#2196f3','#CE7A58']
@@ -181,7 +249,7 @@
       yearSelected: new Date().getFullYear(),
       monthSelected: new Date().getMonth() + 1,
       monthList: [
-        { name: "Cả năm", value: 0 },
+        { name: "Cả năm", value: 'all' },
         { name: "Tháng 1", value: 1 },
         { name: "Tháng 2", value: 2 },
         { name: "Tháng 3", value: 3 },
@@ -207,9 +275,43 @@
     },
     computed: {
     },
+    watch: {
+      monthSelected (val) {
+        let vm = this
+        setTimeout(function () {
+          if (vm.monthSelected) {
+            vm.fromReceiveDateFormatted = ''
+            vm.toReceiveDateFormatted = ''
+          }
+        }, 100)
+      },
+      yearSelected (val) {
+        let vm = this
+        setTimeout(function () {
+          if (vm.yearSelected) {
+            vm.fromReceiveDateFormatted = ''
+            vm.toReceiveDateFormatted = ''
+          }
+        }, 100)
+      },
+      fromReceiveDateFormatted(newValue, oldValue) {
+        if (oldValue) {
+          let vm = this
+          vm.fromDate = vm.parseDate(vm.fromReceiveDateFormatted)
+        }
+      },
+      toReceiveDateFormatted(newValue, oldValue) {
+        if (oldValue) {
+          let vm = this
+          vm.toDate = vm.parseDate(vm.toReceiveDateFormatted)
+        }
+      }
+    },
     created () {
       let vm = this
       vm.groupSelected = vm.listGroup[0]['code']
+      vm.yearSelected = new Date().getFullYear()
+      vm.monthSelected = new Date().getMonth() + 1
       vm.getStatisticVoting()
     },
     methods: {
@@ -217,23 +319,25 @@
         let vm = this
         setTimeout(function () {
           vm.resetChart()
-          if (!vm.yearSelected) {
-            vm.yearSelected = new Date().getFullYear()
-          }
-          if (vm.monthSelected === '' || vm.monthSelected == undefined || vm.monthSelected == null) {
-            vm.monthSelected = new Date().getMonth() + 1
-          }
           let fromDate = ''
           let toDate = ''
+          console.log('fromReceiveDate', vm.fromReceiveDate, vm.toReceiveDate)
           if (vm.monthSelected) {
-            let lastDayOfMonth = vm.getDaysInMonth(vm.monthSelected, vm.yearSelected)
-            console.log('lastDayOfMonth', lastDayOfMonth)
-            fromDate = (new Date(`${vm.yearSelected}-${String(vm.monthSelected).padStart(2, '0')}-01T00:00`)).getTime()
-            toDate = (new Date(`${vm.yearSelected}-${String(vm.monthSelected).padStart(2, '0')}-${String(lastDayOfMonth).padStart(2, '0')}T23:59`)).getTime()
+            if (vm.monthSelected !== 'all') {
+              let lastDayOfMonth = vm.getDaysInMonth(vm.monthSelected, vm.yearSelected)
+              fromDate = (new Date(`${vm.yearSelected}-${String(vm.monthSelected).padStart(2, '0')}-01T00:00`)).getTime()
+              toDate = (new Date(`${vm.yearSelected}-${String(vm.monthSelected).padStart(2, '0')}-${String(lastDayOfMonth).padStart(2, '0')}T23:59`)).getTime()
+            } else {
+              fromDate = (new Date(`${vm.yearSelected}-01-01T00:00`)).getTime()
+              toDate = (new Date(`${vm.yearSelected}-12-31T23:59`)).getTime()
+            }
           } else {
-            console.log('lastDayOfMonth2', vm.yearSelected, vm.monthSelected)
-            fromDate = (new Date(`${vm.yearSelected}-01-01T00:00`)).getTime()
-            toDate = (new Date(`${vm.yearSelected}-12-31T23:59`)).getTime()
+            fromDate = (new Date(`${vm.fromReceiveDate}T00:00`)).getTime()
+            if (vm.toReceiveDate) {
+              toDate = (new Date(`${vm.toReceiveDate}T23:59`)).getTime()
+            } else {
+              toDate = (new Date()).getTime()
+            }
           }
           let config = {
             method: 'get',
@@ -252,9 +356,9 @@
           .then(function (response) {
             vm.dataVoting = response.data
             if (vm.dataVoting.length) {
-              if (vm.dataVoting.length > 4) {
-                vm.widthChart = 150*vm.dataVoting.length
-              }
+              // if (vm.dataVoting.length > 4) {
+              //   vm.widthChart = 150*vm.dataVoting.length
+              // }
               vm.dataVoting = vm.dataVoting.sort(function (a, b) {
                 if (a.unHappyCount > b.unHappyCount) {
                   return -1
@@ -274,15 +378,32 @@
               let dataHappy = []
               let dataUnHappy = []
               for (let index = 0; index < vm.dataVoting.length; index++) {
-                dataName.push(vm.dataVoting[index]['govAgencyName'])
-                dataVeryHappy.push(vm.dataVoting[index]['veryHappyCount'])
-                dataHappy.push(vm.dataVoting[index]['happyCount'])
-                dataUnHappy.push(vm.dataVoting[index]['unHappyCount'])
+                // dataName.push(vm.dataVoting[index]['govAgencyName'])
+                // dataVeryHappy.push(vm.dataVoting[index]['veryHappyCount'])
+                // dataHappy.push(vm.dataVoting[index]['happyCount'])
+                // dataUnHappy.push(vm.dataVoting[index]['unHappyCount'])
+                let itemVeryHappy = {
+                  x: vm.dataVoting[index]['govAgencyName'],
+                  y: vm.dataVoting[index]['percentVeryHappy'],
+                  count: vm.dataVoting[index]['veryHappyCount'],
+                  title: 'Rất hài lòng'
+                }
+                let itemHappy = {
+                  x: vm.dataVoting[index]['govAgencyName'],
+                  y: vm.dataVoting[index]['percentHappy'],
+                  count: vm.dataVoting[index]['happyCount'],
+                  title: 'Hài lòng'
+                }
+                let itemUnHappy = {
+                  x: vm.dataVoting[index]['govAgencyName'],
+                  y: vm.dataVoting[index]['percentUnHappy'],
+                  count: vm.dataVoting[index]['unHappyCount'],
+                  title: 'Không hài lòng'
+                }
+                dataVeryHappy.push(itemVeryHappy)
+                dataHappy.push(itemHappy)
+                dataUnHappy.push(itemUnHappy)
               }
-              // vm.chartOptionsColumn.xaxis.categories = dataName
-              // vm.seriesColumn[0]['data'] = dataVeryHappy
-              // vm.seriesColumn[1]['data'] = dataHappy
-              // vm.seriesColumn[2]['data'] = dataUnHappy
 
               vm.seriesColumn = [
                 {
@@ -301,7 +422,8 @@
                   type: 'bar',
                   toolbar: {
                     show: false
-                  }
+                  },
+                  width: vm.dataVoting.length > 4 ? 150*vm.dataVoting.length : '600'
                 },
                 plotOptions: {
                   bar: {
@@ -334,14 +456,19 @@
                     maxHeight: 170
                   }
                 },
+                yaxis: {
+                  max: 100
+                },
                 fill: {
                   opacity: 1
                 },
                 tooltip: {
-                  y: {
-                    formatter: function (val) {
-                      return val
-                    }
+                  custom: function({series, seriesIndex, dataPointIndex, w}) {
+                    var data = w.globals.initialSeries[seriesIndex].data[dataPointIndex]
+                    return '<div class="wrap-tooltip-chart">' +
+                      '<div class="header-tooltip-chart">'+ data.x +'</div>' +
+                      '<div class="content-tooltip-chart">' + data.title + ': <span class="count-text">' + data.y + '% (' + data.count +' lượt)</span></div>' +
+                    '</div>'
                   }
                 },
                 colors: ['#8bc34a','#2196f3','#CE7A58']
@@ -349,6 +476,7 @@
             }
           })
           .catch(function (error) {
+            
           })
         }, 100)
       },
@@ -425,6 +553,9 @@
               maxHeight: 170
             }
           },
+          yaxis: {
+            max: 100
+          },
           fill: {
             opacity: 1
           },
@@ -438,14 +569,93 @@
           colors: ['#8bc34a','#2196f3','#CE7A58']
         }
         vm.dataVoting = []
+      },
+      parsedate (date) {
+        const [year, month, day] = date.split('-')
+        return `${day}-${month}-${year}`
+      },
+      currentDate () {
+        let date = new Date()
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+      },
+      changeDate(index) {
+        let vm = this
+        vm.monthSelected = ''
+        vm.yearSelected = ''
+        vm.menuDate = vm.menuDate2 = false
+        if (index === '1') {
+          vm.fromReceiveDateFormatted = vm.formatDate(vm.fromReceiveDate)
+        } else if (index === '2') {
+          vm.toReceiveDateFormatted = vm.formatDate(vm.toReceiveDate)
+        }
+        if (vm.fromReceiveDateFormatted || vm.toReceiveDateFormatted) {
+          vm.getStatisticVoting()
+        }
+      },
+      getMinMax (date) {
+        if (!date) return null
+        const [day, month, year] = date.split('/')
+        return `${year}-${month}-${day}`
+      },
+      getMinFromDate30 (date) {
+        let vm = this
+        let toDate = (new Date(vm.parseDate(date))).getTime() - 30*86400000
+        return vm.parseDate(toDate)
+      },
+      getMaxToDate30 (date) {
+        let vm = this
+        let toDate = (new Date(vm.parseDate(date))).getTime() + 30*86400000
+        if (toDate > (new Date()).getTime()) {
+          return vm.parseDate((new Date()).getTime())
+        } else {
+          return vm.parseDate(toDate)
+        }
+      },
+      parseDate(date) {
+        if (!date) return ''
+        if (String(date).indexOf('/') > 0) {
+          const [day, month, year] = date.split('/')
+          return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+        } else if (String(date).indexOf('-') > 0) {
+          const [day, month, year] = date.split('-')
+          return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+        } else {
+          let date1 = new Date(Number(date))
+          return `${date1.getFullYear()}-${(date1.getMonth() + 1).toString().padStart(2, '0')}-${date1.getDate().toString().padStart(2, '0')}`
+        }
+      },
+      formatDate(date) {
+        if (!date) return ''
+        const [year, month, day] = date.split('-')
+        return `${day}/${month}/${year}`
+      },
+      currentDateFormat (date) {
+        let date1 = date ? new Date(date) : new Date()
+        return `${date1.getDate().toString().padStart(2, '0')}/${(date1.getMonth() + 1).toString().padStart(2, '0')}/${date1.getFullYear()}`
       }
     }
   }
 </script>
 
 <style>
+  .wrap-tooltip-chart {
+  }
+  .header-tooltip-chart {
+    padding: 4px 7px;
+    border-radius: 4px;
+    background-color: #ededed;
+    text-align: left;
+  }
+  .content-tooltip-chart {
+    padding: 4px 7px;
+    border-radius: 4px;
+    text-align: left;
+  }
+  .count-text {
+    font-weight: bold;
+  }
   .row-header {
-    height: 38px;
+    height: 48px;
     overflow: hidden;
     background: #fff
   }
@@ -466,9 +676,9 @@
       top: 1px;
       transform: rotate(45deg);
       right: -4px;
-      border-top: 28px solid #903938;
-      border-left: 28px solid transparent;
-      border-bottom: 28px solid transparent;
+      border-top: 30px solid #903938;
+      border-left: 30px solid transparent;
+      border-bottom: 30px solid transparent;
   }
   .colum-chart {
     overflow-x: auto;

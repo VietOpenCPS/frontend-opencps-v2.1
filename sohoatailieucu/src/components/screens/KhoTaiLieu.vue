@@ -3,7 +3,7 @@
     <vue-confirm-dialog></vue-confirm-dialog>
     <v-card class="px-3 py-3" style="width: 100%; background: #ffffff;border-radius: 12px;box-shadow: 0 6px 10px -4px rgb(0 0 0 / 15%)">
       <div class="headline mb-3" style="font-size: 20px!important;">DANH SÁCH GIẤY TỜ SỐ HÓA</div>
-      <v-btn color="#0072bc" small class="mx-0 white--text" @click.stop="showTimKiem" style="position: absolute; right: 17px; top: 15px;">
+      <v-btn color="primary" small class="mx-0 white--text" @click.stop="showTimKiem" style="position: absolute; right: 17px; top: 15px;">
         <v-icon size="20" style="color: #fff !important">
           filter_list
         </v-icon> &nbsp;
@@ -25,13 +25,13 @@
         </v-icon> &nbsp;
         Tải mẫu import
       </v-btn>
-      <v-btn color="#0072bc" small class="mx-2 white--text" :loading="processingImport" :disabled="processingImport" @click.stop="chonDonViImport">
+      <v-btn color="primary" small class="mx-2 white--text" :loading="processingImport" :disabled="processingImport" @click.stop="chonDonViImport">
         <v-icon size="20" style="color: #fff !important">
           post_add
         </v-icon> &nbsp;
         Import danh sách giấy tờ
       </v-btn>
-      <v-btn color="#0072bc" small class="mx-0 white--text ml-2" :loading="processingSigning" :disabled="processingSigning" @click.stop="signDocument">
+      <v-btn color="primary" small class="mx-0 white--text ml-2" :loading="processingSigning" :disabled="processingSigning" @click.stop="signDocument">
         <v-icon size="20" style="color: #fff !important">
           drive_file_rename_outline
         </v-icon> &nbsp;
@@ -196,7 +196,7 @@
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
               <v-tooltip top class="mr-2">
-                <v-btn @click="viewDocument(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
+                <v-btn @click="viewDocument(props.item)" color="primary" slot="activator" flat icon class="mx-0 my-0">
                   <v-icon size="22">visibility</v-icon>
                 </v-btn>
                 <span>Xem giấy tờ</span>
@@ -298,7 +298,7 @@
     <v-dialog v-model="dialogDanhSachLoi" scrollable persistent max-width="900px">
       <v-card>
         <v-toolbar flat dark color="primary">
-          <v-toolbar-title>Danh sách các giấy tờ import lỗi</v-toolbar-title>
+          <v-toolbar-title>Danh sách giấy tờ import lỗi</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="dialogDanhSachLoi = false">
             <v-icon>close</v-icon>
@@ -877,20 +877,18 @@
           if (received_msg.Status == 0 && received_msg.Message && received_msg.Files) {
             let dataFiles = received_msg.Files
             let dossierFiles = []
-            let fileEntries = []
             dataFiles.forEach(element => {
               let signed = JSON.parse(element.FileSignedURL)
               let fileEntryId = signed['fileEntryId']
               let dossierFileId = element['FileID']
-              dossierFiles.push(dossierFileId)
-              fileEntries.push(fileEntryId)
+              let dataItem = {
+                fileEntryIdStr: fileEntryId,
+                excelDataIdStr: dossierFileId
+              }
+              dossierFiles.push(dataItem)
             });
-            vm.mappingFileSignedUpdate.dossierFiles = dossierFiles.toString()
-            vm.mappingFileSignedUpdate.fileEntries = fileEntries.toString()
-            console.log('vm.mappingFileSignedUpdate', vm.mappingFileSignedUpdate)
             let dataUpdateFile = {
-              fileEntryIdStr: vm.mappingFileSignedUpdate.fileEntries,
-              excelDataIdStr: vm.mappingFileSignedUpdate.dossierFiles
+              fileEntryExcelDataMapping: JSON.stringify(dossierFiles)
             }
             vm.$store.dispatch('updateFileKySoVgca', dataUpdateFile).then(res => {
               toastr.success('Ký số thành công')
@@ -905,7 +903,7 @@
         vm.selectedDocument.forEach((element, index) => {
           let prms = {
             "FileID": element.excelDataId,
-            "FileName": element.tenGiayTo,
+            "FileName": String(element.tenGiayTo).replace(/"/g, " "),
             "URL": element.tenFileFull
           }
           fileArr.push(prms)

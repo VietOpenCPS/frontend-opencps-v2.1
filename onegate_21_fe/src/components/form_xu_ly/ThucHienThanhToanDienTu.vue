@@ -138,7 +138,7 @@
                 <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán qua Cổng hỗ trợ thanh toán quốc gia</span>
               </v-chip>
 
-              <v-chip class="mb-2" v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('keypayUrl') && getEPaymentProfile(paymentProfile.epaymentProfile)['keypayUrl']
+              <v-chip class="mb-2" v-if="thanhToanKeypay && getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('keypayUrl') && getEPaymentProfile(paymentProfile.epaymentProfile)['keypayUrl']
                 && !getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('kpdvcqg')" color="orange" text-color="white"
                 :style="methodSelect === 0 ? 'opacity: 1;font-weight:normal' : (methodSelect === 2 ? 'opacity: 1;font-weight:bold' : 'opacity: 0.6;font-weight:normal')"
                 @click.native="toKeyPay(getEPaymentProfile(paymentProfile.epaymentProfile).keypayUrl)"
@@ -380,13 +380,18 @@ export default {
         align: 'center',
         sortable: false
       }
-    ]
+    ],
+    thanhToanKeypay: true
   }),
   directives: {money: VMoney},
   created () {
     var vm = this
     try {
       vm.thanhToanChuyenKhoan = thanhToanChuyenKhoan
+    } catch (error) {
+    }
+    try {
+      vm.thanhToanKeypay = thanhToanKeypay
     } catch (error) {
     }
     if (vm.detailDossier.hasOwnProperty('dossierId')) {

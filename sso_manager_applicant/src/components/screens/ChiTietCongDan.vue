@@ -67,6 +67,7 @@
                     do_disturb
                   </v-icon>
                   <span class="ml-2" style="color: #D32F2F; text-transform: uppercase;font-weight: bold;">{{thongTinCongDan['trangThaiDuLieu']['tenMuc']}}</span>
+                  <span class="ml-2" style="color: #D32F2F;">(Lý do: {{thongTinCongDan['activityNote']}})</span>
                 </div>
                 <table :dense="true" class="cong-dan-info"  style="border-bottom: thin solid rgba(0, 0, 0, 0.12);">
                   <template>
@@ -261,7 +262,7 @@
                   <v-layout wrap>
                     <v-flex xs12 class="mb-2">
                       <div class="text-label mb-2">
-                        <span>Mật khẩu mới</span>
+                        <span>Mật khẩu mới (Ít nhất 8 ký tự, gồm chữ và số)</span>
                         <span class="red--text"> (*)</span>
                       </div>
                       <v-text-field
@@ -269,7 +270,7 @@
                         v-model="passwordChange"
                         solo
                         dense
-                        :rules="required"
+                        :rules="requiredPassword"
                         required
                         hide-details="auto"
                       ></v-text-field>
@@ -752,6 +753,16 @@ export default {
         required: [
           v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc'
         ],
+        requiredPassword: [
+           (value) => {
+            const pattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
+            if (value) {
+              return pattern.test(value) || 'Mật khẩu ít nhất 8 ký tự, có chữ và số'
+            } else {
+              return 'Mật khẩu là bắt buộc'
+            }
+          }
+        ],
         validFormActionAccount: true,
         dialogNoteAction: false,
         titleAction: '',
@@ -1079,7 +1090,7 @@ export default {
           toastr.error('Khóa tài khoản không thành công')
         })
       },
-      unBlockAccount () {
+      unLockAccount () {
         let vm = this
         let filter = {
           data: {

@@ -5589,9 +5589,10 @@ export const store = new Vuex.Store({
           headers: {
             groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
             Token: window.Liferay ? window.Liferay.authToken : ''
-          }
+          },
+          params: filter
         }
-        let url = '/o/rest/v2/qldc/role/employee?serviceCode=' + filter.serviceCode
+        let url = '/o/rest/v2/qldc/role/employee'
         axios.get(url, param).then(function (response) {
           let serializable = response.data
           resolve(serializable)

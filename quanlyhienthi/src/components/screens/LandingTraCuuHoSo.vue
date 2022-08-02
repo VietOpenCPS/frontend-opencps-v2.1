@@ -2,25 +2,25 @@
   <div class="py-0 kios-item">
     <div>
       <v-card color="transparent" flat style="">
-        <div>
-          <div class="layout wrap" style="position: absolute;width: 500px;padding-left: 20px;top: 5px;">
+        <div class="layout wrap">
+          <div class="layout wrap flex" style="max-width: 500px;padding-left: 20px;top: 5px;">
             <img src="/documents/35417/0/quochuy.svg"
-              style="width: 70px;height: auto;max-width: 70px;display: flex;">
+              style="width: 70px;height: 60px;max-width: 70px;display: flex;margin-top: 10px;">
             <div class="text-logo flex"
               style="display: inline-block;font-weight: 700;font-size: 20px;padding-top: 10px;padding-left: 20px;">
               <p style="color: #be4605;margin-bottom: 0px;">TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG</p>
               <p style="color: #e11133;">TỈNH HẬU GIANG</p>
             </div>
           </div>
-          <h4 class="py-2 mx-3 text-xs-center" style="height: 120px;padding-top: 15px !important;">
+          <h4 class=" flex py-2 mx-3 text-xs-center" style="height: 120px;padding-top: 15px !important;">
             <span style="color: #903938; font-size: 1.5em !important;">
               <span v-if="statusFilter == 1">DANH SÁCH HỒ SƠ SẮP ĐẾN HẠN </span>
-              <span v-if="statusFilter == 2">DANH SÁCH HỒ SƠ CÓ KẾT QUẢ </span>
-              <span v-if="dossierList.length > 0">(TỔNG SỐ: {{dossierList.length}})</span>
+              <span v-if="statusFilter == 2">DANH SÁCH HỒ SƠ CÓ KẾT QUẢ NGÀY {{currentDate}}</span>
+              <span v-if="dossierList.length > 0"> (TỔNG SỐ: {{dossierList.length}})</span>
             </span>
           </h4>
 
-          <div class="py-0 mx-3">
+          <div class="py-0 mx-3" style="width: 100%;">
             <v-btn style="position: absolute;right: 0; top: 0px" flat icon color="#903938" @click="showFilter = !showFilter">
               <v-icon>settings</v-icon>
             </v-btn>
@@ -44,7 +44,6 @@
                           solo
                           flat
                           return-object
-                          @change="changeAgency"
                           multiple
                           clearable
                         ></v-autocomplete>
@@ -179,6 +178,7 @@ export default {
     agencies: [],
     dossierList: [],
     totalPages: 0,
+    currentDate: '',
     headerTable: [
       {
         text: 'STT',
@@ -219,7 +219,7 @@ export default {
       "slidesToShow": 3,
       "slidesToScroll": 3,
       "autoplay": true,
-      "autoplaySpeed": 2000,
+      "autoplaySpeed": 3000,
       "pauseOnDotsHover": true,
       "pauseOnFocus": true,
       "pauseOnHover": true
@@ -232,6 +232,11 @@ export default {
   created () {
     let vm = this
     vm.$nextTick(function () {
+      try {
+        let date1 = new Date()
+        vm.currentDate = `${date1.getDate().toString().padStart(2, '0')}/${(date1.getMonth() + 1).toString().padStart(2, '0')}/${date1.getFullYear()}`
+      } catch (error) {
+      }
       let current = vm.$router.history.current
       let newQuery = current.query
       try {
@@ -273,63 +278,85 @@ export default {
         return
       }
       vm.dossierList = []
-      vm.loading = true
-      // let filter = {
-      //   groupId: '45062',
-      //   start: 0,
-      //   end: 100
+      // 
+      // let promises = []
+      // for (let key in vm.agencyFilter) {       
+      //   promises.push(axios.get("/o/rest/v2/dossiers", {
+      //     headers: {
+      //       groupId: vm.agencyFilter[key]['value'],
+      //       Accept: 'application/json'
+      //     },
+      //     params: {
+      //       start: 0,
+      //       end: 500,
+      //       order: true,
+      //       status: vm.statusFilter == 2 ? 'releasing' : '',
+      //       top: vm.statusFilter == 1 ? 'coming' : '',
+      //       agency: vm.agencyFilter[key]['code']
+      //     }
+      //   }))
+      
       // }
-      // if (vm.statusFilter == 1) {
-      //   filter['top'] = 'coming'
-      // }
-      // if (vm.statusFilter == 2) {
-      //   filter['status'] = 'done'
-      // }
-      // vm.$store.dispatch('getDossiers', filter).then(function (result) {
+      // axios.all(promises)
+      // .then(axios.spread((...args) => {
       //   vm.loading = false
-      //   if (result.data) {
-      //     vm.dossierList = result.data
+      //   let myObject = []
+      //   for (let i = 0; i < args.length; i++) {
+      //     let dataOutput = args[i]['data'].hasOwnProperty('total') ? args[i]['data']['data'] : args[i]['data']
+      //     if (args[i]['data']['total'] > 0 || (!args[i]['data'].hasOwnProperty('total') && dataOutput)) {
+      //       myObject = myObject.concat(dataOutput)
+      //     }
       //   }
-      //   console.log('vm.dossierList', vm.dossierList)
-      // }).catch(reject => {
+      //   if (myObject.length > 0) {
+      //     vm.dossierList = myObject
+      //   } else {
+      //     vm.dossierList = []
+      //   }
+      // })).catch(function () {
       //   vm.loading = false
       // })
-
       // 
-      let promises = []
-      for (let key in vm.agencyFilter) {       
-        promises.push(axios.get("/o/rest/v2/dossiers", {
-          headers: {
-            groupId: vm.agencyFilter[key]['value'],
-            Accept: 'application/json'
-          },
-          params: {
-            start: 0,
-            end: 500,
-            order: true,
-            status: vm.statusFilter == 2 ? 'releasing' : '',
-            top: vm.statusFilter == 1 ? 'coming' : '',
-            agency: vm.agencyFilter[key]['code']
-          }
-        }))
-      
-      }
-      axios.all(promises)
-      .then(axios.spread((...args) => {
-        vm.loading = false
-        let myObject = []
-        for (let i = 0; i < args.length; i++) {
-          let dataOutput = args[i]['data'].hasOwnProperty('total') ? args[i]['data']['data'] : args[i]['data']
-          if (args[i]['data']['total'] > 0 || (!args[i]['data'].hasOwnProperty('total') && dataOutput)) {
-            myObject = myObject.concat(dataOutput)
-          }
+      console.log('agencyFilter', vm.agencyFilter)
+      let param = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+          Token: window.Liferay ? window.Liferay.authToken : ''
         }
-        if (myObject.length > 0) {
-          vm.dossierList = myObject
+      }
+      let codeAgency = Array.from(vm.agencyFilter , value => value['code']).toString()
+      let dataGet = {
+        start: 0,
+        end: 500,
+        order: true,
+        status: vm.statusFilter == 2 ? 'releasing' : '',
+        top: vm.statusFilter == 1 ? 'coming' : '',
+        agency: codeAgency
+      }
+      if (vm.statusFilter == 2) {
+        dataGet['fromReleaseDate'] = vm.currentDate
+        dataGet['toReleaseDate'] = vm.currentDate
+      } else {
+        dataGet['fromReleaseDate'] = ''
+        dataGet['toReleaseDate'] = ''
+      }
+      let dataPost = new URLSearchParams()
+      dataPost.append('method', 'GET')
+      dataPost.append('serverCode', 'SERVER_DVC')
+      dataPost.append('url', '/dossiers')
+      dataPost.append('data', JSON.stringify(dataGet))
+      vm.loading = true
+      console.log('dataGet', dataGet)
+      axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+        console.log('response', response)
+        vm.loading = false
+        let serializable = response.data
+        if (serializable.data && serializable.data.length > 0) {
+          vm.dossierList = serializable.data
         } else {
           vm.dossierList = []
         }
-      })).catch(function () {
+      }).catch(function (xhr) {
+        vm.dossierList = []
         vm.loading = false
       })
       // 
@@ -354,15 +381,13 @@ export default {
       let dataPost = new URLSearchParams()
       dataPost.append('method', 'GET')
       dataPost.append('serverCode', 'SERVER_DVC')
-      dataPost.append('url', '/serverconfigs/GROUP_ID_SITE_MOTCUA')
+      dataPost.append('url', '/serverconfigs/GROUP_GOVAGENCY_MOTCUA')
       dataPost.append('data', JSON.stringify(dataGet))
       axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
         let serializable = response.data
         let configs = JSON.parse(serializable.configs)
-        let agency = configs['groupIds']
-        vm.agencyList = agency.filter(function (item) {
-          return !item.hasOwnProperty('parent')
-        })
+        let agency = configs['govagency']
+        vm.agencyList = agency
         // 
         try {
           vm.agencyFilter = JSON.parse(localStorage.getItem("agencyFilter"))

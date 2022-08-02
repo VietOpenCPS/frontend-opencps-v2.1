@@ -22,6 +22,18 @@
                 </template>
               </v-switch>
             </v-flex>
+            <v-flex xs12 v-if="!trangThaiDuLieu" cols="12" class="py-0 mb-2">
+              <label>Lý do đánh dấu xóa</label>
+              <v-text-field
+                class="input-form"
+                v-model="thongTinDoanhNghiep.activityNote"
+                solo
+                dense
+                clearable
+                max
+                hide-details="auto"
+              ></v-text-field>
+            </v-flex>
             <v-flex xs12 class="py-0 mb-2 pr-3">
               <v-btn
                 class="mx-0 mr-2"
@@ -327,6 +339,7 @@ export default {
         itemsThuongTruPhuongXa: [],
         thuongTruPhuongXa: '',
         thongTinDoanhNghiep: {
+          activityNote: "",
           danhBaLienLac: {
             "soDienThoai": "",
             "soFax": "",

@@ -41,7 +41,7 @@
                       <span>{{props.item && props.item.paymentAmount ? currency(props.item.paymentAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; </span>
                     </div>
                   </td>
-                  <td v-if="payments.paymentStatus == 5" width="120" class="text-xs-center py-1">
+                  <td v-if="payments.paymentStatus == 3 || payments.paymentStatus == 5" width="120" class="text-xs-center py-1">
                     <v-btn v-if="feeList.length == 1" class="" color="primary" @click="printPay()">
                       <v-icon>print</v-icon> &nbsp;
                       In biên lai

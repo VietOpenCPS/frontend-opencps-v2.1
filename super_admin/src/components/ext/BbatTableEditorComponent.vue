@@ -557,6 +557,19 @@
               >
               </v-autocomplete>
             </v-col>
+            <v-col cols="12">
+              <v-autocomplete
+                class="mt-3"
+                label="Dịch vụ được phép sử dụng"
+                :items="itemsServiceDvcqg"
+                v-model="userCsdlDanCu.serviceDvcqg"
+                item-text="text"
+                item-value="value"
+                multiple
+                :rules="[rules.required]"
+              >
+              </v-autocomplete>
+            </v-col>
           </v-row>
         </v-form>
       </v-card-text>
@@ -820,8 +833,14 @@
           userName: "",
           employeeEmail: "",
           status: 0,
-          userNameEmployee: ""
+          userNameEmployee: "",
+          serviceDvcqg: ''
         },
+        itemsServiceDvcqg: [
+          {text: 'Tra cứu thông tin công dân', value: '037'},
+          {text: 'Xác nhận số định danh cá nhân và chứng minh nhân dân', value: '033'},
+          {text: 'Xác thực thông tin hộ gia đình', value: '034'}
+        ],
         typeQuyenTruyCap: 'create',
         applicantIdNoLgsp: '',
         applicantNameLgsp: '',
@@ -1557,7 +1576,8 @@
               userName: serializable.userName,
               employeeEmail: vm.data.email,
               status: serializable.status,
-              userNameEmployee: serializable.userNameEmployee
+              userNameEmployee: serializable.userNameEmployee,
+              serviceDvcqg: serializable.serviceDvcqg ? serializable.serviceDvcqg.split(",") : ''
             }
           } else {
             vm.typeQuyenTruyCap = 'create'
@@ -1569,7 +1589,8 @@
               userName: "",
               employeeEmail: vm.data.email,
               status: 0,
-              userNameEmployee: vm.data.fullName
+              userNameEmployee: vm.data.fullName,
+              serviceDvcqg: ''
             }
           }
         }).catch(function (error) {
@@ -1582,7 +1603,8 @@
             userName: "",
             employeeEmail: vm.data.email,
             status: 0,
-            userNameEmployee: vm.data.fullName
+            userNameEmployee: vm.data.fullName,
+            serviceDvcqg: ''
           }
           console.log(error)
         })
@@ -1598,6 +1620,7 @@
         dataPost.append("employeeEmail", emp.employeeEmail);
         dataPost.append("status", emp.status);
         dataPost.append("userNameEmployee", emp.userNameEmployee);
+        dataPost.append("serviceDvcqg", emp.serviceDvcqg ? emp.serviceDvcqg.toString() : '')
         if (vm.typeQuyenTruyCap === 'create') {
           axios.post('/o/rest/v2/socket/web/csdldcUsers', dataPost).then((res)=>{
             toastr.success('Thực hiện thành công')

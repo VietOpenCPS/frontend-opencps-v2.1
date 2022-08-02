@@ -155,12 +155,14 @@
                           <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
                           <span>{{itemServiceConfig.serviceInfoName}}</span>
                         </v-flex>
-                        <v-flex xs12 sm1 class="text-xs-center pt-1">
-                          <span>Mức {{itemServiceConfig.level}}</span>
+                        <v-flex xs12 sm1 class="text-xs-center">
+                          <v-btn class="mx-0 my-0 white--text" depressed readonly small :color="getColor(itemServiceConfig.level)"
+                            style="pointer-events: none;min-width: 110px;">Mức {{itemServiceConfig.level}}
+                          </v-btn>
                         </v-flex>
                         <v-flex xs12 sm2 class="text-xs-center">
                           <v-menu left offset-x>
-                            <v-btn flat class="mx-0 my-0" slot="activator" small 
+                            <v-btn color="primary" text-color="white" class="mx-0 my-0" slot="activator" small 
                               @click="pullServiceOptions(itemServiceConfig, itemGov.govAgencyCode)"
                             >
                               Chọn
@@ -206,12 +208,14 @@
                       <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
                       <span>{{itemServiceConfig.serviceInfoName}}</span>
                     </v-flex>
-                    <v-flex xs12 sm1 class="text-xs-center pt-1">
-                      <span>Mức {{itemServiceConfig.level}}</span>
+                    <v-flex xs12 sm1 class="text-xs-center">
+                      <v-btn class="mx-0 my-0 white--text" depressed readonly small :color="getColor(itemServiceConfig.level)"
+                        style="pointer-events: none;min-width: 110px;">Mức {{itemServiceConfig.level}}
+                      </v-btn>
                     </v-flex>
                     <v-flex xs12 sm2 class="text-xs-center">
                       <v-menu left offset-x>
-                        <v-btn flat class="mx-0 my-0" slot="activator" small 
+                        <v-btn color="primary" text-color="white" class="mx-0 my-0" slot="activator" small 
                           @click="pullServiceOptions(itemServiceConfig, itemDomain.govAgencyCode)"
                         >
                           Chọn
@@ -241,12 +245,14 @@
                 <span>{{itemServiceConfig.serviceInfoName}}</span>&nbsp;
                 <span v-if="itemServiceConfig.govAgencyNameRender" class="primary--text">({{itemServiceConfig.govAgencyNameRender}})</span>
               </v-flex>
-              <v-flex xs12 sm1 class="text-xs-center pt-1">
-                <span>Mức {{serviceLastest ? itemServiceConfig.serviceLevel : itemServiceConfig.level}}</span>
+              <v-flex xs12 sm1 class="text-xs-center">
+                <v-btn class="mx-0 my-0 white--text" depressed readonly small :color="getColor(serviceLastest && itemServiceConfig.serviceLevel ? itemServiceConfig.serviceLevel : itemServiceConfig.level)"
+                  style="pointer-events: none;min-width: 110px;">Mức {{serviceLastest && itemServiceConfig.serviceLevel ? itemServiceConfig.serviceLevel : itemServiceConfig.level}}
+                </v-btn>
               </v-flex>
               <v-flex xs12 sm2 class="text-xs-center">
                 <v-menu left offset-x>
-                  <v-btn flat class="mx-0 my-0" slot="activator" small 
+                  <v-btn color="primary" text-color="white" class="mx-0 my-0" slot="activator" small 
                     @click="pullServiceOptions(itemServiceConfig, itemServiceConfig.govAgencyCode)"
                   >
                     Chọn
@@ -845,7 +851,7 @@
         if (level === 2) {
           return 'green'
         } else if (level === 3) {
-          return 'orange'
+          return 'orange darken-1'
         } else if (level === 4) {
           return 'red'
         }

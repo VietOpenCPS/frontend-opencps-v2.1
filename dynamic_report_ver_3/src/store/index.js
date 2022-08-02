@@ -680,181 +680,203 @@ export const store = new Vuex.Store({
           let agencyListsGet = agencyLists.filter(function (item) {
             return String(item['value']) !== '0'
           })
-          let requestURL = ''
-            // test local
-            // requestURL = 'http://127.0.0.1:8081/api/statistic/todolist'
-            requestURL = filter['api']
-            if (agencyLists.length === 0) {
-              axios.get(requestURL, param).then(function (response) {
-                let serializable = response.data
-                if (serializable.data) {
-                  //test
-                  if (Array.isArray(serializable.data)) {
-                    let dataOut = serializable.data
-                    if (dataOut.length > 0 && Object.keys(dataOut[0]).length > 0) {
-                      resolve(dataOut)
-                    } else {
-                      resolve(null)
-                    }
-                  } else {
-                    resolve([serializable.data])
-                  }
-                } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
-                  resolve(serializable)
-                } else {
-                  console.log('docu', filter.document === 'STATISTIC_05')
-                  if (filter.document === 'STATISTIC_05') {
-                    resolve([])
+          let requestURL = filter['api']
+          // 
+          if (filter['exportVoting']) {
+            param.params['isExcel'] = true
+            let config = {
+              method: 'get',
+              url: filter['api'],
+              headers: param.headers,
+              params: param.params,
+              "responseType": 'blob'
+            }
+            axios(config).then(function (response) {
+              var fileName = filter.fileName
+              var a = document.createElement('a')
+              document.body.appendChild(a)
+              a.style = 'display: none'
+              var url = window.URL.createObjectURL(response.data)
+              a.href = url
+              a.download = fileName
+              a.click()
+              window.URL.revokeObjectURL(url)
+            }).catch(function (error) {
+            })
+            return;
+          }
+          // 
+          if (agencyLists.length === 0) {
+            axios.get(requestURL, param).then(function (response) {
+              let serializable = response.data
+              if (serializable.data) {
+                //test
+                if (Array.isArray(serializable.data)) {
+                  let dataOut = serializable.data
+                  if (dataOut.length > 0 && Object.keys(dataOut[0]).length > 0) {
+                    resolve(dataOut)
                   } else {
                     resolve(null)
                   }
-                }
-              }).catch(function (error) {
-                console.log(error)
-                reject(error)
-              })
-            } else if (String(govAgency) === '0' && agencyLists.length > 0) {
-              let promises = []
-              for (let key in agencyListsGet) {
-                if (String(agencyListsGet[key]['value']) !== '0') {
-                  let paramCopy = Object.assign({}, param)
-                  paramCopy['headers']['groupId'] = agencyListsGet[key]['value']
-                  paramCopy['params']['v'] = Math.random() + key
-                  
-                  promises.push(axios.get(requestURL, {
-                    headers: {
-                      groupId: agencyListsGet[key]['value'],
-                      Accept: 'application/json'
-                    },
-                    params: {
-                      v: Math.random(),
-                      ...param.params
-                    }
-                  }))
-                }
-              }
-              axios.all(promises)
-              .then(axios.spread((...args) => {
-                let myObject = []
-                for (let i = 0; i < args.length; i++) {
-                  let dataOutput = args[i]['data'].hasOwnProperty('total') ? args[i]['data']['data'] : args[i]['data']
-                  if (args[i]['data']['total'] > 0 || (!args[i]['data'].hasOwnProperty('total') && dataOutput)) {
-                    myObject = myObject.concat(dataOutput)
-                  } else {
-                    let itemNoData = [
-                      {
-                        govAgencyCode: agencyListsGet[i]['value'],
-                        govAgencyName: agencyListsGet[i]['text']
-                      }
-                    ]
-                    myObject = myObject.concat(itemNoData)
-                  }
-                }
-                if (myObject.length > 0) {
-                  resolve(myObject)
                 } else {
-                  resolve(null)
+                  resolve([serializable.data])
                 }
-              }))
-            } else if (String(govAgency) !== '0' && String(govAgency) !== '' && agencyLists.length > 0) {
-              if (String(govAgency) === 'all') {
-                param['headers']['groupId'] = 0
+              } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
+                resolve(serializable)
               } else {
-                param['headers']['groupId'] = govAgency
-              }
-              param['params']['v'] = Math.random()
-              axios.get(requestURL, param).then(function (response) {
-                let serializable = response.data
-                if (serializable.data) {
-                  if (Array.isArray(serializable.data)) {
-                    let dataOut = serializable.data
-                    if (dataOut.length > 0 && Object.keys(dataOut[0]).length > 0) {
-                      resolve(dataOut)
-                    } else {
-                      resolve(null)
-                    }
-                    
-                  } else {
-                    resolve([serializable.data])
-                  }
-                } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
-                  resolve(serializable)
+                console.log('docu', filter.document === 'STATISTIC_05')
+                if (filter.document === 'STATISTIC_05') {
+                  resolve([])
                 } else {
                   resolve(null)
                 }
-              }).catch(function (error) {
-                console.log(error)
-                reject(error)
-              })
-            } else if (String(govAgency) === '' && agencyLists.length > 0) {
-              let getAllUrlParams = function(arr) {
-                let obj = {}
-                for (var i = 0; i < arr.length; i++) {
-                  let a = arr[i].split('=')
-                  let paramName = a[0]
-                  let paramValue = typeof (a[1]) === 'undefined' ? true : a[1]
-                  paramName = paramName.toLowerCase()
-                  if (typeof paramValue === 'string') paramValue = paramValue.toLowerCase()
-                  if (paramName.match(/\[(\d+)?\]$/)) {
-                    var key = paramName.replace(/\[(\d+)?\]/, '')
-                    if (!obj[key]) obj[key] = []
-                    if (paramName.match(/\[\d+\]$/)) {
-                      var index = /\[(\d+)\]/.exec(paramName)[1]
-                      obj[key][index] = paramValue
-                    } else {
-                      obj[key].push(paramValue)
-                    }
-                  } else {
-                    if (!obj[paramName]) {
-                      obj[paramName] = paramValue
-                    } else if (obj[paramName] && typeof obj[paramName] === 'string'){
-                      obj[paramName] = [obj[paramName]]
-                      obj[paramName].push(paramValue)
-                    } else {
-                      obj[paramName].push(paramValue)
-                    }
-                  }
-                }
-                return obj
               }
-              let typeMethod = 'POST'
-              let paramProxy = {
+            }).catch(function (error) {
+              console.log(error)
+              reject(error)
+            })
+          } else if (String(govAgency) === '0' && agencyLists.length > 0) {
+            let promises = []
+            for (let key in agencyListsGet) {
+              if (String(agencyListsGet[key]['value']) !== '0') {
+                let paramCopy = Object.assign({}, param)
+                paramCopy['headers']['groupId'] = agencyListsGet[key]['value']
+                paramCopy['params']['v'] = Math.random() + key
+                
+                promises.push(axios.get(requestURL, {
                   headers: {
-                      groupId: window.themeDisplay.getScopeGroupId(),
-                      Token: window.Liferay ? window.Liferay.authToken : ''
+                    groupId: agencyListsGet[key]['value'],
+                    Accept: 'application/json'
                   },
-                  params: {}
+                  params: {
+                    v: Math.random(),
+                    ...param.params
+                  }
+                }))
               }
-              let dataUpdate = new URLSearchParams()
-              let paramGetProxy = param.params
-              try {
-                let paramApi = getAllUrlParams(filter.api.split('?')[1].split('&'))
-                paramGetProxy = Object.assign(param.params, paramApi)
-              } catch (error) {
-              }
-              
-              dataUpdate.append("method", "GET")
-              dataUpdate.append("url", filter['proxyApi'])
-              dataUpdate.append('data', JSON.stringify(paramGetProxy))
-              axios({
-                method: typeMethod,
-                url: '/o/rest/v2/proxy',
-                headers: paramProxy.headers,
-                params: paramProxy.params,
-                data: dataUpdate
-              }).then(function (response) {
-                let serializable = response.data
-                if (serializable.data) {
-                  resolve(serializable.data)
-                } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
-                  resolve(serializable)
-                } else {
-                  resolve(null)
-                }
-              }).catch(function (error) {
-                reject(error)
-              })
             }
+            axios.all(promises)
+            .then(axios.spread((...args) => {
+              let myObject = []
+              for (let i = 0; i < args.length; i++) {
+                let dataOutput = args[i]['data'].hasOwnProperty('total') ? args[i]['data']['data'] : args[i]['data']
+                if (args[i]['data']['total'] > 0 || (!args[i]['data'].hasOwnProperty('total') && dataOutput)) {
+                  myObject = myObject.concat(dataOutput)
+                } else {
+                  let itemNoData = [
+                    {
+                      govAgencyCode: agencyListsGet[i]['value'],
+                      govAgencyName: agencyListsGet[i]['text']
+                    }
+                  ]
+                  myObject = myObject.concat(itemNoData)
+                }
+              }
+              if (myObject.length > 0) {
+                resolve(myObject)
+              } else {
+                resolve(null)
+              }
+            }))
+          } else if (String(govAgency) !== '0' && String(govAgency) !== '' && agencyLists.length > 0) {
+            if (String(govAgency) === 'all') {
+              param['headers']['groupId'] = 0
+            } else {
+              param['headers']['groupId'] = govAgency
+            }
+            param['params']['v'] = Math.random()
+            axios.get(requestURL, param).then(function (response) {
+              let serializable = response.data
+              if (serializable.data) {
+                if (Array.isArray(serializable.data)) {
+                  let dataOut = serializable.data
+                  if (dataOut.length > 0 && Object.keys(dataOut[0]).length > 0) {
+                    resolve(dataOut)
+                  } else {
+                    resolve(null)
+                  }
+                  
+                } else {
+                  resolve([serializable.data])
+                }
+              } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
+                resolve(serializable)
+              } else {
+                resolve(null)
+              }
+            }).catch(function (error) {
+              console.log(error)
+              reject(error)
+            })
+          } else if (String(govAgency) === '' && agencyLists.length > 0) {
+            let getAllUrlParams = function(arr) {
+              let obj = {}
+              for (var i = 0; i < arr.length; i++) {
+                let a = arr[i].split('=')
+                let paramName = a[0]
+                let paramValue = typeof (a[1]) === 'undefined' ? true : a[1]
+                paramName = paramName.toLowerCase()
+                if (typeof paramValue === 'string') paramValue = paramValue.toLowerCase()
+                if (paramName.match(/\[(\d+)?\]$/)) {
+                  var key = paramName.replace(/\[(\d+)?\]/, '')
+                  if (!obj[key]) obj[key] = []
+                  if (paramName.match(/\[\d+\]$/)) {
+                    var index = /\[(\d+)\]/.exec(paramName)[1]
+                    obj[key][index] = paramValue
+                  } else {
+                    obj[key].push(paramValue)
+                  }
+                } else {
+                  if (!obj[paramName]) {
+                    obj[paramName] = paramValue
+                  } else if (obj[paramName] && typeof obj[paramName] === 'string'){
+                    obj[paramName] = [obj[paramName]]
+                    obj[paramName].push(paramValue)
+                  } else {
+                    obj[paramName].push(paramValue)
+                  }
+                }
+              }
+              return obj
+            }
+            let typeMethod = 'POST'
+            let paramProxy = {
+                headers: {
+                    groupId: window.themeDisplay.getScopeGroupId(),
+                    Token: window.Liferay ? window.Liferay.authToken : ''
+                },
+                params: {}
+            }
+            let dataUpdate = new URLSearchParams()
+            let paramGetProxy = param.params
+            try {
+              let paramApi = getAllUrlParams(filter.api.split('?')[1].split('&'))
+              paramGetProxy = Object.assign(param.params, paramApi)
+            } catch (error) {
+            }
+            
+            dataUpdate.append("method", "GET")
+            dataUpdate.append("url", filter['proxyApi'])
+            dataUpdate.append('data', JSON.stringify(paramGetProxy))
+            axios({
+              method: typeMethod,
+              url: '/o/rest/v2/proxy',
+              headers: paramProxy.headers,
+              params: paramProxy.params,
+              data: dataUpdate
+            }).then(function (response) {
+              let serializable = response.data
+              if (serializable.data) {
+                resolve(serializable.data)
+              } else if (!serializable.data && Array.isArray(serializable) && serializable.length > 0) {
+                resolve(serializable)
+              } else {
+                resolve(null)
+              }
+            }).catch(function (error) {
+              reject(error)
+            })
+          }
           
         })
       })

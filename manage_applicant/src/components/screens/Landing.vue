@@ -3,7 +3,8 @@
     <v-card>
       <div class="row-header no__hidden_class">
         <div class="background-triangle-big">
-          <span>QUẢN LÝ THÔNG TIN CÔNG DÂN, CƠ QUAN TỔ CHỨC, DOANH NGHIỆP</span>
+          <span v-if="!onlyDocument">QUẢN LÝ THÔNG TIN CÔNG DÂN, CƠ QUAN TỔ CHỨC, DOANH NGHIỆP</span>
+          <span v-else>KHO GIẤY TỜ CÔNG DÂN, CƠ QUAN TỔ CHỨC, DOANH NGHIỆP</span>
         </div>
         <div class="layout row wrap header_tools row-blue mx-1">
           <div class="flex xs6 text-right" style="margin-left: auto;">
@@ -24,7 +25,7 @@
             <v-radio-group class="pt-0 d-inline-block ml-3 mt-0" v-model="typeSearch" row @change="changeTypeSearch">
               <v-radio label="Công dân" :value="'citizen'"></v-radio>
               <v-radio label="Doanh nghiệp" :value="'business'"></v-radio>
-              <v-radio label="Cơ quan, tổ chức" :value="'organization'"></v-radio>
+              <!-- <v-radio label="Cơ quan, tổ chức" :value="'organization'"></v-radio> -->
               <v-radio label="Tất cả" :value="''" ></v-radio>
             </v-radio-group>
           </v-flex>
@@ -56,7 +57,7 @@
               ></v-text-field>
           </v-flex>
         </v-layout>
-        <div style="text-align: right">
+        <div style="text-align: right" v-if="!onlyDocument">
           <v-btn color="blue darken-3" dark @click="addApplicant">
             <v-icon size="16">add</v-icon>&nbsp;Thêm mới
           </v-btn>
@@ -114,13 +115,13 @@
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-tooltip top v-if="!loadingTable">
+                <v-tooltip top v-if="!loadingTable && !onlyDocument ">
                   <v-btn @click="showEditApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 mr-3 my-0">
                     <v-icon size="22">edit</v-icon>
                   </v-btn>
                   <span>Cập nhật thông tin</span>
                 </v-tooltip>
-                <v-tooltip top v-if="!loadingTable && (getUser('Administrator') || getUser('Administrator_data')) && props.item['verification'] == 1">
+                <v-tooltip top v-if="!loadingTable && !onlyDocument && (getUser('Administrator') || getUser('Administrator_data')) && props.item['verification'] == 1">
                   <v-btn @click="deleteApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0 mr-3">
                     <v-icon size="22">delete</v-icon>
                   </v-btn>
@@ -297,6 +298,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    onlyDocument: false,
     hasVerification: false,
     verificationApplicant: false,
     typeUpdateApplicant: 'update',
@@ -369,6 +371,11 @@ export default {
   },
   created () {
     let vm = this
+
+    try {
+      vm.onlyDocument = onlyDocument
+    } catch (error) {
+    }
     try {
       vm.hasVerification = hasVerification
     } catch (error) {
@@ -540,6 +547,10 @@ export default {
     },
     showEditApplicant (item) {
       let vm = this
+      if (vm.onlyDocument) {
+        vm.documentManage(item)
+        return
+      }
       vm.typeUpdateApplicant = 'update'
       vm.applicantEdit = item
       vm.verificationApplicant = vm.applicantEdit['verification'] === 0 ? true : false

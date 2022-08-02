@@ -1318,7 +1318,7 @@ export default {
         } else {
           vm.$store.dispatch('getFileAttach', filter).then(function (result) {
             let fileType = item.fileExtension.toLowerCase()
-            if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+            if (fileType === '' || fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
               fileType === 'tif' || fileType === 'tiff'
             ) {
               vm.dialogPDF = true

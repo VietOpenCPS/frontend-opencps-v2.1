@@ -161,7 +161,7 @@ export default {
         let actionCode = query.hasOwnProperty('actionCode') ? query.actionCode : ''
         let dataParam = query.hasOwnProperty('data') ? query.data : ''
         if (!referenceUidQuery && dataParam) {
-          referenceUidQuery = dataParam.split('_')[1]
+          referenceUidQuery = dataParam.split('_')[2]
         }
         if (query.hasOwnProperty('paygate') && query.hasOwnProperty('orderId')) {
           // phần thông báo thanh toán qua Cổng PayGate
