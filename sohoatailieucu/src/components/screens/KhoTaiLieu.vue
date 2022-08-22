@@ -12,7 +12,10 @@
       <v-card-text class="px-0 pb-0" v-if="showAdvanceSearch">
         <tim-kiem ref="timkiem" :donVi="donViCapConfig"  v-on:trigger-search="searchGiayToSoHoa" v-on:trigger-cancel="cancelSearchGiayToSoHoa"></tim-kiem>
       </v-card-text>
-
+      <div class="my-2">
+        <span style="color: red">(*) </span>
+        <span style="text-transform: uppercase;font-size: 16px;">Vui lòng tải mẫu import số hóa mới (Cập nhật ngày 5/8/2022)</span>
+      </div>
       <v-btn color="red" small class="mx-0 white--text mr-2" @click.stop="deleteMultiDocument">
         <v-icon size="16" style="color: #fff !important">
           delete
@@ -37,6 +40,7 @@
         </v-icon> &nbsp;
         Ký số giấy tờ
       </v-btn>
+      
       <div class="mt-2">
         <v-checkbox
           class="mt-0 mr-3 d-inline-block"
@@ -901,9 +905,10 @@
         
         let fileArr = []
         vm.selectedDocument.forEach((element, index) => {
+          let ten = String(element.tenGiayTo).length > 170 ? String(element.tenGiayTo).slice(0,170) : element.tenGiayTo
           let prms = {
             "FileID": element.excelDataId,
-            "FileName": String(element.tenGiayTo).replace(/"/g, " "),
+            "FileName": ten.replace(/"/g, " "),
             "URL": element.tenFileFull
           }
           fileArr.push(prms)

@@ -1953,7 +1953,35 @@ export const store = new Vuex.Store({
             resolve([])
           }
         }).catch(function (xhr) {
-          console.log(xhr)
+          reject(xhr)
+        })
+      })
+    },
+    getDossierFilesApplicantsVer2Proxy ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let params = {
+          applicantIdNo: filter.applicantIdNo,
+          templateNo: filter.templateNo
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/applicantdatas/dossierpart')
+        dataPost.append('data', JSON.stringify(params))
+        if (filter.serverCode) {
+          dataPost.append('serverCode', filter.serverCode)
+        }
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) { 
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
           reject(xhr)
         })
       })
@@ -4343,8 +4371,9 @@ export const store = new Vuex.Store({
             votingCode: data.votingCode ? data.votingCode : ''
           }
           let dataPost = new URLSearchParams()
+          let id = data.votingId ? data.votingId : data.voteId
           dataPost.append('method', 'POST')
-          dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
+          dataPost.append('url', '/postal/votings/' + id + '/results')
           dataPost.append('data', JSON.stringify(textPost))
           dataPost.append('serverCode', data.serverCode)
           axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
@@ -4849,7 +4878,9 @@ export const store = new Vuex.Store({
           dataPost.append('method', 'GET')
           dataPost.append('url', '/applicantdatas')
           dataPost.append('data', JSON.stringify(textPost))
-
+          if (filter.serverCode) {
+            dataPost.append('serverCode', filter.serverCode)
+          }
           axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
             if (response['data'].hasOwnProperty('data')) {
               if (Array.isArray(response['data']['data'])) {

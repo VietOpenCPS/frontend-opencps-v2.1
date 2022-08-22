@@ -24,7 +24,7 @@
                 </span>
               </v-btn>
               <v-spacer></v-spacer>
-              <v-btn dark flat class="mr-2" v-if="state === 0" v-on:click="submitUserProfile">
+              <v-btn dark flat class="mr-2" v-if="state === 0 && !hasSSoCanBo" v-on:click="submitUserProfile">
                 <v-icon>done</v-icon> &nbsp; Cập nhật thông tin
               </v-btn>
               <v-btn dark flat class="mr-2" v-else v-on:click.native="doChangePassWord">
@@ -425,17 +425,18 @@
             </v-layout>
             <!-- profile cán bộ -->
             <v-layout v-if="state === 0 && user['className'] === 'org.opencps.usermgt.model.Employee'" row wrap class="px-3 py-3">
-              <v-flex xs12 sm6>
+              <!--  -->
+              <v-flex xs12 sm6 v-if="!hasSSoCanBo">
                 <v-text-field v-model="user['employeeFullName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required>
-                  <template slot="label">Tên người dùng <span class="red--text darken-3">*</span></template>
+                  <template slot="label">Tên cán bộ <span class="red--text darken-3">*</span></template>
                 </v-text-field>
               </v-flex>
-              <v-flex xs12 sm6>
+              <v-flex xs12 sm6 v-if="!hasSSoCanBo">
                 <v-text-field v-model="user['employeeNo']" box>
                   <template slot="label">Mã cán bộ <span class="red--text darken-3">*</span></template>
                 </v-text-field>
               </v-flex>
-              <v-flex xs12 sm6>
+              <v-flex xs12 sm6 v-if="!hasSSoCanBo">
                 <v-menu
                   ref="menuBirthDate"
                   :close-on-content-click="false"
@@ -459,14 +460,34 @@
                   v-model="ngayCap" no-title @input="changeBirthDate"></v-date-picker>
                 </v-menu>
               </v-flex>
-              <v-flex xs12 sm6>
+              <v-flex xs12 sm6 v-if="!hasSSoCanBo">
                 <v-text-field label="Điện thoại" v-model="user['employeeTelNo']" box></v-text-field>
               </v-flex>
-              <!-- <v-flex xs12 sm4>
-                <v-text-field label="Chức danh ký số" v-model="user['title']" box></v-text-field>
-              </v-flex> -->
-              <!-- <v-flex xs8>
-                <v-text-field label="Tên quầy đánh giá" value="" box></v-text-field>
+              <!-- Thông tin cán bộ SSO -->
+              <v-flex xs12 sm6 v-if="hasSSoCanBo">
+                <v-text-field v-model="profileCanBo['HoVaTen']" box>
+                  <template slot="label">Tên cán bộ</template>
+                </v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 v-if="hasSSoCanBo">
+                <v-text-field v-model="profileCanBo['MaSoCanBo']" box>
+                  <template slot="label">Mã cán bộ </template>
+                </v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 v-if="hasSSoCanBo">
+                <v-text-field v-model="profileCanBo['ViTriChucDanh']" box>
+                  <template slot="label">Chức danh</template>
+                </v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 v-if="hasSSoCanBo">
+                <v-text-field v-model="profileCanBo['VaiTroSuDung']" box>
+                  <template slot="label">Vai trò</template>
+                </v-text-field>
+              </v-flex>
+              <!-- <v-flex xs12 sm6 v-if="hasSSoCanBo">
+                <v-text-field v-model="" box>
+                  <template slot="label">Quyền hệ thống</template>
+                </v-text-field>
               </v-flex> -->
               <!--  -->
               <v-flex xs12 class="px-0" v-if="serverProtocolFilter.length > 0">
@@ -477,7 +498,7 @@
                   </v-flex>
                 </v-layout>
               </v-flex>
-              <!--  -->
+
               <v-flex xs12 sm6>
                 <p class="mb-2 px-1">File ảnh ký số</p>
                 <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="itemEsign" :type="'image'"></attached-file-avatar>
@@ -497,7 +518,7 @@
                   class="mt-2 d-inline-block" color="primary" v-model="sendNotify" label="sendNotifycation" @change="changeConfigNotify"
                 ></v-checkbox>
               </v-flex>
-              <v-flex sm12 class="text-xs-right">
+              <v-flex sm12 class="text-xs-right" v-if="!hasSSoCanBo">
                 <v-btn color="blue darken-3" :loading="loading" :disabled="loading" v-on:click.native="submitUserProfile" class="mx-0" dark>
                   <v-icon>done</v-icon>&nbsp; Cập nhật thông tin
                 </v-btn>
@@ -535,18 +556,24 @@
                 <v-flex xs12 sm4>
                   <v-subheader class="pr-0">Ngày sinh: </v-subheader>
                 </v-flex>
-                <v-flex xs8>
+                <v-flex xs8 v-if="!hasSSoCanBo">
                   <v-subheader>{{user['employeeBirthDate']}}</v-subheader>
                 </v-flex>
+                <v-flex xs8 v-if="hasSSoCanBo">
+                  <v-subheader>{{profileCanBo['NgaySinh']}}</v-subheader>
+                </v-flex>                
                 <v-flex xs12 sm4>
                   <v-subheader class="pr-0">Số điện thoại: </v-subheader>
                 </v-flex>
-                <v-flex xs8>
+                <v-flex xs8 v-if="!hasSSoCanBo">
                   <v-subheader>{{user['employeeTelNo']}}</v-subheader>
+                </v-flex>
+                <v-flex xs8 v-if="hasSSoCanBo">
+                  <v-subheader>{{profileCanBo['SoDienThoai']}}</v-subheader>
                 </v-flex>
               </v-layout>
               <!-- Đổi mật khẩu -->
-              <v-layout row wrap v-if="activeChangePass">
+              <v-layout row wrap v-if="activeChangePass && !hasSSoCanBo">
                 <v-flex xs12 class="mx-3">
                   <v-btn block color="blue darken-3" dark v-on:click.native="showChangePass">{{stateLabel}}</v-btn>
                 </v-flex>
@@ -1005,6 +1032,15 @@
       taiKhoanKeycloak: false,
       tokenKeyCloak: '',
       domainKeycloak: '',
+      hasSSoCanBo: false,
+      profileCanBo: {
+        HoVaTen: '',
+        MaSoCanBo: '',
+        ViTriChucDanh: '',
+        VaiTroSuDung: '',
+        SoDienThoai: '',
+        NgaySinh: ''
+      },
       profileCongDan: {
         "hoVaTen": "",
         "maSoCaNhan": "",
@@ -1143,6 +1179,10 @@
       }
       try {
         vm.domainKeycloak = domainKeycloak
+      } catch (error) {
+      }
+      try {
+        vm.hasSSoCanBo = hasSSoCanBo
       } catch (error) {
       }
       try {
@@ -1380,6 +1420,7 @@
             vm.item['upload_api'] = '/o/v1/opencps/users/upload/opencps_employee/org.opencps.usermgt.model.Employee'
             vm.item['class_name'] = 'org.opencps.usermgt.model.Employee'
             vm.getServerConfigAll()
+            vm.getEmployeeInfoKeycloak(vm.user)
           }
         })
       })
@@ -1400,6 +1441,28 @@
       }
     },
     methods: {
+      getEmployeeInfoKeycloak (data) {
+        let vm = this
+        let filter = {
+          domainKeycloak: vm.domainKeycloak,
+          data: {
+            maSoID: window.themeDisplay.getUserId(),
+            tenDinhDanh: data.employeeEmail
+          }
+        }
+        vm.$store.dispatch('getEmployeeInfoKeycloak', filter).then(function (response) {
+          let dataProfile = response
+          let vaiTro = response.VaiTroSuDung ? Array.from(response.VaiTroSuDung, function (item) {
+            return item.TenMuc
+          }) : ''
+          dataProfile.VaiTroSuDung = vaiTro.toString().replace(/,/g, ", ")
+          dataProfile.ViTriChucDanh = response.ViTriChucDanh['TenMuc']
+          dataProfile['SoDienThoai'] = response.DanhBaLienLac['SoDienThoai']
+          dataProfile['NgaySinh'] = response.DanhBaLienLac['NgaySinh']
+          vm.profileCanBo = dataProfile
+        }).catch(function () {
+        })
+      },
       sendCode () {
         let vm = this
         vm.loading = true

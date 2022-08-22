@@ -298,6 +298,15 @@
               } else {
                 vm.agencyList = configs[idSite]
               }
+            } else {
+              if (configs.hasOwnProperty('SBN') && configs.hasOwnProperty('SBN_MANAGER_SITE')) {
+                let isSbn = configs['SBN'].find(function (item) {
+                  return item == idSite
+                })
+                if (isSbn) {
+                  vm.agencyList = configs['SBN_MANAGER_SITE']
+                }
+              }
             }
           }
           vm.$store.commit('setAgencyListManager', vm.agencyList)

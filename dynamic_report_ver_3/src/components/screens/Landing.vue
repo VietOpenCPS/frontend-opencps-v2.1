@@ -1901,7 +1901,7 @@ export default {
                 if (vm.doExportExcel && !vm.doExportWord) {
                   vm.$store.dispatch('getExcelReportFromServer', {
                     data: docDString,
-                    fileName: 'baocaothongke' + '.xls'
+                    fileName: 'baocaothongke' + '.xlsx'
                   })
                 }
                 if (vm.doExportWord) {
@@ -2186,7 +2186,7 @@ export default {
                 if (vm.doExportExcel && !vm.doExportWord) {
                   vm.$store.dispatch('getExcelReportFromServer', {
                     data: docDString,
-                    fileName: 'baocaothongke' + '.xls'
+                    fileName: 'baocaothongke' + '.xlsx'
                   })
                 }
                 if (vm.doExportWord) {
@@ -2739,7 +2739,7 @@ export default {
               if (vm.doExportExcel && !vm.doExportWord) {
                 vm.$store.dispatch('getExcelReportFromServer', {
                   data: docDString,
-                  fileName: new Date().getTime() + '.xls'
+                  fileName: new Date().getTime() + '.xlsx'
                 })
               }
               if (vm.doExportWord) {
@@ -3109,7 +3109,7 @@ export default {
           type: 'data:application/vnd.ms-excel;charset=utf-8;',
         })
         // window.location.href = "data:application/vnd.ms-excel;charset=UTF-8,%EF%BB%BF" + encodeURIComponent(tab_text)
-        FileSaver.saveAs(blob, new Date().getTime() + ".xls");
+        FileSaver.saveAs(blob, new Date().getTime() + ".xlsx");
       })
     },
     goToThongKe () {
@@ -3178,7 +3178,7 @@ export default {
         data: vm.data,
         api: vm.api,
         proxyApi: vm.proxyApi,
-        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xls'
+        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xlsx'
       }
       if (n) {
         filter.start = vm.sttQuyen * counterPage - counterPage
@@ -3214,7 +3214,7 @@ export default {
         data: vm.data,
         api: vm.api,
         proxyApi: vm.proxyApi,
-        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xls'
+        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xlsx'
       }
       for (let key in vm.filterGroup) {
         if(key === vm.groupIdListSelected) {
@@ -3235,7 +3235,7 @@ export default {
       vm.$store.dispatch('getExcelReportFromServer', {
         groupId: vm.govAgency && !isNaN(Number(vm.govAgency)) ? vm.govAgency : window.themeDisplay.getScopeGroupId(),
         data: vm.dataExportExcel,
-        fileName: 'baocaothongke' + '.xls'
+        fileName: 'baocaothongke' + '.xlsx'
       })
     },
     changeGroupIdList(item){

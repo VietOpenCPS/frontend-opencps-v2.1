@@ -231,7 +231,7 @@ import $ from 'jquery'
 import TinyPagination from '../../components/pagging/opencps_pagination'
 Vue.use(toastr)
 export default {
-  props: ['index', 'fileTemplateNoScope', 'status', 'thongTinChuHoSo'],
+  props: ['index', 'fileTemplateNoScope', 'status', 'thongTinChuHoSo', 'serverCode'],
   components: {
     'tiny-pagination': TinyPagination
   },
@@ -362,7 +362,8 @@ export default {
         status: vm.originality === 1 ? 1 : vm.status,
         keywordSearch: vm.keySearch,
         fileNoSearch: vm.fileNoSearch,
-        applicantDataType: ''
+        applicantDataType: '',
+        serverCode: vm.serverCode
       }
       vm.loadingTable = true
       if (vm.originality === 1) {

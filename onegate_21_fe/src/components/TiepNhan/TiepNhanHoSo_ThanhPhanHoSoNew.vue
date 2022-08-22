@@ -637,7 +637,7 @@
           </v-btn>
         </v-toolbar>
         <v-card-text class="py-1" style="min-height: 350px">
-          <kho-tai-lieu ref="khotailieu" :index="applicantId" :fileTemplateNoScope="fileTemplateNoScope" :status="statusApplicantData" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorage"></kho-tai-lieu>
+          <kho-tai-lieu ref="khotailieu" :index="applicantId" :serverCode="!oneApp && originality == '1' ? thongTinHoSo.serverNo : ''" :fileTemplateNoScope="fileTemplateNoScope" :status="statusApplicantData" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorage"></kho-tai-lieu>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -1350,12 +1350,17 @@ export default {
     dialogInputMobile: false,
     loadingAction: false,
     kySoSavis: false,
-    kySoVnptSmartCa: false
+    kySoVnptSmartCa: false,
+    oneApp: false
   }),
   created () {
     let vm = this
     vm.receiveMessage = function (event) {
       vm.saveAlpacaFormCallBack(event)
+    }
+    try {
+      vm.oneApp = oneApp
+    } catch (error) {
     }
     try {
       vm.kySoVnptSmartCa = kySoVnptSmartCa
@@ -3264,7 +3269,8 @@ export default {
       let filter = {
         dossierId: vm.thongTinHoSo.dossierId,
         applicantIdNo: applicantIdNo,
-        fileTemplateNo: fileTemplateNo
+        fileTemplateNo: fileTemplateNo,
+        serverCode: vm.thongTinHoSo.serverNo
       }
       if (applicantIdNo) {
         if (!vm.khoTaiLieuCongDan) {
@@ -3275,12 +3281,22 @@ export default {
           })
         } else {
           filter['templateNo'] = vm.thongTinHoSo.dossierTemplateNo
-          vm.$store.dispatch('getDossierFilesApplicantsVer2', filter).then(result => {
-            vm.dossierFilesApplicant = result
-            console.log('hasFile', vm.dossierFilesApplicant)
-          }).catch(reject => {
-            console.log('error')
-          })
+          if (vm.oneApp || vm.originality == 3) {
+            vm.$store.dispatch('getDossierFilesApplicantsVer2', filter).then(result => {
+              vm.dossierFilesApplicant = result
+              console.log('hasFile', vm.dossierFilesApplicant)
+            }).catch(reject => {
+              console.log('error')
+            })
+          } else {
+            vm.$store.dispatch('getDossierFilesApplicantsVer2Proxy', filter).then(result => {
+              vm.dossierFilesApplicant = result
+              console.log('hasFile', vm.dossierFilesApplicant)
+            }).catch(reject => {
+              console.log('error')
+            })
+          }
+          
         }
       }
     },
@@ -3388,14 +3404,12 @@ export default {
     },
     attachFileFromStorage (data) {
       let vm = this
-      var originUrl = 'http://' + window.location.hostname;
-      var originUrl2 = 'https://' + window.location.hostname;
-      let filePath = data.filePath.replace(originUrl,"").replace(originUrl2,"")
+      let filePath = new URL(data.filePath)
       let filter = {
         dossierId: vm.thongTinHoSo.dossierId,
         dossierTemplateNo: vm.thongTinHoSo.dossierTemplateNo,
         partNo: vm.dossierPartAttach.partNo,
-        filePath: filePath,
+        filePath: filePath.pathname,
         fileName: data.fileName,
         fileType: data.fileExtension,
         fileEntryId: data.fileEntryId,
