@@ -42,7 +42,6 @@ article, .glass::before {
     transition: transform 0.5s ease-out;
   }
   .glass::before {
-    background-image: url('http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/bg-home.jpg');
   }
 
   body .v-navigation-drawer--fixed {

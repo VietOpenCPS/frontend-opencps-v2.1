@@ -98,6 +98,26 @@ export const store = new Vuex.Store({
         })
       })
     },
+    uploadFileKySo ({commit, state}, file) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        console.log('fileInput', file)
+        let fileName = file['name']
+        let dataPost = new FormData()
+        dataPost.append('uploadfile', file, fileName)
+        axios.post('/o/rest/v2/vgca/fileupload', dataPost, config).then(function (result) {
+          let data = Object.assign(result.data, {"fileNameInput": file['name']})
+          resolve(data)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
   },
   mutations: {
     setLoading (state, payload) {

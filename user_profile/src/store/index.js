@@ -126,14 +126,14 @@ export const store = new Vuex.Store({
     getEmployeeInfoKeycloak ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let config = {
-          method: 'get',
-          url: filter.domainKeycloak + '/officer/internal/canbo/1.0/danhtinhdientu',
+          method: 'post',
+          url: '/o/rest/v2/qldc/lgsp',
           headers: { 
             'Accept': 'application/json', 
             'Content-Type': 'application/json'
           },
-          data: {},
-          params: filter.data
+          data: JSON.stringify(filter.data),
+          params: {}
         }
         axios(config).then(function (response) {
           let serializable = response.data

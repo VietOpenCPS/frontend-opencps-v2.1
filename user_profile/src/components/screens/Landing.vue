@@ -27,7 +27,7 @@
               <v-btn dark flat class="mr-2" v-if="state === 0 && !hasSSoCanBo" v-on:click="submitUserProfile">
                 <v-icon>done</v-icon> &nbsp; Cập nhật thông tin
               </v-btn>
-              <v-btn dark flat class="mr-2" v-else v-on:click.native="doChangePassWord">
+              <v-btn dark flat class="mr-2" v-if="state !== 0 && !hasSSoCanBo" v-on:click.native="doChangePassWord">
                 <v-icon>done</v-icon> &nbsp; Xác nhận đổi mật khẩu
               </v-btn>
             </v-toolbar>
@@ -475,8 +475,18 @@
                 </v-text-field>
               </v-flex>
               <v-flex xs12 sm6 v-if="hasSSoCanBo">
+                <v-text-field v-model="profileCanBo['NoiCongTac']" box>
+                  <template slot="label">Nơi công tác</template>
+                </v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 v-if="hasSSoCanBo">
                 <v-text-field v-model="profileCanBo['ViTriChucDanh']" box>
                   <template slot="label">Chức danh</template>
+                </v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 v-if="hasSSoCanBo">
+                <v-text-field v-model="profileCanBo['TinhTrangCongTac']" box>
+                  <template slot="label">Tình trạng công tác</template>
                 </v-text-field>
               </v-flex>
               <v-flex xs12 sm6 v-if="hasSSoCanBo">
@@ -485,7 +495,7 @@
                 </v-text-field>
               </v-flex>
               <!-- <v-flex xs12 sm6 v-if="hasSSoCanBo">
-                <v-text-field v-model="" box>
+                <v-text-field v-model="profileCanBo['PhanQuyenVaiTro']" box>
                   <template slot="label">Quyền hệ thống</template>
                 </v-text-field>
               </v-flex> -->
@@ -1039,7 +1049,9 @@
         ViTriChucDanh: '',
         VaiTroSuDung: '',
         SoDienThoai: '',
-        NgaySinh: ''
+        NgaySinh: '',
+        NoiCongTac: '',
+        TinhTrangCongTac: ''
       },
       profileCongDan: {
         "hoVaTen": "",
@@ -1447,19 +1459,24 @@
           domainKeycloak: vm.domainKeycloak,
           data: {
             maSoID: window.themeDisplay.getUserId(),
-            tenDinhDanh: data.employeeEmail
+            tenDinhDanh: data.employeeEmail,
+            type: "ThongTinCanBo"
           }
         }
         vm.$store.dispatch('getEmployeeInfoKeycloak', filter).then(function (response) {
-          let dataProfile = response
-          let vaiTro = response.VaiTroSuDung ? Array.from(response.VaiTroSuDung, function (item) {
-            return item.TenMuc
-          }) : ''
-          dataProfile.VaiTroSuDung = vaiTro.toString().replace(/,/g, ", ")
-          dataProfile.ViTriChucDanh = response.ViTriChucDanh['TenMuc']
-          dataProfile['SoDienThoai'] = response.DanhBaLienLac['SoDienThoai']
-          dataProfile['NgaySinh'] = response.DanhBaLienLac['NgaySinh']
-          vm.profileCanBo = dataProfile
+          if (response.message == 'success') {
+            let dataProfile = response.resp
+            let vaiTro = response.resp.VaiTroSuDung ? Array.from(response.resp.VaiTroSuDung, function (item) {
+              return item.TenMuc
+            }) : ''
+            dataProfile.VaiTroSuDung = vaiTro.toString().replace(/,/g, ", ")
+            dataProfile.NoiCongTac = response.resp.NoiCongTac['TenGoi']
+            dataProfile.TinhTrangCongTac = response.resp.TinhTrangCongTac['TenMuc']
+            dataProfile.ViTriChucDanh = response.resp.ChucVuCapBac['TenMuc']
+            dataProfile['SoDienThoai'] = response.resp.DanhBaLienLac['SoDienThoai']
+            dataProfile['NgaySinh'] = response.resp['NgaySinh'] ? response.resp['NgaySinh'] : ''
+            vm.profileCanBo = dataProfile
+          }
         }).catch(function () {
         })
       },
