@@ -1693,9 +1693,9 @@ export default {
     kySoDocument (fileSigned) {
       let vm = this
       let prms = {}
-      prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.dossierSelect.dossierId + '/documents/' + fileSigned.fileEntryId
+      prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.dossierSelect.dossierId + '/documents/' + fileSigned.fileEntryId + '/type/' + vm.dossierSelect.documentType + '/group/' + window.themeDisplay.getScopeGroupId()
       prms['SessionId'] = ''
-      prms['FileName'] = fileSigned.url
+      prms['FileName'] = fileSigned.url.split(".pdf")[0] + '.pdf'
       let signFileCallBack = function (rv) {
         let received_msg = JSON.parse(rv)
         if (received_msg.Status === 0) {
@@ -2663,6 +2663,7 @@ export default {
     doPrint01 (dossierItem, item, index, isGroup) {
       let vm = this
       vm.dossierSelect = dossierItem
+      vm.dossierSelect['documentType'] = item.document
       vm.dialogPDFLoading = true
       vm.dialogPDF = true
       let filter = {
