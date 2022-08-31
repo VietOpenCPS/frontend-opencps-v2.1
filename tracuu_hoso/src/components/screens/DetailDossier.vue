@@ -268,7 +268,7 @@
                   </v-flex>
                 </v-layout>
               </v-card-text>
-              <div class="text-xs-left mt-2 mb-3 ml-0">
+              <div class="text-xs-left mt-2 mb-5 ml-0">
                 <!-- thanh toán keypay -->
                 <v-chip v-if="getEPaymentProfile(paymentInfo.epaymentProfile)" color="orange" text-color="white"
                   @click.native="toKeyPay(getEPaymentProfile(paymentInfo.epaymentProfile).keypayUrl)"
@@ -287,6 +287,15 @@
                   </v-avatar>
                   <span class="py-2" style="cursor: pointer">Thanh toán qua Cổng DVCQG</span>
                 </v-chip>
+                <div v-if="urlThanhToanPp" class="pt-0" style="position: absolute;top: 0;right: 0;">
+                  <qrcode :value="urlThanhToanPp" :options="{ width: 150 }"></qrcode><br>
+                  <v-chip class="my-0" color="#cb7755"  text-color="white" style="width:165px;margin-top:-5px !important;margin-left: -10px;">
+                    <v-avatar>
+                      <img src="/o/opencps-store/js/cli/dvc/app/image/logo-ppkp.png" alt="trevor" style="background: #fff">
+                    </v-avatar>
+                    <span style="font-size:13px !important">Quét để thanh toán</span>
+                  </v-chip>
+                </div>
                 <!--  -->
               </div>
             </v-card>
@@ -332,13 +341,17 @@
   </div>
 </template>
 <script>
+  import Vue from 'vue'
   import toastr from 'toastr'
   import axios from 'axios'
+  import VueQrcode from '@chenfengyuan/vue-qrcode'
+  Vue.component(VueQrcode.name, VueQrcode)
   export default {
     props: ['index', 'detail'],
     components: {
     },
     data: () => ({
+      urlThanhToanPp: '',
       votingVersion: '',
       votingResult: null,
       loading: false,
@@ -626,7 +639,17 @@
               vm.paymentInfo = result
             }
           }
-
+          // 
+          if (vm.getEPaymentProfile(vm.paymentInfo.epaymentProfile) && vm.getEPaymentProfile(vm.paymentInfo.epaymentProfile).hasOwnProperty('ppkpdvcqg')) {
+            let filter = {
+              dossierId: vm.dossierDetail.dossierId
+            }
+            vm.$store.dispatch('toKeypayDvcqg', filter).then(result => {
+              vm.urlThanhToanPp = result
+            }).catch(function() {
+            })
+          }
+          // 
         })
       },
       currency (value) {

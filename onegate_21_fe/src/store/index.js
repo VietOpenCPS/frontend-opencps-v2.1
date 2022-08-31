@@ -153,7 +153,8 @@ export const store = new Vuex.Store({
     filterDateFromTo: ['fromReceiveDate','toReceiveDate','fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate'],
     dossierSelectedDoAction: [],
     formActionGroup: '',
-    keywordSearch: ''
+    keywordSearch: '',
+    base64Document: ''
   },
   actions: {
     clearError ({commit}) {
@@ -1264,15 +1265,18 @@ export const store = new Vuex.Store({
           }
         }
         axios.get(state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.referenceUid + '/confirmfile', param).then(function (response) {
+          try {
+            if (response.headers['content-disposition']) {
+              commit('setPaymentFileName', response.headers['content-disposition'].split(';')[1].split('=')[1].replace(/\"/g, ''))
+            } else {
+              commit('setPaymentFileName', 'payment_file')
+            }
+          } catch (error) {
+          }
           if (response.status === 200 || response.status === '200') {
             resolve('hasPayment')
           } else {
             resolve('')
-          }
-          if (response.headers['content-disposition']) {
-            commit('setPaymentFileName', response.headers['content-disposition'].split(';')[1].split('=')[1].replace(/\"/g, ''))
-          } else {
-            commit('setPaymentFileName', 'payment_file')
           }
         }).catch(function (xhr) {
           console.log(xhr)
@@ -1490,10 +1494,22 @@ export const store = new Vuex.Store({
             resolve(response.data)
           }
         }).catch(function (error) {
-          reject(error)
           toastr.clear()
-          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          if (error.response) {
+            try {
+              if (error.response.data.code == 403 && error.response.data.description == 'org.opencps.dossiermgt.exception.DuplicateDossierCounterException: Duplicate DossierCounter') {
+                toastr.error('Thao tác thất bại. Vui lòng thực hiện lại trong giây lát.')
+              } else {
+                toastr.error('Yêu cầu của bạn thực hiện thất bại')
+              }
+            } catch (error) {
+              toastr.error('Yêu cầu của bạn thực hiện thất bại')
+            }
+          } else {
+            toastr.error('Yêu cầu của bạn thực hiện thất bại')
+          }
           commit('setLoading', false)
+          reject(error)
         })
       })
     },
@@ -3279,6 +3295,21 @@ export const store = new Vuex.Store({
             let serializable = response.data
             if (filter.hasOwnProperty('reportType') && filter.reportType) {
               saveAs(serializable, filter.dossierId + '-' + filter.document + new Date().getTime() + '.docx')
+            }
+            try {
+              const blobToBase64 = blob => {
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                return new Promise(resolve => {
+                  reader.onloadend = () => {
+                    resolve(reader.result);
+                  };
+                });
+              };
+              blobToBase64(serializable).then(res => {
+                commit('setBase64Document', res)
+              })
+            } catch (error) {
             }
             let file = window.URL.createObjectURL(serializable)
             resolve(file)
@@ -6170,6 +6201,9 @@ export const store = new Vuex.Store({
     setKeywordSearch (state, payload) {
       state.keywordSearch = payload
     },
+    setBase64Document (state, payload) {
+      state.base64Document = payload
+    },
   },
   getters: {
     groupIdSite (state) {
@@ -6400,6 +6434,9 @@ export const store = new Vuex.Store({
     },
     getKeywordSearch (state) {
       return state.keywordSearch
+    },
+    getBase64Document (state) {
+      return state.base64Document
     }
   }
 })

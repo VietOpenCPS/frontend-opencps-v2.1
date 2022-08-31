@@ -551,6 +551,10 @@
         <v-toolbar flat dark color="primary">
           <v-toolbar-title>{{itemAction.title}}{{itemAction.tiltle}}</v-toolbar-title>
           <v-spacer></v-spacer>
+          <v-btn v-if="showKySoDocument && itemAction.form === 'PRINT_01' && srcDownloadIframe" class="mr-2" color="#a82727" dark @click.native="activeKySoDocument">
+            <v-icon style="color: #fff !important">fa fa-pencil-square-o</v-icon> &nbsp;
+            Ký số giấy tờ
+          </v-btn>
           <v-btn icon dark @click.native="dialogPDF = false">
             <v-icon>close</v-icon>
           </v-btn>
@@ -581,7 +585,8 @@
           </v-btn>
           <v-btn class="mr-3" color="primary">
             <v-icon size=16>fa fa-file-pdf-o</v-icon> &nbsp;
-            <a :href="srcDownloadIframe" download> Tải xuống file pdf</a>
+            <a v-if="fileNameDownload" id="downloadDocument" :href="srcDownloadIframe" :download="fileNameDownload"> Tải xuống file pdf</a>
+            <a v-else id="downloadDocument" :href="srcDownloadIframe" download> Tải xuống file pdf</a>
             <span slot="loader">Loading...</span>
           </v-btn>
         </v-card-actions>
@@ -958,6 +963,7 @@ import support from '../store/support.json'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import AdvSearch from './TimKiemNangCao'
 import SelfieImageBox from './ext/SelfieImageBox.vue'
+import axios from 'axios'
 
 export default {
   props: ['index'],
@@ -971,6 +977,8 @@ export default {
     SelfieImageBox
   },
   data: () => ({
+    showKySoDocument: false,
+    fileNameDownload: '',
     dossierSelect: '',
     xacthuc_BNG: false,
     doActionGroup: false,
@@ -1237,6 +1245,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.showKySoDocument = showKySoDocument
+    } catch (error) {
+    }
     try {
       vm.showOptionName = showOptionName
     } catch (error) {
@@ -1647,6 +1659,61 @@ export default {
     }
   },
   methods: {
+    activeKySoDocument () {
+      let vm = this
+      let base64Document = vm.$store.getters.getBase64Document
+      if (base64Document) {
+        var DataURIToBlob = function(dataURI) {
+          const splitDataURI = dataURI.split(',')
+          const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
+          const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
+          const ia = new Uint8Array(byteString.length)
+          for (let i = 0; i < byteString.length; i++)
+            ia[i] = byteString.charCodeAt(i)
+          return new Blob([ia], { type: mimeString })
+        }
+
+        let fileKySo = DataURIToBlob(base64Document)
+        let config = {
+          headers: {
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        let dataPost = new FormData()
+        dataPost.append('uploadfile', fileKySo, 'fileKySo.pdf')
+        axios.post('/o/rest/v2/vgca/fileupload', dataPost, config).then(function (result) {
+          let dataUpload = JSON.parse(result.data.FileServer)
+          vm.kySoDocument(dataUpload)
+        }).catch(xhr => {
+          toastr.error("Tải lên giấy tờ ký số thất bại.")
+        })
+      }
+    },
+    kySoDocument (fileSigned) {
+      let vm = this
+      let prms = {}
+      prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.dossierSelect.dossierId + '/documents/' + fileSigned.fileEntryId
+      prms['SessionId'] = ''
+      prms['FileName'] = fileSigned.url
+      let signFileCallBack = function (rv) {
+        let received_msg = JSON.parse(rv)
+        if (received_msg.Status === 0) {
+          toastr.success('Ký số thành công')
+          vm.dialogPDF = false
+        } else {
+          if (received_msg.Message) {
+            toastr.clear()
+            toastr.error(received_msg.Message)
+          } else {
+            toastr.clear()
+            toastr.error('Ký số thất bại')
+          }
+        }
+      }
+      let json_prms = JSON.stringify(prms)
+      vgca_sign_approved(json_prms, signFileCallBack)
+    },
     toggleAll () {
       var vm = this
       /*
@@ -2489,9 +2556,11 @@ export default {
           vm.doCancel(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'PRINT_01') {
           // Xem trước phiếu của một hồ sơ
+          vm.fileNameDownload = item.title + "_" + dossierItem.dossierNo + '.pdf'
           vm.doPrint01(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'PRINT_02') {
           // Xem trước phiếu gộp của nhiều hồ sơ
+          vm.fileNameDownload = item.title + "_" + dossierItem.dossierNo + '.pdf'
           vm.doPrint02(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'PRINT_03') {
           // In văn bản mới nhất đã phê duyệt

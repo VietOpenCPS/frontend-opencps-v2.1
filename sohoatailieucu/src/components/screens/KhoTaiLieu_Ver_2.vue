@@ -57,12 +57,12 @@
         Tải lên giấy tờ đã ký số
       </v-btn>
 
-      <v-btn color="primary" small class="mx-0 white--text ml-2" :loading="processingSigning" :disabled="processingSigning" @click.stop="signDocument">
+      <!-- <v-btn color="primary" small class="mx-0 white--text ml-2" :loading="processingSigning" :disabled="processingSigning" @click.stop="signDocument">
         <v-icon size="20" style="color: #fff !important">
           drive_file_rename_outline
         </v-icon> &nbsp;
         Ký số và tải lên giấy tờ
-      </v-btn>
+      </v-btn> -->
       
       <div class="mt-2">
         <v-checkbox
@@ -504,7 +504,7 @@
     },
     data: () => ({
       webServerUrl: 'http://127.0.0.1:8887',
-      daKy: true,
+      daKy: false,
       chuaKy: true,
       processing: false,
       processingImport: false,

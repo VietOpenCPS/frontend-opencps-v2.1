@@ -125,7 +125,7 @@
                 <v-avatar :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">
                   <v-icon size=20 style="color: #fff !important">payment</v-icon>
                 </v-avatar>
-                <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán chuyển khoản</span>
+                <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán trực tiếp, chuyển khoản</span>
               </v-chip>
 
               <v-chip class="mb-2" v-if="showPayGov" color="#3b5ab5" text-color="white"

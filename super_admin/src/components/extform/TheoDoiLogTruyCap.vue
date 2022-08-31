@@ -380,7 +380,7 @@ export default {
         },
         params: {
           api: vm.api,
-          dossierNo: vm.dossierNo,
+          dossierNo: String(vm.dossierNo).trim(),
           fromDate: vm.fromReceiveDateFormatted,
           toDate: vm.toReceiveDateFormatted,
           start: vm.dossierPage * vm.numberPerPage - vm.numberPerPage,
@@ -388,10 +388,13 @@ export default {
         }
       }
       axios.get('/o/rest/v2/socket/web/log-report', param).then(function (response) {
-        let serializable = response.data
-        console.log('serializable', serializable)
         vm.loadingTable = false
-        vm.dossierList = serializable['data']
+        let serializable = response.data
+        if (serializable.hasOwnProperty('data')) {
+          vm.dossierList = serializable['data']
+        } else {
+          vm.dossierList = []
+        }
         vm.totalDossierSearch = serializable['total']
       }).catch(function (error) {
         vm.loadingTable = false

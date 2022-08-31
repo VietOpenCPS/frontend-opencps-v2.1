@@ -216,13 +216,14 @@ export default {
       "dots": false,
       "vertical": true,
       "infinite": true,
-      "slidesToShow": 3,
-      "slidesToScroll": 3,
+      "slidesToShow": 15,
+      "slidesToScroll": 15,
+      "speed": 10000,
       "autoplay": true,
       "autoplaySpeed": 3000,
-      "pauseOnDotsHover": true,
       "pauseOnFocus": true,
-      "pauseOnHover": true
+      "pauseOnHover": true,
+      "cssEase": "linear"
     },
     timeOutRefresh: 300000
   }),

@@ -115,10 +115,10 @@
                     <p class="pt-2 mb-0">{{payments['paymentMethod']}}</p>
                   </v-flex>
                   <v-flex xs12 sm7></v-flex>
-                  <v-flex xs12 sm2 v-if="paymentFile && payments['paymentMethod'] === 'Chuyển khoản'">
+                  <v-flex xs12 sm2 v-if="paymentFile && convertString(payments['paymentMethod']) === 'chuyenkhoan'">
                     <v-subheader class="pl-0 text-right">Chứng từ kèm theo: </v-subheader>
                   </v-flex>
-                  <v-flex xs12 sm10 v-if="paymentFile && payments['paymentMethod'] === 'Chuyển khoản'" >
+                  <v-flex xs12 sm10 v-if="paymentFile && convertString(payments['paymentMethod']) === 'chuyenkhoan'" >
                     <span v-on:click.stop="viewFile()" style="cursor: pointer;">
                       <v-icon>attach_file</v-icon>
                       {{paymentFileName}}
@@ -488,6 +488,8 @@ export default {
       let filter = vm.dossierDetail
       vm.$store.dispatch('getPaymentFiles', filter).then(result => {
         vm.paymentFile = result
+        console.log('paymentFile', vm.paymentFile)
+        console.log('payment', vm.payments)
       }).catch(function(){})
     },
     currency (value) {
@@ -670,6 +672,24 @@ export default {
       } else {
         return ''
       }
+    },
+    convertString(str) {
+      str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
+      str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
+      str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i')
+      str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
+      str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
+      str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
+      str = str.replace(/đ/g, 'd')
+      str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, 'A')
+      str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, 'E')
+      str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, 'I')
+      str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, 'O')
+      str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
+      str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
+      str = str.replace(/Đ/g, 'D')
+      str = str.toLocaleLowerCase().replace(/\s/g, '')
+      return str
     }
   }
 }
