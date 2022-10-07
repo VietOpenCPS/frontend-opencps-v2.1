@@ -37,7 +37,8 @@
           <div class="content-applicant">
             <div class="py-2">
               <span class="codeNumber">{{item.bookings['codeNumber'] ? item.bookings['codeNumber'] : ''}}</span> <br>
-              <span>{{item.bookings['bookingName'] ? item.bookings['bookingName'] : ''}}</span>
+              <span>{{item.bookings['bookingName'] ? item.bookings['bookingName'] : ''}}</span> <br>
+              <span class="codeNumber">{{item.bookings['count'] ? item.bookings['count'] : ''}}</span>
             </div>
           </div>
         </div>

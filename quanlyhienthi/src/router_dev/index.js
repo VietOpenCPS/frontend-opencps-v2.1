@@ -2,9 +2,11 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import NotFound from '@/components/NotFound'
 import LandingApp from '@/components/screens/LandingTraCuuHoSo'
+import LandingThongKeDanhGia from '@/components/screens/LandingThongKeDanhGia'
 import DetailForward from '@/components/blacklist/DetailForward'
 const routes = [
   { path: '/', name: 'LandingApp', component: LandingApp, props: true },
+  { path: '/thong-ke-danh-gia', name: 'LandingThongKeDanhGia', component: LandingThongKeDanhGia, props: true },
   {
     path: '/danh-sach-ho-so/:index',
     name: 'Landing',

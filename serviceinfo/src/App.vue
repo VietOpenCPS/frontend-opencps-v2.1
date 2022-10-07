@@ -236,6 +236,10 @@
         vm.hasTagServiceInfo = hasTagServiceInfo
       } catch (error) {
       }
+      try {
+        vm.thuTucTinhHauGiang = thuTucTinhHauGiang
+      } catch (error) {
+      }
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
@@ -385,20 +389,31 @@
             vm.$store.dispatch('getGovAgency').then(function (result) {
               vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
               // vm.menuServiceInfos[0].children = result
+              let agencyArray = result
+              if (vm.thuTucTinhHauGiang) {
+                agencyArray = result.concat([
+                  {
+                    administrationCode: "DLHG",
+                    administrationName: "Điện lực tỉnh Hậu Giang",
+                    count: ""
+                  }
+                ])
+              }
               vm.$set(vm.menuServiceInfos, 0, {
                   id: 1,
                   name: 'Cơ quan quản lý',
                   mappingName: 'administrationName',
                   mappingCode: 'administrationCode',
                   mappingCount: 'count',
-                  children: result,
+                  children: agencyArray,
                   icon: 'account_balance'
                 }
               )
               vm.$store.commit('setAgencyList', result)
               // console.log('run app',  current)
-              if ((vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) ||
-              (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
+              if (
+                (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) ||
+                (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
               ) {
                 vm.currentAgency = vm.govAgencyList[0].administrationCode
                 let queryString = '?'
@@ -505,13 +520,23 @@
           vm.$store.dispatch('getGovAgency').then(function (result) {
             vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
             // vm.menuServiceInfos[0].children = result
+            let agencyArray = result
+            if (vm.thuTucTinhHauGiang) {
+              agencyArray = result.concat([
+                {
+                  administrationCode: "DLHG",
+                  administrationName: "Điện lực tỉnh Hậu Giang",
+                  count: ""
+                }
+              ])
+            }
             vm.$set(vm.menuServiceInfos, 0, {
                 id: 1,
                 name: 'Cơ quan quản lý',
                 mappingName: 'administrationName',
                 mappingCode: 'administrationCode',
                 mappingCount: 'count',
-                children: result,
+                children: agencyArray,
                 icon: 'account_balance'
               }
             )
@@ -796,6 +821,10 @@
       filterAction (index, item1, item2) {
         let vm = this
         console.log('filterAction', index, item1)
+        if (vm.thuTucTinhHauGiang && item1.administrationCode === 'DLHG') {
+          window.open("https://cskh.evnspc.vn", "_blank")
+          return
+        }
         if (vm.hasCoQuanThucHien) {
           if (index === 0) {
             vm.filterAgency(item1)

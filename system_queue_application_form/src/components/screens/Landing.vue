@@ -272,7 +272,8 @@
                 <v-flex sm12>
                   <div><span class="red--text">Chú ý:</span></div>
                   <div class="pl-3" style="text-align: justify;">
-                    - Họ tên của người nộp phải trùng với họ tên của đương sự (người được cấp trong giấy tờ hoặc người xin cấp hộ chiếu) <br>
+                    - Hồ sơ của anh/chị sẽ bị từ chối tiếp nhận nếu người nộp không phải là người có tên trên giấy tờ hoặc không chứng minh được có quan hệ gia đình với người có tên trên giấy tờ. 
+                    <br>- Ông/Bà cần mang theo giấy tờ có giá trị chứng minh quan hệ khi nộp hộ hồ sơ cho người thân trong gia đình (khai sinh, kết hôn, hộ khẩu, xác nhận cha mẹ con...) <br>
                   </div>
                 </v-flex>
                 <v-flex sm12 class="text-xs-right">

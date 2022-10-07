@@ -391,8 +391,20 @@ export default {
         if (response.data) {
           let url = String(response.data)
           vm.avatarURL = window.themeDisplay.getPortalURL() + url
+          try {
+            if (typeof(Storage) !== "undefined") {
+              localStorage.setItem('avatarEmployee', vm.avatarURL)
+            }
+          } catch (error) {
+          }
         } else {
           vm.avatarURL = ''
+          try {
+            if (typeof(Storage) !== "undefined") {
+              localStorage.setItem('avatarEmployee', '')
+            }
+          } catch (error) {
+          }
         }
       }).catch(function (xhr) {
         vm.avatarURL = ''

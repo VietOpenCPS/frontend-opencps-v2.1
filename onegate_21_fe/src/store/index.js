@@ -5888,6 +5888,38 @@ export const store = new Vuex.Store({
           reject(error)
         })
       })
+    },
+    getChiTietHoSo ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/dossiers/' + filter.dossierId, param).then(function (response) {
+          resolve(response.data)
+        })
+      })
+    },
+    sendDossierNoVoting ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('employeeData', JSON.stringify(
+          {
+            "dossier_vote": filter.dossierNo ? filter.dossierNo : ''
+          }
+        ))
+        axios.put('/o/rest/v2/employees/' + filter.employeeId + '/employeeData', dataPost, config).then(function (result) {
+        }).catch(xhr => {
+        })
+      })
     }
     // ----End---------
   },

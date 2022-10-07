@@ -494,11 +494,11 @@
                   <template slot="label">Vai trò</template>
                 </v-text-field>
               </v-flex>
-              <!-- <v-flex xs12 sm6 v-if="hasSSoCanBo">
-                <v-text-field v-model="profileCanBo['PhanQuyenVaiTro']" box>
-                  <template slot="label">Quyền hệ thống</template>
-                </v-text-field>
-              </v-flex> -->
+              <v-flex xs12 v-if="hasSSoCanBo">
+                <v-textarea v-model="profileCanBo['PhanQuyenVaiTro']" box rows="2">
+                  <template slot="label">Phân quyền vai trò</template>
+                </v-textarea>
+              </v-flex>
               <!--  -->
               <v-flex xs12 class="px-0" v-if="serverProtocolFilter.length > 0">
                 <v-layout wrap>
@@ -1051,7 +1051,8 @@
         SoDienThoai: '',
         NgaySinh: '',
         NoiCongTac: '',
-        TinhTrangCongTac: ''
+        TinhTrangCongTac: '',
+        PhanQuyenVaiTro: ''
       },
       profileCongDan: {
         "hoVaTen": "",
@@ -1469,10 +1470,17 @@
             let vaiTro = response.resp.VaiTroSuDung ? Array.from(response.resp.VaiTroSuDung, function (item) {
               return item.TenMuc
             }) : ''
+            let chucVu = response.resp.ViTriChucDanh ? Array.from(response.resp.ViTriChucDanh, function (item) {
+              return item.TenGoi
+            }) : ''
+            let phanQuyenVaiTro = response.resp.PhanQuyenVaiTro ? Array.from(response.resp.PhanQuyenVaiTro, function (item) {
+              return item.BoDuLieu
+            }) : ''
             dataProfile.VaiTroSuDung = vaiTro.toString().replace(/,/g, ", ")
             dataProfile.NoiCongTac = response.resp.NoiCongTac['TenGoi']
             dataProfile.TinhTrangCongTac = response.resp.TinhTrangCongTac['TenMuc']
-            dataProfile.ViTriChucDanh = response.resp.ChucVuCapBac['TenMuc']
+            dataProfile.ViTriChucDanh = chucVu.toString().replace(/,/g, ", ")
+            dataProfile.PhanQuyenVaiTro = phanQuyenVaiTro.toString().replace(/,/g, ", ")
             dataProfile['SoDienThoai'] = response.resp.DanhBaLienLac['SoDienThoai']
             dataProfile['NgaySinh'] = response.resp['NgaySinh'] ? response.resp['NgaySinh'] : ''
             vm.profileCanBo = dataProfile

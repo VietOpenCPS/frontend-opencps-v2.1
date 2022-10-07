@@ -862,7 +862,8 @@ export default {
     showCounterFee: false,
     rememberApplicant: false,
     sourcePaymentFee: {},
-    urlHistoryUpdateDvc: ''
+    urlHistoryUpdateDvc: '',
+    danhGiaCanBoTrenQuay: false
   }),
   computed: {
     loading () {
@@ -885,6 +886,9 @@ export default {
     },
     dossiersIntoGroupRender () {
       return this.$store.getters.dossierSelectedDoAction
+    },
+    userLoginInfomation () {
+      return this.$store.getters.getUserLogin
     },
     // formActionGroup () {
     //   return this.$store.getters.formActionGroup
@@ -923,6 +927,10 @@ export default {
     }
     try {
       vm.urlHistoryUpdateDvc = urlHistoryUpdateDvc
+    } catch (error) {
+    }
+    try {
+      vm.danhGiaCanBoTrenQuay = danhGiaCanBoTrenQuay
     } catch (error) {
     }
     vm.$nextTick(function () {
@@ -1584,6 +1592,9 @@ export default {
                 }
                 vm.loadingAction = true
                 vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+                  if (vm.danhGiaCanBoTrenQuay) {
+                    vm.sendMaHoSoDanhGia(vm.dossierId)
+                  }
                   vm.loadingAction = false
                   if (!type) {
                     vm.goBack()
@@ -2312,6 +2323,22 @@ export default {
       } catch (error) {
       }
       return metaDataOut
+    },
+    sendMaHoSoDanhGia (dossierId) {
+      let vm = this
+      setTimeout(function () {
+        let filter = {
+          dossierId: dossierId
+        }
+        vm.$store.dispatch('getChiTietHoSo', filter).then(function (result) {
+          let dossierNo = result.dossierNo
+          let filter2 = {
+            employeeId: vm.userLoginInfomation.classPK,
+            dossierNo: dossierNo
+          }
+          vm.$store.dispatch('sendDossierNoVoting', filter2).then(function (result) {})
+        })
+      }, 300)
     },
     currency (value) {
       if (value) {
