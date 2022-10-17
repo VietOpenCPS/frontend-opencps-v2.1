@@ -270,7 +270,7 @@
               </v-card-text>
               <div class="text-xs-left mt-2 mb-5 ml-0">
                 <!-- thanh toán keypay -->
-                <v-chip v-if="getEPaymentProfile(paymentInfo.epaymentProfile)" color="orange" text-color="white"
+                <v-chip class="thanhToanKeypay" v-if="getEPaymentProfile(paymentInfo.epaymentProfile)" color="orange" text-color="white"
                   @click.native="toKeyPay(getEPaymentProfile(paymentInfo.epaymentProfile).keypayUrl)"
                 >
                   <v-avatar style="cursor: pointer">

@@ -1836,7 +1836,7 @@ export default {
                 template['passRequired'] = false
               }
             } else {
-              if (itemFindEfomAttack && template['multiple']) {
+              if (itemFindEfomAttack && ((template['hasForm'] && template['multiple']) || !template['hasForm'])) {
                 template['passRequired'] = true
               } else {
                 template['passRequired'] = false

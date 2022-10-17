@@ -210,16 +210,6 @@
       <v-menu bottom v-if="getUser('Administrator_data')" style="position:relative !important">
         <v-btn slot="activator" color="red" dark>Go to &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
         <v-list>
-          <!-- <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_DONE'}, 0, true)" >
-            <v-list-tile-title>Hoàn thành</v-list-tile-title>
-          </v-list-tile>
-          <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_CANCEL'}, 0, true)">
-            <v-list-tile-title>Rút hồ sơ</v-list-tile-title>
-          </v-list-tile>
-          <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_DENY'}, 0, true)">
-            <v-list-tile-title>Từ chối</v-list-tile-title>
-          </v-list-tile> -->
-
           <v-list-tile v-for="(item, index) in stepCodeForGoTo" v-bind:key="index" @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_STEP', stepCode: item.stepCode, stepName: item.stepName}, 0, true)" >
             <v-list-tile-title>{{item.stepName}}</v-list-tile-title>
           </v-list-tile>
@@ -2556,11 +2546,19 @@ export default {
           vm.doCancel(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'PRINT_01') {
           // Xem trước phiếu của một hồ sơ
-          vm.fileNameDownload = item.title + "_" + dossierItem.dossierNo + '.pdf'
+          if (dossierItem) {
+            vm.fileNameDownload = item.title + "_" + dossierItem.dossierNo + '.pdf'
+          } else {
+            vm.fileNameDownload = item.title + '.pdf'
+          }
           vm.doPrint01(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'PRINT_02') {
           // Xem trước phiếu gộp của nhiều hồ sơ
-          vm.fileNameDownload = item.title + "_" + dossierItem.dossierNo + '.pdf'
+          if (dossierItem) {
+            vm.fileNameDownload = item.title + "_" + dossierItem.dossierNo + '.pdf'
+          } else {
+            vm.fileNameDownload = item.title + '.pdf'
+          }
           vm.doPrint02(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'PRINT_03') {
           // In văn bản mới nhất đã phê duyệt

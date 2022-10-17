@@ -12,7 +12,7 @@
               <p style="color: #e11133;">TỈNH HẬU GIANG</p>
             </div>
           </div>
-          <h4 class=" flex py-2 mx-3 text-xs-center" style="height: 120px;padding-top: 15px !important;">
+          <h4 class=" flex py-2 mx-3 text-xs-center" style="height: 70px;padding-top: 15px !important;">
             <span style="color: #903938; font-size: 1.7em !important;">
               <span>KẾT QUẢ ĐÁNH GIÁ MỨC ĐỘ HÀI LÒNG CÁN BỘ</span>
             </span>
@@ -326,8 +326,14 @@ export default {
       }
       if (vm.siteTrungTam) {
         vm.getDanhSachCanBo()
+        setInterval(function () {
+          vm.getDanhSachCanBo()
+        }, 60*60*1000)
       } else {
         vm.searchDossier()
+        setInterval(function () {
+          vm.searchDossier()
+        }, 60*60*1000)
       }
     })
   },
