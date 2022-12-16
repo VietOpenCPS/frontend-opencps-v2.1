@@ -47,7 +47,7 @@ export const store = new Vuex.Store({
               start: filter.start ? filter.start : 0,
               end: filter.end ? filter.end : 30,
               sort: 'createDate',
-              order: 'desc',
+              order: true,
               maHoSo: filter.maHoSo ? filter.maHoSo : '',
               soHieuVanBan: filter.soHieuVanBan ? filter.soHieuVanBan : '',
               tenGiayTo: filter.tenGiayTo ? filter.tenGiayTo : '',

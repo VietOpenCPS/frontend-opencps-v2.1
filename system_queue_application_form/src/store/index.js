@@ -27,7 +27,8 @@ export const store = new Vuex.Store({
     domainList: [],
     levelList: [],
     isMobile: false,
-    serverNo: ''
+    serverNo: '',
+    chapchablob: ''
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -235,6 +236,32 @@ export const store = new Vuex.Store({
             params: {}
           }
           axios.get(state.endPoint + '/eforms/' + filter.eFormNo + '/password/' + filter.secret, param).then(function (response) {
+            let serializable = response.data
+            if (serializable) {
+              resolve(serializable)
+            } else {
+              resolve('')
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getEformSecretCaptcha ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            },
+            params: {
+              eFormNo: filter.eFormNo,
+              secret: filter.secret,
+              j_captcha_response: filter.j_captcha_response
+            }
+          }
+          axios.get(state.endPoint + '/eforms/searchDeclaration', param).then(function (response) {
             let serializable = response.data
             if (serializable) {
               resolve(serializable)
@@ -695,6 +722,9 @@ export const store = new Vuex.Store({
     setLoading (state, payload) {
       state.loading = payload
     },
+    setChapchablob (state, payload) {
+      state.chapchablob = payload
+    },
     setInitData (state, payload) {
       state.initData = payload
     },
@@ -723,6 +753,9 @@ export const store = new Vuex.Store({
   getters: {
     loading (state) {
       return state.loading
+    },
+    getChapchablob (state) {
+      return state.chapchablob
     },
     index (state) {
       return state.index

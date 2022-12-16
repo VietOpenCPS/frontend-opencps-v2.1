@@ -356,7 +356,8 @@ export default {
     status: null,
     traCuuQlvt: false,
     hoSoQlvt: false,
-    detailQlvt: ''
+    detailQlvt: '',
+    userInfo: ''
   }),
   computed: {
     originality () {
@@ -391,6 +392,10 @@ export default {
     try {
       vm.forEPayment = forEPayment
     } catch (error) {  
+    }
+    try {
+      vm.userInfo = JSON.parse(localStorage.getItem('userInfo'))
+    } catch (error) {
     }
     vm.$nextTick(function () {
       var vm = this
@@ -456,6 +461,9 @@ export default {
         order: true
       }
       if (vm.dossierNoKey || vm.applicantIdNo) {
+        if (window.themeDisplay.isSignedIn() && !vm.applicantIdNo) {
+          filter.applicantIdNo = vm.userInfo.applicantIdNo
+        }
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.loading = false
           vm.totalDossier = result.total

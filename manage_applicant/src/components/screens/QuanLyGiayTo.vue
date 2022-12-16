@@ -717,7 +717,8 @@ export default {
         applicantIdNo: vm.index != 0 ? vm.applicantInfos.applicantIdNo : '',
         fileTemplateNo: vm.fileTemplateNo,
         status: vm.status,
-        keywordSearch: vm.dossierNoSearch ? vm.dossierNoSearch : vm.keySearch,
+        keywordSearch: vm.keySearch,
+        dossierNoSearch: vm.dossierNoSearch,
         fileNoSearch: vm.fileNoSearch,
         applicantDataType: ''
       }

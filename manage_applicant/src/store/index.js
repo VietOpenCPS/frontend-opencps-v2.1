@@ -212,7 +212,8 @@ export const store = new Vuex.Store({
               status: filter.status,
               keyword: filter.keywordSearch ? filter.keywordSearch : '',
               applicantDataType: filter.applicantDataType ? filter.applicantDataType : '',
-              fileNo: filter.fileNoSearch
+              fileNo: filter.fileNoSearch,
+              dossierNo: filter.dossierNoSearch
             }
           }
 
@@ -253,7 +254,8 @@ export const store = new Vuex.Store({
             status: filter.status,
             keyword: filter.keywordSearch ? filter.keywordSearch : '',
             applicantDataType: filter.applicantDataType ? filter.applicantDataType : '',
-            fileNo: filter.fileNoSearch
+            fileNo: filter.fileNoSearch,
+            dossierNo: filter.dossierNoSearch
           }
           let dataPost = new URLSearchParams()
           let textPost = params

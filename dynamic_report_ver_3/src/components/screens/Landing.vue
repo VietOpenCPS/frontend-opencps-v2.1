@@ -1003,6 +1003,10 @@ export default {
             if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
               vm.filters[key]['groupId'] = vm.govAgency && !isNaN(Number(vm.govAgency)) ? vm.govAgency : window.themeDisplay.getScopeGroupId()
               if (!vm.filters[key]['source'] || vm.filters[key]['source'].length === 0) {
+                try {
+                  vm.filters[key]['code'] = vm.govAgencyCodeCurrentSite
+                } catch (error) {
+                }
                 vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
                   vm.filters[key]['source'] = result
                   if (vm.filters[key]['appendItem']) {
@@ -1039,7 +1043,6 @@ export default {
         if (query.hasOwnProperty('doreport')) {
           vm.doCreateReport(false)
         }
-        // 
         // voting
         if (currentQuery.hasOwnProperty('employeeEmail')) {
           vm.changeGovAgency()
@@ -1052,7 +1055,6 @@ export default {
             vm.doCreateReport(false)
           }, 300)
         }
-        // 
         // 
       }, 1000)
     })
@@ -1203,6 +1205,10 @@ export default {
         if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
           vm.filters[key]['groupId'] = vm.govAgency && !isNaN(Number(vm.govAgency)) ? vm.govAgency : window.themeDisplay.getScopeGroupId()
           if (!vm.filters[key]['source'] || vm.filters[key]['source'].length === 0) {
+            try {
+              vm.filters[key]['code'] = vm.govAgencyCodeCurrentSite
+            } catch (error) {
+            }
             vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
               vm.filters[key]['source'] = result
               if (vm.filters[key]['appendItem']) {
@@ -2383,7 +2389,7 @@ export default {
             console.log('codeGovAgency123', codeGovAgency)
             filter.data.listGov = codeGovAgency ? codeGovAgency : ''
           } else {
-            filter.data.listGov = ""
+            filter.data.listGov = vm.govAgencyCodeCurrentSite
           }
         }
       } catch (error) {
@@ -3612,7 +3618,7 @@ export default {
             console.log('codeGovAgency123', codeGovAgency)
             filter.data.listGov = codeGovAgency ? codeGovAgency : ''
           } else {
-            filter.data.listGov = ""
+            filter.data.listGov = vm.govAgencyCodeCurrentSite
           }
         }
       } catch (error) {

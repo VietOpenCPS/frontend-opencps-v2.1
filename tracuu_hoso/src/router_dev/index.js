@@ -2,11 +2,12 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import NotFound from '@/components/NotFound'
 import Landing from '@/components/screens/Landing'
+import LandingCaptcha from '@/components/screens/LandingCaptcha'
 import ThanhToan from '@/components/screens/ThanhToanThanhCong'
 import DetailForward from '@/components/blacklist/DetailForward'
 import TraCuuAI from '@/components/screens/TraCuuAI'
 const routes = [
-  { path: '/', name: 'Landing', component: Landing, props: false },
+  { path: '/', name: 'LandingCaptcha', component: LandingCaptcha, props: false },
   { path: '/tra-cuu-ai', component: TraCuuAI, props: false},
   { path: '/thanh-toan-truc-tuyen', name: 'ThanhToan', component: ThanhToan, props: false },
   {

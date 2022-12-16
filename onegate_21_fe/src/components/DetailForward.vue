@@ -12,7 +12,6 @@
 
 <script>
 import TiepNhanHoSoDetail from './TiepNhanHoSoDetail'
-
 export default {
   props: ['index', 'id', 'formCode'],
   components: {

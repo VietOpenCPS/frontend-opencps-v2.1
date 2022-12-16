@@ -141,7 +141,7 @@
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
               <div v-else>
-                <span>{{ documentPage * numberPerPage - numberPerPage + props.index + 1 }}</span>
+                <span>{{ documentPage * limitRecord - limitRecord + props.index + 1 }}</span>
               </div>
             </td>
             <td class="text-xs-left py-2" style="height:36px">
@@ -250,11 +250,11 @@
         </template>
       </v-data-table>
 
-      <div class="my-2" v-if="totalDocument > numberPerPage">
+      <div class="my-2" v-if="totalDocument > limitRecord">
         <div class="text-xs-right layout wrap" style="position: relative;">
           <div class="flex pagging-table"> 
-            <pagination :total="totalDocument" :page="documentPage" :numberPerPage="numberPerPage" nameRecord="giấy tờ" custom-class="custom-tiny-class" 
-              @tiny:change-page="changePage" ></pagination> 
+            <pagination :total="totalDocument" :page="documentPage" :numberPerPage="limitRecord"  nameRecord="giấy tờ" custom-class="custom-tiny-class" 
+              @tiny:change-page="changePage" :showLimit="true"></pagination> 
           </div>
         </div>
       </div>
@@ -529,8 +529,9 @@
       loadingTable: false,
       documentApplicantList: [],
       totalDocument: 0,
+      limitRecord: 100,
       documentPage: 1,
-      numberPerPage: 30,
+      numberPerPage: 100,
       totalPage: 0,
       dialogViewFileSign: false,
       pathNameFileESign: '',
@@ -663,7 +664,7 @@
       } catch (error) {
       }
       try {
-        vm.numberPerPage = numberPerPage ? numberPerPage : 30
+        vm.numberPerPage = numberPerPage ? numberPerPage : 100
       } catch (error) {
       }
       vm.selectMultiplePage = []
@@ -1102,6 +1103,7 @@
       },
       changePage (config) {
         let vm = this
+        vm.limitRecord = config.numberPerPage ? config.numberPerPage : 100
         vm.documentPage = config.page
         vm.getDanhSachGiayToSoHoa(vm.dataInputSearch)
       },
@@ -1113,8 +1115,8 @@
           vm.selectMultiplePage = []
         }
         let filter = {
-          start: vm.documentPage * vm.numberPerPage - vm.numberPerPage,
-          end: vm.documentPage * vm.numberPerPage,
+          start: vm.documentPage * vm.limitRecord - vm.limitRecord,
+          end: vm.documentPage * vm.limitRecord,
           maHoSo: dataSearch ? dataSearch.dossierNoSearch : '',
           soHieuVanBan: dataSearch ? dataSearch.soHieuVanBanSearch : '',
           tenGiayTo: dataSearch ? dataSearch.tenFileSearch : '',

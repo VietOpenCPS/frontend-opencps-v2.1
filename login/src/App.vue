@@ -120,7 +120,7 @@
             <v-avatar v-else class="white--text" :style="{background: '#' + colorBG}">
               <span class="white--text">{{ userNameLogin.slice(0, 1).toUpperCase() }}</span>
             </v-avatar>
-            {{userNameLogin}}
+            <span class="white--text username-login">{{userNameLogin}}</span>
             <v-icon
               v-if="!isShowUserMenu"
               size="20"
@@ -354,6 +354,10 @@ export default {
               // if (vm.avatarURL.includes("img_id=0")) {
               //   vm.avatarURL = "";
               // }
+              try {
+                localStorage.setItem('userInfo', JSON.stringify(vm.userData))
+              } catch (error) {
+              }
               let filter = {
                 className: vm.userData['className'] === 'org.opencps.usermgt.model.Applicant' ? 'org.opencps.usermgt.model.ApplicantAvatar' : vm.userData['className'],
                 classPK: vm.userData['classPK']

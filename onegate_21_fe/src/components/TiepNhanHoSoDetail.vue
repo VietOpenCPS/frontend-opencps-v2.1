@@ -1352,7 +1352,7 @@ export default {
               postalWardName: dichvuchuyenphathoso.postalWardName,
               postalTelNo: dichvuchuyenphathoso.postalTelNo
             }
-            tempData['vnpostalStatus'] = dichvuchuyenphathoso.vnpostalStatus
+            tempData['vnpostalStatus'] = dichvuchuyenphathoso && dichvuchuyenphathoso.vnpostalStatus ? dichvuchuyenphathoso.vnpostalStatus : 0
             tempData['vnpostalProfile'] = vnpostal
           }
           vm.loadingAction = true

@@ -146,12 +146,17 @@
                         </v-list-tile>
                         <v-list-tile>
                           <v-list-tile-title @click.stop="vgcaSignAction(itemFileView, index, 'issued')">
-                            <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU
+                            <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
                           </v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile>
                           <v-list-tile-title @click.stop="vgcaSignAction(itemFileView, index, 'income')">
-                            <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ VĂN BẢN
+                            <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                          </v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile>
+                          <v-list-tile-title @click.stop="vgcaSignAction(itemFileView, index, 'copy')">
+                            <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
                           </v-list-tile-title>
                         </v-list-tile>
                       </v-list>
@@ -228,12 +233,17 @@
                         </v-list-tile>
                         <v-list-tile>
                           <v-list-tile-title @click.stop="vgcaSignAction(itemFileView, index, 'issued')">
-                            <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU
+                            <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
                           </v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile>
                           <v-list-tile-title @click.stop="vgcaSignAction(itemFileView, index, 'income')">
-                            <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ VĂN BẢN
+                            <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                          </v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile>
+                          <v-list-tile-title @click.stop="vgcaSignAction(itemFileView, index, 'copy')">
+                            <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
                           </v-list-tile-title>
                         </v-list-tile>
                       </v-list>
@@ -701,7 +711,7 @@
                           <v-icon style="color: #fff !important">edit</v-icon> &nbsp;&nbsp; KÝ DUYỆT
                         </v-btn>
                         <v-btn small color="red" class="white--text" @click="vgcaSignAction (fileKySo, indexFileSelect, 'issued')">
-                          <v-icon style="color: #fff !important">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU
+                          <v-icon style="color: #fff !important">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
                         </v-btn>
                       </div>
                     </div>
@@ -3582,8 +3592,10 @@ export default {
         vgca_sign_approved(json_prms, signFileCallBack)
       } else if (typeSign === 'issued') {
         vgca_sign_issued(json_prms, signFileCallBack)
-      } else {
+      } else if (typeSign === 'income') {
         vgca_sign_income(json_prms, signFileCallBack)
+      } else {
+        vgca_sign_copy(json_prms, signFileCallBack)
       }
 
     },

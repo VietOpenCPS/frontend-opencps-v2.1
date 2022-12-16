@@ -13,7 +13,7 @@
     "axios": "^0.18.1",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "idempotent-babel-polyfill": "^7.0.0",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "md5": "^2.3.0",
     "mobile-device-detect": "^0.2.3",
     "node-sass": "^4.11.0",

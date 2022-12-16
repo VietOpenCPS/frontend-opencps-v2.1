@@ -27,30 +27,6 @@
           <v-toolbar flat height="36" dark color="primary">
             <v-toolbar-title class="white--text" style="font-size: 14px;">DANH SÁCH MẪU TỜ KHAI TRỰC TUYẾN</v-toolbar-title>
           </v-toolbar>
-          <!-- <div class="layout row wrap header_tools row-blue">
-            <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-              <v-text-field
-                v-model="eformNoSearch"
-                placeholder="Tìm kiếm tờ khai đã tạo"
-                solo
-                chips
-                multiple
-                deletable-chips
-                item-value="eFormNo"
-                item-text="eFormName"
-                @keyup.enter="searchEform"
-                content-class="adv__search__select"
-                return-object
-                autofocus
-              ></v-text-field>
-            </div>
-            <div class="flex text-right" style="margin-left: auto;max-width: 100px;height:37px">
-              <v-btn color="primary" class="my-0 mx-0 white--text" v-on:click.native="searchEform" style="height:100%">
-                <v-icon size="16">search</v-icon> &nbsp;
-                Tìm kiếm
-              </v-btn>
-            </div>
-          </div>  -->
         </div>
         <v-card flat class="">
           <v-card-text class='grey lighten-3 px-0 py-0'>
@@ -93,30 +69,6 @@
           <v-toolbar flat height="36" dark color="primary">
             <v-toolbar-title class="white--text" style="font-size: 14px;">DANH SÁCH MẪU TỜ KHAI TRỰC TUYẾN</v-toolbar-title>
           </v-toolbar>
-          <!-- <div class="layout row wrap header_tools row-blue">
-            <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-              <v-text-field
-                v-model="eformNoSearch"
-                placeholder="Tìm kiếm tờ khai đã tạo"
-                solo
-                chips
-                multiple
-                deletable-chips
-                item-value="eFormNo"
-                item-text="eFormName"
-                @keyup.enter="searchEform"
-                content-class="adv__search__select"
-                return-object
-                autofocus
-              ></v-text-field>
-            </div>
-            <div class="flex text-right" style="margin-left: auto;max-width: 100px;height:37px">
-              <v-btn color="primary" class="my-0 mx-0 white--text" v-on:click.native="searchEform" style="height:100%">
-                <v-icon size="16">search</v-icon> &nbsp;
-                Tìm kiếm
-              </v-btn>
-            </div>
-          </div>  -->
         </div>
         <v-card flat class="">
           <v-card-text class='grey lighten-3 px-0 py-0'>
@@ -314,6 +266,9 @@
                       <span class="red--text darken-3"> *</span>
                     </template>
                   </v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <captcha ref="captchaTraCuu"></captcha>
                 </v-flex>
                 <v-flex sm12 class="text-xs-right">
                   <v-btn color="blue darken-3" :loading="loading" :disabled="loading" v-on:click.native="submitSearchEform" class="mx-0" dark>
@@ -600,43 +555,46 @@ export default {
       vm.$store.commit('setFileTemplateSelected', templateFile)
       vm.dialogSelectGovagency = true
     },
-    searchEform () {
-      let vm = this
-      vm.secretSearch = ''
-      vm.$refs.formSecret.reset()
-      vm.dialogSecret = true
-    },
     submitSearchEform () {
       let vm = this
       if (vm.$refs.formSearch.validate()) {
         let filter = {
           eFormNo: String(vm.eformNoSearch).trim(),
-          secret: vm.secretSearch
+          secret: vm.secretSearch,
+          j_captcha_response: vm.$refs.captchaTraCuu.j_captcha_response
         }
-        vm.$store.dispatch('getEformSecret', filter).then(function(result) {
-          if (result && result.hasOwnProperty('eFormId')) {
-            vm.dialogSecret = false
-            let templateFile = vm.formTemplateList.filter(function (item) {
-              return item.fileTemplateNo === result.fileTemplateNo
-            })
-            if (templateFile.length > 0) {
-              vm.$store.commit('setFileTemplateSelected', templateFile[0])
-            }
-
-            vm.$store.commit('setEformDetail', result)
-            vm.$router.push({
-              path: '/tao-to-khai-thanh-cong/1',
-              query: {
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-              }
-            })
-          } else {
+        vm.$store.dispatch('getEformSecretCaptcha', filter).then(function(result) {
+          if (result && result['code'] === 203) {
             toastr.clear()
-            toastr.error('Mã tờ khai hoặc mã bí mật không chính xác. Vui lòng kiểm tra lại')
+            toastr.error('Mã captcha không chính xác')
+            vm.$refs.captchaTraCuu.makeImageCap()
+          } else {
+            if (result && result.hasOwnProperty('eFormId')) {
+              vm.dialogSecret = false
+              let templateFile = vm.formTemplateList.filter(function (item) {
+                return item.fileTemplateNo === result.fileTemplateNo
+              })
+              if (templateFile.length > 0) {
+                vm.$store.commit('setFileTemplateSelected', templateFile[0])
+              }
+
+              vm.$store.commit('setEformDetail', result)
+              vm.$router.push({
+                path: '/tao-to-khai-thanh-cong/1',
+                query: {
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                }
+              })
+            } else {
+              toastr.clear()
+              toastr.error('Mã tờ khai hoặc mã bí mật không chính xác. Vui lòng kiểm tra lại')
+              vm.$refs.captchaTraCuu.makeImageCap()
+            }
           }
         }).catch(function(error) {
           toastr.clear()
           toastr.error('Mã tờ khai hoặc mã bí mật không chính xác. Vui lòng kiểm tra lại')
+          vm.$refs.captchaTraCuu.makeImageCap()
         })
       }
     },
