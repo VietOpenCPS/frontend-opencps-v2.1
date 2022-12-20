@@ -154,7 +154,8 @@ export const store = new Vuex.Store({
     dossierSelectedDoAction: [],
     formActionGroup: '',
     keywordSearch: '',
-    base64Document: ''
+    base64Document: '',
+    formDataTphs: ''
   },
   actions: {
     clearError ({commit}) {
@@ -189,6 +190,30 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    loadDataSource ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let apiGet = filter.api
+        let settings = {
+          "url": apiGet,
+          "method": "GET",
+          "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Token': window.Liferay ? window.Liferay.authToken : ''
+          },
+          "data": {
+          }
+        };
+        
+        $.ajax(settings).done(function (response) {
+          let serializable = response
+          resolve(serializable)
+        }).fail(function (response) {
+          reject(response)
+        })
+      })
+    },
+
     getRoleUser ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let param = {
@@ -5924,6 +5949,9 @@ export const store = new Vuex.Store({
     // ----End---------
   },
   mutations: {
+    SET_FORM_DATA (state, payload) {
+      state.formDataTphs = payload
+    },
     setLoading (state, payload) {
       state.loading = payload
     },
@@ -6238,6 +6266,9 @@ export const store = new Vuex.Store({
     },
   },
   getters: {
+    getFormData (state) {
+      return state.formDataTphs
+    },
     groupIdSite (state) {
       return state.groupIdSite
     },

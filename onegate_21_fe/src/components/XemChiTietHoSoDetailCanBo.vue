@@ -841,11 +841,10 @@ import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
 import HoSoLienThong from './HoSoLienThong.vue'
 import PhanCongLai from './form_xu_ly/PhanCongLai.vue'
 import ThongTinBuuChinh from './form_xu_ly/ThongTinGuiBuuChinh.vue'
-// import mermaid from 'mermaid'
-mermaid.initialize({
-  theme: 'forest',
-  startOnLoad: false
-})
+// mermaid.initialize({
+//   theme: 'forest',
+//   startOnLoad: false
+// })
 export default {
   props: ['index', 'id'],
   components: {
