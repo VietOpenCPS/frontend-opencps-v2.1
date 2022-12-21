@@ -2218,6 +2218,25 @@ export const store = new Vuex.Store({
         }
       })
     },
+    putFormNghiepVu ({ commit, state, dispatch }, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            groupId: state.initData.groupId,
+            cps_auth: ''
+          }
+        }
+
+        let dataPutAlpacaForm = new URLSearchParams()
+        dataPutAlpacaForm.append('formdata', JSON.stringify(data.formData))
+        let url = state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid + '/formdata'
+        axios.put(url, dataPutAlpacaForm, options).then(function (response) {
+          resolve(response.data)
+        }).catch(function (xhr) {
+          reject(data)
+        })
+      })
+    },
     putAlpacaFormCallBack ({ commit, state, dispatch }, data) {
       return new Promise((resolve, reject) => {
         let options = {
@@ -2321,6 +2340,26 @@ export const store = new Vuex.Store({
           console.log(e)
           reject(data)
         }
+      })
+    },
+    postEformNghiepVu ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        console.log('vm.thanhPhanFormUpdate3', data)
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        let dataPostEform = new FormData()
+        dataPostEform.append('formData', JSON.stringify(data.formData))
+        dataPostEform.append('file', '')
+        let url = state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.partNo
+        axios.post(url, dataPostEform, options).then(function (response) {
+          resolve(response.data)
+        }).catch(function (xhr) {
+          reject(data)
+        })
       })
     },
     postEformCallBack ({commit, state}, data) {
@@ -5945,7 +5984,122 @@ export const store = new Vuex.Store({
         }).catch(xhr => {
         })
       })
-    }
+    },
+    getDanhSachToChuc ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            "groupId": window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : '',
+            "Accept": "application/json"
+          },
+          params: filter.params
+        }
+        axios.get('/o/rest/v2/tochuc', param).then(function (response) {
+          resolve(response.data)
+        }).catch(function () {
+          reject('')
+        })
+      })
+    },
+    themToChuc ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let settings = {
+          "url": '/o/rest/v2/tochuc',
+          "method": "POST",
+          "headers": {
+            "groupId": window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            "Token": window.Liferay ? window.Liferay.authToken : '',
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json"
+          },
+          "data": filter.data
+        };
+        
+        $.ajax(settings).done(function (response) {
+          resolve(response)
+        }).fail(function (err) {
+          reject(err)
+        })
+      })
+    },
+    capNhatToChuc ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let settings = {
+          "url": '/o/rest/v2/tochuc/' + filter.id,
+          "method": "PUT",
+          "headers": {
+            "groupId": window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            "Token": window.Liferay ? window.Liferay.authToken : '',
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json"
+          },
+          "data": filter.data
+        };
+        
+        $.ajax(settings).done(function (response) {
+          resolve(response)
+        }).fail(function (err) {
+          reject(err)
+        })
+      })
+    },
+    getDanhSachChuyenGia ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            'groupId': window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : '',
+            'Accept': 'application/json',
+          },
+          params: filter.params
+        }
+        axios.get('/o/rest/v2/chuyengia', param).then(function (response) {
+          resolve(response.data)
+        }).catch(function () {
+          reject('')
+        })
+      })
+    },
+    themChuyenGia ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let settings = {
+          "url": '/o/rest/v2/chuyengia',
+          "method": "POST",
+          "headers": {
+            "groupId": window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            "Token": window.Liferay ? window.Liferay.authToken : '',
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json"
+          },
+          "data": filter.data
+        };
+        
+        $.ajax(settings).done(function (response) {
+          resolve(response)
+        }).fail(function (err) {
+          reject(err)
+        })
+      })
+    },
+    capNhatChuyenGia ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let settings = {
+          "url": '/o/rest/v2/chuyengia/' + filter.id,
+          "method": "PUT",
+          "headers": {
+            "groupId": window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            "Token": window.Liferay ? window.Liferay.authToken : '',
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          "data": filter.data
+        };
+        
+        $.ajax(settings).done(function (response) {
+          resolve(response)
+        }).fail(function (err) {
+          reject(err)
+        })
+      })
+    },
     // ----End---------
   },
   mutations: {

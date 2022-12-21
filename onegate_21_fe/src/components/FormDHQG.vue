@@ -11,26 +11,35 @@
     >
       <v-layout wrap>
         <!--  -->
-        <div v-for="(item, index) in mauNhap" v-bind:key="index" :class="item['fieldClass']" class="py-0 mb-2 px-2">
-          <div style="
+        <div v-for="(item, index) in mauNhap" v-bind:key="index" :class="item['fieldClass']" class="py-0 mb-2 px-2"
+          :style=" item.type === 'table-tochuc' || item.type === 'table-canhan' || item.type === 'chuongtrinhlamviec'|| item.type === 'hoatdongbenle' || item.type === 'kinhphi' 
+          ? 'border: 1px dotted #787575;padding-top: 10px !important; padding-bottom: 10px !important; margin-left: 10px;margin-right: 10px;border-radius: 5px;' : ''"
+        >
+          <div class="mb-2" v-if="item.type === 'table-tochuc' || item.type === 'table-canhan' || item.type === 'chuongtrinhlamviec'|| item.type === 'hoatdongbenle' || item.type === 'kinhphi'"> 
+            <div class="background-triangle-small">
+              <v-icon size="18" color="white">star_rate</v-icon>
+            </div> 
+            <span style="font-weight: 600; color: #000000b8">{{item.title}}</span>
+            <v-tooltip top class="ml-2" v-if="item.type === 'table-tochuc' && !readonly">
+              <v-btn icon slot="activator" width="70" height="32" color="primary" dense small dark @click="showAddToChuc(item.name)">
+                <v-icon>add_circle_outline</v-icon>
+              </v-btn>
+              <span>Thêm tổ chức</span>
+            </v-tooltip>
+            <v-tooltip top class="ml-2" v-if="item.type === 'table-canhan' && !readonly">
+              <v-btn icon slot="activator" width="70" height="32" color="primary" dense small dark @click="showAddThanhVien(item.name)">
+                <v-icon>add_circle_outline</v-icon>
+              </v-btn>
+              <span>Thêm thành viên</span>
+            </v-tooltip>
+          </div>
+          <div v-else style="
             margin-bottom: 5px;
             display: inline-block;
             color: #000000b8;
             font-weight: 600;">
             <span>{{item.title}}</span>
             <span class="red--text" v-if="item.required">(*)</span>
-            <v-tooltip top class="ml-2" v-if="item.type === 'table-tochuc'">
-              <v-btn icon slot="activator" width="70" height="32" color="primary" dense small dark @click="showAddToChuc(item.name)">
-                <v-icon>add_circle_outline</v-icon>
-              </v-btn>
-              <span>Thêm tổ chức</span>
-            </v-tooltip>
-            <v-tooltip top class="ml-2" v-if="item.type === 'table-canhan'">
-              <v-btn icon slot="activator" width="70" height="32" color="primary" dense small dark @click="showAddThanhVien(item.name)">
-                <v-icon>add_circle_outline</v-icon>
-              </v-btn>
-              <span>Thêm thành viên</span>
-            </v-tooltip>
           </div>
           <v-text-field
             v-if="item.type === 'textfield'"
@@ -40,7 +49,8 @@
             solo
             dense
             hide-details="auto"
-            :clearable="!readonly"
+            :clearable="!readonly && !item.readonly"
+            :readonly="item.hasOwnProperty('readonly') && item.readonly"
             :rules="item.required ? [v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc'] : []"
           ></v-text-field>
           <v-text-field
@@ -51,7 +61,8 @@
             solo
             dense
             hide-details="auto"
-            :clearable="!readonly"
+            :clearable="!readonly && !item.readonly"
+            :readonly="item.hasOwnProperty('readonly') && item.readonly"
             type="number"
             :rules="item.required ? [v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc'] : []"
             @input="!readonly && item.hasOwnProperty('keyCalculator') ? triggerCalculator(item.keyCalculator) : ''"
@@ -64,7 +75,8 @@
             solo
             dense
             hide-details="auto"
-            :clearable="!readonly"
+            :clearable="!readonly && !item.readonly"
+            :readonly="item.hasOwnProperty('readonly') && item.readonly"
             :rules="item.required ? [v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc'] : []"
           ></v-text-field>
           <v-textarea
@@ -75,7 +87,8 @@
             solo
             dense
             hide-details="auto"
-            :clearable="!readonly"
+            :clearable="!readonly && !item.readonly"
+            :readonly="item.hasOwnProperty('readonly') && item.readonly"
             :rows="item.hasOwnProperty('rows') ? item.rows : 3"
             :rules="item.required ? [v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc'] : []"
           ></v-textarea>
@@ -91,7 +104,8 @@
             solo
             dense
             hide-details="auto"
-            :clearable="!readonly"
+            :clearable="!readonly && !item.readonly"
+            :readonly="item.hasOwnProperty('readonly') && item.readonly"
             :rules="item.required ? [v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc'] : []"
           ></v-text-field>
           <v-text-field
@@ -104,7 +118,8 @@
             solo
             dense
             hide-details="auto"
-            :clearable="!readonly"
+            :clearable="!readonly && !item.readonly"
+            :readonly="item.hasOwnProperty('readonly') && item.readonly"
             :rules="item.required ? [v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc'] : []"
           ></v-text-field>
           <v-autocomplete
@@ -149,6 +164,7 @@
               hide-actions
               class="table-landing table-bordered"
               style="border-left: 1px solid #dedede"
+              no-data-text="Không có tổ chức nào"
             >
               <template slot="items" slot-scope="props">
                 <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
@@ -168,13 +184,13 @@
                     </div>
                   </td>
                   <td width="200" class="text-xs-center py-0">
-                    <v-tooltip top class="mr-2">
+                    <v-tooltip top class="mr-2" v-if="!readonly">
                       <v-btn icon slot="activator" width="50" height="32" color="primary" dense small dark @click="suaToChuc(item.name, props.index)">
                         <v-icon>edit</v-icon>
                       </v-btn>
                       <span>Sửa</span>
                     </v-tooltip>
-                    <v-tooltip top>
+                    <v-tooltip top v-if="!readonly">
                       <v-btn icon slot="activator" width="50" height="32" color="red" dense small dark @click="xoaToChuc(item.name, props.index)">
                         <v-icon style="color: #fff !important">delete</v-icon>
                       </v-btn>
@@ -193,6 +209,7 @@
               hide-actions
               class="table-landing table-bordered"
               style="border-left: 1px solid #dedede"
+              no-data-text="Không có thành viên nào"
             >
               <template slot="items" slot-scope="props">
                 <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
@@ -203,22 +220,28 @@
                   </td>
                   <td class="text-xs-left" style="vertical-align: middle;">
                     <div>
-                      <span>{{props.item.TenToChuc}}</span>
+                      <span v-if="props.item.HocHam">{{props.item.HocHam}} </span>
+                      <span>{{props.item.HoTen}}</span>
                     </div>
                   </td>
                   <td class="text-xs-center" style="width: 150px;vertical-align: middle;">
                     <div>
-                      <span>{{props.item.QuocGia.TenMuc}}</span>
+                      <span>{{props.item.DonViCongTac}}</span>
+                    </div>
+                  </td>
+                  <td class="text-xs-center" style="width: 150px;vertical-align: middle;">
+                    <div>
+                      <span>{{props.item.VaiTroTrongHoiThao.TenMuc}}</span>
                     </div>
                   </td>
                   <td width="200" class="text-xs-center py-0">
-                    <v-tooltip top class="mr-2">
+                    <v-tooltip top class="mr-2" v-if="!readonly">
                       <v-btn icon slot="activator" width="50" height="32" color="primary" dense small dark @click="suaThanhVien(item.name, props.index)">
                         <v-icon>edit</v-icon>
                       </v-btn>
                       <span>Sửa</span>
                     </v-tooltip>
-                    <v-tooltip top>
+                    <v-tooltip top v-if="!readonly">
                       <v-btn icon slot="activator" width="50" height="32" color="red" dense small dark @click="xoaThanhVien(item.name, props.index)">
                         <v-icon style="color: #fff !important">delete</v-icon>
                       </v-btn>
@@ -228,6 +251,191 @@
                 </tr>
               </template>
             </v-data-table>
+          </v-flex>
+          <!--  -->
+          <v-flex class="xs12" v-if="item.type === 'chuongtrinhlamviec' && !loadingChuongTrinh">
+            <!-- <v-data-table
+              :headers="item.headerTable"
+              :items="data[item.name]"
+              hide-actions
+              class="table-landing table-bordered"
+              style="border-left: 1px solid #dedede"
+              no-data-text="Chưa có thông tin"
+            >
+              <template slot="items" slot-scope="props">
+                <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
+                  <td class="text-xs-center" style="width:50px;vertical-align: middle;">
+                    <div>
+                      <span>{{props.index + 1}}</span><br>
+                    </div>
+                  </td>
+                  <td class="text-xs-left" style="width: 200px;vertical-align: middle;">
+                    <div>
+                      <span>{{props.item.ThoiGian}}</span>
+                    </div>
+                  </td>
+                  <td class="text-xs-center" style="vertical-align: middle;">
+                    <div>
+                      <span>{{props.item.NoiDung}}</span>
+                    </div>
+                  </td>
+                  <td width="200" class="text-xs-center py-0">
+                    <v-tooltip top class="mr-2">
+                      <v-btn icon slot="activator" width="50" height="32" color="primary" dense small dark @click="suaNoiDung(item.name, props.index)">
+                        <v-icon>edit</v-icon>
+                      </v-btn>
+                      <span>Sửa</span>
+                    </v-tooltip>
+                    <v-tooltip top>
+                      <v-btn icon slot="activator" width="50" height="32" color="red" dense small dark @click="xoaNoiDung(item.name, props.index)">
+                        <v-icon style="color: #fff !important">delete</v-icon>
+                      </v-btn>
+                      <span>Xóa</span>
+                    </v-tooltip>
+                  </td>
+                </tr>
+              </template>
+            </v-data-table> -->
+
+            <v-data-table
+              :headers="item.headerTable"
+              :items="data[item.name]"
+              hide-actions
+              class="table-landing table-bordered"
+              style="border-left: 1px solid #dedede"
+              no-data-text="Chưa có thông tin"
+              v-if="!loadingChuongTrinh"
+            >
+              <template slot="items" slot-scope="props">
+                <td width="50" class="text-xs-center pt-1" > {{props.index + 1}}</td>
+                <td width="200" class="text-xs-left py-1">
+                  <span v-if="readonly">{{props.item.ThoiGian ? props.item.ThoiGian : ''}}</span>
+                  <v-text-field v-else
+                    single-line
+                    v-model="props.item.ThoiGian"
+                    clearable
+                  ></v-text-field>
+                </td>
+                <td class="text-xs-center py-1" style="font-weight: bold;">
+                  <span v-if="readonly">{{props.item.NoiDung ? props.item.NoiDung : ''}}</span>
+                  <v-text-field v-else
+                    v-model="props.item.NoiDung"
+                    single-line
+                  ></v-text-field>
+                </td>
+                <td width="100" class="text-xs-center py-1">
+                  <v-tooltip top v-if="!readonly">
+                    <v-btn slot="activator" width="50" height="32" color="red" dense small dark @click="xoaNoiDung(item.name, props.index)">
+                      <v-icon>remove</v-icon>
+                    </v-btn>
+                    <span>Xóa</span>
+                  </v-tooltip>
+                </td>
+              </template>
+            </v-data-table>
+            <div v-if="!readonly">
+              <v-btn height="32" color="primary" dense small dark @click="showAddNoiDung(item.name)">
+                <v-icon>add</v-icon> &nbsp;
+                <span>Thêm chương trình</span>
+              </v-btn>
+            </div>
+          </v-flex>
+          <!--  -->
+          <v-flex class="xs12" v-if="item.type === 'hoatdongbenle' && !loadingHoatDongBenLe">
+            <v-data-table
+              :headers="item.headerTable"
+              :items="data[item.name]"
+              hide-actions
+              class="table-landing table-bordered"
+              style="border-left: 1px solid #dedede"
+              no-data-text="Chưa có thông tin"
+              v-if="!loadingHoatDongBenLe"
+            >
+              <template slot="items" slot-scope="props">
+                <td width="50" class="text-xs-center pt-1" > {{props.index + 1}}</td>
+                <td width="200" class="text-xs-left py-1">
+                  <span v-if="readonly">{{props.item.ThoiGian ? props.item.ThoiGian : ''}}</span>
+                  <v-text-field v-else
+                    single-line
+                    v-model="props.item.ThoiGian"
+                    clearable
+                  ></v-text-field>
+                </td>
+                <td class="text-xs-center py-1" style="font-weight: bold;">
+                  <span v-if="readonly">{{props.item.NoiDung ? props.item.NoiDung : ''}}</span>
+                  <v-text-field v-else
+                    v-model="props.item.NoiDung"
+                    single-line
+                  ></v-text-field>
+                </td>
+                <td class="text-xs-center py-1" style="font-weight: bold;">
+                  <span v-if="readonly">{{props.item.DiaDiem ? props.item.DiaDiem : ''}}</span>
+                  <v-text-field v-else
+                    v-model="props.item.DiaDiem"
+                    single-line
+                  ></v-text-field>
+                </td>
+                <td width="100" class="text-xs-center py-1">
+                  <v-tooltip top v-if="!readonly">
+                    <v-btn slot="activator" width="50" height="32" color="red" dense small dark @click="xoaHoatDong(item.name, props.index)">
+                      <v-icon>remove</v-icon>
+                    </v-btn>
+                    <span>Xóa</span>
+                  </v-tooltip>
+                </td>
+              </template>
+            </v-data-table>
+            <div>
+              <v-btn height="32" color="primary" dense small dark @click="showAddHoatDong(item.name)">
+                <v-icon>add</v-icon> &nbsp;
+                <span>Thêm hoạt động</span>
+              </v-btn>
+            </div>
+          </v-flex>
+          <!--  -->
+          <v-flex class="xs12" v-if="item.type === 'kinhphi' && !loadingKinhPhi">
+            <v-data-table
+              :headers="item.headerTable"
+              :items="data[item.name]"
+              hide-actions
+              class="table-landing table-bordered"
+              style="border-left: 1px solid #dedede"
+              no-data-text="Chưa có thông tin"
+              v-if="!loadingKinhPhi"
+            >
+              <template slot="items" slot-scope="props">
+                <td width="50" class="text-xs-center pt-1" > {{props.index + 1}}</td>
+                <td class="text-xs-left py-1">
+                  <span v-if="readonly">{{props.item.NguonKinhPhi ? props.item.NguonKinhPhi : ''}}</span>
+                  <v-text-field v-else
+                    single-line
+                    v-model="props.item.NguonKinhPhi"
+                    clearable
+                  ></v-text-field>
+                </td>
+                <td width="200" class="text-xs-center py-1">
+                  <span v-if="readonly">{{props.item.SoTien ? props.item.SoTien : ''}}</span>
+                  <v-text-field v-else
+                    v-model="props.item.SoTien"
+                    single-line
+                  ></v-text-field>
+                </td>
+                <td width="100" class="text-xs-center py-1">
+                  <v-tooltip top v-if="!readonly">
+                    <v-btn slot="activator" width="50" height="32" color="red" dense small dark @click="xoaKinhPhi(item.name, props.index)">
+                      <v-icon>remove</v-icon>
+                    </v-btn>
+                    <span>Xóa</span>
+                  </v-tooltip>
+                </td>
+              </template>
+            </v-data-table>
+            <div>
+              <v-btn height="32" color="primary" dense small dark @click="showAddKinhPhi(item.name)">
+                <v-icon>add</v-icon> &nbsp;
+                <span>Thêm kinh phí</span>
+              </v-btn>
+            </div>
           </v-flex>
           <!--  -->
         </div>
@@ -246,7 +454,7 @@
         <v-card-text class="py-1">
           <v-form ref="formToChuc" v-model="validToChuc" lazy-validation class="form_vuejs py-3 px-0 grid-list">
             <v-layout row wrap class="px-0 py-3">
-              <v-flex class="xs12">
+              <v-flex class="xs7">
                 <div style="
                   margin-bottom: 5px;
                   display: inline-block;
@@ -282,7 +490,25 @@
                 >
                 </v-combobox>
               </v-flex>
-
+              <v-flex class="xs5">
+                <div style="
+                  margin-bottom: 5px;
+                  display: inline-block;
+                  color: #000000b8;
+                  font-weight: 600;">
+                  <span>Mã tổ chức</span>
+                  <span class="red--text">(*)</span>
+                </div>
+                <v-text-field
+                  class="flex input-form"
+                  v-model="toChucCreate['MaToChuc']"
+                  solo
+                  dense
+                  hide-details="auto"
+                  clearable
+                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
+                ></v-text-field>
+              </v-flex>
               <v-flex class="xs12">
                 <div style="
                   margin-bottom: 5px;
@@ -399,9 +625,9 @@
                   class="flex input-form"
                   v-model="ngaySinhCreate"
                   placeholder="dd/mm/yyyy, ddmmyyyy"
-                  @blur="formatBirthDate()"
-                  @input="formatBirthDate()"
-                  @change="formatBirthDate()"
+                  @blur="formatBirthDateNgaySinh()"
+                  @input="formatBirthDateNgaySinh()"
+                  @change="formatBirthDateNgaySinh()"
                   solo
                   dense
                   hide-details="auto"
@@ -452,7 +678,7 @@
                   dense
                   solo
                   hide-details="auto"
-                  placeholder="Chọn giới tính"
+                  placeholder="Chọn vai trò"
                   return-object
                 >
                 </v-autocomplete>
@@ -686,6 +912,87 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="dialogChuongTrinh" scrollable persistent max-width="900px">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Thông tin tổ chức</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogChuongTrinh = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-1">
+          <v-form ref="formToChuc" v-model="validToChuc" lazy-validation class="form_vuejs py-3 px-0 grid-list">
+            <v-layout row wrap class="px-0 py-3">
+              <v-flex class="xs12">
+                <div style="
+                  margin-bottom: 5px;
+                  display: inline-block;
+                  color: #000000b8;
+                  font-weight: 600;">
+                  <span>Thời gian</span>
+                  <span class="red--text">(*)</span>
+                </div>
+                <v-text-field
+                  class="flex input-form"
+                  v-model="thoiGianCreate"
+                  solo
+                  dense
+                  hide-details="auto"
+                  clearable
+                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
+                ></v-text-field>
+              </v-flex>
+              <v-flex class="xs12">
+                <div style="
+                  margin-bottom: 5px;
+                  display: inline-block;
+                  color: #000000b8;
+                  font-weight: 600;">
+                  <span>Nội dung chương trình</span>
+                  <span class="red--text">(*)</span>
+                </div>
+                <v-textarea
+                  class="flex input-form"
+                  v-model="noiDungCreate"
+                  solo
+                  dense
+                  hide-details="auto"
+                  clearable
+                  rows="3"
+                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
+                ></v-textarea>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-2" color="primary" @click.native="dialogChuongTrinh = false"
+            :loading="loadingSubmit"
+            :disabled="loadingSubmit"
+          >
+            <v-icon>clear</v-icon> &nbsp;
+            Thoát
+          </v-btn>
+          <v-btn v-if="typeAction == 'create'" class="mr-3" color="primary" @click.native="themNoiDung"
+            :loading="loadingSubmit"
+            :disabled="loadingSubmit"
+          >
+            <v-icon>save</v-icon> &nbsp;
+            Thêm nội dung
+          </v-btn>
+          <v-btn v-if="typeAction == 'update'" class="mr-3" color="primary" @click.native="updateNoiDung"
+            :loading="loadingSubmit"
+            :disabled="loadingSubmit"
+          >
+            <v-icon>save</v-icon> &nbsp;
+            Cập nhật
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -699,7 +1006,7 @@ toastr.options = {
   "positionClass": "toast-top-center"
 }
 export default {
-    props: ["mauNhap", "dataInput", "readonly", "thongtinthanhphan"],
+    props: ["mauNhap", "dataInput", "readonly", "thongtinthanhphan", "thongtinhoso"],
     components: {
     },
     data() {
@@ -712,7 +1019,10 @@ export default {
           {MaMuc: 1, TenMuc: 'Nữ'}
         ],
         gioiTinhCreate: '',
-        itemsVaiTroHoiThao: [],
+        itemsVaiTroHoiThao: [
+          {MaMuc: 0, TenMuc: 'Chủ tịch hội thảo'},
+          {MaMuc: 1, TenMuc: 'Phó chủ tịch hội thảo'}
+        ],
         vaiTroHoiThaoCreate: '',
         soHoChieuCreate: '',
         quocGiaSelected: '',
@@ -806,6 +1116,15 @@ export default {
         emailCreate: "",
         trinhDoChuyenMonCreate: "",
         linhVucNghienCuuCreate: "",
+
+        loadingChuongTrinh: false,
+        loadingHoatDongBenLe: false,
+        dialogChuongTrinh: false,
+        tenNhomChuongTrinhThemMoi: '',
+        indexChuongTrinhUpdate: '',
+        tenNhomHoatDongThemMoi: '',
+        tenNhomKinhPhiThemMoi: '',
+        loadingKinhPhi: '',
 
         validFormAdd: false,
         data: {},
@@ -976,9 +1295,9 @@ export default {
         let dataOutput = Object.assign({}, vm.data)
         for (let key in vm.mauNhap) {
           let itemConfig = vm.mauNhap[key]
-          if (itemConfig.type == 'date' && dataOutput[itemConfig['name']]) {
-            dataOutput[itemConfig['name']] = vm.convertDate(dataOutput[itemConfig['name']])
-          }
+          // if (itemConfig.type == 'date' && dataOutput[itemConfig['name']]) {
+          //   dataOutput[itemConfig['name']] = vm.convertDate(dataOutput[itemConfig['name']])
+          // }
           if (itemConfig.type == 'money' && dataOutput[itemConfig['name']]) {
             dataOutput[itemConfig['name']] = Number(dataOutput[itemConfig['name']].toString().replace(/\./g, ''))
           }
@@ -1007,8 +1326,9 @@ export default {
           }
         }
         if (type === 'update' && vm.dataInput) {
+          vm.$refs.formThanhPhan.reset()
           vm.data = vm.dataInput
-          // console.log('data', vm.data)
+          // console.log('data1', vm.data)
           for (let key in vm.data) {
             let filter = vm.mauNhap.find(function (item) {
               return item.name == key
@@ -1031,27 +1351,30 @@ export default {
             let filter = vm.mauNhap.find(function (item) {
               return item.name == key
             })
-            if (filter && filter.defaultValue) {
-              vm.data[key] = vm.dataDefaultOutSite[filter.defaultValue]
+            if (filter && filter.hasOwnProperty('defaultValue') && filter.defaultValue) {
+              if (String(filter.defaultValue).indexOf('thongtinhoso.') >= 0) {
+                let dataHs = String(filter.defaultValue).split('.')[1]
+                vm.data[key] = vm.thongtinhoso[dataHs]
+                console.log('default', dataHs, vm.data[key])
+              } else {
+                vm.data[key] = filter.defaultValue
+              }
             }
           }
         }
 
-        // if (vm.data.files) {
-        //   if (vm.data.files[0]) { 
-        //     console.log('ok', vm.data.files) 
-        //     vm.$store.commit('SET_FILEUPLOADYET', true)
-        //   }
-        //   else { 
-        //     console.log('n') 
-        //     vm.$store.commit('SET_FILEUPLOADYET', false)
-        //   }
-        // } 
-        // else { 
-        //   console.log('not') 
-        //   vm.$store.commit('SET_FILEUPLOADYET', false)
-        // }
-
+        for (let key in vm.mauNhap) {
+          let itemData = vm.mauNhap[key]
+          if (itemData && itemData.hasOwnProperty('defaultValue') && itemData.defaultValue) {
+            if (String(itemData.defaultValue).indexOf('thongtinhoso.') >= 0) {
+              let dataHs = String(itemData.defaultValue).split('.')[1]
+              vm.data[itemData['name']] = vm.thongtinhoso[dataHs]
+            } else {
+              vm.data[itemData['name']] = itemData.defaultValue
+            }
+            console.log('vm.data666666', vm.data)
+          }
+        }
       },
       // LOẠI TỔ CHỨC
       // 
@@ -1068,9 +1391,19 @@ export default {
         vm.toChucSuggested = ''
         vm.dialogToChuc = true
         vm.tenNhomToChucThemMoi = tenDoiTuong
+        let filter = {
+          params: {
+            start: 0,
+            end: 1000
+          }
+        }
+        vm.$store.dispatch('getDanhSachToChuc', filter).then(function (result) {
+          vm.danhSachToChucSuggest = result.data
+        })
       },
       themToChuc () {
         let vm = this
+        vm.typeAction = 'create'
         setTimeout(() => {
           console.log('vm.toChucSuggested', vm.toChucSuggested)
           try {
@@ -1093,6 +1426,16 @@ export default {
           }
           vm.$set(vm.data, vm.tenNhomToChucThemMoi, vm.data[vm.tenNhomToChucThemMoi].concat([toChuc]))
           console.log('vm.data[vm.tenNhomToChucThemMoi144423]', vm.data[vm.tenNhomToChucThemMoi])
+
+          let filter = {
+            data: {
+              "tenToChuc": vm.toChucCreate['TenToChuc'],
+              "maToChuc": vm.toChucCreate['MaToChuc'] ? vm.toChucCreate['MaToChuc'] : '',
+              "maQuocGia": vm.quocGiaSelected.itemCode,
+              "tenQuocGia": vm.quocGiaSelected.itemName
+            }
+          }
+          vm.$store.dispatch('themToChuc', filter).then(function (result) {})
           vm.dialogToChuc = false
         }, 100);
       },
@@ -1158,6 +1501,7 @@ export default {
       // 
       showAddThanhVien (tenDoiTuong) {
         let vm = this
+        vm.typeAction = 'create'
         vm.thanhVienCreate = {
           HoTen: "",
           VaiTroTrongHoiThao: {
@@ -1181,31 +1525,78 @@ export default {
         vm.thanhVienSuggested = ''
         vm.dialogCaNhan = true
         vm.tenNhomThanhVienThemMoi = tenDoiTuong
+        let filter = {
+          params: {
+            start: 0,
+            end: 1000
+          }
+        }
+        vm.$store.dispatch('getDanhSachChuyenGia', filter).then(function (result) {
+          vm.danhSachThanhVienSuggest = result.data
+        })
       },
       themThanhVien () {
         let vm = this
         setTimeout(() => {
           console.log('vm.thanhVienSuggested', vm.thanhVienSuggested)
           try {
-            if (!vm.thanhVienSuggested.hasOwnProperty('TenToChuc')) {
-              vm.thanhVienSuggested['TenToChuc'] = vm.toChucSuggested
+            if (!vm.thanhVienSuggested.hasOwnProperty('HoTen')) {
+              vm.thanhVienCreate['HoTen'] = vm.thanhVienSuggested
             }
           } catch (error) {
           }
           console.log('vm.thanhVienCreate', vm.thanhVienCreate)
           let thanhVien = {
-            "TenToChuc": vm.thanhVienCreate['TenToChuc'],
-            "MaToChuc": vm.thanhVienCreate['MaToChuc'] ? vm.thanhVienCreate['MaToChuc'] : '',
-            "QuocGia": {
-              "MaMuc": vm.quocGiaSelected.itemCode,
-              "TenMuc": vm.quocGiaSelected.itemName
-            }
+            HoTen: vm.thanhVienCreate['HoTen'],
+            VaiTroTrongHoiThao: {
+              MaMuc: vm.vaiTroHoiThaoCreate ? vm.vaiTroHoiThaoCreate.MaMuc : '',
+              TenMuc: vm.vaiTroHoiThaoCreate ? vm.vaiTroHoiThaoCreate.TenMuc : ''
+            },
+            DonViCongTac: vm.donViCongTacCreate,
+            ChucVu: vm.chucVuDonViCreate,
+            NgaySinh: vm.ngaySinhCreate,
+            GioiTinh: {
+              MaMuc: vm.gioiTinhCreate ? vm.gioiTinhCreate.MaMuc : '',
+              TenMuc: vm.gioiTinhCreate ? vm.gioiTinhCreate.TenMuc : ''
+            },
+            QuocGia: {
+              MaMuc: vm.quocGiaSelected ? vm.quocGiaSelected.itemCode : '',
+              TenMuc: vm.quocGiaSelected ? vm.quocGiaSelected.itemName : ''
+            },
+            HoChieu: vm.soHoChieuCreate,
+            DiaChi: vm.diaChiCreate,
+            HocHam: vm.hocHamCreate,
+            NgheNghiep: vm.ngheNghiepCreate,
+            DienThoai: vm.soDienThoaiCreate,
+            Email: vm.emailCreate,
+            TrinhDoChuyenMon: vm.trinhDoChuyenMonCreate,
+            LinhVucNghienCuu: vm.linhVucNghienCuuCreate
           }
           if (!vm.data[vm.tenNhomThanhVienThemMoi]) {
             vm.data[vm.tenNhomThanhVienThemMoi] = []
           }
           vm.$set(vm.data, vm.tenNhomThanhVienThemMoi, vm.data[vm.tenNhomThanhVienThemMoi].concat([thanhVien]))
           console.log('vm.data[vm.tenNhomToChucThemMoi144423]', vm.data[vm.tenNhomThanhVienThemMoi])
+          let filter = {
+            data: {
+              hoTen: vm.thanhVienCreate['HoTen'],
+              vaiTroTrongHoiThao: vm.vaiTroHoiThaoCreate ? vm.vaiTroHoiThaoCreate.TenMuc : '',
+              donViCongTac: vm.donViCongTacCreate,
+              chucVu: vm.chucVuDonViCreate,
+              ngaySinh: vm.ngaySinhCreate,
+              gioiTinh: vm.gioiTinhCreate ? vm.gioiTinhCreate.TenMuc : '',
+              quocGia: vm.quocGiaSelected ? vm.quocGiaSelected.itemName : '',
+              hoChieu: vm.soHoChieuCreate,
+              diaChi: vm.diaChiCreate,
+              hocHam: vm.hocHamCreate,
+              ngheNghiep: vm.ngheNghiepCreate,
+              dienThoai: vm.soDienThoaiCreate,
+              email: vm.emailCreate,
+              trinhDoChuyenMon: vm.trinhDoChuyenMonCreate,
+              linhVucNghienCuu: vm.linhVucNghienCuuCreate
+            }
+          }
+          vm.$store.dispatch('themChuyenGia', filter).then(function (result) {})
           vm.dialogCaNhan = false
         }, 100);
       },
@@ -1268,6 +1659,125 @@ export default {
         }
       },
       // 
+      showAddNoiDung (tenDoiTuong) {
+        let vm = this
+        // vm.typeAction = 'create'
+        // vm.dialogChuongTrinh = true
+        vm.tenNhomChuongTrinhThemMoi = tenDoiTuong
+        let noiDung = {
+          ThoiGian: '',
+          NoiDung: ''
+        }
+        if (!vm.data[vm.tenNhomChuongTrinhThemMoi]) {
+          vm.data[vm.tenNhomChuongTrinhThemMoi] = []
+        }
+        vm.$set(vm.data, vm.tenNhomChuongTrinhThemMoi, vm.data[vm.tenNhomChuongTrinhThemMoi].concat([noiDung]))
+        console.log('vm.data[vm.tenNhomToChucThemMoi144423]', vm.data[vm.tenNhomChuongTrinhThemMoi])
+        vm.loadingChuongTrinh = true
+        setTimeout(function () {
+          vm.loadingChuongTrinh = false
+        }, 10)
+      },
+      suaNoiDung (name, index) {
+        let vm = this
+        vm.typeAction = 'update'
+        vm.tenNhomChuongTrinhThemMoi = name
+        vm.indexChuongTrinhUpdate = index
+        vm.dialogChuongTrinh = true
+      },
+      xoaNoiDung (name, index) {
+        let vm = this
+        console.log('name', name, index)
+        vm.tenNhomChuongTrinhThemMoi = name
+        let abc = vm.data[vm.tenNhomChuongTrinhThemMoi].filter(function (item, key) {
+          return key !== index
+        })
+        vm.$set(vm.data, vm.tenNhomChuongTrinhThemMoi, abc)
+        vm.loadingChuongTrinh = true
+        setTimeout(function () {
+          vm.loadingChuongTrinh = false
+        }, 10)
+      },
+      themNoiDung () {
+        let vm = this
+        setTimeout(() => {
+          let noiDung = {
+            ThoiGian: '',
+            NoiDung: ''
+          }
+          if (!vm.data[vm.tenNhomChuongTrinhThemMoi]) {
+            vm.data[vm.tenNhomChuongTrinhThemMoi] = []
+          }
+          vm.$set(vm.data, vm.tenNhomChuongTrinhThemMoi, vm.data[vm.tenNhomChuongTrinhThemMoi].concat([noiDung]))
+          console.log('vm.data[vm.tenNhomToChucThemMoi144423]', vm.data[vm.tenNhomChuongTrinhThemMoi])
+
+          vm.dialogChuongTrinh = false
+        }, 100);
+      },
+
+      showAddHoatDong (tenDoiTuong) {
+        let vm = this
+        vm.tenNhomHoatDongThemMoi = tenDoiTuong
+        let noiDung = {
+          ThoiGian: '',
+          NoiDung: '',
+          DiaDiem: ''
+        }
+        if (!vm.data[vm.tenNhomHoatDongThemMoi]) {
+          vm.data[vm.tenNhomHoatDongThemMoi] = []
+        }
+        vm.$set(vm.data, vm.tenNhomHoatDongThemMoi, vm.data[vm.tenNhomHoatDongThemMoi].concat([noiDung]))
+        console.log('vm.data[vm.tenNhomToChucThemMoi144423]', vm.data[vm.tenNhomHoatDongThemMoi])
+        vm.loadingHoatDongBenLe = true
+        setTimeout(function () {
+          vm.loadingHoatDongBenLe = false
+        }, 10)
+      },
+      xoaHoatDong (name, index) {
+        let vm = this
+        console.log('name', name, index)
+        vm.tenNhomHoatDongThemMoi = name
+        let abc = vm.data[vm.tenNhomHoatDongThemMoi].filter(function (item, key) {
+          return key !== index
+        })
+        vm.$set(vm.data, vm.tenNhomHoatDongThemMoi, abc)
+        vm.loadingHoatDongBenLe = true
+        setTimeout(function () {
+          vm.loadingHoatDongBenLe = false
+        }, 10)
+      },
+
+      showAddKinhPhi (tenDoiTuong) {
+        let vm = this
+        vm.tenNhomKinhPhiThemMoi = tenDoiTuong
+        let noiDung = {
+          NguonKinhPhi: '',
+          SoTien: ''
+        }
+        if (!vm.data[vm.tenNhomKinhPhiThemMoi]) {
+          vm.data[vm.tenNhomKinhPhiThemMoi] = []
+        }
+        vm.$set(vm.data, vm.tenNhomKinhPhiThemMoi, vm.data[vm.tenNhomKinhPhiThemMoi].concat([noiDung]))
+        console.log('vm.data[vm.tenNhomToChucThemMoi144423]', vm.data[vm.tenNhomKinhPhiThemMoi])
+        vm.loadingKinhPhi = true
+        setTimeout(function () {
+          vm.loadingKinhPhi = false
+        }, 10)
+      },
+      xoaKinhPhi (name, index) {
+        let vm = this
+        console.log('name', name, index)
+        vm.tenNhomKinhPhiThemMoi = name
+        let abc = vm.data[vm.tenNhomKinhPhiThemMoi].filter(function (item, key) {
+          return key !== index
+        })
+        vm.$set(vm.data, vm.tenNhomKinhPhiThemMoi, abc)
+        vm.loadingKinhPhi = true
+        setTimeout(function () {
+          vm.loadingKinhPhi = false
+        }, 10)
+      },
+      // 
       validateForm () {
         let vm = this
         return vm.$refs.formThanhPhan.validate()
@@ -1303,7 +1813,7 @@ export default {
           vm.data[name] = ''
         }
       },
-      formatBirthDateNgaySinh (name) {
+      formatBirthDateNgaySinh () {
         let vm = this
         let lengthDate = String(vm.ngaySinhCreate).trim().length
         let splitDate = String(vm.ngaySinhCreate).split('/')

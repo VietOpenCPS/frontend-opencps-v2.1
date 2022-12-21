@@ -460,7 +460,7 @@
               ></v-progress-circular>
 
               <v-tooltip top v-if="progressUploadPart !== item.partNo && item.hasForm">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item, 'viewform')">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item, 'viewform', index)">
                   <v-badge>
                     <v-icon v-if="onlyView" size="24" color="#004b94">description</v-icon>
                     <v-icon v-else size="24" color="#004b94">edit</v-icon>
@@ -1134,7 +1134,7 @@
       <v-card>
         <v-toolbar dark color="primary">
           <v-toolbar-title>
-            <div style="font-size: 16px;">THÔNG TIN THÀNH PHẦN HỒ SƠ</div>
+            <div style="font-size: 16px;">THÔNG TIN HỘI THẢO</div>
           </v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="dialog_formscript_tphs = false">
@@ -1142,7 +1142,9 @@
           </v-btn>
         </v-toolbar>
         <v-card-text class="py-1">
-          <form-thanh-phan-ho-so ref="formThanhPhanHoSo" :mauNhap="mauNhapForm" :readonly="readonlyForm">
+          <form-thanh-phan-ho-so ref="formThanhPhanHoSo" :dataInput="formDataTphs" :mauNhap="mauNhapForm" :readonly="onlyView"
+            :thongtinhoso="thongTinHoSo"
+          >
           </form-thanh-phan-ho-so>
         </v-card-text>
         <v-card-actions>
@@ -1154,7 +1156,7 @@
             <v-icon>clear</v-icon> &nbsp;
             Thoát
           </v-btn>
-          <v-btn class="mr-4" color="primary" @click.native="submitFormTphs"
+          <v-btn class="mr-4" color="primary" @click.native="submitFormTphs" v-if="!onlyView"
             :loading="loadingSubmitFormTphs"
             :disabled="loadingSubmitFormTphs"
           >
@@ -1218,6 +1220,9 @@ export default {
   },
   data: () => ({
     mauNhapForm: '',
+    formDataTphs: '',
+    thanhPhanFormUpdate: '',
+    indexThanhPhanFormUpdate: '',
     dialog_formscript_tphs: false,
     loadingSubmitFormTphs: false,
     dialog_add_giayto: false,
@@ -1554,14 +1559,61 @@ export default {
   methods: {
     submitFormTphs() {
       let vm = this
-      vm.$refs.formThanhPhanHoSo.submitTaoBaoCao()
-      let formData = vm.$store.getters.getFormData
-      for (const key in formData) {
-        if (formData[key] == undefined) {
-          formData[key] = ''
+      let validate = vm.$refs.formThanhPhanHoSo.validateForm()
+      if (validate) {
+        vm.$refs.formThanhPhanHoSo.submitTaoBaoCao()
+        let formData = vm.$store.getters.getFormData
+        for (const key in formData) {
+          if (formData[key] == undefined) {
+            formData[key] = ''
+          }
+        }
+        console.log('formThanhPhanHoSo', formData)
+
+        var fileFind = vm.dossierFilesItems.find(itemFile => {
+          // return itemFile.dossierPartNo === item.partNo && itemFile.eForm && itemFile.fileSize!==0
+          return itemFile.dossierPartNo === vm.thanhPhanFormUpdate.partNo && itemFile.eForm
+        })
+        if (fileFind) {
+          fileFind['dossierId'] = vm.thongTinHoSo.dossierId
+          fileFind['id'] = vm.id
+          fileFind['formData'] = formData
+          vm.loadingApacal = true
+          vm.$store.dispatch('putFormNghiepVu', fileFind).then(resData => {
+            setTimeout(function () {
+              vm.loadingApacal = false
+              // toastr.clear()
+              // toastr.success('Thực hiện thành công')
+              vm.loadFiles()
+            }, 3000)
+            vm.dossierTemplateItemsFilter[vm.indexThanhPhanFormUpdate]['passRequired'] = true
+          }).catch(reject => {
+            vm.loadingApacal = false
+          })
+        } else {
+          console.log('vm.thanhPhanFormUpdate1', vm.thanhPhanFormUpdate)
+          vm.thanhPhanFormUpdate['dossierId'] = vm.thongTinHoSo.dossierId
+          vm.thanhPhanFormUpdate['id'] = vm.id
+          vm.thanhPhanFormUpdate['formData'] = formData
+          console.log('vm.thanhPhanFormUpdate2', vm.thanhPhanFormUpdate)
+          vm.loadingApacal = true
+          vm.$store.dispatch('postEformNghiepVu', vm.thanhPhanFormUpdate).then(resPostEform => {
+            console.log('resole', resPostEform)
+            setTimeout(function () {
+              vm.loadingApacal = false
+              toastr.clear()
+              toastr.success('Thực hiện thành công')
+              vm.dossierTemplateItemsFilter[vm.indexThanhPhanFormUpdate].daKhai = true
+              vm.loadFiles()
+              vm.dialog_formscript_tphs = false
+            }, 1000)
+            vm.dossierTemplateItemsFilter[vm.indexThanhPhanFormUpdate]['passRequired'] = true
+            
+          }).catch(reject => {
+            vm.loadingApacal = false
+          })
         }
       }
-      console.log('formThanhPhanHoSo', formData)
     },
     formatDate () {
       let vm = this
@@ -2668,7 +2720,7 @@ export default {
     //     })
     //   }
     // },
-    loadAlpcaFormClick (data, viewform) {
+    loadAlpcaFormClick (data, viewform, index) {
       let vm = this
       let path = vm.dossierTemplateItemsFilter.find(function (item) {
         return item.hasForm && data.partNo == item.partNo
@@ -2687,9 +2739,26 @@ export default {
         if (eformScript && eformScript.hasOwnProperty('eformDHQG') && eformScript.eformDHQG) {
           vm.mauNhapForm = eformScript.mauNhap
           vm.dialog_formscript_tphs = true
-          setTimeout(function () {
-            vm.$refs.formThanhPhanHoSo.initForm('create')
-          }, 200)
+          vm.thanhPhanFormUpdate = data
+          vm.indexThanhPhanFormUpdate = index
+          vm.$store.dispatch('loadFormData', path).then(resData => {
+            console.log('FormData', eval('(' + resData + ')'))
+            if (resData) {
+              vm.formDataTphs = eval('(' + resData + ')')
+              setTimeout(function () {
+                vm.$refs.formThanhPhanHoSo.initForm('update')
+              }, 200)
+            } else {
+              setTimeout(function () {
+                vm.$refs.formThanhPhanHoSo.initForm('create')
+              }, 200)
+            }
+          }).catch(function () {
+            setTimeout(function () {
+              vm.$refs.formThanhPhanHoSo.initForm('create')
+            }, 200)
+          })
+          
 
         }
       })
