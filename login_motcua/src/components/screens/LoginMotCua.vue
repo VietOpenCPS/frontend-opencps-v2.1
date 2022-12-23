@@ -4,6 +4,8 @@
       <div class="logo"> 
         <a href=""> 
           <!-- <img src="/o/kiemthuduongbo-theme/images/color_schemes/bogt-theme/logo.png">  -->
+          <!-- <img src="/o/hethongxulynghiepvu-theme/images/color_schemes/bogt-theme/anh-banner.png"> -->
+          
           <img src="o/bongoaigiao-theme/images/logo-login-motcua.png">
           <div class="text-logo">
             
@@ -144,12 +146,12 @@
       </v-flex>
     </v-layout>
     <div class="footer_login">
-      <!-- <p class="site-name">&#169; Trung tâm Công nghệ thông tin - Bộ GTVT</p> 
+      <p class="site-name">&#169; Trung tâm Công nghệ thông tin - Bộ GTVT</p> 
       <p class="info-wrapper"> 
         <span>Địa chỉ: 80 Trần Hưng Đạo, Hoàn kiếm, Hà Nội</span> <br>
         <span>Hotline: 1900 0318 - Điện thoại: (024) 3.822.2979 - Fax: (024) 3.822.1066</span> <br>
         <span>Email: bophanhotro@mt.gov.vn</span> 
-      </p>  -->
+      </p> 
     </div>
   </div>
 </template>

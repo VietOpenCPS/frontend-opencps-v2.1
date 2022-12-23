@@ -4729,15 +4729,9 @@ export const store = new Vuex.Store({
               'Content-Type': 'application/x-www-form-urlencoded'
             }
           }
-          let data = {
-            smsNotify: filter['smsNotify'],
-            emailNotify: filter['emailNotify']
-          }
-          if (filter['optionName']) {
-            data['optionName'] = filter['optionName']
-          }
           let formData = new URLSearchParams()
-          formData.append('data', JSON.stringify(data))
+          formData.append('data', JSON.stringify(filter.data))
+          console.log('metaaaa')
           axios.put('/o/rest/v2/dossiers/' + filter['dossierId'] + '/metadata' ,formData , param).then(function (response) {
             let serializable = response.data
             resolve(serializable)

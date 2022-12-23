@@ -9,7 +9,7 @@
       lazy-validation
       class="mt-2"
     >
-      <v-layout wrap>
+      <v-layout wrap v-if="!loading">
         <!--  -->
         <div v-for="(item, index) in mauNhap" v-bind:key="index" :class="item['fieldClass']" class="py-0 mb-2 px-2"
           :style=" item.type === 'table-tochuc' || item.type === 'table-canhan' || item.type === 'chuongtrinhlamviec'|| item.type === 'hoatdongbenle' || item.type === 'kinhphi' 
@@ -19,7 +19,7 @@
             <div class="background-triangle-small">
               <v-icon size="18" color="white">star_rate</v-icon>
             </div> 
-            <span style="font-weight: 600; color: #000000b8">{{item.title}}</span>
+            <span style="font-weight: 600; color: #000000b8; text-transform: uppercase;">{{item.title}}</span>
             <v-tooltip top class="ml-2" v-if="item.type === 'table-tochuc' && !readonly">
               <v-btn icon slot="activator" width="70" height="32" color="primary" dense small dark @click="showAddToChuc(item.name)">
                 <v-icon>add_circle_outline</v-icon>
@@ -442,7 +442,7 @@
       </v-layout>
     </v-form>
 
-    <v-dialog v-model="dialogToChuc" scrollable persistent max-width="900px">
+    <v-dialog v-model="dialogToChuc" scrollable persistent max-width="1200px">
       <v-card>
         <v-toolbar dark color="primary">
           <v-toolbar-title>Thông tin tổ chức</v-toolbar-title>
@@ -480,8 +480,8 @@
                   hide-no-data
                   :items="danhSachToChucSuggest"
                   v-model="toChucSuggested"
-                  item-text="TenToChuc"
-                  item-value="MaToChuc"
+                  item-text="tenToChuc"
+                  item-value="maToChuc"
                   dense
                   solo
                   clearable
@@ -496,18 +496,24 @@
                   display: inline-block;
                   color: #000000b8;
                   font-weight: 600;">
-                  <span>Mã tổ chức</span>
+                  <span>Loại tổ chức</span>
                   <span class="red--text">(*)</span>
                 </div>
-                <v-text-field
+                <v-autocomplete
                   class="flex input-form"
-                  v-model="toChucCreate['MaToChuc']"
-                  solo
+                  hide-no-data
+                  v-model="loaiToChucSelected"
+                  :items="danhMucLoaiToChuc"
+                  item-text="TenMuc"
+                  item-value="MaMuc"
                   dense
+                  solo
                   hide-details="auto"
+                  return-object
                   clearable
                   :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
-                ></v-text-field>
+                >
+                </v-autocomplete>
               </v-flex>
               <v-flex class="xs12">
                 <div style="
@@ -533,6 +539,73 @@
                   :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
                 >
                 </v-autocomplete>
+              </v-flex>
+              <v-flex class="xs4" 
+                v-if="loaiToChucSelected && loaiToChucSelected.MaMuc == 2 && quocGiaSelected && quocGiaSelected.itemCode != 'VN'"
+              >
+                <div style="
+                  margin-bottom: 5px;
+                  display: inline-block;
+                  color: #000000b8;
+                  font-weight: 600;">
+                  <span>Số giấy phép đăng ký hoạt động tại VN</span>
+                  <span class="red--text">(*)</span>
+                </div>
+                <v-text-field
+                  class="flex input-form"
+                  v-model="soGiayPhepDangKyVN"
+                  solo
+                  dense
+                  hide-details="auto"
+                  clearable
+                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
+                ></v-text-field>
+              </v-flex>
+              <v-flex class="xs4"
+                v-if="loaiToChucSelected && loaiToChucSelected.MaMuc == 2 && quocGiaSelected && quocGiaSelected.itemCode != 'VN'"
+              >
+                <div style="
+                  margin-bottom: 5px;
+                  display: inline-block;
+                  color: #000000b8;
+                  font-weight: 600;">
+                  <span>Ngày cấp</span>
+                  <span class="red--text">(*)</span>
+                </div>
+                <v-text-field
+                  class="flex input-form"
+                  v-model="ngaySinhCreate"
+                  solo
+                  dense
+                  hide-details="auto"
+                  clearable
+                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
+                  placeholder="dd/mm/yyyy, ddmmyyyy"
+                  @blur="formatBirthDateNgaySinh()"
+                  @input="formatBirthDateNgaySinh()"
+                  @change="formatBirthDateNgaySinh()"
+                ></v-text-field>
+              </v-flex>
+              <v-flex class="xs4"
+                v-if="loaiToChucSelected && loaiToChucSelected.MaMuc == 2 && quocGiaSelected && quocGiaSelected.itemCode != 'VN'"
+              >
+                <div style="
+                  margin-bottom: 5px;
+                  display: inline-block;
+                  color: #000000b8;
+                  font-weight: 600;">
+                  <span>Cơ quan cấp</span>
+                  <span class="red--text">(*)</span>
+                </div>
+                <v-text-field
+                  class="flex input-form"
+                  v-model="coQuanCapGiayPhepDangKyVN"
+                  solo
+                  dense
+                  hide-details="auto"
+                  clearable
+                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
+                ></v-text-field>
               </v-flex>
             </v-layout>
           </v-form>
@@ -602,8 +675,8 @@
                   hide-no-data
                   :items="danhSachThanhVienSuggest"
                   v-model="thanhVienSuggested"
-                  item-text="HoTen"
-                  item-value="Id"
+                  item-text="hoTen"
+                  item-value="id"
                   dense
                   solo
                   clearable
@@ -612,7 +685,30 @@
                 >
                 </v-combobox>
               </v-flex>
-              <v-flex class="xs4 px-2">
+              <v-flex class="xs4">
+                <div style="
+                  margin-bottom: 5px;
+                  display: inline-block;
+                  color: #000000b8;
+                  font-weight: 600;">
+                  <span>Quốc gia</span>
+                  <span class="red--text">(*)</span>
+                </div>
+                <v-autocomplete
+                  class="flex input-form"
+                  hide-no-data
+                  v-model="quocGiaSelected"
+                  :items="danhMucQuocGia"
+                  item-text="itemName"
+                  item-value="itemCode"
+                  dense
+                  solo
+                  hide-details="auto"
+                  return-object
+                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
+                >
+              </v-flex>
+              <v-flex class="xs4 px-2" v-if="quocGiaSelected && quocGiaSelected.itemCode !== 'VN'">
                 <div style="
                   margin-bottom: 5px;
                   display: inline-block;
@@ -635,31 +731,27 @@
                   :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
                 ></v-text-field>
               </v-flex>
-              <v-flex class="xs4">
+              
+              <v-flex class="xs6" v-if="quocGiaSelected && quocGiaSelected.itemCode !== 'VN'">
                 <div style="
                   margin-bottom: 5px;
                   display: inline-block;
                   color: #000000b8;
                   font-weight: 600;">
-                  <span>Giới tính</span>
+                  <span>Số hộ chiếu</span>
                   <span class="red--text">(*)</span>
                 </div>
-                <v-autocomplete
+                <v-text-field
                   class="flex input-form"
-                  hide-no-data
-                  :items="itemsGioiTinh"
-                  v-model="gioiTinhCreate"
-                  item-text="TenMuc"
-                  item-value="MaMuc"
-                  dense
+                  v-model="soHoChieuCreate"
                   solo
+                  dense
                   hide-details="auto"
-                  placeholder="Chọn giới tính"
-                  return-object
-                >
-                </v-autocomplete>
+                  clearable
+                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
+                ></v-text-field>
               </v-flex>
-              <v-flex class="xs4">
+              <v-flex v-if="!quocGiaSelected || quocGiaSelected.itemCode != 'VN'" class="xs6">
                 <div style="
                   margin-bottom: 5px;
                   display: inline-block;
@@ -680,53 +772,11 @@
                   hide-details="auto"
                   placeholder="Chọn vai trò"
                   return-object
+                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
                 >
                 </v-autocomplete>
               </v-flex>
-              <v-flex class="xs4">
-                <div style="
-                  margin-bottom: 5px;
-                  display: inline-block;
-                  color: #000000b8;
-                  font-weight: 600;">
-                  <span>Số CCCD/ Hộ chiếu</span>
-                  <span class="red--text">(*)</span>
-                </div>
-                <v-text-field
-                  class="flex input-form"
-                  v-model="soHoChieuCreate"
-                  solo
-                  dense
-                  hide-details="auto"
-                  clearable
-                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
-                ></v-text-field>
-              </v-flex>
-              <v-flex class="xs4">
-                <div style="
-                  margin-bottom: 5px;
-                  display: inline-block;
-                  color: #000000b8;
-                  font-weight: 600;">
-                  <span>Quốc gia</span>
-                  <span class="red--text">(*)</span>
-                </div>
-                <v-autocomplete
-                  class="flex input-form"
-                  hide-no-data
-                  v-model="quocGiaSelected"
-                  :items="danhMucQuocGia"
-                  item-text="itemName"
-                  item-value="itemCode"
-                  dense
-                  solo
-                  hide-details="auto"
-                  return-object
-                  clearable
-                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
-                >
-              </v-flex>
-              <v-flex class="xs12">
+              <v-flex class="xs12" v-if="quocGiaSelected && quocGiaSelected.itemCode !== 'VN'">
                 <div style="
                   margin-bottom: 5px;
                   display: inline-block;
@@ -745,7 +795,7 @@
                   :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
                 ></v-text-field>
               </v-flex>
-              <v-flex class="xs6">
+              <v-flex :class="quocGiaSelected && quocGiaSelected.itemCode !== 'VN' ? 'xs6' : 'xs4'">
                 <div style="
                   margin-bottom: 5px;
                   display: inline-block;
@@ -762,7 +812,32 @@
                   clearable
                 ></v-text-field>
               </v-flex>
-              <v-flex class="xs6">
+              <v-flex v-if="quocGiaSelected && quocGiaSelected.itemCode == 'VN'" class="xs12">
+                <div style="
+                  margin-bottom: 5px;
+                  display: inline-block;
+                  color: #000000b8;
+                  font-weight: 600;">
+                  <span>Vai trò trong hội thảo</span>
+                  <span class="red--text">(*)</span>
+                </div>
+                <v-autocomplete
+                  class="flex input-form"
+                  hide-no-data
+                  :items="itemsVaiTroHoiThao"
+                  v-model="vaiTroHoiThaoCreate"
+                  item-text="TenMuc"
+                  item-value="MaMuc"
+                  dense
+                  solo
+                  hide-details="auto"
+                  placeholder="Chọn vai trò"
+                  return-object
+                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
+                >
+                </v-autocomplete>
+              </v-flex>
+              <v-flex class="xs6" v-if="quocGiaSelected && quocGiaSelected.itemCode !== 'VN'">
                 <div style="
                   margin-bottom: 5px;
                   display: inline-block;
@@ -785,7 +860,7 @@
                   display: inline-block;
                   color: #000000b8;
                   font-weight: 600;">
-                  <span>Đơn vị công tác</span>
+                  <span>Đơn vị công tác <span class="red--text">(*)</span></span>
                 </div>
                 <v-text-field
                   class="flex input-form"
@@ -794,6 +869,7 @@
                   dense
                   hide-details="auto"
                   clearable
+                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
                 ></v-text-field>
               </v-flex>
               <v-flex class="xs6">
@@ -813,7 +889,27 @@
                   clearable
                 ></v-text-field>
               </v-flex>
-              <v-flex class="xs6">
+              <v-flex class="xs12" v-if="quocGiaSelected && quocGiaSelected.itemCode !== 'VN'">
+                <div style="
+                  margin-bottom: 5px;
+                  display: inline-block;
+                  color: #000000b8;
+                  font-weight: 600;">
+                  <span>Quá trình công tác</span>
+                  <span class="red--text">(*)</span>
+                </div>
+                <v-textarea
+                  class="flex input-form"
+                  v-model="quaTrinhCongTacCreate"
+                  solo
+                  dense
+                  hide-details="auto"
+                  clearable
+                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
+                  rows="3"
+                ></v-textarea>
+              </v-flex>
+              <v-flex class="xs6" v-if="quocGiaSelected && quocGiaSelected.itemCode !== 'VN'">
                 <div style="
                   margin-bottom: 5px;
                   display: inline-block;
@@ -830,7 +926,7 @@
                   clearable
                 ></v-text-field>
               </v-flex>
-              <v-flex class="xs6">
+              <v-flex class="xs6" v-if="quocGiaSelected && quocGiaSelected.itemCode !== 'VN'">
                 <div style="
                   margin-bottom: 5px;
                   display: inline-block;
@@ -847,7 +943,7 @@
                   clearable
                 ></v-text-field>
               </v-flex>
-              <v-flex class="xs12">
+              <v-flex class="xs12" v-if="quocGiaSelected && quocGiaSelected.itemCode !== 'VN'">
                 <div style="
                   margin-bottom: 5px;
                   display: inline-block;
@@ -865,7 +961,7 @@
                   rows="5"
                 ></v-textarea>
               </v-flex>
-              <v-flex class="xs12">
+              <v-flex class="xs12" v-if="quocGiaSelected && quocGiaSelected.itemCode !== 'VN'">
                 <div style="
                   margin-bottom: 5px;
                   display: inline-block;
@@ -886,7 +982,7 @@
             </v-layout>
           </v-form>
         </v-card-text>
-        <v-card-actions class="mr-3">
+        <v-card-actions class="mr-0">
           <v-spacer></v-spacer>
           <v-btn class="mr-2" color="primary" @click.native="dialogCaNhan = false"
             :loading="loadingSubmit"
@@ -916,14 +1012,14 @@
     <v-dialog v-model="dialogChuongTrinh" scrollable persistent max-width="900px">
       <v-card>
         <v-toolbar dark color="primary">
-          <v-toolbar-title>Thông tin tổ chức</v-toolbar-title>
+          <v-toolbar-title>Thông tin chương trình</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="dialogChuongTrinh = false">
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
         <v-card-text class="py-1">
-          <v-form ref="formToChuc" v-model="validToChuc" lazy-validation class="form_vuejs py-3 px-0 grid-list">
+          <v-form ref="formChuongTrinh" v-model="validChuongTrinh" lazy-validation class="form_vuejs py-3 px-0 grid-list">
             <v-layout row wrap class="px-0 py-3">
               <v-flex class="xs12">
                 <div style="
@@ -1013,16 +1109,15 @@ export default {
       return {
         validToChuc: false,
         validThanhVien: false,
+        validChuongTrinh: false,
         ngaySinhCreate: '',
         itemsGioiTinh: [
-          {MaMuc: 0, TenMuc: 'Nam'},
-          {MaMuc: 1, TenMuc: 'Nữ'}
+          {MaMuc: 1, TenMuc: 'Nam'},
+          {MaMuc: 2, TenMuc: 'Nữ'},
+          {MaMuc: 0, TenMuc: 'Không xác định'}
         ],
         gioiTinhCreate: '',
-        itemsVaiTroHoiThao: [
-          {MaMuc: 0, TenMuc: 'Chủ tịch hội thảo'},
-          {MaMuc: 1, TenMuc: 'Phó chủ tịch hội thảo'}
-        ],
+        itemsVaiTroHoiThao: [],
         vaiTroHoiThaoCreate: '',
         soHoChieuCreate: '',
         quocGiaSelected: '',
@@ -1044,6 +1139,12 @@ export default {
             }
           }
         ],
+        loaiToChucSelected: '',
+        danhMucLoaiToChuc: [
+          {MaMuc: 1, TenMuc: 'Cơ quan đại diện ngoại giao'},
+          {MaMuc: 2, TenMuc: 'Khác'}
+        ],
+        coQuanCapGiayPhepDangKyVN: '',
         danhSachThanhVienSuggest: [],
         toChucSuggested: '',
         tenNhomToChucThemMoi: '',
@@ -1102,7 +1203,7 @@ export default {
           TrinhDoChuyenMon: "",
           LinhVucNghienCuu: ""
         },
-        thanhVienSuggested: [],
+        thanhVienSuggested: '',
         tenNhomThanhVienThemMoi: '',
         indexThanhVienUpdate: '',
         loadingDataThanhVien: false,
@@ -1112,6 +1213,7 @@ export default {
         ngheNghiepCreate: "",
         donViCongTacCreate: "",
         chucVuDonViCreate: "",
+        quaTrinhCongTacCreate: "",
         soDienThoaiCreate: "",
         emailCreate: "",
         trinhDoChuyenMonCreate: "",
@@ -1148,6 +1250,7 @@ export default {
     created () {
       let vm = this
       vm.getDanhMucQuocGia()
+      vm.getDanhMucVaiTroHoiThao()
       try {
         vm.dataDefaultOutSite.govAgencyName = JSON.parse(localStorage.getItem('EmployeeInfo'))['coQuanDonVi']['tenGoi']
       } catch (error) {
@@ -1192,6 +1295,23 @@ export default {
         }
         vm.$store.dispatch('loadDictItems', filter).then(function (result) {
           vm.danhMucQuocGia = result.data
+        })
+      },
+      getDanhMucVaiTroHoiThao () {
+        let vm = this
+        let filter = {
+          collectionCode: 'VAI_TRO_HOI_THAO',
+          level: 0,
+          parent: 0,
+          commit: ''
+        }
+        vm.$store.dispatch('loadDictItems', filter).then(function (result) {
+          vm.itemsVaiTroHoiThao = Array.from(result.data, function (item) {
+            let itemGet = {}
+            itemGet['MaMuc'] = item['itemCode']
+            itemGet['TenMuc'] = item['itemName']
+            return itemGet
+          })
         })
       },
       getDanhSachToChucSuggest () {
@@ -1347,20 +1467,6 @@ export default {
         } else {
           vm.$refs.formThanhPhan.reset()
           vm.$refs.formThanhPhan.resetValidation()
-          for (let key in vm.data) {
-            let filter = vm.mauNhap.find(function (item) {
-              return item.name == key
-            })
-            if (filter && filter.hasOwnProperty('defaultValue') && filter.defaultValue) {
-              if (String(filter.defaultValue).indexOf('thongtinhoso.') >= 0) {
-                let dataHs = String(filter.defaultValue).split('.')[1]
-                vm.data[key] = vm.thongtinhoso[dataHs]
-                console.log('default', dataHs, vm.data[key])
-              } else {
-                vm.data[key] = filter.defaultValue
-              }
-            }
-          }
         }
 
         for (let key in vm.mauNhap) {
@@ -1368,13 +1474,17 @@ export default {
           if (itemData && itemData.hasOwnProperty('defaultValue') && itemData.defaultValue) {
             if (String(itemData.defaultValue).indexOf('thongtinhoso.') >= 0) {
               let dataHs = String(itemData.defaultValue).split('.')[1]
-              vm.data[itemData['name']] = vm.thongtinhoso[dataHs]
+              vm.$set(vm.data, itemData['name'], vm.thongtinhoso[dataHs])
             } else {
-              vm.data[itemData['name']] = itemData.defaultValue
+              vm.$set(vm.data, itemData['name'], itemData.defaultValue)
             }
-            console.log('vm.data666666', vm.data)
           }
         }
+        vm.loading = true
+        setTimeout(() => {
+          vm.loading = false
+        }, 50);
+        // console.log('vm.data7777', vm.data)
       },
       // LOẠI TỔ CHỨC
       // 
@@ -1386,9 +1496,18 @@ export default {
           "QuocGia": {
             "MaMuc": "",
             "TenMuc": ""
+          },
+          "LoaiToChuc": {
+            "MaMuc": "",
+            "TenMuc": ""
           }
         }
+        
         vm.toChucSuggested = ''
+        vm.coQuanCapGiayPhepDangKyVN = 'Bộ Ngoại giao Việt Nam'
+        vm.loaiToChucSelected = ''
+        vm.ngaySinhCreate = ''
+        vm.quocGiaSelected = ''
         vm.dialogToChuc = true
         vm.tenNhomToChucThemMoi = tenDoiTuong
         let filter = {
@@ -1400,6 +1519,7 @@ export default {
         vm.$store.dispatch('getDanhSachToChuc', filter).then(function (result) {
           vm.danhSachToChucSuggest = result.data
         })
+        vm.$refs.formToChuc.resetValidation()
       },
       themToChuc () {
         let vm = this
@@ -1407,7 +1527,7 @@ export default {
         setTimeout(() => {
           console.log('vm.toChucSuggested', vm.toChucSuggested)
           try {
-            if (!vm.toChucSuggested.hasOwnProperty('TenToChuc')) {
+            if (!vm.toChucSuggested.hasOwnProperty('tenToChuc')) {
               vm.toChucCreate['TenToChuc'] = vm.toChucSuggested
             }
           } catch (error) {
@@ -1415,11 +1535,23 @@ export default {
           console.log('vm.toChucCreate', vm.toChucCreate)
           let toChuc = {
             "TenToChuc": vm.toChucCreate['TenToChuc'],
-            "MaToChuc": vm.toChucCreate['MaToChuc'] ? vm.toChucCreate['MaToChuc'] : '',
+            "MaToChuc": '',
             "QuocGia": {
               "MaMuc": vm.quocGiaSelected.itemCode,
               "TenMuc": vm.quocGiaSelected.itemName
-            }
+            },
+            "LoaiToChuc": {
+              "MaMuc": vm.loaiToChucSelected.MaMuc,
+              "TenMuc": vm.loaiToChucSelected.TenMuc
+            },
+            "SoGiayPhep": "",
+            "NgayCap": "",
+            "CoQuanCap": ""
+          }
+          if (vm.quocGiaSelected.itemCode != 'VN' && vm.loaiToChucSelected.MaMuc == 2) {
+            toChuc['SoGiayPhep'] = vm.soGiayPhepDangKyVN
+            toChuc['NgayCap'] = vm.ngaySinhCreate
+            toChuc['CoQuanCap'] = vm.coQuanCapGiayPhepDangKyVN
           }
           if (!vm.data[vm.tenNhomToChucThemMoi]) {
             vm.data[vm.tenNhomToChucThemMoi] = []
@@ -1432,8 +1564,16 @@ export default {
               "tenToChuc": vm.toChucCreate['TenToChuc'],
               "maToChuc": vm.toChucCreate['MaToChuc'] ? vm.toChucCreate['MaToChuc'] : '',
               "maQuocGia": vm.quocGiaSelected.itemCode,
-              "tenQuocGia": vm.quocGiaSelected.itemName
+              "tenQuocGia": vm.quocGiaSelected.itemName,
+              "soGiayPhep": "",
+              "ngayCap": "",
+              "coQuanCap": ""
             }
+          }
+          if (vm.quocGiaSelected.itemCode != 'VN' && vm.loaiToChucSelected.MaMuc == 2) {
+            filter.data['soGiayPhep'] = vm.soGiayPhepDangKyVN
+            filter.data['ngayCap'] = vm.ngaySinhCreate
+            filter.data['coQuanCap'] = vm.coQuanCapGiayPhepDangKyVN
           }
           vm.$store.dispatch('themToChuc', filter).then(function (result) {})
           vm.dialogToChuc = false
@@ -1448,7 +1588,19 @@ export default {
             "QuocGia": {
               "MaMuc": vm.quocGiaSelected.itemCode,
               "TenMuc": vm.quocGiaSelected.itemName
-            }
+            },
+            "LoaiToChuc": {
+              "MaMuc": vm.loaiToChucSelected.MaMuc,
+              "TenMuc": vm.loaiToChucSelected.TenMuc
+            },
+            "SoGiayPhep": "",
+            "NgayCap": "",
+            "CoQuanCap": ""
+          }
+          if (vm.quocGiaSelected.itemCode != 'VN' && vm.loaiToChucSelected.MaMuc == 2) {
+            toChuc['SoGiayPhep'] = vm.soGiayPhepDangKyVN
+            toChuc['NgayCap'] = vm.ngaySinhCreate
+            toChuc['CoQuanCap'] = vm.coQuanCapGiayPhepDangKyVN
           }
           vm.$set(vm.data[vm.tenNhomToChucThemMoi], vm.indexToChucUpdate, toChuc)
           vm.dialogToChuc = false
@@ -1469,6 +1621,10 @@ export default {
           itemName: data.QuocGia.TenMuc,
           itemCode: data.QuocGia.MaMuc
         }
+        vm.loaiToChucSelected = data.LoaiToChuc
+        vm.soGiayPhepDangKyVN = data.SoGiayPhep
+        vm.ngaySinhCreate = data.NgayCap
+        vm.coQuanCapGiayPhepDangKyVN = data.CoQuanCap
         vm.dialogToChuc = true
       },
       xoaToChuc (name, index) {
@@ -1486,15 +1642,21 @@ export default {
       },
       changeSuggest () {
         let vm = this
-        if (vm.toChucSuggested && vm.toChucSuggested.hasOwnProperty('TenToChuc')) {
-          vm.toChucCreate = vm.toChucSuggested
-          // vm.ngaySinhCreate = vm.thiSinhSuggested.ngaySinh ? vm.convertDate(vm.thiSinhSuggested.ngaySinh) : ''
-          // if (vm.thiSinhSuggested.doiTuongThi) {
-          //   vm.doiTuongSuggested = vm.thiSinhSuggested.doiTuongThi
-          // }
-          // if (vm.thiSinhSuggested.nganhDaoTao) {
-          //   vm.nganhDaoTaoSuggested = vm.thiSinhSuggested.nganhDaoTao
-          // }
+        if (vm.toChucSuggested && vm.toChucSuggested.hasOwnProperty('tenToChuc')) {
+          vm.toChucCreate['TenToChuc'] = vm.toChucSuggested.tenToChuc
+          vm.toChucCreate['MaToChuc'] = ""
+          vm.quocGiaSelected = {
+            itemName: vm.toChucSuggested.tenQuocGia,
+            itemCode: vm.toChucSuggested.maQuocGia
+          }
+          vm.loaiToChucSelected = vm.danhMucLoaiToChuc.find(function (item) {
+            return item.MaMuc == vm.toChucSuggested.loaiToChuc
+          })
+          vm.soGiayPhepDangKyVN = vm.toChucSuggested.soGiayPhep
+          vm.ngaySinhCreate = vm.toChucSuggested.ngayCap
+          vm.coQuanCapGiayPhepDangKyVN = vm.toChucSuggested.coQuanCap
+
+          vm.$refs.formThanhVien.resetValidation()
         }
       },
       // LOẠI THÀNH VIÊN
@@ -1523,6 +1685,24 @@ export default {
           LinhVucNghienCuu: ""
         }
         vm.thanhVienSuggested = ''
+        vm.vaiTroHoiThaoCreate = ''
+        vm.gioiTinhCreate = ''
+        vm.donViCongTacCreate = ''
+        vm.chucVuDonViCreate = ''
+        vm.quaTrinhCongTacCreate = ''
+        vm.ngaySinhCreate = ''
+        vm.soHoChieuCreate = ''
+        vm.diaChiCreate = ''
+        vm.hocHamCreate = ''
+        vm.ngheNghiepCreate = ''
+        vm.soDienThoaiCreate = ''
+        vm.emailCreate = ''
+        vm.trinhDoChuyenMonCreate = ''
+        vm.linhVucNghienCuuCreate = ''
+        vm.quocGiaSelected = {
+          'itemCode': 'VN',
+          'itemName': 'VIET NAM'
+        }
         vm.dialogCaNhan = true
         vm.tenNhomThanhVienThemMoi = tenDoiTuong
         let filter = {
@@ -1534,13 +1714,14 @@ export default {
         vm.$store.dispatch('getDanhSachChuyenGia', filter).then(function (result) {
           vm.danhSachThanhVienSuggest = result.data
         })
+        vm.$refs.formThanhVien.resetValidation()
       },
       themThanhVien () {
         let vm = this
         setTimeout(() => {
           console.log('vm.thanhVienSuggested', vm.thanhVienSuggested)
           try {
-            if (!vm.thanhVienSuggested.hasOwnProperty('HoTen')) {
+            if (!vm.thanhVienSuggested.hasOwnProperty('hoTen')) {
               vm.thanhVienCreate['HoTen'] = vm.thanhVienSuggested
             }
           } catch (error) {
@@ -1554,6 +1735,7 @@ export default {
             },
             DonViCongTac: vm.donViCongTacCreate,
             ChucVu: vm.chucVuDonViCreate,
+            QuaTrinhCongTac: vm.quaTrinhCongTacCreate,
             NgaySinh: vm.ngaySinhCreate,
             GioiTinh: {
               MaMuc: vm.gioiTinhCreate ? vm.gioiTinhCreate.MaMuc : '',
@@ -1575,6 +1757,35 @@ export default {
           if (!vm.data[vm.tenNhomThanhVienThemMoi]) {
             vm.data[vm.tenNhomThanhVienThemMoi] = []
           }
+          if (vm.quocGiaSelected.itemCode === 'VN') {
+            thanhVien = {
+              HoTen: vm.thanhVienCreate['HoTen'],
+              VaiTroTrongHoiThao: {
+                MaMuc: vm.vaiTroHoiThaoCreate ? vm.vaiTroHoiThaoCreate.MaMuc : '',
+                TenMuc: vm.vaiTroHoiThaoCreate ? vm.vaiTroHoiThaoCreate.TenMuc : ''
+              },
+              DonViCongTac: vm.donViCongTacCreate,
+              ChucVu: vm.chucVuDonViCreate,
+              QuaTrinhCongTac: vm.quaTrinhCongTacCreate,
+              QuocGia: {
+                MaMuc: vm.quocGiaSelected ? vm.quocGiaSelected.itemCode : '',
+                TenMuc: vm.quocGiaSelected ? vm.quocGiaSelected.itemName : ''
+              },
+              HocHam: vm.hocHamCreate,
+              NgaySinh: '',
+              GioiTinh: {
+                MaMuc: '',
+                TenMuc: ''
+              },
+              HoChieu: '',
+              DiaChi: '',
+              NgheNghiep: '',
+              DienThoai: '',
+              Email: '',
+              TrinhDoChuyenMon: '',
+              LinhVucNghienCuu: ''
+            }
+          }
           vm.$set(vm.data, vm.tenNhomThanhVienThemMoi, vm.data[vm.tenNhomThanhVienThemMoi].concat([thanhVien]))
           console.log('vm.data[vm.tenNhomToChucThemMoi144423]', vm.data[vm.tenNhomThanhVienThemMoi])
           let filter = {
@@ -1583,6 +1794,7 @@ export default {
               vaiTroTrongHoiThao: vm.vaiTroHoiThaoCreate ? vm.vaiTroHoiThaoCreate.TenMuc : '',
               donViCongTac: vm.donViCongTacCreate,
               chucVu: vm.chucVuDonViCreate,
+              quaTrinhCongTac: vm.quaTrinhCongTacCreate,
               ngaySinh: vm.ngaySinhCreate,
               gioiTinh: vm.gioiTinhCreate ? vm.gioiTinhCreate.TenMuc : '',
               quocGia: vm.quocGiaSelected ? vm.quocGiaSelected.itemName : '',
@@ -1596,6 +1808,26 @@ export default {
               linhVucNghienCuu: vm.linhVucNghienCuuCreate
             }
           }
+          if (vm.quocGiaSelected.itemCode === 'VN') {
+            filter.data = {
+              hoTen: vm.thanhVienCreate['HoTen'],
+              vaiTroTrongHoiThao: vm.vaiTroHoiThaoCreate ? vm.vaiTroHoiThaoCreate.TenMuc : '',
+              donViCongTac: vm.donViCongTacCreate,
+              chucVu: vm.chucVuDonViCreate,
+              quaTrinhCongTac: vm.quaTrinhCongTacCreate,
+              hocHam: vm.hocHamCreate,
+              ngaySinh: '',
+              gioiTinh: '',
+              quocGia: '',
+              hoChieu: '',
+              diaChi: '',
+              ngheNghiep: '',
+              dienThoai: '',
+              email: '',
+              trinhDoChuyenMon: '',
+              linhVucNghienCuu: ''
+            }
+          }
           vm.$store.dispatch('themChuyenGia', filter).then(function (result) {})
           vm.dialogCaNhan = false
         }, 100);
@@ -1604,11 +1836,59 @@ export default {
         let vm = this
         setTimeout(() => {
           let thanhVien = {
-            "TenToChuc": vm.thanhVienCreate['TenToChuc'],
-            "MaToChuc": vm.thanhVienCreate['MaToChuc'] ? vm.thanhVienCreate['MaToChuc'] : '',
-            "QuocGia": {
-              "MaMuc": vm.quocGiaSelected.itemCode,
-              "TenMuc": vm.quocGiaSelected.itemName
+            HoTen: vm.thanhVienCreate['HoTen'],
+            VaiTroTrongHoiThao: {
+              MaMuc: vm.vaiTroHoiThaoCreate ? vm.vaiTroHoiThaoCreate.MaMuc : '',
+              TenMuc: vm.vaiTroHoiThaoCreate ? vm.vaiTroHoiThaoCreate.TenMuc : ''
+            },
+            DonViCongTac: vm.donViCongTacCreate,
+            ChucVu: vm.chucVuDonViCreate,
+            QuaTrinhCongTac: vm.quaTrinhCongTacCreate,
+            NgaySinh: vm.ngaySinhCreate,
+            GioiTinh: {
+              MaMuc: vm.gioiTinhCreate ? vm.gioiTinhCreate.MaMuc : '',
+              TenMuc: vm.gioiTinhCreate ? vm.gioiTinhCreate.TenMuc : ''
+            },
+            QuocGia: {
+              MaMuc: vm.quocGiaSelected ? vm.quocGiaSelected.itemCode : '',
+              TenMuc: vm.quocGiaSelected ? vm.quocGiaSelected.itemName : ''
+            },
+            HoChieu: vm.soHoChieuCreate,
+            DiaChi: vm.diaChiCreate,
+            HocHam: vm.hocHamCreate,
+            NgheNghiep: vm.ngheNghiepCreate,
+            DienThoai: vm.soDienThoaiCreate,
+            Email: vm.emailCreate,
+            TrinhDoChuyenMon: vm.trinhDoChuyenMonCreate,
+            LinhVucNghienCuu: vm.linhVucNghienCuuCreate
+          }
+          if (vm.quocGiaSelected.itemCode === 'VN') {
+            thanhVien = {
+              HoTen: vm.thanhVienCreate['HoTen'],
+              VaiTroTrongHoiThao: {
+                MaMuc: vm.vaiTroHoiThaoCreate ? vm.vaiTroHoiThaoCreate.MaMuc : '',
+                TenMuc: vm.vaiTroHoiThaoCreate ? vm.vaiTroHoiThaoCreate.TenMuc : ''
+              },
+              DonViCongTac: vm.donViCongTacCreate,
+              ChucVu: vm.chucVuDonViCreate,
+              QuaTrinhCongTac: vm.quaTrinhCongTacCreate,
+              QuocGia: {
+                MaMuc: vm.quocGiaSelected ? vm.quocGiaSelected.itemCode : '',
+                TenMuc: vm.quocGiaSelected ? vm.quocGiaSelected.itemName : ''
+              },
+              HocHam: vm.hocHamCreate,
+              NgaySinh: '',
+              GioiTinh: {
+                MaMuc: '',
+                TenMuc: ''
+              },
+              HoChieu: '',
+              DiaChi: '',
+              NgheNghiep: '',
+              DienThoai: '',
+              Email: '',
+              TrinhDoChuyenMon: '',
+              LinhVucNghienCuu: ''
             }
           }
           vm.$set(vm.data[vm.tenNhomThanhVienThemMoi], vm.indexThanhVienUpdate, thanhVien)
@@ -1630,6 +1910,21 @@ export default {
           itemName: data.QuocGia.TenMuc,
           itemCode: data.QuocGia.MaMuc
         }
+        vm.vaiTroHoiThaoCreate = data.VaiTroTrongHoiThao
+        vm.gioiTinhCreate = data.GioiTinh
+        vm.donViCongTacCreate = data.DonViCongTac
+        vm.chucVuDonViCreate = data.ChucVu
+        vm.quaTrinhCongTacCreate = data.QuaTrinhCongTac
+        vm.ngaySinhCreate = data.NgaySinh
+        vm.soHoChieuCreate = data.HoChieu
+        vm.diaChiCreate = data.DiaChi
+        vm.hocHamCreate = data.HocHam
+        vm.ngheNghiepCreate = data.NgheNghiep
+        vm.soDienThoaiCreate = data.DienThoai
+        vm.emailCreate = data.Email
+        vm.trinhDoChuyenMonCreate = data.TrinhDoChuyenMon
+        vm.linhVucNghienCuuCreate = data.LinhVucNghienCuu
+
         vm.dialogCaNhan = true
       },
       xoaThanhVien (name, index) {
@@ -1647,15 +1942,30 @@ export default {
       },
       changeSuggestThanhVien () {
         let vm = this
-        if (vm.thanhVienSuggested && vm.thanhVienSuggested.hasOwnProperty('TenToChuc')) {
+        if (vm.thanhVienSuggested && vm.thanhVienSuggested.hasOwnProperty('hoTen')) {
           vm.thanhVienCreate = vm.thanhVienSuggested
-          // vm.ngaySinhCreate = vm.thiSinhSuggested.ngaySinh ? vm.convertDate(vm.thiSinhSuggested.ngaySinh) : ''
-          // if (vm.thiSinhSuggested.doiTuongThi) {
-          //   vm.doiTuongSuggested = vm.thiSinhSuggested.doiTuongThi
-          // }
-          // if (vm.thiSinhSuggested.nganhDaoTao) {
-          //   vm.nganhDaoTaoSuggested = vm.thiSinhSuggested.nganhDaoTao
-          // }
+
+          vm.quocGiaSelected = vm.danhMucQuocGia.find(function (item) {
+            return item.itemName == vm.thanhVienSuggested.quocGia
+          })
+          vm.vaiTroHoiThaoCreate = vm.itemsVaiTroHoiThao.find(function (item) {
+            return item.itemName == vm.thanhVienSuggested.vaiTroTrongHoiThao
+          })
+          vm.gioiTinhCreate = vm.itemsGioiTinh.find(function (item) {
+            return item.TenMuc == vm.thanhVienSuggested.gioiTinh
+          })
+          vm.donViCongTacCreate = vm.thanhVienSuggested.donViCongTac
+          vm.chucVuDonViCreate = vm.thanhVienSuggested.chucVu
+          vm.quaTrinhCongTacCreate = vm.thanhVienSuggested.quaTrinhCongTac
+          vm.ngaySinhCreate = vm.thanhVienSuggested.ngaySinh
+          vm.soHoChieuCreate = vm.thanhVienSuggested.hoChieu
+          vm.diaChiCreate = vm.thanhVienSuggested.diaChi
+          vm.hocHamCreate = vm.thanhVienSuggested.hocHam
+          vm.ngheNghiepCreate = vm.thanhVienSuggested.ngheNghiep
+          vm.soDienThoaiCreate = vm.thanhVienSuggested.dienThoai
+          vm.emailCreate = vm.thanhVienSuggested.email
+          vm.trinhDoChuyenMonCreate = vm.thanhVienSuggested.trinhDoChuyenMon
+          vm.linhVucNghienCuuCreate = vm.thanhVienSuggested.linhVucNghienCuu
         }
       },
       // 

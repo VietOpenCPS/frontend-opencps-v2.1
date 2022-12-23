@@ -1559,17 +1559,17 @@ export default {
   methods: {
     submitFormTphs() {
       let vm = this
+      vm.$refs.formThanhPhanHoSo.submitTaoBaoCao()
+      let formData = vm.$store.getters.getFormData
+      console.log('formThanhPhanHoSo', formData)
       let validate = vm.$refs.formThanhPhanHoSo.validateForm()
       if (validate) {
-        vm.$refs.formThanhPhanHoSo.submitTaoBaoCao()
-        let formData = vm.$store.getters.getFormData
         for (const key in formData) {
           if (formData[key] == undefined) {
             formData[key] = ''
           }
         }
-        console.log('formThanhPhanHoSo', formData)
-
+        
         var fileFind = vm.dossierFilesItems.find(itemFile => {
           // return itemFile.dossierPartNo === item.partNo && itemFile.eForm && itemFile.fileSize!==0
           return itemFile.dossierPartNo === vm.thanhPhanFormUpdate.partNo && itemFile.eForm
@@ -1582,10 +1582,11 @@ export default {
           vm.$store.dispatch('putFormNghiepVu', fileFind).then(resData => {
             setTimeout(function () {
               vm.loadingApacal = false
-              // toastr.clear()
-              // toastr.success('Thực hiện thành công')
+              toastr.clear()
+              toastr.success('Thực hiện thành công')
               vm.loadFiles()
-            }, 3000)
+              vm.dialog_formscript_tphs = false
+            }, 1000)
             vm.dossierTemplateItemsFilter[vm.indexThanhPhanFormUpdate]['passRequired'] = true
           }).catch(reject => {
             vm.loadingApacal = false
@@ -2741,25 +2742,47 @@ export default {
           vm.dialog_formscript_tphs = true
           vm.thanhPhanFormUpdate = data
           vm.indexThanhPhanFormUpdate = index
-          vm.$store.dispatch('loadFormData', path).then(resData => {
-            console.log('FormData', eval('(' + resData + ')'))
-            if (resData) {
-              vm.formDataTphs = eval('(' + resData + ')')
-              setTimeout(function () {
-                vm.$refs.formThanhPhanHoSo.initForm('update')
-              }, 200)
+
+          vm.$store.dispatch('getListDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+            let listDossierFiles = result
+            if (listDossierFiles && listDossierFiles.length) {
+              let fileTp = listDossierFiles.find(function (item) {
+                return item.dossierPartNo == data.partNo
+              })
+              if (fileTp) {
+                vm.formDataTphs = JSON.parse(fileTp.formData)
+                setTimeout(function () {
+                  vm.$refs.formThanhPhanHoSo.initForm('update')
+                }, 200)
+              } else {
+                setTimeout(function () {
+                  vm.$refs.formThanhPhanHoSo.initForm('create')
+                }, 200)
+              }
             } else {
               setTimeout(function () {
                 vm.$refs.formThanhPhanHoSo.initForm('create')
               }, 200)
             }
-          }).catch(function () {
-            setTimeout(function () {
-              vm.$refs.formThanhPhanHoSo.initForm('create')
-            }, 200)
           })
+          // vm.$store.dispatch('loadFormData', path).then(resData => {
+          //   console.log('FormData', eval('(' + resData + ')'))
+          //   if (resData) {
+          //     vm.formDataTphs = eval('(' + resData + ')')
+          //     setTimeout(function () {
+          //       vm.$refs.formThanhPhanHoSo.initForm('update')
+          //     }, 200)
+          //   } else {
+          //     setTimeout(function () {
+          //       vm.$refs.formThanhPhanHoSo.initForm('create')
+          //     }, 200)
+          //   }
+          // }).catch(function () {
+          //   setTimeout(function () {
+          //     vm.$refs.formThanhPhanHoSo.initForm('create')
+          //   }, 200)
+          // })
           
-
         }
       })
     },
