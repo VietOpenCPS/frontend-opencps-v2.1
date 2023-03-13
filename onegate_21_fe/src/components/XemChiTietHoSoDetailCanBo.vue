@@ -369,11 +369,73 @@
                     <div v-for="(item, index) in documents" v-bind:key="index" style="border-bottom: 1px solid #dedede;">
                       <v-card>
                         <v-layout wrap class="pl-4 pr-2 py-1 align-center row-list-style"> 
-                          <v-flex xs11>
+                          <v-flex xs8>
                             <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
                             <div style="margin-left: 20px;">{{item.documentName}}</div>
                           </v-flex>
-                          <v-flex xs1 class="text-right">
+                          <v-flex xs4 class="text-right">
+                            <v-menu @click.native.stop right offset-y 
+                              transition="slide-x-transition" title="Ký số văn bản" 
+                              v-if="showKySoDocument && item.fileType === 'application/pdf'">
+                              <v-btn slot="activator" color="indigo" style="height: 26px !important">
+                                <v-icon size="16" style="color: #fff !important">fa fa-pencil-square-o</v-icon> &nbsp;
+                                <span style="color: #fff !important">Ký số</span>
+                              </v-btn>
+                              <v-list>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'approved')">
+                                    <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'issued')">
+                                    <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'income')">
+                                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'copy')">
+                                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                              </v-list>
+                            </v-menu>
+
+                            <v-menu @click.native.stop right offset-y 
+                              transition="slide-x-transition" title="Ký số văn bản" 
+                              v-if="showKySoDocument && item.fileType === 'application/pdf'">
+                              <v-btn class="mr-2" slot="activator" color="orange" style="height: 26px !important">
+                                <v-icon size="16" style="color: #fff !important">fa fa-pencil-square-o</v-icon> &nbsp;
+                                <span style="color: #fff !important">Ký số và gửi NLTT</span>
+                              </v-btn>
+                              <v-list>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'approved', 'send')">
+                                    <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'issued', 'send')">
+                                    <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'income', 'send')">
+                                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'copy', 'send')">
+                                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                              </v-list>
+                            </v-menu>
+                            
                             <v-tooltip top>
                               <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFileDocument(item)" style="height:25px;width:25px">
                                 <v-icon style="font-size: 14px;">visibility</v-icon>
@@ -834,8 +896,8 @@ import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
-// import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
-import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNewDhqg.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
+// import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNewDhqg.vue'
 
 import TaiLieuChungThuc from './TiepNhan/TaiLieuChungThuc.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
@@ -1119,6 +1181,7 @@ export default {
     sendInvoice: false,
     removeInvoice: false,
     removeInvoiceGroupPayment: false,
+    showKySoDocument: false,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -1226,6 +1289,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.showKySoDocument = showKySoDocument
+    } catch (error) {
+    }
     try {
       vm.votingVersion = votingVersion
     } catch (error) {
@@ -3676,6 +3743,110 @@ export default {
         }, 1000)
       }
       callServer()
+    },
+    activeKySoDocument (item, typeSign, action) {
+      let vm = this
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId()
+        },
+        responseType: 'blob'
+      }
+      axios.get('/o/rest/v2/dossiers/' + vm.thongTinChiTietHoSo.dossierId + '/documents/' + item.referenceUid, param).then(function (response) {
+        try {
+          const blobToBase64 = blob => {
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            return new Promise(resolve => {
+              reader.onloadend = () => {
+                resolve(reader.result);
+              };
+            });
+          };
+          blobToBase64(response.data).then(res => {
+            if (res) {
+              var DataURIToBlob = function(dataURI) {
+                const splitDataURI = dataURI.split(',')
+                const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
+                const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
+                const ia = new Uint8Array(byteString.length)
+                for (let i = 0; i < byteString.length; i++)
+                  ia[i] = byteString.charCodeAt(i)
+                return new Blob([ia], { type: mimeString })
+              }
+              let fileKySo = DataURIToBlob(res)
+              let config = {
+                headers: {
+                  'groupId': window.themeDisplay.getScopeGroupId(),
+                  'Content-Type': 'multipart/form-data'
+                }
+              }
+              let dataPost = new FormData()
+              dataPost.append('uploadfile', fileKySo, 'fileKySo.pdf')
+              axios.post('/o/rest/v2/vgca/fileupload', dataPost, config).then(function (result) {
+                let dataUpload = JSON.parse(result.data.FileServer)
+                vm.kySoDocument(Object.assign(item, dataUpload), typeSign, action)
+              }).catch(xhr => {
+                toastr.error("Tải lên giấy tờ ký số thất bại.")
+              })
+            }
+          })
+        } catch (error) {
+        }
+      }).catch(function (xhr) {
+        console.log(xhr)
+      })
+    },
+    kySoDocument (fileSigned, typeSign, action) {
+      let vm = this
+      let prms = {}
+      prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.thongTinChiTietHoSo.dossierId + '/documents/' + fileSigned.fileEntryId + '/type/' + fileSigned.documentType + '/group/' + window.themeDisplay.getScopeGroupId()
+      prms['SessionId'] = ''
+      prms['FileName'] = fileSigned.url.split(".pdf")[0] + '.pdf'
+      let signFileCallBack = function (rv) {
+        let received_msg = JSON.parse(rv)
+        if (received_msg.Status === 0) {
+          toastr.success('Ký số thành công')
+          if (action) {
+            var initData = vm.$store.getters.loadingInitData
+            let actionUser = initData.user.userName ? initData.user.userName : ''
+            let options = {
+              headers: {
+                'groupId': window.themeDisplay.getScopeGroupId()
+              }
+            }
+            let dataPostActionDossier = new URLSearchParams()
+            dataPostActionDossier.append('actionCode', 'KSVB')
+            dataPostActionDossier.append('actionNote', '')
+            dataPostActionDossier.append('actionUser', actionUser)
+            dataPostActionDossier.append('payload', '')
+            dataPostActionDossier.append('security', '')
+            dataPostActionDossier.append('assignUsers', '')
+            dataPostActionDossier.append('payment', '{}')
+            dataPostActionDossier.append('createDossiers', '')
+            axios.post('/o/rest/v2/dossiers/' + vm.thongTinChiTietHoSo.dossierId +'/actions', dataPostActionDossier, options).then(function (response) {
+            })
+          }
+        } else {
+          if (received_msg.Message) {
+            toastr.clear()
+            toastr.error(received_msg.Message)
+          } else {
+            toastr.clear()
+            toastr.error('Ký số thất bại')
+          }
+        }
+      }
+      let json_prms = JSON.stringify(prms)
+      if (typeSign === 'approved') {
+        vgca_sign_approved(json_prms, signFileCallBack)
+      } else if (typeSign === 'issued') {
+        vgca_sign_issued(json_prms, signFileCallBack)
+      } else if (typeSign === 'income') {
+        vgca_sign_income(json_prms, signFileCallBack)
+      } else {
+        vgca_sign_copy(json_prms, signFileCallBack)
+      }
     },
     printPay () {
       let vm = this

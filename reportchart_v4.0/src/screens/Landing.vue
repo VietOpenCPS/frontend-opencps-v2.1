@@ -59,42 +59,6 @@
           </div>
           <v-card-text class="px-0 py-3 pt-4">
             <v-layout wrap class="custom-class">
-              <v-flex xs12 sm6 class="px-2 pb-3">
-                <v-card @click="changeLevel(2)" color="green lighten-1" class="white--text" height="70px" style="border-radius: 4px;cursor: pointer;">
-                  <v-layout class="px-2" style="height:70px">
-                    <v-flex class="xs3 pt-1">
-                      <v-btn outline fab color="white" depressed style="pointer-events:none;height:52px">
-                        <v-icon size="32" color="#ffffff">timeline</v-icon>
-                      </v-btn>
-                    </v-flex>
-                    <v-flex class="xs9 pl-4 pt-2">
-                      <p><span>Thủ tục </span> <span class="text-bold">mức độ 2</span> </p>
-                      <p>
-                        <span class="text-bold" style="font-size: 1.75em;">{{levelList[0]['count']}}</span>
-                        <span style="font-size: 1.3em;">&nbsp;({{levelList[0]['percent']}}%)</span>
-                      </p>
-                    </v-flex>
-                  </v-layout>
-                </v-card>
-              </v-flex>
-              <v-flex xs12 sm6 class="px-2 pb-3">
-                <v-card @click="changeLevel(3)" color="orange lighten-1" class="white--text" height="70px" style="border-radius: 4px;cursor: pointer;">
-                  <v-layout class="px-2" style="height:70px">
-                    <v-flex class="xs3 pt-1">
-                      <v-btn outline fab color="white" depressed style="pointer-events:none;height:52px">
-                        <v-icon size="32" color="#ffffff">timeline</v-icon>
-                      </v-btn>
-                    </v-flex>
-                    <v-flex class="xs9 pl-4 pt-2">
-                      <p><span>Thủ tục </span> <span class="text-bold">mức độ 3</span> </p>
-                      <p>
-                        <span class="text-bold" style="font-size: 1.75em;">{{levelList[1]['count']}}</span>
-                        <span style="font-size: 1.3em;">&nbsp;({{levelList[1]['percent']}}%)</span>
-                      </p>
-                    </v-flex>
-                  </v-layout>
-                </v-card>
-              </v-flex>
               <v-flex xs12 sm6 class="px-2 pt-2 pb-3">
                 <v-card @click="changeLevel(4)" color="red lighten-1" class="white--text" height="70px" style="cursor: pointer;">
                   <v-layout class="px-2" style="height:70px">
@@ -104,7 +68,7 @@
                       </v-btn>
                     </v-flex>
                     <v-flex class="xs9 pl-4 pt-2">
-                      <p><span>Thủ tục </span> <span class="text-bold">mức độ 4</span> </p>
+                      <p><span class="text-bold">{{ levelNameMapping['4'] }}</span> </p>
                       <p>
                         <span class="text-bold" style="font-size: 1.75em;">{{levelList[2]['count']}}</span>
                         <span style="font-size: 1.3em;">&nbsp;({{levelList[2]['percent']}}%)</span>
@@ -113,7 +77,46 @@
                   </v-layout>
                 </v-card>
               </v-flex>
-              <v-flex xs12 sm6 class="px-2 pt-2 pb-3">
+              
+              <v-flex xs12 sm6 class="px-2 pt-2">
+                <v-card @click="changeLevel(3)" color="orange lighten-1" class="white--text" height="70px" style="border-radius: 4px;cursor: pointer;">
+                  <v-layout class="px-2" style="height:70px">
+                    <v-flex class="xs3 pt-1">
+                      <v-btn outline fab color="white" depressed style="pointer-events:none;height:52px">
+                        <v-icon size="32" color="#ffffff">timeline</v-icon>
+                      </v-btn>
+                    </v-flex>
+                    <v-flex class="xs9 pl-4 pt-2">
+                      <p><span class="text-bold">{{ levelNameMapping['3'] }}</span> </p>
+                      <p>
+                        <span class="text-bold" style="font-size: 1.75em;">{{levelList[1]['count']}}</span>
+                        <span style="font-size: 1.3em;">&nbsp;({{levelList[1]['percent']}}%)</span>
+                      </p>
+                    </v-flex>
+                  </v-layout>
+                </v-card>
+              </v-flex>
+
+              <v-flex xs12 sm6 class="px-2 pb-3">
+                <v-card @click="changeLevel(2)" color="green lighten-1" class="white--text" height="70px" style="border-radius: 4px;cursor: pointer;">
+                  <v-layout class="px-2" style="height:70px">
+                    <v-flex class="xs3 pt-1">
+                      <v-btn outline fab color="white" depressed style="pointer-events:none;height:52px">
+                        <v-icon size="32" color="#ffffff">timeline</v-icon>
+                      </v-btn>
+                    </v-flex>
+                    <v-flex class="xs9 pl-4 pt-2">
+                      <p> <span class="text-bold">{{ levelNameMapping['2'] }}</span> </p>
+                      <p>
+                        <span class="text-bold" style="font-size: 1.75em;">{{levelList[0]['count']}}</span>
+                        <span style="font-size: 1.3em;">&nbsp;({{levelList[0]['percent']}}%)</span>
+                      </p>
+                    </v-flex>
+                  </v-layout>
+                </v-card>
+              </v-flex>
+              
+              <v-flex xs12 sm6 class="px-2 pb-3">
                 <v-card color="#00bcd5" class="white--text" height="70px">
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
@@ -837,6 +840,11 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    levelNameMapping: {
+      2: 'Mức độ 2',
+      3: 'Mức độ 3',
+      4: 'Mức độ 4'
+    },
     listDonViSBN: [],
     donViSBN: 'total',
     listDonViHuyen: [],
@@ -1168,6 +1176,10 @@ export default {
     let vm = this
     vm.dateTimeSync = "Số liệu tính đến 03h00 ngày " + vm.getCurrentDate()
     //
+    try {
+      vm.levelNameMapping = levelNameMapping
+    } catch (error) {
+    }
     try {
       if (window.innerWidth <= 768) {
         vm.widthBarChart = 700

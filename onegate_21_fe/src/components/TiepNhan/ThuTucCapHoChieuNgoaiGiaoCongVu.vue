@@ -1,7 +1,14 @@
 <template>
     <div class="form_vuejs">
             <v-layout wrap>
-                <v-flex xs12 class="px-2 my-2"><strong>Thông tin người nộp</strong></v-flex>
+                <v-flex xs12 class="px-2 my-2">
+                    <strong>Thông tin người nộp</strong>
+                    <v-btn class="mx-0 ml-3" color="primary" v-if="quyenTraCuuLgsp"
+                        @click.stop="showDialogSearchLgspCongDan()">
+                        <v-icon>fas fa fa-search-plus</v-icon>
+                        <span>Kiểm tra thông tin công dân</span>
+                    </v-btn>
+                </v-flex>
                 <v-flex xs12 sm6  class="px-2">
                     <label>Họ và tên<span class="red--text">*</span></label>
                     <v-text-field
@@ -1411,7 +1418,7 @@ toastr.options = {
 import Suggestions from 'v-suggestions'
 
 export default {
-    props: ['id', 'formCode'],
+    props: ['id', 'formCode', 'quyenTraCuuLgsp'],
     components:{
         'suggestions': Suggestions,
     },
@@ -2151,6 +2158,24 @@ export default {
         }
     },
     methods: {
+        showDialogSearchLgspCongDan () {
+          let vm = this
+          vm.$emit('showDialogSearchLgspCongDanEmit', 
+            {
+              applicantIdNo: vm.dossiers ? vm.dossiers.delegateIdNo : '',
+              applicantName: vm.dossiers ? vm.dossiers.delegateName : ''
+            }
+          )
+        },
+        bindDataCsdlDanCu (data) {
+          let vm = this
+          vm.dossiers.delegateIdNo = data.applicantIdNo
+          vm.dossiers.delegateName = data.applicantName
+          vm.dossiers.delegateAddress = data.address
+          vm.delegateCityCode = data.cityCode
+          vm.delegateDistrictCode = data.districtCode
+          vm.delegateWardCode = data.wardCode
+        },
         getDetail(){
             let vm = this
             let config = {

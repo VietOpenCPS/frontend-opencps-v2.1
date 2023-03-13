@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import TiepNhanHoSoDetail from './TiepNhanHoSoDetailDHQG'
+import TiepNhanHoSoDetail from './TiepNhanHoSoDetail'
 export default {
   props: ['index', 'id', 'formCode'],
   components: {

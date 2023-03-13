@@ -174,7 +174,14 @@
                 </content-placeholders>
                 <div v-else>
                   <v-btn class="mx-0 my-0 mt-1 white--text" depressed readonly small :color="getColor(props.item.maxLevel)"
-                  style="pointer-events: none;min-width: 110px;">Mức độ {{props.item.maxLevel}}</v-btn>
+                  style="pointer-events: none;min-width: 110px;">
+                    <span v-if="levelNameMapping.hasOwnProperty('2,3')">
+                      {{props.item.maxLevel == 2 || props.item.maxLevel == 3 ? levelNameMapping['2,3'] : levelNameMapping[props.item.maxLevel]}}
+                    </span>
+                    <span v-else>
+                      {{ levelNameMapping[props.item.maxLevel] }}
+                    </span>
+                  </v-btn>
                 </div>
               </td>
               <td class="text-xs-center" v-if="!setAgency && (!userLoginInfomation || !userLoginInfomation.hasOwnProperty('className') || (userLoginInfomation && userLoginInfomation.hasOwnProperty('className') &&  userLoginInfomation.className !== 'org.opencps.usermgt.model.Employee'))">
@@ -386,7 +393,14 @@
                 <v-flex xs10 @click="viewDetail(item)">
                   <div style="color:#0054a6; text-align:justify;">{{item.serviceName}}</div>
                   <div> <span class="text-bold">Lĩnh vực: </span> <span>{{item.domainName}}</span> </div>
-                  <div> <span class="text-bold">Mức độ: </span> <span>{{item.maxLevel}}</span> </div>
+                  <div> 
+                    <span class="text-bold" v-if="levelNameMapping.hasOwnProperty('2,3')">
+                      {{item.maxLevel == 2 || item.maxLevel == 3 ? levelNameMapping['2,3'] : levelNameMapping[item.maxLevel]}}
+                    </span>
+                    <span class="text-bold" v-else>
+                      {{ levelNameMapping[item.maxLevel] }}
+                    </span>
+                  </div>
                 </v-flex>
                 <v-flex xs1 class="text-xs-center mt-1">
                   <v-menu :close-on-content-click="false" left style="position:relative !important;">
@@ -842,7 +856,12 @@ export default {
     useJwt: false,
     showChonDichVu: false,
     dialog_selectOption: false,
-    notAgency: false
+    notAgency: false,
+    levelNameMapping: {
+      2: 'Mức độ 2',
+      3: 'Mức độ 3',
+      4: 'Mức độ 4'
+    }
   }),
   computed: {
     govAgencyList () {
@@ -867,6 +886,10 @@ export default {
   created () {
     let vm = this
     // 
+    try {
+      vm.levelNameMapping = levelNameMapping
+    } catch (error) {
+    }
     try {
       vm.notAgency = notAgency
     } catch (error) {
@@ -1045,7 +1068,7 @@ export default {
       }
       vm.govAgencyThucHienSelected = currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') ? (!isNaN(Number(currentQuery.level)) ? Number(currentQuery.level) : currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.doLoadingThuTuc()
     },
@@ -1066,6 +1089,9 @@ export default {
           })[0]['administrationName']
         }
       })
+    },
+    domainList (val) {
+      this.domainListCurrent = val
     }
   },
   methods: {
@@ -1083,7 +1109,7 @@ export default {
       }
       vm.govAgencyThucHienSelected = currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') ? (!isNaN(Number(currentQuery.level)) ? Number(currentQuery.level) : currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       if (currentQuery.hasOwnProperty('agency')) {
         let filterDomain = {
@@ -1093,12 +1119,13 @@ export default {
           vm.domainListCurrent = result
         })
       } else {
-        let filterDomain = {
-          agencyCode: ''
-        }
-        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.domainListCurrent = result
-        })
+        // let filterDomain = {
+        //   agencyCode: ''
+        // }
+        // vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+        //   vm.domainListCurrent = result
+        // })
+        vm.domainListCurrent = vm.domainList
       }
       if (vm.userLoginInfomation && vm.userLoginInfomation.className === 'org.opencps.usermgt.model.Employee' || vm.setAgency) {
         vm.headers = vm.headers.filter(function (item) {
@@ -1760,7 +1787,7 @@ export default {
     getColor (level) {
       if (level === 2) {
         return 'green'
-      } else if (level === 3) {
+      } else if (level === 3 || level === '2,3') {
         return 'orange darken-1'
       } else if (level === 4) {
         return 'red'

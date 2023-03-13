@@ -312,6 +312,50 @@
           vm.$store.commit('setAgencyListManager', vm.agencyList)
         }).catch(function (xhr) {
         })
+
+        // let param = {
+        //   headers: {
+        //     groupId: 357926,
+        //     Token: window.Liferay ? window.Liferay.authToken : ''
+        //   }
+        // }
+        // let url = '/o/rest/v2/serverconfigs/GROUP_ID_SITE_MOTCUA'
+        // axios.get(url, param).then(function (response) {
+        //   let serializable = response.data
+        //   let configs = JSON.parse(serializable.configs)
+        //   let agency = configs['groupIds']
+        //   try {
+        //     let agencyCurrentSite = agency.filter(function (item) {
+        //       return item.value == window.themeDisplay.getScopeGroupId()
+        //     })[0]
+        //     vm.$store.commit('setCurrentSite', agencyCurrentSite)
+        //   } catch (error) {
+        //     vm.$store.commit('setCurrentSite', '')
+        //   }
+        //   if (vm.siteTrungTam) {
+        //     vm.agencyList = agency
+        //   } else {
+        //     let idSite = window.themeDisplay.getScopeGroupId()
+        //     if (configs.hasOwnProperty(idSite)) {
+        //       if (configs[idSite] === 'all' || !configs[idSite]) {
+        //         vm.agencyList = agency
+        //       } else {
+        //         vm.agencyList = configs[idSite]
+        //       }
+        //     } else {
+        //       if (configs.hasOwnProperty('SBN') && configs.hasOwnProperty('SBN_MANAGER_SITE')) {
+        //         let isSbn = configs['SBN'].find(function (item) {
+        //           return item == idSite
+        //         })
+        //         if (isSbn) {
+        //           vm.agencyList = configs['SBN_MANAGER_SITE']
+        //         }
+        //       }
+        //     }
+        //   }
+        //   vm.$store.commit('setAgencyListManager', vm.agencyList)
+        // }).catch(function (error) {
+        // })
       },
       getUser (roleItem) {
         let vm = this

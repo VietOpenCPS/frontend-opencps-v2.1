@@ -241,7 +241,7 @@
                   </v-flex>
                   <v-flex xs12 sm1 class="text-xs-center">
                     <v-btn class="mx-0 my-0 mt-0 white--text" depressed readonly small :color="getColor(itemServiceConfig.serviceLevel)"
-                      style="pointer-events: none;min-width: 90px;">Mức độ {{itemServiceConfig.serviceLevel}}</v-btn>
+                      style="pointer-events: none;min-width: 90px;">{{levelNameMapping[itemServiceConfig.serviceLevel]}}</v-btn>
                   </v-flex>
                   <v-flex xs12 sm2 class="text-xs-center">
                     <v-menu left offset-x>
@@ -282,7 +282,7 @@
                   </v-flex>
                   <v-flex xs12 sm1 class="text-xs-center">
                     <v-btn class="mx-0 my-0 mt-0 white--text" depressed readonly small :color="getColor(item.maxLevel)"
-                      style="pointer-events: none;min-width: 90px;">Mức độ {{item.maxLevel}}</v-btn>
+                      style="pointer-events: none;min-width: 90px;">{{levelNameMapping[item.maxLevel]}}</v-btn>
                   </v-flex>
                   <v-flex xs12 sm2 class="text-xs-center">
                     <v-menu left offset-x v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length === 1">
@@ -512,7 +512,12 @@
       hasVerify: false,
       dialogLoadingCreate: true,
       dialog_selectOption: true,
-      serviceInfoLastestList: []
+      serviceInfoLastestList: [],
+      levelNameMapping: {
+        2: 'Mức độ 2',
+        3: 'Mức độ 3',
+        4: 'Mức độ 4'
+      }
     }),
     computed: {
       currentIndex () {
@@ -531,6 +536,10 @@
     created () {
       var vm = this
       //
+      try {
+        vm.levelNameMapping = levelNameMapping
+      } catch (error) {
+      }
       try {
         vm.verificationApplicantCreateDossier = hasVerificationCreateDossier
       } catch (error) {

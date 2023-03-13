@@ -13,7 +13,7 @@
         <!--  -->
         <div v-for="(item, index) in mauNhap" v-bind:key="index" :class="item['fieldClass']" class="py-0 mb-2 px-2"
           :style=" item.type === 'table-tochuc' || item.type === 'table-canhan' || item.type === 'chuongtrinhlamviec'|| item.type === 'hoatdongbenle' || item.type === 'kinhphi' 
-          ? 'border: 1px dotted #787575;padding-top: 10px !important; padding-bottom: 10px !important; margin-left: 10px;margin-right: 10px;border-radius: 5px;' : ''"
+          ? 'padding-top: 10px !important; padding-bottom: 10px !important;' : ''"
         >
           <div class="mb-2" v-if="item.type === 'table-tochuc' || item.type === 'table-canhan' || item.type === 'chuongtrinhlamviec'|| item.type === 'hoatdongbenle' || item.type === 'kinhphi'"> 
             <div class="background-triangle-small">
@@ -226,6 +226,11 @@
                   </td>
                   <td class="text-xs-center" style="width: 150px;vertical-align: middle;">
                     <div>
+                      <span>{{props.item.QuocGia.TenMuc}}</span>
+                    </div>
+                  </td>
+                  <td class="text-xs-center" style="width: 150px;vertical-align: middle;">
+                    <div>
                       <span>{{props.item.DonViCongTac}}</span>
                     </div>
                   </td>
@@ -307,26 +312,32 @@
               v-if="!loadingChuongTrinh"
             >
               <template slot="items" slot-scope="props">
-                <td width="50" class="text-xs-center pt-1" > {{props.index + 1}}</td>
-                <td width="200" class="text-xs-left py-1">
+                <td width="50" class="text-xs-center pt-1" style="vertical-align: middle;"> {{props.index + 1}}</td>
+                <td width="200" class="text-xs-left py-1" style="vertical-align: middle;">
                   <span v-if="readonly">{{props.item.ThoiGian ? props.item.ThoiGian : ''}}</span>
                   <v-text-field v-else
                     single-line
                     v-model="props.item.ThoiGian"
                     clearable
+                    class="input-form"
                   ></v-text-field>
                 </td>
                 <td class="text-xs-center py-1" style="font-weight: bold;">
                   <span v-if="readonly">{{props.item.NoiDung ? props.item.NoiDung : ''}}</span>
-                  <v-text-field v-else
+                  <v-textarea v-else
+                    class="input-form"
                     v-model="props.item.NoiDung"
-                    single-line
-                  ></v-text-field>
+                    solo
+                    dense
+                    hide-details="auto"
+                    clearable
+                    rows="2"
+                  ></v-textarea>
                 </td>
                 <td width="100" class="text-xs-center py-1">
                   <v-tooltip top v-if="!readonly">
                     <v-btn slot="activator" width="50" height="32" color="red" dense small dark @click="xoaNoiDung(item.name, props.index)">
-                      <v-icon>remove</v-icon>
+                      <v-icon style="color: #fff !important">remove</v-icon>
                     </v-btn>
                     <span>Xóa</span>
                   </v-tooltip>
@@ -352,33 +363,50 @@
               v-if="!loadingHoatDongBenLe"
             >
               <template slot="items" slot-scope="props">
-                <td width="50" class="text-xs-center pt-1" > {{props.index + 1}}</td>
-                <td width="200" class="text-xs-left py-1">
+                <td width="50" class="text-xs-center pt-1" style="vertical-align: middle;"> {{props.index + 1}}</td>
+                <td width="200" class="text-xs-left py-1" style="vertical-align: middle;">
                   <span v-if="readonly">{{props.item.ThoiGian ? props.item.ThoiGian : ''}}</span>
                   <v-text-field v-else
                     single-line
+                    class="input-form"
                     v-model="props.item.ThoiGian"
                     clearable
                   ></v-text-field>
                 </td>
                 <td class="text-xs-center py-1" style="font-weight: bold;">
                   <span v-if="readonly">{{props.item.NoiDung ? props.item.NoiDung : ''}}</span>
-                  <v-text-field v-else
+                  <v-textarea v-else
+                    class="input-form"
                     v-model="props.item.NoiDung"
-                    single-line
-                  ></v-text-field>
+                    solo
+                    dense
+                    hide-details="auto"
+                    clearable
+                    rows="2"
+                  ></v-textarea>
                 </td>
-                <td class="text-xs-center py-1" style="font-weight: bold;">
+                <td width="400" class="text-xs-center py-1" style="font-weight: bold;vertical-align: middle;">
                   <span v-if="readonly">{{props.item.DiaDiem ? props.item.DiaDiem : ''}}</span>
-                  <v-text-field v-else
+                  <v-autocomplete
+                    class="input-form"
+                    hide-no-data
                     v-model="props.item.DiaDiem"
-                    single-line
-                  ></v-text-field>
+                    :items="danhMucTinhThanh"
+                    item-text="TenMuc"
+                    item-value="MaMuc"
+                    dense
+                    solo
+                    hide-details="auto"
+                    return-object
+                    clearable
+                    :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
+                  >
+                  </v-autocomplete>
                 </td>
-                <td width="100" class="text-xs-center py-1">
+                <td width="100" class="text-xs-center py-1" style="vertical-align: middle;">
                   <v-tooltip top v-if="!readonly">
                     <v-btn slot="activator" width="50" height="32" color="red" dense small dark @click="xoaHoatDong(item.name, props.index)">
-                      <v-icon>remove</v-icon>
+                      <v-icon style="color: #fff !important">remove</v-icon>
                     </v-btn>
                     <span>Xóa</span>
                   </v-tooltip>
@@ -420,10 +448,10 @@
                     single-line
                   ></v-text-field>
                 </td>
-                <td width="100" class="text-xs-center py-1">
+                <td width="100" class="text-xs-center py-1" style="vertical-align: middle;">
                   <v-tooltip top v-if="!readonly">
                     <v-btn slot="activator" width="50" height="32" color="red" dense small dark @click="xoaKinhPhi(item.name, props.index)">
-                      <v-icon>remove</v-icon>
+                      <v-icon style="color: #fff !important">remove</v-icon>
                     </v-btn>
                     <span>Xóa</span>
                   </v-tooltip>
@@ -481,12 +509,13 @@
                   :items="danhSachToChucSuggest"
                   v-model="toChucSuggested"
                   item-text="tenToChuc"
-                  item-value="maToChuc"
+                  item-value="id"
                   dense
                   solo
                   clearable
                   return-object
                   @change="changeSuggest"
+                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
                 >
                 </v-combobox>
               </v-flex>
@@ -682,6 +711,7 @@
                   clearable
                   return-object
                   @change="changeSuggestThanhVien"
+                  :rules="[v => (v !== '' && v !== null && v !== undefined) || 'Thông tin bắt buộc']"
                 >
                 </v-combobox>
               </v-flex>
@@ -1244,12 +1274,14 @@ export default {
         dialogCaNhan: false,
         loadingSubmit: false,
         typeAction: 'create',
-        danhMucQuocGia: []
+        danhMucQuocGia: [],
+        danhMucTinhThanh: []
       }
     },
     created () {
       let vm = this
       vm.getDanhMucQuocGia()
+      vm.getDanhMucTinhThanh()
       vm.getDanhMucVaiTroHoiThao()
       try {
         vm.dataDefaultOutSite.govAgencyName = JSON.parse(localStorage.getItem('EmployeeInfo'))['coQuanDonVi']['tenGoi']
@@ -1295,6 +1327,23 @@ export default {
         }
         vm.$store.dispatch('loadDictItems', filter).then(function (result) {
           vm.danhMucQuocGia = result.data
+        })
+      },
+      getDanhMucTinhThanh () {
+        let vm = this
+        let filter = {
+          collectionCode: 'ADMINISTRATIVE_REGION',
+          level: 0,
+          parent: 0,
+          commit: ''
+        }
+        vm.$store.dispatch('loadDictItems', filter).then(function (result) {
+          vm.danhMucTinhThanh = Array.from(result.data, function (item) {
+            let itemGet = {}
+            itemGet['MaMuc'] = item['itemCode']
+            itemGet['TenMuc'] = item['itemName']
+            return itemGet
+          })
         })
       },
       getDanhMucVaiTroHoiThao () {
@@ -1431,6 +1480,19 @@ export default {
             })
             dataOutput[itemConfig['name']] = dataArray
           }
+          // if (itemConfig['name'] == 'CoQuanDongToChuc') {
+          //   let coquanVN = dataOutput['CoQuanDongToChuc'].filter(function (item) {
+          //     return item.QuocGia.MaMuc == 'VN'
+          //   })
+          //   let coquanNuocNgoai = dataOutput['CoQuanDongToChuc'].filter(function (item) {
+          //     return item.QuocGia.MaMuc != 'VN'
+          //   })
+          //   let obj = {
+          //     CoQuanDongToChucVietNam: coquanVN,
+          //     CoQuanDongToChucNuocNgoai: coquanNuocNgoai
+          //   }
+          //   dataOutput = Object.assign(dataOutput, obj)
+          // }
         }
         vm.$store.commit('SET_FORM_DATA', dataOutput)
       },
@@ -1523,6 +1585,10 @@ export default {
       },
       themToChuc () {
         let vm = this
+        let validation = vm.$refs.formToChuc.validate()
+        if (!validation) {
+          return
+        }
         vm.typeAction = 'create'
         setTimeout(() => {
           console.log('vm.toChucSuggested', vm.toChucSuggested)
@@ -1563,6 +1629,7 @@ export default {
             data: {
               "tenToChuc": vm.toChucCreate['TenToChuc'],
               "maToChuc": vm.toChucCreate['MaToChuc'] ? vm.toChucCreate['MaToChuc'] : '',
+              "loaiToChuc": vm.loaiToChucSelected.TenMuc,
               "maQuocGia": vm.quocGiaSelected.itemCode,
               "tenQuocGia": vm.quocGiaSelected.itemName,
               "soGiayPhep": "",
@@ -1581,6 +1648,10 @@ export default {
       },
       updateToChuc () {
         let vm = this
+        let validation = vm.$refs.formToChuc.validate()
+        if (!validation) {
+          return
+        }
         setTimeout(() => {
           let toChuc = {
             "TenToChuc": vm.toChucCreate['TenToChuc'],
@@ -1718,6 +1789,10 @@ export default {
       },
       themThanhVien () {
         let vm = this
+        let validation = vm.$refs.formThanhVien.validate()
+        if (!validation) {
+          return
+        }
         setTimeout(() => {
           console.log('vm.thanhVienSuggested', vm.thanhVienSuggested)
           try {
@@ -1834,6 +1909,10 @@ export default {
       },
       updateThanhVien () {
         let vm = this
+        let validation = vm.$refs.formThanhVien.validate()
+        if (!validation) {
+          return
+        }
         setTimeout(() => {
           let thanhVien = {
             HoTen: vm.thanhVienCreate['HoTen'],
@@ -1949,7 +2028,7 @@ export default {
             return item.itemName == vm.thanhVienSuggested.quocGia
           })
           vm.vaiTroHoiThaoCreate = vm.itemsVaiTroHoiThao.find(function (item) {
-            return item.itemName == vm.thanhVienSuggested.vaiTroTrongHoiThao
+            return item.TenMuc == vm.thanhVienSuggested.vaiTroTrongHoiThao
           })
           vm.gioiTinhCreate = vm.itemsGioiTinh.find(function (item) {
             return item.TenMuc == vm.thanhVienSuggested.gioiTinh
@@ -2031,7 +2110,10 @@ export default {
         let noiDung = {
           ThoiGian: '',
           NoiDung: '',
-          DiaDiem: ''
+          DiaDiem: {
+            TenMuc: '',
+            MaMuc: ''
+          }
         }
         if (!vm.data[vm.tenNhomHoatDongThemMoi]) {
           vm.data[vm.tenNhomHoatDongThemMoi] = []

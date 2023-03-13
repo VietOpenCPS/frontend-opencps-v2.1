@@ -1995,7 +1995,9 @@ export const store = new Vuex.Store({
             serviceProcessId: data.serviceProcessId,
             postalService: data.postalService,
             registerBookCode: data.registerBookCode,
-            sampleCount: data.sampleCount
+            sampleCount: data.sampleCount,
+            forCitizen: data.forCitizen,
+            forBusiness: data.forBusiness,
           }
           if (data.type === 'add') {
             dataPost.append('method', 'POST')

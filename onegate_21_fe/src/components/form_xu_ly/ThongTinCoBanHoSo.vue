@@ -5,7 +5,7 @@
         <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Thông tin chung hồ sơ</div>
         <v-card v-if="!mauCongVan">
           <v-card-text class="py-0">
-            <v-btn v-if="originality == 3 && thongTinChiTietHoSo.applicantIdType === 'citizen' && traCuuLgspCongDan && (quyenTraCuuLgsp == 'always' || quyenTraCuuLgsp == 1 || quyenTraCuuLgsp == 2)" :style="loadingSearchLgsp ? 'pointer-events: none' : ''"
+            <v-btn v-if="originality == 3 && thongTinChiTietHoSo.applicantIdType === 'citizen' && traCuuLgspCongDan && quyenTraCuuLgsp && serviceCheckCsdldc == '037'" :style="loadingSearchLgsp ? 'pointer-events: none' : ''"
              class="mx-0 ml-2 mt-2 mb-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
               <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
               <v-progress-circular :size="24" v-if="loadingSearchLgsp"
@@ -495,9 +495,14 @@
         // 
         if (vm.traCuuLgspCongDan && vm.thongTinChiTietHoSo.applicantIdType === 'citizen' && vm.originality == 3) {
           vm.$store.dispatch('checkRoleSearchLgsp', {serviceCode: vm.thongTinChiTietHoSo.serviceCode}).then(result => {
-            vm.quyenTraCuuLgsp = result.hasOwnProperty('status') ? result.status : 'always'
+            if (result.hasOwnProperty('serviceCode')) {
+              vm.quyenTraCuuLgsp = result.serviceCode
+            }
+            if (result.hasOwnProperty('serviceDvcqg')) {
+              vm.serviceCheckCsdldc = result.serviceDvcqg
+            }
           }).catch(xhr => {
-            vm.quyenTraCuuLgsp = 'always'
+            vm.quyenTraCuuLgsp = false
           })
         }
       },
@@ -531,7 +536,9 @@
       rules: {
         required: (value) => !!value || 'Thông tin bắt buộc'
       },
-      quyenTraCuuLgsp: 'always'
+      quyenTraCuuLgsp: false,
+      serviceCheckCsdldc: '',
+      checkAccSso: false,
     }),
     computed: {
       loading() {
@@ -549,6 +556,10 @@
       var vm = this
       try {
         vm.showOptionName = showOptionName
+      } catch (error) {
+      }
+      try {
+        vm.checkAccSso = checkAccSso
       } catch (error) {
       }
       try {
@@ -654,7 +665,26 @@
         vm.applicantIdNoLgsp = vm.thongTinChiTietHoSo.applicantIdNo
         vm.applicantNameLgsp = vm.thongTinChiTietHoSo.applicantName
         vm.applicantLgspInfomation = ''
-        vm.dialog_searchLgsp = true
+        if (vm.checkAccSso) {
+          let filter = {
+            maSoCaNhan: vm.thongTinChiTietHoSo['applicantIdNo'],
+            type: 'citizen'
+          }
+          vm.$store.dispatch('getStatusAccount', filter).then(result => {
+            console.log('resultCheck', result)
+            if (result && result.profile) {
+              let info = JSON.parse(result.profile)
+              if (info && info.hasOwnProperty('ngaySinh') && info.ngaySinh && info.ngaySinh !== '01/01/1970') {
+                vm.applicantBirthDate = info.ngaySinh
+              }
+            }
+            vm.dialog_searchLgsp = true
+          }).catch(function () {
+            vm.dialog_searchLgsp = true
+          })
+        } else {
+          vm.dialog_searchLgsp = true
+        }
       },
       searchLgspCongDan (event) {
         let vm = this

@@ -415,10 +415,10 @@
                 (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) ||
                 (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
               ) {
-                vm.currentAgency = vm.govAgencyList[0].administrationCode
+                // vm.currentAgency = vm.govAgencyList[0].administrationCode
                 let queryString = '?'
                 newQuery['page'] = 1
-                newQuery['agency'] = vm.govAgencyList[0].administrationCode
+                // newQuery['agency'] = vm.govAgencyList[0].administrationCode
                 for (let key in newQuery) {
                   if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
                     queryString += key + '=' + newQuery[key] + '&'
@@ -512,78 +512,212 @@
               }
               vm.$store.commit('setLevelList', result)
               vm.currentLevel = newQuery.hasOwnProperty('level') ? newQuery.level : ''
+
+              if (result && result.length) {
+                let totalService = 0
+                result.forEach(element => {
+                  totalService += Number(element.count)
+                })
+                vm.countAllService = totalService
+              }
             })
           }).catch(function(error) {
           })
-        }
-        if (!vm.notAgency) {
-          vm.$store.dispatch('getGovAgency').then(function (result) {
-            vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
-            // vm.menuServiceInfos[0].children = result
-            let agencyArray = result
-            if (vm.thuTucTinhHauGiang) {
-              agencyArray = result.concat([
-                {
-                  administrationCode: "DLHG",
-                  administrationName: "Điện lực tỉnh Hậu Giang",
-                  count: ""
-                }
-              ])
-            }
-            vm.$set(vm.menuServiceInfos, 0, {
-                id: 1,
-                name: 'Cơ quan quản lý',
-                mappingName: 'administrationName',
-                mappingCode: 'administrationCode',
-                mappingCount: 'count',
-                children: agencyArray,
-                icon: 'account_balance'
-              }
-            )
-            vm.$store.commit('setAgencyList', result)
-            // console.log('run app',  current)
-            if ((vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) ||
-            (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
-            ) {
-              vm.currentAgency = vm.govAgencyList[0].administrationCode
-              let queryString = '?'
-              newQuery['page'] = 1
-              newQuery['agency'] = vm.govAgencyList[0].administrationCode
-              for (let key in newQuery) {
-                if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
-                  queryString += key + '=' + newQuery[key] + '&'
-                }
-              }
-              let sortLevel = false
-              try {
-                if (sortLevelConfig !== undefined) {
-                  sortLevel = true
-                }
-              } catch (error) {
-              }
-
-              if (!sortLevel) {
-                vm.$router.push({
-                  path: vm.pathRouter + queryString,
-                  query: {
-                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-                  }
-                })
-              } else {
-                vm.$router.push({
-                  path: '/thu-tuc-hanh-chinh?page=1',
-                  query: {
-                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-                  }
-                })
-              }
-
-            } else {
+        } else {
+          // 
+          if (!vm.notAgency) {
+            vm.$store.dispatch('getGovAgency').then(function (result) {
               vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
+              // vm.menuServiceInfos[0].children = result
+              let agencyArray = result
+              if (vm.thuTucTinhHauGiang) {
+                agencyArray = result.concat([
+                  {
+                    administrationCode: "DLHG",
+                    administrationName: "Điện lực tỉnh Hậu Giang",
+                    count: ""
+                  }
+                ])
+              }
+              vm.$set(vm.menuServiceInfos, 0, {
+                  id: 1,
+                  name: 'Cơ quan quản lý',
+                  mappingName: 'administrationName',
+                  mappingCode: 'administrationCode',
+                  mappingCount: 'count',
+                  children: agencyArray,
+                  icon: 'account_balance'
+                }
+              )
+              vm.$store.commit('setAgencyList', result)
+              // console.log('run app',  current)
+              if ((vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) ||
+              (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
+              ) {
+                // vm.currentAgency = vm.govAgencyList[0].administrationCode
+                let queryString = '?'
+                newQuery['page'] = 1
+                // newQuery['agency'] = vm.govAgencyList[0].administrationCode
+                for (let key in newQuery) {
+                  if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+                    queryString += key + '=' + newQuery[key] + '&'
+                  }
+                }
+                let sortLevel = false
+                try {
+                  if (sortLevelConfig !== undefined) {
+                    sortLevel = true
+                  }
+                } catch (error) {
+                }
+
+                if (!sortLevel) {
+                  vm.$router.push({
+                    path: vm.pathRouter + queryString,
+                    query: {
+                      renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                    }
+                  })
+                } else {
+                  vm.$router.push({
+                    path: '/thu-tuc-hanh-chinh?page=1',
+                    query: {
+                      renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                    }
+                  })
+                }
+
+              } else {
+                vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
+              }
+            })
+          } else {
+            vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
+          }
+          // 
+          let filterDomain = {
+            agencyCode: ''
+          }
+          vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+            if (vm.hasCoQuanThucHien) {
+              // vm.menuServiceInfos[2].children = result
+              vm.$set(vm.menuServiceInfos, 2, {
+                  id: 3,
+                  name: 'Lĩnh vực',
+                  mappingName: 'domainName',
+                  mappingCode: 'domainCode',
+                  mappingCount: 'count',
+                  children: result,
+                  icon: 'domain'
+                }
+              )
+            } else if (vm.notAgency) {
+              vm.$set(vm.menuServiceInfos, 0, {
+                  id: 1,
+                  name: 'Lĩnh vực',
+                  mappingName: 'domainName',
+                  mappingCode: 'domainCode',
+                  mappingCount: 'count',
+                  children: result,
+                  icon: 'domain'
+                }
+              )
+            } else {
+              // vm.menuServiceInfos[1].children = result
+              vm.$set(vm.menuServiceInfos, 1, {
+                  id: 2,
+                  name: 'Lĩnh vực',
+                  mappingName: 'domainName',
+                  mappingCode: 'domainCode',
+                  mappingCount: 'count',
+                  children: result,
+                  icon: 'domain'
+                }
+              )
+            }
+            vm.$store.commit('setDomainList', result)
+            vm.currentDomain = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
+            let queryString = '?'
+            newQuery['page'] = 1
+            for (let key in newQuery) {
+              if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+                queryString += key + '=' + newQuery[key] + '&'
+              }
+            }
+            let sortLevel = false
+            try {
+              if (sortLevelConfig !== undefined) {
+                sortLevel = true
+              }
+            } catch (error) {
+            }
+
+            if (!sortLevel) {
+              vm.$router.push({
+                path: vm.pathRouter + queryString,
+                query: {
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                }
+              })
+            } else {
+              vm.$router.push({
+                path: '/thu-tuc-hanh-chinh?page=1',
+                query: {
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                }
+              })
             }
           })
-        } else {
-          vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
+          // 
+          vm.$store.dispatch('getLevelList').then(function (result) {
+            if (vm.hasCoQuanThucHien) {
+              // vm.menuServiceInfos[3].children = result
+              vm.$set(vm.menuServiceInfos, 3, {
+                  id: 4,
+                  name: 'Mức độ',
+                  mappingName: 'levelName',
+                  mappingCode: 'level',
+                  mappingCount: 'count',
+                  children: result,
+                  icon: 'sort'
+                }
+              )
+            } else if (vm.notAgency) {
+              vm.$set(vm.menuServiceInfos, 1, {
+                  id: 2,
+                  name: 'Mức độ',
+                  mappingName: 'levelName',
+                  mappingCode: 'level',
+                  mappingCount: 'count',
+                  children: result,
+                  icon: 'sort'
+                }
+              )
+            } else {
+              // vm.menuServiceInfos[2].children = result
+              vm.$set(vm.menuServiceInfos, 2, {
+                  id: 3,
+                  name: 'Mức độ',
+                  mappingName: 'levelName',
+                  mappingCode: 'level',
+                  mappingCount: 'count',
+                  children: result,
+                  icon: 'sort'
+                }
+              )
+            }
+            vm.$store.commit('setLevelList', result)
+            vm.currentLevel = newQuery.hasOwnProperty('level') ? newQuery.level : ''
+
+            if (result && result.length) {
+              let totalService = 0
+              result.forEach(element => {
+                totalService += Number(element.count)
+              })
+              vm.countAllService = totalService
+            }
+          })
+          // 
         }
         // 
         if (vm.hasCoQuanThucHien) {
@@ -603,81 +737,7 @@
             vm.$store.commit('setAgencyListThucHien', result)
           }).catch(function(){})
         }
-        // 
-        let filterDomain = {
-          agencyCode: ''
-        }
-        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          if (vm.hasCoQuanThucHien) {
-            // vm.menuServiceInfos[2].children = result
-            vm.$set(vm.menuServiceInfos, 2, {
-                id: 3,
-                name: 'Lĩnh vực',
-                mappingName: 'domainName',
-                mappingCode: 'domainCode',
-                mappingCount: 'count',
-                children: result,
-                icon: 'domain'
-              }
-            )
-          } else if (vm.notAgency) {
-            vm.$set(vm.menuServiceInfos, 0, {
-                id: 1,
-                name: 'Lĩnh vực',
-                mappingName: 'domainName',
-                mappingCode: 'domainCode',
-                mappingCount: 'count',
-                children: result,
-                icon: 'domain'
-              }
-            )
-          } else {
-            // vm.menuServiceInfos[1].children = result
-            vm.$set(vm.menuServiceInfos, 1, {
-                id: 2,
-                name: 'Lĩnh vực',
-                mappingName: 'domainName',
-                mappingCode: 'domainCode',
-                mappingCount: 'count',
-                children: result,
-                icon: 'domain'
-              }
-            )
-          }
-          vm.$store.commit('setDomainList', result)
-          vm.currentDomain = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
-          let queryString = '?'
-          newQuery['page'] = 1
-          for (let key in newQuery) {
-            if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
-              queryString += key + '=' + newQuery[key] + '&'
-            }
-          }
-          let sortLevel = false
-          try {
-            if (sortLevelConfig !== undefined) {
-              sortLevel = true
-            }
-          } catch (error) {
-          }
-
-          if (!sortLevel) {
-            vm.$router.push({
-              path: vm.pathRouter + queryString,
-              query: {
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-              }
-            })
-          } else {
-            vm.$router.push({
-              path: '/thu-tuc-hanh-chinh?page=1',
-              query: {
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-              }
-            })
-          }
-        })
-        // 
+        
         if (vm.thuTucTinh) {
           let sortCode = function (serviceList) {
             function compare(a, b) {
@@ -703,49 +763,10 @@
           })
         }
         // 
-        vm.$store.dispatch('getLevelList').then(function (result) {
-          if (vm.hasCoQuanThucHien) {
-            // vm.menuServiceInfos[3].children = result
-            vm.$set(vm.menuServiceInfos, 3, {
-                id: 4,
-                name: 'Mức độ',
-                mappingName: 'levelName',
-                mappingCode: 'level',
-                mappingCount: 'count',
-                children: result,
-                icon: 'sort'
-              }
-            )
-          } else if (vm.notAgency) {
-            vm.$set(vm.menuServiceInfos, 1, {
-                id: 2,
-                name: 'Mức độ',
-                mappingName: 'levelName',
-                mappingCode: 'level',
-                mappingCount: 'count',
-                children: result,
-                icon: 'sort'
-              }
-            )
-          } else {
-            // vm.menuServiceInfos[2].children = result
-            vm.$set(vm.menuServiceInfos, 2, {
-                id: 3,
-                name: 'Mức độ',
-                mappingName: 'levelName',
-                mappingCode: 'level',
-                mappingCount: 'count',
-                children: result,
-                icon: 'sort'
-              }
-            )
-          }
-          vm.$store.commit('setLevelList', result)
-          vm.currentLevel = newQuery.hasOwnProperty('level') ? newQuery.level : ''
-        })
+        
         vm.currentMethod = newQuery.hasOwnProperty('level') && String(newQuery.level) === '2' ? 'MC' : newQuery.hasOwnProperty('level') && String(newQuery.level === '3,4') ? 'DVC' : ''
         vm.activeAll = newQuery.hasOwnProperty('all') && newQuery['all']
-        vm.getCountAll()
+        // vm.getCountAll()
         // 
         if (vm.groupDonViCapXa) {
           vm.$store.dispatch('getDictFromParent', {}).then(function (result) {

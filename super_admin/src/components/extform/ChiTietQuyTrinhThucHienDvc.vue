@@ -442,8 +442,9 @@ export default {
         } else {
           toastr.success('Cập nhật thành công')
         }
+        let serviceConfigName = encodeURI(vm.serviceConfigName)
         vm.$router.push({
-          path: '/table/opencps_processoption?serviceConfigId=' + vm.serviceConfigId + '&serviceConfigName=' + vm.serviceConfigName
+          path: '/table/opencps_processoption?serviceConfigId=' + vm.serviceConfigId + '&serviceConfigName=' + serviceConfigName
         })
       }).catch(reject => {
         toastr.error('Yêu cầu thực hiện thất bại')

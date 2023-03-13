@@ -4,9 +4,9 @@
       <div class="logo"> 
         <a href=""> 
           <!-- <img src="/o/kiemthuduongbo-theme/images/color_schemes/bogt-theme/logo.png">  -->
-          <!-- <img src="/o/hethongxulynghiepvu-theme/images/color_schemes/bogt-theme/anh-banner.png"> -->
+          <img src="/o/hethongxulynghiepvu-theme/images/color_schemes/bogt-theme/logo_login.png">
           
-          <img src="o/bongoaigiao-theme/images/logo-login-motcua.png">
+          <!-- <img src="o/bongoaigiao-theme/images/logo-login-motcua.png"> -->
           <div class="text-logo">
             
           </div> 

@@ -541,10 +541,42 @@
         <v-toolbar flat dark color="primary">
           <v-toolbar-title>{{itemAction.title}}{{itemAction.tiltle}}</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn v-if="showKySoDocument && itemAction.form === 'PRINT_01' && srcDownloadIframe" class="mr-2" color="#a82727" dark @click.native="activeKySoDocument">
+          <!-- <v-btn v-if="showKySoDocument && itemAction.form === 'PRINT_01' && srcDownloadIframe" class="mr-2" color="#a82727" dark @click.native="activeKySoDocument">
             <v-icon style="color: #fff !important">fa fa-pencil-square-o</v-icon> &nbsp;
             Ký số giấy tờ
-          </v-btn>
+          </v-btn> -->
+          <!--  -->
+          <v-menu @click.native.stop right offset-y 
+            transition="slide-x-transition" title="Ký số tài liệu đính kèm" 
+            v-if="showKySoDocument && itemAction.form === 'PRINT_01' && srcDownloadIframe">
+            <v-btn slot="activator" flat color="#a82727">
+              <v-icon size="18">fa fa-pencil-square-o</v-icon> &nbsp;
+              <span style="color: #fff !important">Ký số giấy tờ</span>
+            </v-btn>
+            <v-list>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('approved')">
+                  <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                </v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('issued')">
+                  <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
+                </v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('income')">
+                  <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                </v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('copy')">
+                  <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
+                </v-list-tile-title>
+              </v-list-tile>
+            </v-list>
+          </v-menu>
+          <!--  -->
           <v-btn icon dark @click.native="dialogPDF = false">
             <v-icon>close</v-icon>
           </v-btn>
@@ -1649,7 +1681,7 @@ export default {
     }
   },
   methods: {
-    activeKySoDocument () {
+    activeKySoDocument (typeSign) {
       let vm = this
       let base64Document = vm.$store.getters.getBase64Document
       if (base64Document) {
@@ -1674,13 +1706,13 @@ export default {
         dataPost.append('uploadfile', fileKySo, 'fileKySo.pdf')
         axios.post('/o/rest/v2/vgca/fileupload', dataPost, config).then(function (result) {
           let dataUpload = JSON.parse(result.data.FileServer)
-          vm.kySoDocument(dataUpload)
+          vm.kySoDocument(dataUpload, typeSign)
         }).catch(xhr => {
           toastr.error("Tải lên giấy tờ ký số thất bại.")
         })
       }
     },
-    kySoDocument (fileSigned) {
+    kySoDocument (fileSigned, typeSign) {
       let vm = this
       let prms = {}
       prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.dossierSelect.dossierId + '/documents/' + fileSigned.fileEntryId + '/type/' + vm.dossierSelect.documentType + '/group/' + window.themeDisplay.getScopeGroupId()
@@ -1702,7 +1734,15 @@ export default {
         }
       }
       let json_prms = JSON.stringify(prms)
-      vgca_sign_approved(json_prms, signFileCallBack)
+      if (typeSign === 'approved') {
+        vgca_sign_approved(json_prms, signFileCallBack)
+      } else if (typeSign === 'issued') {
+        vgca_sign_issued(json_prms, signFileCallBack)
+      } else if (typeSign === 'income') {
+        vgca_sign_income(json_prms, signFileCallBack)
+      } else {
+        vgca_sign_copy(json_prms, signFileCallBack)
+      }
     },
     toggleAll () {
       var vm = this
@@ -2674,6 +2714,13 @@ export default {
         document.getElementById('dialogPDFPreview').src = result
         vm.srcDownloadIframe = result
       }).catch(function (){})
+      // 
+      if (vm.showKySoDocument) {
+        $('html, body').animate({
+          scrollTop: $("#banner").offset().top
+        }, 1);
+      }
+      // 
     },
     exportDoc () {
       let vm = this

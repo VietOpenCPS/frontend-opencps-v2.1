@@ -97,7 +97,13 @@
                               <td>
                                 <div>
                                   <v-chip class="mx-0 my-0" small disabled label :color="getColor(serviceDetail.maxLevel)" text-color="white" style="height:px">
-                                    Mức độ {{serviceDetail.maxLevel}}
+                                    <!-- {{levelNameMapping[serviceDetail.maxLevel]}} -->
+                                    <span v-if="levelNameMapping.hasOwnProperty('2,3')">
+                                      {{serviceDetail.maxLevel == 2 || serviceDetail.maxLevel == 3 ? levelNameMapping['2,3'] : levelNameMapping[serviceDetail.maxLevel]}}
+                                    </span>
+                                    <span v-else>
+                                      {{ levelNameMapping[serviceDetail.maxLevel] }}
+                                    </span>
                                   </v-chip>
                                 </div>
                               </td>
@@ -292,7 +298,13 @@
                               <td>
                                 <div>
                                   <v-chip class="mx-0 my-0" small disabled label :color="getColor(serviceDetail.maxLevel)" text-color="white" style="height:px">
-                                    Mức độ {{serviceDetail.maxLevel}}
+                                    <!-- {{levelNameMapping[serviceDetail.maxLevel]}} -->
+                                    <span v-if="levelNameMapping.hasOwnProperty('2,3')">
+                                      {{serviceDetail.maxLevel == 2 || serviceDetail.maxLevel == 3 ? levelNameMapping['2,3'] : levelNameMapping[serviceDetail.maxLevel]}}
+                                    </span>
+                                    <span v-else>
+                                      {{ levelNameMapping[serviceDetail.maxLevel] }}
+                                    </span>
                                   </v-chip>
                                 </div>
                               </td>
@@ -719,6 +731,11 @@ export default {
     dichVuSelected: '',
     listDichVu: [],
     loadingProcess: false,
+    levelNameMapping: {
+      2: 'Mức độ 2',
+      3: 'Mức độ 3',
+      4: 'Mức độ 4'
+    }
   }),
   computed: {
     isMobile () {
@@ -731,6 +748,10 @@ export default {
   created () {
     let vm = this
     // 
+    try {
+      vm.levelNameMapping = levelNameMapping
+    } catch (error) {
+    }
     try {
       vm.formToKhai = toKhaiTrucTuyen ? true : false 
     } catch (error) {
@@ -1308,7 +1329,7 @@ export default {
     getColor (level) {
       if (level === 2) {
         return 'green'
-      } else if (level === 3) {
+      } else if (level === 3 || level == '2,3') {
         return 'orange'
       } else if (level === 4) {
         return 'red'

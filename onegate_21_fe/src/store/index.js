@@ -4903,6 +4903,15 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
+          let levelName = {
+            2: 'Mức độ 2',
+            3: 'Mức độ 3',
+            4: 'Mức độ 4'
+          }
+          try {
+            levelName = levelNameMapping
+          } catch (error) {
+          }
           axios.request(config).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
@@ -4910,7 +4919,7 @@ export const store = new Vuex.Store({
                 return String(item.level) !== '2'
               })
               for (let key in dataReturn) {
-                dataReturn[key]['levelName'] = 'Mức độ ' + dataReturn[key].level
+                dataReturn[key]['levelName'] = levelName[dataReturn[key].level]
               }
               resolve(dataReturn)
             } else {

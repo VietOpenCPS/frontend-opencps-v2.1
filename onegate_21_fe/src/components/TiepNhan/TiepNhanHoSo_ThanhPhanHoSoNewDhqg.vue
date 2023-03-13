@@ -424,7 +424,7 @@
                 <span>Không đạt</span>
               </v-tooltip>
             </v-flex>
-            <v-flex :style="{width: !onlyView ? (khoTaiLieuCongDan && partNoApplicantHasFile(item.partNo) && item.hasForm ? '150px' : '120px') : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
+            <v-flex :style="{width: !onlyView ? (khoTaiLieuCongDan && partNoApplicantHasFile(item.partNo) && item.hasForm ? '170px' : '150px') : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
               <input v-if="item['multiple']"
               type="file"
               multiple
@@ -468,6 +468,14 @@
                 </v-btn>
                 <span v-if="onlyView">Xem bản khai</span>
                 <span v-else>Cập nhật bản khai</span>
+              </v-tooltip>
+              <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id && item.hasForm">
+                <v-btn slot="activator" icon class="mx-2 my-0" @click="exportDoc(item, index)">
+                  <v-badge>
+                    <v-icon size="22" color="#004b94">fas fa fa-file-word-o</v-icon>
+                  </v-badge>
+                </v-btn>
+                <span>Tải xuống văn bản</span>
               </v-tooltip>
               <v-tooltip top v-if="progressUploadPart !== item.partNo && onlyView & item.hasForm && !nghiepvuhanghai">
                 <v-btn slot="activator" class="mx-1 my-0" fab dark small color="primary" @click="loadAlpcaFormClick(item)" style="height:25px;width:25px">
@@ -1179,6 +1187,16 @@ import axios from 'axios'
 import toastr from 'toastr'
 import KhoTaiLieu from '../TiepNhan/KhoTaiLieu'
 import FormThanhPhanHoSo from '../FormDHQG'
+ // 
+  import docxtemplater from 'docxtemplater'
+  import PizZip from "pizzip";
+  import PizZipUtils from "pizzip/utils/index.js";
+  import angularParser from "docxtemplater/js/expressions";
+  import { saveAs } from "file-saver";
+  function loadFile(url, callback) {
+    PizZipUtils.getBinaryContent(url, callback);
+  }
+  // 
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -1220,6 +1238,7 @@ export default {
   },
   data: () => ({
     mauNhapForm: '',
+    docxTemplateUrl: '',
     formDataTphs: '',
     thanhPhanFormUpdate: '',
     indexThanhPhanFormUpdate: '',
@@ -1615,6 +1634,84 @@ export default {
           })
         }
       }
+    },
+    exportDoc (part, index) {
+      let vm = this
+      part['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
+      vm.$store.dispatch('loadFormScript', part).then(resScript => {
+        /* eslint-disable */
+        let eformScript = ''
+        try {
+          eformScript = eval('(' + resScript + ')')
+        } catch (error) {
+        }
+        /* eslint-disable */
+        if (eformScript && eformScript.hasOwnProperty('eformDHQG') && eformScript.eformDHQG) {
+          vm.docxTemplateUrl = eformScript.docxTemplateUrl
+
+          let dataDoc = {}
+          let fileFind = vm.dossierFilesItems.find(itemFile => {
+            return itemFile.dossierPartNo === part.partNo && itemFile.eForm
+          })
+          if (fileFind) {
+            dataDoc = JSON.parse(fileFind.formData)
+          }
+          console.log('dataDoc', dataDoc)
+          if (!vm.docxTemplateUrl) {
+            toastr.clear()
+            toastr.error('Chưa có mẫu văn bản')
+            return
+          }
+          loadFile(vm.docxTemplateUrl, function(
+            error,
+            content
+          ) {
+            if (error) {
+              throw error;
+            }
+            const zip = new PizZip(content);
+            const doc = new docxtemplater(zip, { 
+              paragraphLoop: true, 
+              linebreaks: true, 
+              parser: angularParser
+            });
+            doc.setData(dataDoc);
+            try {
+              doc.render();
+            } catch (error) {
+              function replaceErrors(key, value) {
+                if (value instanceof Error) {
+                  return Object.getOwnPropertyNames(value).reduce(function(
+                    error,
+                    key
+                  ) {
+                    error[key] = value[key];
+                    return error;
+                  },
+                  {});
+                }
+                return value;
+              }
+              console.log(JSON.stringify({ error: error }, replaceErrors));
+              if (error.properties && error.properties.errors instanceof Array) {
+                const errorMessages = error.properties.errors
+                  .map(function(error) {
+                    return error.properties.explanation;
+                  })
+                  .join("\n");
+                console.log("errorMessages", errorMessages);
+              }
+              throw error;
+            }
+            const out = doc.getZip().generate({
+              type: "blob",
+              mimeType:
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            });
+            saveAs(out, "hoithao.docx");
+          });
+        }
+      })
     },
     formatDate () {
       let vm = this
@@ -2668,59 +2765,7 @@ export default {
         })
       }
     },
-    // loadAlpcaFormClick (data, viewform) {
-    //   let vm = this
-    //   window.removeEventListener('message', vm.receiveMessage)
-    //   window.addEventListener('message', vm.receiveMessage)
-    //   //
-    //   if (vm.currentFormView === 'formAlpaca' + data.partNo + vm.id) {
-    //     vm.currentFormView = ''
-    //   } else {
-    //     vm.currentFormView = 'formAlpaca' + data.partNo + vm.id
-    //   }
-    //   vm.pstEl = vm.endEl = 0
-    //   setTimeout(function () {
-    //     if (window.$('div[id="formAlpaca' + data.partNo + vm.id + '"]').height() > 200) {
-    //       vm.pstEl = window.$('div[id="wrapForm' + data.partNo + vm.id + '"]').offset().top
-    //       vm.endEl = window.$('div[id="formAlpaca' + data.partNo + vm.id + '"]').height()
-    //       $(window).scroll(function () {
-    //         vm.pstFixed = $(window).scrollTop()
-    //       })
-    //     }
-    //   }, 500)
-    //   //
-    //   let fileFind = vm.dossierFilesItems.find(itemFile => {
-    //     return itemFile.dossierPartNo === data.partNo && itemFile.eForm
-    //   })
-    //   if (fileFind && !viewform) {
-    //     console.log('fileFind', fileFind)
-    //     if (fileFind.fileSize) {
-    //       fileFind['id'] = vm.id
-    //       // vm.$store.dispatch('loadAlpcaForm', fileFind)
-    //       // preview PDF
-    //       data['editForm'] = false
-    //       vm.$store.dispatch('viewFile', fileFind).then(result => {
-    //         document.getElementById('displayPDF' + fileFind.dossierPartNo + vm.id).src = result
-    //       })
-    //     } else {
-    //       data['editForm'] = false
-    //       data.formData = fileFind.formData
-    //       data['editForm'] = true
-    //       data['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
-    //       vm.showAlpacaJSFORM(data, true)
-    //     }
-        
-    //   } else {
-    //     vm.dossierTemplateItemsFilter.forEach(val => {
-    //       if (val.hasForm && data.partNo === val.partNo) {
-    //         val['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
-    //         // if (!val['loaded']) {
-    //           vm.showAlpacaJSFORM(val)
-    //         // }
-    //       }
-    //     })
-    //   }
-    // },
+    
     loadAlpcaFormClick (data, viewform, index) {
       let vm = this
       let path = vm.dossierTemplateItemsFilter.find(function (item) {
@@ -2739,6 +2784,7 @@ export default {
         /* eslint-disable */
         if (eformScript && eformScript.hasOwnProperty('eformDHQG') && eformScript.eformDHQG) {
           vm.mauNhapForm = eformScript.mauNhap
+          vm.docxTemplateUrl = eformScript.docxTemplateUrl
           vm.dialog_formscript_tphs = true
           vm.thanhPhanFormUpdate = data
           vm.indexThanhPhanFormUpdate = index

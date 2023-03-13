@@ -26,7 +26,7 @@
                     <v-btn class="mx-0 mr-3" v-if="traCuuAI" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" color="primary" @click="showDialogAISearch()">
                       <span>Tra cứu AI</span>
                     </v-btn>
-                    <v-btn v-if="checkAccSso" :style="loadingCheckAcc ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0 mr-3" color="primary" @click.stop="checkInfoAccount()">
+                    <!-- <v-btn v-if="checkAccSso" :style="loadingCheckAcc ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0 mr-3" color="primary" @click.stop="checkInfoAccount()">
                       <v-icon v-if="!loadingCheckAcc">how_to_reg</v-icon> 
                       <v-progress-circular :size="24" v-if="loadingCheckAcc"
                         indeterminate
@@ -34,8 +34,9 @@
                       ></v-progress-circular>&nbsp;
                       <span v-if="!loadingCheckAcc">Kiểm tra thông tin tài khoản</span>
                       <span v-if="loadingCheckAcc">Đang kiểm tra</span>
-                    </v-btn>
-                    <v-btn v-if="quyenTraCuuLgsp && serviceCheckCsdldc == '037'" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
+                    </v-btn> -->
+                    <v-btn v-if="quyenTraCuuLgsp && serviceCheckCsdldc == '037'" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary"
+                     @click.stop="showDialogSearchLgspCongDan()">
                       <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
                       <v-progress-circular :size="24" v-if="loadingSearchLgsp"
                         indeterminate
@@ -46,7 +47,7 @@
                     </v-btn>
                   </v-flex>
                   <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '2' && traCuuLgspDoanhNghiep">
-                    <v-btn v-if="checkAccSso" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0 mr-3" color="primary" @click.stop="checkInfoAccount()">
+                    <!-- <v-btn v-if="checkAccSso" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0 mr-3" color="primary" @click.stop="checkInfoAccount()">
                       <v-icon v-if="!loadingSearchLgsp">how_to_reg</v-icon> 
                       <v-progress-circular :size="24" v-if="loadingSearchLgsp"
                         indeterminate
@@ -54,7 +55,7 @@
                       ></v-progress-circular>&nbsp;
                       <span v-if="!loadingSearchLgsp">Kiểm tra thông tin tài khoản</span>
                       <span v-if="loadingSearchLgsp">Đang kiểm tra</span>
-                    </v-btn>
+                    </v-btn> -->
                     <v-btn :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspDoanhNghiep()">
                       <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
                       <v-progress-circular :size="24" v-if="loadingSearchLgsp"
@@ -1081,8 +1082,11 @@
           <v-form ref="formCreateAcc" v-model="valid" class="py-3 px-0 grid-list" v-if="activeCreateAcc">
             <v-layout row wrap class="px-0 py-0">
               <v-flex xs12>
-                <v-text-field :label="lgspType === 'business' ? 'Mã số thuế doanh nghiệp' : 'Số CCCD hoặc số CMND'" v-model="applicantIdNoCreateAcc"
-                 box clearable :rules="lgspType === 'business' ? [rules.required] : [rules.required, rules.credit]"></v-text-field>
+                <v-text-field :label="lgspType === 'business' ? 'Mã số thuế doanh nghiệp' : 'Số CCCD hoặc số CMND'" 
+                  v-model="applicantIdNoCreateAcc" box clearable 
+                  :rules="lgspType === 'business' ? [rules.required] : [rules.required, rules.credit]"
+                >
+                </v-text-field>
               </v-flex>
               <v-flex xs12>
                 <v-text-field label="Họ và tên" v-model="applicantNameCreateAcc" :rules="[rules.required]"
@@ -1137,13 +1141,13 @@
       </v-card>
     </v-dialog>
     <!-- tra cứu LGSP -->
-    <v-dialog v-model="dialog_searchLgsp" scrollable persistent max-width="700px">
+    <v-dialog v-model="dialog_searchLgsp" scrollable persistent max-width="1000px">
       <v-card>
         <v-toolbar dark color="primary">
           <v-toolbar-title v-if="lgspType === 'business'">Tra cứu CSDL Quốc Gia về thông tin doanh nghiệp</v-toolbar-title>
           <v-toolbar-title v-if="lgspType === 'citizen'">Tra cứu CSDL Quốc Gia về dân cư</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn icon dark @click.native="closeSearchLgsp">
+          <v-btn icon dark @click.native="dialog_searchLgsp = false">
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
@@ -1151,12 +1155,21 @@
           <v-form ref="formLgsp" v-model="valid" class="py-3 px-0 grid-list">
             <v-layout row wrap class="px-0 py-0">
               <v-flex xs12>
-                <v-text-field :label="lgspType === 'business' ? 'Mã số thuế doanh nghiệp' : 'Số CCCD hoặc số CMND'" v-model="applicantIdNoLgsp"
-                 box clearable :rules="lgspType === 'business' ? [rules.required] : [rules.required, rules.credit]"></v-text-field>
+                <v-text-field id="soCanCuocTraCuu" :label="lgspType === 'business' ? 'Mã số thuế doanh nghiệp' : 'Số CCCD hoặc số CMND'" v-model="applicantIdNoLgsp"
+                 box clearable :rules="lgspType === 'business' ? [rules.required] : [rules.required, rules.credit]"
+                 autofocus @keyup.enter="genDataQrCode"
+                >
+                </v-text-field>
+              </v-flex>
+              <v-flex xs12 v-if="dataQrCode">
+                <v-text-field label="Ngày cấp" v-model="dataQrCode['ngayCap']" box readonly></v-text-field>
               </v-flex>
               <v-flex xs12 v-if="lgspType === 'citizen'">
                 <v-text-field label="Họ và tên" v-model="applicantNameLgsp" :rules="[rules.required]"
                  box clearable></v-text-field>
+              </v-flex>
+              <v-flex xs12 v-if="dataQrCode">
+                <v-text-field label="Giới tính" v-model="dataQrCode['gioiTinh']" box readonly></v-text-field>
               </v-flex>
               <v-flex xs12 v-if="lgspType === 'citizen'">
                 <v-menu
@@ -1186,7 +1199,9 @@
                   :first-day-of-week="1" locale="vi" v-model="ngaysinh" no-title @input="menuApplicantIdDate = false"></v-date-picker>
                 </v-menu>
               </v-flex>
-              
+              <v-flex xs12 v-if="dataQrCode">
+                <v-text-field label="Địa chỉ thường trú" v-model="dataQrCode['thuongTru']" box readonly></v-text-field>
+              </v-flex>
               <v-flex xs12 class="text-right">
                 <v-btn color="primary"
                   v-if="lgspType === 'business'"
@@ -1209,7 +1224,7 @@
                 >
                   <v-icon size="20">search</v-icon>
                   &nbsp;
-                  Tra cứu
+                  Tra cứu CSDL dân cư
                   <span slot="loader">Đang tải...</span>
                 </v-btn>
               </v-flex>
@@ -1217,8 +1232,8 @@
             </v-layout>
           </v-form>
           <div>
-            <table :class="lgspType === 'business' ? 'datatable table' : 'datatable table my-3'" style="border-top: 1px solid #dedede;" v-if="lgspType === 'business' && applicantLgspInfomation">
-              <tbody v-if="lgspType === 'business'">
+            <table class="datatable table" style="border-top: 1px solid #dedede;" v-if="lgspType === 'business' && applicantLgspInfomation">
+              <tbody>
                 <tr>
                   <td width="200" class="pt-2"><span class="text-bold">Tên doanh nghiệp</span></td>
                   <td class="pt-2"><span>{{applicantLgspInfomation.NAME}}</span></td>
@@ -1249,30 +1264,8 @@
                 </tr>
                 
               </tbody>
-              <tbody v-if="lgspType === 'citizen'">
-                <tr>
-                  <td width="200" class="pt-2"><span class="text-bold">Họ và tên công dân</span></td>
-                  <td class="pt-2"><span>{{applicantLgspInfomation.HoVaTen}}</span></td>
-                </tr>
-                <tr>
-                  <td width="200" class="pt-2"><span class="text-bold">Số căn cước công dân</span></td>
-                  <td class="pt-2"><span>{{applicantLgspInfomation.SoDinhDanh}}</span></td>
-                </tr>
-                <tr>
-                  <td width="200" class="pt-2"><span class="text-bold">Số chứng minh nhân dân</span></td>
-                  <td class="pt-2"><span>{{applicantLgspInfomation.SoCMND}}</span></td>
-                </tr>
-                <tr>
-                  <td width="200" class="pt-2"><span class="text-bold">Ngày sinh</span></td>
-                  <td class="pt-2"><span>{{applicantLgspInfomation.NgayThangNamSinh}}</span></td>
-                </tr>
-                <tr>
-                  <td width="200" class="pt-2"><span class="text-bold">Giới tính</span></td>
-                  <td class="pt-2"><span>{{applicantLgspInfomation.GioiTinh == '1' ? 'Nam' : (applicantLgspInfomation.GioiTinh == '2' ? 'Nữ' : 'Chưa có thông tin')}}</span></td>
-                </tr>
-                
-              </tbody>
             </table>
+
             <v-flex xs12 class="text-right my-2" v-if="applicantLgspInfomation && lgspType === 'business'">
               <v-btn color="primary"
                 @click="addApplicantLgsp"
@@ -1294,6 +1287,122 @@
                 {{messageLgsp}}
               </v-alert>
             </div>
+            <v-layout wrap v-if="lgspType === 'citizen' && applicantLgspInfomation && lgspAlertColor == 'green'">
+              <v-flex xs12 md6 class="pr-2">
+                <div>
+                  <table class="datatable table my-3" style="border-top: 1px solid #dedede;">
+                    <tbody>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Họ và tên công dân</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.HoVaTen.Ten}}</span></td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Số định danh cá nhân/ CCCD</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.SoDinhDanh}}</span></td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Số chứng minh nhân dân</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.SoCMND}}</span></td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Ngày sinh</span></td>
+                        <td class="pt-2"><span>{{formatNgaySinh(applicantLgspInfomation.NgayThangNamSinh.NgayThangNam)}}</span></td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Giới tính</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.GioiTinh == '1' ? 'Nam' : (applicantLgspInfomation.GioiTinh == '2' ? 'Nữ' : 'Chưa có thông tin')}}</span></td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Quốc tịch</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.QuocTich == 'VN' ? 'Việt Nam' : applicantLgspInfomation.QuocTich}}</span></td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Dân tộc</span></td>
+                        <td class="pt-2"><span>{{danTocTraCuuQr}}</span></td>
+                      </tr>
+                      <tr v-if="diaChiThuongTruTraCuuQr">
+                        <td width="200" class="pt-2"><span class="text-bold">Địa chỉ thường trú</span></td>
+                        <td class="pt-2">
+                          <span>{{applicantLgspInfomation.ThuongTru.ChiTiet}}</span>
+                          <span>, {{diaChiThuongTruTraCuuQr}}</span>
+                        </td>
+                      </tr>
+                      <tr v-if="noiOHienTaiTraCuuQr">
+                        <td width="200" class="pt-2"><span class="text-bold">Nơi ở hiện tại</span></td>
+                        <td class="pt-2">
+                          <span>{{noiOHienTaiTraCuuQr}}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Tình trạng hôn nhân</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.TinhTrangHonNhan == '2' ? 'Đã kết hôn' : 'Chưa kết hôn'}}</span></td>
+                      </tr>
+
+                      <tr v-if="applicantLgspInfomation.TinhTrangHonNhan == '2'">
+                        <td width="200" class="pt-2"><span class="text-bold">Họ và tên vợ/ chồng</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.VoChong.HoVaTen}}</span></td>
+                      </tr>
+                      <tr v-if="applicantLgspInfomation.TinhTrangHonNhan == '2'">
+                        <td width="200" class="pt-2"><span class="text-bold">Quốc tịch</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.VoChong.QuocTich == 'VN' ? 'Việt Nam' : applicantLgspInfomation.VoChong.QuocTich}}</span></td>
+                      </tr>
+                      <tr v-if="applicantLgspInfomation.TinhTrangHonNhan == '2'">
+                        <td width="200" class="pt-2"><span class="text-bold">Số định danh cá nhân/ CCCD</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.VoChong.SoDinhDanh}}</span></td>
+                      </tr>
+                      <tr v-if="applicantLgspInfomation.TinhTrangHonNhan == '2'">
+                        <td width="200" class="pt-2"><span class="text-bold">Số chứng minh nhân dân</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.VoChong.SoCMND}}</span></td>
+                      </tr>
+                      
+                    </tbody>
+                  </table>
+                </div>
+              </v-flex>
+              <v-flex xs12 md6 class="pl-2">
+                <div>
+                  <table class="datatable table my-3" style="border-top: 1px solid #dedede;">
+                    <tbody>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Họ và tên cha</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.Cha.HoVaTen}}</span></td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Quốc tịch</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.Cha.QuocTich == 'VN' ? 'Việt Nam' : applicantLgspInfomation.Cha.QuocTich}}</span></td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Số định danh cá nhân/ CCCD</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.Cha.SoDinhDanh}}</span></td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Số chứng minh nhân dân</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.Cha.SoCMND}}</span></td>
+                      </tr>
+                      
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Họ và tên mẹ</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.Me.HoVaTen}}</span></td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Quốc tịch</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.Me.QuocTich == 'VN' ? 'Việt Nam' : applicantLgspInfomation.Me.QuocTich}}</span></td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Số định danh cá nhân/ CCCD</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.Me.SoDinhDanh}}</span></td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Số chứng minh nhân dân</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.Me.SoCMND}}</span></td>
+                      </tr>
+                      
+                    </tbody>
+                  </table>
+                </div>
+              </v-flex>
+            </v-layout>
+            
             <v-flex xs12 class="text-right my-2" v-if="applicantLgspInfomation && lgspType === 'citizen'">
               <!-- <v-btn color="primary"
                 @click="syncApplicantLgsp"
@@ -1313,7 +1422,7 @@
                 Lấy thông tin
               </v-btn>
               <v-btn color="primary"
-                @click="closeSearchLgsp"
+                @click="dialog_searchLgsp = false"
                 class="mx-0 my-0 white--text"
               >
                 <v-icon size="20" class="white--text">clear</v-icon>
@@ -1473,6 +1582,7 @@ export default {
     selectedSearchItem: null,
     searchOptions: {},
     functionTimeOut: null,
+    functionTimeOutApplicant:false,
     dialog_applicantInfos: false,
     dialog_applicantList: false,
     applicantConfig: false,
@@ -1485,6 +1595,10 @@ export default {
     disabled: true,
     loadingDialogInfo: false,
     dialog_identifyConfirm: false,
+    diaChiThuongTruTraCuuQr: '',
+    noiOHienTaiTraCuuQr: '',
+    danTocTraCuuQr: '',
+    dataQrCode: '',
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       cmndHoChieu: (value) => {
@@ -1508,12 +1622,16 @@ export default {
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       },
       credit: (value) => {
-        if (value.length === 9) {
-          const pattern = /^(([0-9]{9,9}))$/
-          return pattern.test(value) || 'Số CCCD, số CMND gồm 9 hoặc 12 ký tự 0-9'
+        if (value) {
+          if (value.length === 9) {
+            const pattern = /^(([0-9]{9,9}))$/
+            return pattern.test(value) || 'Số CCCD, số CMND gồm 9 hoặc 12 ký tự 0-9'
+          } else {
+            const pattern = /^(([0-9]{12,12}))$/
+            return pattern.test(value) || 'Số CCCD, số CMND gồm 9 hoặc 12 ký tự 0-9'
+          }
         } else {
-          const pattern = /^(([0-9]{12,12}))$/
-          return pattern.test(value) || 'Số CCCD, số CMND gồm 9 hoặc 12 ký tự 0-9'
+          return true
         }
       },
       varchar50: (val) => {
@@ -1599,7 +1717,8 @@ export default {
     userSsoInfo: '',
     quyenTraCuuLgsp: false,
     serviceCheckCsdldc: '',
-    disableEditApplicant: false
+    disableEditApplicant: false,
+    SCAN_QR_CCCD: false
   }),
   computed: {
     loading () {
@@ -1642,6 +1761,10 @@ export default {
     try {
       vm.traCuuLgspCongDan = traCuuLgspCongDan
     } catch (error) {
+    }
+    try {
+      vm.SCAN_QR_CCCD = SCAN_QR_CCCD
+    } catch (error) {  
     }
     try {
       vm.traCuuLgspDoanhNghiep = traCuuLgspDoanhNghiep
@@ -1951,7 +2074,7 @@ export default {
       })
       vm.$refs.formChuHoSo.resetValidation()
       // 
-      if (vm.traCuuLgspCongDan) {
+      if (vm.traCuuLgspCongDan && vm.originality == 3) {
         let checkThuTucTraCuuCsdl = false
         let dataCheckRole = {serviceCode: data.serviceCode}
         try {
@@ -2130,13 +2253,8 @@ export default {
       vm.functionTimeOut = setTimeout(function () {
         if (vm.originality === 3) {
           vm.checkApplicantInfos()
-          // vm.thongTinChuHoSo.applicantIdNo = query.trim()
         }
         vm.$store.commit('setApplicantId', query)
-        // check LGSP
-        // if (vm.originality === 3 && vm.traCuuLgspCongDan && vm.thongTinChuHoSo.userType === '1') {
-        //   vm.searchLgspCongDan('auto')
-        // }
       }, 2000)
       if (query.trim().length === 0) {
         vm.thongTinChuHoSo.applicantIdNo = ''
@@ -2770,10 +2888,35 @@ export default {
     showDialogSearchLgspCongDan () {
       let vm = this
       vm.lgspType = 'citizen'
-      vm.applicantIdNoLgsp = vm.thongTinChuHoSo['applicantIdNo']
-      vm.applicantNameLgsp = vm.thongTinChuHoSo['applicantName']
+      vm.applicantIdNoLgsp = vm.thongTinChuHoSo['applicantIdNo'] ? vm.thongTinChuHoSo['applicantIdNo'] : ''
+      vm.applicantNameLgsp = vm.thongTinChuHoSo['applicantName'] ? vm.thongTinChuHoSo['applicantName'] : ''
+      vm.applicantBirthDate = null
       vm.applicantLgspInfomation = ''
-      vm.dialog_searchLgsp = true
+      if (vm.checkAccSso) {
+        let filter = {
+          maSoCaNhan: vm.thongTinChuHoSo['applicantIdNo'],
+          type: 'citizen'
+        }
+        vm.$store.dispatch('getStatusAccount', filter).then(result => {
+          console.log('resultCheck', result)
+          if (result && result.profile) {
+            let info = JSON.parse(result.profile)
+            if (info && info.hasOwnProperty('ngaySinh') && info.ngaySinh && info.ngaySinh !== '01/01/1970') {
+              vm.applicantBirthDate = info.ngaySinh
+            }
+          }
+          vm.dialog_searchLgsp = true
+        }).catch(function () {
+          vm.dialog_searchLgsp = true
+        })
+      } else {
+        vm.dialog_searchLgsp = true
+      }
+      setTimeout(function(){
+        $("#soCanCuocTraCuu").focus()
+        vm.dataQrCode = ''
+      }, 200)
+      
       // if (vm.applicantIdNoLgsp.trim() && vm.applicantNameLgsp.trim()) {
       //   vm.searchLgspCongDan('auto')
       // } else {
@@ -2808,9 +2951,31 @@ export default {
         vm.applicantLgspInfomation = false
       }
     },
+    genDataQrCode () {
+      let vm = this
+      // console.log('run QR code', String(vm.applicantIdNoLgsp).trim())
+      if (vm.thongTinChuHoSo.userType === '1' && vm.SCAN_QR_CCCD) {
+        let qrScan = String(vm.applicantIdNoLgsp).trim()
+        try {
+          let data = qrScan ? qrScan.split("|") : ''
+          console.log('data QR code', data)
+          if (data && data.length >= 6) {
+            vm.applicantIdNoLgsp = data[0]
+            vm.applicantNameLgsp = data[2]
+            vm.applicantBirthDate = data[3]
+            vm.dataQrCode = {
+              gioiTinh: data[4],
+              ngayCap: data[6].slice(0,2) + '/' + data[6].slice(2,4) + '/' + data[6].slice(4,8),
+              thuongTru: data[5]
+            }
+          }
+        } catch (error) {
+        }
+      }
+    },
     searchLgspCongDan (event) {
       let vm = this
-      if (String(vm.applicantIdNoLgsp).trim() && String(vm.applicantNameLgsp).trim() && vm.applicantBirthDate && String(vm.applicantBirthDate).length === 8) {
+      if (vm.applicantIdNoLgsp && vm.applicantNameLgsp && String(vm.applicantIdNoLgsp).trim() && String(vm.applicantNameLgsp).trim() && vm.applicantBirthDate && String(vm.applicantBirthDate).length === 8) {
         let dateInput = ''
         if (String(vm.applicantBirthDate).indexOf('/') > 0) {
           let date = String(vm.applicantBirthDate).split('/')
@@ -2836,6 +3001,88 @@ export default {
             vm.warningLgsp = true
             vm.messageLgsp = 'Số CCCD/ CMND: "' + vm.applicantIdNoLgsp + '", họ tên: "' + vm.applicantNameLgsp + '" có thông tin trên CSDL quốc gia về dân cư'
             // vm.dialog_searchLgsp = false
+            // 
+            vm.$store.getters.getDictItems({
+              collectionCode: 'DAN_TOC',
+              level: 0
+            }).then(function (dantocs) {
+              let dantoc = dantocs.data.find(function (item) {
+                return item.itemCode == vm.applicantLgspInfomation.DanToc
+              })
+              vm.danTocTraCuuQr = dantoc ? dantoc.itemName : ''
+            })
+            // Lấy thông tin thường trú
+            let dataThuongTru = {
+              ThuongTruTinhThanh: '',
+              ThuongTruQuanHuyen: '',
+              ThuongTruXaPhuong: ''
+            }
+            let city = vm.citys.find(function (item) {
+              return item.itemCode == vm.applicantLgspInfomation.ThuongTru.MaTinhThanh
+            })
+            dataThuongTru.ThuongTruTinhThanh = city ? city.itemName : ''
+            if (city) {
+              vm.$store.getters.getDictItems({
+                collectionCode: 'ADMINISTRATIVE_REGION',
+                level: 1,
+                parent: city.itemCode
+              }).then(function (resultDistricts) {
+                let quanhuyen = resultDistricts.data.find(function (item) {
+                  return item.itemCode == vm.applicantLgspInfomation.ThuongTru.MaQuanHuyen
+                })
+                dataThuongTru.ThuongTruQuanHuyen = quanhuyen ? quanhuyen.itemName : ''
+                if (quanhuyen) {
+                  vm.$store.getters.getDictItems({
+                    collectionCode: 'ADMINISTRATIVE_REGION',
+                    level: 1,
+                    parent: quanhuyen.itemCode
+                  }).then(function (resultWards) {
+                    let xaphuong = resultWards.data.find(function (item) {
+                      return item.itemCode == vm.applicantLgspInfomation.ThuongTru.MaPhuongXa
+                    })
+                    dataThuongTru.ThuongTruXaPhuong = xaphuong ? xaphuong.itemName : ''
+                    vm.diaChiThuongTruTraCuuQr = dataThuongTru.ThuongTruXaPhuong + ', ' + dataThuongTru.ThuongTruQuanHuyen + ', ' + dataThuongTru.ThuongTruTinhThanh
+                    console.log('diaChiThuongTruTraCuuQr', vm.diaChiThuongTruTraCuuQr)
+                  })
+                }
+              })
+            }
+
+            let dataNoiOHienTai = {
+              TinhThanh: '',
+              QuanHuyen: '',
+              XaPhuong: ''
+            }
+            let city1 = vm.citys.find(function (item) {
+              return item.itemCode == vm.applicantLgspInfomation.NoiOHienTai.MaTinhThanh
+            })
+            dataNoiOHienTai.TinhThanh = city1 ? city1.itemName : ''
+            if (city1) {
+              vm.$store.getters.getDictItems({
+                collectionCode: 'ADMINISTRATIVE_REGION',
+                level: 1,
+                parent: city1.itemCode
+              }).then(function (resultDistricts) {
+                let quanhuyen = resultDistricts.data.find(function (item) {
+                  return item.itemCode == vm.applicantLgspInfomation.NoiOHienTai.MaQuanHuyen
+                })
+                dataNoiOHienTai.QuanHuyen = quanhuyen ? quanhuyen.itemName : ''
+                if (quanhuyen) {
+                  vm.$store.getters.getDictItems({
+                    collectionCode: 'ADMINISTRATIVE_REGION',
+                    level: 1,
+                    parent: quanhuyen.itemCode
+                  }).then(function (resultWards) {
+                    let xaphuong = resultWards.data.find(function (item) {
+                      return item.itemCode == vm.applicantLgspInfomation.NoiOHienTai.MaPhuongXa
+                    })
+                    dataNoiOHienTai.XaPhuong = xaphuong ? xaphuong.itemName : ''
+                    vm.noiOHienTaiTraCuuQr = vm.applicantLgspInfomation.NoiOHienTai.ChiTiet + ' ' + dataNoiOHienTai.XaPhuong + ', ' + dataNoiOHienTai.QuanHuyen + ', ' + dataNoiOHienTai.TinhThanh
+                  })
+                }
+              })
+            }
+            // 
           } else {
             // vm.dialog_searchLgsp = true
             vm.lgspAlertColor = 'red'
@@ -2859,7 +3106,7 @@ export default {
                 vm.messageLgsp = "Tài khoản cán bộ không có quyền thao tác";
                 break;
               default:
-                vm.messageLgsp = "Số CCCD/ CMND: " + String(vm.applicantNameLgsp).trim() + ", họ tên: " + String(vm.applicantNameLgsp).trim() + " không có thông tin trên CSDL quốc gia về dân cư"
+                vm.messageLgsp = "Số CCCD/ CMND: " + String(vm.applicantIdNoLgsp).trim() + ", họ tên: " + String(vm.applicantNameLgsp).trim() + " không có thông tin trên CSDL quốc gia về dân cư"
             }
           }
         })
@@ -3386,6 +3633,12 @@ export default {
                 vm.disabled = false
             }
         }
+    },
+    formatNgaySinh (date) {
+      if (!date) {
+        return ''
+      }
+      return date.slice(6,8) + '/' + date.slice(4,6) + '/' + date.slice(0,4)
     }
   }
 }

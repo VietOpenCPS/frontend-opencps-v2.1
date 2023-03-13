@@ -256,9 +256,9 @@
           }
         })
         // 
-        setInterval(function () {
-          vm.loadingCounter()
-        }, 3*60*1000)
+        // setInterval(function () {
+        //   vm.loadingCounter()
+        // }, 3*60*1000)
       })
     },
     updated () {
