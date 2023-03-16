@@ -576,6 +576,37 @@
               </v-list-tile>
             </v-list>
           </v-menu>
+
+          <v-menu @click.native.stop right offset-y 
+            transition="slide-x-transition" title="Ký số tài liệu đính kèm" 
+            v-if="showKySoDocument && itemAction.form === 'PRINT_01' && itemAction.document === 'DOC_01' && dossierSelect.online && srcDownloadIframe">
+            <v-btn slot="activator" flat color="#a82727">
+              <v-icon size="18">fa fa-pencil-square-o</v-icon> &nbsp;
+              <span style="color: #fff !important">Ký số và gửi NLTT</span>
+            </v-btn>
+            <v-list>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('approved', 'send')">
+                  <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                </v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('issued', 'send')">
+                  <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
+                </v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('income', 'send')">
+                  <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                </v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('copy', 'send')">
+                  <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
+                </v-list-tile-title>
+              </v-list-tile>
+            </v-list>
+          </v-menu>
           <!--  -->
           <v-btn icon dark @click.native="dialogPDF = false">
             <v-icon>close</v-icon>
@@ -1681,7 +1712,7 @@ export default {
     }
   },
   methods: {
-    activeKySoDocument (typeSign) {
+    activeKySoDocument (typeSign, action) {
       let vm = this
       let base64Document = vm.$store.getters.getBase64Document
       if (base64Document) {
@@ -1706,13 +1737,13 @@ export default {
         dataPost.append('uploadfile', fileKySo, 'fileKySo.pdf')
         axios.post('/o/rest/v2/vgca/fileupload', dataPost, config).then(function (result) {
           let dataUpload = JSON.parse(result.data.FileServer)
-          vm.kySoDocument(dataUpload, typeSign)
+          vm.kySoDocument(dataUpload, typeSign, action)
         }).catch(xhr => {
           toastr.error("Tải lên giấy tờ ký số thất bại.")
         })
       }
     },
-    kySoDocument (fileSigned, typeSign) {
+    kySoDocument (fileSigned, typeSign, action) {
       let vm = this
       let prms = {}
       prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.dossierSelect.dossierId + '/documents/' + fileSigned.fileEntryId + '/type/' + vm.dossierSelect.documentType + '/group/' + window.themeDisplay.getScopeGroupId()
@@ -1723,6 +1754,26 @@ export default {
         if (received_msg.Status === 0) {
           toastr.success('Ký số thành công')
           vm.dialogPDF = false
+          if (action) {
+            var initData = vm.$store.getters.loadingInitData
+            let actionUser = initData.user.userName ? initData.user.userName : ''
+            let options = {
+              headers: {
+                'groupId': window.themeDisplay.getScopeGroupId()
+              }
+            }
+            let dataPostActionDossier = new URLSearchParams()
+            dataPostActionDossier.append('actionCode', 'KSVB')
+            dataPostActionDossier.append('actionNote', '')
+            dataPostActionDossier.append('actionUser', actionUser)
+            dataPostActionDossier.append('payload', '')
+            dataPostActionDossier.append('security', '')
+            dataPostActionDossier.append('assignUsers', '')
+            dataPostActionDossier.append('payment', '{}')
+            dataPostActionDossier.append('createDossiers', '')
+            axios.post('/o/rest/v2/dossiers/' + vm.dossierSelect.dossierId +'/actions', dataPostActionDossier, options).then(function (response) {
+            })
+          }
         } else {
           if (received_msg.Message) {
             toastr.clear()

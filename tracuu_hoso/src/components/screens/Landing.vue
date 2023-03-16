@@ -257,7 +257,7 @@
                 :disabled="loading"
                 @click="submitPass"
               >
-                <v-icon>search</v-icon>&nbsp;
+                <v-icon style="color: #fff !important">search</v-icon>&nbsp;
                 Tra cứu
               </v-btn>
               <v-btn class="ml-1 my-0 white--text red" color="#0b72ba"

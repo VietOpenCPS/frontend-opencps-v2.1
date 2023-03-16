@@ -2567,6 +2567,7 @@ export default {
           let dataToExportCSV = []
           console.log('resultData3333', resultData)
           for (let key in resultData) {
+            console.log('key3333', key, resultData[key] )
             let dataInput = resultData[key]            
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
                 (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0')) {
@@ -2598,8 +2599,11 @@ export default {
                   } else {
                     dataText = Math.round(eval(currentConfig['calculator']))
                   }
+                  console.log('dataText0', dataText)
                 } else {
                   // console.log('resultData[key]', resultData[key], currentConfig['value'] )
+                  // console.log('resultData[key][currentConfig[value]]', resultData[key][currentConfig['value']] )
+                  // console.log('preff', preff)
                   if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                     if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
                       dataText =  ' - ' + resultData[key][currentConfig['subValue']] + ' '
@@ -2607,12 +2611,14 @@ export default {
                       dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
                     }
                   }
+                  // console.log('dataText1', dataText)
                 }
                 let alignmentConfig = 'center'
                 if (currentConfig.hasOwnProperty('align')) {
                   alignmentConfig = currentConfig['align']
                 }
                 dataToExportCSVItem.push(dataText)
+                // console.log('dataText123123123', dataText)
                 dataRow.push({
                   text: currentConfig['value'] === 'note' || currentConfig.hasOwnProperty('notSum') ? ' ' : (dataText === ' ' ? ' 0 ' : dataText), 
                   alignment: alignmentConfig,
@@ -2640,7 +2646,7 @@ export default {
               } else {
                 index = index + 1
               }
-              
+              // console.log('dataRow123123123', dataRow)
               vm.dataRowRenderHtmlTable.push(dataRow)
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
               vm.dataReportXX += JSON.stringify(dataRow) + ','

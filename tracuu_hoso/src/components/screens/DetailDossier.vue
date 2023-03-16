@@ -270,13 +270,22 @@
               </v-card-text>
               <div class="text-xs-left mt-2 mb-5 ml-0">
                 <!-- thanh toán keypay -->
-                <v-chip class="thanhToanKeypay" v-if="getEPaymentProfile(paymentInfo.epaymentProfile)" color="orange" text-color="white"
+                <v-chip class="thanhToanKeypay" v-if="getEPaymentProfile(paymentInfo.epaymentProfile) && getEPaymentProfile(paymentInfo.epaymentProfile).hasOwnProperty('keypayUrl')" color="orange" text-color="white"
                   @click.native="toKeyPay(getEPaymentProfile(paymentInfo.epaymentProfile).keypayUrl)"
                 >
                   <v-avatar style="cursor: pointer">
                     <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
                   </v-avatar>
                   <span class="py-2" style="cursor: pointer">Thanh toán trực tuyến</span>
+                </v-chip>
+                <!-- thanh toán keypay DVCQG -->
+                <v-chip class="mb-2" v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('kpdvcqg')" color="orange" text-color="white"
+                  @click.native="toKeyPayDvcqg('kpdvcqg')"
+                >
+                  <v-avatar :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">
+                    <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
+                  </v-avatar>
+                  <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán Keypay Cổng DVCQG</span>
                 </v-chip>
                 <!-- thanh toán paymentPlatform -->
                 <v-chip class="mb-2 ml-3" v-if="getEPaymentProfile(paymentInfo.epaymentProfile) && getEPaymentProfile(paymentInfo.epaymentProfile).hasOwnProperty('ppkpdvcqg')" color="#cb7755" text-color="white"
@@ -605,10 +614,11 @@
         let vm = this
         window.open(item, '_self')
       },
-      toKeyPayDvcqg () {
+      toKeyPayDvcqg (text) {
         let vm = this
         let filter = {
-          dossierId: vm.dossierDetail.dossierId
+          dossierId: vm.dossierDetail.dossierId,
+          key: text
         }
         vm.$store.dispatch('toKeypayDvcqg', filter).then(result => {
           window.open(result, '_self')
@@ -644,7 +654,7 @@
             let filter = {
               dossierId: vm.dossierDetail.dossierId
             }
-            vm.$store.dispatch('toKeypayDvcqg', filter).then(result => {
+            vm.$store.dispatch('toKeypayDvcqg2', filter).then(result => {
               vm.urlThanhToanPp = result
             }).catch(function() {
             })

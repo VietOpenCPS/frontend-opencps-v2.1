@@ -345,6 +345,13 @@
                         <v-icon color="white" v-else>print</v-icon>&nbsp;
                         Xem
                       </v-btn>
+                      <v-btn color="primary" @click.stop="exportDoc(item, index)" v-if="item.daKhai && item.hasForm && !item.embed"
+                        :disabled="loadingApacal"
+                      >
+                        <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
+                        <v-icon color="white" v-else>fas fa fa-file-word-o</v-icon>&nbsp;
+                        Tải xuống Word
+                      </v-btn>
                       <v-btn color="primary" @click.stop="editFormAlpaca(item)" v-if="!item['editForm'] && item.hasForm && !onlyView && !item.embed">
                         <v-icon color="white">edit</v-icon>&nbsp;
                         Sửa
@@ -1510,6 +1517,21 @@ export default {
         vm.doChange[key] = ''
       }
       console.log('dossierTemplateItemsFilter222', vm.dossierTemplateItemsFilter)
+    },
+    dialog_documentApplicant (val) {
+      setTimeout(function () {
+        if (val) {
+          let myElements = document.querySelectorAll(".v-menu__content");
+          for (let i = 0; i < myElements.length; i++) {
+            myElements[i].style.position = 'fixed';
+          }
+        } else {
+          let myElements = document.querySelectorAll(".v-menu__content")
+          for (let i = 0; i < myElements.length; i++) {
+            myElements[i].style.position = 'absolute';
+          }
+        }
+      }, 300)
     }
   },
   methods: {
@@ -2690,6 +2712,19 @@ export default {
       }
       
     },
+    exportDoc (item) {
+      let vm = this
+      let fileExport = vm.dossierFilesItems.find(function (file) {
+        return file.dossierPartNo == item.partNo && file.eForm
+      })
+      let filter = {
+        dossierId: vm.thongTinHoSo.dossierId,
+        referenceUid: fileExport.referenceUid,
+        document: item.partName
+      }
+      vm.$store.dispatch('exportDoc', filter).then(function (result) {
+      }).catch(function (){})
+    },
     deleteSingleFileEform (item, index) {
       var vm = this
       let x = confirm('Bạn có chắc chắn xóa file?')
@@ -3347,23 +3382,27 @@ export default {
     },
     partNoApplicantHasFile (partNo) {
       let vm = this
-      let hasFile = vm.dossierFilesApplicant.find(file => {
-        return file.partNo === partNo
-      })
-      // console.log('hasFile', hasFile)
-      if (hasFile && hasFile.hasOwnProperty('applicantDataModels') && hasFile.applicantDataModels) {
-        let fileArr = Array.isArray(hasFile.applicantDataModels) ? hasFile.applicantDataModels : [hasFile.applicantDataModels]
-        console.log('fileArrApplicant', fileArr)
-        let hasFileStatus1 = fileArr.find(file => {
-          return file.status == 1
+      try {
+        let hasFile = vm.dossierFilesApplicant.find(file => {
+          return file.partNo === partNo
         })
-        console.log('hasFileStatus1', hasFileStatus1)
-        if (hasFileStatus1) {
-          return true
+        // console.log('hasFile', hasFile)
+        if (hasFile && hasFile.hasOwnProperty('applicantDataModels') && hasFile.applicantDataModels) {
+          let fileArr = Array.isArray(hasFile.applicantDataModels) ? hasFile.applicantDataModels : [hasFile.applicantDataModels]
+          console.log('fileArrApplicant', fileArr)
+          let hasFileStatus1 = fileArr.find(file => {
+            return file.status == 1
+          })
+          console.log('hasFileStatus1', hasFileStatus1)
+          if (hasFileStatus1) {
+            return true
+          } else {
+            return false
+          }
         } else {
           return false
         }
-      } else {
+      } catch (error) {
         return false
       }
     },

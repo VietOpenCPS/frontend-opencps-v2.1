@@ -1305,6 +1305,10 @@
                         <td class="pt-2"><span>{{applicantLgspInfomation.SoCMND}}</span></td>
                       </tr>
                       <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Số sổ hộ khẩu</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.SoSoHoKhau}}</span></td>
+                      </tr>
+                      <tr>
                         <td width="200" class="pt-2"><span class="text-bold">Ngày sinh</span></td>
                         <td class="pt-2"><span>{{formatNgaySinh(applicantLgspInfomation.NgayThangNamSinh.NgayThangNam)}}</span></td>
                       </tr>
@@ -1318,7 +1322,11 @@
                       </tr>
                       <tr>
                         <td width="200" class="pt-2"><span class="text-bold">Dân tộc</span></td>
-                        <td class="pt-2"><span>{{danTocTraCuuQr}}</span></td>
+                        <td class="pt-2"><span>{{getTenDanhMuc(applicantLgspInfomation.DanToc, 'dantoc')}}</span></td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Tôn giáo</span></td>
+                        <td class="pt-2"><span>{{getTenDanhMuc(applicantLgspInfomation.TonGiao, 'tongiao')}}</span></td>
                       </tr>
                       <tr v-if="diaChiThuongTruTraCuuQr">
                         <td width="200" class="pt-2"><span class="text-bold">Địa chỉ thường trú</span></td>
@@ -1334,8 +1342,12 @@
                         </td>
                       </tr>
                       <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Nhóm máu</span></td>
+                        <td class="pt-2"><span>{{getNhomMau(applicantLgspInfomation.NhomMau)}}</span></td>
+                      </tr>
+                      <tr>
                         <td width="200" class="pt-2"><span class="text-bold">Tình trạng hôn nhân</span></td>
-                        <td class="pt-2"><span>{{applicantLgspInfomation.TinhTrangHonNhan == '2' ? 'Đã kết hôn' : 'Chưa kết hôn'}}</span></td>
+                        <td class="pt-2"><span>{{getTinhTrangHonNhan(applicantLgspInfomation.TinhTrangHonNhan)}}</span></td>
                       </tr>
 
                       <tr v-if="applicantLgspInfomation.TinhTrangHonNhan == '2'">
@@ -1445,6 +1457,7 @@ import TinyPagination from '../../components/pagging/opencps_pagination'
 import AttachedBackImage from "../ext/AttachedBackImage.vue"
 import AttachedFrontImage from "../ext/AttachedFrontImage.vue"
 import AttachedSelfieImage from "../ext/AttachedSelfieImage.vue"
+import support from '../../store/support.json'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000',
@@ -1460,6 +1473,8 @@ export default {
   },
   props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode', 'applicantIdRequired', 'detailDossier'],
   data: () => ({
+    danhmuctongiao: support.danhmuctongiao,
+    danhmucdantoc: support.danhmucdantoc,
     dialog_aiIdentify: false,
     step: 1,
     user: [],
@@ -3001,16 +3016,6 @@ export default {
             vm.warningLgsp = true
             vm.messageLgsp = 'Số CCCD/ CMND: "' + vm.applicantIdNoLgsp + '", họ tên: "' + vm.applicantNameLgsp + '" có thông tin trên CSDL quốc gia về dân cư'
             // vm.dialog_searchLgsp = false
-            // 
-            vm.$store.getters.getDictItems({
-              collectionCode: 'DAN_TOC',
-              level: 0
-            }).then(function (dantocs) {
-              let dantoc = dantocs.data.find(function (item) {
-                return item.itemCode == vm.applicantLgspInfomation.DanToc
-              })
-              vm.danTocTraCuuQr = dantoc ? dantoc.itemName : ''
-            })
             // Lấy thông tin thường trú
             let dataThuongTru = {
               ThuongTruTinhThanh: '',
@@ -3304,6 +3309,52 @@ export default {
         arrName[key] = arrName[key].charAt(0).toUpperCase() + letter.slice(1)
       }
       return arrName.join(' ')
+    },
+    getTinhTrangHonNhan(tinhtrang) {
+      if (tinhtrang == '2') {
+        return 'Đang có vợ/ chồng'
+      } else if (tinhtrang == '1') {
+        return 'Chưa kết hôn'
+      } else if (tinhtrang == '3') {
+        return 'Đã ly hôn hoặc góa vợ/ chồng'
+      } else {
+        return 'Chưa có thông tin'
+      }
+    },
+    getTenDanhMuc (code, danhmuc) {
+      let vm = this
+      if (code) {
+        if (danhmuc === 'tongiao') {
+          let dm = vm.danhmuctongiao.find(function (item) {
+            return Number(item.TONGIAO) == Number(code)
+          })
+          return dm ? dm.TENTONGIAO : ''
+        } else if (danhmuc === 'dantoc') {
+          let dm = vm.danhmucdantoc.find(function (item) {
+            return Number(item.MADANTOC) == Number(code)
+          })
+          return dm ? dm.TENGOI : ''
+        } else {
+          return ''
+        }
+      } else {
+        return ''
+      }
+    },
+    getNhomMau(nhommau) {
+      if (nhommau == '00') {
+        return 'Chưa có thông tin'
+      } else if (nhommau == '01') {
+        return 'Nhóm máu A'
+      } else if (nhommau == '02') {
+        return 'Nhóm máu B'
+      } else if (nhommau == '03') {
+        return 'Nhóm máu AB'
+      } else if (nhommau == '04') {
+        return 'Nhóm máu O'
+      } else {
+        return 'Chưa có thông tin'
+      }
     },
     convertString(str) {
       str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')

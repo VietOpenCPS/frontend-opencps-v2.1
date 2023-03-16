@@ -3499,6 +3499,29 @@ export const store = new Vuex.Store({
         })
       })
     },
+    exportDoc ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            responseType: 'blob'
+          }
+          axios.get('/o/rest/v2/dossiers/' + filter.dossierId + '/files/' + filter.referenceUid + '/type/word' , param).then(function (response) {
+            let serializable = response.data
+            let file = window.URL.createObjectURL(serializable)
+            saveAs(serializable, String(filter.document).replace(/\ /g, '') + String(new Date().getTime()) + '.docx')
+            resolve(file)
+          }).catch(function (error) {
+            console.log(error)
+            toastr.clear()
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            reject(error)
+          })
+        })
+      })
+    },
     printPay ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -5015,7 +5038,8 @@ export const store = new Vuex.Store({
               status: filter.status,
               keyword: filter.keywordSearch ? filter.keywordSearch : '',
               applicantDataType: filter.applicantDataType ? filter.applicantDataType : '',
-              fileNo: filter.fileNoSearch
+              fileNo: filter.fileNoSearch,
+              dossierNo: filter.dossierNoSearch
             }
           }
 
@@ -6103,6 +6127,42 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getServiceInfoItems ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+            }
+          }
+          axios.get('/o/rest/v2/onegate/serviceconfigs/processes', param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getDossierPart ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+            }
+          }
+          axios.get('/o/rest/v2/dossiertemplates/' + filter.dossierTemplateNo, param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    }
     // ----End---------
   },
   mutations: {

@@ -554,7 +554,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    toKeypayDvcqg ({commit, state}, filter) {
+    toKeypayDvcqg2 ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
@@ -570,6 +570,30 @@ export const store = new Vuex.Store({
             resolve(response.data.UrlThanhToan)
           } else if (response.data && ((response.data.hasOwnProperty('error') && response.data.error != '0') || (response.data.hasOwnProperty('MaLoi') && response.data.MaLoi != '00'))) {
             // toastr.error(response.data.hasOwnProperty('msg') ? response.data.msg : 'Yêu cầu thực hiện thất bại')
+            reject(response)
+          } else {
+            reject(response)
+          }
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
+    toKeypayDvcqg ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let url = filter.key === 'kpdvcqg' ? '/o/pgi/kpdvcqg/createtransaction' : '/o/pgi/ppdvcqg/inittransaction'
+        let dataPost = new URLSearchParams()
+        dataPost.append('dossierId', filter.dossierId)
+        
+        axios.post(url, dataPost, param).then(response => {
+          if (response.data && ((response.data.hasOwnProperty('error') && response.data.error == '0') || (response.data.hasOwnProperty('MaLoi') && response.data.MaLoi == '00'))) {
+            resolve(filter.key === 'kpdvcqg' ? response.data.payment_url : response.data.UrlThanhToan)
+          } else if (response.data && ((response.data.hasOwnProperty('error') && response.data.error != '0') || (response.data.hasOwnProperty('MaLoi') && response.data.MaLoi != '00'))) {
             reject(response)
           } else {
             reject(response)

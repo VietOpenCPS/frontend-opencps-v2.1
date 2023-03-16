@@ -51,6 +51,69 @@
           <v-toolbar dark color="primary">
             <v-toolbar-title>{{titleDialogPdf}}</v-toolbar-title>
             <v-spacer></v-spacer>
+            
+            <v-menu @click.native.stop right offset-y 
+              transition="slide-x-transition" title="Ký số văn bản" 
+              v-if="showKySoDocument && showInVanBanKySo">
+              <v-btn slot="activator" color="indigo" style="height: 26px !important">
+                <v-icon size="16" style="color: #fff !important">fa fa-pencil-square-o</v-icon> &nbsp;
+                <span style="color: #fff !important">Ký số</span>
+              </v-btn>
+              <v-list>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('approved')">
+                    <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                  </v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('issued')">
+                    <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
+                  </v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('income')">
+                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                  </v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('copy')">
+                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
+                  </v-list-tile-title>
+                </v-list-tile>
+              </v-list>
+            </v-menu>
+
+            <v-menu @click.native.stop right offset-y 
+              transition="slide-x-transition" title="Ký số văn bản" 
+              v-if="showKySoDocument && showInVanBanKySo">
+              <v-btn class="mr-2" slot="activator" color="orange" style="height: 26px !important">
+                <v-icon size="16" style="color: #fff !important">fa fa-pencil-square-o</v-icon> &nbsp;
+                <span style="color: #fff !important">Ký số và gửi NLTT</span>
+              </v-btn>
+              <v-list>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('approved', 'send')">
+                    <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                  </v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('issued', 'send')">
+                    <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
+                  </v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('income', 'send')">
+                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                  </v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('copy', 'send')">
+                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
+                  </v-list-tile-title>
+                </v-list-tile>
+              </v-list>
+            </v-menu>
+
             <v-btn icon dark @click.native="dialogPDF = false">
               <v-icon>close</v-icon>
             </v-btn>
@@ -306,9 +369,18 @@
               <v-alert class="mx-3" v-if="!btnStateVisible" outline :color="alertObj.color" :icon="alertObj.icon" :value="true">
                 {{alertObj.message}}
               </v-alert>
-              <div v-if="!btnStateVisible && (rollbackable || printDocument || printInvoicefilePayment)" class="ml-2 py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+              <div v-if="!btnStateVisible && (rollbackable || printDocument || printInvoicefilePayment || showInVanBanKySo)" class="ml-2 py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
                 <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Thu hồi hồ sơ</v-btn>
                 <v-btn color="primary" v-if="printDocument" @click="printViewDocument()"
+                  :loading="dialogPDFLoading"
+                  :disabled="dialogPDFLoading"
+                >
+                  <v-icon>print</v-icon> &nbsp;
+                  In văn bản hành chính
+                  <span slot="loader">Loading...</span>
+                </v-btn>
+                <v-btn color="primary" v-if="!printDocument && thongTinChiTietHoSo.online && showInVanBanKySo" 
+                  @click.stop="doPrint01(thongTinChiTietHoSo, {document: 'DOC_01'})"
                   :loading="dialogPDFLoading"
                   :disabled="dialogPDFLoading"
                 >
@@ -373,69 +445,7 @@
                             <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
                             <div style="margin-left: 20px;">{{item.documentName}}</div>
                           </v-flex>
-                          <v-flex xs4 class="text-right">
-                            <v-menu @click.native.stop right offset-y 
-                              transition="slide-x-transition" title="Ký số văn bản" 
-                              v-if="showKySoDocument && item.fileType === 'application/pdf'">
-                              <v-btn slot="activator" color="indigo" style="height: 26px !important">
-                                <v-icon size="16" style="color: #fff !important">fa fa-pencil-square-o</v-icon> &nbsp;
-                                <span style="color: #fff !important">Ký số</span>
-                              </v-btn>
-                              <v-list>
-                                <v-list-tile>
-                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'approved')">
-                                    <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
-                                  </v-list-tile-title>
-                                </v-list-tile>
-                                <v-list-tile>
-                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'issued')">
-                                    <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
-                                  </v-list-tile-title>
-                                </v-list-tile>
-                                <v-list-tile>
-                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'income')">
-                                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
-                                  </v-list-tile-title>
-                                </v-list-tile>
-                                <v-list-tile>
-                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'copy')">
-                                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
-                                  </v-list-tile-title>
-                                </v-list-tile>
-                              </v-list>
-                            </v-menu>
-
-                            <v-menu @click.native.stop right offset-y 
-                              transition="slide-x-transition" title="Ký số văn bản" 
-                              v-if="showKySoDocument && item.fileType === 'application/pdf'">
-                              <v-btn class="mr-2" slot="activator" color="orange" style="height: 26px !important">
-                                <v-icon size="16" style="color: #fff !important">fa fa-pencil-square-o</v-icon> &nbsp;
-                                <span style="color: #fff !important">Ký số và gửi NLTT</span>
-                              </v-btn>
-                              <v-list>
-                                <v-list-tile>
-                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'approved', 'send')">
-                                    <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
-                                  </v-list-tile-title>
-                                </v-list-tile>
-                                <v-list-tile>
-                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'issued', 'send')">
-                                    <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
-                                  </v-list-tile-title>
-                                </v-list-tile>
-                                <v-list-tile>
-                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'income', 'send')">
-                                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
-                                  </v-list-tile-title>
-                                </v-list-tile>
-                                <v-list-tile>
-                                  <v-list-tile-title @click.stop="activeKySoDocument(item, 'copy', 'send')">
-                                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
-                                  </v-list-tile-title>
-                                </v-list-tile>
-                              </v-list>
-                            </v-menu>
-                            
+                          <v-flex xs4 class="text-right">                            
                             <v-tooltip top>
                               <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFileDocument(item)" style="height:25px;width:25px">
                                 <v-icon style="font-size: 14px;">visibility</v-icon>
@@ -1150,6 +1160,9 @@ export default {
     messageChat: '',
     isCallBack: true,
     printDocument: false,
+    showInVanBanKySo: false,
+    doc_KySo: '',
+    documentPrint: '',
     printInvoicefilePayment: false,
     alertObj: {
       icon: 'check_circle',
@@ -1459,6 +1472,11 @@ export default {
           vm.reloadDetailDossier()
         } else {
           vm.activeReload = false
+        }
+        if (vm.thongTinChiTietHoSo.online && !vm.thongTinChiTietHoSo.dossierNo) {
+          vm.showInVanBanKySo = true
+        } else {
+          vm.showInVanBanKySo = false
         }
         vm.loadDetailTempalte()
         vm.loadThanhToan()
@@ -2178,6 +2196,7 @@ export default {
       let vm = this
       vm.dialogPDFLoading = true
       vm.dialogPDF = true
+      vm.doc_KySo = item.document
       let filter = {
         dossierId: dossierItem.dossierId,
         document: item.document
@@ -2188,6 +2207,13 @@ export default {
         document.getElementById('dialogPDFPreviewXl').src = result
         vm.srcDownloadIframe = result
       })
+      // 
+      if (vm.showKySoDocument) {
+        $('html, body').animate({
+          scrollTop: $("#banner").offset().top
+        }, 1);
+      }
+      // 
     },
     exportDoc () {
       let vm = this
@@ -3715,6 +3741,17 @@ export default {
         vm.loadingActionProcess = false
       })
     },
+    getDocumentPrint (documentId) {
+      let vm = this
+      let filter = {
+        dossierId: vm.thongTinChiTietHoSo.dossierId
+      }
+      vm.$store.dispatch('loadDossierDocuments', filter).then(function (result) {
+        if (result && result.length) {
+
+        }
+      })
+    },
     printViewDocument () {
       let vm = this
       vm.dialogPDFLoading = true
@@ -3744,7 +3781,7 @@ export default {
       }
       callServer()
     },
-    activeKySoDocument (item, typeSign, action) {
+    activeKySoDocument2 (item, typeSign, action) {
       let vm = this
       let param = {
         headers: {
@@ -3797,16 +3834,48 @@ export default {
         console.log(xhr)
       })
     },
+    activeKySoDocument (typeSign, action) {
+      let vm = this
+      let base64Document = vm.$store.getters.getBase64Document
+      if (base64Document) {
+        var DataURIToBlob = function(dataURI) {
+          const splitDataURI = dataURI.split(',')
+          const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
+          const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
+          const ia = new Uint8Array(byteString.length)
+          for (let i = 0; i < byteString.length; i++)
+            ia[i] = byteString.charCodeAt(i)
+          return new Blob([ia], { type: mimeString })
+        }
+
+        let fileKySo = DataURIToBlob(base64Document)
+        let config = {
+          headers: {
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        let dataPost = new FormData()
+        dataPost.append('uploadfile', fileKySo, 'fileKySo.pdf')
+        axios.post('/o/rest/v2/vgca/fileupload', dataPost, config).then(function (result) {
+          let dataUpload = JSON.parse(result.data.FileServer)
+          vm.kySoDocument(dataUpload, typeSign, action)
+        }).catch(xhr => {
+          toastr.error("Tải lên giấy tờ ký số thất bại.")
+        })
+      }
+    },
     kySoDocument (fileSigned, typeSign, action) {
       let vm = this
       let prms = {}
-      prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.thongTinChiTietHoSo.dossierId + '/documents/' + fileSigned.fileEntryId + '/type/' + fileSigned.documentType + '/group/' + window.themeDisplay.getScopeGroupId()
+      prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.thongTinChiTietHoSo.dossierId + '/documents/' + fileSigned.fileEntryId + '/type/' + vm.doc_KySo + '/group/' + window.themeDisplay.getScopeGroupId()
       prms['SessionId'] = ''
       prms['FileName'] = fileSigned.url.split(".pdf")[0] + '.pdf'
       let signFileCallBack = function (rv) {
         let received_msg = JSON.parse(rv)
         if (received_msg.Status === 0) {
           toastr.success('Ký số thành công')
+          vm.dialogPDF = false
           if (action) {
             var initData = vm.$store.getters.loadingInitData
             let actionUser = initData.user.userName ? initData.user.userName : ''
