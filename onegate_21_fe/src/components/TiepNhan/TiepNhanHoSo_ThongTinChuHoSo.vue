@@ -1305,10 +1305,6 @@
                         <td class="pt-2"><span>{{applicantLgspInfomation.SoCMND}}</span></td>
                       </tr>
                       <tr>
-                        <td width="200" class="pt-2"><span class="text-bold">Số sổ hộ khẩu</span></td>
-                        <td class="pt-2"><span>{{applicantLgspInfomation.SoSoHoKhau}}</span></td>
-                      </tr>
-                      <tr>
                         <td width="200" class="pt-2"><span class="text-bold">Ngày sinh</span></td>
                         <td class="pt-2"><span>{{formatNgaySinh(applicantLgspInfomation.NgayThangNamSinh.NgayThangNam)}}</span></td>
                       </tr>
@@ -1375,6 +1371,19 @@
                 <div>
                   <table class="datatable table my-3" style="border-top: 1px solid #dedede;">
                     <tbody>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Số sổ hộ khẩu</span></td>
+                        <td class="pt-2"><span>{{applicantLgspInfomation.SoSoHoKhau}}</span></td>
+                      </tr>
+                      <tr>
+                        <td width="200" class="pt-2"><span class="text-bold">Chủ hộ</span></td>
+                        <td class="pt-2">
+                          <p>{{applicantLgspInfomation.ChuHo.HoVaTen}}</p>
+                          <p>Quan hệ: {{ applicantLgspInfomation.ChuHo.QuanHe }}</p>
+                          <p>Số CMND: {{ applicantLgspInfomation.ChuHo.SoCMND }}</p>
+                          <p>Số định danh: {{ applicantLgspInfomation.ChuHo.SoDinhDanh }}</p>
+                        </td>
+                      </tr>
                       <tr>
                         <td width="200" class="pt-2"><span class="text-bold">Họ và tên cha</span></td>
                         <td class="pt-2"><span>{{applicantLgspInfomation.Cha.HoVaTen}}</span></td>

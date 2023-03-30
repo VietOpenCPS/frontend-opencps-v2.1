@@ -279,7 +279,7 @@
                   <span class="py-2" style="cursor: pointer">Thanh toán trực tuyến</span>
                 </v-chip>
                 <!-- thanh toán keypay DVCQG -->
-                <v-chip class="mb-2" v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('kpdvcqg')" color="orange" text-color="white"
+                <v-chip class="mb-2" v-if="getEPaymentProfile(paymentInfo.epaymentProfile) && getEPaymentProfile(paymentInfo.epaymentProfile).hasOwnProperty('kpdvcqg')" color="orange" text-color="white"
                   @click.native="toKeyPayDvcqg('kpdvcqg')"
                 >
                   <v-avatar :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">

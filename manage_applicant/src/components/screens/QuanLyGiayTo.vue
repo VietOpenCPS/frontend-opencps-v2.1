@@ -409,7 +409,7 @@
         </v-form>
         <v-flex class="text-right">
           <v-btn class="mr-2 white--text" color="red" :disabled="loadingAction" @click.native="showDetail = false">
-            <v-icon>clear</v-icon> &nbsp;
+            <v-icon style="color: #fff">clear</v-icon> &nbsp;
             Thoát
           </v-btn>
           <v-btn v-if="typeCreate === 'create'" class="mr-0" color="primary" 
@@ -605,6 +605,10 @@ export default {
     vm.$nextTick(function () {
       try {
         vm.isDvc = isDvc
+      } catch (error) {
+      }
+      try {
+        vm.maxFileSize = maxFileSizeConfig
       } catch (error) {
       }
       let current = vm.$router.history.current

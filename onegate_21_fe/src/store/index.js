@@ -1375,6 +1375,22 @@ export const store = new Vuex.Store({
           responseType: 'blob'
         }
         axios.get(state.initData.dossierApi + '/' + data.dossierId + '/documents/' + data.referenceUid, param).then(function (response) {
+          let serializable = response.data
+          try {
+            const blobToBase64 = blob => {
+              const reader = new FileReader();
+              reader.readAsDataURL(blob);
+              return new Promise(resolve => {
+                reader.onloadend = () => {
+                  resolve(reader.result);
+                };
+              });
+            };
+            blobToBase64(serializable).then(res => {
+              commit('setBase64Document', res)
+            })
+          } catch (error) {
+          }
           let url = window.URL.createObjectURL(response.data)
           resolve(url)
         }).catch(function (xhr) {
@@ -3401,6 +3417,21 @@ export const store = new Vuex.Store({
           }
           axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/documents/print', param).then(function (response) {
             let serializable = response.data
+            try {
+              const blobToBase64 = blob => {
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                return new Promise(resolve => {
+                  reader.onloadend = () => {
+                    resolve(reader.result);
+                  };
+                });
+              };
+              blobToBase64(serializable).then(res => {
+                commit('setBase64Document', res)
+              })
+            } catch (error) {
+            }
             if (response['status'] !== undefined && response['status'] !== 200) {
               resolve('pending')
             } else {
@@ -5780,14 +5811,18 @@ export const store = new Vuex.Store({
             Token: window.Liferay ? window.Liferay.authToken : ''
           }
         }
-        let url = '/o/rest/v2/userSSO/' + filter.maSoCaNhan + '/applicantIdNo'
-        axios.get(url, param).then(function (response) {
-          let serializable = response.data
-          resolve(serializable)
-        }).catch(function (error) {
-          console.log(error)
+        if (filter.maSoCaNhan) {
+          let url = '/o/rest/v2/userSSO/' + filter.maSoCaNhan + '/applicantIdNo'
+          axios.get(url, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        } else {
           reject(error)
-        })
+        }
       })
     },
     createAccountCaNhan ({commit, state}, filter) {
