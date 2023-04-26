@@ -13,10 +13,10 @@
       <div style="font-size:26px; color: yellow" class="">ĐIỀU KHIỂN HỆ THỐNG HIỂN THỊ</div>
     </v-flex>
     <v-layout wrap style="font-size:24px; color: white;max-width:1200px;margin: 0 auto">
-      <v-flex xs3 class="text-xs-center" @click="goTo(1)">
+      <!-- <v-flex xs3 class="text-xs-center" @click="goTo(1)">
         <img :src="'/documents/' + groupId + '/0/layso.png'" alt="" width="250px" height="150px" style="border: 2px solid #fff;border-radius: 5px;">
         <div class="mt-2">SCREEN-1</div>
-      </v-flex>
+      </v-flex> -->
       <v-flex xs3 class="text-xs-center" @click="goTo(2)">
         <img :src="'/documents/' + groupId + '/0/danhsachcho.png'" alt="" width="250px" height="150px" style="border: 2px solid #fff;border-radius: 5px;">
         <div class="mt-2">SCREEN-2</div>
@@ -25,10 +25,10 @@
         <img :src="'/documents/' + groupId + '/0/dhxh.png'" alt="" width="250px" height="150px" style="border: 2px solid #fff;border-radius: 5px;">
         <div class="mt-2">SCREEN-3</div>
       </v-flex>
-      <v-flex xs3 class="text-xs-center"  @click="goTo(4)">
+      <!-- <v-flex xs3 class="text-xs-center"  @click="goTo(4)">
         <img :src="'/documents/' + groupId + '/0/goiso.png'" alt="" width="250px" height="150px" style="border: 2px solid #fff;border-radius: 5px;">
         <div class="mt-2">SCREEN-4</div>
-      </v-flex>
+      </v-flex> -->
       <!-- <v-flex xs3 class="text-xs-center"  @click="goTo(4)">
         <img :src="'/documents/' + groupId + '/0/kios.png'" alt="" width="250px" height="150px">
         <div class="mt-2">KIOSK TRA CỨU</div>

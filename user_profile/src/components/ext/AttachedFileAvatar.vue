@@ -2,7 +2,7 @@
   <v-layout row wrap>
     <v-flex xs12 class="control-section file-preview py-0">
       <div class="control_wrapper">
-        <div id="dropArea" :style="'background-image: url(' + avatarData + ');'" style="height: 250px;overflow: auto;position: relative;border: 1px dashed #949494;text-align: center;padding: 15px;background-size: cover;">
+        <div id="dropArea" :style="'background-image: url(' + avatarData + ');'" style="height: 450px;overflow: auto;position: relative;border: 1px dashed #949494;text-align: center;padding: 15px;background-size: cover;">
           <span id="dropPreview" style="position: absolute;left: 0;top: 0;height: 100%;width: 100%;"> 
             <a href="javascript:;" id="browseAvata">
               <i v-if="type === 'image'" aria-hidden="true" class="v-icon material-icons" style="font-size: 54px;opacity: .2;position: absolute;top: 0;right: 0;">camera_alt</i>

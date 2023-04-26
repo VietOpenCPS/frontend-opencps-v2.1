@@ -85,7 +85,7 @@
           </v-flex>
           <v-flex xs12 sm6 class="px-0 pr-3">
             <v-autocomplete
-              :items="fileTemplateListSeach"
+              :items="fileTemplateListSearch"
               v-model="fileTemplateNo"
               label="Chọn loại giấy tờ"
               item-text="partName"
@@ -212,10 +212,17 @@
                   </span>
                 </div>
               </td>
-              <td class="text-right" style="height:36px;width: 150px">
+              <td class="text-right" style="height:36px;width: 230px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
+                
+                <v-tooltip top v-if="!loadingTable && xemLichSuCapNhatGiayTo" class="mr-2">
+                  <v-btn @click="viewHistory(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
+                    <v-icon size="22">history</v-icon>
+                  </v-btn>
+                  <span>Lịch sử cập nhật</span>
+                </v-tooltip>
                 <v-tooltip top v-if="!loadingTable && props.item.fileEntryId" class="mr-2">
                   <v-btn @click="viewDocument(props.item)" color="blue" slot="activator" flat icon class="mx-0 my-0">
                     <v-icon size="22">visibility</v-icon>
@@ -233,6 +240,12 @@
                     <v-icon size="22">edit</v-icon>
                   </v-btn>
                   <span>Số hóa, cập nhật giấy tờ</span>
+                </v-tooltip>
+                <v-tooltip top v-if="!loadingTable && (getUser('Administrator') || getUser('Administrator_data'))">
+                  <v-btn @click="deleteDocument(props.item)" color="red" slot="activator" flat icon class="mx-0 my-0 mr-2">
+                    <v-icon size="22" style="color: red">delete</v-icon>
+                  </v-btn>
+                  <span>Xóa giấy tờ</span>
                 </v-tooltip>
               </td>
             </tr>
@@ -288,7 +301,6 @@
               <v-autocomplete
                 :items="fileTemplateList"
                 v-model="fileTemplateNoCreate"
-                label="Chọn loại giấy tờ"
                 item-text="partName"
                 item-value="fileTemplateNo"
                 return-object
@@ -296,27 +308,40 @@
                 box
                 :rules="[v => !!v || 'Loại giấy tờ là bắt buộc']"
                 required
-              ></v-autocomplete>
+              >
+                <template slot="label"> 
+                  <span>Loại giấy tờ</span>
+                  <span class="red--text darken-3"> (*)</span>
+                </template>
+              </v-autocomplete>
             </v-flex>
             <v-flex xs12 class="px-0">
               <v-text-field
-                label="Tên giấy tờ"
                 v-model="fileName"
                 box
                 clearable
                 :rules="[v => !!v || 'Tên giấy tờ là bắt buộc']"
                 required
-              ></v-text-field>
+              >
+                <template slot="label"> 
+                  <span>Tên giấy tờ</span>
+                  <span class="red--text darken-3"> (*)</span>
+                </template>
+              </v-text-field>
             </v-flex>
             <v-flex xs12 sm3 class="px-0 pr-3">
               <v-text-field
-                label="Số hiệu giấy tờ"
                 v-model="fileNo"
                 box
                 clearable
                 :rules="[v => !!v || 'Số hiệu giấy tờ là bắt buộc']"
                 required
-              ></v-text-field>
+              >
+                <template slot="label"> 
+                  <span>Số hiệu giấy tờ</span>
+                  <span class="red--text darken-3"> (*)</span>
+                </template>
+              </v-text-field>
             </v-flex>
             <v-flex xs12 sm3 class="px-0 pr-3">
               <v-text-field
@@ -328,7 +353,12 @@
                 clearable
                 :rules="[v => !!v || 'Ngày cấp là bắt buộc']"
                 required
-              ></v-text-field>
+              >
+                <template slot="label"> 
+                  <span>Ngày cấp</span>
+                  <span class="red--text darken-3"> (*)</span>
+                </template>
+              </v-text-field>
             </v-flex>
             <v-flex xs12 sm3 class="px-0 pr-3">
               <v-text-field
@@ -344,48 +374,67 @@
               <v-autocomplete
                 :items="statusList"
                 v-model="statusCreate"
-                label="Tình trạng"
                 item-text="text"
                 item-value="value"
                 :hide-selected="true"
                 box
                 :rules="[v => v !== '' && v !== null || 'Tình trạng là bắt buộc']"
                 required
-              ></v-autocomplete>
+              >
+                <template slot="label"> 
+                  <span>Tình trạng</span>
+                  <span class="red--text darken-3"> (*)</span>
+                </template>
+              </v-autocomplete>
             </v-flex>
             <v-flex xs12 class="px-0">
               <v-text-field
-                label="Đơn vị cấp"
                 v-model="govAgencyCreate"
                 box
                 clearable
                 :rules="[v => !!v || 'Đơn vị cấp là bắt buộc']"
                 required
-              ></v-text-field>
+              >
+                <template slot="label"> 
+                  <span>Đơn vị cấp</span>
+                  <span class="red--text darken-3"> (*)</span>
+                </template>
+              </v-text-field>
             </v-flex>
             <v-flex xs12 sm6 class="px-0 pr-3">
               <v-text-field
-                label="Số cmnd/cccd, MST doanh nghiệp, tổ chức"
                 v-model="applicantIdNoCreate"
                 box
                 clearable
                 :rules="[v => !!v || 'Thông tin bắt buộc']"
                 required
-                
-              ></v-text-field>
+              >
+                <template slot="label"> 
+                  <span>Số cmnd/cccd, MST doanh nghiệp, tổ chức</span>
+                  <span class="red--text darken-3"> (*)</span>
+                </template>
+              </v-text-field>
             </v-flex>
             <v-flex xs12 sm6 class="px-0">
               <v-text-field
-                label="Chủ sở hữu"
                 v-model="applicantNameCreate"
                 box
                 clearable
                 :rules="[v => !!v || 'Chủ sở hữu giấy tờ là bắt buộc']"
                 required
                 
-              ></v-text-field>
+              >
+                <template slot="label"> 
+                  <span>Chủ sở hữu</span>
+                  <span class="red--text darken-3"> (*)</span>
+                </template>
+              </v-text-field>
             </v-flex>
             <v-flex xs12 class="mt-2">
+              <div v-if="maxFileSize" class="mb-3" style="color: red">
+                <span size="18">(*) </span>
+                <span class="ml-2">Giấy tờ tải lên dung lượng tối đa {{maxFileSize}} MB</span>
+              </div>
               <div v-if="fileNameView" class="pb-3" @click="viewDocument(documentSelect)">
                 <v-icon size="18" color="red">fa fa-file-pdf-o</v-icon>
                 <a class="ml-2" style="font-style: italic;font-size: 14px;text-decoration: underline;">{{fileNameView}}</a>
@@ -409,7 +458,7 @@
         </v-form>
         <v-flex class="text-right">
           <v-btn class="mr-2 white--text" color="red" :disabled="loadingAction" @click.native="showDetail = false">
-            <v-icon>clear</v-icon> &nbsp;
+            <v-icon style="color: #fff !important">clear</v-icon> &nbsp;
             Thoát
           </v-btn>
           <v-btn v-if="typeCreate === 'create'" class="mr-0" color="primary" 
@@ -452,6 +501,67 @@
         </iframe>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogHistory" max-width="1000" transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Lịch sử cập nhật</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogHistory = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+
+        <v-card-text class="py-1">
+          <v-data-table
+            :headers="historyHeader"
+            :items="historyData"
+            hide-actions
+            class="table-landing table-bordered mt-3"
+            style="border-left: 1px solid #dedede"
+          >
+            <template slot="items" slot-scope="props">
+              <tr>
+                <td class="text-xs-center" style="width:50px;height:36px">
+                  <div>
+                    <span>{{ props.index + 1 }}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left" style="height:36px" >
+                  <div>
+                    <span>{{props.item.canBoFullName}}</span><br>
+                    <span>{{props.item.canBoEmail}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left" style="height:36px" >
+                  <div>
+                    <span>{{props.item.thaoTac == 'ADD' ? 'Thêm mới' : 'Chỉnh sửa'}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left" style="height:36px" >
+                  <div>
+                    <span>{{ props.item.timeAction ? dateTimeViewSequency(Number(props.item.timeAction)) : '' }}</span>
+                  </div>
+                </td>
+              </tr>
+            </template>
+            <template slot="no-data">
+              <div class="text-xs-center mt-2">
+                Không có lịch sử
+              </div>
+            </template>
+          </v-data-table>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-2" color="primary" @click.native="dialogHistory = false">
+            <v-icon>clear</v-icon> &nbsp;
+            Thoát
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <div style="display:none">
       <a id="downloadFile" :href="srcDownload" download></a>
     </div>
@@ -472,6 +582,32 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    xemLichSuCapNhatGiayTo: false,
+    dialogHistory: false,
+    historyData: [],
+    historyHeader: [
+      {
+        text: 'STT',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Cán bộ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Thao tác',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Thời gian',
+        align: 'center',
+        sortable: false
+      }
+    ],
+
     isDvc: false,
     applicantInfos: '',
     nameTitle: '',
@@ -497,8 +633,12 @@ export default {
     optionCreate: '',
     fileTemplateNoCreate: '',
     fileTemplateList: [],
-    fileTemplateListSeach: [],
+    fileTemplateListSearch: [],
     fileTemplateNo: '',
+    ortherFileTemplate: {
+      fileTemplateNo: 'GIAY_TO_KHAC',
+      partName: 'Giấy tờ dùng chung'
+    },
     fileName: '',
     fileNo: '',
     createDate: '',
@@ -563,7 +703,8 @@ export default {
     srcDownload: '',
     fileEntryESign: '',
     pathNameFileESign: '',
-    hasEsign: false
+    hasEsign: false,
+    rolesUser: [],
   }),
   computed: {
     
@@ -573,38 +714,28 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
-    },
-    // optionCreate (val) {
-    //   let vm = this
-    //   setTimeout (function () {
-    //     if (vm.optionCreate) {
-    //       let filter = {
-    //         dossierTemplateNo: vm.optionCreate.templateNo
-    //       }
-    //       vm.$store.dispatch('getDossierPart', filter).then(function (result) {
-    //         if (result.hasOwnProperty('dossierParts')) {
-    //           vm.fileTemplateList = result.dossierParts
-    //           vm.fileTemplateNoCreate = ''
-    //         } else {
-    //           vm.fileTemplateList = []
-    //         }
-    //         if (vm.fileTemplateList && vm.fileTemplateList.length === 1) {
-    //           vm.fileTemplateNoCreate = vm.fileTemplateList[0]
-    //         }
-    //       }).catch(function () {
-    //       })
-    //     } else {
-    //       vm.fileTemplateList = []
-    //       vm.fileTemplateNoCreate = ''
-    //     }
-    //   }, 200)
-    // }
+    }
   },
   created () {
     let vm = this
     vm.$nextTick(function () {
+      vm.getRoleUser()
       try {
         vm.isDvc = isDvc
+      } catch (error) {
+      }
+      try {
+        vm.maxFileSize = maxFileSizeConfig
+      } catch (error) {
+      }
+      try {
+        vm.xemLichSuCapNhatGiayTo = setXemLichSuCapNhatGiayTo
+      } catch (error) {
+      }
+      try {
+        if (ortherFileTemplateConfig) {
+          vm.ortherFileTemplate = ortherFileTemplateConfig
+        }
       } catch (error) {
       }
       let current = vm.$router.history.current
@@ -622,6 +753,7 @@ export default {
         vm.getApplicantDocument()
       }
       vm.getServiceInfoItems()
+      vm.fileTemplateListSearch = [vm.ortherFileTemplate]
       // vm.getFileItems()
     })
   },
@@ -717,7 +849,8 @@ export default {
         applicantIdNo: vm.index != 0 ? vm.applicantInfos.applicantIdNo : '',
         fileTemplateNo: vm.fileTemplateNo,
         status: vm.status,
-        keywordSearch: vm.dossierNoSearch ? vm.dossierNoSearch : vm.keySearch,
+        keywordSearch: vm.keySearch,
+        dossierNoSearch: vm.dossierNoSearch,
         fileNoSearch: vm.fileNoSearch,
         applicantDataType: ''
       }
@@ -817,7 +950,7 @@ export default {
         }
         vm.optionList = []
         vm.optionCreate = ''
-        vm.fileTemplateList = []
+        vm.fileTemplateList = [vm.ortherFileTemplate]
         vm.fileTemplateNoCreate = ''
       }).catch(function () {
       })
@@ -847,15 +980,18 @@ export default {
                 } else {
                   vm.fileTemplateList = []
                 }
-                if (vm.fileTemplateList && vm.fileTemplateList.length === 1) {
+                vm.fileTemplateList.push(vm.ortherFileTemplate)
+                if (result.hasOwnProperty('dossierParts') && result.dossierParts.length === 1) {
                   vm.fileTemplateNoCreate = vm.fileTemplateList[0]
                 }
               }).catch(function () {
               })
             } else {
-              vm.fileTemplateList = []
+              vm.fileTemplateList = [vm.ortherFileTemplate]
               vm.fileTemplateNoCreate = ''
             }
+          } else {
+            vm.fileTemplateList = [vm.ortherFileTemplate]
           }
         } else {
           if (vm.serviceInfoSearch) {
@@ -864,7 +1000,7 @@ export default {
             vm.optionListSearch = []
           }
           vm.optionSearch = ''
-          vm.fileTemplateListSeach = []
+          vm.fileTemplateListSearch = []
           vm.fileTemplateNo = ''
           if (vm.optionListSearch && vm.optionListSearch.length === 1) {
             vm.optionSearch = vm.optionListSearch[0]
@@ -876,18 +1012,19 @@ export default {
             }
             vm.$store.dispatch('getDossierPart', filter).then(function (result) {
               if (result.hasOwnProperty('dossierParts')) {
-                vm.fileTemplateListSeach = result.dossierParts
+                vm.fileTemplateListSearch = result.dossierParts
                 vm.fileTemplateNo = ''
               } else {
-                vm.fileTemplateListSeach = []
+                vm.fileTemplateListSearch = []
               }
-              if (vm.fileTemplateListSeach && vm.fileTemplateListSeach.length === 1) {
-                vm.fileTemplateNo = vm.fileTemplateListSeach[0]
+              vm.fileTemplateListSearch.push(vm.ortherFileTemplate)
+              if (result.hasOwnProperty('dossierParts') && result.dossierParts.length === 1) {
+                vm.fileTemplateNo = vm.fileTemplateListSearch[0]
               }
             }).catch(function () {
             })
           } else {
-            vm.fileTemplateListSeach = []
+            vm.fileTemplateListSearch = [vm.ortherFileTemplate]
             vm.fileTemplateNo = ''
           }
         }
@@ -907,13 +1044,15 @@ export default {
             } else {
               vm.fileTemplateList = []
             }
-            if (vm.fileTemplateList && vm.fileTemplateList.length === 1) {
+
+            vm.fileTemplateList.push(vm.ortherFileTemplate)
+            if (result.hasOwnProperty('dossierParts') && result.dossierParts.length === 1) {
               vm.fileTemplateNoCreate = vm.fileTemplateList[0]
             }
           }).catch(function () {
           })
         } else {
-          vm.fileTemplateList = []
+          vm.fileTemplateList = [vm.ortherFileTemplate]
           vm.fileTemplateNoCreate = ''
         }
       }, 200)
@@ -927,18 +1066,19 @@ export default {
           }
           vm.$store.dispatch('getDossierPart', filter).then(function (result) {
             if (result.hasOwnProperty('dossierParts')) {
-              vm.fileTemplateListSeach = result.dossierParts
+              vm.fileTemplateListSearch = result.dossierParts
               vm.fileTemplateNo = ''
             } else {
-              vm.fileTemplateListSeach = []
+              vm.fileTemplateListSearch = []
             }
-            if (vm.fileTemplateListSeach && vm.fileTemplateListSeach.length === 1) {
-              vm.fileTemplateNo = vm.fileTemplateListSeach[0]
+            vm.fileTemplateListSearch.push(vm.ortherFileTemplate)
+            if (result.hasOwnProperty('dossierParts') && result.dossierParts.length === 1) {
+              vm.fileTemplateNo = vm.fileTemplateListSearch[0]
             }
           }).catch(function () {
           })
         } else {
-          vm.fileTemplateList = []
+          vm.fileTemplateListSearch = [vm.ortherFileTemplate]
           vm.fileTemplateNoCreate = ''
         }
       }, 200)
@@ -998,8 +1138,8 @@ export default {
             dataCreateFile.append('issueDate', vm.createDate)
             dataCreateFile.append('expireDate', vm.expireDate)
             dataCreateFile.append('desciption', '')
-            dataCreateFile.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
-            dataCreateFile.append('templateNo', vm.optionCreate['templateNo'])
+            dataCreateFile.append('serviceCode', vm.fileTemplateNoCreate.fileTemplateNo !== 'GIAY_TO_KHAC' ? vm.serviceInfoCreate['serviceCode'] : '')
+            dataCreateFile.append('templateNo', vm.fileTemplateNoCreate.fileTemplateNo !== 'GIAY_TO_KHAC' ? vm.optionCreate['templateNo'] : '')
             dataCreateFile.append('dossierNo', '')
             
             axios.post(url, dataCreateFile, param).then(result1 => {
@@ -1056,8 +1196,8 @@ export default {
           dataCreateFile.append('issueDate', vm.createDate)
           dataCreateFile.append('expireDate', vm.expireDate)
           dataCreateFile.append('desciption', '')
-          dataCreateFile.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
-          dataCreateFile.append('templateNo', vm.optionCreate['templateNo'])
+          dataCreateFile.append('serviceCode', vm.fileTemplateNoCreate.fileTemplateNo !== 'GIAY_TO_KHAC' ? vm.serviceInfoCreate['serviceCode'] : '')
+          dataCreateFile.append('templateNo', vm.fileTemplateNoCreate.fileTemplateNo !== 'GIAY_TO_KHAC' ? vm.optionCreate['templateNo'] : '')
           dataCreateFile.append('dossierNo', '')
           dataCreateFile.append('file', '')
           
@@ -1121,8 +1261,8 @@ export default {
           dataPost.append('issueDate', vm.createDate)
           dataPost.append('expireDate', vm.expireDate)
           dataPost.append('desciption', '')
-          dataPost.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
-          dataPost.append('templateNo', vm.optionCreate['templateNo'])
+          dataPost.append('serviceCode', vm.fileTemplateNoCreate.fileTemplateNo !== 'GIAY_TO_KHAC' ? vm.serviceInfoCreate['serviceCode'] : '')
+          dataPost.append('templateNo', vm.fileTemplateNoCreate.fileTemplateNo !== 'GIAY_TO_KHAC' ? vm.optionCreate['templateNo'] : '')
           dataPost.append('dossierNo', '')
           if (vm.updateFile) {
             dataPost.append('file', vm.fileUpdate)
@@ -1178,8 +1318,8 @@ export default {
         dataPost.append('issueDate', '')
         dataPost.append('expireDate', '')
         dataPost.append('desciption', '')
-        dataPost.append('serviceCode', vm.serviceInfoCreate['serviceCode'])
-        dataPost.append('templateNo', vm.optionCreate['templateNo'])
+        dataPost.append('serviceCode', vm.fileTemplateNoCreate.fileTemplateNo !== 'GIAY_TO_KHAC' ? vm.serviceInfoCreate['serviceCode'] : '')
+        dataPost.append('templateNo', vm.fileTemplateNoCreate.fileTemplateNo !== 'GIAY_TO_KHAC' ? vm.optionCreate['templateNo'] : '')
         dataPost.append('dossierNo', '')
         dataPost.append('file', '')
 
@@ -1250,6 +1390,34 @@ export default {
       let vm = this
       vm.documentPage = config.page
       vm.getApplicantDocument()
+    },
+    viewHistory (item) {
+      let vm = this
+      let metadata = item.hasOwnProperty('metadata') ? item.metadata : ''
+      if (metadata) {
+        try {
+          let history = JSON.parse(metadata)
+          vm.historyData = history.hasOwnProperty('lichSuCapNhat') ? history.lichSuCapNhat : []
+        } catch (error) {
+        }
+      }
+      vm.dialogHistory = true
+    },
+    deleteDocument (item) {
+      let vm = this
+      let x = confirm('Bạn có chắc chắn xóa giấy tờ này?')
+      if (x) {
+        vm.$store.dispatch('deleteDocument', item).then(function () {
+          toastr.clear()
+          toastr.success('Yêu cầu thực hiện thành công')
+          setTimeout(function () {
+            vm.getApplicantDocument()
+          }, 200)
+        }).catch(function () {
+          toastr.clear()
+          toastr.error('Yêu cầu thực hiện thất bại')
+        })
+      }
     },
     showEditDocument (item) {
       let vm = this
@@ -1446,6 +1614,50 @@ export default {
       } else {
         vm.expireDate = ''
       }     
+    },
+    dateTimeViewSequency (arg) {
+      if (arg) {
+        let value = new Date(arg)
+        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+      } else {
+        return ''
+      }
+    },
+    getRoleUser () {
+      let vm = this
+      return new Promise(resolve => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/users/login', param).then(function (response) {
+          let serializable = response.data
+          if (serializable && serializable.length > 0) {
+            let roles = []
+            for (let key in serializable) {
+              if (serializable[key]['role']) {
+                roles.push(serializable[key]['role'])
+              }
+            }
+            console.log('roles', roles)
+            vm.rolesUser = roles
+          } else {
+            vm.rolesUser = []
+          }
+        }).catch(function (error) {
+        })
+      })
+      
+    },
+    getUser (roleItem) {
+      let vm = this
+      let roles = vm.rolesUser
+      if (!roles) {
+        return false
+      }
+      let roleExits = roles.findIndex(item => item === roleItem)
+      return (roleExits >= 0)
     },
     goBack () {
       let vm = this

@@ -399,7 +399,9 @@ export default {
       let vm = this
       let filterEform = {
         state: 1,
-        className: 'EFORM'
+        className: 'EFORM',
+        start: 0,
+        end: 10
       }
       vm.$store.dispatch('getBookingDangGoi', filterEform).then(function (result) {
         vm.loadData = !vm.loadData

@@ -10,6 +10,7 @@
   "dependencies": {
     "@inotom/vue-go-top": "^1.0.2",
     "@syncfusion/ej2-vue-inputs": "^16.3.27",
+    "jquery": "^3.5.0",
     "axios": "^0.18.0",
     "file-saver": "^2.0.0-rc.4",
     "idempotent-babel-polyfill": "^7.0.0",

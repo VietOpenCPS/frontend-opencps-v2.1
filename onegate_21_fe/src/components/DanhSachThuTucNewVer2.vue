@@ -151,13 +151,13 @@
           <div v-if="serviceConfigListRender.length > 0">
             <v-card-text class="pl-3 py-1 pr-0" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3' style="border-bottom: 1px solid #dedede;">
               <v-layout row wrap>
-                <v-flex class="pt-0" :style="!isMobile ? 'width:calc(100% - 240px)' : ''">
+                <v-flex class="pt-0" :style="!isMobile ? 'width:calc(100% - 290px)' : ''">
                   <span style="font-weight: bold">{{(agencyPage*numberPerPage - numberPerPage)+ index3 + 1}}.</span> &nbsp;
                   <span>{{itemServiceConfig.serviceName}}</span>
                 </v-flex>
-                <v-flex class="" style="width:190px" >
+                <v-flex class="" style="width:200px" >
                   <v-btn class="mx-2 my-0 mt-0 white--text" depressed readonly small :color="getColor(itemServiceConfig.maxLevel)"
-                    style="pointer-events: none;min-width: 90px;">Mức độ {{itemServiceConfig.maxLevel}}
+                    style="pointer-events: none;min-width: 90px;">{{levelNameMapping[itemServiceConfig.maxLevel]}}
                   </v-btn>
                   <!-- <v-menu class="right" left offset-x v-if="itemServiceConfig.serviceConfigs && serviceConfigs(itemServiceConfig.serviceConfigs).length === 1">
                     <v-btn color="primary" class="mx-2 my-0" slot="activator" small 
@@ -198,13 +198,13 @@
           <div v-if="serviceInfoLastestList.length > 0">
             <v-card-text class="pl-3 py-1 pr-2" v-for='(item, index) in serviceInfoLastestList' :key='index' style="border-bottom: 1px solid #dedede;">
               <v-layout row wrap>
-                <v-flex :style="!isMobile ? 'width:calc(100% - 240px)' : ''">
+                <v-flex :style="!isMobile ? 'width:calc(100% - 290px)' : ''">
                   <span style="font-weight: bold">{{(agencyPage*numberPerPage - numberPerPage)+ index + 1}}.</span> &nbsp;
                   <span>{{item.serviceName}}</span>
                 </v-flex>
-                <v-flex class="" style="width:190px" >
+                <v-flex class="" style="width:200px" >
                   <v-btn class="mx-0 my-0 mt-0 white--text" depressed readonly small :color="getColor(item.maxLevel)"
-                    style="pointer-events: none;min-width: 90px;">Mức độ {{item.maxLevel}}
+                    style="pointer-events: none;min-width: 90px;">{{levelNameMapping[item.maxLevel]}}
                   </v-btn>
                   <!-- <v-menu class="right" left offset-x v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length === 1">
                     <v-btn color="primary" class="mx-0 my-0" slot="activator" small 
@@ -433,7 +433,12 @@
       hasFilterAgency: false,
       agencyListXuLyThuTuc: [],
       agencyXuLyThuTuc: '',
-      useJwt: false
+      useJwt: false,
+      levelNameMapping: {
+        2: 'Mức độ 2',
+        3: 'Mức độ 3',
+        4: 'Mức độ 4'
+      }
     }),
     computed: {
       currentIndex () {
@@ -452,6 +457,10 @@
     created () {
       var vm = this
       //
+      try {
+        vm.levelNameMapping = levelNameMapping
+      } catch (error) {
+      }
       try {
         vm.useJwt = useJwt
       } catch (error) {

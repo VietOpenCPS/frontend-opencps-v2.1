@@ -47,7 +47,7 @@ export const store = new Vuex.Store({
               start: filter.start ? filter.start : 0,
               end: filter.end ? filter.end : 30,
               sort: 'createDate',
-              order: 'desc',
+              order: true,
               maHoSo: filter.maHoSo ? filter.maHoSo : '',
               soHieuVanBan: filter.soHieuVanBan ? filter.soHieuVanBan : '',
               tenGiayTo: filter.tenGiayTo ? filter.tenGiayTo : '',
@@ -95,6 +95,26 @@ export const store = new Vuex.Store({
           resolve(serializable)
         }).catch(function (error) {
           reject(error)
+        })
+      })
+    },
+    uploadFileKySo ({commit, state}, file) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        console.log('fileInput', file)
+        let fileName = file['name']
+        let dataPost = new FormData()
+        dataPost.append('uploadfile', file, fileName)
+        axios.post('/o/rest/v2/vgca/fileupload', dataPost, config).then(function (result) {
+          let data = Object.assign(result.data, {"fileNameInput": file['name']})
+          resolve(data)
+        }).catch(xhr => {
+          reject(xhr)
         })
       })
     },

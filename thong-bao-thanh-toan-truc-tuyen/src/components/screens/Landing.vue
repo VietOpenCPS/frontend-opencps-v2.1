@@ -154,7 +154,7 @@ export default {
       if (searchParams) {
         let query = vm.parse_query_string(searchParams)
         let responseCode = query.hasOwnProperty('response_code') ? query.response_code : ''
-        responseCode = query.hasOwnProperty('responseCode') ? query.responseCode : ''
+        responseCode = !query.hasOwnProperty('response_code') && query.hasOwnProperty('responseCode') ? query.responseCode : ''
         let responseCodePayGov = query.hasOwnProperty('errorCode') ? query.errorCode : ''
         let dossierId = query.hasOwnProperty('dossierId') ? query.dossierId : ''
         let referenceUidQuery = query.hasOwnProperty('referenceUid') ? query.referenceUid : ''
@@ -194,6 +194,30 @@ export default {
           // if (vm.statusDeal) {
           //   vm.$store.dispatch('doActionPayGov', filterUpdate)
           // }
+        } else if (query.hasOwnProperty('data') && query.hasOwnProperty('responseCode') && query.hasOwnProperty('secureCode')) {
+          // phần thông báo thanh toán qua Payment Platform
+          if (responseCode === '00') {
+            vm.statusDeal = true
+          } else {
+            vm.statusDeal = false
+          }
+          let filter = {
+            data: query.data,
+            responseCode: '00',
+            transaction_id: '',
+            status: '',
+            requestCode: '',
+            errorCode: ''
+          }
+          vm.$store.dispatch('getDetailPaymentPlatform', filter).then(resultDossier => {
+            vm.dossierDetail['serviceName'] = resultDossier.dossierName
+            vm.dossierDetail['dossierNo'] = resultDossier.dossierNo
+            vm.dossierDetail['govAgencyName'] = resultDossier.govAgencyName
+            vm.dossierDetail['applicantName'] = resultDossier.applicantName
+            vm.dossierDetail['transId'] = query.transId
+            vm.dossierDetail['paymentPortal'] = 'PaymentPlatform'
+            vm.dossierDetail['paymentAmount'] = resultDossier.paymentAmount
+          })
         } else {
           if (responseCode === '00') {
             vm.statusDeal = true

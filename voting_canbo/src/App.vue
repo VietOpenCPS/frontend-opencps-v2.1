@@ -50,7 +50,8 @@
             </div>
             <div class="flex col-right sm6 md7 lg7">
               <div class="title-voting">
-                Xin vui lòng đánh giá chất lượng dịch vụ
+                <span>Xin vui lòng đánh giá chất lượng dịch vụ</span> <br>
+                <span v-if="dossierNoVoting">Hồ sơ: {{dossierNoVoting}}</span>
               </div>
               <div>
                 <div>
@@ -95,7 +96,7 @@
               <p class="text-success" style="text-align: justify">- Kết quả đánh giá của bạn đã giúp chúng tôi cải thiện, nâng cao chất lượng phục vụ và cung ứng
                 dịch vụ giải quyết thủ tục hành chính cho người dân, tổ chức, doanh nghiệp.
               </p>
-              <p class="my-2 text-success" style="text-align:center">(Có thể đánh giá sau {{countDown}} giây)</p>
+              <!-- <p class="my-2 text-success" style="text-align:center">(Có thể đánh giá sau {{countDown}} giây)</p> -->
             </v-card-text>
           </v-card>
         </v-dialog>
@@ -140,6 +141,7 @@
   }
   export default {
     data: () => ({
+      dossierNoVoting: '',
       gateName: '',
       gateNameEdit: '',
       dialogSuccess: false,
@@ -174,10 +176,6 @@
     created () {
       let vm = this
       vm.getEmployee()
-      setInterval(function () {
-        // location.reload()
-        vm.getEmployee()
-      }, 3*60*1000)
     },
     methods: {
       onResize () {
@@ -210,6 +208,9 @@
             }).catch(function (xhr) {
             })
             vm.getEmpProfile(vm.employeeInfo.employeeEmail)
+            setInterval(function () {
+              vm.getEmpData(vm.employeeInfo.employeeEmail)
+            }, 5000)
           }).catch(function () {
             window.location.href = "/c/portal/logout"
           })
@@ -256,8 +257,35 @@
         }).catch(function (xhr) {
         })
       },
+      getEmpData (email) {
+        let vm = this
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/employees/' + email + '/profile', param).then(function (response) {
+          try {
+            let data = response.data
+            let empData = data.employeeData ? JSON.parse(data.employeeData) : ''
+            if (empData.hasOwnProperty('dossier_vote') && empData.dossier_vote) {
+              vm.dossierNoVoting = empData.dossier_vote
+            } else {
+              vm.dossierNoVoting = ''
+            }
+          } catch (error) {
+            vm.dossierNoVoting = ''
+          }
+        }).catch(function (xhr) {
+          vm.dossierNoVoting = ''
+        })
+      },
       submitVoting (vote) {
         let vm = this
+        if (!vm.dossierNoVoting) {
+          toastr.error('Chưa có hồ sơ thực hiện đánh giá')
+          return;
+        }
         vm.loading = true
         let settings = {
           "url": "/o/rest/v2/votings/rateEmployee",
@@ -266,7 +294,7 @@
             "Content-Type": "application/x-www-form-urlencoded"
           },
           "data": {
-            "dossierNo": "",
+            "dossierNo": vm.dossierNoVoting,
             "govAgencyCode": vm.govAgency ? vm.govAgency.itemCode : '',
             "govAgencyName": vm.govAgency ? vm.govAgency.itemName : '',
             "employeeEmail": vm.employeeInfo ? vm.employeeInfo.employeeEmail : '',
@@ -280,16 +308,32 @@
         $.ajax(settings).done(function (response) {
           vm.loading = false
           vm.dialogSuccess = true
-          vm.countDown = 60
-          var downloadTimer = setInterval(function(){
-            if(vm.countDown <= 0){
-              clearInterval(downloadTimer)
+          // vm.countDown = 60
+          // var downloadTimer = setInterval(function(){
+          //   if(vm.countDown <= 0){
+          //     clearInterval(downloadTimer)
+          //   }
+          //   vm.countDown -= 1
+          // }, 1000)
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded'
             }
-            vm.countDown -= 1
-          }, 1000)
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('employeeData', JSON.stringify(
+            {
+              "title_vote": vm.gateNameEdit,
+              "dossier_vote": ''
+            }
+          ))
+          axios.put('/o/rest/v2/employees/' + vm.employeeInfo['classPK'] + '/employeeData', dataPost, config).then(function (result) {})
+          vm.dossierNoVoting = ''
           setTimeout (function () {
             vm.dialogSuccess = false
-          }, 60000)
+          }, 10000)
         }).fail(function () {
           vm.loading = false
         })
@@ -312,7 +356,8 @@
         let dataPost = new URLSearchParams()
         dataPost.append('employeeData', JSON.stringify(
           {
-            "title_vote": vm.gateNameEdit
+            "title_vote": vm.gateNameEdit,
+            "dossier_vote": vm.dossierNoVoting ? vm.dossierNoVoting : ''
           }
         ))
         axios.put('/o/rest/v2/employees/' + vm.employeeInfo['classPK'] + '/employeeData', dataPost, config).then(function (result) {
@@ -457,7 +502,7 @@
     border-radius: 15px;
     margin: 0 auto;
     text-transform: uppercase;
-    margin-bottom: 40px
+    margin-bottom: 20px
   }
   .col-left img {
     width: 300px;

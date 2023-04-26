@@ -138,6 +138,11 @@ export const store = new Vuex.Store({
     },
     getReportTotal ({commit, state}, year) {
       return new Promise((resolve, reject) => {
+        let groupBy = 1
+        try {
+          groupBy = groupByConfig
+        } catch (error) {
+        }
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
@@ -147,7 +152,7 @@ export const store = new Vuex.Store({
             params: {
               year: year,
               month: 0,
-              groupBy: 2,
+              groupBy: groupBy,
               groupId: window.themeDisplay.getScopeGroupId(),
               system: year == 0 ? 'allSystemTotal' : 'yearSum'
             }
@@ -163,7 +168,7 @@ export const store = new Vuex.Store({
                 month: 0,
                 domainCode: 'total',
                 govAgencyCode: 'total',
-                groupBy: 2,
+                groupBy: groupBy,
                 groupId: groupIdConfig
               }
             }
@@ -224,6 +229,11 @@ export const store = new Vuex.Store({
     },
     getAgencyReportLists ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
+        let groupBy = 1
+        try {
+          groupBy = groupByConfig
+        } catch (error) {
+        }
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
@@ -232,11 +242,11 @@ export const store = new Vuex.Store({
             },
             params: {
               year: filter.year,
-              month: !filter.hasOwnProperty('month') ? '1,2,3,4,5,6,7,8,9,10,11,12' : filter.month,
+              month: !filter.hasOwnProperty('month') && groupBy == 2 ? '1,2,3,4,5,6,7,8,9,10,11,12' : filter.month,
               // group: filter.group,
               // agency: filter['agency'],
-              groupBy: 2,
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupBy: groupBy,
+              groupId: groupIdConfig ? groupIdConfig : window.themeDisplay.getScopeGroupId()
             }
           }
           if (filter['system'] == 1) {
@@ -457,7 +467,7 @@ export const store = new Vuex.Store({
             month: filter.month,
             group: filter.group,
             agency: filter['agency'],
-            groupId: window.themeDisplay.getScopeGroupId()
+            groupId: groupIdConfig ? groupIdConfig : window.themeDisplay.getScopeGroupId()
           }
           if (filter['system'] !== 'total') {
             params['system'] = filter['system']
@@ -472,10 +482,10 @@ export const store = new Vuex.Store({
           params['govAgencyCode'] = paramm.params['agency']
           params['domainCode'] = paramm.params['domain']
           if (params['govAgencyCode'] === 'total' && params['domainCode'] === '') {
-            params['groupBy'] = 2
+            params['groupBy'] = groupByConfig ? groupByConfig : 1
           }
           if (params['govAgencyCode'] === '' && params['domainCode'] === 'total') {
-            params['groupBy'] = 2
+            params['groupBy'] = groupByConfig ? groupByConfig : 1
           }
           // 
           // 

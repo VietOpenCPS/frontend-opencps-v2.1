@@ -115,6 +115,90 @@
             </div>
           </v-flex> -->
         </v-layout>
+        <v-layout wrap class="mt-2" v-if="index && thongTinChuHoSo">
+          <v-flex xs12 md6 class="px-0 pr-3">
+            <v-autocomplete
+              :items="serviceInfoList"
+              v-model="serviceInfoSearch"
+              label="Chọn thủ tục hành chính"
+              item-text="serviceName"
+              item-value="serviceCode"
+              return-object
+              :hide-selected="true"
+              box
+              @change="changeService('search')"
+              clearable
+            ></v-autocomplete>
+          </v-flex>
+          <v-flex xs12 md6 class="px-0">
+            <v-autocomplete
+              :items="optionListSearch"
+              v-model="optionSearch"
+              label="Chọn trường hợp"
+              item-text="optionName"
+              item-value="templateNo"
+              return-object
+              :hide-selected="true"
+              box
+              clearable
+              @change="changeOptionSearch"
+            ></v-autocomplete>
+          </v-flex>
+          <v-flex xs12 sm6 class="px-0 pr-3">
+            <v-autocomplete
+              :items="fileTemplateListSearch"
+              v-model="fileTemplateNo"
+              label="Chọn loại giấy tờ"
+              item-text="partName"
+              item-value="fileTemplateNo"
+              :hide-selected="true"
+              clearable
+              @change="changeFilterSearch"
+              box
+            ></v-autocomplete>
+          </v-flex>
+          
+          <!-- <v-flex xs12 sm6 class="pr-0">
+            <v-text-field
+              label="Tìm theo mã giấy tờ"
+              v-model="fileNoSearch"
+              @keyup.enter="changeFilterSearch"
+              append-icon="search"
+              box
+              clear-icon="clear"
+              clearable
+              @click:clear="changeFilterSearch"
+              @click:append="changeFilterSearch"
+            ></v-text-field>
+          </v-flex> -->
+          <v-flex xs12 sm6 class="">
+            <v-text-field
+              label="Tìm theo mã hồ sơ"
+              v-model="dossierNoSearch"
+              @keyup.enter="changeFilterSearch"
+              append-icon="search"
+              box
+              clear-icon="clear"
+              clearable
+              @click:clear="changeFilterSearch"
+              @click:append="changeFilterSearch"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs12 sm12 class="">
+            <v-text-field
+              label="Tìm theo tên tài liệu"
+              v-model="keySearch"
+              @keyup.enter="changeFilterSearch"
+              append-icon="search"
+              box
+              clear-icon="clear"
+              clearable
+              @click:clear="changeFilterSearch"
+              @click:append="changeFilterSearch"
+            ></v-text-field>
+          </v-flex>
+        </v-layout>
+
         <v-data-table
           :headers="documentListHeader"
           :items="documentApplicantList"
@@ -231,7 +315,7 @@ import $ from 'jquery'
 import TinyPagination from '../../components/pagging/opencps_pagination'
 Vue.use(toastr)
 export default {
-  props: ['index', 'fileTemplateNoScope', 'status', 'thongTinChuHoSo'],
+  props: ['index', 'fileTemplateNoScope', 'status', 'thongTinChuHoSo', 'serverCode'],
   components: {
     'tiny-pagination': TinyPagination
   },
@@ -301,7 +385,18 @@ export default {
     documentSelect: '',
     fileNameView: '',
     srcDownload: '',
-    applicantIdNo: ''
+    applicantIdNo: '',
+    serviceInfoList: [],
+    serviceInfoSearch: '',
+    optionListSearch: [],
+    optionSearch: '',
+    fileTemplateListSearch: [],
+    fileTemplateNo: '',
+    dossierNoSearch: '',
+    ortherFileTemplate: {
+      fileTemplateNo: 'GIAY_TO_KHAC',
+      partName: 'Giấy tờ dùng chung'
+    },
   }),
   computed: {
     originality () {
@@ -325,6 +420,12 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      if (ortherFileTemplateConfig) {
+        vm.ortherFileTemplate = ortherFileTemplateConfig
+      }
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
@@ -339,7 +440,9 @@ export default {
     initData () {
       let vm = this
       vm.getApplicantDocument()
-      vm.getFileItems()
+      // vm.getFileItems()
+      vm.getServiceInfoItems()
+      vm.fileTemplateListSearch = [vm.ortherFileTemplate]
     },
     getApplicantInfos () {
       let vm = this
@@ -362,7 +465,9 @@ export default {
         status: vm.originality === 1 ? 1 : vm.status,
         keywordSearch: vm.keySearch,
         fileNoSearch: vm.fileNoSearch,
-        applicantDataType: ''
+        dossierNoSearch: vm.dossierNoSearch,
+        applicantDataType: '',
+        serverCode: vm.serverCode
       }
       vm.loadingTable = true
       if (vm.originality === 1) {
@@ -421,6 +526,89 @@ export default {
         })
       }
       
+    },
+    getServiceInfoItems () {
+      let vm = this
+      let filter = {
+      }
+      vm.$store.dispatch('getServiceInfoItems', filter).then(function (result) {
+        if (result.hasOwnProperty('data')) {
+          vm.serviceInfoList = result.data
+        } else {
+          vm.serviceInfoList = []
+        }
+        vm.optionList = []
+        vm.optionCreate = ''
+        vm.fileTemplateListSearch = [vm.ortherFileTemplate]
+        vm.fileTemplateNoCreate = ''
+      }).catch(function () {
+      })
+    },
+    changeService (type) {
+      let vm = this
+      setTimeout(function () {
+        if (vm.serviceInfoSearch) {
+          vm.optionListSearch = vm.serviceInfoSearch.options
+        } else {
+          vm.optionListSearch = []
+        }
+        vm.optionSearch = ''
+        vm.fileTemplateListSearch = []
+        vm.fileTemplateNo = ''
+        if (vm.optionListSearch && vm.optionListSearch.length === 1) {
+          vm.optionSearch = vm.optionListSearch[0]
+        }
+        // 
+        if (vm.optionSearch) {
+          let filter = {
+            dossierTemplateNo: vm.optionSearch.templateNo
+          }
+          vm.$store.dispatch('getDossierPart', filter).then(function (result) {
+            if (result.hasOwnProperty('dossierParts')) {
+              vm.fileTemplateListSearch = result.dossierParts
+              vm.fileTemplateNo = ''
+            } else {
+              vm.fileTemplateListSearch = []
+            }
+            vm.fileTemplateListSearch.push(vm.ortherFileTemplate)
+            if (result.hasOwnProperty('dossierParts') && result.dossierParts.length === 1) {
+              vm.fileTemplateNo = vm.fileTemplateListSearch[0]
+            }
+          }).catch(function () {
+            vm.fileTemplateListSearch = [vm.ortherFileTemplate]
+          })
+        } else {
+          vm.fileTemplateListSearch = [vm.ortherFileTemplate]
+          vm.fileTemplateNo = ''
+        }
+      }, 200)
+    },
+    changeOptionSearch () {
+      let vm = this
+      setTimeout (function () {
+        if (vm.optionSearch) {
+          let filter = {
+            dossierTemplateNo: vm.optionSearch.templateNo
+          }
+          vm.$store.dispatch('getDossierPart', filter).then(function (result) {
+            if (result.hasOwnProperty('dossierParts')) {
+              vm.fileTemplateListSearch = result.dossierParts
+              vm.fileTemplateNo = ''
+            } else {
+              vm.fileTemplateListSearch = []
+            }
+            vm.fileTemplateListSearch.push(vm.ortherFileTemplate)
+            if (result.hasOwnProperty('dossierParts') && result.dossierParts.length === 1) {
+              vm.fileTemplateNo = vm.fileTemplateListSearch[0]
+            }
+          }).catch(function () {
+          })
+        } else {
+          vm.fileTemplateList = []
+          vm.fileTemplateListSearch = [vm.ortherFileTemplate]
+          vm.fileTemplateNoCreate = ''
+        }
+      }, 200)
     },
     showCreatedocument () {
       let vm = this

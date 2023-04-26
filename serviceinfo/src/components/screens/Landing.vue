@@ -4,14 +4,16 @@
     <div class="list-thu-tuc" v-if="!isMobile">
       <div class="row-header no__hidden_class">
         <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
-          <span v-if="!setAgency">DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
+          <span v-if="!setAgency">
+            {{titleConfig === 'thutuc' ? 'DANH SÁCH THỦ TỤC HÀNH CHÍNH' : 'DANH SÁCH DỊCH VỤ CÔNG'}}
+          </span>
           <span v-else style="text-transform: uppercase;">THỦ TỤC HÀNH CHÍNH {{govAgencySelectedName}}</span>
         </div>
         <div class="layout row wrap header_tools row-blue">
           <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
             <v-text-field
               v-model="serviceNameKey"
-              placeholder="Tìm kiếm theo tên thủ tục, mã thủ tục ..."
+              :placeholder="titleConfig === 'thutuc' ? 'Tìm kiếm theo tên thủ tục, mã thủ tục ...' : 'Tìm kiếm theo tên dịch vụ công, mã dịch vụ công ...'"
               solo
               chips
               multiple
@@ -174,7 +176,14 @@
                 </content-placeholders>
                 <div v-else>
                   <v-btn class="mx-0 my-0 mt-1 white--text" depressed readonly small :color="getColor(props.item.maxLevel)"
-                  style="pointer-events: none;min-width: 110px;">Mức độ {{props.item.maxLevel}}</v-btn>
+                  style="pointer-events: none;min-width: 110px;">
+                    <span v-if="levelNameMapping.hasOwnProperty('2,3')">
+                      {{props.item.maxLevel == 2 || props.item.maxLevel == 3 ? levelNameMapping['2,3'] : levelNameMapping[props.item.maxLevel]}}
+                    </span>
+                    <span v-else>
+                      {{ levelNameMapping[props.item.maxLevel] }}
+                    </span>
+                  </v-btn>
                 </div>
               </td>
               <td class="text-xs-center" v-if="!setAgency && (!userLoginInfomation || !userLoginInfomation.hasOwnProperty('className') || (userLoginInfomation && userLoginInfomation.hasOwnProperty('className') &&  userLoginInfomation.className !== 'org.opencps.usermgt.model.Employee'))">
@@ -241,7 +250,7 @@
           </template>
           <template slot="no-data">
             <div class="text-xs-center mt-2">
-              Không có thủ tục nào được tìm thấy
+              {{titleConfig === 'thutuc' ? 'Không có thủ tục nào được tìm thấy' : 'Không có dịch vụ công nào được tìm thấy'}}
             </div>
           </template>
         </v-data-table>
@@ -298,7 +307,7 @@
     <div class="list-thu-tuc" v-else>
       <div class="row-header" style="background-color: #0054a6">
         <div class="ml-2 py-2 text-bold white--text"> 
-          <span v-if="!setAgency">DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
+          <span v-if="!setAgency">{{titleConfig === 'thutuc' ? 'DANH SÁCH THỦ TỤC HÀNH CHÍNH' : 'DANH SÁCH DỊCH VỤ CÔNG'}}</span>
           <span v-else style="text-transform: uppercase;">THỦ TỤC HÀNH CHÍNH {{govAgencySelectedName}}</span>
         </div>
         <div class="layout row wrap header_tools row-blue">
@@ -358,7 +367,7 @@
         <v-flex xs12 sm6 md3 class="pl-2 pr-2">
           <div style="position:relative">
             <v-text-field class="input-border input-search"
-              placeholder="Tên thủ tục, mã thủ tục..."
+              :placeholder="titleConfig === 'thutuc' ? 'Tên thủ tục, mã thủ tục...' : 'Tên dịch vụ công, mã dịch vụ công...'"
               v-model="serviceNameKey"
               @keyup.enter="filterServiceName()"
               box
@@ -374,8 +383,11 @@
       </content-placeholders>
       <div v-else class="service__info__table mt-2">
         <v-card class="">
-          <div class="px-2 py-2 text-bold white--text" style="background: #0054a6;">
+          <div class="px-2 py-2 text-bold white--text" style="background: #0054a6;" v-if="titleConfig === 'thutuc'">
             STT | Thủ tục hành chính (tổng số: {{totalThuTuc}} thủ tục)
+          </div>
+          <div v-else class="px-2 py-2 text-bold white--text" style="background: #0054a6;">
+            STT | Dịch vụ công (tổng số: {{totalThuTuc}} dịch vụ công)
           </div>
           <v-list class="py-0">
             <template v-for="(item, index) in serviceInfoList" >
@@ -386,7 +398,14 @@
                 <v-flex xs10 @click="viewDetail(item)">
                   <div style="color:#0054a6; text-align:justify;">{{item.serviceName}}</div>
                   <div> <span class="text-bold">Lĩnh vực: </span> <span>{{item.domainName}}</span> </div>
-                  <div> <span class="text-bold">Mức độ: </span> <span>{{item.maxLevel}}</span> </div>
+                  <div> 
+                    <span class="text-bold" v-if="levelNameMapping.hasOwnProperty('2,3')">
+                      {{item.maxLevel == 2 || item.maxLevel == 3 ? levelNameMapping['2,3'] : levelNameMapping[item.maxLevel]}}
+                    </span>
+                    <span class="text-bold" v-else>
+                      {{ levelNameMapping[item.maxLevel] }}
+                    </span>
+                  </div>
                 </v-flex>
                 <v-flex xs1 class="text-xs-center mt-1">
                   <v-menu :close-on-content-click="false" left style="position:relative !important;">
@@ -842,7 +861,13 @@ export default {
     useJwt: false,
     showChonDichVu: false,
     dialog_selectOption: false,
-    notAgency: false
+    notAgency: false,
+    levelNameMapping: {
+      2: 'Mức độ 2',
+      3: 'Mức độ 3',
+      4: 'Mức độ 4'
+    },
+    titleConfig: 'thutuc'
   }),
   computed: {
     govAgencyList () {
@@ -867,6 +892,49 @@ export default {
   created () {
     let vm = this
     // 
+    try {
+      vm.titleConfig = titleConfig ? titleConfig : 'thutuc'
+      if (vm.titleConfig === 'dichvucong') {
+        vm.headers = [
+          {
+            text: 'STT',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Mã dịch vụ công',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Tên dịch vụ công',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Lĩnh vực',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Mức độ',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Thao tác',
+            align: 'center',
+            sortable: false,
+            type: 'action'
+          }
+        ]
+      }
+    } catch (error) {
+    }
+    try {
+      vm.levelNameMapping = levelNameMapping
+    } catch (error) {
+    }
     try {
       vm.notAgency = notAgency
     } catch (error) {
@@ -1022,11 +1090,13 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
+      console.log('oldRoute', oldRoute)
+      console.log('newRoute', newRoute)
       if (currentQuery.hasOwnProperty('setAgency')) {
         vm.setAgency = true
       }
       vm.domainListCurrent = []
-      if ((currentQuery.hasOwnProperty('agency') && currentQuery['agency']) || vm.index) {
+      if ((currentQuery.hasOwnProperty('agency') && currentQuery['agency']) || (vm.index && vm.index !== 'thu-tuc-hanh-chinh')) {
         let filterDomain = {
           agencyCode: currentQuery['agency']
         }
@@ -1045,7 +1115,7 @@ export default {
       }
       vm.govAgencyThucHienSelected = currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') ? (!isNaN(Number(currentQuery.level)) ? Number(currentQuery.level) : currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.doLoadingThuTuc()
     },
@@ -1066,6 +1136,9 @@ export default {
           })[0]['administrationName']
         }
       })
+    },
+    domainList (val) {
+      this.domainListCurrent = val
     }
   },
   methods: {
@@ -1083,7 +1156,7 @@ export default {
       }
       vm.govAgencyThucHienSelected = currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') ? (!isNaN(Number(currentQuery.level)) ? Number(currentQuery.level) : currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       if (currentQuery.hasOwnProperty('agency')) {
         let filterDomain = {
@@ -1093,12 +1166,13 @@ export default {
           vm.domainListCurrent = result
         })
       } else {
-        let filterDomain = {
-          agencyCode: ''
-        }
-        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.domainListCurrent = result
-        })
+        // let filterDomain = {
+        //   agencyCode: ''
+        // }
+        // vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+        //   vm.domainListCurrent = result
+        // })
+        vm.domainListCurrent = vm.domainList
       }
       if (vm.userLoginInfomation && vm.userLoginInfomation.className === 'org.opencps.usermgt.model.Employee' || vm.setAgency) {
         vm.headers = vm.headers.filter(function (item) {
@@ -1760,7 +1834,7 @@ export default {
     getColor (level) {
       if (level === 2) {
         return 'green'
-      } else if (level === 3) {
+      } else if (level === 3 || level === '2,3') {
         return 'orange darken-1'
       } else if (level === 4) {
         return 'red'

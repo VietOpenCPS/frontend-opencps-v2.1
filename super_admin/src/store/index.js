@@ -531,6 +531,10 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              start: 0,
+              end: 1000
             }
           }
           axios.get(state.endPointApi + '/jobpos', param).then(function (response) {
@@ -731,6 +735,10 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              start: 0,
+              end: 1000
             }
           }
           axios.get(state.endPointApi + '/dossiertemplates', param).then(function (response) {
@@ -787,6 +795,10 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              start: 0,
+              end: 1000
             }
           }
           axios.get(state.endPointApi + '/employees', param).then(function (response) {
@@ -807,6 +819,10 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              start: 0,
+              end: 1000
             }
           }
           axios.get(state.endPointApi + '/dossiertemplates/' + template + '/parts', param).then(function (response) {
@@ -867,7 +883,10 @@ export const store = new Vuex.Store({
           let paramInput = filter.page ? {
             start: filter.page * 10 - 10,
             end: filter.page * 10
-          } : {}
+          } : {
+            start: 0,
+            end: 1000
+          }
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -1764,6 +1783,10 @@ export const store = new Vuex.Store({
               administration: data.administration ? data.administration : '',
               domain: data.domain ? data.domain : ''
             }
+          }
+          if (data.hasOwnProperty('start')) {
+            param.params['start'] = data.start
+            param.params['end'] = data.end
           }
           axios.get(state.endPointApi + '/serviceinfos', param).then(function (response) {
             let serializable = response.data

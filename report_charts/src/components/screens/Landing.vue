@@ -468,7 +468,7 @@ export default {
     chartOptionColumn: {},
     seriesChartColumn: [],
     chartDonutOptions: {
-      labels: ['Mức độ 2', 'Mức độ 3', 'Mức độ 4'],
+      labels: ['Mức độ 2', 'DVCTT một phần', 'DVCTT toàn trình'],
       colors: ['#8BC34A', '#FFC107', '#FF4560'],
       plotOptions: {
         pie: {

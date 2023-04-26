@@ -181,6 +181,12 @@ export const store = new Vuex.Store({
               service: filter.service ? filter.service : ''
             }
           }
+          if (filter.hasOwnProperty('start')) {
+            param['params'].start = filter['start']
+          }
+          if (filter.hasOwnProperty('end')) {
+            param['params'].end = filter['end']
+          }
           if (filter['bookingFrom']) {
             param['params'].bookingFrom = filter['bookingFrom']
           }

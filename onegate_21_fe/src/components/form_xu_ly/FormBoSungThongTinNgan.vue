@@ -38,6 +38,13 @@
                     :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
                     :required="(item.required === true || item.required === 'true') ? true : false"
                   ></v-text-field>
+                  <!--  -->
+                  <v-checkbox v-if="item.fieldType.indexOf('checkbox') >= 0" :value="item.value" @change = 'inputChangeCheckbox($event, item)'>
+                    <template slot="label">
+                      <div style="color: black !important">{{item.fieldLabel}}</div>
+                    </template>
+                  </v-checkbox>
+                  <!--  -->
                   <v-autocomplete v-if="validDatasourceSelect(item.fieldType) && JSON.parse(item.fieldType)['select'] && !JSON.parse(item.fieldType)['api']"
                     class="select-border"
                     :items="validDatasourceSelect(item.fieldType) ? JSON.parse(item.fieldType)['select'] : []"
@@ -435,6 +442,15 @@
         }
         console.log('formBuilder', vm.formBuilder)
       },
+      inputChangeCheckbox (event, item) {
+        let vm = this
+        if (event !== undefined && event !== null && event !== 'undefined' && event !== 'null') {
+          item.value = true
+        } else {
+          item.value = false
+        }
+        console.log('formBuilder', vm.formBuilder)
+      },
       inputChangeSelect (item, index) {
         console.log('inputChangeSelect', item, index)
         let vm = this
@@ -443,6 +459,7 @@
           vm.optionsGroup[index + 1]['value'] = ''
           vm.getDataSource(vm.optionsGroup[index + 1]['api'], index + 1, {parent: item})
         }
+        console.log('vm.optionsGroup[index]', vm.optionsGroup[index])
       },
       getDataSource (api, index, paramInput) {
         let vm = this
@@ -533,6 +550,16 @@
               let valueEdit = vm.formBuilder[key].value
               if (vm.formBuilder[key].fieldType === 'date') {
                 valueEdit = (new Date(vm.formBuilder[key].value)).getTime() ? (new Date(vm.formBuilder[key].value)).getTime() : ''
+              }
+              if (vm.formBuilder[key].fieldType === 'number') {
+                try {
+                  valueEdit = Number(vm.formBuilder[key].value)
+                } catch (error) {
+                }
+              }
+              if (vm.formBuilder[key].fieldType.indexOf('checkbox') >= 0) {
+                let valueMapping = JSON.parse(vm.formBuilder[key]['fieldType'])['checkbox']
+                valueEdit = vm.formBuilder[key].value == true ? valueMapping['checked'] : valueMapping['uncheck']
               }
               objectReturn[vm.formBuilder[key].fieldName] = valueEdit
             } else if (!vm.formBuilder[key].fieldName && vm.formBuilder[key].fieldType.indexOf('options_group') >= 0) {

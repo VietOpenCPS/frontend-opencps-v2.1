@@ -252,20 +252,20 @@
             </v-flex>
             <div class="flex primary--text mb-3">Mã tra cứu là dãy số gồm 4 ký tự được in trên giấy tiếp nhận hồ sơ và hẹn trả kết quả, mail thông báo tiếp nhận hồ sơ.</div>
             <v-flex xs12 class="text-xs-left text-xs-center mt-2">
-              <v-btn class="ml-0 mr-1 my-0 white--text" color="#0b72ba"
+              <v-btn class="ml-0 mr-1 my-0 white--text primary" color="#0b72ba"
                 :loading="loading"
                 :disabled="loading"
                 @click="submitPass"
               >
-                <v-icon>search</v-icon>&nbsp;
+                <v-icon style="color: #fff !important">search</v-icon>&nbsp;
                 Tra cứu
               </v-btn>
-              <v-btn class="ml-1 my-0 white--text" color="#0b72ba"
+              <v-btn class="ml-1 my-0 white--text red" color="#0b72ba"
                 :loading="loading"
                 :disabled="loading"
                 @click="dialogCheckPass = false"
               >
-                <v-icon>reply</v-icon>&nbsp;
+                <v-icon style="color: #fff !important">reply</v-icon>&nbsp;
                 Quay lại
               </v-btn>
             </v-flex>
@@ -356,7 +356,8 @@ export default {
     status: null,
     traCuuQlvt: false,
     hoSoQlvt: false,
-    detailQlvt: ''
+    detailQlvt: '',
+    userInfo: ''
   }),
   computed: {
     originality () {
@@ -391,6 +392,10 @@ export default {
     try {
       vm.forEPayment = forEPayment
     } catch (error) {  
+    }
+    try {
+      vm.userInfo = JSON.parse(localStorage.getItem('userInfo'))
+    } catch (error) {
     }
     vm.$nextTick(function () {
       var vm = this
@@ -456,6 +461,9 @@ export default {
         order: true
       }
       if (vm.dossierNoKey || vm.applicantIdNo) {
+        if (window.themeDisplay.isSignedIn() && !vm.applicantIdNo) {
+          filter.applicantIdNo = vm.userInfo.applicantIdNo
+        }
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.loading = false
           vm.totalDossier = result.total

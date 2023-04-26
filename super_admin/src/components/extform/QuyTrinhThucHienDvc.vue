@@ -272,8 +272,9 @@ export default {
       let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
+      let serviceConfigName = encodeURI(vm.serviceConfigName)
       vm.$router.push({
-        path: '/table/opencps_processoption/editor/0?serviceConfigId=' + vm.serviceConfigId + '&serviceConfigName=' + vm.serviceConfigName + '&col=serviceConfigId&pk=' + vm.serviceConfigId
+        path: '/table/opencps_processoption/editor/0?serviceConfigId=' + vm.serviceConfigId + '&serviceConfigName=' + serviceConfigName + '&col=serviceConfigId&pk=' + vm.serviceConfigId
       })
     },
     getserviceProcessOptionList (reset) {

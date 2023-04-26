@@ -11,7 +11,7 @@
     "axios": "^0.18.1",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "idempotent-babel-polyfill": "^7.0.0",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "toastr": "^2.1.4",
     "vue": "^2.5.9",
     "vue-router": "^3.0.1",

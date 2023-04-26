@@ -210,16 +210,6 @@
       <v-menu bottom v-if="getUser('Administrator_data')" style="position:relative !important">
         <v-btn slot="activator" color="red" dark>Go to &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
         <v-list>
-          <!-- <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_DONE'}, 0, true)" >
-            <v-list-tile-title>Hoàn thành</v-list-tile-title>
-          </v-list-tile>
-          <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_CANCEL'}, 0, true)">
-            <v-list-tile-title>Rút hồ sơ</v-list-tile-title>
-          </v-list-tile>
-          <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_DENY'}, 0, true)">
-            <v-list-tile-title>Từ chối</v-list-tile-title>
-          </v-list-tile> -->
-
           <v-list-tile v-for="(item, index) in stepCodeForGoTo" v-bind:key="index" @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_STEP', stepCode: item.stepCode, stepName: item.stepName}, 0, true)" >
             <v-list-tile-title>{{item.stepName}}</v-list-tile-title>
           </v-list-tile>
@@ -551,6 +541,73 @@
         <v-toolbar flat dark color="primary">
           <v-toolbar-title>{{itemAction.title}}{{itemAction.tiltle}}</v-toolbar-title>
           <v-spacer></v-spacer>
+          <!-- <v-btn v-if="showKySoDocument && itemAction.form === 'PRINT_01' && srcDownloadIframe" class="mr-2" color="#a82727" dark @click.native="activeKySoDocument">
+            <v-icon style="color: #fff !important">fa fa-pencil-square-o</v-icon> &nbsp;
+            Ký số giấy tờ
+          </v-btn> -->
+          <!--  -->
+          <v-menu @click.native.stop right offset-y 
+            transition="slide-x-transition" title="Ký số tài liệu đính kèm" 
+            v-if="showKySoDocument && itemAction.form === 'PRINT_01' && srcDownloadIframe">
+            <v-btn slot="activator" flat color="#a82727">
+              <v-icon size="18">fa fa-pencil-square-o</v-icon> &nbsp;
+              <span style="color: #fff !important">Ký số giấy tờ</span>
+            </v-btn>
+            <v-list>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('approved')">
+                  <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                </v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('issued')">
+                  <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
+                </v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('income')">
+                  <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                </v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('copy')">
+                  <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
+                </v-list-tile-title>
+              </v-list-tile>
+            </v-list>
+          </v-menu>
+
+          <v-menu @click.native.stop right offset-y 
+            transition="slide-x-transition" title="Ký số tài liệu đính kèm" 
+            v-if="showKySoDocument && itemAction.form === 'PRINT_01' && itemAction.document === 'DOC_01' && dossierSelect.online && srcDownloadIframe">
+            <v-btn slot="activator" flat color="#a82727">
+              <v-icon size="18">fa fa-pencil-square-o</v-icon> &nbsp;
+              <span style="color: #fff !important">Ký số và gửi NLTT</span>
+            </v-btn>
+            <v-list>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('approved', 'send')">
+                  <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                </v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('issued', 'send')">
+                  <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
+                </v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('income', 'send')">
+                  <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                </v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-title @click.stop="activeKySoDocument('copy', 'send')">
+                  <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
+                </v-list-tile-title>
+              </v-list-tile>
+            </v-list>
+          </v-menu>
+          <!--  -->
           <v-btn icon dark @click.native="dialogPDF = false">
             <v-icon>close</v-icon>
           </v-btn>
@@ -581,7 +638,8 @@
           </v-btn>
           <v-btn class="mr-3" color="primary">
             <v-icon size=16>fa fa-file-pdf-o</v-icon> &nbsp;
-            <a :href="srcDownloadIframe" download> Tải xuống file pdf</a>
+            <a v-if="fileNameDownload" id="downloadDocument" :href="srcDownloadIframe" :download="fileNameDownload"> Tải xuống file pdf</a>
+            <a v-else id="downloadDocument" :href="srcDownloadIframe" download> Tải xuống file pdf</a>
             <span slot="loader">Loading...</span>
           </v-btn>
         </v-card-actions>
@@ -958,6 +1016,7 @@ import support from '../store/support.json'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import AdvSearch from './TimKiemNangCao'
 import SelfieImageBox from './ext/SelfieImageBox.vue'
+import axios from 'axios'
 
 export default {
   props: ['index'],
@@ -971,6 +1030,8 @@ export default {
     SelfieImageBox
   },
   data: () => ({
+    showKySoDocument: false,
+    fileNameDownload: '',
     dossierSelect: '',
     xacthuc_BNG: false,
     doActionGroup: false,
@@ -1237,6 +1298,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.showKySoDocument = showKySoDocument
+    } catch (error) {
+    }
     try {
       vm.showOptionName = showOptionName
     } catch (error) {
@@ -1647,6 +1712,89 @@ export default {
     }
   },
   methods: {
+    activeKySoDocument (typeSign, action) {
+      let vm = this
+      let base64Document = vm.$store.getters.getBase64Document
+      if (base64Document) {
+        var DataURIToBlob = function(dataURI) {
+          const splitDataURI = dataURI.split(',')
+          const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
+          const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
+          const ia = new Uint8Array(byteString.length)
+          for (let i = 0; i < byteString.length; i++)
+            ia[i] = byteString.charCodeAt(i)
+          return new Blob([ia], { type: mimeString })
+        }
+
+        let fileKySo = DataURIToBlob(base64Document)
+        let config = {
+          headers: {
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        let dataPost = new FormData()
+        dataPost.append('uploadfile', fileKySo, 'fileKySo.pdf')
+        axios.post('/o/rest/v2/vgca/fileupload', dataPost, config).then(function (result) {
+          let dataUpload = JSON.parse(result.data.FileServer)
+          vm.kySoDocument(dataUpload, typeSign, action)
+        }).catch(xhr => {
+          toastr.error("Tải lên giấy tờ ký số thất bại.")
+        })
+      }
+    },
+    kySoDocument (fileSigned, typeSign, action) {
+      let vm = this
+      let prms = {}
+      prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.dossierSelect.dossierId + '/documents/' + fileSigned.fileEntryId + '/type/' + vm.dossierSelect.documentType + '/group/' + window.themeDisplay.getScopeGroupId()
+      prms['SessionId'] = ''
+      prms['FileName'] = fileSigned.url.split(".pdf")[0] + '.pdf'
+      let signFileCallBack = function (rv) {
+        let received_msg = JSON.parse(rv)
+        if (received_msg.Status === 0) {
+          toastr.success('Ký số thành công')
+          vm.dialogPDF = false
+          if (action) {
+            var initData = vm.$store.getters.loadingInitData
+            let actionUser = initData.user.userName ? initData.user.userName : ''
+            let options = {
+              headers: {
+                'groupId': window.themeDisplay.getScopeGroupId()
+              }
+            }
+            let dataPostActionDossier = new URLSearchParams()
+            dataPostActionDossier.append('actionCode', 'KSVB')
+            dataPostActionDossier.append('actionNote', '')
+            dataPostActionDossier.append('actionUser', actionUser)
+            dataPostActionDossier.append('payload', '')
+            dataPostActionDossier.append('security', '')
+            dataPostActionDossier.append('assignUsers', '')
+            dataPostActionDossier.append('payment', '{}')
+            dataPostActionDossier.append('createDossiers', '')
+            axios.post('/o/rest/v2/dossiers/' + vm.dossierSelect.dossierId +'/actions', dataPostActionDossier, options).then(function (response) {
+            })
+          }
+        } else {
+          if (received_msg.Message) {
+            toastr.clear()
+            toastr.error(received_msg.Message)
+          } else {
+            toastr.clear()
+            toastr.error('Ký số thất bại')
+          }
+        }
+      }
+      let json_prms = JSON.stringify(prms)
+      if (typeSign === 'approved') {
+        vgca_sign_approved(json_prms, signFileCallBack)
+      } else if (typeSign === 'issued') {
+        vgca_sign_issued(json_prms, signFileCallBack)
+      } else if (typeSign === 'income') {
+        vgca_sign_income(json_prms, signFileCallBack)
+      } else {
+        vgca_sign_copy(json_prms, signFileCallBack)
+      }
+    },
     toggleAll () {
       var vm = this
       /*
@@ -2489,9 +2637,19 @@ export default {
           vm.doCancel(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'PRINT_01') {
           // Xem trước phiếu của một hồ sơ
+          if (dossierItem) {
+            vm.fileNameDownload = item.title + "_" + dossierItem.dossierNo + '.pdf'
+          } else {
+            vm.fileNameDownload = item.title + '.pdf'
+          }
           vm.doPrint01(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'PRINT_02') {
           // Xem trước phiếu gộp của nhiều hồ sơ
+          if (dossierItem) {
+            vm.fileNameDownload = item.title + "_" + dossierItem.dossierNo + '.pdf'
+          } else {
+            vm.fileNameDownload = item.title + '.pdf'
+          }
           vm.doPrint02(dossierItem, item, index, isGroup)
         } else if (String(item.form) === 'PRINT_03') {
           // In văn bản mới nhất đã phê duyệt
@@ -2594,6 +2752,7 @@ export default {
     doPrint01 (dossierItem, item, index, isGroup) {
       let vm = this
       vm.dossierSelect = dossierItem
+      vm.dossierSelect['documentType'] = item.document
       vm.dialogPDFLoading = true
       vm.dialogPDF = true
       let filter = {
@@ -2606,6 +2765,13 @@ export default {
         document.getElementById('dialogPDFPreview').src = result
         vm.srcDownloadIframe = result
       }).catch(function (){})
+      // 
+      if (vm.showKySoDocument) {
+        $('html, body').animate({
+          scrollTop: $("#banner").offset().top
+        }, 1);
+      }
+      // 
     },
     exportDoc () {
       let vm = this

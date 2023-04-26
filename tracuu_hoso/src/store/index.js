@@ -59,6 +59,25 @@ export const store = new Vuex.Store({
         }
       })
     },
+    makeImageCapLogin ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId ? state.initData.groupId : '',
+            'Accept': 'application/json'
+          },
+          responseType: 'blob'
+        }
+        // var url = '/o/v1/opencps/users/login/jcaptcha'
+        var url = '/o/rest/v2/applicants/jcaptcha'
+        axios.get(url, param).then(response => {
+          var url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
     loadingDataHoSo ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -84,6 +103,58 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
+        })
+      })
+    },
+    loadingDataHoSoCaptcha ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          // let param = {
+          //   headers: {
+          //     groupId: state.initData.groupId
+          //   },
+          //   params: {
+          //     start: filter.page * 10 - 10,
+          //     end: filter.page * 10,
+          //     dossierNo: filter.dossierNo ? filter.dossierNo : ''
+          //   }
+          // }
+          // axios.get(state.endPointApi + '/dossiers/searchDossierNo', param).then(function (response) {
+          //   let serializable = response.data
+          //   resolve(serializable)
+          // }).catch(function (error) {
+          //   console.log(error)
+          //   reject(error)
+          // })
+
+          // 
+          var config = {
+            method: 'get',
+            url: state.endPointApi + '/dossiers/searchDossierNo',
+            headers: { groupId: state.initData.groupId },
+            params: {
+              start: filter.page * 10 - 10,
+              end: filter.page * 10,
+              dossierNo: filter.dossierNo ? filter.dossierNo : '',
+              j_captcha_response: filter.captcha
+            }
+          };
+
+          axios(config)
+          .then(function (response) {
+            if (response['status'] !== undefined && response['status'] === 203) {
+              toastr.clear()
+              toastr.error('Mã captcha không chính xác')
+              reject('captcha')
+            } else {
+              resolve(response.data)
+            }
+          })
+          .catch(function (error) {
+            console.log(error)
+            reject(error)
+          });
+          // 
         })
       })
     },
@@ -483,7 +554,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    toKeypayDvcqg ({commit, state}, filter) {
+    toKeypayDvcqg2 ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
@@ -498,7 +569,31 @@ export const store = new Vuex.Store({
           if (response.data && ((response.data.hasOwnProperty('error') && response.data.error == '0') || (response.data.hasOwnProperty('MaLoi') && response.data.MaLoi == '00'))) {
             resolve(response.data.UrlThanhToan)
           } else if (response.data && ((response.data.hasOwnProperty('error') && response.data.error != '0') || (response.data.hasOwnProperty('MaLoi') && response.data.MaLoi != '00'))) {
-            toastr.error(response.data.hasOwnProperty('msg') ? response.data.msg : 'Yêu cầu thực hiện thất bại')
+            // toastr.error(response.data.hasOwnProperty('msg') ? response.data.msg : 'Yêu cầu thực hiện thất bại')
+            reject(response)
+          } else {
+            reject(response)
+          }
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
+    toKeypayDvcqg ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let url = filter.key === 'kpdvcqg' ? '/o/pgi/kpdvcqg/createtransaction' : '/o/pgi/ppdvcqg/inittransaction'
+        let dataPost = new URLSearchParams()
+        dataPost.append('dossierId', filter.dossierId)
+        
+        axios.post(url, dataPost, param).then(response => {
+          if (response.data && ((response.data.hasOwnProperty('error') && response.data.error == '0') || (response.data.hasOwnProperty('MaLoi') && response.data.MaLoi == '00'))) {
+            resolve(filter.key === 'kpdvcqg' ? response.data.payment_url : response.data.UrlThanhToan)
+          } else if (response.data && ((response.data.hasOwnProperty('error') && response.data.error != '0') || (response.data.hasOwnProperty('MaLoi') && response.data.MaLoi != '00'))) {
             reject(response)
           } else {
             reject(response)

@@ -51,6 +51,69 @@
           <v-toolbar dark color="primary">
             <v-toolbar-title>{{titleDialogPdf}}</v-toolbar-title>
             <v-spacer></v-spacer>
+            
+            <v-menu @click.native.stop right offset-y 
+              transition="slide-x-transition" title="Ký số văn bản" 
+              v-if="showKySoDocument && showInVanBanKySo">
+              <v-btn slot="activator" color="indigo" style="height: 26px !important">
+                <v-icon size="16" style="color: #fff !important">fa fa-pencil-square-o</v-icon> &nbsp;
+                <span style="color: #fff !important">Ký số</span>
+              </v-btn>
+              <v-list>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('approved')">
+                    <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                  </v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('issued')">
+                    <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
+                  </v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('income')">
+                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                  </v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('copy')">
+                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
+                  </v-list-tile-title>
+                </v-list-tile>
+              </v-list>
+            </v-menu>
+
+            <v-menu @click.native.stop right offset-y 
+              transition="slide-x-transition" title="Ký số văn bản" 
+              v-if="showKySoDocument && showInVanBanKySo">
+              <v-btn class="mr-2" slot="activator" color="orange" style="height: 26px !important">
+                <v-icon size="16" style="color: #fff !important">fa fa-pencil-square-o</v-icon> &nbsp;
+                <span style="color: #fff !important">Ký số và gửi NLTT</span>
+              </v-btn>
+              <v-list>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('approved', 'send')">
+                    <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                  </v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('issued', 'send')">
+                    <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
+                  </v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('income', 'send')">
+                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                  </v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-title @click.stop="activeKySoDocument('copy', 'send')">
+                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
+                  </v-list-tile-title>
+                </v-list-tile>
+              </v-list>
+            </v-menu>
+
             <v-btn icon dark @click.native="dialogPDF = false">
               <v-icon>close</v-icon>
             </v-btn>
@@ -306,9 +369,18 @@
               <v-alert class="mx-3" v-if="!btnStateVisible" outline :color="alertObj.color" :icon="alertObj.icon" :value="true">
                 {{alertObj.message}}
               </v-alert>
-              <div v-if="!btnStateVisible && (rollbackable || printDocument || printInvoicefilePayment)" class="ml-2 py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+              <div v-if="!btnStateVisible && (rollbackable || printDocument || printInvoicefilePayment || showInVanBanKySo)" class="ml-2 py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
                 <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Thu hồi hồ sơ</v-btn>
                 <v-btn color="primary" v-if="printDocument" @click="printViewDocument()"
+                  :loading="dialogPDFLoading"
+                  :disabled="dialogPDFLoading"
+                >
+                  <v-icon>print</v-icon> &nbsp;
+                  In văn bản hành chính
+                  <span slot="loader">Loading...</span>
+                </v-btn>
+                <v-btn color="primary" v-if="!printDocument && thongTinChiTietHoSo.online && showInVanBanKySo" 
+                  @click.stop="doPrint01(thongTinChiTietHoSo, {document: 'DOC_01'})"
                   :loading="dialogPDFLoading"
                   :disabled="dialogPDFLoading"
                 >
@@ -369,11 +441,72 @@
                     <div v-for="(item, index) in documents" v-bind:key="index" style="border-bottom: 1px solid #dedede;">
                       <v-card>
                         <v-layout wrap class="pl-4 pr-2 py-1 align-center row-list-style"> 
-                          <v-flex xs11>
+                          <v-flex xs8>
                             <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
                             <div style="margin-left: 20px;">{{item.documentName}}</div>
                           </v-flex>
-                          <v-flex xs1 class="text-right">
+                          <v-flex xs4 class="text-right">
+                            <!-- <v-menu @click.native.stop right offset-y 
+                              transition="slide-x-transition" title="Ký số văn bản" 
+                              v-if="showKySoDocument">
+                              <v-btn slot="activator" color="indigo" style="height: 26px !important">
+                                <v-icon size="16" style="color: #fff !important">fa fa-pencil-square-o</v-icon> &nbsp;
+                                <span style="color: #fff !important">Ký số</span>
+                              </v-btn>
+                              <v-list>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument2(item, 'approved')">
+                                    <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument2(item, 'issued')">
+                                    <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument2(item, 'income')">
+                                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument2(item, 'copy')">
+                                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                              </v-list>
+                            </v-menu>
+
+                            <v-menu @click.native.stop right offset-y 
+                              transition="slide-x-transition" title="Ký số văn bản" 
+                              v-if="showKySoDocument">
+                              <v-btn class="mr-2" slot="activator" color="orange" style="height: 26px !important">
+                                <v-icon size="16" style="color: #fff !important">fa fa-pencil-square-o</v-icon> &nbsp;
+                                <span style="color: #fff !important">Ký số và gửi NLTT</span>
+                              </v-btn>
+                              <v-list>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument2(item, 'approved', 'send')">
+                                    <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument2(item, 'issued', 'send')">
+                                    <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument2(item, 'income', 'send')">
+                                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile>
+                                  <v-list-tile-title @click.stop="activeKySoDocument2(item, 'copy', 'send')">
+                                    <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
+                                  </v-list-tile-title>
+                                </v-list-tile>
+                              </v-list>
+                            </v-menu>                             -->
                             <v-tooltip top>
                               <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFileDocument(item)" style="height:25px;width:25px">
                                 <v-icon style="font-size: 14px;">visibility</v-icon>
@@ -541,7 +674,7 @@
             </v-btn>
           </v-tab>
           <v-tab :key="2" href="#tabs-2b" 
-            v-if="(originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || originality === 3"
+            v-if="(viewTraoDoiCanBoCongDan && originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || (originality === 3)"
           >
             <v-btn flat class="px-0 py-0 mx-0 my-0">
               TRAO ĐỔI
@@ -624,9 +757,9 @@
               </div>
             </v-tab-item>
             <v-tab-item value="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition"
-              v-if="(originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || originality === 3"
+              v-if="(viewTraoDoiCanBoCongDan && originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || (originality === 3)"
             >
-              <div v-if="thongTinChiTietHoSo.online && !thongTinChiTietHoSo.originDossierNo">
+              <div v-if="viewTraoDoiCanBoCongDan && thongTinChiTietHoSo.online && !thongTinChiTietHoSo.originDossierNo">
                 <v-expansion-panel :value="[true]" expand  class="expansion-pl">
                   <v-expansion-panel-content hide-actions :key="1">
                     <div slot="header">
@@ -835,17 +968,18 @@ import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
+// import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNewDhqg.vue'
+
 import TaiLieuChungThuc from './TiepNhan/TaiLieuChungThuc.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
 import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
 import HoSoLienThong from './HoSoLienThong.vue'
 import PhanCongLai from './form_xu_ly/PhanCongLai.vue'
 import ThongTinBuuChinh from './form_xu_ly/ThongTinGuiBuuChinh.vue'
-// import mermaid from 'mermaid'
-mermaid.initialize({
-  theme: 'forest',
-  startOnLoad: false
-})
+// mermaid.initialize({
+//   theme: 'forest',
+//   startOnLoad: false
+// })
 export default {
   props: ['index', 'id'],
   components: {
@@ -1087,6 +1221,10 @@ export default {
     messageChat: '',
     isCallBack: true,
     printDocument: false,
+    documentIdPrintAfterDoAction: '',
+    showInVanBanKySo: false,
+    doc_KySo: '',
+    documentPrint: '',
     printInvoicefilePayment: false,
     alertObj: {
       icon: 'check_circle',
@@ -1118,6 +1256,8 @@ export default {
     sendInvoice: false,
     removeInvoice: false,
     removeInvoiceGroupPayment: false,
+    showKySoDocument: false,
+    viewTraoDoiCanBoCongDan: true,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -1226,6 +1366,10 @@ export default {
   created () {
     let vm = this
     try {
+      vm.showKySoDocument = showKySoDocument
+    } catch (error) {
+    }
+    try {
       vm.votingVersion = votingVersion
     } catch (error) {
     }
@@ -1247,6 +1391,12 @@ export default {
     }
     try {
       vm.viewTienTrinhDvc = viewTienTrinhDvc
+    } catch (error) {
+    }
+    try {
+      if (traoDoiCanBoCongDan !== undefined) {
+        vm.viewTraoDoiCanBoCongDan = traoDoiCanBoCongDan
+      }
     } catch (error) {
     }
     window.toastr = toastr
@@ -1383,7 +1533,7 @@ export default {
     initData (data) {
       var vm = this
       vm.dossierId = data
-      vm.activeTab2 = 'tabs-2b'
+      vm.activeTab2 = vm.originality == 3 || (vm.originality == 1 && vm.viewTraoDoiCanBoCongDan) ? 'tabs-2b' : 'tabs-3b'
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
         if (vm.thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(vm.thongTinChiTietHoSo.dossierSyncState) === '1') {
@@ -1391,6 +1541,11 @@ export default {
           vm.reloadDetailDossier()
         } else {
           vm.activeReload = false
+        }
+        if (vm.thongTinChiTietHoSo.online && !vm.thongTinChiTietHoSo.dossierNo) {
+          vm.showInVanBanKySo = true
+        } else {
+          vm.showInVanBanKySo = false
         }
         vm.loadDetailTempalte()
         vm.loadThanhToan()
@@ -1432,6 +1587,8 @@ export default {
         }
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'new') {
           vm.activeTab2 = 'tabs-3b'
+        }
+        if (vm.activeTab2 === 'tabs-3b') {
           vm.loadDossierLogs()
         }
         if (vm.originality === 3) {
@@ -2110,6 +2267,7 @@ export default {
       let vm = this
       vm.dialogPDFLoading = true
       vm.dialogPDF = true
+      vm.doc_KySo = item.document
       let filter = {
         dossierId: dossierItem.dossierId,
         document: item.document
@@ -2120,6 +2278,13 @@ export default {
         document.getElementById('dialogPDFPreviewXl').src = result
         vm.srcDownloadIframe = result
       })
+      // 
+      if (vm.showKySoDocument) {
+        $('html, body').animate({
+          scrollTop: $("#banner").offset().top
+        }, 1);
+      }
+      // 
     },
     exportDoc () {
       let vm = this
@@ -2541,6 +2706,7 @@ export default {
             }
             if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
               vm.printDocument = true
+              vm.documentIdPrintAfterDoAction = result.dossierDocumentId
             }
             try {
               currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
@@ -2753,6 +2919,7 @@ export default {
                     }
                     if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                       vm.printDocument = true
+                      vm.documentIdPrintAfterDoAction = result.dossierDocumentId
                     }
                     if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
                       vm.printInvoicefilePayment = true
@@ -2883,6 +3050,7 @@ export default {
                         }
                         if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                           vm.printDocument = true
+                          vm.documentIdPrintAfterDoAction = result.dossierDocumentId
                         }
                         if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
                           vm.printInvoicefilePayment = true
@@ -2955,6 +3123,7 @@ export default {
                     }
                     if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                       vm.printDocument = true
+                      vm.documentIdPrintAfterDoAction = result.dossierDocumentId
                     }
                     if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
                       vm.printInvoicefilePayment = true
@@ -3033,6 +3202,7 @@ export default {
                   }
                   if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                     vm.printDocument = true
+                    vm.documentIdPrintAfterDoAction = result.dossierDocumentId
                   }
                   if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5' && !filter['payment']['groupPaymentFile']) {
                     vm.printInvoicefilePayment = true
@@ -3435,6 +3605,7 @@ export default {
     },
     viewFileDocument (item) {
       var vm = this
+      vm.doc_KySo = item.documentType
       vm.dialogPDFLoading = true
       vm.titleDialogPdf = 'Văn bản hành chính'
       vm.dialogPDF = true
@@ -3443,6 +3614,13 @@ export default {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPDFPreviewXl').src = result
       })
+      // 
+      if (vm.showKySoDocument) {
+        $('html, body').animate({
+          scrollTop: $("#banner").offset().top
+        }, 1);
+      }
+      // 
     },
     loadTPHS () {
       var vm = this
@@ -3647,8 +3825,22 @@ export default {
         vm.loadingActionProcess = false
       })
     },
+    getDocumentPrint () {
+      let vm = this
+      let filter = {
+        dossierId: vm.thongTinChiTietHoSo.dossierId
+      }
+      vm.$store.dispatch('loadDossierDocuments', filter).then(function (result) {
+        if (result && result.length) {
+          vm.doc_KySo = result.find(function (item) {
+            return item.dossierDocumentId == vm.documentIdPrintAfterDoAction
+          })['documentType']
+        }
+      })
+    },
     printViewDocument () {
       let vm = this
+      vm.getDocumentPrint()
       vm.dialogPDFLoading = true
       let filter = {
         dossierId: vm.thongTinChiTietHoSo.dossierId
@@ -3675,6 +3867,160 @@ export default {
         }, 1000)
       }
       callServer()
+      // 
+      if (vm.showKySoDocument) {
+        $('html, body').animate({
+          scrollTop: $("#banner").offset().top
+        }, 1);
+      }
+      // 
+    },
+    activeKySoDocument2 (item, typeSign, action) {
+      let vm = this
+      vm.doc_KySo = item.documentType
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId()
+        },
+        responseType: 'blob'
+      }
+      axios.get('/o/rest/v2/dossiers/' + vm.thongTinChiTietHoSo.dossierId + '/documents/' + item.referenceUid, param).then(function (response) {
+        try {
+          const blobToBase64 = blob => {
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            return new Promise(resolve => {
+              reader.onloadend = () => {
+                resolve(reader.result);
+              };
+            });
+          };
+          blobToBase64(response.data).then(res => {
+            if (res) {
+              var DataURIToBlob = function(dataURI) {
+                const splitDataURI = dataURI.split(',')
+                const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
+                const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
+                const ia = new Uint8Array(byteString.length)
+                for (let i = 0; i < byteString.length; i++)
+                  ia[i] = byteString.charCodeAt(i)
+                return new Blob([ia], { type: mimeString })
+              }
+              let fileKySo = DataURIToBlob(res)
+              let config = {
+                headers: {
+                  'groupId': window.themeDisplay.getScopeGroupId(),
+                  'Content-Type': 'multipart/form-data'
+                }
+              }
+              let dataPost = new FormData()
+              dataPost.append('uploadfile', fileKySo, 'fileKySo.pdf')
+              axios.post('/o/rest/v2/vgca/fileupload', dataPost, config).then(function (result) {
+                let dataUpload = JSON.parse(result.data.FileServer)
+                vm.kySoDocument(Object.assign(item, dataUpload), typeSign, action)
+              }).catch(xhr => {
+                toastr.error("Tải lên giấy tờ ký số thất bại.")
+              })
+            }
+          })
+        } catch (error) {
+        }
+      }).catch(function (xhr) {
+        console.log(xhr)
+      })
+    },
+    activeKySoDocument (typeSign, action) {
+      let vm = this
+      let base64Document = vm.$store.getters.getBase64Document
+      if (base64Document) {
+        var DataURIToBlob = function(dataURI) {
+          const splitDataURI = dataURI.split(',')
+          const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
+          const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
+          const ia = new Uint8Array(byteString.length)
+          for (let i = 0; i < byteString.length; i++)
+            ia[i] = byteString.charCodeAt(i)
+          return new Blob([ia], { type: mimeString })
+        }
+
+        let fileKySo = DataURIToBlob(base64Document)
+        let config = {
+          headers: {
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        let dataPost = new FormData()
+        dataPost.append('uploadfile', fileKySo, 'fileKySo.pdf')
+        axios.post('/o/rest/v2/vgca/fileupload', dataPost, config).then(function (result) {
+          let dataUpload = JSON.parse(result.data.FileServer)
+          vm.kySoDocument(dataUpload, typeSign, action)
+        }).catch(xhr => {
+          toastr.error("Tải lên giấy tờ ký số thất bại.")
+        })
+      }
+    },
+    kySoDocument (fileSigned, typeSign, action) {
+      let vm = this
+      let prms = {}
+      prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.thongTinChiTietHoSo.dossierId + '/documents/' + fileSigned.fileEntryId + '/type/' + vm.doc_KySo + '/group/' + window.themeDisplay.getScopeGroupId()
+      prms['SessionId'] = ''
+      prms['FileName'] = fileSigned.url.split(".pdf")[0] + '.pdf'
+      let signFileCallBack = function (rv) {
+        let received_msg = JSON.parse(rv)
+        if (received_msg.Status === 0) {
+          toastr.success('Ký số thành công')
+          vm.dialogPDF = false
+          if (action) {
+            var initData = vm.$store.getters.loadingInitData
+            let actionUser = initData.user.userName ? initData.user.userName : ''
+            let options = {
+              headers: {
+                'groupId': window.themeDisplay.getScopeGroupId()
+              }
+            }
+            let dataPostActionDossier = new URLSearchParams()
+            dataPostActionDossier.append('actionCode', 'KSVB')
+            dataPostActionDossier.append('actionNote', '')
+            dataPostActionDossier.append('actionUser', actionUser)
+            dataPostActionDossier.append('payload', '')
+            dataPostActionDossier.append('security', '')
+            dataPostActionDossier.append('assignUsers', '')
+            dataPostActionDossier.append('payment', '{}')
+            dataPostActionDossier.append('createDossiers', '')
+            axios.post('/o/rest/v2/dossiers/' + vm.thongTinChiTietHoSo.dossierId +'/actions', dataPostActionDossier, options).then(function (response) {
+            })
+          }
+          vm.$store.dispatch('loadDossierDocuments', vm.thongTinChiTietHoSo).then(resultDocuments => {
+            if (Array.isArray(resultDocuments)) {
+              vm.documents = resultDocuments
+            } else {
+              vm.documents.push(resultDocuments)
+            }
+            vm.documents = vm.documents.filter(function(item) {
+              return item.documentType !== 'DOC_LUU_TRU'
+            })
+          })
+        } else {
+          if (received_msg.Message) {
+            toastr.clear()
+            toastr.error(received_msg.Message)
+          } else {
+            toastr.clear()
+            toastr.error('Ký số thất bại')
+          }
+        }
+      }
+      let json_prms = JSON.stringify(prms)
+      if (typeSign === 'approved') {
+        vgca_sign_approved(json_prms, signFileCallBack)
+      } else if (typeSign === 'issued') {
+        vgca_sign_issued(json_prms, signFileCallBack)
+      } else if (typeSign === 'income') {
+        vgca_sign_income(json_prms, signFileCallBack)
+      } else {
+        vgca_sign_copy(json_prms, signFileCallBack)
+      }
     },
     printPay () {
       let vm = this

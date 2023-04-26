@@ -609,7 +609,9 @@ export default {
       let vm = this
       let data = {
         domain: domainCode ? domainCode : '',
-        administration: agencyCode ? agencyCode : ''
+        administration: agencyCode ? agencyCode : '',
+        start: 0,
+        end: 1000
       }
       vm.serviceInfoList = []
       vm.$store.dispatch('getServiceInfo', data).then(function(res) {
@@ -713,8 +715,9 @@ export default {
       let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
+      let serviceName = encodeURI(item.serviceName)
       vm.$router.push({
-        path: '/table/opencps_processoption?serviceConfigId=' + item.serviceConfigId + '&serviceConfigName=' + item.serviceName
+        path: '/table/opencps_processoption?serviceConfigId=' + item.serviceConfigId + '&serviceConfigName=' + serviceName
       })
     },
     parsedate (date) {

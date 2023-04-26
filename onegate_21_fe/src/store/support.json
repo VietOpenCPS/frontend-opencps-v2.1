@@ -101,5 +101,293 @@
             "display": false,
             "disabled": false
         }
+    ],
+    "danhmucdantoc": [
+        {
+            "TENGOI": "Kinh",
+            "MADANTOC": "1"
+        },
+        {
+            "TENGOI": "Tày",
+            "MADANTOC": "2"
+        },
+        {
+            "TENGOI": "Thái",
+            "MADANTOC": "3"
+        },
+        {
+            "TENGOI": "Hoa",
+            "MADANTOC": "4"
+        },
+        {
+            "TENGOI": "Khơ-me",
+            "MADANTOC": "5"
+        },
+        {
+            "TENGOI": "Mường",
+            "MADANTOC": "6"
+        },
+        {
+            "TENGOI": "Nùng",
+            "MADANTOC": "7"
+        },
+        {
+            "TENGOI": "HMông",
+            "MADANTOC": "8"
+        },
+        {
+            "TENGOI": "Dao",
+            "MADANTOC": "9"
+        },
+        {
+            "TENGOI": "Gia-rai",
+            "MADANTOC": "10"
+        },
+        {
+            "TENGOI": "Ngái",
+            "MADANTOC": "11"
+        },
+        {
+            "TENGOI": "Ê-đê",
+            "MADANTOC": "12"
+        },
+        {
+            "TENGOI": "Ba na",
+            "MADANTOC": "13"
+        },
+        {
+            "TENGOI": "Xơ-Đăng",
+            "MADANTOC": "14"
+        },
+        {
+            "TENGOI": "Sán Chay",
+            "MADANTOC": "15"
+        },
+        {
+            "TENGOI": "Cơ-ho",
+            "MADANTOC": "16"
+        },
+        {
+            "TENGOI": "Chăm",
+            "MADANTOC": "17"
+        },
+        {
+            "TENGOI": "Sán Dìu",
+            "MADANTOC": "18"
+        },
+        {
+            "TENGOI": "Hrê",
+            "MADANTOC": "19"
+        },
+        {
+            "TENGOI": "Mnông",
+            "MADANTOC": "20"
+        },
+        {
+            "TENGOI": "Ra-glai",
+            "MADANTOC": "21"
+        },
+        {
+            "TENGOI": "Xtiêng",
+            "MADANTOC": "22"
+        },
+        {
+            "TENGOI": "Bru-Vân Kiều",
+            "MADANTOC": "23"
+        },
+        {
+            "TENGOI": "Thổ",
+            "MADANTOC": "24"
+        },
+        {
+            "TENGOI": "Giáy",
+            "MADANTOC": "25"
+        },
+        {
+            "TENGOI": "Cơ-tu",
+            "MADANTOC": "26"
+        },
+        {
+            "TENGOI": "Gié Triêng",
+            "MADANTOC": "27"
+        },
+        {
+            "TENGOI": "Mạ",
+            "MADANTOC": "28"
+        },
+        {
+            "TENGOI": "Khơ-mú",
+            "MADANTOC": "29"
+        },
+        {
+            "TENGOI": "Co",
+            "MADANTOC": "30"
+        },
+        {
+            "TENGOI": "Tà-ôi",
+            "MADANTOC": "31"
+        },
+        {
+            "TENGOI": "Chơ-ro",
+            "MADANTOC": "32"
+        },
+        {
+            "TENGOI": "Kháng",
+            "MADANTOC": "33"
+        },
+        {
+            "TENGOI": "Xinh-mun",
+            "MADANTOC": "34"
+        },
+        {
+            "TENGOI": "Hà Nhì",
+            "MADANTOC": "35"
+        },
+        {
+            "TENGOI": "Chu ru",
+            "MADANTOC": "36"
+        },
+        {
+            "TENGOI": "Lào",
+            "MADANTOC": "37"
+        },
+        {
+            "TENGOI": "La Chí",
+            "MADANTOC": "38"
+        },
+        {
+            "TENGOI": "La Ha",
+            "MADANTOC": "39"
+        },
+        {
+            "TENGOI": "Phù Lá",
+            "MADANTOC": "40"
+        },
+        {
+            "TENGOI": "La Hủ",
+            "MADANTOC": "41"
+        },
+        {
+            "TENGOI": "Lự",
+            "MADANTOC": "42"
+        },
+        {
+            "TENGOI": "Lô Lô",
+            "MADANTOC": "43"
+        },
+        {
+            "TENGOI": "Chứt",
+            "MADANTOC": "44"
+        },
+        {
+            "TENGOI": "Mảng",
+            "MADANTOC": "45"
+        },
+        {
+            "TENGOI": "Pà Thẻn",
+            "MADANTOC": "46"
+        },
+        {
+            "TENGOI": "Co Lao",
+            "MADANTOC": "47"
+        },
+        {
+            "TENGOI": "Cống",
+            "MADANTOC": "48"
+        },
+        {
+            "TENGOI": "Bố Y",
+            "MADANTOC": "49"
+        },
+        {
+            "TENGOI": "Si La",
+            "MADANTOC": "50"
+        },
+        {
+            "TENGOI": "Pu Péo",
+            "MADANTOC": "51"
+        },
+        {
+            "TENGOI": "Brâu",
+            "MADANTOC": "52"
+        },
+        {
+            "TENGOI": "Ơ Đu",
+            "MADANTOC": "53"
+        },
+        {
+            "TENGOI": "Rơ măm",
+            "MADANTOC": "54"
+        },
+        {
+            "TENGOI": "Người nước ngoài",
+            "MADANTOC": "55"
+        },
+        {
+            "TENGOI": "Không rõ",
+            "MADANTOC": "99"
+        }
+    ],
+    "danhmuctongiao": [
+        {
+            "TONGIAO": "0",
+            "TENTONGIAO": "Không"
+        },
+        {
+            "TONGIAO": "1",
+            "TENTONGIAO": "Phật giáo"
+        },
+        {
+            "TONGIAO": "2",
+            "TENTONGIAO": "Công giáo"
+        },
+        {
+            "TONGIAO": "3",
+            "TENTONGIAO": "Phật giáo Hoà Hảo"
+        },
+        {
+            "TONGIAO": "4",
+            "TENTONGIAO": "Hồi giáo"
+        },
+        {
+            "TONGIAO": "5",
+            "TENTONGIAO": "Cao đài"
+        },
+        {
+            "TONGIAO": "6",
+            "TENTONGIAO": "Minh sư đạo"
+        },
+        {
+            "TONGIAO": "7",
+            "TENTONGIAO": "Minh lý đạo"
+        },
+        {
+            "TONGIAO": "8",
+            "TENTONGIAO": "Tin lành"
+        },
+        {
+            "TONGIAO": "9",
+            "TENTONGIAO": "Tịnh độ cư sĩ Phật hội Việt Nam"
+        },
+        {
+            "TONGIAO": "10",
+            "TENTONGIAO": "Đạo Tứ ấn hiếu nghĩa"
+        },
+        {
+            "TONGIAO": "11",
+            "TENTONGIAO": "Bửu sơn Kỳ hương"
+        },
+        {
+            "TONGIAO": "12",
+            "TENTONGIAO": "Đạo Ba Ha'i"
+        },
+        {
+            "TONGIAO": "13",
+            "TENTONGIAO": "Bà La Môn"
+        },
+        {
+            "TONGIAO": "14",
+            "TENTONGIAO": "Mặc Môn"
+        }
     ]
 }
