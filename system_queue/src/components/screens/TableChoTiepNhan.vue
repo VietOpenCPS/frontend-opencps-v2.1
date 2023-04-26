@@ -10,7 +10,8 @@
       <tr>
         <td class="text-xs-center text-bold px-0" style="">
           <div>
-            <span style="font-size:22px">{{props.index + 1}}</span>
+            <!-- <span style="font-size:22px">{{props.index + 1}}</span> -->
+            <span style="font-size:22px">{{props.item['count']}}</span>
           </div>
         </td>
         <td class="text-xs-center text-bold px-0" style="">

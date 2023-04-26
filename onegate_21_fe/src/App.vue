@@ -183,7 +183,12 @@
         vm.$store.commit('setGroupIdSite', currentQuery.groupIdSiteMng)
       }
       vm.$store.commit('setIsMobile', isMobile)
-      axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
+      let param = {
+        headers: {
+          groupId: window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : ''
+        }
+      }
+      axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId(), param).then(function(response) {
         let userData = response.data
         vm.$store.commit('setUserLogin', userData)
         if (userData.hasOwnProperty('className') && userData.className === 'org.opencps.usermgt.model.Employee') {
@@ -229,9 +234,9 @@
           }
         })
         // 
-        setInterval(function () {
-          vm.loadingCounter()
-        }, 5*60*1000)
+        // setInterval(function () {
+        //   vm.loadingCounter()
+        // }, 5*60*1000)
       })
     },
     updated () {

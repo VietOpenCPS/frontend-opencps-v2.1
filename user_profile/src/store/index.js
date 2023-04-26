@@ -123,6 +123,26 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getEmployeeInfoKeycloak ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          method: 'post',
+          url: '/o/rest/v2/qldc/lgsp',
+          headers: { 
+            'Accept': 'application/json', 
+            'Content-Type': 'application/json'
+          },
+          data: JSON.stringify(filter.data),
+          params: {}
+        }
+        axios(config).then(function (response) {
+          let serializable = response.data
+          resolve(serializable)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
     getApplicantInfo ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {

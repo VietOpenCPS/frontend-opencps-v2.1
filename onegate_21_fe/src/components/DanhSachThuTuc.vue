@@ -376,7 +376,12 @@
       hasVerify: false,
       dialogLoadingCreate: true,
       dialog_selectOption: true,
-      useJwt: false
+      useJwt: false,
+      levelNameMapping: {
+        2: 'Mức độ 2',
+        3: 'Mức độ 3',
+        4: 'Mức độ 4'
+      }
     }),
     computed: {
       currentIndex () {
@@ -394,6 +399,10 @@
     },
     created () {
       var vm = this
+      try {
+        vm.levelNameMapping = levelNameMapping
+      } catch (error) {
+      }
       try {
         vm.useJwt = useJwt
       } catch (error) {

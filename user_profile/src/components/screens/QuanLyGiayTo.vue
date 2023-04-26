@@ -133,7 +133,7 @@
                   </span>
                 </div>
               </td>
-              <td class="text-xs-center" style="height:36px;width: 190px">
+              <td class="text-xs-center" style="height:36px;width: 200px">
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -193,11 +193,10 @@
         <v-card-text class="py-1">
           <v-form ref="form" v-model="valid" lazy-validation class="px-0 grid-list">
             <v-layout row wrap class="px-0 py-3">
-              <v-flex xs12 class="pr-2">
+              <!-- <v-flex xs12 class="pr-2">
                 <v-autocomplete
                   :items="fileTemplateList"
                   v-model="fileTemplateNoCreate"
-                  label="Chọn loại tài liệu"
                   item-text="name"
                   item-value="fileTemplateNo"
                   return-object
@@ -205,18 +204,27 @@
                   box
                   :rules="[v => !!v || 'Loại tài liệu là bắt buộc']"
                   required
-                ></v-autocomplete>
-              </v-flex>
+                >
+                  <template slot="label"> 
+                    <span>Loại tài liệu</span>
+                    <span class="red--text darken-3"> (*)</span>
+                  </template>  
+                </v-autocomplete>
+              </v-flex> -->
               
               <v-flex xs12 class="">
                 <v-text-field
-                  label="Tên tài liệu"
                   v-model="fileName"
                   box
                   clearable
                   :rules="[v => !!v || 'Tên tài liệu là bắt buộc']"
                   required
-                ></v-text-field>
+                >
+                  <template slot="label"> 
+                    <span>Tên tài liệu</span>
+                    <span class="red--text darken-3"> (*)</span>
+                  </template> 
+                </v-text-field>
               </v-flex>
               <v-flex xs12 class="">
                 <v-text-field
@@ -226,7 +234,12 @@
                   clearable
                   :rules="[v => !!v || 'Mã tài liệu là bắt buộc']"
                   required
-                ></v-text-field>
+                >
+                  <template slot="label"> 
+                    <span>Mã tài liệu</span>
+                    <span class="red--text darken-3"> (*)</span>
+                  </template> 
+                </v-text-field>
               </v-flex>
 
               <v-flex xs12 class="mt-2">
@@ -384,6 +397,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.maxFileSize = maxFileSizeConfig
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
@@ -512,7 +529,7 @@ export default {
         if (vm.fileNameView) {
           vm.loadingAction = true
           let filter = {
-            fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
+            fileTemplateNo: vm.fileTemplateNoCreate ? vm.fileTemplateNoCreate.fileTemplateNo : '',
             status: 0,
             fileNo: vm.fileNo,
             fileName: vm.fileName,
@@ -568,7 +585,7 @@ export default {
       if (vm.$refs.form.validate()) {
         vm.loadingAction = true
         let filter = {
-          fileTemplateNo: vm.fileTemplateNoCreate.fileTemplateNo,
+          fileTemplateNo: vm.fileTemplateNoCreate ? vm.fileTemplateNoCreate.fileTemplateNo : '',
           fileNo: vm.fileNo,
           fileName: vm.fileName,
           applicantIdNo: vm.applicantInfos.applicantIdNo,

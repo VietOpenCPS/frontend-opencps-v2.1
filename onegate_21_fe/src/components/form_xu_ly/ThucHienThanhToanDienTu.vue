@@ -125,7 +125,7 @@
                 <v-avatar :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">
                   <v-icon size=20 style="color: #fff !important">payment</v-icon>
                 </v-avatar>
-                <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán chuyển khoản</span>
+                <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán trực tiếp, chuyển khoản</span>
               </v-chip>
 
               <v-chip class="mb-2" v-if="showPayGov" color="#3b5ab5" text-color="white"
@@ -157,7 +157,7 @@
                 <v-avatar :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">
                   <img src="/o/opencps-store/js/cli/dvc/app/image/logo-keypay.png" alt="trevor" style="background: #fff">
                 </v-avatar>
-                <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán qua Cổng DVCQG</span>
+                <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán Keypay Cổng DVCQG</span>
               </v-chip>
 
               <v-chip class="mb-2" v-if="getEPaymentProfile(paymentProfile.epaymentProfile) && getEPaymentProfile(paymentProfile.epaymentProfile).hasOwnProperty('ppkpdvcqg')" color="#cb7755" text-color="white"

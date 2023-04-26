@@ -5,7 +5,6 @@ import axios from 'axios'
 import support from './support.json'
 import $ from 'jquery'
 import saveAs from 'file-saver'
-import parseString from'xml2js'
 // 
 
 Vue.use(toastr)
@@ -19,7 +18,6 @@ export const store = new Vuex.Store({
     initData: support.initData,
     groupIdSite: '',
     endPointApi: '/o/rest/v2',
-    // endPointApi: 'http://127.0.0.1:8080/api',
     loading: false,
     loadingTable: false,
     loadingDynamicBtn: false,
@@ -153,7 +151,9 @@ export const store = new Vuex.Store({
     filterDateFromTo: ['fromReceiveDate','toReceiveDate','fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate'],
     dossierSelectedDoAction: [],
     formActionGroup: '',
-    keywordSearch: ''
+    keywordSearch: '',
+    base64Document: '',
+    formDataTphs: ''
   },
   actions: {
     clearError ({commit}) {
@@ -188,6 +188,30 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    loadDataSource ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let apiGet = filter.api
+        let settings = {
+          "url": apiGet,
+          "method": "GET",
+          "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Token': window.Liferay ? window.Liferay.authToken : ''
+          },
+          "data": {
+          }
+        };
+        
+        $.ajax(settings).done(function (response) {
+          let serializable = response
+          resolve(serializable)
+        }).fail(function (response) {
+          reject(response)
+        })
+      })
+    },
+
     getRoleUser ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let param = {
@@ -711,6 +735,11 @@ export const store = new Vuex.Store({
           if (data.dossierTemplateNo) {
             axios.get(state.initData.dossierTemplatesApi + '/' + data.dossierTemplateNo, param).then(function (response) {
               let serializable = response.data
+              let maxSizeFileUpload = ''
+              try {
+                maxSizeFileUpload = maxSizeFileUploadConfig
+              } catch (error) {
+              }
               let jsonParse = function (string) {
                 try {
                   JSON.parse(string)
@@ -718,7 +747,7 @@ export const store = new Vuex.Store({
                 } catch (e) {
                   let partTip = {
                     tip: string,
-                    maxSize: 100,
+                    maxSize: maxSizeFileUpload ? maxSizeFileUpload : 100,
                     extensions: state.fileTypeAllowDefault
                   }
                   return partTip
@@ -758,6 +787,11 @@ export const store = new Vuex.Store({
           }
           axios.get(state.initData.dossierTemplatesApi + '/' + data.dossierTemplateNo, param).then(function (response) {
             let serializable = response.data
+            let maxSizeFileUpload = ''
+            try {
+              maxSizeFileUpload = maxSizeFileUploadConfig
+            } catch (error) {
+            }
             let jsonParse = function (string) {
               try {
                 JSON.parse(string)
@@ -765,7 +799,7 @@ export const store = new Vuex.Store({
               } catch (e) {
                 let partTip = {
                   tip: string,
-                  maxSize: 100,
+                  maxSize: maxSizeFileUpload ? maxSizeFileUpload : 100,
                   extensions: state.fileTypeAllowDefault
                 }
                 return partTip
@@ -1264,15 +1298,18 @@ export const store = new Vuex.Store({
           }
         }
         axios.get(state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.referenceUid + '/confirmfile', param).then(function (response) {
+          try {
+            if (response.headers['content-disposition']) {
+              commit('setPaymentFileName', response.headers['content-disposition'].split(';')[1].split('=')[1].replace(/\"/g, ''))
+            } else {
+              commit('setPaymentFileName', 'payment_file')
+            }
+          } catch (error) {
+          }
           if (response.status === 200 || response.status === '200') {
             resolve('hasPayment')
           } else {
             resolve('')
-          }
-          if (response.headers['content-disposition']) {
-            commit('setPaymentFileName', response.headers['content-disposition'].split(';')[1].split('=')[1].replace(/\"/g, ''))
-          } else {
-            commit('setPaymentFileName', 'payment_file')
           }
         }).catch(function (xhr) {
           console.log(xhr)
@@ -1346,6 +1383,22 @@ export const store = new Vuex.Store({
           responseType: 'blob'
         }
         axios.get(state.initData.dossierApi + '/' + data.dossierId + '/documents/' + data.referenceUid, param).then(function (response) {
+          let serializable = response.data
+          try {
+            const blobToBase64 = blob => {
+              const reader = new FileReader();
+              reader.readAsDataURL(blob);
+              return new Promise(resolve => {
+                reader.onloadend = () => {
+                  resolve(reader.result);
+                };
+              });
+            };
+            blobToBase64(serializable).then(res => {
+              commit('setBase64Document', res)
+            })
+          } catch (error) {
+          }
           let url = window.URL.createObjectURL(response.data)
           resolve(url)
         }).catch(function (xhr) {
@@ -1490,10 +1543,22 @@ export const store = new Vuex.Store({
             resolve(response.data)
           }
         }).catch(function (error) {
-          reject(error)
           toastr.clear()
-          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          if (error.response) {
+            try {
+              if (error.response.data.code == 403 && error.response.data.description == 'org.opencps.dossiermgt.exception.DuplicateDossierCounterException: Duplicate DossierCounter') {
+                toastr.error('Thao tác thất bại. Vui lòng thực hiện lại trong giây lát.')
+              } else {
+                toastr.error('Yêu cầu của bạn thực hiện thất bại')
+              }
+            } catch (error) {
+              toastr.error('Yêu cầu của bạn thực hiện thất bại')
+            }
+          } else {
+            toastr.error('Yêu cầu của bạn thực hiện thất bại')
+          }
           commit('setLoading', false)
+          reject(error)
         })
       })
     },
@@ -1953,7 +2018,35 @@ export const store = new Vuex.Store({
             resolve([])
           }
         }).catch(function (xhr) {
-          console.log(xhr)
+          reject(xhr)
+        })
+      })
+    },
+    getDossierFilesApplicantsVer2Proxy ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let params = {
+          applicantIdNo: filter.applicantIdNo,
+          templateNo: filter.templateNo
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/applicantdatas/dossierpart')
+        dataPost.append('data', JSON.stringify(params))
+        if (filter.serverCode) {
+          dataPost.append('serverCode', filter.serverCode)
+        }
+        axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) { 
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
           reject(xhr)
         })
       })
@@ -2149,6 +2242,25 @@ export const store = new Vuex.Store({
         }
       })
     },
+    putFormNghiepVu ({ commit, state, dispatch }, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            groupId: state.initData.groupId,
+            cps_auth: ''
+          }
+        }
+
+        let dataPutAlpacaForm = new URLSearchParams()
+        dataPutAlpacaForm.append('formdata', JSON.stringify(data.formData))
+        let url = state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid + '/formdata'
+        axios.put(url, dataPutAlpacaForm, options).then(function (response) {
+          resolve(response.data)
+        }).catch(function (xhr) {
+          reject(data)
+        })
+      })
+    },
     putAlpacaFormCallBack ({ commit, state, dispatch }, data) {
       return new Promise((resolve, reject) => {
         let options = {
@@ -2252,6 +2364,26 @@ export const store = new Vuex.Store({
           console.log(e)
           reject(data)
         }
+      })
+    },
+    postEformNghiepVu ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        console.log('vm.thanhPhanFormUpdate3', data)
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        let dataPostEform = new FormData()
+        dataPostEform.append('formData', JSON.stringify(data.formData))
+        dataPostEform.append('file', '')
+        let url = state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.partNo
+        axios.post(url, dataPostEform, options).then(function (response) {
+          resolve(response.data)
+        }).catch(function (xhr) {
+          reject(data)
+        })
       })
     },
     postEformCallBack ({commit, state}, data) {
@@ -3252,6 +3384,21 @@ export const store = new Vuex.Store({
             if (filter.hasOwnProperty('reportType') && filter.reportType) {
               saveAs(serializable, filter.dossierId + '-' + filter.document + new Date().getTime() + '.docx')
             }
+            try {
+              const blobToBase64 = blob => {
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                return new Promise(resolve => {
+                  reader.onloadend = () => {
+                    resolve(reader.result);
+                  };
+                });
+              };
+              blobToBase64(serializable).then(res => {
+                commit('setBase64Document', res)
+              })
+            } catch (error) {
+            }
             let file = window.URL.createObjectURL(serializable)
             resolve(file)
           }).catch(function (error) {
@@ -3278,6 +3425,21 @@ export const store = new Vuex.Store({
           }
           axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/documents/print', param).then(function (response) {
             let serializable = response.data
+            try {
+              const blobToBase64 = blob => {
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                return new Promise(resolve => {
+                  reader.onloadend = () => {
+                    resolve(reader.result);
+                  };
+                });
+              };
+              blobToBase64(serializable).then(res => {
+                commit('setBase64Document', res)
+              })
+            } catch (error) {
+            }
             if (response['status'] !== undefined && response['status'] !== 200) {
               resolve('pending')
             } else {
@@ -3366,6 +3528,29 @@ export const store = new Vuex.Store({
             if (filter.hasOwnProperty('reportType') && filter.reportType) {
               saveAs(serializable, filter.document + new Date().getTime() + '.docx')
             }
+            resolve(file)
+          }).catch(function (error) {
+            console.log(error)
+            toastr.clear()
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            reject(error)
+          })
+        })
+      })
+    },
+    exportDoc ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            responseType: 'blob'
+          }
+          axios.get('/o/rest/v2/dossiers/' + filter.dossierId + '/files/' + filter.referenceUid + '/type/word' , param).then(function (response) {
+            let serializable = response.data
+            let file = window.URL.createObjectURL(serializable)
+            saveAs(serializable, String(filter.document).replace(/\ /g, '') + String(new Date().getTime()) + '.docx')
             resolve(file)
           }).catch(function (error) {
             console.log(error)
@@ -4343,8 +4528,9 @@ export const store = new Vuex.Store({
             votingCode: data.votingCode ? data.votingCode : ''
           }
           let dataPost = new URLSearchParams()
+          let id = data.votingId ? data.votingId : data.voteId
           dataPost.append('method', 'POST')
-          dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
+          dataPost.append('url', '/postal/votings/' + id + '/results')
           dataPost.append('data', JSON.stringify(textPost))
           dataPost.append('serverCode', data.serverCode)
           axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
@@ -4605,15 +4791,9 @@ export const store = new Vuex.Store({
               'Content-Type': 'application/x-www-form-urlencoded'
             }
           }
-          let data = {
-            smsNotify: filter['smsNotify'],
-            emailNotify: filter['emailNotify']
-          }
-          if (filter['optionName']) {
-            data['optionName'] = filter['optionName']
-          }
           let formData = new URLSearchParams()
-          formData.append('data', JSON.stringify(data))
+          formData.append('data', JSON.stringify(filter.data))
+          console.log('metaaaa')
           axios.put('/o/rest/v2/dossiers/' + filter['dossierId'] + '/metadata' ,formData , param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
@@ -4785,6 +4965,15 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
+          let levelName = {
+            2: 'Mức độ 2',
+            3: 'Mức độ 3',
+            4: 'Mức độ 4'
+          }
+          try {
+            levelName = levelNameMapping
+          } catch (error) {
+          }
           axios.request(config).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
@@ -4792,7 +4981,7 @@ export const store = new Vuex.Store({
                 return String(item.level) !== '2'
               })
               for (let key in dataReturn) {
-                dataReturn[key]['levelName'] = 'Mức độ ' + dataReturn[key].level
+                dataReturn[key]['levelName'] = levelName[dataReturn[key].level]
               }
               resolve(dataReturn)
             } else {
@@ -4849,7 +5038,9 @@ export const store = new Vuex.Store({
           dataPost.append('method', 'GET')
           dataPost.append('url', '/applicantdatas')
           dataPost.append('data', JSON.stringify(textPost))
-
+          if (filter.serverCode) {
+            dataPost.append('serverCode', filter.serverCode)
+          }
           axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
             if (response['data'].hasOwnProperty('data')) {
               if (Array.isArray(response['data']['data'])) {
@@ -4886,7 +5077,8 @@ export const store = new Vuex.Store({
               status: filter.status,
               keyword: filter.keywordSearch ? filter.keywordSearch : '',
               applicantDataType: filter.applicantDataType ? filter.applicantDataType : '',
-              fileNo: filter.fileNoSearch
+              fileNo: filter.fileNoSearch,
+              dossierNo: filter.dossierNoSearch
             }
           }
 
@@ -5627,14 +5819,18 @@ export const store = new Vuex.Store({
             Token: window.Liferay ? window.Liferay.authToken : ''
           }
         }
-        let url = '/o/rest/v2/userSSO/' + filter.maSoCaNhan + '/applicantIdNo'
-        axios.get(url, param).then(function (response) {
-          let serializable = response.data
-          resolve(serializable)
-        }).catch(function (error) {
-          console.log(error)
+        if (filter.maSoCaNhan) {
+          let url = '/o/rest/v2/userSSO/' + filter.maSoCaNhan + '/applicantIdNo'
+          axios.get(url, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        } else {
           reject(error)
-        })
+        }
       })
     },
     createAccountCaNhan ({commit, state}, filter) {
@@ -5826,10 +6022,196 @@ export const store = new Vuex.Store({
           reject(error)
         })
       })
+    },
+    getChiTietHoSo ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/dossiers/' + filter.dossierId, param).then(function (response) {
+          resolve(response.data)
+        })
+      })
+    },
+    sendDossierNoVoting ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('employeeData', JSON.stringify(
+          {
+            "dossier_vote": filter.dossierNo ? filter.dossierNo : ''
+          }
+        ))
+        axios.put('/o/rest/v2/employees/' + filter.employeeId + '/employeeData', dataPost, config).then(function (result) {
+        }).catch(xhr => {
+        })
+      })
+    },
+    getDanhSachToChuc ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            "groupId": window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : '',
+            "Accept": "application/json"
+          },
+          params: filter.params
+        }
+        axios.get('/o/rest/v2/tochuc', param).then(function (response) {
+          resolve(response.data)
+        }).catch(function () {
+          reject('')
+        })
+      })
+    },
+    themToChuc ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let settings = {
+          "url": '/o/rest/v2/tochuc',
+          "method": "POST",
+          "headers": {
+            "groupId": window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            "Token": window.Liferay ? window.Liferay.authToken : '',
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json"
+          },
+          "data": filter.data
+        };
+        
+        $.ajax(settings).done(function (response) {
+          resolve(response)
+        }).fail(function (err) {
+          reject(err)
+        })
+      })
+    },
+    capNhatToChuc ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let settings = {
+          "url": '/o/rest/v2/tochuc/' + filter.id,
+          "method": "PUT",
+          "headers": {
+            "groupId": window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            "Token": window.Liferay ? window.Liferay.authToken : '',
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json"
+          },
+          "data": filter.data
+        };
+        
+        $.ajax(settings).done(function (response) {
+          resolve(response)
+        }).fail(function (err) {
+          reject(err)
+        })
+      })
+    },
+    getDanhSachChuyenGia ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            'groupId': window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : '',
+            'Accept': 'application/json',
+          },
+          params: filter.params
+        }
+        axios.get('/o/rest/v2/chuyengia', param).then(function (response) {
+          resolve(response.data)
+        }).catch(function () {
+          reject('')
+        })
+      })
+    },
+    themChuyenGia ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let settings = {
+          "url": '/o/rest/v2/chuyengia',
+          "method": "POST",
+          "headers": {
+            "groupId": window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            "Token": window.Liferay ? window.Liferay.authToken : '',
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json"
+          },
+          "data": filter.data
+        };
+        
+        $.ajax(settings).done(function (response) {
+          resolve(response)
+        }).fail(function (err) {
+          reject(err)
+        })
+      })
+    },
+    capNhatChuyenGia ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let settings = {
+          "url": '/o/rest/v2/chuyengia/' + filter.id,
+          "method": "PUT",
+          "headers": {
+            "groupId": window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            "Token": window.Liferay ? window.Liferay.authToken : '',
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          "data": filter.data
+        };
+        
+        $.ajax(settings).done(function (response) {
+          resolve(response)
+        }).fail(function (err) {
+          reject(err)
+        })
+      })
+    },
+    getServiceInfoItems ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+            }
+          }
+          axios.get('/o/rest/v2/onegate/serviceconfigs/processes', param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getDossierPart ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+            }
+          }
+          axios.get('/o/rest/v2/dossiertemplates/' + filter.dossierTemplateNo, param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
     }
     // ----End---------
   },
   mutations: {
+    SET_FORM_DATA (state, payload) {
+      state.formDataTphs = payload
+    },
     setLoading (state, payload) {
       state.loading = payload
     },
@@ -6139,8 +6521,14 @@ export const store = new Vuex.Store({
     setKeywordSearch (state, payload) {
       state.keywordSearch = payload
     },
+    setBase64Document (state, payload) {
+      state.base64Document = payload
+    },
   },
   getters: {
+    getFormData (state) {
+      return state.formDataTphs
+    },
     groupIdSite (state) {
       return state.groupIdSite
     },
@@ -6369,6 +6757,9 @@ export const store = new Vuex.Store({
     },
     getKeywordSearch (state) {
       return state.keywordSearch
+    },
+    getBase64Document (state) {
+      return state.base64Document
     }
   }
 })

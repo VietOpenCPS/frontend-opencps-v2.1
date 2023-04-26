@@ -71,8 +71,8 @@
             </div> 
           </div>
           <v-card-text class="py-0 px-0" :class="!isMobile ? 'pt-4' : 'pt-2'">
-            <v-layout wrap class="custom-class">
-              <v-flex xs12 sm6 class="px-2" :class="!isMobile ? 'pb-3' : 'pb-2'">
+            <v-layout wrap class="custom-class" style="justify-content: center;">
+              <!-- <v-flex xs12 sm6 class="px-2" :class="!isMobile ? 'pb-3' : 'pb-2'">
                 <v-card color="green lighten-1" class="white--text" height="70px" style="border-radius: 4px;">
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
@@ -86,7 +86,7 @@
                     </v-flex>
                   </v-layout>
                 </v-card>
-              </v-flex>
+              </v-flex> -->
               <v-flex xs12 sm6 class="px-2" :class="!isMobile ? 'pb-3' : 'pb-2'">
                 <v-card color="orange lighten-1" class="white--text" height="70px" style="border-radius: 4px;">
                   <v-layout class="px-2" style="height:70px">
@@ -96,13 +96,13 @@
                       </v-btn>
                     </v-flex>
                     <v-flex class="xs9 pl-4 pt-2">
-                      <p><span>Thủ tục </span> <span class="text-bold">mức độ 3</span> </p>
+                      <p><span>DVC trực tuyến</span> <span class="text-bold"> một phần</span> </p>
                       <p class="text-bold" style="font-size: 1.75em">{{levelList[1]['count']}}</p>
                     </v-flex>
                   </v-layout>
                 </v-card>
               </v-flex>
-              <v-flex xs12 sm6 class="px-2" :class="!isMobile ? 'pt-2 pb-3' : 'pt-0 pb-2'">
+              <v-flex xs12 sm6 class="px-2" :class="!isMobile ? 'pt-0 pb-3' : 'pt-0 pb-2'">
                 <v-card color="red lighten-1" class="white--text" height="70px">
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
@@ -111,13 +111,13 @@
                       </v-btn>
                     </v-flex>
                     <v-flex class="xs9 pl-4 pt-2">
-                      <p><span>Thủ tục </span> <span class="text-bold">mức độ 4</span> </p>
+                      <p><span>DVC trực tuyến </span> <span class="text-bold">toàn trình</span> </p>
                       <p class="text-bold" style="font-size: 1.75em">{{levelList[2]['count']}}</p>
                     </v-flex>
                   </v-layout>
                 </v-card>
               </v-flex>
-              <v-flex xs12 sm6 class="px-2" :class="!isMobile ? 'pt-2 pb-3' : 'pt-0 pb-2'">
+              <v-flex style="max-width: 300px" class="px-2" :class="!isMobile ? 'pt-2 pb-3' : 'pt-0 pb-2'">
                 <v-card color="#00bcd5" class="white--text" height="70px">
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
@@ -613,9 +613,9 @@ export default {
     itemTotalAllYear: {},
     itemTotal: {},
     levelList: [
-      {level: 2, count: "0", levelName: 2},
-      {level: 3, count: "0", levelName: 3},
-      {level: 4, count: "0", levelName: 4}
+      {level: 2, count: 0, levelName: 2},
+      {level: 3, count: 0, levelName: 3},
+      {level: 4, count: 0, levelName: 4}
     ],
     totalTTHC: 0,
     chartView: false,
@@ -634,20 +634,7 @@ export default {
     group: '',
     onegateCount: 0,
     onlineCount: 0,
-    years: [
-      {
-        'value': '2019',
-        'name': 'Năm 2019'
-      },
-      {
-        'value': '2018',
-        'name': 'Năm 2018'
-      },
-      {
-        'value': '2017',
-        'name': 'Năm 2017'
-      }
-    ],
+    years: [],
     year: (new Date()).getFullYear() + '',
     months: [
       {
@@ -995,7 +982,7 @@ export default {
             })
           }
         } else {
-          for (let j = 0; j<=2; j++) {
+          for (let j = 0; j<=3; j++) {
             vm.years.push(
               {
                 'value': String(Number(currentYear) - j),
@@ -1005,7 +992,7 @@ export default {
           }
         }
       } catch (error) {
-        for (let i = 0; i<=2; i++) {
+        for (let i = 0; i<=3; i++) {
           vm.years.push(
             {
               'value': String(Number(currentYear) - i),
@@ -1056,11 +1043,9 @@ export default {
             let totalXXX = 0
             for (let key in result) {
               totalXXX = totalXXX + parseInt(result[key]['count'])
-              if (result[key]['level'] === 2) {
-                vm.levelList[0]['count'] = result[key]['count']
-              } else if (result[key]['level'] === 3) {
-                vm.levelList[1]['count'] = result[key]['count']
-              } else if (result[key]['level'] === 4) {
+              if (result[key]['level'] === 2 || result[key]['level'] === 3) {
+                vm.levelList[1]['count'] += Number(result[key]['count'])
+              } else {
                 vm.levelList[2]['count'] = result[key]['count']
               }
             }
@@ -1071,11 +1056,9 @@ export default {
             let totalXXX = 0
             for (let key in result) {
               totalXXX = totalXXX + parseInt(result[key]['count'])
-              if (result[key]['level'] === 2) {
-                vm.levelList[0]['count'] = result[key]['count']
-              } else if (result[key]['level'] === 3) {
-                vm.levelList[1]['count'] = result[key]['count']
-              } else if (result[key]['level'] === 4) {
+              if (result[key]['level'] === 2 || result[key]['level'] === 3) {
+                vm.levelList[1]['count'] += Number(result[key]['count'])
+              } else {
                 vm.levelList[2]['count'] = result[key]['count']
               }
             }

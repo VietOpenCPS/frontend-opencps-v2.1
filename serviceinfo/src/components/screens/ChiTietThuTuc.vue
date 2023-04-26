@@ -3,7 +3,7 @@
     <div v-if="!isMobile">
       <v-card>
         <div class="row-header">
-          <div class="background-triangle-big"> <span>THÔNG TIN THỦ TỤC HÀNH CHÍNH</span> </div>
+          <div class="background-triangle-big"> <span>{{titleConfig === 'thutuc' ? 'THÔNG TIN THỦ TỤC HÀNH CHÍNH' : 'THÔNG TIN DỊCH VỤ CÔNG'}}</span> </div>
           <div class="layout row wrap header_tools row-blue">
             <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
               <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
@@ -89,7 +89,7 @@
                         <table class="datatable table">
                           <tbody>
                             <tr>
-                              <td width="200"><span class="text-bold">Mã thủ tục</span></td>
+                              <td width="200"><span class="text-bold">{{titleConfig === 'thutuc' ? 'Mã thủ tục' : 'Mã dịch vụ công'}}</span></td>
                               <td><span>{{serviceDetail.serviceCodeDVCQG ? serviceDetail.serviceCodeDVCQG : serviceDetail.serviceCode}}</span></td>
                             </tr>
                             <tr>
@@ -97,7 +97,13 @@
                               <td>
                                 <div>
                                   <v-chip class="mx-0 my-0" small disabled label :color="getColor(serviceDetail.maxLevel)" text-color="white" style="height:px">
-                                    Mức độ {{serviceDetail.maxLevel}}
+                                    <!-- {{levelNameMapping[serviceDetail.maxLevel]}} -->
+                                    <span v-if="levelNameMapping.hasOwnProperty('2,3')">
+                                      {{serviceDetail.maxLevel == 2 || serviceDetail.maxLevel == 3 ? levelNameMapping['2,3'] : levelNameMapping[serviceDetail.maxLevel]}}
+                                    </span>
+                                    <span v-else>
+                                      {{ levelNameMapping[serviceDetail.maxLevel] }}
+                                    </span>
                                   </v-chip>
                                 </div>
                               </td>
@@ -197,7 +203,7 @@
     <div v-else>
       <v-card>
         <div class="row-header" style="background-color: #0054a6">
-          <div class="ml-2 py-2 text-bold white--text"> <span>THÔNG TIN THỦ TỤC HÀNH CHÍNH</span> </div>
+          <div class="ml-2 py-2 text-bold white--text"> <span>{{titleConfig === 'thutuc' ? 'THÔNG TIN THỦ TỤC HÀNH CHÍNH' : 'THÔNG TIN DỊCH VỤ CÔNG'}}</span> </div>
           <div class="layout row wrap header_tools row-blue">
             <div class="flex text-right" style="margin-left: auto;">
               <v-btn flat class="my-0 mx-0 btn-border-left white--text" @click="goBack" active-class="temp_active">
@@ -284,7 +290,7 @@
                         <table class="datatable table">
                           <tbody>
                             <tr>
-                              <td width="130" class="px-1"><span class="text-bold">Mã thủ tục</span></td>
+                              <td width="130" class="px-1"><span class="text-bold">{{titleConfig === 'thutuc' ? 'Mã thủ tục' : 'Mã dịch vụ công'}}</span></td>
                               <td class="px-1"><span>{{serviceDetail.serviceCodeDVCQG ? serviceDetail.serviceCodeDVCQG : serviceDetail.serviceCode}}</span></td>
                             </tr>
                             <tr>
@@ -292,7 +298,13 @@
                               <td>
                                 <div>
                                   <v-chip class="mx-0 my-0" small disabled label :color="getColor(serviceDetail.maxLevel)" text-color="white" style="height:px">
-                                    Mức độ {{serviceDetail.maxLevel}}
+                                    <!-- {{levelNameMapping[serviceDetail.maxLevel]}} -->
+                                    <span v-if="levelNameMapping.hasOwnProperty('2,3')">
+                                      {{serviceDetail.maxLevel == 2 || serviceDetail.maxLevel == 3 ? levelNameMapping['2,3'] : levelNameMapping[serviceDetail.maxLevel]}}
+                                    </span>
+                                    <span v-else>
+                                      {{ levelNameMapping[serviceDetail.maxLevel] }}
+                                    </span>
                                   </v-chip>
                                 </div>
                               </td>
@@ -719,6 +731,12 @@ export default {
     dichVuSelected: '',
     listDichVu: [],
     loadingProcess: false,
+    levelNameMapping: {
+      2: 'Mức độ 2',
+      3: 'Mức độ 3',
+      4: 'Mức độ 4'
+    },
+    titleConfig: 'thutuc'
   }),
   computed: {
     isMobile () {
@@ -731,6 +749,14 @@ export default {
   created () {
     let vm = this
     // 
+    try {
+      vm.titleConfig = titleConfig ? titleConfig : 'thutuc'
+    } catch (error) {
+    }
+    try {
+      vm.levelNameMapping = levelNameMapping
+    } catch (error) {
+    }
     try {
       vm.formToKhai = toKhaiTrucTuyen ? true : false 
     } catch (error) {
@@ -1308,7 +1334,7 @@ export default {
     getColor (level) {
       if (level === 2) {
         return 'green'
-      } else if (level === 3) {
+      } else if (level === 3 || level == '2,3') {
         return 'orange'
       } else if (level === 4) {
         return 'red'

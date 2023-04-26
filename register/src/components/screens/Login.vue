@@ -111,7 +111,7 @@
                 Đăng nhập
               </v-btn>
               <v-btn class="ml-2 my-0 white--text xacthuc-btn" color="#0b72ba"
-                v-if="showXacThucSso"
+                v-if="showXacThucSso || ssoNew"
                 @click="redirectXacThucSso"
               >
                 <v-icon>done_all</v-icon>&nbsp;
@@ -180,6 +180,7 @@ export default {
   components: {},
   data: () => ({
     xacThucSso: false,
+    ssoNew: false,
     showXacThucSso: false,
     npmreactlogin_login: '',
     npmreactlogin_password: '',
@@ -213,6 +214,10 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      vm.ssoNew = ssoNew
+    } catch (error) {
+    }
     try {
       vm.xacThucSso = xacThucSso
     } catch (error) {
@@ -280,7 +285,7 @@ export default {
     },
     redirectXacThucSso () {
       let vm = this
-      window.location.href = vm.showXacThucSso
+      window.location.href = vm.ssoNew ? vm.ssoNew : vm.showXacThucSso
     },
     makeImageCap () {
       var vm = this

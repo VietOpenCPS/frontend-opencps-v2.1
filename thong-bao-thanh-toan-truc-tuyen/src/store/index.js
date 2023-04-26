@@ -175,6 +175,25 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    getDetailPaymentPlatform ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: data
+          }
+          axios.get('/o/pgi/payment/transaction', param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
+        }).catch(function (){})
+      })
+    },
     getRoleUser ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let param = {

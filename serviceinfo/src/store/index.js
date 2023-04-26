@@ -123,12 +123,34 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
+          let levelName = {
+            2: 'Mức độ 2',
+            3: 'Mức độ 3',
+            4: 'Mức độ 4'
+          }
+          try {
+            levelName = levelNameMapping
+          } catch (error) {
+          }
           axios.get(state.endPoint + '/serviceinfos/statistics/levels', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
+              let counter23 = 0
+              let counter4 = 0
               for (let key in dataReturn) {
-                dataReturn[key]['levelName'] = 'Mức độ ' + dataReturn[key].level
+                dataReturn[key]['levelName'] = levelName[dataReturn[key].level]
+                if (dataReturn[key]['level'] == 2 || dataReturn[key]['level'] == 3) {
+                  counter23 += Number(dataReturn[key]['count'])
+                } else {
+                  counter4 = Number(dataReturn[key]['count'])
+                }
+              }
+              if (levelNameMapping.hasOwnProperty('2,3')) {
+                dataReturn = [
+                  {"level": "2,3", "count": counter23, "levelName": levelName["2,3"]},
+                  {"level": 4, "count": counter4, "levelName": levelName['4']}
+                ]
               }
               try {
                 if (sortLevelConfig !== undefined) {

@@ -618,6 +618,7 @@ import toastr from 'toastr'
 import $ from 'jquery'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
+// import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNewDhqg.vue'
 import TaiLieuChungThuc from './TiepNhan/TaiLieuChungThuc.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail2.vue'
@@ -862,7 +863,8 @@ export default {
     showCounterFee: false,
     rememberApplicant: false,
     sourcePaymentFee: {},
-    urlHistoryUpdateDvc: ''
+    urlHistoryUpdateDvc: '',
+    danhGiaCanBoTrenQuay: false
   }),
   computed: {
     loading () {
@@ -885,6 +887,9 @@ export default {
     },
     dossiersIntoGroupRender () {
       return this.$store.getters.dossierSelectedDoAction
+    },
+    userLoginInfomation () {
+      return this.$store.getters.getUserLogin
     },
     // formActionGroup () {
     //   return this.$store.getters.formActionGroup
@@ -923,6 +928,10 @@ export default {
     }
     try {
       vm.urlHistoryUpdateDvc = urlHistoryUpdateDvc
+    } catch (error) {
+    }
+    try {
+      vm.danhGiaCanBoTrenQuay = danhGiaCanBoTrenQuay
     } catch (error) {
     }
     vm.$nextTick(function () {
@@ -1344,7 +1353,7 @@ export default {
               postalWardName: dichvuchuyenphathoso.postalWardName,
               postalTelNo: dichvuchuyenphathoso.postalTelNo
             }
-            tempData['vnpostalStatus'] = dichvuchuyenphathoso.vnpostalStatus
+            tempData['vnpostalStatus'] = dichvuchuyenphathoso && dichvuchuyenphathoso.vnpostalStatus ? dichvuchuyenphathoso.vnpostalStatus : 0
             tempData['vnpostalProfile'] = vnpostal
           }
           vm.loadingAction = true
@@ -1584,6 +1593,9 @@ export default {
                 }
                 vm.loadingAction = true
                 vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+                  if (vm.danhGiaCanBoTrenQuay) {
+                    vm.sendMaHoSoDanhGia(vm.dossierId)
+                  }
                   vm.loadingAction = false
                   if (!type) {
                     vm.goBack()
@@ -2312,6 +2324,22 @@ export default {
       } catch (error) {
       }
       return metaDataOut
+    },
+    sendMaHoSoDanhGia (dossierId) {
+      let vm = this
+      setTimeout(function () {
+        let filter = {
+          dossierId: dossierId
+        }
+        vm.$store.dispatch('getChiTietHoSo', filter).then(function (result) {
+          let dossierNo = result.dossierNo
+          let filter2 = {
+            employeeId: vm.userLoginInfomation.classPK,
+            dossierNo: dossierNo
+          }
+          vm.$store.dispatch('sendDossierNoVoting', filter2).then(function (result) {})
+        })
+      }, 300)
     },
     currency (value) {
       if (value) {

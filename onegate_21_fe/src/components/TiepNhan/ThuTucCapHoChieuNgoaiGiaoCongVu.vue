@@ -1,7 +1,14 @@
 <template>
     <div class="form_vuejs">
             <v-layout wrap>
-                <v-flex xs12 class="px-2 my-2"><strong>Thông tin người nộp</strong></v-flex>
+                <v-flex xs12 class="px-2 my-2">
+                    <strong>Thông tin người nộp</strong>
+                    <v-btn class="mx-0 ml-3" color="primary" v-if="quyenTraCuuLgsp"
+                        @click.stop="showDialogSearchLgspCongDan()">
+                        <v-icon>fas fa fa-search-plus</v-icon>
+                        <span>Kiểm tra thông tin công dân</span>
+                    </v-btn>
+                </v-flex>
                 <v-flex xs12 sm6  class="px-2">
                     <label>Họ và tên<span class="red--text">*</span></label>
                     <v-text-field
@@ -1411,7 +1418,7 @@ toastr.options = {
 import Suggestions from 'v-suggestions'
 
 export default {
-    props: ['id', 'formCode'],
+    props: ['id', 'formCode', 'quyenTraCuuLgsp'],
     components:{
         'suggestions': Suggestions,
     },
@@ -2151,6 +2158,24 @@ export default {
         }
     },
     methods: {
+        showDialogSearchLgspCongDan () {
+          let vm = this
+          vm.$emit('showDialogSearchLgspCongDanEmit', 
+            {
+              applicantIdNo: vm.dossiers ? vm.dossiers.delegateIdNo : '',
+              applicantName: vm.dossiers ? vm.dossiers.delegateName : ''
+            }
+          )
+        },
+        bindDataCsdlDanCu (data) {
+          let vm = this
+          vm.dossiers.delegateIdNo = data.applicantIdNo
+          vm.dossiers.delegateName = data.applicantName
+          vm.dossiers.delegateAddress = data.address
+          vm.delegateCityCode = data.cityCode
+          vm.delegateDistrictCode = data.districtCode
+          vm.delegateWardCode = data.wardCode
+        },
         getDetail(){
             let vm = this
             let config = {
@@ -3093,11 +3118,11 @@ export default {
             
             let giaLePhiMoi = 200000
             if(vm.serviceCode === 'BNG-270820'){
-                giaLePhiMoi = 80000
+                giaLePhiMoi = 100000
             }
             let lp_moi = (hcng_moi + hccv_moi)*giaLePhiMoi;
             let lp_gia_han = hc_gh * 100000;
-            let lp_hong = (hc_hong + hc_mat) * 400000;
+            let lp_hong = (hc_hong + hc_mat) * 200000;
             // let lp_schengen = so_nuoc * so_schengen * 10000 * vm.cong_ham_so_nguoi;
             // let lp_nhap = so_nuoc * so_nhap_canh * 10000 * vm.cong_ham_so_nguoi;
             // let lp_qua = so_nuoc * so_qua_canh * 10000 * vm.cong_ham_so_nguoi;
@@ -3111,9 +3136,9 @@ export default {
             let le_phi = lp_moi + lp_gia_han + lp_hong + lp_schengen + lp_nhap + lp_qua;
             
             let file_payment2 = new Array();
-            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 80000 : 200000, 'thanh_tien': lp_moi};
+            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu cấp mới', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hcng_moi + hccv_moi), 'trang_thai': 1, 'don_gia': vm.serviceCode === 'BNG-270820' ? 100000 : 200000, 'thanh_tien': lp_moi};
             file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Gia hạn hộ chiếu ngoại giao, hộ chiếu công vụ', 'partName': 'Hộ chiếu gia hạn', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': hc_gh, 'trang_thai': 1, 'don_gia': 100000, 'thanh_tien': lp_gia_han};
-            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 400000, 'thanh_tien': lp_hong};
+            file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp hộ chiếu ngoại giao, hộ chiếu công vụ (mất, hỏng)', 'partName': 'Hộ chiếu hỏng', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': (hc_hong + hc_mat), 'trang_thai': 1, 'don_gia': 200000, 'thanh_tien': lp_hong};
             file_payment2[file_payment2.length] = {'partNo': '','serviceName': 'Cấp công hàm đề nghị cấp thị thực', 'partName': 'Công hàm', 'fileMark': '-1', 'fileMarkName': '', 'recordCount': so_cong_ham, 'trang_thai': 1, 'don_gia': 10000, 'thanh_tien': lp_cong_ham};
 
             // if(lp_moi > 0)

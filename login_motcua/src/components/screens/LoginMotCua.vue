@@ -3,10 +3,12 @@
     <div class="header_login">
       <div class="logo"> 
         <a href=""> 
-          <img src="/o/kiemthuduongbo-theme/images/color_schemes/bogt-theme/logo.png"> 
+          <!-- <img src="/o/kiemthuduongbo-theme/images/color_schemes/bogt-theme/logo.png">  -->
+          <img src="/o/hethongxulynghiepvu-theme/images/color_schemes/bogt-theme/logo_login.png">
+          
+          <!-- <img src="o/bongoaigiao-theme/images/logo-login-motcua.png"> -->
           <div class="text-logo">
-            Bộ Giao thông Vận tải <br> 
-            <span>Hệ thống nghiệp vụ xử lý thủ tục hành chính</span>
+            
           </div> 
         </a> 
       </div>
@@ -184,7 +186,7 @@ export default {
       $('body').addClass('body_login')
       let current = vm.$router.history.current
       let currentQuery = current.query
-      vm.checkShowXacThucSso()
+      // vm.checkShowXacThucSso()
     })
   },
   updated () {

@@ -32,16 +32,16 @@
                 hide-details="auto"
               ></v-text-field>
             </v-flex>
-            <v-flex xs12 class="py-0 mb-2 pr-3" v-if="quyenTraCuuLgsp == 1 || quyenTraCuuLgsp == 2">
+            <v-flex xs12 class="py-0 mb-2 pr-3" v-if="quyenTraCuuLgsp">
               <v-btn
                 class="mx-0 mr-2"
                 small
                 color="primary"
-                @click="checkCsdldc()"
+                @click="showTraCuuCsdldc()"
                 :loading="loadingSearchLgsp" :disabled="loadingSearchLgsp"
               >
                 <v-icon size="18">check</v-icon>&nbsp;
-                <span>Kiểm tra thông tin CSDL dân cư</span>
+                <span>Tra cứu thông tin CSDL dân cư</span>
               </v-btn>
             </v-flex>
             <v-flex xs12 md6 class="py-0 mb-2 pr-3">
@@ -344,7 +344,7 @@
         </v-layout>
       </v-form>
       <!--  -->
-      <v-dialog v-model="dialog_searchLgsp" scrollable persistent max-width="700px">
+      <!-- <v-dialog v-model="dialog_searchLgsp" scrollable persistent max-width="700px">
         <v-card>
           <v-toolbar dark color="primary">
             <v-toolbar-title>Thông tin công dân trên CSDL Quốc gia</v-toolbar-title>
@@ -410,6 +410,40 @@
             </div>
           </v-card-text>
         </v-card>
+      </v-dialog> -->
+      <!--  -->
+      <v-dialog v-model="dialog_searchLgsp" scrollable persistent max-width="1000px">
+        <v-card>
+          <v-toolbar dark color="primary">
+            <v-toolbar-title>Tra cứu thông tin công dân trên CSDL dân cư</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon dark @click.native="dialog_searchLgsp = false">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-card-text class="py-1 pt-3" style="min-height: 200px;">
+            <form-tra-cuu ref="tracuudancu" :employeeEmail="staffEmail" :hoVaTen="thongTinCongDan.hoVaTen" :maSoCaNhan="thongTinCongDan.maSoCaNhan" :ngaySinh="ngaySinhCreate"></form-tra-cuu>
+            <!-- <v-flex xs12 class="text-right my-2">
+              <v-btn color="primary"
+                @click="addApplicantLgsp"
+                class="mx-0 my-0 mr-2"
+                v-if="applicantLgspInfomation"
+              >
+                <v-icon size="20">save_alt</v-icon>
+                &nbsp;
+                Lấy thông tin
+              </v-btn>
+              <v-btn color="primary"
+                @click="dialog_searchLgsp = false"
+                class="mx-0 my-0 white--text"
+              >
+                <v-icon size="20" class="white--text">clear</v-icon>
+                &nbsp;
+                Đóng
+              </v-btn>
+            </v-flex> -->
+          </v-card-text>
+        </v-card>
       </v-dialog>
     </div>
 </template>
@@ -418,9 +452,7 @@
 import Vue from 'vue'
 import toastr from 'toastr'
 import axios from 'axios'
-import VueConfirmDialog from 'vue-confirm-dialog'
-Vue.use(VueConfirmDialog)
-Vue.component('vue-confirm-dialog', VueConfirmDialog.default)
+import FormTraCuu from './TraCuuCsdlDanCu.vue'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000',
@@ -428,9 +460,13 @@ toastr.options = {
 }
 export default {
     props: ["id"],
+    components: {
+      'form-tra-cuu': FormTraCuu
+    },
     data() {
       return {
         applicantLgspInfomation: '',
+        staffEmail: '',
         quyenTraCuuLgsp: false,
         userLoginInfomation: '',
         loadingSearchLgsp: false,
@@ -628,12 +664,13 @@ export default {
       let url = '/o/rest/v2/qldc/role/employee'
       axios.get(url, param).then(function (response) {
         let serializable = response.data
-        vm.quyenTraCuuLgsp = serializable.hasOwnProperty('status') ? serializable.status : ''
+        vm.quyenTraCuuLgsp = serializable.hasOwnProperty('serviceCode') && serializable.serviceCode ? true : false
       }).catch(function () {
-        vm.quyenTraCuuLgsp = ''
+        vm.quyenTraCuuLgsp = false
       })
       axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId(), param).then(function(response) {
         vm.userLoginInfomation = response.data
+        vm.staffEmail = vm.userLoginInfomation.employeeEmail
       })
       .catch(function(error) {
       })
@@ -669,6 +706,13 @@ export default {
       }
     },
     methods: {
+      showTraCuuCsdldc () {
+        let vm = this
+        vm.dialog_searchLgsp = true
+        setTimeout(function () {
+          vm.$refs.tracuudancu.initData()
+        }, 100)
+      },
       checkCsdldc () {
         let vm = this
         if (String(vm.thongTinCongDan.maSoCaNhan).trim() && String(vm.thongTinCongDan.hoVaTen).trim() && String(vm.ngaySinhCreate).trim()) {

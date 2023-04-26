@@ -418,7 +418,7 @@ export const store = new Vuex.Store({
           "MaYeuCau" : (new Date()).getTime(),
           "MaTichHop" : "037",
           "StaffEmail" : filter.StaffEmail,
-          "GovAgencyCode": 'SLDTBXH',
+          "GovAgencyCode": filter.GovAgencyCode,
           "MaDVC" : "",
           "HoVaTen" : filter.applicantName,
           "type" : "TraCuuThongTinCongDan",
@@ -529,6 +529,25 @@ export const store = new Vuex.Store({
         }).catch(xhr => {
           reject('')
         })
+      })
+    },
+    loadDictItems ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+              parent: data.parent
+            }
+          }
+          axios.get('/o/rest/v2/dictcollections/' + data.collectionCode + '/dictitems', param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
       })
     },
   },

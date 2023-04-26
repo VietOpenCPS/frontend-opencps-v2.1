@@ -386,7 +386,9 @@ export default {
       let vm = this
       let data = {
         domain: domainCode ? domainCode : '',
-        administration: agencyCode ? agencyCode : ''
+        administration: agencyCode ? agencyCode : '',
+        start: 0,
+        end: 1000
       }
       vm.serviceInfoList = []
       vm.$store.dispatch('getServiceInfo', data).then(function(res) {

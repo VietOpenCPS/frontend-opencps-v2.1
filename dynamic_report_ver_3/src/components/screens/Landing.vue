@@ -230,7 +230,8 @@
                   <span>STT</span>
                 </th>
                 <th rowspan="2" class="text-center px-2 py-2" style="border: 1px solid #b5b5b5;">
-                  <span>Tên cán bộ</span>
+                  <span v-if="groupDanhGiaTheoDonVi">Tên đơn vị</span>
+                  <span v-if="groupDanhGiaTheoCanBo">Tên cán bộ</span>
                 </th>
                 <th width="80" rowspan="2" class="text-center px-2 py-2" style="border: 1px solid #b5b5b5;">
                   <span>Số lượt đánh giá</span>
@@ -258,10 +259,10 @@
               </content-placeholders>
             </tbody>
             <tbody v-if="!loadingTable && dataTableVottingList.length > 0">
-              <tr v-for="(item,index) in dataTableVottingList" :key="index">
+              <tr v-for="(item,index) in dataTableVottingList" :key="index" v-if="item.govAgencyName || item.employeeName">
                 <td align="center" class="px-2 py-2" style="border: 1px solid #b5b5b5;">{{index + 1}}</td>
                 <td align="left" class="px-2 py-2" style="padding: 8px 10px;border: 1px solid #b5b5b5;">
-                  {{item.employeeName}}
+                  {{groupDanhGiaTheoDonVi ? item.govAgencyName : item.employeeName}}
                 </td>
                 <td align="center" class="px-2 py-2" style="padding: 8px 10px;border: 1px solid #b5b5b5;">
                   <a class="chitiet" v-if="item.sumCount" title="Xem chi tiết" href="javascript:;" @click.stop="viewChiTietDanhGia(item, '3,2,1')">{{item.sumCount}}</a>
@@ -799,7 +800,9 @@ export default {
     loadingGetDossier: false,
     hasVoting: [],
     showTableVoting: false,
-    govCodeSelected: ''
+    govCodeSelected: '',
+    groupDanhGiaTheoDonVi: false,
+    groupDanhGiaTheoCanBo: false
   }),
   computed: {
     itemsReports () {
@@ -974,6 +977,16 @@ export default {
           } else {
             vm.groupIdList = []
           }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupDanhGiaTheoDonVi')) {
+            vm.groupDanhGiaTheoDonVi = true
+          } else {
+            vm.groupDanhGiaTheoDonVi = false
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupDanhGiaTheoCanBo')) {
+            vm.groupDanhGiaTheoCanBo = true
+          } else {
+            vm.groupDanhGiaTheoCanBo = false
+          }
           // 
           for (let key in vm.filters) {
             if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
@@ -990,6 +1003,10 @@ export default {
             if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
               vm.filters[key]['groupId'] = vm.govAgency && !isNaN(Number(vm.govAgency)) ? vm.govAgency : window.themeDisplay.getScopeGroupId()
               if (!vm.filters[key]['source'] || vm.filters[key]['source'].length === 0) {
+                try {
+                  vm.filters[key]['code'] = vm.govAgencyCodeCurrentSite
+                } catch (error) {
+                }
                 vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
                   vm.filters[key]['source'] = result
                   if (vm.filters[key]['appendItem']) {
@@ -1026,7 +1043,6 @@ export default {
         if (query.hasOwnProperty('doreport')) {
           vm.doCreateReport(false)
         }
-        // 
         // voting
         if (currentQuery.hasOwnProperty('employeeEmail')) {
           vm.changeGovAgency()
@@ -1039,7 +1055,6 @@ export default {
             vm.doCreateReport(false)
           }, 300)
         }
-        // 
         // 
       }, 1000)
     })
@@ -1085,6 +1100,16 @@ export default {
         vm.noHeader = true
       }
       // 
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupDanhGiaTheoDonVi')) {
+        vm.groupDanhGiaTheoDonVi = true
+      } else {
+        vm.groupDanhGiaTheoDonVi = false
+      }
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupDanhGiaTheoCanBo')) {
+        vm.groupDanhGiaTheoCanBo = true
+      } else {
+        vm.groupDanhGiaTheoCanBo = false
+      }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
         vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
         let defaultValGroup = vm.groupBy[0]['key']
@@ -1180,6 +1205,10 @@ export default {
         if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
           vm.filters[key]['groupId'] = vm.govAgency && !isNaN(Number(vm.govAgency)) ? vm.govAgency : window.themeDisplay.getScopeGroupId()
           if (!vm.filters[key]['source'] || vm.filters[key]['source'].length === 0) {
+            try {
+              vm.filters[key]['code'] = vm.govAgencyCodeCurrentSite
+            } catch (error) {
+            }
             vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
               vm.filters[key]['source'] = result
               if (vm.filters[key]['appendItem']) {
@@ -1901,7 +1930,7 @@ export default {
                 if (vm.doExportExcel && !vm.doExportWord) {
                   vm.$store.dispatch('getExcelReportFromServer', {
                     data: docDString,
-                    fileName: 'baocaothongke' + '.xls'
+                    fileName: 'baocaothongke' + '.xlsx'
                   })
                 }
                 if (vm.doExportWord) {
@@ -2186,7 +2215,7 @@ export default {
                 if (vm.doExportExcel && !vm.doExportWord) {
                   vm.$store.dispatch('getExcelReportFromServer', {
                     data: docDString,
-                    fileName: 'baocaothongke' + '.xls'
+                    fileName: 'baocaothongke' + '.xlsx'
                   })
                 }
                 if (vm.doExportWord) {
@@ -2360,7 +2389,7 @@ export default {
             console.log('codeGovAgency123', codeGovAgency)
             filter.data.listGov = codeGovAgency ? codeGovAgency : ''
           } else {
-            filter.data.listGov = ""
+            filter.data.listGov = vm.govAgencyCodeCurrentSite
           }
         }
       } catch (error) {
@@ -2538,6 +2567,7 @@ export default {
           let dataToExportCSV = []
           console.log('resultData3333', resultData)
           for (let key in resultData) {
+            console.log('key3333', key, resultData[key] )
             let dataInput = resultData[key]            
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
                 (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0')) {
@@ -2569,8 +2599,11 @@ export default {
                   } else {
                     dataText = Math.round(eval(currentConfig['calculator']))
                   }
+                  console.log('dataText0', dataText)
                 } else {
                   // console.log('resultData[key]', resultData[key], currentConfig['value'] )
+                  // console.log('resultData[key][currentConfig[value]]', resultData[key][currentConfig['value']] )
+                  // console.log('preff', preff)
                   if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                     if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
                       dataText =  ' - ' + resultData[key][currentConfig['subValue']] + ' '
@@ -2578,12 +2611,14 @@ export default {
                       dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
                     }
                   }
+                  // console.log('dataText1', dataText)
                 }
                 let alignmentConfig = 'center'
                 if (currentConfig.hasOwnProperty('align')) {
                   alignmentConfig = currentConfig['align']
                 }
                 dataToExportCSVItem.push(dataText)
+                // console.log('dataText123123123', dataText)
                 dataRow.push({
                   text: currentConfig['value'] === 'note' || currentConfig.hasOwnProperty('notSum') ? ' ' : (dataText === ' ' ? ' 0 ' : dataText), 
                   alignment: alignmentConfig,
@@ -2611,7 +2646,7 @@ export default {
               } else {
                 index = index + 1
               }
-              
+              // console.log('dataRow123123123', dataRow)
               vm.dataRowRenderHtmlTable.push(dataRow)
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
               vm.dataReportXX += JSON.stringify(dataRow) + ','
@@ -2739,7 +2774,7 @@ export default {
               if (vm.doExportExcel && !vm.doExportWord) {
                 vm.$store.dispatch('getExcelReportFromServer', {
                   data: docDString,
-                  fileName: new Date().getTime() + '.xls'
+                  fileName: new Date().getTime() + '.xlsx'
                 })
               }
               if (vm.doExportWord) {
@@ -3109,7 +3144,7 @@ export default {
           type: 'data:application/vnd.ms-excel;charset=utf-8;',
         })
         // window.location.href = "data:application/vnd.ms-excel;charset=UTF-8,%EF%BB%BF" + encodeURIComponent(tab_text)
-        FileSaver.saveAs(blob, new Date().getTime() + ".xls");
+        FileSaver.saveAs(blob, new Date().getTime() + ".xlsx");
       })
     },
     goToThongKe () {
@@ -3178,7 +3213,7 @@ export default {
         data: vm.data,
         api: vm.api,
         proxyApi: vm.proxyApi,
-        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xls'
+        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xlsx'
       }
       if (n) {
         filter.start = vm.sttQuyen * counterPage - counterPage
@@ -3214,7 +3249,7 @@ export default {
         data: vm.data,
         api: vm.api,
         proxyApi: vm.proxyApi,
-        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xls'
+        fileName: vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xlsx'
       }
       for (let key in vm.filterGroup) {
         if(key === vm.groupIdListSelected) {
@@ -3235,7 +3270,7 @@ export default {
       vm.$store.dispatch('getExcelReportFromServer', {
         groupId: vm.govAgency && !isNaN(Number(vm.govAgency)) ? vm.govAgency : window.themeDisplay.getScopeGroupId(),
         data: vm.dataExportExcel,
-        fileName: 'baocaothongke' + '.xls'
+        fileName: 'baocaothongke' + '.xlsx'
       })
     },
     changeGroupIdList(item){
@@ -3535,6 +3570,20 @@ export default {
         formatDate: "timestamp",
         govAgency: vm.govAgency
       }
+      if (vm.groupDanhGiaTheoDonVi) {
+        filter = {
+          agencyLists: agencyLists,
+          api: "/o/rest/v2/votings/reportVE?type=2",
+          data: {
+            fromDate: vm.data['fromDate'],
+            listGov: item.govAgencyCode,
+            toDate: vm.data['toDate']
+          },
+          document: "STATISTIC_98_VER_3",
+          formatDate: "timestamp",
+          govAgency: item.govAgencyCode
+        }
+      }
       if (filter['govAgency']) {
         for (let key in agencyLists) {
           if (String(agencyLists[key]['value']) === String(filter['govAgency'])) {
@@ -3567,7 +3616,7 @@ export default {
           }
         }
 
-        if (filter.api.indexOf('/o/rest/v2/votings/reportVE') >= 0) {
+        if (filter.api.indexOf('/o/rest/v2/votings/reportVE') >= 0 && !filter.data.listGov) {
           if (filter.data['listGroupId']) {
             let codeGovAgency = filter.agencyLists.filter(function (item) {
               return item.value == filter.data['listGroupId']
@@ -3575,7 +3624,7 @@ export default {
             console.log('codeGovAgency123', codeGovAgency)
             filter.data.listGov = codeGovAgency ? codeGovAgency : ''
           } else {
-            filter.data.listGov = ""
+            filter.data.listGov = vm.govAgencyCodeCurrentSite
           }
         }
       } catch (error) {

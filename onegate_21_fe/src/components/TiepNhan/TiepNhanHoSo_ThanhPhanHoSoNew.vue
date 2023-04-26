@@ -146,12 +146,17 @@
                         </v-list-tile>
                         <v-list-tile>
                           <v-list-tile-title @click.stop="vgcaSignAction(itemFileView, index, 'issued')">
-                            <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU
+                            <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
                           </v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile>
                           <v-list-tile-title @click.stop="vgcaSignAction(itemFileView, index, 'income')">
-                            <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ VĂN BẢN
+                            <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                          </v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile>
+                          <v-list-tile-title @click.stop="vgcaSignAction(itemFileView, index, 'copy')">
+                            <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
                           </v-list-tile-title>
                         </v-list-tile>
                       </v-list>
@@ -228,12 +233,17 @@
                         </v-list-tile>
                         <v-list-tile>
                           <v-list-tile-title @click.stop="vgcaSignAction(itemFileView, index, 'issued')">
-                            <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU
+                            <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
                           </v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile>
                           <v-list-tile-title @click.stop="vgcaSignAction(itemFileView, index, 'income')">
-                            <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ VĂN BẢN
+                            <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                          </v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile>
+                          <v-list-tile-title @click.stop="vgcaSignAction(itemFileView, index, 'copy')">
+                            <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
                           </v-list-tile-title>
                         </v-list-tile>
                       </v-list>
@@ -334,6 +344,13 @@
                         <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
                         <v-icon color="white" v-else>print</v-icon>&nbsp;
                         Xem
+                      </v-btn>
+                      <v-btn color="primary" @click.stop="exportDoc(item, index)" v-if="item.daKhai && item.hasForm && !item.embed"
+                        :disabled="loadingApacal"
+                      >
+                        <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
+                        <v-icon color="white" v-else>fas fa fa-file-word-o</v-icon>&nbsp;
+                        Tải xuống Word
                       </v-btn>
                       <v-btn color="primary" @click.stop="editFormAlpaca(item)" v-if="!item['editForm'] && item.hasForm && !onlyView && !item.embed">
                         <v-icon color="white">edit</v-icon>&nbsp;
@@ -504,7 +521,8 @@
                 <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ từ máy</span>
                 <span v-else>Tải giấy tờ từ máy (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
               </v-tooltip>
-              <v-tooltip class="pl-1 pt-1" top v-if="applicantId && partNoApplicantHasFile(item.partNo) && khoTaiLieuCongDan">
+              <!-- <v-tooltip class="pl-1 pt-1" top v-if="applicantId && partNoApplicantHasFile(item.partNo) && khoTaiLieuCongDan"> -->
+              <v-tooltip class="pl-1 pt-1" top v-if="applicantId && khoTaiLieuCongDan">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="showDocumentApplicant(item, index)">
                   <v-badge>
                     <v-icon size="20" color="orange darken-3">storage</v-icon>
@@ -637,7 +655,7 @@
           </v-btn>
         </v-toolbar>
         <v-card-text class="py-1" style="min-height: 350px">
-          <kho-tai-lieu ref="khotailieu" :index="applicantId" :fileTemplateNoScope="fileTemplateNoScope" :status="statusApplicantData" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorage"></kho-tai-lieu>
+          <kho-tai-lieu ref="khotailieu" :index="applicantId" :serverCode="!oneApp && originality == '1' ? thongTinHoSo.serverNo : ''" :fileTemplateNoScope="fileTemplateNoScope" :status="statusApplicantData" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorage"></kho-tai-lieu>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -701,7 +719,7 @@
                           <v-icon style="color: #fff !important">edit</v-icon> &nbsp;&nbsp; KÝ DUYỆT
                         </v-btn>
                         <v-btn small color="red" class="white--text" @click="vgcaSignAction (fileKySo, indexFileSelect, 'issued')">
-                          <v-icon style="color: #fff !important">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU
+                          <v-icon style="color: #fff !important">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
                         </v-btn>
                       </div>
                     </div>
@@ -1350,12 +1368,17 @@ export default {
     dialogInputMobile: false,
     loadingAction: false,
     kySoSavis: false,
-    kySoVnptSmartCa: false
+    kySoVnptSmartCa: false,
+    oneApp: false
   }),
   created () {
     let vm = this
     vm.receiveMessage = function (event) {
       vm.saveAlpacaFormCallBack(event)
+    }
+    try {
+      vm.oneApp = oneApp
+    } catch (error) {
     }
     try {
       vm.kySoVnptSmartCa = kySoVnptSmartCa
@@ -1494,6 +1517,21 @@ export default {
         vm.doChange[key] = ''
       }
       console.log('dossierTemplateItemsFilter222', vm.dossierTemplateItemsFilter)
+    },
+    dialog_documentApplicant (val) {
+      setTimeout(function () {
+        if (val) {
+          let myElements = document.querySelectorAll(".v-menu__content");
+          for (let i = 0; i < myElements.length; i++) {
+            myElements[i].style.position = 'fixed';
+          }
+        } else {
+          let myElements = document.querySelectorAll(".v-menu__content")
+          for (let i = 0; i < myElements.length; i++) {
+            myElements[i].style.position = 'absolute';
+          }
+        }
+      }, 300)
     }
   },
   methods: {
@@ -1831,7 +1869,7 @@ export default {
                 template['passRequired'] = false
               }
             } else {
-              if (itemFindEfomAttack && template['multiple']) {
+              if (itemFindEfomAttack && ((template['hasForm'] && template['multiple']) || !template['hasForm'])) {
                 template['passRequired'] = true
               } else {
                 template['passRequired'] = false
@@ -2674,6 +2712,19 @@ export default {
       }
       
     },
+    exportDoc (item) {
+      let vm = this
+      let fileExport = vm.dossierFilesItems.find(function (file) {
+        return file.dossierPartNo == item.partNo && file.eForm
+      })
+      let filter = {
+        dossierId: vm.thongTinHoSo.dossierId,
+        referenceUid: fileExport.referenceUid,
+        document: item.partName
+      }
+      vm.$store.dispatch('exportDoc', filter).then(function (result) {
+      }).catch(function (){})
+    },
     deleteSingleFileEform (item, index) {
       var vm = this
       let x = confirm('Bạn có chắc chắn xóa file?')
@@ -3264,7 +3315,8 @@ export default {
       let filter = {
         dossierId: vm.thongTinHoSo.dossierId,
         applicantIdNo: applicantIdNo,
-        fileTemplateNo: fileTemplateNo
+        fileTemplateNo: fileTemplateNo,
+        serverCode: vm.thongTinHoSo.serverNo
       }
       if (applicantIdNo) {
         if (!vm.khoTaiLieuCongDan) {
@@ -3275,12 +3327,22 @@ export default {
           })
         } else {
           filter['templateNo'] = vm.thongTinHoSo.dossierTemplateNo
-          vm.$store.dispatch('getDossierFilesApplicantsVer2', filter).then(result => {
-            vm.dossierFilesApplicant = result
-            console.log('hasFile', vm.dossierFilesApplicant)
-          }).catch(reject => {
-            console.log('error')
-          })
+          if (vm.oneApp || vm.originality == 3) {
+            vm.$store.dispatch('getDossierFilesApplicantsVer2', filter).then(result => {
+              vm.dossierFilesApplicant = result
+              console.log('hasFile', vm.dossierFilesApplicant)
+            }).catch(reject => {
+              console.log('error')
+            })
+          } else {
+            vm.$store.dispatch('getDossierFilesApplicantsVer2Proxy', filter).then(result => {
+              vm.dossierFilesApplicant = result
+              console.log('hasFile', vm.dossierFilesApplicant)
+            }).catch(reject => {
+              console.log('error')
+            })
+          }
+          
         }
       }
     },
@@ -3320,23 +3382,27 @@ export default {
     },
     partNoApplicantHasFile (partNo) {
       let vm = this
-      let hasFile = vm.dossierFilesApplicant.find(file => {
-        return file.partNo === partNo
-      })
-      // console.log('hasFile', hasFile)
-      if (hasFile && hasFile.hasOwnProperty('applicantDataModels') && hasFile.applicantDataModels) {
-        let fileArr = Array.isArray(hasFile.applicantDataModels) ? hasFile.applicantDataModels : [hasFile.applicantDataModels]
-        console.log('fileArrApplicant', fileArr)
-        let hasFileStatus1 = fileArr.find(file => {
-          return file.status == 1
+      try {
+        let hasFile = vm.dossierFilesApplicant.find(file => {
+          return file.partNo === partNo
         })
-        console.log('hasFileStatus1', hasFileStatus1)
-        if (hasFileStatus1) {
-          return true
+        // console.log('hasFile', hasFile)
+        if (hasFile && hasFile.hasOwnProperty('applicantDataModels') && hasFile.applicantDataModels) {
+          let fileArr = Array.isArray(hasFile.applicantDataModels) ? hasFile.applicantDataModels : [hasFile.applicantDataModels]
+          console.log('fileArrApplicant', fileArr)
+          let hasFileStatus1 = fileArr.find(file => {
+            return file.status == 1
+          })
+          console.log('hasFileStatus1', hasFileStatus1)
+          if (hasFileStatus1) {
+            return true
+          } else {
+            return false
+          }
         } else {
           return false
         }
-      } else {
+      } catch (error) {
         return false
       }
     },
@@ -3388,14 +3454,12 @@ export default {
     },
     attachFileFromStorage (data) {
       let vm = this
-      var originUrl = 'http://' + window.location.hostname;
-      var originUrl2 = 'https://' + window.location.hostname;
-      let filePath = data.filePath.replace(originUrl,"").replace(originUrl2,"")
+      let filePath = new URL(data.filePath)
       let filter = {
         dossierId: vm.thongTinHoSo.dossierId,
         dossierTemplateNo: vm.thongTinHoSo.dossierTemplateNo,
         partNo: vm.dossierPartAttach.partNo,
-        filePath: filePath,
+        filePath: filePath.pathname,
         fileName: data.fileName,
         fileType: data.fileExtension,
         fileEntryId: data.fileEntryId,
@@ -3459,7 +3523,8 @@ export default {
     },
     showDocumentApplicant (part, index) {
       let vm = this
-      vm.fileTemplateNoScope = part.fileTemplateNo
+      // vm.fileTemplateNoScope = part.fileTemplateNo
+      vm.fileTemplateNoScope = ''
       vm.statusApplicantData = 1
       vm.dossierPartAttach = part
       vm.indexPart = index
@@ -3568,8 +3633,10 @@ export default {
         vgca_sign_approved(json_prms, signFileCallBack)
       } else if (typeSign === 'issued') {
         vgca_sign_issued(json_prms, signFileCallBack)
-      } else {
+      } else if (typeSign === 'income') {
         vgca_sign_income(json_prms, signFileCallBack)
+      } else {
+        vgca_sign_copy(json_prms, signFileCallBack)
       }
 
     },

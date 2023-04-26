@@ -32,7 +32,8 @@ export default {
     //
     checkOpinion: true,
     validFileUpload: true,
-    fileTypeAllow: ['png', 'jpg', 'jpeg', 'pdf', 'docx', 'doc', 'xls', 'xlsx', 'txt', 'rtf']
+    fileTypeAllow: ['png', 'jpg', 'jpeg', 'pdf', 'docx', 'doc', 'xls', 'xlsx', 'txt', 'rtf'],
+    currentUserId: window.themeDisplay.getUserId()
   }),
   computed: {
     loading () {
@@ -45,12 +46,12 @@ export default {
   watch: {
     classPK (val) {
       var vm = this
-      vm.$store.dispatch('loadUsersComment', val).then(result => {
-        vm.usersComment = result
-        vm.initComment()
-      }).catch(reject => {
-        vm.initComment()
-      })
+      // vm.$store.dispatch('loadUsersComment', val).then(result => {
+      //   vm.usersComment = result
+      //   vm.initComment()
+      // }).catch(reject => {
+      //   vm.initComment()
+      // })
     }
   },
   created () {
@@ -75,12 +76,6 @@ export default {
       var vm = this
       if (vm.classPK) {
         vm.initComment()
-        // vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
-        //   vm.usersComment = result
-        //   vm.initComment()
-        // }).catch(reject => {
-        //   vm.initComment()
-        // })
       }
     },
     validateFile (data) {
@@ -370,6 +365,9 @@ export default {
       vm.comment.pings = comment.pings.toString().split(',')
       vm.comment.createdDate = vm.comment.createDate
       vm.comment.modifiedDate = vm.comment.modifiedDate
+      if (comment.userId == vm.currentUserId) {
+        vm.comment.createdByCurrentUser = true
+      }
     },
     dateTimeView (arg) {
       if (arg) {

@@ -145,7 +145,13 @@
                 <template slot="label">Số bộ hồ sơ</template>
               </v-text-field>
             </v-flex>
-
+            <v-flex xs12 sm6 class="mb-2 pl-2"></v-flex>
+            <v-flex xs12 sm6>
+              <v-switch class="" label="Công dân nộp hồ sơ" v-model="forCitizen"></v-switch>
+            </v-flex>
+            <v-flex xs12 sm6>
+              <v-switch class="" label="Doanh nghiệp nộp hồ sơ" v-model="forBusiness"></v-switch>
+            </v-flex>
             <!--  -->
           </v-layout>
           <v-flex xs12 class="text-right pr-3" style="
@@ -216,6 +222,8 @@ export default {
     registerBookList: [],
     registerBookCode: '',
     sampleCount: '',
+    forCitizen: false,
+    forBusiness: false,
     cmOptions: {
       tabSize: 4,
       mode: 'text/html',
@@ -417,6 +425,8 @@ export default {
           vm.instructionNote = processOptionFilter.instructionNote
           vm.submissionNote = processOptionFilter.submissionNote
           vm.sampleCount = processOptionFilter.sampleCount
+          vm.forCitizen = processOptionFilter.forCitizen
+          vm.forBusiness = processOptionFilter.forBusiness
           vm.registerBookCode = processOptionFilter.hasOwnProperty('registerBookCode') ? processOptionFilter['registerBookCode'] : ''
           vm.reRender = false
           setTimeout(function() {
@@ -439,6 +449,8 @@ export default {
         instructionNote: vm.instructionNote,
         submissionNote: vm.submissionNote,
         sampleCount: vm.sampleCount,
+        forCitizen: vm.forCitizen,
+        forBusiness: vm.forBusiness,
         registerBookCode: vm.registerBookCode,
         type: type
       }

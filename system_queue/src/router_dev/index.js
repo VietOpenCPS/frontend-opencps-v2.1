@@ -12,7 +12,7 @@ const routes = [
   { path: '/danh-sach-cho-tiep-nhan', name: 'DanhSachChoTiepNhan', component: DanhSachChoTiepNhan, props: true },
   { path: '/dieu-hanh-xep-hang', name: 'DieuHanhXepHang', component: DieuHanhXepHang, props: true },
   { path: '/so-dang-goi', name: 'GoiSo', component: GoiSo, props: true },
-  { path: '/lay-so-tu-dong', name: 'LaySoTuDong', component: LaySoTuDong, props: true },
+  { path: '/123456789qwertyuiop', name: 'LaySoTuDong', component: LaySoTuDong, props: true },
   {
     path: '/danh-sach-ho-so/:index',
     name: 'Landing',

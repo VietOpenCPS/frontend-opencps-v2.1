@@ -163,7 +163,12 @@
           <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
             <td class="text-xs-center text-bold py-2" width="70px">
               <div>
-                <span>{{props.index + 1}}</span><br>
+                <span>{{props.item.count}}</span><br>
+              </div>
+            </td>
+            <td v-if="!bookingMethodSelected" class="text-xs-center text-bold py-2" width="150px">
+              <div>
+                <span>{{convertDate(props.item.checkinDate)}}</span>
               </div>
             </td>
             <td class="text-xs-center text-bold py-2" width="150px">
@@ -349,6 +354,11 @@ export default {
     headers: [
       {
         text: 'Thứ tự',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Thời gian checkin',
         align: 'center',
         sortable: false
       },
@@ -994,6 +1004,14 @@ export default {
       vm.$store.dispatch('updateGateNumber', filter).then(function (result) {
         vm.getBookingCalling()
       })
+    },
+    convertDate (arg) {
+      if (arg) {
+        let value = new Date(Number(arg))
+        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}:${value.getSeconds().toString().padStart(2, '0')}`
+      } else {
+        return ''
+      }
     },
     getCurrentDate: function () {
       let date = new Date()

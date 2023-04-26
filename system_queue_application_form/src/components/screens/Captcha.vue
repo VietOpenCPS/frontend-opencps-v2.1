@@ -1,5 +1,5 @@
 <template>
-  <v-layout row wrap>
+  <v-layout row wrap class="mx-0">
     <v-flex xs12 class="py-2" style="
       display: flex;
       align-items: center;
@@ -31,7 +31,6 @@ export default {
   },
   data: () => ({
     j_captcha_response: '',
-    chapchablob: '',
     options: {},
     arrCaptcha: [],
     captcha: '',
@@ -45,6 +44,9 @@ export default {
   computed: {
     loading () {
       return this.$store.getters.loading
+    },
+    chapchablob () {
+      return this.$store.getters.getChapchablob
     }
   },
   created () {
@@ -56,11 +58,11 @@ export default {
   methods: {
     makeImageCap () {
       var vm = this
-      vm.chapchablob = ''
       vm.$store.dispatch('makeImageCap').then(function (result) {
-        vm.chapchablob = result
+        // vm.chapchablob = result
+        vm.$store.commit('setChapchablob', result)
       }).catch(function (reject) {
-        vm.chapchablob = ''
+        vm.$store.commit('setChapchablob', '')
       })
     },
     makeRandomString () {

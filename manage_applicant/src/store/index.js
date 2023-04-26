@@ -212,7 +212,8 @@ export const store = new Vuex.Store({
               status: filter.status,
               keyword: filter.keywordSearch ? filter.keywordSearch : '',
               applicantDataType: filter.applicantDataType ? filter.applicantDataType : '',
-              fileNo: filter.fileNoSearch
+              fileNo: filter.fileNoSearch,
+              dossierNo: filter.dossierNoSearch
             }
           }
 
@@ -237,6 +238,21 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    deleteDocument ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let url = '/o/rest/v2/applicantdatas/' + filter['applicantDataId']
+        axios.delete(url, param).then(result1 => {
+          resolve(result1)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
     getApplicantDocumentFromDvc ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -253,7 +269,8 @@ export const store = new Vuex.Store({
             status: filter.status,
             keyword: filter.keywordSearch ? filter.keywordSearch : '',
             applicantDataType: filter.applicantDataType ? filter.applicantDataType : '',
-            fileNo: filter.fileNoSearch
+            fileNo: filter.fileNoSearch,
+            dossierNo: filter.dossierNoSearch
           }
           let dataPost = new URLSearchParams()
           let textPost = params

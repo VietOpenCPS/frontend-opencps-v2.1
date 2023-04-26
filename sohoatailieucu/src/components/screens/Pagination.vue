@@ -2,6 +2,16 @@
   <div>
     <div v-if="!isMobile" style="text-align: left;position: absolute;line-height: 46px">Tổng số <span class="text-bold primary--text">{{total}}</span> {{nameRecord}} </div>
     <div v-if="total > 0" class="vue-tiny-pagination pagination layout" :style="!isMobile ? 'justify-content: flex-end; -webkit-justify-content: flex-end;' : ''">
+      <div v-if="showLimit" class="pr-2 flex" style="width:120px">
+        Số giấy tờ mỗi trang:
+      </div>
+      <div v-if="showLimit" class="pr-3 xs4 sm2 flex" style="max-width: 70px !important;">
+        <v-autocomplete
+          v-bind:items="limits"
+          v-model="numberPerPage"
+          @input="onLimitChange"
+        ></v-autocomplete>
+      </div>
       <div :class="!isMobile ? 'px-3 xs4 flex' : 'pr-3 xs4 flex'">
         <v-select
           v-bind:items="totalPagesData"
@@ -70,7 +80,7 @@ export default {
     limits: {
       type: Array,
       default () {
-        return [10, 15, 20, 50, 100]
+        return [10, 30, 50, 100]
       }
     },
     showLimit: {
@@ -178,6 +188,10 @@ export default {
     },
     onLimitChange () {
       this.currentPage = 1
+      this.$emit('tiny:change-page', {
+        page: 1,
+        numberPerPage: this.numberPerPage
+      })
     }
   }
 }
