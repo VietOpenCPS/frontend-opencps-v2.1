@@ -94,21 +94,28 @@ export const store = new Vuex.Store({
     getDanhSachCauHoi ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId
+          var settings = {
+            "url": "/o/rest/v2/nps/pakn",
+            "method": "GET",
+            "headers": {
+              "groupId": window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : '',
+              "Content-Type": "application/x-www-form-urlencoded",
+              "Accept": "application/json",
             },
-            params: {
-              trangHienTai: filter.page,
-              soBanGhiMoiTrang: filter.itemsPerPage,
-              keyword: filter.tukhoa
+            "data": {
+              "trangHienTai": filter.page,
+              "soBanGhiMoiTrang": filter.itemsPerPage,
+              "keyword": filter.tukhoa
             }
-          }
-          axios.get('/o/rest/v2/nps/pakn', param).then(function (response) {
-            let serializable = response.data
-            resolve(serializable)
-          }).catch(function (error) {
-            console.log(error)
+          };
+          
+          $.ajax(settings).done(function (response) {
+            if (response) {
+              resolve(response)
+            } else {
+              resolve("")
+            }
+          }).fail(function (error) {
             reject(error)
           })
         })

@@ -51,7 +51,7 @@
     <div>
       <div class="row-header no__hidden_class">
         <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
-          <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
+          <span>DANH SÁCH DỊCH VỤ CÔNG</span>
         </div>
         <div class="layout row wrap header_tools row-blue" v-if="!isMobile">
           <div class="flex text-right" style="margin-left: auto;max-width: 340px;">
@@ -64,7 +64,7 @@
                     hide-details
                   >
                     <template slot="label">
-                      <div class="white--text">THỦ TỤC NỘP GẦN ĐÂY</div>
+                      <div class="white--text">DỊCH VỤ CÔNG NỘP GẦN ĐÂY</div>
                     </template>
                   </v-checkbox>
                 </v-chip>
@@ -180,9 +180,9 @@
                 </v-flex>
                 <v-flex xs12 sm3 class="mb-2 px-2">
                   <div>
-                    <div class="d-inline-block text-bold" style="font-weight:450;width: 100px;">Mã thủ tục:</div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 100px;">Mã dịch vụ công:</div>
                     <v-text-field
-                      placeholder="Nhập mã thủ tục"
+                      placeholder="Nhập mã dịch vụ công"
                       v-model="serviceCodeFilter"
                       class="search-input-appbar input-search d-inline-block"
                       style="width: calc(100% - 100px);"
@@ -198,9 +198,9 @@
                 </v-flex>
                 <v-flex xs12 class="mb-2 px-2">
                   <div>
-                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Tên thủ tục :</div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 200px;">Tên dịch vụ công :</div>
                     <v-text-field
-                      placeholder="Nhập tên thủ tục"
+                      placeholder="Nhập tên dịch vụ công"
                       v-model="serviceNameKey"
                       class="search-input-appbar input-search d-inline-block"
                       style="width: calc(100% - 200px);"
@@ -268,7 +268,7 @@
                 icon="info"
                 outline
               >
-                  Không có thủ tục nào
+                  Không có dịch vụ công nào
               </v-alert>
             </div>
           </v-card>
@@ -315,14 +315,14 @@
                 icon="info"
                 outline
               >
-                  Không có thủ tục nào
+                  Không có dịch vụ công nào
               </v-alert>
             </div>
           </v-card>
           <div class="my-2" v-if="serviceConfigListRender.length > 0 && !serviceLastest">
             <div class="text-xs-right layout wrap" style="position: relative;">
               <div class="flex pagging-table px-2"> 
-                <tiny-pagination :total="serviceTotal" :page="agencyPage" :numberPerPage="numberPerPage" nameRecord="thủ tục" custom-class="custom-tiny-class" 
+                <tiny-pagination :total="serviceTotal" :page="agencyPage" :numberPerPage="numberPerPage" nameRecord="dịch vụ công" custom-class="custom-tiny-class" 
                   @tiny:change-page="changePage" ></tiny-pagination> 
               </div>
             </div>
@@ -331,7 +331,7 @@
           <div class="my-2" v-if="serviceInfoLastestList.length > 0 && serviceLastest">
             <div class="text-xs-right layout wrap" style="position: relative;">
               <div class="flex pagging-table px-2"> 
-                <tiny-pagination :total="serviceLastestTotal" :page="serviceLastestPage" :numberPerPage="numberPerPage" nameRecord="thủ tục" custom-class="custom-tiny-class" 
+                <tiny-pagination :total="serviceLastestTotal" :page="serviceLastestPage" :numberPerPage="numberPerPage" nameRecord="dịch vụ công" custom-class="custom-tiny-class" 
                   @tiny:change-page="changePageServiceLastest" ></tiny-pagination> 
               </div>
             </div>

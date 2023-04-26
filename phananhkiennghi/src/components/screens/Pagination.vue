@@ -1,6 +1,6 @@
 <template>
   <div style="margin-top: 20px">
-    <div :style="!viewMobile ? 'text-align: left;position: absolute;line-height: 46px;' : ''">Tổng số <span class="text-bold primary--text">{{total}}</span>. </div>
+    <div v-if="total > 0" :style="!viewMobile ? 'text-align: left;position: absolute;line-height: 46px;' : ''">Tổng số <span class="text-bold primary--text">{{total}}</span>. </div>
     <div v-if="total > 0" class="vue-tiny-pagination pagination layout" :style="!viewMobile ? 'justify-content: flex-end; -webkit-justify-content: flex-end;' : ''">
       <div :class="!viewMobile ? 'px-3 xs4 flex' : 'pr-3 xs4 flex'">
         <v-autocomplete

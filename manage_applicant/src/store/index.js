@@ -238,6 +238,21 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    deleteDocument ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let url = '/o/rest/v2/applicantdatas/' + filter['applicantDataId']
+        axios.delete(url, param).then(result1 => {
+          resolve(result1)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
     getApplicantDocumentFromDvc ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {

@@ -485,14 +485,14 @@
                         <td width="200" class="pt-2"><span class="text-bold">Tôn giáo</span></td>
                         <td class="pt-2"><span>{{getTenDanhMuc(applicantLgspInfomation.TonGiao, 'tongiao')}}</span></td>
                       </tr>
-                      <tr v-if="diaChiThuongTruTraCuuQr">
+                      <tr>
                         <td width="200" class="pt-2"><span class="text-bold">Địa chỉ thường trú</span></td>
                         <td class="pt-2">
                           <span>{{applicantLgspInfomation.ThuongTru.ChiTiet}}</span>
                           <span>, {{diaChiThuongTruTraCuuQr}}</span>
                         </td>
                       </tr>
-                      <tr v-if="noiOHienTaiTraCuuQr">
+                      <tr>
                         <td width="200" class="pt-2"><span class="text-bold">Nơi ở hiện tại</span></td>
                         <td class="pt-2">
                           <span>{{noiOHienTaiTraCuuQr}}</span>
@@ -507,19 +507,19 @@
                         <td class="pt-2"><span>{{getTinhTrangHonNhan(applicantLgspInfomation.TinhTrangHonNhan)}}</span></td>
                       </tr>
 
-                      <tr v-if="applicantLgspInfomation.TinhTrangHonNhan == '2'">
+                      <tr>
                         <td width="200" class="pt-2"><span class="text-bold">Họ và tên vợ/ chồng</span></td>
                         <td class="pt-2"><span>{{applicantLgspInfomation.VoChong.HoVaTen}}</span></td>
                       </tr>
-                      <tr v-if="applicantLgspInfomation.TinhTrangHonNhan == '2'">
+                      <tr>
                         <td width="200" class="pt-2"><span class="text-bold">Quốc tịch</span></td>
                         <td class="pt-2"><span>{{applicantLgspInfomation.VoChong.QuocTich == 'VN' ? 'Việt Nam' : applicantLgspInfomation.VoChong.QuocTich}}</span></td>
                       </tr>
-                      <tr v-if="applicantLgspInfomation.TinhTrangHonNhan == '2'">
+                      <tr>
                         <td width="200" class="pt-2"><span class="text-bold">Số định danh cá nhân/ CCCD</span></td>
                         <td class="pt-2"><span>{{applicantLgspInfomation.VoChong.SoDinhDanh}}</span></td>
                       </tr>
-                      <tr v-if="applicantLgspInfomation.TinhTrangHonNhan == '2'">
+                      <tr>
                         <td width="200" class="pt-2"><span class="text-bold">Số chứng minh nhân dân</span></td>
                         <td class="pt-2"><span>{{applicantLgspInfomation.VoChong.SoCMND}}</span></td>
                       </tr>

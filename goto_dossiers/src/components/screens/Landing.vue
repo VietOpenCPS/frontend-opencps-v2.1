@@ -32,6 +32,28 @@
                     ></v-autocomplete>
                   </div>
                 </v-flex>
+                <v-flex xs12 class="mb-3 px-2" v-if="siteTrungTam && agencyFilter.hasOwnProperty('hasChildrenSite')">
+                  <div>
+                    <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">{{ agencyFilter.labelGroup }}:</div>
+                    <v-autocomplete
+                      placeholder="Chọn"
+                      class="select-search d-inline-block"
+                      style="width: calc(100% - 130px)"
+                      :items="agencyChildrenList"
+                      v-model="agencyChildrenFilter"
+                      item-text="text"
+                      item-value="code"
+                      hide-details
+                      hide-no-data
+                      solo
+                      flat
+                      height="32"
+                      min-height="32"
+                      return-object
+                      clearable
+                    ></v-autocomplete>
+                  </div>
+                </v-flex>
                 <v-flex xs12 class="mb-3 px-2" v-if="agencyFilter && agencyFilter.hasOwnProperty('parent')">
                   <div>
                     <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Đơn vị xã, phường:</div>
@@ -734,7 +756,9 @@
           class: 'ketqua_column'
         }
       ],
-      requestCount: 0
+      requestCount: 0,
+      agencyChildrenList: [],
+      agencyChildrenFilter: ''
     }),
     components: {
       'tiny-pagination': TinyPagination
@@ -777,6 +801,16 @@
         vm.dossierSelected = []
         vm.loadingTable = true
         vm.numberPerPage = vm.limitRecord
+        let agencyCode = vm.agencyFilter ? vm.agencyFilter['code'] : ''
+        if (vm.agencyFilterXa) {
+          agencyCode = vm.agencyFilterXa['itemCode']
+        }
+        if (vm.agencyChildrenFilter) {
+          agencyCode = vm.agencyChildrenFilter['code']
+        }
+        if (vm.agencyFilter.hasOwnProperty('hasChildrenSite') && !vm.agencyChildrenFilter) {
+          agencyCode = ''
+        }
         let params = {
           groupId: vm.groupIdDonVi,
           dossierNo: vm.dossierNoKey,
@@ -788,7 +822,7 @@
           service: vm.serviceFilter ? vm.serviceFilter : '',
           start: vm.dossierPage * vm.numberPerPage - vm.numberPerPage,
           end: vm.dossierPage * vm.numberPerPage,
-          agency: vm.agencyFilterXa ? vm.agencyFilterXa['itemCode'] : (vm.agencyFilter ? vm.agencyFilter['code'] : '')
+          agency: agencyCode
         }
         vm.$store.dispatch('getDossiers', params).then(res => {
           vm.loadingTable = false
@@ -1000,6 +1034,17 @@
             vm.agencyListXa = []
             vm.agencyFilterXa = ''
           }
+          if (vm.agencyFilter.hasOwnProperty('hasChildrenSite')) {
+            let arr = []
+            vm.agencyList.forEach(element => {
+              if (element.value == vm.agencyFilter['value']) {
+                arr.push(element)
+              }
+            });
+            vm.agencyChildrenList = arr
+          } else {
+            vm.agencyChildrenFilter = ''
+          }
         }, 200)
       },
       getServiceInfo () {
@@ -1041,6 +1086,15 @@
           vm.agencyList = agency
           vm.agencyFilter = vm.agencyList[0]
           vm.groupIdDonVi = vm.agencyFilter['value']
+          if (vm.agencyFilter.hasOwnProperty('hasChildrenSite')) {
+            let arr = []
+            vm.agencyList.forEach(element => {
+              if (element.value == vm.agencyFilter['value']) {
+                arr.push(element)
+              }
+            });
+            vm.agencyChildrenList = arr
+          }
           vm.getServiceInfo()
         }).catch(function (xhr) {
         })

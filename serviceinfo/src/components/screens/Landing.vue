@@ -1090,11 +1090,13 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
+      console.log('oldRoute', oldRoute)
+      console.log('newRoute', newRoute)
       if (currentQuery.hasOwnProperty('setAgency')) {
         vm.setAgency = true
       }
       vm.domainListCurrent = []
-      if ((currentQuery.hasOwnProperty('agency') && currentQuery['agency']) || vm.index) {
+      if ((currentQuery.hasOwnProperty('agency') && currentQuery['agency']) || (vm.index && vm.index !== 'thu-tuc-hanh-chinh')) {
         let filterDomain = {
           agencyCode: currentQuery['agency']
         }

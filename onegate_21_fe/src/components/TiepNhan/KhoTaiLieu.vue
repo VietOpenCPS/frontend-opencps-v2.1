@@ -146,7 +146,7 @@
           </v-flex>
           <v-flex xs12 sm6 class="px-0 pr-3">
             <v-autocomplete
-              :items="fileTemplateListSeach"
+              :items="fileTemplateListSearch"
               v-model="fileTemplateNo"
               label="Chọn loại giấy tờ"
               item-text="partName"
@@ -390,9 +390,13 @@ export default {
     serviceInfoSearch: '',
     optionListSearch: [],
     optionSearch: '',
-    fileTemplateListSeach: [],
+    fileTemplateListSearch: [],
     fileTemplateNo: '',
     dossierNoSearch: '',
+    ortherFileTemplate: {
+      fileTemplateNo: 'GIAY_TO_KHAC',
+      partName: 'Giấy tờ dùng chung'
+    },
   }),
   computed: {
     originality () {
@@ -416,6 +420,12 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      if (ortherFileTemplateConfig) {
+        vm.ortherFileTemplate = ortherFileTemplateConfig
+      }
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
@@ -432,6 +442,7 @@ export default {
       vm.getApplicantDocument()
       // vm.getFileItems()
       vm.getServiceInfoItems()
+      vm.fileTemplateListSearch = [vm.ortherFileTemplate]
     },
     getApplicantInfos () {
       let vm = this
@@ -528,7 +539,7 @@ export default {
         }
         vm.optionList = []
         vm.optionCreate = ''
-        vm.fileTemplateList = []
+        vm.fileTemplateListSearch = [vm.ortherFileTemplate]
         vm.fileTemplateNoCreate = ''
       }).catch(function () {
       })
@@ -542,7 +553,7 @@ export default {
           vm.optionListSearch = []
         }
         vm.optionSearch = ''
-        vm.fileTemplateListSeach = []
+        vm.fileTemplateListSearch = []
         vm.fileTemplateNo = ''
         if (vm.optionListSearch && vm.optionListSearch.length === 1) {
           vm.optionSearch = vm.optionListSearch[0]
@@ -554,18 +565,20 @@ export default {
           }
           vm.$store.dispatch('getDossierPart', filter).then(function (result) {
             if (result.hasOwnProperty('dossierParts')) {
-              vm.fileTemplateListSeach = result.dossierParts
+              vm.fileTemplateListSearch = result.dossierParts
               vm.fileTemplateNo = ''
             } else {
-              vm.fileTemplateListSeach = []
+              vm.fileTemplateListSearch = []
             }
-            if (vm.fileTemplateListSeach && vm.fileTemplateListSeach.length === 1) {
-              vm.fileTemplateNo = vm.fileTemplateListSeach[0]
+            vm.fileTemplateListSearch.push(vm.ortherFileTemplate)
+            if (result.hasOwnProperty('dossierParts') && result.dossierParts.length === 1) {
+              vm.fileTemplateNo = vm.fileTemplateListSearch[0]
             }
           }).catch(function () {
+            vm.fileTemplateListSearch = [vm.ortherFileTemplate]
           })
         } else {
-          vm.fileTemplateListSeach = []
+          vm.fileTemplateListSearch = [vm.ortherFileTemplate]
           vm.fileTemplateNo = ''
         }
       }, 200)
@@ -579,18 +592,20 @@ export default {
           }
           vm.$store.dispatch('getDossierPart', filter).then(function (result) {
             if (result.hasOwnProperty('dossierParts')) {
-              vm.fileTemplateListSeach = result.dossierParts
+              vm.fileTemplateListSearch = result.dossierParts
               vm.fileTemplateNo = ''
             } else {
-              vm.fileTemplateListSeach = []
+              vm.fileTemplateListSearch = []
             }
-            if (vm.fileTemplateListSeach && vm.fileTemplateListSeach.length === 1) {
-              vm.fileTemplateNo = vm.fileTemplateListSeach[0]
+            vm.fileTemplateListSearch.push(vm.ortherFileTemplate)
+            if (result.hasOwnProperty('dossierParts') && result.dossierParts.length === 1) {
+              vm.fileTemplateNo = vm.fileTemplateListSearch[0]
             }
           }).catch(function () {
           })
         } else {
           vm.fileTemplateList = []
+          vm.fileTemplateListSearch = [vm.ortherFileTemplate]
           vm.fileTemplateNoCreate = ''
         }
       }, 200)

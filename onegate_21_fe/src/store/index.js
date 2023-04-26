@@ -5,7 +5,6 @@ import axios from 'axios'
 import support from './support.json'
 import $ from 'jquery'
 import saveAs from 'file-saver'
-import parseString from'xml2js'
 // 
 
 Vue.use(toastr)
@@ -19,7 +18,6 @@ export const store = new Vuex.Store({
     initData: support.initData,
     groupIdSite: '',
     endPointApi: '/o/rest/v2',
-    // endPointApi: 'http://127.0.0.1:8080/api',
     loading: false,
     loadingTable: false,
     loadingDynamicBtn: false,
@@ -737,6 +735,11 @@ export const store = new Vuex.Store({
           if (data.dossierTemplateNo) {
             axios.get(state.initData.dossierTemplatesApi + '/' + data.dossierTemplateNo, param).then(function (response) {
               let serializable = response.data
+              let maxSizeFileUpload = ''
+              try {
+                maxSizeFileUpload = maxSizeFileUploadConfig
+              } catch (error) {
+              }
               let jsonParse = function (string) {
                 try {
                   JSON.parse(string)
@@ -744,7 +747,7 @@ export const store = new Vuex.Store({
                 } catch (e) {
                   let partTip = {
                     tip: string,
-                    maxSize: 100,
+                    maxSize: maxSizeFileUpload ? maxSizeFileUpload : 100,
                     extensions: state.fileTypeAllowDefault
                   }
                   return partTip
@@ -784,6 +787,11 @@ export const store = new Vuex.Store({
           }
           axios.get(state.initData.dossierTemplatesApi + '/' + data.dossierTemplateNo, param).then(function (response) {
             let serializable = response.data
+            let maxSizeFileUpload = ''
+            try {
+              maxSizeFileUpload = maxSizeFileUploadConfig
+            } catch (error) {
+            }
             let jsonParse = function (string) {
               try {
                 JSON.parse(string)
@@ -791,7 +799,7 @@ export const store = new Vuex.Store({
               } catch (e) {
                 let partTip = {
                   tip: string,
-                  maxSize: 100,
+                  maxSize: maxSizeFileUpload ? maxSizeFileUpload : 100,
                   extensions: state.fileTypeAllowDefault
                 }
                 return partTip

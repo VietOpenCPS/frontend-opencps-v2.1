@@ -674,7 +674,7 @@
             </v-btn>
           </v-tab>
           <v-tab :key="2" href="#tabs-2b" 
-            v-if="(originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || originality === 3"
+            v-if="(viewTraoDoiCanBoCongDan && originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || (originality === 3)"
           >
             <v-btn flat class="px-0 py-0 mx-0 my-0">
               TRAO ĐỔI
@@ -757,9 +757,9 @@
               </div>
             </v-tab-item>
             <v-tab-item value="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition"
-              v-if="(originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || originality === 3"
+              v-if="(viewTraoDoiCanBoCongDan && originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || (originality === 3)"
             >
-              <div v-if="thongTinChiTietHoSo.online && !thongTinChiTietHoSo.originDossierNo">
+              <div v-if="viewTraoDoiCanBoCongDan && thongTinChiTietHoSo.online && !thongTinChiTietHoSo.originDossierNo">
                 <v-expansion-panel :value="[true]" expand  class="expansion-pl">
                   <v-expansion-panel-content hide-actions :key="1">
                     <div slot="header">
@@ -1257,6 +1257,7 @@ export default {
     removeInvoice: false,
     removeInvoiceGroupPayment: false,
     showKySoDocument: false,
+    viewTraoDoiCanBoCongDan: true,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -1390,6 +1391,12 @@ export default {
     }
     try {
       vm.viewTienTrinhDvc = viewTienTrinhDvc
+    } catch (error) {
+    }
+    try {
+      if (traoDoiCanBoCongDan !== undefined) {
+        vm.viewTraoDoiCanBoCongDan = traoDoiCanBoCongDan
+      }
     } catch (error) {
     }
     window.toastr = toastr
@@ -1526,7 +1533,7 @@ export default {
     initData (data) {
       var vm = this
       vm.dossierId = data
-      vm.activeTab2 = 'tabs-2b'
+      vm.activeTab2 = vm.originality == 3 || (vm.originality == 1 && vm.viewTraoDoiCanBoCongDan) ? 'tabs-2b' : 'tabs-3b'
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
         if (vm.thongTinChiTietHoSo.hasOwnProperty('dossierSyncState') && String(vm.thongTinChiTietHoSo.dossierSyncState) === '1') {
@@ -1580,6 +1587,8 @@ export default {
         }
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'new') {
           vm.activeTab2 = 'tabs-3b'
+        }
+        if (vm.activeTab2 === 'tabs-3b') {
           vm.loadDossierLogs()
         }
         if (vm.originality === 3) {

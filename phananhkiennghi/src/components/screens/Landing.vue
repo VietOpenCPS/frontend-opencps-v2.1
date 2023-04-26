@@ -47,13 +47,12 @@
             </v-btn>
           </v-col>
         </v-row>
-        <div>
+        <div v-if="!loadingData && itemsCauHoi.length">
           <div v-for="item in itemsCauHoi" :key="item.Id" class="item" style="
             padding-top: 15px;
             padding-bottom: 15px;
             position: relative;
             padding-left: 140px;
-            position: relative;
             min-height: 100px;
             border-bottom: 1px solid #dde8f3;
             cursor: pointer;
@@ -64,8 +63,7 @@
               <div href="" class="d-inline-block" style="width: 100px;
                 height: 100px;
                 position: absolute;
-                left: 0px
-                top: 0px;
+                left: 0px;
                 background: transparent;
                 border-radius: 50%;
                 display: flex !important;
@@ -74,10 +72,11 @@
                 <v-icon size="36" style="color: #658a04 !important">question_answer</v-icon>
               </div>
               <div class="post-info" style="font-size: 16px; color: #666;  margin-bottom: 7px;">
-                <span>{{item.HoTenNguoiGui}} -  {{item.ThoiGianGui}}</span>
-                <span :style="item.TrangThai == '1' ? 'color: #FFAB00; margin-left: 30px;' : 'color: green; margin-left: 30px;'">
+                <span style="font-weight: 600;">{{item.Ten}} </span>
+                <span> -  {{convertDate(item.NgayGuiPAKN)}}</span>
+                <!-- <span :style="item.TrangThai == '1' ? 'color: #FFAB00; margin-left: 30px;' : 'color: green; margin-left: 30px;'">
                   {{item.TrangThai == '1' ? 'Chưa trả lời' : 'Đã trả lời'}}
-                </span>
+                </span> -->
               </div>
               <h3 class="post-title" style="margin: 0px;  margin-bottom: 5px; font-size: 18px;">
                 <p style="text-align: left; display: block; font-weight: 500; line-height: 26px;">
@@ -96,10 +95,17 @@
                 -webkit-box-orient: vertical;
                 overflow: hidden;
                 text-overflow: ellipsis;" class="post-shortdesc">
-                Nội dung kiến nghị: {{item.NoiDungKienNghi}}
+                <span style="font-weight: 500;">Nội dung kiến nghị: </span>{{item.NoiDungPAKN}}
               </p>
             </div>
           </div>
+        </div>
+        <div v-if="!loadingData && !itemsCauHoi.length" style="display: flex; justify-content: center; align-items: center; height: 100px;">
+          <span style="font-size: 16px;">KHÔNG CÓ PHẢN ÁNH KIẾN NGHỊ</span>
+        </div>
+        <div v-if="loadingData" style="display: flex; justify-content: center; align-items: center; height: 300px;flex-direction: column;">
+          <div class="mb-3" style="font-size: 16px;">Đang tải ...</div>
+          <v-progress-linear :indeterminate="true" color="#658a04" style="max-width: 500px;"></v-progress-linear>
         </div>
         <pagination :pageInput="page-1" :pageCount="pageCount" :total="total" @tiny:change-page="changePage"></pagination>
       </div>
@@ -138,7 +144,8 @@
                 text-align: justify;
             ">{{selected.TieuDe}}</div>
             <div style="font-size: 16px; color: #666; margin-bottom: 7px;"> 
-              <span>{{selected.HoTenNguoiGui}} -  {{selected.ThoiGianGui}}</span>
+              <span style="font-weight: 600;">{{selected.Ten}} </span>
+              <span> - {{convertDate(selected.NgayGuiPAKN)}}</span>
             </div>
             <div class="item" style="
               padding-top: 15px;
@@ -150,11 +157,10 @@
               border-bottom: 1px solid #E9F0F8;"
             >
               <div class="">
-                <div href="" class="d-inline-block" style="width: 80px;
-                  height: 80px;
+                <div href="" class="d-inline-block" style="width: 70px;
+                  height: 70px;
                   position: absolute;
-                  left: 0px
-                  top: 0px;
+                  left: 0px;
                   background: #fbecd6;
                   border-radius: 50%;
                   display: flex !important;
@@ -169,7 +175,7 @@
                   </p>
                 </div>
                 <p style="text-align: justify; margin-bottom: 5px;font-size: 16px;" class="post-shortdesc">
-                  {{selected.NoiDungKienNghi}}
+                  {{selected.NoiDungPAKN}}
                 </p>
               </div>
             </div>
@@ -183,16 +189,7 @@
               border-bottom: 1px solid #E9F0F8;"
             >
               <div class="">
-                <div href="" class="d-inline-block" style="width: 80px;
-                  height: 80px;
-                  position: absolute;
-                  left: 0px
-                  top: 0px;
-                  background: #e5eadb;
-                  border-radius: 50%;
-                  display: flex !important;
-                  align-items: center;
-                  justify-content: center;">
+                <div href="" class="d-inline-block" style="width: 70px;height: 70px;position: absolute;left: 0px;background: rgb(251, 236, 214);border-radius: 50%;display: flex !important;align-items: center;justify-content: center;">
                   <v-icon size="36" style="color: #7c964c !important">question_answer</v-icon>
                 </div>
 
@@ -211,7 +208,7 @@
                 <v-icon left style="color: #fff !important;">
                   close
                 </v-icon>
-                Thoát
+                Quay lại
               </v-btn>
             </div>
           </v-card-text>
@@ -238,41 +235,13 @@
     data: () => ({
       dialogTraLoi: false,
       loadingData: false,
-      itemsCauHoi: [
-        {
-          Id: 1,
-          HoTenNguoiGui: "Nguyễn Văn Nam",
-          ThoiGianGui: "12:30 20/08/2022",
-          TrangThai: 1,
-          TieuDe: "Đèn đường trước cửa số nhà 120 đường 30/4 không hoạt động",
-          NoiDungKienNghi: "Người dân phản ánh đèn đường trước cửa số nhà 120 đường 30/4, phường 1, TP Cao Lãnh bị hư lâu không thấy chiếu sáng nhưng chưa được sửa chữa. Nhờ cơ quan chức năng hỗ trợ xử lý giúp!",
-          NoiDungTraLoi: "Tiếp nhận thông tin phản ánh từ người dân, trong ngày 23/12/2022 Ban Quản lý công trình công cộng thành phố đã khắc phục, sửa chữa xong đèn chiếu sáng ngay số 120 đường 30/4, Phường 1, Thành phố Cao Lãnh.  "
-        },
-        {
-          Id: 2,
-          HoTenNguoiGui: "Nguyễn Văn Bắc",
-          ThoiGianGui: "08:30 23/09/2022",
-          TrangThai: 1,
-          TieuDe: "Thủ tục kết hôn trong nước",
-          NoiDungKienNghi: "Cho hỏi thủ tục kết hôn trong nước cần những giấy tờ gì và thời gian giải quyết đăng ký trong bao lâu?",
-          NoiDungTraLoi: "Tiếp nhận thông tin phản ánh từ người dân, trong ngày 23/12/2022 Ban Quản lý công trình công cộng thành phố đã khắc phục, sửa chữa xong đèn chiếu sáng ngay số 120 đường 30/4, Phường 1, Thành phố Cao Lãnh.  "
-        },
-        {
-          Id: 3,
-          HoTenNguoiGui: "Nguyễn Văn Nam",
-          ThoiGianGui: "12:30 20/08/2022",
-          TrangThai: 1,
-          TieuDe: "Đèn đường trước cửa số nhà 120 đường 30/4 không hoạt động",
-          NoiDungKienNghi: "Người dân phản ánh đèn đường trước cửa số nhà 120 đường 30/4, phường 1, TP Cao Lãnh bị hư lâu không thấy chiếu sáng nhưng chưa được sửa chữa. Nhờ cơ quan chức năng hỗ trợ xử lý giúp!",
-          NoiDungTraLoi: "Tiếp nhận thông tin phản ánh từ người dân, trong ngày 23/12/2022 Ban Quản lý công trình công cộng thành phố đã khắc phục, sửa chữa xong đèn chiếu sáng ngay số 120 đường 30/4, Phường 1, Thành phố Cao Lãnh.  "
-        }
-      ],
+      itemsCauHoi: [],
       selected: '',
       keywordSearch: '',
       page: 1,
       itemsPerPage: 10,
-      total: 15,
-      pageCount: 2
+      total: 0,
+      pageCount: 0
     }),
     created () {
       let vm = this
@@ -295,24 +264,20 @@
         }
         vm.loadingData = true
         let filter = {
-          data: {
-            page: vm.page,
-            tukhoa: String(vm.keywordSearch).trim(),
-            itemsPerPage: vm.itemsPerPage
-          },
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            // Authorization: "Bearer " + vm.$cookies.get('Token', '')
-          }
+          page: vm.page,
+          tukhoa: String(vm.keywordSearch).trim(),
+          itemsPerPage: vm.itemsPerPage
         }
         vm.$store.dispatch('getDanhSachCauHoi', filter).then(function (response) {
           vm.loadingData = false
-          vm.itemsCauHoi = response.data
-          vm.total = response.recordsTotal
+          vm.itemsCauHoi = response.hasOwnProperty('DanhSachPAKNCongKhai') && response.DanhSachPAKNCongKhai ? response.DanhSachPAKNCongKhai : []
+          vm.total = response.DanhSachPAKNCongKhai && response.DanhSachPAKNCongKhai.length ? Number(response.DanhSachPAKNCongKhai[0]['TongSo']) : 0
           vm.pageCount = Math.ceil(vm.total / vm.itemsPerPage)
         }).catch(function () {
           vm.loadingData = false
+          vm.itemsCauHoi = []
+          vm.total = 0
+          vm.pageCount = 0
         })
       },
       showTraLoi (item) {
@@ -337,6 +302,13 @@
           let arg = String(val).replace(/\(/g, "").replace(/\)/g, "").replace(/Date/g, "").replace(/\//g, "")
           let value = new Date(Number(arg))
           return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()}  ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+        } else {
+          return ''
+        }
+      },
+      convertDate (val) {
+        if (val) {
+          return `${val.slice(6,8)}/${val.slice(4,6)}/${val.slice(0,4)}  ${val.slice(8,10)}:${val.slice(10,12)}:${val.slice(12,14)}`
         } else {
           return ''
         }
